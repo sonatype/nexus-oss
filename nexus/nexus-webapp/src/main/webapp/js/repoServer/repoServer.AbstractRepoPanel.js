@@ -320,6 +320,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
           var statusResp = Ext.decode(response.responseText);
           if (statusResp.data) {
             if ( statusResp.data.allowWrite ) {
+              if ( ! this.formCards ) {
+                this.formCards = this.cardPanel;
+              }
+                
               var oldItem = this.formCards.getLayout().activeItem;
               this.formCards.remove(oldItem, true);
               
@@ -334,8 +338,8 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
                 frame: true,
                 items: [ new Sonatype.repoServer.FileUploadPanel({
                   title: 'Artifact Upload to ' + rec.get('name'),
-                  repoPanel: this,
-                  repoRecord: rec
+//                  repoPanel: this,
+                  payload: rec
                 }) ]
               });
               this.formCards.insert(1, panel);

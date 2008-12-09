@@ -20,12 +20,17 @@
  */
 Sonatype.repoServer.FileUploadPanel = function(config){
   var config = config || {};
-  var defaultConfig = {autoScroll:true};
+  var defaultConfig = {
+    autoScroll:true
+  };
   Ext.apply(this, config, defaultConfig);
 
   var ht = Sonatype.repoServer.resources.help.artifact;
 
-  var packagingStore = new Ext.data.SimpleStore({fields:['value'], data:[['pom'], ['jar'], ['ejb'], ['war'], ['ear'], ['rar'], ['par'], ['maven-archetype'], ['maven-plugin']]});
+  var packagingStore = new Ext.data.SimpleStore( {
+    fields: ['value'], 
+    data: [['pom'], ['jar'], ['ejb'], ['war'], ['ear'], ['rar'], ['par'], ['maven-archetype'], ['maven-plugin']]
+  } );
 
   this.pomMode = true;
 
@@ -47,178 +52,176 @@ Sonatype.repoServer.FileUploadPanel = function(config){
 
   this.pomCard = 'pomCard';
   this.attributeCard = 'attributeCard';
-  this.cardPanel = new Ext.Panel(
-    {
-      xtype: 'panel',
-      columnWidth: .8,
-      layout: 'card',
-      activeItem: this.pomCard, 
-      items: [
-           {
-               xtype: 'fieldset',
-               id: this.pomCard,
-               labelWidth: 80,
-               checkboxToggle:false,
-               collapsed: false,
-               collapsible: false,
-               autoHeight:true,
-               layoutConfig: {
-                 labelSeparator: ''
-               },
-               items: [
-                 {
-                      xtype: 'panel',
-                      layout: 'column',
-                      style: 'padding-bottom:4px',
-                      hideLabel: true,
-                      items: [
-                        {
-                            xtype: 'label',
-                            text: 'POM',
-                            width: 84
-                        },
-                        this.pomnameField,
-                        {
-                          xtype: 'browsebutton',
-                          text: 'Browse...',
-                          columnWidth: .2,
-                          uploadPanel: this,
-                          handler: function( b ) {
-                            b.uploadPanel.pomInput = b.detachInputFile(); 
-                            var filename = b.uploadPanel.pomInput.getValue();
-                            b.uploadPanel.pomnameField.setRawValue( filename );
-                            b.uploadPanel.updateUploadButton( b.uploadPanel );
-                          }
-                        }
-                      ]
-                 },
-                 {
-                   xtype: 'textfield',
-                   fieldLabel: 'Classifier',
-                   helpText: ht.classifier,
-                   anchor: Sonatype.view.FIELD_OFFSET,
-                   name: 'pomc',
-                   allowBlank:true
-                 },
-                 {
-                   xtype: 'textfield',
-                   fieldLabel: 'Extension',
-                   helpText: ht.extension,
-                   anchor: Sonatype.view.FIELD_OFFSET,
-                   name: 'pome',
-                   allowBlank:true
-                 }
-               ] 
+  this.cardPanel = new Ext.Panel( {
+    xtype: 'panel',
+    columnWidth: .8,
+    layout: 'card',
+    activeItem: this.pomCard, 
+    items: [
+      {
+        xtype: 'fieldset',
+        id: this.pomCard,
+        labelWidth: 80,
+        checkboxToggle:false,
+        collapsed: false,
+        collapsible: false,
+        autoHeight:true,
+        layoutConfig: {
+          labelSeparator: ''
         },
-        {
-          xtype: 'fieldset',
-          labelWidth: 80,
-          checkboxToggle:false,
-          collapsed: false,
-          collapsible: false,
-          autoHeight:true,
-          id: this.attributeCard,
-          layoutConfig: {
-            labelSeparator: ''
+        items: [
+          {
+            xtype: 'panel',
+            layout: 'column',
+            style: 'padding-bottom:4px',
+            hideLabel: true,
+            items: [
+              {
+                xtype: 'label',
+                text: 'POM',
+                width: 84
+              },
+              this.pomnameField,
+              {
+                xtype: 'browsebutton',
+                text: 'Browse...',
+                columnWidth: .2,
+                uploadPanel: this,
+                handler: function( b ) {
+                  b.uploadPanel.pomInput = b.detachInputFile(); 
+                  var filename = b.uploadPanel.pomInput.getValue();
+                  b.uploadPanel.pomnameField.setRawValue( filename );
+                  b.uploadPanel.updateUploadButton( b.uploadPanel );
+                }
+              }
+            ]
           },
-          items: [
-            {
-              xtype: 'checkbox',
-              fieldLabel: 'Auto Guess',
-              checked: true,
-              name: 'autoguess',
-              helpText: ht.autoguess,
-              listeners: {
-                'check': {
-                  fn: function( checkbox, value ) {
-                    this.updateFilename( this );
-                  },
-                  scope: this
-                }
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Classifier',
+            helpText: ht.classifier,
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'pomc',
+            allowBlank:true
+          },
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Extension',
+            helpText: ht.extension,
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'pome',
+            allowBlank:true
+          }
+        ] 
+      },
+      {
+        xtype: 'fieldset',
+        labelWidth: 80,
+        checkboxToggle:false,
+        collapsed: false,
+        collapsible: false,
+        autoHeight:true,
+        id: this.attributeCard,
+        layoutConfig: {
+          labelSeparator: ''
+        },
+        items: [
+          {
+            xtype: 'checkbox',
+            fieldLabel: 'Auto Guess',
+            checked: true,
+            name: 'autoguess',
+            helpText: ht.autoguess,
+            listeners: {
+              'check': {
+                fn: function( checkbox, value ) {
+                  this.updateFilename( this );
+                },
+                scope: this
               }
-            },
-            {
-              xtype: 'textfield',
-              fieldLabel: 'Group',
-              itemCls: 'required-field',
-              helpText: ht.groupId,
-              anchor: Sonatype.view.FIELD_OFFSET,
-              name: 'g',
-              allowBlank: false
-            },
-            {
-              xtype: 'textfield',
-              fieldLabel: 'Artifact',
-              itemCls: 'required-field',
-              helpText: ht.artifactId,
-              anchor: Sonatype.view.FIELD_OFFSET,
-              name: 'a',
-              allowBlank:false
-            },
-            {
-              xtype: 'textfield',
-              fieldLabel: 'Version',
-              itemCls: 'required-field',
-              helpText: ht.version,
-              anchor: Sonatype.view.FIELD_OFFSET,
-              name: 'v',
-              allowBlank: false,
-              uploadPanel: this,
-              validator: function( v ){
-                var isSnapshotVersion = /-SNAPSHOT$/.test( v ) || /LATEST$/.test( v ) || /^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$/.test( v );
-                var isSnapshotRepo = this.uploadPanel.repoRecord.get( 'repoPolicy' ) == 'snapshot';
-                if ( isSnapshotRepo ) {
-                  if ( ! isSnapshotVersion ) {
-                    return 'You cannot upload a release version into a snapshot repository';
-                  }
-                }
-                else {
-                  if ( isSnapshotVersion ) {
-                    return 'You cannot upload a snapshot version into a release repository';
-                  }
-                }
-                return true;
-              }
-            },
-            {
-              xtype: 'combo',
-              fieldLabel: 'Packaging',
-              itemCls: 'required-field',
-              helpText: ht.packaging,
-              store: packagingStore,
-              displayField: 'value',
-              editable: true,
-              forceSelection: false,
-              mode: 'local',
-              triggerAction: 'all',
-              emptyText: 'Select...',
-              selectOnFocus: true,
-              allowBlank: false,
-              name: 'p',
-              width: 150,
-              listWidth: 150
-            },
-            {
-              xtype: 'textfield',
-              fieldLabel: 'Classifier',
-              helpText: ht.classifier,
-              anchor: Sonatype.view.FIELD_OFFSET,
-              name: 'c',
-              allowBlank:true
-            },
-            {
-              xtype: 'textfield',
-              fieldLabel: 'Extension',
-              helpText: ht.extension,
-              anchor: Sonatype.view.FIELD_OFFSET,
-              name: 'e',
-              allowBlank:true
             }
-          ]
-        }
-      ]
-    }
-  );
+          },
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Group',
+            itemCls: 'required-field',
+            helpText: ht.groupId,
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'g',
+            allowBlank: false
+          },
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Artifact',
+            itemCls: 'required-field',
+            helpText: ht.artifactId,
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'a',
+            allowBlank:false
+          },
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Version',
+            itemCls: 'required-field',
+            helpText: ht.version,
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'v',
+            allowBlank: false,
+            uploadPanel: this,
+            validator: function( v ){
+              var isSnapshotVersion = /-SNAPSHOT$/.test( v ) || /LATEST$/.test( v ) || /^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$/.test( v );
+              var isSnapshotRepo = this.uploadPanel.payload.data.repoPolicy == 'snapshot';
+              if ( isSnapshotRepo ) {
+                if ( ! isSnapshotVersion ) {
+                  return 'You cannot upload a release version into a snapshot repository';
+                }
+              }
+              else {
+                if ( isSnapshotVersion ) {
+                  return 'You cannot upload a snapshot version into a release repository';
+                }
+              }
+              return true;
+            }
+          },
+          {
+            xtype: 'combo',
+            fieldLabel: 'Packaging',
+            itemCls: 'required-field',
+            helpText: ht.packaging,
+            store: packagingStore,
+            displayField: 'value',
+            editable: true,
+            forceSelection: false,
+            mode: 'local',
+            triggerAction: 'all',
+            emptyText: 'Select...',
+            selectOnFocus: true,
+            allowBlank: false,
+            name: 'p',
+            width: 150,
+            listWidth: 150
+          },
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Classifier',
+            helpText: ht.classifier,
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'c',
+            allowBlank:true
+          },
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Extension',
+            helpText: ht.extension,
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'e',
+            allowBlank:true
+          }
+        ]
+      }
+    ]
+  } );
 
   Sonatype.repoServer.FileUploadPanel.superclass.constructor.call(this, {
     autoScroll: true,
@@ -228,6 +231,8 @@ Sonatype.repoServer.FileUploadPanel = function(config){
     collapsible: false,
     collapsed: false,
     fileUpload: true,
+    width: '100%',
+    height: '100%',
     layoutConfig: {
       labelSeparator: ''
     },
@@ -236,7 +241,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
       {
         xtype: 'hidden',
         name: 'r',
-        value: this.repoRecord.id
+        value: this.payload.id
       },
       {
         xtype: 'fieldset',
@@ -339,11 +344,9 @@ Sonatype.repoServer.FileUploadPanel = function(config){
         scope: this
       },
       {
-        text: 'Cancel',
+        text: 'Reset',
         handler: function() {
-          if ( this.repoPanel ) {
-            this.repoPanel.viewRepo( this.repoRecord );
-          }
+          this.form.reset();
         },
         scope: this
       }
@@ -373,15 +376,9 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
   },
 
   createUploadForm: function() {
-    var repoId = this.repoRecord.id;
+    var repoId = this.payload.id;
     repoId = repoId.substring( repoId.lastIndexOf( '/' ) + 1 );
 
-//    var authTokenTag = {
-//      tag: 'input',
-//      type: 'hidden',
-//      name: 'NexusAuthToken',
-//      value: Sonatype.user.curr.authToken
-//    };
     var repoTag = {
       tag: 'input',
       type: 'hidden',
@@ -396,7 +393,6 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
       children:
         this.pomMode ?
           [
-//            authTokenTag,
             repoTag,
             {
               tag: 'input',
@@ -419,7 +415,6 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
           ]
         :
           [
-//            authTokenTag,
             repoTag,
             {
               tag: 'input',
@@ -606,3 +601,56 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
     uploadPanel.updateUploadButton( uploadPanel );
   }
 });
+
+Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
+  var sp = Sonatype.lib.Permissions;
+  
+  if ( sp.checkPermission( 'nexus:artifact', sp.CREATE ) &&
+      rec.data.repoType == 'hosted' && rec.data.repoPolicy == 'release' ) {
+    
+    Ext.Ajax.request({
+      url: rec.data.resourceURI,
+      scope: this,
+      callback: function( options, success, response ) {
+        if ( success ) {
+          var statusResp = Ext.decode( response.responseText );
+          if ( statusResp.data ) {
+            if ( statusResp.data.allowWrite ) {
+              var uploadPanel = cardPanel.add( {
+                xtype: 'panel',
+                layout: 'fit',
+                tabTitle: 'Upload',
+                items: [ new Sonatype.repoServer.FileUploadPanel( { payload: rec } ) ]
+              } );
+              
+              uploadPanel.on( 'show', function( p ) {
+                p.doLayout();
+              } );
+            }
+            else {
+              cardPanel.add( {
+                xtype: 'panel',
+                tabTitle: 'Upload',
+                items: [
+                  {
+                    border: false,
+                    html: '<div class="little-padding">' +
+                      'Artifact deployment is disabled for ' + rec.data.name + '.<br /><br />' +
+                      'You can enable it in the "Access Settings" section of the ' +
+                      'repository configuration.</div>'
+                  }
+                ]
+              } );
+            }
+            
+            cardPanel.doLayout();
+            
+            return;
+          }
+        }
+        Sonatype.utils.connectionError( response,
+          'There was a problem obtaining repository status.' );
+      }
+    } );
+  }
+} );
