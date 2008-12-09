@@ -11,13 +11,13 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<!-- a unique name for this project -->
-	<artifactId>nexus-repository-convertion-tool</artifactId>
+	<artifactId>nexus-repository-conversion-tool</artifactId>
 
 	<!-- POM packaging -->
 	<packaging>jar</packaging>
 
 	<!-- a short but descriptive name for the project -->
-	<name>Nexus Repository Convertion Tool</name>
+	<name>Nexus Repository Conversion Tool</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
@@ -62,7 +62,7 @@
 				<configuration>
 					<descriptors>
 						<descriptor>
-							src/main/assembly/repository-convertion-cli-assembly.xml 
+							src/main/assembly/repository-conversion-cli-assembly.xml 
 						</descriptor>
 					</descriptors>
 					<archive>

@@ -41,7 +41,7 @@ public class RepositoryConvertorCli
 
     public static final String GROUP_ID = "org.sonatype.nexus.tools";
 
-    public static final String ARTIFACT_ID = "nexus-repository-convertion-tool";
+    public static final String ARTIFACT_ID = "nexus-repository-conversion-tool";
 
     // ----------------------------------------------------------------------------
     // Options
