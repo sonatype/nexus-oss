@@ -347,6 +347,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
         text: 'Reset',
         handler: function() {
           this.form.reset();
+          this.pomMode = true;
         },
         scope: this
       }
