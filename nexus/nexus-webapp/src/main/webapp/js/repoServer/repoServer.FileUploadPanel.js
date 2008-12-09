@@ -625,9 +625,12 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
               
               uploadPanel.on( 'show', function( p ) {
                 p.doLayout();
-                var b = p.find( 'xtype', 'browsebutton' );
-                for ( var i = 0; i < b.length; i++ ) {
-                  b[i].setClipSize();
+                if ( ! p.browseButtonsUpdated ) {
+                  var b = p.find( 'xtype', 'browsebutton' );
+                  for ( var i = 0; i < b.length; i++ ) {
+                    b[i].setClipSize();
+                  }
+                  p.browseButtonsUpdated = true;
                 }
               } );
             }
