@@ -68,8 +68,6 @@ public class AbstractNexusIntegrationTest
 
     private Map<String, Object> context;
 
-    private String basedir;
-
     private static boolean NEEDS_INIT = false;
 
     private static boolean NEEDS_HARD_STOP = false;
@@ -495,13 +493,13 @@ public class AbstractNexusIntegrationTest
 
         context = new HashMap<String, Object>();
 
-        context.put( "basedir", basedir );
+        context.put( "basedir", getBasedir() );
 
         boolean hasPlexusHome = context.containsKey( "plexus.home" );
 
         if ( !hasPlexusHome )
         {
-            File f = new File( basedir, "target/plexus-home" );
+            File f = new File( getBasedir(), "target/plexus-home" );
 
             if ( !f.isDirectory() )
             {
@@ -531,6 +529,18 @@ public class AbstractNexusIntegrationTest
             e.printStackTrace();
             fail( "Failed to create plexus container." );
         }
+    }
+
+    public static String getBasedir()
+    {
+        String basedir = System.getProperty( "basedir" );
+
+        if ( basedir == null )
+        {
+            basedir = new File( "" ).getAbsolutePath();
+        }
+
+        return basedir;
     }
 
     protected Object lookup( String componentKey )
