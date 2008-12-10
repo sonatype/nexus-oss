@@ -700,7 +700,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+			<!--plugin>
                 <groupId>com.google.code.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
                 <version>1.4.0</version>
@@ -716,7 +716,7 @@
 						<exclude>**/js/filetree/**</exclude>
 					</excludes>
                 </configuration>
-            </plugin>
+            </plugin-->
 		</plugins>
 		<pluginManagement>
 			<plugins>
