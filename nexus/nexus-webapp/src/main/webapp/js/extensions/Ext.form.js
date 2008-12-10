@@ -486,9 +486,9 @@ Sonatype.ext.FormPanel = function( config ) {
         disabled: config.readOnly
       },
       {
-        handler: this.cancelHandler,
+        handler: this.resetButton ? this.resetHandler : this.cancelHandler,
         scope: this,
-        text: 'Cancel'
+        text: this.resetButton ? 'Reset' : 'Cancel'
       }
     ]
   };
@@ -503,15 +503,7 @@ Sonatype.ext.FormPanel = function( config ) {
   this.form.on( 'actionfailed', this.actionFailedHandler, this );
   this.addEvents( { cancel: true, load: true, submit: true } );
 
-  if ( ! this.isNew ) {
-    this.form.doAction( 'sonatypeLoad', {
-      url: this.getActionURL(),
-      method: 'GET',
-      fpanel: this,
-      dataModifiers: this.dataModifiers.load,
-      scope: this
-    } );
-  }
+  this.loadData();
 };
 
 Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
@@ -543,6 +535,27 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
   
   cancelHandler: function( button, event ) {
     this.fireEvent( 'cancel', this );
+  },
+  
+  resetHandler: function( button, event ) {
+    if ( this.isNew ) {
+      this.form.reset();
+    }
+    else {
+      this.loadData();
+    }
+  },
+  
+  loadData: function() {
+    if ( ! this.isNew ) {
+      this.form.doAction( 'sonatypeLoad', {
+        url: this.getActionURL(),
+        method: 'GET',
+        fpanel: this,
+        dataModifiers: this.dataModifiers.load,
+        scope: this
+      } );
+    }
   },
   
   isValid: function() {
@@ -582,7 +595,7 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
   
   //(Ext.form.BasicForm, Ext.form.Action)
   actionCompleteHandler : function( form, action ) {
-    var receivedData = action.handleResponse(action.response).data;
+    var receivedData = action.handleResponse( action.response ).data;
     if ( action.type == 'sonatypeSubmit' ) {
       this.fireEvent( 'submit', form, action, receivedData );
       this.isNew = false;
@@ -597,5 +610,27 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
       ( this.payload.data.resourceURI ?  // if resouceURI is supplied, return it
           this.payload.data.resourceURI :
           this.uri + '/' + payload.id ); // otherwise construct a uri
+  },
+  
+  optionalFieldsetExpandHandler: function( panel ) {
+    panel.items.each( function( item, i, len ) {
+      if ( item.getEl().up( 'div.required-field', 3 ) ) {
+        item.allowBlank = false;
+      }
+      else if ( item.isXType( 'fieldset', true ) ) {
+        this.optionalFieldsetExpandHandler( item );
+      }
+    }, this );
+  },
+  
+  optionalFieldsetCollapseHandler : function( panel ) {
+    panel.items.each( function( item, i, len ) {
+      if ( item.getEl().up( 'div.required-field', 3 ) ) {
+        item.allowBlank = true;
+      }
+      else if ( item.isXType( 'fieldset', true ) ) {
+        this.optionalFieldsetCollapseHandler( item );
+      }
+    }, this );
   }
 });
