@@ -27,6 +27,9 @@ body {
   display:inline;
 }
 
+#logo SUP {
+	font-size: 10px;
+}
 
 #header div.right-side {
   float: right;
