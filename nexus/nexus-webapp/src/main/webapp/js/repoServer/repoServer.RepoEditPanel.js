@@ -1703,14 +1703,68 @@ Sonatype.repoServer.AbstractRepositoryEditor = function( config ) {
   var config = config || {};
   var defaultConfig = {
     uri: Sonatype.config.repos.urls.repositories,
-    resetButton: true
+    resetButton: true,
+    defaultTimeoutValues: {}
   };
   Ext.apply( this, config, defaultConfig );
-
+  
   Sonatype.repoServer.AbstractRepositoryEditor.superclass.constructor.call( this, {} );
 };
 
 Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel, {
+  repoPolicySelectHandler: function( combo, rec, index ) {
+    var repoPolicy = rec.data.value.toLowerCase();
+    var fields = ['notFoundCacheTTL', 'artifactMaxAge', 'metadataMaxAge'];
+  
+    if ( this.lastPolicy != repoPolicy ) {
+      if ( this.setBackExpValsFunc ) {
+        this.setBackExpValsFunc();
+      }
+      else {
+        var oldValues = {};
+        for ( var i = fields.length - 1; i >= 0; i-- ) {
+          var formField = this.form.findField( fields[i] );
+          if ( formField ) {
+            oldValues[fields[i]] = formField.getValue();
+          }
+        }
+  
+        this.setBackExpValsFunc = function() {
+          this.form.setValues( oldValues );
+          this.setBackExpValsFunc = null;
+        }.createDelegate( this );
+  
+        var repoType = this.form.findField( 'repoType' ).getValue();
+  
+        if ( this.defaultTimeoutValues[repoPolicy]) {
+          this.form.setValues( this.defaultTimeoutValues[repoPolicy] );
+        }
+        else {
+          Ext.Ajax.request( {
+            scope: this,
+            url: Sonatype.config.repos.urls.repoTemplate[repoType + '_' + repoPolicy],
+            callback: function( options, success, response ) {
+              if ( success ) {
+                var templateData = Ext.decode( response.responseText );
+                this.defaultTimeoutValues[repoPolicy] = {};
+                for ( var i = fields.length - 1; i >= 0; i-- ) {
+                  var formField = this.form.findField( fields[i] );
+                  if ( formField ) {
+                    this.defaultTimeoutValues[repoPolicy][fields[i]] = templateData.data[fields[i]];
+                  }
+                }
+                
+                this.form.setValues( this.defaultTimeoutValues[repoPolicy] );
+              }  
+            }
+          } );
+        }
+    
+      }
+  
+      this.lastPolicy = repoPolicy;
+    }
+  }
 } );
 
 Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
@@ -1756,13 +1810,13 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
       { name:'roleHint', sortType:Ext.data.SortTypes.asUCString }
     ],
     sortInfo: { field: 'roleHint', direction: 'asc' },
-    url: Sonatype.config.repos.urls.shadowRepoTypes,
+    url: Sonatype.config.repos.urls.repoTypes,
     autoLoad: true
   } );
 
   this.checkPayload();
 
-  Sonatype.repoServer.DefaultUserEditor.superclass.constructor.call( this, {
+  Sonatype.repoServer.HostedRepositoryEditor.superclass.constructor.call( this, {
     items: [
       {
         xtype: 'textfield',
@@ -1835,7 +1889,11 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
         triggerAction: 'all',
         emptyText: 'Select...',
         selectOnFocus: true,
-        allowBlank: false          
+        allowBlank: false,
+        listeners: {
+          select: this.repoPolicySelectHandler,
+          scope: this
+        }
       },
       {
         xtype: 'textfield',
@@ -1986,13 +2044,13 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
       { name:'roleHint', sortType:Ext.data.SortTypes.asUCString }
     ],
     sortInfo: { field: 'roleHint', direction: 'asc' },
-    url: Sonatype.config.repos.urls.shadowRepoTypes,
+    url: Sonatype.config.repos.urls.repoTypes,
     autoLoad: true
   } );
 
   this.checkPayload();
 
-  Sonatype.repoServer.DefaultUserEditor.superclass.constructor.call( this, {
+  Sonatype.repoServer.ProxyRepositoryEditor.superclass.constructor.call( this, {
     items: [
       {
         xtype: 'textfield',
@@ -2065,7 +2123,11 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
         triggerAction: 'all',
         emptyText: 'Select...',
         selectOnFocus: true,
-        allowBlank: false          
+        allowBlank: false,
+        listeners: {
+          select: this.repoPolicySelectHandler,
+          scope: this
+        }
       },
       {
         xtype: 'textfield',
@@ -2501,93 +2563,6 @@ Ext.extend( Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.Abstr
       // until we find a better solution for procurement repos
       this.buttons[0].disable();
     }
-    
-//    if ( repoType == 'hosted' || repoType == 'proxy' ) {
-//
-//      form.setBackExpValsFunc = null;
-//      
-//      var repoField = form.findField('repoPolicy');
-//      
-//      form.defaultTimeoutVals = this.defaultTimeoutVals; //put a reference on the form, so it's in scope
-//      
-//      //@todo: should not need to store this myself.  Maybe extend select event to provide a change bit
-//      form.lastPolicy = repoField.getValue();
-//      
-//      repoField.on('select', function(field, rec, index){  
-//          //note: scoped to form
-//          
-//          if (this.lastPolicy != field.getValue()){
-//            if (this.setBackExpValsFunc) {
-//              this.setBackExpValsFunc();
-//            }
-//            else {
-//              if (repoType == 'proxy') {
-//                var notFoundCacheTTL = this.findField('notFoundCacheTTL').getValue();
-//                var artifactMaxAge = this.findField('artifactMaxAge').getValue();
-//                var metadataMaxAge = this.findField('metadataMaxAge').getValue();
-//        
-//                this.setBackExpValsFunc = function(){
-//                  this.setValues({
-//                    notFoundCacheTTL : notFoundCacheTTL,
-//                    artifactMaxAge : artifactMaxAge,                
-//                    metadataMaxAge : metadataMaxAge
-//                  });
-//          
-//                  this.setBackExpValsFunc = null; //terminate self
-//                }.createDelegate(this);
-//              }
-//              else {
-//                var notFoundCacheTTL = this.findField('notFoundCacheTTL').getValue();
-//                
-//                this.setBackExpValsFunc = function(){
-//                  this.setValues({
-//                    notFoundCacheTTL : notFoundCacheTTL
-//                  });
-//          
-//                  this.setBackExpValsFunc = null; //terminate self
-//                }.createDelegate(this);
-//              }
-//          
-//              var repoType = this.findField('repoType').getValue();
-//              var repoPolicy = field.getValue().toLowerCase();
-//          
-//              if (this.defaultTimeoutVals[repoType + '_' + repoPolicy]) {
-//                this.setValues(this.defaultTimeoutVals[repoType + '_' + repoPolicy]);
-//              }
-//              else {
-//                Ext.Ajax.request({
-//                  scope: this, //this is the basic form
-//                  method: 'GET',
-//                  url: Sonatype.config.repos.urls.repoTemplate[repoType + '_' + repoPolicy],
-//                  callback: function(options, success, response){
-//                    if (success) {
-//                      var templateData = Ext.decode(response.responseText);
-//                      if (repoType == 'proxy') {
-//                        this.defaultTimeoutVals[repoType + '_' + repoPolicy] = {
-//                          notFoundCacheTTL : templateData.data.notFoundCacheTTL,
-//                          artifactMaxAge : templateData.data.artifactMaxAge,
-//                          metadataMaxAge : templateData.data.metadataMaxAge
-//                        };
-//                      }
-//                      else {
-//                        this.defaultTimeoutVals[repoType + '_' + repoPolicy] = {
-//                          notFoundCacheTTL : templateData.data.notFoundCacheTTL
-//                        };
-//                      }
-//                      
-//                      this.setValues(this.defaultTimeoutVals[repoType + '_' + repoPolicy]);
-//                    }  
-//                  }
-//                });
-//              }
-//          
-//            }
-//            this.lastPolicy = field.getValue();
-//          }
-//        },
-//        form
-//      );
-//    }
   }
 } );
 
@@ -2641,7 +2616,7 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
 
   this.checkPayload();
 
-  Sonatype.repoServer.DefaultUserEditor.superclass.constructor.call( this, {
+  Sonatype.repoServer.VirtualRepositoryEditor.superclass.constructor.call( this, {
     items: [
       {
         xtype: 'textfield',
