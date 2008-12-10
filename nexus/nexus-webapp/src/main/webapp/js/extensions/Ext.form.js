@@ -266,6 +266,10 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
       if (Ext.type(value) === 'object'){
         if (sVal){ //only write object serialization for non-root objects
           var fieldSet = Ext.getCmp(fpanel.id + '_' + sPrepend + sVal);
+          if ( ! fieldSet ) {
+            fieldSet = fpanel.find( 'name', 'fieldset_' + sPrepend + sVal )[0];
+          }
+
           if(fieldSet && fieldSet.collapsed){
             eval('accObj' + '.' + sPrepend + sVal + ' = null;');
             return; //skip recursive calls for children form items
