@@ -1,4 +1,4 @@
-ï»¿Sonatype NexusTM [Open Source Version].
+Sonatype NexusTM [Open Source Version].
 Copyright © 2008 Sonatype, Inc. All rights reserved.
 Includes the third-party code listed at ${thirdpartyurl}. 
 
