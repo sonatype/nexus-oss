@@ -403,6 +403,9 @@ Ext.extend(Ext.form.Action.sonatypeLoad, Ext.form.Action, {
       if (sVal){ //only write object serialization for non-root objects
         if(hasNonEmptyChildren){
           var fieldSet = Ext.getCmp(fpanel.id + '_' + sPrepend + sVal);
+          if ( ! fieldSet ) {
+            fieldSet = fpanel.find( 'name', 'fieldset_' + sPrepend + sVal )[0];
+          }
           if(fieldSet){
             fieldSet.expand(true);
           }

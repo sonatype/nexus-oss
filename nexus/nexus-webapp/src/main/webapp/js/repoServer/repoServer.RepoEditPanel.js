@@ -1208,7 +1208,7 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
     var formLayout = this.formCards.getLayout();
     var gridSelectModel = this.reposGridPanel.getSelectionModel();
     var store = this.reposGridPanel.getStore();
-    
+
     this.formCards.remove(formInfoObj.formPanel.id, true);
     //select previously selected form, or the default view (index == 0)
     var newIndex = this.formCards.items.length - 1;
@@ -1703,10 +1703,23 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
 });
 
 
-Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
+Sonatype.repoServer.AbstractRepositoryEditor = function( config ) {
   var config = config || {};
   var defaultConfig = {
     uri: Sonatype.config.repos.urls.repositories,
+    resetButton: true
+  };
+  Ext.apply( this, config, defaultConfig );
+
+  Sonatype.repoServer.AbstractRepositoryEditor.superclass.constructor.call( this, {} );
+};
+
+Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel, {
+} );
+
+Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
+  var config = config || {};
+  var defaultConfig = {
     dataModifiers: {
       load: {
         repoPolicy: Sonatype.utils.capitalize,
@@ -1723,13 +1736,11 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
         checksumPolicy: function() { return 'ignore'; }
       }
     },
-    resetButton: true
+    referenceData: Sonatype.repoServer.referenceData.repositoryState.hosted
   };
   Ext.apply( this, config, defaultConfig );
 
   var ht = Sonatype.repoServer.resources.help.repos;
-  
-  this.COMBO_WIDTH = 300;
 
   this.tfStore = new Ext.data.SimpleStore( {
     fields: ['value'],
@@ -1926,36 +1937,35 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
   } );
 };
 
-Ext.extend( Sonatype.repoServer.HostedRepositoryEditor, Sonatype.ext.FormPanel, {
+Ext.extend( Sonatype.repoServer.HostedRepositoryEditor, Sonatype.repoServer.AbstractRepositoryEditor, {
 } );
 
 Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
   var config = config || {};
   var defaultConfig = {
-    uri: Sonatype.config.repos.urls.repositories,
     dataModifiers: {
       load: {
         repoPolicy: Sonatype.utils.capitalize,
         allowWrite: Sonatype.utils.capitalize,
         browseable: Sonatype.utils.capitalize,
-        indexable: Sonatype.utils.capitalize
+        indexable: Sonatype.utils.capitalize,
+        downloadRemoteIndexes: Sonatype.utils.capitalize,
+        checksumPolicy: Sonatype.utils.capitalize
       },
       submit: { 
         repoPolicy: Sonatype.utils.lowercase,
         allowWrite: Sonatype.utils.convert.stringContextToBool,
         browseable: Sonatype.utils.convert.stringContextToBool,
         indexable: Sonatype.utils.convert.stringContextToBool,
-        downloadRemoteIndexes: function() { return false; },
-        checksumPolicy: function() { return 'ignore'; }
+        downloadRemoteIndexes: Sonatype.utils.convert.stringContextToBool,
+        checksumPolicy: Sonatype.utils.lowercaseFirstChar
       }
     },
-    resetButton: true
+    referenceData: Sonatype.repoServer.referenceData.repositoryState.proxy
   };
   Ext.apply( this, config, defaultConfig );
 
   var ht = Sonatype.repoServer.resources.help.repos;
-  
-  this.COMBO_WIDTH = 300;
 
   this.tfStore = new Ext.data.SimpleStore( {
     fields: ['value'],
@@ -2470,17 +2480,124 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
           }
         ]
       } // end proxy settings
-    ]
+    ],
+    listeners: {
+      load: {
+        fn: this.loadHandler,
+        scope: this
+      }
+    }
   } );
 };
 
-Ext.extend( Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.ext.FormPanel, {
+Ext.extend( Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.AbstractRepositoryEditor, {
+  loadHandler: function( form, action, receivedData ) {
+    var repoType = receivedData.repoType;
+    var repoPolicy = receivedData.repoPolicy;
+    
+    if ( repoType == 'proxy' &&! receivedData.remoteStorage.remoteStorageUrl
+        .match( REPO_REMOTE_STORAGE_REGEXP ) ) {
+      var rsUrl = this.form.findField( 'remoteStorage.remoteStorageUrl' );
+      rsUrl.disable();
+      rsUrl.clearInvalid();
+      
+      // Disable the editor - this is a temporary measure,
+      // until we find a better solution for procurement repos
+      this.buttons[0].disable();
+    }
+    
+//    if ( repoType == 'hosted' || repoType == 'proxy' ) {
+//
+//      form.setBackExpValsFunc = null;
+//      
+//      var repoField = form.findField('repoPolicy');
+//      
+//      form.defaultTimeoutVals = this.defaultTimeoutVals; //put a reference on the form, so it's in scope
+//      
+//      //@todo: should not need to store this myself.  Maybe extend select event to provide a change bit
+//      form.lastPolicy = repoField.getValue();
+//      
+//      repoField.on('select', function(field, rec, index){  
+//          //note: scoped to form
+//          
+//          if (this.lastPolicy != field.getValue()){
+//            if (this.setBackExpValsFunc) {
+//              this.setBackExpValsFunc();
+//            }
+//            else {
+//              if (repoType == 'proxy') {
+//                var notFoundCacheTTL = this.findField('notFoundCacheTTL').getValue();
+//                var artifactMaxAge = this.findField('artifactMaxAge').getValue();
+//                var metadataMaxAge = this.findField('metadataMaxAge').getValue();
+//        
+//                this.setBackExpValsFunc = function(){
+//                  this.setValues({
+//                    notFoundCacheTTL : notFoundCacheTTL,
+//                    artifactMaxAge : artifactMaxAge,                
+//                    metadataMaxAge : metadataMaxAge
+//                  });
+//          
+//                  this.setBackExpValsFunc = null; //terminate self
+//                }.createDelegate(this);
+//              }
+//              else {
+//                var notFoundCacheTTL = this.findField('notFoundCacheTTL').getValue();
+//                
+//                this.setBackExpValsFunc = function(){
+//                  this.setValues({
+//                    notFoundCacheTTL : notFoundCacheTTL
+//                  });
+//          
+//                  this.setBackExpValsFunc = null; //terminate self
+//                }.createDelegate(this);
+//              }
+//          
+//              var repoType = this.findField('repoType').getValue();
+//              var repoPolicy = field.getValue().toLowerCase();
+//          
+//              if (this.defaultTimeoutVals[repoType + '_' + repoPolicy]) {
+//                this.setValues(this.defaultTimeoutVals[repoType + '_' + repoPolicy]);
+//              }
+//              else {
+//                Ext.Ajax.request({
+//                  scope: this, //this is the basic form
+//                  method: 'GET',
+//                  url: Sonatype.config.repos.urls.repoTemplate[repoType + '_' + repoPolicy],
+//                  callback: function(options, success, response){
+//                    if (success) {
+//                      var templateData = Ext.decode(response.responseText);
+//                      if (repoType == 'proxy') {
+//                        this.defaultTimeoutVals[repoType + '_' + repoPolicy] = {
+//                          notFoundCacheTTL : templateData.data.notFoundCacheTTL,
+//                          artifactMaxAge : templateData.data.artifactMaxAge,
+//                          metadataMaxAge : templateData.data.metadataMaxAge
+//                        };
+//                      }
+//                      else {
+//                        this.defaultTimeoutVals[repoType + '_' + repoPolicy] = {
+//                          notFoundCacheTTL : templateData.data.notFoundCacheTTL
+//                        };
+//                      }
+//                      
+//                      this.setValues(this.defaultTimeoutVals[repoType + '_' + repoPolicy]);
+//                    }  
+//                  }
+//                });
+//              }
+//          
+//            }
+//            this.lastPolicy = field.getValue();
+//          }
+//        },
+//        form
+//      );
+//    }
+  }
 } );
 
 Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
   var config = config || {};
   var defaultConfig = {
-    uri: Sonatype.config.repos.urls.repositories,
     dataModifiers: {
       load: {
         syncAtStartup: Sonatype.utils.capitalize
@@ -2489,7 +2606,7 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
         syncAtStartup: Sonatype.utils.convert.stringContextToBool
       }
     },
-    resetButton: true
+    referenceData: Sonatype.repoServer.referenceData.repositoryState.virtual
   };
   Ext.apply( this, config, defaultConfig );
 
@@ -2625,14 +2742,7 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
   } );
 };
 
-Ext.extend( Sonatype.repoServer.VirtualRepositoryEditor, Sonatype.ext.FormPanel, {
-//  saveHandler: function( button, event ) {
-//    var password = this.form.getValues().password;
-//    this.referenceData = ( this.isNew && password ) ?
-//      Sonatype.repoServer.referenceData.userNew : Sonatype.repoServer.referenceData.users;
-//    
-//    return Sonatype.repoServer.DefaultUserEditor.superclass.saveHandler.call( this, button, event );
-//  }
+Ext.extend( Sonatype.repoServer.VirtualRepositoryEditor, Sonatype.repoServer.AbstractRepositoryEditor, {
 } );
 
 Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
