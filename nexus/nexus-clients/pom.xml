@@ -8,7 +8,7 @@
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-clients</artifactId>
   <packaging>pom</packaging>
-  <name>Nexus Clients (Parent)</name>
+  <name>Nexus Clients</name>
   <description />
   <modules>
   	<module>nexus-rest-client-java</module>

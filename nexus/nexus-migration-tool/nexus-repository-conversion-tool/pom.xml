@@ -17,7 +17,7 @@
 	<packaging>jar</packaging>
 
 	<!-- a short but descriptive name for the project -->
-	<name>Nexus Repository Conversion Tool</name>
+	<name>Nexus Tools: Repository Conversion Tool</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>

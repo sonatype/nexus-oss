@@ -17,7 +17,7 @@
 	<packaging>jar</packaging>
 
 	<!-- a short but descriptive name for the project -->
-	<name>Nexus Maven Metadata Rebuild Tool</name>
+	<name>Nexus Tools: Maven Metadata Rebuild Tool</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
