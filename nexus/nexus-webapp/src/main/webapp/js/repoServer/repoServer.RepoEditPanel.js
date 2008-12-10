@@ -1708,7 +1708,14 @@ Sonatype.repoServer.AbstractRepositoryEditor = function( config ) {
   };
   Ext.apply( this, config, defaultConfig );
   
-  Sonatype.repoServer.AbstractRepositoryEditor.superclass.constructor.call( this, {} );
+  Sonatype.repoServer.AbstractRepositoryEditor.superclass.constructor.call( this, {
+    listeners: {
+      submit: {
+        fn: this.submitHandler,
+        scope: this
+      }
+    }
+  } );
 };
 
 Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel, {
@@ -1764,6 +1771,21 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
   
       this.lastPolicy = repoPolicy;
     }
+  },
+
+  submitHandler: function( form, action, receivedData ) {
+    if ( this.isNew ) {
+      this.form.findField( 'id' ).disable();
+      this.form.findField( 'format' ).disable();
+    }
+    
+    var rec = this.payload;
+    rec.beginEdit();
+    rec.set( 'name', receivedData.name );
+    rec.set( 'repoType', receivedData.repoType );
+    rec.set( 'repoPolicy', receivedData.repoPolicy );
+    rec.commit();
+    rec.endEdit();
   }
 } );
 
@@ -2650,7 +2672,7 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
         helpText: ht.repoType,
         name: 'repoType',
         width: 100,
-        disabled: ! this.isNew,
+        disabled: true,
         allowBlank: false
       },
       {
