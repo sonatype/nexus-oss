@@ -58,6 +58,9 @@ Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
         } );
   
         Sonatype.panels.AutoTabPanel.superclass.add.call( this, this.tabPanel );
+        if ( this.getLayout() && this.getLayout().setActiveItem ) {
+          this.getLayout().setActiveItem( this.tabPanel );
+        }
       }
 
       if ( ! c.title && c.tabTitle ) {
