@@ -539,7 +539,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
       store.remove( store.getById(resourceId) );
     }
     else {
-      Sonatype.utils.connectionError( response, 'The server did not delete the user.', null, null, true );
+      Sonatype.utils.connectionError( response, 'The server did not delete the user.', null, null, false );
     }
   },
       

@@ -18,6 +18,7 @@ package org.sonatype.nexus.rest.users;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
+import org.jsecurity.SecurityUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -142,31 +143,47 @@ public class UserPlexusResource
     {
         try
         {
-            if ( !isAnonymousUser( getUserId( request ), request ) )
-            {
-                getNexusSecurity().deleteUser( getUserId( request ) );
-
-                response.setStatus( Status.SUCCESS_NO_CONTENT );
-            }
-            else
+            // not allowed to delete system Anonymous user
+            if ( isAnonymousUser( getUserId( request ), request ) )
             {
                 String error = "The user with user ID ["
                     + getUserId( request )
                     + "] cannot be deleted, since it is marked user used for Anonymous access in Server Administration. To delete this user, disable anonymous access or, change the anonymous username and password to another valid values!";
-                // i changed this to be an errorResponse, TODO: check if this is valid
-                // response.setEntity( new StringRepresentation( error, MediaType.TEXT_HTML ) );
 
                 getLogger()
                     .info(
                         "Anonymous user cannot be deleted! Unset the Allow Anonymous access first in Server Administration!" );
 
-                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, getNexusErrorResponse( "*", error ) );
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, error );
             }
+
+            // not allowed to delete the current user himself
+            if ( isCurrentUser( request ) )
+            {
+                String error = "The user with user ID [" + getUserId( request )
+                    + "] cannot be deleted, since you can't delete youself";
+
+                getLogger().info(
+                    "The user with user ID [" + getUserId( request )
+                        + "] cannot be deleted! He's trying to delete himself!" );
+
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, error );
+            }
+
+            getNexusSecurity().deleteUser( getUserId( request ) );
+
+            response.setStatus( Status.SUCCESS_NO_CONTENT );
+
         }
         catch ( NoSuchUserException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
         }
+    }
+    
+    protected boolean isCurrentUser( Request request )
+    {
+        return SecurityUtils.getSubject().getPrincipal().equals( getUserId( request ) );
     }
 
 }
