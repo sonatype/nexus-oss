@@ -104,7 +104,7 @@
 
 <div id="header">
   <div id="logo">
-    <span>Sonatype<sup>TM</sup> Nexus<sup>TM</sup></span>
+    <span>Sonatype&trade; Nexus&trade;</span>
   </div>
   <div class="right-side">
     <div><span id="username"></span><span id="login-link"></span></div>
