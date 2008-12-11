@@ -87,4 +87,14 @@ public interface NexusResourceBundle
      * @return
      */
     String getPostBodyContribution( Map<String, Object> context );
+    
+    /**
+     * A header logo contribution is an HTML snippet that will be appended to the logo in the header section of the index.html
+     * The snippet will be processed by Velocity, so it can be a Velocity template too. The context passed in may be
+     * modified by this bundle, and it will be finally used to evaluate the template returned by this call.
+     *  
+     * @param context
+     * @return
+     */
+    String getLogoContribution( Map<String, Object> context );
 }

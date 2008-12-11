@@ -104,7 +104,12 @@
 
 <div id="header">
   <div id="logo">
-    <span>Sonatype&trade; Nexus&trade;</span>
+    <span>
+      Sonatype&trade; Nexus&trade;
+      #foreach( $pluginLogoContribution in $pluginLogoContributions )
+        $pluginLogoContribution
+      #end
+    </span>
   </div>
   <div class="right-side">
     <div><span id="username"></span><span id="login-link"></span></div>
