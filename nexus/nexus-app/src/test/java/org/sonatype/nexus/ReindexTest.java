@@ -16,13 +16,51 @@
  */
 package org.sonatype.nexus;
 
+import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 
 public class ReindexTest
     extends AbstractMavenRepoContentTests
 {
-    public void testRepositoryReindex()
+    private ServletServer servletServer;
+
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        servletServer = (ServletServer) lookup( ServletServer.class );
+
+        servletServer.start();
+    }
+
+    protected void tearDown()
+        throws Exception
+    {
+        servletServer.stop();
+
+        super.tearDown();
+    }
+
+    protected void makeCentralDownloadRemoteIndex()
+        throws Exception
+    {
+        CRepository repoConfig = defaultNexus.readRepository( "central" );
+
+        // redirect it to our "sppof" jetty (see ReindexTest.xml in src/test/resources....
+        repoConfig.getRemoteStorage().setUrl( "http://localhost:12345/central/" );
+
+        // make the central download the remote indexes is found
+        repoConfig.setDownloadRemoteIndexes( true );
+
+        // update repo --> this will spawn one task doing reindex on central
+        defaultNexus.updateRepository( repoConfig );
+    }
+
+    public void testHostedRepositoryReindex()
         throws Exception
     {
         fillInRepo();
@@ -47,4 +85,63 @@ public class ReindexTest
             fail( "NoSuchRepositoryException reindexing repository" );
         }
     }
+
+    public void testProxyRepositoryReindex()
+        throws Exception
+    {
+        fillInRepo();
+
+        try
+        {
+            makeCentralDownloadRemoteIndex();
+
+            defaultNexus.reindexRepository( null, "central" );
+
+            // should download index
+            // log4j-1.2.12.jar :: sha1 = 057b8740427ee6d7b0b60792751356cad17dc0d9
+            ArtifactInfo ai = defaultNexus.identifyArtifact(
+                ArtifactInfo.SHA1,
+                "057b8740427ee6d7b0b60792751356cad17dc0d9" );
+
+            assertNotNull( "Should find it!", ai );
+
+            assertEquals( "log4j", ai.groupId );
+            assertEquals( "log4j", ai.artifactId );
+            assertEquals( "1.2.12", ai.version );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            fail( "NoSuchRepositoryException reindexing repository" );
+        }
+    }
+
+    public void testGroupReindex()
+        throws Exception
+    {
+        fillInRepo();
+
+        try
+        {
+            makeCentralDownloadRemoteIndex();
+
+            defaultNexus.reindexRepositoryGroup( null, "public" );
+
+            // should download index
+            // log4j-1.2.12.jar :: sha1 = 057b8740427ee6d7b0b60792751356cad17dc0d9
+            ArtifactInfo ai = defaultNexus.identifyArtifact(
+                ArtifactInfo.SHA1,
+                "057b8740427ee6d7b0b60792751356cad17dc0d9" );
+
+            assertNotNull( "Should find it!", ai );
+
+            assertEquals( "log4j", ai.groupId );
+            assertEquals( "log4j", ai.artifactId );
+            assertEquals( "1.2.12", ai.version );
+        }
+        catch ( NoSuchRepositoryGroupException e )
+        {
+            fail( "NoSuchRepositoryException reindexing repository" );
+        }
+    }
+
 }
