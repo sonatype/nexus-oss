@@ -83,4 +83,18 @@ public class DefaultSecurityConfigurationUpgraderTest
     
         resultIsFine( "/org/sonatype/nexus/configuration/security/upgrade/security-100-2.xml", configuration );
     }
+    
+    public void testFrom201to202()
+    throws Exception
+    {
+        IOUtil.copy(
+            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/security/upgrade/security-100-2.xml" ),
+            new FileOutputStream( getSecurityConfiguration() ) );
+    
+        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getSecurityConfiguration() ) );
+    
+        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
+    
+        resultIsFine( "/org/sonatype/nexus/configuration/security/upgrade/security-100-2.xml", configuration );
+    }
 }

@@ -149,13 +149,17 @@ public class UserMessageUtil
     public List<UserResource> getList()
         throws IOException
     {
-        String responseText = RequestFacade.doGetRequest( "service/local/users" ).getEntity().getText();
+        Response response = RequestFacade.doGetRequest( "service/local/users" );
+        String responseText = response.getEntity().getText();
         LOG.debug( "responseText: \n" + responseText );
 
         // must use the XML xstream even if we 'thought' we wanted to use JSON, because REST client doesn't listen to the MediaType in some situations.
         XStreamRepresentation representation =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
 
+        // make sure we have a success
+        Assert.assertTrue( "Status: "+  response.getStatus() +"\n"+responseText, response.getStatus().isSuccess() );
+        
         UserListResourceResponse resourceResponse =
             (UserListResourceResponse) representation.getPayload( new UserListResourceResponse() );
 

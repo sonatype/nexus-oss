@@ -65,13 +65,13 @@ public class UserComparator implements Comparator<CUser>
 //        }
 //        else if ( !user1.getPassword().equals( user2.getPassword() ) )
 //            return -1;
-        if ( user1.getRoles() == null )
-        {
-            if ( user2.getRoles() != null )
-                return -1;
-        }
-        else if ( !user1.getRoles().equals( user2.getRoles() ) )
-            return -1;
+//        if ( user1.getRoles() == null )
+//        {
+//            if ( user2.getRoles() != null )
+//                return -1;
+//        }
+//        else if ( !user1.getRoles().equals( user2.getRoles() ) )
+//            return -1;
         if ( user1.getStatus() == null )
         {
             if ( user2.getStatus() != null )

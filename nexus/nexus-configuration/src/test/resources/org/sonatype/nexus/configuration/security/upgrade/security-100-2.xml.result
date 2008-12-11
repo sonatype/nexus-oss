@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <security>
-  <version>2.0.1</version>
+  <version>2.0.2</version>
   <users>
     <user>
       <id>admin</id>
@@ -8,9 +8,6 @@
       <password>f865b53623b121fd34ee5426c792e5c33af8c227</password>
       <status>active</status>
       <email>changeme@yourcompany.com</email>
-      <roles>
-        <role>admin</role>
-      </roles>
     </user>
     <user>
       <id>deployment</id>
@@ -18,10 +15,6 @@
       <password>b2a0e378437817cebdf753d7dff3dd75483af9e0</password>
       <status>active</status>
       <email>changeme1@yourcompany.com</email>
-      <roles>
-        <role>deployment</role>
-        <role>repo-all-full</role>
-      </roles>
     </user>
     <user>
       <id>anonymous</id>
@@ -29,10 +22,28 @@
       <password>0a92fab3230134cca6eadd9898325b9b2ae67998</password>
       <status>active</status>
       <email>changeme2@yourcompany.com</email>
+    </user>
+  </users>
+  <userRoleMappings>
+    <userRoleMapping>
+      <userId>admin</userId>
+      <roles>
+        <role>admin</role>
+      </roles>
+    </userRoleMapping>
+    <userRoleMapping>
+      <userId>deployment</userId>
+      <roles>
+        <role>deployment</role>
+        <role>repo-all-full</role>
+      </roles>
+    </userRoleMapping>
+    <userRoleMapping>
+      <userId>anonymous</userId>
       <roles>
         <role>anonymous</role>
         <role>repo-all-read</role>
       </roles>
-    </user>
-  </users>
+    </userRoleMapping>
+  </userRoleMappings>
 </security>
