@@ -1,6 +1,6 @@
 /*
- * Sonatype Nexus™ [Open Source Version].
- * Copyright © 2008 Sonatype, Inc. All rights reserved.
+ * ﻿Sonatype Nexus (TM) [Open Source Version].
+ * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
  * Includes the third-party code listed at ${thirdpartyurl}.
  *
  * This program is licensed to you under Version 3 only of the GNU General
