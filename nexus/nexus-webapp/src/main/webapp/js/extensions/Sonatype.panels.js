@@ -242,6 +242,21 @@ Sonatype.panels.GridViewer = function( config ) {
 };
 
 Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
+  addActionHandler: function( handler, item, e ) {
+    if ( item.autoCreateNewRecord ) {
+      var rec = new this.dataStore.reader.recordType( {
+        name: 'New ' + item.text
+      },
+      'new_' + new Date().getTime() );
+      this.dataStore.insert( 0, [rec] );
+      this.gridPanel.getSelectionModel().selectRow( 0 );
+      handler( rec, item, e );
+    }
+    else {
+      handler( item, e );
+    }
+  },
+
   clearCards: function() {
     this.cardPanel.items.each( function( item, i, len ) {
       if ( i > 0 ) { this.remove( item, true ); }
@@ -253,7 +268,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
   createAddMenu: function() {
     if ( this.addMenuInitEvent ) {
       var menu = new Sonatype.menu.Menu({
-        payload: null,
+        payload: this,
         scope: this,
         items: []
       } );
@@ -268,6 +283,12 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
         menu.remove( item ); // clean up if the last element is a separator
       }
       if ( ! menu.items.length ) return; // quit if empty
+      
+      menu.items.each( function( item, index, length ) {
+        if ( item.handler ) {
+          item.setHandler( this.addActionHandler.createDelegate( this, [item.handler], 0 ) );
+        }
+      }, this );
       
       this.tbar.push( {
         text: 'Add...',
@@ -287,9 +308,6 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
       if ( panel ) {
         this.cardPanel.remove( panel, true );
         panel = null;
-      }
-      else {
-        return;
       }
     }
 

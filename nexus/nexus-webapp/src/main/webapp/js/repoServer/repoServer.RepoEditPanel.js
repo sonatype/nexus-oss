@@ -2761,3 +2761,38 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
     } );
   }
 } );
+
+Sonatype.Events.addListener( 'repositoryAddMenuInit', function( menu ) {
+  var sp = Sonatype.lib.Permissions;
+  
+  if ( sp.checkPermission( 'nexus:repositories', sp.READ ) ) {
+    var createRepoFunc = function( container, rec, item, e ) {
+      rec.beginEdit();
+      rec.set( 'repoType', item.value );
+      rec.commit();
+      rec.endEdit();
+    };
+
+    menu.add( [
+      '-',
+      {
+        text: 'Hosted Repository',
+        value: 'hosted',
+        autoCreateNewRecord: true,
+        handler: createRepoFunc
+      },
+      {
+        text: 'Proxy Repository',
+        value: 'proxy',
+        autoCreateNewRecord: true,
+        handler: createRepoFunc
+      },
+      {
+        text: 'Virtual Repository',
+        value: 'virtual',
+        autoCreateNewRecord: true,
+        handler: createRepoFunc
+      }
+    ] );
+  }
+} );

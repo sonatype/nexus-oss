@@ -1139,6 +1139,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
   Ext.apply( this, config, defaultConfig );
 
   Sonatype.repoServer.RepositoryPanel.superclass.constructor.call( this, {
+    addMenuInitEvent: 'repositoryAddMenuInit',
     rowClickEvent: 'repositoryViewInit',
     rowContextClickEvent: 'repositoryMenuInit',
     url: Sonatype.config.repos.urls.repositories,
@@ -1396,8 +1397,10 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
 } );
 
 Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
-  cardPanel.add( new Sonatype.repoServer.RepositoryBrowsePanel( { 
-    payload: rec,
-    tabTitle: 'Browse'
-  } ) );
+  if ( rec.data.resourceURI ) {
+    cardPanel.add( new Sonatype.repoServer.RepositoryBrowsePanel( { 
+      payload: rec,
+      tabTitle: 'Browse'
+    } ) );
+  }
 } );

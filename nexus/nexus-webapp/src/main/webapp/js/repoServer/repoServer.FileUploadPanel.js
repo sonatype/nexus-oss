@@ -602,7 +602,8 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
 Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
   var sp = Sonatype.lib.Permissions;
   
-  if ( sp.checkPermission( 'nexus:artifact', sp.CREATE ) &&
+  if ( rec.data.resourceURI && 
+      sp.checkPermission( 'nexus:artifact', sp.CREATE ) &&
       rec.data.repoType == 'hosted' && rec.data.repoPolicy == 'release' ) {
     
     Ext.Ajax.request({
