@@ -2765,12 +2765,14 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
 Sonatype.Events.addListener( 'repositoryAddMenuInit', function( menu ) {
   var sp = Sonatype.lib.Permissions;
   
-  if ( sp.checkPermission( 'nexus:repositories', sp.READ ) ) {
+  if ( sp.checkPermission( 'nexus:repositories', sp.CREATE ) ) {
     var createRepoFunc = function( container, rec, item, e ) {
       rec.beginEdit();
       rec.set( 'repoType', item.value );
       rec.commit();
       rec.endEdit();
+
+      container.createChildPanel( rec );
     };
 
     menu.add( [

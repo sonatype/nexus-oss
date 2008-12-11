@@ -309,6 +309,9 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
         this.cardPanel.remove( panel, true );
         panel = null;
       }
+      else {
+        return;
+      }
     }
 
     if ( ! panel ) {
