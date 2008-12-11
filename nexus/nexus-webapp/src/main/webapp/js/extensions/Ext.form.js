@@ -561,16 +561,14 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
   },
   
   resetHandler: function( button, event ) {
+    this.loadData();
+  },
+  
+  loadData: function() {
     if ( this.isNew ) {
       this.form.reset();
     }
     else {
-      this.loadData();
-    }
-  },
-  
-  loadData: function() {
-    if ( ! this.isNew ) {
       this.form.doAction( 'sonatypeLoad', {
         url: this.getActionURL(),
         method: 'GET',
@@ -621,7 +619,17 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
     var receivedData = action.handleResponse( action.response ).data;
     if ( action.type == 'sonatypeSubmit' ) {
       this.fireEvent( 'submit', form, action, receivedData );
+      
+      if ( this.isNew && this.payload.autoCreateNewRecord ) {
+        var store = this.payload.store;
+        store.remove( this.payload );
+        
+        var rec = new store.reader.recordType( receivedData, receivedData.resourceURI );
+        rec.autoCreateNewRecord = true;
+        store.addSorted( rec );
+      }
       this.isNew = false;
+      this.payload.autoCreateNewRecord = false;
     }
     else if ( action.type == 'sonatypeLoad' ) {
       this.fireEvent( 'load', form, action, receivedData );

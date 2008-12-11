@@ -153,6 +153,10 @@ Sonatype.panels.GridViewer = function( config ) {
     autoLoad: this.dataAutoLoad,
     sortInfo: this.dataSortInfo,
     listeners: {
+      add: {
+        fn: this.recordAddHandler,
+        scope: this
+      },
       remove: {
         fn: this.recordRemoveHandler,
         scope: this
@@ -248,9 +252,12 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
         name: 'New ' + item.text
       },
       'new_' + new Date().getTime() );
+      rec.autoCreateNewRecord = true;
+      if ( handler && handler( rec, item, e ) == false ) {
+        return;
+      }
+
       this.dataStore.insert( 0, [rec] );
-      this.gridPanel.getSelectionModel().selectRow( 0 );
-      handler( rec, item, e );
     }
     else {
       handler( item, e );
@@ -332,6 +339,12 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
 
     this.cardPanel.getLayout().setActiveItem( panel );
     panel.doLayout();
+  },
+  
+  recordAddHandler: function( store, recs, index ) {
+    if ( recs.length == 1 && recs[0].autoCreateNewRecord ) {
+      this.createChildPanel( recs[0] );
+    }
   },
   
   recordRemoveHandler: function( store, rec, index ) {

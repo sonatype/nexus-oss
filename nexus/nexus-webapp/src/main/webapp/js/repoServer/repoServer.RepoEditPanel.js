@@ -1719,6 +1719,34 @@ Sonatype.repoServer.AbstractRepositoryEditor = function( config ) {
 };
 
 Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel, {
+  loadData: function() {
+    if ( this.isNew ) {
+      var templateModifiers = Ext.apply( {}, 
+        {
+          id : Sonatype.utils.returnEmptyStr,
+          name : Sonatype.utils.returnEmptyStr
+        },
+        this.dataModifiers.load );
+
+      this.form.on( 'actioncomplete',
+        function( form, action ) { 
+          form.clearInvalid();
+        }, 
+        { single:true } 
+      );
+      this.form.doAction( 'sonatypeLoad', {
+        url: Sonatype.config.repos.urls.repoTemplate[this.payload.data.repoType],
+        method: 'GET',
+        fpanel: this,
+        dataModifiers: templateModifiers,
+        scope: this
+      } );
+    }
+    else {
+      Sonatype.repoServer.AbstractRepositoryEditor.superclass.loadData.call( this );
+    }
+  },
+
   repoPolicySelectHandler: function( combo, rec, index ) {
     var repoPolicy = rec.data.value.toLowerCase();
     var fields = ['notFoundCacheTTL', 'artifactMaxAge', 'metadataMaxAge'];
@@ -1775,8 +1803,13 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
 
   submitHandler: function( form, action, receivedData ) {
     if ( this.isNew ) {
-      this.form.findField( 'id' ).disable();
-      this.form.findField( 'format' ).disable();
+      if ( ! receivedData.resourceURI ) {
+        var url = action.options.url + '/' + receivedData.id;
+        receivedData.resourceURI = url;
+        receivedData.displayURI = url.replace(
+          Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories );
+      }
+      return;
     }
     
     var rec = this.payload;
@@ -2628,8 +2661,8 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
     root: 'data',
     id: 'roleHint',
     fields: [
-      { name:'description' },
-      { name:'roleHint', sortType:Ext.data.SortTypes.asUCString }
+      { name: 'description' },
+      { name: 'roleHint', sortType:Ext.data.SortTypes.asUCString }
     ],
     sortInfo: { field: 'roleHint', direction: 'asc' },
     url: Sonatype.config.repos.urls.shadowRepoTypes,
@@ -2657,7 +2690,8 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
             return 'No spaces allowed in ID'; 
           }
         }
-      },{
+      },
+      {
         xtype: 'textfield',
         fieldLabel: 'Repository Name',
         itemCls: 'required-field',
@@ -2665,7 +2699,8 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
         name: 'name',
         width: 200,
         allowBlank: false
-      },{
+      },
+      {
         xtype: 'textfield',
         fieldLabel: 'Repository Type',
         itemCls: 'required-field',
@@ -2771,8 +2806,6 @@ Sonatype.Events.addListener( 'repositoryAddMenuInit', function( menu ) {
       rec.set( 'repoType', item.value );
       rec.commit();
       rec.endEdit();
-
-      container.createChildPanel( rec );
     };
 
     menu.add( [
