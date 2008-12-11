@@ -158,7 +158,10 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         allowBlank: false,
         width: this.COMBO_WIDTH,
         value: 60,
-        allowDecimals: false
+        validator: function( value ){
+     		// decimal values are not allowed
+     		return (value - 0) % 1 == 0 ? true : 'Only integer values are allowed';
+        }
       },
       {
         xtype: 'panel',
