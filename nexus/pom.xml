@@ -122,6 +122,7 @@
 		<module>nexus-migration-tool</module>
 		<module>nexus-webapp</module>
 		<module>nexus-clients</module>
+		<module>nexus-migration-extension</module>
 	</modules>
 	<profiles>
 		<profile>
