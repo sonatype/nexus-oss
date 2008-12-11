@@ -712,7 +712,6 @@
                     </includes>
 					<excludes>
 						<exclude>**/ext-2.2/**</exclude>
-						<exclude>**/ext-2.2/**</exclude>
 						<exclude>**/js/filetree/**</exclude>
 					</excludes>
                 </configuration>
