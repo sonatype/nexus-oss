@@ -1857,7 +1857,7 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
     data: [['Release'], ['Snapshot']]
   } );
   
-  this.formatStore = new Ext.data.Store( {
+  this.formatStore = new Ext.data.JsonStore( {
     root: 'data',
     id: 'roleHint',
     fields: [
@@ -2091,7 +2091,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
     data: [['Ignore'], ['Warn'], ['StrictIfExists'], ['Strict']]
   } );
 
-  this.formatStore = new Ext.data.Store( {
+  this.formatStore = new Ext.data.JsonStore( {
     root: 'data',
     id: 'roleHint',
     fields: [
@@ -2657,7 +2657,7 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
     autoLoad: true
   } );
 
-  this.formatStore = new Ext.data.Store( {
+  this.formatStore = new Ext.data.JsonStore( {
     root: 'data',
     id: 'roleHint',
     fields: [
