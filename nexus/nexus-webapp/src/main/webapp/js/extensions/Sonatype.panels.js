@@ -74,6 +74,17 @@ Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
  * A viewer panel offering a grid on top and a details pane at the bottom.
  * 
  * Config options:
+ * 
+ * autoCreateNewRecord: if set, the "add" menu action handler will automatically
+ *                      create a new blank record and insert it into the grid, before
+ *                      invoking the subscriber supplied handler. The record will be
+ *                      assigned the same "autoCreateNewRecord=true" flag, which is
+ *                      tracked by the editor component, causing it to re-create the
+ *                      record from the server response when the form is submitted.
+ * 
+ * addMenuInitEvent: this parameter causes the panel to create an "Add" button
+ *                   on the taskbar and fire the event so the subscribers can
+ *                   append actions to the "add" menu.
  *
  * columns: a column config, combining the properties of Ext.data.Record and 
  *          Ext.grid.ColumnModel. All items are used in the Record constructor.
@@ -87,6 +98,9 @@ Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
  * dataRoot: the root property of the response (defaults to 'data').
  * 
  * dataSortInfo: the 'sortInfo' property for the data store.
+ * 
+ * deleteButton: creates a "Delete" button on the toolbar. The delete handler will
+ *               submit a DELETE request to requestURI of the selected record.
  * 
  * rowClickEvent: event name to fire when a row is clicked.
  * 
@@ -205,6 +219,7 @@ Sonatype.panels.GridViewer = function( config ) {
     }
   } );
 
+  var toolbar = this.tbar;
   this.tbar = [
     {
       text: 'Refresh',
@@ -213,9 +228,12 @@ Sonatype.panels.GridViewer = function( config ) {
       scope: this,
       handler: this.refreshHandler
     }
-  ].concat( this.tbar ? this.tbar : [] );
-
+  ]
   this.createAddMenu();
+  this.createDeleteButton();
+  if ( toolbar ) {
+    this.tbar.concat( toolbar );
+  }
 
   this.cardPanel = new Ext.Panel( {
     layout: 'card',
@@ -339,6 +357,57 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
 
     this.cardPanel.getLayout().setActiveItem( panel );
     panel.doLayout();
+  },
+  
+  createDeleteButton: function() {
+    if ( this.deleteButton ) {
+      this.tbar.push( {
+        text: 'Delete',
+        icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
+        cls: 'x-btn-text-icon',
+        handler: this.deleteActionHandler,
+        scope: this
+      } );
+    }
+  },
+  
+  deleteActionHandler: function( button, e ) {
+    if ( this.gridPanel.getSelectionModel().hasSelection() ) {
+      var rec = this.gridPanel.getSelectionModel().getSelected();
+      
+      if ( rec.id.substring( 0, 4 ) == 'new_' ) {
+        this.dataStore.remove( rec );
+      }
+      else {
+        Sonatype.utils.defaultToNo();
+        
+        Sonatype.MessageBox.show({
+          animEl: this.gridPanel.getEl(),
+          title: 'Delete',
+          msg: 'Delete ' + rec.data[this.titleColumn] + '?',
+          buttons: Sonatype.MessageBox.YESNO,
+          scope: this,
+          icon: Sonatype.MessageBox.QUESTION,
+          fn: function( btnName ) {
+            if ( btnName == 'yes' || btnName == 'ok' ) {
+              Ext.Ajax.request( {
+                callback: function( options, success, response ) {
+                  if ( success ) {
+                    this.dataStore.remove( rec );
+                  }
+                  else {
+                    Sonatype.utils.connectionError( action.response, 'Delete Failed!' );
+                  }
+                },
+                scope: this,
+                method: 'DELETE',
+                url: rec.data.resourceURI
+              } );
+            }
+          }
+        } );
+      }
+    }
   },
   
   recordAddHandler: function( store, recs, index ) {

@@ -1138,8 +1138,11 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
   };
   Ext.apply( this, config, defaultConfig );
 
+  var sp = Sonatype.lib.Permissions;
+  
   Sonatype.repoServer.RepositoryPanel.superclass.constructor.call( this, {
     addMenuInitEvent: 'repositoryAddMenuInit',
+    deleteButton: sp.checkPermission( 'nexus:repositories', sp.DELETE ),
     rowClickEvent: 'repositoryViewInit',
     rowContextClickEvent: 'repositoryMenuInit',
     url: Sonatype.config.repos.urls.repositories,
