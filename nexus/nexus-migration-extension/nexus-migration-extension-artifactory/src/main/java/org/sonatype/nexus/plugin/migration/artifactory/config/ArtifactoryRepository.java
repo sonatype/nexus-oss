@@ -1,5 +1,7 @@
 package org.sonatype.nexus.plugin.migration.artifactory.config;
 
+import static org.sonatype.nexus.plugin.migration.artifactory.util.DomUtil.getValue;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,22 +54,27 @@ public class ArtifactoryRepository
 
     public String getKey()
     {
-        return dom.getChild( "key" ).getValue();
+        return getValue( dom, "key" );
     }
 
     public String getDescription()
     {
-        return dom.getChild( "description" ).getValue();
+        return getValue( dom, "description" );
     }
 
     public boolean getHandleReleases()
     {
-        return Boolean.parseBoolean( dom.getChild( "handleReleases" ).getValue() );
+        return Boolean.parseBoolean( getValue( dom, "handleReleases" ) );
     }
 
     public boolean getHandleSnapshots()
     {
-        return Boolean.parseBoolean( dom.getChild( "handleSnapshots" ).getValue() );
+        return Boolean.parseBoolean( getValue( dom, "handleSnapshots" ) );
+    }
+
+    public String getUrl()
+    {
+        return getValue( dom, "url" );
     }
 
 }
