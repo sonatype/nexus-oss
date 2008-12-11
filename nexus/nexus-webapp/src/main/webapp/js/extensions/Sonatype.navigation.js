@@ -198,10 +198,17 @@ Ext.extend( Sonatype.menu.Menu, Ext.menu.Menu, {
   add: function( c ) {
     if ( c == null ) return null;
 
+    var arr = null;
     var a = arguments;
     if ( a.length > 1 ) {
-      for( var i = 0; i < a.length; i++ ) {
-        this.add( a[i] );
+      arr = a;
+    }
+    else if ( Ext.isArray( c ) ) {
+      arr = c;
+    }
+    if ( arr != null ) {
+      for( var i = 0; i < arr.length; i++ ) {
+        this.add( arr[i] );
       }
       return;
     }

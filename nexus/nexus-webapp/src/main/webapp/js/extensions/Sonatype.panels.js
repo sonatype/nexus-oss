@@ -200,7 +200,19 @@ Sonatype.panels.GridViewer = function( config ) {
       }
     }
   } );
-  
+
+  this.tbar = [
+    {
+      text: 'Refresh',
+      icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+      cls: 'x-btn-text-icon',
+      scope: this,
+      handler: this.refreshHandler
+    }
+  ].concat( this.tbar ? this.tbar : [] );
+
+  this.createAddMenu();
+
   this.cardPanel = new Ext.Panel( {
     layout: 'card',
     region: 'center',
@@ -222,15 +234,6 @@ Sonatype.panels.GridViewer = function( config ) {
     autoScroll: false,
     width: '100%',
     height: '100%',
-    tbar: [
-      {
-        text: 'Refresh',
-        icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
-        cls: 'x-btn-text-icon',
-        scope: this,
-        handler: this.refreshHandler
-      }
-    ].concat( this.tbar ? this.tbar : [] ),
     items: [
       this.gridPanel,
       this.cardPanel
@@ -245,6 +248,34 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
     }, this.cardPanel );
     
     this.cardPanel.getLayout().setActiveItem( 0 );
+  },
+  
+  createAddMenu: function() {
+    if ( this.addMenuInitEvent ) {
+      var menu = new Sonatype.menu.Menu({
+        payload: null,
+        scope: this,
+        items: []
+      } );
+
+      Sonatype.Events.fireEvent( this.addMenuInitEvent, menu );
+      var item = menu.items.first();
+      if ( item && ! item.text ) {
+        menu.remove( item ); // clean up if the first element is a separator
+      }
+      item = menu.items.last();
+      if ( item && ! item.text ) {
+        menu.remove( item ); // clean up if the last element is a separator
+      }
+      if ( ! menu.items.length ) return; // quit if empty
+      
+      this.tbar.push( {
+        text: 'Add...',
+        icon: Sonatype.config.resourcePath + '/images/icons/add.png',
+        cls: 'x-btn-text-icon',
+        menu: menu
+      } );
+    }
   },
   
   createChildPanel: function( rec, recreateIfExists ) {
