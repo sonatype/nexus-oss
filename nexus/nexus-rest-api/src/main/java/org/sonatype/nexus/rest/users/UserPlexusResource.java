@@ -161,11 +161,11 @@ public class UserPlexusResource
             if ( isCurrentUser( request ) )
             {
                 String error = "The user with user ID [" + getUserId( request )
-                    + "] cannot be deleted, since you can't delete youself";
+                    + "] cannot be deleted, as that is the user currently logged into the Nexus application.";
 
                 getLogger().info(
                     "The user with user ID [" + getUserId( request )
-                        + "] cannot be deleted! He's trying to delete himself!" );
+                        + "] cannot be deleted, as that is the user currently logged into the Nexus application." );
 
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, error );
             }
