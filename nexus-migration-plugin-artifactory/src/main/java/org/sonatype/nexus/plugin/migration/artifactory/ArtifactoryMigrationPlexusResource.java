@@ -5,13 +5,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.NotFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.component.annotations.Component;
@@ -31,6 +36,9 @@ import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryProxy;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryRepository;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryVirtualRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -42,6 +50,9 @@ public class ArtifactoryMigrationPlexusResource
 
     @Requirement( role = org.codehaus.plexus.archiver.UnArchiver.class, hint = "zip" )
     private ZipUnArchiver zipUnArchiver;
+
+    @Requirement
+    private NexusScheduler nexusScheduler;
 
     public ArtifactoryMigrationPlexusResource()
     {
@@ -94,8 +105,9 @@ public class ArtifactoryMigrationPlexusResource
 
                 validate( cfg.getLocalRepositories(), cfg.getRemoteRepositories() );
 
-                importRepositories( cfg.getLocalRepositories(), cfg.getProxies() );
-                importRepositories( cfg.getRemoteRepositories(), cfg.getProxies() );
+                File repositoriesBackup = new File( artifactoryBackup, "repositories" );
+                importRepositories( cfg.getLocalRepositories(), cfg.getProxies(), repositoriesBackup );
+                importRepositories( cfg.getRemoteRepositories(), cfg.getProxies(), repositoriesBackup );
 
                 importGroups( cfg.getVirtualRepositories() );
 
@@ -136,7 +148,8 @@ public class ArtifactoryMigrationPlexusResource
         }
     }
 
-    private void importRepositories( List<ArtifactoryRepository> repositories, Map<String, ArtifactoryProxy> proxies )
+    private void importRepositories( List<ArtifactoryRepository> repositories, Map<String, ArtifactoryProxy> proxies,
+                                     File repositoriesBackup )
         throws ResourceException
     {
         for ( ArtifactoryRepository repo : repositories )
@@ -183,8 +196,54 @@ public class ArtifactoryMigrationPlexusResource
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error creating repository "
                     + repo.getKey() );
             }
+
+            File repositoryBackup = new File( repositoriesBackup, repo.getKey() );
+
+            if ( repositoryBackup.isDirectory() && repositoryBackup.list().length > 0 )
+            {
+                copyArtifacts( nexusRepo, repositoryBackup );
+
+                ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTaskDescriptor.ID );
+                rt.setRepositoryId( nexusRepo.getId() );
+                nexusScheduler.submit( "Download remote index enabled.", rt );
+
+            }
+
         }
 
+    }
+
+    private void copyArtifacts( CRepository nexusRepo, File repositoryBackup )
+        throws ResourceException
+    {
+        try
+        {
+            File storage = new File( getStorage( nexusRepo ).toURI() );
+
+            // filter artifactory metadata
+            NotFileFilter filter = new NotFileFilter( new SuffixFileFilter( ".artifactory-metadata" ) );
+            FileUtils.copyDirectory( repositoryBackup, storage, filter );
+        }
+        catch ( Exception e )
+        {
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to copy artifacts to "
+                + nexusRepo.getId(), e );
+        }
+    }
+
+    private URL getStorage( CRepository nexusRepo )
+        throws ResourceException, MalformedURLException
+    {
+        URL storage;
+        if ( nexusRepo.getLocalStorage() == null )
+        {
+            storage = new URL( nexusRepo.defaultLocalStorageUrl );
+        }
+        else
+        {
+            storage = new URL( nexusRepo.getLocalStorage().getUrl() );
+        }
+        return storage;
     }
 
     private void validate( List<ArtifactoryRepository>... repositoriesSet )
