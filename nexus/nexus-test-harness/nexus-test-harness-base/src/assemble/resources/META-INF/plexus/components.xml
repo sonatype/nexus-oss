@@ -9,7 +9,7 @@
       <isolated-realm>false</isolated-realm>
       <configuration>
         <disable-blocking>true</disable-blocking>
-        <debug>false</debug>
+        <debug>${nexus.test.debug}</debug>
         <java-cmd>java</java-cmd>
         <debug-port>5005</debug-port>
         <debug-suspend>true</debug-suspend>

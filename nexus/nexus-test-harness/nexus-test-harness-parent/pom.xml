@@ -55,6 +55,8 @@
 
     <config-resource>${project.build.directory}/config-resources</config-resource>
     <bundle-conf-resource>${project.build.directory}/bundle-conf-resource</bundle-conf-resource>
+
+    <nexus.test.debug>false</nexus.test.debug>
   </properties>
 
   <dependencies>
