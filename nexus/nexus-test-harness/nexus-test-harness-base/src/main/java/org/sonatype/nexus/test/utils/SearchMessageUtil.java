@@ -57,33 +57,33 @@ public class SearchMessageUtil
 
         return RequestFacade.doGetRequest( serviceURI );
     }
-    
+
     public Response doSearchFor( Map<String, String> queryArgs )
-    throws Exception
-{
-    StringBuffer serviceURI = new StringBuffer("service/local/data_index?");
-    
-    for ( Entry<String, String> entry : queryArgs.entrySet() )
+        throws Exception
     {
-        serviceURI.append( entry.getKey() ).append( "=" ).append( entry.getValue() ).append( "&" );
+        StringBuffer serviceURI = new StringBuffer( "service/local/data_index?" );
+
+        for ( Entry<String, String> entry : queryArgs.entrySet() )
+        {
+            serviceURI.append( entry.getKey() ).append( "=" ).append( entry.getValue() ).append( "&" );
+        }
+
+        return RequestFacade.doGetRequest( serviceURI.toString() );
     }
-    
-    return RequestFacade.doGetRequest( serviceURI.toString() );
-}
-    
+
     @SuppressWarnings( "unchecked" )
     public List<NexusArtifact> searchFor( String query )
         throws Exception
-    {   
+    {
         HashMap<String, String> queryArgs = new HashMap<String, String>();
         queryArgs.put( "q", query );
         return searchFor( queryArgs );
     }
-    
+
     @SuppressWarnings( "unchecked" )
     public List<NexusArtifact> searchFor( Map<String, String> queryArgs )
         throws Exception
-    {   
+    {
         String responseText = doSearchFor( queryArgs ).getEntity().getText();
 
         XStreamRepresentation representation =
@@ -186,6 +186,17 @@ public class SearchMessageUtil
         String serviceURI = "service/local/data_index?cn=" + classname;
 
         return RequestFacade.doGetRequest( serviceURI );
+    }
+
+    public List<NexusArtifact> searchFor( String groupId, String artifactId, String version )
+        throws Exception
+    {
+        Map<String, String> args = new HashMap<String, String>();
+        args.put( "g", groupId );
+        args.put( "a", artifactId );
+        args.put( "v", version );
+
+        return searchFor( args );
     }
 
 }
