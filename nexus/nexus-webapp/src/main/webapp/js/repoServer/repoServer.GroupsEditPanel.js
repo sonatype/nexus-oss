@@ -922,7 +922,12 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
     var nodes = grpTree.root.childNodes;
     
     for(var i = 0; i < nodes.length; i++){
-      outputArr[i] = nodes[i].attributes.payload;
+      var repo = nodes[i].attributes.payload;
+      outputArr[i] = {
+        id: repo.id,
+        name: repo.name,
+        resourceURI: repo.resourceURI
+      };
     }
     
     return outputArr;
