@@ -19,8 +19,6 @@ package org.sonatype.nexus;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 
 public class ReindexTest
     extends AbstractMavenRepoContentTests
@@ -45,13 +43,13 @@ public class ReindexTest
         super.tearDown();
     }
 
-    protected void makeCentralDownloadRemoteIndex()
+    protected void makeCentralPointTo( String url )
         throws Exception
     {
         CRepository repoConfig = defaultNexus.readRepository( "central" );
 
         // redirect it to our "sppof" jetty (see ReindexTest.xml in src/test/resources....
-        repoConfig.getRemoteStorage().setUrl( "http://localhost:12345/central/" );
+        repoConfig.getRemoteStorage().setUrl( url );
 
         // make the central download the remote indexes is found
         repoConfig.setDownloadRemoteIndexes( true );
@@ -60,30 +58,39 @@ public class ReindexTest
         defaultNexus.updateRepository( repoConfig );
     }
 
+    protected void validateIndexWithIdentify( boolean shouldBePresent, String sha1Hash, String gid, String aid,
+        String version )
+        throws Exception
+    {
+        ArtifactInfo ai = defaultNexus.identifyArtifact( ArtifactInfo.SHA1, sha1Hash );
+
+        if ( shouldBePresent )
+        {
+            assertNotNull( "Should find it!", ai );
+
+            assertEquals( gid, ai.groupId );
+            assertEquals( aid, ai.artifactId );
+            assertEquals( version, ai.version );
+        }
+        else
+        {
+            assertNull( "Should not find it!", ai );
+        }
+    }
+
     public void testHostedRepositoryReindex()
         throws Exception
     {
         fillInRepo();
 
-        try
-        {
-            defaultNexus.reindexRepository( null, "releases" );
+        defaultNexus.reindexRepository( null, "releases" );
 
-            // nexus-indexer-1.0-beta-4.jar :: sha1 = 86e12071021fa0be4ec809d4d2e08f07b80d4877
-            ArtifactInfo ai = defaultNexus.identifyArtifact(
-                ArtifactInfo.SHA1,
-                "86e12071021fa0be4ec809d4d2e08f07b80d4877" );
-
-            assertNotNull( "Should find it!", ai );
-
-            assertEquals( "org.sonatype.nexus", ai.groupId );
-            assertEquals( "nexus-indexer", ai.artifactId );
-            assertEquals( "1.0-beta-4", ai.version );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            fail( "NoSuchRepositoryException reindexing repository" );
-        }
+        validateIndexWithIdentify(
+            true,
+            "86e12071021fa0be4ec809d4d2e08f07b80d4877",
+            "org.sonatype.nexus",
+            "nexus-indexer",
+            "1.0-beta-4" );
     }
 
     public void testProxyRepositoryReindex()
@@ -91,28 +98,11 @@ public class ReindexTest
     {
         fillInRepo();
 
-        try
-        {
-            makeCentralDownloadRemoteIndex();
+        makeCentralPointTo( "http://localhost:12345/central/" );
 
-            defaultNexus.reindexRepository( null, "central" );
+        defaultNexus.reindexRepository( null, "central" );
 
-            // should download index
-            // log4j-1.2.12.jar :: sha1 = 057b8740427ee6d7b0b60792751356cad17dc0d9
-            ArtifactInfo ai = defaultNexus.identifyArtifact(
-                ArtifactInfo.SHA1,
-                "057b8740427ee6d7b0b60792751356cad17dc0d9" );
-
-            assertNotNull( "Should find it!", ai );
-
-            assertEquals( "log4j", ai.groupId );
-            assertEquals( "log4j", ai.artifactId );
-            assertEquals( "1.2.12", ai.version );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            fail( "NoSuchRepositoryException reindexing repository" );
-        }
+        validateIndexWithIdentify( true, "057b8740427ee6d7b0b60792751356cad17dc0d9", "log4j", "log4j", "1.2.12" );
     }
 
     public void testGroupReindex()
@@ -120,28 +110,55 @@ public class ReindexTest
     {
         fillInRepo();
 
-        try
-        {
-            makeCentralDownloadRemoteIndex();
+        makeCentralPointTo( "http://localhost:12345/central/" );
 
-            defaultNexus.reindexRepositoryGroup( null, "public" );
+        // central is member of public group
+        defaultNexus.reindexRepositoryGroup( null, "public" );
 
-            // should download index
-            // log4j-1.2.12.jar :: sha1 = 057b8740427ee6d7b0b60792751356cad17dc0d9
-            ArtifactInfo ai = defaultNexus.identifyArtifact(
-                ArtifactInfo.SHA1,
-                "057b8740427ee6d7b0b60792751356cad17dc0d9" );
+        validateIndexWithIdentify( true, "057b8740427ee6d7b0b60792751356cad17dc0d9", "log4j", "log4j", "1.2.12" );
+    }
 
-            assertNotNull( "Should find it!", ai );
+    public void testIncrementalIndexes()
+        throws Exception
+    {
+        // day 1
+        makeCentralPointTo( "http://localhost:12345/central-inc1/" );
 
-            assertEquals( "log4j", ai.groupId );
-            assertEquals( "log4j", ai.artifactId );
-            assertEquals( "1.2.12", ai.version );
-        }
-        catch ( NoSuchRepositoryGroupException e )
-        {
-            fail( "NoSuchRepositoryException reindexing repository" );
-        }
+        defaultNexus.reindexRepository( null, "central" );
+
+        // validation
+        validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );
+        validateIndexWithIdentify( false, "83cd2cd674a217ade95a4bb83a8a14f351f48bd0", "antlr", "antlr", "2.7.7" );
+
+        validateIndexWithIdentify( true, "3640dd71069d7986c9a14d333519216f4ca5c094", "log4j", "log4j", "1.2.8" );
+        validateIndexWithIdentify( false, "057b8740427ee6d7b0b60792751356cad17dc0d9", "log4j", "log4j", "1.2.12" );
+        validateIndexWithIdentify( false, "f0a0d2e29ed910808c33135a3a5a51bba6358f7b", "log4j", "log4j", "1.2.15" );
+
+        // day 2
+        makeCentralPointTo( "http://localhost:12345/central-inc2/" );
+
+        defaultNexus.reindexRepository( null, "central" );
+
+        // validation
+        validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );
+        validateIndexWithIdentify( true, "83cd2cd674a217ade95a4bb83a8a14f351f48bd0", "antlr", "antlr", "2.7.7" );
+
+        validateIndexWithIdentify( true, "3640dd71069d7986c9a14d333519216f4ca5c094", "log4j", "log4j", "1.2.8" );
+        validateIndexWithIdentify( true, "057b8740427ee6d7b0b60792751356cad17dc0d9", "log4j", "log4j", "1.2.12" );
+        validateIndexWithIdentify( false, "f0a0d2e29ed910808c33135a3a5a51bba6358f7b", "log4j", "log4j", "1.2.15" );
+
+        // day 3
+        makeCentralPointTo( "http://localhost:12345/central-inc3/" );
+
+        defaultNexus.reindexRepository( null, "central" );
+
+        // validation
+        validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );
+        validateIndexWithIdentify( true, "83cd2cd674a217ade95a4bb83a8a14f351f48bd0", "antlr", "antlr", "2.7.7" );
+
+        validateIndexWithIdentify( true, "3640dd71069d7986c9a14d333519216f4ca5c094", "log4j", "log4j", "1.2.8" );
+        validateIndexWithIdentify( true, "057b8740427ee6d7b0b60792751356cad17dc0d9", "log4j", "log4j", "1.2.12" );
+        validateIndexWithIdentify( true, "f0a0d2e29ed910808c33135a3a5a51bba6358f7b", "log4j", "log4j", "1.2.15" );
     }
 
 }
