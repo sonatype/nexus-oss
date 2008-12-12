@@ -77,4 +77,9 @@ public class ArtifactoryRepository
         return getValue( dom, "url" );
     }
 
+    public String getProxy()
+    {
+        return getValue( dom, "proxy" );
+    }
+
 }

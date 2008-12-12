@@ -14,6 +14,7 @@
 
   <modules>
     <module>nexus-migration-plugin-artifactory</module>
+    <module>nexus-migration-plugin-test-harness</module>
   </modules>
 
 </project>

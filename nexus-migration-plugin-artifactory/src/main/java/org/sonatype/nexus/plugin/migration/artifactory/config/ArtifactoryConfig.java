@@ -22,14 +22,6 @@ public class ArtifactoryConfig
 
     private final Xpp3Dom dom;
 
-    private List<ArtifactoryVirtualRepository> virtualRepositories;
-
-    private List<ArtifactoryRepository> remoteRepositories;
-
-    private List<ArtifactoryRepository> localRepositories;
-
-    private Map<String, ArtifactoryProxy> proxies;
-
     public ArtifactoryConfig( Xpp3Dom dom )
     {
         this.dom = dom;
@@ -67,80 +59,69 @@ public class ArtifactoryConfig
 
     public List<ArtifactoryRepository> getLocalRepositories()
     {
-        if ( localRepositories == null )
+        Xpp3Dom repositoriesDom = dom.getChild( "localRepositories" );
+        if ( repositoriesDom == null )
         {
-            Xpp3Dom repositoriesDom = dom.getChild( "localRepositories" );
-            if ( repositoriesDom == null )
-            {
-                return Collections.emptyList();
-            }
-
-            localRepositories = new ArrayList<ArtifactoryRepository>();
-            for ( Xpp3Dom repoDom : repositoriesDom.getChildren( "localRepository" ) )
-            {
-                localRepositories.add( new ArtifactoryRepository( repoDom ) );
-            }
-            localRepositories = Collections.unmodifiableList( localRepositories );
+            return Collections.emptyList();
         }
+
+        List<ArtifactoryRepository> localRepositories = new ArrayList<ArtifactoryRepository>();
+        for ( Xpp3Dom repoDom : repositoriesDom.getChildren( "localRepository" ) )
+        {
+            localRepositories.add( new ArtifactoryRepository( repoDom ) );
+        }
+        localRepositories = Collections.unmodifiableList( localRepositories );
         return localRepositories;
     }
 
     public List<ArtifactoryRepository> getRemoteRepositories()
     {
-        if ( remoteRepositories == null )
+        Xpp3Dom repositoriesDom = dom.getChild( "remoteRepositories" );
+        if ( repositoriesDom == null )
         {
-            Xpp3Dom repositoriesDom = dom.getChild( "remoteRepositories" );
-            if ( repositoriesDom == null )
-            {
-                return Collections.emptyList();
-            }
-
-            remoteRepositories = new ArrayList<ArtifactoryRepository>();
-            for ( Xpp3Dom repoDom : repositoriesDom.getChildren( "remoteRepository" ) )
-            {
-                remoteRepositories.add( new ArtifactoryRepository( repoDom ) );
-            }
-            remoteRepositories = Collections.unmodifiableList( remoteRepositories );
+            return Collections.emptyList();
         }
+
+        List<ArtifactoryRepository> remoteRepositories = new ArrayList<ArtifactoryRepository>();
+        for ( Xpp3Dom repoDom : repositoriesDom.getChildren( "remoteRepository" ) )
+        {
+            remoteRepositories.add( new ArtifactoryRepository( repoDom ) );
+        }
+        remoteRepositories = Collections.unmodifiableList( remoteRepositories );
         return remoteRepositories;
     }
 
     public List<ArtifactoryVirtualRepository> getVirtualRepositories()
     {
-        if ( virtualRepositories == null )
+        Xpp3Dom repositoriesDom = dom.getChild( "virtualRepositories" );
+        if ( repositoriesDom == null )
         {
-            Xpp3Dom repositoriesDom = dom.getChild( "virtualRepositories" );
-            if ( repositoriesDom == null )
-            {
-                return Collections.emptyList();
-            }
-
-            virtualRepositories = new ArrayList<ArtifactoryVirtualRepository>();
-            for ( Xpp3Dom repoDom : repositoriesDom.getChildren( "virtualRepository" ) )
-            {
-                virtualRepositories.add( new ArtifactoryVirtualRepository( repoDom ) );
-            }
-            virtualRepositories = Collections.unmodifiableList( virtualRepositories );
+            return Collections.emptyList();
         }
+
+        List<ArtifactoryVirtualRepository> virtualRepositories = new ArrayList<ArtifactoryVirtualRepository>();
+        for ( Xpp3Dom repoDom : repositoriesDom.getChildren( "virtualRepository" ) )
+        {
+            virtualRepositories.add( new ArtifactoryVirtualRepository( repoDom ) );
+        }
+        virtualRepositories = Collections.unmodifiableList( virtualRepositories );
         return virtualRepositories;
     }
 
     public Map<String, ArtifactoryProxy> getProxies()
     {
-        if ( proxies == null )
+        Xpp3Dom proxiesDom = dom.getChild( "proxies" );
+        if ( proxiesDom == null )
         {
-            Xpp3Dom proxiesDom = dom.getChild( "proxies" );
-            if ( proxiesDom == null )
-            {
-                return Collections.emptyMap();
-            }
-
-            proxies = new LinkedHashMap<String, ArtifactoryProxy>();
-            for ( Xpp3Dom proxyDom : proxiesDom.getChildren( "proxy" ) )
-            {
-                proxies.put( getValue( proxyDom, "key" ), new ArtifactoryProxy( proxyDom ) );
-            }
+            return Collections.emptyMap();
         }
+
+        Map<String, ArtifactoryProxy> proxies = new LinkedHashMap<String, ArtifactoryProxy>();
+        for ( Xpp3Dom proxyDom : proxiesDom.getChildren( "proxy" ) )
+        {
+            proxies.put( getValue( proxyDom, "key" ), new ArtifactoryProxy( proxyDom ) );
+        }
+        proxies = Collections.unmodifiableMap( proxies );
         return proxies;
     }
 

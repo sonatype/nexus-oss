@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
@@ -20,9 +21,15 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
+import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryProxy;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryRepository;
+import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryVirtualRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -87,25 +94,10 @@ public class ArtifactoryMigrationPlexusResource
 
                 validate( cfg.getLocalRepositories(), cfg.getRemoteRepositories() );
 
-                for ( ArtifactoryRepository repo : cfg.getLocalRepositories() )
-                {
-                    CRepository nexusRepo = new CRepository();
-                    nexusRepo.setId( repo.getKey() );
-                    nexusRepo.setName( repo.getDescription() );
-                    if ( repo.getHandleReleases() )
-                    {
-                        nexusRepo.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_RELEASE );
-                    }
-                    else if ( repo.getHandleSnapshots() )
-                    {
-                        nexusRepo.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_SNAPSHOT );
-                    }
-                    else
-                    {
-                        // TODO
-                    }
-                    getNexus().createRepository( nexusRepo );
-                }
+                importRepositories( cfg.getLocalRepositories(), cfg.getProxies() );
+                importRepositories( cfg.getRemoteRepositories(), cfg.getProxies() );
+
+                importGroups( cfg.getVirtualRepositories() );
 
             }
             catch ( Exception e )
@@ -115,7 +107,84 @@ public class ArtifactoryMigrationPlexusResource
                 throw new ResourceException( e );
             }
         }
-        return super.upload( context, request, response, files );
+        return null;
+    }
+
+    private void importGroups( List<ArtifactoryVirtualRepository> virtualRepositories )
+        throws ResourceException
+    {
+        for ( ArtifactoryVirtualRepository virtualRepo : virtualRepositories )
+        {
+            CRepositoryGroup group = new CRepositoryGroup();
+            group.setGroupId( virtualRepo.getKey() );
+            group.setName( virtualRepo.getKey() );
+
+            for ( String repo : virtualRepo.getRepositories() )
+            {
+                group.addRepository( repo );
+            }
+
+            try
+            {
+                getNexus().createRepositoryGroup( group );
+            }
+            catch ( Exception e )
+            {
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to create group "
+                    + virtualRepo.getKey(), e );
+            }
+        }
+    }
+
+    private void importRepositories( List<ArtifactoryRepository> repositories, Map<String, ArtifactoryProxy> proxies )
+        throws ResourceException
+    {
+        for ( ArtifactoryRepository repo : repositories )
+        {
+            CRepository nexusRepo = new CRepository();
+            nexusRepo.setId( repo.getKey() );
+            nexusRepo.setName( repo.getDescription() );
+            if ( repo.getHandleSnapshots() )
+            {
+                nexusRepo.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_SNAPSHOT );
+            }
+
+            String url = repo.getUrl();
+            if ( url != null )
+            {
+                CRemoteStorage remote = new CRemoteStorage();
+                remote.setUrl( url );
+
+                String proxyId = repo.getProxy();
+                if ( proxyId != null )
+                {
+                    ArtifactoryProxy proxy = proxies.get( proxyId );
+
+                    CRemoteHttpProxySettings nexusProxy = new CRemoteHttpProxySettings();
+                    nexusProxy.setProxyHostname( proxy.getHost() );
+                    nexusProxy.setProxyPort( proxy.getPort() );
+
+                    CRemoteAuthentication authentication = new CRemoteAuthentication();
+                    authentication.setUsername( proxy.getUsername() );
+                    authentication.setPassword( proxy.getPassword() );
+                    nexusProxy.setAuthentication( authentication );
+
+                    remote.setHttpProxySettings( nexusProxy );
+                }
+                nexusRepo.setRemoteStorage( remote );
+            }
+
+            try
+            {
+                getNexus().createRepository( nexusRepo );
+            }
+            catch ( Exception e )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error creating repository "
+                    + repo.getKey() );
+            }
+        }
+
     }
 
     private void validate( List<ArtifactoryRepository>... repositoriesSet )
