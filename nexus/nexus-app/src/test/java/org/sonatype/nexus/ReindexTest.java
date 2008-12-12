@@ -54,7 +54,8 @@ public class ReindexTest
         // make the central download the remote indexes is found
         repoConfig.setDownloadRemoteIndexes( true );
 
-        // update repo --> this will spawn one task doing reindex on central
+        // update repo --> this will _NOT_ spawn one task doing reindex on central (coz we are modifying the same model
+        // got from readRepo())
         defaultNexus.updateRepository( repoConfig );
     }
 
