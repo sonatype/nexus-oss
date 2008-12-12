@@ -232,7 +232,7 @@ Sonatype.panels.GridViewer = function( config ) {
   this.createAddMenu();
   this.createDeleteButton();
   if ( toolbar ) {
-    this.tbar.concat( toolbar );
+    this.tbar = this.tbar.concat( toolbar );
   }
 
   this.cardPanel = new Ext.Panel( {
@@ -396,7 +396,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
                     this.dataStore.remove( rec );
                   }
                   else {
-                    Sonatype.utils.connectionError( action.response, 'Delete Failed!' );
+                    Sonatype.utils.connectionError( response, 'Delete Failed!' );
                   }
                 },
                 scope: this,

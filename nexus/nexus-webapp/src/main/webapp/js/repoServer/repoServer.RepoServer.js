@@ -316,10 +316,13 @@ Sonatype.repoServer.RepoServer = function(){
               ( sp.checkPermission('nexus:repositories', sp.CREATE) ||
                 sp.checkPermission('nexus:repositories', sp.DELETE) ||
                 sp.checkPermission('nexus:repositories', sp.EDIT)),
-            title: 'Repositories',
-            tabId: 'repos-config',
-            tabCode: Sonatype.repoServer.RepoEditPanel,
-            tabTitle: 'Repository Config'
+              title: 'Repositories',
+              tabId: 'st-repositories',
+              tabCode: Sonatype.repoServer.RepositoryPanel
+//            title: 'Repositories',
+//            tabId: 'repos-config',
+//            tabCode: Sonatype.repoServer.RepoEditPanel,
+//            tabTitle: 'Repository Config'
           },
           {
             enabled: sp.checkPermission('nexus:repogroups', sp.READ) &&

@@ -1139,6 +1139,25 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
   Ext.apply( this, config, defaultConfig );
 
   var sp = Sonatype.lib.Permissions;
+
+  var toolbar = sp.checkPermission( 'nexus:wastebasket', sp.DELETE ) ? 
+    [ {
+      id: 'repo-trash-btn',
+      text: 'Trash...',
+      icon: Sonatype.config.resourcePath + '/images/icons/user-trash.png',
+      cls: 'x-btn-text-icon',
+      tooltip: { title: 'Trash', text: 'Manage the Trash contents' },
+      menu: {
+        width:125,
+        items: [
+          {
+            text: 'Empty Trash',
+            handler: this.deleteTrashHandler,
+            scope: this
+          }
+        ]
+      }
+    } ] : null;
   
   Sonatype.repoServer.RepositoryPanel.superclass.constructor.call( this, {
     addMenuInitEvent: 'repositoryAddMenuInit',
@@ -1147,6 +1166,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
     rowContextClickEvent: 'repositoryMenuInit',
     url: Sonatype.config.repos.urls.repositories,
     tabbedChildren: true,
+    tbar: toolbar,
     columns: [
       { name: 'resourceURI' },
       {
@@ -1192,17 +1212,32 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
 };
 
 Ext.extend( Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
-} );
-
-Sonatype.Events.addListener( 'nexusNavigationInit', function( nexusPanel ) {
-  nexusPanel.add( {
-    enabled: Sonatype.lib.Permissions.checkPermission( 'nexus:repostatus', Sonatype.lib.Permissions.READ ),
-    sectionId: 'st-nexus-views',
-    title: 'Repositories II',
-    tabTitle: 'Repositories',
-    tabId: 'st-repositories',
-    tabCode: Sonatype.repoServer.RepositoryPanel
-  } );
+  deleteTrashHandler: function( button, e ) {
+    Sonatype.utils.defaultToNo();
+    
+    Sonatype.MessageBox.show( {
+      animEl: this.gridPanel,
+      title: 'Empty Trash',
+      msg : 'Delete the entire contents of the Trash?<br><br>This operation cannot be undone!',
+      buttons: Sonatype.MessageBox.YESNO,
+      scope: this,
+      icon: Sonatype.MessageBox.QUESTION,
+      fn: function(btnName){
+        if ( btnName == 'yes' || btnName == 'ok' ) {
+          Ext.Ajax.request( {
+            callback: function( options, success, response ) {
+              if ( ! success ) {
+                Sonatype.utils.connectionError( response, 'Error emptying the trash!' );
+              }
+            },
+            scope: this,
+            method: 'DELETE',
+            url:Sonatype.config.repos.urls.trash
+          } );
+        }
+      }
+    } );
+  }
 } );
 
 Sonatype.repoServer.RepositoryBrowsePanel = function( config ) {
