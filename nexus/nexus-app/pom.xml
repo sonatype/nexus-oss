@@ -26,6 +26,10 @@
 			<groupId>org.sonatype.nexus</groupId>
 			<artifactId>nexus-configuration</artifactId>
 		</dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-oss-edition</artifactId>
+    </dependency>
 		<dependency>
 			<groupId>org.sonatype.nexus</groupId>
 			<artifactId>nexus-indexer</artifactId>

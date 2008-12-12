@@ -410,6 +410,11 @@ Sonatype.repoServer.RepoServer = function(){
         collapsible: true,
         collapsed: true,
         items: [
+          {
+            title: 'About Nexus',
+            tabId: 'AboutNexus',
+            tabCode: Sonatype.repoServer.HelpAboutPanel
+          },
           { title: 'Nexus Home',
             href: 'http://nexus.sonatype.org/' },
           { title: 'Getting Started',

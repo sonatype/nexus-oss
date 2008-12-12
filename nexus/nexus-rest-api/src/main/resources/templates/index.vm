@@ -82,6 +82,7 @@
   <script src="js/repoServer/repoServer.RepoEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.RepoServer.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>  
   <script src="js/repoServer/repoServer.RepoTargetEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.helpAbout.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
 
   <!-- Plugin post HEAD contributions start here -->
   #foreach( $pluginPostHeadContribution in $pluginPostHeadContributions )

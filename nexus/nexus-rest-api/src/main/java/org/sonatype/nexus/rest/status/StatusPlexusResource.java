@@ -110,6 +110,8 @@ public class StatusPlexusResource
         }
 
         resource.setClientPermissions( getClientPermissionsForCurrentUser( request ) );
+        
+        resource.setEdition( status.getEdition() );
 
         StatusResourceResponse result = new StatusResourceResponse();
 
