@@ -1,48 +1,124 @@
 package org.sonatype.nexus.plugins.migration.nxcm254;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.sonatype.nexus.test.utils.SearchMessageUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-public class NXCM254ImportArtifactoryTest
+public abstract class AbstractImportArtifactoryTest
     extends AbstractNexusIntegrationTest
 {
+    @BeforeClass
+    public static void clean()
+        throws IOException
+    {
+        cleanWorkDir();
+    }
 
     private RepositoryMessageUtil repositoryUtil;
 
     private GroupMessageUtil groupUtil;
 
-    public NXCM254ImportArtifactoryTest()
+    private SearchMessageUtil searchUtil;
+
+    public AbstractImportArtifactoryTest()
     {
         this.repositoryUtil = new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
         this.groupUtil = new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.searchUtil = new SearchMessageUtil();
     }
 
     @Test
     public void importArtifactory125()
         throws Exception
     {
-        int code = ImportMessageUtil.importBackup( getTestFile( "artifactory125.zip" ) );
+        int code = ImportMessageUtil.importBackup( getBackupFile() );
         Assert.assertTrue( "Unexpected result from server: " + code, Status.isSuccess( code ) );
 
         checkCreation();
         checkLocalRepo();
         checkRemoteRepo();
         checkVirtualRepo();
+
+        TaskScheduleUtil.waitForTasks( 40 );
+
+        Thread.sleep( 2000 );
+
+        checkIndexes();
+        checkDownloadArtifacts();
+    }
+
+    protected abstract File getBackupFile();
+
+    private void checkDownloadArtifacts()
+        throws Exception
+    {
+        checkArtifact( "nxcm254", "ext-releases", "1.0" );
+        checkArtifact( "nxcm254", "ext-snapshots", "1.0-SNAPSHOT" );
+        checkArtifact( "nxcm254", "libs-releases", "1.0" );
+        checkArtifact( "nxcm254", "libs-snapshots", "1.0-SNAPSHOT" );
+        checkArtifact( "nxcm254", "plugins-releases", "1.0" );
+        checkArtifact( "nxcm254", "plugins-snapshots", "1.0-SNAPSHOT" );
+    }
+
+    private void checkArtifact( String groupId, String artifactId, String version )
+        throws IOException
+    {
+        File artifact = getTestFile( "artifact.jar" );
+        Gav gav =
+            new Gav( groupId, artifactId, version, null, "jar", null, null, null, false, false, null, false, null );
+        File downloaded;
+        try
+        {
+            downloaded = downloadArtifactFromRepository( artifactId, gav, "target/downloads/nxcm254" );
+        }
+        catch ( IOException e )
+        {
+            Assert.fail( "Unable to download artifact " + artifactId + " got:\n" + e.getMessage() );
+            throw e; // never happen
+        }
+
+        Assert.assertTrue( "Downloaded artifact was not right, checksum comparation fail " + artifactId,
+                           FileTestingUtils.compareFileSHA1s( artifact, downloaded ) );
+    }
+
+    private void checkIndexes()
+        throws Exception
+    {
+        checkIndex( "nxcm254", "ext-releases", "1.0" );
+        checkIndex( "nxcm254", "ext-snapshots", "1.0-SNAPSHOT" );
+        checkIndex( "nxcm254", "libs-releases", "1.0" );
+        checkIndex( "nxcm254", "libs-snapshots", "1.0-SNAPSHOT" );
+        checkIndex( "nxcm254", "plugins-releases", "1.0" );
+        checkIndex( "nxcm254", "plugins-snapshots", "1.0-SNAPSHOT" );
+    }
+
+    private void checkIndex( String groupId, String artifactId, String version )
+        throws Exception
+    {
+        List<NexusArtifact> artifacts = searchUtil.searchFor( groupId, artifactId, version );
+        Assert.assertEquals( "Expected to found only one artifact (" + artifactId + ") instead of " + artifacts.size()
+            + "\n" + artifacts, 1, artifacts.size() );
     }
 
     @SuppressWarnings( "unchecked" )
