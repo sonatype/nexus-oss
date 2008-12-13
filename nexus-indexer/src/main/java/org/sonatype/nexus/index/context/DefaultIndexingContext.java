@@ -310,7 +310,13 @@ public class DefaultIndexingContext
     public void updateTimestamp( boolean save )
         throws IOException
     {
-        timestamp = new Date();
+        updateTimestamp( save, new Date() );
+    }
+
+    public void updateTimestamp( boolean save, Date timestamp )
+        throws IOException
+    {
+        this.timestamp = timestamp;
 
         if ( save )
         {
@@ -558,13 +564,23 @@ public class DefaultIndexingContext
         finally
         {
             r.close();
-            
+
             closeReaders();
         }
 
         rebuildGroups();
 
-        updateTimestamp( true );
+        Date mergedTimestamp = IndexUtils.getTimestamp( directory );
+
+        if ( getTimestamp() != null && mergedTimestamp != null && mergedTimestamp.after( getTimestamp() ) )
+        {
+            // we have both, keep the newest
+            updateTimestamp( true, mergedTimestamp );
+        }
+        else
+        {
+            updateTimestamp( true );
+        }
 
         optimize();
     }

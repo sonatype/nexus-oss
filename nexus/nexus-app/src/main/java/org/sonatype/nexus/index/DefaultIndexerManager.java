@@ -52,6 +52,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.packer.IndexPacker;
+import org.sonatype.nexus.index.packer.IndexPackingRequest;
 import org.sonatype.nexus.index.updater.IndexUpdater;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -486,7 +487,11 @@ public class DefaultIndexerManager
                 }
                 else
                 {
-                    indexPacker.packIndex( context, targetDir );
+                    IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
+
+                    packReq.setCreateIncrementalChunks( false );
+
+                    indexPacker.packIndex( packReq );
 
                     File[] files = targetDir.listFiles();
 
@@ -508,17 +513,20 @@ public class DefaultIndexerManager
                                     true,
                                     true,
                                     fis );
-                                if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
-                                {
-                                    // XXX review this! index pieces need to be proxied differently
-                                    // for proxy reposes, date is important
-                                    // for locally published indexes in proxy reposes, set file dates old
-                                    // by setting spoofed file timestamps old, we will refetch them when we can
-                                    fItem.setModified( 1 );
-                                    fItem.setCreated( 1 );
-                                }
 
-                                repository.storeItem( fItem );
+                                fItem.setModified( context.getTimestamp().getTime() );
+                                fItem.setCreated( context.getTimestamp().getTime() );
+
+                                if ( repository instanceof MavenRepository )
+                                {
+                                    // this is maven repo, so use the checksumming facility
+                                    ( (MavenRepository) repository ).storeItemWithChecksums( fItem );
+                                }
+                                else
+                                {
+                                    // simply store it
+                                    repository.storeItem( fItem );
+                                }
                             }
                             catch ( Exception e )
                             {
@@ -570,7 +578,11 @@ public class DefaultIndexerManager
                     getLogger().debug( "Packing the merged index context." );
                 }
 
-                indexPacker.packIndex( context, targetDir );
+                IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
+
+                packReq.setCreateIncrementalChunks( false );
+
+                indexPacker.packIndex( packReq );
 
                 FileInputStream fi = null;
 
@@ -885,8 +897,7 @@ public class DefaultIndexerManager
     {
         if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
         {
-            // this will force redownload
-            // XXX should only force downloading of the .properties file
+            // this will force remote check for newer files
             repository.clearCaches( "/.index" );
 
             IndexingContext context = null;
@@ -926,20 +937,33 @@ public class DefaultIndexerManager
                         return false; // index is up to date
                     }
 
-                    String chunkName = indexUpdater.getUpdateChunkName( contextTimestamp, properties );
+                    // iterate over chunks
+                    Date chunkTimestamp = indexUpdater.getNextUpdateChunkTimestamp( contextTimestamp, null, properties );
 
-                    if ( chunkName != null )
+                    if ( chunkTimestamp != null )
                     {
-                        // download update index chunk
-                        RepositoryItemUid zipUid = repository.createUid( "/.index/" + chunkName );
+                        while ( chunkTimestamp != null )
+                        {
+                            String chunkName = indexUpdater.getUpdateChunkName( chunkTimestamp, properties );
 
-                        StorageFileItem chunkItem = retrieveItem( repository, ctx, zipUid );
+                            // download update index chunk
+                            RepositoryItemUid zipUid = repository.createUid( "/.index/" + chunkName );
 
-                        tmpdir = createTmpDir();
+                            StorageFileItem chunkItem = retrieveItem( repository, ctx, zipUid );
 
-                        directory = unpackIndex( chunkItem, repository, tmpdir );
+                            tmpdir = createTmpDir();
 
-                        context.merge( directory );
+                            directory = unpackIndex( chunkItem, repository, tmpdir );
+
+                            context.merge( directory );
+
+                            context.updateTimestamp( true, chunkTimestamp );
+
+                            chunkTimestamp = indexUpdater.getNextUpdateChunkTimestamp(
+                                contextTimestamp,
+                                chunkTimestamp,
+                                properties );
+                        }
 
                         return true;
                     }

@@ -22,8 +22,8 @@ import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
 
-/** 
- * @author Jason van Zyl 
+/**
+ * @author Jason van Zyl
  */
 public interface IndexUpdater
 {
@@ -44,8 +44,9 @@ public interface IndexUpdater
     Properties fetchIndexProperties( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
         throws IOException;
 
-    Date getTimestamp( Properties properties, String key ); 
+    Date getTimestamp( Properties properties, String key );
 
-    String getUpdateChunkName( Date contextTimestamp, Properties properties ); 
+    Date getNextUpdateChunkTimestamp( Date contextTimestamp, Date lastChunkTimestamp, Properties properties );
 
+    String getUpdateChunkName( Date chunkTimestamp, Properties properties );
 }

@@ -51,15 +51,13 @@ public interface IndexingContext
 
     public static final String INDEX_PROPERTY_PREFIX = "nexus.index.";
 
-    public static final String INDEX_DAY_PREFIX = INDEX_PROPERTY_PREFIX + "day-";
-
     public static final String INDEX_ID = INDEX_PROPERTY_PREFIX + "id";
 
     public static final String INDEX_TIMESTAMP = INDEX_PROPERTY_PREFIX + "time";
 
-    public static final String INDEX_TIME_FORMAT = "yyyyMMddHHmmss.SSS Z";
+    public static final String INDEX_CHUNKS_RESOLUTION = INDEX_PROPERTY_PREFIX + "chunkResolution";
 
-    public static final String INDEX_TIME_DAY_FORMAT = "yyyyMMdd";
+    public static final String INDEX_TIME_FORMAT = "yyyyMMddHHmmss.SSS Z";
 
     /**
      * Returns this indexing context id.
@@ -110,6 +108,9 @@ public interface IndexingContext
         throws IOException;
 
     void updateTimestamp( boolean save )
+        throws IOException;
+
+    void updateTimestamp( boolean save, Date date )
         throws IOException;
 
     /**

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.lucene.store.Directory;
@@ -39,11 +40,11 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.index.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.packer.IndexChunker;
 
 /**
  * @author Jason van Zyl
  * @author Eugene Kuleshov
- * 
  * @plexus.component
  */
 public class DefaultIndexUpdater
@@ -52,6 +53,9 @@ public class DefaultIndexUpdater
 {
     /** @plexus.requirement */
     private WagonManager wagonManager;
+
+    /** @plexus.requirement role="org.sonatype.nexus.index.packer.IndexChunker" */
+    private Map<String, IndexChunker> indexChunkers;
 
     public Date fetchAndUpdateIndex( IndexingContext context, TransferListener listener )
         throws IOException
@@ -72,22 +76,26 @@ public class DefaultIndexUpdater
                 if ( contextTimestamp != null )
                 {
                     Properties properties = downloadIndexProperties( wagon );
-                    
+
                     Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
 
                     if ( updateTimestamp != null && contextTimestamp.after( updateTimestamp ) )
                     {
-                        return null;  // index is up to date
+                        return null; // index is up to date
                     }
-                    
-                    String chunkName = getUpdateChunkName( contextTimestamp, properties );
-                    
-                    if( chunkName != null )
+
+                    Date chunkTimestamp = getNextUpdateChunkTimestamp( contextTimestamp, null, properties );
+
+                    while ( chunkTimestamp != null )
                     {
+                        String chunkName = getUpdateChunkName( chunkTimestamp, properties );
+
                         downloadIndexChunk( context, wagon, chunkName );
-                        return updateTimestamp;
+
+                        chunkTimestamp = getNextUpdateChunkTimestamp( contextTimestamp, chunkTimestamp, properties );
                     }
-                    
+
+                    return updateTimestamp;
                 }
 
                 return downloadFullIndex( context, wagon );
@@ -118,7 +126,7 @@ public class DefaultIndexUpdater
         try
         {
             wagon = wagonManager.getWagon( repository );
-            
+
             if ( listener != null )
             {
                 wagon.addTransferListener( listener );
@@ -165,31 +173,31 @@ public class DefaultIndexUpdater
         }
     }
 
-    Date downloadFullIndex( IndexingContext context, Wagon wagon ) 
-        throws IOException 
+    Date downloadFullIndex( IndexingContext context, Wagon wagon )
+        throws IOException
     {
         RAMDirectory directory = new RAMDirectory();
-        
-        Date updateTimestamp = loadIndexDirectory( IndexingContext.INDEX_FILE + ".zip", wagon, directory);
+
+        Date updateTimestamp = loadIndexDirectory( IndexingContext.INDEX_FILE + ".zip", wagon, directory );
 
         context.replace( directory );
-        
+
         return updateTimestamp;
     }
-    
-    Date loadIndexDirectory(String remoteIndexFile, Wagon wagon, 
-        Directory directory) throws IOException 
+
+    Date loadIndexDirectory( String remoteIndexFile, Wagon wagon, Directory directory )
+        throws IOException
     {
         File indexArchive = File.createTempFile( "nexus", "index.zip" );
-        
+
         BufferedInputStream is = null;
 
         try
         {
             downloadResource( wagon, remoteIndexFile, indexArchive );
-            
+
             is = new BufferedInputStream( new FileInputStream( indexArchive ) );
-      
+
             return IndexUtils.unpackIndexArchive( is, directory );
         }
         finally
@@ -212,7 +220,7 @@ public class DefaultIndexUpdater
             downloadResource( wagon, remoteIndexProperties, indexProperties );
 
             Properties properties = new Properties();
-            
+
             FileInputStream fis = new FileInputStream( indexProperties );
             try
             {
@@ -255,52 +263,70 @@ public class DefaultIndexUpdater
     /**
      * Returns chunk name for downloading or null
      */
-    public String getUpdateChunkName( Date contextTimestamp, Properties properties )
+    public Date getNextUpdateChunkTimestamp( Date contextTimestamp, Date lastChunkTimestamp, Properties properties )
     {
         Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
-        
+
         if ( updateTimestamp == null || updateTimestamp.before( contextTimestamp ) )
         {
-            return null;  // no updates
+            return null; // no updates
         }
-        
-        int n = 0;
-        
-        while ( true ) 
-        {
-            Date chunkTimestamp = getTimestamp( properties, IndexingContext.INDEX_DAY_PREFIX + n );
 
-            if( chunkTimestamp == null )
+        String chunkResolution = properties.getProperty( IndexingContext.INDEX_CHUNKS_RESOLUTION );
+
+        if ( chunkResolution == null )
+        {
+            return null; // not chunked
+        }
+
+        Date lookingFor = lastChunkTimestamp == null ? contextTimestamp : lastChunkTimestamp;
+
+        int n = 0;
+
+        while ( true )
+        {
+            Date chunkTimestamp = getTimestamp( properties, IndexingContext.INDEX_PROPERTY_PREFIX + chunkResolution
+                + "-" + n );
+
+            if ( chunkTimestamp == null )
             {
                 break;
             }
-            
-            if( contextTimestamp.after( chunkTimestamp ) )
+
+            if ( lookingFor.before( chunkTimestamp ) )
             {
-                SimpleDateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_DAY_FORMAT );
-                return IndexingContext.INDEX_FILE + "." + df.format( contextTimestamp ) + ".zip";                
+                return chunkTimestamp;
             }
-        
+
             n++;
         }
-        
-        return null;  // no update chunk available
+
+        return null; // no update chunk available
     }
 
-    void downloadIndexChunk( IndexingContext context, Wagon wagon, String name ) 
-        throws IOException 
+    public String getUpdateChunkName( Date chunkTimestamp, Properties properties )
     {
-        RAMDirectory directory = new RAMDirectory();
-        
-        loadIndexDirectory( name, wagon, directory );
+        String chunkResolution = properties.getProperty( IndexingContext.INDEX_CHUNKS_RESOLUTION );
 
-        context.merge( directory );
+        if ( chunkResolution == null )
+        {
+            return null; // not chunked
+        }
+
+        IndexChunker chunker = indexChunkers.get( chunkResolution );
+
+        if ( chunker == null )
+        {
+            throw new IllegalArgumentException( "Unknown chunk resolution: " + chunkResolution );
+        }
+
+        return IndexingContext.INDEX_FILE + "." + chunker.getChunkId( chunkTimestamp ) + ".zip";
     }
 
     public Date getTimestamp( Properties properties, String key )
     {
         String indexTimestamp = properties.getProperty( key );
-        
+
         if ( indexTimestamp != null )
         {
             try
@@ -312,6 +338,16 @@ public class DefaultIndexUpdater
             }
         }
         return null;
+    }
+
+    private void downloadIndexChunk( IndexingContext context, Wagon wagon, String name )
+        throws IOException
+    {
+        RAMDirectory directory = new RAMDirectory();
+
+        loadIndexDirectory( name, wagon, directory );
+
+        context.merge( directory );
     }
 
     /**

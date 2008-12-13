@@ -18,8 +18,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,171 +45,183 @@ import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
  * 
  * @author Tamas Cservenak
  * @author Eugene Kuleshov
- * 
  * @plexus.component
  */
 public class DefaultIndexPacker
     extends AbstractLogEnabled
     implements IndexPacker
 {
-    private static final int MAX_CHUNKS = 30;
-
-    public void packIndex( IndexingContext context, File targetDir )
-        throws IOException, IllegalArgumentException
+    public void packIndex( IndexPackingRequest request )
+        throws IOException,
+            IllegalArgumentException
     {
-        if ( targetDir == null )
+        if ( request.getTargetDir() == null )
         {
             throw new IllegalArgumentException( "The target dir is null" );
         }
 
-        if ( targetDir.exists() )
+        if ( request.getTargetDir().exists() )
         {
-            if ( !targetDir.isDirectory() )
+            if ( !request.getTargetDir().isDirectory() )
             {
                 throw new IllegalArgumentException( //
-                    String.format( "Specified target path %s is not a directory", targetDir.getAbsolutePath() ) );
-            } 
-            if ( !targetDir.canWrite() ) 
+                    String.format( "Specified target path %s is not a directory", request
+                        .getTargetDir().getAbsolutePath() ) );
+            }
+            if ( !request.getTargetDir().canWrite() )
             {
-                throw new IllegalArgumentException( 
-                    String.format( "Specified target path %s is not writtable", targetDir.getAbsolutePath() ) );
+                throw new IllegalArgumentException( String.format( "Specified target path %s is not writtable", request
+                    .getTargetDir().getAbsolutePath() ) );
             }
         }
-        else 
+        else
         {
-            if( !targetDir.mkdirs() ) 
+            if ( !request.getTargetDir().mkdirs() )
             {
-                throw new IllegalArgumentException( "Can't create " + targetDir.getAbsolutePath() );
+                throw new IllegalArgumentException( "Can't create " + request.getTargetDir().getAbsolutePath() );
             }
         }
 
         Properties info = new Properties();
-        
-        DateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_DAY_FORMAT );
-        
-        Map<String, List<Integer>> chunks = getIndexChunks( context, df );
 
-        writeIndexChunks( context, info, MAX_CHUNKS, chunks, df, targetDir );
-        
-        writeIndexArchive( context, new File( targetDir, IndexingContext.INDEX_FILE + ".zip" ) );
+        if ( request.isCreateIncrementalChunks() )
+        {
+            if ( request.getIndexChunker() == null )
+            {
+                throw new IllegalArgumentException( "Can't create incremental index without supplied chunker!" );
+            }
 
-        writeIndexProperties( context, info, new File( targetDir, IndexingContext.INDEX_FILE + ".properties" ) );
+            Map<String, List<Integer>> chunks = getIndexChunks( request );
+
+            writeIndexChunks( info, chunks, request );
+
+        }
+
+        writeIndexArchive( request.getContext(), new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".zip" ) );
+
+        writeIndexProperties( request, info, new File( request.getTargetDir(), IndexingContext.INDEX_FILE
+            + ".properties" ) );
     }
 
-    Map<String, List<Integer>> getIndexChunks( IndexingContext context, DateFormat df ) 
+    private Map<String, List<Integer>> getIndexChunks( IndexPackingRequest request )
         throws IOException
     {
-        Map<String, List<Integer>> chunks = new TreeMap<String, List<Integer>>( Collections.<String>reverseOrder() );
-        
-        IndexReader r = context.getIndexReader();
-        
+        Map<String, List<Integer>> chunks = new TreeMap<String, List<Integer>>( Collections.<String> reverseOrder() );
+
+        IndexReader r = request.getContext().getIndexReader();
+
         for ( int i = 0; i < r.numDocs(); i++ )
         {
             if ( !r.isDeleted( i ) )
             {
                 Document d = r.document( i );
-    
+
                 String lastModified = d.get( ArtifactInfo.LAST_MODIFIED );
-                
-                if( lastModified != null )
+
+                if ( lastModified != null )
                 {
                     Date t = new Date( Long.parseLong( lastModified ) );
-                    getChunk( chunks, df.format( t ) ).add( i );
+
+                    String chunkId = request.getIndexChunker().getChunkId( t );
+
+                    if ( chunkId != null )
+                    {
+                        getChunk( chunks, chunkId ).add( i );
+                    }
                 }
             }
         }
-        
+
         return chunks;
     }
 
-    void writeIndexChunks( IndexingContext context, Properties info, 
-        int max, Map<String, List<Integer>> chunks, DateFormat df, File targetDir ) 
+    void writeIndexChunks( Properties info, Map<String, List<Integer>> chunks, IndexPackingRequest request )
         throws IOException
     {
         if ( chunks.size() < 2 )
         {
-           return;  // no updates available
+            return; // no updates available
         }
-        
+
         RAMDirectory chunkDir = new RAMDirectory();
 
         IndexingContext chunkContext;
-        try 
+        try
         {
             chunkContext = new DefaultIndexingContext(
-                context.getId(),
-                context.getRepositoryId(),
+                request.getContext().getId(),
+                request.getContext().getRepositoryId(),
                 null,
                 chunkDir,
                 null,
                 null,
-                context.getIndexCreators(), 
+                request.getContext().getIndexCreators(),
                 false );
-        } 
-        catch ( UnsupportedExistingLuceneIndexException ex ) 
+        }
+        catch ( UnsupportedExistingLuceneIndexException ex )
         {
             throw new IOException( "Can't create temporary indexing context" );
         }
 
-        IndexReader r = context.getIndexReader();
-        
+        IndexReader r = request.getContext().getIndexReader();
+
         IndexWriter w = chunkContext.getIndexWriter();
-        
+
         int n = 0;
-        
-        for ( Entry<String, List<Integer>> e : chunks.entrySet() ) 
+
+        for ( Entry<String, List<Integer>> e : chunks.entrySet() )
         {
             String key = e.getKey();
-          
+
             for ( int i : e.getValue() )
             {
-                context.copyDocument( r.document( i ), w );
+                request.getContext().copyDocument( r.document( i ), w );
             }
-            
+
             w.flush();
+
             w.optimize();
-            
-            try
-            {
-                info.put( IndexingContext.INDEX_DAY_PREFIX + n, format( df.parse( key ) ) );
-            }
-            catch ( ParseException ex ) 
-            {
-            }
-            
-            writeIndexArchive( chunkContext, new File( targetDir, IndexingContext.INDEX_FILE + "." + key + ".zip" ));
-        
+
+            info.put(
+                IndexingContext.INDEX_PROPERTY_PREFIX + request.getIndexChunker().getId() + "-" + n,
+                format( request.getIndexChunker().getChunkDate( key ) ) );
+
+            writeIndexArchive( chunkContext, new File( request.getTargetDir(), IndexingContext.INDEX_FILE + "." + key
+                + ".zip" ) );
+
             n++;
-            
-            if ( max <= n || n == chunks.size() - 1 ) 
+
+            if ( request.getMaxIndexChunks() <= n || n == chunks.size() - 1 )
             {
                 break;
             }
         }
-        
+
         w.close();
-        
-        chunkContext.close( /* delete files */ false );
+
+        r.close();
+
+        chunkContext.close( /* delete files */false );
 
         // ctxDir.delete();
 
         chunkDir.close();
     }
-  
+
     void writeIndexArchive( IndexingContext context, File targetArchive )
         throws IOException
     {
-        if ( targetArchive.exists() ) 
+        if ( targetArchive.exists() )
         {
             targetArchive.delete();
         }
-    
+
         OutputStream os = null;
-    
+
         try
         {
             os = new BufferedOutputStream( new FileOutputStream( targetArchive ), 4096 );
-    
+
             IndexUtils.packIndexArchive( context, os );
         }
         finally
@@ -220,19 +230,24 @@ public class DefaultIndexPacker
         }
     }
 
-    void writeIndexProperties( IndexingContext context, Properties info, File propertiesFile )
+    void writeIndexProperties( IndexPackingRequest request, Properties info, File propertiesFile )
         throws IOException
     {
-        info.setProperty( IndexingContext.INDEX_ID, context.getId() );
+        info.setProperty( IndexingContext.INDEX_ID, request.getContext().getId() );
 
-        Date timestamp = context.getTimestamp();
-        
-        if( timestamp == null )
+        Date timestamp = request.getContext().getTimestamp();
+
+        if ( timestamp == null )
         {
-            timestamp = new Date( 0 );  // never updated
+            timestamp = new Date( 0 ); // never updated
         }
-        
+
         info.setProperty( IndexingContext.INDEX_TIMESTAMP, format( timestamp ) );
+
+        if ( request.isCreateIncrementalChunks() )
+        {
+            info.setProperty( IndexingContext.INDEX_CHUNKS_RESOLUTION, request.getIndexChunker().getId() );
+        }
 
         OutputStream os = null;
 
@@ -248,21 +263,23 @@ public class DefaultIndexPacker
         }
     }
 
-    private String format( Date d ) 
+    private String format( Date d )
     {
         return new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT ).format( d );
     }
 
-    private List<Integer> getChunk( Map<String, List<Integer>> chunks, String key ) 
+    private List<Integer> getChunk( Map<String, List<Integer>> chunks, String key )
     {
         List<Integer> chunk = chunks.get( key );
-        if( chunk == null) 
+
+        if ( chunk == null )
         {
             chunk = new ArrayList<Integer>();
+
             chunks.put( key, chunk );
         }
+
         return chunk;
     }
-    
-}
 
+}

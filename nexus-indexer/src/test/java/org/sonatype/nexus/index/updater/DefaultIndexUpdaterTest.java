@@ -42,18 +42,20 @@ public class DefaultIndexUpdaterTest
     extends PlexusTestCase
 {
     private String repositoryId = "test";
+
     private File repositoryDir = null;
+
     private String repositoryUrl = "http://repo1.maven.org/maven2/";
 
     private NexusIndexer indexer;
-    
-    private IndexingContext context;
-    
 
-    protected void setUp() throws Exception 
+    private IndexingContext context;
+
+    protected void setUp()
+        throws Exception
     {
         super.setUp();
-        
+
         indexer = (NexusIndexer) lookup( NexusIndexer.class );
 
         Directory indexDirectory = new RAMDirectory();
@@ -67,7 +69,7 @@ public class DefaultIndexUpdaterTest
             null,
             NexusIndexer.MINIMAL_INDEX );
     }
-  
+
     public void testReplaceIndex()
         throws Exception
     {
@@ -110,15 +112,15 @@ public class DefaultIndexUpdaterTest
 
         // RAMDirectory is closed with context, forcing timestamp update
         IndexUtils.updateTimestamp( tempContext.getIndexDirectory(), tempContext.getTimestamp() );
-        
+
         RAMDirectory tempDir2 = new RAMDirectory( tempContext.getIndexDirectory() );
 
         Date newIndexTimestamp = tempContext.getTimestamp();
-        
+
         indexer.removeIndexingContext( tempContext, false );
 
         context.replace( tempDir2 );
-        
+
         assertEquals( newIndexTimestamp, context.getTimestamp() );
 
         q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
@@ -137,9 +139,9 @@ public class DefaultIndexUpdaterTest
 
         {
             Query q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
-    
+
             Collection<ArtifactInfo> content1 = indexer.searchFlat( q );
-    
+
             assertEquals( content1.toString(), 1, content1.size() );
         }
 
@@ -147,7 +149,7 @@ public class DefaultIndexUpdaterTest
 
         {
             Directory tempIndexDirectory = new RAMDirectory();
-            
+
             IndexingContext tempContext = indexer.addIndexingContext(
                 repositoryId + "temp",
                 repositoryId,
@@ -156,35 +158,41 @@ public class DefaultIndexUpdaterTest
                 repositoryUrl,
                 null,
                 NexusIndexer.MINIMAL_INDEX );
-    
+
             // indexer.addArtifactToIndex(
             // createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.2", null ),
             // tempContext );
-    
-            indexer.addArtifactToIndex(
-                createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.3", null ),
-                tempContext );
-    
-            indexer.addArtifactToIndex(
-                createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.4", null ),
-                tempContext );
+
+            indexer.addArtifactToIndex( createArtifactContext(
+                repositoryId,
+                "commons-lang",
+                "commons-lang",
+                "2.3",
+                null ), tempContext );
+
+            indexer.addArtifactToIndex( createArtifactContext(
+                repositoryId,
+                "commons-lang",
+                "commons-lang",
+                "2.4",
+                null ), tempContext );
 
             Query q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
-    
+
             Collection<ArtifactInfo> tempContent = indexer.searchFlat( q );
-    
+
             assertEquals( tempContent.toString(), 3, tempContent.size() );
 
             RAMDirectory tempDir2 = new RAMDirectory( tempContext.getIndexDirectory() );
-    
+
             indexer.removeIndexingContext( tempContext, false );
-    
+
             context.merge( tempDir2 );
 
             q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
-    
+
             Collection<ArtifactInfo> content2 = indexer.searchFlat( q );
-    
+
             assertEquals( content2.toString(), 3, content2.size() );
         }
     }
@@ -199,14 +207,14 @@ public class DefaultIndexUpdaterTest
         indexer.addArtifactToIndex(
             createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.3", null ),
             context );
-        
+
         indexer.addArtifactToIndex(
             createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.4", null ),
             context );
-        
+
         {
             Directory tempIndexDirectory = new RAMDirectory();
-    
+
             IndexingContext tempContext = indexer.addIndexingContext(
                 repositoryId + "temp",
                 repositoryId,
@@ -215,42 +223,55 @@ public class DefaultIndexUpdaterTest
                 repositoryUrl,
                 null,
                 NexusIndexer.MINIMAL_INDEX );
-    
-            indexer.addArtifactToIndex(
-                createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.4", null ),
-                tempContext );
-            
-            indexer.addArtifactToIndex(
-                createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.2", null ),
-                tempContext );
-            
-            indexer.deleteArtifactFromIndex(
-                createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.2", null ),
-                tempContext );
-            
-            indexer.deleteArtifactFromIndex(
-                createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.4", null ),
-                tempContext );
-            
+
+            indexer.addArtifactToIndex( createArtifactContext(
+                repositoryId,
+                "commons-lang",
+                "commons-lang",
+                "2.4",
+                null ), tempContext );
+
+            indexer.addArtifactToIndex( createArtifactContext(
+                repositoryId,
+                "commons-lang",
+                "commons-lang",
+                "2.2",
+                null ), tempContext );
+
+            indexer.deleteArtifactFromIndex( createArtifactContext(
+                repositoryId,
+                "commons-lang",
+                "commons-lang",
+                "2.2",
+                null ), tempContext );
+
+            indexer.deleteArtifactFromIndex( createArtifactContext(
+                repositoryId,
+                "commons-lang",
+                "commons-lang",
+                "2.4",
+                null ), tempContext );
+
             RAMDirectory tempDir2 = new RAMDirectory( tempContext.getIndexDirectory() );
-            
+
             indexer.removeIndexingContext( tempContext, false );
-            
+
             context.merge( tempDir2 );
         }
-    
+
         Query q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
 
         Collection<ArtifactInfo> content2 = indexer.searchFlat( q );
 
         assertEquals( content2.toString(), 1, content2.size() );
     }
-    
-    public void testMergeSearch() throws Exception 
+
+    public void testMergeSearch()
+        throws Exception
     {
         File repo1 = new File( getBasedir(), "src/test/nexus-658" );
         Directory indexDir1 = new RAMDirectory();
-        
+
         IndexingContext context1 = indexer.addIndexingContext(
             "nexus-658",
             "nexus-658",
@@ -260,10 +281,10 @@ public class DefaultIndexUpdaterTest
             null,
             NexusIndexer.DEFAULT_INDEX );
         indexer.scan( context1 );
-        
+
         File repo2 = new File( getBasedir(), "src/test/nexus-13" );
         Directory indexDir2 = new RAMDirectory();
-        
+
         IndexingContext context2 = indexer.addIndexingContext(
             "nexus-13",
             "nexus-13",
@@ -273,39 +294,43 @@ public class DefaultIndexUpdaterTest
             null,
             NexusIndexer.DEFAULT_INDEX );
         indexer.scan( context2 );
-        
+
         context1.merge( indexDir2 );
-        
+
         Query q = new TermQuery( new Term( ArtifactInfo.SHA1, "b5e9d009320d11b9859c15d3ad3603b455fa1c85" ) );
         FlatSearchRequest request = new FlatSearchRequest( q, context1 );
         FlatSearchResponse response = indexer.searchFlat( request );
-        
+
         Set<ArtifactInfo> results = response.getResults();
         ArtifactInfo artifactInfo = results.iterator().next();
         assertEquals( artifactInfo.artifactId, "dma.integration.tests" );
     }
-    
-    public void testMergeGroups() throws Exception 
+
+    public void testMergeGroups()
+        throws Exception
     {
         indexer.addArtifactToIndex(
             createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.2", null ),
             context );
-          
-        indexer.addArtifactToIndex(
-            createArtifactContext( repositoryId, "commons-collections", "commons-collections", "1.0", null ),
-            context );
+
+        indexer.addArtifactToIndex( createArtifactContext(
+            repositoryId,
+            "commons-collections",
+            "commons-collections",
+            "1.0",
+            null ), context );
 
         indexer.addArtifactToIndex(
             createArtifactContext( repositoryId, "org.slf4j", "slf4j-api", "1.4.2", null ),
             context );
-        
+
         indexer.addArtifactToIndex(
             createArtifactContext( repositoryId, "org.slf4j", "slf4j-log4j12", "1.4.2", null ),
             context );
-        
+
         {
             Directory tempIndexDirectory = new RAMDirectory();
-    
+
             IndexingContext tempContext = indexer.addIndexingContext(
                 repositoryId + "temp",
                 repositoryId,
@@ -314,76 +339,106 @@ public class DefaultIndexUpdaterTest
                 repositoryUrl,
                 null,
                 NexusIndexer.MINIMAL_INDEX );
-    
-            indexer.addArtifactToIndex(
-                createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.4", null ),
-                tempContext );
-            
+
+            indexer.addArtifactToIndex( createArtifactContext(
+                repositoryId,
+                "commons-lang",
+                "commons-lang",
+                "2.4",
+                null ), tempContext );
+
             indexer.addArtifactToIndex(
                 createArtifactContext( repositoryId, "junit", "junit", "3.8", null ),
                 tempContext );
-            
-            indexer.addArtifactToIndex(
-                createArtifactContext( repositoryId, "org.slf4j.foo", "jcl104-over-slf4j", "1.4.2", null ),
-                context );
-            
+
+            indexer.addArtifactToIndex( createArtifactContext(
+                repositoryId,
+                "org.slf4j.foo",
+                "jcl104-over-slf4j",
+                "1.4.2",
+                null ), context );
+
             RAMDirectory tempDir2 = new RAMDirectory( tempContext.getIndexDirectory() );
-            
+
             indexer.removeIndexingContext( tempContext, false );
-            
+
             context.merge( tempDir2 );
         }
-        
+
         Set<String> rootGroups = context.getRootGroups();
-        
-        assertEquals( rootGroups.toString(), 4, rootGroups.size());
-        
+
+        assertEquals( rootGroups.toString(), 4, rootGroups.size() );
+
         Set<String> allGroups = context.getAllGroups();
-        
-        assertEquals( allGroups.toString(), 5, allGroups.size());
+
+        assertEquals( allGroups.toString(), 5, allGroups.size() );
     }
-    
-    public void testGetUpdateChunkName() throws Exception 
+
+    public void testGetUpdateChunkName()
+        throws Exception
     {
         IndexUpdater updater = (IndexUpdater) lookup( IndexUpdater.class );
-        
-        Properties properties = new Properties();
-        properties.setProperty("nexus.index.id", "central");
-        properties.setProperty("nexus.index.time",  "20081129174241.859 -0600");
-        properties.setProperty("nexus.index.day-0", "20081129000000.000 -0600");
-        properties.setProperty("nexus.index.day-1", "20081128000000.000 -0600");
-        properties.setProperty("nexus.index.day-2", "20081127000000.000 -0600");
-        properties.setProperty("nexus.index.day-3", "20081126000000.000 -0600");
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss.SSS Z");
-        
+        Properties properties = new Properties();
+        properties.setProperty( "nexus.index.id", "central" );
+        properties.setProperty( "nexus.index.time", "20081129174241.859 -0600" );
+        properties.setProperty( "nexus.index.day-0", "20081129000000.000 -0600" );
+        properties.setProperty( "nexus.index.day-1", "20081128000000.000 -0600" );
+        properties.setProperty( "nexus.index.day-2", "20081127000000.000 -0600" );
+        properties.setProperty( "nexus.index.day-3", "20081126000000.000 -0600" );
+/*
+        SimpleDateFormat df = new SimpleDateFormat( "yyyyMMddHHmmss.SSS Z" );
+
         {
-            String updateChunkName = updater.getUpdateChunkName(df.parse("20081125010000.000 -0600"), properties);
-            assertEquals(null, updateChunkName);
+            Date updateChunkDate = updater.getNextUpdateChunkTimestamp(
+                df.parse( "20081125010000.000 -0600" ),
+                null,
+                properties );
+            String updateChunkName = updater.getUpdateChunkName( updateChunkDate );
+            assertEquals( null, updateChunkName );
         }
         {
-            String updateChunkName = updater.getUpdateChunkName(df.parse("20081126010000.000 -0600"), properties);
-            assertEquals("nexus-maven-repository-index.20081126.zip", updateChunkName);
+            Date updateChunkDate = updater.getNextUpdateChunkTimestamp(
+                df.parse( "20081126010000.000 -0600" ),
+                null,
+                properties );
+            String updateChunkName = updater.getUpdateChunkName( updateChunkDate );
+            assertEquals( "nexus-maven-repository-index.20081126.zip", updateChunkName );
         }
         {
-            String updateChunkName = updater.getUpdateChunkName(df.parse("20081127010000.000 -0600"), properties);
-            assertEquals("nexus-maven-repository-index.20081127.zip", updateChunkName);
+            Date updateChunkDate = updater.getNextUpdateChunkTimestamp(
+                df.parse( "20081127010000.000 -0600" ),
+                null,
+                properties );
+            String updateChunkName = updater.getUpdateChunkName( updateChunkDate );
+            assertEquals( "nexus-maven-repository-index.20081127.zip", updateChunkName );
         }
         {
-            String updateChunkName = updater.getUpdateChunkName(df.parse("20081128010000.000 -0600"), properties);
-            assertEquals("nexus-maven-repository-index.20081128.zip", updateChunkName);
+            Date updateChunkDate = updater.getNextUpdateChunkTimestamp(
+                df.parse( "20081128010000.000 -0600" ),
+                null,
+                properties );
+            String updateChunkName = updater.getUpdateChunkName( updateChunkDate );
+            assertEquals( "nexus-maven-repository-index.20081128.zip", updateChunkName );
         }
         {
-            String updateChunkName = updater.getUpdateChunkName(df.parse("20081129010000.000 -0600"), properties);
-            assertEquals("nexus-maven-repository-index.20081129.zip", updateChunkName);
+            Date updateChunkDate = updater.getNextUpdateChunkTimestamp(
+                df.parse( "20081129010000.000 -0600" ),
+                null,
+                properties );
+            String updateChunkName = updater.getUpdateChunkName( updateChunkDate );
+            assertEquals( "nexus-maven-repository-index.20081129.zip", updateChunkName );
         }
         {
-            String updateChunkName = updater.getUpdateChunkName(df.parse("20081130010000.000 -0600"), properties);
-            assertEquals(null, updateChunkName);
-        }
+            Date updateChunkDate = updater.getNextUpdateChunkTimestamp(
+                df.parse( "20081130010000.000 -0600" ),
+                null,
+                properties );
+            String updateChunkName = updater.getUpdateChunkName( updateChunkDate );
+            assertEquals( null, updateChunkName );
+        }*/
     }
-    
-    
+
     private ArtifactContext createArtifactContext( String repositoryId, String groupId, String artifactId,
         String version, String classifier )
     {

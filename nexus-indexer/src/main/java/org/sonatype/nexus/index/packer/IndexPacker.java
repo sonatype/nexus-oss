@@ -13,10 +13,7 @@
  *******************************************************************************/
 package org.sonatype.nexus.index.packer;
 
-import java.io.File;
 import java.io.IOException;
-
-import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
  * A component that creates defined ZIP and Properties file where the index will get packed.
@@ -36,7 +33,7 @@ public interface IndexPacker
      * @throws IllegalArgumentException when the targetDir already exists and is not a writable directory.
      * @throws IOException on lethal IO problem
      */
-    void packIndex( IndexingContext context, File targetDir )
+    void packIndex( IndexPackingRequest request )
         throws IOException,
             IllegalArgumentException;
 
