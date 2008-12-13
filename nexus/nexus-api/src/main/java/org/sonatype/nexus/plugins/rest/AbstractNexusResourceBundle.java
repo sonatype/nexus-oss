@@ -46,10 +46,5 @@ public class AbstractNexusResourceBundle
     {
         return null;
     }
-    
-    public String getLogoContribution( Map<String, Object> context )
-    {
-        return null;
-    }
 
 }

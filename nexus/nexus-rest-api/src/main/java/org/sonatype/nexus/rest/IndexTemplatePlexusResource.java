@@ -132,8 +132,6 @@ public class IndexTemplatePlexusResource
 
         List<String> pluginPreBodyContributions = new ArrayList<String>();
         List<String> pluginPostBodyContributions = new ArrayList<String>();
-        
-        List<String> pluginLogoContributions = new ArrayList<String>();
 
         for ( String key : bundles.keySet() )
         {
@@ -182,25 +180,16 @@ public class IndexTemplatePlexusResource
                 pluginContext,
                 postBodyTemplate,
                 pluginPostBodyContributions );
-            
-            // header logo
-            
-            String logoTemplate = bundle.getLogoContribution( pluginContext );
-            
-            evaluateIfNeeded(
-                templateRepresentation.getEngine(),
-                pluginContext,
-                logoTemplate,
-                pluginLogoContributions );
         }
+        
+        templatingContext.put( "appName", nexus.getSystemStatus().getAppName() );
+        templatingContext.put( "formattedAppName", nexus.getSystemStatus().getFormattedAppName() );
 
         templatingContext.put( "pluginPreHeadContributions", pluginPreHeadContributions );
         templatingContext.put( "pluginPostHeadContributions", pluginPostHeadContributions );
 
         templatingContext.put( "pluginPreBodyContributions", pluginPreBodyContributions );
         templatingContext.put( "pluginPostBodyContributions", pluginPostBodyContributions );
-        
-        templatingContext.put( "pluginLogoContributions", pluginLogoContributions );
 
         templateRepresentation.setDataModel( templatingContext );
 

@@ -28,6 +28,16 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
 public class SystemStatus
 {
     /**
+     * The Application Name
+     */
+    private String appName = "Sonatype Nexus";
+    
+    /**
+     * The Formatted Application Name, used whenever possible
+     */
+    private String formattedAppName = "Sonatype&trade Nexus&trade";
+    
+    /**
      * The Nexus Application version.
      */
     private String version = "unknown";
@@ -86,6 +96,26 @@ public class SystemStatus
      * Other error cause that blocked startup.
      */
     private Throwable errorCause;
+    
+    public String getAppName()
+    {
+        return appName;
+    }
+    
+    public void setAppName( String appName )
+    {
+        this.appName = appName;
+    }
+    
+    public String getFormattedAppName()
+    {
+        return formattedAppName;
+    }
+    
+    public void setFormattedAppName( String formattedAppName )
+    {
+        this.formattedAppName = formattedAppName;
+    }
 
     public String getVersion()
     {

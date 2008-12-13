@@ -22,7 +22,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>Sonatype Nexus</title>
+  <title>Sonatype Nexus Maven Repository Manager</title>
   
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <link rel="shortcut icon" href="favicon.ico" type="image/gif" />
@@ -106,10 +106,7 @@
 <div id="header">
   <div id="logo">
     <span>
-      Sonatype&trade; Nexus&trade;
-      #foreach( $pluginLogoContribution in $pluginLogoContributions )
-        $pluginLogoContribution
-      #end
+      $formattedAppName
     </span>
   </div>
   <div class="right-side">
@@ -119,7 +116,7 @@
 </div>
 
 <div id="welcome-tab" class="little-padding">
-  <p>Welcome to the <a href="http://nexus.sonatype.org" target="new">Sonatype Nexus Maven Repository Manager</a>.</p>
+  <p>Welcome to the <a href="http://nexus.sonatype.org" target="new">$appName</a>.</p>
   <br/>
 </div>
 
