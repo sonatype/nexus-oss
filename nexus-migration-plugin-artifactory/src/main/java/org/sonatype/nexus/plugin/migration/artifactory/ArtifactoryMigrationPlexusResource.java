@@ -271,10 +271,11 @@ public class ArtifactoryMigrationPlexusResource
     {
         File tempDir = getNexus().getNexusConfiguration().getTemporaryDirectory();
 
-        File artifactoryBackupZip = new File( tempDir, fileItem.getName() );
-
         try
         {
+            File artifactoryBackupZip =
+                File.createTempFile( FilenameUtils.getBaseName( fileItem.getName() ), ".zip", tempDir );
+
             InputStream in = fileItem.getInputStream();
             OutputStream out = new FileOutputStream( artifactoryBackupZip );
 
