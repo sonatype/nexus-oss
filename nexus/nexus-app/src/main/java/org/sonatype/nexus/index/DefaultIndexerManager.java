@@ -220,7 +220,7 @@ public class DefaultIndexerManager
         IndexingContext ctx = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
 
         if ( !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() )
-            || !ctx.getRepositoryUrl().equals( repository.getRemoteUrl() ) )
+            || !StringUtils.equalsIgnoreCase( ctx.getRepositoryUrl(), repository.getRemoteUrl() ) )
         {
             // recreate the context
             removeRepositoryIndexContext( repositoryId, false );
