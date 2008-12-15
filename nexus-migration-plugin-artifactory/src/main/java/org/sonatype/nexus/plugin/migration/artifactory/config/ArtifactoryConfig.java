@@ -91,20 +91,22 @@ public class ArtifactoryConfig
         return remoteRepositories;
     }
 
-    public List<ArtifactoryVirtualRepository> getVirtualRepositories()
+    public Map<String, ArtifactoryVirtualRepository> getVirtualRepositories()
     {
         Xpp3Dom repositoriesDom = dom.getChild( "virtualRepositories" );
         if ( repositoriesDom == null )
         {
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
 
-        List<ArtifactoryVirtualRepository> virtualRepositories = new ArrayList<ArtifactoryVirtualRepository>();
+        Map<String, ArtifactoryVirtualRepository> virtualRepositories =
+            new LinkedHashMap<String, ArtifactoryVirtualRepository>();
         for ( Xpp3Dom repoDom : repositoriesDom.getChildren( "virtualRepository" ) )
         {
-            virtualRepositories.add( new ArtifactoryVirtualRepository( repoDom ) );
+            ArtifactoryVirtualRepository virtualRepo = new ArtifactoryVirtualRepository( repoDom );
+            virtualRepositories.put( virtualRepo.getKey(), virtualRepo );
         }
-        virtualRepositories = Collections.unmodifiableList( virtualRepositories );
+        virtualRepositories = Collections.unmodifiableMap( virtualRepositories );
         return virtualRepositories;
     }
 

@@ -35,6 +35,7 @@ import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryProxy;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryRepository;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryVirtualRepository;
+import org.sonatype.nexus.plugin.migration.artifactory.util.VirtualRepositoryUtil;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ReindexTask;
@@ -122,16 +123,17 @@ public class ArtifactoryMigrationPlexusResource
         return null;
     }
 
-    private void importGroups( List<ArtifactoryVirtualRepository> virtualRepositories )
+    private void importGroups( Map<String, ArtifactoryVirtualRepository> map )
         throws ResourceException
     {
-        for ( ArtifactoryVirtualRepository virtualRepo : virtualRepositories )
+        VirtualRepositoryUtil.resolveRepositories( map );
+        for ( ArtifactoryVirtualRepository virtualRepo : map.values() )
         {
             CRepositoryGroup group = new CRepositoryGroup();
             group.setGroupId( virtualRepo.getKey() );
             group.setName( virtualRepo.getKey() );
 
-            for ( String repo : virtualRepo.getRepositories() )
+            for ( String repo : virtualRepo.getResolvedRepositories() )
             {
                 group.addRepository( repo );
             }

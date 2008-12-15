@@ -1,4 +1,4 @@
-package org.sonatype.nexus.plugins.migration.nxcm254;
+package org.sonatype.nexus.plugins.migration.util;
 
 import java.io.File;
 import java.io.IOException;

@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
+import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
@@ -26,14 +26,8 @@ import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractImportArtifactoryTest
-    extends AbstractNexusIntegrationTest
+    extends AbstractMigrationIntegrationTest
 {
-    @BeforeClass
-    public static void clean()
-        throws IOException
-    {
-        cleanWorkDir();
-    }
 
     private RepositoryMessageUtil repositoryUtil;
 
@@ -190,11 +184,6 @@ public abstract class AbstractImportArtifactoryTest
             groupsIds.add( group.getId() );
         }
         assertContains( groupsIds, "snapshots-only" );
-    }
-
-    private void assertContains( ArrayList<String> reposIds, String repoId )
-    {
-        Assert.assertTrue( repoId + " not found.\n" + reposIds, reposIds.contains( repoId ) );
     }
 
 }

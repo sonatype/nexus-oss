@@ -60,11 +60,11 @@ public class PaserConfigTest
         Assert.assertEquals( "http://snapshots.repository.codehaus.org", codehausSnapshots.getUrl() );
 
         // validate virtual repos
-        List<ArtifactoryVirtualRepository> virtualRepositories = config.getVirtualRepositories();
+        Map<String, ArtifactoryVirtualRepository> virtualRepositories = config.getVirtualRepositories();
         Assert.assertNotNull( virtualRepositories );
         Assert.assertEquals( 1, virtualRepositories.size() );
 
-        ArtifactoryVirtualRepository snapshotsOnly = virtualRepositories.get( 0 );
+        ArtifactoryVirtualRepository snapshotsOnly = virtualRepositories.get( "snapshots-only" );
         Assert.assertEquals( "snapshots-only", snapshotsOnly.getKey() );
         Assert.assertEquals( 4, snapshotsOnly.getRepositories().size() );
         Assert.assertEquals( "plugins-snapshots", snapshotsOnly.getRepositories().get( 1 ) );

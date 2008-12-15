@@ -13,6 +13,8 @@ public class ArtifactoryVirtualRepository
 
     private Xpp3Dom dom;
 
+    private List<String> resolvedRepositories;
+
     public ArtifactoryVirtualRepository( Xpp3Dom dom )
     {
         this.dom = dom;
@@ -37,6 +39,16 @@ public class ArtifactoryVirtualRepository
             repos.add( repoDom.getValue() );
         }
         return Collections.unmodifiableList( repos );
+    }
+
+    public List<String> getResolvedRepositories()
+    {
+        return resolvedRepositories;
+    }
+
+    public void setResolvedRepositories( List<String> resolvedRepositories )
+    {
+        this.resolvedRepositories = resolvedRepositories;
     }
 
 }
