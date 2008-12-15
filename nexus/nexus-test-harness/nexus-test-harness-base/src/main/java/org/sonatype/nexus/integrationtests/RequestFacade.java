@@ -51,7 +51,7 @@ import org.sonatype.nexus.test.utils.TestProperties;
 public class RequestFacade
 {
     public static final String SERVICE_LOCAL = "service/local/";
-    
+
     private static final Logger LOG = Logger.getLogger( RequestFacade.class );
 
     public static Response doGetRequest( String serviceURIpart )
@@ -86,7 +86,7 @@ public class RequestFacade
         {
             request.setEntity( representation );
         }
-        
+
         // change the MediaType if this is a GET, default to application/xml
         if( Method.GET.equals( method ) )
         {
@@ -196,6 +196,7 @@ public class RequestFacade
         try
         {
             client.executeMethod( method );
+            method.getResponseBodyAsString();
             return method;
         }
         finally
