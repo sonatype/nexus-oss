@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
@@ -26,7 +27,15 @@ public class ArtifactorySecurityConfig
     {
         XmlStreamReader reader = ReaderFactory.newXmlReader( file );
 
-        return build( Xpp3DomBuilder.build( reader ) );
+        try
+        {
+            return build( Xpp3DomBuilder.build( reader ) );
+        }
+
+        finally
+        {
+            reader.close();
+        }
     }
 
     public static ArtifactorySecurityConfig read( InputStream inputStream )
@@ -47,26 +56,7 @@ public class ArtifactorySecurityConfig
 
         for ( Xpp3Dom userDom : usersDom.getChildren() )
         {
-            String username = userDom.getChild( "username" ).getValue();
-
-            String password = userDom.getChild( "password" ).getValue();
-
-            ArtifactoryUser user = new ArtifactoryUser( username, password );
-
-            for ( Xpp3Dom roleDom : userDom.getChild( "authorities" ).getChildren() )
-            {
-                String roleValue = roleDom.getChild( "role" ).getValue();
-
-                if ( roleValue.equals( "ADMIN" ) )
-                {
-                    user.addRole( ArtifactoryRole.ADMIN );
-                }
-                else if ( roleValue.equals( "USER" ) )
-                {
-                    user.addRole( ArtifactoryRole.USER );
-                }
-            }
-            securityConfig.addUser( user );
+            securityConfig.addUser( buildUser( userDom ) );
         }
 
         // build repoPaths
@@ -74,18 +64,122 @@ public class ArtifactorySecurityConfig
 
         for ( Xpp3Dom repoPathDom : repoPathsDom.getChildren() )
         {
-            String repoKey = repoPathDom.getChild( "repoKey" ).getValue();
-
-            String path = repoPathDom.getChild( "path" ).getValue();
-
-            ArtifactoryRepoPath repoPath = new ArtifactoryRepoPath( repoKey, path );
-
-            securityConfig.addRepoPath( repoPath );
+            securityConfig.addRepoPath( buildRepoPath( repoPathDom ) );
         }
-        
-        // TODO: build acls
+
+        // build acls
+        Xpp3Dom aclsDom = dom.getChild( "acls" );
+
+        for ( Xpp3Dom aclDom : aclsDom.getChildren() )
+        {
+            String maskValue = aclDom.getChild( "mask" ).getValue();
+
+            // no permission set, skip
+            if ( maskValue.equals( "0" ) )
+            {
+                continue;
+            }
+            
+            Set<ArtifactoryPermission> permissions = ArtifactoryPermission.buildPermission( Integer.parseInt( maskValue ) );
+
+            String username = aclDom.getChild( "recipient" ).getValue();
+
+            ArtifactoryUser user = securityConfig.getUserByUsername( username );
+
+            ArtifactoryRepoPath repoPath = null;
+
+            Xpp3Dom repoPathDom = aclDom.getChild( "aclObjectIdentity" );
+
+            if ( repoPathDom.getAttribute( "reference" ) == null )
+            {
+                repoPath = buildRepoPath( repoPathDom );
+            }
+            else
+            {
+                repoPath = buildRepoPath( findReference(repoPathDom) );
+            }
+            
+            ArtifactoryAcl acl = new ArtifactoryAcl(repoPath, user);
+            
+            for ( ArtifactoryPermission permission : permissions)
+            {
+                acl.addPermission( permission );
+            }
+            
+            securityConfig.addAcl( acl );
+        }
+
         return securityConfig;
     }
+
+    public static ArtifactoryRepoPath buildRepoPath( Xpp3Dom dom )
+    {
+        String repoKeyValue = dom.getChild( "repoKey" ).getValue();
+
+        String pathValue = dom.getChild( "path" ).getValue();
+
+        return new ArtifactoryRepoPath( repoKeyValue, pathValue );
+    }
+    
+    public static ArtifactoryUser buildUser( Xpp3Dom dom )
+    {
+        String username = dom.getChild( "username" ).getValue();
+
+        String password = dom.getChild( "password" ).getValue();
+
+        ArtifactoryUser user = new ArtifactoryUser( username, password );
+
+        for ( Xpp3Dom roleDom : dom.getChild( "authorities" ).getChildren() )
+        {
+            String roleValue = roleDom.getChild( "role" ).getValue();
+
+            if ( roleValue.equals( "ADMIN" ) )
+            {
+                user.addRole( ArtifactoryRole.ADMIN );
+            }
+            else if ( roleValue.equals( "USER" ) )
+            {
+                user.addRole( ArtifactoryRole.USER );
+            }
+        }
+
+        return user;
+    }
+    
+    public static Xpp3Dom findReference( Xpp3Dom dom )
+    {
+        String ref = dom.getAttribute( "reference" );
+
+        Xpp3Dom currentDom = dom;
+
+        String[] tokens = ref.split( "/" );
+
+        for ( String token : tokens )
+        {
+            if ( token.equals( ".." ) )
+            {
+                currentDom = currentDom.getParent();
+            }
+            else if ( token.contains( "[" ) && token.contains( "]" ) )
+            {
+                int squareStart = token.indexOf( '[' );
+
+                int squareEnd = token.indexOf( ']' );
+
+                String childGroup = token.substring( 0, squareStart );
+
+                String childIndex = token.substring( squareStart + 1, squareEnd );
+
+                currentDom = currentDom.getChildren( childGroup )[Integer.parseInt( childIndex ) - 1];
+            }
+            else
+            {
+                currentDom = currentDom.getChild( token );
+            }
+        }
+        return currentDom;
+    }
+    
 
     public List<ArtifactoryUser> getUsers()
     {
@@ -115,6 +209,18 @@ public class ArtifactorySecurityConfig
     public void addAcl( ArtifactoryAcl acl )
     {
         acls.add( acl );
+    }
+    
+    public ArtifactoryUser getUserByUsername( String username )
+    {
+        for ( ArtifactoryUser user : users )
+        {
+            if ( user.getUsername().equals( username ) )
+            {
+                return user;
+            }
+        }
+        return null;
     }
 
 }

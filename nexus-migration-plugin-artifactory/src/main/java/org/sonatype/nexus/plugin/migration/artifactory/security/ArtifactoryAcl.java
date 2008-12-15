@@ -37,5 +37,24 @@ public class ArtifactoryAcl
     {
         permissions.add( permission );
     }
+    
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj )
+        {
+            return true;
+        }
+
+        if ( !( obj instanceof ArtifactoryAcl ) )
+        {
+            return false;
+        }
+
+        ArtifactoryAcl acl = (ArtifactoryAcl) obj;
+
+        return this.user.equals( acl.user ) && this.repoPath.equals( acl.repoPath )
+            && this.permissions.equals( acl.permissions );
+    }
 
 }
