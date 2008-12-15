@@ -10,7 +10,7 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-indexer</artifactId>
-  <version>1.2.0-SNAPSHOT</version>
+  <version>1.1.3-SNAPSHOT</version>
 
   <name>Sonatype Nexus: Indexer</name>
 
