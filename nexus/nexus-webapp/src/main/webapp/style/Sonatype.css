@@ -255,3 +255,12 @@ button.st-icon-refresh {
 .ext-strict .ext-mb-input{height:18px;}
 .ext-safari .ext-mb-input{height:20px;padding:0 3px;}
 .ext-gecko .ext-mb-input{padding-top:2px;padding-bottom:0;}
+
+.ext-strict .ext-safari .x-small-editor .x-form-text {
+    height: 18px !important;
+}
+.ext-safari .x-form-field-wrap .x-form-trigger{
+    position:static;
+    top:auto;
+    vertical-align:top;
+}
