@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -35,7 +36,7 @@ public class ArtifactorySecurityConfig
 
         finally
         {
-            reader.close();
+            IOUtils.closeQuietly( reader );
         }
     }
 
@@ -45,7 +46,14 @@ public class ArtifactorySecurityConfig
     {
         XmlStreamReader reader = ReaderFactory.newXmlReader( inputStream );
 
-        return build( Xpp3DomBuilder.build( reader ) );
+        try
+        {
+            return build( Xpp3DomBuilder.build( reader ) );
+        }
+        finally
+        {
+            IOUtils.closeQuietly( reader );
+        }
     }
 
     public static ArtifactorySecurityConfig build( Xpp3Dom dom )
