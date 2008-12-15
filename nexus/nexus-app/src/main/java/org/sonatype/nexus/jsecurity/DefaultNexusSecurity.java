@@ -465,24 +465,25 @@ public class DefaultNexusSecurity
         return null;
     }
 
-    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, String source, ValidationContext context )
-        throws InvalidConfigurationException,
-            NoSuchRoleMappingException
+    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, ValidationContext context )
+        throws InvalidConfigurationException
     {
-        this.manager.createUserRoleMapping( userRoleMapping, source, context );
+        this.manager.createUserRoleMapping( userRoleMapping, context );
+        save();
     }
 
-    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, String source )
-        throws InvalidConfigurationException,
-            NoSuchRoleMappingException
+    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping )
+        throws InvalidConfigurationException
     {
-        this.manager.createUserRoleMapping( userRoleMapping, source );
+        this.manager.createUserRoleMapping( userRoleMapping );
+        save();
     }
 
     public void deleteUserRoleMapping( String userId, String source )
         throws NoSuchRoleMappingException
     {
         this.manager.deleteUserRoleMapping( userId, source );
+        save();
     }
 
     public List<SecurityUserRoleMapping> listUserRoleMappings()
@@ -496,18 +497,20 @@ public class DefaultNexusSecurity
        return this.manager.readUserRoleMapping( userId, source );
     }
 
-    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, String source, ValidationContext context )
+    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, ValidationContext context )
         throws InvalidConfigurationException,
             NoSuchRoleMappingException
     {
-        this.manager.updateUserRoleMapping( userRoleMapping, source, context );
+        this.manager.updateUserRoleMapping( userRoleMapping, context );
+        save();
     }
 
-    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, String source )
+    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping )
         throws InvalidConfigurationException,
             NoSuchRoleMappingException
     {
-        this.manager.updateUserRoleMapping( userRoleMapping, source );
+        this.manager.updateUserRoleMapping( userRoleMapping );
+        save();
     }
 
 }

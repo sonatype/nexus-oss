@@ -39,7 +39,7 @@ public class PlexusUserPlexusResource
 {
     public static final String USER_ID_KEY = "userId";
     
-    @Requirement( role = PlexusUserManager.class )
+    @Requirement( role = PlexusUserManager.class, hint="additinalRoles" )
     private PlexusUserManager userManager;
     
     public PlexusUserPlexusResource()
