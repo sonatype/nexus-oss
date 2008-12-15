@@ -2,6 +2,7 @@ package org.sonatype.nexus.index.packer;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 /**
  * Weekly chunker. This Chunker will cut the index into weeks, based on LAST_MODIFIED, the timestamp when the file get
@@ -17,7 +18,13 @@ public class WeeklyIndexChunker
 
     private static final String INDEX_TIME_DAY_FORMAT = "yyyyMMW";
 
-    private SimpleDateFormat df = new SimpleDateFormat( INDEX_TIME_DAY_FORMAT );
+    private final SimpleDateFormat df;
+
+    public WeeklyIndexChunker()
+    {
+        this.df = new SimpleDateFormat( INDEX_TIME_DAY_FORMAT );
+        this.df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
+    }
 
     public String getId()
     {

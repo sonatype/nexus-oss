@@ -41,6 +41,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.index.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.packer.IndexChunker;
+import org.sonatype.nexus.index.packer.IndexPacker;
 
 /**
  * @author Jason van Zyl
@@ -331,7 +332,7 @@ public class DefaultIndexUpdater
         {
             try
             {
-                return new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT ).parse( indexTimestamp );
+                return new SimpleDateFormat( IndexPacker.INDEX_TIME_FORMAT ).parse( indexTimestamp );
             }
             catch ( ParseException ex )
             {

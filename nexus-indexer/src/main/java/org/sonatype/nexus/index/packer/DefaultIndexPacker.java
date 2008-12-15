@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
@@ -51,6 +52,14 @@ public class DefaultIndexPacker
     extends AbstractLogEnabled
     implements IndexPacker
 {
+    private final SimpleDateFormat df;
+
+    public DefaultIndexPacker()
+    {
+        this.df = new SimpleDateFormat( INDEX_TIME_FORMAT );
+        this.df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
+    }
+
     public void packIndex( IndexPackingRequest request )
         throws IOException,
             IllegalArgumentException
@@ -265,7 +274,7 @@ public class DefaultIndexPacker
 
     private String format( Date d )
     {
-        return new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT ).format( d );
+        return df.format( d );
     }
 
     private List<Integer> getChunk( Map<String, List<Integer>> chunks, String key )
