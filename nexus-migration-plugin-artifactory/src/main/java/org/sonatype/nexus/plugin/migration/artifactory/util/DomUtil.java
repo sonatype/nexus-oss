@@ -14,5 +14,38 @@ public class DomUtil
         }
         return node.getValue();
     }
+    
+    public static Xpp3Dom findReference( Xpp3Dom dom )
+    {
+        String ref = dom.getAttribute( "reference" );
 
+        Xpp3Dom currentDom = dom;
+
+        String[] tokens = ref.split( "/" );
+
+        for ( String token : tokens )
+        {
+            if ( token.equals( ".." ) )
+            {
+                currentDom = currentDom.getParent();
+            }
+            else if ( token.contains( "[" ) && token.contains( "]" ) )
+            {
+                int squareStart = token.indexOf( '[' );
+
+                int squareEnd = token.indexOf( ']' );
+
+                String childGroup = token.substring( 0, squareStart );
+
+                String childIndex = token.substring( squareStart + 1, squareEnd );
+
+                currentDom = currentDom.getChildren( childGroup )[Integer.parseInt( childIndex ) - 1];
+            }
+            else
+            {
+                currentDom = currentDom.getChild( token );
+            }
+        }
+        return currentDom;
+    }
 }

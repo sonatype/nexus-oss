@@ -12,6 +12,7 @@ import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.plugin.migration.artifactory.util.DomUtil;
 
 public class ArtifactorySecurityConfig
 {
@@ -96,7 +97,7 @@ public class ArtifactorySecurityConfig
             }
             else
             {
-                repoPath = buildRepoPath( findReference(repoPathDom) );
+                repoPath = buildRepoPath( DomUtil.findReference(repoPathDom) );
             }
             
             ArtifactoryAcl acl = new ArtifactoryAcl(repoPath, user);
@@ -145,41 +146,6 @@ public class ArtifactorySecurityConfig
 
         return user;
     }
-    
-    public static Xpp3Dom findReference( Xpp3Dom dom )
-    {
-        String ref = dom.getAttribute( "reference" );
-
-        Xpp3Dom currentDom = dom;
-
-        String[] tokens = ref.split( "/" );
-
-        for ( String token : tokens )
-        {
-            if ( token.equals( ".." ) )
-            {
-                currentDom = currentDom.getParent();
-            }
-            else if ( token.contains( "[" ) && token.contains( "]" ) )
-            {
-                int squareStart = token.indexOf( '[' );
-
-                int squareEnd = token.indexOf( ']' );
-
-                String childGroup = token.substring( 0, squareStart );
-
-                String childIndex = token.substring( squareStart + 1, squareEnd );
-
-                currentDom = currentDom.getChildren( childGroup )[Integer.parseInt( childIndex ) - 1];
-            }
-            else
-            {
-                currentDom = currentDom.getChild( token );
-            }
-        }
-        return currentDom;
-    }
-    
 
     public List<ArtifactoryUser> getUsers()
     {
