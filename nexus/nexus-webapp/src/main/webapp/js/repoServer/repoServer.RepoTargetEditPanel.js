@@ -155,13 +155,13 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
           },
           {
         	xtype: 'panel',
-  		    width: 100,
+  		    width: 120,
         	items: [
         	  {
                 xtype: 'button',
                 text: 'Add', 
                 style: 'padding-left: 7px',
-                minWidth: 85,
+                minWidth: 100,
                 id: 'button-add',
                 handler: this.addNewPattern,
                 scope: this
@@ -200,13 +200,13 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
           },
           { 
             xtype: 'panel',
-  		    width: 100,
+  		    width: 120,
         	items: [
 	          {
 	            xtype: 'button',
 		        text: 'Remove', 
                 style: 'padding-left: 6px',
-                minWidth: 85,
+                minWidth: 100,
 		        id: 'button-remove',
                 handler: this.removePattern,
                 scope: this
@@ -215,7 +215,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
 	            xtype: 'button',
 		        text: 'Remove All', 
                 style: 'padding-left: 6px; margin-top: 5px',
-                minWidth: 85,
+                minWidth: 100,
 		        id: 'button-remove-all',
                 handler: this.removeAllPatterns,
                 scope: this
