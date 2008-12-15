@@ -39,4 +39,22 @@ public class ArtifactoryUser
         roles.add( role );
     }
 
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj )
+        {
+            return true;
+        }
+
+        if ( !( obj instanceof ArtifactoryUser ) )
+        {
+            return false;
+        }
+
+        ArtifactoryUser user = (ArtifactoryUser) obj;
+
+        return this.username.equals( user.username ) && this.password.equals( user.password )
+            && this.roles.equals( user.roles );
+    }
 }

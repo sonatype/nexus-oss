@@ -4,7 +4,7 @@ public class ArtifactoryRepoPath
 {
     public static final String REPO_KEY_ANY = "ANY";
 
-    public static final String PATH = "ANY";
+    public static final String PATH_ANY = "ANY";
 
     private String repoKey;
 
@@ -27,5 +27,21 @@ public class ArtifactoryRepoPath
         return path;
     }
     
-    
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj )
+        {
+            return true;
+        }
+
+        if ( !( obj instanceof ArtifactoryRepoPath ) )
+        {
+            return false;
+        }
+
+        ArtifactoryRepoPath repoPath = (ArtifactoryRepoPath) obj;
+
+        return this.repoKey.equals( repoPath.repoKey ) && this.path.equals( repoPath.path );
+    }
 }
