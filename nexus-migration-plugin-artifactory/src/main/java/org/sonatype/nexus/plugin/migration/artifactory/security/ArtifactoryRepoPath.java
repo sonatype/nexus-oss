@@ -44,4 +44,10 @@ public class ArtifactoryRepoPath
 
         return this.repoKey.equals( repoPath.repoKey ) && this.path.equals( repoPath.path );
     }
+    
+    @Override
+    public int hashCode()
+    {
+        return repoKey.hashCode() * 13 + path.hashCode();
+    }
 }
