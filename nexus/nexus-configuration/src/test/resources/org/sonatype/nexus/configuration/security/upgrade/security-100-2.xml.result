@@ -27,12 +27,14 @@
   <userRoleMappings>
     <userRoleMapping>
       <userId>admin</userId>
+      <source>default</source>
       <roles>
         <role>admin</role>
       </roles>
     </userRoleMapping>
     <userRoleMapping>
       <userId>deployment</userId>
+      <source>default</source>
       <roles>
         <role>deployment</role>
         <role>repo-all-full</role>
@@ -40,6 +42,7 @@
     </userRoleMapping>
     <userRoleMapping>
       <userId>anonymous</userId>
+      <source>default</source>
       <roles>
         <role>anonymous</role>
         <role>repo-all-read</role>

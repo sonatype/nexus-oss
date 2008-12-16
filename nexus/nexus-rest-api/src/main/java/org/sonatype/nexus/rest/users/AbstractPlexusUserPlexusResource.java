@@ -31,6 +31,7 @@ public abstract class AbstractPlexusUserPlexusResource
         PlexusUserResource resource = new PlexusUserResource();
         
         resource.setUserId( user.getUserId() );
+        resource.setSource( user.getSource() );
         resource.setName( user.getName() );
         resource.setEmail( user.getEmailAddress() );
         

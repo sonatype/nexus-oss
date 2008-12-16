@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.jsecurity.locators.SecurityXmlPlexusUserLocator;
 import org.sonatype.jsecurity.model.v2_0_1.CPrivilege;
 import org.sonatype.jsecurity.model.v2_0_1.CProperty;
 import org.sonatype.jsecurity.model.v2_0_1.CRole;
@@ -70,7 +71,7 @@ public class Upgrade201to202
             newu.setStatus( oldu.getStatus() );
             
             // convert the old roles mapping to the new one
-            this.migrateOldRolesToUserRoleMapping( oldu.getId(), null, oldu.getRoles(), newc );
+            this.migrateOldRolesToUserRoleMapping( oldu.getId(), SecurityXmlPlexusUserLocator.SOURCE, oldu.getRoles(), newc );
 
             newc.addUser( newu );
         }

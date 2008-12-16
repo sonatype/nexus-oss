@@ -87,18 +87,21 @@
   <userRoleMappings>
     <userRoleMapping>
       <userId>admin</userId>
+      <source>default</source>
       <roles>
         <role>admin</role>
       </roles>
     </userRoleMapping>
     <userRoleMapping>
       <userId>deployment</userId>
+      <source>default</source>
       <roles>
         <role>deployment-customized</role>
       </roles>
     </userRoleMapping>
     <userRoleMapping>
       <userId>anonymous</userId>
+      <source>default</source>
       <roles>
         <role>anonymous-customized</role>
       </roles>

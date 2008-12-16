@@ -48,7 +48,7 @@ public class UserToRolePlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:ldapuserrolemap]" );
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:users]" );
     }
 
     @Override

@@ -455,7 +455,28 @@ public class NexusApplication
             new AliasingListConverter( ClientPermission.class, "permission" ) );
 
         xstream.omitField( ClientPermission.class, "modelEncoding" );
-
+        
+        xstream.omitField( UserToRoleResourceRequest.class, "modelEncoding" );
+        xstream.omitField( UserToRoleResource.class, "modelEncoding" );
+        xstream.alias( "user-to-role", UserToRoleResourceRequest.class );
+        
+        xstream.omitField( PlexusUserResourceResponse.class, "modelEncoding" );
+        xstream.alias( "plexus-user", PlexusUserResourceResponse.class );
+        xstream.omitField( PlexusUserResource.class, "modelEncoding" );
+        xstream.registerLocalConverter( PlexusUserResource.class, "roles", new AliasingListConverter(
+            PlexusRoleResource.class,
+              "plexus-role" ) );
+        
+        xstream.omitField( PlexusRoleResource.class, "modelEncoding" );
+        xstream.alias( "plexus-role", PlexusRoleResource.class );
+        
+        xstream.omitField( PlexusUserListResourceResponse.class, "modelEncoding" );
+        xstream.alias( "plexus-user-list", PlexusUserListResourceResponse.class );
+        xstream.registerLocalConverter( PlexusUserListResourceResponse.class, "data", new AliasingListConverter(
+            PlexusUserResource.class,
+              "plexus-user" ) );
+        
+        
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );
         xstream.omitField( ModelBase.class, "modelEncoding" );

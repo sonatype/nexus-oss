@@ -30,99 +30,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang.time.DateUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.rest.NexusApplication;
-import org.sonatype.nexus.rest.model.AuthenticationClientPermissions;
-import org.sonatype.nexus.rest.model.AuthenticationLoginResource;
-import org.sonatype.nexus.rest.model.AuthenticationLoginResourceResponse;
-import org.sonatype.nexus.rest.model.AuthenticationSettings;
-import org.sonatype.nexus.rest.model.ClientPermission;
-import org.sonatype.nexus.rest.model.ConfigurationsListResource;
-import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
-import org.sonatype.nexus.rest.model.ContentListResource;
-import org.sonatype.nexus.rest.model.ContentListResourceResponse;
-import org.sonatype.nexus.rest.model.FeedListResource;
-import org.sonatype.nexus.rest.model.FeedListResourceResponse;
-import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
-import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
-import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
-import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
-import org.sonatype.nexus.rest.model.LogsListResource;
-import org.sonatype.nexus.rest.model.LogsListResourceResponse;
-import org.sonatype.nexus.rest.model.NFCRepositoryResource;
-import org.sonatype.nexus.rest.model.NFCResource;
-import org.sonatype.nexus.rest.model.NFCResourceResponse;
-import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.rest.model.NexusError;
-import org.sonatype.nexus.rest.model.NexusErrorResponse;
-import org.sonatype.nexus.rest.model.PlexusComponentListResource;
-import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
-import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
-import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
-import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
-import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
-import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
-import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
-import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
-import org.sonatype.nexus.rest.model.RepositoryContentClassListResource;
-import org.sonatype.nexus.rest.model.RepositoryContentClassListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
-import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
-import org.sonatype.nexus.rest.model.RepositoryGroupResource;
-import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryListResource;
-import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryMetaResource;
-import org.sonatype.nexus.rest.model.RepositoryMetaResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryProxyResource;
-import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryRouteListResource;
-import org.sonatype.nexus.rest.model.RepositoryRouteListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
-import org.sonatype.nexus.rest.model.RepositoryRouteResource;
-import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryShadowResource;
-import org.sonatype.nexus.rest.model.RepositoryStatusListResource;
-import org.sonatype.nexus.rest.model.RepositoryStatusListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryStatusResource;
-import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
-import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryTargetResource;
-import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
-import org.sonatype.nexus.rest.model.RoleListResourceResponse;
-import org.sonatype.nexus.rest.model.RoleResource;
-import org.sonatype.nexus.rest.model.RoleResourceRequest;
-import org.sonatype.nexus.rest.model.RoleResourceResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
-import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
-import org.sonatype.nexus.rest.model.SearchResponse;
-import org.sonatype.nexus.rest.model.SmtpSettings;
-import org.sonatype.nexus.rest.model.StatusConfigurationValidationResponse;
-import org.sonatype.nexus.rest.model.StatusResource;
-import org.sonatype.nexus.rest.model.StatusResourceResponse;
-import org.sonatype.nexus.rest.model.UserChangePasswordRequest;
-import org.sonatype.nexus.rest.model.UserChangePasswordResource;
-import org.sonatype.nexus.rest.model.UserForgotPasswordRequest;
-import org.sonatype.nexus.rest.model.UserForgotPasswordResource;
-import org.sonatype.nexus.rest.model.UserListResourceResponse;
-import org.sonatype.nexus.rest.model.UserResource;
-import org.sonatype.nexus.rest.model.UserResourceRequest;
-import org.sonatype.nexus.rest.model.UserResourceResponse;
-import org.sonatype.nexus.rest.model.WastebasketResource;
-import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
+import org.sonatype.nexus.rest.model.*;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
@@ -1439,6 +1347,93 @@ public class TestMarshalUnmarchal
 
     }
 
+    public void testUserToRoleResourceRequest()
+    {
+        UserToRoleResourceRequest resourceResponse = new UserToRoleResourceRequest();
+        UserToRoleResource resource = new UserToRoleResource();
+        resourceResponse.setData( resource );
+        
+        resource.setUserId( "userId" );
+        resource.setSource( "source" );
+        resource.addRole( "role1" );
+        resource.addRole( "role2" );
+
+        this.marshalUnmarchalThenCompare( resourceResponse );
+        this.validateXmlHasNoPackageNames( resourceResponse );
+
+    }
+    
+    public void testPlexusUserResourceResponse()
+    {
+        PlexusUserResourceResponse resourceResponse = new PlexusUserResourceResponse();
+        PlexusUserResource resource = new PlexusUserResource();
+        resourceResponse.setData( resource );
+        
+        resource.setUserId( "userId" );
+        resource.setSource( "source" );
+        resource.setEmail( "email" );
+        PlexusRoleResource role1 = new PlexusRoleResource();
+        role1.setName( "role1" );
+        role1.setSource( "source1" );
+        role1.setRoleId( "roleId1" );
+        resource.addRole( role1 );
+
+        PlexusRoleResource role2 = new PlexusRoleResource();
+        role2.setName( "role2" );
+        role2.setSource( "source2" );
+        role2.setRoleId( "roleId2" );
+        resource.addRole( role2 );
+
+        this.marshalUnmarchalThenCompare( resourceResponse );
+        this.validateXmlHasNoPackageNames( resourceResponse );
+
+    }
+    
+    public void testPlexusUserListResourceResponse()
+    {
+        PlexusUserListResourceResponse resourceResponse = new PlexusUserListResourceResponse();
+        PlexusUserResource resource1 = new PlexusUserResource();
+        resourceResponse.addData( resource1 );
+        
+        resource1.setUserId( "userId" );
+        resource1.setSource( "source" );
+        resource1.setEmail( "email" );
+        PlexusRoleResource role1 = new PlexusRoleResource();
+        role1.setName( "role1" );
+        role1.setSource( "source1" );
+        role1.setRoleId( "roleId1" );
+        resource1.addRole( role1 );
+
+        PlexusRoleResource role2 = new PlexusRoleResource();
+        role1.setName( "role2" );
+        role1.setSource( "source2" );
+        role1.setRoleId( "roleId2" );
+        resource1.addRole( role2 );
+        
+        
+        PlexusUserResource resource2 = new PlexusUserResource();
+        resourceResponse.addData( resource2 );
+        
+        resource2.setUserId( "userId" );
+        resource2.setSource( "source" );
+        resource2.setEmail( "email" );
+        PlexusRoleResource role3 = new PlexusRoleResource();
+        role3.setName( "role1" );
+        role3.setSource( "source1" );
+        role3.setRoleId( "roleId1" );
+        resource2.addRole( role3 );
+
+        PlexusRoleResource role4 = new PlexusRoleResource();
+        role4.setName( "role2" );
+        role4.setSource( "source2" );
+        role4.setRoleId( "roleId2" );
+        resource2.addRole( role4 );
+
+        this.marshalUnmarchalThenCompare( resourceResponse );
+        this.validateXmlHasNoPackageNames( resourceResponse );
+
+    }
+    
     public void testPlexusComponentListResourceResponse()
     {
         PlexusComponentListResourceResponse resourceResponse = new PlexusComponentListResourceResponse();
@@ -1462,11 +1457,14 @@ public class TestMarshalUnmarchal
     {
         // do xml
         String xml = this.xstreamXML.toXML( obj );
+        
+//        System.out.println( "xml: \n"+  xml);
         this.compareObjects( obj, xstreamXML.fromXML( xml ) );
 
         // do json
         String json = new StringBuffer( "{ \"" ).append( obj.getClass().getName() ).append( "\" : " ).append(
             this.xstreamJSON.toXML( obj ) ).append( " }" ).toString();
+//        System.out.println( "json:\n "+ json );
         try
         {
             this.compareObjects( obj, xstreamJSON.fromXML( json, obj.getClass().newInstance() ) );
@@ -1503,6 +1501,8 @@ public class TestMarshalUnmarchal
         //        
         // Assert.assertFalse( "Found <string> XML: " + obj.getClass() + "\n" + xml, xml.contains( "<string>" ) );
 
+        // also check for modelEncoding
+        Assert.assertFalse( xml.contains( "modelEncoding" ) );
     }
 
     private String toDebugString( Object obj )

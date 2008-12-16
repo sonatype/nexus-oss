@@ -48,14 +48,6 @@ public class PlexusUserListPlexusResource
     }
     
     @Override
-    public void configureXStream( XStream xstream )
-    {
-        xstream.omitField( PlexusUserListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( PlexusUserResource.class, "modelEncoding" );
-        xstream.omitField( PlexusRoleResource.class, "modelEncoding" );
-    }
-    
-    @Override
     public Object getPayloadInstance()
     {
         return null;
