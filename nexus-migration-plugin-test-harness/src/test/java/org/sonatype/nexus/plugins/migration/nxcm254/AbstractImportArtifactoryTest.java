@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -43,11 +44,14 @@ public abstract class AbstractImportArtifactoryTest
     }
 
     @Test
-    public void importArtifactory125()
+    public void importArtifactory()
         throws Exception
     {
-        int code = ImportMessageUtil.importBackup( getBackupFile() );
-        Assert.assertTrue( "Unexpected result from server: " + code, Status.isSuccess( code ) );
+        MigrationSummaryDTO migrationSummary = ImportMessageUtil.importBackup( getBackupFile() );
+        Assert.assertNotNull( "Unexpected result from server: " + migrationSummary, migrationSummary );
+
+        Status status = ImportMessageUtil.commitImport( migrationSummary ).getStatus();
+        Assert.assertTrue( "Unable to commit import " + status, status.isSuccess() );
 
         checkCreation();
         checkLocalRepo();

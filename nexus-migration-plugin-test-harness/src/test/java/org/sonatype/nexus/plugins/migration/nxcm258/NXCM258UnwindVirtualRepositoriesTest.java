@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
@@ -28,8 +29,11 @@ public class NXCM258UnwindVirtualRepositoriesTest
     public void importWindVirtualRepos()
         throws Exception
     {
-        int code = ImportMessageUtil.importBackup( getTestFile( "windedBackup.zip" ) );
-        Assert.assertTrue( "Unexpected result from server: " + code, Status.isSuccess( code ) );
+        MigrationSummaryDTO migrationSummary = ImportMessageUtil.importBackup( getTestFile( "windedBackup.zip" ) );
+        Assert.assertNotNull( "Unexpected result from server: " + migrationSummary, migrationSummary );
+
+        Status status = ImportMessageUtil.commitImport( migrationSummary ).getStatus();
+        Assert.assertTrue( "Unable to commit import " + status, status.isSuccess() );
 
         RepositoryGroupResource group = this.groupUtil.getGroup( "libs-snapshots" );
         Assert.assertNotNull( group );

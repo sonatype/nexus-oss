@@ -1,6 +1,6 @@
 package org.sonatype.nexus.plugin.migration.artifactory.config.test;
+
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -22,18 +22,18 @@ public class PaserConfigTest
         ArtifactoryConfig config = ArtifactoryConfig.read( input );
 
         // validate local repos
-        List<ArtifactoryRepository> localRepositories = config.getLocalRepositories();
+        Map<String, ArtifactoryRepository> localRepositories = config.getLocalRepositories();
         Assert.assertNotNull( localRepositories );
         Assert.assertEquals( 6, localRepositories.size() );
 
-        ArtifactoryRepository libsReleases = localRepositories.get( 0 );
+        ArtifactoryRepository libsReleases = localRepositories.get( "libs-releases" );
         Assert.assertEquals( "libs-releases", libsReleases.getKey() );
         Assert.assertEquals( "Local repository for in-house libraries", libsReleases.getDescription() );
         Assert.assertTrue( libsReleases.getHandleReleases() );
         Assert.assertFalse( libsReleases.getHandleSnapshots() );
         Assert.assertNull( libsReleases.getUrl() );
 
-        ArtifactoryRepository extSnapshots = localRepositories.get( 5 );
+        ArtifactoryRepository extSnapshots = localRepositories.get( "ext-snapshots" );
         Assert.assertEquals( "ext-snapshots", extSnapshots.getKey() );
         Assert.assertEquals( "Local repository for third party snapshots", extSnapshots.getDescription() );
         Assert.assertFalse( extSnapshots.getHandleReleases() );
@@ -41,18 +41,18 @@ public class PaserConfigTest
         Assert.assertNull( extSnapshots.getUrl() );
 
         // validate remote repos
-        List<ArtifactoryRepository> remoteRepositories = config.getRemoteRepositories();
+        Map<String, ArtifactoryRepository> remoteRepositories = config.getRemoteRepositories();
         Assert.assertNotNull( remoteRepositories );
         Assert.assertEquals( 3, remoteRepositories.size() );
 
-        ArtifactoryRepository repo1 = remoteRepositories.get( 0 );
+        ArtifactoryRepository repo1 = remoteRepositories.get( "repo1" );
         Assert.assertEquals( "repo1", repo1.getKey() );
         Assert.assertNull( repo1.getDescription() );
         Assert.assertTrue( repo1.getHandleReleases() );
         Assert.assertFalse( repo1.getHandleSnapshots() );
         Assert.assertEquals( "http://repo1.maven.org/maven2", repo1.getUrl() );
 
-        ArtifactoryRepository codehausSnapshots = remoteRepositories.get( 1 );
+        ArtifactoryRepository codehausSnapshots = remoteRepositories.get( "codehaus-snapshots" );
         Assert.assertEquals( "codehaus-snapshots", codehausSnapshots.getKey() );
         Assert.assertNull( codehausSnapshots.getDescription() );
         Assert.assertFalse( codehausSnapshots.getHandleReleases() );
@@ -74,7 +74,7 @@ public class PaserConfigTest
         Assert.assertNotNull( proxies );
         Assert.assertEquals( 1, proxies.size() );
 
-        ArtifactoryProxy unsuedProxy = proxies.values( ).iterator().next();
+        ArtifactoryProxy unsuedProxy = proxies.values().iterator().next();
         Assert.assertEquals( "unused-proxy", unsuedProxy.getKey() );
         Assert.assertEquals( "host", unsuedProxy.getHost() );
         Assert.assertEquals( 8080, unsuedProxy.getPort() );

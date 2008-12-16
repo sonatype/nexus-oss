@@ -5,10 +5,9 @@ import static org.sonatype.nexus.plugin.migration.artifactory.util.DomUtil.getVa
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.util.ReaderFactory;
@@ -57,37 +56,39 @@ public class ArtifactoryConfig
         }
     }
 
-    public List<ArtifactoryRepository> getLocalRepositories()
+    public Map<String, ArtifactoryRepository> getLocalRepositories()
     {
         Xpp3Dom repositoriesDom = dom.getChild( "localRepositories" );
         if ( repositoriesDom == null )
         {
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
 
-        List<ArtifactoryRepository> localRepositories = new ArrayList<ArtifactoryRepository>();
+        Map<String, ArtifactoryRepository> localRepositories = new HashMap<String, ArtifactoryRepository>();
         for ( Xpp3Dom repoDom : repositoriesDom.getChildren( "localRepository" ) )
         {
-            localRepositories.add( new ArtifactoryRepository( repoDom ) );
+            ArtifactoryRepository repo = new ArtifactoryRepository( repoDom );
+            localRepositories.put( repo.getKey(), repo );
         }
-        localRepositories = Collections.unmodifiableList( localRepositories );
+        localRepositories = Collections.unmodifiableMap( localRepositories );
         return localRepositories;
     }
 
-    public List<ArtifactoryRepository> getRemoteRepositories()
+    public Map<String, ArtifactoryRepository> getRemoteRepositories()
     {
         Xpp3Dom repositoriesDom = dom.getChild( "remoteRepositories" );
         if ( repositoriesDom == null )
         {
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
 
-        List<ArtifactoryRepository> remoteRepositories = new ArrayList<ArtifactoryRepository>();
+        Map<String, ArtifactoryRepository> remoteRepositories = new HashMap<String, ArtifactoryRepository>();
         for ( Xpp3Dom repoDom : repositoriesDom.getChildren( "remoteRepository" ) )
         {
-            remoteRepositories.add( new ArtifactoryRepository( repoDom ) );
+            ArtifactoryRepository repo = new ArtifactoryRepository( repoDom );
+            remoteRepositories.put( repo.getKey(), repo );
         }
-        remoteRepositories = Collections.unmodifiableList( remoteRepositories );
+        remoteRepositories = Collections.unmodifiableMap( remoteRepositories );
         return remoteRepositories;
     }
 
@@ -125,6 +126,15 @@ public class ArtifactoryConfig
         }
         proxies = Collections.unmodifiableMap( proxies );
         return proxies;
+    }
+
+    public Map<String, ArtifactoryRepository> getRepositories()
+    {
+        Map<String, ArtifactoryRepository> repositories = new HashMap<String, ArtifactoryRepository>();
+        repositories.putAll( getLocalRepositories() );
+        repositories.putAll( getRemoteRepositories() );
+        repositories = Collections.unmodifiableMap( repositories );
+        return repositories;
     }
 
 }
