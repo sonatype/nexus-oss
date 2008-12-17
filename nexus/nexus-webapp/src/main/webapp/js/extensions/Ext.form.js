@@ -510,9 +510,9 @@ Sonatype.ext.FormPanel = function( config ) {
         disabled: config.readOnly
       },
       {
-        handler: this.resetHandler,
+        handler: this.cancelButton ? this.cancelHandler : this.resetHandler,
         scope: this,
-        text: 'Reset'
+        text: this.cancelButton ? 'Cancel' : 'Reset'
       }
     ]
   };
@@ -641,7 +641,7 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
     return this.isNew ? this.uri :       // if new, return the uri
       ( this.payload.data.resourceURI ?  // if resouceURI is supplied, return it
           this.payload.data.resourceURI :
-          this.uri + '/' + payload.id ); // otherwise construct a uri
+          this.uri + '/' + this.payload.id ); // otherwise construct a uri
   },
   
   optionalFieldsetExpandHandler: function( panel ) {
