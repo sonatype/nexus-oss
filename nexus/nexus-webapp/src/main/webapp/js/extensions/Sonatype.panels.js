@@ -342,7 +342,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
     if ( ! panel ) {
       panel = new Sonatype.panels.AutoTabPanel( { 
         id: id,
-        title: rec.get( this.titleColumn )
+        title: rec.data[this.titleColumn]
       } );
 
       Sonatype.Events.fireEvent( this.rowClickEvent, panel, rec );
