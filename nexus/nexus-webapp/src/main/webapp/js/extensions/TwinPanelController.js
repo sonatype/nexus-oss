@@ -286,6 +286,9 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
   loadStore: function() {
     if ( this.store ) {
       var root = this.getComponent( 2 ).root;
+      while ( root.lastChild ) {
+        root.removeChild( root.lastChild );
+      }
       this.store.each( function( rec ) {
         this.createNode( root, rec );
       }, this );
@@ -345,8 +348,14 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
     if ( ! Ext.isArray( arr ) ) {
       arr = [arr];
     }
+
     var leftRoot = this.getComponent( 0 ).root;
+    while ( leftRoot.lastChild ) {
+      leftRoot.removeChild( leftRoot.lastChild );
+    }
+
     var rightRoot = this.getComponent( 2 ).root;
+    this.loadStore();
     var nodes = rightRoot.childNodes;
     
     for ( var i = 0; i < arr.length; i++ ) {
