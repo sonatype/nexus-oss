@@ -91,6 +91,7 @@ public class ArtifactoryMigrationPlexusResource
         }
         catch ( Exception e )
         {
+            getLogger().error( e.getMessage(), e );
             throw new ResourceException( e );
         }
 
@@ -138,8 +139,6 @@ public class ArtifactoryMigrationPlexusResource
                     {
                         File repositoryBackup = new File( repositoriesBackup, repo.getKey() );
                         copyArtifacts( nexusRepoSnapshots, nexusRepoReleases, repositoryBackup );
-                        // copyArtifacts( nexusRepoSnapshots, repositoryBackup );
-                        // copyArtifacts( nexusRepoReleases, repositoryBackup );
                     }
 
                     if ( resolution.isMapUrls() )
@@ -178,6 +177,7 @@ public class ArtifactoryMigrationPlexusResource
         }
         catch ( Exception e )
         {
+            getLogger().error( e.getMessage(), e );
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to converto mixed repository", e );
         }
     }
@@ -200,6 +200,7 @@ public class ArtifactoryMigrationPlexusResource
         }
         catch ( Exception e )
         {
+            getLogger().error( e.getMessage(), e );
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to create group " + groupId, e );
         }
 
@@ -280,6 +281,7 @@ public class ArtifactoryMigrationPlexusResource
         }
         catch ( Exception e )
         {
+            getLogger().error( e.getMessage(), e );
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error creating repository " + repoId );
         }
 
@@ -314,6 +316,7 @@ public class ArtifactoryMigrationPlexusResource
             }
             catch ( Exception e )
             {
+                getLogger().error( e.getMessage(), e );
                 throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to create group "
                     + virtualRepo.getKey(), e );
             }
@@ -334,6 +337,7 @@ public class ArtifactoryMigrationPlexusResource
             }
             catch ( Exception e )
             {
+                getLogger().error( e.getMessage(), e );
                 throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to copy artifacts to "
                     + nexusRepo.getId(), e );
             }

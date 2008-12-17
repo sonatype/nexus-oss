@@ -41,7 +41,7 @@ public class NXCM258UnwindVirtualRepositoriesTest
 
         ArrayList<RepositoryGroupMemberRepository> repositories =
             (ArrayList<RepositoryGroupMemberRepository>) group.getRepositories();
-        Assert.assertEquals( 5, repositories.size() );
+        Assert.assertEquals( 4, repositories.size() );
 
         ArrayList<String> reposIds = new ArrayList<String>();
         for ( RepositoryGroupMemberRepository repo : repositories )
@@ -51,7 +51,6 @@ public class NXCM258UnwindVirtualRepositoriesTest
         assertContains( reposIds, "libs-snapshots-local" );
         assertContains( reposIds, "ext-snapshots-local" );
         assertContains( reposIds, "java.net.m2" );
-        assertContains( reposIds, "java.net.m1" );
         assertContains( reposIds, "repo1" );
 
     }
