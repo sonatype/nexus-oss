@@ -1,65 +1,37 @@
 /*
- * Sonatype Nexus (TM) [Open Source Version].
- * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
- * Includes the third-party code listed at ${thirdPartyUrl}.
- *
- * This program is licensed to you under Version 3 only of the GNU
- * General Public License as published by the Free Software Foundation.
- *
+ * Nexus: Maven Repository Manager
+ * Copyright (C) 2008 Sonatype Inc.                                                                                                                          
+ * 
+ * This file is part of Nexus.                                                                                                                                  
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License Version 3 for more details.
- *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
  * You should have received a copy of the GNU General Public License
- * Version 3 along with this program. If not, see http://www.gnu.org/licenses/.
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ *
  */
 /*
  * User Edit/Create panel layout and controller
  */
-  
-var NEXUS_USER_REALM = 'Nexus';
 
-Sonatype.repoServer.UserEditPanel = function(config){
+Sonatype.repoServer.UserEditPanel = function( config ) {
   var config = config || {};
-  var defaultConfig = {};
-  Ext.apply(this, config, defaultConfig);
-
-  Sonatype.Events.addListener( 'userMenuInit', this.onUserMenuInit, this );
-
-  this.editorMap = {};
-
-  this.roleCombiner = function(val, parent) {
-    var s = '';
-    if ( val ) {
-      for ( var i = 0; i < val.length; i++ ) {
-        var roleName = val[i];
-        var rec = this.roleDataStore.getAt( this.roleDataStore.find( 'id', roleName ) );
-        if ( rec ) {
-          roleName = rec.get( 'name' );
-        }
-        if ( s ) {
-          s += ', ';
-        }
-        s += roleName;
-      }
-    }
-
-    return s;
+  var defaultConfig = {
+    title: 'Users'
   };
+  Ext.apply( this, config, defaultConfig );
+
+  this.sp = Sonatype.lib.Permissions;
   
   this.actions = {
-    refresh: {
-      text: 'Refresh',
-      iconCls: 'st-icon-refresh',
-      scope:this,
-      handler: this.reloadAll
-    },
-    deleteAction: {
-      text: 'Delete',
-      scope:this,
-      handler: this.deleteHandler
-    },
     resetPasswordAction: {
       text: 'Reset Password',
       scope: this,
@@ -71,249 +43,94 @@ Sonatype.repoServer.UserEditPanel = function(config){
       handler: this.changePasswordHandler
     }
   };
-  
-  //A record to hold the name and id of a repository
-  this.userRecordConstructor = Ext.data.Record.create([
-    {name:'resourceURI'},
-    {name:'userId', sortType:Ext.data.SortTypes.asUCString},
-    {name:'name'},
-    {name:'email'},
-    {name:'status'},
-    {name:'roles'},
-    {name:'userManaged'},
-    {name:'displayRoles', mapping:'roles', convert: this.roleCombiner.createDelegate(this)},
-    {name:'stRealm'}
-  ]);
-  
-  //Reader and datastore that queries the server for the list of currently defined users
-  this.usersReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.userRecordConstructor );
-  this.usersDataStore = new Ext.data.Store({
-    url: Sonatype.config.repos.urls.users,
-    reader: this.usersReader,
-    sortInfo: {field: 'userId', direction: 'ASC'},
-    autoLoad: false
-  });
-  
-  //A record to hold the name and id of a role
-  this.roleRecordConstructor = Ext.data.Record.create([
-    {name:'id'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString}
-  ]);
-  
-  this.roleReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.roleRecordConstructor );  
-  this.roleDataStore = new Ext.data.Store({
-    url: Sonatype.config.repos.urls.roles,
-    reader: this.roleReader,
-    sortInfo: {field: 'name', direction: 'ASC'},
-    autoLoad: true,
-    listeners: {
-      'load': {
-        fn: function() {
-          Sonatype.Events.fireEvent( 'userListInit', this, this );
-        },
-        scope: this
-      }
-    }
-  });
-  
-  this.sp = Sonatype.lib.Permissions;
 
-  this.usersGridPanel = new Ext.grid.GridPanel({
-    title: 'Users',
-    id: 'st-users-grid',
-    
-    region: 'north',
-    layout:'fit',
-    collapsible: true,
-    split:true,
-    height: 200,
-    minHeight: 150,
-    maxHeight: 400,
-    frame: false,
-    autoScroll: true,
-    tbar: [
-      {
-        id: 'user-refresh-btn',
-        text: 'Refresh',
-        icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
-        cls: 'x-btn-text-icon',
-        scope: this,
-        handler: this.reloadAll
-      },
-      {
-        id: 'user-add-btn',
-        text:'Add',
-        icon: Sonatype.config.resourcePath + '/images/icons/add.png',
-        cls: 'x-btn-text-icon',
-        scope: this,
-        handler: this.addResourceHandler,
-        disabled: !this.sp.checkPermission('nexus:users', this.sp.CREATE)
-      },
-      {
-        id: 'user-delete-btn',
-        text: 'Delete',
-        icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
-        cls: 'x-btn-text-icon',
-        scope:this,
-        handler: this.deleteToolbarHandler,
-        disabled: !this.sp.checkPermission('nexus:users', this.sp.DELETE)
-      }
-    ],
-
-    //grid view options
-    ds: this.usersDataStore,
-    sortInfo:{field: 'userId', direction: "ASC"},
-    loadMask: true,
-    deferredRender: false,
+  Sonatype.repoServer.UserEditPanel.superclass.constructor.call( this, {
+    addMenuInitEvent: 'userAddMenuInit',
+    deleteButton: this.sp.checkPermission( 'nexus:users', this.sp.DELETE ),
+    rowClickEvent: 'userViewInit',
+    rowContextClickEvent: 'userMenuInit',
+    url: Sonatype.config.repos.urls.plexusUsersAllConfigured,
+    dataAutoLoad: true,
+    dataId: 'userId',
     columns: [
-      {header: 'User ID', dataIndex: 'userId', width:100, id: 'user-config-userid-col'},
-      {header: 'Realm', dataIndex: 'stRealm', width:50, id: 'user-config-realm-col'},
-      {header: 'User Managed', dataIndex: 'userManaged', width:100, id: 'user-config-readonly-col'},
-      {header: 'Name', dataIndex: 'name', width:175, id: 'user-config-name-col'},
-      {header: 'Email', dataIndex: 'email', width:175, id: 'user-config-email-col'},
-      {header: 'Status', dataIndex: 'status', width:75, id: 'user-config-status-col'},
-      {header: 'Roles', dataIndex: 'displayRoles', width:175, id: 'user-config-roles-col'}
+      { 
+        name: 'resourceURI',
+        mapping: 'userId',
+        convert: function( value, parent ) {
+          return parent.source == 'default' ? 
+            ( Sonatype.config.repos.urls.users + '/' + value ) :
+            ( Sonatype.config.repos.urls.plexusUser + '/' + value );
+        }
+      },
+      { 
+        name: 'userId', 
+        sortType: Ext.data.SortTypes.asUCString,
+        header: 'User ID',
+        width: 100
+      },
+      { 
+        name: 'source',
+        header: 'Realm',
+        width: 50
+      },
+      { 
+        name: 'name',
+        header: 'Name',
+        width: 175
+      },
+      { 
+        name: 'email',
+        header: 'Email',
+        width: 175
+      },
+      { name: 'roles' },
+      { 
+        name: 'displayRoles', 
+        mapping: 'roles', 
+        convert: this.combineRoles.createDelegate( this ),
+        header: 'Roles',
+        autoExpand: true
+      }
     ],
-    autoExpandColumn: 'user-config-roles-col',
-    disableSelection: false,
-    viewConfig: {
-      emptyText: 'Click "Add" to create a new User.'
-    }
-  });
-  this.usersGridPanel.on('rowclick', this.rowClick, this);
-  this.usersGridPanel.on('rowcontextmenu', this.contextClick, this);
-
-  Sonatype.repoServer.UserEditPanel.superclass.constructor.call(this, {
-    layout: 'border',
-    autoScroll: false,
-    width: '100%',
-    height: '100%',
     listeners: {
-      'beforedestroy': {
+      beforedestroy: {
         fn: function(){
           Sonatype.Events.removeListener( 'userMenuInit', this.onUserMenuInit, this );
         },
         scope: this
       }
     },
-    items: [
-      this.usersGridPanel,
+    tbar: [
       {
-        xtype: 'panel',
-        id: 'user-config-forms',
-        title: 'User Configuration',
-        layout: 'card',
-        region: 'center',
-        activeItem: 0,
-        deferredRender: false,
-        autoScroll: false,
-        frame: false,
-        items: [
-          {
-            xtype: 'panel',
-            layout: 'fit',
-            html: '<div class="little-padding">Select a user to edit it, or click "Add" to create a new one.</div>'
-          }
-        ]
+        text: 'Map User Roles',
+        icon: Sonatype.config.resourcePath + '/images/icons/page_white_put.png',
+        cls: 'x-btn-text-icon',
+        scope: this,
+        handler: this.mapRolesHandler
       }
     ]
-  });
+  } );
 
-  this.formCards = this.findById('user-config-forms');
+  Sonatype.Events.addListener( 'userMenuInit', this.onUserMenuInit, this );
 };
 
 
-Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
-  //Dump the currently stored data and requery for everything
-  reloadAll : function(){
-    this.formCards.items.each(function(item, i, len){
-      if(i>0){this.remove(item, true);}
-    }, this.formCards);
+Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
+  combineRoles: function( val, parent ) {
+    var s = '';
+    if ( val ) {
+      for ( var i = 0; i < val.length; i++ ) {
+        var roleName = val[i].name;
+        if ( s ) {
+          s += ', ';
+        }
+        s += roleName;
+      }
+    }
 
-    this.editorMap = {};
-    this.roleDataStore.removeAll();
-    this.usersDataStore.removeAll();
-    this.roleDataStore.reload();
-    
-    this.formCards.getLayout().setActiveItem(0);
+    return s;
   },
-  
-  cancelHandler : function(formObj) {
-    var formLayout = this.formCards.getLayout();
-    var gridSelectModel = this.usersGridPanel.getSelectionModel();
-    var store = this.usersGridPanel.getStore();
-  
-    this.formCards.remove(formObj.id, true);
-  
-    if (this.formCards.items.length > 1){
-      formLayout.setActiveItem(this.formCards.items.length - 1);
-      //select the coordinating row in the grid, or none if back to default
-      var i = store.indexOfId(formLayout.activeItem.id);
-      if (i >= 0){
-        gridSelectModel.selectRow(i);
-        var rec = store.getById(formLayout.activeItem.id);
-        if (rec.data.userManaged == true
-        		&& this.sp.checkPermission('nexus:users', this.sp.DELETE)){
-        	this.usersGridPanel.getTopToolbar().items.get('user-delete-btn').enable();
-        }
-        else{
-        	this.usersGridPanel.getTopToolbar().items.get('user-delete-btn').disable();
-        }
-      }
-      else{
-        gridSelectModel.clearSelections();
-      }
-    }
-    else{
-      formLayout.setActiveItem(0);
-      gridSelectModel.clearSelections();
-    }
-    
-    //delete row from grid if canceling a new repo form
-    if(formObj.isNew){
-      store.remove( store.getById(formObj.id) );
-    }
-  },
-  
-  addResourceHandler : function() {
-    var id = 'new_user_' + new Date().getTime();
 
-    var newRec = new this.userRecordConstructor({
-        userId : 'New User',
-        resourceURI : 'new',
-        userManaged : true
-      },
-      id
-    ); //use "new_user_" id instead of resourceURI like the reader does
-    
-    var formPanel = new Sonatype.repoServer.DefaultUserEditor( {
-      payload: newRec,
-      listeners: {
-        cancel: {
-          fn: this.cancelHandler,
-          scope: this
-        },
-        submit: {
-          fn: this.actionCompleteHandler,
-          scope: this
-        }
-      }
-    } );
-    
-    //add place holder to grid
-    this.usersDataStore.insert(0, [newRec]);
-    this.usersGridPanel.getSelectionModel().selectRow(0);
-    
-    this.usersGridPanel.getTopToolbar().items.get('user-delete-btn').enable();
-    
-    //add new form
-    this.formCards.add(formPanel);
-    
-    //always set active and re-layout
-    this.formCards.getLayout().setActiveItem(formPanel);
-    formPanel.doLayout();
-  },
-  
   changePasswordHandler : function( rec ) {
     var userId = rec.get( 'userId' );
 
@@ -415,15 +232,10 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
   
   resetPasswordHandler : function( rec ) {
     if ( rec.data.resourceURI != 'new' ) {
-      Sonatype.MessageBox.getDialog().on('show', function(){
-        this.focusEl = this.buttons[2]; //ack! we're offset dependent here
-        this.focus();
-      },
-      Sonatype.MessageBox.getDialog(),
-      {single:true});
+      Sonatype.utils.defaultToNo();
         
       Sonatype.MessageBox.show({
-        animEl: this.usersGridPanel.getEl(),
+        animEl: this.gridPanel.getEl(),
         title : 'Reset user password?',
         msg : 'Reset the ' + rec.get('userId') + ' user password?',
         buttons: Sonatype.MessageBox.YESNO,
@@ -454,239 +266,12 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
       Sonatype.MessageBox.alert('The server did not reset the password.');
     }
   },
-  
-  deleteToolbarHandler : function(){
-    if (this.ctxRecord || this.usersGridPanel.getSelectionModel().hasSelection()){
-      this.deleteHandler( this.ctxRecord ? this.ctxRecord : this.usersGridPanel.getSelectionModel().getSelected() );
-    }
-  },
-  
-  deleteHandler : function( rec ){
-    if(rec.data.resourceURI == 'new'){
-      this.cancelHandler(Ext.getCmp(rec.id));
-    }
-    else {
-      //@note: this handler selects the "No" button as the default
-      //@todo: could extend Sonatype.MessageBox to take the button to select as a param
-      Sonatype.MessageBox.getDialog().on('show', function(){
-        this.focusEl = this.buttons[2]; //ack! we're offset dependent here
-        this.focus();
-      },
-      Sonatype.MessageBox.getDialog(),
-      {single:true});
-      
-      Sonatype.MessageBox.show({
-        animEl: this.usersGridPanel.getEl(),
-        title : 'Delete User?',
-        msg : 'Delete the ' + rec.get('userId') + ' user?',
-        buttons: Sonatype.MessageBox.YESNO,
-        scope: this,
-        icon: Sonatype.MessageBox.QUESTION,
-        fn: function(btnName){
-          if (btnName == 'yes' || btnName == 'ok') {
-            Ext.Ajax.request({
-              callback: this.deleteCallback,
-              cbPassThru: {
-                resourceId: rec.id
-              },
-              scope: this,
-              method: 'DELETE',
-              url:rec.data.resourceURI
-            });
-          }
-        }
-      });
-    }
-  },
-  
-  deleteCallback : function(options, isSuccess, response){
-    if(isSuccess){
-      var resourceId = options.cbPassThru.resourceId;
-      var formLayout = this.formCards.getLayout();
-      var gridSelectModel = this.usersGridPanel.getSelectionModel();
-      var store = this.usersGridPanel.getStore();
 
-      if(formLayout.activeItem.id == resourceId){
-        this.formCards.remove(resourceId, true);
-        if (this.formCards.items.length > 0){
-          formLayout.setActiveItem(this.formCards.items.length - 1);
-          //select the coordinating row in the grid, or none if back to default
-          var i = store.indexOfId(formLayout.activeItem.id);
-          if (i >= 0){
-            gridSelectModel.selectRow(i);
-            var rec = store.getById(formLayout.activeItem.id);
-            if (rec.data.userManaged == true
-            		&& this.sp.checkPermission('nexus:users', this.sp.DELETE)){
-            	this.usersGridPanel.getTopToolbar().items.get('user-delete-btn').enable();
-            }
-            else{
-            	this.usersGridPanel.getTopToolbar().items.get('user-delete-btn').disable();
-            }
-          }
-          else{
-            gridSelectModel.clearSelections();
-          }
-        }
-        else{
-            formLayout.setActiveItem(0);
-            gridSelectModel.clearSelections();
-        }
-      }
-      else {
-        this.formCards.remove(resourceId, true);
-      }
+  onUserMenuInit: function( menu, userRecord ) {
+    if ( userRecord.data.source == 'default' // && userRecord.data.userManaged == true
+        ) {
 
-      store.remove( store.getById(resourceId) );
-    }
-    else {
-      var errorOptions = {
-    		  hideErrorStatus : true
-      };
-      Sonatype.utils.connectionError( response, 'The server did not delete the user.', false, errorOptions );
-    }
-  },
-      
-  //(Ext.form.BasicForm, Ext.form.Action)
-  actionCompleteHandler : function(form, action, receivedData) {
-    var isNew = action.options.isNew;
-    if (isNew) {
-      //successful create        
-      var dataObj = {
-        userId : receivedData.userId,
-        name : receivedData.name,
-        resourceURI : receivedData.resourceURI,
-        email : receivedData.email,
-        status : receivedData.status,
-        roles : receivedData.roles,
-        userManaged : receivedData.userManaged,
-        displayRoles : this.roleCombiner(receivedData.roles),
-        stRealm: NEXUS_USER_REALM
-      };
-      
-      var newRec = new this.userRecordConstructor(
-        dataObj,
-        action.options.fpanel.id);
-      
-      this.usersDataStore.remove(this.usersDataStore.getById(action.options.fpanel.id)); //remove old one
-      this.usersDataStore.addSorted(newRec);
-      this.usersGridPanel.getSelectionModel().selectRecords([newRec], false);
-      action.options.fpanel.payload = newRec;
-    }
-    else {
-      var i = this.usersDataStore.indexOfId(action.options.fpanel.id);
-      var rec = this.usersDataStore.getAt(i);
-
-      this.updateUserRecord(rec, receivedData);
-      
-      var sortState = this.usersDataStore.getSortState();
-      this.usersDataStore.sort(sortState.field, sortState.direction);
-    }
-  },
-  
-  updateUserRecord : function(rec, receivedData){
-    if ( receivedData ) {
-      rec.beginEdit();
-      rec.set('name', receivedData.name);
-      rec.set('userId', receivedData.userId);
-      rec.set('email', receivedData.email);
-      rec.set('status', receivedData.status);
-      rec.set('roles', receivedData.roles);
-      rec.set('userManaged', receivedData.userManaged);
-      rec.set('displayRoles', this.roleCombiner(receivedData.roles));
-      rec.commit();
-      rec.endEdit();
-    }
-  },
-
-  rowClick : function(grid, rowIndex, e){
-    var rec = grid.store.getAt(rowIndex);
-    if (rec) {
-	    if (rec.data.userManaged == true
-	            && this.sp.checkPermission('nexus:users', this.sp.DELETE)) {
-	      grid.getTopToolbar().items.get('user-delete-btn').enable();
-	    } else {
-	      grid.getTopToolbar().items.get('user-delete-btn')
-	        .disable();
-	    }
-	    var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
-	    var formPanel = this.formCards.findById(id);
-	    
-	    //assumption: new route forms already exist in formCards, so they won't get into this case
-	    if(!formPanel){ //create form and populate current data
-	      var editor = this.editorMap[rec.data.stRealm];
-	      if ( editor ) {
-  	      formPanel = new editor( {
-            payload: rec,
-            readOnly: rec.data.userManaged == false ||
-              ! this.sp.checkPermission( 'nexus:users', this.sp.EDIT ),
-            listeners: {
-              cancel: {
-                fn: this.cancelHandler,
-                scope: this
-              },
-              submit: {
-                fn: this.actionCompleteHandler,
-                scope: this
-              }
-            }
-          } );
-  	  
-  	      this.formCards.add(formPanel);
-  	      this.formCards.getLayout().setActiveItem(formPanel);    
-  	      formPanel.doLayout();
-	      }
-	    }
-	    else{
-	      //always set active
-	      this.formCards.getLayout().setActiveItem(formPanel);
-	    }
-    }
-    else {
-    	grid.getTopToolbar().items.get('user-delete-btn').disable();
-    }
-  },
-  
-  contextClick : function(grid, index, e){
-    this.contextHide();
-    
-    if ( e.target.nodeName == 'A' ) return; // no menu on links
-    
-    this.ctxRow = this.usersGridPanel.view.getRow(index);
-    this.ctxRecord = this.usersGridPanel.store.getAt(index);
-    Ext.fly(this.ctxRow).addClass('x-node-ctx');
-
-    //@todo: would be faster to pre-render the six variations of the menu for whole instance
-    var menu = new Sonatype.menu.Menu({
-      id:'users-grid-ctx',
-      payload: this.ctxRecord,
-      items: [
-        this.actions.refresh
-      ]
-    });
-
-    Sonatype.Events.fireEvent( 'userMenuInit', menu, this.ctxRecord );
-    
-    menu.on('hide', this.contextHide, this);
-    e.stopEvent();
-    menu.showAt(e.getXY());
-  },
-  
-  contextHide : function(){
-    if(this.ctxRow){
-      Ext.fly(this.ctxRow).removeClass('x-node-ctx');
-      this.ctxRow = null;
-      this.ctxRecord = null;
-    }
-  },
-
-  onUserMenuInit: function( menu, userRecord, a, b, c ) {
-    if ( userRecord.data.userManaged == true && userRecord.data.stRealm == NEXUS_USER_REALM ) {
-
-      if ( this.sp.checkPermission( 'nexus:users', this.sp.DELETE ) ) {
-        menu.add( this.actions.deleteAction );
-      }
-
-      if ( userRecord.data.resourceURI != 'new' ) {
+      if ( userRecord.data.resourceURI.substring( 0, 4 ) != 'new_' ) {
         if ( this.sp.checkPermission( 'nexus:usersreset', this.sp.DELETE ) ) {
           menu.add(this.actions.resetPasswordAction);
         }
@@ -698,24 +283,41 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     }
   },
   
-  addRecords: function( users, realm, form ) {
-    if ( form ) {
-      this.editorMap[realm] = form;
+  mapRolesHandler: function( button, e ) {
+    this.createChildPanel( { 
+      id: 'new_mapping',
+      hostPanel: this,
+      data: {
+        name: 'User Role Mapping'
+      }
+    } );
+  },
+  
+  deleteActionHandler: function( button, e ) {
+    if ( this.gridPanel.getSelectionModel().hasSelection() ) {
+      var rec = this.gridPanel.getSelectionModel().getSelected();
+      if ( rec.data.source == 'default' ) {
+        return Sonatype.repoServer.UserEditPanel.superclass.deleteActionHandler.call( this, button, e );
+      }
+      else {
+        Sonatype.MessageBox.show( {
+          animEl: this.gridPanel.getEl(),
+          title: 'Delete',
+          msg: 'Cannot delete a user from external realm.',
+          buttons: Sonatype.MessageBox.OK,
+          scope: this,
+          icon: Sonatype.MessageBox.WARNING
+        } );
+      }
     }
-
-    for ( var i = 0; i < users.length; i++ ) {
-      users[i].stRealm = realm;
-    }
-
-    this.usersDataStore.loadData( { data: users }, true );
-    this.usersDataStore.sort( 'userId' );
   }
-});
+} );
 
 Sonatype.repoServer.DefaultUserEditor = function( config ) {
   var config = config || {};
   var defaultConfig = {
     uri: Sonatype.config.repos.urls.users,
+    labelWidth: 100,
     dataModifiers: {
       load: {
         roles: function( arr, srcObj, fpanel ) {
@@ -735,19 +337,17 @@ Sonatype.repoServer.DefaultUserEditor = function( config ) {
   //List of user statuses
   this.statusStore = new Ext.data.SimpleStore( { fields: ['value', 'display'],
     data: [['active', 'Active'], ['disabled', 'Disabled']] } );
-  
-  //A record to hold the name and id of a role
-  this.roleRecordConstructor = Ext.data.Record.create( [
-    { name: 'id' },
-    { name: 'name', sortType: Ext.data.SortTypes.asUCString }
-  ] );
-  this.roleReader = new Ext.data.JsonReader(
-    { root: 'data', id: 'id' }, this.roleRecordConstructor );  
-  this.roleDataStore = new Ext.data.Store( {
+
+  this.roleDataStore = new Ext.data.JsonStore( {
+    root: 'data',
+    id: 'id',
     url: Sonatype.config.repos.urls.roles,
-    reader: this.roleReader,
     sortInfo: { field: 'name', direction: 'ASC' },
-    autoLoad: true
+    autoLoad: true,
+    fields: [
+      { name: 'id' },
+      { name: 'name', sortType:Ext.data.SortTypes.asUCString }
+    ]
   } );
 
   var ht = Sonatype.repoServer.resources.help.users;
@@ -755,6 +355,7 @@ Sonatype.repoServer.DefaultUserEditor = function( config ) {
   this.COMBO_WIDTH = 300;
 
   this.checkPayload();
+
   var items = [
     {
       xtype: 'textfield',
@@ -849,13 +450,36 @@ Sonatype.repoServer.DefaultUserEditor = function( config ) {
   } );
 
   Sonatype.repoServer.DefaultUserEditor.superclass.constructor.call( this, {
-    items: items
+    items: items,
+    listeners: {
+      submit: {
+        fn: this.submitHandler,
+        scope: this
+      }
+    }
   } );
-
-  this.on( 'submit', this.submitCleanup, this );
 };
 
 Ext.extend( Sonatype.repoServer.DefaultUserEditor, Sonatype.ext.FormPanel, {
+  combineRoles: function( val ) {
+    var s = '';
+    if ( val ) {
+      for ( var i = 0; i < val.length; i++ ) {
+        var roleName = val[i];
+        var rec = this.roleDataStore.getAt( this.roleDataStore.find( 'id', roleName ) );
+        if ( rec ) {
+          roleName = rec.get( 'name' );
+        }
+        if ( s ) {
+          s += ', ';
+        }
+        s += roleName;
+      }
+    }
+
+    return s;
+  },
+
   isValid: function() {
     return this.form.isValid() && this.find( 'name', 'roles' )[0].validate();
   },
@@ -867,36 +491,309 @@ Ext.extend( Sonatype.repoServer.DefaultUserEditor, Sonatype.ext.FormPanel, {
     
     return Sonatype.repoServer.DefaultUserEditor.superclass.saveHandler.call( this, button, event );
   },
-  
-  submitCleanup: function( form, action, receivedData ) {
-    this.find( 'name', 'status' )[0].setValue( receivedData.status );
-    
+
+  submitHandler: function( form, action, receivedData ) {
     if ( this.isNew ) {
-      var useridField = this.find( 'name', 'userId' )[0];
-      if ( useridField ) {
-        useridField.disable();
+      receivedData.source = 'default';
+      receivedData.displayRoles = this.combineRoles( receivedData.roles );
+      return;
+    }
+
+    var rec = this.payload;
+    rec.beginEdit();
+    rec.set( 'name', receivedData.name );
+    rec.set( 'email', receivedData.email );
+    rec.set( 'displayRoles', this.combineRoles( receivedData.roles ) );
+    rec.commit();
+    rec.endEdit();
+  }
+} );
+
+Sonatype.repoServer.UserMappingEditor = function( config ) {
+  var config = config || {};
+  var defaultConfig = {
+    uri: Sonatype.config.repos.urls.plexusUser,
+    dataModifiers: {
+      load: {
+        roles: function( arr, srcObj, fpanel ) {
+          var arr2 = [];
+          var externalRoles = 0;
+          for ( var i = 0; i < arr.length; i++ ) {
+            var a = arr[i];
+            var readOnly = false;
+            if ( a.source != 'default' ) {
+              readOnly = true;
+              externalRoles++;
+            }
+            arr2.push( {
+              id: a.roleId,
+              name: a.name,
+              readOnly: readOnly
+            } );
+          }
+          var roleBox = fpanel.find( 'name', 'roles' )[0];
+          roleBox.setValue( arr2 );
+          roleBox.nexusRolesEmptyOnLoad = ( arr.length == externalRoles );
+
+          return arr;
+        }
+      },
+      submit: { 
+        roles: function( value, fpanel ) {
+          return fpanel.find( 'name', 'roles' )[0].getValue();
+        }
       }
-      var passwordField = this.find( 'name', 'password' )[0];
-      if ( passwordField ) {
-        this.remove( passwordField );
+    },
+    referenceData: {
+      userId: '',
+      source: '',
+      roles: []
+    },
+    cancelButton: config.payload.id == 'new_mapping'
+  };
+  Ext.apply( this, config, defaultConfig );
+
+//  if ( ! Sonatype.lib.Permissions.checkPermission( 'nexus:ldapuserrolemap',
+//      Sonatype.lib.Permissions.EDIT ) ) {
+//    this.readOnly = true;
+//  }
+
+  this.roleDataStore = new Ext.data.JsonStore( {
+    root: 'data',
+    id: 'id',
+    url: Sonatype.config.repos.urls.roles,
+    sortInfo: { field: 'name', direction: 'ASC' },
+    autoLoad: true,
+    fields: [
+      { name: 'id' },
+      { name: 'name', sortType:Ext.data.SortTypes.asUCString }
+    ]
+  } );
+
+  var ht = Sonatype.repoServer.resources.help.users;
+  
+  this.COMBO_WIDTH = 300;
+  
+  var useridField = this.payload.id == 'new_mapping' ? 
+    {
+      xtype: 'trigger',
+      triggerClass: 'x-form-search-trigger',
+      fieldLabel: 'Enter a User ID',
+      itemCls: 'required-field',
+      labelStyle: 'margin-left: 15px; width: 185px;',
+      name: 'userId',
+      allowBlank: false,
+      width: this.COMBO_WIDTH,
+      listeners: {
+        specialkey: {
+          fn: function(f, e){
+            if(e.getKey() == e.ENTER){
+              this.onTriggerClick();
+            }
+          }
+        }
+      },
+      onTriggerClick: this.loadUserId.createDelegate( this ),
+      listeners: {
+        change: {
+          fn: function( control, newValue, oldValue ) {
+            if ( newValue != this.lastLoadedId ) {
+              this.loadUserId();
+            }
+          },
+          scope: this
+        }
       }
-      var passwordField2 = this.find( 'name', 'confirmPassword' )[0];
-      if ( passwordField2 ) {
-        this.remove( passwordField2 );
+    } :
+    {
+      xtype: 'textfield',
+      fieldLabel: 'User ID',
+      itemCls: 'required-field',
+      labelStyle: 'margin-left: 15px; width: 185px;',
+      name: 'userId',
+      disabled: true,
+      allowBlank: false,
+      width: this.COMBO_WIDTH
+    };
+    
+
+  Sonatype.repoServer.UserMappingEditor.superclass.constructor.call( this, {
+    items: [
+      useridField,
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Realm',
+        itemCls: 'required-field',
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        name: 'source',
+        disabled: true,
+        allowBlank: false,
+        width: this.COMBO_WIDTH
+      },
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Name',
+        itemCls: 'required-field',
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        name: 'name',
+        disabled: true,
+        allowBlank: false,
+        width: this.COMBO_WIDTH
+      },
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Email',
+        itemCls: 'required-field',
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        name: 'email',
+        disabled: true,
+        allowBlank: false,
+        width: this.COMBO_WIDTH
+      },
+      {
+        xtype: 'twinpanelchooser',
+        titleLeft: 'Selected Roles',
+        titleRight: 'Available Roles',
+        name: 'roles',
+        valueField: 'id',
+        store: this.roleDataStore,
+        required: true
       }
+    ],
+    listeners: {
+      cancel: {
+        fn: function() {
+          this.payload.hostPanel.recordRemoveHandler( null, this.payload, 0 );
+        },
+        scope: this
+      }
+    }
+  } );
+};
+
+Ext.extend( Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
+  saveHandler : function( button, event ){
+    if ( this.isValid() ) {
+      var method = 'PUT';
+      var roleBox = this.find( 'name', 'roles' )[0];
+      var roles = roleBox.getValue();
+      if ( roles.length == 0 ) {
+        if ( roleBox.nexusRolesEmptyOnLoad ) {
+          // if there weren't any nexus roles on load, and we're not saving any - do nothing
+          return;
+        }
+        else {
+          method = 'DELETE';
+          roleBox.nexusRolesEmptyOnLoad = true;
+        }
+      }
+      else {
+        roleBox.nexusRolesEmptyOnLoad = false;
+      }
+
+      var url = Sonatype.config.repos.urls.userToRoles + '/' +
+        this.form.findField( 'source').getValue() + '/' +
+        this.form.findField( 'userId' ).getValue();
+
+      this.form.doAction( 'sonatypeSubmit', {
+        method: method,
+        url: url,
+        waitMsg: 'Updating records...',
+        fpanel: this,
+        dataModifiers: this.dataModifiers.submit,
+        serviceDataObj: this.referenceData,
+        isNew: this.isNew //extra option to send to callback, instead of conditioning on method
+      } );
+    }
+  },
+  
+  isValid: function() {
+    return this.form.findField( 'userId' ).userFound &&
+      this.form.findField( 'source' ).getValue() && 
+      this.find( 'name', 'roles' )[0].validate();
+  },
+
+  loadUserId: function() {
+    var testField = this.form.findField( 'userId' );
+    testField.clearInvalid();
+    testField.userFound = true;
+    this.lastLoadedId = testField.getValue();
+
+    this.form.doAction( 'sonatypeLoad', {
+      url: this.uri + '/' + testField.getValue(),
+      method: 'GET',
+      fpanel: this,
+      testField: testField,
+      suppressStatus: 404,
+      dataModifiers: this.dataModifiers.load,
+      scope: this
+    } );
+  },
+
+  actionFailedHandler: function( form, action ) {
+    if ( action.response.status == 404 && action.options.testField ) {
+      action.options.testField.markInvalid( 'User record not found.' );
+      action.options.testField.userFound = false;
+    }
+    else {
+      return Sonatype.repoServer.UserMappingEditor.superclass.actionFailedHandler.call(
+        this, form, action );
     }
   }
 } );
 
 Sonatype.Events.addListener( 'userListInit', function( userContainer ) {
-  Ext.Ajax.request( {
-    url: Sonatype.config.repos.urls.users,
-    success: function( response, options ) {
-      var resp = Ext.decode( response.responseText );
-      if ( resp.data ) {
-        userContainer.addRecords( resp.data, NEXUS_USER_REALM, Sonatype.repoServer.DefaultUserEditor );
+  var url = Sonatype.config.servicePath + '/plexus_users/LDAP';
+  if ( Sonatype.lib.Permissions.checkPermission( 'nexus:ldapuserrolemap', Sonatype.lib.Permissions.READ ) ) {
+    Ext.Ajax.request( {
+      url: url,
+      suppressStatus: 503, // the server will return an error if LDAP is not configured
+      success: function( response, options ) {
+        var resp = Ext.decode( response.responseText );
+        if ( resp.data ) {
+          var data = resp.data;
+          for ( var i = 0; i < data.length; i++ ) {
+            data[i].resourceURI = Sonatype.config.servicePath + '/plexus_user/' + data[i].userId;
+            if ( data[i].roles ) {
+              for ( var j = 0; j < data[i].roles.length; j++ ) {
+                data[i].roles[j] = data[i].roles[j].roleId;
+              }
+            }
+          }
+          userContainer.addRecords( data, 'LDAP', Sonatype.repoServer.LdapUserEditor );
+        }
+      },
+      scope: userContainer
+    } );
+  }
+} );
+
+Sonatype.Events.addListener( 'userViewInit', function( cardPanel, rec ) {
+  var config = { payload: rec };
+  cardPanel.add( rec.data.source == 'default' ?
+    new Sonatype.repoServer.DefaultUserEditor( config ) :
+    new Sonatype.repoServer.UserMappingEditor( config )
+  );
+} );
+
+Sonatype.Events.addListener( 'userAddMenuInit', function( menu ) {
+  var sp = Sonatype.lib.Permissions;
+  
+  if ( sp.checkPermission( 'nexus:users', sp.CREATE ) ) {
+    var createUserFunc = function( container, rec, item, e ) {
+      rec.beginEdit();
+      rec.set( 'source', 'default' );
+      rec.commit();
+      rec.endEdit();
+    };
+
+    menu.add( [
+      '-',
+      {
+        text: 'Nexus User',
+        autoCreateNewRecord: true,
+        handler: createUserFunc
       }
-    },
-    scope: userContainer
-  } );
+    ] );
+  }
 } );
