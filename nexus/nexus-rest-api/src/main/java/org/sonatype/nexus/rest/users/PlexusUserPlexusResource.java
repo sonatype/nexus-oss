@@ -24,6 +24,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.jsecurity.locators.users.PlexusUser;
 import org.sonatype.jsecurity.locators.users.PlexusUserManager;
 import org.sonatype.nexus.rest.model.PlexusRoleResource;
 import org.sonatype.nexus.rest.model.PlexusUserResource;
@@ -71,12 +72,14 @@ public class PlexusUserPlexusResource
     {
         PlexusUserResourceResponse result = new PlexusUserResourceResponse();
 
-        PlexusUserResource resource = nexusToRestModel( userManager.getUser( getUserId( request ) ), request );
+        PlexusUser user = userManager.getUser( getUserId( request ) );
         
-        if ( resource == null )
+        if ( user == null )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
         }
+        
+        PlexusUserResource resource = nexusToRestModel( user, request );
         
         result.setData( resource );
             

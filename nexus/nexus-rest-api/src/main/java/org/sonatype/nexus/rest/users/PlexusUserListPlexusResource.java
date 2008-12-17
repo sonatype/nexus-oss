@@ -25,13 +25,10 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
 import org.sonatype.jsecurity.locators.users.PlexusUserManager;
-import org.sonatype.nexus.rest.model.PlexusRoleResource;
 import org.sonatype.nexus.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.nexus.rest.model.PlexusUserResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-
-import com.thoughtworks.xstream.XStream;
 
 @Component( role = PlexusResource.class, hint = "PlexusUserListPlexusResource" )
 public class PlexusUserListPlexusResource
