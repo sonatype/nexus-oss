@@ -368,7 +368,8 @@ Ext.extend(Ext.form.Action.sonatypeLoad, Ext.form.Action, {
       this.createCallback(this.options), {
         method:this.getMethod(),
         url:this.getUrl(false),
-        params:this.getParams()
+        params:this.getParams(),
+        suppressStatus: this.options.suppressStatus
     }));
   },
 
@@ -509,9 +510,9 @@ Sonatype.ext.FormPanel = function( config ) {
         disabled: config.readOnly
       },
       {
-        handler: this.resetButton ? this.resetHandler : this.cancelHandler,
+        handler: this.resetHandler,
         scope: this,
-        text: this.resetButton ? 'Reset' : 'Cancel'
+        text: 'Reset'
       }
     ]
   };
