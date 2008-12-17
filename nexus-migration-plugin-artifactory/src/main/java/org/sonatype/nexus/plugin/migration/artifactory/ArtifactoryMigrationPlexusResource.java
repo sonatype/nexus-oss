@@ -1,13 +1,15 @@
 package org.sonatype.nexus.plugin.migration.artifactory;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.NotFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -20,6 +22,8 @@ import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
+import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryProxy;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryRepository;
@@ -31,8 +35,11 @@ import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryReque
 import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.util.VirtualRepositoryUtil;
 import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tools.repository.RepositoryConvertor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -42,8 +49,14 @@ public class ArtifactoryMigrationPlexusResource
 
 {
 
+    private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER =
+        new NotFileFilter( new SuffixFileFilter( ".artifactory-metadata" ) );
+
     @Requirement
     private NexusScheduler nexusScheduler;
+
+    @Requirement
+    private RepositoryConvertor repositoryConvertor;
 
     public ArtifactoryMigrationPlexusResource()
     {
@@ -115,8 +128,8 @@ public class ArtifactoryMigrationPlexusResource
                 else
                 // BOTH
                 {
-                    CRepository nexusRepoSnapshots = createRepository( repo, artifactoryProxies, false, "snapshots" );
                     CRepository nexusRepoReleases = createRepository( repo, artifactoryProxies, false, "releases" );
+                    CRepository nexusRepoSnapshots = createRepository( repo, artifactoryProxies, true, "snapshots" );
 
                     CRepositoryGroup nexusGroup =
                         createGroup( repo.getKey(), nexusRepoReleases.getId(), nexusRepoSnapshots.getId() );
@@ -124,8 +137,9 @@ public class ArtifactoryMigrationPlexusResource
                     if ( resolution.isCopyCachedArtifacts() )
                     {
                         File repositoryBackup = new File( repositoriesBackup, repo.getKey() );
-                        copyArtifacts( nexusRepoSnapshots, repositoryBackup );
-                        copyArtifacts( nexusRepoReleases, repositoryBackup );
+                        copyArtifacts( nexusRepoSnapshots, nexusRepoReleases, repositoryBackup );
+                        // copyArtifacts( nexusRepoSnapshots, repositoryBackup );
+                        // copyArtifacts( nexusRepoReleases, repositoryBackup );
                     }
 
                     if ( resolution.isMapUrls() )
@@ -150,6 +164,21 @@ public class ArtifactoryMigrationPlexusResource
                                       repo.getHandleSnapshots(), null );
                 }
             }
+        }
+    }
+
+    private void copyArtifacts( CRepository nexusRepoSnapshots, CRepository nexusRepoReleases, File repositoryBackup )
+        throws ResourceException
+    {
+        try
+        {
+            repositoryConvertor.convertRepositoryWithCopy( repositoryBackup, getStorage( nexusRepoReleases ),
+                                                           getStorage( nexusRepoSnapshots ),
+                                                           ARTIFACTORY_METADATA_FILE_FILTER );
+        }
+        catch ( Exception e )
+        {
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to converto mixed repository", e );
         }
     }
 
@@ -214,7 +243,7 @@ public class ArtifactoryMigrationPlexusResource
         {
             nexusRepo.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_SNAPSHOT );
         }
-        //supported on artifactory 1.3
+        // supported on artifactory 1.3
         if ( "maven1".equals( repo.getType() ) )
         {
             nexusRepo.setType( "maven1" );
@@ -298,13 +327,10 @@ public class ArtifactoryMigrationPlexusResource
         {
             try
             {
-                File storage = new File( getStorage( nexusRepo ).toURI() );
+                File storage = getStorage( nexusRepo );
 
                 // filter artifactory metadata
-                boolean isSnapshotRepo =
-                    CRepository.REPOSITORY_POLICY_SNAPSHOT.equals( nexusRepo.getRepositoryPolicy() );
-                FileFilter filter = new ArtifactoryFileFilder( isSnapshotRepo );
-                FileUtils.copyDirectory( repositoryBackup, storage, filter );
+                FileUtils.copyDirectory( repositoryBackup, storage, ARTIFACTORY_METADATA_FILE_FILTER );
             }
             catch ( Exception e )
             {
@@ -312,15 +338,32 @@ public class ArtifactoryMigrationPlexusResource
                     + nexusRepo.getId(), e );
             }
 
-            ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTaskDescriptor.ID );
-            rt.setRepositoryId( nexusRepo.getId() );
-            nexusScheduler.submit( "Download remote index enabled.", rt );
+            createMetadatas( nexusRepo );
         }
 
     }
 
-    private URL getStorage( CRepository nexusRepo )
-        throws ResourceException, MalformedURLException
+    private void createMetadatas( CRepository nexusRepo )
+    {
+        String repoId = nexusRepo.getId();
+
+        ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTaskDescriptor.ID );
+        rt.setRepositoryId( repoId );
+        nexusScheduler.submit( "reindex-" + repoId, rt );
+
+        RebuildMavenMetadataTask mt =
+            (RebuildMavenMetadataTask) nexusScheduler.createTaskInstance( RebuildMavenMetadataTaskDescriptor.ID );
+        mt.setRepositoryId( repoId );
+        nexusScheduler.submit( "rebuild-maven-metadata-" + repoId, mt );
+
+        RebuildAttributesTask at =
+            (RebuildAttributesTask) nexusScheduler.createTaskInstance( RebuildAttributesTaskDescriptor.ID );
+        at.setRepositoryId( repoId );
+        nexusScheduler.submit( "rebuild-attributes-" + repoId, at );
+    }
+
+    private File getStorage( CRepository nexusRepo )
+        throws MalformedURLException, URISyntaxException
     {
         URL storage;
         if ( nexusRepo.getLocalStorage() == null )
@@ -331,7 +374,8 @@ public class ArtifactoryMigrationPlexusResource
         {
             storage = new URL( nexusRepo.getLocalStorage().getUrl() );
         }
-        return storage;
+
+        return new File( storage.toURI() );
     }
 
     @Override
