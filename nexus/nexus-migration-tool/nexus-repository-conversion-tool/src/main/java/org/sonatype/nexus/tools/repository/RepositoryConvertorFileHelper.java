@@ -17,18 +17,17 @@
 package org.sonatype.nexus.tools.repository;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 
 /**
- * 
  * @author Juven Xu
- *
  */
 public interface RepositoryConvertorFileHelper
 {
     /**
      * move a file or folder to the target location, based on the basePath
-     * 
+     *
      * @param file The file or folder to be moved
      * @param target The target repository
      * @param basePath The path based on which to run the moving.
@@ -37,14 +36,20 @@ public interface RepositoryConvertorFileHelper
     void move( File file, File target, String basePath )
         throws IOException;
 
+    void move( File file, File target, String basePath, FileFilter filter )
+        throws IOException;
+
     /**
      * copy a file or folder to the target location, based on the basePath
-     * 
+     *
      * @param file The file or folder to be moved
      * @param target The target repository
      * @param basePath The path based on which to run the moving.
      * @throws IOException
      */
     void copy( File file, File target, String basePath )
+        throws IOException;
+
+    void copy( File file, File target, String basePath, FileFilter filter )
         throws IOException;
 }

@@ -17,6 +17,7 @@
 package org.sonatype.nexus.tools.repository;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,36 +33,39 @@ public class DefaultRepositoryConvertorFileHelper
     implements RepositoryConvertorFileHelper
 {
 
-    public void copy( File file, File target, String basePath )
+    public void copy( File file, File target, String basePath, FileFilter filter )
         throws IOException
     {
-        copyOrMove( file, target, basePath, false );
+        copyOrMove( file, target, basePath, false, filter );
     }
 
-    public void move( File file, File target, String basePath )
+    public void move( File file, File target, String basePath, FileFilter filter )
         throws IOException
     {
-        copyOrMove( file, target, basePath, true );
+        copyOrMove( file, target, basePath, true, filter );
     }
 
-    protected void copyOrMove( File file, File target, String basePath, boolean isMove )
+    protected void copyOrMove( File file, File target, String basePath, boolean isMove, FileFilter filter )
         throws IOException
     {
         File targetFile = new File( target, basePath + file.getName() );
 
         buildDirectoryPath( targetFile.getParentFile() );
 
-        if ( file.isDirectory() )
+        if ( filter != null && !filter.accept( file ) )
         {
-            targetFile.mkdir();
-
+            return;
+        }
+        else if ( file.isDirectory() )
+        {
             for ( File child : file.listFiles() )
             {
-                copyOrMove( child, target, basePath + file.getName() + File.separatorChar, isMove );
+                copyOrMove( child, target, basePath + file.getName() + File.separatorChar, isMove, filter );
             }
         }
-        else if ( file.isFile() && !isMetadataFile (file) )
+        else if ( file.isFile() && !isMetadataFile( file ) )
         {
+            targetFile.getParentFile().mkdirs();
             moveFileContent( file, targetFile );
         }
 
@@ -114,11 +118,10 @@ public class DefaultRepositoryConvertorFileHelper
         }
         directory.mkdir();
     }
-    
-    
+
     /**
      * maven-metadata-<repoId>.xml, maven-matedata.xml, and their checksums md5/sha1
-     * 
+     *
      * @param file
      * @return
      */
@@ -133,6 +136,18 @@ public class DefaultRepositoryConvertorFileHelper
             return true;
         }
         return false;
+    }
+
+    public void copy( File file, File target, String basePath )
+        throws IOException
+    {
+        this.copy( file, target, basePath, null );
+    }
+
+    public void move( File file, File target, String basePath )
+        throws IOException
+    {
+        this.move( file, target, basePath, null );
     }
 
 }

@@ -17,6 +17,7 @@
 package org.sonatype.nexus.tools.repository;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,84 +34,70 @@ public class DefaultRepositoryConvertor
 {
 
     public static final String VERSION_REGEX = "^[0-9].*$";
-    
 
-    @Requirement( role = ConvertorCommand.class , hint = RepositorySeperationConvertorCommand.ID )
-    private RepositorySeperationConvertorCommand repositorySeperationConvertorCommand; 
-    
+    @Requirement( role = ConvertorCommand.class, hint = RepositorySeperationConvertorCommand.ID )
+    private RepositorySeperationConvertorCommand repositorySeperationConvertorCommand;
+
     private File currentRepository;
 
     private File releaseRepository;
 
     private File snapshotRepository;
-    
+
     private List<ConvertorCommand> convertorCommands = new ArrayList<ConvertorCommand>();
 
-    
-    public void convertRepositoryWithCopy( File repository, File targetPath )
+    public void convertRepositoryWithCopy( File repository, File releasedTargetPath, File snapshotTargetPath,
+                                           FileFilter filter )
         throws IOException
     {
-        setUp( repository, targetPath );
-        
-        convertorCommands.clear();
-        
-        repositorySeperationConvertorCommand.setRepository( currentRepository );
-        
-        repositorySeperationConvertorCommand.setReleaseRepository( releaseRepository );
-        
-        repositorySeperationConvertorCommand.setSnapshotRepository( snapshotRepository );
-        
-        repositorySeperationConvertorCommand.setMove( false );
-
-        convertorCommands.add( repositorySeperationConvertorCommand );
-        
-        iterate( currentRepository, false );
+        setUp( repository, releasedTargetPath, snapshotTargetPath, false, filter );
     }
 
-    public void convertRepositoryWithMove( File repository, File targetPath )
+    public void convertRepositoryWithMove( File repository, File releasedTargetPath, File snapshotTargetPath,
+                                           FileFilter filter )
         throws IOException
     {
-        setUp( repository, targetPath );
-        
-        convertorCommands.clear();
-        
-        repositorySeperationConvertorCommand.setRepository( currentRepository );
-        
-        repositorySeperationConvertorCommand.setReleaseRepository( releaseRepository );
-        
-        repositorySeperationConvertorCommand.setSnapshotRepository( snapshotRepository );
-        
-        repositorySeperationConvertorCommand.setMove( true );
+        setUp( repository, releasedTargetPath, snapshotTargetPath, true, filter );
 
-        convertorCommands.add( repositorySeperationConvertorCommand );
-        
-        iterate( currentRepository, true );
-        
         deleteCurrentRepository();
     }
 
-    private void setUp( File repository, File targetPath )
+    private void setUp( File repository, File releasedTargetPath, File snapshotTargetPath, boolean move,
+                        FileFilter filter )
+        throws IOException
     {
         currentRepository = repository;
 
-        releaseRepository = new File( targetPath, currentRepository.getName() + SUFFIX_RELEASES );
+        releaseRepository = releasedTargetPath;
 
-        snapshotRepository = new File( targetPath, currentRepository.getName() + SUFFIX_SNAPSHOTS );
+        snapshotRepository = snapshotTargetPath;
 
         releaseRepository.mkdir();
 
         snapshotRepository.mkdir();
+
+        convertorCommands.clear();
+
+        repositorySeperationConvertorCommand.setRepository( currentRepository );
+        repositorySeperationConvertorCommand.setReleaseRepository( releaseRepository );
+        repositorySeperationConvertorCommand.setSnapshotRepository( snapshotRepository );
+        repositorySeperationConvertorCommand.setMove( move );
+        repositorySeperationConvertorCommand.setFilter( filter );
+
+        convertorCommands.add( repositorySeperationConvertorCommand );
+
+        iterate( currentRepository, move );
+
     }
 
-    
-    private void iterate( File file , boolean isMove)
+    private void iterate( File file, boolean isMove )
         throws IOException
     {
         List<File> artifactVersions = getArtifactVersions( file );
 
         if ( !artifactVersions.isEmpty() )
         {
-            for (ConvertorCommand convertorCommand : convertorCommands )
+            for ( ConvertorCommand convertorCommand : convertorCommands )
             {
                 convertorCommand.execute( artifactVersions );
             }
@@ -119,21 +106,21 @@ public class DefaultRepositoryConvertor
         {
             for ( File subFile : file.listFiles() )
             {
-                iterate( subFile , isMove);
+                iterate( subFile, isMove );
             }
         }
     }
-    
+
     /**
      * Check if the file is the artifact directory, which contains sub-directory named by version
-     * 
+     *
      * @param file
      * @return
      */
     private List<File> getArtifactVersions( File file )
     {
         List<File> artifactVersions = new ArrayList<File>();
-        
+
         if ( !file.exists() || !file.isDirectory() )
         {
             return artifactVersions;
@@ -142,7 +129,7 @@ public class DefaultRepositoryConvertor
         {
             for ( File subFile : file.listFiles() )
             {
-                if ( subFile.getName().matches( VERSION_REGEX ))
+                if ( subFile.getName().matches( VERSION_REGEX ) )
                 {
                     artifactVersions.add( subFile );
                 }
@@ -150,12 +137,12 @@ public class DefaultRepositoryConvertor
             return artifactVersions;
         }
     }
-    
+
     private void deleteCurrentRepository()
     {
-        deleteFile (currentRepository);
+        deleteFile( currentRepository );
     }
-    
+
     private void deleteFile( File file )
     {
         if ( file.isDirectory() )
@@ -166,6 +153,26 @@ public class DefaultRepositoryConvertor
             }
         }
         file.delete();
+    }
+
+    public void convertRepositoryWithCopy( File repository, File targetPath )
+        throws IOException
+    {
+        File releasedTargetPath = new File( targetPath, repository.getName() + SUFFIX_RELEASES );
+
+        File snapshotTargetPath = new File( targetPath, repository.getName() + SUFFIX_SNAPSHOTS );
+
+        convertRepositoryWithCopy( repository, releasedTargetPath, snapshotTargetPath, null );
+    }
+
+    public void convertRepositoryWithMove( File repository, File targetPath )
+        throws IOException
+    {
+        File releasedTargetPath = new File( targetPath, repository.getName() + SUFFIX_RELEASES );
+
+        File snapshotTargetPath = new File( targetPath, repository.getName() + SUFFIX_SNAPSHOTS );
+
+        convertRepositoryWithMove( repository, releasedTargetPath, snapshotTargetPath, null );
     }
 
 }

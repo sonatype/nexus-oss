@@ -17,13 +17,14 @@
 package org.sonatype.nexus.tools.repository;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 
 /**
  * Convert a repository mixed with release and snapshot versions to two, one with release versions and the other with
  * snapshot version.</br> For example, a repository named 'third-party' will be converted to 'third-party-releases' and
  * 'third-party-snapshots'.
- * 
+ *
  * @author Juven Xu
  */
 public interface RepositoryConvertor
@@ -36,5 +37,11 @@ public interface RepositoryConvertor
         throws IOException;
 
     void convertRepositoryWithMove( File repository, File targetPath )
+        throws IOException;
+
+    void convertRepositoryWithCopy( File repository, File releasedTargetPath, File snapshotTargetPath, FileFilter filter )
+        throws IOException;
+
+    void convertRepositoryWithMove( File repository, File releasedTargetPath, File snapshotTargetPath, FileFilter filter )
         throws IOException;
 }

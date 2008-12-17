@@ -17,6 +17,7 @@
 package org.sonatype.nexus.tools.repository;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
 
@@ -24,7 +25,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
- * 
+ *
  * @author Juven Xu
  *
  */
@@ -32,9 +33,9 @@ import org.codehaus.plexus.component.annotations.Requirement;
 public class RepositorySeperationConvertorCommand
     implements ConvertorCommand
 {
- 
+
     public static final String ID = "RepositorySeperationConvertorCommand";
-    
+
     @Requirement
     private RepositoryConvertorFileHelper repositoryConvertorFileHelper;
 
@@ -46,6 +47,7 @@ public class RepositorySeperationConvertorCommand
 
     private File snapshotRepository;
 
+    private FileFilter filter;
 
     public void setMove( boolean isMove )
     {
@@ -85,7 +87,7 @@ public class RepositorySeperationConvertorCommand
 
     /**
      * copy the version folder to its target repository according to it's version type
-     * 
+     *
      * @param versionFolder A folder in repository, normally its name is a version of an artifact
      * @throws IOException
      */
@@ -95,12 +97,12 @@ public class RepositorySeperationConvertorCommand
         repositoryConvertorFileHelper.copy(
             versionFolder,
             getTargetRepository( versionFolder ),
-            getCoordinatePath( versionFolder ) );
+            getCoordinatePath( versionFolder ), filter );
     }
 
     /**
      * move the version folder to its target repository according to it's version type
-     * 
+     *
      * @param versionFolder A folder in repository, normally its name is a version of an artifact
      * @throws IOException
      */
@@ -110,7 +112,7 @@ public class RepositorySeperationConvertorCommand
         repositoryConvertorFileHelper.move(
             versionFolder,
             getTargetRepository( versionFolder ),
-            getCoordinatePath( versionFolder ) );
+            getCoordinatePath( versionFolder ), filter );
     }
 
     private File getTargetRepository( File versionFolder )
@@ -143,6 +145,11 @@ public class RepositorySeperationConvertorCommand
             return true;
         }
         return false;
+    }
+
+    public void setFilter( FileFilter filter )
+    {
+        this.filter = filter;
     }
 
 }
