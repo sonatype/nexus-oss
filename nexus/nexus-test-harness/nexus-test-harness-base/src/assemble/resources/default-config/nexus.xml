@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.0.7</version>
+  <version>1.0.8</version>
   <applicationLogDirectory>${project.build.directory}/logs/</applicationLogDirectory>
 
   <smtpConfiguration>
@@ -90,6 +90,7 @@
     <repositoryGroups>
       <repositoryGroup>
         <groupId>public</groupId>
+        <type>maven2</type>
         <name>Public Repositories</name>
         <repositories>
           <repository>fake-central</repository>
@@ -103,6 +104,7 @@
 
       <repositoryGroup>
         <groupId>nexus-test</groupId>
+        <type>maven2</type>
         <name>nexus-test</name>
         <repositories>
           <repository>nexus-test-harness-repo</repository>
@@ -112,6 +114,7 @@
       </repositoryGroup>
       <repositoryGroup>
         <groupId>nexus-test-harness-snapshot-group</groupId>
+        <type>maven2</type>
         <name>nexus-test-harness-snapshot-group</name>
         <repositories>
           <repository>nexus-test-harness-snapshot-repo</repository>
@@ -119,6 +122,7 @@
       </repositoryGroup>
       <repositoryGroup>
         <groupId>nexus-test-harness-release-group</groupId>
+        <type>maven2</type>
         <name>nexus-test-harness-release-group</name>
         <repositories>
           <repository>nexus-test-harness-release-repo</repository>
