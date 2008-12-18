@@ -30,6 +30,14 @@
     
     <Set name="handler">
       <New id="Contexts" class="org.mortbay.jetty.handler.ContextHandlerCollection">
+          <!-- The following configuration is REQUIRED, and MUST BE FIRST. 
+               It makes the Plexus container available for use in the Nexus webapp. -->
+          <Call name="addLifeCycleListener">
+              <Arg>
+                <New class="org.sonatype.plexus.jetty.custom.InjectExistingPlexusListener" />
+              </Arg>
+          </Call>
+    
           <!-- The following configuration disables JSP taglib support, the validation of which
                slows down Jetty's startup significantly. -->
           <Call name="addLifeCycleListener">
