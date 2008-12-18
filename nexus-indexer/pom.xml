@@ -160,7 +160,8 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <finalName>nexus-indexer-${version}-cli-jdk14</finalName>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+			  <shadedClassifierName>cli-jdk14</shadedClassifierName>
               <createDependencyReducedPom>false</createDependencyReducedPom>
               <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
               <transformers>
@@ -197,7 +198,8 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <finalName>nexus-indexer-${version}-cli-jdk15</finalName>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+			  <shadedClassifierName>cli-jdk15</shadedClassifierName>
               <createDependencyReducedPom>false</createDependencyReducedPom>
               <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
               <transformers>
