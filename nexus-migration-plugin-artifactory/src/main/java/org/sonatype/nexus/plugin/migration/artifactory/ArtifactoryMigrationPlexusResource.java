@@ -34,6 +34,8 @@ import org.sonatype.nexus.plugin.migration.artifactory.dto.ERepositoryType;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRequestDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
+import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecurityConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
@@ -62,9 +64,11 @@ public class ArtifactoryMigrationPlexusResource
     @Requirement
     private NexusScheduler nexusScheduler;
 
-
     @Requirement
     private RepositoryConvertor repositoryConvertor;
+
+    @Requirement( role = MappingConfiguration.class, hint = "default" )
+    private MappingConfiguration mappingConfiguration;
 
     @Requirement
     private SecurityConfigAdaptorPersistor securityConfigAdaptorPersistor;
@@ -95,7 +99,6 @@ public class ArtifactoryMigrationPlexusResource
 
         // need to resolve that on posts
         File artifactoryBackup = new File( migrationSummary.getBackupLocation() );
-
         ArtifactoryConfig cfg;
 
         ArtifactorySecurityConfig securityCfg;
@@ -208,7 +211,10 @@ public class ArtifactoryMigrationPlexusResource
 
                     if ( resolution.isMapUrls() )
                     {
-                        addMapping( resolution.getRepositoryId(), nexusGroup.getGroupId(), true );
+                        CMapping map = new CMapping();
+                        map.setArtifactoryRepositoryId( resolution.getRepositoryId() );
+                        map.setNexusGroupId( nexusGroup.getGroupId() );
+                        mappingConfiguration.addMapping( map );
                     }
 
                 }
@@ -219,7 +225,10 @@ public class ArtifactoryMigrationPlexusResource
                 {
                     if ( resolution.isMapUrls() )
                     {
-                        addMapping( resolution.getRepositoryId(), resolution.getSimilarRepository(), false );
+                        CMapping map = new CMapping();
+                        map.setArtifactoryRepositoryId( resolution.getRepositoryId() );
+                        map.setNexusGroupId( resolution.getSimilarRepository() );
+                        mappingConfiguration.addMapping( map );
                     }
                 }
                 else
@@ -286,7 +295,10 @@ public class ArtifactoryMigrationPlexusResource
         }
         if ( resolution.isMapUrls() )
         {
-            addMapping( resolution.getRepositoryId(), nexusRepo.getId(), false );
+            CMapping map = new CMapping();
+            map.setArtifactoryRepositoryId( resolution.getRepositoryId() );
+            map.setNexusRepositoryId( nexusRepo.getId() );
+            mappingConfiguration.addMapping( map );
         }
     }
 
@@ -354,17 +366,11 @@ public class ArtifactoryMigrationPlexusResource
 
     }
 
-    private void addMapping( String artifactoryRepositoryId, String nexusRepositoryId, boolean isGroup )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void importGroups( Map<String, ArtifactoryVirtualRepository> map )
+    private void importGroups( Map<String, ArtifactoryVirtualRepository> virtualRepositories )
         throws ResourceException
     {
-        VirtualRepositoryUtil.resolveRepositories( map );
-        for ( ArtifactoryVirtualRepository virtualRepo : map.values() )
+        VirtualRepositoryUtil.resolveRepositories( virtualRepositories );
+        for ( ArtifactoryVirtualRepository virtualRepo : virtualRepositories.values() )
         {
             CRepositoryGroup group = new CRepositoryGroup();
             group.setGroupId( virtualRepo.getKey() );
@@ -385,6 +391,12 @@ public class ArtifactoryMigrationPlexusResource
                 throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to create group "
                     + virtualRepo.getKey(), e );
             }
+
+            CMapping map = new CMapping();
+            map.setArtifactoryRepositoryId( virtualRepo.getKey() );
+            map.setNexusGroupId( group.getGroupId() );
+            mappingConfiguration.addMapping( map );
+
         }
     }
 

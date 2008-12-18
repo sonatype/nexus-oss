@@ -28,6 +28,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-migration-plugin-configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
     </dependency>
@@ -48,9 +53,9 @@
       <version>4.4</version>
     </dependency>
     <dependency>
-    	<groupId>org.sonatype.nexus.tools</groupId>
-    	<artifactId>nexus-repository-conversion-tool</artifactId>
-    	<version>${nexus.version}</version>
+      <groupId>org.sonatype.nexus.tools</groupId>
+      <artifactId>nexus-repository-conversion-tool</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
   </dependencies>
 
