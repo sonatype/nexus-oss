@@ -282,6 +282,30 @@
       </patterns>
     </repositoryTarget>
   </repositoryTargets>
+  <tasks>
+    <task>
+      <id>1</id>
+      <name>weekly_task</name>
+      <enabled>true</enabled>
+      <type>ReindexTask</type>
+      <status>SUBMITTED</status>
+      <nextRun>1229291340000</nextRun>
+      <schedule>
+        <type>weekly</type>
+        <startDate>1229032140000</startDate>
+        <daysOfWeek>
+          <daysOfWeek>1</daysOfWeek>
+          <daysOfWeek>2</daysOfWeek>
+        </daysOfWeek>
+      </schedule>
+      <properties>
+        <property>
+          <key>repositoryOrGroupId</key>
+          <value>all_repo</value>
+        </property>
+      </properties>
+    </task>
+  </tasks>
   <smtpConfiguration>
     <host>smtp-host</host>
     <port>25</port>
