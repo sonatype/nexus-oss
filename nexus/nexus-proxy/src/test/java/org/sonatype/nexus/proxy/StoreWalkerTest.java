@@ -54,7 +54,7 @@ public class StoreWalkerTest
 
         TestWalker w;
 
-        w = new TestWalker( getRouter( "repositories" ), null );
+        w = new TestWalker( getRouter( "repositories" ), getLogger() );
         w.walk();
         assertEquals( 15, w.collEnters );
         assertEquals( 15, w.collExits );
@@ -62,7 +62,7 @@ public class StoreWalkerTest
         assertEquals( 4, w.files );
         assertEquals( 0, w.links );
 
-        w = new TestWalker( getRouter( "groups-m2" ), null );
+        w = new TestWalker( getRouter( "groups-m2" ), getLogger() );
         w.walk();
         assertEquals( 11, w.collEnters );
         assertEquals( 11, w.collExits );

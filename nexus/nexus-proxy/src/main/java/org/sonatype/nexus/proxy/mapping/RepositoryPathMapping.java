@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.sonatype.nexus.proxy.ResourceStore;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
 /**
  * The mapping.
@@ -59,11 +59,11 @@ public class RepositoryPathMapping
         this.resourceStores = resourceStores;
     }
 
-    public boolean matches( ResourceStoreRequest request )
+    public boolean matches( RepositoryItemUid uid )
     {
-        if ( allGroups || groupId.equals( request.getRequestRepositoryGroupId() ) )
+        if ( allGroups || groupId.equals( uid.getRepository().getId() ) )
         {
-            return pattern.matcher( request.getRequestPath() ).matches();
+            return pattern.matcher( uid.getPath() ).matches();
         }
         else
         {

@@ -18,9 +18,11 @@ package org.sonatype.nexus.configuration.application.runtime;
 
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
@@ -45,5 +47,12 @@ public interface ApplicationRuntimeConfigurationBuilder
 
     ShadowRepository updateRepositoryFromModel( ShadowRepository old, Configuration configuration,
         CRepositoryShadow repositoryShadow )
+        throws InvalidConfigurationException;
+
+    GroupRepository createRepositoryFromModel( Configuration configuration, CRepositoryGroup repositoryGroup )
+        throws InvalidConfigurationException;
+
+    GroupRepository updateRepositoryFromModel( GroupRepository old, Configuration configuration,
+        CRepositoryGroup repositoryGroup )
         throws InvalidConfigurationException;
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.0.7</version>
+  <version>1.0.8</version>
   <security>
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
@@ -110,6 +110,7 @@
     <repositoryGroups>
       <repositoryGroup>
         <groupId>torrent</groupId>
+        <type>maven2</type>
         <repositories>
           <repository>release</repository>
           <repository>team</repository>
@@ -121,6 +122,7 @@
       </repositoryGroup>
       <repositoryGroup>
         <groupId>public.snapshot</groupId>
+        <type>maven2</type>
         <repositories>
           <repository>central.snapshot</repository>
         </repositories>

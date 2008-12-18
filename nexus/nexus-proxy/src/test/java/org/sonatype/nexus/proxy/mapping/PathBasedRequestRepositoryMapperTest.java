@@ -16,7 +16,10 @@
  */
 package org.sonatype.nexus.proxy.mapping;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.makeThreadSafe;
+import static org.easymock.EasyMock.replay;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,11 +30,12 @@ import java.util.Map;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
-import org.sonatype.nexus.proxy.ResourceStore;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.proxy.item.DefaultRepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class PathBasedRequestRepositoryMapperTest
@@ -53,6 +57,8 @@ public class PathBasedRequestRepositoryMapperTest
     private Repository repoE;
 
     private Repository repoF;
+    
+    private GroupRepository groupRepo;
 
     protected PathBasedRequestRepositoryMapper prepare( Map<String, String[]> inclusions,
         Map<String, String[]> exclusions, Map<String, String[]> blockings )
@@ -136,7 +142,7 @@ public class PathBasedRequestRepositoryMapperTest
         testgroup.add( repoE.getId() );
         testgroup.add( repoF.getId() );
 
-        registry.addRepositoryGroup( "test", testgroup );
+        groupRepo = registry.addRepositoryGroup( "test", testgroup );
 
         if ( inclusions != null )
         {
@@ -199,25 +205,25 @@ public class PathBasedRequestRepositoryMapperTest
         PathBasedRequestRepositoryMapper pm = prepare( inclusions, exclusions, null );
 
         // using group to guarantee proper ordering
-        List<ResourceStore> resolvedRepositories = new ArrayList<ResourceStore>();
+        List<Repository> resolvedRepositories = new ArrayList<Repository>();
 
         resolvedRepositories.addAll( registry.getRepositoryGroup( "test" ) );
 
-        List<ResourceStore> mappedRepositories;
+        List<Repository> mappedRepositories;
 
-        ResourceStoreRequest request;
+        RepositoryItemUid request;
 
-        request = new ResourceStoreRequest( "/a/b/something", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/a/b/something" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 2, mappedRepositories.size() );
         assertTrue( mappedRepositories.get( 0 ).equals( repoA ) );
         assertTrue( mappedRepositories.get( 1 ).equals( repoB ) );
 
-        request = new ResourceStoreRequest( "/e/f/should/not/return/any/repo", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/e/f/should/not/return/any/repo" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 0, mappedRepositories.size() );
 
-        request = new ResourceStoreRequest( "/all/should/be/servicing", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/all/should/be/servicing" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 6, mappedRepositories.size() );
 
@@ -238,23 +244,23 @@ public class PathBasedRequestRepositoryMapperTest
         PathBasedRequestRepositoryMapper pm = prepare( inclusions, exclusions, null );
 
         // using group to guarantee proper ordering
-        List<ResourceStore> resolvedRepositories = new ArrayList<ResourceStore>();
+        List<Repository> resolvedRepositories = new ArrayList<Repository>();
 
         resolvedRepositories.addAll( registry.getRepositoryGroup( "test" ) );
 
-        List<ResourceStore> mappedRepositories;
+        List<Repository> mappedRepositories;
 
-        ResourceStoreRequest request;
+        RepositoryItemUid request;
 
         // /a/b inclusion hit, needed order: A, B
-        request = new ResourceStoreRequest( "/a/b/something", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/a/b/something" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 2, mappedRepositories.size() );
         assertTrue( mappedRepositories.get( 0 ).equals( repoA ) );
         assertTrue( mappedRepositories.get( 1 ).equals( repoB ) );
 
         // /e/f exclusion hit, needed order: A, B, C, D
-        request = new ResourceStoreRequest( "/e/f/should/not/return/any/repo", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/e/f/should/not/return/any/repo" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 4, mappedRepositories.size() );
         assertTrue( mappedRepositories.get( 0 ).equals( repoA ) );
@@ -262,7 +268,7 @@ public class PathBasedRequestRepositoryMapperTest
         assertTrue( mappedRepositories.get( 2 ).equals( repoC ) );
         assertTrue( mappedRepositories.get( 3 ).equals( repoD ) );
 
-        request = new ResourceStoreRequest( "/all/should/be/servicing", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/all/should/be/servicing" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 6, mappedRepositories.size() );
 
@@ -290,33 +296,33 @@ public class PathBasedRequestRepositoryMapperTest
         PathBasedRequestRepositoryMapper pm = prepare( inclusions, exclusions, null );
 
         // using group to guarantee proper ordering
-        List<ResourceStore> resolvedRepositories = new ArrayList<ResourceStore>();
+        List<Repository> resolvedRepositories = new ArrayList<Repository>();
 
         resolvedRepositories.addAll( registry.getRepositoryGroup( "test" ) );
 
-        List<ResourceStore> mappedRepositories;
+        List<Repository> mappedRepositories;
 
-        ResourceStoreRequest request;
+        RepositoryItemUid request;
 
         // empty inclusion, it should don't be acted upon
-        request = new ResourceStoreRequest( "/empty/1/something", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/empty/1/something" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 6, mappedRepositories.size() );
 
         // null inclusion, it should don't be acted upon
-        request = new ResourceStoreRequest( "/empty/2/something", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/empty/2/something" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 6, mappedRepositories.size() );
 
-        request = new ResourceStoreRequest( "/empty/5/something", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/empty/5/something" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 6, mappedRepositories.size() );
 
-        request = new ResourceStoreRequest( "/empty/6/something", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/empty/6/something" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 6, mappedRepositories.size() );
 
-        request = new ResourceStoreRequest( "/empty/7/something", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/empty/7/something" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 6, mappedRepositories.size() );
     }
@@ -330,21 +336,21 @@ public class PathBasedRequestRepositoryMapperTest
         PathBasedRequestRepositoryMapper pm = prepare( null, null, blockings );
 
         // using group to guarantee proper ordering
-        List<ResourceStore> resolvedRepositories = new ArrayList<ResourceStore>();
+        List<Repository> resolvedRepositories = new ArrayList<Repository>();
 
         resolvedRepositories.addAll( registry.getRepositoryGroup( "test" ) );
 
-        List<ResourceStore> mappedRepositories;
+        List<Repository> mappedRepositories;
 
-        ResourceStoreRequest request;
+        RepositoryItemUid request;
 
         // empty inclusion, it should don't be acted upon
-        request = new ResourceStoreRequest( "/blocked/1/something", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/blocked/1/something" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 0, mappedRepositories.size() );
 
         // null inclusion, it should don't be acted upon
-        request = new ResourceStoreRequest( "/dummy/2/something", true );
+        request = new DefaultRepositoryItemUid( groupRepo, "/dummy/2/something" );
         mappedRepositories = pm.getMappedRepositories( registry, request, resolvedRepositories );
         assertEquals( 6, mappedRepositories.size() );
     }

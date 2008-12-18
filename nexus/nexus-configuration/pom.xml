@@ -89,7 +89,7 @@
 							<goal>xpp3-writer</goal>
 						</goals>
 						<configuration>
-							<version>1.0.7</version>
+							<version>1.0.8</version>
 							<packagedVersions>
 								<packagedVersion>1.0.0</packagedVersion>
 								<packagedVersion>1.0.1</packagedVersion>
@@ -98,6 +98,7 @@
 								<packagedVersion>1.0.4</packagedVersion>
 								<packagedVersion>1.0.5</packagedVersion>
 								<packagedVersion>1.0.6</packagedVersion>
+                <packagedVersion>1.0.7</packagedVersion>
 							</packagedVersions>
 							<model>src/main/mdo/nexus.xml</model>
 						</configuration>
@@ -126,6 +127,37 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+			<plugin>
+				<!-- TODO remove when upgrade generator is marged into modello -->
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>modello-plugin-upgrade</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<id>nexus-upgrade</id>
+						<goals>
+							<goal>upgrade</goal>
+						</goals>
+						<configuration>
+							<version>1.0.8</version>
+							<packagedVersions>
+								<packagedVersion>1.0.7</packagedVersion>
+							</packagedVersions>
+							<model>src/main/mdo/nexus.xml</model>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<packageWithVersion>false</packageWithVersion>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>commons-collections</groupId>
+						<artifactId>commons-collections</artifactId>
+						<version>3.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>			
 			<plugin>
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-component-metadata</artifactId>

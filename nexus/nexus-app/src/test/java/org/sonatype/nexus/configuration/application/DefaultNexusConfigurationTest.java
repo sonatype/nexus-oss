@@ -27,7 +27,8 @@ import org.codehaus.plexus.util.io.InputStreamFacade;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.proxy.maven.maven2.M2GroupIdBasedRepositoryRouter;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
@@ -192,9 +193,7 @@ public class DefaultNexusConfigurationTest
         // load default config
         nexusConfiguration.loadConfiguration();
 
-        M2GroupIdBasedRepositoryRouter groupRouter = (M2GroupIdBasedRepositoryRouter) lookup(
-            RepositoryRouter.class,
-            "groups-m2" );
+        M2GroupRepository groupRouter = (M2GroupRepository) lookup( GroupRepository.class, "maven2" );
 
         // runtime state should equal to config
         assertEquals( nexusConfiguration.getConfiguration().getRouting().getGroups().isMergeMetadata(), groupRouter

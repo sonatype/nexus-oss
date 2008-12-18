@@ -4,7 +4,7 @@
 	<!-- used as default config source -->
 
 <nexusConfiguration>
-	<version>1.0.7</version>
+	<version>1.0.8</version>
 
 	<smtpConfiguration>
 		<host>smtp-host</host>
@@ -208,6 +208,7 @@
 		<repositoryGroups>
 			<repositoryGroup>
 				<groupId>public</groupId>
+				<type>maven2</type>
 				<name>Public Repositories</name>
 				<repositories>
 					<repository>releases</repository>
@@ -218,6 +219,7 @@
 			</repositoryGroup>
 			<repositoryGroup>
 				<groupId>public-snapshots</groupId>
+        <type>maven2</type>
 				<name>Public Snapshot Repositories</name>
 				<repositories>
 					<repository>apache-snapshots</repository>

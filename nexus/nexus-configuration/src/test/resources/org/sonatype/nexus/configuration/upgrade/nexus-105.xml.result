@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.0.7</version>
+  <version>1.0.8</version>
   <security>
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
@@ -200,6 +200,7 @@
     <repositoryGroups>
       <repositoryGroup>
         <groupId>sonatype-nexus</groupId>
+        <type>maven2</type>
         <repositories>
           <repository>sonatype-snapshots</repository>
           <repository>sonatype-releases</repository>
@@ -214,6 +215,7 @@
       </repositoryGroup>
       <repositoryGroup>
         <groupId>public-releases</groupId>
+        <type>maven2</type>
         <repositories>
           <repository>extFree</repository>
           <repository>extNonFree</repository>
@@ -224,6 +226,7 @@
       </repositoryGroup>
       <repositoryGroup>
         <groupId>public-snapshots</groupId>
+        <type>maven2</type>
         <repositories>
           <repository>apache-snapshots</repository>
           <repository>codehaus-snapshots</repository>
@@ -231,12 +234,14 @@
       </repositoryGroup>
       <repositoryGroup>
         <groupId>inhouse-releases</groupId>
+        <type>maven2</type>
         <repositories>
           <repository>inhouse</repository>
         </repositories>
       </repositoryGroup>
       <repositoryGroup>
         <groupId>inhouse-snapshots</groupId>
+        <type>maven2</type>
         <repositories>
           <repository>inhouse-snapshots</repository>
         </repositories>

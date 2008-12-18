@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.0.7</version>
+  <version>1.0.8</version>
   <security>
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
@@ -94,6 +94,7 @@
     <repositoryGroups>
       <repositoryGroup>
         <groupId>public</groupId>
+        <type>maven2</type>
         <repositories>
           <repository>releases</repository>
           <repository>snapshots</repository>
@@ -103,6 +104,7 @@
       </repositoryGroup>
       <repositoryGroup>
         <groupId>public-snapshots</groupId>
+        <type>maven2</type>
         <repositories>
           <repository>apache-snapshots</repository>
           <repository>codehaus-snapshots</repository>

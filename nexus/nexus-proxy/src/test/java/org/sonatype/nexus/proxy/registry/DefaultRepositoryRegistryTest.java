@@ -1,18 +1,22 @@
-/**
- * Sonatype Nexus (TM) [Open Source Version].
- * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
- * Includes the third-party code listed at ${thirdPartyUrl}.
- *
- * This program is licensed to you under Version 3 only of the GNU
- * General Public License as published by the Free Software Foundation.
- *
+/*
+ * Nexus: Maven Repository Manager
+ * Copyright (C) 2008 Sonatype Inc.                                                                                                                          
+ * 
+ * This file is part of Nexus.                                                                                                                                  
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License Version 3 for more details.
- *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
  * You should have received a copy of the GNU General Public License
- * Version 3 along with this program. If not, see http://www.gnu.org/licenses/.
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ *
  */
 package org.sonatype.nexus.proxy.registry;
 
@@ -23,6 +27,7 @@ import static org.easymock.EasyMock.replay;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.easymock.EasyMock;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.events.EventListener;
@@ -55,6 +60,10 @@ public class DefaultRepositoryRegistryTest
         Repository repoA = createMock( Repository.class );
         Repository repoB = createMock( Repository.class );
         Repository repoC = createMock( Repository.class );
+        
+        EasyMock.makeThreadSafe( repoA, true );
+        EasyMock.makeThreadSafe( repoB, true );
+        EasyMock.makeThreadSafe( repoC, true );
 
         // id will be called twice
         expect( repoA.getId() ).andReturn( "A" ).anyTimes();

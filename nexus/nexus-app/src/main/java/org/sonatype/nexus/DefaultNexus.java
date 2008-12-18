@@ -82,6 +82,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
@@ -303,6 +304,12 @@ public class DefaultNexus
         return repositoryRegistry.getRepositoryGroup( repoGroupId );
     }
 
+    public GroupRepository getRepositoryGroupXXX( String repoGroupId )
+        throws NoSuchRepositoryGroupException
+    {
+        return repositoryRegistry.getRepositoryGroupXXX( repoGroupId );
+    }
+
     public String getRepositoryGroupType( String repoGroupId )
         throws NoSuchRepositoryGroupException
     {
@@ -319,6 +326,23 @@ public class DefaultNexus
     public Collection<Repository> getRepositories()
     {
         return repositoryRegistry.getRepositories();
+    }
+
+    public Collection<GroupRepository> getGroupRepositories()
+    {
+        ArrayList<GroupRepository> result = new ArrayList<GroupRepository>();
+        for ( String groupId : repositoryRegistry.getRepositoryGroupIds() )
+        {
+            try
+            {
+                result.add( repositoryRegistry.getRepositoryGroupXXX( groupId ) );
+            }
+            catch ( NoSuchRepositoryGroupException e )
+            {
+                getLogger().warn( "Impossible exception", e);
+            }
+        }
+        return result;
     }
 
     public StorageItem dereferenceLinkItem( StorageLinkItem item )

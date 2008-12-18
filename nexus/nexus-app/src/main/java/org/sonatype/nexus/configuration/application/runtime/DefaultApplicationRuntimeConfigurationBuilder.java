@@ -27,11 +27,14 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.GroupRepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -54,6 +57,8 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
     private static final String DEFAULT_REPOSITORY_TYPE = "maven2";
 
+    private static final String DEFAULT_GROUPREPOSITORY_TYPE = "maven2";
+
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
@@ -75,16 +80,9 @@ public class DefaultApplicationRuntimeConfigurationBuilder
     public Repository createRepositoryFromModel( Configuration configuration, CRepository repo )
         throws InvalidConfigurationException
     {
-        try
-        {
-            Repository repository = (Repository) plexusContainer.lookup( Repository.class, repo.getType() );
+        Repository repository = createRepository( Repository.class, repo.getType() );
 
-            return updateRepositoryFromModel( repository, configuration, repo );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new InvalidConfigurationException( "Could not lookup a new instance of Repository!", e );
-        }
+        return updateRepositoryFromModel( repository, configuration, repo );
     }
 
     public Repository updateRepositoryFromModel( Repository old, Configuration configuration, CRepository repo )
@@ -139,18 +137,8 @@ public class DefaultApplicationRuntimeConfigurationBuilder
     public ShadowRepository createRepositoryFromModel( Configuration configuration, CRepositoryShadow shadow )
         throws InvalidConfigurationException
     {
-        try
-        {
-            ShadowRepository shadowRepository = (ShadowRepository) plexusContainer.lookup(
-                ShadowRepository.class,
-                shadow.getType() );
-
-            return updateRepositoryFromModel( shadowRepository, configuration, shadow );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new InvalidConfigurationException( "Could not lookup a new instance of Repository!", e );
-        }
+        ShadowRepository shadowRepository = createRepository( ShadowRepository.class, shadow.getType() );
+        return updateRepositoryFromModel( shadowRepository, configuration, shadow );
     }
 
     public ShadowRepository updateRepositoryFromModel( ShadowRepository old, Configuration configuration,
@@ -196,8 +184,70 @@ public class DefaultApplicationRuntimeConfigurationBuilder
         return shadowRepository;
     }
 
+    public GroupRepository createRepositoryFromModel( Configuration configuration, CRepositoryGroup group )
+        throws InvalidConfigurationException
+    {
+        GroupRepository groupRepository = createRepository( GroupRepository.class, group.getType() );
+        return updateRepositoryFromModel( groupRepository, configuration, group );
+    }
+
+    public GroupRepository updateRepositoryFromModel( GroupRepository old, Configuration configuration,
+        CRepositoryGroup group )
+        throws InvalidConfigurationException
+    {
+        GroupRepository repository = null;
+
+        String type = group.getType();
+
+        if ( type == null )
+        {
+            type = DEFAULT_GROUPREPOSITORY_TYPE;
+        }
+
+        try
+        {
+            LocalRepositoryStorage ls = null;
+
+            if ( group.getLocalStorage() != null )
+            {
+                ls = getLocalRepositoryStorage( group.getGroupId(), group.getLocalStorage().getProvider() );
+            }
+            else
+            {
+                ls = getLocalRepositoryStorage( group.getGroupId(), DEFAULT_LS_PROVIDER );
+            }
+
+            // Setting contentClass specific things on a repository
+            GroupRepositoryConfigurator configurator = (GroupRepositoryConfigurator) plexusContainer.lookup(
+                GroupRepositoryConfigurator.class,
+                type );
+
+            repository = configurator.updateRepositoryFromModel( old, nexusConfiguration, group, ls );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new InvalidConfigurationException( "Repository of type='" + type
+                + "' does not have a valid configurator!", e );
+        }
+
+        return repository;
+    }
+
     // ----------------------------------------
     // private stuff
+
+    private <T extends Repository> T createRepository( Class<T> role, String hint )
+        throws InvalidConfigurationException
+    {
+        try
+        {
+            return role.cast( plexusContainer.lookup( role, hint ) );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new InvalidConfigurationException( "Could not lookup a new instance of Repository!", e );
+        }
+    }
 
     private LocalRepositoryStorage getLocalRepositoryStorage( String repoId, String provider )
         throws InvalidConfigurationException

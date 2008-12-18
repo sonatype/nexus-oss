@@ -17,16 +17,12 @@
 package org.sonatype.nexus.index;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -58,17 +53,15 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
-import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
-import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.router.ResourceStoreIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.router.RootRepositoryRouter;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
@@ -499,43 +492,7 @@ public class DefaultIndexerManager
                     {
                         for ( File file : files )
                         {
-                            String path = "/.index/" + file.getName();
-
-                            FileInputStream fis = null;
-
-                            try
-                            {
-                                fis = new FileInputStream( file );
-
-                                DefaultStorageFileItem fItem = new DefaultStorageFileItem(
-                                    repository,
-                                    path,
-                                    true,
-                                    true,
-                                    fis );
-
-                                fItem.setModified( context.getTimestamp().getTime() );
-                                fItem.setCreated( context.getTimestamp().getTime() );
-
-                                if ( repository instanceof MavenRepository )
-                                {
-                                    // this is maven repo, so use the checksumming facility
-                                    ( (MavenRepository) repository ).storeItemWithChecksums( fItem );
-                                }
-                                else
-                                {
-                                    // simply store it
-                                    repository.storeItem( fItem );
-                                }
-                            }
-                            catch ( Exception e )
-                            {
-                                getLogger().error( "Cannot store index file " + path, e );
-                            }
-                            finally
-                            {
-                                IOUtil.close( fis );
-                            }
+                            storeItem( repository, file, context );
                         }
                     }
                 }
@@ -551,6 +508,47 @@ public class DefaultIndexerManager
         finally
         {
             repository.setIndexable( repositoryIndexable );
+        }
+    }
+
+    private void storeItem( Repository repository, File file, IndexingContext context )
+    {
+        String path = "/.index/" + file.getName();
+
+        FileInputStream fis = null;
+
+        try
+        {
+            fis = new FileInputStream( file );
+
+            DefaultStorageFileItem fItem = new DefaultStorageFileItem(
+                repository,
+                path,
+                true,
+                true,
+                fis );
+
+            fItem.setModified( context.getTimestamp().getTime() );
+            fItem.setCreated( context.getTimestamp().getTime() );
+
+            if ( repository instanceof MavenRepository )
+            {
+                // this is maven repo, so use the checksumming facility
+                ( (MavenRepository) repository ).storeItemWithChecksums( fItem );
+            }
+            else
+            {
+                // simply store it
+                repository.storeItem( fItem );
+            }
+        }
+        catch ( Exception e )
+        {
+            getLogger().error( "Cannot store index file " + path, e );
+        }
+        finally
+        {
+            IOUtil.close( fis );
         }
     }
 
@@ -584,56 +582,15 @@ public class DefaultIndexerManager
 
                 indexPacker.packIndex( packReq );
 
-                FileInputStream fi = null;
-
-                DigestInputStream sha1Is = null;
-
-                DigestInputStream md5Is = null;
-
                 File[] files = targetDir.listFiles();
 
                 if ( files != null )
                 {
-                    try
+                    GroupRepository group = repositoryRegistry.getRepositoryGroupXXX( repositoryGroupId );
+
+                    for ( File file : files )
                     {
-                        for ( File file : files )
-                        {
-                            fi = new FileInputStream( file );
-
-                            sha1Is = new DigestInputStream( fi, MessageDigest.getInstance( "SHA1" ) );
-
-                            md5Is = new DigestInputStream( sha1Is, MessageDigest.getInstance( "MD5" ) );
-
-                            String filePath = DefaultGroupIdBasedRepositoryRouter.ID + "/" + repositoryGroupId
-                                + "/.index/" + file.getName();
-
-                            RepositoryRouter router = (RepositoryRouter) rootRouter.resolveResourceStore(
-                                new ResourceStoreRequest( filePath, true ) ).get( 0 );
-
-                            if ( getLogger().isDebugEnabled() )
-                            {
-                                getLogger().debug(
-                                    "Storing the " + file.getName() + " file in the " + router.getId() + " router." );
-                            }
-
-                            router.storeItem( repositoryGroupId + "/.index/" + file.getName(), md5Is );
-
-                            String sha1Sum = new String( Hex.encodeHex( sha1Is.getMessageDigest().digest() ) );
-
-                            String md5Sum = new String( Hex.encodeHex( md5Is.getMessageDigest().digest() ) );
-
-                            router.storeItem(
-                                repositoryGroupId + "/.index/" + file.getName() + ".sha1",
-                                new ByteArrayInputStream( sha1Sum.getBytes() ) );
-
-                            router.storeItem(
-                                repositoryGroupId + "/.index/" + file.getName() + ".md5",
-                                new ByteArrayInputStream( md5Sum.getBytes() ) );
-                        }
-                    }
-                    catch ( NoSuchAlgorithmException e )
-                    {
-                        // will not happen
+                        storeItem( group, file, context );
                     }
                 }
             }

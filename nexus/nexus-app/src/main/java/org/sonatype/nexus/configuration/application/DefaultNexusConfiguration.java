@@ -54,10 +54,12 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
-import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.Target;
@@ -320,10 +322,16 @@ public class DefaultNexusConfiguration
         return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repository );
     }
 
-    public Repository createRepositoryFromModel( Configuration configuration, CRepositoryShadow repositoryShadow )
+    public ShadowRepository createRepositoryFromModel( Configuration configuration, CRepositoryShadow repositoryShadow )
         throws InvalidConfigurationException
     {
         return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repositoryShadow );
+    }
+
+    public GroupRepository createRepositoryFromModel( Configuration configuration, CRepositoryGroup repositoryGroup )
+        throws InvalidConfigurationException
+    {
+        return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repositoryGroup );
     }
 
     public Collection<ContentClass> listRepositoryContentClasses()
@@ -471,18 +479,10 @@ public class DefaultNexusConfiguration
                 {
                     group.setName( group.getGroupId() );
                 }
-                try
-                {
-                    repositoryRegistry.addRepositoryGroup( group.getGroupId(), group.getRepositories() );
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    throw new ConfigurationException( "Cannot register repository groups!", e );
-                }
-                catch ( InvalidGroupingException e )
-                {
-                    throw new ConfigurationException( "Configuration contains invalid grouping!", e );
-                }
+
+                GroupRepository repository = createRepositoryFromModel( getConfiguration(), group );
+
+                repositoryRegistry.addRepositoryGroup( repository );
             }
         }
     }

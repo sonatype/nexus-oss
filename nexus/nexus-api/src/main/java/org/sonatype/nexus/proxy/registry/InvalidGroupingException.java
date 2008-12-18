@@ -31,4 +31,9 @@ public class InvalidGroupingException
         super( "The content classes are not groupable! '" + c1.getId() + "' and '" + c2.getId()
             + "' are not compatible!" );
     }
+
+    public InvalidGroupingException( ContentClass c1 )
+    {
+        super( "There is no repository group implementation that supports this content class '" + c1.getId() + "'!" );
+    }
 }

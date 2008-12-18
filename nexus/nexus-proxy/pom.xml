@@ -135,6 +135,18 @@
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
+        <executions>
+          <execution>
+            <id>test-components</id>
+            <goals>
+              <goal>generate-test-metadata</goal>
+            </goals>
+            <configuration>
+              <generatedMetadata>${project.build.testOutputDirectory}/META-INF/plexus/components.xml</generatedMetadata>
+              <staticMetadataDirectory>${basedir}/src/test/resources/META-INF/plexus</staticMetadataDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
