@@ -21,12 +21,18 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
+import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryRepository;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.ERepositoryType;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryResponseDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecurityConfig;
+import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
+import org.sonatype.nexus.plugin.migration.artifactory.security.builder.ArtifactorySecurityConfigBuilder;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -40,12 +46,20 @@ public class ArtifactoryUploadBackupPlexusResource
 
     @Requirement( role = org.codehaus.plexus.archiver.UnArchiver.class, hint = "zip" )
     private ZipUnArchiver zipUnArchiver;
+    
+    @Requirement
+    private NexusSecurity nexusSecurity;
 
     public ArtifactoryUploadBackupPlexusResource()
     {
         this.setReadable( false );
         this.setModifiable( true );
     }
+    
+    protected NexusSecurity getNexusSecurity()
+    {
+        return nexusSecurity;
+    }   
 
     @Override
     public Object getPayloadInstance()
@@ -83,17 +97,31 @@ public class ArtifactoryUploadBackupPlexusResource
             {
                 File artifactoryBackup = saveArtifactoryBackup( fileItem );
 
+                MigrationSummaryDTO data = new MigrationSummaryDTO();
+
+                data.setBackupLocation( artifactoryBackup.getAbsolutePath() );
+
+                // read artifactory.config.xml
                 File configFile = new File( artifactoryBackup, "artifactory.config.xml" );
 
                 ArtifactoryConfig cfg = ArtifactoryConfig.read( configFile );
 
-                MigrationSummaryDTO data = new MigrationSummaryDTO();
-                data.setBackupLocation( artifactoryBackup.getAbsolutePath() );
+                List<RepositoryResolutionDTO> repositoriesResolution = validate(
+                    cfg.getLocalRepositories().values(),
+                    cfg.getRemoteRepositories().values() );
 
-                List<RepositoryResolutionDTO> repositoriesResolution =
-                    validate( cfg.getLocalRepositories().values(), cfg.getRemoteRepositories().values() );
                 data.setRepositoriesResolution( repositoriesResolution );
 
+                // read security.xml
+                File securityFile = new File( artifactoryBackup, "security.xml" );
+
+                ArtifactorySecurityConfig securityCfg = ArtifactorySecurityConfigBuilder.read( securityFile );
+
+                List<UserResolutionDTO> userResolution = validate( securityCfg.getUsers() );
+
+                data.setUserResolution( userResolution );
+
+                // set response
                 MigrationSummaryResponseDTO res = new MigrationSummaryResponseDTO();
 
                 res.setData( data );
@@ -145,7 +173,42 @@ public class ArtifactoryUploadBackupPlexusResource
         }
         return resolutions;
     }
+    
+    private List<UserResolutionDTO> validate( List<ArtifactoryUser> users )
+    {
+        List<UserResolutionDTO> resolutions = new ArrayList<UserResolutionDTO>( users.size() );
 
+        for ( ArtifactoryUser user : users )
+        {
+            UserResolutionDTO resolution = new UserResolutionDTO();
+
+            resolution.setId( validateUserId( user.getUsername() ) );
+
+            resolution.setAdmin( user.isAdmin() );
+
+            resolution.setEmail( user.getEmail() );
+
+            resolutions.add( resolution );
+        }
+
+        return resolutions;
+    }
+    
+    /**
+     * If the user id already exists, append a suffix "-artifactory"
+     */
+    private String validateUserId( String id )
+    {
+        for ( SecurityUser user : getNexusSecurity().listUsers() )
+        {
+            if ( user.getId().equals( id ) )
+            {
+                return id + "-artifactory";
+            }
+        }
+        return id;
+    }
+    
     private String findSimilarRepository( String url )
     {
         if ( url == null )

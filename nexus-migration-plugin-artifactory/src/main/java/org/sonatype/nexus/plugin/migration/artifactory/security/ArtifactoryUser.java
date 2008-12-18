@@ -1,22 +1,23 @@
 package org.sonatype.nexus.plugin.migration.artifactory.security;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class ArtifactoryUser
 {
     private String username;
 
-    /** Read form Artifactory's security.xml, so it's encrypted */
-    private String password;
+    private String email = "";
 
-    private Set<ArtifactoryRole> roles = new HashSet<ArtifactoryRole>();
+    private boolean isAdmin = false;
 
-    public ArtifactoryUser( String username, String password )
+    public ArtifactoryUser( String username )
+    {
+        this.username = username;
+    }
+
+    public ArtifactoryUser( String username, String email )
     {
         this.username = username;
 
-        this.password = password;
+        this.email = email;
     }
 
     public String getUsername()
@@ -24,19 +25,29 @@ public class ArtifactoryUser
         return username;
     }
 
-    public String getPassword()
+    public void setUsername( String username )
     {
-        return password;
+        this.username = username;
     }
 
-    public Set<ArtifactoryRole> getRoles()
+    public String getEmail()
     {
-        return roles;
+        return email;
     }
 
-    public void addRole( ArtifactoryRole role )
+    public void setEmail( String email )
     {
-        roles.add( role );
+        this.email = email;
+    }
+
+    public boolean isAdmin()
+    {
+        return isAdmin;
+    }
+
+    public void setAdmin( boolean isAdmin )
+    {
+        this.isAdmin = isAdmin;
     }
 
     @Override
@@ -54,7 +65,6 @@ public class ArtifactoryUser
 
         ArtifactoryUser user = (ArtifactoryUser) obj;
 
-        return this.username.equals( user.username ) && this.password.equals( user.password )
-            && this.roles.equals( user.roles );
+        return this.username.equals( user.username ) && this.email.equals( user.email ) && this.isAdmin == user.isAdmin;
     }
 }

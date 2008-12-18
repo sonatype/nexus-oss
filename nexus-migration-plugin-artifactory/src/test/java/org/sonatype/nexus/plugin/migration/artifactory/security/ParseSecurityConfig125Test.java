@@ -7,8 +7,9 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sonatype.nexus.plugin.migration.artifactory.security.builder.ArtifactorySecurityConfigBuilder;
 
-public class ParseSecurityConfigTest
+public class ParseSecurityConfig125Test
 {
 
     protected ArtifactorySecurityConfig securityConfig;
@@ -18,26 +19,19 @@ public class ParseSecurityConfigTest
         throws Exception
     {
         // Note that the whole test case is based on this configuration file
-        securityConfig = ArtifactorySecurityConfig
+        securityConfig = ArtifactorySecurityConfigBuilder
             .read( getClass().getResourceAsStream( "/security-config-1.2.5.xml" ) );
     }
 
     @Test
     public void assertUser()
     {
-        ArtifactoryUser admin = new ArtifactoryUser( "admin", "5f4dcc3b5aa765d61d8327deb882cf99" );
-        admin.addRole( ArtifactoryRole.ADMIN );
-        admin.addRole( ArtifactoryRole.USER );
-
-        ArtifactoryUser admin1 = new ArtifactoryUser( "admin1", "5f4dcc3b5aa765d61d8327deb882cf99" );
-        admin1.addRole( ArtifactoryRole.ADMIN );
-        admin1.addRole( ArtifactoryRole.USER );
-
-        ArtifactoryUser user = new ArtifactoryUser( "user", "5f4dcc3b5aa765d61d8327deb882cf99" );
-        user.addRole( ArtifactoryRole.USER );
-
-        ArtifactoryUser user1 = new ArtifactoryUser( "user1", "5f4dcc3b5aa765d61d8327deb882cf99" );
-        user1.addRole( ArtifactoryRole.USER );
+        ArtifactoryUser admin = new ArtifactoryUser( "admin" );
+        admin.setAdmin( true );
+        ArtifactoryUser admin1 = new ArtifactoryUser( "admin1" );
+        admin1.setAdmin( true );
+        ArtifactoryUser user = new ArtifactoryUser( "user" );
+        ArtifactoryUser user1 = new ArtifactoryUser( "user1" );
 
         List<ArtifactoryUser> users = new ArrayList<ArtifactoryUser>();
 
@@ -70,10 +64,8 @@ public class ParseSecurityConfigTest
     @Test
     public void assertAcl()
     {
-        ArtifactoryUser user = new ArtifactoryUser( "user", "5f4dcc3b5aa765d61d8327deb882cf99" );
-        user.addRole( ArtifactoryRole.USER );
-        ArtifactoryUser user1 = new ArtifactoryUser( "user1", "5f4dcc3b5aa765d61d8327deb882cf99" );
-        user1.addRole( ArtifactoryRole.USER );
+        ArtifactoryUser user = new ArtifactoryUser( "user" );
+        ArtifactoryUser user1 = new ArtifactoryUser( "user1" );
 
         ArtifactoryRepoPath repoPath2 = new ArtifactoryRepoPath( "libs-releases", "org/apache" );
         ArtifactoryRepoPath repoPath3 = new ArtifactoryRepoPath( "java.net-cache", ArtifactoryRepoPath.PATH_ANY );

@@ -1,5 +1,7 @@
 package org.sonatype.nexus.plugins.migration;
 
+import hidden.org.codehaus.plexus.util.StringUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,8 +11,12 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.restlet.data.MediaType;
+import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
+import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
@@ -23,7 +29,8 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public class AbstractMigrationIntegrationTest
     extends AbstractNexusIntegrationTest
 {
-
+    protected static final String DEFAULT_EMAIL = "juven@mars.com";
+    
     protected RepositoryMessageUtil repositoryUtil;
 
     protected GroupMessageUtil groupUtil;
@@ -131,5 +138,32 @@ public class AbstractMigrationIntegrationTest
             reposIds.add( repo.getId() );
         }
         assertContains( reposIds, repoId );
+    }
+    
+    protected MigrationSummaryDTO prepareMigration( File artifactoryBackup )
+        throws IOException
+    {
+        MigrationSummaryDTO migrationSummary = ImportMessageUtil.importBackup( artifactoryBackup );
+        Assert.assertNotNull( "Unexpected result from server: " + migrationSummary, migrationSummary );
+        fillDefaultEmailIfNotExist( migrationSummary.getUserResolution() );
+        return migrationSummary;
+    }
+    
+    protected void commitMigration( MigrationSummaryDTO migrationSummary )
+        throws IOException
+    {
+        Status status = ImportMessageUtil.commitImport( migrationSummary ).getStatus();
+        Assert.assertTrue( "Unable to commit import " + status, status.isSuccess() );
+    }
+
+    protected void fillDefaultEmailIfNotExist( List<UserResolutionDTO> resolutions )
+    {
+        for ( UserResolutionDTO resolution : resolutions )
+        {
+            if ( StringUtils.isEmpty( resolution.getEmail() ) )
+            {
+                resolution.setEmail( DEFAULT_EMAIL );
+            }
+        }
     }
 }

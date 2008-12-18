@@ -10,7 +10,9 @@ public class MigrationSummaryDTO
 
     private String backupLocation;
 
-    //TODO need security related stuff
+    private List<UserResolutionDTO> userResolution;
+    
+    private boolean resolvePermission;
 
     private List<RepositoryResolutionDTO> repositoriesResolution;
 
@@ -32,6 +34,26 @@ public class MigrationSummaryDTO
     public void setBackupLocation( String backupLocation )
     {
         this.backupLocation = backupLocation;
+    }
+
+    public List<UserResolutionDTO> getUserResolution()
+    {
+        return userResolution;
+    }
+
+    public void setUserResolution( List<UserResolutionDTO> userResolution )
+    {
+        this.userResolution = userResolution;
+    }
+
+    public boolean isResolvePermission()
+    {
+        return resolvePermission;
+    }
+
+    public void setResolvePermission( boolean resolvePermission )
+    {
+        this.resolvePermission = resolvePermission;
     }
 
 }

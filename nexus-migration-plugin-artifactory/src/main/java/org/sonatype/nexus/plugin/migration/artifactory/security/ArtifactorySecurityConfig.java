@@ -23,138 +23,6 @@ public class ArtifactorySecurityConfig
 
     private List<ArtifactoryAcl> acls = new ArrayList<ArtifactoryAcl>();
 
-    public static ArtifactorySecurityConfig read( File file )
-        throws IOException,
-            XmlPullParserException
-    {
-        XmlStreamReader reader = ReaderFactory.newXmlReader( file );
-
-        try
-        {
-            return build( Xpp3DomBuilder.build( reader ) );
-        }
-
-        finally
-        {
-            IOUtils.closeQuietly( reader );
-        }
-    }
-
-    public static ArtifactorySecurityConfig read( InputStream inputStream )
-        throws IOException,
-            XmlPullParserException
-    {
-        XmlStreamReader reader = ReaderFactory.newXmlReader( inputStream );
-
-        try
-        {
-            return build( Xpp3DomBuilder.build( reader ) );
-        }
-        finally
-        {
-            IOUtils.closeQuietly( reader );
-        }
-    }
-
-    public static ArtifactorySecurityConfig build( Xpp3Dom dom )
-    {
-        ArtifactorySecurityConfig securityConfig = new ArtifactorySecurityConfig();
-
-        // build users
-        Xpp3Dom usersDom = dom.getChild( "users" );
-
-        for ( Xpp3Dom userDom : usersDom.getChildren() )
-        {
-            securityConfig.addUser( buildUser( userDom ) );
-        }
-
-        // build repoPaths
-        Xpp3Dom repoPathsDom = dom.getChild( "repoPaths" );
-
-        for ( Xpp3Dom repoPathDom : repoPathsDom.getChildren() )
-        {
-            securityConfig.addRepoPath( buildRepoPath( repoPathDom ) );
-        }
-
-        // build acls
-        Xpp3Dom aclsDom = dom.getChild( "acls" );
-
-        for ( Xpp3Dom aclDom : aclsDom.getChildren() )
-        {
-            String maskValue = aclDom.getChild( "mask" ).getValue();
-
-            // no permission set, skip
-            if ( maskValue.equals( "0" ) )
-            {
-                continue;
-            }
-            
-            Set<ArtifactoryPermission> permissions = ArtifactoryPermission.buildPermission( Integer.parseInt( maskValue ) );
-
-            String username = aclDom.getChild( "recipient" ).getValue();
-
-            ArtifactoryUser user = securityConfig.getUserByUsername( username );
-
-            ArtifactoryRepoPath repoPath = null;
-
-            Xpp3Dom repoPathDom = aclDom.getChild( "aclObjectIdentity" );
-
-            if ( repoPathDom.getAttribute( "reference" ) == null )
-            {
-                repoPath = buildRepoPath( repoPathDom );
-            }
-            else
-            {
-                repoPath = buildRepoPath( DomUtil.findReference(repoPathDom) );
-            }
-            
-            ArtifactoryAcl acl = new ArtifactoryAcl(repoPath, user);
-            
-            for ( ArtifactoryPermission permission : permissions)
-            {
-                acl.addPermission( permission );
-            }
-            
-            securityConfig.addAcl( acl );
-        }
-
-        return securityConfig;
-    }
-
-    public static ArtifactoryRepoPath buildRepoPath( Xpp3Dom dom )
-    {
-        String repoKeyValue = dom.getChild( "repoKey" ).getValue();
-
-        String pathValue = dom.getChild( "path" ).getValue();
-
-        return new ArtifactoryRepoPath( repoKeyValue, pathValue );
-    }
-    
-    public static ArtifactoryUser buildUser( Xpp3Dom dom )
-    {
-        String username = dom.getChild( "username" ).getValue();
-
-        String password = dom.getChild( "password" ).getValue();
-
-        ArtifactoryUser user = new ArtifactoryUser( username, password );
-
-        for ( Xpp3Dom roleDom : dom.getChild( "authorities" ).getChildren() )
-        {
-            String roleValue = roleDom.getChild( "role" ).getValue();
-
-            if ( roleValue.equals( "ADMIN" ) )
-            {
-                user.addRole( ArtifactoryRole.ADMIN );
-            }
-            else if ( roleValue.equals( "USER" ) )
-            {
-                user.addRole( ArtifactoryRole.USER );
-            }
-        }
-
-        return user;
-    }
-
     public List<ArtifactoryUser> getUsers()
     {
         return users;
@@ -194,6 +62,19 @@ public class ArtifactorySecurityConfig
                 return user;
             }
         }
+        return null;
+    }
+    
+    public ArtifactoryRepoPath getArtifactoryRepoPath( String repoKey, String path )
+    {
+        for ( ArtifactoryRepoPath repoPath : repoPaths )
+        {
+            if ( repoPath.getRepoKey().equals( repoKey ) && repoPath.getPath().equals( path ) )
+            {
+                return repoPath;
+            }
+        }
+
         return null;
     }
 

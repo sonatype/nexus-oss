@@ -102,7 +102,7 @@ public class SecurityConfigAdaptor
         {
             SecurityUser user = buildSecurityUser( artifactoryUser );
 
-            if ( artifactoryUser.getRoles().contains( ArtifactoryRole.ADMIN ) )
+            if ( artifactoryUser.isAdmin() )
             {
                 user.addRole( "admin" );
             }
@@ -135,6 +135,8 @@ public class SecurityConfigAdaptor
     {
         CRepositoryTarget repoTarget = new CRepositoryTarget();
 
+        repoTarget.setId( repoPath.getRepoKey() );
+        
         repoTarget.setName( repoPath.getRepoKey() );
 
         repoTarget.setContentClass( "maven2" );
@@ -220,9 +222,9 @@ public class SecurityConfigAdaptor
 
         securityUser.setId( artifactoryUser.getUsername() );
 
-        securityUser.setName( artifactoryUser.getUsername() + "(Artifactory)" );
+        securityUser.setName( artifactoryUser.getUsername() );
 
-        securityUser.setEmail( "undefined@undefined.org" );
+        securityUser.setEmail( artifactoryUser.getEmail() );
 
         securityUser.setStatus( "active" );
 

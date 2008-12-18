@@ -4,6 +4,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
@@ -24,11 +25,9 @@ public class SecurityConfigAdaptorTest
         ArtifactorySecurityConfig config = new ArtifactorySecurityConfig();
 
         // users
-        ArtifactoryUser admin = new ArtifactoryUser( "arti-admin", "unknown" );
-        admin.addRole( ArtifactoryRole.ADMIN );
-        admin.addRole( ArtifactoryRole.USER );
-        ArtifactoryUser user = new ArtifactoryUser( "arti-user", "unknown" );
-        user.addRole( ArtifactoryRole.USER );
+        ArtifactoryUser admin = new ArtifactoryUser( "arti-admin" );
+        admin.setAdmin( true );
+        ArtifactoryUser user = new ArtifactoryUser( "arti-user" );
         config.addUser( admin );
         config.addUser( user );
 
@@ -133,8 +132,8 @@ public class SecurityConfigAdaptorTest
         SecurityUser admin = users.get( 0 );
 
         Assert.assertEquals( "arti-admin", admin.getId() );
-        Assert.assertEquals( "arti-admin(Artifactory)", admin.getName() );
-        Assert.assertEquals( "undefined@undefined.org", admin.getEmail() );
+        Assert.assertEquals( "arti-admin", admin.getName() );
+        Assert.assertTrue( StringUtils.isEmpty( admin.getEmail() ) );
         Assert.assertEquals( "active", admin.getStatus() );
 
         Assert.assertTrue( admin.getRoles().contains( "admin" ) );
@@ -148,8 +147,8 @@ public class SecurityConfigAdaptorTest
         SecurityUser user = users.get( 1 );
 
         Assert.assertEquals( "arti-user", user.getId() );
-        Assert.assertEquals( "arti-user(Artifactory)", user.getName() );
-        Assert.assertEquals( "undefined@undefined.org", user.getEmail() );
+        Assert.assertEquals( "arti-user", user.getName() );
+        Assert.assertTrue( StringUtils.isEmpty( user.getEmail() ) );
         Assert.assertEquals( "active", user.getStatus() );
 
         Assert.assertFalse( user.getRoles().contains( "admin" ) );

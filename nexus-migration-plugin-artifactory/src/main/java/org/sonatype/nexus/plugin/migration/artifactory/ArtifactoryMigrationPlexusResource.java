@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,12 @@ import org.sonatype.nexus.plugin.migration.artifactory.dto.ERepositoryType;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRequestDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecurityConfig;
+import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
+import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigAdaptor;
+import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigAdaptorPersistor;
+import org.sonatype.nexus.plugin.migration.artifactory.security.builder.ArtifactorySecurityConfigBuilder;
 import org.sonatype.nexus.plugin.migration.artifactory.util.VirtualRepositoryUtil;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
@@ -55,9 +62,13 @@ public class ArtifactoryMigrationPlexusResource
     @Requirement
     private NexusScheduler nexusScheduler;
 
+
     @Requirement
     private RepositoryConvertor repositoryConvertor;
 
+    @Requirement
+    private SecurityConfigAdaptorPersistor securityConfigAdaptorPersistor;
+    
     public ArtifactoryMigrationPlexusResource()
     {
         this.setReadable( false );
@@ -84,10 +95,16 @@ public class ArtifactoryMigrationPlexusResource
 
         // need to resolve that on posts
         File artifactoryBackup = new File( migrationSummary.getBackupLocation() );
+
         ArtifactoryConfig cfg;
+
+        ArtifactorySecurityConfig securityCfg;
+
         try
         {
             cfg = ArtifactoryConfig.read( new File( artifactoryBackup, "artifactory.config.xml" ) );
+
+            securityCfg = ArtifactorySecurityConfigBuilder.read( new File( artifactoryBackup, "security.xml" ) );
         }
         catch ( Exception e )
         {
@@ -100,6 +117,54 @@ public class ArtifactoryMigrationPlexusResource
 
         importGroups( cfg.getVirtualRepositories() );
 
+        importSecurity( migrationSummary, securityCfg );
+
+        return null;
+    }
+    
+    private void importSecurity( MigrationSummaryDTO migrationSummary, ArtifactorySecurityConfig cfg )
+    {
+        //TODO: this method is messy, needs to clean up
+        List<ArtifactoryUser> userToBeRemoved = new ArrayList<ArtifactoryUser>();
+
+        for ( ArtifactoryUser user : cfg.getUsers() )
+        {
+            if ( getUserResolutionById( migrationSummary, user.getUsername() ) != null )
+            {
+                user.setEmail( getUserResolutionById( migrationSummary, user.getUsername() ).getEmail() );
+            }
+            else if ( getUserResolutionById( migrationSummary, user.getUsername() + "-artifactory" ) != null )
+            {
+                user.setEmail( getUserResolutionById( migrationSummary, user.getUsername() + "-artifactory" )
+                    .getEmail() );
+                
+                user.setUsername( user.getUsername() + "-artifactory" );
+            }
+            else
+            {
+                userToBeRemoved.add( user );
+            }
+        }
+
+        for ( ArtifactoryUser user : userToBeRemoved )
+        {
+            cfg.getUsers().remove( user );
+        }
+
+        SecurityConfigAdaptor adaptor = new SecurityConfigAdaptor( cfg, securityConfigAdaptorPersistor );
+
+        adaptor.convert();
+    }
+    
+    private UserResolutionDTO getUserResolutionById( MigrationSummaryDTO migrationSummary, String id )
+    {
+        for ( UserResolutionDTO resolution : migrationSummary.getUserResolution() )
+        {
+            if ( resolution.getId().equals( id ) )
+            {
+                return resolution;
+            }
+        }
         return null;
     }
 

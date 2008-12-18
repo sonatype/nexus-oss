@@ -6,11 +6,9 @@ import java.util.ArrayList;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
-import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -23,12 +21,9 @@ public class NXCM259ImportMixedRepositoriesTest
     public void importMixedRepo()
         throws Exception
     {
-        MigrationSummaryDTO migrationSummary = ImportMessageUtil.importBackup( getTestFile( "artifactoryBackup.zip" ) );
-        Assert.assertNotNull( "Unexpected result from server: " + migrationSummary, migrationSummary );
-
-        Status status = ImportMessageUtil.commitImport( migrationSummary ).getStatus();
-        Assert.assertTrue( "Unable to commit import " + status, status.isSuccess() );
-
+        MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
+        commitMigration( migrationSummary );
+        
         checkRepository( "main-local-releases" );
         checkRepository( "main-local-snapshots" );
 
