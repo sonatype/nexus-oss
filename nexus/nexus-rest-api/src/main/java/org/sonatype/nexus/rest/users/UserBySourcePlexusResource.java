@@ -31,16 +31,18 @@ import org.sonatype.nexus.rest.model.PlexusUserResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = PlexusResource.class, hint = "PlexusUserPlexusResource" )
-public class PlexusUserPlexusResource
+@Component( role = PlexusResource.class, hint = "UserBySourcePlexusResource" )
+public class UserBySourcePlexusResource
     extends AbstractPlexusUserPlexusResource
 {
-    public static final String USER_ID_KEY = "userId";
+public static final String USER_ID_KEY = "userId";
+    
+    public static final String USER_SOURCE_KEY = "userSource";
     
     @Requirement( role = PlexusUserManager.class, hint="additinalRoles" )
     private PlexusUserManager userManager;
     
-    public PlexusUserPlexusResource()
+    public UserBySourcePlexusResource()
     {
         setModifiable( false );
     }
@@ -60,7 +62,7 @@ public class PlexusUserPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/plexus_user/{" + USER_ID_KEY + "}";
+        return "/plexus_user/{"+ USER_SOURCE_KEY +"}/{" + USER_ID_KEY + "}";
     }
     
     @Override
@@ -69,7 +71,7 @@ public class PlexusUserPlexusResource
     {
         PlexusUserResourceResponse result = new PlexusUserResourceResponse();
 
-        PlexusUser user = userManager.getUser( getUserId( request ) );
+        PlexusUser user = userManager.getUser( getUserId( request ), getUserSource( request ) );
         
         if ( user == null )
         {
@@ -86,5 +88,10 @@ public class PlexusUserPlexusResource
     protected String getUserId( Request request )
     {
         return request.getAttributes().get( USER_ID_KEY ).toString();
+    }
+
+    protected String getUserSource( Request request )
+    {
+        return request.getAttributes().get( USER_SOURCE_KEY ).toString();
     }
 }

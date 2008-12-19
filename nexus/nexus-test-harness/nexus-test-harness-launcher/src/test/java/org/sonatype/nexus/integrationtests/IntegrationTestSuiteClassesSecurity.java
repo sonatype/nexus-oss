@@ -23,6 +23,8 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.sonatype.nexus.integrationtests.client.nexus725.Nexus725InitialRestClient;
 import org.sonatype.nexus.integrationtests.client.nexus758.Nexus758StatusService;
 import org.sonatype.nexus.integrationtests.nexus1170.Nexus1170ReducePermissionChecking;
+import org.sonatype.nexus.integrationtests.nexus1239.Nexus1239PlexusUserResourceTest;
+import org.sonatype.nexus.integrationtests.nexus1239.Nexus1239UserSearchTest;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetPermissionTests;
@@ -170,7 +172,9 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus570IndexArchetypeTest.class,
     Nexus504ChangeRoleTest.class,
     Nexus999SetUsersPassword.class,
-    Nexus537RepoTargetsTests.class
+    Nexus537RepoTargetsTests.class,
+    Nexus1239PlexusUserResourceTest.class,
+    Nexus1239UserSearchTest.class
 } )
 public class IntegrationTestSuiteClassesSecurity
 {

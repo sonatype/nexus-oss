@@ -22,11 +22,17 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.jsecurity.io.TextResource;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.restlet.resource.Representation;
+import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.rest.model.PlexusUserListResourceResponse;
+import org.sonatype.nexus.rest.model.PlexusUserResource;
+import org.sonatype.nexus.rest.model.PlexusUserResourceResponse;
 import org.sonatype.nexus.rest.model.UserListResourceResponse;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
@@ -40,7 +46,7 @@ public class UserMessageUtil
     private XStream xstream;
 
     private MediaType mediaType;
-    
+
     private static final Logger LOG = Logger.getLogger( UserMessageUtil.class );
 
     public UserMessageUtil( XStream xstream, MediaType mediaType )
@@ -85,11 +91,13 @@ public class UserMessageUtil
         String responseText = RequestFacade.doGetRequest( "service/local/users/" + userId ).getEntity().getText();
         LOG.debug( "responseText: \n" + responseText );
 
-        XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+        XStreamRepresentation representation = new XStreamRepresentation(
+            XStreamFactory.getXmlXStream(),
+            responseText,
+            MediaType.APPLICATION_XML );
 
-        UserResourceRequest resourceResponse =
-            (UserResourceRequest) representation.getPayload( new UserResourceRequest() );
+        UserResourceRequest resourceResponse = (UserResourceRequest) representation
+            .getPayload( new UserResourceRequest() );
 
         return resourceResponse.getData();
     }
@@ -141,7 +149,7 @@ public class UserMessageUtil
 
     /**
      * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     *
+     * 
      * @return
      * @throws IOException
      */
@@ -153,15 +161,18 @@ public class UserMessageUtil
         String responseText = response.getEntity().getText();
         LOG.debug( "responseText: \n" + responseText );
 
-        // must use the XML xstream even if we 'thought' we wanted to use JSON, because REST client doesn't listen to the MediaType in some situations.
-        XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+        // must use the XML xstream even if we 'thought' we wanted to use JSON, because REST client doesn't listen to
+        // the MediaType in some situations.
+        XStreamRepresentation representation = new XStreamRepresentation(
+            XStreamFactory.getXmlXStream(),
+            responseText,
+            MediaType.APPLICATION_XML );
 
         // make sure we have a success
-        Assert.assertTrue( "Status: "+  response.getStatus() +"\n"+responseText, response.getStatus().isSuccess() );
-        
-        UserListResourceResponse resourceResponse =
-            (UserListResourceResponse) representation.getPayload( new UserListResourceResponse() );
+        Assert.assertTrue( "Status: " + response.getStatus() + "\n" + responseText, response.getStatus().isSuccess() );
+
+        UserListResourceResponse resourceResponse = (UserListResourceResponse) representation
+            .getPayload( new UserListResourceResponse() );
 
         return resourceResponse.getData();
 
@@ -176,10 +187,71 @@ public class UserMessageUtil
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
         // this
-        UserResourceRequest resourceResponse =
-            (UserResourceRequest) representation.getPayload( new UserResourceRequest() );
+        UserResourceRequest resourceResponse = (UserResourceRequest) representation
+            .getPayload( new UserResourceRequest() );
 
         return resourceResponse.getData();
+    }
+
+    public Object parseResponseText( String responseString, Object responseType )
+        throws IOException
+    {
+        XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
+
+        return representation.getPayload( responseType );
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PlexusUserResource> getPlexusUsers( String source )
+        throws IOException
+    {
+        // plexus_users
+        String uriPart = RequestFacade.SERVICE_LOCAL + "plexus_users/" + source;
+
+        Response response = RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation(
+            "",
+            this.mediaType ) );
+        String responseString = response.getEntity().getText();
+        Assert.assertTrue( "Status: "+ response.getStatus()+"\nResponse:\n"+responseString, response.getStatus().isSuccess() );
+
+        PlexusUserListResourceResponse result = (PlexusUserListResourceResponse) this.parseResponseText( responseString, new PlexusUserListResourceResponse() ); 
+        
+        return result.getData();
+    }
+
+    public PlexusUserResource getPlexusUser( String source, String userId ) throws IOException
+    {
+        String sourcePart = (source != null) ? source +"/" : ""; 
+        
+        // plexus_user
+        String uriPart = RequestFacade.SERVICE_LOCAL + "plexus_user/" + sourcePart + userId;
+
+        Response response = RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation(
+            "",
+            this.mediaType ) );
+        String responseString = response.getEntity().getText();
+        Assert.assertTrue( "Status: "+ response.getStatus()+"\nResponse:\n"+responseString, response.getStatus().isSuccess() );
+
+        PlexusUserResourceResponse result = (PlexusUserResourceResponse) this.parseResponseText( responseString, new PlexusUserResourceResponse() ); 
+        
+        return result.getData();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PlexusUserResource> searchPlexusUsers( String source, String userId ) throws IOException
+    {
+        // user_search
+        String uriPart = RequestFacade.SERVICE_LOCAL + "user_search/" + source +"/"+ userId;
+
+        Response response = RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation(
+            "",
+            this.mediaType ) );
+        String responseString = response.getEntity().getText();
+        Assert.assertTrue( "Status: "+ response.getStatus()+"\nResponse:\n"+responseString, response.getStatus().isSuccess() );
+
+        PlexusUserListResourceResponse result = (PlexusUserListResourceResponse) this.parseResponseText( responseString, new PlexusUserListResourceResponse() ); 
+        
+        return result.getData();
     }
 
     /**
