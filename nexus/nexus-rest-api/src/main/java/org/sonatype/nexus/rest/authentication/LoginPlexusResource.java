@@ -17,11 +17,15 @@
 package org.sonatype.nexus.rest.authentication;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.jsecurity.locators.users.PlexusUser;
+import org.sonatype.jsecurity.locators.users.PlexusUserManager;
 import org.sonatype.nexus.rest.model.AuthenticationLoginResource;
 import org.sonatype.nexus.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -36,6 +40,8 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class LoginPlexusResource
     extends AbstractUIPermissionCalculatingPlexusResource
 {
+    @Requirement(hint="additinalRoles")
+    private PlexusUserManager userManager;
 
     @Override
     public Object getPayloadInstance()
@@ -64,6 +70,16 @@ public class LoginPlexusResource
         resource.setClientPermissions( getClientPermissionsForCurrentUser( request ) );
 
         AuthenticationLoginResourceResponse result = new AuthenticationLoginResourceResponse();
+        
+        String username = resource.getClientPermissions().getLoggedInUsername();
+        
+        if( StringUtils.isNotEmpty( username ))
+        {
+            // look up the realm of the user
+            PlexusUser user = userManager.getUser( username );
+            String source = (user != null) ? user.getSource() : null;
+            resource.getClientPermissions().setLoggedInUserSource( source);
+        }
 
         result.setData( resource );
 
