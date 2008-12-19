@@ -68,4 +68,9 @@ public class PatternConvertorTest
     {
         Assert.assertFalse( text + " matches pattern " + pattern.pattern(), pattern.matcher( text ).matches() );
     }
+    
+    public static void main(String[] args)
+    {
+        System.out.println("\ufffd");
+    }
 }
