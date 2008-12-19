@@ -5,22 +5,22 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.security.builder.ArtifactorySecurityConfigBuilder;
 
 public class ParseSecurityConfig125Test
 {
 
-    protected ArtifactorySecurityConfig securityConfig;
+    protected static ArtifactorySecurityConfig securityConfig;
 
-    @Before
-    public void parseSecurityConfig()
+    @BeforeClass
+    public static void parseSecurityConfig()
         throws Exception
     {
         // Note that the whole test case is based on this configuration file
-        securityConfig = ArtifactorySecurityConfigBuilder
-            .read( getClass().getResourceAsStream( "/security-config-1.2.5.xml" ) );
+        securityConfig = ArtifactorySecurityConfigBuilder.read( ParseSecurityConfig125Test.class
+            .getResourceAsStream( "/security-config-1.2.5.xml" ) );
     }
 
     @Test
@@ -44,21 +44,18 @@ public class ParseSecurityConfig125Test
     }
 
     @Test
-    public void assertRepoPath()
+    public void assertPermissionTarget()
     {
-        ArtifactoryRepoPath repoPath1 = new ArtifactoryRepoPath(
-            ArtifactoryRepoPath.REPO_KEY_ANY,
-            ArtifactoryRepoPath.PATH_ANY );
-        ArtifactoryRepoPath repoPath2 = new ArtifactoryRepoPath( "libs-releases", "org/apache" );
-        ArtifactoryRepoPath repoPath3 = new ArtifactoryRepoPath( "java.net-cache", ArtifactoryRepoPath.PATH_ANY );
+        ArtifactoryPermissionTarget target1 = new ArtifactoryPermissionTarget( "ANY" );
+        target1.addInclude( "ANY" );
+        ArtifactoryPermissionTarget target2 = new ArtifactoryPermissionTarget( "libs-releases" );
+        target2.addInclude( "org/apache" );
+        ArtifactoryPermissionTarget target3 = new ArtifactoryPermissionTarget( "java.net-cache" );
+        target3.addInclude( "ANY" );
 
-        List<ArtifactoryRepoPath> repoPaths = new ArrayList<ArtifactoryRepoPath>();
-
-        repoPaths.add( repoPath1 );
-        repoPaths.add( repoPath2 );
-        repoPaths.add( repoPath3 );
-
-        Assert.assertEquals( repoPaths, securityConfig.getRepoPaths() );
+        assertPermissionTargetContent( target1, securityConfig.getPermissionTargets().get( 0 ) );
+        assertPermissionTargetContent( target2, securityConfig.getPermissionTargets().get( 1 ) );
+        assertPermissionTargetContent( target3, securityConfig.getPermissionTargets().get( 2 ) );
     }
 
     @Test
@@ -67,14 +64,14 @@ public class ParseSecurityConfig125Test
         ArtifactoryUser user = new ArtifactoryUser( "user" );
         ArtifactoryUser user1 = new ArtifactoryUser( "user1" );
 
-        ArtifactoryRepoPath repoPath2 = new ArtifactoryRepoPath( "libs-releases", "org/apache" );
-        ArtifactoryRepoPath repoPath3 = new ArtifactoryRepoPath( "java.net-cache", ArtifactoryRepoPath.PATH_ANY );
+        ArtifactoryPermissionTarget target2 = securityConfig.getPermissionTargets().get( 1 );
+        ArtifactoryPermissionTarget target3 = securityConfig.getPermissionTargets().get( 2 );
 
-        ArtifactoryAcl acl1 = new ArtifactoryAcl( repoPath2, user1 );
+        ArtifactoryAcl acl1 = new ArtifactoryAcl( target2, user1 );
         acl1.addPermission( ArtifactoryPermission.DEPLOYER );
         acl1.addPermission( ArtifactoryPermission.READER );
 
-        ArtifactoryAcl acl2 = new ArtifactoryAcl( repoPath3, user );
+        ArtifactoryAcl acl2 = new ArtifactoryAcl( target3, user );
         acl2.addPermission( ArtifactoryPermission.ADMIN );
         acl2.addPermission( ArtifactoryPermission.DEPLOYER );
         acl2.addPermission( ArtifactoryPermission.READER );
@@ -84,5 +81,12 @@ public class ParseSecurityConfig125Test
         acls.add( acl2 );
 
         Assert.assertEquals( acls, securityConfig.getAcls() );
+    }
+
+    private void assertPermissionTargetContent( ArtifactoryPermissionTarget expected, ArtifactoryPermissionTarget actual )
+    {
+        Assert.assertEquals( expected.getRepoKey(), actual.getRepoKey() );
+        Assert.assertEquals( expected.getIncludes(), actual.getIncludes() );
+        Assert.assertEquals( expected.getExcludes(), actual.getExcludes() );
     }
 }

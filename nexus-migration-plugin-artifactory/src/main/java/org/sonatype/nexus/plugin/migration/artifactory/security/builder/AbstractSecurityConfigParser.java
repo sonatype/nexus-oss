@@ -28,7 +28,7 @@ public abstract class AbstractSecurityConfigParser
 
     abstract protected void parseUsers();
 
-    abstract protected void parseRepoPaths();
+    abstract protected void parsePermissionTargets();
 
     abstract protected void parseAcls();
     
@@ -36,7 +36,7 @@ public abstract class AbstractSecurityConfigParser
     {
         parseUsers();
         
-        parseRepoPaths();
+        parsePermissionTargets();
         
         parseAcls();
     }

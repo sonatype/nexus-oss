@@ -5,7 +5,7 @@ import java.util.Set;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryAcl;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryPermission;
-import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryRepoPath;
+import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryPermissionTarget;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecurityConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
 import org.sonatype.nexus.plugin.migration.artifactory.util.DomUtil;
@@ -53,7 +53,7 @@ public class SecurityConfig125Parser
 
             String pathValue = repoPathDom.getChild( "path" ).getValue();
 
-            ArtifactoryRepoPath repoPath = getConfig().getArtifactoryRepoPath( repoKeyValue, pathValue );
+            ArtifactoryPermissionTarget repoPath = getConfig().getArtifactoryRepoTarget( repoKeyValue, pathValue );
 
             ArtifactoryAcl acl = new ArtifactoryAcl( repoPath, user );
 
@@ -68,7 +68,7 @@ public class SecurityConfig125Parser
     }
 
     @Override
-    public void parseRepoPaths()
+    public void parsePermissionTargets()
     {
         Xpp3Dom repoPathsDom = getDom().getChild( "repoPaths" );
 
@@ -78,17 +78,11 @@ public class SecurityConfig125Parser
 
             String pathValue = repoPathDom.getChild( "path" ).getValue();
 
-            for ( ArtifactoryRepoPath repoPath : getConfig().getRepoPaths() )
-            {
-                if ( repoPath.getRepoKey().equals( repoKeyValue ) && repoPath.getPath().equals( pathValue ) )
-                {
-                    // already exist, skip
-                }
-            }
-
-            ArtifactoryRepoPath repoPath = new ArtifactoryRepoPath( repoKeyValue, pathValue );
-
-            getConfig().addRepoPath( repoPath );
+            ArtifactoryPermissionTarget repoTarget = new ArtifactoryPermissionTarget(repoKeyValue);
+            
+            repoTarget.addInclude( pathValue );
+            
+            getConfig().addPermissionTarget( repoTarget );
         }
 
     }

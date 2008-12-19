@@ -21,7 +21,7 @@ public class SecurityConfig130Parser
     }
 
     @Override
-    protected void parseRepoPaths()
+    protected void parsePermissionTargets()
     {
         // TODO Auto-generated method stub
 

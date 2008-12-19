@@ -13,10 +13,10 @@ import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 
-public class SecurityConfigAdaptorTest
+public class SecurityConfigConvertorTest
 {
 
-    protected SecurityConfigAdaptor configAdaptor;
+    protected SecurityConfigConvertor configAdaptor;
 
     @Before
     public void prepare()
@@ -32,10 +32,12 @@ public class SecurityConfigAdaptorTest
         config.addUser( user );
 
         // repoPaths
-        ArtifactoryRepoPath apache = new ArtifactoryRepoPath( "apache", "org/apache" );
-        ArtifactoryRepoPath jvnet = new ArtifactoryRepoPath( "jvnet", "ANY" );
-        config.addRepoPath( apache );
-        config.addRepoPath( jvnet );
+        ArtifactoryPermissionTarget apache = new ArtifactoryPermissionTarget( "apachePermTarget", "apache" );
+        apache.addInclude( "org/apache" );
+        ArtifactoryPermissionTarget jvnet = new ArtifactoryPermissionTarget( "jvnet" );
+        jvnet.addInclude( "ANY" );
+        config.addPermissionTarget( apache );
+        config.addPermissionTarget( jvnet );
 
         // acls
         ArtifactoryAcl apacheAcl = new ArtifactoryAcl( apache, user );
@@ -47,7 +49,7 @@ public class SecurityConfigAdaptorTest
         config.addAcl( jvnetAcl );
         config.addAcl( apacheAcl );
 
-        configAdaptor = new SecurityConfigAdaptor( config, new FakePersistor() );
+        configAdaptor = new SecurityConfigConvertor( config, new FakeReceiver() );
 
         configAdaptor.convert();
     }
@@ -58,15 +60,15 @@ public class SecurityConfigAdaptorTest
         List<CRepositoryTarget> repoTargets = configAdaptor.getRepositoryTargets();
 
         CRepositoryTarget targetApache = repoTargets.get( 0 );
-        Assert.assertNotNull( targetApache.getId() );
-        Assert.assertEquals( "apache", targetApache.getName() );
+        Assert.assertEquals( "apachePermTarget", targetApache.getId() );
+        Assert.assertEquals( "apachePermTarget", targetApache.getName() );
         Assert.assertEquals( "maven2", targetApache.getContentClass() );
         Assert.assertEquals( 1, targetApache.getPatterns().size() );
         Assert.assertTrue( targetApache.getPatterns().contains( "org/apache/.*" ) );
 
         CRepositoryTarget targetJvnet = repoTargets.get( 1 );
         Assert.assertNotNull( targetJvnet.getId() );
-        Assert.assertEquals( "jvnet", targetJvnet.getName() );
+        Assert.assertNotNull( targetJvnet.getName() );
         Assert.assertEquals( "maven2", targetJvnet.getContentClass() );
         Assert.assertEquals( 1, targetJvnet.getPatterns().size() );
         Assert.assertTrue( targetJvnet.getPatterns().contains( ".*" ) );
@@ -79,22 +81,23 @@ public class SecurityConfigAdaptorTest
         List<SecurityPrivilege> privileges = configAdaptor.getSecurityPrivileges();
 
         Assert.assertNotNull( privileges.get( 0 ).getId() );
-        Assert.assertEquals( "apache - (create)", privileges.get( 0 ).getName() );
-        Assert.assertEquals( "apache - (create) imported from Artifactory", privileges.get( 0 ).getDescription() );
+        Assert.assertEquals( "apachePermTarget-create", privileges.get( 0 ).getName() );
+        Assert.assertEquals( "apachePermTarget-create", privileges.get( 0 ).getDescription() );
         Assert.assertEquals( "target", privileges.get( 0 ).getType() );
 
         Assert.assertEquals( "method", ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 0 ) ).getKey() );
         Assert.assertEquals( "create", ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 0 ) ).getValue() );
         Assert.assertEquals( "repositoryTargetId", ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 1 ) )
             .getKey() );
-        Assert.assertNotNull( ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 1 ) ).getValue() );
+        Assert.assertEquals( "apachePermTarget", ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 1 ) )
+            .getValue() );
         Assert.assertEquals( "repositoryId", ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 2 ) )
             .getKey() );
         Assert.assertEquals( "apache", ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 2 ) ).getValue() );
 
         Assert.assertNotNull( privileges.get( 7 ).getId() );
-        Assert.assertEquals( "jvnet - (delete)", privileges.get( 7 ).getName() );
-        Assert.assertEquals( "jvnet - (delete) imported from Artifactory", privileges.get( 7 ).getDescription() );
+        Assert.assertTrue( privileges.get( 7 ).getName().endsWith( "delete" ) );
+        Assert.assertEquals( privileges.get( 7 ).getDescription(), privileges.get( 7 ).getName() );
         Assert.assertEquals( "target", privileges.get( 7 ).getType() );
 
         Assert.assertEquals( "method", ( (SecurityProperty) privileges.get( 7 ).getProperties().get( 0 ) ).getKey() );
@@ -105,7 +108,6 @@ public class SecurityConfigAdaptorTest
         Assert.assertEquals( "repositoryId", ( (SecurityProperty) privileges.get( 7 ).getProperties().get( 2 ) )
             .getKey() );
         Assert.assertEquals( "jvnet", ( (SecurityProperty) privileges.get( 7 ).getProperties().get( 2 ) ).getValue() );
-
     }
 
     @Test
@@ -113,15 +115,17 @@ public class SecurityConfigAdaptorTest
     {
         List<SecurityRole> roles = configAdaptor.getSecurityRoles();
 
-        Assert.assertEquals( "repo-apache-read", roles.get( 0 ).getId() );
-        Assert.assertEquals( "Repo: apache (read)", roles.get( 0 ).getName() );
+        Assert.assertEquals( "apachePermTarget-reader", roles.get( 0 ).getId() );
+        Assert.assertEquals( "apachePermTarget-reader", roles.get( 0 ).getName() );
         Assert.assertEquals( 60, roles.get( 0 ).getSessionTimeout() );
+        // read priv
         Assert.assertEquals( 1, roles.get( 0 ).getPrivileges().size() );
 
-        Assert.assertEquals( "repo-jvnet-all", roles.get( 3 ).getId() );
-        Assert.assertEquals( "Repo: jvnet (all)", roles.get( 3 ).getName() );
-        Assert.assertEquals( 60, roles.get( 3 ).getSessionTimeout() );
-        Assert.assertEquals( 4, roles.get( 3 ).getPrivileges().size() );
+        Assert.assertTrue( roles.get( 5 ).getId().endsWith( "admin" ) );
+        Assert.assertEquals( roles.get( 5 ).getId(), roles.get( 5 ).getName() );
+        Assert.assertEquals( 60, roles.get( 5 ).getSessionTimeout() );
+        // update and delete priv
+        Assert.assertEquals( 2, roles.get( 5 ).getPrivileges().size() );
     }
 
     @Test
@@ -151,36 +155,32 @@ public class SecurityConfigAdaptorTest
         Assert.assertTrue( StringUtils.isEmpty( user.getEmail() ) );
         Assert.assertEquals( "active", user.getStatus() );
 
-        Assert.assertFalse( user.getRoles().contains( "admin" ) );
-        Assert.assertTrue( user.getRoles().contains( "repo-apache-read" ) );
-        Assert.assertTrue( user.getRoles().contains( "repo-jvnet-all" ) );
+        Assert.assertFalse( user.getRoles().contains( "apachePermTarget-admin" ) );
+        Assert.assertTrue( user.getRoles().contains( "apachePermTarget-reader" ) );
+        Assert.assertTrue( user.getRoles().contains( configAdaptor.getSecurityRoles().get( 5 ).getId() ) );
     }
 
-    class FakePersistor
-        implements SecurityConfigAdaptorPersistor
+    class FakeReceiver
+        implements SecurityConfigReceiver
     {
-        private int repoTargetIdCount = 1001;
-
         private int privilegeIdCount = 2001;
 
-        public void persistRepositoryTarget( CRepositoryTarget repoTarget )
+        public void receiveRepositoryTarget( CRepositoryTarget repoTarget )
         {
-            repoTarget.setId( "repoTarget-" + repoTargetIdCount );
-            repoTargetIdCount++;
         }
 
-        public void persistSecurityPrivilege( SecurityPrivilege privilege )
+        public void receiveSecurityPrivilege( SecurityPrivilege privilege )
         {
             privilege.setId( "privilege-" + privilegeIdCount );
             privilegeIdCount++;
         }
 
-        public void persistSecurityRole( SecurityRole role )
+        public void receiveSecurityRole( SecurityRole role )
         {
 
         }
 
-        public void persistSecurityUser( SecurityUser user )
+        public void receiveSecurityUser( SecurityUser user )
         {
 
         }

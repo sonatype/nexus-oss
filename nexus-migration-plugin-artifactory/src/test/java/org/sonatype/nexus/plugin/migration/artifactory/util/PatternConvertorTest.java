@@ -20,7 +20,7 @@ public class PatternConvertorTest
         assertMatch(pattern, "com/");
         
         pattern = Pattern.compile( PatternConvertor.convert125Pattern( "org/apache" ) );
-        assertMatch(pattern, "org/apache");
+        assertMatch(pattern, "org/apache/");
         assertMatch(pattern, "org/apache/maven");
         assertMatch(pattern, "org/apache/maven/artifact.jar");
         assertNotMatch(pattern, "org/sonatype");

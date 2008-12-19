@@ -3,7 +3,6 @@ package org.sonatype.nexus.plugin.migration.artifactory.security.builder;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -11,12 +10,7 @@ import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryAcl;
-import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryPermission;
-import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryRepoPath;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecurityConfig;
-import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
-import org.sonatype.nexus.plugin.migration.artifactory.util.DomUtil;
 
 public class ArtifactorySecurityConfigBuilder
 {

@@ -15,7 +15,14 @@ public class PatternConvertor
         {
             return ".*";
         }
-        return path + ".*";
+        else
+        {
+            if ( !path.equals( "/" ) )
+            {
+                path = path + "/";
+            }
+            return path + ".*";
+        }
     }
 
     /**

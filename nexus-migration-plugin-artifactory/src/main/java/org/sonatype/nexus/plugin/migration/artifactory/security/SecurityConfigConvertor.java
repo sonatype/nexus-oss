@@ -10,12 +10,13 @@ import org.sonatype.jsecurity.realms.tools.dao.SecurityProperty;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
+import org.sonatype.nexus.plugin.migration.artifactory.util.PatternConvertor;
 
-public class SecurityConfigAdaptor
+public class SecurityConfigConvertor
 {
     private ArtifactorySecurityConfig config;
 
-    private SecurityConfigAdaptorPersistor persistor;
+    private SecurityConfigReceiver persistor;
 
     private List<CRepositoryTarget> repoTargets = new ArrayList<CRepositoryTarget>();
 
@@ -25,9 +26,9 @@ public class SecurityConfigAdaptor
 
     private List<SecurityUser> users = new ArrayList<SecurityUser>();
 
-    private Map<ArtifactoryRepoPath, List<SecurityRole>> repoPathRolesMap = new HashMap<ArtifactoryRepoPath, List<SecurityRole>>();
+    private Map<ArtifactoryPermissionTarget, List<SecurityRole>> repoPathRolesMap = new HashMap<ArtifactoryPermissionTarget, List<SecurityRole>>();
 
-    public SecurityConfigAdaptor( ArtifactorySecurityConfig config, SecurityConfigAdaptorPersistor persistor )
+    public SecurityConfigConvertor( ArtifactorySecurityConfig config, SecurityConfigReceiver persistor )
     {
         this.config = config;
 
@@ -54,48 +55,31 @@ public class SecurityConfigAdaptor
         return privileges;
     }
 
-    /**
-     * Convert a Artifactory repoPath to a nexus repoTarget pattern
-     * 
-     * @param artifactoryRepoPath
-     * @return
-     */
-    private static String convertPathToPattern( String artifactoryRepoPath )
-    {
-        if ( artifactoryRepoPath.equals( ArtifactoryRepoPath.PATH_ANY ) )
-        {
-            return ".*";
-        }
-        return artifactoryRepoPath + "/.*";
-    }
-
     public void convert()
     {
-        repoTargets = new ArrayList<CRepositoryTarget>( config.getRepoPaths().size() );
+        repoTargets = new ArrayList<CRepositoryTarget>( config.getPermissionTargets().size() );
 
-        for ( ArtifactoryRepoPath repoPath : config.getRepoPaths() )
+        for ( ArtifactoryPermissionTarget target : config.getPermissionTargets() )
         {
-            CRepositoryTarget repoTarget = buildRepositoryTarget( repoPath );
+            CRepositoryTarget repoTarget = buildRepositoryTarget( target );
 
-            SecurityPrivilege createPrivilege = buildSecurityPrivilege( repoPath, repoTarget, "create" );
-            SecurityPrivilege readPrivilege = buildSecurityPrivilege( repoPath, repoTarget, "read" );
-            SecurityPrivilege updatePrivilege = buildSecurityPrivilege( repoPath, repoTarget, "update" );
-            SecurityPrivilege deletePrivilege = buildSecurityPrivilege( repoPath, repoTarget, "delete" );
+            SecurityPrivilege createPrivilege = buildSecurityPrivilege( target, repoTarget, "create" );
+            SecurityPrivilege readPrivilege = buildSecurityPrivilege( target, repoTarget, "read" );
+            SecurityPrivilege updatePrivilege = buildSecurityPrivilege( target, repoTarget, "update" );
+            SecurityPrivilege deletePrivilege = buildSecurityPrivilege( target, repoTarget, "delete" );
 
-            SecurityRole readRole = buildSecurityRole( repoPath, "read", readPrivilege );
-            SecurityRole allRole = buildSecurityRole(
-                repoPath,
-                "all",
-                createPrivilege,
-                readPrivilege,
-                updatePrivilege,
-                deletePrivilege );
+            SecurityRole readerRole = buildSecurityRole( target, "reader", readPrivilege );
 
-            List<SecurityRole> roles = new ArrayList<SecurityRole>( 2 );
-            roles.add( readRole );
-            roles.add( allRole );
+            SecurityRole deployerRole = buildSecurityRole( target, "deployer", createPrivilege, updatePrivilege );
 
-            repoPathRolesMap.put( repoPath, roles );
+            SecurityRole adminRole = buildSecurityRole( target, "admin", updatePrivilege, deletePrivilege );
+
+            List<SecurityRole> roles = new ArrayList<SecurityRole>( 3 );
+            roles.add( readerRole );
+            roles.add( deployerRole );
+            roles.add( adminRole );
+
+            repoPathRolesMap.put( target, roles );
         }
 
         for ( ArtifactoryUser artifactoryUser : config.getUsers() )
@@ -110,58 +94,64 @@ public class SecurityConfigAdaptor
             {
                 for ( ArtifactoryAcl acl : config.getAcls() )
                 {
-                    List<SecurityRole> roles = (List<SecurityRole>) repoPathRolesMap.get( acl.getRepoPath() );
+                    List<SecurityRole> roles = (List<SecurityRole>) repoPathRolesMap.get( acl.getPermissionTarget() );
 
-                    if ( acl.getPermissions().contains( ArtifactoryPermission.ADMIN )
-                        || acl.getPermissions().contains( ArtifactoryPermission.DEPLOYER ) )
+                    if (acl.getPermissions().contains( ArtifactoryPermission.READER ) )
+                    {
+                        user.addRole( roles.get( 0 ).getId() );
+                    }
+                    if (acl.getPermissions().contains( ArtifactoryPermission.DEPLOYER ))
                     {
                         user.addRole( roles.get( 1 ).getId() );
                     }
-                    else if ( acl.getPermissions().contains( ArtifactoryPermission.READER ) )
+                    if ( acl.getPermissions().contains( ArtifactoryPermission.ADMIN ) )
                     {
-                        user.addRole( roles.get( 0 ).getId() );
+                        user.addRole( roles.get( 2 ).getId() );
                     }
                 }
             }
 
-            persistor.persistSecurityUser( user );
+            persistor.receiveSecurityUser( user );
 
             users.add( user );
         }
 
     }
 
-    private CRepositoryTarget buildRepositoryTarget( ArtifactoryRepoPath repoPath )
+    private CRepositoryTarget buildRepositoryTarget( ArtifactoryPermissionTarget target )
     {
         CRepositoryTarget repoTarget = new CRepositoryTarget();
 
-        repoTarget.setId( repoPath.getRepoKey() );
-        
-        repoTarget.setName( repoPath.getRepoKey() );
+        repoTarget.setId( target.getId() );
+
+        repoTarget.setName( target.getId() );
 
         repoTarget.setContentClass( "maven2" );
 
-        List<String> patterns = new ArrayList<String>( 1 );
+        List<String> patterns = new ArrayList<String>();
 
-        patterns.add( convertPathToPattern( repoPath.getPath() ) );
+        for ( String include : target.getIncludes() )
+        {
+            patterns.add( PatternConvertor.convert125Pattern( include ) );
+        }
 
         repoTarget.setPatterns( patterns );
 
-        persistor.persistRepositoryTarget( repoTarget );
+        persistor.receiveRepositoryTarget( repoTarget );
 
         repoTargets.add( repoTarget );
 
         return repoTarget;
     }
 
-    private SecurityPrivilege buildSecurityPrivilege( ArtifactoryRepoPath repoPath, CRepositoryTarget repoTarget,
-        String method )
+    private SecurityPrivilege buildSecurityPrivilege( ArtifactoryPermissionTarget permissionTarget,
+        CRepositoryTarget repoTarget, String method )
     {
         SecurityPrivilege privilege = new SecurityPrivilege();
 
-        privilege.setName( repoPath.getRepoKey() + " - (" + method + ")" );
+        privilege.setName( permissionTarget.getId() + "-" + method );
 
-        privilege.setDescription( repoPath.getRepoKey() + " - (" + method + ") imported from Artifactory" );
+        privilege.setDescription( permissionTarget.getId() + "-" + method );
 
         privilege.setType( "target" );
 
@@ -179,24 +169,25 @@ public class SecurityConfigAdaptor
 
         prop = new SecurityProperty();
         prop.setKey( "repositoryId" );
-        prop.setValue( repoPath.getRepoKey() );
+        prop.setValue( permissionTarget.getRepoKey() );
 
         privilege.addProperty( prop );
 
-        persistor.persistSecurityPrivilege( privilege );
+        persistor.receiveSecurityPrivilege( privilege );
 
         privileges.add( privilege );
 
         return privilege;
     }
 
-    private SecurityRole buildSecurityRole( ArtifactoryRepoPath repoPath, String key, SecurityPrivilege... privileges )
+    private SecurityRole buildSecurityRole( ArtifactoryPermissionTarget target, String key,
+        SecurityPrivilege... privileges )
     {
         SecurityRole role = new SecurityRole();
 
-        role.setId( "repo-" + repoPath.getRepoKey() + "-" + key );
+        role.setId( target.getId() + "-" + key );
 
-        role.setName( "Repo: " + repoPath.getRepoKey() + " (" + key + ")" );
+        role.setName( target.getId() + "-" + key );
 
         role.setSessionTimeout( 60 );
 
@@ -209,7 +200,7 @@ public class SecurityConfigAdaptor
 
         role.setPrivileges( privIds );
 
-        persistor.persistSecurityRole( role );
+        persistor.receiveSecurityRole( role );
 
         roles.add( role );
 

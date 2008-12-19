@@ -5,22 +5,22 @@ import java.util.Set;
 
 public class ArtifactoryAcl
 {
-    private ArtifactoryRepoPath repoPath;
+    private ArtifactoryPermissionTarget permissionTarget;
 
     private ArtifactoryUser user;
 
     private Set<ArtifactoryPermission> permissions = new HashSet<ArtifactoryPermission>();
 
-    public ArtifactoryAcl( ArtifactoryRepoPath repoPath, ArtifactoryUser user )
+    public ArtifactoryAcl( ArtifactoryPermissionTarget permissionTarget, ArtifactoryUser user )
     {
-        this.repoPath = repoPath;
+        this.permissionTarget = permissionTarget;
 
         this.user = user;
     }
 
-    public ArtifactoryRepoPath getRepoPath()
+    public ArtifactoryPermissionTarget getPermissionTarget()
     {
-        return repoPath;
+        return permissionTarget;
     }
 
     public ArtifactoryUser getUser()
@@ -53,7 +53,7 @@ public class ArtifactoryAcl
 
         ArtifactoryAcl acl = (ArtifactoryAcl) obj;
 
-        return this.user.equals( acl.user ) && this.repoPath.equals( acl.repoPath )
+        return this.user.equals( acl.user ) && this.permissionTarget.equals( acl.permissionTarget )
             && this.permissions.equals( acl.permissions );
     }
 

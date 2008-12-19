@@ -39,8 +39,8 @@ import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecurityConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
-import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigAdaptor;
-import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigAdaptorPersistor;
+import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigConvertor;
+import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigReceiver;
 import org.sonatype.nexus.plugin.migration.artifactory.security.builder.ArtifactorySecurityConfigBuilder;
 import org.sonatype.nexus.plugin.migration.artifactory.util.VirtualRepositoryUtil;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -71,7 +71,7 @@ public class ArtifactoryMigrationPlexusResource
     private MappingConfiguration mappingConfiguration;
 
     @Requirement
-    private SecurityConfigAdaptorPersistor securityConfigAdaptorPersistor;
+    private SecurityConfigReceiver securityConfigAdaptorPersistor;
     
     public ArtifactoryMigrationPlexusResource()
     {
@@ -154,7 +154,7 @@ public class ArtifactoryMigrationPlexusResource
             cfg.getUsers().remove( user );
         }
 
-        SecurityConfigAdaptor adaptor = new SecurityConfigAdaptor( cfg, securityConfigAdaptorPersistor );
+        SecurityConfigConvertor adaptor = new SecurityConfigConvertor( cfg, securityConfigAdaptorPersistor );
 
         adaptor.convert();
     }

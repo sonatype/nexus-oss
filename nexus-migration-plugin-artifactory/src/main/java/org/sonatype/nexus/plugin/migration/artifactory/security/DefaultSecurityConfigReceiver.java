@@ -13,9 +13,9 @@ import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
 
-@Component( role = SecurityConfigAdaptorPersistor.class )
-public class DefaultSecurityConfigAdaptorPersistor
-    implements SecurityConfigAdaptorPersistor
+@Component( role = SecurityConfigReceiver.class )
+public class DefaultSecurityConfigReceiver
+    implements SecurityConfigReceiver
 {
 
     @Requirement
@@ -24,7 +24,7 @@ public class DefaultSecurityConfigAdaptorPersistor
     @Requirement
     private Nexus nexus;
 
-    public void persistRepositoryTarget( CRepositoryTarget repoTarget )
+    public void receiveRepositoryTarget( CRepositoryTarget repoTarget )
     {
         try
         {
@@ -43,7 +43,7 @@ public class DefaultSecurityConfigAdaptorPersistor
 
     }
 
-    public void persistSecurityPrivilege( SecurityPrivilege privilege )
+    public void receiveSecurityPrivilege( SecurityPrivilege privilege )
     {
         try
         {
@@ -57,7 +57,7 @@ public class DefaultSecurityConfigAdaptorPersistor
 
     }
 
-    public void persistSecurityRole( SecurityRole role )
+    public void receiveSecurityRole( SecurityRole role )
     {
         try
         {
@@ -71,7 +71,7 @@ public class DefaultSecurityConfigAdaptorPersistor
 
     }
 
-    public void persistSecurityUser( SecurityUser user )
+    public void receiveSecurityUser( SecurityUser user )
     {
         try
         {
