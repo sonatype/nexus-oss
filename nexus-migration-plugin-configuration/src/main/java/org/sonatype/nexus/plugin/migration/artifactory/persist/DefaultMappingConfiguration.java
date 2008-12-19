@@ -1,12 +1,14 @@
 package org.sonatype.nexus.plugin.migration.artifactory.persist;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -48,13 +50,25 @@ public class DefaultMappingConfiguration
     public void save()
     {
         lock.lock();
+
+        FileLock fileLock = null;
+        FileChannel channel = null;
+        FileOutputStream out = null;
         try
         {
             XStream xs = getXStream();
 
-            Writer out = new FileWriter( configurationFile );
+            if ( !configurationFile.exists() )
+            {
+                configurationFile.getParentFile().mkdirs();
+                configurationFile.createNewFile();
+            }
+
+            out = new FileOutputStream( configurationFile );
+            channel = out.getChannel();
+            fileLock = channel.lock( 0, Long.MAX_VALUE, false ); // exclusive lock on save
+
             xs.toXML( getConfiguration(), out );
-            out.close();
         }
         catch ( IOException e )
         {
@@ -62,6 +76,8 @@ public class DefaultMappingConfiguration
         }
         finally
         {
+            release( fileLock, channel, out );
+
             lock.unlock();
         }
     }
@@ -82,12 +98,15 @@ public class DefaultMappingConfiguration
         }
 
         lock.lock();
-        Reader in = null;
-
+        FileInputStream in = null;
+        FileChannel channel = null;
+        FileLock fileLock = null;
         try
         {
 
-            in = new FileReader( configurationFile );
+            in = new FileInputStream( configurationFile );
+            channel = in.getChannel();
+            fileLock = channel.lock( 0, Long.MAX_VALUE, true );
 
             XStream xs = getXStream();
             Object config = xs.fromXML( in );
@@ -110,24 +129,76 @@ public class DefaultMappingConfiguration
         {
             getLogger().error( "Invalid configuration XML", e );
         }
+        catch ( IOException e )
+        {
+            getLogger().error( "Error reading configuration", e );
+        }
         finally
         {
-            lock.unlock();
+            release( fileLock, channel, in );
 
-            if ( in != null )
-            {
-                try
-                {
-                    in.close();
-                }
-                catch ( IOException e )
-                {
-                    // just closing
-                }
-            }
+            lock.unlock();
         }
 
         return this.configuration;
+    }
+
+    private void release( FileLock fileLock, Closeable channel, Closeable stream )
+    {
+        if ( fileLock != null )
+        {
+            try
+            {
+                fileLock.release();
+            }
+            catch ( IOException e )
+            {
+                // just releasing lock
+            }
+        }
+
+        if ( channel != null )
+        {
+            try
+            {
+                channel.close();
+            }
+            catch ( IOException e )
+            {
+                // just closing channel
+            }
+        }
+
+        if ( stream != null )
+        {
+            try
+            {
+                stream.close();
+            }
+            catch ( IOException e )
+            {
+                // just closing file
+            }
+        }
+    }
+
+    public CMapping getMapping( String repositoryId )
+    {
+        if ( repositoryId == null )
+        {
+            return null;
+        }
+
+        List<CMapping> urls = getConfiguration().getUrlsMapping();
+        for ( CMapping mapping : urls )
+        {
+            if ( repositoryId.equals( mapping.getArtifactoryRepositoryId() ) )
+            {
+                return mapping;
+            }
+        }
+
+        return null;
     }
 
 }

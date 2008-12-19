@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <!--
+        /* * Nexus: Maven Repository Manager * Copyright (C) 2008 Sonatype Inc. * * This file is part of Nexus. * * This program is free
+        software: you can redistribute it and/or modify * it under the terms of the GNU General Public License as published by * the Free
+        Software Foundation, either version 3 of the License, or * (at your option) any later version. * * This program is distributed in
+        the hope that it will be useful, * but WITHOUT ANY WARRANTY; without even the implied warranty of * MERCHANTABILITY or FITNESS FOR A
+        PARTICULAR PURPOSE. See the * GNU General Public License for more details. * * You should have received a copy of the GNU General
+        Public License * along with this program. If not, see http://www.gnu.org/licenses/. * */
+    -->
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+    <display-name>Nexus/Artifactory Bridge</display-name>
+
+    <servlet>
+        <servlet-name>artifactory</servlet-name>
+        <servlet-class>org.sonatype.nexus.artifactorybridge.RedirectorServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>artifactory</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Welcome File -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+</web-app>

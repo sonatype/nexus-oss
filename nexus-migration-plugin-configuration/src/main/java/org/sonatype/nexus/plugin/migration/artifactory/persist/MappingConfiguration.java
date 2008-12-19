@@ -9,4 +9,6 @@ public interface MappingConfiguration
 
     void addMapping(CMapping map);
 
+    CMapping getMapping( String repositoryId );
+
 }

@@ -17,6 +17,14 @@ public class CMapping
         super();
     }
 
+    public CMapping( String artifactoryRepositoryId, String nexusGroupId, String nexusRepositoryId )
+    {
+        this();
+        this.artifactoryRepositoryId = artifactoryRepositoryId;
+        this.nexusGroupId = nexusGroupId;
+        this.nexusRepositoryId = nexusRepositoryId;
+    }
+
     public String getArtifactoryRepositoryId()
     {
         return artifactoryRepositoryId;
