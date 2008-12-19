@@ -3,11 +3,11 @@
 
 	<context-param>
 		<param-name>plexus-config</param-name>
-		<param-value>/src/test/resources/plexus/plexus.xml</param-value>
+		<param-value>WEB-INF/plexus.xml</param-value>
 	</context-param>
 	<context-param>
 		<param-name>plexus-properties</param-name>
-		<param-value>/src/test/resources/plexus/plexus.properties</param-value>
+		<param-value>WEB-INF/plexus.properties</param-value>
 	</context-param>
 
     <listener>

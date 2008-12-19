@@ -28,28 +28,39 @@ import com.meterware.servletunit.InvocationContext;
 import com.meterware.servletunit.ServletRunner;
 import com.meterware.servletunit.ServletUnitClient;
 
-public class PlexusContainerContextListenerTest extends TestCase {
+public class PlexusContainerContextListenerTest
+    extends TestCase
+{
 
-	protected File webXml;
-	protected ServletRunner servletRunner;
-	
-	protected void setUp(){
-		webXml = new File("src/test/resources/httpunit/web.xml");
-		try{
-			servletRunner = new ServletRunner(webXml);
-		}
-		catch(Exception e){
-			System.out.println("Error while initializing servlet runner:");
-			e.printStackTrace();
-		}
-	}
-	
-	public void testListener() throws Exception{
-		ServletUnitClient client = servletRunner.newClient();
-		WebRequest request = new PostMethodWebRequest( "http://localhost/dummyServlet" );
-		InvocationContext context = client.newInvocation(request);
-		HttpServlet servlet = (HttpServlet)context.getServlet();
-		assertNotNull(servlet.getServletContext().getAttribute("plexus"));
+    protected File webXml;
 
-	}
+    protected ServletRunner servletRunner;
+
+    protected void setUp()
+    {
+        webXml = new File( "src/test/resources/httpunit/WEB-INF/web.xml" );
+        try
+        {
+            servletRunner = new ServletRunner( webXml , "/target/httpunit");
+        }
+        catch ( Exception e )
+        {
+            System.out.println( "Error while initializing servlet runner:" );
+            e.printStackTrace();
+        }
+    }
+
+    public void testListener()
+        throws Exception
+    {
+        ServletUnitClient client = servletRunner.newClient();
+     
+        WebRequest request = new PostMethodWebRequest( "http://localhost/target/httpunit/dummyServlet" );
+       
+        InvocationContext context = client.newInvocation( request );
+        
+        HttpServlet servlet = (HttpServlet) context.getServlet();
+        
+        assertNotNull( servlet.getServletContext().getAttribute( "plexus" ) );
+    }
 }
