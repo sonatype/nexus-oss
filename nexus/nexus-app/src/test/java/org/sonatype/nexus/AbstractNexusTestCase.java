@@ -21,7 +21,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -113,6 +115,11 @@ public abstract class AbstractNexusTestCase
         throws Exception
     {
         super.tearDown();
+    }
+
+    protected LoggerManager getLoggerManager() throws ComponentLookupException
+    {
+        return (LoggerManager) getContainer().lookup( LoggerManager.class );
     }
 
 }

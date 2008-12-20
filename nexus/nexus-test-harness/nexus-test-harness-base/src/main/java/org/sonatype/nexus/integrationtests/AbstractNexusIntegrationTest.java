@@ -82,7 +82,7 @@ public class AbstractNexusIntegrationTest
 
     protected PlexusContainer container;
 
-    private Map<String, Object> context;
+    private Map<Object, Object> context;
 
     private static boolean NEEDS_INIT = false;
 
@@ -507,7 +507,7 @@ public class AbstractNexusIntegrationTest
         // Context Setup
         // ----------------------------------------------------------------------------
 
-        context = new HashMap<String, Object>();
+        context = new HashMap<Object, Object>();
 
         context.put( "basedir", getBasedir() );
 

@@ -21,7 +21,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
@@ -55,6 +57,11 @@ public abstract class AbstractNexusTestCase
     {
         IOUtil.copy( getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" ), new FileOutputStream(
             getNexusConfiguration() ) );
+    }
+
+    protected LoggerManager getLoggerManager() throws ComponentLookupException
+    {
+        return (LoggerManager) getContainer().lookup( LoggerManager.class );
     }
 
 }

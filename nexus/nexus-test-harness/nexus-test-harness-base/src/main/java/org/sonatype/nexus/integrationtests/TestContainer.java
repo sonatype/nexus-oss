@@ -64,7 +64,7 @@ public class TestContainer
             f.mkdirs();
         }
 
-        Map<String, Object> context = new HashMap<String, Object>();
+        Map<Object, Object> context = new HashMap<Object, Object>();
         context.put( "plexus.home", f.getAbsolutePath() );
 
         // ----------------------------------------------------------------------------

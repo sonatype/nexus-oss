@@ -31,7 +31,7 @@ public class NexusWorkDirUtilsTest
         if(System.getenv().containsKey( NexusWorkDirUtils.KEY_NEXUS_WORK_ENV_VAR )){
             return;
         }
-        Map<Object, String> context = new HashMap<Object, String>();
+        Map<Object, Object> context = new HashMap<Object, Object>();
         NexusWorkDirUtils.setUpNexusWorkDir( context );
         String defaultRoot = new File( System.getProperty( "user.home" ), "/sonatype-work/nexus" ).getAbsolutePath();
         assertDirectoryProperties(context, defaultRoot);
@@ -40,7 +40,7 @@ public class NexusWorkDirUtilsTest
     
     public void testPlexusSetUp(){
         String rootPath = new File("/src/test/resources/nexus").getAbsolutePath();
-        Map<Object, String> context = new HashMap<Object, String>();
+        Map<Object, Object> context = new HashMap<Object, Object>();
         context.put( "nexus-work",  rootPath);
         NexusWorkDirUtils.setUpNexusWorkDir( context );
         assertDirectoryProperties(context, rootPath);  
@@ -49,7 +49,7 @@ public class NexusWorkDirUtilsTest
     
     public void testSystemPropertiesSetUp(){
         String rootPath = new File("/src/test/resources/nexus").getAbsolutePath();
-        Map<Object, String> context = new HashMap<Object, String>();
+        Map<Object, Object> context = new HashMap<Object, Object>();
         System.getProperties().put( "nexus-work", rootPath );
         NexusWorkDirUtils.setUpNexusWorkDir( context );
         assertDirectoryProperties(context, rootPath);  
@@ -66,7 +66,7 @@ public class NexusWorkDirUtilsTest
         assertDirectoryProperties(context, rootPath);  
     }*/
     
-    private void assertDirectoryProperties(Map<Object, String> context, String rootPath){
+    private void assertDirectoryProperties(Map<Object, Object> context, String rootPath){
         assertEquals(new File(rootPath).getAbsolutePath(), context.get( NexusWorkDirUtils.KEY_NEXUS_WORK ));
         assertEquals(new File(rootPath, NexusWorkDirUtils.RELATIVE_PATH_RUNTIME).getAbsolutePath(), context.get(NexusWorkDirUtils.KEY_RUNTIME ));
         assertEquals(new File(rootPath, NexusWorkDirUtils.RELATIVE_PATH_SECURITY_XML_FILE).getAbsolutePath(), context.get(NexusWorkDirUtils.KEY_SECURITY_XML_FILE ));

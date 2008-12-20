@@ -23,7 +23,9 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.tools.cli.AbstractCli;
 
 /*
@@ -96,7 +98,15 @@ public class MetadataRebuildCli
     {
         if ( cli.hasOption( DEBUG ) )
         {
-            plexus.getLoggerManager().setThresholds( Logger.LEVEL_DEBUG );
+            try
+            {
+                LoggerManager mgr = (LoggerManager) plexus.lookup( LoggerManager.class );
+                mgr.setThresholds( Logger.LEVEL_DEBUG );
+            }
+            catch ( ComponentLookupException e )
+            {
+                // too bad we can't change log level
+            }
         }
 
         File repository = new File( cli.getOptionValue( REPO ) );
@@ -126,5 +136,5 @@ public class MetadataRebuildCli
 
         System.out.println( "Metadata rebuild is successful!" );
     }
-
+    
 }

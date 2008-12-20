@@ -52,22 +52,22 @@ public class NexusWorkDirUtils
 
     public static final String RELATIVE_PATH_APPLICATION_CONF = "/conf";
 
-    public static void setUpNexusWorkDir( Map<Object, String> context )
+    public static void setUpNexusWorkDir( Map<Object, Object> context )
     {
         String root = setUpRootDir( context );
 
         setUpMinorDirs( context, root );
     }
 
-    private static String setUpRootDir( Map<Object, String> context )
+    private static String setUpRootDir( Map<Object, Object> context )
     {
 
         String value;
 
         // check if the value already exists (loaded by plexus container)
-        if ( !StringUtils.isEmpty( context.get( KEY_NEXUS_WORK ) ) )
+        if ( !StringUtils.isEmpty( (String) context.get( KEY_NEXUS_WORK ) ) )
         {
-            value = context.get( KEY_NEXUS_WORK );
+            value = (String) context.get( KEY_NEXUS_WORK );
         }
 
         // check system properties
@@ -99,19 +99,19 @@ public class NexusWorkDirUtils
     /**
      * Set up other directory properties based on the root directory.
      */
-    private static void setUpMinorDirs( Map<Object, String> context, String root )
+    private static void setUpMinorDirs( Map<Object, Object> context, String root )
     {
-        if ( StringUtils.isEmpty( context.get( KEY_RUNTIME ) ) )
+        if ( StringUtils.isEmpty( (String) context.get( KEY_RUNTIME ) ) )
         {
             context.put( KEY_RUNTIME, new File( root, RELATIVE_PATH_RUNTIME ).getAbsolutePath() );
         }
 
-        if ( StringUtils.isEmpty( context.get( KEY_SECURITY_XML_FILE ) ) )
+        if ( StringUtils.isEmpty( (String) context.get( KEY_SECURITY_XML_FILE ) ) )
         {
             context.put( KEY_SECURITY_XML_FILE, new File( root, RELATIVE_PATH_SECURITY_XML_FILE ).getAbsolutePath() );
         }
 
-        if ( StringUtils.isEmpty( context.get( KEY_APPLICATION_CONF ) ) )
+        if ( StringUtils.isEmpty( (String) context.get( KEY_APPLICATION_CONF ) ) )
         {
             context.put( KEY_APPLICATION_CONF, new File( root, RELATIVE_PATH_APPLICATION_CONF ).getAbsolutePath() );
         }

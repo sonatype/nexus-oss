@@ -220,7 +220,7 @@ public abstract class AbstractProxyTestEnvironment
     {
         super.setUp();
 
-        LoggerManager loggerManager = getContainer().getLoggerManager();
+        LoggerManager loggerManager = getLoggerManager();
 
         this.logger = loggerManager.getLoggerForComponent( this.getClass().toString() );
 

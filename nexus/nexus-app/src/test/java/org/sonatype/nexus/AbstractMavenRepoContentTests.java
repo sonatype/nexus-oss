@@ -49,7 +49,7 @@ public class AbstractMavenRepoContentTests
     {
         super.setUp();
 
-        getContainer().getLoggerManager().setThresholds( Logger.LEVEL_DEBUG );
+        getLoggerManager().setThresholds( Logger.LEVEL_DEBUG );
 
         defaultNexus = (DefaultNexus) lookup( Nexus.class );
 

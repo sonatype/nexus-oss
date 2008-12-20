@@ -64,7 +64,7 @@ public abstract class AbstractComponentListPlexusResource
         String role = getRole( request );
 
         // get component descriptors
-        List<ComponentDescriptor> componentMap = this.container.getComponentDescriptorList( role );
+        List<ComponentDescriptor<?>> componentMap = this.container.getComponentDescriptorList( role );
 
         // check if valid role
         if ( componentMap == null || componentMap.isEmpty() )

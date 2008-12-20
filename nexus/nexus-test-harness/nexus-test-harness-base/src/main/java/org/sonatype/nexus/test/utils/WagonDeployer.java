@@ -132,7 +132,7 @@ public class WagonDeployer
         }
         catch ( Exception e )
         {
-            throw new ComponentLookupException( e.getMessage(), Wagon.ROLE, protocol, null );
+            throw new ComponentLookupException( e.getMessage(), Wagon.ROLE, protocol );
         }
 
         Repository repository = new Repository();
@@ -222,7 +222,7 @@ public class WagonDeployer
                         + consoleOutput );
                 case 7:
                     throw new ComponentLookupException( "Process exit status was: " + status + "Process output:\n"
-                        + consoleOutput, Wagon.ROLE, protocol, null );
+                        + consoleOutput, Wagon.ROLE, protocol );
                 default:
                     break;
             }

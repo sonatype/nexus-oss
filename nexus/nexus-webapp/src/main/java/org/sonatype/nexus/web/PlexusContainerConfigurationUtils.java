@@ -52,11 +52,11 @@ public class PlexusContainerConfigurationUtils
         return cc;
     }
 
-    private Map<String, String> buildContext( ServletContext servletContext )
+    private Map<Object, Object> buildContext( ServletContext servletContext )
     {
         servletContext.log( "Loading plexus context properties from: '" + DEFAULT_PLEXUS_PROPERTIES + "'" );
 
-        Map<String, String> context = new HashMap<String, String>();
+        Map<Object, Object> context = new HashMap<Object, Object>();
 
         String plexusPropertiesPath = servletContext.getInitParameter( PLEXUS_PROPERTIES_PARAM );
 
