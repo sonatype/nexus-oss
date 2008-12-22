@@ -339,7 +339,6 @@ Sonatype.repoServer.DefaultUserEditor = function( config ) {
     id: 'id',
     url: Sonatype.config.repos.urls.roles,
     sortInfo: { field: 'name', direction: 'ASC' },
-    autoLoad: true,
     fields: [
       { name: 'id' },
       { name: 'name', sortType:Ext.data.SortTypes.asUCString }
@@ -447,6 +446,7 @@ Sonatype.repoServer.DefaultUserEditor = function( config ) {
 
   Sonatype.repoServer.DefaultUserEditor.superclass.constructor.call( this, {
     items: items,
+    dataStores: [this.roleDataStore],
     listeners: {
       submit: {
         fn: this.submitHandler,
@@ -549,17 +549,11 @@ Sonatype.repoServer.UserMappingEditor = function( config ) {
   };
   Ext.apply( this, config, defaultConfig );
 
-//  if ( ! Sonatype.lib.Permissions.checkPermission( 'nexus:ldapuserrolemap',
-//      Sonatype.lib.Permissions.EDIT ) ) {
-//    this.readOnly = true;
-//  }
-
   this.roleDataStore = new Ext.data.JsonStore( {
     root: 'data',
     id: 'id',
     url: Sonatype.config.repos.urls.roles,
     sortInfo: { field: 'name', direction: 'ASC' },
-    autoLoad: true,
     fields: [
       { name: 'id' },
       { name: 'name', sortType:Ext.data.SortTypes.asUCString }
@@ -614,6 +608,7 @@ Sonatype.repoServer.UserMappingEditor = function( config ) {
     
 
   Sonatype.repoServer.UserMappingEditor.superclass.constructor.call( this, {
+    dataStores: [this.roleDataStore],
     items: [
       useridField,
       {
@@ -735,32 +730,6 @@ Ext.extend( Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
       return Sonatype.repoServer.UserMappingEditor.superclass.actionFailedHandler.call(
         this, form, action );
     }
-  }
-} );
-
-Sonatype.Events.addListener( 'userListInit', function( userContainer ) {
-  var url = Sonatype.config.servicePath + '/plexus_users/LDAP';
-  if ( Sonatype.lib.Permissions.checkPermission( 'nexus:ldapuserrolemap', Sonatype.lib.Permissions.READ ) ) {
-    Ext.Ajax.request( {
-      url: url,
-      suppressStatus: 503, // the server will return an error if LDAP is not configured
-      success: function( response, options ) {
-        var resp = Ext.decode( response.responseText );
-        if ( resp.data ) {
-          var data = resp.data;
-          for ( var i = 0; i < data.length; i++ ) {
-            data[i].resourceURI = Sonatype.config.servicePath + '/plexus_user/' + data[i].userId;
-            if ( data[i].roles ) {
-              for ( var j = 0; j < data[i].roles.length; j++ ) {
-                data[i].roles[j] = data[i].roles[j].roleId;
-              }
-            }
-          }
-          userContainer.addRecords( data, 'LDAP', Sonatype.repoServer.LdapUserEditor );
-        }
-      },
-      scope: userContainer
-    } );
   }
 } );
 
