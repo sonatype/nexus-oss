@@ -41,7 +41,7 @@
           </webappInfo>
           <webappInfo>
             <warPath>${runtime}/apps/artifactory-bridge/webapp</warPath>
-            <contextPath>artifactory</contextPath>
+            <contextPath>/artifactory</contextPath>
           </webappInfo>
         </webappInfos>
         <lifecycleListenerInfos>

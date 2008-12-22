@@ -1,5 +1,6 @@
 package org.sonatype.nexus.artifactorybridge;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -30,16 +31,10 @@ public class RedirectorServlet
     public void doGet( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
     {
-        // sample artifactory URL
-        // http://localhost:8083/artifactory/main-local/nxcm259/released/1.0/released-1.0.pom
-        String nexusUrl = "http://" + request.getLocalAddr() + ":" + request.getLocalPort() + "/nexus";
-
-        String servletPath = request.getServletPath();
-
         UrlConverter urlConverter;
         try
         {
-            urlConverter = (UrlConverter) getPlexusContainer().lookup( UrlConverter.class );
+            urlConverter = getPlexusContainer().lookup( UrlConverter.class );
         }
         catch ( ComponentLookupException e )
         {
@@ -47,6 +42,11 @@ public class RedirectorServlet
                 + UrlConverter.class + "')", e );
         }
 
+        // sample artifactory URL
+        // http://localhost:8083/artifactory/main-local/nxcm259/released/1.0/released-1.0.pom
+        String nexusUrl = "http://" + request.getLocalAddr() + ":" + request.getLocalPort() + "/nexus";
+
+        String servletPath = request.getRequestURI();
         String nexusPath = urlConverter.convert( servletPath );
         if ( nexusPath == null )
         {
@@ -57,14 +57,22 @@ public class RedirectorServlet
         URL url = new URL( nexusUrl + nexusPath );
         URLConnection urlConn = url.openConnection();
 
-        InputStream in = urlConn.getInputStream();
-        byte[] bytes = IOUtils.toByteArray( in );
-        in.close();
+        try
+        {
+            InputStream in = urlConn.getInputStream();
+            byte[] bytes = IOUtils.toByteArray( in );
+            in.close();
 
-        ServletOutputStream out = response.getOutputStream();
-        IOUtils.write( bytes, out );
-        out.flush();
-        out.close();
+            ServletOutputStream out = response.getOutputStream();
+            IOUtils.write( bytes, out );
+            out.flush();
+            out.close();
+        }
+        catch ( FileNotFoundException e )
+        {
+            response.sendError( HttpServletResponse.SC_NOT_FOUND );
+            return;
+        }
     }
 
 }

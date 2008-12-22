@@ -13,8 +13,7 @@ public class UrlConverterSkip
     @Override
     protected void setUp()
         throws Exception
-
-        {
+    {
         urlConverter = lookup( UrlConverter.class );
         MappingConfiguration cfg = lookup( MappingConfiguration.class );
         cfg.addMapping( new CMapping( "repo1", null, "central" ) );

@@ -34,6 +34,7 @@
             </goals>
             <configuration>
               <includeArtifactIds>nexus-migration-artifactory-bridge</includeArtifactIds>
+              <includeTypes>zip</includeTypes>
               <outputDirectory>${nexus-abs-basedir}/runtime/apps/artifactory-bridge</outputDirectory>
             </configuration>
           </execution>

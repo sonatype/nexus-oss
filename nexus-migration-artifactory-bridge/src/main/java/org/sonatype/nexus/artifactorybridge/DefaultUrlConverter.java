@@ -17,10 +17,13 @@ public class DefaultUrlConverter
 
     public String convert( String servletPath )
     {
-        // servletPath: /main-local/nxcm259/released/1.0/released-1.0.pom
-        if(servletPath == null) {
+        // servletPath: /artifactory/main-local/nxcm259/released/1.0/released-1.0.pom
+        if(servletPath == null || servletPath.length() < 12) {
             return null;
         }
+
+        // cut /artifactory
+        servletPath = servletPath.substring( 12 );
 
         // repository: main-local
         int artifactPathIndex = servletPath.indexOf( "/", 1 );
