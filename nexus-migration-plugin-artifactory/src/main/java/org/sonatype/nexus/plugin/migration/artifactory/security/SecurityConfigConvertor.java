@@ -170,6 +170,12 @@ public class SecurityConfigConvertor
         prop.setKey( "repositoryTargetId" );
         prop.setValue( repoTarget.getId() );
 
+        //for creating privs with a repoTarget to all repos, set the repoId and repoGroupId to be empty
+        if ( prop.getValue().equals( "ANY" ))
+        {
+            prop.setKey( "" );
+        }
+        
         privilege.addProperty( prop );
 
         prop = new SecurityProperty();
