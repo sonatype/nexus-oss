@@ -30,6 +30,8 @@ public class SecurityConfigConvertorTest
         ArtifactoryUser user = new ArtifactoryUser( "arti-user" );
         config.addUser( admin );
         config.addUser( user );
+        ArtifactoryUser user1 = new ArtifactoryUser( "arti-user1" );
+        config.addUser( user1 );
 
         // repoPaths
         ArtifactoryPermissionTarget apache = new ArtifactoryPermissionTarget( "apachePermTarget", "apache" );
@@ -48,6 +50,11 @@ public class SecurityConfigConvertorTest
         jvnetAcl.addPermission( ArtifactoryPermission.READER );
         config.addAcl( jvnetAcl );
         config.addAcl( apacheAcl );
+
+        ArtifactoryAcl apacheAcl2 = new ArtifactoryAcl( apache, user1 );
+        apacheAcl2.addPermission( ArtifactoryPermission.READER );
+        apacheAcl2.addPermission( ArtifactoryPermission.DEPLOYER );
+        config.addAcl( apacheAcl2 );
 
         configAdaptor = new SecurityConfigConvertor( config, new FakeReceiver() );
 
@@ -155,9 +162,13 @@ public class SecurityConfigConvertorTest
         Assert.assertTrue( StringUtils.isEmpty( user.getEmail() ) );
         Assert.assertEquals( "active", user.getStatus() );
 
+        Assert.assertEquals( 4, user.getRoles().size() );
         Assert.assertFalse( user.getRoles().contains( "apachePermTarget-admin" ) );
         Assert.assertTrue( user.getRoles().contains( "apachePermTarget-reader" ) );
         Assert.assertTrue( user.getRoles().contains( configAdaptor.getSecurityRoles().get( 5 ).getId() ) );
+
+        SecurityUser user1 = users.get( 2 );
+        Assert.assertEquals( 2, user1.getRoles().size() );
     }
 
     class FakeReceiver

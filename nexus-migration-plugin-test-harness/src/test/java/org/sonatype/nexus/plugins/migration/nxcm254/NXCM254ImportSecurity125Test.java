@@ -1,13 +1,101 @@
 package org.sonatype.nexus.plugins.migration.nxcm254;
 
-import java.io.File;
+import java.util.List;
+
+import junit.framework.Assert;
+
+import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
+import org.sonatype.nexus.rest.model.PlexusRoleResource;
+import org.sonatype.nexus.rest.model.PlexusUserResource;
+import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
+import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
+import org.sonatype.nexus.rest.model.RoleResource;
 
 public class NXCM254ImportSecurity125Test
     extends AbstractImportSecurityTest
 {
-    @Override
-    protected File getBackupFile()
+    public NXCM254ImportSecurity125Test()
+        throws Exception
     {
-        return getTestFile( "artifactory-security-125.zip" );
+        super();
+    }
+
+    @Override
+    public void importSecurity()
+        throws Exception
+    {
+        MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactory-security-125.zip" ) );
+
+        commitMigration( migrationSummary );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    @Override
+    public void verifySecurity()
+        throws Exception
+    {
+        List<PlexusUserResource> userList = getImportedUserList();
+        List<RepositoryTargetListResource> targetList = getImportedRepoTargetList();
+        List<PrivilegeBaseStatusResource> privilegeList = getImportedPrivilegeList();
+        List<RoleResource> roleList = getImportedRoleList();
+
+        Assert.assertEquals( "4 users imported", 4, userList.size() );
+        Assert.assertEquals( "3 repo targets imported", 3, targetList.size() );
+        Assert.assertEquals( "4 privileges for each repo target", targetList.size() * 4, privilegeList.size() );
+        Assert.assertEquals( "3 roles for each repo target", targetList.size() * 3, roleList.size() );
+
+        // these users are imported
+        Assert.assertTrue( containUser( userList, "admin-artifactory" ) );
+        Assert.assertTrue( containUser( userList, "admin1" ) );
+        Assert.assertTrue( containUser( userList, "user" ) );
+        Assert.assertTrue( containUser( userList, "user1" ) );
+
+        for ( RepositoryTargetListResource target : targetList )
+        {
+            String key = target.getId();
+
+            // 4 privileges for 1 repoTarget imported
+            Assert.assertTrue( containPrivilegeName( privilegeList, key + "-create" ) );
+            Assert.assertTrue( containPrivilegeName( privilegeList, key + "-read" ) );
+            Assert.assertTrue( containPrivilegeName( privilegeList, key + "-update" ) );
+            Assert.assertTrue( containPrivilegeName( privilegeList, key + "-read" ) );
+
+            // 3 roles for 1 repoTarget imported
+            Assert.assertTrue( containRole( roleList, key + "-reader" ) );
+            Assert.assertTrue( containRole( roleList, key + "-deployer" ) );
+            Assert.assertTrue( containRole( roleList, key + "-admin" ) );
+        }
+
+        // verify user-role mapping
+        PlexusUserResource admin = getUserById( userList, "admin-artifactory" );
+        Assert.assertEquals( 1, admin.getRoles().size() );
+        containRoleEndWith( admin.getRoles(), "admin" );
+
+        PlexusUserResource admin1 = getUserById( userList, "admin1" );
+        Assert.assertEquals( 1, admin1.getRoles().size() );
+        containRoleEndWith( admin1.getRoles(), "admin" );
+
+        PlexusUserResource user = getUserById( userList, "user" );
+        Assert.assertEquals( 3, user.getRoles().size() );
+        containRoleEndWith( user.getRoles(), "-admin" );
+        containRoleEndWith( user.getRoles(), "-deployer" );
+        containRoleEndWith( user.getRoles(), "-reader" );
+
+        PlexusUserResource user1 = getUserById( userList, "user1" );
+        Assert.assertEquals( 2, user1.getRoles().size() );
+        containRoleEndWith( user1.getRoles(), "-deployer" );
+        containRoleEndWith( user1.getRoles(), "-reader" );
+    }
+
+    protected boolean containRoleEndWith( List<PlexusRoleResource> roleList, String suffix )
+    {
+        for ( PlexusRoleResource role : roleList )
+        {
+            if ( role.equals( suffix ) )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

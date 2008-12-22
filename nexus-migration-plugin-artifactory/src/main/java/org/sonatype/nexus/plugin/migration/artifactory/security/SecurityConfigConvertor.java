@@ -94,13 +94,18 @@ public class SecurityConfigConvertor
             {
                 for ( ArtifactoryAcl acl : config.getAcls() )
                 {
+                    if ( !acl.getUser().getUsername().equals( user.getName() ) )
+                    {
+                        continue;
+                    }
+
                     List<SecurityRole> roles = (List<SecurityRole>) repoPathRolesMap.get( acl.getPermissionTarget() );
 
-                    if (acl.getPermissions().contains( ArtifactoryPermission.READER ) )
+                    if ( acl.getPermissions().contains( ArtifactoryPermission.READER ) )
                     {
                         user.addRole( roles.get( 0 ).getId() );
                     }
-                    if (acl.getPermissions().contains( ArtifactoryPermission.DEPLOYER ))
+                    if ( acl.getPermissions().contains( ArtifactoryPermission.DEPLOYER ) )
                     {
                         user.addRole( roles.get( 1 ).getId() );
                     }
