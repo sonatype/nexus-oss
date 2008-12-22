@@ -22,15 +22,9 @@ public class SecurityConfigConvertor
     // by default, resolve artifactory permissions
     private boolean resolvePermission = true;
 
-    private List<CRepositoryTarget> repoTargets = new ArrayList<CRepositoryTarget>();
-
-    private List<SecurityPrivilege> privileges = new ArrayList<SecurityPrivilege>();
-
-    private List<SecurityRole> roles = new ArrayList<SecurityRole>();
-
     private List<SecurityUser> users = new ArrayList<SecurityUser>();
 
-    private Map<ArtifactoryPermissionTarget, List<SecurityRole>> repoPathRolesMap = new HashMap<ArtifactoryPermissionTarget, List<SecurityRole>>();
+    private Map<String, TargetSuite> mapping = new HashMap<String, TargetSuite>();
 
     public SecurityConfigConvertor( ArtifactorySecurityConfig config, SecurityConfigReceiver persistor )
     {
@@ -54,28 +48,39 @@ public class SecurityConfigConvertor
         return users;
     }
 
-    public List<SecurityRole> getSecurityRoles()
-    {
-        return roles;
-    }
-
-    public List<CRepositoryTarget> getRepositoryTargets()
-    {
-        return repoTargets;
-    }
-
-    public List<SecurityPrivilege> getSecurityPrivileges()
-    {
-        return privileges;
-    }
-
     public void convert()
         throws ArtifactoryMigrationException
     {
-        if ( resolvePermission )
+        if ( !resolvePermission )
+        {
+            // convert users only, admin/anonymous
+            for ( ArtifactoryUser artifactoryUser : config.getUsers() )
+            {
+                SecurityUser user = buildSecurityUser( artifactoryUser );
+
+                if ( artifactoryUser.isAdmin() )
+                {
+                    user.addRole( "admin" );
+                }
+                else
+                {
+                    user.addRole( "anonymous" );
+                }
+
+                receiver.receiveSecurityUser( user );
+
+                users.add( user );
+            }
+        }
+
+        else
         {
             for ( ArtifactoryPermissionTarget target : config.getPermissionTargets() )
             {
+                String id = target.getId();
+
+                TargetSuite targetSuite = new TargetSuite();
+
                 CRepositoryTarget repoTarget = buildRepositoryTarget( target );
 
                 SecurityPrivilege createPrivilege = buildSecurityPrivilege( target, repoTarget, "create" );
@@ -84,66 +89,38 @@ public class SecurityConfigConvertor
                 SecurityPrivilege deletePrivilege = buildSecurityPrivilege( target, repoTarget, "delete" );
 
                 SecurityRole readerRole = buildSecurityRole( target, "reader", readPrivilege );
-
                 SecurityRole deployerRole = buildSecurityRole( target, "deployer", createPrivilege, updatePrivilege );
-
                 SecurityRole adminRole = buildSecurityRole( target, "admin", updatePrivilege, deletePrivilege );
 
-                List<SecurityRole> roles = new ArrayList<SecurityRole>( 3 );
-                roles.add( readerRole );
-                roles.add( deployerRole );
-                roles.add( adminRole );
+                targetSuite.setRepositoryTarget( repoTarget );
+                targetSuite.getPrivileges().add( createPrivilege );
+                targetSuite.getPrivileges().add( readPrivilege );
+                targetSuite.getPrivileges().add( updatePrivilege );
+                targetSuite.getPrivileges().add( deletePrivilege );
+                targetSuite.getRoles().add( readerRole );
+                targetSuite.getRoles().add( deployerRole );
+                targetSuite.getRoles().add( adminRole );
 
-                repoPathRolesMap.put( target, roles );
+                mapping.put( id, targetSuite );
             }
-        }
-        for ( ArtifactoryUser artifactoryUser : config.getUsers() )
-        {
-            SecurityUser user = buildSecurityUser( artifactoryUser );
 
-            if ( artifactoryUser.isAdmin() )
+            for ( ArtifactoryUser artifactoryUser : config.getUsers() )
             {
-                user.addRole( "admin" );
-            }
-            else
-            {
-                if ( resolvePermission )
+                SecurityUser user = buildSecurityUser( artifactoryUser );
+
+                if ( artifactoryUser.isAdmin() )
                 {
-                    for ( ArtifactoryAcl acl : config.getAcls() )
-                    {
-                        if ( !acl.getUser().getUsername().equals( user.getName() ) )
-                        {
-                            continue;
-                        }
-
-                        List<SecurityRole> roles = (List<SecurityRole>) repoPathRolesMap
-                            .get( acl.getPermissionTarget() );
-
-                        if ( acl.getPermissions().contains( ArtifactoryPermission.READER ) )
-                        {
-                            user.addRole( roles.get( 0 ).getId() );
-                        }
-                        if ( acl.getPermissions().contains( ArtifactoryPermission.DEPLOYER ) )
-                        {
-                            user.addRole( roles.get( 1 ).getId() );
-                        }
-                        if ( acl.getPermissions().contains( ArtifactoryPermission.ADMIN ) )
-                        {
-                            user.addRole( roles.get( 2 ).getId() );
-                        }
-                    }
+                    user.addRole( "admin" );
                 }
                 else
                 {
-                    user.addRole( "anonymous" );
+                    buildUserAclRole( user );
                 }
+                receiver.receiveSecurityUser( user );
+
+                users.add( user );
             }
-
-            receiver.receiveSecurityUser( user );
-
-            users.add( user );
         }
-
     }
 
     private CRepositoryTarget buildRepositoryTarget( ArtifactoryPermissionTarget target )
@@ -167,8 +144,6 @@ public class SecurityConfigConvertor
         repoTarget.setPatterns( patterns );
 
         receiver.receiveRepositoryTarget( repoTarget );
-
-        repoTargets.add( repoTarget );
 
         return repoTarget;
     }
@@ -205,8 +180,6 @@ public class SecurityConfigConvertor
 
         receiver.receiveSecurityPrivilege( privilege );
 
-        privileges.add( privilege );
-
         return privilege;
     }
 
@@ -233,8 +206,6 @@ public class SecurityConfigConvertor
 
         receiver.receiveSecurityRole( role );
 
-        roles.add( role );
-
         return role;
     }
 
@@ -251,5 +222,79 @@ public class SecurityConfigConvertor
         securityUser.setStatus( "active" );
 
         return securityUser;
+    }
+
+    private void buildUserAclRole( SecurityUser user )
+    {
+        for ( ArtifactoryAcl acl : config.getAcls() )
+        {
+            if ( !acl.getUser().getUsername().equals( user.getName() ) )
+            {
+                continue;
+            }
+            List<SecurityRole> roles = mapping.get( acl.getPermissionTarget().getId() ).getRoles();
+
+            if ( acl.getPermissions().contains( ArtifactoryPermission.READER ) )
+            {
+                user.addRole( roles.get( 0 ).getId() );
+            }
+            if ( acl.getPermissions().contains( ArtifactoryPermission.DEPLOYER ) )
+            {
+                user.addRole( roles.get( 1 ).getId() );
+            }
+            if ( acl.getPermissions().contains( ArtifactoryPermission.ADMIN ) )
+            {
+                user.addRole( roles.get( 2 ).getId() );
+            }
+        }
+    }
+
+    /**
+     * One permission target will be converted a one TargetSuite
+     * 
+     * @author Juven Xu
+     */
+    class TargetSuite
+    {
+
+        /**
+         * Id of the permission target where this suite be converted from
+         */
+
+        private CRepositoryTarget repositoryTarget;
+
+        private List<SecurityPrivilege> privileges = new ArrayList<SecurityPrivilege>();
+
+        private List<SecurityRole> roles = new ArrayList<SecurityRole>();
+
+        public CRepositoryTarget getRepositoryTarget()
+        {
+            return repositoryTarget;
+        }
+
+        public void setRepositoryTarget( CRepositoryTarget repositoryTarget )
+        {
+            this.repositoryTarget = repositoryTarget;
+        }
+
+        public List<SecurityPrivilege> getPrivileges()
+        {
+            return privileges;
+        }
+
+        public void setPrivileges( List<SecurityPrivilege> privileges )
+        {
+            this.privileges = privileges;
+        }
+
+        public List<SecurityRole> getRoles()
+        {
+            return roles;
+        }
+
+        public void setRoles( List<SecurityRole> roles )
+        {
+            this.roles = roles;
+        }
     }
 }

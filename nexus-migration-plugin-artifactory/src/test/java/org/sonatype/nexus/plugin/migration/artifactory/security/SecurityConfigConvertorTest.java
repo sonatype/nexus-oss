@@ -1,5 +1,6 @@
 package org.sonatype.nexus.plugin.migration.artifactory.security;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -18,6 +19,14 @@ public class SecurityConfigConvertorTest
 
     protected SecurityConfigConvertor configAdaptor;
 
+    protected List<CRepositoryTarget> repoTargetList;
+    
+    protected List<SecurityPrivilege> privList;
+    
+    protected List<SecurityRole> roleList;
+    
+    protected List<SecurityUser> userList;
+    
     @Before
     public void prepare()
         throws Exception
@@ -25,6 +34,12 @@ public class SecurityConfigConvertorTest
         // initialize security config
         ArtifactorySecurityConfig config = new ArtifactorySecurityConfig();
 
+        repoTargetList = new ArrayList<CRepositoryTarget>();
+        privList = new ArrayList<SecurityPrivilege>();
+        roleList = new ArrayList<SecurityRole>();
+        userList = new ArrayList<SecurityUser>();
+        
+        
         // users
         ArtifactoryUser admin = new ArtifactoryUser( "arti-admin" );
         admin.setAdmin( true );
@@ -65,16 +80,14 @@ public class SecurityConfigConvertorTest
     @Test
     public void assertRepositoryTarget()
     {
-        List<CRepositoryTarget> repoTargets = configAdaptor.getRepositoryTargets();
-
-        CRepositoryTarget targetApache = repoTargets.get( 0 );
+        CRepositoryTarget targetApache = repoTargetList.get( 0 );
         Assert.assertEquals( "apachePermTarget", targetApache.getId() );
         Assert.assertEquals( "apachePermTarget", targetApache.getName() );
         Assert.assertEquals( "maven2", targetApache.getContentClass() );
         Assert.assertEquals( 1, targetApache.getPatterns().size() );
         Assert.assertTrue( targetApache.getPatterns().contains( "org/apache/.*" ) );
 
-        CRepositoryTarget targetJvnet = repoTargets.get( 1 );
+        CRepositoryTarget targetJvnet = repoTargetList.get( 1 );
         Assert.assertNotNull( targetJvnet.getId() );
         Assert.assertNotNull( targetJvnet.getName() );
         Assert.assertEquals( "maven2", targetJvnet.getContentClass() );
@@ -86,62 +99,56 @@ public class SecurityConfigConvertorTest
     public void assertPrivilege()
     {
         // assert the privileges
-        List<SecurityPrivilege> privileges = configAdaptor.getSecurityPrivileges();
+        Assert.assertNotNull( privList.get( 0 ).getId() );
+        Assert.assertEquals( "apachePermTarget-create", privList.get( 0 ).getName() );
+        Assert.assertEquals( "apachePermTarget-create", privList.get( 0 ).getDescription() );
+        Assert.assertEquals( "target", privList.get( 0 ).getType() );
 
-        Assert.assertNotNull( privileges.get( 0 ).getId() );
-        Assert.assertEquals( "apachePermTarget-create", privileges.get( 0 ).getName() );
-        Assert.assertEquals( "apachePermTarget-create", privileges.get( 0 ).getDescription() );
-        Assert.assertEquals( "target", privileges.get( 0 ).getType() );
-
-        Assert.assertEquals( "method", ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 0 ) ).getKey() );
-        Assert.assertEquals( "create", ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 0 ) ).getValue() );
-        Assert.assertEquals( "repositoryTargetId", ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 1 ) )
+        Assert.assertEquals( "method", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 0 ) ).getKey() );
+        Assert.assertEquals( "create", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 0 ) ).getValue() );
+        Assert.assertEquals( "repositoryTargetId", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 1 ) )
             .getKey() );
-        Assert.assertEquals( "apachePermTarget", ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 1 ) )
+        Assert.assertEquals( "apachePermTarget", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 1 ) )
             .getValue() );
-        Assert.assertEquals( "repositoryId", ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 2 ) )
+        Assert.assertEquals( "repositoryId", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 2 ) )
             .getKey() );
-        Assert.assertEquals( "apache", ( (SecurityProperty) privileges.get( 0 ).getProperties().get( 2 ) ).getValue() );
+        Assert.assertEquals( "apache", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 2 ) ).getValue() );
 
-        Assert.assertNotNull( privileges.get( 7 ).getId() );
-        Assert.assertTrue( privileges.get( 7 ).getName().endsWith( "delete" ) );
-        Assert.assertEquals( privileges.get( 7 ).getDescription(), privileges.get( 7 ).getName() );
-        Assert.assertEquals( "target", privileges.get( 7 ).getType() );
+        Assert.assertNotNull( privList.get( 7 ).getId() );
+        Assert.assertTrue( privList.get( 7 ).getName().endsWith( "delete" ) );
+        Assert.assertEquals( privList.get( 7 ).getDescription(), privList.get( 7 ).getName() );
+        Assert.assertEquals( "target", privList.get( 7 ).getType() );
 
-        Assert.assertEquals( "method", ( (SecurityProperty) privileges.get( 7 ).getProperties().get( 0 ) ).getKey() );
-        Assert.assertEquals( "delete", ( (SecurityProperty) privileges.get( 7 ).getProperties().get( 0 ) ).getValue() );
-        Assert.assertEquals( "repositoryTargetId", ( (SecurityProperty) privileges.get( 7 ).getProperties().get( 1 ) )
+        Assert.assertEquals( "method", ( (SecurityProperty) privList.get( 7 ).getProperties().get( 0 ) ).getKey() );
+        Assert.assertEquals( "delete", ( (SecurityProperty) privList.get( 7 ).getProperties().get( 0 ) ).getValue() );
+        Assert.assertEquals( "repositoryTargetId", ( (SecurityProperty) privList.get( 7 ).getProperties().get( 1 ) )
             .getKey() );
-        Assert.assertNotNull( ( (SecurityProperty) privileges.get( 7 ).getProperties().get( 1 ) ).getValue() );
-        Assert.assertEquals( "repositoryId", ( (SecurityProperty) privileges.get( 7 ).getProperties().get( 2 ) )
+        Assert.assertNotNull( ( (SecurityProperty) privList.get( 7 ).getProperties().get( 1 ) ).getValue() );
+        Assert.assertEquals( "repositoryId", ( (SecurityProperty) privList.get( 7 ).getProperties().get( 2 ) )
             .getKey() );
-        Assert.assertEquals( "jvnet", ( (SecurityProperty) privileges.get( 7 ).getProperties().get( 2 ) ).getValue() );
+        Assert.assertEquals( "jvnet", ( (SecurityProperty) privList.get( 7 ).getProperties().get( 2 ) ).getValue() );
     }
 
     @Test
     public void assertRole()
     {
-        List<SecurityRole> roles = configAdaptor.getSecurityRoles();
-
-        Assert.assertEquals( "apachePermTarget-reader", roles.get( 0 ).getId() );
-        Assert.assertEquals( "apachePermTarget-reader", roles.get( 0 ).getName() );
-        Assert.assertEquals( 60, roles.get( 0 ).getSessionTimeout() );
+        Assert.assertEquals( "apachePermTarget-reader", roleList.get( 0 ).getId() );
+        Assert.assertEquals( "apachePermTarget-reader", roleList.get( 0 ).getName() );
+        Assert.assertEquals( 60, roleList.get( 0 ).getSessionTimeout() );
         // read priv
-        Assert.assertEquals( 1, roles.get( 0 ).getPrivileges().size() );
+        Assert.assertEquals( 1, roleList.get( 0 ).getPrivileges().size() );
 
-        Assert.assertTrue( roles.get( 5 ).getId().endsWith( "admin" ) );
-        Assert.assertEquals( roles.get( 5 ).getId(), roles.get( 5 ).getName() );
-        Assert.assertEquals( 60, roles.get( 5 ).getSessionTimeout() );
+        Assert.assertTrue( roleList.get( 5 ).getId().endsWith( "admin" ) );
+        Assert.assertEquals( roleList.get( 5 ).getId(), roleList.get( 5 ).getName() );
+        Assert.assertEquals( 60, roleList.get( 5 ).getSessionTimeout() );
         // update and delete priv
-        Assert.assertEquals( 2, roles.get( 5 ).getPrivileges().size() );
+        Assert.assertEquals( 2, roleList.get( 5 ).getPrivileges().size() );
     }
 
     @Test
     public void assertAdmin()
     {
-        List<SecurityUser> users = configAdaptor.getSecurityUsers();
-
-        SecurityUser admin = users.get( 0 );
+        SecurityUser admin = userList.get( 0 );
 
         Assert.assertEquals( "arti-admin", admin.getId() );
         Assert.assertEquals( "arti-admin", admin.getName() );
@@ -154,9 +161,7 @@ public class SecurityConfigConvertorTest
     @Test
     public void assertUser()
     {
-        List<SecurityUser> users = configAdaptor.getSecurityUsers();
-
-        SecurityUser user = users.get( 1 );
+        SecurityUser user = userList.get( 1 );
 
         Assert.assertEquals( "arti-user", user.getId() );
         Assert.assertEquals( "arti-user", user.getName() );
@@ -166,9 +171,9 @@ public class SecurityConfigConvertorTest
         Assert.assertEquals( 4, user.getRoles().size() );
         Assert.assertFalse( user.getRoles().contains( "apachePermTarget-admin" ) );
         Assert.assertTrue( user.getRoles().contains( "apachePermTarget-reader" ) );
-        Assert.assertTrue( user.getRoles().contains( configAdaptor.getSecurityRoles().get( 5 ).getId() ) );
+        Assert.assertTrue( user.getRoles().contains( roleList.get( 5 ).getId() ) );
 
-        SecurityUser user1 = users.get( 2 );
+        SecurityUser user1 = userList.get( 2 );
         Assert.assertEquals( 2, user1.getRoles().size() );
     }
 
@@ -179,23 +184,25 @@ public class SecurityConfigConvertorTest
 
         public void receiveRepositoryTarget( CRepositoryTarget repoTarget )
         {
+            repoTargetList.add( repoTarget );
         }
 
         public void receiveSecurityPrivilege( SecurityPrivilege privilege )
         {
             privilege.setId( "privilege-" + privilegeIdCount );
             privilegeIdCount++;
+
+            privList.add( privilege );
         }
 
         public void receiveSecurityRole( SecurityRole role )
         {
-
+            roleList.add( role );
         }
 
         public void receiveSecurityUser( SecurityUser user )
         {
-
+            userList.add( user );
         }
-
     }
 }
