@@ -293,8 +293,8 @@ public abstract class AbstractProxyTestEnvironment
         assertTrue( new File( getBasedir(), "target/test-classes/"
             + item.getRepositoryItemUid().getRepository().getId() + item.getRepositoryItemUid().getPath() ).exists() );
         // match content
-        checkForFileAndMatchContents( item, new FileInputStream( new File( getBasedir(), "target/test-classes/"
-            + item.getRepositoryItemUid().getRepository().getId() + item.getRepositoryItemUid().getPath() ) ) );
+        checkForFileAndMatchContents( item, new File( getBasedir(), "target/test-classes/"
+            + item.getRepositoryItemUid().getRepository().getId() + item.getRepositoryItemUid().getPath() ) );
     }
 
     /**
@@ -304,6 +304,12 @@ public abstract class AbstractProxyTestEnvironment
      * @param wantedContent the wanted content
      * @throws Exception the exception
      */
+    protected void checkForFileAndMatchContents( StorageItem item, File wantedFile )
+        throws Exception
+    {
+        checkForFileAndMatchContents( item, new FileInputStream( wantedFile ) );
+    }
+
     protected void checkForFileAndMatchContents( StorageItem item, InputStream wantedContent )
         throws Exception
     {
@@ -320,8 +326,40 @@ public abstract class AbstractProxyTestEnvironment
         assertTrue( file.isReusableStream() );
         // content equals
         InputStream fileContent = file.getInputStream();
-        assertTrue( IOUtil.contentEquals( wantedContent, fileContent ) );
-        fileContent.close();
+
+        try
+        {
+            assertTrue( IOUtil.contentEquals( wantedContent, fileContent ) );
+        }
+        finally
+        {
+            IOUtil.close( fileContent );
+
+            IOUtil.close( wantedContent );
+        }
+    }
+
+    protected boolean fileContentEquals( File file1, File file2 )
+        throws Exception
+    {
+        FileInputStream fis1 = null;
+
+        FileInputStream fis2 = null;
+
+        try
+        {
+            fis1 = new FileInputStream( file1 );
+
+            fis2 = new FileInputStream( file2 );
+
+            return IOUtil.contentEquals( fis1, fis2 );
+        }
+        finally
+        {
+            IOUtil.close( fis1 );
+
+            IOUtil.close( fis2 );
+        }
     }
 
     protected File getFile( Repository repository, String path )
@@ -344,10 +382,13 @@ public abstract class AbstractProxyTestEnvironment
         try
         {
             IOUtil.copy( inputStream, fos );
+
             fos.flush();
         }
         finally
         {
+            IOUtil.close( inputStream );
+
             if ( fos != null )
             {
                 fos.close();

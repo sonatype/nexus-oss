@@ -16,8 +16,6 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.io.FileInputStream;
-
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -83,8 +81,9 @@ public class RepositoryRedeployTest
         StorageFileItem dest = (StorageFileItem) getRepository().retrieveItem(
             new ResourceStoreRequest( "/activemq/activemq-core/1.2/activemq-core-1.2.jar-copy", true ) );
 
-        checkForFileAndMatchContents( dest, new FileInputStream( getRemoteFile( getRepositoryRegistry().getRepository(
-            "repo1" ), "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) ) );
+        checkForFileAndMatchContents( dest, getRemoteFile(
+            getRepositoryRegistry().getRepository( "repo1" ),
+            "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) );
 
     }
 

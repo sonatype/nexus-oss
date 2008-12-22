@@ -16,7 +16,6 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.io.FileInputStream;
 import java.util.Collection;
 
 import org.sonatype.jettytestsuite.ServletServer;
@@ -34,12 +33,13 @@ public abstract class M2ResourceStoreTest
         throws Exception
     {
         ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
-        
+
         return new M2TestsuiteEnvironmentBuilder( ss );
     }
 
     protected abstract ResourceStore getResourceStore()
-        throws NoSuchResourceStoreException, Exception;
+        throws NoSuchResourceStoreException,
+            Exception;
 
     protected abstract String getItemPath();
 
@@ -89,8 +89,9 @@ public abstract class M2ResourceStoreTest
 
         StorageItem item = getResourceStore().retrieveItem( new ResourceStoreRequest( getItemPath() + "-copy", true ) );
 
-        checkForFileAndMatchContents( item, new FileInputStream( getRemoteFile( getRepositoryRegistry().getRepository(
-            "repo1" ), "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) ) );
+        checkForFileAndMatchContents( item, getRemoteFile(
+            getRepositoryRegistry().getRepository( "repo1" ),
+            "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) );
 
         try
         {
@@ -140,8 +141,9 @@ public abstract class M2ResourceStoreTest
         StorageFileItem dest = (StorageFileItem) getResourceStore().retrieveItem(
             new ResourceStoreRequest( getItemPath() + "-copy", true ) );
 
-        checkForFileAndMatchContents( dest, new FileInputStream( getRemoteFile( getRepositoryRegistry().getRepository(
-            "repo1" ), "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) ) );
+        checkForFileAndMatchContents( dest, getRemoteFile(
+            getRepositoryRegistry().getRepository( "repo1" ),
+            "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) );
 
     }
 
@@ -179,7 +181,7 @@ public abstract class M2ResourceStoreTest
         {
             System.out.println( item.getPath() );
         }
-        
+
         req = new ResourceStoreRequest( "/", true );
 
         StorageCollectionItem coll = (StorageCollectionItem) getResourceStore().retrieveItem( req );

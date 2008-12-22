@@ -17,8 +17,7 @@
 package org.sonatype.nexus.proxy;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -46,7 +45,7 @@ public class GroupingBehaviourTest
         return jettyTestsuiteEnvironmentBuilder;
     }
 
-    protected Metadata readMetadata( InputStream is )
+    protected Metadata readMetadata( File mis )
         throws Exception
     {
         MetadataXpp3Reader metadataReader = new MetadataXpp3Reader();
@@ -54,7 +53,8 @@ public class GroupingBehaviourTest
         Metadata md = null;
         try
         {
-            isr = new InputStreamReader( is );
+            isr = new FileReader( mis );
+
             md = metadataReader.read( isr );
         }
         finally
@@ -98,7 +98,7 @@ public class GroupingBehaviourTest
         StorageItem item = getRouter( "groups-m2" ).retrieveItem(
             new ResourceStoreRequest( "/test" + spoofedPath, false ) );
         // it should be a file and unmodified to repo1 originated file
-        checkForFileAndMatchContents( item, new FileInputStream( md1File ) );
+        checkForFileAndMatchContents( item, md1File );
 
     }
 
@@ -121,7 +121,7 @@ public class GroupingBehaviourTest
         // save it
         saveInputStreamToFile( ( (StorageFileItem) item ).getInputStream(), md1File );
         // some content check
-        md1 = readMetadata( new FileInputStream( md1File ) );
+        md1 = readMetadata( md1File );
         assertEquals( 3, md1.getVersioning().getVersions().size() );
         assertEquals( "20030303030303", md1.getVersioning().getLastUpdated() );
 
@@ -133,7 +133,7 @@ public class GroupingBehaviourTest
         // save it
         saveInputStreamToFile( ( (StorageFileItem) item1 ).getInputStream(), md1File );
         // some content check
-        md1 = readMetadata( new FileInputStream( md1File ) );
+        md1 = readMetadata( md1File );
         assertEquals( "1.0", md1.getVersioning().getRelease() );
         assertEquals( 1, md1.getVersioning().getVersions().size() );
         assertEquals( "20010101010101", md1.getVersioning().getLastUpdated() );
@@ -146,7 +146,7 @@ public class GroupingBehaviourTest
         // save it
         saveInputStreamToFile( ( (StorageFileItem) item2 ).getInputStream(), md2File );
         // some content check
-        md2 = readMetadata( new FileInputStream( md2File ) );
+        md2 = readMetadata( md2File );
         assertEquals( "1.1", md2.getVersioning().getRelease() );
         assertEquals( 1, md2.getVersioning().getVersions().size() );
         assertEquals( "20020202020202", md2.getVersioning().getLastUpdated() );
@@ -159,7 +159,7 @@ public class GroupingBehaviourTest
 
         item = getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test" + spoofedPath, false ) );
         // it should be a file and unmodified
-        checkForFileAndMatchContents( item, new FileInputStream( md1File ) );
+        checkForFileAndMatchContents( item, md1File );
 
     }
 
@@ -180,14 +180,11 @@ public class GroupingBehaviourTest
         // save it
         saveInputStreamToFile( ( (StorageFileItem) item ).getInputStream(), mdmFile );
         // it should came modified and be different of any existing
-        assertFalse( IOUtil.contentEquals( new FileInputStream( new File( getBasedir(), "target/test-classes/repo1"
-            + spoofedPath ) ), new FileInputStream( mdmFile ) ) );
-        assertFalse( IOUtil.contentEquals( new FileInputStream( new File( getBasedir(), "target/test-classes/repo2"
-            + spoofedPath ) ), new FileInputStream( mdmFile ) ) );
-        assertFalse( IOUtil.contentEquals( new FileInputStream( new File( getBasedir(), "target/test-classes/repo3"
-            + spoofedPath ) ), new FileInputStream( mdmFile ) ) );
+        assertFalse( fileContentEquals( new File( getBasedir(), "target/test-classes/repo1" + spoofedPath ), mdmFile ) );
+        assertFalse( fileContentEquals( new File( getBasedir(), "target/test-classes/repo2" + spoofedPath ), mdmFile ) );
+        assertFalse( fileContentEquals( new File( getBasedir(), "target/test-classes/repo3" + spoofedPath ), mdmFile ) );
 
-        mdm = readMetadata( new FileInputStream( mdmFile ) );
+        mdm = readMetadata( mdmFile );
         assertEquals( "1.2", mdm.getVersioning().getRelease() );
         assertEquals( 3, mdm.getVersioning().getVersions().size() );
         // heh? why?
@@ -233,14 +230,11 @@ public class GroupingBehaviourTest
         // save it
         saveInputStreamToFile( ( (StorageFileItem) item ).getInputStream(), mdmFile );
         // it should came modified and be different of any existing
-        assertFalse( IOUtil.contentEquals( new FileInputStream( new File( getBasedir(), "target/test-classes/repo1"
-            + spoofedPath ) ), new FileInputStream( mdmFile ) ) );
-        assertFalse( IOUtil.contentEquals( new FileInputStream( new File( getBasedir(), "target/test-classes/repo2"
-            + spoofedPath ) ), new FileInputStream( mdmFile ) ) );
-        assertFalse( IOUtil.contentEquals( new FileInputStream( new File( getBasedir(), "target/test-classes/repo3"
-            + spoofedPath ) ), new FileInputStream( mdmFile ) ) );
+        assertFalse( fileContentEquals( new File( getBasedir(), "target/test-classes/repo1" + spoofedPath ), mdmFile ) );
+        assertFalse( fileContentEquals( new File( getBasedir(), "target/test-classes/repo2" + spoofedPath ), mdmFile ) );
+        assertFalse( fileContentEquals( new File( getBasedir(), "target/test-classes/repo3" + spoofedPath ), mdmFile ) );
 
-        mdm = readMetadata( new FileInputStream( mdmFile ) );
+        mdm = readMetadata( mdmFile );
         assertTrue( mdm.getPlugins() != null );
         assertEquals( 4, mdm.getPlugins().size() );
         // heh? why?

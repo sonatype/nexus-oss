@@ -19,6 +19,7 @@ package org.sonatype.nexus.proxy;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -35,10 +36,13 @@ public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
+
     public static final String APPS_CONFIGURATION_KEY = "apps";
 
     public static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
+
     public static final File WORK_HOME = new File( PLEXUS_HOME, "nexus-work" );
+
     public static final File CONF_HOME = new File( WORK_HOME, "conf" );
 
     protected void customizeContext( Context ctx )
@@ -55,11 +59,28 @@ public abstract class AbstractNexusTestCase
     protected void copyDefaultConfigToPlace()
         throws IOException
     {
-        IOUtil.copy( getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" ), new FileOutputStream(
-            getNexusConfiguration() ) );
+        InputStream is = getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" );
+
+        FileOutputStream fos = null;
+
+        try
+        {
+            fos = new FileOutputStream( getNexusConfiguration() );
+
+            IOUtil.copy( is, fos );
+
+            fos.flush();
+        }
+        finally
+        {
+            IOUtil.close( is );
+
+            IOUtil.close( fos );
+        }
     }
 
-    protected LoggerManager getLoggerManager() throws ComponentLookupException
+    protected LoggerManager getLoggerManager()
+        throws ComponentLookupException
     {
         return (LoggerManager) getContainer().lookup( LoggerManager.class );
     }
