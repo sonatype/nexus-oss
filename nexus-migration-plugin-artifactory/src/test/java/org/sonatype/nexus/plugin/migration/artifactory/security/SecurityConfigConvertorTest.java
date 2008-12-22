@@ -20,6 +20,7 @@ public class SecurityConfigConvertorTest
 
     @Before
     public void prepare()
+        throws Exception
     {
         // initialize security config
         ArtifactorySecurityConfig config = new ArtifactorySecurityConfig();

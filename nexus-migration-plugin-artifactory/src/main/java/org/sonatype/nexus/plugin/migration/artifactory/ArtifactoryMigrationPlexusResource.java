@@ -126,8 +126,9 @@ public class ArtifactoryMigrationPlexusResource
     }
     
     private void importSecurity( MigrationSummaryDTO migrationSummary, ArtifactorySecurityConfig cfg )
+        throws ResourceException
     {
-        //TODO: this method is messy, needs to clean up
+        // TODO: this method is messy, needs to clean up
         List<ArtifactoryUser> userToBeRemoved = new ArrayList<ArtifactoryUser>();
 
         for ( ArtifactoryUser user : cfg.getUsers() )
@@ -140,7 +141,7 @@ public class ArtifactoryMigrationPlexusResource
             {
                 user.setEmail( getUserResolutionById( migrationSummary, user.getUsername() + "-artifactory" )
                     .getEmail() );
-                
+
                 user.setUsername( user.getUsername() + "-artifactory" );
             }
             else
@@ -155,10 +156,19 @@ public class ArtifactoryMigrationPlexusResource
         }
 
         SecurityConfigConvertor adaptor = new SecurityConfigConvertor( cfg, securityConfigAdaptorPersistor );
-        
+
         adaptor.setResolvePermission( migrationSummary.isResolvePermission() );
-        
-        adaptor.convert();
+
+        try
+        {
+            adaptor.convert();
+        }
+        catch ( ArtifactoryMigrationException e )
+        {
+            getLogger().error( e.getMessage(), e );
+
+            throw new ResourceException( e );
+        }
     }
     
     private UserResolutionDTO getUserResolutionById( MigrationSummaryDTO migrationSummary, String id )

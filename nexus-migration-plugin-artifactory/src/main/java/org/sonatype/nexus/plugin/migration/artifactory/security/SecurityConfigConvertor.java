@@ -10,6 +10,7 @@ import org.sonatype.jsecurity.realms.tools.dao.SecurityProperty;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
+import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
 import org.sonatype.nexus.plugin.migration.artifactory.util.PatternConvertor;
 
 public class SecurityConfigConvertor
@@ -69,6 +70,7 @@ public class SecurityConfigConvertor
     }
 
     public void convert()
+        throws ArtifactoryMigrationException
     {
         if ( resolvePermission )
         {
@@ -145,6 +147,7 @@ public class SecurityConfigConvertor
     }
 
     private CRepositoryTarget buildRepositoryTarget( ArtifactoryPermissionTarget target )
+        throws ArtifactoryMigrationException
     {
         CRepositoryTarget repoTarget = new CRepositoryTarget();
 
@@ -172,6 +175,7 @@ public class SecurityConfigConvertor
 
     private SecurityPrivilege buildSecurityPrivilege( ArtifactoryPermissionTarget permissionTarget,
         CRepositoryTarget repoTarget, String method )
+        throws ArtifactoryMigrationException
     {
         SecurityPrivilege privilege = new SecurityPrivilege();
 
@@ -208,6 +212,7 @@ public class SecurityConfigConvertor
 
     private SecurityRole buildSecurityRole( ArtifactoryPermissionTarget target, String key,
         SecurityPrivilege... privileges )
+        throws ArtifactoryMigrationException
     {
         SecurityRole role = new SecurityRole();
 

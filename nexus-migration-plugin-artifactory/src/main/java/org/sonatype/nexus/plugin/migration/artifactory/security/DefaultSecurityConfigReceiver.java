@@ -1,7 +1,5 @@
 package org.sonatype.nexus.plugin.migration.artifactory.security;
 
-import java.io.IOException;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
@@ -9,9 +7,9 @@ import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
+import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
 
 @Component( role = SecurityConfigReceiver.class )
 public class DefaultSecurityConfigReceiver
@@ -25,25 +23,21 @@ public class DefaultSecurityConfigReceiver
     private Nexus nexus;
 
     public void receiveRepositoryTarget( CRepositoryTarget repoTarget )
+        throws ArtifactoryMigrationException
     {
         try
         {
             nexus.createRepositoryTarget( repoTarget );
         }
-        catch ( ConfigurationException e )
+        catch ( Exception e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch ( IOException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ArtifactoryMigrationException( "Cannot create repository target with id " + repoTarget.getId(), e );
         }
 
     }
 
     public void receiveSecurityPrivilege( SecurityPrivilege privilege )
+        throws ArtifactoryMigrationException
     {
         try
         {
@@ -51,13 +45,13 @@ public class DefaultSecurityConfigReceiver
         }
         catch ( InvalidConfigurationException e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ArtifactoryMigrationException( "Cannot create privilege with name " + privilege.getName(), e );
         }
 
     }
 
     public void receiveSecurityRole( SecurityRole role )
+        throws ArtifactoryMigrationException
     {
         try
         {
@@ -65,13 +59,13 @@ public class DefaultSecurityConfigReceiver
         }
         catch ( InvalidConfigurationException e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ArtifactoryMigrationException( "Cannot create role with id " + role.getId(), e );
         }
 
     }
 
     public void receiveSecurityUser( SecurityUser user )
+        throws ArtifactoryMigrationException
     {
         try
         {
@@ -79,8 +73,7 @@ public class DefaultSecurityConfigReceiver
         }
         catch ( InvalidConfigurationException e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ArtifactoryMigrationException( "Cannot create user with id " + user.getId(), e );
         }
 
     }
