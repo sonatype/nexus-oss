@@ -46,7 +46,7 @@ public class ArtifactoryUploadBackupPlexusResource
 
     @Requirement( role = org.codehaus.plexus.archiver.UnArchiver.class, hint = "zip" )
     private ZipUnArchiver zipUnArchiver;
-    
+
     @Requirement
     private NexusSecurity nexusSecurity;
 
@@ -55,11 +55,11 @@ public class ArtifactoryUploadBackupPlexusResource
         this.setReadable( false );
         this.setModifiable( true );
     }
-    
+
     protected NexusSecurity getNexusSecurity()
     {
         return nexusSecurity;
-    }   
+    }
 
     @Override
     public Object getPayloadInstance()
@@ -173,7 +173,7 @@ public class ArtifactoryUploadBackupPlexusResource
         }
         return resolutions;
     }
-    
+
     private List<UserResolutionDTO> validate( List<ArtifactoryUser> users )
     {
         List<UserResolutionDTO> resolutions = new ArrayList<UserResolutionDTO>( users.size() );
@@ -182,7 +182,9 @@ public class ArtifactoryUploadBackupPlexusResource
         {
             UserResolutionDTO resolution = new UserResolutionDTO();
 
-            resolution.setId( validateUserId( user.getUsername() ) );
+            validateUser( user );
+
+            resolution.setId( user.getUsername() );
 
             resolution.setAdmin( user.isAdmin() );
 
@@ -193,22 +195,21 @@ public class ArtifactoryUploadBackupPlexusResource
 
         return resolutions;
     }
-    
+
     /**
      * If the user id already exists, append a suffix "-artifactory"
      */
-    private String validateUserId( String id )
+    private void validateUser( ArtifactoryUser artiUser )
     {
         for ( SecurityUser user : getNexusSecurity().listUsers() )
         {
-            if ( user.getId().equals( id ) )
+            if ( user.getId().equals( artiUser.getUsername() ) )
             {
-                return id + "-artifactory";
+                artiUser.setUsername( artiUser.getUsername() + "-artifactory" );
             }
         }
-        return id;
     }
-    
+
     private String findSimilarRepository( String url )
     {
         if ( url == null )
@@ -239,8 +240,10 @@ public class ArtifactoryUploadBackupPlexusResource
 
         try
         {
-            File artifactoryBackupZip =
-                File.createTempFile( FilenameUtils.getBaseName( fileItem.getName() ), ".zip", tempDir );
+            File artifactoryBackupZip = File.createTempFile(
+                FilenameUtils.getBaseName( fileItem.getName() ),
+                ".zip",
+                tempDir );
 
             InputStream in = fileItem.getInputStream();
             OutputStream out = new FileOutputStream( artifactoryBackupZip );
@@ -250,9 +253,9 @@ public class ArtifactoryUploadBackupPlexusResource
             in.close();
             out.close();
 
-            File artifactoryBackup =
-                new File( artifactoryBackupZip.getParentFile(),
-                          FilenameUtils.getBaseName( artifactoryBackupZip.getAbsolutePath() ) + "content" );
+            File artifactoryBackup = new File( artifactoryBackupZip.getParentFile(), FilenameUtils
+                .getBaseName( artifactoryBackupZip.getAbsolutePath() )
+                + "content" );
             artifactoryBackup.mkdirs();
 
             zipUnArchiver.setSourceFile( artifactoryBackupZip );

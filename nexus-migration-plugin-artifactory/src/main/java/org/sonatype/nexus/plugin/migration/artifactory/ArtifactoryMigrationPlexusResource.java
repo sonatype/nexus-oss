@@ -128,40 +128,28 @@ public class ArtifactoryMigrationPlexusResource
     private void importSecurity( MigrationSummaryDTO migrationSummary, ArtifactorySecurityConfig cfg )
         throws ResourceException
     {
-        // TODO: this method is messy, needs to clean up
-        List<ArtifactoryUser> userToBeRemoved = new ArrayList<ArtifactoryUser>();
+        List<ArtifactoryUser> userList = new ArrayList<ArtifactoryUser>();
 
-        for ( ArtifactoryUser user : cfg.getUsers() )
+        for ( UserResolutionDTO userResolution : migrationSummary.getUserResolution() )
         {
-            if ( getUserResolutionById( migrationSummary, user.getUsername() ) != null )
-            {
-                user.setEmail( getUserResolutionById( migrationSummary, user.getUsername() ).getEmail() );
-            }
-            else if ( getUserResolutionById( migrationSummary, user.getUsername() + "-artifactory" ) != null )
-            {
-                user.setEmail( getUserResolutionById( migrationSummary, user.getUsername() + "-artifactory" )
-                    .getEmail() );
+            ArtifactoryUser user = new ArtifactoryUser( userResolution.getId(), userResolution.getEmail() );
 
-                user.setUsername( user.getUsername() + "-artifactory" );
-            }
-            else
-            {
-                userToBeRemoved.add( user );
-            }
+            user.setAdmin( userResolution.isAdmin() );
+
+            userList.add( user );
         }
 
-        for ( ArtifactoryUser user : userToBeRemoved )
-        {
-            cfg.getUsers().remove( user );
-        }
+        cfg.getUsers().clear();
 
-        SecurityConfigConvertor adaptor = new SecurityConfigConvertor( cfg, securityConfigAdaptorPersistor );
+        cfg.getUsers().addAll( userList );
 
-        adaptor.setResolvePermission( migrationSummary.isResolvePermission() );
+        SecurityConfigConvertor convertor = new SecurityConfigConvertor( cfg, securityConfigAdaptorPersistor );
+
+        convertor.setResolvePermission( migrationSummary.isResolvePermission() );
 
         try
         {
-            adaptor.convert();
+            convertor.convert();
         }
         catch ( ArtifactoryMigrationException e )
         {
@@ -169,18 +157,6 @@ public class ArtifactoryMigrationPlexusResource
 
             throw new ResourceException( e );
         }
-    }
-    
-    private UserResolutionDTO getUserResolutionById( MigrationSummaryDTO migrationSummary, String id )
-    {
-        for ( UserResolutionDTO resolution : migrationSummary.getUserResolution() )
-        {
-            if ( resolution.getId().equals( id ) )
-            {
-                return resolution;
-            }
-        }
-        return null;
     }
 
     private void importRepositories( MigrationSummaryDTO migrationSummary, ArtifactoryConfig cfg )
