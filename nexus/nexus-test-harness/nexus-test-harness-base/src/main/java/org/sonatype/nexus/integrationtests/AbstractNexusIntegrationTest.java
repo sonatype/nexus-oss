@@ -104,6 +104,8 @@ public class AbstractNexusIntegrationTest
 
     protected static Logger log = Logger.getLogger( AbstractNexusIntegrationTest.class );
 
+    protected static int nexusApplicationPort;
+
     /**
      * Flag that says if we should verify the config before startup, we do not want to do this for upgrade tests.
      */
@@ -115,6 +117,7 @@ public class AbstractNexusIntegrationTest
         baseNexusUrl = TestProperties.getString( "nexus.base.url" );
         nexusWorkDir = TestProperties.getString( "nexus.work.dir" );
         nexusLogDir = TestProperties.getString( "nexus.log.dir" );
+        nexusApplicationPort = TestProperties.getInteger( "nexus.application.port" );
     }
 
     public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
