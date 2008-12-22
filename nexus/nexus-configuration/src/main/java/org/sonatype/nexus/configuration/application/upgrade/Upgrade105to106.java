@@ -546,6 +546,13 @@ public class Upgrade105to106
             schedule.setEndDate( oldschedule.getEndDate() );
             schedule.setStartDate( oldschedule.getStartDate() );
             schedule.setType( oldschedule.getType() );
+            
+            // Fix for NEXUS-1252
+            if ( schedule.getDaysOfWeek() != null 
+                && schedule.getDaysOfWeek().size() > 0 )
+            {
+                schedule.setType( "weekly" );
+            }
         }
 
         return schedule;
