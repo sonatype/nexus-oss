@@ -44,18 +44,21 @@ public abstract class AbstractSecurityConfigurationSourceTest
         
         InputStream configStream = null;
         
+        InputStream origStream = null;
+
         try
         {
             configStream = configurationSource.getConfigurationAsStream();
-            
-            assertTrue( IOUtil.contentEquals( configStream, getOriginatingConfigurationInputStream() ) );
+
+            origStream = getOriginatingConfigurationInputStream();
+
+            assertTrue( IOUtil.contentEquals( configStream, origStream ) );
         }
         finally
         {
-            if ( configStream != null )
-            {
-                configStream.close();
-            }
+            IOUtil.close( origStream );
+
+            IOUtil.close( configStream );
         }
     }
 
