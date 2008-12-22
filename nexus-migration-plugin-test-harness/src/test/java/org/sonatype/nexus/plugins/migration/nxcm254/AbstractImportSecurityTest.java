@@ -43,6 +43,15 @@ public abstract class AbstractImportSecurityTest
 
     protected List<RepositoryTargetListResource> preTargetList;
 
+    public AbstractImportSecurityTest()
+    {
+        // initialize the utils
+        userUtil = new PlexusUserMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        repoTargetUtil = new TargetMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        privilegeUtil = new PrivilegesMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        roleUtil = new RoleMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+    }
+    
     abstract protected void importSecurity()
         throws Exception;
 
@@ -70,17 +79,6 @@ public abstract class AbstractImportSecurityTest
             .getResourceListFromResponse( privilegeUtil.sendMessage( Method.GET, null, "" ) );
         preRoleList = roleUtil.getList();
         preTargetList = repoTargetUtil.getList();
-    }
-
-    public AbstractImportSecurityTest()
-        throws Exception
-    {
-        // initialize the utils
-        userUtil = new PlexusUserMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
-        repoTargetUtil = new TargetMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
-        privilegeUtil = new PrivilegesMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
-        roleUtil = new RoleMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
-
     }
 
     @SuppressWarnings( "static-access" )
@@ -278,6 +276,18 @@ public abstract class AbstractImportSecurityTest
             }
         }
         return null;
+    }
+    
+    protected boolean containRoleEndWith( List<PlexusRoleResource> roleList, String suffix )
+    {
+        for ( PlexusRoleResource role : roleList )
+        {
+            if ( role.equals( suffix ) )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

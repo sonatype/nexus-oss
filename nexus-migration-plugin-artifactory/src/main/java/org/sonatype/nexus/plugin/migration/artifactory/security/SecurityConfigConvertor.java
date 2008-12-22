@@ -16,7 +16,10 @@ public class SecurityConfigConvertor
 {
     private ArtifactorySecurityConfig config;
 
-    private SecurityConfigReceiver persistor;
+    private SecurityConfigReceiver receiver;
+
+    // by default, resolve artifactory permissions
+    private boolean resolvePermission = true;
 
     private List<CRepositoryTarget> repoTargets = new ArrayList<CRepositoryTarget>();
 
@@ -32,7 +35,17 @@ public class SecurityConfigConvertor
     {
         this.config = config;
 
-        this.persistor = persistor;
+        this.receiver = persistor;
+    }
+
+    public boolean isResolvePermission()
+    {
+        return resolvePermission;
+    }
+
+    public void setResolvePermission( boolean resolvePermission )
+    {
+        this.resolvePermission = resolvePermission;
     }
 
     public List<SecurityUser> getSecurityUsers()
@@ -57,31 +70,31 @@ public class SecurityConfigConvertor
 
     public void convert()
     {
-        repoTargets = new ArrayList<CRepositoryTarget>( config.getPermissionTargets().size() );
-
-        for ( ArtifactoryPermissionTarget target : config.getPermissionTargets() )
+        if ( resolvePermission )
         {
-            CRepositoryTarget repoTarget = buildRepositoryTarget( target );
+            for ( ArtifactoryPermissionTarget target : config.getPermissionTargets() )
+            {
+                CRepositoryTarget repoTarget = buildRepositoryTarget( target );
 
-            SecurityPrivilege createPrivilege = buildSecurityPrivilege( target, repoTarget, "create" );
-            SecurityPrivilege readPrivilege = buildSecurityPrivilege( target, repoTarget, "read" );
-            SecurityPrivilege updatePrivilege = buildSecurityPrivilege( target, repoTarget, "update" );
-            SecurityPrivilege deletePrivilege = buildSecurityPrivilege( target, repoTarget, "delete" );
+                SecurityPrivilege createPrivilege = buildSecurityPrivilege( target, repoTarget, "create" );
+                SecurityPrivilege readPrivilege = buildSecurityPrivilege( target, repoTarget, "read" );
+                SecurityPrivilege updatePrivilege = buildSecurityPrivilege( target, repoTarget, "update" );
+                SecurityPrivilege deletePrivilege = buildSecurityPrivilege( target, repoTarget, "delete" );
 
-            SecurityRole readerRole = buildSecurityRole( target, "reader", readPrivilege );
+                SecurityRole readerRole = buildSecurityRole( target, "reader", readPrivilege );
 
-            SecurityRole deployerRole = buildSecurityRole( target, "deployer", createPrivilege, updatePrivilege );
+                SecurityRole deployerRole = buildSecurityRole( target, "deployer", createPrivilege, updatePrivilege );
 
-            SecurityRole adminRole = buildSecurityRole( target, "admin", updatePrivilege, deletePrivilege );
+                SecurityRole adminRole = buildSecurityRole( target, "admin", updatePrivilege, deletePrivilege );
 
-            List<SecurityRole> roles = new ArrayList<SecurityRole>( 3 );
-            roles.add( readerRole );
-            roles.add( deployerRole );
-            roles.add( adminRole );
+                List<SecurityRole> roles = new ArrayList<SecurityRole>( 3 );
+                roles.add( readerRole );
+                roles.add( deployerRole );
+                roles.add( adminRole );
 
-            repoPathRolesMap.put( target, roles );
+                repoPathRolesMap.put( target, roles );
+            }
         }
-
         for ( ArtifactoryUser artifactoryUser : config.getUsers() )
         {
             SecurityUser user = buildSecurityUser( artifactoryUser );
@@ -92,31 +105,39 @@ public class SecurityConfigConvertor
             }
             else
             {
-                for ( ArtifactoryAcl acl : config.getAcls() )
+                if ( resolvePermission )
                 {
-                    if ( !acl.getUser().getUsername().equals( user.getName() ) )
+                    for ( ArtifactoryAcl acl : config.getAcls() )
                     {
-                        continue;
-                    }
+                        if ( !acl.getUser().getUsername().equals( user.getName() ) )
+                        {
+                            continue;
+                        }
 
-                    List<SecurityRole> roles = (List<SecurityRole>) repoPathRolesMap.get( acl.getPermissionTarget() );
+                        List<SecurityRole> roles = (List<SecurityRole>) repoPathRolesMap
+                            .get( acl.getPermissionTarget() );
 
-                    if ( acl.getPermissions().contains( ArtifactoryPermission.READER ) )
-                    {
-                        user.addRole( roles.get( 0 ).getId() );
+                        if ( acl.getPermissions().contains( ArtifactoryPermission.READER ) )
+                        {
+                            user.addRole( roles.get( 0 ).getId() );
+                        }
+                        if ( acl.getPermissions().contains( ArtifactoryPermission.DEPLOYER ) )
+                        {
+                            user.addRole( roles.get( 1 ).getId() );
+                        }
+                        if ( acl.getPermissions().contains( ArtifactoryPermission.ADMIN ) )
+                        {
+                            user.addRole( roles.get( 2 ).getId() );
+                        }
                     }
-                    if ( acl.getPermissions().contains( ArtifactoryPermission.DEPLOYER ) )
-                    {
-                        user.addRole( roles.get( 1 ).getId() );
-                    }
-                    if ( acl.getPermissions().contains( ArtifactoryPermission.ADMIN ) )
-                    {
-                        user.addRole( roles.get( 2 ).getId() );
-                    }
+                }
+                else
+                {
+                    user.addRole( "anonymous" );
                 }
             }
 
-            persistor.receiveSecurityUser( user );
+            receiver.receiveSecurityUser( user );
 
             users.add( user );
         }
@@ -142,7 +163,7 @@ public class SecurityConfigConvertor
 
         repoTarget.setPatterns( patterns );
 
-        persistor.receiveRepositoryTarget( repoTarget );
+        receiver.receiveRepositoryTarget( repoTarget );
 
         repoTargets.add( repoTarget );
 
@@ -178,7 +199,7 @@ public class SecurityConfigConvertor
 
         privilege.addProperty( prop );
 
-        persistor.receiveSecurityPrivilege( privilege );
+        receiver.receiveSecurityPrivilege( privilege );
 
         privileges.add( privilege );
 
@@ -205,7 +226,7 @@ public class SecurityConfigConvertor
 
         role.setPrivileges( privIds );
 
-        persistor.receiveSecurityRole( role );
+        receiver.receiveSecurityRole( role );
 
         roles.add( role );
 

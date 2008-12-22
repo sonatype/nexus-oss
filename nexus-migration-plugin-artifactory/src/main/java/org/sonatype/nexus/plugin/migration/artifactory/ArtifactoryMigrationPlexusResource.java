@@ -155,7 +155,9 @@ public class ArtifactoryMigrationPlexusResource
         }
 
         SecurityConfigConvertor adaptor = new SecurityConfigConvertor( cfg, securityConfigAdaptorPersistor );
-
+        
+        adaptor.setResolvePermission( migrationSummary.isResolvePermission() );
+        
         adaptor.convert();
     }
     
