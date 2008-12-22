@@ -70,8 +70,9 @@ public class LinkTest
             ( (StorageLinkItem) item ).getTarget().getPath() );
 
         StorageFileItem item1 = (StorageFileItem) repo1.retrieveItem( true, uid, null );
-        checkForFileAndMatchContents( item1, new ByteArrayInputStream( contentString.getBytes() ) );
-
+        
+        assertStorageFileItem( item1 );
+        assertTrue( contentEquals( item1.getInputStream(), new ByteArrayInputStream( contentString.getBytes() ) ) );
     }
 
 }

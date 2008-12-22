@@ -17,14 +17,10 @@
 package org.sonatype.nexus.proxy;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.InputStreamReader;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.digest.Md5Digester;
 import org.codehaus.plexus.digest.Sha1Digester;
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -45,25 +41,6 @@ public class GroupingBehaviourTest
         return jettyTestsuiteEnvironmentBuilder;
     }
 
-    protected Metadata readMetadata( File mis )
-        throws Exception
-    {
-        MetadataXpp3Reader metadataReader = new MetadataXpp3Reader();
-        InputStreamReader isr = null;
-        Metadata md = null;
-        try
-        {
-            isr = new FileReader( mis );
-
-            md = metadataReader.read( isr );
-        }
-        finally
-        {
-            isr.close();
-        }
-        return md;
-    }
-
     public void testSpoofingNonMetadata()
         throws Exception
     {
@@ -78,7 +55,7 @@ public class GroupingBehaviourTest
         // it should be a file and unmodified
         checkForFileAndMatchContents( item1 );
         // save it
-        saveInputStreamToFile( ( (StorageFileItem) item1 ).getInputStream(), md1File );
+        saveItemToFile( (StorageFileItem) item1, md1File );
 
         // get metadata directly from repo2, no aggregation, no spoofing
         StorageItem item2 = getRepositoryRegistry().getRepository( "repo2" ).retrieveItem(
@@ -86,7 +63,7 @@ public class GroupingBehaviourTest
         // it should be a file and unmodified
         checkForFileAndMatchContents( item2 );
         // save it
-        saveInputStreamToFile( ( (StorageFileItem) item2 ).getInputStream(), md2File );
+        saveItemToFile( (StorageFileItem) item2, md2File );
 
         // get metadata from a gidr router but switch merging off (default is on), spoofing should happen, and the
         // highest ranked repo
@@ -119,7 +96,7 @@ public class GroupingBehaviourTest
         StorageItem item = getRouter( "groups-m2" ).retrieveItem(
             new ResourceStoreRequest( "/test" + spoofedPath, false ) );
         // save it
-        saveInputStreamToFile( ( (StorageFileItem) item ).getInputStream(), md1File );
+        saveItemToFile( (StorageFileItem) item, md1File );
         // some content check
         md1 = readMetadata( md1File );
         assertEquals( 3, md1.getVersioning().getVersions().size() );
@@ -131,7 +108,7 @@ public class GroupingBehaviourTest
         // it should be a file and unmodified
         checkForFileAndMatchContents( item1 );
         // save it
-        saveInputStreamToFile( ( (StorageFileItem) item1 ).getInputStream(), md1File );
+        saveItemToFile( (StorageFileItem) item1, md1File );
         // some content check
         md1 = readMetadata( md1File );
         assertEquals( "1.0", md1.getVersioning().getRelease() );
@@ -144,7 +121,7 @@ public class GroupingBehaviourTest
         // it should be a file and unmodified
         checkForFileAndMatchContents( item2 );
         // save it
-        saveInputStreamToFile( ( (StorageFileItem) item2 ).getInputStream(), md2File );
+        saveItemToFile( (StorageFileItem) item2, md2File );
         // some content check
         md2 = readMetadata( md2File );
         assertEquals( "1.1", md2.getVersioning().getRelease() );
@@ -178,11 +155,11 @@ public class GroupingBehaviourTest
         // it should be a file
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
         // save it
-        saveInputStreamToFile( ( (StorageFileItem) item ).getInputStream(), mdmFile );
+        saveItemToFile( (StorageFileItem) item, mdmFile );
         // it should came modified and be different of any existing
-        assertFalse( fileContentEquals( new File( getBasedir(), "target/test-classes/repo1" + spoofedPath ), mdmFile ) );
-        assertFalse( fileContentEquals( new File( getBasedir(), "target/test-classes/repo2" + spoofedPath ), mdmFile ) );
-        assertFalse( fileContentEquals( new File( getBasedir(), "target/test-classes/repo3" + spoofedPath ), mdmFile ) );
+        assertFalse( contentEquals( new File( getBasedir(), "target/test-classes/repo1" + spoofedPath ), mdmFile ) );
+        assertFalse( contentEquals( new File( getBasedir(), "target/test-classes/repo2" + spoofedPath ), mdmFile ) );
+        assertFalse( contentEquals( new File( getBasedir(), "target/test-classes/repo3" + spoofedPath ), mdmFile ) );
 
         mdm = readMetadata( mdmFile );
         assertEquals( "1.2", mdm.getVersioning().getRelease() );
@@ -196,7 +173,7 @@ public class GroupingBehaviourTest
         // it should be a file
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
         // save it
-        String md5hash = IOUtil.toString( ( (StorageFileItem) item ).getInputStream(), "UTF-8", 1024 );
+        String md5hash = contentAsString( item );
 
         // get hash from a gidr router, merging should happen and newly calced hash should come down
         item = getRouter( "groups-m2" )
@@ -204,7 +181,7 @@ public class GroupingBehaviourTest
         // it should be a file
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
         // save it
-        String sha1hash = IOUtil.toString( ( (StorageFileItem) item ).getInputStream(), "UTF-8", 1024 );
+        String sha1hash = contentAsString( item );
 
         Md5Digester md5Digester = new Md5Digester();
         md5Digester.verify( mdmFile, md5hash );
@@ -228,11 +205,11 @@ public class GroupingBehaviourTest
         // it should be a file
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
         // save it
-        saveInputStreamToFile( ( (StorageFileItem) item ).getInputStream(), mdmFile );
+        saveItemToFile( ( (StorageFileItem) item ), mdmFile );
         // it should came modified and be different of any existing
-        assertFalse( fileContentEquals( new File( getBasedir(), "target/test-classes/repo1" + spoofedPath ), mdmFile ) );
-        assertFalse( fileContentEquals( new File( getBasedir(), "target/test-classes/repo2" + spoofedPath ), mdmFile ) );
-        assertFalse( fileContentEquals( new File( getBasedir(), "target/test-classes/repo3" + spoofedPath ), mdmFile ) );
+        assertFalse( contentEquals( new File( getBasedir(), "target/test-classes/repo1" + spoofedPath ), mdmFile ) );
+        assertFalse( contentEquals( new File( getBasedir(), "target/test-classes/repo2" + spoofedPath ), mdmFile ) );
+        assertFalse( contentEquals( new File( getBasedir(), "target/test-classes/repo3" + spoofedPath ), mdmFile ) );
 
         mdm = readMetadata( mdmFile );
         assertTrue( mdm.getPlugins() != null );
@@ -246,7 +223,7 @@ public class GroupingBehaviourTest
         // it should be a file
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
         // save it
-        String md5hash = IOUtil.toString( ( (StorageFileItem) item ).getInputStream(), "UTF-8", 1024 );
+        String md5hash = contentAsString( item );
 
         // get hash from a gidr router, merging should happen and newly calced hash should come down
         item = getRouter( "groups-m2" )
@@ -254,7 +231,7 @@ public class GroupingBehaviourTest
         // it should be a file
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
         // save it
-        String sha1hash = IOUtil.toString( ( (StorageFileItem) item ).getInputStream(), "UTF-8", 1024 );
+        String sha1hash = contentAsString( item );
 
         Md5Digester md5Digester = new Md5Digester();
         md5Digester.verify( mdmFile, md5hash );
@@ -262,5 +239,4 @@ public class GroupingBehaviourTest
         sha1Digester.verify( mdmFile, sha1hash );
 
     }
-
 }

@@ -81,9 +81,8 @@ public class RepositoryRedeployTest
         StorageFileItem dest = (StorageFileItem) getRepository().retrieveItem(
             new ResourceStoreRequest( "/activemq/activemq-core/1.2/activemq-core-1.2.jar-copy", true ) );
 
-        checkForFileAndMatchContents( dest, getRemoteFile(
-            getRepositoryRegistry().getRepository( "repo1" ),
-            "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) );
+        checkForFileAndMatchContents( dest, getRemoteFile( getRepositoryRegistry().getRepository(
+            "repo1" ), "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) );
 
     }
 

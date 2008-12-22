@@ -21,10 +21,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
@@ -297,26 +300,41 @@ public abstract class AbstractProxyTestEnvironment
             + item.getRepositoryItemUid().getRepository().getId() + item.getRepositoryItemUid().getPath() ) );
     }
 
+    protected void checkForFileAndMatchContents( StorageItem item, StorageFileItem expected )
+        throws Exception
+    {
+        assertStorageFileItem( item );
+
+        StorageFileItem fileItem = (StorageFileItem) item;
+
+        assertTrue( "content equals", contentEquals( fileItem.getInputStream(), expected.getInputStream() ) );
+    }
+
     /**
      * Check for file and match contents.
      * 
      * @param item the item
-     * @param wantedContent the wanted content
+     * @param expected the wanted content
      * @throws Exception the exception
      */
-    protected void checkForFileAndMatchContents( StorageItem item, File wantedFile )
+    protected void checkForFileAndMatchContents( StorageItem item, File expected )
         throws Exception
     {
-        checkForFileAndMatchContents( item, new FileInputStream( wantedFile ) );
+        assertStorageFileItem( item );
+
+        StorageFileItem fileItem = (StorageFileItem) item;
+
+        assertTrue( "content equals", contentEquals( fileItem.getInputStream(), new FileInputStream( expected ) ) );
     }
 
-    protected void checkForFileAndMatchContents( StorageItem item, InputStream wantedContent )
-        throws Exception
+    protected void assertStorageFileItem( StorageItem item )
     {
         // is file
-        assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
+        assertTrue( item instanceof StorageFileItem );
+
         // is non-virtual
         assertFalse( item.isVirtual() );
+
         // have UID
         assertTrue( item.getRepositoryItemUid() != null );
 
@@ -324,42 +342,6 @@ public abstract class AbstractProxyTestEnvironment
 
         // is reusable
         assertTrue( file.isReusableStream() );
-        // content equals
-        InputStream fileContent = file.getInputStream();
-
-        try
-        {
-            assertTrue( IOUtil.contentEquals( wantedContent, fileContent ) );
-        }
-        finally
-        {
-            IOUtil.close( fileContent );
-
-            IOUtil.close( wantedContent );
-        }
-    }
-
-    protected boolean fileContentEquals( File file1, File file2 )
-        throws Exception
-    {
-        FileInputStream fis1 = null;
-
-        FileInputStream fis2 = null;
-
-        try
-        {
-            fis1 = new FileInputStream( file1 );
-
-            fis2 = new FileInputStream( file2 );
-
-            return IOUtil.contentEquals( fis1, fis2 );
-        }
-        finally
-        {
-            IOUtil.close( fis1 );
-
-            IOUtil.close( fis2 );
-        }
     }
 
     protected File getFile( Repository repository, String path )
@@ -375,24 +357,22 @@ public abstract class AbstractProxyTestEnvironment
         return new File( getBasedir(), "target/test-classes/" + repository.getId() + path );
     }
 
-    protected void saveInputStreamToFile( InputStream inputStream, File file )
+    protected void saveItemToFile( StorageFileItem item, File file )
         throws IOException
     {
-        FileOutputStream fos = new FileOutputStream( file );
+        FileOutputStream fos = null;
+        InputStream is = null;
         try
         {
-            IOUtil.copy( inputStream, fos );
-
+            is = item.getInputStream();
+            fos = new FileOutputStream( file );
+            IOUtil.copy( is, fos );
             fos.flush();
         }
         finally
         {
-            IOUtil.close( inputStream );
-
-            if ( fos != null )
-            {
-                fos.close();
-            }
+            IOUtil.close( is );
+            IOUtil.close( fos );
         }
 
     }
@@ -495,6 +475,59 @@ public abstract class AbstractProxyTestEnvironment
             {
                 events.add( evt );
             }
+        }
+    }
+
+    protected Metadata readMetadata( File mdf )
+        throws Exception
+    {
+        MetadataXpp3Reader metadataReader = new MetadataXpp3Reader();
+        InputStreamReader isr = null;
+        Metadata md = null;
+        try
+        {
+            isr = new InputStreamReader( new FileInputStream( mdf ) );
+            md = metadataReader.read( isr );
+        }
+        finally
+        {
+            isr.close();
+        }
+        return md;
+    }
+
+    protected String contentAsString( StorageItem item )
+        throws IOException
+    {
+        InputStream is = ( (StorageFileItem) item ).getInputStream();
+        try
+        {
+            return IOUtil.toString( is, "UTF-8", 1024 );
+        }
+        finally
+        {
+            IOUtil.close( is );
+        }
+    }
+
+    protected boolean contentEquals( File f1, File f2 ) throws IOException
+    {
+        return contentEquals( new FileInputStream( f1 ), new FileInputStream( f2 ) );
+    }
+
+    /**
+     * Both s1 and s2 will be closed.
+     */
+    protected boolean contentEquals( InputStream s1, InputStream s2 ) throws IOException
+    {
+        try
+        {
+            return IOUtil.contentEquals( s1, s2 );
+        }
+        finally
+        {
+            IOUtil.close( s1 );
+            IOUtil.close( s2 );
         }
     }
 
