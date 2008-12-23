@@ -25,6 +25,7 @@ import junit.framework.Assert;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.rest.feeds.sources.FeedSource;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.sun.syndication.feed.synd.SyndFeed;

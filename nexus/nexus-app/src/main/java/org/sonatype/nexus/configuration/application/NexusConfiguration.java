@@ -18,6 +18,7 @@ package org.sonatype.nexus.configuration.application;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.source.ApplicationConfigurationSource;
@@ -74,6 +75,8 @@ public interface NexusConfiguration
     InputStream getConfigurationAsStream()
         throws IOException;
 
+
+    
     boolean isInstanceUpgraded();
 
     boolean isConfigurationUpgraded();
@@ -98,4 +101,14 @@ public interface NexusConfiguration
         throws ConfigurationException;
 
     void dropInternals();
+    
+    /**
+     * List the names of files under Configuration Directory
+     * 
+     * @return A map with the value be file name
+     */
+    Map<String, String> getConfigurationFiles();
+
+    InputStream getConfigurationAsStreamByKey( String key )
+        throws IOException;
 }

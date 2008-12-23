@@ -17,13 +17,16 @@
 package org.sonatype.nexus.configuration.application;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -135,6 +138,9 @@ public class DefaultNexusConfiguration
 
     /** The trash */
     private File wastebasketDirectory;
+    
+    /** Names of the conf files */
+    private Map<String, String> configurationFiles;
 
     public RemoteStorageContext getRemoteStorageContext()
     {
@@ -1521,5 +1527,43 @@ public class DefaultNexusConfiguration
         getConfiguration().setSmtpConfiguration( settings );
 
         applyAndSaveConfiguration();
+    }
+    
+    public Map<String, String> getConfigurationFiles()
+    {
+        if ( configurationFiles == null )
+        {
+            configurationFiles = new HashMap<String, String>();
+
+            File configDirectory = getConfigurationDirectory();
+
+            int key = 1;
+
+            // Tamas:
+            // configDirectory.listFiles() may be returning null... in this case, it is 99.9% not true (otherwise nexus
+            // would not start at all), but in general, be more explicit about checks.
+            
+            if ( configDirectory.isDirectory() && configDirectory.listFiles() != null )
+            {
+                for ( File file : configDirectory.listFiles() )
+                {
+                    if ( file.exists() && file.isFile() )
+                    {
+                        configurationFiles.put( Integer.toString( key ), file.getName() );
+
+                        key++;
+                    }
+                }
+            }
+        }
+        return configurationFiles;
+    }
+
+    public InputStream getConfigurationAsStreamByKey( String key )
+        throws IOException
+    {
+        String fileName = configurationFiles.get( key );
+
+        return new FileInputStream( new File( getConfigurationDirectory(), fileName ) );
     }
 }

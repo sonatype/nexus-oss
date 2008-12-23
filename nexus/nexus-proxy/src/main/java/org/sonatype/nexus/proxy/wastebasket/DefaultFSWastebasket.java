@@ -125,6 +125,12 @@ public class DefaultFSWastebasket
     {
         FileUtils.cleanDirectory( getWastebasketDirectory() );
     }
+    
+    public void purge( long age )
+        throws IOException
+    {
+        removeForever( getWastebasketDirectory(), age );
+    }
 
     public void delete( RepositoryItemUid uid, LocalRepositoryStorage ls )
         throws StorageException
@@ -248,6 +254,38 @@ public class DefaultFSWastebasket
         }
 
         FileUtils.forceDelete( file );
+    }
+    
+    protected void removeForever( File file, long age )
+        throws IOException
+    {
+        if ( file.isFile() )
+        {
+            if ( isOlderThan( file, age ) )
+            {
+                FileUtils.forceDelete( file );
+            }
+        }
+        else
+        {
+            for ( File subFile : file.listFiles() )
+            {
+                removeForever( subFile, age );
+            }
+            if ( file.list().length == 0 && isOlderThan( file, age ) )
+            {
+                FileUtils.forceDelete( file );
+            }
+        }
+    }
+
+    private boolean isOlderThan( File file, long age )
+    {
+        if ( System.currentTimeMillis() - file.lastModified() > age )
+        {
+            return true;
+        }
+        return false;
     }
 
 

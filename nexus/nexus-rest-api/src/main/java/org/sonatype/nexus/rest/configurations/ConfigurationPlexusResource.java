@@ -46,11 +46,6 @@ public class ConfigurationPlexusResource
     /** The config key used in URI and request attributes */
     public static final String CONFIG_NAME_KEY = "configName";
 
-    /** Name denoting current Nexus configuration */
-    public static final String CURRENT_CONFIG_NAME = "current";
-
-    /** Name denoting default Nexus configuration */
-    public static final String DEFAULT_CONFIG_NAME = "default";
 
     @Override
     public Object getPayloadInstance()
@@ -87,25 +82,21 @@ public class ConfigurationPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        String configurationName = request
+        String key = request
             .getAttributes().get( GlobalConfigurationPlexusResource.CONFIG_NAME_KEY ).toString();
 
         try
         {
             NexusStreamResponse result;
 
-            if ( DEFAULT_CONFIG_NAME.equals( configurationName ) )
+            if ( !getNexus().getConfigurationFiles().containsKey( key ) )
             {
-                result = getNexus().getDefaultConfigurationAsStream();
-            }
-            else if ( CURRENT_CONFIG_NAME.equals( configurationName ) )
-            {
-                result = getNexus().getConfigurationAsStream();
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "No configuration with key '"
+                    + key + "' found!" );
             }
             else
             {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "No configuration named '"
-                    + configurationName + "' found!" );
+                result = getNexus().getConfigurationAsStreamByKey( key );
             }
 
             return new InputStreamRepresentation( MediaType.valueOf( result.getMimeType() ), result.getInputStream() );

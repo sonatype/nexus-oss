@@ -335,5 +335,19 @@ public interface Nexus
      * Remove the repository's storage folder
      */
     void removeRepositoryFolder( Repository repository );
+    
+    /**
+     * List the names of files in nexus-work/conf
+     */
+    Map<String, String> getConfigurationFiles();
+    
+    /**
+     * Get the content of configuration file based on the key
+     * @param key index in configuration file name list
+     * @return
+     * @throws IOException
+     */
+    NexusStreamResponse getConfigurationAsStreamByKey( String key )
+        throws IOException;
 
 }

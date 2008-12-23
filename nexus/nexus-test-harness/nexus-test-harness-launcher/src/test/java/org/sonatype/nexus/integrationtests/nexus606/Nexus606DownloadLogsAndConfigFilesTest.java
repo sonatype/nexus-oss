@@ -84,15 +84,16 @@ public class Nexus606DownloadLogsAndConfigFilesTest
         ConfigurationsListResourceResponse logListResponse =
             (ConfigurationsListResourceResponse) this.getXMLXStream().fromXML( responseText );
         List<ConfigurationsListResource> configList = logListResponse.getData();
-        Assert.assertTrue( "Config List should contain  2 config file: "+ configList, configList.size() == 2 );
+        Assert.assertTrue( "Config List should contain at least 2 config file: "+ configList, configList.size() >= 2 );
 
-        Assert.assertNotNull( "Default Config", this.getConfigFromList(configList, "default") );
+        ConfigurationsListResource nexusXmlConfigResource = getConfigFromList(configList, "nexus.xml");
+        Assert.assertNotNull( "nexus.xml", nexusXmlConfigResource );
         
-        ConfigurationsListResource configResource = this.getConfigFromList(configList, "current");
-        Assert.assertNotNull( "Current Config", configResource );
+        ConfigurationsListResource securityXmlConfigResource = this.getConfigFromList(configList, "security.xml");
+        Assert.assertNotNull( "security.xml", securityXmlConfigResource );
 
         // check the config now...
-        response = RequestFacade.sendMessage( new URL( configResource.getResourceURI() ), Method.GET, null );
+        response = RequestFacade.sendMessage( new URL( nexusXmlConfigResource.getResourceURI() ), Method.GET, null );
         Assert.assertEquals( "Status: ", 200, response.getStatus().getCode() );
 
         
@@ -127,12 +128,9 @@ public class Nexus606DownloadLogsAndConfigFilesTest
     
     private ConfigurationsListResource getConfigFromList( List<ConfigurationsListResource> configList, String name )
     {
-        
-        for ( Iterator<ConfigurationsListResource> iter = configList.iterator(); iter.hasNext(); )
+        for ( ConfigurationsListResource configurationsListResource : configList )
         {
-            ConfigurationsListResource configurationsListResource = iter.next();
-            
-            if( configurationsListResource.getName().equals( name ))
+            if ( configurationsListResource.getName().equals( name ) )
             {
                 return configurationsListResource;
             }

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -1871,5 +1872,27 @@ public class DefaultNexus
         {
             getLogger().warn( "Error during deleting repository folders ", e );
         }
+    }
+    
+    public Map<String, String> getConfigurationFiles()
+    {
+        return nexusConfiguration.getConfigurationFiles();
+    }
+
+    public NexusStreamResponse getConfigurationAsStreamByKey( String key )
+        throws IOException
+    {
+        NexusStreamResponse response = new NexusStreamResponse();
+
+        response.setName( key );
+
+        response.setMimeType( "text/xml" );
+
+        // TODO:
+        response.setSize( 0 );
+
+        response.setInputStream( nexusConfiguration.getConfigurationAsStreamByKey( key ) );
+
+        return response;
     }
 }

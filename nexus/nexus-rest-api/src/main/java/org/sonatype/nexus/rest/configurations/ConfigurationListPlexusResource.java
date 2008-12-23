@@ -16,6 +16,8 @@
  */
 package org.sonatype.nexus.rest.configurations;
 
+import java.util.Map;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -61,24 +63,19 @@ public class ConfigurationListPlexusResource
         throws ResourceException
     {
         ConfigurationsListResourceResponse result = new ConfigurationsListResourceResponse();
-
-        ConfigurationsListResource resource = new ConfigurationsListResource();
-
-        resource.setResourceURI( createChildReference( request, ConfigurationPlexusResource.DEFAULT_CONFIG_NAME )
-            .toString() );
-
-        resource.setName( ConfigurationPlexusResource.DEFAULT_CONFIG_NAME );
-
-        result.addData( resource );
-
-        resource = new ConfigurationsListResource();
-
-        resource.setResourceURI( createChildReference( request, ConfigurationPlexusResource.CURRENT_CONFIG_NAME )
-            .toString() );
-
-        resource.setName( ConfigurationPlexusResource.CURRENT_CONFIG_NAME );
-
-        result.addData( resource );
+        
+        Map<String, String> configFileNames = getNexus().getConfigurationFiles();
+        
+        for ( Map.Entry<String, String> entry : configFileNames.entrySet())
+        {
+            ConfigurationsListResource resource = new ConfigurationsListResource();
+            
+            resource.setResourceURI( createChildReference( request, entry.getKey() ).toString() );
+            
+            resource.setName( entry.getValue() );
+            
+            result.addData( resource );
+        }
 
         return result;
     }

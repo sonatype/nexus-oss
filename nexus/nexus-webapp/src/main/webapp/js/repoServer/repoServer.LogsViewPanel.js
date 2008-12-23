@@ -28,9 +28,14 @@ Sonatype.repoServer.LogsViewPanel = function(config){
   this.tailed = true;
   this.tailEnabled = true;
   
+
+  
   this.listeners = {
     'beforerender' : {
-      fn: this.updateFileList,
+      fn: function() {
+      		this.updateLogFileList();
+      		this.updateConfigFileList();
+      	},
       scope: this
     },
     'beforedestroy': {
@@ -189,14 +194,7 @@ Sonatype.repoServer.LogsViewPanel = function(config){
           id:'log-menu',
           width:200,
           items: [
-            {
-              text: 'nexus.xml',
-              value: 0,
-              checked: false,
-              group:'rp-group',
-              checkHandler: this.logMenuBtnClick.createDelegate(this, [Sonatype.config.repos.urls.configCurrent,'application/xml'], 0),
-              scope:this
-            }
+
           ]
         }
       },
@@ -284,6 +282,37 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
     }
   },
   
+  renderConfigList : function(options, success, response){
+  	if (success){
+      var resp = Ext.decode(response.responseText);
+      var myMenu = Ext.menu.MenuMgr.get('log-menu');
+      
+      for ( var i=0; i<resp.data.length; i++){
+      	var name = resp.data[i].name;
+      	var uri = resp.data[i].resourceURI;
+      	
+      	var existingItem = myMenu.items.find( function( o ) {
+          return o.logUri == uri;
+        } );
+        
+        if ( !existingItem ){
+        	  myMenu.addMenuItem({
+            logUri: uri, 
+            text: name,
+            value: 0,
+            checked: false,
+            group:'rp-group',
+            checkHandler: this.logMenuBtnClick.createDelegate(this, [uri,'application/xml'], 0),
+            scope:this
+          });
+        }
+      }
+  	}
+  	else {
+      Sonatype.MessageBox.alert('Failed to get config file list from server.');
+    }
+  },
+  
   logMenuBtnClick : function(resourceURI, contentType, mItem, pressed){
     if ( ! pressed ) return;
     this.logTextArea.setRawValue('');
@@ -297,7 +326,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
     
     if ( this.tailed ) {
       this.doUpdateTail = true;
-      this.updateFileList();
+      this.updateLogFileList();
     }
     else {
       this.getLogFile();
@@ -360,7 +389,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       this.currentSize += response.responseText.length;
       this.currentOffset += response.responseText.length;
       this.updateTotals();
-      this.updateFileList();
+      this.updateLogFileList();
     }
     else {
       Sonatype.utils.connectionError( response, 'The file failed to load from the server.' )
@@ -403,15 +432,26 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
     return n + ' ' + kb;
   },
   
-  updateFileList: function() {
-    Ext.Ajax.request({
+  updateLogFileList: function() {
+  	  Ext.Ajax.request({
       callback: this.renderLogList,
       scope: this,
       method: 'GET',
       url: Sonatype.config.repos.urls.logs
     });
+  },
+  
+  updateConfigFileList: function() {
+    Ext.Ajax.request({
+      callback: this.renderConfigList,
+      scope: this,
+      method: 'GET',
+      url: Sonatype.config.repos.urls.configs
+    });
     return true;
   },
+  
+  
   
   loadTailButtonHandler: function( button, event ) {
     if ( button.value != this.tailUpdateButton.value ) {
@@ -432,7 +472,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       this.currentOffset = 0;
       this.currentSize = 0;
     }
-    this.updateFileList();
+    this.updateLogFileList();
   },
   
   fixUpdateTask: function() {

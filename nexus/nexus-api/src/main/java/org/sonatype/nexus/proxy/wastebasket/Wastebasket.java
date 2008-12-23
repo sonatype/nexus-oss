@@ -54,6 +54,15 @@ public interface Wastebasket
      */
     void purge()
         throws IOException;
+    
+    /**
+     * Purge the items older than the age
+     * 
+     * @param age age of the items to be deleted, in milliseconds
+     * @throws IOException
+     */
+    void purge( long age )
+        throws IOException;
 
     /**
      * Performs a delete operation. It delets at once if item is file or link. If it is a collection, it will delete it

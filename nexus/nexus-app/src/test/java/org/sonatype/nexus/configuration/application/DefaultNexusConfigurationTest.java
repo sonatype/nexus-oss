@@ -16,10 +16,12 @@
  */
 package org.sonatype.nexus.configuration.application;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -208,5 +210,39 @@ public class DefaultNexusConfigurationTest
         // runtime state should equal to config again
         assertEquals( nexusConfiguration.getConfiguration().getRouting().getGroups().isMergeMetadata(), groupRouter
             .isMergeMetadata() );
+    }
+
+    public void testGetAndReadConfigurationFiles()
+        throws Exception
+    {
+        nexusConfiguration.loadConfiguration();
+
+        File testConfFile = new File( CONF_HOME, "test.xml" );
+
+        FileUtils.fileWrite( testConfFile.getAbsolutePath(), "test" );
+
+        Map<String, String> confFileNames = nexusConfiguration.getConfigurationFiles();
+
+        assertTrue( confFileNames.size() > 1);
+
+        assertTrue( confFileNames.containsValue( "nexus.xml" ) );
+
+        assertTrue( confFileNames.containsValue( "test.xml" ) );
+        
+        for ( Map.Entry<String, String> entry : confFileNames.entrySet() )
+        {
+            if ( entry.getValue().equals( "test.xml" ) )
+            {
+                IOUtil.contentEquals( new ByteArrayInputStream( "test".getBytes() ), nexusConfiguration
+                    .getConfigurationAsStreamByKey( entry.getKey() ) );
+            }
+            else if ( entry.getValue().equals( "nexus.xml" ) )
+            {
+                IOUtil.contentEquals( new FileInputStream( new File( getNexusConfiguration() ) ), nexusConfiguration
+                    .getConfigurationAsStreamByKey( entry.getKey() ) );
+            }
+        }
+        FileUtils.forceDelete( testConfFile );
+
     }
 }

@@ -43,7 +43,7 @@ public class Nexus639PurgeTaskTest
     {
         // an artifact was deployed already, so test the deploy feed has something.
         
-        SyndFeed feed = FeedUtil.getFeed( "recentlyDeployed" );
+        SyndFeed feed = FeedUtil.getFeed( "recentlyDeployedArtifacts" );
         List<SyndEntry> entries = feed.getEntries();
         
         Assert.assertTrue("Expected artifacts in the recentlyDeployed feed.", entries.size() > 0 );
@@ -59,7 +59,7 @@ public class Nexus639PurgeTaskTest
         
         // validate the feeds contain nothing.
         
-        feed = FeedUtil.getFeed( "recentlyDeployed" );
+        feed = FeedUtil.getFeed( "recentlyDeployedArtifacts" );
         entries = feed.getEntries();
         
 //        for ( SyndEntry syndEntry : entries )
