@@ -19,7 +19,7 @@
 
   <properties>
     <jetty.version>6.1.12</jetty.version>
-    <plexus.version>1.0-beta-3.0.3</plexus.version>
+    <plexus.version>1.0-beta-3.0.4-SNAPSHOT</plexus.version>
   </properties>
 
   <dependencyManagement>
