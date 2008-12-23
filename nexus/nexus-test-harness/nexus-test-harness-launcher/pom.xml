@@ -57,26 +57,6 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>unpack-maven</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.apache.maven</groupId>
-									<artifactId>apache-maven</artifactId>
-									<version>${maven-version}</version>
-									<type>tar.gz</type>
-									<classifier>bin</classifier>
-								</artifactItem>
-							</artifactItems>
-							<outputDirectory>${project.build.directory}</outputDirectory>
-						</configuration>
-					</execution>
-
-					<execution>
 						<id>copy-fake-central-repo</id>
 						<phase>generate-resources</phase>
 						<goals>

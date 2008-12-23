@@ -13,13 +13,13 @@
   <name>Nexus Test Harness Parent</name>
 
   <dependencyManagement>
-  	<dependencies>
-  		<dependency>
-  			<groupId>junit</groupId>
-  			<artifactId>junit</artifactId>
-  			<version>4.4</version>
-  		</dependency>
-  	</dependencies>
+    <dependencies>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.4</version>
+      </dependency>
+    </dependencies>
   </dependencyManagement>
 
   <properties>
@@ -74,7 +74,7 @@
       <artifactId>nexus-test-harness-base</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-simple-memory-realm</artifactId>
@@ -247,6 +247,26 @@
                 </artifactItem>
               </artifactItems>
 
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>unpack-maven</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>apache-maven</artifactId>
+                  <version>${maven-version}</version>
+                  <type>tar.gz</type>
+                  <classifier>bin</classifier>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}</outputDirectory>
             </configuration>
           </execution>
 
