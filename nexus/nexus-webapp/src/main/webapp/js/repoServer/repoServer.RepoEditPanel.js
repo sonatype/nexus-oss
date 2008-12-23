@@ -185,10 +185,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         width: 200,
         allowBlank:false,
         disabled:true,
-        validator: function(v){
-          if(v.search(' ') == -1){ return true; }
-          else{ return 'No spaces allowed in ID'; }
-        }
+        validator: Sonatype.utils.validateId
       },{
         xtype: 'textfield',
         fieldLabel: 'Repository Name',
@@ -1882,14 +1879,7 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
         width: 200,
         allowBlank: false,
         disabled: ! this.isNew,
-        validator: function( v ) {
-          if ( v.search(' ') == -1 ){
-            return true; 
-          }
-          else { 
-            return 'No spaces allowed in ID'; 
-          }
-        }
+        validator: Sonatype.utils.validateId
       },
       {
         xtype: 'textfield',
@@ -2116,14 +2106,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
         width: 200,
         allowBlank: false,
         disabled: ! this.isNew,
-        validator: function( v ) {
-          if ( v.search(' ') == -1 ){
-            return true; 
-          }
-          else { 
-            return 'No spaces allowed in ID'; 
-          }
-        }
+        validator: Sonatype.utils.validateId
       },
       {
         xtype: 'textfield',
@@ -2682,14 +2665,7 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
         width: 200,
         allowBlank: false,
         disabled: ! this.isNew,
-        validator: function(v){
-          if ( v.search(' ') == -1) {
-            return true; 
-          }
-          else { 
-            return 'No spaces allowed in ID'; 
-          }
-        }
+        validator: Sonatype.utils.validateId
       },
       {
         xtype: 'textfield',

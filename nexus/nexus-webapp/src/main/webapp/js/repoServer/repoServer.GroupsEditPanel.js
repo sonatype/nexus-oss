@@ -82,10 +82,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
         width: 200,
         allowBlank:false,
         disabled: true,
-        validator: function(v){
-          if(v.search(' ') == -1){ return true; }
-          else{ return 'No spaces allowed in ID'; }
-        }
+        validator: Sonatype.utils.validateId
       },
       {
         xtype: 'textfield',
