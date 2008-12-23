@@ -26,6 +26,7 @@ import org.sonatype.nexus.integrationtests.nexus1071.Nexus1071DeployToRepoAnonCa
 import org.sonatype.nexus.integrationtests.nexus1197.Nexus1197CheckUserAgentTest;
 import org.sonatype.nexus.integrationtests.nexus1239.Nexus1239PlexusUserResourceTest;
 import org.sonatype.nexus.integrationtests.nexus1239.Nexus1239UserSearchTest;
+import org.sonatype.nexus.integrationtests.nexus1286.Nexus1286RoleListTest;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetValidationTests;
@@ -199,7 +200,8 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1116.Nexus1116InvalidPr
     Nexus1111ProxyRemote500ErrorTest.class,
     Nexus1197CheckUserAgentTest.class,
     Nexus1239PlexusUserResourceTest.class,
-    Nexus1239UserSearchTest.class
+    Nexus1239UserSearchTest.class,
+    Nexus1286RoleListTest.class
 } )
 public class IntegrationTestSuiteClasses
 {

@@ -31,6 +31,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.rest.NexusApplication;
 import org.sonatype.nexus.rest.model.*;
+import org.sonatype.nexus.rest.roles.PlexusRoleListPlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
@@ -1447,6 +1448,78 @@ public class TestMarshalUnmarchal
         resource2.setDescription( "description2" );
         resource2.setRoleHint( "role-hint2" );
         resourceResponse.addData( resource2 );
+
+        this.marshalUnmarchalThenCompare( resourceResponse );
+        this.validateXmlHasNoPackageNames( resourceResponse );
+
+    }
+    
+    public void testExternalRoleMappingResourceResponse()
+    {
+        ExternalRoleMappingResourceResponse resourceResponse = new ExternalRoleMappingResourceResponse();
+
+        ExternalRoleMappingResource resource1 = new ExternalRoleMappingResource();
+        resourceResponse.addData( resource1 );
+        
+        PlexusRoleResource role1 = new PlexusRoleResource();        
+        role1.setName( "role1" );
+        role1.setSource( "source1" );
+        role1.setRoleId( "roleId1" );
+        resource1.setDefaultRole( role1 );
+        
+        PlexusRoleResource role2 = new PlexusRoleResource();
+        role2.setName( "role2" );
+        role2.setSource( "source2" );
+        role2.setRoleId( "roleId2" );
+        resource1.addMappedRole( role2 );
+        
+        PlexusRoleResource role3 = new PlexusRoleResource();
+        role3.setName( "role3" );
+        role3.setSource( "source3" );
+        role3.setRoleId( "roleId3" );
+        resource1.addMappedRole( role3 );
+        
+        ExternalRoleMappingResource resource2 = new ExternalRoleMappingResource();
+        resourceResponse.addData( resource2 );
+        
+        PlexusRoleResource role4 = new PlexusRoleResource();        
+        role4.setName( "role4" );
+        role4.setSource( "source4" );
+        role4.setRoleId( "roleId4" );
+        resource2.setDefaultRole( role4 );
+        
+        PlexusRoleResource role5 = new PlexusRoleResource();
+        role5.setName( "role5" );
+        role5.setSource( "source5" );
+        role5.setRoleId( "roleId5" );
+        resource2.addMappedRole( role5 );
+        
+        PlexusRoleResource role6 = new PlexusRoleResource();
+        role6.setName( "role6" );
+        role6.setSource( "source6" );
+        role6.setRoleId( "roleId6" );
+        resource2.addMappedRole( role6 );
+
+        this.marshalUnmarchalThenCompare( resourceResponse );
+        this.validateXmlHasNoPackageNames( resourceResponse );
+
+    }
+    
+    public void testPlexusRoleListPlexusResource()
+    {
+        PlexusRoleListResourceResponse resourceResponse = new PlexusRoleListResourceResponse();
+        
+        PlexusRoleResource role1 = new PlexusRoleResource();
+        role1.setName( "role1" );
+        role1.setSource( "source1" );
+        role1.setRoleId( "roleId1" );
+        resourceResponse.addData( role1 );
+
+        PlexusRoleResource role2 = new PlexusRoleResource();
+        role2.setName( "role2" );
+        role2.setSource( "source2" );
+        role2.setRoleId( "roleId2" );
+        resourceResponse.addData( role2 );
 
         this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );

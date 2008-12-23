@@ -476,6 +476,22 @@ public class NexusApplication
             PlexusUserResource.class,
               "plexus-user" ) );
         
+        xstream.omitField( ExternalRoleMappingResourceResponse.class, "modelEncoding" );
+        xstream.alias( "external-role-mapping", ExternalRoleMappingResourceResponse.class );
+        xstream.registerLocalConverter( ExternalRoleMappingResourceResponse.class, "data", new AliasingListConverter(
+            ExternalRoleMappingResource.class,
+              "mapping" ) );
+        xstream.omitField( ExternalRoleMappingResource.class, "modelEncoding" );
+        xstream.alias( "mapping", ExternalRoleMappingResource.class );        
+        xstream.registerLocalConverter( ExternalRoleMappingResource.class, "mappedRoles", new AliasingListConverter(
+            PlexusRoleResource.class,
+              "plexus-role" ) );
+        
+        xstream.omitField( PlexusRoleListResourceResponse.class, "modelEncoding" );
+        xstream.alias( "plexus-roles", PlexusRoleListResourceResponse.class );
+        xstream.registerLocalConverter( PlexusRoleListResourceResponse.class, "data", new AliasingListConverter(
+            PlexusRoleResource.class,
+              "plexus-role" ) );
         
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );

@@ -3048,6 +3048,63 @@
         </field>
       </fields>
     </class>
+    
+    <class>
+      <name>ExternalRoleMappingResourceResponse</name>
+      <version>1.0.0+</version>
+      <superClass>NexusResponse</superClass>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>ExternalRoleMappingResource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+
+	<class>
+      <name>ExternalRoleMappingResource</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>defaultRole</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>PlexusRoleResource</type>
+          </association>
+          <required>true</required>
+        </field>
+        <field>
+          <name>mappedRoles</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>PlexusRoleResource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>PlexusRoleListResourceResponse</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>PlexusRoleResource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
 
 	</classes>
 </model>

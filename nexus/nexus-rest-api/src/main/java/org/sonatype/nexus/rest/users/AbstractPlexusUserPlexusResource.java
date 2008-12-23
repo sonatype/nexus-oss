@@ -36,15 +36,20 @@ public abstract class AbstractPlexusUserPlexusResource
         resource.setEmail( user.getEmailAddress() );
         
         for ( PlexusRole role : user.getRoles() )
-        {
-            PlexusRoleResource roleResource = new PlexusRoleResource();
-            roleResource.setRoleId( role.getRoleId() );
-            roleResource.setName( role.getName() );
-            roleResource.setSource( role.getSource() );
-            
-            resource.addRole( roleResource );
+        {   
+            resource.addRole( this.nexusToRestModel( role ) );
         }
         
         return resource;
+    }
+    
+    protected PlexusRoleResource nexusToRestModel( PlexusRole role )
+    {
+        PlexusRoleResource roleResource = new PlexusRoleResource();
+        roleResource.setRoleId( role.getRoleId() );
+        roleResource.setName( role.getName() );
+        roleResource.setSource( role.getSource() );
+        
+        return roleResource;
     }
 }
