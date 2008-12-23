@@ -34,9 +34,9 @@ import org.sonatype.nexus.plugin.migration.artifactory.dto.ERepositoryType;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRequestDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
-import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecurityConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
 import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigConvertor;
@@ -72,7 +72,7 @@ public class ArtifactoryMigrationPlexusResource
 
     @Requirement
     private SecurityConfigReceiver securityConfigAdaptorPersistor;
-    
+
     public ArtifactoryMigrationPlexusResource()
     {
         this.setReadable( false );
@@ -124,7 +124,7 @@ public class ArtifactoryMigrationPlexusResource
 
         return null;
     }
-    
+
     private void importSecurity( MigrationSummaryDTO migrationSummary, ArtifactorySecurityConfig cfg )
         throws ResourceException
     {
@@ -199,9 +199,9 @@ public class ArtifactoryMigrationPlexusResource
 
                     if ( resolution.isMapUrls() )
                     {
-                        CMapping map = new CMapping();
-                        map.setArtifactoryRepositoryId( resolution.getRepositoryId() );
-                        map.setNexusGroupId( nexusGroup.getGroupId() );
+                        CMapping map =
+                            new CMapping( resolution.getRepositoryId(), nexusGroup.getGroupId(),
+                                          nexusRepoReleases.getId(), nexusRepoSnapshots.getId() );
                         mappingConfiguration.addMapping( map );
                     }
 
@@ -213,9 +213,7 @@ public class ArtifactoryMigrationPlexusResource
                 {
                     if ( resolution.isMapUrls() )
                     {
-                        CMapping map = new CMapping();
-                        map.setArtifactoryRepositoryId( resolution.getRepositoryId() );
-                        map.setNexusGroupId( resolution.getSimilarRepository() );
+                        CMapping map = new CMapping( resolution.getRepositoryId(), resolution.getSimilarRepository() );
                         mappingConfiguration.addMapping( map );
                     }
                 }
@@ -283,9 +281,7 @@ public class ArtifactoryMigrationPlexusResource
         }
         if ( resolution.isMapUrls() )
         {
-            CMapping map = new CMapping();
-            map.setArtifactoryRepositoryId( resolution.getRepositoryId() );
-            map.setNexusRepositoryId( nexusRepo.getId() );
+            CMapping map = new CMapping( resolution.getRepositoryId(), nexusRepo.getId() );
             mappingConfiguration.addMapping( map );
         }
     }
@@ -380,9 +376,7 @@ public class ArtifactoryMigrationPlexusResource
                     + virtualRepo.getKey(), e );
             }
 
-            CMapping map = new CMapping();
-            map.setArtifactoryRepositoryId( virtualRepo.getKey() );
-            map.setNexusGroupId( group.getGroupId() );
+            CMapping map = new CMapping( virtualRepo.getKey(), group.getGroupId(), null, null );
             mappingConfiguration.addMapping( map );
 
         }

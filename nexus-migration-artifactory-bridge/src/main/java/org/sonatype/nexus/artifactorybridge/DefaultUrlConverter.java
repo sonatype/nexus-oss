@@ -12,13 +12,23 @@ public class DefaultUrlConverter
     implements UrlConverter
 {
 
+    private static final String GROUP = "/content/groups/";
+
+    private static final String REPOSITORY = "/content/repositories/";
+
     @Requirement( role = MappingConfiguration.class, hint = "default" )
     private MappingConfiguration mappingConfiguration;
 
-    public String convert( String servletPath )
+    public String convertDownload( String servletPath )
+    {
+        return convert( servletPath, false );
+    }
+
+    private String convert( String servletPath, boolean resolveRepository )
     {
         // servletPath: /artifactory/main-local/nxcm259/released/1.0/released-1.0.pom
-        if(servletPath == null || servletPath.length() < 12) {
+        if ( servletPath == null || servletPath.length() < 12 )
+        {
             return null;
         }
 
@@ -29,7 +39,7 @@ public class DefaultUrlConverter
         int artifactPathIndex = servletPath.indexOf( "/", 1 );
         if ( artifactPathIndex == -1 )
         {
-            getLogger().info( "Unexpected servletPath: " + servletPath );
+            getLogger().error( "Unexpected servletPath: " + servletPath );
             return null;
         }
 
@@ -38,24 +48,55 @@ public class DefaultUrlConverter
         CMapping map = mappingConfiguration.getMapping( repository );
         if ( map == null )
         {
-            getLogger().info( "Mapping not found to: " + repository );
+            getLogger().error( "Mapping not found to: " + repository );
             return null;
         }
 
         // path: /nxcm259/released/1.0/released-1.0.pom
         String artifactPath = servletPath.substring( artifactPathIndex );
 
-        String nexusPath;
         if ( map.getNexusGroupId() != null )
         {
-            nexusPath = "/content/groups/" + map.getNexusGroupId() + artifactPath;
+            if ( resolveRepository )
+            {
+                int lastSlash = artifactPath.lastIndexOf( "/" );
+                int previousSlash = 0;
+                do
+                {
+                    int slash = artifactPath.indexOf( "/", previousSlash + 1 );
+                    if ( slash == lastSlash )
+                    {
+                        break;
+                    }
+
+                    previousSlash = slash;
+                }
+                while ( true );
+
+                String version = artifactPath.substring( previousSlash, lastSlash );
+                if ( version.endsWith( "-SNAPSHOT" ) )
+                {
+                    return REPOSITORY + map.getSnapshotsRepositoryId() + artifactPath;
+                }
+                else
+                {
+                    return REPOSITORY + map.getReleasesRepositoryId() + artifactPath;
+                }
+            }
+            else
+            {
+                return GROUP + map.getNexusGroupId() + artifactPath;
+            }
         }
         else
         {
-            nexusPath = "/content/repositories/" + map.getNexusRepositoryId() + artifactPath;
+            return REPOSITORY + map.getNexusRepositoryId() + artifactPath;
         }
+    }
 
-        return nexusPath;
+    public String convertDeploy( String servletPath )
+    {
+        return convert( servletPath, true );
     }
 
 }

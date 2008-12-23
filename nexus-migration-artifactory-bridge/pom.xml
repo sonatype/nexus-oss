@@ -62,6 +62,5 @@
       <artifactId>nexus-rest-api</artifactId>
     </dependency>
 
-
   </dependencies>
 </project>

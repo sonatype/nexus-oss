@@ -12,17 +12,30 @@ public class CMapping
 
     private String nexusRepositoryId;
 
+    private String releasesRepositoryId;
+
+    private String snapshotsRepositoryId;
+
     public CMapping()
     {
         super();
     }
 
-    public CMapping( String artifactoryRepositoryId, String nexusGroupId, String nexusRepositoryId )
+    public CMapping( String artifactoryRepositoryId, String nexusRepositoryId )
+    {
+        this();
+        this.artifactoryRepositoryId = artifactoryRepositoryId;
+        this.nexusRepositoryId = nexusRepositoryId;
+    }
+
+    public CMapping( String artifactoryRepositoryId, String nexusGroupId, String releasesRepositoryId,
+                     String snapshotsRepositoryId )
     {
         this();
         this.artifactoryRepositoryId = artifactoryRepositoryId;
         this.nexusGroupId = nexusGroupId;
-        this.nexusRepositoryId = nexusRepositoryId;
+        this.releasesRepositoryId = releasesRepositoryId;
+        this.snapshotsRepositoryId = snapshotsRepositoryId;
     }
 
     public String getArtifactoryRepositoryId()
@@ -53,6 +66,26 @@ public class CMapping
     public void setNexusRepositoryId( String nexusRepositoryId )
     {
         this.nexusRepositoryId = nexusRepositoryId;
+    }
+
+    public String getReleasesRepositoryId()
+    {
+        return releasesRepositoryId;
+    }
+
+    public void setReleasesRepositoryId( String releasesRepositoryId )
+    {
+        this.releasesRepositoryId = releasesRepositoryId;
+    }
+
+    public String getSnapshotsRepositoryId()
+    {
+        return snapshotsRepositoryId;
+    }
+
+    public void setSnapshotsRepositoryId( String snapshotsRepositoryId )
+    {
+        this.snapshotsRepositoryId = snapshotsRepositoryId;
     }
 
 }

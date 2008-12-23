@@ -21,8 +21,8 @@ public class NXCM255MapRepositoriesTest
     extends AbstractMigrationIntegrationTest
 {
 
-    @Test
-    public void importMixedRepo()
+    @Override
+    protected void runOnce()
         throws Exception
     {
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
@@ -30,6 +30,12 @@ public class NXCM255MapRepositoriesTest
 
         TaskScheduleUtil.waitForTasks( 40 );
         Thread.sleep( 2000 );
+    }
+
+    @Test
+    public void downloadMixedRepo()
+        throws Exception
+    {
 
         File artifact = getTestFile( "artifact.jar" );
         URL url =
@@ -49,12 +55,15 @@ public class NXCM255MapRepositoriesTest
         Assert.assertTrue( "Downloaded artifact was not right, checksum comparation fail " + url,
                            FileTestingUtils.compareFileSHA1s( artifact, downloaded ) );
 
+    }
+
+    @Test
+    public void resolveMixedRepo() throws Exception {
         File mavenProject = getTestFile( "maven-project" );
 
         Verifier verifier = createVerifier( mavenProject, null );
         verifier.executeGoal( "dependency:resolve" );
         verifier.verifyErrorFreeLog();
-
     }
 
     /**

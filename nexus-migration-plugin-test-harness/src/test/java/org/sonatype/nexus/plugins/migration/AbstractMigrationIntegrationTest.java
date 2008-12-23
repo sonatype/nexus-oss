@@ -30,7 +30,7 @@ public class AbstractMigrationIntegrationTest
     extends AbstractNexusIntegrationTest
 {
     protected static final String DEFAULT_EMAIL = "juven@mars.com";
-    
+
     protected RepositoryMessageUtil repositoryUtil;
 
     protected GroupMessageUtil groupUtil;
@@ -46,9 +46,16 @@ public class AbstractMigrationIntegrationTest
 
     @BeforeClass
     public static void clean()
-        throws IOException
     {
-        cleanWorkDir();
+        try
+        {
+            cleanWorkDir();
+        }
+        catch ( IOException e )
+        {
+            // is not a good sign, but I can ignore it
+            log.error( "Error deleting work dir", e );
+        }
     }
 
     protected <E> void assertContains( ArrayList<E> collection, E item )
@@ -87,7 +94,7 @@ public class AbstractMigrationIntegrationTest
     }
 
     protected void checkArtifactOnGroup( String nexusGroupId, String groupId, String artifactId, String version )
-    throws IOException
+        throws IOException
     {
         File artifact = getTestFile( "artifact.jar" );
         Gav gav =
@@ -139,7 +146,7 @@ public class AbstractMigrationIntegrationTest
         }
         assertContains( reposIds, repoId );
     }
-    
+
     protected MigrationSummaryDTO prepareMigration( File artifactoryBackup )
         throws IOException
     {
@@ -148,7 +155,7 @@ public class AbstractMigrationIntegrationTest
         fillDefaultEmailIfNotExist( migrationSummary.getUserResolution() );
         return migrationSummary;
     }
-    
+
     protected void commitMigration( MigrationSummaryDTO migrationSummary )
         throws IOException
     {
