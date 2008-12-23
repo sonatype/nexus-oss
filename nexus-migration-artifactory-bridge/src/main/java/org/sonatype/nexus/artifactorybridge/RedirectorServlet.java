@@ -1,12 +1,11 @@
 package org.sonatype.nexus.artifactorybridge;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -27,23 +26,11 @@ public class RedirectorServlet
 
     private Logger logger;
 
+    private static final long serialVersionUID = -1962100850716961287L;
+
     public PlexusContainer getPlexusContainer()
     {
         return (PlexusContainer) getServletContext().getAttribute( PlexusConstants.PLEXUS_KEY );
-    }
-
-    private static final long serialVersionUID = -1962100850716961287L;
-
-    @Override
-    protected void service( HttpServletRequest req, HttpServletResponse resp )
-        throws ServletException, IOException
-    {
-        LoggerManager logManager = getComponent( LoggerManager.class );
-        logger = logManager.getLoggerForComponent( getClass().getName() );
-
-        logger.debug( req.getMethod() + " - " + req.getRequestURI() );
-
-        super.service( req, resp );
     }
 
     private <E> E getComponent( Class<E> clazz )
@@ -57,6 +44,18 @@ public class RedirectorServlet
             throw new IllegalStateException( "The PlexusServerServlet couldn't lookup the target component (role='"
                 + clazz + "')", e );
         }
+    }
+
+    @Override
+    protected void service( HttpServletRequest req, HttpServletResponse resp )
+        throws ServletException, IOException
+    {
+        LoggerManager logManager = getComponent( LoggerManager.class );
+        logger = logManager.getLoggerForComponent( getClass().getName() );
+
+        logger.debug( req.getMethod() + " - " + req.getRequestURI() );
+
+        super.service( req, resp );
     }
 
     @Override
@@ -79,7 +78,10 @@ public class RedirectorServlet
 
         URL url = new URL( nexusUrl + nexusPath );
         logger.debug( "Redirecting request to: " + url );
-        URLConnection urlConn = url.openConnection();
+
+        HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
+
+        copyHeaders( request, urlConn );
 
         InputStream in = null;
         ServletOutputStream out = null;
@@ -93,22 +95,18 @@ public class RedirectorServlet
             IOUtils.write( bytes, out );
             out.flush();
             out.close();
+
+            response.setStatus( urlConn.getResponseCode() );
         }
-        catch ( FileNotFoundException e )
+        catch ( Throwable e )
         {
-            response.sendError( HttpServletResponse.SC_NOT_FOUND );
-            return;
+            int statusCode = urlConn == null ? 500 : urlConn.getResponseCode();
+            response.sendError( statusCode, e.getMessage() );
         }
         finally
         {
-            close( in, out );
+            close( urlConn, in, out );
         }
-    }
-
-    private String getNexusUrl( HttpServletRequest request )
-    {
-        String nexusUrl = "http://" + request.getLocalAddr() + ":" + request.getLocalPort() + "/nexus";
-        return nexusUrl;
     }
 
     @Override
@@ -117,6 +115,7 @@ public class RedirectorServlet
     {
         InputStream in = null;
         OutputStream out = null;
+        HttpURLConnection urlConn = null;
         try
         {
             in = request.getInputStream();
@@ -133,27 +132,55 @@ public class RedirectorServlet
             }
 
             URL url = new URL( nexusUrl + nexusPath );
-            HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
+            urlConn = (HttpURLConnection) url.openConnection();
+            copyHeaders( request, urlConn );
 
             urlConn.setRequestMethod( "PUT" );
             urlConn.setDoOutput( true );
             out = urlConn.getOutputStream();
             IOUtils.write( bytes, out );
 
-            urlConn.disconnect();
             int statusCode = urlConn.getResponseCode();
             logger.debug( "URL connection return: " + statusCode + " - " + urlConn.getResponseMessage() );
             response.setStatus( statusCode );
         }
+        catch ( Throwable e )
+        {
+            int statusCode = urlConn == null ? 500 : urlConn.getResponseCode();
+            response.sendError( statusCode, e.getMessage() );
+        }
         finally
         {
-            close( in, out );
+            close( urlConn, in, out );
         }
 
     }
 
-    private void close( InputStream in, OutputStream out )
+    private String getNexusUrl( HttpServletRequest request )
     {
+        String nexusUrl = "http://" + request.getLocalAddr() + ":" + request.getLocalPort() + "/nexus";
+        return nexusUrl;
+    }
+
+    private void copyHeaders( HttpServletRequest request, HttpURLConnection urlConn )
+    {
+        // send headers (authentication)
+        Enumeration<?> headers = request.getHeaderNames();
+        while ( headers.hasMoreElements() )
+        {
+            String name = (String) headers.nextElement();
+            String value = request.getHeader( name );
+            urlConn.setRequestProperty( name, value );
+        }
+    }
+
+    private void close( HttpURLConnection urlConn, InputStream in, OutputStream out )
+    {
+        if ( urlConn != null )
+        {
+            urlConn.disconnect();
+        }
+
         if ( in != null )
         {
             try

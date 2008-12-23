@@ -14,6 +14,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
 import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
@@ -67,6 +68,8 @@ public class AbstractMigrationIntegrationTest
     public void waitEnd()
         throws Exception
     {
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+
         TaskScheduleUtil.waitForTasks( 40 );
 
         Thread.sleep( 2000 );
