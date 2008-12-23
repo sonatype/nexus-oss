@@ -54,8 +54,8 @@
 			<description>Role One</description>
 			<sessionTimeout>60</sessionTimeout>
 			<privileges>
-				<privilege>1</privilege>
-				<privilege>2</privilege>
+				<privilege>1</privilege> <!-- query status -->
+				<privilege>2</privilege> <!-- Login to UI -->
 			</privileges>
 		</role>
 		<role>
@@ -64,8 +64,8 @@
 			<description>Role Two</description>
 			<sessionTimeout>60</sessionTimeout>
 			<privileges>
-				<privilege>3</privilege>
-				<privilege>4</privilege>
+				<privilege>3</privilege> <!-- query settings -->
+				<privilege>4</privilege> <!-- change settings -->
 			</privileges>
 		</role>
 	</roles>

@@ -24,34 +24,19 @@ import java.util.Date;
 
 import junit.framework.Assert;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
 /**
  * @author Juven Xu
  */
 public class Nexus1071AnonAccessTest
-    extends AbstractNexusIntegrationTest
+    extends AbstractAnonAccessTest
 {
-    @Before
-    public void turnOffSecure()
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( false );
-    }
-
-    @After
-    public void turnOnSecure()
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
 
     @Test
-    public void downloadArtifactFromPublicRepo()
+    public void downloadArtifactFromPublicGroup()
         throws IOException
     {
         Gav gav = new Gav(
@@ -70,7 +55,7 @@ public class Nexus1071AnonAccessTest
             null );
 
         File artifact = this
-            .downloadArtifactFromRepository( "nexus-test-harness-repo", gav, "./target/downloaded-jars" );
+            .downloadArtifactFromGroup( "public", gav, "./target/downloaded-jars" );
 
         assertTrue( artifact.exists() );
 

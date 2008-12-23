@@ -23,8 +23,6 @@ import junit.framework.Assert;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.junit.Test;
-import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
-import org.sonatype.nexus.integrationtests.TestContainer;
 
 /**
  * 
@@ -32,12 +30,8 @@ import org.sonatype.nexus.integrationtests.TestContainer;
  *
  */
 public class Nexus1071DeployToRepoAnonCannotAccess
-    extends AbstractMavenNexusIT
+    extends AbstractAnonAccessTest
 {
-    static
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
 
     @Test
     public void deployRepeatly()

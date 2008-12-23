@@ -146,11 +146,6 @@ public class Nexus537RepoTargetsTests
     public void doReadTest()
         throws Exception
     {
-        if(true) {
-            printKnownErrorButDoNotFail( getClass(), "doReadTest" );
-            return;
-        }
-
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
@@ -167,9 +162,9 @@ public class Nexus537RepoTargetsTests
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         this.download( REPO1_ID, repo1BarArtifact, false );
+        this.download( REPO1_ID, repo1FooArtifact, true );
         this.download( REPO2_ID, repo2BarArtifact, false );
         this.download( REPO2_ID, repo2FooArtifact, false );
-        this.download( REPO1_ID, repo1FooArtifact, true );
 
         // now give
         this.overwriteUserRole( TEST_USER_NAME, "barPrivReadId", this.barPrivReadId );
@@ -178,9 +173,9 @@ public class Nexus537RepoTargetsTests
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         this.download( REPO1_ID, repo1BarArtifact, true );
+        this.download( REPO1_ID, repo1FooArtifact, false );
         this.download( REPO2_ID, repo2BarArtifact, false );
         this.download( REPO2_ID, repo2FooArtifact, false );
-        this.download( REPO1_ID, repo1FooArtifact, false );
 
         // now give
         this.overwriteUserRole( TEST_USER_NAME, "groupPrivReadId", this.groupFooPrivReadId );
@@ -188,16 +183,16 @@ public class Nexus537RepoTargetsTests
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        // try the groups
+        // try the group
         this.groupDownload( repo1BarArtifact, false );
+        this.groupDownload( repo1FooArtifact, true );
         this.groupDownload( repo2BarArtifact, false );
         this.groupDownload( repo2FooArtifact, true );
-        this.groupDownload( repo1FooArtifact, true );
 
-        this.download( REPO1_ID, repo1BarArtifact, false );
+        this.download( REPO1_ID, repo1BarArtifact, false ); 
+        this.download( REPO1_ID, repo1FooArtifact, false ); // can't access directly
         this.download( REPO2_ID, repo2BarArtifact, false );
-        this.download( REPO2_ID, repo2FooArtifact, true ); // this repo is included in a group we have access to
-        this.download( REPO1_ID, repo1FooArtifact, true );
+        this.download( REPO2_ID, repo2FooArtifact, false ); // can't access directly
 
     }
 
@@ -244,11 +239,9 @@ public class Nexus537RepoTargetsTests
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
-        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true ); // group contains
-        // this repo
+        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
         this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true ); // group contains
-        // this repo
+        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
     }
 
@@ -297,9 +290,9 @@ public class Nexus537RepoTargetsTests
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         this.upload( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
-        this.upload( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true );
+        this.upload( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
         this.upload( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.upload( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true );
+        this.upload( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
     }
 
     @Test
@@ -446,10 +439,6 @@ public class Nexus537RepoTargetsTests
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest#oncePerClassSetUp()
-     */
     @Override
     public void oncePerClassSetUp()
         throws Exception

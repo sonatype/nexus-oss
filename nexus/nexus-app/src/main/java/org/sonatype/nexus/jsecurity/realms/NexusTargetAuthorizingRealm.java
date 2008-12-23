@@ -17,8 +17,6 @@
 package org.sonatype.nexus.jsecurity.realms;
 
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -30,8 +28,6 @@ import org.jsecurity.realm.Realm;
 import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 @Component( role = Realm.class, hint = "NexusTargetAuthorizingRealm" )
 public class NexusTargetAuthorizingRealm
@@ -97,27 +93,8 @@ public class NexusTargetAuthorizingRealm
             }
             else if ( !StringUtils.isEmpty( repositoryGroupId ) )
             {
-                try
-                {
-                    Set<Permission> permissions = new HashSet<Permission>();
-
-                    List<Repository> repositories = nexus.getRepositoryGroup( repositoryGroupId );
-
-                    for ( Repository repository : repositories )
-                    {
-                        WildcardPermission permission = new WildcardPermission( basePermString + repository.getId()
-                            + postPermString );
-
-                        permissions.add( permission );
-                    }
-
-                    return permissions;
-                }
-                catch ( NoSuchRepositoryGroupException e )
-                {
-                    // If there is no such group you don't have permission to it
-                    return Collections.emptySet();
-                }
+                return Collections.singleton( (Permission) new WildcardPermission( basePermString + repositoryGroupId
+                    + postPermString ) );
             }
             else
             {

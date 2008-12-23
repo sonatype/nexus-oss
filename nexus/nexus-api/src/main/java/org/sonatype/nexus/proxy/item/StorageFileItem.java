@@ -48,7 +48,7 @@ public interface StorageFileItem
     boolean isReusableStream();
 
     /**
-     * Gets the input stream.
+     * Gets the input stream. Caller must close the stream. 
      * 
      * @return the input stream
      */

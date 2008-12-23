@@ -36,6 +36,30 @@
 
 
     <component>
+      <role>org.sonatype.appbooter.ForkedAppBooter</role>
+      <role-hint>TestUnforkedAppBooter</role-hint>
+      <implementation>org.sonatype.nexus.test.utils.UnforkedAppBooter</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+      <description></description>
+      <isolated-realm>false</isolated-realm>
+      <configuration>
+        <configuration>${nexus-plexus-config-file}</configuration>
+        <basedir>${nexus-abs-basedir}</basedir>
+        <temp-dir>${project.build.directory}/appbooter.tmp/</temp-dir>
+        <systemProperties>
+          <plexus.application-port>${nexus-application-port}</plexus.application-port>
+          <plexus.application-host>${jetty-application-host}</plexus.application-host>
+          <plexus.runtime>${nexus-abs-basedir}/runtime</plexus.runtime>
+          <plexus.apps>${nexus-abs-basedir}/runtime/apps</plexus.apps>
+          <plexus.nexus-work>${nexus-abs-basedir}/runtime/work</plexus.nexus-work>
+          <plexus.webapp>${nexus-abs-basedir}/runtime/apps/nexus/webapp</plexus.webapp>
+          <plexus.webapp-context-path>/nexus</plexus.webapp-context-path>
+        </systemProperties>
+      </configuration>
+    </component>
+
+
+    <component>
       <role>org.sonatype.jettytestsuite.ServletServer</role>
       <implementation>org.sonatype.jettytestsuite.ServletServer</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>

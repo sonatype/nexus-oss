@@ -63,9 +63,16 @@ public class NexusStateUtil
         }
     }
     
-    private static AbstractForkedAppBooter getAppBooter() throws Exception
+    private static ForkedAppBooter getAppBooter() throws Exception
     {
-        return (AbstractForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
+        if ( System.getProperty( "classpath.conf" ) == null )
+        {
+            return (AbstractForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
+        }
+        else
+        {
+            return (UnforkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestUnforkedAppBooter" );
+        }
     }
 
     public static StatusResourceResponse getNexusStatus()
@@ -146,11 +153,14 @@ public class NexusStateUtil
     public static ForkedAppBooter doHardStart()
         throws Exception
     {
-        AbstractForkedAppBooter appBooter = getAppBooter();
+        ForkedAppBooter appBooter = getAppBooter();
 
         Assert.assertFalse( "Nexus is already started.", getClient().isNexusStarted( true ) );
+        if ( appBooter instanceof AbstractForkedAppBooter )
+        {
+            ((AbstractForkedAppBooter) appBooter).setSleepAfterStart( 0 );
+        }
 
-        appBooter.setSleepAfterStart( 0 );
         appBooter.start();
 
         Assert.assertTrue( "Unable to start Nexus after 4 minutes", NexusStatusUtil.waitForStart( getClient() ) );
@@ -161,7 +171,7 @@ public class NexusStateUtil
     public static void doHardStop()
         throws Exception
     {
-        AbstractForkedAppBooter appBooter = getAppBooter();
+        ForkedAppBooter appBooter = getAppBooter();
         doHardStop( true );
     }
 
