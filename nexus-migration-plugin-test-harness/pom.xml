@@ -16,49 +16,15 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-plugin</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <includeTypes>jar</includeTypes>
-              <outputDirectory>${nexus-abs-basedir}/runtime/apps/nexus/lib</outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
             <id>artifactory-bridge</id>
-            <phase>generate-resources</phase>
+            <phase>generate-test-resources</phase>
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
               <includeArtifactIds>nexus-migration-artifactory-bridge</includeArtifactIds>
               <includeTypes>zip</includeTypes>
-              <outputDirectory>${nexus-abs-basedir}/runtime/apps/artifactory-bridge</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.3</version>
-        <executions>
-          <execution>
-            <id>copy-plexus-conf</id>
-            <phase>process-test-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${nexus-abs-basedir}/conf</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${basedir}/src/test/plexus-config</directory>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
+              <outputDirectory>${nexus-abs-basedir}</outputDirectory>
             </configuration>
           </execution>
         </executions>

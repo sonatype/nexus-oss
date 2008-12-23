@@ -9,14 +9,18 @@
   <fileSets>
     <fileSet>
       <directory>${basedir}/src/main/webapp</directory>
-      <outputDirectory>webapp</outputDirectory>
+      <outputDirectory>runtime/apps/artifactory-bridge/webapp</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}/src/main/conf</directory>
+      <outputDirectory>conf</outputDirectory>
     </fileSet>
   </fileSets>
 
   <dependencySets>
     <dependencySet>
       <unpack>false</unpack>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>runtime/apps/nexus/lib</outputDirectory>
     </dependencySet>
   </dependencySets>
 

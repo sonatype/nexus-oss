@@ -14,8 +14,8 @@ public class UrlConverterSkip
     protected void setUp()
         throws Exception
     {
-        urlConverter = lookup( UrlConverter.class );
-        MappingConfiguration cfg = lookup( MappingConfiguration.class );
+        urlConverter = (UrlConverter) lookup( UrlConverter.class );
+        MappingConfiguration cfg = (MappingConfiguration) lookup( MappingConfiguration.class );
         cfg.addMapping( new CMapping( "repo1", "central" ) );
         cfg.addMapping( new CMapping( "libs-local", "libs-local", "libs-local-releases", "libs-local-snapshots" ) );
     }

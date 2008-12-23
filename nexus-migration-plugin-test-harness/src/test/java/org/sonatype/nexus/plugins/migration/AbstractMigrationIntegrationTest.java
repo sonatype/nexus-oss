@@ -30,6 +30,7 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public class AbstractMigrationIntegrationTest
     extends AbstractNexusIntegrationTest
 {
+
     protected static final String DEFAULT_EMAIL = "juven@mars.com";
 
     protected RepositoryMessageUtil repositoryUtil;
@@ -48,6 +49,8 @@ public class AbstractMigrationIntegrationTest
     @BeforeClass
     public static void clean()
     {
+        TestContainer.getInstance().getTestContext().setSecureTest( false );
+
         try
         {
             cleanWorkDir();
