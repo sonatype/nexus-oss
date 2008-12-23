@@ -51,75 +51,46 @@ public class SecurityConfigConvertor
     public void convert()
         throws ArtifactoryMigrationException
     {
+        buildTargetSuite();
+
+        buildSecurityUsers();
+    }
+
+    private void buildTargetSuite()
+        throws ArtifactoryMigrationException
+    {
         if ( !resolvePermission )
         {
-            // convert users only, admin/anonymous
-            for ( ArtifactoryUser artifactoryUser : config.getUsers() )
-            {
-                SecurityUser user = buildSecurityUser( artifactoryUser );
-
-                if ( artifactoryUser.isAdmin() )
-                {
-                    user.addRole( "admin" );
-                }
-                else
-                {
-                    user.addRole( "anonymous" );
-                }
-
-                receiver.receiveSecurityUser( user );
-
-                users.add( user );
-            }
+            return;
         }
 
-        else
+        for ( ArtifactoryPermissionTarget target : config.getPermissionTargets() )
         {
-            for ( ArtifactoryPermissionTarget target : config.getPermissionTargets() )
-            {
-                String id = target.getId();
+            String id = target.getId();
 
-                TargetSuite targetSuite = new TargetSuite();
+            TargetSuite targetSuite = new TargetSuite();
 
-                CRepositoryTarget repoTarget = buildRepositoryTarget( target );
+            CRepositoryTarget repoTarget = buildRepositoryTarget( target );
 
-                SecurityPrivilege createPrivilege = buildSecurityPrivilege( target, repoTarget, "create" );
-                SecurityPrivilege readPrivilege = buildSecurityPrivilege( target, repoTarget, "read" );
-                SecurityPrivilege updatePrivilege = buildSecurityPrivilege( target, repoTarget, "update" );
-                SecurityPrivilege deletePrivilege = buildSecurityPrivilege( target, repoTarget, "delete" );
+            SecurityPrivilege createPrivilege = buildSecurityPrivilege( target, repoTarget, "create" );
+            SecurityPrivilege readPrivilege = buildSecurityPrivilege( target, repoTarget, "read" );
+            SecurityPrivilege updatePrivilege = buildSecurityPrivilege( target, repoTarget, "update" );
+            SecurityPrivilege deletePrivilege = buildSecurityPrivilege( target, repoTarget, "delete" );
 
-                SecurityRole readerRole = buildSecurityRole( target, "reader", readPrivilege );
-                SecurityRole deployerRole = buildSecurityRole( target, "deployer", createPrivilege, updatePrivilege );
-                SecurityRole adminRole = buildSecurityRole( target, "admin", updatePrivilege, deletePrivilege );
+            SecurityRole readerRole = buildSecurityRole( target, "reader", readPrivilege );
+            SecurityRole deployerRole = buildSecurityRole( target, "deployer", createPrivilege, updatePrivilege );
+            SecurityRole adminRole = buildSecurityRole( target, "admin", updatePrivilege, deletePrivilege );
 
-                targetSuite.setRepositoryTarget( repoTarget );
-                targetSuite.getPrivileges().add( createPrivilege );
-                targetSuite.getPrivileges().add( readPrivilege );
-                targetSuite.getPrivileges().add( updatePrivilege );
-                targetSuite.getPrivileges().add( deletePrivilege );
-                targetSuite.getRoles().add( readerRole );
-                targetSuite.getRoles().add( deployerRole );
-                targetSuite.getRoles().add( adminRole );
+            targetSuite.setRepositoryTarget( repoTarget );
+            targetSuite.getPrivileges().add( createPrivilege );
+            targetSuite.getPrivileges().add( readPrivilege );
+            targetSuite.getPrivileges().add( updatePrivilege );
+            targetSuite.getPrivileges().add( deletePrivilege );
+            targetSuite.getRoles().add( readerRole );
+            targetSuite.getRoles().add( deployerRole );
+            targetSuite.getRoles().add( adminRole );
 
-                mapping.put( id, targetSuite );
-            }
-
-            for ( ArtifactoryUser artifactoryUser : config.getUsers() )
-            {
-                SecurityUser user = buildSecurityUser( artifactoryUser );
-
-                if ( artifactoryUser.isAdmin() )
-                {
-                    user.addRole( "admin" );
-                }
-                else
-                {
-                    buildUserAclRole( user );
-                }
-                receiver.receiveSecurityUser( user );
-
-                users.add( user );
-            }
+            mapping.put( id, targetSuite );
         }
     }
 
@@ -170,12 +141,12 @@ public class SecurityConfigConvertor
         prop.setKey( "repositoryTargetId" );
         prop.setValue( repoTarget.getId() );
 
-        //for creating privs with a repoTarget to all repos, set the repoId and repoGroupId to be empty
-        if ( prop.getValue().equals( "ANY" ))
+        // for creating privs with a repoTarget to all repos, set the repoId and repoGroupId to be empty
+        if ( prop.getValue().equals( "ANY" ) )
         {
             prop.setKey( "" );
         }
-        
+
         privilege.addProperty( prop );
 
         prop = new SecurityProperty();
@@ -215,6 +186,33 @@ public class SecurityConfigConvertor
         return role;
     }
 
+    private void buildSecurityUsers()
+        throws ArtifactoryMigrationException
+    {
+        for ( ArtifactoryUser artifactoryUser : config.getUsers() )
+        {
+            SecurityUser user = buildSecurityUser( artifactoryUser );
+
+            if ( artifactoryUser.isAdmin() )
+            {
+                user.addRole( "admin" );
+            }
+            else
+            {
+                buildUserAclRole( user );
+            }
+
+            // nexus doesn't allow a user has no role assigned
+            if ( user.getRoles().isEmpty() )
+            {
+                user.addRole( "anonymous" );
+            }
+            receiver.receiveSecurityUser( user );
+
+            users.add( user );
+        }
+    }
+
     private SecurityUser buildSecurityUser( ArtifactoryUser artifactoryUser )
     {
         SecurityUser securityUser = new SecurityUser();
@@ -232,6 +230,11 @@ public class SecurityConfigConvertor
 
     private void buildUserAclRole( SecurityUser user )
     {
+        if ( !resolvePermission )
+        {
+            return;
+        }
+
         for ( ArtifactoryAcl acl : config.getAcls() )
         {
             if ( !acl.getUser().getUsername().equals( user.getName() ) )
