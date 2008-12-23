@@ -39,6 +39,8 @@ Sonatype.repoServer.UserEditPanel = function( config ) {
       handler: this.changePasswordHandler
     }
   };
+  
+  this.searchField = new Ext.app.SearchField( { searchPanel: this } );
 
   Sonatype.repoServer.UserEditPanel.superclass.constructor.call( this, {
     addMenuInitEvent: 'userAddMenuInit',
@@ -103,7 +105,28 @@ Sonatype.repoServer.UserEditPanel = function( config ) {
         cls: 'x-btn-text-icon',
         scope: this,
         handler: this.mapRolesHandler
-      }
+      },
+      ' ',
+      {
+        text: 'Find',
+        icon: Sonatype.config.resourcePath + '/images/icons/search.gif',
+        cls: 'x-btn-text-icon',
+        menu: {
+          items: [
+            {
+              text: 'Show Default Realm Users',
+              handler: this.showDefaultUsers,
+              scope: this
+            },
+            {
+              text: 'Show All Users With Nexus Roles',
+              handler: this.refreshHandler,
+              scope: this
+            }
+          ]
+        }
+      },
+      this.searchField
     ]
   } );
 
@@ -261,6 +284,36 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
     else {
       Sonatype.MessageBox.alert('The server did not reset the password.');
     }
+  },
+  
+  searchByUrl: function( url ) {
+    Ext.Ajax.request( {
+      scope: this,
+      url: url,
+      success: function( response, options ) {
+        var r = Ext.decode( response.responseText );
+        if ( r.data ) {
+          this.dataStore.loadData( r );
+        }
+        else {
+          this.clearAll();
+        }
+      }
+    } );
+  },
+
+  showDefaultUsers: function( button, e ) {
+    this.searchByUrl( Sonatype.config.repos.urls.plexusUsersDefault );
+  },
+  
+  startSearch: function( panel ) {
+    panel.searchField.triggers[0].show();
+    panel.searchByUrl( Sonatype.config.repos.urls.searchUsers + '/all/' +
+      panel.searchField.getValue() );
+  },
+  
+  stopSearch: function( panel ) {
+    panel.searchField.triggers[0].hide();
   },
 
   onUserMenuInit: function( menu, userRecord ) {

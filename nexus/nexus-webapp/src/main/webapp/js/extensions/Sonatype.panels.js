@@ -282,6 +282,11 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
     }
   },
 
+  clearAll: function() {
+    this.clearCards();
+    this.dataStore.removeAll();
+  },
+
   clearCards: function() {
     this.cardPanel.items.each( function( item, i, len ) {
       if ( i > 0 ) { this.remove( item, true ); }
