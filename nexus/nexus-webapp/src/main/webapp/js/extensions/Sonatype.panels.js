@@ -415,6 +415,22 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
     }
   },
   
+  deleteRecord: function( rec ) {
+    Ext.Ajax.request( {
+      callback: function( options, success, response ) {
+        if ( success ) {
+          this.dataStore.remove( rec );
+        }
+        else {
+          Sonatype.utils.connectionError( response, 'Delete Failed!' );
+        }
+      },
+      scope: this,
+      method: 'DELETE',
+      url: rec.data.resourceURI
+    } );
+  },
+  
   deleteActionHandler: function( button, e ) {
     if ( this.gridPanel.getSelectionModel().hasSelection() ) {
       var rec = this.gridPanel.getSelectionModel().getSelected();
@@ -434,19 +450,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
           icon: Sonatype.MessageBox.QUESTION,
           fn: function( btnName ) {
             if ( btnName == 'yes' || btnName == 'ok' ) {
-              Ext.Ajax.request( {
-                callback: function( options, success, response ) {
-                  if ( success ) {
-                    this.dataStore.remove( rec );
-                  }
-                  else {
-                    Sonatype.utils.connectionError( response, 'Delete Failed!' );
-                  }
-                },
-                scope: this,
-                method: 'DELETE',
-                url: rec.data.resourceURI
-              } );
+              this.deleteRecord( rec );
             }
           }
         } );

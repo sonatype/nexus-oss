@@ -297,16 +297,20 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
   
   searchByUrl: function( url ) {
     this.lastUrl = url;
+    this.gridPanel.loadMask.show();
     Ext.Ajax.request( {
       scope: this,
       url: url,
-      success: function( response, options ) {
-        var r = Ext.decode( response.responseText );
-        if ( r.data ) {
-          this.dataStore.loadData( r );
-        }
-        else {
-          this.clearAll();
+      callback: function( options, success, response ) {
+        this.gridPanel.loadMask.hide();
+        if ( success ) {
+          var r = Ext.decode( response.responseText );
+          if ( r.data ) {
+            this.dataStore.loadData( r );
+          }
+          else {
+            this.clearAll();
+          }
         }
       }
     } );
@@ -383,6 +387,29 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
       }
     } );
   },
+
+  deleteRecord: function( rec ) {
+    if ( rec.data.source == 'default' ) {
+      return Sonatype.repoServer.UserEditPanel.superclass.deleteRecord.call( this, rec );
+    }
+    else {
+      Ext.Ajax.request( {
+        callback: function( options, success, response ) {
+          if ( success ) {
+            this.dataStore.remove( rec );
+          }
+          else {
+            Sonatype.utils.connectionError( response, 'Delete Failed!' );
+          }
+        },
+        scope: this,
+        suppressStatus: 404,
+        method: 'DELETE',
+        url: Sonatype.config.repos.urls.userToRoles + '/' +
+          rec.data.source + '/' + rec.data.userId
+      } );
+    }
+  },
   
   deleteActionHandler: function( button, e ) {
     if ( this.gridPanel.getSelectionModel().hasSelection() ) {
@@ -391,10 +418,31 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
         return Sonatype.repoServer.UserEditPanel.superclass.deleteActionHandler.call( this, button, e );
       }
       else {
+        var roles = rec.data.roles;
+        if ( roles ) for ( var i = 0; i < roles.length; i++ ) {
+          if ( roles[i].source == 'default' ) {
+            Sonatype.utils.defaultToNo();
+            
+            Sonatype.MessageBox.show({
+              animEl: this.gridPanel.getEl(),
+              title: 'Delete',
+              msg: 'Delete Nexus role mapping for ' + rec.data[this.titleColumn] + '?',
+              buttons: Sonatype.MessageBox.YESNO,
+              scope: this,
+              icon: Sonatype.MessageBox.QUESTION,
+              fn: function( btnName ) {
+                if ( btnName == 'yes' || btnName == 'ok' ) {
+                  this.deleteRecord( rec );
+                }
+              }
+            } );
+            return;
+          }
+        }
         Sonatype.MessageBox.show( {
           animEl: this.gridPanel.getEl(),
           title: 'Delete',
-          msg: 'Cannot delete a user from external realm.',
+          msg: 'This user does not have any Nexus roles mapped.',
           buttons: Sonatype.MessageBox.OK,
           scope: this,
           icon: Sonatype.MessageBox.WARNING
@@ -751,6 +799,12 @@ Sonatype.repoServer.UserMappingEditor = function( config ) {
       cancel: {
         fn: function() {
           this.payload.hostPanel.recordRemoveHandler( null, this.payload, 0 );
+        },
+        scope: this
+      },
+      submit: {
+        fn: function() {
+          this.payload.hostPanel.refreshHandler( null, null );
         },
         scope: this
       }
