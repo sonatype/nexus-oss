@@ -10,11 +10,11 @@ import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 
-public class NXCM254ImportSecurity125WithoutPermissionTest
+public class NXCM254ImportSecurity125DisablePermissionTest
     extends AbstractImportSecurityTest
 {
 
-    public NXCM254ImportSecurity125WithoutPermissionTest()
+    public NXCM254ImportSecurity125DisablePermissionTest()
     {
         super();
     }
@@ -55,19 +55,19 @@ public class NXCM254ImportSecurity125WithoutPermissionTest
         // verify user-role mapping
         PlexusUserResource admin = getUserById( userList, "admin-artifactory" );
         Assert.assertEquals( 1, admin.getRoles().size() );
-        containRoleEndWith( admin.getRoles(), "admin" );
+        containPlexusRole( admin.getRoles(), "admin" );
 
         PlexusUserResource admin1 = getUserById( userList, "admin1" );
         Assert.assertEquals( 1, admin1.getRoles().size() );
-        containRoleEndWith( admin1.getRoles(), "admin" );
+        containPlexusRole( admin1.getRoles(), "admin" );
 
         PlexusUserResource user = getUserById( userList, "user" );
         Assert.assertEquals( 1, user.getRoles().size() );
-        containRoleEndWith( user.getRoles(), "anonymous" );
+        containPlexusRole( user.getRoles(), "anonymous" );
 
         PlexusUserResource user1 = getUserById( userList, "user1" );
         Assert.assertEquals( 1, user1.getRoles().size() );
-        containRoleEndWith( user1.getRoles(), "anonymous" );
+        containPlexusRole( user1.getRoles(), "anonymous" );
     }
 
 }

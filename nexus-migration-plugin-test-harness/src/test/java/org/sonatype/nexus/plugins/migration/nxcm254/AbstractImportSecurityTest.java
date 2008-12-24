@@ -1,14 +1,11 @@
 package org.sonatype.nexus.plugins.migration.nxcm254;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.plugins.migration.util.PlexusUserMessageUtil;
 import org.sonatype.nexus.rest.model.PlexusRoleResource;
@@ -151,19 +148,6 @@ public abstract class AbstractImportSecurityTest
         return addedList;
     }
 
-    private void checkUsers()
-        throws Exception
-    {
-        List<PlexusUserResource> userList = userUtil.getList();
-
-        // artifactory admin is conflicted with nexus admin, so a suffix should be added
-        checkUser( userList, "admin-artifactory", "admin-artifactory", DEFAULT_EMAIL, "admin" );
-        // others keep unchanged
-        checkUser( userList, "admin1", "admin1", DEFAULT_EMAIL, "admin" );
-        checkUser( userList, "user", "user", DEFAULT_EMAIL );
-        checkUser( userList, "user1", "user1", DEFAULT_EMAIL );
-    }
-
     protected boolean containRepoTarget( List<RepositoryTargetListResource> repoTargetList, String repoTargetId )
     {
         for ( RepositoryTargetListResource target : repoTargetList )
@@ -174,23 +158,6 @@ public abstract class AbstractImportSecurityTest
             }
         }
         return false;
-    }
-
-    @SuppressWarnings( "unchecked" )
-    private void checkUser( List<PlexusUserResource> userList, String id, String name, String email, String... roleIds )
-    {
-        PlexusUserResource user = getUserById( userList, id );
-
-        Assert.assertNotNull( "User with id '" + id + "' does not exist", user );
-        Assert.assertEquals( name, user.getName() );
-        Assert.assertEquals( email, user.getEmail() );
-
-        for ( String roleId : roleIds )
-        {
-            Assert.assertTrue(
-                "User with id '" + id + "' does not contain the role '" + roleId + "'",
-                containPlexusRole( user.getRoles(), roleId ) );
-        }
     }
 
     protected boolean containRole( List<RoleResource> roleList, String roleId )
@@ -204,19 +171,6 @@ public abstract class AbstractImportSecurityTest
         }
         return false;
     }
-    
-/*    protected boolean containRole( List<String> roleList, String roleId )
-    {
-        for ( String role : roleList )
-        {
-            if ( role.equals( roleId ) )
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }*/
 
     protected boolean containPlexusRole( List<PlexusRoleResource> roleList, String roleId )
     {
@@ -273,6 +227,18 @@ public abstract class AbstractImportSecurityTest
             if ( user.getUserId().equals( id ) )
             {
                 return user;
+            }
+        }
+        return null;
+    }
+    
+    protected RoleResource getRoleById( List<RoleResource> roleList, String id )
+    {
+        for ( RoleResource role : roleList )
+        {
+            if ( role.getId().equals( id ) )
+            {
+                return role;
             }
         }
         return null;

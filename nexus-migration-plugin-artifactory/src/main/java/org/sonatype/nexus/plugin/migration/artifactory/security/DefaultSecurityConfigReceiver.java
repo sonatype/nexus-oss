@@ -10,6 +10,7 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
+import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
 
 @Component( role = SecurityConfigReceiver.class )
 public class DefaultSecurityConfigReceiver
@@ -22,6 +23,9 @@ public class DefaultSecurityConfigReceiver
     @Requirement
     private Nexus nexus;
 
+    @Requirement( role = MappingConfiguration.class, hint = "default" )
+    private MappingConfiguration mapping;
+    
     public void receiveRepositoryTarget( CRepositoryTarget repoTarget )
         throws ArtifactoryMigrationException
     {

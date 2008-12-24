@@ -86,6 +86,12 @@ public class SecurityConfigConvertor
                 }
                 role.setRoles( subRoles );
             }
+            
+            // nexus doesn't allow a new role without privileges and roles
+            if ( role.getRoles().isEmpty() && role.getPrivileges().isEmpty())
+            {
+                role.addRole( "anonymous" );
+            }
 
             receiver.receiveSecurityRole( role );
         }

@@ -10,28 +10,29 @@ import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 
-public class NXCM254ImportSecurity125Test
+public class NXCM254ImportSecurity130Test
     extends AbstractImportSecurityTest
 {
-    public NXCM254ImportSecurity125Test()
+    public NXCM254ImportSecurity130Test()
     {
         super();
     }
 
     @Override
-    public void importSecurity()
+    protected void importSecurity()
         throws Exception
     {
-        MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactory-security-125.zip" ) );
+        MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactory-security-130.zip" ) );
 
         migrationSummary.setResolvePermission( true );
         
         commitMigration( migrationSummary );
+
     }
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     @Override
-    public void verifySecurity()
+    protected void verifySecurity()
         throws Exception
     {
         List<PlexusUserResource> userList = getImportedUserList();
@@ -42,50 +43,55 @@ public class NXCM254ImportSecurity125Test
         Assert.assertEquals( "4 users imported", 4, userList.size() );
         Assert.assertEquals( "3 repo targets imported", 3, targetList.size() );
         Assert.assertEquals( "4 privileges for each repo target", targetList.size() * 4, privilegeList.size() );
-        Assert.assertEquals( "4 roles for each repo target", targetList.size() * 4, roleList.size() );
-
+        Assert.assertEquals( "4 roles for each repo target, plus a group", targetList.size() * 4 + 1, roleList.size() );
+        
         // these users are imported
+        Assert.assertTrue( containUser( userList, "anonymous-artifactory" ) );
         Assert.assertTrue( containUser( userList, "admin-artifactory" ) );
-        Assert.assertTrue( containUser( userList, "admin1" ) );
         Assert.assertTrue( containUser( userList, "user" ) );
         Assert.assertTrue( containUser( userList, "user1" ) );
-
+        
         for ( RepositoryTargetListResource target : targetList )
         {
             String key = target.getId();
 
-            // 4 privileges for 1 repoTarget imported
+            // 4 privileges for each repoTarget imported
             Assert.assertTrue( containPrivilegeName( privilegeList, key + "-create" ) );
             Assert.assertTrue( containPrivilegeName( privilegeList, key + "-read" ) );
             Assert.assertTrue( containPrivilegeName( privilegeList, key + "-update" ) );
             Assert.assertTrue( containPrivilegeName( privilegeList, key + "-delete" ) );
 
-            // 3 roles for 1 repoTarget imported
+            // 4 roles for each repoTarget imported
             Assert.assertTrue( containRole( roleList, key + "-reader" ) );
             Assert.assertTrue( containRole( roleList, key + "-deployer" ) );
+            Assert.assertTrue( containRole( roleList, key + "-delete" ) );
             Assert.assertTrue( containRole( roleList, key + "-admin" ) );
         }
-
+        
         // verify user-role mapping
+        PlexusUserResource anonymous = getUserById( userList, "anonymous-artifactory" );
+        Assert.assertEquals( 1, anonymous.getRoles().size() );
+        containPlexusRole( anonymous.getRoles(), "Anything-reader" );
+
         PlexusUserResource admin = getUserById( userList, "admin-artifactory" );
         Assert.assertEquals( 1, admin.getRoles().size() );
-        containRoleEndWith( admin.getRoles(), "admin" );
-
-        PlexusUserResource admin1 = getUserById( userList, "admin1" );
-        Assert.assertEquals( 1, admin1.getRoles().size() );
-        containRoleEndWith( admin1.getRoles(), "admin" );
+        containPlexusRole( admin.getRoles(), "admin" );
 
         PlexusUserResource user = getUserById( userList, "user" );
-        Assert.assertEquals( 3, user.getRoles().size() );
-        containRoleEndWith( user.getRoles(), "-admin" );
-        containRoleEndWith( user.getRoles(), "-deployer" );
-        containRoleEndWith( user.getRoles(), "-reader" );
+        Assert.assertEquals( 1, user.getRoles().size() );
+        containPlexusRole( user.getRoles(), "group" );
 
         PlexusUserResource user1 = getUserById( userList, "user1" );
-        Assert.assertEquals( 2, user1.getRoles().size() );
-        containRoleEndWith( user1.getRoles(), "-deployer" );
-        containRoleEndWith( user1.getRoles(), "-reader" );
+        Assert.assertEquals( 1, user1.getRoles().size() );
+        containPlexusRole( user1.getRoles(), "permTarget1-delete" );
+        
+        // verify the group role
+        RoleResource groupRole = getRoleById(roleList, "group");
+        Assert.assertNotNull ( groupRole);
+        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-reader" ) );
+        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-deployer" ) );
+        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-delete" ) );
+        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-admin" ) );
     }
-
 
 }

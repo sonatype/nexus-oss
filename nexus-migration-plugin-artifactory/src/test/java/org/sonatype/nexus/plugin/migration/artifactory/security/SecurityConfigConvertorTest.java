@@ -149,7 +149,7 @@ public class SecurityConfigConvertorTest
         configConvertor.convert();
 
         Assert.assertEquals( 9, roleList.size() );
-        
+
         // the READER, DEPLOYER, DELETE, ADMIN by order for each target
         Assert.assertEquals( "apachePermTarget-reader", roleList.get( 0 ).getId() );
         Assert.assertEquals( "apachePermTarget-reader", roleList.get( 0 ).getName() );
@@ -212,7 +212,7 @@ public class SecurityConfigConvertorTest
         SecurityUser user1 = userList.get( 2 );
         Assert.assertEquals( 2, user1.getRoles().size() );
     }
-    
+
     @Test
     public void disableResolvePermission()
         throws Exception
@@ -230,9 +230,8 @@ public class SecurityConfigConvertorTest
         Assert.assertTrue( userList.get( 2 ).getRoles().contains( "anonymous" ) );
 
         Assert.assertTrue( roleList.get( 0 ).getPrivileges().isEmpty() );
-        Assert.assertTrue( roleList.get( 0 ).getRoles().isEmpty() );
+        Assert.assertTrue( roleList.get( 0 ).getRoles().contains( "anonymous" ) );
     }
-    
 
     class FakeReceiver
         implements SecurityConfigReceiver
