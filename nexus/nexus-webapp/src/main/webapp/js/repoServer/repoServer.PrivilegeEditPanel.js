@@ -135,7 +135,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
         },
         scope: this
       }
-    },
+    }
   } );  
 };
 
