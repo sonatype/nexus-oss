@@ -172,7 +172,11 @@ public class M2GroupRepository
                         + " found items." );
             }
 
-            return createStorageItem( uid, bos.toByteArray(), context );
+            AbstractStorageItem item = createStorageItem( uid, bos.toByteArray(), context );
+
+            item.getItemContext().put( CTX_TRANSITIVE_ITEM, Boolean.TRUE );
+
+            return item;
         }
         catch ( NoSuchAlgorithmException ex )
         {

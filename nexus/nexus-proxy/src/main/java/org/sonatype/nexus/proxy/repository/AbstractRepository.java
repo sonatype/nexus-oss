@@ -103,6 +103,13 @@ public abstract class AbstractRepository
 
     private static final ExecutorService exec = Executors.newCachedThreadPool();
 
+    /**
+     * StorageItem context key. If value set to Boolean.TRUE, the item will
+     * not be stored locally. Useful to suppress caching of secondary items,
+     * like merged m2 group repository metadata.
+     */
+    public static final String CTX_TRANSITIVE_ITEM = AbstractRepository.class.getCanonicalName() + ".CTX_TRANSITIVE_ITEM";
+
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
@@ -1385,6 +1392,11 @@ public abstract class AbstractRepository
     protected AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws StorageException
     {
+        if ( Boolean.TRUE.equals( item.getItemContext().get( CTX_TRANSITIVE_ITEM ) ) )
+        {
+            return item;
+        }
+
         AbstractStorageItem result = null;
 
         try
