@@ -13,6 +13,8 @@ import org.sonatype.jsecurity.realms.tools.dao.SecurityProperty;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
+import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
+import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
 
 public class SecurityConfigConvertorTest
 {
@@ -81,7 +83,7 @@ public class SecurityConfigConvertorTest
         groupAcl.addPermission( ArtifactoryPermission.READER );
         config.addAcl( groupAcl );
 
-        configConvertor = new SecurityConfigConvertor( config, new FakeReceiver() );
+        configConvertor = new SecurityConfigConvertor( config, new FakeReceiver(), new FakeMappingConfiguration() );
     }
 
     @Test
@@ -260,6 +262,36 @@ public class SecurityConfigConvertorTest
         {
             userList.add( user );
         }
+    }
+
+    class FakeMappingConfiguration
+        implements MappingConfiguration
+    {
+
+        public void addMapping( CMapping map )
+        {
+            // nothing
+        }
+
+        // always return the same repository id
+        public CMapping getMapping( String repositoryId )
+        {
+            CMapping mapping = new CMapping();
+
+            mapping.setArtifactoryRepositoryId( repositoryId );
+
+            mapping.setNexusGroupId( null );
+
+            mapping.setNexusRepositoryId( repositoryId );
+
+            return mapping;
+        }
+
+        public void save()
+        {
+            // nothing
+        }
+
     }
 
 }

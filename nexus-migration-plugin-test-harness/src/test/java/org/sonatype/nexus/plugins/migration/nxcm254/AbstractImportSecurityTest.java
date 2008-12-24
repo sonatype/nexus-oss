@@ -13,7 +13,9 @@ import org.sonatype.nexus.rest.model.PlexusUserResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RoleResource;
+import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
+import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 
@@ -28,6 +30,10 @@ public abstract class AbstractImportSecurityTest
     protected RoleMessageUtil roleUtil;
 
     protected PrivilegesMessageUtil privilegeUtil;
+    
+    protected RepositoryMessageUtil repoUtil;
+    
+    protected GroupMessageUtil groupUtil;
 
     /**
      * System user, role, privilege, repoTarget, before importing artifactory
@@ -47,6 +53,8 @@ public abstract class AbstractImportSecurityTest
         repoTargetUtil = new TargetMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
         privilegeUtil = new PrivilegesMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
         roleUtil = new RoleMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        repoUtil = new RepositoryMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        groupUtil = new GroupMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
     }
     
     abstract protected void importSecurity()

@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityProperty;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
+import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
+import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
 
 public class SecurityConfigConvertor
 {
@@ -23,13 +26,24 @@ public class SecurityConfigConvertor
 
     private List<SecurityUser> users = new ArrayList<SecurityUser>();
 
+    /**
+     * Mapping between the target id and target suite
+     */
     private Map<String, TargetSuite> mapping = new HashMap<String, TargetSuite>();
 
-    public SecurityConfigConvertor( ArtifactorySecurityConfig config, SecurityConfigReceiver persistor )
+    /**
+     * Mapping between artifactory repo key and nexus repo/group id
+     */
+    private MappingConfiguration mappingConfiguration;
+
+    public SecurityConfigConvertor( ArtifactorySecurityConfig config, SecurityConfigReceiver persistor,
+        MappingConfiguration mappingConfiguration )
     {
         this.config = config;
 
         this.receiver = persistor;
+
+        this.mappingConfiguration = mappingConfiguration;
     }
 
     public boolean isResolvePermission()
@@ -86,9 +100,9 @@ public class SecurityConfigConvertor
                 }
                 role.setRoles( subRoles );
             }
-            
+
             // nexus doesn't allow a new role without privileges and roles
-            if ( role.getRoles().isEmpty() && role.getPrivileges().isEmpty())
+            if ( role.getRoles().isEmpty() && role.getPrivileges().isEmpty() )
             {
                 role.addRole( "anonymous" );
             }
@@ -181,30 +195,76 @@ public class SecurityConfigConvertor
         SecurityProperty prop = new SecurityProperty();
         prop.setKey( "method" );
         prop.setValue( method );
-
         privilege.addProperty( prop );
 
         prop = new SecurityProperty();
         prop.setKey( "repositoryTargetId" );
         prop.setValue( repoTarget.getId() );
+        privilege.addProperty( prop );
 
         // for creating privs with a repoTarget to all repos, set the repoId and repoGroupId to be empty
-        if ( prop.getValue().equals( "ANY" ) )
+        if ( permissionTarget.getRepoKey().equals( "ANY" ) )
         {
-            prop.setKey( "" );
+            prop = new SecurityProperty();
+            prop.setKey( "repositoryGroupId" );
+            prop.setValue( "" );
+            privilege.addProperty( prop );
+
+            prop = new SecurityProperty();
+            prop.setKey( "repositoryId" );
+            prop.setValue( "" );
+            privilege.addProperty( prop );
         }
-
-        privilege.addProperty( prop );
-
-        prop = new SecurityProperty();
-        prop.setKey( "repositoryId" );
-        prop.setValue( permissionTarget.getRepoKey() );
-
-        privilege.addProperty( prop );
+        else
+        {
+            privilege.addProperty( buildRepoIdGroupIdProperty( permissionTarget.getRepoKey() ) );
+        }
 
         receiver.receiveSecurityPrivilege( privilege );
 
         return privilege;
+    }
+
+    private SecurityProperty buildRepoIdGroupIdProperty( String repoKey )
+        throws ArtifactoryMigrationException
+
+    {
+        String artiRepoKey = repoKey;
+
+        // Here I have to hack damned Artifactory again, the repoKeys in its artifactory.config.xml and security.xml are
+        // inconsistant
+        if ( artiRepoKey.endsWith( "-cache" ) )
+        {
+            artiRepoKey = artiRepoKey.substring( 0, artiRepoKey.indexOf( "-cache" ) );
+        }
+
+        CMapping mapping = mappingConfiguration.getMapping( artiRepoKey );
+
+        if ( mapping == null )
+        {
+            throw new ArtifactoryMigrationException( "Cannot find the mapping repo/repoGroup id for key '"
+                + artiRepoKey + "'." );
+        }
+        SecurityProperty prop = new SecurityProperty();
+
+        if ( !StringUtils.isEmpty( mapping.getNexusGroupId() ) )
+        {
+            prop.setKey( "repositoryGroupId" );
+
+            prop.setValue( mapping.getNexusGroupId() );
+        }
+        else if ( !StringUtils.isEmpty( mapping.getNexusRepositoryId() ) )
+        {
+            prop.setKey( "repositoryId" );
+
+            prop.setValue( mapping.getNexusRepositoryId() );
+        }
+        else
+        {
+            throw new ArtifactoryMigrationException( "Cannot find the mapping repo/repoGroup id for repo key '"
+                + artiRepoKey + "'." );
+        }
+        return prop;
     }
 
     private SecurityRole buildSecurityRoleFromPrivilege( ArtifactoryPermissionTarget target, String key,
