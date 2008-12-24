@@ -17,8 +17,10 @@
 package org.sonatype.nexus;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -120,6 +122,27 @@ public abstract class AbstractNexusTestCase
     protected LoggerManager getLoggerManager() throws ComponentLookupException
     {
         return (LoggerManager) getContainer().lookup( LoggerManager.class );
+    }
+
+    protected boolean contentEquals( File f1, File f2 ) throws IOException
+    {
+        return contentEquals( new FileInputStream( f1 ), new FileInputStream( f2 ) );
+    }
+
+    /**
+     * Both s1 and s2 will be closed.
+     */
+    protected boolean contentEquals( InputStream s1, InputStream s2 ) throws IOException
+    {
+        try
+        {
+            return IOUtil.contentEquals( s1, s2 );
+        }
+        finally
+        {
+            IOUtil.close( s1 );
+            IOUtil.close( s2 );
+        }
     }
 
 }

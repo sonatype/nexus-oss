@@ -24,14 +24,12 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.InputStreamFacade;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 public class DefaultNexusConfigurationTest
@@ -176,7 +174,7 @@ public class DefaultNexusConfigurationTest
     {
         nexusConfiguration.loadConfiguration();
 
-        IOUtil.contentEquals( new FileInputStream( new File( getNexusConfiguration() ) ), nexusConfiguration
+        contentEquals( new FileInputStream( new File( getNexusConfiguration() ) ), nexusConfiguration
             .getConfigurationAsStream() );
     }
 
@@ -185,7 +183,7 @@ public class DefaultNexusConfigurationTest
     {
         nexusConfiguration.loadConfiguration();
 
-        IOUtil.contentEquals( getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" ), nexusConfiguration
+        contentEquals( getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" ), nexusConfiguration
             .getConfigurationSource().getDefaultsSource().getConfigurationAsStream() );
     }
 
@@ -233,12 +231,12 @@ public class DefaultNexusConfigurationTest
         {
             if ( entry.getValue().equals( "test.xml" ) )
             {
-                IOUtil.contentEquals( new ByteArrayInputStream( "test".getBytes() ), nexusConfiguration
+                contentEquals( new ByteArrayInputStream( "test".getBytes() ), nexusConfiguration
                     .getConfigurationAsStreamByKey( entry.getKey() ) );
             }
             else if ( entry.getValue().equals( "nexus.xml" ) )
             {
-                IOUtil.contentEquals( new FileInputStream( new File( getNexusConfiguration() ) ), nexusConfiguration
+                contentEquals( new FileInputStream( new File( getNexusConfiguration() ) ), nexusConfiguration
                     .getConfigurationAsStreamByKey( entry.getKey() ) );
             }
         }

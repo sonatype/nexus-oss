@@ -263,13 +263,27 @@ public class SecurityConfigUtil
             fr = new InputStreamReader( new FileInputStream( secConfigFile ) );
 
             // read again with interpolation
-            configuration = reader.read( fr );
+            try
+            {
+                configuration = reader.read( fr );
+            }
+            finally
+            {
+                fr.close();
+            }
             
             Configuration staticConfiguration = null;
             
             fr = new InputStreamReader( SecurityConfigUtil.class.getResourceAsStream( "/META-INF/nexus/static-security.xml" ) );
             
-            staticConfiguration = reader.read( fr );
+            try
+            {
+                staticConfiguration = reader.read( fr );
+            }
+            finally
+            {
+                fr.close();
+            }
             
             for ( CUser user : ( List<CUser> ) staticConfiguration.getUsers() )
             {
@@ -288,13 +302,6 @@ public class SecurityConfigUtil
         catch ( XmlPullParserException e )
         {
             Assert.fail( "could not parse nexus.xml: " + e.getMessage() );
-        }
-        finally
-        {
-            if ( fr != null )
-            {
-                fr.close();
-            }
         }
         return configuration;
     }

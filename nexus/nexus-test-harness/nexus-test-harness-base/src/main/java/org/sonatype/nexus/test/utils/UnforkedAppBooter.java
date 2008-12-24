@@ -202,7 +202,15 @@ public class UnforkedAppBooter
 
             try
             {
-                containerProperties.load( new FileInputStream( containerPropertiesFile ) );
+                FileInputStream is = new FileInputStream( containerPropertiesFile );
+                try
+                {
+                    containerProperties.load( is );
+                }
+                finally
+                {
+                    is.close();
+                }
             }
             catch ( IOException e )
             {
