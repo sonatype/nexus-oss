@@ -9,8 +9,12 @@
   </parent>
   <artifactId>nexus-migration-plugin-test-harness</artifactId>
 
-  <build>
+  <properties>
+    <migration-plugin-version>1.0-SNAPSHOT</migration-plugin-version>
+    <nexus.version>1.3.0-SNAPSHOT</nexus.version>
+  </properties>
 
+  <build>
     <plugins>
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -27,6 +31,18 @@
               <outputDirectory>${nexus-abs-basedir}</outputDirectory>
             </configuration>
           </execution>
+          <execution>
+            <id>unpack-maven-repo</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeArtifactIds>nexus-test-harness-launcher</includeArtifactIds>
+              <includeTypes>zip</includeTypes>
+              <outputDirectory>${project.build.testOutputDirectory}/fake-central</outputDirectory>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 
@@ -37,19 +53,26 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-migration-plugin-artifactory</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${migration-plugin-version}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-migration-artifactory-bridge</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${migration-plugin-version}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-migration-artifactory-bridge</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${migration-plugin-version}</version>
       <type>zip</type>
       <classifier>webapp</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <version>${nexus.version}</version>
+      <type>zip</type>
+      <classifier>repo</classifier>
     </dependency>
   </dependencies>
 

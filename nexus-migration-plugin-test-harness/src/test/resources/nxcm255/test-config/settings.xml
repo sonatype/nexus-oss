@@ -4,12 +4,31 @@
 
   <localRepository>${project.build.directory}/maven_repo</localRepository>
 
+  <mirrors>
+    <mirror>
+      <!--This sends everything else to /public -->
+      <id>nexus</id>
+      <mirrorOf>central</mirrorOf>
+      <url>${nexus-base-url}content/groups/public</url>
+    </mirror>
+  </mirrors>
+
   <profiles>
     <profile>
       <id>development</id>
       <!--Central is included by default and we must either turn it off, or fix it for our purposes. Lets fix it by turning on snapshots so that internal snaps will be found. Do
      this for repo and pluginRepo -->
       <repositories>
+        <repository>
+          <id>central</id>
+          <url>http://central</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
         <repository>
           <id>artifactory</id>
           <url>http://localhost:${nexus-application-port}/artifactory/main-local</url>
@@ -21,6 +40,18 @@
           </snapshots>
         </repository>
       </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>http://central</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
     </profile>
   </profiles>
   <activeProfiles>
