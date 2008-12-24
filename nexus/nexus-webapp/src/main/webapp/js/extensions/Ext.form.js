@@ -532,12 +532,11 @@ Sonatype.ext.FormPanel = function( config ) {
     layoutConfig: {
       labelSeparator: ''
     },
-    buttons: [
+    buttons: ( config.readOnly || this.readOnly ) ? [] : [
       {
         text: 'Save',
         handler: this.saveHandler,
-        scope: this,
-        disabled: config.readOnly
+        scope: this
       },
       {
         handler: this.cancelButton ? this.cancelHandler : this.resetHandler,
@@ -552,23 +551,11 @@ Sonatype.ext.FormPanel = function( config ) {
 
   Sonatype.ext.FormPanel.superclass.constructor.call( this, {} );
 
+  this.on( 'afterlayout', this.initData, this, { single:true } );
   this.on( 'afterlayout', this.registerRequiredQuicktips, this, { single:true } );
   this.form.on( 'actioncomplete', this.actionCompleteHandler, this );
   this.form.on( 'actionfailed', this.actionFailedHandler, this );
   this.addEvents( { cancel: true, load: true, submit: true } );
-
-  if ( this.dataStores ) {
-    for ( var i = 0; i < this.dataStores.length; i++ ) {
-      var store = this.dataStores[i]; 
-      store.on( 'load', this.dataStoreLoadHandler, this );
-      if ( store.autoLoad != true ) {
-        store.load();
-      }
-    }
-  }
-  else {
-    this.loadData();
-  }
 };
 
 Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
@@ -623,6 +610,21 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
   resetHandler: function( button, event ) {
     this.loadData();
   },
+
+  initData: function() {
+    if ( this.dataStores ) {
+      for ( var i = 0; i < this.dataStores.length; i++ ) {
+        var store = this.dataStores[i]; 
+        store.on( 'load', this.dataStoreLoadHandler, this );
+        if ( store.autoLoad != true ) {
+          store.load();
+        }
+      }
+    }
+    else {
+      this.loadData();
+    }
+  },
   
   loadData: function() {
     if ( this.isNew ) {
@@ -650,6 +652,7 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
         url: this.getActionURL(),
         waitMsg: this.isNew ? 'Creating a new record...' : 'Updating records...',
         fpanel: this,
+        validationModifiers: this.validationModifiers,
         dataModifiers: this.dataModifiers.submit,
         serviceDataObj: this.referenceData,
         isNew: this.isNew //extra option to send to callback, instead of conditioning on method
@@ -683,10 +686,19 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
       if ( this.isNew && this.payload.autoCreateNewRecord ) {
         var store = this.payload.store;
         store.remove( this.payload );
-        
-        var rec = new store.reader.recordType( receivedData, receivedData.resourceURI );
-        rec.autoCreateNewRecord = true;
-        store.addSorted( rec );
+
+        if ( Ext.isArray( receivedData ) ) {
+          for ( var i = 0; i < receivedData.length; i++ ) {
+            var r = receivedData[i];
+            var rec = new store.reader.recordType( r, r.resourceURI );
+            store.addSorted( rec );
+          }
+        }
+        else {
+          var rec = new store.reader.recordType( receivedData, receivedData.resourceURI );
+          rec.autoCreateNewRecord = true;
+          store.addSorted( rec );
+        }
       }
       this.isNew = false;
       this.payload.autoCreateNewRecord = false;
