@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
@@ -25,7 +26,9 @@ import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryRepository;
+import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryVirtualRepository;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.ERepositoryType;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.GroupResolutionDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryResponseDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
@@ -33,6 +36,7 @@ import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecurityConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
 import org.sonatype.nexus.plugin.migration.artifactory.security.builder.ArtifactorySecurityConfigBuilder;
+import org.sonatype.nexus.plugin.migration.artifactory.util.VirtualRepositoryUtil;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -85,7 +89,6 @@ public class ArtifactoryUploadBackupPlexusResource
         return true;
     }
 
-    @SuppressWarnings( "unchecked" )
     @Override
     public Object upload( Context context, Request request, Response response, List<FileItem> files )
         throws ResourceException
@@ -106,18 +109,21 @@ public class ArtifactoryUploadBackupPlexusResource
 
                 ArtifactoryConfig cfg = ArtifactoryConfig.read( configFile );
 
-                List<RepositoryResolutionDTO> repositoriesResolution = validate(
-                    cfg.getLocalRepositories().values(),
-                    cfg.getRemoteRepositories().values() );
+                final Map<String, ArtifactoryRepository> repositories = cfg.getRepositories();
+
+                List<RepositoryResolutionDTO> repositoriesResolution = resolve( repositories.values() );
 
                 data.setRepositoriesResolution( repositoriesResolution );
+
+                List<GroupResolutionDTO> groupsResolution = resolve( cfg.getVirtualRepositories(), repositories );
+                data.setGroupsResolution( groupsResolution );
 
                 // read security.xml
                 File securityFile = new File( artifactoryBackup, "security.xml" );
 
                 ArtifactorySecurityConfig securityCfg = ArtifactorySecurityConfigBuilder.read( securityFile );
 
-                List<UserResolutionDTO> userResolution = validate( securityCfg.getUsers() );
+                List<UserResolutionDTO> userResolution = resolve( securityCfg.getUsers() );
 
                 data.setUserResolution( userResolution );
 
@@ -142,39 +148,73 @@ public class ArtifactoryUploadBackupPlexusResource
         throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST );
     }
 
-    private List<RepositoryResolutionDTO> validate( Collection<ArtifactoryRepository>... repositoriesSet )
+    private List<GroupResolutionDTO> resolve( Map<String, ArtifactoryVirtualRepository> virtualRepos,
+                                              Map<String, ArtifactoryRepository> repositories )
+    {
+        VirtualRepositoryUtil.resolveRepositories( virtualRepos );
+
+        List<GroupResolutionDTO> groups = new ArrayList<GroupResolutionDTO>();
+        for ( ArtifactoryVirtualRepository virtualRepo : virtualRepos.values() )
+        {
+            List<String> repos = virtualRepo.getResolvedRepositories();
+            boolean containsNull = false;
+            boolean containsMaven1 = false;
+            boolean containsMaven2 = false;
+            for ( String repoName : repos )
+            {
+                ArtifactoryRepository repo = repositories.get( repoName );
+                if ( repo.getType() == null )
+                {
+                    containsNull = true;
+                }
+                else if ( "maven2".equals( repo.getType() ) )
+                {
+                    containsMaven2 = true;
+                }
+                else if ( "maven1".equals( repo.getType() ) )
+                {
+                    containsMaven1 = true;
+                }
+            }
+
+            boolean isMixed = ( containsNull || containsMaven2 ) && containsMaven1;
+
+            GroupResolutionDTO group = new GroupResolutionDTO( virtualRepo.getKey(), isMixed );
+            groups.add( group );
+        }
+        return groups;
+    }
+
+    private List<RepositoryResolutionDTO> resolve( Collection<ArtifactoryRepository> artifactoryRepos )
         throws ResourceException
     {
         List<RepositoryResolutionDTO> resolutions = new ArrayList<RepositoryResolutionDTO>();
-        for ( Collection<ArtifactoryRepository> artifactoryRepos : repositoriesSet )
+        for ( ArtifactoryRepository repoArtifactory : artifactoryRepos )
         {
-            for ( ArtifactoryRepository repoArtifactory : artifactoryRepos )
+            String repoId = repoArtifactory.getKey();
+            ERepositoryType type = ERepositoryType.HOSTED;
+            String similarId = null;
+
+            if ( repoArtifactory.getUrl() != null )
             {
-                String repoId = repoArtifactory.getKey();
-                ERepositoryType type = ERepositoryType.HOSTED;
-                String similarId = null;
-
-                if ( repoArtifactory.getUrl() != null )
-                {
-                    type = ERepositoryType.PROXIED;
-                    similarId = findSimilarRepository( repoArtifactory.getUrl() );
-                }
-
-                RepositoryResolutionDTO resolution = new RepositoryResolutionDTO( repoId, type, similarId );
-
-                if ( repoArtifactory.getHandleReleases() && repoArtifactory.getHandleSnapshots() )
-                {
-                    resolution.setMixed( true );
-                }
-
-                resolutions.add( resolution );
-
+                type = ERepositoryType.PROXIED;
+                similarId = findSimilarRepository( repoArtifactory.getUrl() );
             }
+
+            RepositoryResolutionDTO resolution = new RepositoryResolutionDTO( repoId, type, similarId );
+
+            if ( repoArtifactory.getHandleReleases() && repoArtifactory.getHandleSnapshots() )
+            {
+                resolution.setMixed( true );
+            }
+
+            resolutions.add( resolution );
+
         }
         return resolutions;
     }
 
-    private List<UserResolutionDTO> validate( List<ArtifactoryUser> users )
+    private List<UserResolutionDTO> resolve( List<ArtifactoryUser> users )
     {
         List<UserResolutionDTO> resolutions = new ArrayList<UserResolutionDTO>( users.size() );
 
@@ -240,10 +280,8 @@ public class ArtifactoryUploadBackupPlexusResource
 
         try
         {
-            File artifactoryBackupZip = File.createTempFile(
-                FilenameUtils.getBaseName( fileItem.getName() ),
-                ".zip",
-                tempDir );
+            File artifactoryBackupZip =
+                File.createTempFile( FilenameUtils.getBaseName( fileItem.getName() ), ".zip", tempDir );
 
             InputStream in = fileItem.getInputStream();
             OutputStream out = new FileOutputStream( artifactoryBackupZip );
@@ -253,9 +291,9 @@ public class ArtifactoryUploadBackupPlexusResource
             in.close();
             out.close();
 
-            File artifactoryBackup = new File( artifactoryBackupZip.getParentFile(), FilenameUtils
-                .getBaseName( artifactoryBackupZip.getAbsolutePath() )
-                + "content" );
+            File artifactoryBackup =
+                new File( artifactoryBackupZip.getParentFile(),
+                          FilenameUtils.getBaseName( artifactoryBackupZip.getAbsolutePath() ) + "content" );
             artifactoryBackup.mkdirs();
 
             zipUnArchiver.setSourceFile( artifactoryBackupZip );

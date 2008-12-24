@@ -18,7 +18,7 @@ public class RepositoryResolutionDTO
 
     private String mixResolution = EMixResolution.BOTH.name();
 
-    private String similarRepository;
+    private String similarRepositoryId;
 
     private boolean mergeSimilarRepository = false;
 
@@ -28,12 +28,12 @@ public class RepositoryResolutionDTO
         super();
     }
 
-    public RepositoryResolutionDTO( String repositoryId, ERepositoryType type, String similarRepository )
+    public RepositoryResolutionDTO( String repositoryId, ERepositoryType type, String similarRepositoryId )
     {
         this();
         this.repositoryId = repositoryId;
         this.type = type.name();
-        this.similarRepository = similarRepository;
+        this.similarRepositoryId = similarRepositoryId;
     }
 
     public EMixResolution getMixResolution()
@@ -96,14 +96,14 @@ public class RepositoryResolutionDTO
         this.type = type.name();
     }
 
-    public String getSimilarRepository()
+    public String getSimilarRepositoryId()
     {
-        return similarRepository;
+        return similarRepositoryId;
     }
 
-    public void setSimilarRepository( String similarRepository )
+    public void setSimilarRepositoryId( String similarRepositoryId )
     {
-        this.similarRepository = similarRepository;
+        this.similarRepositoryId = similarRepositoryId;
     }
 
     public boolean isMergeSimilarRepository()

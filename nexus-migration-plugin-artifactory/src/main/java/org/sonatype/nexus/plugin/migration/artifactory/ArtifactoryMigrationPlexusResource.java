@@ -23,6 +23,7 @@ import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
+import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
@@ -31,6 +32,8 @@ import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryReposit
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryVirtualRepository;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.EMixResolution;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.ERepositoryType;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.ERepositoryTypeResolution;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.GroupResolutionDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRequestDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
@@ -118,7 +121,7 @@ public class ArtifactoryMigrationPlexusResource
         importRepositories( migrationSummary, cfg );
         // importRepositories( cfg.getRemoteRepositories(), cfg.getProxies(), repositoriesBackup );
 
-        importGroups( cfg.getVirtualRepositories() );
+        importGroups( migrationSummary, cfg );
 
         importSecurity( migrationSummary, securityCfg );
 
@@ -213,7 +216,7 @@ public class ArtifactoryMigrationPlexusResource
                 {
                     if ( resolution.isMapUrls() )
                     {
-                        CMapping map = new CMapping( resolution.getRepositoryId(), resolution.getSimilarRepository() );
+                        CMapping map = new CMapping( resolution.getRepositoryId(), resolution.getSimilarRepositoryId() );
                         mappingConfiguration.addMapping( map );
                     }
                 }
@@ -350,19 +353,66 @@ public class ArtifactoryMigrationPlexusResource
 
     }
 
-    private void importGroups( Map<String, ArtifactoryVirtualRepository> virtualRepositories )
+    private void importGroups( MigrationSummaryDTO migrationSummary, ArtifactoryConfig cfg )
         throws ResourceException
     {
+        final Map<String, ArtifactoryVirtualRepository> virtualRepositories = cfg.getVirtualRepositories();
         VirtualRepositoryUtil.resolveRepositories( virtualRepositories );
-        for ( ArtifactoryVirtualRepository virtualRepo : virtualRepositories.values() )
+        final Map<String, ArtifactoryRepository> repositories = cfg.getRepositories();
+        final List<GroupResolutionDTO> groups = migrationSummary.getGroupsResolution();
+
+        for ( GroupResolutionDTO resolution : groups )
         {
+            ArtifactoryVirtualRepository virtualRepo = virtualRepositories.get( resolution.getGroupId() );
             CRepositoryGroup group = new CRepositoryGroup();
             group.setGroupId( virtualRepo.getKey() );
             group.setName( virtualRepo.getKey() );
 
-            for ( String repo : virtualRepo.getResolvedRepositories() )
+            for ( final String repoId : virtualRepo.getResolvedRepositories() )
             {
-                group.addRepository( repo );
+                RepositoryResolutionDTO repoResolution = migrationSummary.getRepositoryResolution( repoId );
+
+                if ( ERepositoryType.PROXIED.equals( repoResolution.getType() )
+                    && repoResolution.isMergeSimilarRepository() )
+                {
+                    group.addRepository( repoResolution.getSimilarRepositoryId() );
+                }
+                else if ( !resolution.isMixed() )
+                {
+                    addRepository( group, repoId );
+                }
+                else
+                {
+                    ArtifactoryRepository repo = repositories.get( repoId );
+                    String type = repo.getType();
+                    if ( ERepositoryTypeResolution.MAVEN_1_ONLY.equals( resolution.getRepositoryTypeResolution() ) )
+                    {
+                        if ( "maven1".equals( type ) )
+                        {
+                            addRepository( group, repoId );
+                        }
+                    }
+                    else if ( ERepositoryTypeResolution.VIRTUAL_BOTH.equals( resolution.getRepositoryTypeResolution() ) )
+                    {
+                        if ( "maven1".equals( type ) )
+                        {
+                            addVirtualRepository( group, repoId );
+                        }
+                        else
+                        {
+                            addRepository( group, repoId );
+                        }
+                    }
+                    else
+                    // MAVEN2 only
+                    {
+                        if ( type == null || "maven2".equals( type ) )
+                        {
+                            addRepository( group, repoId );
+                        }
+
+                    }
+                }
             }
 
             try
@@ -380,6 +430,65 @@ public class ArtifactoryMigrationPlexusResource
             mappingConfiguration.addMapping( map );
 
         }
+    }
+
+    private void addVirtualRepository( CRepositoryGroup group, String repoId )
+        throws ResourceException
+    {
+
+        CMapping map = mappingConfiguration.getMapping( repoId );
+
+        if ( map.getNexusGroupId() == null )
+        {
+            CRepositoryShadow shadowRepo = createShadowRepo( map.getNexusRepositoryId() );
+            group.addRepository( shadowRepo.getId() );
+        }
+        else
+        {
+            CRepositoryShadow releasesRepo = createShadowRepo( map.getReleasesRepositoryId() );
+            group.addRepository( releasesRepo.getId() );
+            CRepositoryShadow snapshotsRepo = createShadowRepo( map.getSnapshotsRepositoryId() );
+            group.addRepository( snapshotsRepo.getId() );
+        }
+    }
+
+    private void addRepository( CRepositoryGroup group, String repoId )
+    {
+        CMapping map = mappingConfiguration.getMapping( repoId );
+
+        if ( map.getNexusGroupId() == null )
+        {
+            group.addRepository( map.getNexusRepositoryId() );
+        }
+        else
+        {
+            group.addRepository( map.getReleasesRepositoryId() );
+            group.addRepository( map.getSnapshotsRepositoryId() );
+        }
+    }
+
+    private CRepositoryShadow createShadowRepo( String shadowOfRepoId )
+        throws ResourceException
+    {
+        CRepositoryShadow shadowRepo = new CRepositoryShadow();
+        String shadowId = shadowOfRepoId + "-virtual";
+        shadowRepo.setId( shadowId );
+        shadowRepo.setName( shadowId );
+        shadowRepo.setShadowOf( shadowOfRepoId );
+        shadowRepo.setType( "m1-m2-shadow" );
+
+        try
+        {
+            getNexus().createRepositoryShadow( shadowRepo );
+        }
+        catch ( Exception e )
+        {
+            getLogger().error( e.getMessage(), e );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error creating repository "
+                + shadowRepo.getId() );
+        }
+
+        return shadowRepo;
     }
 
     private void copyArtifacts( CRepository nexusRepo, File repositoryBackup )
