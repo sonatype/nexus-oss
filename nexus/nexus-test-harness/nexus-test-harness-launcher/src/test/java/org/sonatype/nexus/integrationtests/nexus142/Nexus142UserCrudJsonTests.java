@@ -23,6 +23,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -40,6 +41,19 @@ import org.sonatype.nexus.test.utils.UserMessageUtil;
 public class Nexus142UserCrudJsonTests
     extends AbstractNexusIntegrationTest
 {
+
+    @BeforeClass
+    public static void clean()
+    {
+        try
+        {
+            cleanWorkDir();
+        }
+        catch ( IOException e )
+        {
+            // NVM
+        }
+    }
 
     protected UserMessageUtil messageUtil;
 
@@ -83,7 +97,7 @@ public class Nexus142UserCrudJsonTests
         this.messageUtil.createUser( resource );
 
         // validate password is correct
-        PasswordGenerator pwGenerator = (PasswordGenerator) this.getContainer().lookup( PasswordGenerator.class );
+        PasswordGenerator pwGenerator = this.getContainer().lookup( PasswordGenerator.class );
         String hashedPassword = pwGenerator.hashPassword( password );
         CUser cUser = SecurityConfigUtil.getCUser( "createTestWithPassword" );
         Assert.assertEquals( "Expected hashed passwords to be the same.", hashedPassword, cUser.getPassword() );
@@ -91,7 +105,8 @@ public class Nexus142UserCrudJsonTests
     }
 
     @Test
-    public void listTest() throws IOException
+    public void listTest()
+        throws IOException
     {
         UserResource resource = new UserResource();
 
@@ -101,16 +116,14 @@ public class Nexus142UserCrudJsonTests
         resource.setEmail( "listTest@user.com" );
         resource.addRole( "role1" );
 
-     // this also validates
+        // this also validates
         this.messageUtil.createUser( resource );
 
         // now that we have at least one element stored (more from other tests, most likely)
 
-
         // NEED to work around a GET problem with the REST client
         List<UserResource> users = this.messageUtil.getList();
         SecurityConfigUtil.verifyUsers( users );
-
 
     }
 
@@ -126,9 +139,8 @@ public class Nexus142UserCrudJsonTests
         resource.setEmail( "read@user.com" );
         resource.addRole( "role1" );
 
-     // this also validates
+        // this also validates
         this.messageUtil.createUser( resource );
-
 
         Response response = this.messageUtil.sendMessage( Method.GET, resource );
 
@@ -146,7 +158,6 @@ public class Nexus142UserCrudJsonTests
         Assert.assertEquals( resource.getEmail(), responseResource.getEmail() );
         Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
     }
-
 
     @Test
     public void updateTest()
