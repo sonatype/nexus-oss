@@ -66,7 +66,7 @@ Sonatype.view = {
 //      },
         {
           region:'west',
-          title: 'Sonatype Servers',
+          title: 'Sonatype&trade; Servers',
           collapsible: true,
           //collapseMode: 'mini',
           //border: false,
