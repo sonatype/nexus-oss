@@ -43,7 +43,34 @@
               <outputDirectory>${project.build.testOutputDirectory}/fake-central</outputDirectory>
             </configuration>
           </execution>
+          <execution>
+            <id>get-sources-for-emma</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <classifier>sources</classifier>
+              <includeGroupIds>org.sonatype.nexus.plugins</includeGroupIds>
+              <outputDirectory>${emma-sources-base}</outputDirectory>
+            </configuration>
+          </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${basedir}</directory>
+              <includes>
+                <include>/coverage.ec</include>
+              </includes>
+              <followSymlinks>false</followSymlinks>
+            </fileset>
+          </filesets>
+        </configuration>
       </plugin>
 
     </plugins>
@@ -75,5 +102,27 @@
       <classifier>repo</classifier>
     </dependency>
   </dependencies>
+
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.maven.plugin</groupId>
+        <artifactId>emma4it-maven-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <searchPath>${basedir}</searchPath>
+          <sourceFolders>
+            <sourceFolder>${emma-sources-base}</sourceFolder>
+          </sourceFolders>
+          <jarFiles>
+            <jarFile>${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-migration-artifactory-bridge-${migration-plugin-version}.jar</jarFile>
+            <jarFile>${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-migration-plugin-artifactory-${migration-plugin-version}.jar</jarFile>
+            <jarFile>${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-migration-plugin-configuration-${migration-plugin-version}.jar</jarFile>
+          </jarFiles>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 
 </project>
