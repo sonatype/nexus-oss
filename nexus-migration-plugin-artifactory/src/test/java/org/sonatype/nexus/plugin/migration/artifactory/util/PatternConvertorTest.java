@@ -37,6 +37,7 @@ public class PatternConvertorTest
         includes.add( "org/apache/**" );
         includes.add( "com/acme/**" );
         includes.add( "org/?aven/**" );
+        includes.add( "**/*-sources.*" );
         excludes.add( "com/acme/exp-project/**" );
         excludes.add( "**/*-sources.*" );
         excludes.add( "**/*-SNAPSHOT/**" );
@@ -48,7 +49,8 @@ public class PatternConvertorTest
         assertMatch(pattern, "com/acme/artifactory");
         assertMatch(pattern, "org/maven/");
         assertMatch(pattern, "org/raven/");
-        
+        assertMatch(pattern, "com/sonatype/my/artifact-1.0-sources.jar");
+        assertNotMatch(pattern, "com/sonatype/my/artifact-1.0-sourcesjar");
         //TODO: the asserts below should be passed
 /*        assertNotMatch(pattern, "org/");
         assertNotMatch(pattern, "org/ntaven/");
@@ -71,6 +73,6 @@ public class PatternConvertorTest
     
     public static void main(String[] args)
     {
-        System.out.println("\ufffd");
+        System.out.println(PatternConvertor.convertAntStylePattern("**/*-sources.*"));
     }
 }

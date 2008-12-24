@@ -28,12 +28,17 @@ public abstract class AbstractSecurityConfigParser
 
     abstract protected void parseUsers();
 
+    abstract protected void parseGroups();
+    
     abstract protected void parsePermissionTargets();
 
     abstract protected void parseAcls();
     
     public void parse()
     {
+        // NOTE that this order is critical
+        parseGroups();
+        
         parseUsers();
         
         parsePermissionTargets();

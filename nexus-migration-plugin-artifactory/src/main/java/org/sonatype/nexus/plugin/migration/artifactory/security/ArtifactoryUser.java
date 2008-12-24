@@ -1,5 +1,8 @@
 package org.sonatype.nexus.plugin.migration.artifactory.security;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ArtifactoryUser
 {
     private String username;
@@ -7,6 +10,8 @@ public class ArtifactoryUser
     private String email = "";
 
     private boolean isAdmin = false;
+
+    private Set<ArtifactoryGroup> groups = new HashSet<ArtifactoryGroup>();
 
     public ArtifactoryUser( String username )
     {
@@ -50,6 +55,11 @@ public class ArtifactoryUser
         this.isAdmin = isAdmin;
     }
 
+    public Set<ArtifactoryGroup> getGroups()
+    {
+        return groups;
+    }
+
     @Override
     public boolean equals( Object obj )
     {
@@ -65,6 +75,7 @@ public class ArtifactoryUser
 
         ArtifactoryUser user = (ArtifactoryUser) obj;
 
-        return this.username.equals( user.username ) && this.email.equals( user.email ) && this.isAdmin == user.isAdmin;
+        return this.username.equals( user.username ) && this.email.equals( user.email ) && this.isAdmin == user.isAdmin
+            && groups.equals( user.groups );
     }
 }

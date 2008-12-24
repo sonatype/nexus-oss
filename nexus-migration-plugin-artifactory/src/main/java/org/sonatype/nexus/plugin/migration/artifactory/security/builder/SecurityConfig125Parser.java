@@ -9,6 +9,7 @@ import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryPermi
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecurityConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
 import org.sonatype.nexus.plugin.migration.artifactory.util.DomUtil;
+import org.sonatype.nexus.plugin.migration.artifactory.util.PatternConvertor;
 
 public class SecurityConfig125Parser
     extends AbstractSecurityConfigParser
@@ -35,7 +36,7 @@ public class SecurityConfig125Parser
                 continue;
             }
 
-            Set<ArtifactoryPermission> permissions = ArtifactoryPermission.buildPermission( Integer
+            Set<ArtifactoryPermission> permissions = ArtifactoryPermission.buildPermission125( Integer
                 .parseInt( maskValue ) );
 
             String username = aclDom.getChild( "recipient" ).getValue();
@@ -53,14 +54,13 @@ public class SecurityConfig125Parser
 
             String pathValue = repoPathDom.getChild( "path" ).getValue();
 
-            ArtifactoryPermissionTarget repoPath = getConfig().getArtifactoryRepoTarget( repoKeyValue, pathValue );
+            ArtifactoryPermissionTarget repoPath = getConfig().getArtifactoryRepoTarget(
+                repoKeyValue,
+                PatternConvertor.convert125Pattern( pathValue ) );
 
             ArtifactoryAcl acl = new ArtifactoryAcl( repoPath, user );
 
-            for ( ArtifactoryPermission permission : permissions )
-            {
-                acl.addPermission( permission );
-            }
+            acl.getPermissions().addAll( permissions );
 
             getConfig().addAcl( acl );
         }
@@ -78,10 +78,10 @@ public class SecurityConfig125Parser
 
             String pathValue = repoPathDom.getChild( "path" ).getValue();
 
-            ArtifactoryPermissionTarget repoTarget = new ArtifactoryPermissionTarget(repoKeyValue);
-            
-            repoTarget.addInclude( pathValue );
-            
+            ArtifactoryPermissionTarget repoTarget = new ArtifactoryPermissionTarget( repoKeyValue );
+
+            repoTarget.addInclude( PatternConvertor.convert125Pattern( pathValue ) );
+
             getConfig().addPermissionTarget( repoTarget );
         }
 
@@ -110,6 +110,13 @@ public class SecurityConfig125Parser
 
             getConfig().addUser( user );
         }
+    }
+
+    @Override
+    protected void parseGroups()
+    {
+        // Artifactory 1.2.5 does not have groups
+
     }
 
 }

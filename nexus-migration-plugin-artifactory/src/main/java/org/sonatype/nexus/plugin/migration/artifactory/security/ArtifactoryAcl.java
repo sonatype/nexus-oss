@@ -9,6 +9,8 @@ public class ArtifactoryAcl
 
     private ArtifactoryUser user;
 
+    private ArtifactoryGroup group;
+
     private Set<ArtifactoryPermission> permissions = new HashSet<ArtifactoryPermission>();
 
     public ArtifactoryAcl( ArtifactoryPermissionTarget permissionTarget, ArtifactoryUser user )
@@ -16,6 +18,13 @@ public class ArtifactoryAcl
         this.permissionTarget = permissionTarget;
 
         this.user = user;
+    }
+
+    public ArtifactoryAcl( ArtifactoryPermissionTarget permissionTarget, ArtifactoryGroup group )
+    {
+        this.permissionTarget = permissionTarget;
+
+        this.group = group;
     }
 
     public ArtifactoryPermissionTarget getPermissionTarget()
@@ -28,6 +37,11 @@ public class ArtifactoryAcl
         return user;
     }
 
+    public ArtifactoryGroup getGroup()
+    {
+        return group;
+    }
+
     public Set<ArtifactoryPermission> getPermissions()
     {
         return permissions;
@@ -37,7 +51,7 @@ public class ArtifactoryAcl
     {
         permissions.add( permission );
     }
-    
+
     @Override
     public boolean equals( Object obj )
     {
@@ -53,8 +67,12 @@ public class ArtifactoryAcl
 
         ArtifactoryAcl acl = (ArtifactoryAcl) obj;
 
-        return this.user.equals( acl.user ) && this.permissionTarget.equals( acl.permissionTarget )
-            && this.permissions.equals( acl.permissions );
+        return
+
+        ( ( user == null && acl.user == null ) || ( user != null && acl.user != null && user.equals( acl.user ) ) )
+            && ( group == null && acl.group == null || ( group != null && acl.group != null && group.equals( acl.group ) ) )
+            && this.permissionTarget.equals( acl.permissionTarget ) && this.permissions.equals( acl.permissions );
+
     }
 
 }

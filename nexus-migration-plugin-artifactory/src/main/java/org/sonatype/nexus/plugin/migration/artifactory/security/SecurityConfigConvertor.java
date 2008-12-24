@@ -11,7 +11,6 @@ import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
-import org.sonatype.nexus.plugin.migration.artifactory.util.PatternConvertor;
 
 public class SecurityConfigConvertor
 {
@@ -51,12 +50,48 @@ public class SecurityConfigConvertor
     public void convert()
         throws ArtifactoryMigrationException
     {
-        buildTargetSuite();
+        buildTargetSuites();
+
+        buildGroupRoles();
 
         buildSecurityUsers();
+
     }
 
-    private void buildTargetSuite()
+    private void buildGroupRoles()
+        throws ArtifactoryMigrationException
+    {
+        for ( ArtifactoryGroup group : config.getGroups() )
+        {
+            SecurityRole role = new SecurityRole();
+
+            role.setId( group.getName() );
+
+            role.setName( group.getName() );
+
+            role.setDescription( group.getDescription() );
+
+            role.setSessionTimeout( 60 );
+
+            if ( resolvePermission )
+            {
+                List<String> subRoles = new ArrayList<String>();
+
+                for ( ArtifactoryAcl acl : config.getAcls() )
+                {
+                    if ( acl.getGroup() != null && acl.getGroup().getName().equals( group.getName() ) )
+                    {
+                        subRoles.addAll( getRoleListByAcl( acl ) );
+                    }
+                }
+                role.setRoles( subRoles );
+            }
+
+            receiver.receiveSecurityRole( role );
+        }
+    }
+
+    private void buildTargetSuites()
         throws ArtifactoryMigrationException
     {
         if ( !resolvePermission )
@@ -77,9 +112,14 @@ public class SecurityConfigConvertor
             SecurityPrivilege updatePrivilege = buildSecurityPrivilege( target, repoTarget, "update" );
             SecurityPrivilege deletePrivilege = buildSecurityPrivilege( target, repoTarget, "delete" );
 
-            SecurityRole readerRole = buildSecurityRole( target, "reader", readPrivilege );
-            SecurityRole deployerRole = buildSecurityRole( target, "deployer", createPrivilege, updatePrivilege );
-            SecurityRole adminRole = buildSecurityRole( target, "admin", updatePrivilege, deletePrivilege );
+            SecurityRole readerRole = buildSecurityRoleFromPrivilege( target, "reader", readPrivilege );
+            SecurityRole deployerRole = buildSecurityRoleFromPrivilege(
+                target,
+                "deployer",
+                createPrivilege,
+                updatePrivilege );
+            SecurityRole deleteRole = buildSecurityRoleFromPrivilege( target, "delete", deletePrivilege );
+            SecurityRole adminRole = buildSecurityRoleFromPrivilege( target, "admin", updatePrivilege, deletePrivilege );
 
             targetSuite.setRepositoryTarget( repoTarget );
             targetSuite.getPrivileges().add( createPrivilege );
@@ -88,6 +128,7 @@ public class SecurityConfigConvertor
             targetSuite.getPrivileges().add( deletePrivilege );
             targetSuite.getRoles().add( readerRole );
             targetSuite.getRoles().add( deployerRole );
+            targetSuite.getRoles().add( deleteRole );
             targetSuite.getRoles().add( adminRole );
 
             mapping.put( id, targetSuite );
@@ -109,7 +150,7 @@ public class SecurityConfigConvertor
 
         for ( String include : target.getIncludes() )
         {
-            patterns.add( PatternConvertor.convert125Pattern( include ) );
+            patterns.add( include );
         }
 
         repoTarget.setPatterns( patterns );
@@ -160,7 +201,7 @@ public class SecurityConfigConvertor
         return privilege;
     }
 
-    private SecurityRole buildSecurityRole( ArtifactoryPermissionTarget target, String key,
+    private SecurityRole buildSecurityRoleFromPrivilege( ArtifactoryPermissionTarget target, String key,
         SecurityPrivilege... privileges )
         throws ArtifactoryMigrationException
     {
@@ -202,6 +243,12 @@ public class SecurityConfigConvertor
                 buildUserAclRole( user );
             }
 
+            // add group roles
+            for ( ArtifactoryGroup group : artifactoryUser.getGroups() )
+            {
+                user.addRole( group.getName() );
+            }
+
             // nexus doesn't allow a user has no role assigned
             if ( user.getRoles().isEmpty() )
             {
@@ -237,25 +284,37 @@ public class SecurityConfigConvertor
 
         for ( ArtifactoryAcl acl : config.getAcls() )
         {
-            if ( !acl.getUser().getUsername().equals( user.getName() ) )
+            if ( acl.getUser() != null && acl.getUser().getUsername().equals( user.getName() ) )
             {
-                continue;
-            }
-            List<SecurityRole> roles = mapping.get( acl.getPermissionTarget().getId() ).getRoles();
-
-            if ( acl.getPermissions().contains( ArtifactoryPermission.READER ) )
-            {
-                user.addRole( roles.get( 0 ).getId() );
-            }
-            if ( acl.getPermissions().contains( ArtifactoryPermission.DEPLOYER ) )
-            {
-                user.addRole( roles.get( 1 ).getId() );
-            }
-            if ( acl.getPermissions().contains( ArtifactoryPermission.ADMIN ) )
-            {
-                user.addRole( roles.get( 2 ).getId() );
+                user.getRoles().addAll( getRoleListByAcl( acl ) );
             }
         }
+    }
+
+    private List<String> getRoleListByAcl( ArtifactoryAcl acl )
+    {
+        List<String> roleList = new ArrayList<String>();
+
+        List<SecurityRole> roles = mapping.get( acl.getPermissionTarget().getId() ).getRoles();
+
+        if ( acl.getPermissions().contains( ArtifactoryPermission.READER ) )
+        {
+            roleList.add( roles.get( 0 ).getId() );
+        }
+        if ( acl.getPermissions().contains( ArtifactoryPermission.DEPLOYER ) )
+        {
+            roleList.add( roles.get( 1 ).getId() );
+        }
+        if ( acl.getPermissions().contains( ArtifactoryPermission.DELETE ) )
+        {
+            roleList.add( roles.get( 2 ).getId() );
+        }
+        if ( acl.getPermissions().contains( ArtifactoryPermission.ADMIN ) )
+        {
+            roleList.add( roles.get( 3 ).getId() );
+        }
+
+        return roleList;
     }
 
     /**

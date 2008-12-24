@@ -42,7 +42,7 @@ public class NXCM254ImportSecurity125Test
         Assert.assertEquals( "4 users imported", 4, userList.size() );
         Assert.assertEquals( "3 repo targets imported", 3, targetList.size() );
         Assert.assertEquals( "4 privileges for each repo target", targetList.size() * 4, privilegeList.size() );
-        Assert.assertEquals( "3 roles for each repo target", targetList.size() * 3, roleList.size() );
+        Assert.assertEquals( "4 roles for each repo target", targetList.size() * 4, roleList.size() );
 
         // these users are imported
         Assert.assertTrue( containUser( userList, "admin-artifactory" ) );

@@ -51,16 +51,14 @@ public class PatternConvertor
 
             regx.append( "(" + convertAntStylePattern( includes.get( i ) ) + ")" );
         }
-        
+
         // TODO: how to append excludes?
 
         return regx.toString();
     }
 
     /**
-     *  ?   -> .{1} </br>
-     *  **  -> .*   </br>
-     *  *   -> [^/]* 
+     * ? -> .{1} </br> ** -> .* </br> * -> [^/]*
      * 
      * @param pattern
      * @return
@@ -88,6 +86,12 @@ public class PatternConvertor
             {
                 regx.append( "[^/]*" );
 
+                i++;
+            }
+            else if ( pattern.charAt( i ) == '.' )
+            {
+                regx.append( "\\." );
+                
                 i++;
             }
             else

@@ -23,18 +23,6 @@
       <groups/>
     </user>
     <user>
-      <username>admin1</username>
-      <password>5f4dcc3b5aa765d61d8327deb882cf99</password>
-      <email>admin1@artifactory.org</email>
-      <admin>true</admin>
-      <enabled>true</enabled>
-      <updatableProfile>true</updatableProfile>
-      <accountNonExpired>true</accountNonExpired>
-      <credentialsNonExpired>true</credentialsNonExpired>
-      <accountNonLocked>true</accountNonLocked>
-      <groups/>
-    </user>
-    <user>
       <username>user</username>
       <password>5f4dcc3b5aa765d61d8327deb882cf99</password>
       <email>user@artifactory.org</email>
@@ -44,7 +32,9 @@
       <accountNonExpired>true</accountNonExpired>
       <credentialsNonExpired>true</credentialsNonExpired>
       <accountNonLocked>true</accountNonLocked>
-      <groups/>
+      <groups>
+        <string>group</string>
+      </groups>
     </user>
     <user>
       <username>user1</username>
@@ -56,15 +46,13 @@
       <accountNonExpired>true</accountNonExpired>
       <credentialsNonExpired>true</credentialsNonExpired>
       <accountNonLocked>true</accountNonLocked>
-      <groups>
-        <string>userGroup</string>
-      </groups>
+      <groups/>
     </user>
   </users>
   <groups>
     <group>
-      <groupName>userGroup</groupName>
-      <description>test</description>
+      <groupName>group</groupName>
+      <description>A test user group</description>
       <newUserDefault>false</newUserDefault>
     </group>
   </groups>
@@ -89,18 +77,39 @@
     </acl>
     <acl>
       <permissionTarget>
-        <name>pt-1</name>
-        <repoKey>libs-releases-local</repoKey>
+        <name>permTarget</name>
+        <repoKey>repo1-cache</repoKey>
         <includes>
-          <string>org/apache/**</string>
+          <string>**</string>
+          <string>**/*-sources.*</string>
         </includes>
         <excludes/>
       </permissionTarget>
       <aces>
         <ace>
-          <principal>user</principal>
+          <principal>group</principal>
+          <group>true</group>
+          <mask>27</mask>
+        </ace>
+      </aces>
+      <updatedBy>admin</updatedBy>
+    </acl>
+    <acl>
+      <permissionTarget>
+        <name>permTarget1</name>
+        <repoKey>repo1-cache</repoKey>
+        <includes>
+          <string>**</string>
+          <string>com/acme/**</string>
+          <string>**/*-sources.*</string>
+        </includes>
+        <excludes/>
+      </permissionTarget>
+      <aces>
+        <ace>
+          <principal>user1</principal>
           <group>false</group>
-          <mask>11</mask>
+          <mask>8</mask>
         </ace>
       </aces>
       <updatedBy>admin</updatedBy>

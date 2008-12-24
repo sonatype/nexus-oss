@@ -7,6 +7,8 @@ public class ArtifactorySecurityConfig
 {
     private List<ArtifactoryUser> users = new ArrayList<ArtifactoryUser>();
 
+    private List<ArtifactoryGroup> groups = new ArrayList<ArtifactoryGroup>();
+
     private List<ArtifactoryPermissionTarget> permissionTargets = new ArrayList<ArtifactoryPermissionTarget>();
 
     private List<ArtifactoryAcl> acls = new ArrayList<ArtifactoryAcl>();
@@ -14,6 +16,11 @@ public class ArtifactorySecurityConfig
     public List<ArtifactoryUser> getUsers()
     {
         return users;
+    }
+
+    public List<ArtifactoryGroup> getGroups()
+    {
+        return groups;
     }
 
     public List<ArtifactoryPermissionTarget> getPermissionTargets()
@@ -29,6 +36,11 @@ public class ArtifactorySecurityConfig
     public void addUser( ArtifactoryUser user )
     {
         users.add( user );
+    }
+
+    public void addGroup( ArtifactoryGroup group )
+    {
+        groups.add( group );
     }
 
     public void addPermissionTarget( ArtifactoryPermissionTarget repoPath )
@@ -52,6 +64,18 @@ public class ArtifactorySecurityConfig
         }
         return null;
     }
+    
+    public ArtifactoryGroup getGroupByName( String name )
+    {
+        for ( ArtifactoryGroup group : groups )
+        {
+            if ( group.getName().equals( name ) )
+            {
+                return group;
+            }
+        }
+        return null;
+    }
 
     // this works for 1.2.5, there only one include path exists
     public ArtifactoryPermissionTarget getArtifactoryRepoTarget( String repoKey, String path )
@@ -60,6 +84,19 @@ public class ArtifactorySecurityConfig
         {
             if ( target.getRepoKey().equals( repoKey ) && target.getIncludes().size() == 1
                 && target.getExcludes().isEmpty() && target.getIncludes().get( 0 ).equals( path ) )
+            {
+                return target;
+            }
+        }
+        return null;
+    }
+    
+    
+    public ArtifactoryPermissionTarget getPermissionTarget( String name )
+    {
+        for ( ArtifactoryPermissionTarget target : permissionTargets )
+        {
+            if ( target.getId().equals( name ) )
             {
                 return target;
             }

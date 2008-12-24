@@ -47,11 +47,11 @@ public class ParseSecurityConfig125Test
     public void assertPermissionTarget()
     {
         ArtifactoryPermissionTarget target1 = new ArtifactoryPermissionTarget( "ANY" );
-        target1.addInclude( "ANY" );
+        target1.addInclude( ".*" );
         ArtifactoryPermissionTarget target2 = new ArtifactoryPermissionTarget( "libs-releases" );
-        target2.addInclude( "org/apache" );
+        target2.addInclude( "org/apache/.*" );
         ArtifactoryPermissionTarget target3 = new ArtifactoryPermissionTarget( "java.net-cache" );
-        target3.addInclude( "ANY" );
+        target3.addInclude( ".*" );
 
         assertPermissionTargetContent( target1, securityConfig.getPermissionTargets().get( 0 ) );
         assertPermissionTargetContent( target2, securityConfig.getPermissionTargets().get( 1 ) );
