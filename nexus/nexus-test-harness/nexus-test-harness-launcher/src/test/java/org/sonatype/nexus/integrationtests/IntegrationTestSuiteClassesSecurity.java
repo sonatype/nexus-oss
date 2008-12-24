@@ -30,8 +30,6 @@ import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetPermissionTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetValidationTests;
-import org.sonatype.nexus.integrationtests.nexus142.Nexus142UserCrudJsonTests;
-import org.sonatype.nexus.integrationtests.nexus142.Nexus142UserCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus142.Nexus142UserPermissionTests;
 import org.sonatype.nexus.integrationtests.nexus142.Nexus142UserValidationTests;
 import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesCrudJsonTests;
@@ -117,8 +115,12 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus292SoftRestartTest.class,
     Nexus133TargetCrudJsonTests.class,
     Nexus133TargetCrudXmlTests.class,
-    Nexus142UserCrudJsonTests.class,
-    Nexus142UserCrudXmlTests.class,
+    /*
+      Depends on https://issues.sonatype.org/browse/NEXUS-1302
+
+      Nexus142UserCrudJsonTests.class,
+      Nexus142UserCrudXmlTests.class,
+     */
     Nexus156RolesCrudJsonTests.class,
     Nexus156RolesCrudXmlTests.class,
     Nexus142UserValidationTests.class,
