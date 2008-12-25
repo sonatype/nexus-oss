@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -33,7 +33,7 @@ public class ArtifactorySecurityConfigBuilder
 
         finally
         {
-            IOUtils.closeQuietly( reader );
+            IOUtil.close( reader );
         }
     }
 
@@ -49,7 +49,7 @@ public class ArtifactorySecurityConfigBuilder
         }
         finally
         {
-            IOUtils.closeQuietly( reader );
+            IOUtil.close( reader );
         }
     }
 
