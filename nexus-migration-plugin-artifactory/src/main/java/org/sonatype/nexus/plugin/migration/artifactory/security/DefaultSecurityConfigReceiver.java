@@ -2,6 +2,7 @@ package org.sonatype.nexus.plugin.migration.artifactory.security;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
@@ -16,11 +17,14 @@ public class DefaultSecurityConfigReceiver
     implements SecurityConfigReceiver
 {
 
-    @Requirement
-    private NexusSecurity nexusSecurity;
+/*    @Requirement
+    private NexusSecurity nexusSecurity;*/
 
     @Requirement
     private Nexus nexus;
+    
+    @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
+    private ConfigurationManager manager;
 
     public void receiveRepositoryTarget( CRepositoryTarget repoTarget )
         throws ArtifactoryMigrationException
@@ -41,7 +45,11 @@ public class DefaultSecurityConfigReceiver
     {
         try
         {
-            nexusSecurity.createPrivilege( privilege );
+            //nexusSecurity.createPrivilege( privilege );
+            
+            manager.createPrivilege( privilege );
+            
+            manager.save();
         }
         catch ( InvalidConfigurationException e )
         {
@@ -55,7 +63,9 @@ public class DefaultSecurityConfigReceiver
     {
         try
         {
-            nexusSecurity.createRole( role );
+            manager.createRole( role );
+            
+            manager.save();
         }
         catch ( InvalidConfigurationException e )
         {
@@ -69,7 +79,9 @@ public class DefaultSecurityConfigReceiver
     {
         try
         {
-            nexusSecurity.createUser( user );
+            manager.createUser( user );
+            
+            manager.save();
         }
         catch ( InvalidConfigurationException e )
         {

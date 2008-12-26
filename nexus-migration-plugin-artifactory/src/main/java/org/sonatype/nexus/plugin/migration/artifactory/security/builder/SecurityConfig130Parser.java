@@ -128,7 +128,9 @@ public class SecurityConfig130Parser
         {
             String username = userDom.getChild( "username" ).getValue();
 
-            ArtifactoryUser user = new ArtifactoryUser( username );
+            String password = userDom.getChild( "password" ).getValue();
+
+            ArtifactoryUser user = new ArtifactoryUser( username, password );
 
             if ( userDom.getChild( "admin" ) != null && userDom.getChild( "admin" ).getValue().equals( "true" ) )
             {

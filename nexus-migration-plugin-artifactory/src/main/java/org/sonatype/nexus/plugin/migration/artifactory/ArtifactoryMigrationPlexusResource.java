@@ -135,7 +135,10 @@ public class ArtifactoryMigrationPlexusResource
 
         for ( UserResolutionDTO userResolution : migrationSummary.getUserResolution() )
         {
-            ArtifactoryUser user = new ArtifactoryUser( userResolution.getId(), userResolution.getEmail() );
+            ArtifactoryUser user = new ArtifactoryUser(
+                userResolution.getId(),
+                userResolution.getPassword(),
+                userResolution.getEmail() );
 
             user.setAdmin( userResolution.isAdmin() );
 

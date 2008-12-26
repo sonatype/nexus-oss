@@ -31,16 +31,19 @@ public class ParseSecurityConfig130Test
 
         Assert.assertEquals( groups, securityConfig.getGroups() );
     }
-    
+
     @Test
     public void assertUser()
     {
-        ArtifactoryUser anonymous = new ArtifactoryUser( "anonymous" );
-        ArtifactoryUser admin = new ArtifactoryUser( "admin" );
+        ArtifactoryUser anonymous = new ArtifactoryUser( "anonymous", "d41d8cd98f00b204e9800998ecf8427e" );
+        ArtifactoryUser admin = new ArtifactoryUser( "admin", "5f4dcc3b5aa765d61d8327deb882cf99" );
         admin.setAdmin( true );
-        ArtifactoryUser user = new ArtifactoryUser( "user", "user@artifactory.org" );
+        ArtifactoryUser user = new ArtifactoryUser( "user", "5f4dcc3b5aa765d61d8327deb882cf99", "user@artifactory.org" );
         user.getGroups().add( securityConfig.getGroups().get( 0 ) );
-        ArtifactoryUser user1 = new ArtifactoryUser( "user1", "user1@artifactory.org" );
+        ArtifactoryUser user1 = new ArtifactoryUser(
+            "user1",
+            "5f4dcc3b5aa765d61d8327deb882cf99",
+            "user1@artifactory.org" );
 
         List<ArtifactoryUser> users = new ArrayList<ArtifactoryUser>();
 
@@ -96,7 +99,7 @@ public class ParseSecurityConfig130Test
         acls.add( acl1 );
         acls.add( acl2 );
         acls.add( acl3 );
-        
+
         Assert.assertEquals( acls, securityConfig.getAcls() );
     }
 }

@@ -46,11 +46,11 @@ public class SecurityConfigConvertorTest
         config.addGroup( group );
 
         // users
-        ArtifactoryUser admin = new ArtifactoryUser( "arti-admin" );
+        ArtifactoryUser admin = new ArtifactoryUser( "arti-admin", "5f4dcc3b5aa765d61d8327deb882cf99" );
         admin.setAdmin( true );
-        ArtifactoryUser user = new ArtifactoryUser( "arti-user" );
+        ArtifactoryUser user = new ArtifactoryUser( "arti-user", "5f4dcc3b5aa765d61d8327deb882cf99" );
         user.getGroups().add( group );
-        ArtifactoryUser user1 = new ArtifactoryUser( "arti-user1" );
+        ArtifactoryUser user1 = new ArtifactoryUser( "arti-user1", "5f4dcc3b5aa765d61d8327deb882cf99" );
         config.addUser( admin );
         config.addUser( user );
         config.addUser( user1 );
@@ -184,6 +184,7 @@ public class SecurityConfigConvertorTest
         SecurityUser admin = userList.get( 0 );
 
         Assert.assertEquals( "arti-admin", admin.getId() );
+        Assert.assertEquals( "5f4dcc3b5aa765d61d8327deb882cf99", admin.getPassword() );
         Assert.assertEquals( "arti-admin", admin.getName() );
         Assert.assertTrue( StringUtils.isEmpty( admin.getEmail() ) );
         Assert.assertEquals( "active", admin.getStatus() );
@@ -201,6 +202,7 @@ public class SecurityConfigConvertorTest
 
         Assert.assertEquals( "arti-user", user.getId() );
         Assert.assertEquals( "arti-user", user.getName() );
+        Assert.assertEquals("5f4dcc3b5aa765d61d8327deb882cf99", user.getPassword());
         Assert.assertTrue( StringUtils.isEmpty( user.getEmail() ) );
         Assert.assertEquals( "active", user.getStatus() );
 

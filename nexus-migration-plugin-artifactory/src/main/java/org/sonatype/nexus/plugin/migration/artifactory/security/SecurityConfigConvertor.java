@@ -331,6 +331,8 @@ public class SecurityConfigConvertor
         SecurityUser securityUser = new SecurityUser();
 
         securityUser.setId( artifactoryUser.getUsername() );
+        
+        securityUser.setPassword( artifactoryUser.getPassword());
 
         securityUser.setName( artifactoryUser.getUsername() );
 

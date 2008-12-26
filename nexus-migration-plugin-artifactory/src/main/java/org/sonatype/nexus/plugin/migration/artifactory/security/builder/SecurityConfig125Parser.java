@@ -95,8 +95,10 @@ public class SecurityConfig125Parser
         for ( Xpp3Dom userDom : usersDom.getChildren() )
         {
             String username = userDom.getChild( "username" ).getValue();
+            
+            String password = userDom.getChild( "password" ).getValue();
 
-            ArtifactoryUser user = new ArtifactoryUser( username );
+            ArtifactoryUser user = new ArtifactoryUser( username, password );
 
             for ( Xpp3Dom roleDom : userDom.getChild( "authorities" ).getChildren() )
             {

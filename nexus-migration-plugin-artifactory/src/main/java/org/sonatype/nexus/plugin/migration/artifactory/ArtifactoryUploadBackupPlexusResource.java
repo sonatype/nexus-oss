@@ -225,6 +225,8 @@ public class ArtifactoryUploadBackupPlexusResource
             validateUser( user );
 
             resolution.setId( user.getUsername() );
+            
+            resolution.setPassword( user.getPassword() );
 
             resolution.setAdmin( user.isAdmin() );
 

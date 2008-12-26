@@ -26,12 +26,12 @@ public class ParseSecurityConfig125Test
     @Test
     public void assertUser()
     {
-        ArtifactoryUser admin = new ArtifactoryUser( "admin" );
+        ArtifactoryUser admin = new ArtifactoryUser( "admin", "5f4dcc3b5aa765d61d8327deb882cf99" );
         admin.setAdmin( true );
-        ArtifactoryUser admin1 = new ArtifactoryUser( "admin1" );
+        ArtifactoryUser admin1 = new ArtifactoryUser( "admin1", "5f4dcc3b5aa765d61d8327deb882cf99" );
         admin1.setAdmin( true );
-        ArtifactoryUser user = new ArtifactoryUser( "user" );
-        ArtifactoryUser user1 = new ArtifactoryUser( "user1" );
+        ArtifactoryUser user = new ArtifactoryUser( "user", "5f4dcc3b5aa765d61d8327deb882cf99" );
+        ArtifactoryUser user1 = new ArtifactoryUser( "user1", "5f4dcc3b5aa765d61d8327deb882cf99" );
 
         List<ArtifactoryUser> users = new ArrayList<ArtifactoryUser>();
 
@@ -61,8 +61,8 @@ public class ParseSecurityConfig125Test
     @Test
     public void assertAcl()
     {
-        ArtifactoryUser user = new ArtifactoryUser( "user" );
-        ArtifactoryUser user1 = new ArtifactoryUser( "user1" );
+        ArtifactoryUser user = new ArtifactoryUser( "user", "5f4dcc3b5aa765d61d8327deb882cf99" );
+        ArtifactoryUser user1 = new ArtifactoryUser( "user1", "5f4dcc3b5aa765d61d8327deb882cf99" );
 
         ArtifactoryPermissionTarget target2 = securityConfig.getPermissionTargets().get( 1 );
         ArtifactoryPermissionTarget target3 = securityConfig.getPermissionTargets().get( 2 );

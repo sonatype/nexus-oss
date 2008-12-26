@@ -6,6 +6,11 @@ import java.util.Set;
 public class ArtifactoryUser
 {
     private String username;
+    
+    /**
+     * Read from Artifactory's security.xml, encrypted with MD5.
+     */
+    private String password;
 
     private String email = "";
 
@@ -13,14 +18,18 @@ public class ArtifactoryUser
 
     private Set<ArtifactoryGroup> groups = new HashSet<ArtifactoryGroup>();
 
-    public ArtifactoryUser( String username )
+    public ArtifactoryUser( String username, String password )
     {
         this.username = username;
+        
+        this.password = password;
     }
 
-    public ArtifactoryUser( String username, String email )
+    public ArtifactoryUser( String username, String password, String email )
     {
         this.username = username;
+        
+        this.password = password;
 
         this.email = email;
     }
@@ -33,6 +42,16 @@ public class ArtifactoryUser
     public void setUsername( String username )
     {
         this.username = username;
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public void setPassword( String password )
+    {
+        this.password = password;
     }
 
     public String getEmail()
@@ -75,7 +94,7 @@ public class ArtifactoryUser
 
         ArtifactoryUser user = (ArtifactoryUser) obj;
 
-        return this.username.equals( user.username ) && this.email.equals( user.email ) && this.isAdmin == user.isAdmin
-            && groups.equals( user.groups );
+        return this.username.equals( user.username ) && this.password.equals( user.password )
+            && this.email.equals( user.email ) && this.isAdmin == user.isAdmin && groups.equals( user.groups );
     }
 }
