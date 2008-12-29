@@ -32,7 +32,7 @@ public abstract class AbstractImportArtifactoryTest
 
         TaskScheduleUtil.waitForTasks( 40 );
 
-        Thread.sleep( 2000 );
+        Thread.sleep( 3000 );
 
         checkIndexes();
         checkDownloadArtifacts();
