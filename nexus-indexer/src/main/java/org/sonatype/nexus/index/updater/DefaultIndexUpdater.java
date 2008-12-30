@@ -16,16 +16,13 @@ package org.sonatype.nexus.index.updater;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 import java.util.Properties;
 
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -37,11 +34,10 @@ import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.index.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.index.packer.IndexChunker;
-import org.sonatype.nexus.index.packer.IndexPacker;
 
 /**
  * @author Jason van Zyl
@@ -55,273 +51,218 @@ public class DefaultIndexUpdater
     /** @plexus.requirement */
     private WagonManager wagonManager;
 
-    /** @plexus.requirement role="org.sonatype.nexus.index.packer.IndexChunker" */
-    private Map<String, IndexChunker> indexChunkers;
-
+    public Date fetchAndUpdateIndex( IndexUpdateRequest updateRequest )
+        throws IOException
+    {
+        ResourceFetcher fetcher = updateRequest.getResourceFetcher();
+        
+        IndexingContext context = updateRequest.getIndexingContext();
+        
+        fetcher.connect( context.getId(), context.getIndexUpdateUrl() );
+        
+        try
+        {
+            Date contextTimestamp = context.getTimestamp();
+            
+            if ( contextTimestamp != null ) 
+            {
+                Properties properties = downloadIndexProperties( fetcher );
+    
+                Date updateTimestamp = getTimestamp(properties,
+                    IndexingContext.INDEX_TIMESTAMP);
+    
+                if ( updateTimestamp != null
+                    && contextTimestamp.after( updateTimestamp ) ) {
+                  return null; // index is up to date
+                }
+    
+                String chunkName = getUpdateChunkName(contextTimestamp, properties);
+    
+                if ( chunkName != null ) 
+                {
+                    loadIndexDirectory( updateRequest, true, chunkName );
+    
+                    return updateTimestamp;
+                }
+            }
+            return loadIndexDirectory( updateRequest, false, IndexingContext.INDEX_FILE + ".zip" );
+        } 
+        finally 
+        {
+            fetcher.disconnect();
+        }
+    }
+    
+    /**
+     * @deprecated use {@link #fetchAndUpdateIndex(IndexingContext, ResourceFetcher)}
+     */
     public Date fetchAndUpdateIndex( IndexingContext context, TransferListener listener )
         throws IOException
     {
         return fetchAndUpdateIndex( context, listener, null );
     }
 
+    /**
+     * @deprecated use {@link #fetchAndUpdateIndex(IndexingContext, ResourceFetcher)}
+     */
     public Date fetchAndUpdateIndex( final IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
         throws IOException
     {
-        return run( context, listener, proxyInfo, new WagonTask<Date>()
-        {
-            public Date invoke( Wagon wagon )
-                throws IOException
-            {
-                Date contextTimestamp = context.getTimestamp();
-
-                if ( contextTimestamp != null )
-                {
-                    Properties properties = downloadIndexProperties( wagon );
-
-                    Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
-
-                    if ( updateTimestamp != null && contextTimestamp.after( updateTimestamp ) )
-                    {
-                        return null; // index is up to date
-                    }
-
-                    Date chunkTimestamp = getNextUpdateChunkTimestamp( contextTimestamp, null, properties );
-
-                    while ( chunkTimestamp != null )
-                    {
-                        String chunkName = getUpdateChunkName( chunkTimestamp, properties );
-
-                        downloadIndexChunk( context, wagon, chunkName );
-
-                        chunkTimestamp = getNextUpdateChunkTimestamp( contextTimestamp, chunkTimestamp, properties );
-                    }
-
-                    return updateTimestamp;
-                }
-
-                return downloadFullIndex( context, wagon );
-            }
-        } );
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( context );
+        
+        updateRequest.setResourceFetcher( new WagonFetcher( wagonManager, listener, null ) );
+        
+        return fetchAndUpdateIndex( updateRequest );
     }
 
+    public Properties fetchIndexProperties( IndexingContext context, ResourceFetcher fetcher )
+        throws IOException
+    {
+        fetcher.connect( context.getId(), context.getIndexUpdateUrl() );
+        
+        try
+        {
+            return downloadIndexProperties( fetcher );
+        } 
+        finally 
+        {
+            fetcher.disconnect();
+        }
+    }
+    
+    /**
+     * @deprecated use {@link #fetchIndexProperties(IndexingContext, ResourceFetcher)}
+     */
     public Properties fetchIndexProperties( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
         throws IOException
     {
-        return run( context, listener, proxyInfo, new WagonTask<Properties>()
-        {
-            public Properties invoke( Wagon wagon )
-                throws IOException
-            {
-                return downloadIndexProperties( wagon );
-            }
-        } );
+        return fetchIndexProperties(context, new WagonFetcher( wagonManager, listener, proxyInfo ));
     }
 
-    private <T> T run( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo, WagonTask<T> task )
-        throws IOException
-    {
-        Repository repository = new Repository( context.getRepositoryId(), context.getIndexUpdateUrl() );
-
-        Wagon wagon = null;
-
-        try
-        {
-            wagon = wagonManager.getWagon( repository );
-
-            if ( listener != null )
-            {
-                wagon.addTransferListener( listener );
-            }
-
-            // when working in the context of Maven, the WagonManager is already
-            // populated with proxy information from the Maven environment
-
-            if ( proxyInfo != null )
-            {
-                wagon.connect( repository, proxyInfo );
-            }
-            else
-            {
-                wagon.connect( repository );
-            }
-
-            return task.invoke( wagon );
-        }
-        catch ( AuthenticationException e )
-        {
-            throw new IOException( "Authentication exception connecting to " + repository );
-        }
-        catch ( WagonException e )
-        {
-            throw new IOException( "Wagon exception connecting to " + repository );
-        }
-        finally
-        {
-            if ( wagon != null )
-            {
-                try
-                {
-                    wagon.disconnect();
-                }
-                catch ( ConnectionException ex )
-                {
-                    if ( listener != null )
-                    {
-                        listener.debug( "Failed to close connection; " + ex.getMessage() );
-                    }
-                }
-            }
-        }
-    }
-
-    Date downloadFullIndex( IndexingContext context, Wagon wagon )
-        throws IOException
-    {
-        RAMDirectory directory = new RAMDirectory();
-
-        Date updateTimestamp = loadIndexDirectory( IndexingContext.INDEX_FILE + ".zip", wagon, directory );
-
-        context.replace( directory );
-
-        return updateTimestamp;
-    }
-
-    Date loadIndexDirectory( String remoteIndexFile, Wagon wagon, Directory directory )
+    private Date loadIndexDirectory( IndexUpdateRequest updateRequest, boolean merge, String remoteIndexFile )
         throws IOException
     {
         File indexArchive = File.createTempFile( "nexus", "index.zip" );
+
+        File indexDir = new File( indexArchive.getAbsoluteFile().getParentFile(), indexArchive.getName() + ".dir" );
+        
+        indexDir.mkdirs();
+        
+        FSDirectory directory = FSDirectory.getDirectory( indexDir );
 
         BufferedInputStream is = null;
 
         try
         {
-            downloadResource( wagon, remoteIndexFile, indexArchive );
+            updateRequest.getResourceFetcher().retrieve( remoteIndexFile, indexArchive );
 
             is = new BufferedInputStream( new FileInputStream( indexArchive ) );
 
-            return IndexUtils.unpackIndexArchive( is, directory );
+            Date timestamp = IndexUtils.unpackIndexArchive( is, directory );
+            
+            if( updateRequest.getDocumentFilter() != null )
+            {
+                IndexUtils.filterDirectory( directory, updateRequest.getDocumentFilter() );
+            }
+            
+            if( merge )
+            {
+               updateRequest.getIndexingContext().merge( directory );
+            }
+            else
+            {
+               updateRequest.getIndexingContext().replace( directory );
+            }
+            
+            return timestamp;
         }
         finally
         {
             IOUtil.close( is );
+            
             indexArchive.delete();
+
+            if( directory != null ) 
+            {
+                directory.close();
+            }
+            
+            if( indexDir != null )
+            {
+                try
+                {
+                    FileUtils.deleteDirectory( indexDir );
+                }
+                catch ( IOException ex )
+                {
+                    // ignore
+                }
+            }
         }
     }
 
-    Properties downloadIndexProperties( Wagon wagon )
-        throws IOException,
-            FileNotFoundException
+    private Properties downloadIndexProperties( ResourceFetcher fetcher )
+        throws IOException
     {
         File indexProperties = File.createTempFile( "nexus", "index.properties" );
-
+  
+        FileInputStream fis = null;
+        
         try
         {
             String remoteIndexProperties = IndexingContext.INDEX_FILE + ".properties";
-
-            downloadResource( wagon, remoteIndexProperties, indexProperties );
-
+  
+            fetcher.retrieve( remoteIndexProperties, indexProperties );
+  
             Properties properties = new Properties();
+  
+            fis = new FileInputStream( indexProperties );
 
-            FileInputStream fis = new FileInputStream( indexProperties );
-            try
-            {
-                properties.load( fis );
-            }
-            finally
-            {
-                fis.close();
-            }
-
+            properties.load( fis );
+  
             return properties;
         }
         finally
         {
+            IOUtil.close(fis);
             indexProperties.delete();
         }
     }
-
-    void downloadResource( Wagon wagon, String name, File targetFile )
-        throws IOException
-    {
-        try
-        {
-            wagon.get( name, targetFile );
-        }
-        catch ( AuthorizationException e )
-        {
-            throw new IOException( "Authorization exception retrieving " + name );
-        }
-        catch ( ResourceDoesNotExistException e )
-        {
-            throw new IOException( "Resource " + name + " does not exist" );
-        }
-        catch ( WagonException e )
-        {
-            throw new IOException( "Transfer for " + name + " failed; " + e.getMessage() );
-        }
-    }
-
+    
     /**
-     * Returns chunk name for downloading or null
+     * Returns chunk name for downloading that contain all required updates since
+     * given <code>contextTimestamp</code> or null.
      */
-    public Date getNextUpdateChunkTimestamp( Date contextTimestamp, Date lastChunkTimestamp, Properties properties )
+    public String getUpdateChunkName( Date contextTimestamp, Properties properties )
     {
         Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
-
+        
         if ( updateTimestamp == null || updateTimestamp.before( contextTimestamp ) )
         {
-            return null; // no updates
+            return null;  // no updates
         }
-
-        String chunkResolution = properties.getProperty( IndexingContext.INDEX_CHUNKS_RESOLUTION );
-
-        if ( chunkResolution == null )
-        {
-            return null; // not chunked
-        }
-
-        Date lookingFor = lastChunkTimestamp == null ? contextTimestamp : lastChunkTimestamp;
-
+        
         int n = 0;
-
-        while ( true )
+        
+        while ( true ) 
         {
-            Date chunkTimestamp = getTimestamp( properties, IndexingContext.INDEX_PROPERTY_PREFIX + chunkResolution
-                + "-" + n );
+            Date chunkTimestamp = getTimestamp( properties, IndexingContext.INDEX_CHUNK_PREFIX + n );
 
-            if ( chunkTimestamp == null )
+            if( chunkTimestamp == null )
             {
                 break;
             }
-
-            if ( lookingFor.before( chunkTimestamp ) )
+            
+            if( contextTimestamp.after( chunkTimestamp ) )
             {
-                return chunkTimestamp;
+                SimpleDateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_DAY_FORMAT );
+                return IndexingContext.INDEX_FILE + "." + df.format( contextTimestamp ) + ".zip";                
             }
-
+        
             n++;
         }
-
-        return null; // no update chunk available
-    }
-
-    public String getUpdateChunkName( Date chunkTimestamp, Properties properties )
-    {
-        String chunkResolution = properties.getProperty( IndexingContext.INDEX_CHUNKS_RESOLUTION );
-
-        if ( chunkResolution == null )
-        {
-            return null; // not chunked
-        }
-
-        IndexChunker chunker = indexChunkers.get( chunkResolution );
-
-        if ( chunker == null )
-        {
-            throw new IllegalArgumentException( "Unknown chunk resolution: " + chunkResolution );
-        }
-
-        return IndexingContext.INDEX_FILE + "." + chunker.getChunkId( chunkTimestamp ) + ".zip";
+        
+        return null;  // no update chunk available
     }
 
     public Date getTimestamp( Properties properties, String key )
@@ -332,7 +273,7 @@ public class DefaultIndexUpdater
         {
             try
             {
-                return new SimpleDateFormat( IndexPacker.INDEX_TIME_FORMAT ).parse( indexTimestamp );
+                return new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT ).parse( indexTimestamp );
             }
             catch ( ParseException ex )
             {
@@ -341,23 +282,112 @@ public class DefaultIndexUpdater
         return null;
     }
 
-    private void downloadIndexChunk( IndexingContext context, Wagon wagon, String name )
-        throws IOException
-    {
-        RAMDirectory directory = new RAMDirectory();
-
-        loadIndexDirectory( name, wagon, directory );
-
-        context.merge( directory );
-    }
-
     /**
-     * A task that requires a Wagon instance
+     * A ResourceFetcher implementation based on Wagon 
      */
-    interface WagonTask<T>
+    static class WagonFetcher implements ResourceFetcher
     {
-        T invoke( Wagon wagon )
-            throws IOException;
-    }
+        private final WagonManager wagonManager;
+        private final TransferListener listener;
+        private final ProxyInfo proxyInfo;
+        
+        private Wagon wagon = null;
+        
+        public WagonFetcher( WagonManager wagonManager, TransferListener listener, ProxyInfo proxyInfo ) 
+        {
+            this.wagonManager = wagonManager;
+            this.listener = listener;
+            this.proxyInfo = proxyInfo;
+        }
 
+        public void connect( String id, String url ) throws IOException 
+        {
+            Repository repository = new Repository( id, url );
+    
+            try
+            {
+                wagon = wagonManager.getWagon( repository );
+    
+                if ( listener != null )
+                {
+                    wagon.addTransferListener( listener );
+                }
+    
+                // when working in the context of Maven, the WagonManager is already
+                // populated with proxy information from the Maven environment
+    
+                if ( proxyInfo != null )
+                {
+                    wagon.connect( repository, proxyInfo );
+                }
+                else
+                {
+                    wagon.connect( repository );
+                }
+            }
+            catch ( AuthenticationException ex )
+            {
+                String msg = "Authentication exception connecting to " + repository;
+                logError( msg, ex );
+                throw new IOException( msg );
+            }
+            catch ( WagonException ex )
+            {
+                String msg = "Wagon exception connecting to " + repository;
+                logError( msg, ex );
+                throw new IOException( msg );
+            }
+        }
+
+        public void disconnect() 
+        {
+            if ( wagon != null )
+            {
+                try
+                {
+                    wagon.disconnect();
+                }
+                catch ( ConnectionException ex )
+                {
+                    logError( "Failed to close connection", ex);
+                }
+            }
+        }
+  
+        public void retrieve( String name, File targetFile ) throws IOException 
+        {
+            try
+            {
+                wagon.get( name, targetFile );
+            }
+            catch ( AuthorizationException e )
+            {
+                String msg = "Authorization exception retrieving " + name;
+                logError( msg, e );
+                throw new IOException( msg );
+            }
+            catch ( ResourceDoesNotExistException e )
+            {
+                String msg = "Resource " + name + " does not exist";
+                logError( msg, e );
+                throw new IOException( msg );
+            }
+            catch ( WagonException e )
+            {
+                String msg = "Transfer for " + name + " failed";
+                logError( msg, e );
+                throw new IOException( msg + "; " + e.getMessage() );
+            }
+        }
+      
+        private void logError( String msg, Exception ex ) 
+        {
+            if ( listener != null )
+            {
+                listener.debug( msg + "; " + ex.getMessage() );
+            }
+        }
+      
+    }
+    
 }

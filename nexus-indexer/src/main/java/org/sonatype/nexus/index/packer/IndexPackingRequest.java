@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2008 Sonatype, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
+
 package org.sonatype.nexus.index.packer;
 
 import java.io.File;
@@ -26,7 +34,7 @@ public class IndexPackingRequest
 
         this.createIncrementalChunks = true;
 
-        this.indexChunker = new DailyIndexChunker();
+        this.indexChunker = new DefaultIndexChunker();
 
         this.maxIndexChunks = MAX_CHUNKS;
     }

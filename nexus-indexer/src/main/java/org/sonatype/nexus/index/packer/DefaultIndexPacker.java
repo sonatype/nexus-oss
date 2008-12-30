@@ -52,14 +52,6 @@ public class DefaultIndexPacker
     extends AbstractLogEnabled
     implements IndexPacker
 {
-    private final SimpleDateFormat df;
-
-    public DefaultIndexPacker()
-    {
-        this.df = new SimpleDateFormat( INDEX_TIME_FORMAT );
-        this.df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
-    }
-
     public void packIndex( IndexPackingRequest request )
         throws IOException,
             IllegalArgumentException
@@ -95,15 +87,9 @@ public class DefaultIndexPacker
 
         if ( request.isCreateIncrementalChunks() )
         {
-            if ( request.getIndexChunker() == null )
-            {
-                throw new IllegalArgumentException( "Can't create incremental index without supplied chunker!" );
-            }
-
             Map<String, List<Integer>> chunks = getIndexChunks( request );
 
             writeIndexChunks( info, chunks, request );
-
         }
 
         writeIndexArchive( request.getContext(), new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".zip" ) );
@@ -192,11 +178,12 @@ public class DefaultIndexPacker
             w.optimize();
 
             info.put(
-                IndexingContext.INDEX_PROPERTY_PREFIX + request.getIndexChunker().getId() + "-" + n,
+                IndexingContext.INDEX_CHUNK_PREFIX + n,
                 format( request.getIndexChunker().getChunkDate( key ) ) );
 
-            writeIndexArchive( chunkContext, new File( request.getTargetDir(), IndexingContext.INDEX_FILE + "." + key
-                + ".zip" ) );
+            writeIndexArchive( chunkContext, //
+                new File( request.getTargetDir(), //
+                    IndexingContext.INDEX_FILE + "." + key + ".zip") );
 
             n++;
 
@@ -253,10 +240,10 @@ public class DefaultIndexPacker
 
         info.setProperty( IndexingContext.INDEX_TIMESTAMP, format( timestamp ) );
 
-        if ( request.isCreateIncrementalChunks() )
-        {
-            info.setProperty( IndexingContext.INDEX_CHUNKS_RESOLUTION, request.getIndexChunker().getId() );
-        }
+//        if ( request.isCreateIncrementalChunks() )
+//        {
+//            info.setProperty( IndexingContext.INDEX_CHUNKS_RESOLUTION, request.getIndexChunker().getId() );
+//        }
 
         OutputStream os = null;
 
@@ -274,6 +261,8 @@ public class DefaultIndexPacker
 
     private String format( Date d )
     {
+        SimpleDateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT );
+        df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
         return df.format( d );
     }
 

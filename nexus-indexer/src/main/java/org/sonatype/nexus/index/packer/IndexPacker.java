@@ -24,8 +24,6 @@ public interface IndexPacker
 {
     String ROLE = IndexPacker.class.getName();
 
-    public static final String INDEX_TIME_FORMAT = "yyyyMMddHHmmss.SSS Z";
-
     /**
      * Pack a context into a target directory. If the directory does not exists, it will be created. If the directory
      * exists, it should be writable.

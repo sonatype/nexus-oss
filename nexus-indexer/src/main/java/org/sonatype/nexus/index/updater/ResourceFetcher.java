@@ -6,11 +6,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.sonatype.nexus.index;
+package org.sonatype.nexus.index.updater;
 
-import org.apache.lucene.document.Document;
+import java.io.File;
+import java.io.IOException;
 
-public interface DocumentFilter
+/**
+ * An interface defining resource downloading contract
+ * 
+ * @author Eugene Kuleshov
+ */
+public interface ResourceFetcher 
 {
-    boolean accept( Document doc );
+    void connect( String id, String url ) throws IOException;
+    void disconnect() throws IOException;
+    void retrieve( String name, File targetFile ) throws IOException;
 }

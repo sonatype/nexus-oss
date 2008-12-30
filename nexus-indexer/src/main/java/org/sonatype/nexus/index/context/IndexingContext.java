@@ -55,7 +55,11 @@ public interface IndexingContext
 
     public static final String INDEX_TIMESTAMP = INDEX_PROPERTY_PREFIX + "time";
 
-    public static final String INDEX_CHUNKS_RESOLUTION = INDEX_PROPERTY_PREFIX + "chunkResolution";
+    public static final String INDEX_CHUNK_PREFIX = INDEX_PROPERTY_PREFIX + "chunk-";
+
+    public static final String INDEX_TIME_FORMAT = "yyyyMMddHHmmss.SSS Z";
+
+    public static final String INDEX_TIME_DAY_FORMAT = "yyyyMMdd";
 
     /**
      * Returns this indexing context id.
