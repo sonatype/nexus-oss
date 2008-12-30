@@ -607,7 +607,7 @@ Ext.extend( Sonatype.repoServer.DefaultUserEditor, Sonatype.ext.FormPanel, {
         var roleName = val[i];
         var rec = this.roleDataStore.getAt( this.roleDataStore.find( 'id', roleName ) );
         if ( rec ) {
-          roleName = rec.get( 'name' );
+          roleName = rec.data.name;
         }
         if ( s ) {
           s += ', ';
@@ -721,7 +721,7 @@ Sonatype.repoServer.UserMappingEditor = function( config ) {
         specialkey: {
           fn: function(f, e){
             if(e.getKey() == e.ENTER){
-              this.onTriggerClick();
+              this.loadUserId.createDelegate( this );
             }
           }
         }
@@ -803,9 +803,7 @@ Sonatype.repoServer.UserMappingEditor = function( config ) {
         scope: this
       },
       submit: {
-        fn: function() {
-          this.payload.hostPanel.refreshHandler( null, null );
-        },
+        fn: this.submitHandler,
         scope: this
       }
     }
@@ -845,6 +843,45 @@ Ext.extend( Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
         serviceDataObj: this.referenceData,
         isNew: this.isNew //extra option to send to callback, instead of conditioning on method
       } );
+    }
+  },
+
+  // update roles if the user record with the same id is displayed in the grid
+  // (auto-update doesn't work since the mapping resource does not return anything)
+  submitHandler: function( form, action, receivedData ) {
+    var store;
+    if ( this.payload.id == 'new_mapping' && this.payload.hostPanel ) {
+      store = this.payload.hostPanel.dataStore;
+    }
+    else if ( this.payload.store ) {
+      store = this.payload.store;
+    }
+    
+    if ( store ) {
+      var rec = store.getById( action.output.data.userId );
+      if ( rec ) {
+        var s = '';
+        var roles = [];
+        var sentRoles = action.output.data.roles;
+        for ( var i = 0; i < sentRoles.length; i++ ) {
+          var roleName = sentRoles[i];
+          var roleRec = this.roleDataStore.getAt( this.roleDataStore.find( 'id', roleName ) );
+          if ( roleRec ) {
+            roles.push( roleRec.data );
+            roleName = roleRec.data.name;
+          }
+          if ( s ) {
+            s += ', ';
+          }
+          s += roleName;
+        }
+        
+        rec.beginEdit();
+        rec.set( 'roles', roles );
+        rec.set( 'displayRoles', s );
+        rec.commit();
+        rec.endEdit();
+      }
     }
   },
   
