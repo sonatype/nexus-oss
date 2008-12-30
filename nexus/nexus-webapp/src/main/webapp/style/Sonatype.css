@@ -22,13 +22,11 @@ body {
 }
 
 #logo {
-  font-size: 20px;
+  font-size: 16px;
   float: left;
   display:inline;
-}
-
-#logo SUP {
-	font-size: 10px;
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
 
 #header div.right-side {
