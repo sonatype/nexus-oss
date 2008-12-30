@@ -19,6 +19,7 @@ package org.sonatype.nexus.rest.users;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.SecurityUtils;
+import org.jsecurity.subject.Subject;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -180,10 +181,16 @@ public class UserPlexusResource
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
         }
     }
-    
+
     protected boolean isCurrentUser( Request request )
     {
-        return SecurityUtils.getSubject().getPrincipal().equals( getUserId( request ) );
+        Subject subject = SecurityUtils.getSubject();
+        if ( subject == null )
+        {
+            return false; // not the current user because there is no current user
+        }
+
+        return subject.getPrincipal().equals( getUserId( request ) );
     }
 
 }
