@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.codehaus.plexus.PlexusContainer;
@@ -48,6 +49,8 @@ public class RepositoryConvertorCli
 
     public static final char MOVE = 'm';
 
+    private Options options;
+    
     public static void main( String[] args )
         throws Exception
     {
@@ -62,11 +65,13 @@ public class RepositoryConvertorCli
             "The repository to be converted." ).create( REPO ) );
 
         options.addOption( OptionBuilder.withLongOpt( "output" ).hasArg().withDescription(
-            "Where the converted repositoris locate." ).create( OUTPUT ) );
+            "Where the converted repositories locate." ).create( OUTPUT ) );
 
         options.addOption( OptionBuilder.withLongOpt( "move" ).withDescription(
             "Move the repository (old repository will be deleted )." ).create( MOVE ) );
 
+        this.options = options;
+        
         return options;
     }
 
@@ -156,6 +161,15 @@ public class RepositoryConvertorCli
     public String getPomPropertiesPath()
     {
         return "META-INF/maven/" + GROUP_ID + "/" + ARTIFACT_ID + "/pom.properties";
+    }
+    
+    public void displayHelp()
+    {
+        System.out.println();
+
+        HelpFormatter formatter = new HelpFormatter();
+
+        formatter.printHelp( "java -jar cli-jar-name [options]", "\nOptions:", options, "\n" );
     }
 
 }
