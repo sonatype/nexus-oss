@@ -91,7 +91,7 @@ public class ArtifactoryMigrationPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:migration]" );
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:artifactorymigrate]" );
     }
 
     @Override

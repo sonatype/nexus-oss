@@ -1,7 +1,5 @@
 package org.sonatype.nexus.plugins.migration;
 
-import hidden.org.codehaus.plexus.util.StringUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +14,6 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
-import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
 import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
@@ -30,8 +27,6 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public class AbstractMigrationIntegrationTest
     extends AbstractNexusIntegrationTest
 {
-
-    protected static final String DEFAULT_EMAIL = "juven@mars.com";
 
     protected RepositoryMessageUtil repositoryUtil;
 
@@ -158,7 +153,7 @@ public class AbstractMigrationIntegrationTest
     {
         MigrationSummaryDTO migrationSummary = ImportMessageUtil.importBackup( artifactoryBackup );
         Assert.assertNotNull( "Unexpected result from server: " + migrationSummary, migrationSummary );
-        fillDefaultEmailIfNotExist( migrationSummary.getUserResolution() );
+        ImportMessageUtil.fillDefaultEmailIfNotExist( migrationSummary.getUserResolution() );
         return migrationSummary;
     }
 
@@ -169,14 +164,4 @@ public class AbstractMigrationIntegrationTest
         Assert.assertTrue( "Unable to commit import " + status, status.isSuccess() );
     }
 
-    protected void fillDefaultEmailIfNotExist( List<UserResolutionDTO> resolutions )
-    {
-        for ( UserResolutionDTO resolution : resolutions )
-        {
-            if ( StringUtils.isEmpty( resolution.getEmail() ) )
-            {
-                resolution.setEmail( DEFAULT_EMAIL );
-            }
-        }
-    }
 }

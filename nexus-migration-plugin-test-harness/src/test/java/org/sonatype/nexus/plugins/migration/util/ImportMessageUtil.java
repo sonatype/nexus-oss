@@ -1,8 +1,11 @@
 package org.sonatype.nexus.plugins.migration.util;
 
+import hidden.org.codehaus.plexus.util.StringUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -19,6 +22,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRequestDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryResponseDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
@@ -26,6 +30,7 @@ import com.thoughtworks.xstream.XStream;
 
 public class ImportMessageUtil
 {
+    public static final String DEFAULT_EMAIL = "juven@mars.com";
 
     public static MigrationSummaryDTO importBackup( File testFile )
         throws IOException
@@ -76,6 +81,17 @@ public class ImportMessageUtil
             RequestFacade.sendMessage( "service/local/migration/artifactory/content", Method.POST, representation );
 
         return response;
+    }
+    
+    public static void fillDefaultEmailIfNotExist( List<UserResolutionDTO> resolutions )
+    {
+        for ( UserResolutionDTO resolution : resolutions )
+        {
+            if ( StringUtils.isEmpty( resolution.getEmail() ) )
+            {
+                resolution.setEmail( DEFAULT_EMAIL );
+            }
+        }
     }
 
 }
