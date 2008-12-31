@@ -2764,12 +2764,10 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
       ( sp.checkPermission( 'nexus:repositories', sp.CREATE ) ||
         sp.checkPermission( 'nexus:repositories', sp.DELETE ) ||
         sp.checkPermission( 'nexus:repositories', sp.EDIT ) ) ) {
-    cardPanel.add( {
-      xtype: 'panel',
-      layout: 'fit',
+    cardPanel.add( new editor( {
       tabTitle: 'Configuration',
-      items: [ new editor( { payload: rec } ) ]
-    } );
+      payload: rec 
+    } ) );
   }
 } );
 

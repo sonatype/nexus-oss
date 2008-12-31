@@ -531,7 +531,16 @@ Sonatype.ext.FormPanel = function( config ) {
     labelWidth: 200,
     layoutConfig: {
       labelSeparator: ''
-    },
+    }
+  };
+  Ext.apply( this, config, defaultConfig );
+
+  this.checkPayload();
+  if ( this.isNew && this.cancelButton == null ) {
+    this.cancelButton = true;
+  }
+  
+  Sonatype.ext.FormPanel.superclass.constructor.call( this, {
     buttons: ( config.readOnly || this.readOnly ) ? [] : [
       {
         text: 'Save',
@@ -544,12 +553,7 @@ Sonatype.ext.FormPanel = function( config ) {
         text: this.cancelButton ? 'Cancel' : 'Reset'
       }
     ]
-  };
-  Ext.apply( this, config, defaultConfig );
-
-  this.checkPayload();
-
-  Sonatype.ext.FormPanel.superclass.constructor.call( this, {} );
+  } );
 
   this.on( 'afterlayout', this.initData, this, { single:true } );
   this.on( 'afterlayout', this.registerRequiredQuicktips, this, { single:true } );

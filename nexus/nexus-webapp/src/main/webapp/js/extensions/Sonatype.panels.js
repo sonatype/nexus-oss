@@ -292,6 +292,18 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
     }
   },
   
+  cancelHandler: function( panel ) {
+    var rec = panel.payload;
+    if ( rec ) {
+      if ( this.dataStore.getById( rec.id ) ) {
+        this.dataStore.remove( rec );
+      }
+      else {
+        this.recordRemoveHandler( this.dataStore, rec, -1 );
+      }
+    }
+  },
+  
   checkStores: function() {
     if ( this.dataStores ) {
       for ( var i = 0; i < this.dataStores.length; i++ ) {
@@ -385,6 +397,12 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
       Sonatype.Events.fireEvent( this.rowClickEvent, panel, rec );
 
       if ( panel.items ) {
+        if ( ! panel.tabPanel ) {
+          // if the panel has a single child, and the child fires a cancel event,
+          // catch it to clean up automatically
+          var child = panel.getComponent( 0 );
+          child.on( 'cancel', this.cancelHandler.createDelegate( this, [child] ), this );
+        }
         this.cardPanel.add( panel );
       }
       else {
