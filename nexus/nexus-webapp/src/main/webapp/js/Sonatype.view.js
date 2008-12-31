@@ -111,6 +111,9 @@ Sonatype.view = {
     Sonatype.view.serverTabPanel = viewport.findById('st-server-tab-panel');
     Sonatype.view.mainTabPanel = viewport.findById('st-main-tab-panel');
     
+    var size = Sonatype.view.serverTabPanel.getSize();
+    Sonatype.view.serverTabPanel.setHeight( size.height - 20 );
+    
     //allow each included sonatype server to setup its tab and events
     var availSvrs = Sonatype.config.installedServers;
     for(var srv in availSvrs) {

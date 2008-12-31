@@ -222,7 +222,7 @@ Sonatype.repoServer.RepoServer = function(){
                 id: 'quick-search--field',
                 triggerClass: 'x-form-search-trigger',
                 repoPanel: this,
-                width: 150,
+                width: 140,
                 listeners: {
                   'specialkey': {
                     fn: function(f, e){

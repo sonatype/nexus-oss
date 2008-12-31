@@ -25,8 +25,9 @@ Sonatype.navigation.NavigationPanel = function( config ) {
 
   Sonatype.navigation.NavigationPanel.superclass.constructor.call( this, {
     cls: 'st-server-panel',
-    layout:'fit',
-    border: false
+    autoScroll: true,
+    border: false,
+    items: []
   });
 };
 
@@ -46,6 +47,8 @@ Ext.extend( Sonatype.navigation.NavigationPanel, Ext.Panel, {
       }
       return;
     }
+
+    if ( c == null ) return;
 
     // check if this is an attempt to add a navigation item to an existing section
     if ( c.sectionId ) {
@@ -93,11 +96,22 @@ Sonatype.navigation.Section = function( config ) {
     cls: 'st-server-sub-container',
     layout: 'fit',
     frame: true,
-    autoHeight: true
+    autoHeight: true,
+    listeners: {
+      collapse: this.collapseExpandHandler,
+      expand: this.collapseExpandHandler,
+      scope: this
+    }
   });
 };
 
 Ext.extend( Sonatype.navigation.Section, Ext.Panel, {
+  collapseExpandHandler: function() {
+    if ( this.layout && this.layout.layout ) {
+      this.ownerCt.doLayout();
+    }
+  },
+
   transformItem: function( c ) {
     if ( ! c ) return null;
 

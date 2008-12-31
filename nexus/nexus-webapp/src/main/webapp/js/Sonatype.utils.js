@@ -718,6 +718,7 @@ Sonatype.utils = {
         Sonatype.view.updateLoginLinkText();
         Sonatype.repoServer.RepoServer.resetMainTabPanel();
         Sonatype.repoServer.RepoServer.createSubComponents();
+        Sonatype.view.serverTabPanel.doLayout();
 
         if ( baseUrlMismatch ) {
           Sonatype.view.welcomeTab.add( {
