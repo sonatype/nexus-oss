@@ -256,7 +256,7 @@ public class DefaultIndexUpdater
             if( contextTimestamp.after( chunkTimestamp ) )
             {
                 SimpleDateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_DAY_FORMAT );
-                return IndexingContext.INDEX_FILE + "." + df.format( contextTimestamp ) + ".zip";                
+                return IndexingContext.INDEX_FILE + "." + df.format( chunkTimestamp ) + ".zip";                
             }
         
             n++;

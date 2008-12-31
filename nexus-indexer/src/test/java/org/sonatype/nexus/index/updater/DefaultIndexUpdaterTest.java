@@ -14,6 +14,7 @@
 package org.sonatype.nexus.index.updater;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -26,6 +27,11 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.util.IOUtil;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.api.Invocation;
+import org.jmock.lib.action.VoidAction;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
@@ -49,7 +55,11 @@ public class DefaultIndexUpdaterTest
 
     private NexusIndexer indexer;
 
+    private IndexUpdater updater;
+    
     private IndexingContext context;
+
+    private SimpleDateFormat df = new SimpleDateFormat( "yyyyMMddHHmmss.SSS Z" );
 
     protected void setUp()
         throws Exception
@@ -58,6 +68,8 @@ public class DefaultIndexUpdaterTest
 
         indexer = (NexusIndexer) lookup( NexusIndexer.class );
 
+        updater = (IndexUpdater) lookup( IndexUpdater.class );
+        
         Directory indexDirectory = new RAMDirectory();
 
         context = indexer.addIndexingContext(
@@ -377,68 +389,212 @@ public class DefaultIndexUpdaterTest
     public void testGetUpdateChunkName()
         throws Exception
     {
-        IndexUpdater updater = (IndexUpdater) lookup( IndexUpdater.class );
-
         Properties properties = new Properties();
         properties.setProperty( "nexus.index.id", "central" );
         properties.setProperty( "nexus.index.time", "20081129174241.859 -0600" );
-        properties.setProperty( "nexus.index.day-0", "20081129000000.000 -0600" );
-        properties.setProperty( "nexus.index.day-1", "20081128000000.000 -0600" );
-        properties.setProperty( "nexus.index.day-2", "20081127000000.000 -0600" );
-        properties.setProperty( "nexus.index.day-3", "20081126000000.000 -0600" );
-/*
-        SimpleDateFormat df = new SimpleDateFormat( "yyyyMMddHHmmss.SSS Z" );
+        properties.setProperty( "nexus.index.chunk-0", "20081129000000.000 -0600" );
+        properties.setProperty( "nexus.index.chunk-1", "20081128000000.000 -0600" );
+        properties.setProperty( "nexus.index.chunk-2", "20081127000000.000 -0600" );
+        properties.setProperty( "nexus.index.chunk-3", "20081126000000.000 -0600" );
 
         {
-            Date updateChunkDate = updater.getNextUpdateChunkTimestamp(
-                df.parse( "20081125010000.000 -0600" ),
-                null,
-                properties );
-            String updateChunkName = updater.getUpdateChunkName( updateChunkDate );
-            assertEquals( null, updateChunkName );
+            String updateChunkName = updater.getUpdateChunkName(df.parse("20081125010000.000 -0600"), properties);
+            assertEquals(null, updateChunkName);
         }
         {
-            Date updateChunkDate = updater.getNextUpdateChunkTimestamp(
-                df.parse( "20081126010000.000 -0600" ),
-                null,
-                properties );
-            String updateChunkName = updater.getUpdateChunkName( updateChunkDate );
-            assertEquals( "nexus-maven-repository-index.20081126.zip", updateChunkName );
+            String updateChunkName = updater.getUpdateChunkName(df.parse("20081126010000.000 -0600"), properties);
+            assertEquals("nexus-maven-repository-index.20081126.zip", updateChunkName);
         }
         {
-            Date updateChunkDate = updater.getNextUpdateChunkTimestamp(
-                df.parse( "20081127010000.000 -0600" ),
-                null,
-                properties );
-            String updateChunkName = updater.getUpdateChunkName( updateChunkDate );
-            assertEquals( "nexus-maven-repository-index.20081127.zip", updateChunkName );
+            String updateChunkName = updater.getUpdateChunkName(df.parse("20081127010000.000 -0600"), properties);
+            assertEquals("nexus-maven-repository-index.20081127.zip", updateChunkName);
         }
         {
-            Date updateChunkDate = updater.getNextUpdateChunkTimestamp(
-                df.parse( "20081128010000.000 -0600" ),
-                null,
-                properties );
-            String updateChunkName = updater.getUpdateChunkName( updateChunkDate );
-            assertEquals( "nexus-maven-repository-index.20081128.zip", updateChunkName );
+            String updateChunkName = updater.getUpdateChunkName(df.parse("20081128010000.000 -0600"), properties);
+            assertEquals("nexus-maven-repository-index.20081128.zip", updateChunkName);
         }
         {
-            Date updateChunkDate = updater.getNextUpdateChunkTimestamp(
-                df.parse( "20081129010000.000 -0600" ),
-                null,
-                properties );
-            String updateChunkName = updater.getUpdateChunkName( updateChunkDate );
-            assertEquals( "nexus-maven-repository-index.20081129.zip", updateChunkName );
+            String updateChunkName = updater.getUpdateChunkName(df.parse("20081129010000.000 -0600"), properties);
+            assertEquals("nexus-maven-repository-index.20081129.zip", updateChunkName);
         }
         {
-            Date updateChunkDate = updater.getNextUpdateChunkTimestamp(
-                df.parse( "20081130010000.000 -0600" ),
-                null,
-                properties );
-            String updateChunkName = updater.getUpdateChunkName( updateChunkDate );
-            assertEquals( null, updateChunkName );
-        }*/
+            String updateChunkName = updater.getUpdateChunkName(df.parse("20081130010000.000 -0600"), properties);
+            assertEquals(null, updateChunkName);
+        }
+    }
+    
+    public void testNoIndexUpdate() throws Exception 
+    {
+        Mockery mockery = new Mockery();
+        
+        final String indexUrl = repositoryUrl + ".index";
+        final Date contextTimestamp = df.parse( "20081125010000.000 -0600" );
+        
+        final ResourceFetcher mockFetcher = mockery.mock( ResourceFetcher.class );
+
+        final IndexingContext tempContext = mockery.mock( IndexingContext.class );
+        
+        mockery.checking(new Expectations() 
+        {{
+            allowing( tempContext ).getTimestamp();
+            will( returnValue( contextTimestamp ) );
+            
+            allowing( tempContext ).getId();
+            will( returnValue( repositoryId ) );
+            
+            allowing( tempContext ).getIndexUpdateUrl();
+            will( returnValue( indexUrl ) );
+            
+            oneOf( mockFetcher ).connect( repositoryId, indexUrl );
+            
+            oneOf( mockFetcher ).retrieve( //
+                with( IndexingContext.INDEX_FILE + ".properties" ), //
+                with( any( File.class ) ) );
+            will(new PropertiesAction() 
+            {
+                Properties getProperties() 
+                {
+                    Properties properties = new Properties();
+                    properties.setProperty( "nexus.index.id", "central" );
+                    properties.setProperty( "nexus.index.time", "20081125010000.000 -0600" );
+                    return properties;
+                }
+            });
+            
+            oneOf( mockFetcher ).disconnect();
+        }});
+        
+        // tempContext.updateTimestamp( true, contextTimestamp );
+        
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
+        
+        updateRequest.setResourceFetcher( mockFetcher );
+
+        updater.fetchAndUpdateIndex( updateRequest );
+        
+        mockery.assertIsSatisfied();
     }
 
+    public void testFullIndexUpdate() throws Exception 
+    {
+        Mockery mockery = new Mockery();
+        
+        final String indexUrl = repositoryUrl + ".index";
+        final Date contextTimestamp = df.parse( "20081125010000.000 -0600" );
+        
+        final ResourceFetcher mockFetcher = mockery.mock( ResourceFetcher.class );
+
+        final IndexingContext tempContext = mockery.mock( IndexingContext.class );
+        
+        mockery.checking(new Expectations() 
+        {{
+            allowing( tempContext ).getTimestamp();
+            will( returnValue( contextTimestamp ) );
+            
+            allowing( tempContext ).getId();
+            will( returnValue( repositoryId ) );
+            
+            allowing( tempContext ).getIndexUpdateUrl();
+            will( returnValue( indexUrl ) );
+            
+            oneOf( mockFetcher ).connect( repositoryId, indexUrl );
+            
+            oneOf( mockFetcher ).retrieve( //
+                with( IndexingContext.INDEX_FILE + ".properties" ), //
+                with( any( File.class ) ) );
+            will(new PropertiesAction() 
+            {
+                Properties getProperties() 
+                {
+                    Properties properties = new Properties();
+                    properties.setProperty( "nexus.index.id", "central" );
+                    properties.setProperty( "nexus.index.time", "20081126010000.000 -0600" );
+                    return properties;
+                }
+            });
+            
+            oneOf( mockFetcher ).retrieve( //
+                with( IndexingContext.INDEX_FILE + ".zip" ), //
+                with( Expectations.<File>anything() ) );
+            
+            oneOf( tempContext ).replace( with( any( Directory.class ) ) );
+            
+            oneOf( mockFetcher ).disconnect();
+        }});
+        
+        // tempContext.updateTimestamp( true, contextTimestamp );
+        
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
+        
+        updateRequest.setResourceFetcher( mockFetcher );
+
+        updater.fetchAndUpdateIndex( updateRequest );
+        
+        mockery.assertIsSatisfied();
+    }
+
+    public void testIncrementalIndexUpdate() throws Exception 
+    {
+        Mockery mockery = new Mockery();
+        
+        final String indexUrl = repositoryUrl + ".index";
+        final Date contextTimestamp = df.parse( "20081128000000.000 -0600" );
+        
+        final ResourceFetcher mockFetcher = mockery.mock( ResourceFetcher.class );
+        
+        final IndexingContext tempContext = mockery.mock( IndexingContext.class );
+        
+        mockery.checking(new Expectations() 
+        {{
+            allowing( tempContext ).getTimestamp();
+            will( returnValue( contextTimestamp ) );
+            
+            allowing( tempContext ).getId();
+            will( returnValue( repositoryId ) );
+            
+            allowing( tempContext ).getIndexUpdateUrl();
+            will( returnValue( indexUrl ) );
+            
+            oneOf( mockFetcher ).connect( repositoryId, indexUrl );
+            
+            oneOf( mockFetcher ).retrieve( //
+                with( IndexingContext.INDEX_FILE + ".properties" ), //
+                with( any( File.class ) ) );
+            will(new PropertiesAction() 
+            {
+                Properties getProperties() 
+                {
+                    Properties properties = new Properties();
+                    properties.setProperty( "nexus.index.id", "central" );
+                    properties.setProperty( "nexus.index.time", "20081129174241.859 -0600" );
+                    properties.setProperty( "nexus.index.chunk-0", "20081129000000.000 -0600" );
+                    properties.setProperty( "nexus.index.chunk-1", "20081127000000.000 -0600" );
+                    properties.setProperty( "nexus.index.chunk-2", "20081126000000.000 -0600" );
+                    return properties;
+                }
+            });
+            
+            oneOf( mockFetcher ).retrieve( //
+                with( IndexingContext.INDEX_FILE + ".20081127.zip" ), //
+                with( Expectations.<File>anything() ) );
+            // could create index archive there and verify that it is merged correctly
+            
+            oneOf( tempContext ).merge( with( any( Directory.class ) ) );
+            
+            oneOf( mockFetcher ).disconnect();
+        }});
+        
+        // tempContext.updateTimestamp( true, contextTimestamp );
+        
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
+        
+        updateRequest.setResourceFetcher( mockFetcher );
+        
+        updater.fetchAndUpdateIndex( updateRequest );
+        
+        mockery.assertIsSatisfied();
+    }
+    
     private ArtifactContext createArtifactContext( String repositoryId, String groupId, String artifactId,
         String version, String classifier )
     {
@@ -470,4 +626,31 @@ public class DefaultIndexUpdaterTest
             + ( classifier == null ? "" : "-" + classifier );
     }
 
+    
+    abstract static class PropertiesAction extends VoidAction 
+    {
+        public Object invoke(Invocation invocation) throws Throwable 
+        {
+            File file = (File) invocation.getParameter( 1 );
+            
+            Properties properties = getProperties();
+    
+            FileOutputStream is = null;
+            try 
+            {
+                is = new FileOutputStream(file);
+                properties.store(is, null);
+                is.flush();
+            } 
+            finally 
+            {
+                IOUtil.close(is);
+            }
+            
+            return null;
+        }
+
+        abstract Properties getProperties();
+    }
+    
 }
