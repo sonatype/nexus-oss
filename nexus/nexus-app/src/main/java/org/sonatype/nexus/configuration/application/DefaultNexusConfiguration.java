@@ -894,14 +894,10 @@ public class DefaultNexusConfiguration
             // all existing groups
             List<CRepositoryGroup> groups = getConfiguration().getRepositoryGrouping().getRepositoryGroups();
 
-            // the groups that references the repository
-            List<String> repoGroups = repositoryRegistry.getGroupsOfRepository( id );
-
-            for ( Iterator<CRepositoryGroup> i = groups.iterator(); i.hasNext(); )
+            // if any group reference this repository, remove that reference
+            for ( CRepositoryGroup group : groups)
             {
-                CRepositoryGroup group = i.next();
-
-                if ( repoGroups.contains( group.getGroupId() ) )
+                if ( group.getRepositories().contains( id ))
                 {
                     group.getRepositories().remove( id );
                 }
