@@ -102,6 +102,11 @@
         <scope>test</scope>
         <version>3.8.2</version>
     </dependency>
+    <dependency>
+    	<groupId>org.jmock</groupId>
+    	<artifactId>jmock</artifactId>
+    	<version>2.5.1</version>
+    </dependency>
   </dependencies>
 
   <build>
