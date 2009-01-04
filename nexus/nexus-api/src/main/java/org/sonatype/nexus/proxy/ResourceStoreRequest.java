@@ -29,11 +29,11 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
  */
 public class ResourceStoreRequest
 {
+    /** Context flag to mark a request local only. */
+    public static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
+
     /** The path we want to retrieve. */
     private String requestPath;
-
-    /** If true, there will not happen remote access to get this item. Only local storage will be involved. */
-    private boolean requestLocalOnly;
 
     /** Extra data associated with this request. */
     private Map<String, Object> requestContext;
@@ -51,11 +51,11 @@ public class ResourceStoreRequest
     {
         super();
         this.requestPath = requestPath;
-        this.requestLocalOnly = localOnly;
         this.requestRepositoryId = repositoryId;
         this.requestRepositoryGroupId = repositoryGroupId;
-        this.requestContext = new HashMap<String, Object>();
         this.pathStack = new Stack<String>();
+        this.requestContext = new HashMap<String, Object>();
+        this.requestContext.put( CTX_LOCAL_ONLY_FLAG, localOnly );
     }
 
     /**
@@ -127,7 +127,7 @@ public class ResourceStoreRequest
      */
     public boolean isRequestLocalOnly()
     {
-        return requestLocalOnly;
+        return (Boolean) getRequestContext().get( CTX_LOCAL_ONLY_FLAG );
     }
 
     /**
@@ -137,7 +137,7 @@ public class ResourceStoreRequest
      */
     public void setRequestLocalOnly( boolean requestLocalOnly )
     {
-        this.requestLocalOnly = requestLocalOnly;
+        getRequestContext().put( CTX_LOCAL_ONLY_FLAG, requestLocalOnly );
     }
 
     /**

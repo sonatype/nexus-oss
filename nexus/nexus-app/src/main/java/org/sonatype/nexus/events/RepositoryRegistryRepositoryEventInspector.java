@@ -26,9 +26,11 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
-import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryType;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 /**
  * @author Juven Xu
@@ -65,7 +67,18 @@ public class RepositoryRegistryRepositoryEventInspector
     {
         RepositoryRegistryRepositoryEvent revt = (RepositoryRegistryRepositoryEvent) evt;
 
-        StringBuffer sb = new StringBuffer( " repository " );
+        Repository repository = revt.getRepository();
+
+        StringBuffer sb = new StringBuffer();
+
+        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        {
+            sb.append( " repository group " );
+        }
+        else
+        {
+            sb.append( " repository " );
+        }
 
         sb.append( revt.getRepository().getName() );
 
@@ -75,17 +88,17 @@ public class RepositoryRegistryRepositoryEventInspector
 
         sb.append( ") " );
 
-        if ( RepositoryType.PROXY.equals( revt.getRepository().getRepositoryType() ) )
+        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
             sb.append( " as proxy repository for URL " );
 
-            sb.append( revt.getRepository().getRemoteUrl() );
+            sb.append( revt.getRepository().adaptToFacet( ProxyRepository.class ).getRemoteUrl() );
         }
-        else if ( RepositoryType.HOSTED.equals( revt.getRepository().getRepositoryType() ) )
+        else if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
         {
             sb.append( " as hosted repository" );
         }
-        else if ( RepositoryType.SHADOW.equals( revt.getRepository().getRepositoryType() ) )
+        else if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
         {
             sb.append( " as " );
 
@@ -93,11 +106,11 @@ public class RepositoryRegistryRepositoryEventInspector
 
             sb.append( " virtual repository for " );
 
-            sb.append( ( (DefaultShadowRepository) revt.getRepository() ).getMasterRepository().getName() );
+            sb.append( revt.getRepository().adaptToFacet( ShadowRepository.class ).getMasterRepository().getName() );
 
             sb.append( " (ID=" );
 
-            sb.append( ( (DefaultShadowRepository) revt.getRepository() ).getMasterRepository().getId() );
+            sb.append( revt.getRepository().adaptToFacet( ShadowRepository.class ).getMasterRepository().getId() );
 
             sb.append( ") " );
         }

@@ -19,7 +19,6 @@ package org.sonatype.nexus.proxy.storage.local.fs;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +26,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -38,6 +40,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
+import org.sonatype.nexus.proxy.item.FileContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -48,32 +51,34 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.AbstractLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
+import org.sonatype.nexus.util.ItemPathUtils;
 
 /**
  * The Class DefaultFSLocalRepositoryStorage.
  * 
  * @author cstamas
- * @plexus.component role-hint="file"
  */
+@Component( role = LocalRepositoryStorage.class, hint = "file" )
 public class DefaultFSLocalRepositoryStorage
     extends AbstractLocalRepositoryStorage
-    implements LocalRepositoryStorage
 {
     private static final String LINK_PREFIX = "LINK to ";
 
     /**
      * The UID factory.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private RepositoryItemUidFactory repositoryItemUidFactory;
 
-    /**
-     * Instantiates a new default FS local repository storage.
-     */
-    public DefaultFSLocalRepositoryStorage()
+    public void validateStorageUrl( String url )
+        throws StorageException
     {
-        super();
+        boolean result = org.sonatype.nexus.util.FileUtils.validFileUrl( url );
+
+        if ( !result )
+        {
+            throw new StorageException( "Invalid storage url: " + url );
+        }
     }
 
     /**
@@ -81,11 +86,13 @@ public class DefaultFSLocalRepositoryStorage
      * 
      * @return the base dir
      */
-    public File getBaseDir( Repository repository )
+    public File getBaseDir( Repository repository, Map<String, Object> context )
         throws StorageException
     {
-        URL url = getAbsoluteUrlFromBase( repository.createUid( RepositoryItemUid.PATH_ROOT ) );
+        URL url = getAbsoluteUrlFromBase( repository, context, RepositoryItemUid.PATH_ROOT );
+
         File file;
+
         try
         {
             file = new File( url.toURI() );
@@ -94,6 +101,7 @@ public class DefaultFSLocalRepositoryStorage
         {
             file = new File( url.getPath() );
         }
+
         if ( file.exists() )
         {
             if ( file.isFile() )
@@ -108,6 +116,7 @@ public class DefaultFSLocalRepositoryStorage
                 throw new StorageException( "Could not create the baseDir directory on path " + file.getAbsolutePath() );
             }
         }
+
         return file;
     }
 
@@ -117,38 +126,41 @@ public class DefaultFSLocalRepositoryStorage
      * @param uid the uid
      * @return the file from base
      */
-    public File getFileFromBase( RepositoryItemUid uid )
+    public File getFileFromBase( Repository repository, Map<String, Object> context, String path )
         throws StorageException
     {
-        File repoBase = getBaseDir( uid.getRepository() );
+        File repoBase = getBaseDir( repository, context );
 
         if ( !repoBase.exists() )
         {
             repoBase.mkdir();
         }
+
         File result = null;
-        if ( uid.getPath() == null || RepositoryItemUid.PATH_ROOT.equals( uid.getPath() ) )
+
+        if ( path == null || RepositoryItemUid.PATH_ROOT.equals( path ) )
         {
             result = repoBase;
         }
-        else if ( uid.getPath().startsWith( "/" ) )
+        else if ( path.startsWith( "/" ) )
         {
-            result = new File( repoBase, uid.getPath().substring( 1 ) );
+            result = new File( repoBase, path.substring( 1 ) );
         }
         else
         {
-            result = new File( repoBase, uid.getPath() );
+            result = new File( repoBase, path );
         }
+
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( uid.toString() + " --> " + result.getAbsoluteFile() );
+            getLogger().debug( path + " --> " + result.getAbsoluteFile() );
         }
 
         // to be foolproof, chrooting it
-        if ( !result.getAbsolutePath().startsWith( getBaseDir( uid.getRepository() ).getAbsolutePath() ) )
+        if ( !result.getAbsolutePath().startsWith( getBaseDir( repository, context ).getAbsolutePath() ) )
         {
             throw new StorageException( "FileFromBase evaluated directory wrongly! baseDir="
-                + getBaseDir( uid.getRepository() ).getAbsolutePath() + ", target=" + result.getAbsolutePath() );
+                + getBaseDir( repository, context ).getAbsolutePath() + ", target=" + result.getAbsolutePath() );
         }
         else
         {
@@ -165,13 +177,11 @@ public class DefaultFSLocalRepositoryStorage
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
      */
-    protected AbstractStorageItem retrieveItemFromFile( RepositoryItemUid tuid, File target )
+    protected AbstractStorageItem retrieveItemFromFile( Repository repository, String path, File target )
         throws ItemNotFoundException,
             StorageException
     {
-        boolean mustBeACollection = tuid.getPath().endsWith( RepositoryItemUid.PATH_SEPARATOR );
-
-        String path = tuid.getPath();
+        boolean mustBeACollection = path.endsWith( RepositoryItemUid.PATH_SEPARATOR );
 
         if ( path.endsWith( "/" ) )
         {
@@ -183,15 +193,15 @@ public class DefaultFSLocalRepositoryStorage
             path = RepositoryItemUid.PATH_ROOT;
         }
 
-        RepositoryItemUid uid = tuid.getRepository().createUid( path );
+        RepositoryItemUid uid = repository.createUid( path );
 
         AbstractStorageItem result = null;
         if ( target.exists() && target.isDirectory() )
         {
 
             DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-                uid.getRepository(),
-                uid.getPath(),
+                repository,
+                path,
                 target.canRead(),
                 target.canWrite() );
             coll.setModified( target.lastModified() );
@@ -207,8 +217,8 @@ public class DefaultFSLocalRepositoryStorage
                 try
                 {
                     DefaultStorageLinkItem link = new DefaultStorageLinkItem(
-                        uid.getRepository(),
-                        uid.getPath(),
+                        repository,
+                        path,
                         target.canRead(),
                         target.canWrite(),
                         getLinkTarget( target ) );
@@ -228,8 +238,8 @@ public class DefaultFSLocalRepositoryStorage
             }
             else
             {
-                DefaultStorageFileItem file = new DefaultStorageFileItem( uid.getRepository(), uid.getPath(), target
-                    .canRead(), target.canWrite() );
+                DefaultStorageFileItem file = new DefaultStorageFileItem( repository, path, target.canRead(), target
+                    .canWrite(), new FileContentLocator( target ) );
                 getAttributesHandler().fetchAttributes( file );
                 file.setModified( target.lastModified() );
                 file.setCreated( target.lastModified() );
@@ -245,39 +255,25 @@ public class DefaultFSLocalRepositoryStorage
         return result;
     }
 
-    public boolean isReachable( RepositoryItemUid uid )
+    public boolean isReachable( Repository repository, Map<String, Object> context, String path )
         throws StorageException
     {
-        File target = getBaseDir( uid.getRepository() );
+        File target = getBaseDir( repository, context );
 
         return target.exists() && target.canWrite();
     }
 
-    public boolean containsItem( RepositoryItemUid uid )
+    public boolean containsItem( Repository repository, Map<String, Object> context, String path )
         throws StorageException
     {
-        return getFileFromBase( uid ).exists();
+        return getFileFromBase( repository, context, path ).exists();
     }
 
-    public AbstractStorageItem retrieveItem( RepositoryItemUid uid )
+    public AbstractStorageItem retrieveItem( Repository repository, Map<String, Object> context, String path )
         throws ItemNotFoundException,
             StorageException
     {
-        return retrieveItemFromFile( uid, getFileFromBase( uid ) );
-    }
-
-    public InputStream retrieveItemContent( RepositoryItemUid uid )
-        throws ItemNotFoundException,
-            StorageException
-    {
-        try
-        {
-            return new FileInputStream( getFileFromBase( uid ) );
-        }
-        catch ( FileNotFoundException ex )
-        {
-            throw new ItemNotFoundException( uid );
-        }
+        return retrieveItemFromFile( repository, path, getFileFromBase( repository, context, path ) );
     }
 
     private synchronized void mkParentDirs( File target )
@@ -289,7 +285,7 @@ public class DefaultFSLocalRepositoryStorage
         }
     }
 
-    public void storeItem( StorageItem item )
+    public void storeItem( Repository repository, Map<String, Object> context, StorageItem item )
         throws UnsupportedStorageOperationException,
             StorageException
     {
@@ -299,14 +295,17 @@ public class DefaultFSLocalRepositoryStorage
         item.setExpired( false );
 
         File target = null;
+
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
         {
-            target = getFileFromBase( item.getRepositoryItemUid() );
+            target = getFileFromBase( repository, context, item.getPath() );
+
             try
             {
                 mkParentDirs( target );
 
                 InputStream is = null;
+
                 FileOutputStream os = null;
 
                 try
@@ -354,7 +353,7 @@ public class DefaultFSLocalRepositoryStorage
         }
         else if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
         {
-            target = getFileFromBase( item.getRepositoryItemUid() );
+            target = getFileFromBase( repository, context, item.getPath() );
 
             mkParentDirs( target );
 
@@ -366,13 +365,15 @@ public class DefaultFSLocalRepositoryStorage
         {
             try
             {
-                target = getFileFromBase( item.getRepositoryItemUid() );
+                target = getFileFromBase( repository, context, item.getPath() );
 
                 mkParentDirs( target );
 
                 FileOutputStream os = new FileOutputStream( target );
+
                 IOUtil.copy( new ByteArrayInputStream( ( LINK_PREFIX + ( (StorageLinkItem) item ).getTarget() )
                     .getBytes() ), os );
+
                 os.flush();
                 os.close();
                 target.setLastModified( item.getModified() );
@@ -391,13 +392,17 @@ public class DefaultFSLocalRepositoryStorage
         }
     }
 
-    public void shredItem( RepositoryItemUid uid )
+    public void shredItem( Repository repository, Map<String, Object> context, String path )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             StorageException
     {
+        RepositoryItemUid uid = repository.createUid( path );
+
         getAttributesHandler().deleteAttributes( uid );
-        File target = getFileFromBase( uid );
+
+        File target = getFileFromBase( repository, context, path );
+
         if ( target.exists() )
         {
             if ( target.isDirectory() )
@@ -421,16 +426,18 @@ public class DefaultFSLocalRepositoryStorage
         }
         else
         {
-            throw new ItemNotFoundException( uid.toString() );
+            throw new ItemNotFoundException( path, repository.getId() );
         }
     }
 
-    public Collection<StorageItem> listItems( RepositoryItemUid uid )
+    public Collection<StorageItem> listItems( Repository repository, Map<String, Object> context, String path )
         throws ItemNotFoundException,
             StorageException
     {
-        File target = getFileFromBase( uid );
+        File target = getFileFromBase( repository, context, path );
+
         List<StorageItem> result = new ArrayList<StorageItem>();
+
         if ( target.exists() )
         {
             if ( target.isDirectory() )
@@ -443,40 +450,30 @@ public class DefaultFSLocalRepositoryStorage
                     {
                         if ( files[i].isFile() || files[i].isDirectory() )
                         {
-                            RepositoryItemUid tuid;
-
-                            if ( uid.getPath().endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
-                            {
-                                tuid = uid.getRepository().createUid( uid.getPath() + files[i].getName() );
-                            }
-                            else
-                            {
-                                tuid = uid.getRepository().createUid(
-                                    uid.getPath() + RepositoryItemUid.PATH_SEPARATOR + files[i].getName() );
-                            }
-
-                            result.add( retrieveItemFromFile( tuid, files[i] ) );
+                            result.add( retrieveItemFromFile( repository, ItemPathUtils.concatPaths( path, files[i]
+                                .getName() ), files[i] ) );
                         }
                     }
                 }
                 else
                 {
-                    getLogger().warn( "Cannot list directory " + uid.toString() );
+                    getLogger().warn( "Cannot list directory " + target.getAbsolutePath() );
                 }
             }
             else if ( target.isFile() )
             {
-                result.add( retrieveItemFromFile( uid, target ) );
+                result.add( retrieveItemFromFile( repository, path, target ) );
             }
             else
             {
-                throw new ItemNotFoundException( uid );
+                throw new ItemNotFoundException( path, repository.getId() );
             }
         }
         else
         {
-            throw new ItemNotFoundException( uid.toString() );
+            throw new ItemNotFoundException( path, repository.getId() );
         }
+
         return result;
     }
 
@@ -555,14 +552,4 @@ public class DefaultFSLocalRepositoryStorage
         }
     }
 
-    public void validateStorageUrl( String url )
-        throws StorageException
-    {
-        boolean result = org.sonatype.nexus.util.FileUtils.validFileUrl( url );
-
-        if ( !result )
-        {
-            throw new StorageException( "Invalid storage url: " + url );
-        }
-    }
 }

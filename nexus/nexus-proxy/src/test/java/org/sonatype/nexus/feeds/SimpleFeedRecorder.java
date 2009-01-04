@@ -43,7 +43,7 @@ public class SimpleFeedRecorder
     {
     }
 
-    public void systemProcessFinished( SystemProcess prc )
+    public void systemProcessFinished( SystemProcess prc, String finishMessage )
     {
     }
 

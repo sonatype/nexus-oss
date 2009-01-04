@@ -25,9 +25,13 @@ import java.util.List;
 
 import org.easymock.EasyMock;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.repository.DefaultGroupRepository;
+import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class DefaultRepositoryRegistryTest
@@ -53,10 +57,10 @@ public class DefaultRepositoryRegistryTest
     public void testSimple()
         throws Exception
     {
-        Repository repoA = createMock( Repository.class );
-        Repository repoB = createMock( Repository.class );
-        Repository repoC = createMock( Repository.class );
-        
+        HostedRepository repoA = createMock( HostedRepository.class );
+        HostedRepository repoB = createMock( HostedRepository.class );
+        HostedRepository repoC = createMock( HostedRepository.class );
+
         EasyMock.makeThreadSafe( repoA, true );
         EasyMock.makeThreadSafe( repoB, true );
         EasyMock.makeThreadSafe( repoC, true );
@@ -69,6 +73,17 @@ public class DefaultRepositoryRegistryTest
         expect( repoA.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
         expect( repoB.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
         expect( repoC.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
+
+        expect( repoA.getRepositoryKind() )
+            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+        expect( repoB.getRepositoryKind() )
+            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+        expect( repoC.getRepositoryKind() )
+            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+
+        expect( repoA.adaptToFacet( HostedRepository.class ) ).andReturn( repoA ).anyTimes();
+        expect( repoB.adaptToFacet( HostedRepository.class ) ).andReturn( repoB ).anyTimes();
+        expect( repoC.adaptToFacet( HostedRepository.class ) ).andReturn( repoC ).anyTimes();
 
         repoA.addProximityEventListener( (EventListener) repositoryRegistry );
         repoB.addProximityEventListener( (EventListener) repositoryRegistry );
@@ -88,9 +103,15 @@ public class DefaultRepositoryRegistryTest
         gl.add( "A" );
         gl.add( "B" );
         gl.add( "C" );
-        repositoryRegistry.addRepositoryGroup( "ALL", gl );
 
-        List<Repository> repoMembers = repositoryRegistry.getRepositoryGroup( "ALL" );
+        DefaultGroupRepository groupRepository = (DefaultGroupRepository) getContainer().lookup( GroupRepository.class );
+        groupRepository.setId( "ALL" );
+        groupRepository.setRepositoryContentClass( new DefaultContentClass( "any" ) );
+        groupRepository.setMemberRepositories( gl );
+        repositoryRegistry.addRepository( groupRepository );
+
+        List<Repository> repoMembers = repositoryRegistry
+            .getRepositoryWithFacet( "ALL", GroupRepository.class ).getMemberRepositories();
 
         assertEquals( 3, repoMembers.size() );
 
@@ -98,8 +119,13 @@ public class DefaultRepositoryRegistryTest
         assertEquals( "B", repoMembers.get( 1 ).getId() );
         assertEquals( "C", repoMembers.get( 2 ).getId() );
 
+        // recheck the group
+        GroupRepository group = repositoryRegistry.getRepositoryWithFacet( "ALL", GroupRepository.class );
+
+        assertEquals( 3, group.getMemberRepositories().size() );
+
         // and remove them all
-        List<Repository> repositories = repositoryRegistry.getRepositories();
+        List<? extends Repository> repositories = repositoryRegistry.getRepositoriesWithFacet( HostedRepository.class );
 
         for ( Repository repo : repositories )
         {
@@ -108,17 +134,23 @@ public class DefaultRepositoryRegistryTest
 
         try
         {
-            repoMembers = repositoryRegistry.getRepositoryGroup( "ALL" );
+            repoMembers = repositoryRegistry
+                .getRepositoryWithFacet( "ALL", GroupRepository.class ).getMemberRepositories();
 
             assertEquals( 0, repoMembers.size() );
         }
-        catch ( NoSuchRepositoryGroupException e )
+        catch ( NoSuchRepositoryException e )
         {
             fail( "Repo group should remain as empty group!" );
         }
 
         repoMembers = repositoryRegistry.getRepositories();
 
-        assertEquals( 0, repoMembers.size() );
+        assertEquals( 1, repoMembers.size() );
+
+        // the group is there alone, recheck it again
+        group = repositoryRegistry.getRepositoryWithFacet( "ALL", GroupRepository.class );
+
+        assertEquals( 0, group.getMemberRepositories().size() );
     }
 }

@@ -39,20 +39,27 @@ import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
+import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
+import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.util.DateParseException;
 import org.apache.commons.httpclient.util.DateUtil;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
+import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -62,8 +69,8 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
  * The Class CommonsHttpClientRemoteStorage.
  * 
  * @author cstamas
- * @plexus.component role-hint="apacheHttpClient3x"
  */
+@Component( role = RemoteRepositoryStorage.class, hint = "apacheHttpClient3x" )
 public class CommonsHttpClientRemoteStorage
     extends AbstractRemoteRepositoryStorage
     implements RemoteRepositoryStorage
@@ -97,10 +104,12 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
-    public boolean containsItem( RepositoryItemUid uid, long newerThen, Map<String, Object> context )
+    public boolean containsItem( long newerThen, ProxyRepository repository, Map<String, Object> context, String path )
         throws StorageException
     {
-        HttpMethodBase method = new HeadMethod( getAbsoluteUrlFromBase( uid ).toString() );
+        URL remoteURL = getAbsoluteUrlFromBase( repository, context, path );
+
+        HttpMethodBase method = new HeadMethod( remoteURL.toString() );
 
         int response = HttpStatus.SC_BAD_REQUEST;
 
@@ -108,7 +117,7 @@ public class CommonsHttpClientRemoteStorage
 
         try
         {
-            response = executeMethod( uid, method );
+            response = executeMethod( repository, context, path, method );
         }
         catch ( StorageException e )
         {
@@ -132,12 +141,12 @@ public class CommonsHttpClientRemoteStorage
         if ( doGet )
         {
             // create a GET
-            method = new GetMethod( getAbsoluteUrlFromBase( uid ).toString() );
+            method = new GetMethod( remoteURL.toString() );
 
             try
             {
                 // execute it
-                response = executeMethod( uid, method );
+                response = executeMethod( repository, context, path, method );
             }
             finally
             {
@@ -163,24 +172,18 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
-    public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
+    public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String path )
         throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
             StorageException
     {
-        // TODO: do a HTTP OPTION and discover is DELETE allowed
-        throw new UnsupportedStorageOperationException( "This operation is not supported on "
-            + getAbsoluteUrlFromBase( uid ).toString() );
-    }
+        URL remoteURL = getAbsoluteUrlFromBase( repository, context, path );
 
-    public AbstractStorageItem retrieveItem( RepositoryItemUid uid, Map<String, Object> context )
-        throws ItemNotFoundException,
-            StorageException
-    {
         HttpMethod method = null;
-        method = new GetMethod( getAbsoluteUrlFromBase( uid ).toString() );
 
-        int response = executeMethod( uid, method );
+        method = new GetMethod( remoteURL.toString() );
+
+        int response = executeMethod( repository, context, path, method );
+
         if ( response == HttpStatus.SC_OK )
         {
 
@@ -191,11 +194,14 @@ public class CommonsHttpClientRemoteStorage
                 // _should_
                 // give us URL with ending "/"
                 method.releaseConnection();
-                throw new ItemNotFoundException( uid );
+
+                throw new ItemNotFoundException( remoteURL.toString() );
             }
 
             GetMethod get = (GetMethod) method;
+
             InputStream is = null;
+
             try
             {
                 is = get.getResponseBodyAsStream();
@@ -206,25 +212,30 @@ public class CommonsHttpClientRemoteStorage
                 }
 
                 DefaultStorageFileItem httpItem = new DefaultStorageFileItem(
-                    uid.getRepository(),
-                    uid.getPath(),
+                    repository,
+                    path,
                     true,
                     true,
                     new PreparedContentLocator( new HttpClientInputStream( get, is ) ) );
-                httpItem.setRemoteUrl( getAbsoluteUrlFromBase( uid ).toString() );
+
+                httpItem.setRemoteUrl( remoteURL.toString() );
+
                 if ( get.getResponseContentLength() != -1 )
                 {
                     // FILE
                     httpItem.setLength( get.getResponseContentLength() );
                 }
+
                 if ( method.getResponseHeader( "content-type" ) != null )
                 {
                     httpItem.setMimeType( method.getResponseHeader( "content-type" ).getValue() );
                 }
-                httpItem.setModified( makeDateFromHeader( method.getResponseHeader( "last-modified" ) ) );
-                httpItem.setCreated( httpItem.getModified() );
-                return httpItem;
 
+                httpItem.setModified( makeDateFromHeader( method.getResponseHeader( "last-modified" ) ) );
+
+                httpItem.setCreated( httpItem.getModified() );
+
+                return httpItem;
             }
             catch ( IOException ex )
             {
@@ -245,7 +256,7 @@ public class CommonsHttpClientRemoteStorage
 
             if ( response == HttpStatus.SC_NOT_FOUND )
             {
-                throw new ItemNotFoundException( getAbsoluteUrlFromBase( uid ).toString() );
+                throw new ItemNotFoundException( remoteURL.toString() );
             }
             else
             {
@@ -254,13 +265,80 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
-    public void storeItem( StorageItem item )
+    public void storeItem( ProxyRepository repository, Map<String, Object> context, StorageItem item )
         throws UnsupportedStorageOperationException,
+            RemoteAccessException,
             StorageException
     {
-        // TODO: do a HTTP OPTION and discover is PUT allowed
-        throw new UnsupportedStorageOperationException( "This operation is not supported on "
-            + getAbsoluteUrlFromBase( item.getRepositoryItemUid() ).toString() );
+        if ( !( item instanceof StorageFileItem ) )
+        {
+            throw new UnsupportedStorageOperationException( "Storing of non-files remotely is not supported!" );
+        }
+
+        StorageFileItem fItem = (StorageFileItem) item;
+
+        URL remoteURL = getAbsoluteUrlFromBase( repository, context, item.getPath() );
+
+        PutMethod method = new PutMethod( remoteURL.toString() );
+
+        try
+        {
+            method.setRequestEntity( new InputStreamRequestEntity( fItem.getInputStream(), fItem.getLength(), fItem
+                .getMimeType() ) );
+
+            int response = executeMethod( repository, context, item.getPath(), method );
+
+            if ( response == HttpStatus.SC_FORBIDDEN )
+            {
+                throw new RemoteAccessDeniedException( repository, remoteURL, HttpStatus
+                    .getStatusText( HttpStatus.SC_FORBIDDEN ) );
+            }
+            else if ( response == HttpStatus.SC_UNAUTHORIZED )
+            {
+                throw new RemoteAuthenticationNeededException( repository, HttpStatus
+                    .getStatusText( HttpStatus.SC_UNAUTHORIZED ) );
+            }
+            else if ( response != HttpStatus.SC_OK && response != HttpStatus.SC_NO_CONTENT
+                && response != HttpStatus.SC_ACCEPTED )
+            {
+                throw new StorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code "
+                    + response + " : " + HttpStatus.getStatusText( response ) );
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new StorageException( e );
+        }
+        finally
+        {
+            method.releaseConnection();
+        }
+    }
+
+    public void deleteItem( ProxyRepository repository, Map<String, Object> context, String path )
+        throws ItemNotFoundException,
+            UnsupportedStorageOperationException,
+            StorageException
+    {
+        URL remoteURL = getAbsoluteUrlFromBase( repository, context, path );
+
+        DeleteMethod method = new DeleteMethod( remoteURL.toString() );
+
+        try
+        {
+            int response = executeMethod( repository, context, path, method );
+
+            if ( response != HttpStatus.SC_OK && response != HttpStatus.SC_NO_CONTENT
+                && response != HttpStatus.SC_ACCEPTED )
+            {
+                throw new StorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code "
+                    + response + " : " + HttpStatus.getStatusText( response ) );
+            }
+        }
+        finally
+        {
+            method.releaseConnection();
+        }
     }
 
     /**
@@ -268,7 +346,7 @@ public class CommonsHttpClientRemoteStorage
      * 
      * @return the http client
      */
-    protected void updateContext( Repository repository, RemoteStorageContext ctx )
+    protected void updateContext( ProxyRepository repository, RemoteStorageContext ctx )
     {
         HttpClient httpClient = null;
 
@@ -407,18 +485,17 @@ public class CommonsHttpClientRemoteStorage
      * @param method the method
      * @return the int
      */
-    protected int executeMethod( RepositoryItemUid uid, HttpMethod method )
+    protected int executeMethod( ProxyRepository repository, Map<String, Object> context, String path, HttpMethod method )
         throws StorageException
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger()
-                .debug(
-                    "Invoking HTTP " + method.getName() + " method against remote location "
-                        + getAbsoluteUrlFromBase( uid ) );
+            getLogger().debug(
+                "Invoking HTTP " + method.getName() + " method against remote location "
+                    + getAbsoluteUrlFromBase( repository, context, path ) );
         }
 
-        RemoteStorageContext ctx = getRemoteStorageContext( uid.getRepository() );
+        RemoteStorageContext ctx = getRemoteStorageContext( repository );
 
         HttpClient httpClient = (HttpClient) ctx.getRemoteConnectionContext().get( CTX_KEY_CLIENT );
 
@@ -428,7 +505,7 @@ public class CommonsHttpClientRemoteStorage
         HostConfiguration httpConfiguration = (HostConfiguration) ctx.getRemoteConnectionContext().get(
             CTX_KEY_HTTP_CONFIGURATION );
 
-        method.setRequestHeader( new Header( "user-agent", formatUserAgentString( ctx, uid.getRepository() ) ) );
+        method.setRequestHeader( new Header( "user-agent", formatUserAgentString( ctx, repository ) ) );
         method.setRequestHeader( new Header( "accept", "*/*" ) );
         method.setRequestHeader( new Header( "accept-language", "en-us" ) );
         method.setRequestHeader( new Header( "accept-encoding", "gzip, identity" ) );

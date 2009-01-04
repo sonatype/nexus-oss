@@ -19,14 +19,14 @@ package org.sonatype.nexus.proxy.maven;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.proxy.repository.AbstractRepositoryConfigurator;
+import org.sonatype.nexus.proxy.repository.DefaultRepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 public class AbstractMavenRepositoryConfigurator
-    extends AbstractRepositoryConfigurator
+    extends DefaultRepositoryConfigurator
 {
     @Override
     public Repository updateRepositoryFromModel( Repository old, ApplicationConfiguration configuration,

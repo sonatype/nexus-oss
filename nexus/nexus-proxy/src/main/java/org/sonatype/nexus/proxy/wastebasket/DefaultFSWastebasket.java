@@ -20,7 +20,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.FileUtils;
@@ -32,7 +35,6 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -44,14 +46,12 @@ import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage
  * A default FS based implementation.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.proxy.wastebasket.Wastebasket"
  */
+@Component( role = Wastebasket.class )
 public class DefaultFSWastebasket
     implements SmartWastebasket, EventListener, Initializable
 {
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
     private File wastebasketDirectory;
@@ -125,21 +125,21 @@ public class DefaultFSWastebasket
     {
         FileUtils.cleanDirectory( getWastebasketDirectory() );
     }
-    
+
     public void purge( long age )
         throws IOException
     {
         removeForever( getWastebasketDirectory(), age );
     }
 
-    public void delete( RepositoryItemUid uid, LocalRepositoryStorage ls )
+    public void delete( LocalRepositoryStorage ls, Repository repository, Map<String, Object> context, String path )
         throws StorageException
     {
         try
         {
             if ( DeleteOperation.MOVE_TO_TRASH.equals( getDeleteOperation() ) )
             {
-                AbstractStorageItem item = ls.retrieveItem( uid );
+                AbstractStorageItem item = ls.retrieveItem( repository, context, path );
 
                 // not deleting virtual items
                 if ( item.isVirtual() )
@@ -154,12 +154,14 @@ public class DefaultFSWastebasket
                     basketFile.getParentFile().mkdirs();
 
                     // a file or link, it is a simple File
-                    InputStream is = ( (StorageFileItem) item ).getInputStream();
+                    InputStream is = null;
 
                     FileOutputStream fos = null;
 
                     try
                     {
+                        is = ( (StorageFileItem) item ).getInputStream();
+
                         fos = new FileOutputStream( basketFile );
 
                         IOUtil.copy( is, fos );
@@ -181,8 +183,10 @@ public class DefaultFSWastebasket
                     if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( ls.getClass() ) )
                     {
                         // an easy way, we have a File
-                        File itemFile = ( (DefaultFSLocalRepositoryStorage) ls ).getFileFromBase( item
-                            .getRepositoryItemUid() );
+                        File itemFile = ( (DefaultFSLocalRepositoryStorage) ls ).getFileFromBase(
+                            repository,
+                            context,
+                            path );
 
                         FileUtils.copyDirectory( itemFile, basketFile );
                     }
@@ -195,7 +199,7 @@ public class DefaultFSWastebasket
                 }
             }
 
-            ls.shredItem( uid );
+            ls.shredItem( repository, context, path );
         }
         catch ( ItemNotFoundException e )
         {
@@ -219,8 +223,7 @@ public class DefaultFSWastebasket
     {
         // TODO Auto-generated method stub
     }
-    
-    
+
     public void deleteRepositoryFolders( Repository repository )
         throws IOException
     {
@@ -255,7 +258,7 @@ public class DefaultFSWastebasket
 
         FileUtils.forceDelete( file );
     }
-    
+
     protected void removeForever( File file, long age )
         throws IOException
     {
@@ -287,6 +290,5 @@ public class DefaultFSWastebasket
         }
         return false;
     }
-
 
 }

@@ -22,14 +22,14 @@ import junit.framework.Assert;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.junit.Test;
 import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.nexus.configuration.RepositoryStatusConverter;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
@@ -56,10 +56,10 @@ public class Nexus412RemoteLeakTest
         // mangle one repos to have quasi different host, thus different HttpCommons HostConfig
         // but make it fail! (unknown host, so will not be able to connect)
 
-        Repository repo1 = this.convertRepo( "release-proxy-repo-1" );
+        ProxyRepository repo1 = this.convertRepo( "release-proxy-repo-1" );
         repo1.setRemoteUrl( repo1.getRemoteUrl().replace( "localhost", "1.1.1.1" ) );
 
-        Repository repo2 = this.convertRepo( "tasks-snapshot-repo" );
+        ProxyRepository repo2 = this.convertRepo( "tasks-snapshot-repo" );
 
         // loop until we have some "sensible" result (not unknown, since this is async op)
         // first unforced request will trigger the check, and wait until we have result
@@ -84,11 +84,11 @@ public class Nexus412RemoteLeakTest
 
     }
 
-    private Repository convertRepo( String repoId )
+    private ProxyRepository convertRepo( String repoId )
         throws IOException
     {
 
-        Repository repo = new M2Repository();
+        ProxyRepository repo = new M2Repository();
 
         CRepository cRepo = NexusConfigUtil.getRepo( repoId );
 

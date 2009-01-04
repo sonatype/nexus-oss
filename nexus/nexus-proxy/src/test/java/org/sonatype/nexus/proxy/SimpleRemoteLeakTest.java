@@ -20,8 +20,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 
@@ -50,20 +50,24 @@ public class SimpleRemoteLeakTest
     {
         // mangle one repos to have quasi different host, thus different HttpCommons HostConfig
         // but make it succeed! (127.0.0.1 is localhost, so will be able to connect)
-        getRepositoryRegistry().getRepository( "repo1" ).setRemoteUrl(
-            getRepositoryRegistry().getRepository( "repo1" ).getRemoteUrl().replace( "localhost", "127.0.0.1" ) );
+        getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).setRemoteUrl(
+            getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).getRemoteUrl().replace(
+                "localhost",
+                "127.0.0.1" ) );
 
         ResourceStoreRequest req1 = new ResourceStoreRequest(
-            "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar",
+            "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar",
             false );
-        ResourceStoreRequest req2 = new ResourceStoreRequest( "/repo2/xstream/xstream/1.2.2/xstream-1.2.2.pom", false );
+        ResourceStoreRequest req2 = new ResourceStoreRequest(
+            "/repositories/repo2/xstream/xstream/1.2.2/xstream-1.2.2.pom",
+            false );
 
         for ( int i = 0; i < 10; i++ )
         {
-            StorageItem item1 = getRouter( "repositories" ).retrieveItem( req1 );
+            StorageItem item1 = getRootRouter().retrieveItem( req1 );
             checkForFileAndMatchContents( item1 );
 
-            StorageItem item2 = getRouter( "repositories" ).retrieveItem( req2 );
+            StorageItem item2 = getRootRouter().retrieveItem( req2 );
             checkForFileAndMatchContents( item2 );
 
             // to force refetch
@@ -91,13 +95,13 @@ public class SimpleRemoteLeakTest
     {
         // mangle one repos to have quasi different host, thus different HttpCommons HostConfig
         // but make it fail! (unknown host, so will not be able to connect)
-        getRepositoryRegistry().getRepository( "repo1" ).setRemoteUrl(
-            getRepositoryRegistry().getRepository( "repo1" ).getRemoteUrl().replace(
+        getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).setRemoteUrl(
+            getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).getRemoteUrl().replace(
                 "localhost",
                 "1.1.1.1" ) );
 
-        Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
-        Repository repo2 = getRepositoryRegistry().getRepository( "repo2" );
+        ProxyRepository repo1 = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
+        ProxyRepository repo2 = getRepositoryRegistry().getRepositoryWithFacet( "repo2", ProxyRepository.class );
 
         // loop until we have some "sensible" result (not unknown, since this is async op)
         // first unforced request will trigger the check, and wait until we have result

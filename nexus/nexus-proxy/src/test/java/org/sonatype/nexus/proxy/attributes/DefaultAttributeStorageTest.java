@@ -20,13 +20,12 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
-import java.io.ByteArrayInputStream;
-
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.item.DefaultRepositoryItemUid;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -60,13 +59,11 @@ public class DefaultAttributeStorageTest
 
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
 
-        expect( repository.createUid( "/a.txt" ) ).andReturn(
-            new DefaultRepositoryItemUid( repository, "/a.txt" ) );
-        expect( repository.createUid( "/b.txt" ) ).andReturn(
-            new DefaultRepositoryItemUid( repository, "/b.txt" ) );
+        expect( repository.createUid( "/a.txt" ) ).andReturn( new DefaultRepositoryItemUid( repository, "/a.txt" ) );
+        expect( repository.createUid( "/b.txt" ) ).andReturn( new DefaultRepositoryItemUid( repository, "/b.txt" ) );
 
         replay( repository );
-        
+
         getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
         getRepositoryItemUidFactory().createUid( repository, "/b.txt" );
 
@@ -81,7 +78,7 @@ public class DefaultAttributeStorageTest
             "/a.txt",
             true,
             true,
-            new ByteArrayInputStream( "CONTENT".getBytes() ) );
+            new StringContentLocator( "CONTENT" ) );
 
         file.getAttributes().put( "kuku", "kuku" );
 
@@ -102,7 +99,7 @@ public class DefaultAttributeStorageTest
             "/b.txt",
             true,
             true,
-            new ByteArrayInputStream( "CONTENT".getBytes() ) );
+            new StringContentLocator( "CONTENT" ) );
 
         file.getAttributes().put( "kuku", "kuku" );
 

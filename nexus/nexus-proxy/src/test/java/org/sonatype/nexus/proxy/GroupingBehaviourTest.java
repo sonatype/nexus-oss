@@ -72,8 +72,8 @@ public class GroupingBehaviourTest
         getApplicationConfiguration().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
-        StorageItem item = getRouter( "groups-m2" ).retrieveItem(
-            new ResourceStoreRequest( "/test" + spoofedPath, false ) );
+        StorageItem item = getRootRouter()
+            .retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );
         // it should be a file and unmodified to repo1 originated file
         checkForFileAndMatchContents( item, md1File );
 
@@ -93,8 +93,8 @@ public class GroupingBehaviourTest
         getApplicationConfiguration().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
-        StorageItem item = getRouter( "groups-m2" ).retrieveItem(
-            new ResourceStoreRequest( "/test" + spoofedPath, false ) );
+        StorageItem item = getRootRouter()
+            .retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );
         // save it
         saveItemToFile( (StorageFileItem) item, md1File );
         // some content check
@@ -134,7 +134,7 @@ public class GroupingBehaviourTest
         getApplicationConfiguration().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
-        item = getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test" + spoofedPath, false ) );
+        item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );
         // it should be a file and unmodified
         checkForFileAndMatchContents( item, md1File );
 
@@ -150,8 +150,8 @@ public class GroupingBehaviourTest
         Metadata mdm;
 
         // get metadata from a gidr router, merging should happen
-        StorageItem item = getRouter( "groups-m2" ).retrieveItem(
-            new ResourceStoreRequest( "/test" + spoofedPath, false ) );
+        StorageItem item = getRootRouter()
+            .retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );
         // it should be a file
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
         // save it
@@ -168,16 +168,14 @@ public class GroupingBehaviourTest
         // assertEquals( "20020202020202", mdm.getVersioning().getLastUpdated() );
 
         // get hash from a gidr router, merging should happen and newly calced hash should come down
-        item = getRouter( "groups-m2" )
-            .retrieveItem( new ResourceStoreRequest( "/test" + spoofedPath + ".md5", false ) );
+        item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath + ".md5", false ) );
         // it should be a file
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
         // save it
         String md5hash = contentAsString( item );
 
         // get hash from a gidr router, merging should happen and newly calced hash should come down
-        item = getRouter( "groups-m2" )
-            .retrieveItem( new ResourceStoreRequest( "/test" + spoofedPath + ".sha1", false ) );
+        item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath + ".sha1", false ) );
         // it should be a file
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
         // save it
@@ -200,8 +198,8 @@ public class GroupingBehaviourTest
         Metadata mdm;
 
         // get metadata from a gidr router, merging should happen
-        StorageItem item = getRouter( "groups-m2" ).retrieveItem(
-            new ResourceStoreRequest( "/test" + spoofedPath, false ) );
+        StorageItem item = getRootRouter()
+            .retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );
         // it should be a file
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
         // save it
@@ -218,16 +216,14 @@ public class GroupingBehaviourTest
         // assertEquals( "20020202020202", mdm.getVersioning().getLastUpdated() );
 
         // get hash from a gidr router, merging should happen and newly calced hash should come down
-        item = getRouter( "groups-m2" )
-            .retrieveItem( new ResourceStoreRequest( "/test" + spoofedPath + ".md5", false ) );
+        item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath + ".md5", false ) );
         // it should be a file
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
         // save it
         String md5hash = contentAsString( item );
 
         // get hash from a gidr router, merging should happen and newly calced hash should come down
-        item = getRouter( "groups-m2" )
-            .retrieveItem( new ResourceStoreRequest( "/test" + spoofedPath + ".sha1", false ) );
+        item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath + ".sha1", false ) );
         // it should be a file
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
         // save it

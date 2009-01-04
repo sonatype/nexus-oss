@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The mapping.
@@ -36,9 +36,9 @@ public class RepositoryPathMapping
 
     private Pattern pattern;
 
-    private List<ResourceStore> resourceStores;
+    private List<Repository> resourceStores;
 
-    public RepositoryPathMapping( boolean allGroups, String groupId, String regexp, List<ResourceStore> resourceStores )
+    public RepositoryPathMapping( boolean allGroups, String groupId, String regexp, List<Repository> resourceStores )
         throws PatternSyntaxException
     {
         if ( allGroups )
@@ -81,7 +81,7 @@ public class RepositoryPathMapping
         return pattern;
     }
 
-    public List<ResourceStore> getResourceStores()
+    public List<Repository> getResourceStores()
     {
         return resourceStores;
     }

@@ -33,7 +33,9 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
@@ -469,7 +471,14 @@ public abstract class AbstractRepositoryPlexusResource
 
                 CRepository m = (CRepository) model;
 
-                RemoteStatus rs = getNexus().getRepository( m.getId() ).getRemoteStatus( forceCheck );
+                Repository repository = getNexus().getRepository( m.getId() );
+
+                RemoteStatus rs = null;
+
+                if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                {
+                    rs = repository.adaptToFacet( ProxyRepository.class ).getRemoteStatus( forceCheck );
+                }
 
                 if ( RemoteStatus.UNKNOWN.equals( rs ) )
                 {

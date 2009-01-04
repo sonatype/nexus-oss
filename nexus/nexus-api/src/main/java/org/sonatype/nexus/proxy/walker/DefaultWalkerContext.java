@@ -21,12 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.nexus.proxy.ResourceStore;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 public class DefaultWalkerContext
     implements WalkerContext
 {
-    private final ResourceStore resourceStore;
+    private final Repository resourceStore;
 
     private final WalkerFilter walkerFilter;
 
@@ -42,17 +42,17 @@ public class DefaultWalkerContext
 
     private volatile boolean running;
 
-    public DefaultWalkerContext( ResourceStore store )
+    public DefaultWalkerContext( Repository store )
     {
         this( store, null );
     }
 
-    public DefaultWalkerContext( ResourceStore store, WalkerFilter filter )
+    public DefaultWalkerContext( Repository store, WalkerFilter filter )
     {
         this( store, filter, true, false );
     }
 
-    public DefaultWalkerContext( ResourceStore store, WalkerFilter filter, boolean localOnly, boolean collectionsOnly )
+    public DefaultWalkerContext( Repository store, WalkerFilter filter, boolean localOnly, boolean collectionsOnly )
     {
         super();
 
@@ -106,7 +106,7 @@ public class DefaultWalkerContext
         return walkerFilter;
     }
 
-    public ResourceStore getResourceStore()
+    public Repository getRepository()
     {
         return resourceStore;
     }

@@ -26,9 +26,10 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.rest.AbstractIndexContentPlexusResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -40,22 +41,24 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author dip
  */
 @Component( role = PlexusResource.class, hint = "groupIndexResource" )
-public class GroupIndexContentPlexusResource extends
-        AbstractIndexContentPlexusResource {
+public class GroupIndexContentPlexusResource
+    extends AbstractIndexContentPlexusResource
+{
     public static final String GROUP_ID_KEY = "groupId";
 
     @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
-    
+
     @Override
-    public String getResourceUri() {
+    public String getResourceUri()
+    {
         return "/repo_groups/{" + GROUP_ID_KEY + "}/index_content";
     }
 
     @Override
-    public PathProtectionDescriptor getResourceProtection() {
-        return new PathProtectionDescriptor("/repo_groups/*/index_content/**",
-                "authcBasic,tgiperms");
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/repo_groups/*/index_content/**", "authcBasic,tgiperms" );
     }
 
     protected IndexingContext getIndexingContext( Request request )
@@ -64,61 +67,81 @@ public class GroupIndexContentPlexusResource extends
         try
         {
             String groupId = String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
-            return indexerManager.getRepositoryGroupContext( groupId );
+
+            // just to test availability, this will throw NoSuchRepository if there is none found
+            getNexus().getRepositoryWithFacet( groupId, GroupRepository.class );
+
+            return indexerManager.getRepositoryBestIndexContext( groupId );
         }
-        catch ( NoSuchRepositoryGroupException e )
+        catch ( NoSuchRepositoryException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e );
         }
     }
 
     /**
-     * Convert from ArtifactInfo to a NexusArtifact. Limited functionality, just
-     * enough to make index browsing work.
+     * Convert from ArtifactInfo to a NexusArtifact. Limited functionality, just enough to make index browsing work.
      */
-    protected NexusArtifact ai2Na(Request request, ArtifactInfo ai) {
-        if (ai == null) {
-            return null;
-        }
-
-        NexusArtifact a = new NexusArtifact();
-        
-        try {
-            String groupId = String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
-            IndexingContext indexingContext = indexerManager.getRepositoryGroupContext( groupId );
-
-            Gav gav = new Gav(ai.groupId, ai.artifactId, ai.version,
-                ai.classifier, artifactPackagingMapper
-                        .getExtensionForPackaging(ai.packaging), null,
-                null, null, VersionUtils.isSnapshot(ai.version), false,
-                null, false, null);
-
-            String path = indexingContext.getGavCalculator().gavToPath( gav );
-
-            // make path relative
-            if (path.startsWith(RepositoryItemUid.PATH_ROOT)) {
-                path = path.substring(RepositoryItemUid.PATH_ROOT.length());
-            }
-
-            path = "content/" + path;
-
-            Reference repoRoot = createReference( getContextRoot( request ),
-                    "service/local/repo_groups/" + groupId ).getTargetRef();
-                
-            a.setResourceURI( createReference(repoRoot, path).toString() );
-        }
-        catch ( NoSuchRepositoryGroupException e )
+    protected NexusArtifact ai2Na( Request request, ArtifactInfo ai )
+    {
+        if ( ai == null )
         {
             return null;
         }
 
-        a.setGroupId(ai.groupId);
-        a.setArtifactId(ai.artifactId);
-        a.setVersion(ai.version);
-        a.setClassifier(ai.classifier);
-        a.setPackaging(ai.packaging);
-        a.setRepoId(ai.repository);
-        a.setContextId(ai.context);
+        NexusArtifact a = new NexusArtifact();
+
+        try
+        {
+            String groupId = String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
+
+            // just to test availability, this will throw NoSuchRepository if there is none found
+            getNexus().getRepositoryWithFacet( groupId, GroupRepository.class );
+
+            IndexingContext indexingContext = indexerManager.getRepositoryBestIndexContext( groupId );
+
+            Gav gav = new Gav(
+                ai.groupId,
+                ai.artifactId,
+                ai.version,
+                ai.classifier,
+                artifactPackagingMapper.getExtensionForPackaging( ai.packaging ),
+                null,
+                null,
+                null,
+                VersionUtils.isSnapshot( ai.version ),
+                false,
+                null,
+                false,
+                null );
+
+            String path = indexingContext.getGavCalculator().gavToPath( gav );
+
+            // make path relative
+            if ( path.startsWith( RepositoryItemUid.PATH_ROOT ) )
+            {
+                path = path.substring( RepositoryItemUid.PATH_ROOT.length() );
+            }
+
+            path = "content/" + path;
+
+            Reference repoRoot = createReference( getContextRoot( request ), "service/local/repo_groups/" + groupId )
+                .getTargetRef();
+
+            a.setResourceURI( createReference( repoRoot, path ).toString() );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            return null;
+        }
+
+        a.setGroupId( ai.groupId );
+        a.setArtifactId( ai.artifactId );
+        a.setVersion( ai.version );
+        a.setClassifier( ai.classifier );
+        a.setPackaging( ai.packaging );
+        a.setRepoId( ai.repository );
+        a.setContextId( ai.context );
 
         return a;
     }

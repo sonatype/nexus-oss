@@ -24,6 +24,7 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -67,16 +68,21 @@ public class DefaultNexusURLResolver
 
     public URL resolve( URL url )
     {
-        Repository mappedRepository = null;
+        ProxyRepository mappedRepository = null;
 
         for ( Repository repository : repositoryRegistry.getRepositories() )
         {
-            if ( repository.getRemoteUrl() != null
-                && url.toString().toLowerCase().startsWith( repository.getRemoteUrl().toLowerCase() ) )
+            if ( repository instanceof ProxyRepository )
             {
-                mappedRepository = repository;
+                ProxyRepository proxy = (ProxyRepository) repository;
 
-                break;
+                if ( proxy.getRemoteUrl() != null
+                    && url.toString().toLowerCase().startsWith( proxy.getRemoteUrl().toLowerCase() ) )
+                {
+                    mappedRepository = proxy;
+
+                    break;
+                }
             }
         }
 

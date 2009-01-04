@@ -30,7 +30,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -41,6 +40,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
@@ -81,7 +81,6 @@ public class DefaultSnapshotRemover
 
     public SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
         throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException,
             IllegalArgumentException
     {
         SnapshotRemovalResult result = new SnapshotRemovalResult();
@@ -108,7 +107,9 @@ public class DefaultSnapshotRemover
             getLogger().info(
                 "Removing old SNAPSHOT deployments from " + request.getRepositoryGroupId() + " repository group." );
 
-            for ( Repository repository : getRepositoryRegistry().getRepositoryGroup( request.getRepositoryGroupId() ) )
+            for ( Repository repository : getRepositoryRegistry().getRepositoryWithFacet(
+                request.getRepositoryGroupId(),
+                GroupRepository.class ).getMemberRepositories() )
             {
                 // only from maven repositories, stay silent for others and simply skip
                 if ( MavenRepository.class.isAssignableFrom( repository.getClass() )
@@ -516,7 +517,7 @@ public class DefaultSnapshotRemover
 
                             RepositoryItemUid uid = mrepository.createUid( path );
 
-                            mrepository.retrieveItem( true, uid, context );
+                            mrepository.retrieveItem( uid, context );
 
                             return true;
                         }

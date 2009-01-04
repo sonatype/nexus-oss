@@ -27,7 +27,9 @@ import org.sonatype.jettytestsuite.WebappContext;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
-import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
+import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
+import org.sonatype.nexus.proxy.repository.DefaultGroupRepository;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
@@ -100,18 +102,21 @@ public class M1TestsuiteEnvironmentBuilder
         reposes.add( repo.getId() );
         env.getRepositoryRegistry().addRepository( repo );
 
-        try
-        {
-            env.getRepositoryRegistry().addRepositoryGroup( "test", reposes );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            throw new IllegalStateException( "Hum hum", e );
-        }
-        catch ( InvalidGroupingException e )
-        {
-            throw new IllegalStateException( "Hum hum", e );
-        }
+        DefaultGroupRepository group = (DefaultGroupRepository) container.lookup( GroupRepository.class );
+
+        group.setId( "test" );
+
+        group.setLocalUrl( env
+            .getApplicationConfiguration().getWorkingDirectory( "proxy/groupstore/" + repo.getId() ).toURI().toURL()
+            .toString() );
+
+        group.setLocalStorage( env.getLocalRepositoryStorage() );
+
+        group.setRepositoryContentClass( new Maven1ContentClass() );
+
+        group.setMemberRepositories( reposes );
+
+        env.getRepositoryRegistry().addRepository( group );
 
         // adding routers
     }

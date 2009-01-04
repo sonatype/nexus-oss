@@ -17,9 +17,10 @@
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The event fired on item cache (will proably be followed by retrieve!).
+ * The event fired on item cache (will probably be followed by retrieve!).
  * 
  * @author cstamas
  */
@@ -27,9 +28,9 @@ public class RepositoryItemEventCache
     extends RepositoryItemEvent
 {
 
-    public RepositoryItemEventCache( final StorageItem item )
+    public RepositoryItemEventCache( final Repository repository, final StorageItem item )
     {
-        super( item );
+        super( repository, item );
     }
 
 }

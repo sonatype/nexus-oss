@@ -66,6 +66,11 @@ public class AbstractMavenRepoContentTests
         super.tearDown();
     }
 
+    public Nexus getNexus()
+    {
+        return defaultNexus;
+    }
+
     public void fillInRepo()
         throws Exception
     {

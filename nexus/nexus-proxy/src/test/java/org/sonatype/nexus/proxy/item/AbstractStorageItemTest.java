@@ -54,12 +54,13 @@ public abstract class AbstractStorageItemTest
         {
             // repo stuff eq
             assertEquals( repository.getId(), item.getRepositoryId() );
-            assertEquals( repository.getId(), item.getStore().getId() );
+            assertEquals( repository.getId(), ( (Repository) item.getStore() ).getId() );
         }
         else
         {
             assertEquals( null, item.getRepositoryId() );
-            assertEquals( router.getId(), item.getStore().getId() );
+            // router is only one from now on and has no ID
+            // assertEquals( router.getId(), item.getStore().getId() );
         }
 
         // path

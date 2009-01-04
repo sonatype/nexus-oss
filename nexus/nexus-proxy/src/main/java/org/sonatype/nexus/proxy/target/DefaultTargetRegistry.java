@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -12,8 +13,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * The default implementation of target registry.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = TargetRegistry.class )
 public class DefaultTargetRegistry
     extends AbstractLogEnabled
     implements TargetRegistry

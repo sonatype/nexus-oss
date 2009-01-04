@@ -57,7 +57,6 @@ public abstract class AbstractMavenRepository
     extends DefaultRepository
     implements MavenRepository
 {
-
     /**
      * Metadata manager.
      */
@@ -125,16 +124,6 @@ public abstract class AbstractMavenRepository
         return !ctx.isStopped();
     }
 
-    public ChecksumPolicy getChecksumPolicy()
-    {
-        return checksumPolicy;
-    }
-
-    public void setChecksumPolicy( ChecksumPolicy checksumPolicy )
-    {
-        this.checksumPolicy = checksumPolicy;
-    }
-
     public RepositoryPolicy getRepositoryPolicy()
     {
         return repositoryPolicy;
@@ -143,6 +132,36 @@ public abstract class AbstractMavenRepository
     public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
     {
         this.repositoryPolicy = repositoryPolicy;
+    }
+
+    public boolean isCleanseRepositoryMetadata()
+    {
+        return cleanseRepositoryMetadata;
+    }
+
+    public void setCleanseRepositoryMetadata( boolean cleanseRepositoryMetadata )
+    {
+        this.cleanseRepositoryMetadata = cleanseRepositoryMetadata;
+    }
+
+    public boolean isFixRepositoryChecksums()
+    {
+        return fixRepositoryChecksums;
+    }
+
+    public void setFixRepositoryChecksums( boolean fixRepositoryChecksums )
+    {
+        this.fixRepositoryChecksums = fixRepositoryChecksums;
+    }
+
+    public ChecksumPolicy getChecksumPolicy()
+    {
+        return checksumPolicy;
+    }
+
+    public void setChecksumPolicy( ChecksumPolicy checksumPolicy )
+    {
+        this.checksumPolicy = checksumPolicy;
     }
 
     public int getReleaseMaxAge()
@@ -175,25 +194,7 @@ public abstract class AbstractMavenRepository
         this.metadataMaxAge = metadataMaxAge;
     }
 
-    public boolean isCleanseRepositoryMetadata()
-    {
-        return cleanseRepositoryMetadata;
-    }
-
-    public void setCleanseRepositoryMetadata( boolean cleanseRepositoryMetadata )
-    {
-        this.cleanseRepositoryMetadata = cleanseRepositoryMetadata;
-    }
-
-    public boolean isFixRepositoryChecksums()
-    {
-        return fixRepositoryChecksums;
-    }
-
-    public void setFixRepositoryChecksums( boolean fixRepositoryChecksums )
-    {
-        this.fixRepositoryChecksums = fixRepositoryChecksums;
-    }
+    public abstract boolean shouldServeByPolicies( RepositoryItemUid uid );
 
     public void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException,
@@ -219,7 +220,7 @@ public abstract class AbstractMavenRepository
 
             RepositoryItemUid itemUid = createUid( request.getRequestPath() );
 
-            StorageFileItem storedFile = (StorageFileItem) retrieveItem( true, itemUid, null );
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( itemUid, null );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -334,7 +335,7 @@ public abstract class AbstractMavenRepository
                 throw new StorageException( "Could not get the content from the ContentLocator!", e );
             }
 
-            StorageFileItem storedFile = (StorageFileItem) retrieveItem( true, item.getRepositoryItemUid(), item
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( item.getRepositoryItemUid(), item
                 .getItemContext() );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
@@ -429,13 +430,11 @@ public abstract class AbstractMavenRepository
         return metadataManager;
     }
 
-    public abstract boolean shouldServeByPolicies( RepositoryItemUid uid );
-
     // =================================================================================
     // DefaultRepository customizations
 
     @Override
-    protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
+    protected StorageItem doRetrieveItem( RepositoryItemUid uid, Map<String, Object> context )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
@@ -450,8 +449,45 @@ public abstract class AbstractMavenRepository
             throw new ItemNotFoundException( uid );
         }
 
-        return super.doRetrieveItem( localOnly, uid, context );
+        return super.doRetrieveItem( uid, context );
     }
+
+    @Override
+    public void storeItem( StorageItem item )
+        throws UnsupportedStorageOperationException,
+            IllegalOperationException,
+            StorageException
+    {
+        if ( shouldServeByPolicies( item.getRepositoryItemUid() ) )
+        {
+            super.storeItem( item );
+        }
+        else
+        {
+            String msg = "Storing of item " + item.getRepositoryItemUid().toString()
+                + " is forbidden by Maven Repository policy. Because " + getId() + " is a "
+                + getRepositoryPolicy().name() + " repository";
+
+            getLogger().info( msg );
+
+            throw new UnsupportedStorageOperationException( msg );
+        }
+    }
+
+    @Override
+    public boolean isCompatible( Repository repository )
+    {
+        if ( super.isCompatible( repository ) && MavenRepository.class.isAssignableFrom( repository.getClass() )
+            && getRepositoryPolicy().equals( ( (MavenRepository) repository ).getRepositoryPolicy() ) )
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    // =================================================================================
+    // DefaultRepository customizations
 
     @Override
     protected AbstractStorageItem doRetrieveRemoteItem( RepositoryItemUid uid, Map<String, Object> context )
@@ -462,7 +498,7 @@ public abstract class AbstractMavenRepository
         {
             // we are about to download an artifact from remote repository
             // lets clean any existing (stale) checksum files
-            removeLocalChecksum( uid );
+            removeLocalChecksum( uid, context );
         }
 
         return super.doRetrieveRemoteItem( uid, context );
@@ -593,7 +629,7 @@ public abstract class AbstractMavenRepository
             // TODO should we remove bad checksum if policy==WARN?
             try
             {
-                getLocalStorage().deleteItem( hashItem.getRepositoryItemUid() );
+                getLocalStorage().deleteItem( this, context, hashItem.getRepositoryItemUid().getPath() );
             }
             catch ( ItemNotFoundException e )
             {
@@ -638,14 +674,14 @@ public abstract class AbstractMavenRepository
         return uid.getPath().endsWith( ".sha1" ) || uid.getPath().endsWith( ".md5" );
     }
 
-    private void removeLocalChecksum( RepositoryItemUid uid )
+    private void removeLocalChecksum( RepositoryItemUid uid, Map<String, Object> context )
         throws StorageException
     {
         try
         {
             try
             {
-                getLocalStorage().deleteItem( uid.getRepository().createUid( uid.getPath() + ".sha1" ) );
+                getLocalStorage().deleteItem( this, context, uid.getPath() + ".sha1" );
             }
             catch ( ItemNotFoundException e )
             {
@@ -654,7 +690,7 @@ public abstract class AbstractMavenRepository
 
             try
             {
-                getLocalStorage().deleteItem( uid.getRepository().createUid( uid.getPath() + ".md5" ) );
+                getLocalStorage().deleteItem( this, context, uid.getPath() + ".md5" );
             }
             catch ( ItemNotFoundException e )
             {
@@ -668,82 +704,25 @@ public abstract class AbstractMavenRepository
 
     }
 
-    @Override
-    protected void markItemRemotelyChecked( RepositoryItemUid uid )
+    protected void markItemRemotelyChecked( RepositoryItemUid uid, Map<String, Object> context )
         throws StorageException,
             ItemNotFoundException
     {
-        super.markItemRemotelyChecked( uid );
+        super.markItemRemotelyChecked( uid, context );
 
         RepositoryItemUid sha1Uid = uid.getRepository().createUid( uid.getPath() + ".sha1" );
 
-        if ( getLocalStorage().containsItem( sha1Uid ) )
+        if ( getLocalStorage().containsItem( this, context, sha1Uid.getPath() ) )
         {
-            super.markItemRemotelyChecked( sha1Uid );
+            super.markItemRemotelyChecked( sha1Uid, context );
         }
 
         RepositoryItemUid md5Uid = uid.getRepository().createUid( uid.getPath() + ".md5" );
 
-        if ( getLocalStorage().containsItem( md5Uid ) )
+        if ( getLocalStorage().containsItem( this, context, md5Uid.getPath() ) )
         {
-            super.markItemRemotelyChecked( md5Uid );
+            super.markItemRemotelyChecked( md5Uid, context );
         }
-    }
-
-    @Override
-    public InputStream retrieveItemContent( RepositoryItemUid uid )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
-    {
-        if ( shouldServeByPolicies( uid ) )
-        {
-            return super.retrieveItemContent( uid );
-        }
-        else
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "The serving of item " + uid.toString() + " is forbidden by Maven repository policy." );
-            }
-
-            throw new ItemNotFoundException( uid );
-        }
-    }
-
-    @Override
-    public void storeItem( StorageItem item )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            StorageException
-    {
-        if ( shouldServeByPolicies( item.getRepositoryItemUid() ) )
-        {
-            super.storeItem( item );
-        }
-        else
-        {
-            String msg = "Storing of item " + item.getRepositoryItemUid().toString()
-                + " is forbidden by Maven Repository policy. Because " + getId() + " is a "
-                + getRepositoryPolicy().name() + " repository";
-
-            getLogger().info( msg );
-
-            throw new UnsupportedStorageOperationException( msg );
-        }
-    }
-
-    @Override
-    public boolean isCompatible( Repository repository )
-    {
-        if ( super.isCompatible( repository ) && MavenRepository.class.isAssignableFrom( repository.getClass() )
-            && getRepositoryPolicy().equals( ( (MavenRepository) repository ).getRepositoryPolicy() ) )
-        {
-            return true;
-        }
-
-        return false;
     }
 
 }

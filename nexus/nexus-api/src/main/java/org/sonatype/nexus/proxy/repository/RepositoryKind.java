@@ -14,28 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * Version 3 along with this program. If not, see http://www.gnu.org/licenses/.
  */
-package org.sonatype.nexus.proxy.utils;
+package org.sonatype.nexus.proxy.repository;
 
-import org.sonatype.nexus.proxy.item.StorageCollectionItem;
-import org.sonatype.nexus.proxy.item.StorageItem;
-
-/**
- * The affirmative implementation of StoraWalkerFilter that is used when no filter is supplied. It will process all
- * items and will dive into all collections.
- * 
- * @author cstamas
- * @deprecated use Walker service in org.sonatype.nexus.proxy.walker package
- */
-public class AffirmativeStoreWalkerFilter
-    implements StoreWalkerFilter
+public interface RepositoryKind
 {
-    public boolean shouldProcess( StorageItem item )
-    {
-        return true;
-    }
+    Class<?> getMainFacet();
 
-    public boolean shouldProcessRecursively( StorageCollectionItem coll )
-    {
-        return true;
-    }
+    boolean isFacetAvailable( Class<?> f );
 }

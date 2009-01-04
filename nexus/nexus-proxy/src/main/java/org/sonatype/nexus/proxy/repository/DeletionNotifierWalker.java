@@ -18,29 +18,27 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.Map;
 
-import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.utils.StoreFileWalker;
+import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
+import org.sonatype.nexus.proxy.walker.WalkerContext;
 
 public class DeletionNotifierWalker
-    extends StoreFileWalker
+    extends AbstractFileWalkerProcessor
 {
-    private Repository repository;
+    private final Repository repository;
 
-    private Map<String, Object> context;
+    private final Map<String, Object> context;
 
-    public DeletionNotifierWalker( Repository repository, Logger logger, Map<String, Object> context )
+    public DeletionNotifierWalker( Repository repository, Map<String, Object> context )
     {
-        super( repository, logger );
-
         this.repository = repository;
 
         this.context = context;
     }
 
     @Override
-    protected void processFileItem( StorageFileItem item )
+    protected void processFileItem( WalkerContext ctx, StorageFileItem item )
     {
         if ( context != null )
         {
@@ -48,7 +46,7 @@ public class DeletionNotifierWalker
         }
 
         // just fire it, and someone will eventually catch it
-        repository.notifyProximityEventListeners( new RepositoryItemEventDelete( item ) );
+        repository.notifyProximityEventListeners( new RepositoryItemEventDelete( ctx.getRepository(), item ) );
     }
 
 }

@@ -16,11 +16,10 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.io.ByteArrayInputStream;
-
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -116,14 +115,14 @@ public class M1RepositoryTest
             SPOOF_RELEASE,
             true,
             true,
-            new ByteArrayInputStream( SPOOF_RELEASE.getBytes() ) );
+            new StringContentLocator( SPOOF_RELEASE ) );
 
         repository.storeItem( item );
 
         try
         {
-            item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new ByteArrayInputStream(
-                SPOOF_SNAPSHOT.getBytes() ) );
+            item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
+                SPOOF_SNAPSHOT ) );
 
             repository.storeItem( item );
 
@@ -140,15 +139,15 @@ public class M1RepositoryTest
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
 
-        item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new ByteArrayInputStream(
-            SPOOF_SNAPSHOT.getBytes() ) );
+        item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
+            SPOOF_SNAPSHOT ) );
 
         repository.storeItem( item );
 
         try
         {
-            item = new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true, new ByteArrayInputStream(
-                SPOOF_RELEASE.getBytes() ) );
+            item = new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true, new StringContentLocator(
+                SPOOF_RELEASE ) );
 
             repository.storeItem( item );
 

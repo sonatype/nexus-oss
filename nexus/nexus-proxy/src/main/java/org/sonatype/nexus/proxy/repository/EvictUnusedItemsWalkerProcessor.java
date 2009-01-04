@@ -45,7 +45,7 @@ public class EvictUnusedItemsWalkerProcessor
 
     protected Repository getRepository( WalkerContext ctx )
     {
-        return (Repository) ctx.getResourceStore();
+        return (Repository) ctx.getRepository();
     }
 
     public long getTimestamp()

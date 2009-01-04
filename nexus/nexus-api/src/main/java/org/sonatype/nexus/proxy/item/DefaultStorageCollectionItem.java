@@ -67,7 +67,6 @@ public class DefaultStorageCollectionItem
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.sonatype.nexus.item.StorageCollectionItem#list()
      */
     public Collection<StorageItem> list()
@@ -87,6 +86,16 @@ public class DefaultStorageCollectionItem
         {
             return getStore().list( req );
         }
+        else if ( getStore() instanceof Repository )
+        {
+            Repository repo = (Repository) getStore();
+
+            Collection<StorageItem> result = repo.list( this );
+
+            correctPaths( result );
+
+            return result;
+        }
         else
         {
             // path correction here
@@ -94,20 +103,29 @@ public class DefaultStorageCollectionItem
 
             Collection<StorageItem> result = getStore().list( req );
 
-            for ( StorageItem item : result )
-            {
-                if ( getPath().endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
-                {
-                    ( (AbstractStorageItem) item ).setPath( getPath() + item.getName() );
-                }
-                else
-                {
-                    ( (AbstractStorageItem) item ).setPath( getPath() + RepositoryItemUid.PATH_SEPARATOR
-                        + item.getName() );
-                }
-            }
+            correctPaths( result );
+
             return result;
         }
     }
 
+    /**
+     * This method "normalizes" the paths back to the "level" from where the original item was requested.
+     * 
+     * @param list
+     */
+    protected void correctPaths( Collection<StorageItem> list )
+    {
+        for ( StorageItem item : list )
+        {
+            if ( getPath().endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+            {
+                ( (AbstractStorageItem) item ).setPath( getPath() + item.getName() );
+            }
+            else
+            {
+                ( (AbstractStorageItem) item ).setPath( getPath() + RepositoryItemUid.PATH_SEPARATOR + item.getName() );
+            }
+        }
+    }
 }

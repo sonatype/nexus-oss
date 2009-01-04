@@ -17,7 +17,6 @@
 package org.sonatype.nexus.maven.tasks;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 
 public interface SnapshotRemover
 {
@@ -30,6 +29,5 @@ public interface SnapshotRemover
 
     SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
         throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException,
             IllegalArgumentException;
 }

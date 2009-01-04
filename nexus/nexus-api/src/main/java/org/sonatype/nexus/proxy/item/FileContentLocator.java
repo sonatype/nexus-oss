@@ -29,7 +29,7 @@ import java.io.InputStream;
 public class FileContentLocator
     implements ContentLocator
 {
-    private File file;
+    private final File file;
 
     public FileContentLocator( File file )
     {
@@ -47,5 +47,10 @@ public class FileContentLocator
     public boolean isReusable()
     {
         return true;
+    }
+
+    public File getFile()
+    {
+        return file;
     }
 }

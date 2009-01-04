@@ -35,9 +35,8 @@ import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -48,7 +47,7 @@ public class JettyClientRemoteRepositoryStorage
     public static final String CTX_KEY = "jettyClient";
 
     @Override
-    protected void updateContext( Repository repository, RemoteStorageContext context )
+    protected void updateContext( ProxyRepository repository, RemoteStorageContext context )
         throws StorageException
     {
         try
@@ -135,14 +134,14 @@ public class JettyClientRemoteRepositoryStorage
         }
     }
 
-    public boolean containsItem( RepositoryItemUid uid, long newerThen, Map<String, Object> context )
+    public boolean containsItem( long newerThen, ProxyRepository repository, Map<String, Object> context, String path )
         throws StorageException
     {
-        RemoteStorageContext rsc = getRemoteStorageContext( uid.getRepository() );
+        RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
-        ContainsHttpExchange contains = new ContainsHttpExchange( uid, newerThen );
+        ContainsHttpExchange contains = new ContainsHttpExchange( repository, path, newerThen );
 
-        setUpExchange( contains, rsc, uid );
+        setUpExchange( contains, rsc, repository, context, path );
 
         executeRequest( rsc, contains );
 
@@ -156,30 +155,30 @@ public class JettyClientRemoteRepositoryStorage
         }
     }
 
-    public AbstractStorageItem retrieveItem( RepositoryItemUid uid, Map<String, Object> context )
+    public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String path )
         throws ItemNotFoundException,
             StorageException
     {
-        RemoteStorageContext rsc = getRemoteStorageContext( uid.getRepository() );
+        RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
-        RetrieveHttpExchange retrieve = new RetrieveHttpExchange( uid );
+        RetrieveHttpExchange retrieve = new RetrieveHttpExchange( repository, path );
 
-        setUpExchange( retrieve, rsc, uid );
+        setUpExchange( retrieve, rsc, repository, context, path );
 
         executeRequest( rsc, retrieve );
 
         return retrieve.getStorageItem();
     }
 
-    public void storeItem( StorageItem item )
+    public void storeItem( ProxyRepository repository, Map<String, Object> context, StorageItem item )
         throws UnsupportedStorageOperationException,
             StorageException
     {
-        RemoteStorageContext rsc = getRemoteStorageContext( item.getRepositoryItemUid().getRepository() );
+        RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
-        StoreHttpExchange store = new StoreHttpExchange( item );
+        StoreHttpExchange store = new StoreHttpExchange( repository, item.getPath(), item );
 
-        setUpExchange( store, rsc, item.getRepositoryItemUid() );
+        setUpExchange( store, rsc, repository, context, item.getPath() );
 
         executeRequest( rsc, store );
 
@@ -193,16 +192,16 @@ public class JettyClientRemoteRepositoryStorage
         }
     }
 
-    public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
+    public void deleteItem( ProxyRepository repository, Map<String, Object> context, String path )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             StorageException
     {
-        RemoteStorageContext rsc = getRemoteStorageContext( uid.getRepository() );
+        RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
-        DeleteHttpExchange delete = new DeleteHttpExchange( uid );
+        DeleteHttpExchange delete = new DeleteHttpExchange( repository, path );
 
-        setUpExchange( delete, rsc, uid );
+        setUpExchange( delete, rsc, repository, context, path );
 
         executeRequest( rsc, delete );
 
@@ -229,18 +228,19 @@ public class JettyClientRemoteRepositoryStorage
 
     // ----
 
-    protected void setUpExchange( AbstractNexusExchange exchange, RemoteStorageContext context, RepositoryItemUid uid )
+    protected void setUpExchange( AbstractNexusExchange exchange, RemoteStorageContext rsc, ProxyRepository repository,
+        Map<String, Object> context, String path )
         throws StorageException
     {
-        URL requestURL = getAbsoluteUrlFromBase( exchange.getRepositoryItemUid() );
+        URL requestURL = getAbsoluteUrlFromBase( repository, context, path );
 
         StringBuffer requestStringBuffer = new StringBuffer( requestURL.toString() );
 
-        CRemoteConnectionSettings rcs = getRemoteConnectionSettings( context );
+        CRemoteConnectionSettings rcs = getRemoteConnectionSettings( rsc );
 
         if ( rcs != null )
         {
-            exchange.setRequestHeader( HttpHeaders.USER_AGENT, formatUserAgentString( context, uid.getRepository() ) );
+            exchange.setRequestHeader( HttpHeaders.USER_AGENT, formatUserAgentString( rsc, repository ) );
 
             if ( !StringUtils.isEmpty( rcs.getQueryString() ) )
             {

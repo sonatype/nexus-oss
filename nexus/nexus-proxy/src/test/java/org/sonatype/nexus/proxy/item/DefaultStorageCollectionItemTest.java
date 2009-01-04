@@ -32,8 +32,7 @@ public class DefaultStorageCollectionItemTest
     public void testNonVirtualCollectionSimple()
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/" ) ).andReturn(
-            new DefaultRepositoryItemUid( repository, "/" ) );
+        expect( repository.createUid( "/" ) ).andReturn( new DefaultRepositoryItemUid( repository, "/" ) );
 
         replay( repository );
 
@@ -55,14 +54,17 @@ public class DefaultStorageCollectionItemTest
             new DefaultRepositoryItemUid( repository, "/a/some/dir/coll/B" ) );
         expect( repository.createUid( "/a/some/dir/coll/C" ) ).andReturn(
             new DefaultRepositoryItemUid( repository, "/a/some/dir/coll/C" ) );
-        expect( repository.list( isA( ResourceStoreRequest.class ) ) ).andReturn( result );
+        expect( repository.list( isA( StorageCollectionItem.class ) ) ).andReturn( result );
 
         replay( repository );
 
         // and now fill in result, since repo is active
-        result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/A", true, true ) );
-        result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/B", true, true ) );
-        result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/C", true, true ) );
+        result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/A", true, true, new StringContentLocator(
+            "A" ) ) );
+        result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/B", true, true, new StringContentLocator(
+            "B" ) ) );
+        result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/C", true, true, new StringContentLocator(
+            "C" ) ) );
 
         DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
             repository,
@@ -77,8 +79,6 @@ public class DefaultStorageCollectionItemTest
 
     public void testVirtualCollectionSimple()
     {
-        expect( router.getId() ).andReturn( "dummyRouter" ).anyTimes();
-
         replay( router );
 
         DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( router, "/", true, true );
@@ -90,7 +90,6 @@ public class DefaultStorageCollectionItemTest
     {
         List<StorageItem> result = new ArrayList<StorageItem>();
 
-        expect( router.getId() ).andReturn( "dummyRouter" ).anyTimes();
         expect( router.list( isA( ResourceStoreRequest.class ) ) ).andReturn( result );
 
         replay( router );

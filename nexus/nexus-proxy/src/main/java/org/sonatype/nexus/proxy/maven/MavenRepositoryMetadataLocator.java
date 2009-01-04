@@ -136,7 +136,6 @@ public class MavenRepositoryMetadataLocator
             String pomPath = getMavenRepository().getGavCalculator().gavToPath( gav );
 
             StorageFileItem pomFile = (StorageFileItem) getMavenRepository().retrieveItem(
-                true,
                 getMavenRepository().createUid( pomPath ),
                 request.getRequestContext() );
 
@@ -279,7 +278,7 @@ public class MavenRepositoryMetadataLocator
 
         try
         {
-            StorageItem item = uid.getRepository().retrieveItem( false, uid, ctx );
+            StorageItem item = uid.getRepository().retrieveItem( uid, ctx );
 
             if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
             {

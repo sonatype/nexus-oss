@@ -32,7 +32,6 @@ import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
@@ -199,17 +198,16 @@ public interface MutableConfiguration
             ConfigurationException;
 
     CRepositoryGroup readRepositoryGroup( String id )
-        throws NoSuchRepositoryGroupException;
+        throws NoSuchRepositoryException;
 
     void updateRepositoryGroup( CRepositoryGroup settings )
         throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException,
             InvalidGroupingException,
             IOException,
             ConfigurationException;
 
     void deleteRepositoryGroup( String id )
-        throws NoSuchRepositoryGroupException,
+        throws NoSuchRepositoryException,
             IOException;
 
     // CRepositoryTarget: CRUD

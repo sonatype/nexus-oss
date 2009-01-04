@@ -16,9 +16,7 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * A simple content locator that emits a string actually.
@@ -26,25 +24,34 @@ import java.io.InputStream;
  * @author cstamas
  */
 public class StringContentLocator
-    implements ContentLocator
+    extends ByteArrayContentLocator
 {
-    private String content;
+    private static final String ENCODING = "UTF-8";
+
+    private final String content;
 
     public StringContentLocator( String content )
     {
-        super();
+        super( toByteArray( content ) );
+
         this.content = content;
     }
 
-    public InputStream getContent()
-        throws IOException
+    public String getString()
     {
-        return new ByteArrayInputStream( content.getBytes() );
+        return content;
     }
 
-    public boolean isReusable()
+    public static byte[] toByteArray( String string )
     {
-        return true;
+        try
+        {
+            return string.getBytes( ENCODING );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            // heh? will not happen
+            return new byte[0];
+        }
     }
-
 }

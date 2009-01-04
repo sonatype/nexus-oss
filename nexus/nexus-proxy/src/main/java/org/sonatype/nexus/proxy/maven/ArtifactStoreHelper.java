@@ -28,7 +28,6 @@ import java.util.Map;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
@@ -205,7 +204,6 @@ public class ArtifactStoreHelper
         {
             // check for POM existence
             repository.retrieveItem(
-                true,
                 repository.createUid( repository.getGavCalculator().gavToPath( pomGav ) ),
                 gavRequest.getRequestContext() );
         }
@@ -393,7 +391,6 @@ public class ArtifactStoreHelper
         {
             // get the parent collection
             StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem(
-                true,
                 parentCollUid,
                 gavRequest.getRequestContext() );
 
@@ -454,7 +451,6 @@ public class ArtifactStoreHelper
         {
             // get the parent collection
             StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem(
-                true,
                 parentCollUid,
                 gavRequest.getRequestContext() );
 
@@ -511,7 +507,9 @@ public class ArtifactStoreHelper
 
         try
         {
-            reader = ReaderFactory.newXmlReader( repository.retrieveItemContent( uid ) );
+            repository.retrieveItem( uid, null );
+            
+            //reader = ReaderFactory.newXmlReader( repository.retrieveItemContent( uid ) );
 
             XmlPullParser parser = new MXParser();
 

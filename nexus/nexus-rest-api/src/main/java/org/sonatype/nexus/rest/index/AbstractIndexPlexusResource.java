@@ -34,7 +34,6 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
 import org.sonatype.nexus.tasks.ReindexTask;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 
 public abstract class AbstractIndexPlexusResource
     extends AbstractRestorePlexusResource
@@ -197,7 +196,7 @@ public abstract class AbstractIndexPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        ReindexTask task = (ReindexTask) getNexus().createTaskInstance( ReindexTaskDescriptor.ID );
+        ReindexTask task = getNexus().createTaskInstance( ReindexTask.class );
 
         task.setRepositoryId( getRepositoryId( request ) );
 

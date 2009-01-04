@@ -17,14 +17,14 @@
 package org.sonatype.nexus.proxy;
 
 /**
- * Thrown when a request is denied for security reasons. This exception should be ALWAYS considered as
+ * Thrown when a request is denied by Nexus for security reasons. This exception should be ALWAYS considered as
  * "authorization denied" type of stuff, since Nexus does not deal with authentication. Simply taken, this exception is
  * thrown for lack of permissions of the already authenticated subject.
  * 
  * @author cstamas
  */
 public class AccessDeniedException
-    extends Exception
+    extends AuthorizationException
 {
     private static final long serialVersionUID = 8341250956517740603L;
 
@@ -33,7 +33,7 @@ public class AccessDeniedException
     public AccessDeniedException( ResourceStoreRequest request, String msg )
     {
         super( msg );
-        
+
         this.request = request;
     }
 

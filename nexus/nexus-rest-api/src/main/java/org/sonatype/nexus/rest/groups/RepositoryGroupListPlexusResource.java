@@ -30,8 +30,8 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
@@ -93,7 +93,9 @@ public class RepositoryGroupListPlexusResource
 
                 resource.setId( group.getGroupId() );
 
-                resource.setFormat( getNexus().getRepositoryGroupType( group.getGroupId() ) );
+                resource.setFormat( getNexus()
+                    .getRepositoryWithFacet( group.getGroupId(), GroupRepository.class ).getRepositoryContentClass()
+                    .getId() );
 
                 resource.setName( group.getName() );
 
@@ -120,13 +122,7 @@ public class RepositoryGroupListPlexusResource
         }
         catch ( NoSuchRepositoryException e )
         {
-            getLogger().warn( "Cannot find a repository declared within a group!", e );
-
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-        }
-        catch ( NoSuchRepositoryGroupException e )
-        {
-            getLogger().warn( "Cannot find a repository group!", e );
+            getLogger().warn( "Cannot find a repository group or repository declared within a group!", e );
 
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
         }
@@ -169,7 +165,7 @@ public class RepositoryGroupListPlexusResource
                         "The repository group with id=" + group.getGroupId() + " already exists!" ) );
                 }
             }
-            catch ( NoSuchRepositoryGroupException ex )
+            catch ( NoSuchRepositoryException ex )
             {
                 CRepositoryGroup group = new CRepositoryGroup();
 

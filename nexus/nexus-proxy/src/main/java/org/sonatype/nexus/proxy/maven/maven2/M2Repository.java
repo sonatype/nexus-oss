@@ -37,6 +37,7 @@ import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -60,19 +61,19 @@ public class M2Repository
     /**
      * The ContentClass.
      */
-	@Requirement( hint = "maven2" )
+    @Requirement( hint = "maven2" )
     private ContentClass contentClass;
 
     /**
      * The GAV Calculator.
      */
-	@Requirement( hint = "maven2" )
+    @Requirement( hint = "maven2" )
     private GavCalculator gavCalculator;
 
     /**
      * The artifact packaging mapper.
      */
-	@Requirement
+    @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
 
     public ContentClass getRepositoryContentClass()
@@ -162,8 +163,7 @@ public class M2Repository
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 OutputStreamWriter osw = new OutputStreamWriter( bos );
                 metadataWriter.write( osw, imd );
-                ByteArrayInputStream bis = new ByteArrayInputStream( bos.toByteArray() );
-                mdFile.setContentLocator( new PreparedContentLocator( bis ) );
+                mdFile.setContentLocator( new ByteArrayContentLocator( bos.toByteArray() ) );
             }
             catch ( Exception e )
             {
@@ -177,6 +177,7 @@ public class M2Repository
                 }
             }
         }
+
         return super.doCacheItem( item );
     }
 
@@ -212,7 +213,8 @@ public class M2Repository
         {
             // if we need snapshots and the version is not snapshot, or
             // if we need releases and the version is snapshot
-            if ( ( snapshot && !VersionUtils.isSnapshot( iversion.next() ) ) || ( !snapshot && VersionUtils.isSnapshot( iversion.next() ) ) )
+            if ( ( snapshot && !VersionUtils.isSnapshot( iversion.next() ) )
+                || ( !snapshot && VersionUtils.isSnapshot( iversion.next() ) ) )
             {
                 iversion.remove();
             }

@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
@@ -46,7 +45,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.proxy.router.ResourceStoreIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -87,11 +85,6 @@ public abstract class AbstractProxyTestEnvironment
 
     /** The test listener */
     private TestItemEventListener testEventListener;
-
-    /**
-     * The all routers.
-     */
-    private Map<String, RepositoryRouter> routers;
 
     public ApplicationConfiguration getApplicationConfiguration()
     {
@@ -194,17 +187,6 @@ public abstract class AbstractProxyTestEnvironment
     }
 
     /**
-     * Gets a specific router.
-     * 
-     * @param hint
-     * @return
-     */
-    public RepositoryRouter getRouter( String hint )
-    {
-        return routers.get( hint );
-    }
-
-    /**
      * Gets the test event listener.
      * 
      * @return
@@ -249,9 +231,7 @@ public abstract class AbstractProxyTestEnvironment
 
         remoteRepositoryStorage = (RemoteRepositoryStorage) lookup( RemoteRepositoryStorage.class, "apacheHttpClient3x" );
 
-        rootRouter = (RepositoryRouter) lookup( ResourceStoreIdBasedRepositoryRouter.ROLE );
-
-        routers = getContainer().lookupMap( RepositoryRouter.class );
+        rootRouter = (RepositoryRouter) lookup( RepositoryRouter.class );
 
         getEnvironmentBuilder().buildEnvironment( this );
 

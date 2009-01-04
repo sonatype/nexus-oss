@@ -20,13 +20,14 @@ import java.io.InputStream;
 
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -72,16 +73,23 @@ public class DefaultMetadataHelper
     public boolean exists( String path )
         throws StorageException
     {
-        return repository.getLocalStorage().containsItem( repository.createUid( path ) );
+        return repository.getLocalStorage().containsItem( repository, null, path );
     }
 
     @Override
     public InputStream retrieveContent( String path )
         throws Exception
     {
-        RepositoryItemUid uid = repository.createUid( path );
+        StorageItem item = repository.retrieveItem( repository.createUid( path ), null );
 
-        return repository.retrieveItemContent( uid );
+        if ( item instanceof StorageFileItem )
+        {
+            return ( (StorageFileItem) item ).getInputStream();
+        }
+        else
+        {
+            return null;
+        }
     }
 
     @Override
@@ -127,7 +135,7 @@ public class DefaultMetadataHelper
         throws StorageException,
             ItemNotFoundException
     {
-        return repository.getLocalStorage().retrieveItem( repository.createUid( path ) );
+        return repository.getLocalStorage().retrieveItem( repository, null, path );
     }
 
     private void storeItem( RepositoryItemUid uid, ContentLocator contentLocator )

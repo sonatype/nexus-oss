@@ -16,7 +16,6 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +23,7 @@ import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -110,14 +110,14 @@ public class M2RepositoryTest
             SPOOF_RELEASE,
             true,
             true,
-            new ByteArrayInputStream( SPOOF_RELEASE.getBytes() ) );
+            new StringContentLocator( SPOOF_RELEASE ) );
 
         repository.storeItem( item );
 
         try
         {
-            item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new ByteArrayInputStream(
-                SPOOF_SNAPSHOT.getBytes() ) );
+            item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
+                SPOOF_SNAPSHOT ) );
 
             repository.storeItem( item );
 
@@ -134,15 +134,15 @@ public class M2RepositoryTest
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
 
-        item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new ByteArrayInputStream(
-            SPOOF_SNAPSHOT.getBytes() ) );
+        item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
+            SPOOF_SNAPSHOT ) );
 
         repository.storeItem( item );
 
         try
         {
-            item = new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true, new ByteArrayInputStream(
-                SPOOF_RELEASE.getBytes() ) );
+            item = new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true, new StringContentLocator(
+                SPOOF_RELEASE ) );
 
             repository.storeItem( item );
 

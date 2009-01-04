@@ -27,7 +27,6 @@ import org.apache.commons.httpclient.HttpMethod;
 public class HttpClientInputStream
     extends InputStream
 {
-
     /** The method. */
     private HttpMethod method;
 
@@ -47,7 +46,8 @@ public class HttpClientInputStream
         this.method = method;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see java.io.InputStream#read()
      */
     public int read()
@@ -56,7 +56,8 @@ public class HttpClientInputStream
         return is.read();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see java.io.InputStream#close()
      */
     public void close()

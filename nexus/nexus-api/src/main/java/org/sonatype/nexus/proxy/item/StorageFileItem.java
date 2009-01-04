@@ -25,7 +25,6 @@ import java.io.InputStream;
 public interface StorageFileItem
     extends StorageItem
 {
-
     /**
      * Gets the length.
      * 
@@ -41,14 +40,15 @@ public interface StorageFileItem
     String getMimeType();
 
     /**
-     * Reusable stream.
+     * Shorthand method, goes to ContentLocator. Reusable stream. See {@link ContentLocator}
      * 
      * @return true, if successful
      */
     boolean isReusableStream();
 
     /**
-     * Gets the input stream. Caller must close the stream. 
+     * Shorthand method, goes to ContentLocator. Gets the input stream. Caller must close the stream. See
+     * {@link ContentLocator}
      * 
      * @return the input stream
      */
@@ -60,4 +60,8 @@ public interface StorageFileItem
      */
     void setContentLocator( ContentLocator locator );
 
+    /**
+     * Exposes the content locator.
+     */
+    ContentLocator getContentLocator();
 }

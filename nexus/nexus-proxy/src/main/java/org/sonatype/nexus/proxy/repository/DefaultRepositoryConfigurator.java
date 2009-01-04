@@ -20,6 +20,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.RepositoryStatusConverter;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -35,7 +36,14 @@ import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
-public abstract class AbstractRepositoryConfigurator
+/**
+ * This is default configurator of a repository. It supports age calculation, a repeated retrieval if item is found
+ * locally but it's age is more then allowed.
+ * 
+ * @author cstamas
+ */
+@Component( role = RepositoryConfigurator.class )
+public class DefaultRepositoryConfigurator
     implements RepositoryConfigurator
 {
     @Requirement
@@ -48,21 +56,18 @@ public abstract class AbstractRepositoryConfigurator
         CRepository repo, RemoteStorageContext rsc, LocalRepositoryStorage ls, RemoteRepositoryStorage rs )
         throws InvalidConfigurationException
     {
-        AbstractRepository repository = (AbstractRepository) old;
+        DefaultRepository repository = (DefaultRepository) old;
 
         repository.setId( repo.getId() );
         repository.setName( repo.getName() );
         repository.setLocalStatus( repositoryStatusConverter.localStatusFromModel( repo.getLocalStatus() ) );
         repository.setAllowWrite( repo.isAllowWrite() );
         repository.setBrowseable( repo.isBrowseable() );
-        repository.setProxyMode( repositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
         repository.setIndexable( repo.isIndexable() );
         repository.setNotFoundCacheTimeToLive( repo.getNotFoundCacheTTL() );
         repository.setUserManaged( repo.isUserManaged() );
         repository.setExposed( repo.isExposed() );
         repository.setNotFoundCacheActive( repo.isNotFoundCacheActive() );
-
-        repository.setItemMaxAge( repo.getArtifactMaxAge() );
 
         // Setting common things on a repository
 
@@ -115,6 +120,12 @@ public abstract class AbstractRepositoryConfigurator
             throw new InvalidConfigurationException( response );
         }
 
+        // proxy stuff
+
+        repository.setProxyMode( repositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
+
+        repository.setItemMaxAge( repo.getArtifactMaxAge() );
+
         try
         {
             if ( repo.getRemoteStorage() != null )
@@ -149,9 +160,9 @@ public abstract class AbstractRepositoryConfigurator
             else
             {
                 repository.setRemoteUrl( null );
-                
+
                 repository.setRemoteStorage( null );
-                
+
                 repository.setRemoteStorageContext( null );
             }
         }

@@ -34,8 +34,12 @@ import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.DefaultRepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.registry.DefaultContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.DefaultGroupRepository;
+import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class PathBasedRequestRepositoryMapperTest
@@ -57,7 +61,7 @@ public class PathBasedRequestRepositoryMapperTest
     private Repository repoE;
 
     private Repository repoF;
-    
+
     private GroupRepository groupRepo;
 
     protected PathBasedRequestRepositoryMapper prepare( Map<String, String[]> inclusions,
@@ -96,13 +100,6 @@ public class PathBasedRequestRepositoryMapperTest
         makeThreadSafe( repoF, true );
         expect( repoF.getId() ).andReturn( "repoF" ).anyTimes();
         expect( repoF.isUserManaged() ).andReturn( true ).anyTimes();
-        
-        expect(repoA.getProxyMode()).andReturn( null ).anyTimes();
-        expect(repoB.getProxyMode()).andReturn( null ).anyTimes();
-        expect(repoC.getProxyMode()).andReturn( null ).anyTimes();
-        expect(repoD.getProxyMode()).andReturn( null ).anyTimes();
-        expect(repoE.getProxyMode()).andReturn( null ).anyTimes();
-        expect(repoF.getProxyMode()).andReturn( null ).anyTimes();
 
         expect( repoA.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
         expect( repoB.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
@@ -110,6 +107,19 @@ public class PathBasedRequestRepositoryMapperTest
         expect( repoD.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
         expect( repoE.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
         expect( repoF.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
+
+        expect( repoA.getRepositoryKind() )
+            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+        expect( repoB.getRepositoryKind() )
+            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+        expect( repoC.getRepositoryKind() )
+            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+        expect( repoD.getRepositoryKind() )
+            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+        expect( repoE.getRepositoryKind() )
+            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+        expect( repoF.getRepositoryKind() )
+            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
 
         repoA.addProximityEventListener( (EventListener) registry );
         repoB.addProximityEventListener( (EventListener) registry );
@@ -142,7 +152,11 @@ public class PathBasedRequestRepositoryMapperTest
         testgroup.add( repoE.getId() );
         testgroup.add( repoF.getId() );
 
-        groupRepo = registry.addRepositoryGroup( "test", testgroup );
+        DefaultGroupRepository groupRepo = (DefaultGroupRepository) getContainer().lookup( GroupRepository.class );
+        groupRepo.setId( "test" );
+        groupRepo.setRepositoryContentClass( new DefaultContentClass( "any" ) );
+        groupRepo.setMemberRepositories( testgroup );
+        registry.addRepository( groupRepo );
 
         if ( inclusions != null )
         {
@@ -207,7 +221,8 @@ public class PathBasedRequestRepositoryMapperTest
         // using group to guarantee proper ordering
         List<Repository> resolvedRepositories = new ArrayList<Repository>();
 
-        resolvedRepositories.addAll( registry.getRepositoryGroup( "test" ) );
+        resolvedRepositories.addAll( registry
+            .getRepositoryWithFacet( "test", GroupRepository.class ).getMemberRepositories() );
 
         List<Repository> mappedRepositories;
 
@@ -246,7 +261,8 @@ public class PathBasedRequestRepositoryMapperTest
         // using group to guarantee proper ordering
         List<Repository> resolvedRepositories = new ArrayList<Repository>();
 
-        resolvedRepositories.addAll( registry.getRepositoryGroup( "test" ) );
+        resolvedRepositories.addAll( registry
+            .getRepositoryWithFacet( "test", GroupRepository.class ).getMemberRepositories() );
 
         List<Repository> mappedRepositories;
 
@@ -298,7 +314,8 @@ public class PathBasedRequestRepositoryMapperTest
         // using group to guarantee proper ordering
         List<Repository> resolvedRepositories = new ArrayList<Repository>();
 
-        resolvedRepositories.addAll( registry.getRepositoryGroup( "test" ) );
+        resolvedRepositories.addAll( registry
+            .getRepositoryWithFacet( "test", GroupRepository.class ).getMemberRepositories() );
 
         List<Repository> mappedRepositories;
 
@@ -338,7 +355,8 @@ public class PathBasedRequestRepositoryMapperTest
         // using group to guarantee proper ordering
         List<Repository> resolvedRepositories = new ArrayList<Repository>();
 
-        resolvedRepositories.addAll( registry.getRepositoryGroup( "test" ) );
+        resolvedRepositories.addAll( registry
+            .getRepositoryWithFacet( "test", GroupRepository.class ).getMemberRepositories() );
 
         List<Repository> mappedRepositories;
 

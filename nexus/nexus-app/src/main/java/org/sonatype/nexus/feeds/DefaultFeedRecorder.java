@@ -263,13 +263,13 @@ public class DefaultFeedRecorder
         return event;
     }
 
-    public void systemProcessFinished( SystemProcess prc )
+    public void systemProcessFinished( SystemProcess prc, String finishMessage )
     {
-        prc.finished();
+        prc.finished( finishMessage );
 
         addToTimeline( prc );
 
-        getLogger().info( prc.getMessage() );
+        getLogger().info( prc.getFinishedMessage() );
     }
 
     public void systemProcessBroken( SystemProcess prc, Throwable e )

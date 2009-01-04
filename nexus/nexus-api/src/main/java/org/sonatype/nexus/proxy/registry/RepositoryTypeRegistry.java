@@ -18,6 +18,8 @@ package org.sonatype.nexus.proxy.registry;
 
 import java.util.Set;
 
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
+
 /**
  * This is the registry of known repository types.
  * 
@@ -28,4 +30,6 @@ public interface RepositoryTypeRegistry
     Set<String> getExistingRepositoryTypes();
 
     ContentClass getTypeContentClass( String repositoryType );
+
+    RepositoryKind getTypeRepositoryKind( String repositooryType );
 }

@@ -17,7 +17,6 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 public class RouterTest
     extends M2ResourceStoreTest
@@ -26,7 +25,7 @@ public class RouterTest
     @Override
     protected String getItemPath()
     {
-        return "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar";
+        return "/activemq/activemq-core/1.2/activemq-core-1.2.jar";
     }
 
     @Override
@@ -37,8 +36,8 @@ public class RouterTest
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
 
         repo1.setAllowWrite( true );
-
-        return (ResourceStore) lookup( RepositoryRouter.class, "repositories" );
+        
+        return repo1;
     }
 
 }

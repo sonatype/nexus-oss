@@ -23,9 +23,9 @@ import org.sonatype.nexus.feeds.NexusArtifactEvent;
 
 public class ContentValidationResult
 {
-
     private final List<NexusArtifactEvent> events = new ArrayList<NexusArtifactEvent>();
-    private boolean contentValid;
+
+    private boolean contentValid = true;
 
     public boolean isContentValid()
     {
@@ -46,5 +46,4 @@ public class ContentValidationResult
     {
         this.contentValid = contentValid;
     }
-
 }

@@ -111,7 +111,7 @@ public interface FeedRecorder
 
     SystemProcess systemProcessStarted( String action, String message );
 
-    void systemProcessFinished( SystemProcess prc );
+    void systemProcessFinished( SystemProcess prc, String finishMessage );
 
     void systemProcessBroken( SystemProcess prc, Throwable e );
 

@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
 
 public class DefaultSnapshotRemoverTest
     extends AbstractMavenRepoContentTests
@@ -32,7 +33,7 @@ public class DefaultSnapshotRemoverTest
         {
             try
             {
-                snapshots.retrieveItem( true, snapshots.createUid( entry.getKey() ), null );
+                snapshots.retrieveItem( snapshots.createUid( entry.getKey() ), null );
 
                 // we succeaeded, the value must be true
                 assertTrue( "The entry '" + entry.getKey() + "' was found in repository.", entry.getValue() );
@@ -49,6 +50,9 @@ public class DefaultSnapshotRemoverTest
         throws Exception
     {
         fillInRepo();
+
+        // XXX: the test stuff is published on sonatype, so put the real central out of service for test
+        getNexus().getRepository( "central" ).setLocalStatus( LocalStatus.OUT_OF_SERVICE );
 
         // and now setup the request
         // process the apacheSnapshots, leave min 1 snap, remove older than 0 day and delete them if release exists

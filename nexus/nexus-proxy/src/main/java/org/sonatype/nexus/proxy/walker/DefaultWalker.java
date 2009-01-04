@@ -17,6 +17,8 @@
 package org.sonatype.nexus.proxy.walker;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -28,7 +30,6 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The Class Walker.
@@ -61,8 +62,7 @@ public class DefaultWalker
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                "Start walking on ResourceStore " + context.getResourceStore().getId() + " from path '" + fromPath
-                    + "'." );
+                "Start walking on ResourceStore " + context.getRepository().getId() + " from path '" + fromPath + "'." );
         }
 
         // user may call stop()
@@ -79,32 +79,18 @@ public class DefaultWalker
 
         try
         {
-            if ( Repository.class.isAssignableFrom( context.getResourceStore().getClass() ) )
+            // this way we avoid security context processing!!!
+            // TODO: enable somehow ability to pass-over the req context!
+            RepositoryItemUid uid = context.getRepository().createUid( fromPath );
+
+            Map<String, Object> rctx = new HashMap<String, Object>();
+
+            if ( context.isLocalOnly() )
             {
-                // we are dealing with repository
-                // this way we avoid security context processing!!!
-                // TODO: enable somehow ability to pass-over the req context!
-                RepositoryItemUid uid = ( (Repository) context.getResourceStore() ).createUid( fromPath );
-
-                item = ( (Repository) context.getResourceStore() ).retrieveItem( context.isLocalOnly(), uid, null );
+                rctx.put( ResourceStoreRequest.CTX_LOCAL_ONLY_FLAG, Boolean.TRUE );
             }
-            else
-            {
-                // we are dealing with router
-                ResourceStoreRequest request = new ResourceStoreRequest( fromPath, context.isLocalOnly() );
 
-                item = context.getResourceStore().retrieveItem( request );
-            }
-        }
-        catch ( AccessDeniedException ex )
-        {
-            getLogger().warn( "Security is enabled. Walking on routers without context is not possible.", ex );
-
-            context.stop( ex );
-
-            reportWalkEnd( context );
-
-            return;
+            item = context.getRepository().retrieveItem( uid, rctx );
         }
         catch ( ItemNotFoundException ex )
         {
@@ -180,7 +166,7 @@ public class DefaultWalker
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Finished walking on ResourceStore '" + context.getResourceStore().getId() + "' from path '"
+                    "Finished walking on ResourceStore '" + context.getRepository().getId() + "' from path '"
                         + context.getContext().get( WALKER_WALKED_FROM_PATH ) + "'." );
             }
         }
@@ -189,7 +175,7 @@ public class DefaultWalker
     protected final int walkRecursive( int collCount, WalkerContext context, WalkerFilter filter,
         StorageCollectionItem coll )
         throws AccessDeniedException,
-        IllegalOperationException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -235,17 +221,7 @@ public class DefaultWalker
 
         if ( shouldProcessRecursively )
         {
-            if ( Repository.class.isAssignableFrom( context.getResourceStore().getClass() ) )
-            {
-                ls = ( (Repository) context.getResourceStore() ).list( coll );
-            }
-            else
-            {
-                // we are dealing with router
-                ResourceStoreRequest request = new ResourceStoreRequest( coll.getPath(), context.isLocalOnly() );
-
-                ls = context.getResourceStore().list( request );
-            }
+            ls = context.getRepository().list( coll );
 
             for ( StorageItem i : ls )
             {

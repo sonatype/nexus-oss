@@ -17,6 +17,7 @@
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The event fired on item store.
@@ -27,9 +28,9 @@ public class RepositoryItemEventStore
     extends RepositoryItemEvent
 {
 
-    public RepositoryItemEventStore( final StorageItem item )
+    public RepositoryItemEventStore( final Repository repository, final StorageItem item )
     {
-        super( item );
+        super( repository, item );
     }
 
 }

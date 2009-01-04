@@ -25,7 +25,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
 import org.sonatype.nexus.proxy.repository.IncompatibleMasterRepositoryException;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 public class M1LayoutedM2ShadowRepositoryTest
@@ -48,7 +48,7 @@ public class M1LayoutedM2ShadowRepositoryTest
             ComponentLookupException,
             IncompatibleMasterRepositoryException
     {
-        for ( Repository master : getRepositoryRegistry().getRepositories() )
+        for ( ProxyRepository master : getRepositoryRegistry().getRepositoriesWithFacet( ProxyRepository.class ) )
         {
             M1LayoutedM2ShadowRepository shadow = (M1LayoutedM2ShadowRepository) getContainer().lookup(
                 ShadowRepository.class,
@@ -76,12 +76,12 @@ public class M1LayoutedM2ShadowRepositoryTest
         addShadowReposes();
 
         // get some content to masters
-        StorageItem item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
+        StorageItem item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
         checkForFileAndMatchContents( item );
 
-        item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo2/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo2/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
         checkForFileAndMatchContents( item );
 
         // we will check stuff on M1 places but,
@@ -90,12 +90,12 @@ public class M1LayoutedM2ShadowRepositoryTest
         getApplicationConfiguration().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
-        item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
         assertTrue( StorageLinkItem.class.isAssignableFrom( item.getClass() ) );
 
-        item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo2-m1/xstream/poms/xstream-1.2.2.pom", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo2-m1/xstream/poms/xstream-1.2.2.pom", false ) );
         assertTrue( StorageLinkItem.class.isAssignableFrom( item.getClass() ) );
 
         // and now we will force the router itself to resolve links
@@ -104,15 +104,15 @@ public class M1LayoutedM2ShadowRepositoryTest
         getApplicationConfiguration().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
-        item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
         // it comes from repo1 even if we requested it from repo1-m1
         assertTrue( "repo1".equals( item.getRepositoryId() ) );
         // and the content is correct
         checkForFileAndMatchContents( item );
 
-        item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo2-m1/xstream/poms/xstream-1.2.2.pom", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo2-m1/xstream/poms/xstream-1.2.2.pom", false ) );
         // it comes from repo1 even if we requested it from repo1-m1
         assertTrue( "repo2".equals( item.getRepositoryId() ) );
         // and the content is correct
@@ -123,12 +123,12 @@ public class M1LayoutedM2ShadowRepositoryTest
     public void testM1ShadowSync()
         throws Exception
     {
-        StorageItem item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
+        StorageItem item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
         checkForFileAndMatchContents( item );
 
-        item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo2/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo2/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
         checkForFileAndMatchContents( item );
 
         // this will add shadows manually for all registered reposes
@@ -141,12 +141,12 @@ public class M1LayoutedM2ShadowRepositoryTest
         getApplicationConfiguration().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
-        item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
         assertTrue( StorageLinkItem.class.isAssignableFrom( item.getClass() ) );
 
-        item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo2-m1/xstream/poms/xstream-1.2.2.pom", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo2-m1/xstream/poms/xstream-1.2.2.pom", false ) );
         assertTrue( StorageLinkItem.class.isAssignableFrom( item.getClass() ) );
 
         // and now we will force the router itself to resolve links
@@ -155,15 +155,15 @@ public class M1LayoutedM2ShadowRepositoryTest
         getApplicationConfiguration().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
-        item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
         // it comes from repo1 even if we requested it from repo1-m1
         assertTrue( "repo1".equals( item.getRepositoryId() ) );
         // and the content is correct
         checkForFileAndMatchContents( item );
 
-        item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo2-m1/xstream/poms/xstream-1.2.2.pom", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo2-m1/xstream/poms/xstream-1.2.2.pom", false ) );
         // it comes from repo1 even if we requested it from repo1-m1
         assertTrue( "repo2".equals( item.getRepositoryId() ) );
         // and the content is correct

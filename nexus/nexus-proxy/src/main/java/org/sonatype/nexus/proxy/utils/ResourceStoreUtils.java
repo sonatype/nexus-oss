@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ResourceStore;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * Simple utils regarding stores.
@@ -47,7 +48,14 @@ public class ResourceStoreUtils
 
         for ( ResourceStore store : stores )
         {
-            repoIdList.add( store.getId() );
+            if ( store instanceof Repository )
+            {
+                repoIdList.add( ( (Repository) store ).getId() );
+            }
+            else
+            {
+                repoIdList.add( store.getClass().getName() );
+            }
         }
 
         return StringUtils.join( repoIdList.iterator(), ", " );

@@ -19,7 +19,7 @@ package org.sonatype.nexus.proxy.walker;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.nexus.proxy.ResourceStore;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The WalkerContext is usable to control the walk and to share some contextual data during the wak.
@@ -101,5 +101,5 @@ public interface WalkerContext
      * 
      * @return
      */
-    ResourceStore getResourceStore();
+    Repository getRepository();
 }

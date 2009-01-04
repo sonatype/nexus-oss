@@ -19,7 +19,8 @@ package org.sonatype.nexus.index;
 import java.util.Collection;
 
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
-import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.scheduling.ScheduledTask;
 
 public class DefaultIndexerManagerTest
     extends AbstractMavenRepoContentTests
@@ -47,12 +48,12 @@ public class DefaultIndexerManagerTest
     {
         fillInRepo();
 
-        defaultNexus.reindexAllRepositories( null );
+        ReindexTask reindexTask = defaultNexus.createTaskInstance( ReindexTask.class );
 
-        Thread.sleep( 5000 );
+        ScheduledTask<Object> st = defaultNexus.submit( "reindexAll", reindexTask );
 
-        // will use the group index context, that is from now automatically merged
-        IndexingContext ctx = indexerManager.getRepositoryGroupContext( "public" );
+        // make it block until finished
+        st.get();
 
         Collection<ArtifactInfo> result = indexerManager.getNexusIndexer().searchFlat(
             indexerManager.getNexusIndexer().constructQuery( ArtifactInfo.GROUP_ID, "org.sonatype.nexus" ) );

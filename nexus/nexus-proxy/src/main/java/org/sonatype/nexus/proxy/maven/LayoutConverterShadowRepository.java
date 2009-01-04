@@ -35,7 +35,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
-import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
+import org.sonatype.nexus.proxy.repository.AbstractShadowRepository;
 import org.sonatype.nexus.proxy.repository.IncompatibleMasterRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -46,7 +46,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  * @author cstamas
  */
 public abstract class LayoutConverterShadowRepository
-    extends DefaultShadowRepository
+    extends AbstractShadowRepository
     implements MavenRepository
 {
     /**
@@ -141,7 +141,7 @@ public abstract class LayoutConverterShadowRepository
 
             RepositoryItemUid itemUid = createUid( request.getRequestPath() );
 
-            StorageFileItem storedFile = (StorageFileItem) retrieveItem( true, itemUid, null );
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( itemUid, null );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -256,7 +256,7 @@ public abstract class LayoutConverterShadowRepository
                 throw new StorageException( "Could not get the content from the ContentLocator!", e );
             }
 
-            StorageFileItem storedFile = (StorageFileItem) retrieveItem( true, item.getRepositoryItemUid(), item
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( item.getRepositoryItemUid(), item
                 .getItemContext() );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );

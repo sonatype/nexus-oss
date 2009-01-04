@@ -23,6 +23,8 @@ import java.io.InputStream;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
@@ -33,8 +35,8 @@ import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
  * The Class EhCacheCacheManager is a thin wrapper around EhCache, just to make things going.
  * 
  * @author cstamas
- * @plexus.component role-hint="default"
  */
+@Component( role = CacheManager.class )
 public class EhCacheCacheManager
     extends AbstractLogEnabled
     implements CacheManager
@@ -42,9 +44,8 @@ public class EhCacheCacheManager
 
     /**
      * The application interpolation service.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private ApplicationInterpolatorProvider interpolatorProvider;
 
     /** The eh cache manager. */
@@ -81,8 +82,8 @@ public class EhCacheCacheManager
         ehCacheManager.removalAll();
 
         ehCacheManager.shutdown();
-        
-        ehCacheManager  = null;
+
+        ehCacheManager = null;
     }
 
     private void constructEhCacheManager()

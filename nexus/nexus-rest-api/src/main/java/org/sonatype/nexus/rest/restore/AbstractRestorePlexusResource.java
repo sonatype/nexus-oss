@@ -23,7 +23,6 @@ import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.scheduling.NexusTask;
 
@@ -125,10 +124,6 @@ public abstract class AbstractRestorePlexusResource
             throw new ResourceException( Status.CLIENT_ERROR_CONFLICT, e.getMessage() );
         }
         catch ( NoSuchRepositoryException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
-        }
-        catch ( NoSuchRepositoryGroupException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
         }

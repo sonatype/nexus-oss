@@ -20,15 +20,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.EventMulticasterComponent;
@@ -47,9 +44,7 @@ import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventClearCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
-import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
@@ -66,11 +61,8 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.proxy.target.TargetSet;
-import org.sonatype.nexus.proxy.utils.StoreFileWalker;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskActivityDescriptor;
@@ -98,17 +90,12 @@ public abstract class AbstractRepository
     extends EventMulticasterComponent
     implements Repository, Initializable
 {
-    /** The time while we do NOT check an already known remote status: 5 mins */
-    protected static final long REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
-
-    private static final ExecutorService exec = Executors.newCachedThreadPool();
-
     /**
-     * StorageItem context key. If value set to Boolean.TRUE, the item will
-     * not be stored locally. Useful to suppress caching of secondary items,
-     * like merged m2 group repository metadata.
+     * StorageItem context key. If value set to Boolean.TRUE, the item will not be stored locally. Useful to suppress
+     * caching of secondary items, like merged m2 group repository metadata.
      */
-    public static final String CTX_TRANSITIVE_ITEM = AbstractRepository.class.getCanonicalName() + ".CTX_TRANSITIVE_ITEM";
+    public static final String CTX_TRANSITIVE_ITEM = AbstractRepository.class.getCanonicalName()
+        + ".CTX_TRANSITIVE_ITEM";
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -146,23 +133,11 @@ public abstract class AbstractRepository
     /** The id. */
     private String id;
 
-    /** The local status */
-    private volatile LocalStatus localStatus = LocalStatus.IN_SERVICE;
-
-    /** The proxy mode */
-    private volatile ProxyMode proxyMode = ProxyMode.ALLOW;
-
-    /** The proxy remote status */
-    private volatile RemoteStatus remoteStatus = RemoteStatus.UNKNOWN;
-
-    /** The repo status check mode */
-    private volatile RepositoryStatusCheckMode repositoryStatusCheckMode = RepositoryStatusCheckMode.NEVER;
-
-    /** Last time remote status was updated */
-    private volatile long remoteStatusUpdated = 0;
-
     /** The name. */
     private String name;
+
+    /** The local status */
+    private volatile LocalStatus localStatus = LocalStatus.IN_SERVICE;
 
     /** The read only. */
     private boolean allowWrite = true;
@@ -182,9 +157,6 @@ public abstract class AbstractRepository
     /** The local storage. */
     private LocalRepositoryStorage localStorage;
 
-    /** The remote storage. */
-    private RemoteRepositoryStorage remoteStorage;
-
     /** The not found cache. */
     private PathCache notFoundCache;
 
@@ -197,19 +169,8 @@ public abstract class AbstractRepository
     /** The local url. */
     private String localUrl;
 
-    /** The remote url. */
-    private String remoteUrl;
-
     /** Request processors list */
     private List<RequestProcessor> requestProcessors;
-
-    /** Remote storage context to store connection configs. */
-    private RemoteStorageContext remoteStorageContext;
-
-    /**
-     * The item max age.
-     */
-    private int itemMaxAge = 24 * 60;
 
     public void initialize()
     {
@@ -226,21 +187,9 @@ public abstract class AbstractRepository
         return applicationConfiguration;
     }
 
-    public RepositoryType getRepositoryType()
-    {
-        if ( getRemoteUrl() != null )
-        {
-            return RepositoryType.PROXY;
-        }
-        else
-        {
-            return RepositoryType.HOSTED;
-        }
-    }
-
     public RepositoryTaskFilter getRepositoryTaskFilter()
     {
-        // TODO: now we are allowing everything. But this is not a finished implementation!
+        // we are allowing all, and subclasses will filter as they want
         return new DefaultRepositoryTaskFilter()
             .setAllowsRepositoryScanning( true ).setAllowsScheduledTasks( true ).setAllowsUserInitiatedTasks( true )
             .setContentOperators( DefaultRepositoryTaskActivityDescriptor.ALL_CONTENT_OPERATIONS )
@@ -262,181 +211,6 @@ public abstract class AbstractRepository
         {
             notifyProximityEventListeners( new RepositoryEventLocalStatusChanged( this, oldStatus, localStatus ) );
         }
-    }
-
-    protected void resetRemoteStatus()
-    {
-        remoteStatusUpdated = 0;
-    }
-
-    protected boolean isRemoteStorageReachable()
-        throws StorageException
-    {
-        if ( !RepositoryType.PROXY.equals( getRepositoryType() ) )
-        {
-            return false;
-        }
-        else
-        {
-            // TODO: include context? from where?
-            return getRemoteStorage().isReachable( this, null );
-        }
-
-    }
-
-    /** Is checking in progress? */
-    private volatile boolean _remoteStatusChecking = false;
-
-    public RemoteStatus getRemoteStatus( boolean forceCheck )
-    {
-        if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
-        {
-            // if the last known status is old, simply reset it
-            if ( forceCheck || System.currentTimeMillis() - remoteStatusUpdated > REMOTE_STATUS_RETAIN_TIME )
-            {
-                remoteStatus = RemoteStatus.UNKNOWN;
-            }
-
-            if ( getProxyMode() != null && getProxyMode().shouldCheckRemoteStatus()
-                && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !_remoteStatusChecking )
-            {
-                // check for thread and go check it
-                _remoteStatusChecking = true;
-
-                exec.submit( new Callable<Object>()
-                {
-                    public Object call()
-                        throws Exception
-                    {
-                        try
-                        {
-                            try
-                            {
-                                if ( isRemoteStorageReachable() )
-                                {
-                                    setRemoteStatus( RemoteStatus.AVAILABLE, null );
-                                }
-                                else
-                                {
-                                    setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( "/" ) );
-                                }
-                            }
-                            catch ( StorageException e )
-                            {
-                                setRemoteStatus( RemoteStatus.UNAVAILABLE, e );
-                            }
-                        }
-                        finally
-                        {
-                            _remoteStatusChecking = false;
-                        }
-
-                        return null;
-                    }
-                } );
-            }
-            else if ( getProxyMode() != null && !getProxyMode().shouldCheckRemoteStatus()
-                && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !_remoteStatusChecking )
-            {
-                setRemoteStatus( RemoteStatus.UNAVAILABLE, null );
-
-                _remoteStatusChecking = false;
-            }
-
-            return remoteStatus;
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    private void setRemoteStatus( RemoteStatus remoteStatus, Throwable cause )
-    {
-        this.remoteStatus = remoteStatus;
-
-        if ( RemoteStatus.AVAILABLE.equals( remoteStatus ) )
-        {
-            this.remoteStatusUpdated = System.currentTimeMillis();
-
-            if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
-            {
-                setProxyMode( ProxyMode.ALLOW, true, cause );
-            }
-        }
-        /*
-         * AUTO_BLOCK temporarily disabled else if ( RemoteStatus.UNAVAILABLE.equals( remoteStatus ) ) {
-         * this.remoteStatusUpdated = System.currentTimeMillis(); if ( getProxyMode() != null &&
-         * getProxyMode().shouldProxy() ) { setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause ); } }
-         */
-    }
-
-    public ProxyMode getProxyMode()
-    {
-        if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
-        {
-            return proxyMode;
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    protected void setProxyMode( ProxyMode proxyMode, boolean sendNotification, Throwable cause )
-    {
-        if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
-        {
-            ProxyMode oldProxyMode = this.proxyMode;
-
-            this.proxyMode = proxyMode;
-
-            // if this is proxy
-            // and was !shouldProxy() and the new is shouldProxy()
-            if ( this.proxyMode != null && this.proxyMode.shouldProxy() && !oldProxyMode.shouldProxy() )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "We have a !shouldProxy() -> shouldProxy() transition, purging NFC" );
-                }
-
-                getNotFoundCache().purge();
-
-                resetRemoteStatus();
-            }
-
-            if ( sendNotification && !proxyMode.equals( oldProxyMode ) )
-            {
-                notifyProximityEventListeners( new RepositoryEventProxyModeChanged(
-                    this,
-                    oldProxyMode,
-                    proxyMode,
-                    cause ) );
-            }
-        }
-    }
-
-    public void setProxyMode( ProxyMode proxyMode )
-    {
-        setProxyMode( proxyMode, true, null );
-    }
-
-    protected void autoBlockProxying( Throwable cause )
-    {
-        if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
-        {
-            setRemoteStatus( RemoteStatus.UNAVAILABLE, cause );
-        }
-    }
-
-    public RepositoryStatusCheckMode getRepositoryStatusCheckMode()
-    {
-        return repositoryStatusCheckMode;
-    }
-
-    public void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode )
-    {
-        this.repositoryStatusCheckMode = mode;
     }
 
     public boolean isAllowWrite()
@@ -593,6 +367,7 @@ public abstract class AbstractRepository
     public void setLocalUrl( String localUrl )
     {
         String trstr = localUrl.trim();
+
         if ( !trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
             this.localUrl = trstr;
@@ -603,66 +378,17 @@ public abstract class AbstractRepository
         }
     }
 
-    public String getRemoteUrl()
+    @SuppressWarnings( "unchecked" )
+    public <T> T adaptToFacet( Class<T> t )
     {
-        return remoteUrl;
-    }
-
-    public void setRemoteUrl( String remoteUrl )
-    {
-        if ( remoteUrl == null )
+        if ( t.isAssignableFrom( this.getClass() ) )
         {
-            this.remoteUrl = null;
+            return (T) this;
         }
         else
         {
-            String trstr = remoteUrl.trim();
-
-            if ( !trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
-            {
-                this.remoteUrl = trstr;
-            }
-            else
-            {
-                this.remoteUrl = trstr.substring( 0, trstr.length() - 1 );
-            }
+            return null;
         }
-    }
-
-    public RemoteStorageContext getRemoteStorageContext()
-    {
-        return remoteStorageContext;
-    }
-
-    public void setRemoteStorageContext( RemoteStorageContext remoteStorageContext )
-    {
-        this.remoteStorageContext = remoteStorageContext;
-
-        if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
-        {
-            // perm changes? retry if autoBlocked
-            setProxyMode( ProxyMode.ALLOW );
-        }
-    }
-
-    /**
-     * Gets the item max age in (in minutes).
-     * 
-     * @return the item max age in (in minutes)
-     */
-    public int getItemMaxAge()
-    {
-        return itemMaxAge;
-    }
-
-    /**
-     * Sets the item max age in (in minutes).
-     * 
-     * @param itemMaxAgeInSeconds the new item max age in (in minutes).
-     */
-    public void setItemMaxAge( int itemMaxAge )
-    {
-        this.itemMaxAge = itemMaxAge;
     }
 
     protected Walker getWalker()
@@ -672,6 +398,7 @@ public abstract class AbstractRepository
 
     // ===================================================================================
     // Repository iface
+
     public AccessManager getAccessManager()
     {
         return accessManager;
@@ -684,9 +411,22 @@ public abstract class AbstractRepository
 
     public void clearCaches( String path )
     {
-        // no path given, purge the whole NFC
-        if ( path == null || RepositoryItemUid.PATH_ROOT.equals( path ) )
+        if ( StringUtils.isEmpty( path ) )
         {
+            path = RepositoryItemUid.PATH_ROOT;
+        }
+
+        // 1st, expire all the files below path
+        DefaultWalkerContext ctx = new DefaultWalkerContext( this );
+
+        ctx.getProcessors().add( new ClearCacheWalker( this ) );
+
+        walker.walk( ctx, path );
+
+        // 2nd, remove the items from NFC
+        if ( RepositoryItemUid.PATH_ROOT.equals( path ) )
+        {
+            // purge all
             path = RepositoryItemUid.PATH_ROOT;
 
             if ( getNotFoundCache() != null )
@@ -696,6 +436,7 @@ public abstract class AbstractRepository
         }
         else
         {
+            // purge below and above path only
             if ( getNotFoundCache() != null )
             {
                 getNotFoundCache().removeWithParents( path );
@@ -703,36 +444,6 @@ public abstract class AbstractRepository
                 getNotFoundCache().removeWithChildren( path );
             }
         }
-
-        // construct an imperial walker to do the job
-        StoreFileWalker walker = new StoreFileWalker( this, getLogger() )
-        {
-            @Override
-            protected void processFileItem( StorageFileItem item )
-            {
-                // expiring found files
-                try
-                {
-                    // expire it
-                    item.setExpired( true );
-
-                    getLocalStorage().updateItemAttributes( item );
-                }
-                catch ( ItemNotFoundException e )
-                {
-                    // will not happen
-                }
-                catch ( StorageException e )
-                {
-                    getLogger().warn(
-                        "Got storage exception while touching " + item.getRepositoryItemUid().toString(),
-                        e );
-                }
-            }
-        };
-
-        // and let it loose
-        walker.walk( path, true, false );
 
         notifyProximityEventListeners( new RepositoryEventClearCaches( this, path ) );
     }
@@ -757,9 +468,13 @@ public abstract class AbstractRepository
     {
         getLogger().info( "Rebuilding attributes on repository " + getId() );
 
-        RecreateAttributesWalker walker = new RecreateAttributesWalker( this, getLogger(), initialData );
+        RecreateAttributesWalker walkerProcessor = new RecreateAttributesWalker( this, initialData );
 
-        walker.walk( path, true, false );
+        DefaultWalkerContext ctx = new DefaultWalkerContext( this );
+
+        ctx.getProcessors().add( walkerProcessor );
+
+        walker.walk( ctx, path );
 
         notifyProximityEventListeners( new RepositoryEventRecreateAttributes( this ) );
 
@@ -776,20 +491,9 @@ public abstract class AbstractRepository
         this.localStorage = localStorage;
     }
 
-    public RemoteRepositoryStorage getRemoteStorage()
-    {
-        return remoteStorage;
-    }
-
-    public void setRemoteStorage( RemoteRepositoryStorage remoteStorage )
-    {
-        this.remoteStorage = remoteStorage;
-
-        setAllowWrite( remoteStorage == null );
-    }
-
     // ===================================================================================
     // Store iface
+
     public StorageItem retrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
@@ -803,7 +507,7 @@ public abstract class AbstractRepository
 
         RepositoryItemUid uid = createUid( request.getRequestPath() );
 
-        StorageItem item = retrieveItem( request.isRequestLocalOnly(), uid, request.getRequestContext() );
+        StorageItem item = retrieveItem( uid, request.getRequestContext() );
 
         if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) && !isBrowseable() )
         {
@@ -895,7 +599,12 @@ public abstract class AbstractRepository
             throw new AccessDeniedException( request, "Operation does not fills needed requirements!" );
         }
 
-        DefaultStorageFileItem fItem = new DefaultStorageFileItem( this, request.getRequestPath(), true, true, is );
+        DefaultStorageFileItem fItem = new DefaultStorageFileItem(
+            this,
+            request.getRequestPath(),
+            true,
+            true,
+            new PreparedContentLocator( is ) );
 
         fItem.getItemContext().putAll( request.getRequestContext() );
 
@@ -974,7 +683,7 @@ public abstract class AbstractRepository
         {
             RepositoryItemUid uid = createUid( rsr.getRequestPath() );
 
-            retrieveItem( true, uid, rsr.getRequestContext() );
+            retrieveItem( uid, rsr.getRequestContext() );
 
             return Action.update;
         }
@@ -998,27 +707,8 @@ public abstract class AbstractRepository
 
     // ===================================================================================
     // Repositry store-like
-    public InputStream retrieveItemContent( RepositoryItemUid uid )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
-    {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "retrieveItemContent() :: " + uid.toString() );
-        }
 
-        if ( !getLocalStatus().shouldServiceRequest() )
-        {
-            throw new RepositoryNotAvailableException( this );
-        }
-
-        getLocalStorage().touchItemLastRequested( uid );
-
-        return getLocalStorage().retrieveItemContent( uid );
-    }
-
-    public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
+    public StorageItem retrieveItem( RepositoryItemUid uid, Map<String, Object> context )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
@@ -1035,8 +725,6 @@ public abstract class AbstractRepository
 
         maintainNotFoundCache( uid.getPath() );
 
-        boolean isLocalOnlyRequest = ( localOnly ) || ( getProxyMode() != null && !getProxyMode().shouldProxy() );
-
         try
         {
             StorageItem item = null;
@@ -1045,24 +733,19 @@ public abstract class AbstractRepository
 
             try
             {
-                item = doRetrieveItem( localOnly, uid, new HashMap<String, Object>() );
+                item = doRetrieveItem( uid, context );
             }
             finally
             {
                 repositoryItemUidFactory.unlock( uid );
             }
 
-            if ( context != null )
-            {
-                item.getItemContext().putAll( context );
-            }
+            notifyProximityEventListeners( new RepositoryItemEventRetrieve( this, item ) );
 
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( getId() + " retrieveItem() :: FOUND " + uid.toString() );
             }
-
-            notifyProximityEventListeners( new RepositoryItemEventRetrieve( item ) );
 
             return item;
         }
@@ -1073,10 +756,7 @@ public abstract class AbstractRepository
                 getLogger().debug( getId() + " retrieveItem() :: NOT FOUND " + uid.toString() );
             }
 
-            if ( !isLocalOnlyRequest )
-            {
-                addToNotFoundCache( uid.getPath() );
-            }
+            addToNotFoundCache( uid.getPath() );
 
             throw ex;
         }
@@ -1100,7 +780,7 @@ public abstract class AbstractRepository
 
         maintainNotFoundCache( from.getPath() );
 
-        StorageItem item = retrieveItem( true, from, context );
+        StorageItem item = retrieveItem( from, context );
 
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
         {
@@ -1167,10 +847,15 @@ public abstract class AbstractRepository
         maintainNotFoundCache( uid.getPath() );
 
         // determine is the thing to be deleted a collection or not
-        StorageItem item = retrieveItem( true, uid, context );
+        StorageItem item = getLocalStorage().retrieveItem( this, context, uid.getPath() );
+
+        if ( context != null )
+        {
+            item.getItemContext().putAll( context );
+        }
 
         // fire the event for file being deleted
-        notifyProximityEventListeners( new RepositoryItemEventDelete( item ) );
+        notifyProximityEventListeners( new RepositoryItemEventDelete( this, item ) );
 
         if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
         {
@@ -1181,12 +866,16 @@ public abstract class AbstractRepository
             }
 
             // it is collection, walk it and below and fire events for all files
-            DeletionNotifierWalker dnw = new DeletionNotifierWalker( this, getLogger(), context );
+            DeletionNotifierWalker dnw = new DeletionNotifierWalker( this, context );
 
-            dnw.walk( uid.getPath() );
+            DefaultWalkerContext ctx = new DefaultWalkerContext( this );
+
+            ctx.getProcessors().add( dnw );
+
+            walker.walk( ctx, uid.getPath() );
         }
 
-        doDeleteItem( uid );
+        doDeleteItem( uid, context );
     }
 
     public void storeItem( StorageItem item )
@@ -1208,12 +897,12 @@ public abstract class AbstractRepository
         item.setRepositoryItemUid( createUid( item.getPath() ) );
 
         // store it
-        getLocalStorage().storeItem( item );
+        getLocalStorage().storeItem( this, item.getItemContext(), item );
 
         // remove the "request" item from n-cache if there
         removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
 
-        notifyProximityEventListeners( new RepositoryItemEventStore( item ) );
+        notifyProximityEventListeners( new RepositoryItemEventStore( this, item ) );
     }
 
     public Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
@@ -1233,11 +922,14 @@ public abstract class AbstractRepository
 
         maintainNotFoundCache( uid.getPath() );
 
-        Collection<StorageItem> items = doListItems( false, uid, context );
+        Collection<StorageItem> items = doListItems( uid, context );
 
-        for ( StorageItem item : items )
+        if ( context != null )
         {
-            item.getItemContext().putAll( context );
+            for ( StorageItem item : items )
+            {
+                item.getItemContext().putAll( context );
+            }
         }
 
         return items;
@@ -1389,48 +1081,6 @@ public abstract class AbstractRepository
         return result;
     }
 
-    protected AbstractStorageItem doCacheItem( AbstractStorageItem item )
-        throws StorageException
-    {
-        if ( Boolean.TRUE.equals( item.getItemContext().get( CTX_TRANSITIVE_ITEM ) ) )
-        {
-            return item;
-        }
-
-        AbstractStorageItem result = null;
-
-        try
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "Caching item " + item.getRepositoryItemUid().toString() + " in local storage of repository." );
-            }
-
-            getLocalStorage().storeItem( item );
-
-            removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
-
-            result = getLocalStorage().retrieveItem( item.getRepositoryItemUid() );
-
-            notifyProximityEventListeners( new RepositoryItemEventCache( result ) );
-
-            result.getItemContext().putAll( item.getItemContext() );
-        }
-        catch ( ItemNotFoundException ex )
-        {
-            // this is a nonsense, we just stored it!
-            result = item;
-        }
-        catch ( UnsupportedStorageOperationException ex )
-        {
-            getLogger().warn( "LocalStorage does not handle STORE operation, not caching remote fetched item.", ex );
-            result = item;
-        }
-
-        return result;
-    }
-
     public boolean isCompatible( Repository repository )
     {
         return getRepositoryContentClass().isCompatible( repository.getRepositoryContentClass() );
@@ -1449,55 +1099,65 @@ public abstract class AbstractRepository
         result.getItemContext().putAll( context );
         result.setMimeType( "text/plain" );
         result.setLength( bytes.length );
-        
+
         return result;
     }
 
-    /**
-     * Do retrieve item.
-     * 
-     * @param request the request
-     * @param uid the uid
-     * @return the storage item
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
-     * @throws AccessDeniedException the access denied exception
-     */
-    protected abstract StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException;
-
-    /**
-     * Do delete item.
-     * 
-     * @param request the request
-     * @param uid the uid
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
-     * @throws UnsupportedStorageOperationException
-     */
-    protected abstract void doDeleteItem( RepositoryItemUid uid )
+    protected void doDeleteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
-            IllegalOperationException,
             ItemNotFoundException,
-            StorageException;
+            StorageException
+    {
+        getLocalStorage().deleteItem( this, context, uid.getPath() );
+    }
 
-    /**
-     * Do list items.
-     * 
-     * @param uid the uid
-     * @return the collection< storage item>
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
-     * @throws AccessDeniedException the access denied exception
-     */
-    protected abstract Collection<StorageItem> doListItems( boolean localOnly, RepositoryItemUid uid,
-        Map<String, Object> context )
+    protected Collection<StorageItem> doListItems( RepositoryItemUid uid, Map<String, Object> context )
+        throws ItemNotFoundException,
+            StorageException
+    {
+        return getLocalStorage().listItems( this, context, uid.getPath() );
+    }
+
+    protected StorageItem doRetrieveItem( RepositoryItemUid uid, Map<String, Object> context )
         throws IllegalOperationException,
             ItemNotFoundException,
-            StorageException;
+            StorageException
+    {
+        AbstractStorageItem localItem = null;
+
+        try
+        {
+            localItem = getLocalStorage().retrieveItem( this, context, uid.getPath() );
+
+            if ( context != null )
+            {
+                localItem.getItemContext().putAll( context );
+            }
+
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Item " + uid.toString() + " found in local storage." );
+            }
+
+            // this "self correction" is needed to nexus build for himself the needed metadata
+            if ( localItem.getRemoteChecked() == 0 )
+            {
+                getLocalStorage().touchItemRemoteChecked( this, context, uid.getPath() );
+
+                localItem = getLocalStorage().retrieveItem( this, context, uid.getPath() );
+            }
+        }
+        catch ( ItemNotFoundException ex )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Item " + uid.toString() + " not found in local storage." );
+            }
+
+            localItem = null;
+        }
+
+        return localItem;
+    }
+
 }

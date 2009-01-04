@@ -16,12 +16,10 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStore;
@@ -38,8 +36,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
@@ -50,28 +46,14 @@ import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
  * @author cstamas
  */
 public interface Repository
-    extends EventMulticaster, ResourceStore, EventListener
+    extends ResourceStore, EventMulticaster, EventListener
 {
     /**
-     * This is the "class" of the repository content. It is used in grouping, only same content reposes may be grouped.
+     * Returns the ID of the resourceStore.
      * 
-     * @return
+     * @return the id
      */
-    ContentClass getRepositoryContentClass();
-
-    /**
-     * Returns the type of repository.
-     * 
-     * @return
-     */
-    RepositoryType getRepositoryType();
-
-    /**
-     * Returns the task filter for this repository.
-     * 
-     * @return
-     */
-    RepositoryTaskFilter getRepositoryTaskFilter();
+    String getId();
 
     /**
      * Sets the ID of the resourceStore. It must be unique type-wide (Router vs Repository).
@@ -93,6 +75,70 @@ public interface Repository
      * @param name
      */
     void setName( String name );
+
+    /**
+     * This is the "type"/kind of the repository. It tells some minimal info about the repo working (not content,
+     * neither implementation).
+     * 
+     * @return
+     */
+    RepositoryKind getRepositoryKind();
+
+    /**
+     * This is the "class" of the repository content. It is used in grouping, only same content reposes may be grouped.
+     * 
+     * @return
+     */
+    ContentClass getRepositoryContentClass();
+
+    /**
+     * Returns the task filter for this repository.
+     * 
+     * @return
+     */
+    RepositoryTaskFilter getRepositoryTaskFilter();
+
+    /**
+     * Gets the target set for UID.
+     * 
+     * @param uid
+     * @return
+     */
+    TargetSet getTargetsForRequest( RepositoryItemUid uid, Map<String, Object> context );
+
+    /**
+     * Creates an UID within this Repository.
+     */
+    RepositoryItemUid createUid( String path );
+
+    /**
+     * Will return the proper Action that will occur on "write" operation: create (if nothing exists on the given path)
+     * or update (if overwrite will happen since the path already exists).
+     * 
+     * @param action
+     * @return
+     */
+    Action getResultingActionOnWrite( ResourceStoreRequest rsr );
+
+    /**
+     * Is the target repository compatible to this one
+     * 
+     * @param repository
+     * @return
+     */
+    boolean isCompatible( Repository repository );
+
+    /**
+     * Returns the facet of Repository, if available, otherwise it returns null.
+     * 
+     * @param <T>
+     * @param t
+     * @return the facet requested, otherwise null.
+     */
+    <T> T adaptToFacet( Class<T> t );
+
+    // ==================================================
+    // NFC et al
 
     /**
      * Gets the not found cache time to live (in minutes).
@@ -150,19 +196,22 @@ public interface Repository
      */
     void setNotFoundCacheActive( boolean notFoundCacheActive );
 
-    /**
-     * Gets the item max age in (in minutes).
-     * 
-     * @return the item max age in (in minutes)
-     */
-    int getItemMaxAge();
+    // ==================================================
+    // LocalStorage et al
 
     /**
-     * Sets the item max age in (in minutes).
+     * Returns the local URL of this repository, if any.
      * 
-     * @param itemMaxAgeInSeconds the new item max age in (in minutes).
+     * @return local url of this repository, null otherwise.
      */
-    void setItemMaxAge( int itemMaxAge );
+    String getLocalUrl();
+
+    /**
+     * Sets the local url.
+     * 
+     * @param url the new local url
+     */
+    void setLocalUrl( String url );
 
     /**
      * Gets local status.
@@ -177,37 +226,22 @@ public interface Repository
     void setLocalStatus( LocalStatus val );
 
     /**
-     * Gets remote status.
+     * Returns the local storage of the repository. Per repository instance may exists.
+     * 
+     * @return localStorage or null.
      */
-    RemoteStatus getRemoteStatus( boolean forceCheck );
+    LocalRepositoryStorage getLocalStorage();
 
     /**
-     * Gets proxy mode.
+     * Sets the local storage of the repository. May be null if this is an aggregating repos without caching function.
+     * Per repository instance may exists.
      * 
-     * @return
+     * @param storage the storage
      */
-    ProxyMode getProxyMode();
+    void setLocalStorage( LocalRepositoryStorage storage );
 
-    /**
-     * Sets proxy mode.
-     * 
-     * @param val
-     */
-    void setProxyMode( ProxyMode val );
-
-    /**
-     * Gets the RepositoryStatusCheckMode.
-     * 
-     * @return
-     */
-    RepositoryStatusCheckMode getRepositoryStatusCheckMode();
-
-    /**
-     * Sets the RepositoryStatusCheckMode.
-     * 
-     * @param mode
-     */
-    void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode );
+    // ==================================================
+    // Behaviour
 
     /**
      * Returns the list of defined request processors.
@@ -215,6 +249,35 @@ public interface Repository
      * @return
      */
     List<RequestProcessor> getRequestProcessors();
+
+    /**
+     * If is user managed, the nexus core and nexus core UI handles the store. Thus, for reposes, users are allowed to
+     * edit/drop the repository.
+     * 
+     * @return
+     */
+    boolean isUserManaged();
+
+    /**
+     * Sets is the store user managed.
+     * 
+     * @param val
+     */
+    void setUserManaged( boolean val );
+
+    /**
+     * Tells whether the resource store is exposed as Nexus content or not.
+     * 
+     * @return
+     */
+    boolean isExposed();
+
+    /**
+     * Sets the exposed flag.
+     * 
+     * @param val
+     */
+    void setExposed( boolean val );
 
     /**
      * Is Repository listable?.
@@ -261,47 +324,8 @@ public interface Repository
      */
     void setIndexable( boolean val );
 
-    /**
-     * Returns the local URL of this repository, if any.
-     * 
-     * @return local url of this repository, null otherwise.
-     */
-    String getLocalUrl();
-
-    /**
-     * Sets the local url.
-     * 
-     * @param url the new local url
-     */
-    void setLocalUrl( String url );
-
-    /**
-     * Returns the remote URL of this repository, if any.
-     * 
-     * @return remote url of this repository, null otherwise.
-     */
-    String getRemoteUrl();
-
-    /**
-     * Sets the remote url.
-     * 
-     * @param url the new remote url
-     */
-    void setRemoteUrl( String url );
-
-    /**
-     * Returns repository specific remote connection context.
-     * 
-     * @return null if none
-     */
-    RemoteStorageContext getRemoteStorageContext();
-
-    /**
-     * Sets the repository specific remote connection context.
-     * 
-     * @param ctx
-     */
-    void setRemoteStorageContext( RemoteStorageContext ctx );
+    // ==================================================
+    // Maintenance
 
     /**
      * Purges the caches (NFC and expires files) from path and below.
@@ -339,64 +363,10 @@ public interface Repository
      */
     void setAccessManager( AccessManager accessManager );
 
-    /**
-     * Returns the local storage of the repository. Per repository instance may exists.
-     * 
-     * @return localStorage or null.
-     */
-    LocalRepositoryStorage getLocalStorage();
+    // ==================================================
+    // Alternative (and unprotected) Content access
 
-    /**
-     * Sets the local storage of the repository. May be null if this is an aggregating repos without caching function.
-     * Per repository instance may exists.
-     * 
-     * @param storage the storage
-     */
-    void setLocalStorage( LocalRepositoryStorage storage );
-
-    /**
-     * Returns the remoteStorage of the repository. Per repository instance may exists.
-     * 
-     * @return remoteStorage or null.
-     */
-    RemoteRepositoryStorage getRemoteStorage();
-
-    /**
-     * Sets the remote storage of the repository. May be null if this is a Local repository only. Per repository
-     * instance may exists.
-     * 
-     * @param storage the storage
-     */
-    void setRemoteStorage( RemoteRepositoryStorage storage );
-
-    /**
-     * Retrieves item content from the path.
-     * 
-     * @param uid the uid
-     * @return the input stream
-     * @throws UnsupportedOperationException the unsupported operation exception
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
-     * @throws AccessDeniedException the access denied exception
-     */
-    InputStream retrieveItemContent( RepositoryItemUid uid )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException;
-
-    /**
-     * Retrieves item with content from the path.
-     * 
-     * @param localOnly should look it up locally only
-     * @param uid the uid
-     * @return the storage item
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
-     * @throws AccessDeniedException the access denied exception
-     */
-    StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
+    StorageItem retrieveItem( RepositoryItemUid uid, Map<String, Object> context )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
@@ -413,91 +383,25 @@ public interface Repository
             ItemNotFoundException,
             StorageException;
 
-    /**
-     * Delete item.
-     * 
-     * @param uid the uid
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
-     * @throws AccessDeniedException the access denied exception
-     * @throws UnsupportedStorageOperationException the unsupported storage operation exception
-     */
     void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
-    /**
-     * Stores item. Involves local storage only.
-     * 
-     * @param item the item
-     * @throws StorageException the storage exception
-     * @throws UnsupportedStorageOperationException the unsupported storage operation exception
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws AccessDeniedException the access denied exception
-     */
     void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException;
 
-    /**
-     * Lists the path denoted by item.
-     * 
-     * @param uid the uid
-     * @return the collection< storage item>
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
-     */
     Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
-    /**
-     * Lists the path denoted by item.
-     * 
-     * @param uid the uid
-     * @return the collection< storage item>
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
-     */
     Collection<StorageItem> list( StorageCollectionItem item )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
-    /**
-     * Gets the target set for UID.
-     * 
-     * @param uid
-     * @return
-     */
-    TargetSet getTargetsForRequest( RepositoryItemUid uid, Map<String, Object> context );
-
-    /**
-     * Creates an UID within this Repository.
-     */
-    RepositoryItemUid createUid( String path );
-
-    /**
-     * Will return the proper Action that will occur on "write" operation: create (if nothing exists on the given path)
-     * or update (if overwrite will happen since the path already exists).
-     * 
-     * @param action
-     * @return
-     */
-    Action getResultingActionOnWrite( ResourceStoreRequest rsr );
-
-    /**
-     * Is the target repository compatible to this one
-     * 
-     * @param repository
-     * @return
-     */
-    boolean isCompatible( Repository repository );
 }

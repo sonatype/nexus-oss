@@ -78,7 +78,7 @@ public class DefaultMetadataManager
 
         try
         {
-            StorageItem item = uid.getRepository().retrieveItem( false, uid, ctx );
+            StorageItem item = uid.getRepository().retrieveItem( uid, ctx );
 
             if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
             {
@@ -546,7 +546,7 @@ public class DefaultMetadataManager
 
     public void deployPlugin( ArtifactStoreRequest req, MavenRepository repository )
         throws IOException,
-        IllegalOperationException,
+            IllegalOperationException,
             UnsupportedStorageOperationException
     {
         if ( req.getClassifier() != null )
@@ -587,7 +587,7 @@ public class DefaultMetadataManager
 
             String pomPath = repository.getGavCalculator().gavToPath( pomGav );
 
-            pomFile = (StorageFileItem) repository.retrieveItem( true, repository.createUid( pomPath ), req
+            pomFile = (StorageFileItem) repository.retrieveItem( repository.createUid( pomPath ), req
                 .getRequestContext() );
         }
         catch ( ItemNotFoundException e )
@@ -640,7 +640,7 @@ public class DefaultMetadataManager
 
     public void undeployPlugin( ArtifactStoreRequest req, MavenRepository repository )
         throws IOException,
-        IllegalOperationException,
+            IllegalOperationException,
             UnsupportedStorageOperationException
     {
         if ( req.getClassifier() != null )
@@ -681,7 +681,7 @@ public class DefaultMetadataManager
 
             String pomPath = repository.getGavCalculator().gavToPath( pomGav );
 
-            pomFile = (StorageFileItem) repository.retrieveItem( true, repository.createUid( pomPath ), req
+            pomFile = (StorageFileItem) repository.retrieveItem( repository.createUid( pomPath ), req
                 .getRequestContext() );
         }
         catch ( ItemNotFoundException e )

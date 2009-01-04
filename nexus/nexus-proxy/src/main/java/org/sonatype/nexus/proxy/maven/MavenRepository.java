@@ -35,27 +35,11 @@ public interface MavenRepository
 {
     GavCalculator getGavCalculator();
 
-    ChecksumPolicy getChecksumPolicy();
-
     ArtifactPackagingMapper getArtifactPackagingMapper();
-
-    void setChecksumPolicy( ChecksumPolicy checksumPolicy );
 
     RepositoryPolicy getRepositoryPolicy();
 
     void setRepositoryPolicy( RepositoryPolicy repositoryPolicy );
-
-    int getReleaseMaxAge();
-
-    void setReleaseMaxAge( int releaseMaxAge );
-
-    int getSnapshotMaxAge();
-
-    void setSnapshotMaxAge( int snapshotMaxAge );
-
-    int getMetadataMaxAge();
-
-    void setMetadataMaxAge( int metadataMaxAge );
 
     boolean isCleanseRepositoryMetadata();
 
@@ -68,6 +52,22 @@ public interface MavenRepository
     MetadataManager getMetadataManager();
 
     boolean recreateMavenMetadata( String path );
+
+    ChecksumPolicy getChecksumPolicy();
+
+    void setChecksumPolicy( ChecksumPolicy checksumPolicy );
+
+    int getReleaseMaxAge();
+
+    void setReleaseMaxAge( int releaseMaxAge );
+
+    int getSnapshotMaxAge();
+
+    void setSnapshotMaxAge( int snapshotMaxAge );
+
+    int getMetadataMaxAge();
+
+    void setMetadataMaxAge( int metadataMaxAge );
 
     // == "Public API" (JSec protected)
 

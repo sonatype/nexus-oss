@@ -68,7 +68,6 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.cache.CacheManager;
@@ -81,12 +80,11 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryType;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.proxy.router.RootRepositoryRouter;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.scheduling.NexusTask;
@@ -96,15 +94,11 @@ import org.sonatype.nexus.store.Store;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.tasks.RemoveRepoFolderTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.RemoveRepoFolderTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
 import org.sonatype.nexus.timeline.RepositoryIdTimelineFilter;
 import org.sonatype.nexus.timeline.TimelineFilter;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -187,7 +181,7 @@ public class DefaultNexus
     /**
      * The SecurityConfiguration component.
      */
-    @Requirement( role = RootRepositoryRouter.class )
+    @Requirement
     private RepositoryRouter rootRepositoryRouter;
 
     /**
@@ -298,29 +292,10 @@ public class DefaultNexus
         return repositoryRegistry.getRepository( repoId );
     }
 
-    public List<Repository> getRepositoryGroup( String repoGroupId )
-        throws NoSuchRepositoryGroupException
+    public <T> T getRepositoryWithFacet( String repoId, Class<T> f )
+        throws NoSuchRepositoryException
     {
-        return repositoryRegistry.getRepositoryGroup( repoGroupId );
-    }
-
-    public GroupRepository getRepositoryGroupXXX( String repoGroupId )
-        throws NoSuchRepositoryGroupException
-    {
-        return repositoryRegistry.getRepositoryGroupXXX( repoGroupId );
-    }
-
-    public String getRepositoryGroupType( String repoGroupId )
-        throws NoSuchRepositoryGroupException
-    {
-        ContentClass contentClass = repositoryRegistry.getRepositoryGroupContentClass( repoGroupId );
-
-        if ( contentClass == null )
-        {
-            return null;
-        }
-
-        return contentClass.getId();
+        return repositoryRegistry.getRepositoryWithFacet( repoId, f );
     }
 
     public Collection<Repository> getRepositories()
@@ -328,21 +303,9 @@ public class DefaultNexus
         return repositoryRegistry.getRepositories();
     }
 
-    public Collection<GroupRepository> getGroupRepositories()
+    public <T> Collection<T> getRepositoriesWithFacet( Class<T> f )
     {
-        ArrayList<GroupRepository> result = new ArrayList<GroupRepository>();
-        for ( String groupId : repositoryRegistry.getRepositoryGroupIds() )
-        {
-            try
-            {
-                result.add( repositoryRegistry.getRepositoryGroupXXX( groupId ) );
-            }
-            catch ( NoSuchRepositoryGroupException e )
-            {
-                getLogger().warn( "Impossible exception", e);
-            }
-        }
-        return result;
+        return repositoryRegistry.getRepositoriesWithFacet( f );
     }
 
     public StorageItem dereferenceLinkItem( StorageLinkItem item )
@@ -534,7 +497,7 @@ public class DefaultNexus
             if ( settings.isIndexable() )
             {
                 // Create the initial index for the repository
-                ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTaskDescriptor.ID );
+                ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
                 rt.setRepositoryId( settings.getId() );
                 nexusScheduler.submit( "Create initial index.", rt );
             }
@@ -567,7 +530,7 @@ public class DefaultNexus
         if ( !previousDownloadRemoteIndexes && settings.isDownloadRemoteIndexes() )
         {
             // Create the initial index for the repository
-            ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTaskDescriptor.ID );
+            ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
             rt.setRepositoryId( settings.getId() );
             nexusScheduler.submit( "Download remote index enabled.", rt );
         }
@@ -587,8 +550,7 @@ public class DefaultNexus
         if ( defaultStorageFile.toURL().toString().equals( repository.getLocalUrl() + "/" ) )
         {
             // remove the storage folders for the repository
-            RemoveRepoFolderTask task = (RemoveRepoFolderTask) nexusScheduler
-                .createTaskInstance( RemoveRepoFolderTaskDescriptor.ID );
+            RemoveRepoFolderTask task = nexusScheduler.createTaskInstance( RemoveRepoFolderTask.class );
 
             task.setRepository( repository );
 
@@ -687,14 +649,13 @@ public class DefaultNexus
     }
 
     public CRepositoryGroup readRepositoryGroup( String id )
-        throws NoSuchRepositoryGroupException
+        throws NoSuchRepositoryException
     {
         return nexusConfiguration.readRepositoryGroup( id );
     }
 
     public void updateRepositoryGroup( CRepositoryGroup settings )
         throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException,
             InvalidGroupingException,
             IOException,
             ConfigurationException
@@ -703,7 +664,7 @@ public class DefaultNexus
     }
 
     public void deleteRepositoryGroup( String id )
-        throws NoSuchRepositoryGroupException,
+        throws NoSuchRepositoryException,
             IOException
     {
         nexusConfiguration.deleteRepositoryGroup( id );
@@ -882,11 +843,13 @@ public class DefaultNexus
     }
 
     public void clearRepositoryGroupCaches( String path, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException
+        throws NoSuchRepositoryException
     {
         getLogger().info( "Clearing caches in repository group " + repositoryGroupId + " from path " + path );
 
-        for ( Repository repository : repositoryRegistry.getRepositoryGroup( repositoryGroupId ) )
+        for ( Repository repository : repositoryRegistry.getRepositoryWithFacet(
+            repositoryGroupId,
+            GroupRepository.class ).getMemberRepositories() )
         {
             repository.clearCaches( path );
         }
@@ -895,7 +858,7 @@ public class DefaultNexus
     protected Collection<String> evictUnusedItems( long timestamp, Repository repository, boolean proxyOnly )
         throws IOException
     {
-        if ( proxyOnly && RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
+        if ( proxyOnly && repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
             return repository.evictUnusedItems( timestamp );
         }
@@ -930,14 +893,16 @@ public class DefaultNexus
     }
 
     public Collection<String> evictRepositoryGroupUnusedProxiedItems( long timestamp, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
+        throws NoSuchRepositoryException,
             IOException
     {
         getLogger().info( "Evicting unused items from repositories in group " + repositoryGroupId + "." );
 
         ArrayList<String> result = new ArrayList<String>();
 
-        for ( Repository repository : repositoryRegistry.getRepositoryGroup( repositoryGroupId ) )
+        for ( Repository repository : repositoryRegistry.getRepositoryWithFacet(
+            repositoryGroupId,
+            GroupRepository.class ).getMemberRepositories() )
         {
             result.addAll( evictUnusedItems( timestamp, repository, true ) );
         }
@@ -947,7 +912,6 @@ public class DefaultNexus
 
     public SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
         throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException,
             IllegalArgumentException
     {
         return snapshotRemover.removeSnapshots( request );
@@ -958,7 +922,9 @@ public class DefaultNexus
     {
         try
         {
-            DefaultShadowRepository shadowRepo = (DefaultShadowRepository) getRepository( shadowRepositoryId );
+            ShadowRepository shadowRepo = repositoryRegistry.getRepositoryWithFacet(
+                shadowRepositoryId,
+                ShadowRepository.class );
 
             shadowRepo.synchronizeWithMaster();
         }
@@ -1244,9 +1210,9 @@ public class DefaultNexus
         return feedRecorder.systemProcessStarted( action, message );
     }
 
-    public void systemProcessFinished( SystemProcess prc )
+    public void systemProcessFinished( SystemProcess prc, String finishMessage )
     {
-        feedRecorder.systemProcessFinished( prc );
+        feedRecorder.systemProcessFinished( prc, finishMessage );
     }
 
     public void systemProcessBroken( SystemProcess prc, Throwable e )
@@ -1327,11 +1293,11 @@ public class DefaultNexus
     // =============
     // Schedules
 
-    public <T> void submit( String name, NexusTask<T> task )
+    public <T> ScheduledTask<T> submit( String name, NexusTask<T> task )
         throws RejectedExecutionException,
             NullPointerException
     {
-        nexusScheduler.submit( name, task );
+        return nexusScheduler.submit( name, task );
     }
 
     public <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
@@ -1364,13 +1330,7 @@ public class DefaultNexus
         return nexusScheduler.getTaskById( id );
     }
 
-    public NexusTask<?> createTaskInstance( String taskType )
-        throws IllegalArgumentException
-    {
-        return nexusScheduler.createTaskInstance( taskType );
-    }
-
-    public SchedulerTask<?> createTaskInstance( Class<?> taskType )
+    public <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException
     {
         return nexusScheduler.createTaskInstance( taskType );
@@ -1393,7 +1353,7 @@ public class DefaultNexus
     }
 
     public void reindexRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
+        throws NoSuchRepositoryException,
             IOException
     {
         indexerManager.reindexRepositoryGroup( path, repositoryGroupId );
@@ -1414,7 +1374,7 @@ public class DefaultNexus
 
     public void publishRepositoryGroupIndex( String repositoryGroupId )
         throws IOException,
-            NoSuchRepositoryGroupException
+            NoSuchRepositoryException
     {
         indexerManager.publishRepositoryGroupIndex( repositoryGroupId );
     }
@@ -1446,10 +1406,11 @@ public class DefaultNexus
     }
 
     public void rebuildMavenMetadataRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
+        throws NoSuchRepositoryException,
             IOException
     {
-        List<Repository> reposes = repositoryRegistry.getRepositoryGroup( repositoryGroupId );
+        List<Repository> reposes = repositoryRegistry
+            .getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
 
         for ( Repository repo : reposes )
         {
@@ -1479,10 +1440,11 @@ public class DefaultNexus
     }
 
     public void rebuildAttributesRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
+        throws NoSuchRepositoryException,
             IOException
     {
-        List<Repository> reposes = repositoryRegistry.getRepositoryGroup( repositoryGroupId );
+        List<Repository> reposes = repositoryRegistry
+            .getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
 
         for ( Repository repo : reposes )
         {
@@ -1740,8 +1702,7 @@ public class DefaultNexus
             // spawn tasks to do it
             if ( shadow.isSyncAtStartup() )
             {
-                SynchronizeShadowsTask task = (SynchronizeShadowsTask) nexusScheduler
-                    .createTaskInstance( SynchronizeShadowTaskDescriptor.ID );
+                SynchronizeShadowsTask task = nexusScheduler.createTaskInstance( SynchronizeShadowsTask.class );
 
                 task.setShadowRepositoryId( shadow.getId() );
 
@@ -1872,7 +1833,7 @@ public class DefaultNexus
             getLogger().warn( "Error during deleting repository folders ", e );
         }
     }
-    
+
     public Map<String, String> getConfigurationFiles()
     {
         return nexusConfiguration.getConfigurationFiles();

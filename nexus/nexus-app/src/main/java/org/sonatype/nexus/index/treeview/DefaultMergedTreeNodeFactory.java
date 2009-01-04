@@ -21,12 +21,12 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.treeview.TreeNode.Type;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * A default implementation of merged TreeNodeFactory, that is failry simple to extend. Note: this implementation
@@ -38,18 +38,18 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 public class DefaultMergedTreeNodeFactory
     extends DefaultTreeNodeFactory
 {
-    private ResourceStore store;
+    private Repository repository;
 
-    public DefaultMergedTreeNodeFactory( IndexingContext ctx, ResourceStore store )
+    public DefaultMergedTreeNodeFactory( IndexingContext ctx, Repository repository )
     {
         super( ctx );
 
-        this.store = store;
+        this.repository = repository;
     }
 
-    public ResourceStore getResourceStore()
+    public Repository getRepository()
     {
-        return store;
+        return repository;
     }
 
     protected TreeNode decorateArtifactNode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
@@ -63,7 +63,7 @@ public class DefaultMergedTreeNodeFactory
 
         try
         {
-            StorageItem item = getResourceStore().retrieveItem( request );
+            StorageItem item = getRepository().retrieveItem( request );
 
             if ( item instanceof StorageFileItem )
             {
@@ -107,7 +107,7 @@ public class DefaultMergedTreeNodeFactory
     {
         TreeNode result = super.createNode( tview, path, leaf, nodeName, type );
 
-        result.setRepositoryId( getResourceStore().getId() );
+        result.setRepositoryId( getRepository().getId() );
 
         return result;
     }

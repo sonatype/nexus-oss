@@ -71,11 +71,9 @@ public abstract class AbstractShadowRepositoryConfigurator
         shadowRepository.setLocalStatus( repositoryStatusConverter.localStatusFromModel( repo.getLocalStatus() ) );
         shadowRepository.setAllowWrite( false );
         shadowRepository.setBrowseable( true );
-        shadowRepository.setProxyMode( null );
         shadowRepository.setIndexable( false );
         shadowRepository.setNotFoundCacheTimeToLive( masterRepository.getNotFoundCacheTimeToLive() );
         shadowRepository.setUserManaged( repo.isUserManaged() );
-        shadowRepository.setItemMaxAge( masterRepository.getItemMaxAge() );
 
         // NX-198: filling up the default variable to store the "default" local URL
         File defaultStorageFile = new File(

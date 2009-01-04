@@ -21,7 +21,7 @@ import java.util.Collection;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.RepositoryType;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 
@@ -43,14 +43,14 @@ public class RecreateMavenMetadataWalkerProcessor
     {
         isHostedRepo = false;
 
-        repository = context.getResourceStore() instanceof MavenRepository ? (MavenRepository) context
-            .getResourceStore() : null;
+        repository = context.getRepository() instanceof MavenRepository ? (MavenRepository) context
+            .getRepository() : null;
 
         if ( repository != null )
         {
             mdHelper = new DefaultMetadataHelper( repository );
 
-            isHostedRepo = RepositoryType.HOSTED.equals( repository.getRepositoryType() );
+            isHostedRepo = repository.getRepositoryKind().isFacetAvailable( HostedRepository.class );
         }
 
         setActive( isHostedRepo );

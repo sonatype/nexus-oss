@@ -22,12 +22,13 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 /**
  * Default group repository implementation.
  */
-@Component( role = GroupRepository.class, hint = "default", instantiationStrategy = "per-lookup" )
+@Component( role = GroupRepository.class, instantiationStrategy = "per-lookup", description = "Default group repository" )
 public class DefaultGroupRepository
     extends AbstractGroupRepository
 {
-
     private ContentClass contentClass;
+
+    private RepositoryKind repositoryKind = new DefaultRepositoryKind( GroupRepository.class, null );
 
     public ContentClass getRepositoryContentClass()
     {
@@ -39,4 +40,8 @@ public class DefaultGroupRepository
         this.contentClass = contentClass;
     }
 
+    public RepositoryKind getRepositoryKind()
+    {
+        return repositoryKind;
+    }
 }

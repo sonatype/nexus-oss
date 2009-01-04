@@ -48,8 +48,10 @@ public class SimplePullTest
 
         try
         {
-            item = getRouter( "repositories" ).retrieveItem(
-                new ResourceStoreRequest( "/repo1/activemq/activemq-core/1.2/broken/activemq-core-1.2", false ) );
+            item = getRootRouter().retrieveItem(
+                new ResourceStoreRequest(
+                    "/repositories/repo1/activemq/activemq-core/1.2/broken/activemq-core-1.2",
+                    false ) );
 
             fail();
         }
@@ -58,48 +60,48 @@ public class SimplePullTest
             // good, the layout says this is not a file!
         }
 
-        item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
         checkForFileAndMatchContents( item );
         assertEquals( RepositoryItemEventCache.class, getTestEventListener().getFirstEvent().getClass() );
         assertEquals( RepositoryItemEventRetrieve.class, getTestEventListener().getLastEvent().getClass() );
         getTestEventListener().reset();
 
-        item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo2/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo2/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
         checkForFileAndMatchContents( item );
         assertEquals( RepositoryItemEventCache.class, getTestEventListener().getFirstEvent().getClass() );
         assertEquals( RepositoryItemEventRetrieve.class, getTestEventListener().getLastEvent().getClass() );
         getTestEventListener().reset();
 
-        item = getRouter( "groups-m2" ).retrieveItem(
-            new ResourceStoreRequest( "/test/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/groups/test/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
         checkForFileAndMatchContents( item );
         assertEquals( RepositoryItemEventRetrieve.class, getTestEventListener().getFirstEvent().getClass() );
-        assertEquals( 1, getTestEventListener().getEvents().size() );
+        assertEquals( 2, getTestEventListener().getEvents().size() );
         getTestEventListener().reset();
 
-        item = getRouter( "groups-m2" ).retrieveItem(
-            new ResourceStoreRequest( "/test/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/groups/test/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
         checkForFileAndMatchContents( item );
         assertEquals( RepositoryItemEventRetrieve.class, getTestEventListener().getFirstEvent().getClass() );
-        assertEquals( 1, getTestEventListener().getEvents().size() );
+        assertEquals( 2, getTestEventListener().getEvents().size() );
         getTestEventListener().reset();
 
-        item = getRouter( "groups-m2" ).retrieveItem(
-            new ResourceStoreRequest( "/test/rome/rome/0.9/rome-0.9.pom", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/groups/test/rome/rome/0.9/rome-0.9.pom", false ) );
         checkForFileAndMatchContents( item );
         assertEquals( RepositoryItemEventCache.class, getTestEventListener().getFirstEvent().getClass() );
         assertEquals( RepositoryItemEventRetrieve.class, getTestEventListener().getLastEvent().getClass() );
         getTestEventListener().reset();
 
-        item = getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test/repo3.txt", false ) );
+        item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test/repo3.txt", false ) );
         checkForFileAndMatchContents( item );
         assertEquals( RepositoryItemEventCache.class, getTestEventListener().getFirstEvent().getClass() );
         assertEquals( RepositoryItemEventRetrieve.class, getTestEventListener().getLastEvent().getClass() );
         getTestEventListener().reset();
 
-        item = getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test/", false ) );
+        item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test/", false ) );
         Collection<StorageItem> dir = ( (StorageCollectionItem) item ).list();
         // we should have listed in root only those things/dirs we pulled, se above!
         assertEquals( 4, dir.size() );
@@ -110,24 +112,24 @@ public class SimplePullTest
     {
 
         // pull the stuff from remote, to play with it below
-        StorageItem item = getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
+        StorageItem item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
         checkForFileAndMatchContents( item );
 
-        item = getRouter( "groups-m2" ).retrieveItem(
-            new ResourceStoreRequest( "/test/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
+        item = getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/groups/test/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
         checkForFileAndMatchContents( item );
 
         // new test regarding item properties and path endings.
         // All resource storage implementations should behave the same way.
-        item = getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test/activemq", false ) );
-        assertEquals( "/test/activemq", item.getPath() );
-        assertEquals( "/test", item.getParentPath() );
+        item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test/activemq", false ) );
+        assertEquals( "/groups/test/activemq", item.getPath() );
+        assertEquals( "/groups/test", item.getParentPath() );
         assertEquals( "activemq", item.getName() );
 
-        item = getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test/activemq/", false ) );
-        assertEquals( "/test/activemq", item.getPath() );
-        assertEquals( "/test", item.getParentPath() );
+        item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test/activemq/", false ) );
+        assertEquals( "/groups/test/activemq", item.getPath() );
+        assertEquals( "/groups/test", item.getParentPath() );
         assertEquals( "activemq", item.getName() );
 
         // against reposes
@@ -164,12 +166,12 @@ public class SimplePullTest
     {
 
         ResourceStoreRequest request = new ResourceStoreRequest(
-            "/inhouse/activemq/activemq-core/1.2/activemq-core-1.2.jar",
+            "/repositories/inhouse/activemq/activemq-core/1.2/activemq-core-1.2.jar",
             true );
-        StorageFileItem item = (StorageFileItem) getRouter( "repositories" ).retrieveItem(
-            new ResourceStoreRequest( "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
+        StorageFileItem item = (StorageFileItem) getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
 
-        getRouter( "repositories" ).storeItem( request, item.getInputStream(), null );
+        getRootRouter().storeItem( request, item.getInputStream(), null );
 
         assertTrue( FileUtils.contentEquals( getFile(
             getRepositoryRegistry().getRepository( "repo1" ),
@@ -182,9 +184,9 @@ public class SimplePullTest
     {
         try
         {
-            getRouter( "repositories" ).retrieveItem(
+            getRootRouter().retrieveItem(
                 new ResourceStoreRequest(
-                    "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar-there-is-no-such",
+                    "/groups/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar-there-is-no-such",
                     false ) );
             fail();
         }
@@ -195,8 +197,8 @@ public class SimplePullTest
 
         try
         {
-            getRouter( "groups-m2" ).retrieveItem(
-                new ResourceStoreRequest( "/test/rome/rome/0.9/rome-0.9.pom-there-is-no-such", false ) );
+            getRootRouter().retrieveItem(
+                new ResourceStoreRequest( "/groups/test/rome/rome/0.9/rome-0.9.pom-there-is-no-such", false ) );
             fail();
         }
         catch ( ItemNotFoundException e )
@@ -210,8 +212,11 @@ public class SimplePullTest
     {
         try
         {
-            getRouter( "repositories" ).retrieveItem(
-                new ResourceStoreRequest( "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
+            getRootRouter()
+                .retrieveItem(
+                    new ResourceStoreRequest(
+                        "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar",
+                        false ) );
         }
         catch ( ItemNotFoundException e )
         {
@@ -220,15 +225,16 @@ public class SimplePullTest
 
         try
         {
-            getRouter( "repositories" ).retrieveItem(
-                new ResourceStoreRequest( "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar/", false ) );
-            
-            fail("The path ends with slash '/'!");
+            getRootRouter().retrieveItem(
+                new ResourceStoreRequest(
+                    "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar/",
+                    false ) );
+
+            fail( "The path ends with slash '/'!" );
         }
         catch ( ItemNotFoundException e )
         {
             // good
         }
     }
-
 }

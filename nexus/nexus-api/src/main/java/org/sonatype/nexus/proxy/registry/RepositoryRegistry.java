@@ -19,9 +19,7 @@ package org.sonatype.nexus.proxy.registry;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.events.EventMulticaster;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -38,13 +36,6 @@ public interface RepositoryRegistry
      * @param repository the repository
      */
     void addRepository( Repository repository );
-
-    /**
-     * Adds single group repository.
-     * 
-     * @param repository the repository
-     */
-    void addRepositoryGroup( GroupRepository repository );
 
     /**
      * Updates (replaces) single repository, with keeping all its memberships in groups, etc.
@@ -73,40 +64,6 @@ public interface RepositoryRegistry
         throws NoSuchRepositoryException;
 
     /**
-     * Adds the repository group.
-     * 
-     * @param groupId the group id
-     * @param memberRepositories the repository IDs
-     * @throws NoSuchRepositoryException the no such repository exception
-     * @throws InvalidGroupingException when reposes to group are not groupable
-     */
-    @Deprecated
-    GroupRepository addRepositoryGroup( String groupId, List<String> memberRepositories )
-        throws NoSuchRepositoryException,
-            InvalidGroupingException;
-
-    /**
-     * Removes a grouping of repositories. The group members are not removed.
-     * 
-     * @param groupId the group id
-     * @throws NoSuchRepositoryGroupException the no such repository group exception
-     */
-    @Deprecated
-    void removeRepositoryGroup( String groupId )
-        throws NoSuchRepositoryGroupException;
-
-    /**
-     * Removes a grouping of repositories, and also the member repositories if requested.
-     * 
-     * @param groupId the group id
-     * @param withRepositories if true, the members will be removed too
-     * @throws NoSuchRepositoryGroupException the no such repository group exception
-     */
-    @Deprecated
-    void removeRepositoryGroup( String groupId, boolean withRepositories )
-        throws NoSuchRepositoryGroupException;
-
-    /**
      * Returns the list of Repositories that serves Proximity. The repo order within list follows repo rank, so
      * processing is possible by simply iterating over resulting list.
      * 
@@ -115,12 +72,12 @@ public interface RepositoryRegistry
     List<Repository> getRepositories();
 
     /**
-     * Returns the list of existing repository group IDs.
+     * Returns the list of Repositories that serves Proximity and have facets as T available. The repo order within list
+     * follows repo rank, so processing is possible by simply iterating over resulting list.
      * 
-     * @return
+     * @return a List<T>
      */
-    @Deprecated
-    List<String> getRepositoryGroupIds();
+    <T> List<T> getRepositoriesWithFacet( Class<T> f );
 
     /**
      * Returns the requested Repository by ID.
@@ -133,27 +90,14 @@ public interface RepositoryRegistry
         throws NoSuchRepositoryException;
 
     /**
-     * Returns the list of Repositories in given group. The repo order within list follows repo rank, so processing is
-     * possible by simply iterating over resulting list.
+     * Returns the requested Repository by ID.
      * 
-     * @param groupId the group id
-     * @return a List<Repository>
-     * @throws NoSuchRepositoryGroupException the no such repository group exception
+     * @param repoId the repo id
+     * @return the repository
+     * @throws NoSuchRepositoryException the no such repository exception
      */
-    @Deprecated
-    List<Repository> getRepositoryGroup( String groupId )
-        throws NoSuchRepositoryGroupException;
-
-    /**
-     * Returns the content class of repository group.
-     * 
-     * @param groupId
-     * @return
-     * @throws NoSuchRepositoryGroupException
-     */
-    @Deprecated
-    ContentClass getRepositoryGroupContentClass( String groupId )
-        throws NoSuchRepositoryGroupException;
+    <T> T getRepositoryWithFacet( String repoId, Class<T> f )
+        throws NoSuchRepositoryException;
 
     /**
      * Checks for the existence of given repositoryId within this registry.
@@ -164,28 +108,10 @@ public interface RepositoryRegistry
     boolean repositoryIdExists( String repositoryId );
 
     /**
-     * Checks for the existence of given repositoryGroupId (group) within this registry.
-     * 
-     * @param repositoryGroupId the repository group id
-     * @return boolean
-     */
-    @Deprecated
-    boolean repositoryGroupIdExists( String repositoryGroupId );
-
-    /**
      * Collect the groupIds where repository is member.
      * 
      * @param repositoryId the repository id
      * @return list of groupId's where the repo appears as member
      */
-   @Deprecated
-   List<String> getGroupsOfRepository( String repositoryId );
-
-
-   /**
-    * Temporary method until I figure out how to access group repositories properly.
-    */
-   @Deprecated
-    GroupRepository getRepositoryGroupXXX( String groupId )
-        throws NoSuchRepositoryGroupException;
+    List<String> getGroupsOfRepository( String repositoryId );
 }

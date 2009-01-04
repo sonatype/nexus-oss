@@ -54,24 +54,29 @@ import org.sonatype.nexus.index.updater.IndexUpdater;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryType;
-import org.sonatype.nexus.proxy.router.ResourceStoreIdBasedRepositoryRouter;
-import org.sonatype.nexus.proxy.router.RootRepositoryRouter;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ReindexTask;
 
 /**
- * Indexer Manager
+ * Indexer Manager. This is a thin layer above Nexus Indexer and simply manages indexingContext additions, updates and
+ * removals. Every Nexus repository (except ShadowRepository, which are completely left out of indexing) has two
+ * indexing context maintained: local and remote. In case of hosted/proxy repositories, the local context contains the
+ * content/cache content and the remote context contains nothing/downloaded index (if remote index downlad happened and
+ * remote peer is publishing index). In case of group reposes, the things are little different: their local context
+ * contains the index of GroupRepository local storage, and remote context contains the merged indexes of it's member
+ * repositories.
  * 
  * @author Tamas Cservenak
  */
@@ -86,9 +91,6 @@ public class DefaultIndexerManager
 
     /** Context id remote suffix */
     public static final String CTX_REMOTE_SUFIX = "-remote";
-
-    /** Context id merged suffix */
-    public static final String CTX_MERGED_SUFIX = "-merged";
 
     @Requirement
     private NexusIndexer nexusIndexer;
@@ -107,9 +109,6 @@ public class DefaultIndexerManager
 
     @Requirement
     private NexusScheduler nexusScheduler;
-
-    @Requirement( role = RootRepositoryRouter.class )
-    private ResourceStoreIdBasedRepositoryRouter rootRouter;
 
     private File workingDirectory;
 
@@ -144,7 +143,6 @@ public class DefaultIndexerManager
         for ( IndexingContext ctx : nexusIndexer.getIndexingContexts().values() )
         {
             nexusIndexer.removeIndexingContext( ctx, false );
-            // ctx.close( deleteFiles );
         }
     }
 
@@ -165,34 +163,91 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        File repoRoot = getRepositoryLocalStorageAsFile( repository );
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+        {
+            // shadows are left out completely for now
+            return;
+        }
+        else if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        {
+            // group repository
+            // just to throw NoSuchRepositoryGroupException if not existing
+            repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
 
-        // add context for repository
-        IndexingContext ctxLocal = nexusIndexer.addIndexingContextForced(
-            getLocalContextId( repository.getId() ),
-            repository.getId(),
-            repoRoot,
-            new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ),
-            repository.getRemoteUrl(),
-            null,
-            NexusIndexer.FULL_INDEX );
-        ctxLocal.setSearchable( repository.isIndexable() );
+            File repoRoot = getRepositoryLocalStorageAsFile( repository );
 
-        IndexingContext ctxRemote = nexusIndexer.addIndexingContextForced(
-            getRemoteContextId( repository.getId() ),
-            repository.getId(),
-            repoRoot,
-            new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ),
-            repository.getRemoteUrl(),
-            repository.getRemoteUrl(),
-            NexusIndexer.FULL_INDEX );
-        ctxRemote.setSearchable( repository.isIndexable() );
+            // add context for repository
+            IndexingContext ctxLocal = nexusIndexer.addIndexingContextForced(
+                getLocalContextId( repository.getId() ),
+                repository.getId(),
+                repoRoot,
+                new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ),
+                null,
+                null,
+                NexusIndexer.FULL_INDEX );
+            ctxLocal.setSearchable( repository.isIndexable() );
+
+            IndexingContext ctxRemote = nexusIndexer.addIndexingContextForced(
+                getRemoteContextId( repository.getId() ),
+                repository.getId(),
+                repoRoot,
+                new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ),
+                null,
+                null,
+                NexusIndexer.FULL_INDEX );
+            ctxRemote.setSearchable( repository.isIndexable() );
+        }
+        else
+        {
+            repositoryRegistry.getRepositoryWithFacet( repositoryId, Repository.class );
+
+            File repoRoot = getRepositoryLocalStorageAsFile( repository );
+
+            // add context for repository
+            IndexingContext ctxLocal = nexusIndexer.addIndexingContextForced(
+                getLocalContextId( repository.getId() ),
+                repository.getId(),
+                repoRoot,
+                new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ),
+                null,
+                null,
+                NexusIndexer.FULL_INDEX );
+            ctxLocal.setSearchable( repository.isIndexable() );
+
+            IndexingContext ctxRemote = nexusIndexer.addIndexingContextForced(
+                getRemoteContextId( repository.getId() ),
+                repository.getId(),
+                repoRoot,
+                new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ),
+                null,
+                null,
+                NexusIndexer.FULL_INDEX );
+            ctxRemote.setSearchable( repository.isIndexable() );
+        }
     }
 
     public void removeRepositoryIndexContext( String repositoryId, boolean deleteFiles )
         throws IOException,
             NoSuchRepositoryException
     {
+        Repository repository = repositoryRegistry.getRepository( repositoryId );
+
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+        {
+            // shadows are left out completely for now
+            return;
+        }
+        else if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        {
+            // group repository
+            // just to throw NoSuchRepositoryGroupException if not existing
+            repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
+        }
+        else
+        {
+            repositoryRegistry.getRepositoryWithFacet( repositoryId, Repository.class );
+        }
+
         // remove context for repository
         nexusIndexer.removeIndexingContext(
             nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) ),
@@ -209,13 +264,27 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+        {
+            // shadows are left out completely for now
+            return;
+        }
+        else if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        {
+            // group repository
+            repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
+        }
+        else
+        {
+            repositoryRegistry.getRepositoryWithFacet( repositoryId, Repository.class );
+        }
+
         File repoRoot = getRepositoryLocalStorageAsFile( repository );
 
         // get context for repository, check is change needed
         IndexingContext ctx = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
 
-        if ( !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() )
-            || !StringUtils.equalsIgnoreCase( ctx.getRepositoryUrl(), repository.getRemoteUrl() ) )
+        if ( !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() ) )
         {
             // recreate the context
             removeRepositoryIndexContext( repositoryId, false );
@@ -270,55 +339,6 @@ public class DefaultIndexerManager
         }
 
         return bestContext;
-    }
-
-    public void addRepositoryGroupIndexContext( String repositoryGroupId )
-        throws IOException,
-            NoSuchRepositoryGroupException
-    {
-        // just to throw NoSuchRepositoryGroupException if not existing
-        repositoryRegistry.getRepositoryGroup( repositoryGroupId );
-
-        IndexingContext ctxMerged = nexusIndexer.addIndexingContextForced(
-            getMergedContextId( repositoryGroupId ),
-            repositoryGroupId,
-            null,
-            new File( getWorkingDirectory(), getMergedContextId( repositoryGroupId ) ),
-            null,
-            null,
-            NexusIndexer.FULL_INDEX );
-
-        // the merged context is not adding any value, so it does not takes part in searches
-        // it gets only published
-
-        ctxMerged.setSearchable( false );
-    }
-
-    public void removeRepositoryGroupIndexContext( String repositoryGroupId, boolean deleteFiles )
-        throws IOException,
-            NoSuchRepositoryGroupException
-    {
-        // just to throw NoSuchRepositoryGroupException if not existing
-        repositoryRegistry.getRepositoryGroup( repositoryGroupId );
-
-        // remove context for repository
-        if ( nexusIndexer.getIndexingContexts().containsKey( getMergedContextId( repositoryGroupId ) ) )
-        {
-            nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
-                getMergedContextId( repositoryGroupId ) ), deleteFiles );
-        }
-    }
-
-    public IndexingContext getRepositoryGroupContext( String repositoryGroupId )
-        throws NoSuchRepositoryGroupException
-    {
-        // just to throw NoSuchRepositoryGroupException if not existing
-        repositoryRegistry.getRepositoryGroup( repositoryGroupId );
-
-        // get context for repository
-        IndexingContext ctx = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
-
-        return ctx;
     }
 
     public void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
@@ -403,18 +423,11 @@ public class DefaultIndexerManager
             publishRepositoryIndex( repository );
         }
 
-        List<String> groupIds = repositoryRegistry.getRepositoryGroupIds();
+        List<GroupRepository> groups = repositoryRegistry.getRepositoriesWithFacet( GroupRepository.class );
 
-        for ( String groupId : groupIds )
+        for ( GroupRepository group : groups )
         {
-            try
-            {
-                publishRepositoryGroupIndex( groupId, repositoryRegistry.getRepositoryGroup( groupId ) );
-            }
-            catch ( NoSuchRepositoryGroupException e )
-            {
-                // will not be thrown
-            }
+            publishRepositoryGroupIndex( group );
         }
     }
 
@@ -427,23 +440,23 @@ public class DefaultIndexerManager
 
     public void publishRepositoryGroupIndex( String repositoryGroupId )
         throws IOException,
-            NoSuchRepositoryGroupException
+            NoSuchRepositoryException
     {
-        List<Repository> group = repositoryRegistry.getRepositoryGroup( repositoryGroupId );
+        GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
 
-        for ( Repository repository : group )
+        for ( Repository repository : group.getMemberRepositories() )
         {
             publishRepositoryIndex( repository );
         }
 
-        publishRepositoryGroupIndex( repositoryGroupId, group );
+        publishRepositoryGroupIndex( group );
     }
 
     protected void publishRepositoryIndex( Repository repository )
         throws IOException
     {
         // shadows are not capable to publish indexes
-        if ( RepositoryType.SHADOW.equals( repository.getRepositoryType() ) )
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
         {
             return;
         }
@@ -528,7 +541,7 @@ public class DefaultIndexerManager
                 path,
                 true,
                 true,
-                fis );
+                new PreparedContentLocator( fis ) );
 
             fItem.setModified( context.getTimestamp().getTime() );
             fItem.setCreated( context.getTimestamp().getTime() );
@@ -554,16 +567,16 @@ public class DefaultIndexerManager
         }
     }
 
-    protected void publishRepositoryGroupIndex( String repositoryGroupId, List<Repository> repositories )
-        throws IOException,
-            NoSuchRepositoryGroupException
+    protected void publishRepositoryGroupIndex( GroupRepository groupRepository )
+        throws IOException
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "Publishing merged index for repository group " + repositoryGroupId );
+            getLogger().debug( "Publishing merged index for repository group " + groupRepository.getId() );
         }
 
-        IndexingContext context = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
+        IndexingContext context = nexusIndexer
+            .getIndexingContexts().get( getRemoteContextId( groupRepository.getId() ) );
 
         File targetDir = null;
 
@@ -588,11 +601,9 @@ public class DefaultIndexerManager
 
                 if ( files != null )
                 {
-                    GroupRepository group = repositoryRegistry.getRepositoryGroupXXX( repositoryGroupId );
-
                     for ( File file : files )
                     {
-                        storeItem( group, file, context );
+                        storeItem( groupRepository, file, context );
                     }
                 }
             }
@@ -624,9 +635,9 @@ public class DefaultIndexerManager
         List<Repository> reposes = repositoryRegistry.getRepositories();
 
         // purge all group idxes, below will get all repopulated
-        for ( String groupId : repositoryRegistry.getRepositoryGroupIds() )
+        for ( GroupRepository groupRepo : repositoryRegistry.getRepositoriesWithFacet( GroupRepository.class ) )
         {
-            purgeRepositoryGroupIndex( groupId );
+            purgeRepositoryGroupIndex( groupRepo.getId() );
         }
 
         for ( Repository repository : reposes )
@@ -649,10 +660,11 @@ public class DefaultIndexerManager
     }
 
     public void reindexRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
+        throws NoSuchRepositoryException,
             IOException
     {
-        List<Repository> group = repositoryRegistry.getRepositoryGroup( repositoryGroupId );
+        List<Repository> group = repositoryRegistry
+            .getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
 
         // purge it, and below will be repopulated
         purgeRepositoryGroupIndex( repositoryGroupId );
@@ -668,6 +680,11 @@ public class DefaultIndexerManager
     protected void reindexRepository( Repository repository )
         throws IOException
     {
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+        {
+            return;
+        }
+
         boolean repositoryIndexable = repository.isIndexable();
 
         IndexingContext tmpContext = null;
@@ -724,60 +741,56 @@ public class DefaultIndexerManager
     protected void mergeRepositoryGroupIndexWithMember( Repository repository )
         throws IOException
     {
-        if ( !RepositoryType.SHADOW.equals( repository.getRepositoryType() ) )
+        List<String> groupsOfRepository = repositoryRegistry.getGroupsOfRepository( repository.getId() );
+
+        for ( String repositoryGroupId : groupsOfRepository )
         {
-            List<String> groupsOfRepository = repositoryRegistry.getGroupsOfRepository( repository.getId() );
+            getLogger().info(
+                "Cascading merge of group indexes for group '" + repositoryGroupId + "', where repository '"
+                    + repository.getId() + "' is member." );
 
-            for ( String repositoryGroupId : groupsOfRepository )
+            IndexingContext context = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryGroupId ) );
+
+            IndexingContext bestContext = null;
+
+            // local idx has every repo
+            try
             {
-                getLogger().info(
-                    "Cascading merge of group indexes for group '" + repositoryGroupId + "', where repository '"
-                        + repository.getId() + "' is member." );
-
-                IndexingContext context = nexusIndexer.getIndexingContexts().get(
-                    getMergedContextId( repositoryGroupId ) );
-
-                IndexingContext bestContext = null;
-
-                // local idx has every repo
-                try
-                {
-                    bestContext = getRepositoryBestIndexContext( repository.getId() );
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    // not to happen, we are iterating over them
-                }
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                        " ...found best context " + bestContext.getId() + " for repository "
-                            + bestContext.getRepositoryId() + ", merging it..." );
-                }
-
-                context.merge( bestContext.getIndexDirectory() );
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Rebuilding groups in merged index for repository group " + repositoryGroupId );
-                }
-
-                // rebuild group info
-                nexusIndexer.rebuildGroups( context );
-
-                // committing changes
-                context.getIndexWriter().flush();
-
-                context.updateTimestamp();
+                bestContext = getRepositoryBestIndexContext( repository.getId() );
             }
+            catch ( NoSuchRepositoryException e )
+            {
+                // not to happen, we are iterating over them
+            }
+
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    " ...found best context " + bestContext.getId() + " for repository "
+                        + bestContext.getRepositoryId() + ", merging it..." );
+            }
+
+            context.merge( bestContext.getIndexDirectory() );
+
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Rebuilding groups in merged index for repository group " + repositoryGroupId );
+            }
+
+            // rebuild group info
+            nexusIndexer.rebuildGroups( context );
+
+            // committing changes
+            context.getIndexWriter().flush();
+
+            context.updateTimestamp();
         }
     }
 
     protected void purgeRepositoryGroupIndex( String repositoryGroupId )
         throws IOException
     {
-        IndexingContext context = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
+        IndexingContext context = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryGroupId ) );
 
         if ( context != null )
         {
@@ -788,13 +801,15 @@ public class DefaultIndexerManager
     private boolean updateIndexForRemoteRepository( Repository repository )
         throws IOException
     {
-        if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
+        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
             boolean shouldDownloadRemoteIndex = false;
 
+            ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
+
             try
             {
-                CRepository repoModel = nexusConfiguration.readRepository( repository.getId() );
+                CRepository repoModel = nexusConfiguration.readRepository( proxy.getId() );
 
                 shouldDownloadRemoteIndex = repoModel.isDownloadRemoteIndexes();
             }
@@ -809,18 +824,18 @@ public class DefaultIndexerManager
             {
                 try
                 {
-                    getLogger().info( "Trying to get remote index for repository " + repository.getId() );
+                    getLogger().info( "Trying to get remote index for repository " + proxy.getId() );
 
-                    hasRemoteIndex = updateRemoteIndex( repository );
+                    hasRemoteIndex = updateRemoteIndex( proxy );
 
                     if ( hasRemoteIndex )
                     {
-                        getLogger().info( "Remote indexes updated successfully for repository " + repository.getId() );
+                        getLogger().info( "Remote indexes updated successfully for repository " + proxy.getId() );
                     }
                     else
                     {
-                        getLogger().info(
-                            "Remote indexes unchanged (no update needed) for repository " + repository.getId() );
+                        getLogger()
+                            .info( "Remote indexes unchanged (no update needed) for repository " + proxy.getId() );
                     }
                 }
                 catch ( Exception e )
@@ -831,8 +846,7 @@ public class DefaultIndexerManager
             else
             {
                 // make empty the remote context
-                IndexingContext context = nexusIndexer.getIndexingContexts().get(
-                    getRemoteContextId( repository.getId() ) );
+                IndexingContext context = nexusIndexer.getIndexingContexts().get( getRemoteContextId( proxy.getId() ) );
 
                 context.purge();
 
@@ -849,15 +863,11 @@ public class DefaultIndexerManager
         }
     }
 
-    private boolean updateRemoteIndex( final Repository repository )
+    private boolean updateRemoteIndex( final ProxyRepository repository )
         throws IOException,
             IllegalOperationException,
             ItemNotFoundException
     {
-        if ( !RepositoryType.PROXY.equals( repository.getRepositoryType() ) ) {
-            return false;
-        }
-        
         // this will force remote check for newer files
         repository.clearCaches( "/.index" );
 
@@ -880,57 +890,59 @@ public class DefaultIndexerManager
 
             updateRequest.setDocumentFilter( mrepository.getRepositoryPolicy().getFilter() );
         }
-        
-        updateRequest.setResourceFetcher( new ResourceFetcher() 
+
+        updateRequest.setResourceFetcher( new ResourceFetcher()
         {
             Map<String, Object> ctx = new HashMap<String, Object>();
-            
-            public void connect(String id, String url) throws IOException 
+
+            public void connect( String id, String url )
+                throws IOException
             {
             }
-  
-            public void disconnect() throws IOException 
+
+            public void disconnect()
+                throws IOException
             {
             }
-  
+
             // TODO is there a better way to fetch a file at given location?
             public void retrieve( String name, File targetFile )
-                throws IOException 
+                throws IOException
             {
                 RepositoryItemUid uid = repository.createUid( //
                     "/.index/" + name );
-                
+
                 OutputStream fos = null;
                 InputStream is = null;
-  
-                try 
+
+                try
                 {
                     StorageFileItem item = retrieveItem( repository, ctx, uid );
-                    
+
                     is = item.getInputStream();
-                    
+
                     fos = new FileOutputStream( targetFile );
-                    
+
                     IOUtil.copy( is, fos, 8192 );
-                } 
-                catch ( IllegalOperationException ex ) 
+                }
+                catch ( IllegalOperationException ex )
                 {
                     throw new IOException( "Illegal operation retrieving " + name );
-                } 
-                catch ( ItemNotFoundException ex ) 
+                }
+                catch ( ItemNotFoundException ex )
                 {
                     throw new IOException( "Item not found " + name );
-                } 
+                }
                 finally
                 {
-                     IOUtil.close( is );
-                     IOUtil.close( fos );
+                    IOUtil.close( is );
+                    IOUtil.close( fos );
                 }
             }
         } );
-        
+
         Date contextTimestamp = indexUpdater.fetchAndUpdateIndex( updateRequest );
-        
+
         return contextTimestamp != null;
     }
 
@@ -1192,7 +1204,7 @@ public class DefaultIndexerManager
 
             if ( ai.context.endsWith( CTX_LOCAL_SUFIX ) )
             {
-                if ( RepositoryType.PROXY.equals( sourceRepository.getRepositoryType() ) )
+                if ( sourceRepository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
                 {
                     result = sourceRepository.getName() + " (Cache)";
                 }
@@ -1204,11 +1216,6 @@ public class DefaultIndexerManager
             else if ( ai.context.endsWith( CTX_REMOTE_SUFIX ) )
             {
                 result = sourceRepository.getName() + " (Remote)";
-            }
-            else if ( ai.context.endsWith( CTX_MERGED_SUFIX ) )
-            {
-                // TODO: this is not repo!
-                result = result + " (Merged)";
             }
 
         }
@@ -1243,17 +1250,12 @@ public class DefaultIndexerManager
         return repositoryId + CTX_REMOTE_SUFIX;
     }
 
-    protected String getMergedContextId( String groupId )
-    {
-        return groupId + CTX_MERGED_SUFIX;
-    }
-
     private StorageFileItem retrieveItem( Repository repository, Map<String, Object> ctx, RepositoryItemUid uid )
         throws StorageException,
             IllegalOperationException,
             ItemNotFoundException
     {
-        return (StorageFileItem) repository.retrieveItem( false, uid, ctx );
+        return (StorageFileItem) repository.retrieveItem( uid, ctx );
     }
 
 }

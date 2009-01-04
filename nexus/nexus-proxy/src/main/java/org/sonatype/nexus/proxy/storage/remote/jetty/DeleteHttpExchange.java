@@ -20,14 +20,14 @@ import org.mortbay.jetty.HttpMethods;
 import org.mortbay.jetty.HttpStatus;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 public class DeleteHttpExchange
     extends AbstractNexusExchange
 {
-    public DeleteHttpExchange( RepositoryItemUid uid )
+    public DeleteHttpExchange( ProxyRepository repository, String path )
     {
-        super( uid );
+        super( repository, path );
 
         setMethod( HttpMethods.DELETE );
     }

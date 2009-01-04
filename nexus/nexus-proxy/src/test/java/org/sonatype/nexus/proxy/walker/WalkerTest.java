@@ -55,38 +55,27 @@ public class WalkerTest
     {
 
         // fetch some content to have on walk on something
-        getRouter( "groups-m2" ).retrieveItem(
-            new ResourceStoreRequest( "/test/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
-        getRouter( "groups-m2" ).retrieveItem(
-            new ResourceStoreRequest( "/test/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
-        getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test/rome/rome/0.9/rome-0.9.pom", false ) );
-        getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test/repo3.txt", false ) );
+        getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/groups/test/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
+        getRootRouter().retrieveItem(
+            new ResourceStoreRequest( "/groups/test/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
+        getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test/rome/rome/0.9/rome-0.9.pom", false ) );
+        getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test/repo3.txt", false ) );
 
         TestWalkerProcessor wp = null;
         WalkerContext wc = null;
 
         wp = new TestWalkerProcessor();
-        wc = new DefaultWalkerContext( getRouter( "repositories" ) );
+        // this is a group
+        wc = new DefaultWalkerContext( getRepositoryRegistry().getRepository( "test" ) );
         wc.getProcessors().add( wp );
 
         walker.walk( wc );
-        assertEquals( 15, wp.collEnters );
-        assertEquals( 15, wp.collExits );
-        assertEquals( 15, wp.colls );
+        assertEquals( 10, wp.collEnters );
+        assertEquals( 10, wp.collExits );
+        assertEquals( 10, wp.colls );
         assertEquals( 4, wp.files );
         assertEquals( 0, wp.links );
-
-        wp = new TestWalkerProcessor();
-        wc = new DefaultWalkerContext( getRouter( "groups-m2" ) );
-        wc.getProcessors().add( wp );
-
-        walker.walk( wc );
-        assertEquals( 11, wp.collEnters );
-        assertEquals( 11, wp.collExits );
-        assertEquals( 11, wp.colls );
-        assertEquals( 4, wp.files );
-        assertEquals( 0, wp.links );
-
     }
 
     private class TestWalkerProcessor

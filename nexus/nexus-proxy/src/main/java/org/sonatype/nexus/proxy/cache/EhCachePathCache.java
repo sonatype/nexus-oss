@@ -31,7 +31,6 @@ import net.sf.ehcache.Statistics;
 public class EhCachePathCache
     extends AbstractPathCache
 {
-
     /** The ec. */
     private Ehcache ec;
 

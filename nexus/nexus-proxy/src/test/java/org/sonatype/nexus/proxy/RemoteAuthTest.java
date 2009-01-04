@@ -19,6 +19,7 @@ package org.sonatype.nexus.proxy;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
@@ -51,7 +52,7 @@ public class RemoteAuthTest
         dras2.setPassword( "cstamas123" );
         DefaultRemoteStorageContext ctx2 = new DefaultRemoteStorageContext( null );
         ctx2.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS, dras2 );
-        getRepositoryRegistry().getRepository( "repo2" ).setRemoteStorageContext( ctx2 );
+        getRepositoryRegistry().getRepositoryWithFacet( "repo2", ProxyRepository.class ).setRemoteStorageContext( ctx2 );
 
         item = getRepositoryRegistry().getRepository( "repo2" ).retrieveItem(
             new ResourceStoreRequest( "/repo2.txt", false ) );
@@ -63,7 +64,7 @@ public class RemoteAuthTest
         dras3.setPassword( "brian123" );
         DefaultRemoteStorageContext ctx3 = new DefaultRemoteStorageContext( null );
         ctx3.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS, dras3 );
-        getRepositoryRegistry().getRepository( "repo3" ).setRemoteStorageContext( ctx3 );
+        getRepositoryRegistry().getRepositoryWithFacet( "repo3", ProxyRepository.class ).setRemoteStorageContext( ctx3 );
 
         item = getRepositoryRegistry().getRepository( "repo3" ).retrieveItem(
             new ResourceStoreRequest( "/repo3.txt", false ) );

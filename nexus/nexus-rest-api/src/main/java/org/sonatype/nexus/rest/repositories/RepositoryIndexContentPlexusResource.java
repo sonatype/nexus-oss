@@ -22,8 +22,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.rest.AbstractIndexContentPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -57,23 +55,12 @@ public class RepositoryIndexContentPlexusResource
         try
         {
             String repositoryId = String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
-            Repository repository = getNexus().getRepository( repositoryId );
-            RepositoryType repositoryType = repository.getRepositoryType();
 
-            if ( RepositoryType.HOSTED.equals( repositoryType ) )
-            {
-                return indexerManager.getRepositoryLocalIndexContext( repositoryId );
-            }
-            else if ( RepositoryType.PROXY.equals( repositoryType ) )
-            {
-                return indexerManager.getRepositoryRemoteIndexContext( repositoryId );
-            }
+            return indexerManager.getRepositoryBestIndexContext( repositoryId );
         }
         catch ( NoSuchRepositoryException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e );
         }
-
-        throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
     }
 }

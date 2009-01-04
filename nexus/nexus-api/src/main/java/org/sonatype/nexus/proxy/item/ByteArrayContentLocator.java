@@ -23,13 +23,11 @@ import java.io.InputStream;
 public class ByteArrayContentLocator
     implements ContentLocator
 {
-
     private final byte[] content;
 
     public ByteArrayContentLocator( byte[] content )
     {
         this.content = content;
-        
     }
 
     public InputStream getContent()
@@ -43,4 +41,8 @@ public class ByteArrayContentLocator
         return true;
     }
 
+    public byte[] getByteArray()
+    {
+        return content;
+    }
 }

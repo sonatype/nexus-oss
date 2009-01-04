@@ -42,12 +42,10 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.scheduling.NexusTask;
@@ -76,18 +74,12 @@ public interface Nexus
     Repository getRepository( String repoId )
         throws NoSuchRepositoryException;
 
-    GroupRepository getRepositoryGroupXXX( String repoId )
-        throws NoSuchRepositoryGroupException;
-
-    List<Repository> getRepositoryGroup( String repoGroupId )
-        throws NoSuchRepositoryGroupException;
-
-    String getRepositoryGroupType( String repoGroupId )
-        throws NoSuchRepositoryGroupException;
+    <T> T getRepositoryWithFacet( String repoId, Class<T> f )
+        throws NoSuchRepositoryException;
 
     Collection<Repository> getRepositories();
 
-    Collection<GroupRepository> getGroupRepositories();
+    <T> Collection<T> getRepositoriesWithFacet( Class<T> f );
 
     StorageItem dereferenceLinkItem( StorageLinkItem item )
         throws NoSuchResourceStoreException,
@@ -130,7 +122,7 @@ public interface Nexus
         throws NoSuchRepositoryException;
 
     void clearRepositoryGroupCaches( String path, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException;
+        throws NoSuchRepositoryException;
 
     void reindexAllRepositories( String path )
         throws IOException;
@@ -140,7 +132,7 @@ public interface Nexus
             IOException;
 
     void reindexRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
+        throws NoSuchRepositoryException,
             IOException;
 
     void publishAllIndex()
@@ -152,7 +144,7 @@ public interface Nexus
 
     void publishRepositoryGroupIndex( String repositoryGroupId )
         throws IOException,
-            NoSuchRepositoryGroupException;
+            NoSuchRepositoryException;
 
     void rebuildAttributesAllRepositories( String path )
         throws IOException;
@@ -162,7 +154,7 @@ public interface Nexus
             IOException;
 
     void rebuildAttributesRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
+        throws NoSuchRepositoryException,
             IOException;
 
     void rebuildMavenMetadataAllRepositories( String path )
@@ -173,7 +165,7 @@ public interface Nexus
             IOException;
 
     void rebuildMavenMetadataRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
+        throws NoSuchRepositoryException,
             IOException;
 
     Collection<String> evictAllUnusedProxiedItems( long timestamp )
@@ -184,12 +176,11 @@ public interface Nexus
             IOException;
 
     Collection<String> evictRepositoryGroupUnusedProxiedItems( long timestamp, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
+        throws NoSuchRepositoryException,
             IOException;
 
     SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
         throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException,
             IllegalArgumentException;
 
     void synchronizeShadow( String shadowRepositoryId )
@@ -207,7 +198,7 @@ public interface Nexus
 
     SystemProcess systemProcessStarted( String action, String message );
 
-    void systemProcessFinished( SystemProcess prc );
+    void systemProcessFinished( SystemProcess prc, String finishMessage );
 
     void systemProcessBroken( SystemProcess prc, Throwable e );
 
@@ -232,7 +223,7 @@ public interface Nexus
     // Scheduler
     // ----------------------------------------------------------------------------
 
-    <T> void submit( String name, NexusTask<T> task )
+    <T> ScheduledTask<T> submit( String name, NexusTask<T> task )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -251,11 +242,8 @@ public interface Nexus
     ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException;
 
-    NexusTask<?> createTaskInstance( String taskType )
+    <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException;
-
-    // SchedulerTask<?> createTaskInstance( Class<?> taskType )
-    // throws IllegalArgumentException;
 
     // ----------------------------------------------------------------------------
     // Default Configuration
@@ -335,14 +323,15 @@ public interface Nexus
      * Remove the repository's storage folder
      */
     void removeRepositoryFolder( Repository repository );
-    
+
     /**
      * List the names of files in nexus-work/conf
      */
     Map<String, String> getConfigurationFiles();
-    
+
     /**
      * Get the content of configuration file based on the key
+     * 
      * @param key index in configuration file name list
      * @return
      * @throws IOException

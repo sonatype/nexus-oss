@@ -93,16 +93,6 @@ public interface NexusScheduler
      * @return
      * @throws IllegalArgumentException
      */
-    NexusTask<?> createTaskInstance( String taskType )
-        throws IllegalArgumentException;
-
-    /**
-     * A factory for tasks.
-     * 
-     * @param taskType
-     * @return
-     * @throws IllegalArgumentException
-     */
-    NexusTask<?> createTaskInstance( Class<?> taskType )
+    <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException;
 }

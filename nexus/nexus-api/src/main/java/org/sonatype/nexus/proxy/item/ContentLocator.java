@@ -20,15 +20,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * The Interface ContentLocator. Implements a strategy to fetch content of a file item.
+ * The Interface ContentLocator. Implements a strategy to fetch content of an item.
  * 
  * @author cstamas
  */
 public interface ContentLocator
 {
-
     /**
-     * Gets the content.
+     * Gets the content. It has to be closed by the caller explicitly.
      * 
      * @return the content
      * @throws IOException Signals that an I/O exception has occurred.
@@ -42,5 +41,4 @@ public interface ContentLocator
      * @return true, if is reusable
      */
     boolean isReusable();
-
 }

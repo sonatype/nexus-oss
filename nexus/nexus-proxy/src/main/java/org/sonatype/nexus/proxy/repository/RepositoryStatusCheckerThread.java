@@ -19,16 +19,16 @@ package org.sonatype.nexus.proxy.repository;
 public class RepositoryStatusCheckerThread
     extends Thread
 {
-    private final Repository repository;
+    private final ProxyRepository repository;
 
-    public RepositoryStatusCheckerThread( Repository repository )
+    public RepositoryStatusCheckerThread( ProxyRepository repository )
     {
         super();
 
         this.repository = repository;
     }
 
-    public Repository getRepository()
+    public ProxyRepository getRepository()
     {
         return repository;
     }
@@ -59,7 +59,7 @@ public class RepositoryStatusCheckerThread
                     // nothing
                 }
 
-                Thread.sleep( AbstractRepository.REMOTE_STATUS_RETAIN_TIME );
+                Thread.sleep( AbstractProxyRepository.REMOTE_STATUS_RETAIN_TIME );
             }
         }
         catch ( InterruptedException e )

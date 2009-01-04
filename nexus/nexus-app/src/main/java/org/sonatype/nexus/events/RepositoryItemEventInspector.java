@@ -165,7 +165,8 @@ public class RepositoryItemEventInspector
                         .getItemUid().getRepository().getLocalStorage().getClass() ) )
                     {
                         File file = ( (DefaultFSLocalRepositoryStorage) ievt.getRepository().getLocalStorage() )
-                            .getFileFromBase( ievt.getItemUid() );
+                            .getFileFromBase( ievt.getRepository(), ievt.getItem().getItemContext(), ievt
+                                .getItemUid().getPath() );
 
                         if ( file.exists() )
                         {

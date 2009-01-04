@@ -17,12 +17,12 @@
 package org.sonatype.nexus.proxy.maven.maven2;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryConfigurator;
+import org.sonatype.nexus.proxy.repository.DefaultGroupRepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.GroupRepositoryConfigurator;
 
 @Component( role = GroupRepositoryConfigurator.class, hint = "maven2" )
 public class M2GroupRepositoryConfigurator
-    extends AbstractGroupRepositoryConfigurator
+    extends DefaultGroupRepositoryConfigurator
 {
 
 

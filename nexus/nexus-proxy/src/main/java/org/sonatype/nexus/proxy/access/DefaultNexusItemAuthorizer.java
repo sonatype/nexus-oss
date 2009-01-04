@@ -29,7 +29,6 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.proxy.router.RootRepositoryRouter;
 import org.sonatype.nexus.proxy.target.TargetMatch;
 import org.sonatype.nexus.proxy.target.TargetSet;
 
@@ -44,7 +43,7 @@ public class DefaultNexusItemAuthorizer
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
-    @Requirement( role = RootRepositoryRouter.class )
+    @Requirement
     private RepositoryRouter root;
 
     public boolean authorizePath( RepositoryItemUid uid, Map<String, Object> context, Action action )

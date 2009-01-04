@@ -20,13 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.scheduling.ScheduledTask;
@@ -35,17 +32,19 @@ import org.sonatype.scheduling.TaskState;
 
 public abstract class AbstractNexusTask<T>
     extends AbstractLogEnabled
-    implements NexusTask<T>, Contextualizable
+    implements NexusTask<T>
 {
     public static final long A_DAY = 24L * 60L * 60L * 1000L;
 
+    @Requirement
     private PlexusContainer plexusContainer;
+
+    @Requirement
+    private Nexus nexus = null;
 
     private Map<String, String> parameters;
 
     private SystemProcess prc;
-
-    private Nexus nexus = null;
 
     // override if you have a task that needs to hide itself
     public boolean isExposed()
@@ -57,12 +56,6 @@ public abstract class AbstractNexusTask<T>
     public RepositoryTaskActivityDescriptor getTaskActivityDescriptor()
     {
         return null;
-    }
-
-    public void contextualize( Context ctx )
-        throws ContextException
-    {
-        this.plexusContainer = (PlexusContainer) ctx.get( PlexusConstants.PLEXUS_KEY );
     }
 
     protected Nexus getNexus()
@@ -142,7 +135,7 @@ public abstract class AbstractNexusTask<T>
         {
             result = doRun();
 
-            getNexus().systemProcessFinished( prc );
+            getNexus().systemProcessFinished( prc, getMessage() );
 
             afterRun();
 

@@ -20,6 +20,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
@@ -29,11 +30,11 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
-public class AbstractGroupRepositoryConfigurator
+@Component( role = GroupRepositoryConfigurator.class )
+public class DefaultGroupRepositoryConfigurator
     implements GroupRepositoryConfigurator
 {
-
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     public GroupRepository updateRepositoryFromModel( GroupRepository old, ApplicationConfiguration configuration,
         CRepositoryGroup group, LocalRepositoryStorage ls )
         throws InvalidConfigurationException
@@ -88,7 +89,7 @@ public class AbstractGroupRepositoryConfigurator
 
             throw new InvalidConfigurationException( response );
         }
-        
+
         repository.setMemberRepositories( new ArrayList<String>( group.getRepositories() ) );
 
         return repository;

@@ -27,12 +27,10 @@ import java.io.InputStream;
 public class PreparedContentLocator
     implements ContentLocator
 {
-
-    private InputStream content;
+    private final InputStream content;
 
     public PreparedContentLocator( InputStream content )
     {
-        super();
         this.content = content;
     }
 
@@ -46,5 +44,4 @@ public class PreparedContentLocator
     {
         return false;
     }
-
 }

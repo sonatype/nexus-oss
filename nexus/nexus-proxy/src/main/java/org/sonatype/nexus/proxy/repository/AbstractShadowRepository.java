@@ -18,13 +18,10 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.Map;
 
-import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -37,20 +34,23 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.proxy.utils.StoreFileWalker;
+import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
+import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerContext;
 
 /**
  * The Class ShadowRepository.
  * 
  * @author cstamas
  */
-public abstract class DefaultShadowRepository
-    extends DefaultRepository
-    implements ShadowRepository, EventListener
+public abstract class AbstractShadowRepository
+    extends AbstractRepository
+    implements ShadowRepository
 {
-
     /** The master repository. */
     private Repository masterRepository;
+
+    private RepositoryKind repositoryKind = new DefaultRepositoryKind( ShadowRepository.class, null );
 
     /**
      * Gets the master repository.
@@ -62,11 +62,11 @@ public abstract class DefaultShadowRepository
         return masterRepository;
     }
 
-    public RepositoryType getRepositoryType()
+    public RepositoryKind getRepositoryKind()
     {
-        return RepositoryType.SHADOW;
+        return repositoryKind;
     }
-
+    
     public abstract ContentClass getMasterRepositoryContentClass();
 
     /**
@@ -106,12 +106,12 @@ public abstract class DefaultShadowRepository
         {
             RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 
-            if ( ievt.getItemUid().getPath().endsWith( ".pom" ) || ievt.getItemUid().getPath().endsWith( ".jar" ) )
+            try
             {
-                try
-                {
-                    String shadowPath = transformMaster2Shadow( ievt.getItemUid().getPath() );
+                String shadowPath = transformMaster2Shadow( ievt.getItemUid().getPath() );
 
+                if ( shadowPath != null )
+                {
                     if ( ievt instanceof RepositoryItemEventStore || ievt instanceof RepositoryItemEventCache )
                     {
                         DefaultStorageLinkItem link = new DefaultStorageLinkItem( this, shadowPath, true, true, ievt
@@ -129,15 +129,15 @@ public abstract class DefaultShadowRepository
                         deleteItem( createUid( shadowPath ), ievt.getContext() );
                     }
                 }
-                catch ( Exception e )
-                {
-                    getLogger().warn( "Could not sync shadow repository because of exception", e );
-                }
+            }
+            catch ( Exception e )
+            {
+                getLogger().warn( "Could not sync shadow repository because of exception", e );
             }
         }
     }
 
-    protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
+    protected StorageItem doRetrieveItem( RepositoryItemUid uid, Map<String, Object> context )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
@@ -146,7 +146,7 @@ public abstract class DefaultShadowRepository
 
         try
         {
-            result = super.doRetrieveItem( localOnly, uid, context );
+            result = super.doRetrieveItem( uid, context );
 
             return result;
         }
@@ -163,7 +163,7 @@ public abstract class DefaultShadowRepository
             // delegate the call to the master
             RepositoryItemUid tuid = getMasterRepository().createUid( transformedPath );
 
-            return ( (AbstractRepository) getMasterRepository() ).doRetrieveItem( localOnly, tuid, context );
+            return ( (AbstractRepository) getMasterRepository() ).doRetrieveItem( tuid, context );
         }
     }
 
@@ -191,13 +191,17 @@ public abstract class DefaultShadowRepository
 
         clearCaches( RepositoryItemUid.PATH_ROOT );
 
-        SyncWalker sw = new SyncWalker( this, getMasterRepository(), getLogger() );
+        SyncWalker sw = new SyncWalker( this );
 
-        sw.walk( true, false );
+        DefaultWalkerContext ctx = new DefaultWalkerContext( getMasterRepository() );
+
+        ctx.getProcessors().add( sw );
+
+        getWalker().walk( ctx );
     }
 
     /**
-     * Gets the shadow path from master path.
+     * Gets the shadow path from master path. If path is not transformable, return null.
      * 
      * @param path the path
      * @return the shadow path
@@ -206,7 +210,7 @@ public abstract class DefaultShadowRepository
         throws ItemNotFoundException;
 
     /**
-     * Gets the master path from shadow path.
+     * Gets the master path from shadow path. If path is not transformable, return null.
      * 
      * @param path the path
      * @return the master path
@@ -215,36 +219,27 @@ public abstract class DefaultShadowRepository
         throws ItemNotFoundException;
 
     protected class SyncWalker
-        extends StoreFileWalker
+        extends AbstractFileWalkerProcessor
     {
-
         private Repository repository;
 
-        public SyncWalker( Repository repository, ResourceStore master, Logger logger )
+        public SyncWalker( Repository repository )
         {
-            super( master, logger );
-
             this.repository = repository;
         }
 
         @Override
-        protected void processFileItem( StorageFileItem item )
+        protected void processFileItem( WalkerContext ctx, StorageFileItem item )
+            throws Exception
         {
-            if ( item.getPath().endsWith( ".pom" ) || item.getPath().endsWith( ".jar" ) )
+            String tuid = transformMaster2Shadow( item.getRepositoryItemUid().getPath() );
+
+            if ( tuid != null )
             {
-                try
-                {
-                    String tuid = transformMaster2Shadow( item.getRepositoryItemUid().getPath() );
+                DefaultStorageLinkItem link = new DefaultStorageLinkItem( repository, tuid, true, true, item
+                    .getRepositoryItemUid() );
 
-                    DefaultStorageLinkItem link = new DefaultStorageLinkItem( repository, tuid, true, true, item
-                        .getRepositoryItemUid() );
-
-                    storeItem( link );
-                }
-                catch ( Exception e )
-                {
-                    getLogger().warn( "Could not sync shadow repository because of exception", e );
-                }
+                storeItem( link );
             }
         }
     };

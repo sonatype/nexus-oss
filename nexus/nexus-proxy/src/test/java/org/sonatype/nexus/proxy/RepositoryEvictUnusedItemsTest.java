@@ -54,13 +54,15 @@ public class RepositoryEvictUnusedItemsTest
 
         // now mangle the attributes of one of them
         AbstractStorageItem mangledItem = repo1.getLocalStorage().retrieveItem(
-            getRepositoryItemUidFactory().createUid( repo1, "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) );
+            repo1,
+            null,
+            "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
 
         // make it last requested before 3 days
         mangledItem.setLastRequested( System.currentTimeMillis() - ( 3 * DAY ) );
 
         // store the change
-        repo1.getLocalStorage().updateItemAttributes( mangledItem );
+        repo1.getLocalStorage().updateItemAttributes( repo1, null, mangledItem );
 
         // and evict all that are not "used" for 2 days
         Collection<String> evicted = repo1.evictUnusedItems( System.currentTimeMillis() - ( 2 * DAY ) );

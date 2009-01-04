@@ -31,43 +31,6 @@ import org.sonatype.nexus.proxy.target.TargetSet;
  */
 public interface ResourceStore
 {
-
-    /**
-     * Returns the ID of the resourceStore.
-     * 
-     * @return the id
-     */
-    String getId();
-
-    /**
-     * If is user managed, the nexus core and nexus core UI handles the store. Thus, for reposes, users are allowed to
-     * edit/drop the repository.
-     * 
-     * @return
-     */
-    boolean isUserManaged();
-
-    /**
-     * Sets is the store user managed.
-     * 
-     * @param val
-     */
-    void setUserManaged( boolean val );
-
-    /**
-     * Tells whether the resource store is exposed as Nexus content or not.
-     * 
-     * @return
-     */
-    boolean isExposed();
-
-    /**
-     * Sets the exposed flag.
-     * 
-     * @param val
-     */
-    void setExposed( boolean val );
-
     /**
      * Retrieves item from the path of the request.
      * 

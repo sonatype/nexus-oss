@@ -24,14 +24,13 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.NFCRepositoryResource;
 import org.sonatype.nexus.rest.model.NFCResource;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
 import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
 import org.sonatype.nexus.tasks.ClearCacheTask;
-import org.sonatype.nexus.tasks.descriptors.ClearCacheTaskDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -69,7 +68,9 @@ public class CachePlexusResource
             // check reposes
             if ( getRepositoryGroupId( request ) != null )
             {
-                for ( Repository repository : getNexus().getRepositoryGroup( getRepositoryGroupId( request ) ) )
+                for ( Repository repository : getNexus().getRepositoryWithFacet(
+                    getRepositoryGroupId( request ),
+                    GroupRepository.class ).getMemberRepositories() )
                 {
                     NFCRepositoryResource repoNfc = new NFCRepositoryResource();
 
@@ -103,17 +104,13 @@ public class CachePlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
         }
-        catch ( NoSuchRepositoryGroupException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
-        }
     }
 
     @Override
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        ClearCacheTask task = (ClearCacheTask) getNexus().createTaskInstance( ClearCacheTaskDescriptor.ID );
+        ClearCacheTask task = getNexus().createTaskInstance( ClearCacheTask.class );
 
         task.setRepositoryId( getRepositoryId( request ) );
 

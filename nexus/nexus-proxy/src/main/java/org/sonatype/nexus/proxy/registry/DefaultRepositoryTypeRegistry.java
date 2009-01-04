@@ -23,6 +23,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
 @Component( role = RepositoryTypeRegistry.class )
 public class DefaultRepositoryTypeRegistry
@@ -42,6 +43,18 @@ public class DefaultRepositoryTypeRegistry
         if ( existingRepositoryTypes.containsKey( repositoryType ) )
         {
             return existingRepositoryTypes.get( repositoryType ).getRepositoryContentClass();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public RepositoryKind getTypeRepositoryKind( String repositoryType )
+    {
+        if ( existingRepositoryTypes.containsKey( repositoryType ) )
+        {
+            return existingRepositoryTypes.get( repositoryType ).getRepositoryKind();
         }
         else
         {

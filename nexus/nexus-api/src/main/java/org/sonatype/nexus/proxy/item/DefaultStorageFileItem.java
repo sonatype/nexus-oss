@@ -33,44 +33,12 @@ public class DefaultStorageFileItem
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 3608889194663697395L;
 
-    /** The length. */
-    private long length;
-
-    /** The mime type. */
-    private String mimeType;
-
     /** The input stream. */
     private transient ContentLocator contentLocator;
 
-    /**
-     * Instantiates a new default storage file item.
-     * 
-     * @param repository the repository
-     * @param path the path
-     * @param canRead the can read
-     * @param canWrite the can write
-     */
-    public DefaultStorageFileItem( Repository repository, String path, boolean canRead, boolean canWrite )
-    {
-        super( repository, path, canRead, canWrite );
-        this.contentLocator = new RepositoryContentLocator( getRepositoryItemUid() );
-    }
+    private long length;
 
-    /**
-     * Instantiates a new default storage file item.
-     * 
-     * @param repository the repository
-     * @param path the path
-     * @param canRead the can read
-     * @param canWrite the can write
-     * @param inputStream the input stream
-     */
-    public DefaultStorageFileItem( Repository repository, String path, boolean canRead, boolean canWrite,
-        InputStream inputStream )
-    {
-        super( repository, path, canRead, canWrite );
-        this.contentLocator = new PreparedContentLocator( inputStream );
-    }
+    private String mimeType;
 
     /**
      * Instantiates a new default storage file item.
@@ -86,22 +54,6 @@ public class DefaultStorageFileItem
     {
         super( repository, path, canRead, canWrite );
         this.contentLocator = contentLocator;
-    }
-
-    /**
-     * Instantiates a new default storage file item.
-     * 
-     * @param RepositoryRouter router
-     * @param path the path
-     * @param canRead the can read
-     * @param canWrite the can write
-     * @param inputStream the input stream
-     */
-    public DefaultStorageFileItem( RepositoryRouter router, String path, boolean canRead, boolean canWrite,
-        InputStream inputStream )
-    {
-        super( router, path, canRead, canWrite );
-        this.contentLocator = new PreparedContentLocator( inputStream );
     }
 
     /**
@@ -125,11 +77,6 @@ public class DefaultStorageFileItem
         return length;
     }
 
-    /**
-     * Sets the length.
-     * 
-     * @param length the new length
-     */
     public void setLength( long length )
     {
         this.length = length;
@@ -140,11 +87,6 @@ public class DefaultStorageFileItem
         return mimeType;
     }
 
-    /**
-     * Sets the mime type.
-     * 
-     * @param mimeType the new mime type
-     */
     public void setMimeType( String mimeType )
     {
         this.mimeType = mimeType;
@@ -152,27 +94,13 @@ public class DefaultStorageFileItem
 
     public boolean isReusableStream()
     {
-        return contentLocator.isReusable();
+        return getContentLocator().isReusable();
     }
 
     public InputStream getInputStream()
         throws IOException
     {
-        if ( contentLocator != null )
-        {
-            return contentLocator.getContent();
-        }
-        else
-        {
-            if ( isVirtual() )
-            {
-                throw new UnsupportedOperationException( "This item is virtual, and does not have content!" );
-            }
-            else
-            {
-                throw new IllegalStateException( "This item is NOT virtual, but does not have content? (BUG)" );
-            }
-        }
+        return getContentLocator().getContent();
     }
 
     public void setContentLocator( ContentLocator locator )
@@ -180,12 +108,8 @@ public class DefaultStorageFileItem
         this.contentLocator = locator;
     }
 
-    public void overlay( StorageItem item )
-        throws IllegalArgumentException
+    public ContentLocator getContentLocator()
     {
-        super.overlay( item );
-        setLength( ( (StorageFileItem) item ).getLength() );
-        setMimeType( ( (StorageFileItem) item ).getMimeType() );
+        return this.contentLocator;
     }
-
 }

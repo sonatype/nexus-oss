@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
@@ -28,8 +29,11 @@ import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.LoggingComponent;
+import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -41,9 +45,7 @@ public abstract class AbstractRemoteRepositoryStorage
     extends LoggingComponent
     implements RemoteRepositoryStorage
 {
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private ApplicationStatusSource applicationStatusSource;
 
     /**
@@ -62,18 +64,18 @@ public abstract class AbstractRemoteRepositoryStorage
      * @param uid the uid
      * @return the absolute url from base
      */
-    public URL getAbsoluteUrlFromBase( RepositoryItemUid uid )
+    public URL getAbsoluteUrlFromBase( ProxyRepository repository, Map<String, Object> context, String path )
         throws StorageException
     {
-        StringBuffer urlStr = new StringBuffer( uid.getRepository().getRemoteUrl() );
+        StringBuffer urlStr = new StringBuffer( repository.getRemoteUrl() );
 
-        if ( uid.getPath().startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        if ( path.startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
-            urlStr.append( uid.getPath() );
+            urlStr.append( path );
         }
         else
         {
-            urlStr.append( RepositoryItemUid.PATH_SEPARATOR ).append( uid.getPath() );
+            urlStr.append( RepositoryItemUid.PATH_SEPARATOR ).append( path );
         }
 
         try
@@ -91,10 +93,10 @@ public abstract class AbstractRemoteRepositoryStorage
      * 
      * @param context
      */
-    protected abstract void updateContext( Repository repository, RemoteStorageContext context )
+    protected abstract void updateContext( ProxyRepository repository, RemoteStorageContext context )
         throws StorageException;
 
-    protected synchronized RemoteStorageContext getRemoteStorageContext( Repository repository )
+    protected synchronized RemoteStorageContext getRemoteStorageContext( ProxyRepository repository )
         throws StorageException
     {
         if ( repository.getRemoteStorageContext() != null )
@@ -134,16 +136,20 @@ public abstract class AbstractRemoteRepositoryStorage
         return repository.getRemoteStorageContext();
     }
 
-    public boolean isReachable( Repository repository, Map<String, Object> context )
-        throws StorageException
+    public boolean isReachable( ProxyRepository repository, Map<String, Object> context )
+        throws RemoteAuthenticationNeededException,
+            RemoteAccessException,
+            StorageException
     {
-        return containsItem( repository.createUid( RepositoryItemUid.PATH_ROOT ), context );
+        return containsItem( repository, context, RepositoryItemUid.PATH_ROOT );
     }
 
-    public boolean containsItem( RepositoryItemUid uid, Map<String, Object> context )
-        throws StorageException
+    public boolean containsItem( ProxyRepository repository, Map<String, Object> context, String path )
+        throws RemoteAuthenticationNeededException,
+            RemoteAccessException,
+            StorageException
     {
-        return containsItem( uid, 0, context );
+        return containsItem( 0, repository, context, path );
     }
 
     // helper methods

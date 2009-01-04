@@ -2,7 +2,8 @@ package org.sonatype.nexus.proxy.target;
 
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.utils.StoreWalkerFilter;
+import org.sonatype.nexus.proxy.walker.WalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerFilter;
 
 /**
  * A Walker filter that will walk only agains a Repository target. Ie. remove snapshots only from Maven target.
@@ -10,7 +11,7 @@ import org.sonatype.nexus.proxy.utils.StoreWalkerFilter;
  * @author cstamas
  */
 public class TargetStoreWalkerFilter
-    implements StoreWalkerFilter
+    implements WalkerFilter
 {
     private final Target target;
 
@@ -27,13 +28,13 @@ public class TargetStoreWalkerFilter
         this.target = target;
     }
 
-    public boolean shouldProcess( StorageItem item )
+    public boolean shouldProcess( WalkerContext context, StorageItem item )
     {
         return target.isPathContained( item.getRepositoryItemUid().getRepository().getRepositoryContentClass(), item
             .getPath() );
     }
 
-    public boolean shouldProcessRecursively( StorageCollectionItem coll )
+    public boolean shouldProcessRecursively( WalkerContext context, StorageCollectionItem coll )
     {
         // TODO: initial naive implementation. Later, we could evaluate target patterns: are those "slicing" the repo
         // (ie. forbids /a/b but allows /a and /a/b/c) or "cutting" (ie. allows only /a and nothing below). That would

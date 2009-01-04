@@ -49,6 +49,11 @@ public class SystemProcess
     private Date finished;
 
     /**
+     * Human message/descritpion.
+     */
+    private String finishedMessage;
+
+    /**
      * The error cause while running, if any.
      */
     private Throwable errorCause;
@@ -62,11 +67,13 @@ public class SystemProcess
         this.status = Status.STARTED;
     }
 
-    public void finished()
+    public void finished( String message )
     {
         this.finished = new Date();
 
         this.status = Status.FINISHED;
+
+        this.finishedMessage = message;
     }
 
     public void broken( Throwable e )
@@ -118,6 +125,11 @@ public class SystemProcess
     public Throwable getErrorCause()
     {
         return errorCause;
+    }
+
+    public String getFinishedMessage()
+    {
+        return finishedMessage;
     }
 
     public String getMessage()

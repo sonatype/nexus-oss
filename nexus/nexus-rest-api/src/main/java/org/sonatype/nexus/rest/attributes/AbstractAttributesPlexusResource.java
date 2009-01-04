@@ -22,7 +22,6 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
-import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 
 public abstract class AbstractAttributesPlexusResource
     extends AbstractRestorePlexusResource
@@ -38,8 +37,7 @@ public abstract class AbstractAttributesPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        RebuildAttributesTask task = (RebuildAttributesTask) getNexus().createTaskInstance(
-            RebuildAttributesTaskDescriptor.ID );
+        RebuildAttributesTask task = getNexus().createTaskInstance( RebuildAttributesTask.class );
 
         task.setRepositoryId( getRepositoryId( request ) );
 

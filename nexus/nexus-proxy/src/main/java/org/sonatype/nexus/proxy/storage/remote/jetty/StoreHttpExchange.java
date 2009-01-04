@@ -21,14 +21,15 @@ import org.mortbay.jetty.HttpStatus;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 public class StoreHttpExchange
     extends AbstractNexusExchange
 {
 
-    public StoreHttpExchange( StorageItem item )
+    public StoreHttpExchange( ProxyRepository repository, String path, StorageItem item )
     {
-        super( item.getRepositoryItemUid() );
+        super( repository, path );
 
         setMethod( HttpMethods.PUT );
     }

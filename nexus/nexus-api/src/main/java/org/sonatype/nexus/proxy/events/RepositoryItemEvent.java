@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The event fired in case of some content changes in Nexus related to an item/file.
@@ -32,9 +33,9 @@ public abstract class RepositoryItemEvent
     /** The item in question */
     private final StorageItem item;
 
-    public RepositoryItemEvent( final StorageItem item )
+    public RepositoryItemEvent( final Repository repository, final StorageItem item )
     {
-        super( item.getRepositoryItemUid().getRepository() );
+        super( repository );
 
         this.item = item;
     }

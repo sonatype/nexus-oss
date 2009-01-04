@@ -40,9 +40,19 @@ public interface GroupRepository
      * over resulting list.
      * 
      * @return a List<Repository>
-     * @throws StorageException 
+     * @throws StorageException
      */
     List<Repository> getMemberRepositories();
 
-    List<StorageItem> doRetrieveItems( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context ) throws StorageException;
+    /**
+     * Returns the list of available items in the group for same path. The resulting list keeps the order of reposes
+     * queried for path.
+     * 
+     * @param uid
+     * @param context
+     * @return
+     * @throws StorageException
+     */
+    List<StorageItem> doRetrieveItems( RepositoryItemUid uid, Map<String, Object> context )
+        throws StorageException;
 }

@@ -30,8 +30,8 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
@@ -86,13 +86,16 @@ public class RepositoryGroupPlexusResource
         {
             CRepositoryGroup group = getNexus().readRepositoryGroup( getGroupId( request ) );
 
+            GroupRepository groupRepo = getNexus()
+                .getRepositoryWithFacet( getGroupId( request ), GroupRepository.class );
+
             RepositoryGroupResource resource = new RepositoryGroupResource();
 
             resource.setId( group.getGroupId() );
 
             resource.setName( group.getName() );
 
-            resource.setFormat( getNexus().getRepositoryGroupType( group.getGroupId() ) );
+            resource.setFormat( groupRepo.getRepositoryContentClass().getId() );
 
             // just to trigger list creation, and not stay null coz of XStream serialization
             resource.getRepositories();
@@ -118,12 +121,6 @@ public class RepositoryGroupPlexusResource
             getLogger().warn( "Cannot find a repository declared within a group!", e );
 
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-        }
-        catch ( NoSuchRepositoryGroupException e )
-        {
-            getLogger().warn( "Repository group not found, id=" + getGroupId( request ) );
-
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Group Not Found" );
         }
         return result;
     }
@@ -159,7 +156,7 @@ public class RepositoryGroupPlexusResource
                     "Repository group id is empty! ",
                     getNexusErrorResponse( "repositories", "Repository group id can't be empty! " ) );
             }
-            
+
             try
             {
                 validateGroup( resource, request );
@@ -181,13 +178,6 @@ public class RepositoryGroupPlexusResource
             catch ( ConfigurationException e )
             {
                 handleConfigurationException( e );
-            }
-            catch ( NoSuchRepositoryGroupException e )
-            {
-                getLogger().warn( "Repository group not exists, GroupId=" + getGroupId( request ), e );
-
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository group not exists, GroupId="
-                    + getGroupId( request ) );
             }
             catch ( NoSuchRepositoryException e )
             {
@@ -227,7 +217,7 @@ public class RepositoryGroupPlexusResource
         {
             getNexus().deleteRepositoryGroup( getGroupId( request ) );
         }
-        catch ( NoSuchRepositoryGroupException e )
+        catch ( NoSuchRepositoryException e )
         {
             getLogger().warn( "Repository group not found, id=" + getGroupId( request ) );
 

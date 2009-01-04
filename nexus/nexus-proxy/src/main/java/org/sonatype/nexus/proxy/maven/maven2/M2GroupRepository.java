@@ -36,8 +36,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -45,12 +45,13 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.repository.AbstractGroupRepository;
+import org.sonatype.nexus.proxy.repository.DefaultGroupRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 @Component( role = GroupRepository.class, hint = "maven2", instantiationStrategy = "per-lookup" )
 public class M2GroupRepository
-    extends AbstractGroupRepository
+    extends DefaultGroupRepository
 {
 
     @Requirement( hint = "maven2" )
@@ -64,8 +65,8 @@ public class M2GroupRepository
     }
 
     @Override
-    protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
+    protected StorageItem doRetrieveItem( RepositoryItemUid uid, Map<String, Object> context )
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -74,20 +75,29 @@ public class M2GroupRepository
             // metadata checksum files are calculated and cached as side-effect
             // of doRetrieveMetadata.
 
-            return doRetriveMetadata( localOnly, uid, context );
+            try
+            {
+                return doRetrieveMetadata( uid, context );
+            }
+            catch ( UnsupportedStorageOperationException e )
+            {
+                throw new StorageException( e );
+            }
         }
 
-        return super.doRetrieveItem( localOnly, uid, context );
+        return super.doRetrieveItem( uid, context );
     }
 
     /**
      * Aggregates metadata from all member repositories
      */
-    private StorageItem doRetriveMetadata( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
+    private StorageItem doRetrieveMetadata( RepositoryItemUid uid, Map<String, Object> context )
         throws StorageException,
+            IllegalOperationException,
+            UnsupportedStorageOperationException,
             ItemNotFoundException
     {
-        List<StorageItem> listOfStorageItems = doRetrieveItems( localOnly, uid, context );
+        List<StorageItem> listOfStorageItems = doRetrieveItems( uid, context );
 
         if ( !mergeMetadata )
         {
@@ -189,14 +199,17 @@ public class M2GroupRepository
     }
 
     protected void storeDigest( RepositoryItemUid uid, MessageDigest digest, Map<String, Object> context )
-        throws IOException
+        throws IOException,
+            UnsupportedStorageOperationException,
+            IllegalOperationException
     {
+        byte[] bytes = ( new String( Hex.encodeHex( digest.digest() ) ) + "\n" ).getBytes();
 
-        byte[] bytes = (new String( Hex.encodeHex( digest.digest() ) ) + "\n").getBytes();
         RepositoryItemUid csuid = createUid( uid.getPath() + "." + digest.getAlgorithm().toLowerCase() );
-        
+
         AbstractStorageItem item = createStorageItem( csuid, bytes, context );
-        doCacheItem( item );
+
+        storeItem( item );
     }
 
     public boolean isMergeMetadata()

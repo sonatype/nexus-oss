@@ -14,31 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * Version 3 along with this program. If not, see http://www.gnu.org/licenses/.
  */
-package org.sonatype.nexus.proxy.router;
+package org.sonatype.nexus.proxy.maven;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 
-/**
- * The default grouping router, without any specific postprocessing.
- * 
- * @author cstamas
- */
-@Component( role = RepositoryRouter.class, hint = "groups" )
-public class DefaultGroupIdBasedRepositoryRouter
-    extends GroupIdBasedRepositoryRouter
+public interface MavenHostedRepository
+    extends MavenRepository, HostedRepository
 {
-    public static final String ID = "groups";
 
-    private ContentClass contentClass = new DefaultContentClass();
-
-    public String getId()
-    {
-        return ID;
-    }
-
-    public ContentClass getHandledContentClass()
-    {
-        return contentClass;
-    }
 }

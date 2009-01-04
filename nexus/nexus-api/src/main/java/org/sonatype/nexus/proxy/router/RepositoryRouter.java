@@ -16,19 +16,15 @@
  */
 package org.sonatype.nexus.proxy.router;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
-import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -43,12 +39,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public interface RepositoryRouter
     extends ResourceStore, EventListener
 {
-    /**
-     * The content class that is handled by this router.
-     * 
-     * @return
-     */
-    ContentClass getHandledContentClass();
+    boolean isFollowLinks();
+
+    void setFollowLinks( boolean follow );
 
     /**
      * Dereferences the link.
@@ -60,28 +53,9 @@ public interface RepositoryRouter
      * @throws RepositoryNotAvailableException
      * @throws StorageException
      */
-    StorageItem dereferenceLink( StorageLinkItem item )
-        throws NoSuchResourceStoreException,
-            AccessDeniedException,
+    StorageItem dereferenceLink( StorageLinkItem link )
+        throws AccessDeniedException,
             ItemNotFoundException,
             IllegalOperationException,
             StorageException;
-
-    /**
-     * Storing an item in router is simply "spoofing" all repo items beneath that path.
-     * 
-     * @param path
-     * @param is
-     */
-    void storeItem( String path, InputStream is )
-        throws IOException;
-
-    /**
-     * Deletes an item from the router. See storeItem(path, is)
-     * 
-     * @param path
-     * @throws IOException
-     */
-    void deleteItem( String path )
-        throws IOException;
 }

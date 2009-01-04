@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.tasks.descriptors.properties.RepositoryOrGroupPropertyDescriptor;
 import org.sonatype.scheduling.DefaultScheduledTask;
@@ -80,29 +81,37 @@ public abstract class AbstractNexusRepositoriesTask<T>
     protected boolean hasIntersectingTasksThatRuns( Map<String, List<ScheduledTask<?>>> activeTasks )
     {
         // get all activeTasks that runs and are descendants of AbstractNexusRepositoriesTask
-        for ( String taskCls : activeTasks.keySet() )
+        for ( String taskClz : activeTasks.keySet() )
         {
-            if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( this
-                .getNexus().createTaskInstance( taskCls ).getClass() ) )
+            try
             {
-                List<ScheduledTask<?>> tasks = activeTasks.get( taskCls );
+                Class<?> taskClazz = Class.forName( taskClz );
 
-                for ( ScheduledTask<?> task : tasks )
+                if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( taskClazz ) )
                 {
-                    // check against RUNNING intersection
-                    if ( TaskState.RUNNING.equals( task.getTaskState() )
-                        && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
-                        && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get(
-                            RepositoryOrGroupPropertyDescriptor.ID ) ) )
+                    List<ScheduledTask<?>> tasks = activeTasks.get( taskClz );
+
+                    for ( ScheduledTask<?> task : tasks )
                     {
-                        getLogger()
-                            .debug(
-                                "Task "
-                                    + task.getName()
-                                    + " is running and shares same repo or group, so this task will be rescheduled for a later time." );
-                        return true;
+                        // check against RUNNING intersection
+                        if ( TaskState.RUNNING.equals( task.getTaskState() )
+                            && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
+                            && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get(
+                                RepositoryOrGroupPropertyDescriptor.ID ) ) )
+                        {
+                            getLogger()
+                                .debug(
+                                    "Task "
+                                        + task.getName()
+                                        + " is running and shares same repo or group, so this task will be rescheduled for a later time." );
+                            return true;
+                        }
                     }
                 }
+            }
+            catch ( ClassNotFoundException e )
+            {
+                // ignore, cannot happen
             }
         }
 
@@ -146,7 +155,8 @@ public abstract class AbstractNexusRepositoriesTask<T>
             }
             else
             {
-                thisReposes.addAll( getNexus().getRepositoryGroup( getRepositoryGroupId() ) );
+                thisReposes.addAll( getNexus()
+                    .getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).getMemberRepositories() );
             }
 
             List<Repository> otherReposes = new ArrayList<Repository>();
@@ -157,7 +167,8 @@ public abstract class AbstractNexusRepositoriesTask<T>
             }
             else
             {
-                otherReposes.addAll( getNexus().getRepositoryGroup( otherRepositoryGroupId ) );
+                otherReposes.addAll( getNexus()
+                    .getRepositoryWithFacet( otherRepositoryGroupId, GroupRepository.class ).getMemberRepositories() );
             }
 
             HashSet<Repository> testSet = new HashSet<Repository>();

@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -48,16 +50,13 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * </tt>
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = RequestRepositoryMapper.class )
 public class PathBasedRequestRepositoryMapper
     extends LoggingComponent
     implements RequestRepositoryMapper, Initializable
 {
-
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
     /** The compiled flag. */
@@ -110,8 +109,8 @@ public class PathBasedRequestRepositoryMapper
                 reposList.clear();
 
                 getLogger().info(
-                    "The request path [" + uid.getPath() + "] is blocked by rule "
-                        + mapping.getPattern().toString() + " defined for group='" + mapping.getGroupId() + "'" );
+                    "The request path [" + uid.getPath() + "] is blocked by rule " + mapping.getPattern().toString()
+                        + " defined for group='" + mapping.getGroupId() + "'" );
 
                 return reposList;
             }
@@ -150,7 +149,7 @@ public class PathBasedRequestRepositoryMapper
             {
                 mapped = true;
 
-                for ( ResourceStore store : mapping.getResourceStores() )
+                for ( Repository store : mapping.getResourceStores() )
                 {
                     // but only if is user managed
                     if ( store.isUserManaged() )
@@ -176,8 +175,7 @@ public class PathBasedRequestRepositoryMapper
                 if ( reposList.size() == 0 )
                 {
                     getLogger().debug(
-                        "Mapping for path [" + uid.getPath()
-                            + "] excluded all storages from servicing the request." );
+                        "Mapping for path [" + uid.getPath() + "] excluded all storages from servicing the request." );
                 }
                 else
                 {
@@ -222,13 +220,13 @@ public class PathBasedRequestRepositoryMapper
 
         for ( CGroupsSettingPathMappingItem item : pathMappings )
         {
-            List<ResourceStore> reposes = null;
+            List<Repository> reposes = null;
 
             if ( !CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
             {
                 List<String> repoIds = item.getRepositories();
 
-                reposes = new ArrayList<ResourceStore>( repoIds.size() );
+                reposes = new ArrayList<Repository>( repoIds.size() );
 
                 for ( String repoId : repoIds )
                 {

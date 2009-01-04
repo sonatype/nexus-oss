@@ -14,30 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * Version 3 along with this program. If not, see http://www.gnu.org/licenses/.
  */
-package org.sonatype.nexus.proxy.router;
+package org.sonatype.nexus.proxy.maven;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
-@Component( role = RepositoryRouter.class, hint = "groups-m2" )
-public class TestM2GroupIdBasedRouter
-    extends GroupIdBasedRepositoryRouter
+public interface MavenProxyRepository
+    extends MavenRepository, ProxyRepository
 {
+    ChecksumPolicy getChecksumPolicy();
 
-    public static final String ID = "groups-m2";
+    void setChecksumPolicy( ChecksumPolicy checksumPolicy );
 
-    @Requirement( hint = "maven2" )
-    private ContentClass contentClass;
+    int getReleaseMaxAge();
 
-    public ContentClass getHandledContentClass()
-    {
-        return contentClass;
-    }
+    void setReleaseMaxAge( int releaseMaxAge );
 
-    public String getId()
-    {
-        return ID;
-    }
+    int getSnapshotMaxAge();
 
+    void setSnapshotMaxAge( int snapshotMaxAge );
+
+    int getMetadataMaxAge();
+
+    void setMetadataMaxAge( int metadataMaxAge );
 }

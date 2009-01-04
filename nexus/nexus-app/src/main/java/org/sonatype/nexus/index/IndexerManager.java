@@ -22,7 +22,6 @@ import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 
 public interface IndexerManager
 {
@@ -32,6 +31,8 @@ public interface IndexerManager
 
     void shutdown( boolean deleteFiles )
         throws IOException;
+
+    void resetConfiguration();
 
     void addRepositoryIndexContext( String repositoryId )
         throws IOException,
@@ -44,8 +45,6 @@ public interface IndexerManager
     void updateRepositoryIndexContext( String repositoryId )
         throws IOException,
             NoSuchRepositoryException;
-
-    void resetConfiguration();
 
     /**
      * Returns the local index (the true index for hosted ones, and the true cacheds index for proxy reposes). Every
@@ -79,17 +78,14 @@ public interface IndexerManager
     IndexingContext getRepositoryBestIndexContext( String repositoryId )
         throws NoSuchRepositoryException;
 
-    void addRepositoryGroupIndexContext( String repositoryGroupId )
-        throws IOException,
-            NoSuchRepositoryGroupException;
-
-    void removeRepositoryGroupIndexContext( String repositoryGroupId, boolean deleteFiles )
-        throws IOException,
-            NoSuchRepositoryGroupException;
-
-    IndexingContext getRepositoryGroupContext( String repositoryGroupId )
-        throws NoSuchRepositoryGroupException;
-
+    /**
+     * Flags an indexing context should be searched in global searches or not.
+     * 
+     * @param repositoryId
+     * @param searchable
+     * @throws IOException
+     * @throws NoSuchRepositoryException
+     */
     void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
         throws IOException,
             NoSuchRepositoryException;
@@ -113,7 +109,7 @@ public interface IndexerManager
 
     void publishRepositoryGroupIndex( String repositoryGroupId )
         throws IOException,
-            NoSuchRepositoryGroupException;
+            NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------
     // Reindexing related
@@ -127,7 +123,7 @@ public interface IndexerManager
             IOException;
 
     void reindexRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
+        throws NoSuchRepositoryException,
             IOException;
 
     // ----------------------------------------------------------------------------

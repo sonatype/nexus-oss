@@ -29,7 +29,6 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
 import org.sonatype.nexus.tasks.EmptyTrashTask;
-import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -90,7 +89,7 @@ public class WastebasketPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        EmptyTrashTask task = (EmptyTrashTask) getNexus().createTaskInstance( EmptyTrashTaskDescriptor.ID );
+        EmptyTrashTask task = getNexus().createTaskInstance( EmptyTrashTask.class );
 
         getNexus().submit( "Internal", task );
 
