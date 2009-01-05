@@ -67,7 +67,7 @@ public class ReindexTest
 
         if ( shouldBePresent )
         {
-            assertNotNull( "Should find it!", ai );
+            assertNotNull( "Should find " + gid + ":" + aid + ":" + version, ai );
 
             assertEquals( gid, ai.groupId );
             assertEquals( aid, ai.artifactId );
@@ -75,7 +75,7 @@ public class ReindexTest
         }
         else
         {
-            assertNull( "Should not find it!", ai );
+            assertNull( "Should not find " + gid + ":" + aid + ":" + version, ai );
         }
     }
 
