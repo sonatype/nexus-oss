@@ -128,9 +128,8 @@
 		<profile>
 			<id>test-harness</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
 				<property>
-					<name>test-harness</name>
+					<name>!skip-test-harness</name>
 				</property>
 			</activation>
 			<modules>
