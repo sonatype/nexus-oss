@@ -35,6 +35,6 @@ public class AffirmativeStoreWalkerFilter
 
     public boolean shouldProcessRecursively( WalkerContext ctx, StorageCollectionItem coll )
     {
-        return !coll.getName().startsWith( "." );
+        return true;
     }
 }
