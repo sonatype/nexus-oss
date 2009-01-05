@@ -74,8 +74,8 @@ public class IndexTreeViewTest
         int leafsFound = prettyPrint( debug, root, 0 );
 
         assertEquals( "The group name should be here", "/", root.getNodeName() );
-        assertEquals( 8, root.getChildren().size() );
-        assertEquals( 28, leafsFound );
+        assertEquals( 10, root.getChildren().size() );
+        assertEquals( 30, leafsFound );
     }
 
     public void testPathIsAboveRealGroup()

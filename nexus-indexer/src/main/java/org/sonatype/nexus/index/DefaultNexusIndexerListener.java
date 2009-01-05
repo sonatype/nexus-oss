@@ -45,7 +45,7 @@ class DefaultNexusIndexerListener implements
     private final Set<String> allGroups = new HashSet<String>();
     private final Set<String> groups = new HashSet<String>();
     
-    private final List<IOException> exceptions = new ArrayList<IOException>();
+    private final List<Exception> exceptions = new ArrayList<Exception>();
     
     private int count = 0;
     
@@ -100,6 +100,11 @@ class DefaultNexusIndexerListener implements
         {
             indexer.artifactDiscovered( ac, context );
             
+            for ( Exception e : ac.getErrors() )
+            {
+                artifactError( ac, e );
+            }
+            
             groups.add( AbstractIndexCreator.getRootGroup( ac.getArtifactInfo().groupId ) );
             allGroups.add( ac.getArtifactInfo().groupId );
             
@@ -107,17 +112,12 @@ class DefaultNexusIndexerListener implements
             
             if ( listener != null )
             {
-              listener.artifactDiscovered( ac );
+                listener.artifactDiscovered( ac );
             }
         }
         catch ( IOException ex )
         {
-            exceptions.add( ex );
-            
-            if ( listener != null )
-            {
-                listener.artifactError( ac, ex );
-            }
+            artifactError( ac, ex );
         }
     }
     
@@ -125,7 +125,7 @@ class DefaultNexusIndexerListener implements
     {
         result.setTotalFiles( count );
         
-        for ( IOException ex : exceptions ) 
+        for ( Exception ex : exceptions ) 
         {
             result.addException( ex );
         }
@@ -170,6 +170,8 @@ class DefaultNexusIndexerListener implements
   
     public void artifactError( ArtifactContext ac, Exception e )
     {
+        exceptions.add( e );
+        
         if ( listener != null )
         {
             listener.artifactError( ac, e );

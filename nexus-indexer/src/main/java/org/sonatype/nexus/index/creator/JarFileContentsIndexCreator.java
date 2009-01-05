@@ -74,8 +74,6 @@ public class JarFileContentsIndexCreator
     private void updateArtifactInfo( ArtifactInfo ai, File f )
         throws IOException
     {
-        int totalClasses = 0;
-
         ZipFile jar = null;
 
         try
@@ -94,8 +92,6 @@ public class JarFileContentsIndexCreator
 
                 if ( name.endsWith( ".class" ) )
                 {
-                    totalClasses++;
-
                     // TODO verify if class is public or protected
                     // TODO skip all inner classes for now
 
@@ -114,7 +110,7 @@ public class JarFileContentsIndexCreator
                 }
             }
 
-            ai.classNames = sb.toString(); 
+            ai.classNames = sb.toString();
         }
         finally
         {

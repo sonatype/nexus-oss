@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
@@ -99,4 +100,40 @@ public class Index20081108RegressionTest
             assertEquals( "zip", ai.fextension );
         }
     }
+    
+    @Override
+    public void testRootGroups()
+        throws Exception
+    {
+        Set<String> rootGroups = nexusIndexer.getRootGroups( context );
+        assertEquals( rootGroups.toString(), 8, rootGroups.size() );
+      
+        assertGroup( 2, "qdox", context );
+      
+        assertGroup( 1, "proptest", context );
+        
+        assertGroup( 1, "junit", context );
+      
+        assertGroup( 6, "commons-logging", context );
+      
+        assertGroup( 1, "regexp", context );
+      
+        assertGroup( 1, "commons-cli", context );
+      
+        assertGroup( 15, "org", context );
+      
+        assertGroup( 6, "org.slf4j", context );
+      
+        assertGroup( 3, "org.testng", context );
+      
+        assertGroup( 3, "org.apache", context );
+      
+        assertGroup( 1, "org.apache.directory", context );
+        assertGroup( 1, "org.apache.directory.server", context );
+      
+        assertGroup( 1, "org.apache.maven", context );
+        assertGroup( 1, "org.apache.maven.plugins", context );
+        assertGroup( 0, "org.apache.maven.plugins.maven-core-it-plugin", context );
+    }
+
 }

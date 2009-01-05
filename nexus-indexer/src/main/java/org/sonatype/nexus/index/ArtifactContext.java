@@ -14,6 +14,8 @@
 package org.sonatype.nexus.index;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.sonatype.nexus.artifact.Gav;
 
@@ -25,15 +27,17 @@ import org.sonatype.nexus.artifact.Gav;
  */
 public class ArtifactContext
 {
-    private File pom;
+    private final File pom;
 
-    private File artifact;
+    private final File artifact;
 
-    private File metadata;
+    private final File metadata;
 
-    private ArtifactInfo artifactInfo;
+    private final ArtifactInfo artifactInfo;
 
-    private Gav gav;
+    private final Gav gav;
+
+    private final List<Exception> errors = new ArrayList<Exception>();
 
     public ArtifactContext( File pom, File artifact, File metadata, ArtifactInfo artifactInfo, Gav gav )
     {
@@ -69,8 +73,13 @@ public class ArtifactContext
         return gav;
     }
 
-    public void setGav( Gav gav )
+    public List<Exception> getErrors() 
     {
-        this.gav = gav;
+        return errors;
+    }
+    
+    public void addError(Exception e) 
+    {
+        errors.add( e );
     }
 }

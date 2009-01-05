@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.FilteredQuery;
@@ -288,5 +289,44 @@ public class DefaultIndexNexusIndexerTest
         assertEquals(response.getResults().toString(), 4, response.getTotalHits());
     }
     
+    public void testBrokenJar() throws Exception 
+    {
+        Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "brokenjar" );
+  
+        FlatSearchRequest searchRequest = new FlatSearchRequest( q );
+        
+        FlatSearchResponse response = nexusIndexer.searchFlat( searchRequest );
+        
+        Set<ArtifactInfo> r = response.getResults();
+  
+        assertEquals( r.toString(), 1, r.size() );
+        
+        ArtifactInfo ai = r.iterator().next();
+  
+        assertEquals( "brokenjar", ai.groupId );
+        assertEquals( "brokenjar", ai.artifactId );
+        assertEquals( "1.0", ai.version );
+        assertEquals( null, ai.classNames );
+    }
 
+    public void testMissingPom() throws Exception 
+    {
+        Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "missingpom" );
+        
+        FlatSearchRequest searchRequest = new FlatSearchRequest( q );
+        
+        FlatSearchResponse response = nexusIndexer.searchFlat( searchRequest );
+        
+        Set<ArtifactInfo> r = response.getResults();
+  
+        assertEquals( r.toString(), 1, r.size() );
+        
+        ArtifactInfo ai = r.iterator().next();
+  
+        assertEquals( "missingpom", ai.groupId );
+        assertEquals( "missingpom", ai.artifactId );
+        assertEquals( "1.0", ai.version );
+        assertNotNull( ai.classNames );
+    }
+    
 }

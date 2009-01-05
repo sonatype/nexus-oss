@@ -111,7 +111,6 @@ public class DefaultIndexerEngine
     }
 
     private Document createDocument( IndexingContext context, ArtifactContext ac )
-        throws IOException
     {
         ArtifactInfo ai = ac.getArtifactInfo();
 
@@ -132,7 +131,14 @@ public class DefaultIndexerEngine
 
         for ( IndexCreator indexCreator : context.getIndexCreators() )
         {
-            indexCreator.populateArtifactInfo( indexingContext );
+            try 
+            {
+                indexCreator.populateArtifactInfo( indexingContext );
+            } 
+            catch ( IOException ex ) 
+            {
+                ac.addError( ex );
+            }
         }
 
         // need a second pass in case index creators updated document attributes
