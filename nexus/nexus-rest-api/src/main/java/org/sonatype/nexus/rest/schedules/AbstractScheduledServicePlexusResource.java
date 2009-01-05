@@ -312,7 +312,7 @@ public abstract class AbstractScheduledServicePlexusResource
 
         try
         {
-            Class<?> taskClass = getClass().forName( serviceType );
+            Class<?> taskClass = Class.forName( serviceType );
 
             NexusTask<?> task = (NexusTask<?>) getNexus().createTaskInstance( taskClass );
 
