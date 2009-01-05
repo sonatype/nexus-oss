@@ -405,6 +405,13 @@ public class DefaultSecurityConfigurationValidator
                 + "' requires a name.", "Name is required." );
             response.addValidationError( message );
         }
+        
+        if ( !role.getId().matches( "\\S*" ) )
+        {
+            ValidationMessage message = new ValidationMessage( "id", "Whitespace is not allowed in Role ID '" + role.getId()
+                + ".", "Whitespace is not allowed." );
+            response.addValidationError( message );
+        }
 
         if ( 1 > role.getSessionTimeout() )
         {

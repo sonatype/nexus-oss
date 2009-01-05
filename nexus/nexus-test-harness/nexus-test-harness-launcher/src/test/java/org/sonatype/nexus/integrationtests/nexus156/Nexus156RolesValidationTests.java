@@ -86,6 +86,27 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
     }
     
     @Test
+    public void roleWithSpaceInId()
+        throws IOException
+    {
+        RoleResource resource = new RoleResource();
+
+        resource.setId( "role With Space In Id" );
+        resource.setDescription( "roleWithSpaceInId" );
+        resource.setName( "roleWithSpaceInId" );
+        resource.setSessionTimeout( 30 );
+        resource.addPrivilege( "1" );
+
+        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+
+        if ( response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Response: "+ response.getEntity().getText() +"Role should not have been created: " + response.getStatus() );
+        }
+        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    }
+    
+    @Test
     public void duplicateIdTest()
         throws IOException
     {

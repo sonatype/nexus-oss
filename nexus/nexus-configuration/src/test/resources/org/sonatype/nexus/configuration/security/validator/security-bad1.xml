@@ -22,6 +22,14 @@
 	      <privilege>1</privilege>
 	    </privileges>
 	  </role>
+	  <role>
+	    <id>space in id</id> <!-- Space In name -->
+	    <name>space in id</name>
+	    <sessionTimeout>50</sessionTimeout>
+	    <privileges>
+	      <privilege>1</privilege>
+	    </privileges>
+	  </role>
 	</roles>
 	<users>		
 	    <!-- no id -->
