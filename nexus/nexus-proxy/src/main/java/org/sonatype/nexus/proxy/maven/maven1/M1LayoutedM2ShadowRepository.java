@@ -35,47 +35,35 @@ public class M1LayoutedM2ShadowRepository
     extends LayoutConverterShadowRepository
 {
     /**
-     * The ContentClass.
-     */
-    @Requirement( hint = "maven1" )
-    private ContentClass contentClass;
-
-    /**
-     * The ContentClass.
-     */
-    @Requirement( hint = "maven2" )
-    private ContentClass masterContentClass;
-
-    /**
      * The artifact packaging mapper.
      */
     @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
 
-    /**
-     * This repo provides Maven1 content.
-     */
-    public ContentClass getRepositoryContentClass()
-    {
-        return contentClass;
-    }
+    @Requirement( hint = "maven1" )
+    private ContentClass contentClass;
+
+    @Requirement( hint = "maven2" )
+    private ContentClass masterContentClass;
 
     public GavCalculator getGavCalculator()
     {
         return getM1GavCalculator();
     }
 
-    public ArtifactPackagingMapper getArtifactPackagingMapper()
+    public ContentClass getRepositoryContentClass()
     {
-        return artifactPackagingMapper;
+        return contentClass;
     }
 
-    /**
-     * This repo needs Maven2 content master.
-     */
     public ContentClass getMasterRepositoryContentClass()
     {
         return masterContentClass;
+    }
+
+    public ArtifactPackagingMapper getArtifactPackagingMapper()
+    {
+        return artifactPackagingMapper;
     }
 
     protected String transformMaster2Shadow( String path )

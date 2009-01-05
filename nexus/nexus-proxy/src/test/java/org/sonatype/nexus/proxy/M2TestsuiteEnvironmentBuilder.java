@@ -28,7 +28,6 @@ import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
-import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
@@ -94,6 +93,7 @@ public class M2TestsuiteEnvironmentBuilder
 
         // ading one hosted only
         M2Repository repo = (M2Repository) container.lookup( Repository.class, "maven2" );
+
         // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
         repo.setId( "inhouse" );
         repo.setLocalUrl( env
@@ -106,6 +106,7 @@ public class M2TestsuiteEnvironmentBuilder
 
         // add a hosted snapshot repo
         M2Repository repoSnapshot = (M2Repository) container.lookup( Repository.class, "maven2" );
+
         repoSnapshot.setId( "inhouse-snapshot" );
         repoSnapshot.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
         repoSnapshot.setLocalUrl( env.getApplicationConfiguration().getWorkingDirectory(
@@ -123,8 +124,6 @@ public class M2TestsuiteEnvironmentBuilder
             .toString() );
 
         group.setLocalStorage( env.getLocalRepositoryStorage() );
-
-        group.setRepositoryContentClass( new Maven2ContentClass() );
 
         group.setMemberRepositories( reposes );
 

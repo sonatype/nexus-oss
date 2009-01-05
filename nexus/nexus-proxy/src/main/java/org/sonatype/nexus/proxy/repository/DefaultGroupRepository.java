@@ -16,29 +16,13 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.proxy.registry.ContentClass;
-
 /**
  * Default group repository implementation.
  */
-@Component( role = GroupRepository.class, instantiationStrategy = "per-lookup", description = "Default group repository" )
-public class DefaultGroupRepository
+public abstract class DefaultGroupRepository
     extends AbstractGroupRepository
 {
-    private ContentClass contentClass;
-
     private RepositoryKind repositoryKind = new DefaultRepositoryKind( GroupRepository.class, null );
-
-    public ContentClass getRepositoryContentClass()
-    {
-        return contentClass;
-    }
-
-    public void setRepositoryContentClass( ContentClass contentClass )
-    {
-        this.contentClass = contentClass;
-    }
 
     public RepositoryKind getRepositoryKind()
     {

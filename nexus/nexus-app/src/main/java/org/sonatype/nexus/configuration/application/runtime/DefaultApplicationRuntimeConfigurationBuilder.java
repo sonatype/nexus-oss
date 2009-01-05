@@ -138,6 +138,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
         throws InvalidConfigurationException
     {
         ShadowRepository shadowRepository = createRepository( ShadowRepository.class, shadow.getType() );
+
         return updateRepositoryFromModel( shadowRepository, configuration, shadow );
     }
 
@@ -187,7 +188,13 @@ public class DefaultApplicationRuntimeConfigurationBuilder
     public GroupRepository createRepositoryFromModel( Configuration configuration, CRepositoryGroup group )
         throws InvalidConfigurationException
     {
+        if ( group.getType() == null )
+        {
+            group.setType( DEFAULT_GROUPREPOSITORY_TYPE );
+        }
+
         GroupRepository groupRepository = createRepository( GroupRepository.class, group.getType() );
+
         return updateRepositoryFromModel( groupRepository, configuration, group );
     }
 
@@ -198,11 +205,6 @@ public class DefaultApplicationRuntimeConfigurationBuilder
         GroupRepository repository = null;
 
         String type = group.getType();
-
-        if ( type == null )
-        {
-            type = DEFAULT_GROUPREPOSITORY_TYPE;
-        }
 
         try
         {

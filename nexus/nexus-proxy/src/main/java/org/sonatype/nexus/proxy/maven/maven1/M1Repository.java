@@ -40,21 +40,18 @@ public class M1Repository
     extends AbstractMavenRepository
 {
     /**
-     * The ContentClass.
-     */
-	@Requirement( hint="maven1" )
-    private ContentClass contentClass;
-
-    /**
      * The GAV Calculator.
      */
-	@Requirement( hint="maven1" )
+    @Requirement( hint = "maven1" )
     private GavCalculator gavCalculator;
+
+    @Requirement( hint = "maven1" )
+    private ContentClass contentClass;
 
     /**
      * The artifact packaging mapper.
      */
-	@Requirement
+    @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
 
     public ContentClass getRepositoryContentClass()

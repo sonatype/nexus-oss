@@ -53,7 +53,6 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 public class M2GroupRepository
     extends DefaultGroupRepository
 {
-
     @Requirement( hint = "maven2" )
     private ContentClass contentClass;
 

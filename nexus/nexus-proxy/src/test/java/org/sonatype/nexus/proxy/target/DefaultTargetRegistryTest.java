@@ -7,6 +7,8 @@ import static org.easymock.EasyMock.replay;
 import java.util.Arrays;
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
+import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -24,9 +26,9 @@ public class DefaultTargetRegistryTest
     {
         super.setUp();
 
-        maven1 = (ContentClass) lookup( ContentClass.class, "maven1" );
+        maven1 = new Maven1ContentClass();
 
-        maven2 = (ContentClass) lookup( ContentClass.class, "maven2" );
+        maven2 = new Maven2ContentClass();
 
         targetRegistry = (TargetRegistry) lookup( TargetRegistry.class );
 

@@ -14,28 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * Version 3 along with this program. If not, see http://www.gnu.org/licenses/.
  */
-package org.sonatype.nexus.proxy.maven.maven2;
+package org.sonatype.nexus.proxy.maven.maven1;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.proxy.repository.AbstractShadowRepositoryConfigurator;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.proxy.repository.ShadowRepositoryConfigurator;
+import org.sonatype.nexus.proxy.repository.DefaultGroupRepositoryConfigurator;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.GroupRepositoryConfigurator;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
-@Component( role = ShadowRepositoryConfigurator.class, hint = "m1-m2-shadow" )
-public class M2LayoutedM1ShadowRepositoryConfigurator
-    extends AbstractShadowRepositoryConfigurator
+@Component( role = GroupRepositoryConfigurator.class, hint = "maven1" )
+public class M1GroupRepositoryConfigurator
+    extends DefaultGroupRepositoryConfigurator
 {
-    @Override
-    public ShadowRepository updateRepositoryFromModel( ShadowRepository old, ApplicationConfiguration configuration,
-        CRepositoryShadow repo, RemoteStorageContext rsc, LocalRepositoryStorage ls, Repository masterRepository )
+    public GroupRepository updateRepositoryFromModel( GroupRepository old, ApplicationConfiguration configuration,
+        CRepositoryGroup group, LocalRepositoryStorage ls )
         throws InvalidConfigurationException
     {
-        return super.updateRepositoryFromModel( old, configuration, repo, rsc, ls, masterRepository );
+        return super.updateRepositoryFromModel( old, configuration, group, ls );
     }
+
 }

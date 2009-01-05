@@ -53,6 +53,7 @@ public class M1LayoutedM2ShadowRepositoryTest
             M1LayoutedM2ShadowRepository shadow = (M1LayoutedM2ShadowRepository) getContainer().lookup(
                 ShadowRepository.class,
                 "m2-m1-shadow" );
+
             // shadow.enableLogging( getLogger().getChildLogger( "SHADOW " + master.getId() ) );
             shadow.setMasterRepository( master );
             shadow.setId( master.getId() + "-m1" );

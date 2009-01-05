@@ -33,10 +33,9 @@ import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.DefaultRepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.registry.DefaultContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.DefaultGroupRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -152,9 +151,8 @@ public class PathBasedRequestRepositoryMapperTest
         testgroup.add( repoE.getId() );
         testgroup.add( repoF.getId() );
 
-        DefaultGroupRepository groupRepo = (DefaultGroupRepository) getContainer().lookup( GroupRepository.class );
+        M2GroupRepository groupRepo = (M2GroupRepository) getContainer().lookup( GroupRepository.class, "maven2" );
         groupRepo.setId( "test" );
-        groupRepo.setRepositoryContentClass( new DefaultContentClass( "any" ) );
         groupRepo.setMemberRepositories( testgroup );
         registry.addRepository( groupRepo );
 

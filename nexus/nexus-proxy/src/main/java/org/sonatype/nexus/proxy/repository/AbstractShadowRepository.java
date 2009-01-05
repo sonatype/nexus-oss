@@ -32,7 +32,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
-import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
@@ -66,8 +65,6 @@ public abstract class AbstractShadowRepository
     {
         return repositoryKind;
     }
-    
-    public abstract ContentClass getMasterRepositoryContentClass();
 
     /**
      * Sets the master repository.

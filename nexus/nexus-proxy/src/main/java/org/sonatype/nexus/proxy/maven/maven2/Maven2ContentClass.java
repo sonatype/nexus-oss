@@ -25,7 +25,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  * 
  * @author cstamas
  */
-@Component( role = ContentClass.class, hint = "maven2", description = "Maven 2" )
+@Component( role = ContentClass.class, hint = "maven2" )
 public class Maven2ContentClass
     extends AbstractIdContentClass
 {

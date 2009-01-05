@@ -27,8 +27,8 @@ import org.easymock.EasyMock;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.repository.DefaultGroupRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -104,9 +104,8 @@ public class DefaultRepositoryRegistryTest
         gl.add( "B" );
         gl.add( "C" );
 
-        DefaultGroupRepository groupRepository = (DefaultGroupRepository) getContainer().lookup( GroupRepository.class );
+        M2GroupRepository groupRepository = (M2GroupRepository) getContainer().lookup( GroupRepository.class, "maven2" );
         groupRepository.setId( "ALL" );
-        groupRepository.setRepositoryContentClass( new DefaultContentClass( "any" ) );
         groupRepository.setMemberRepositories( gl );
         repositoryRegistry.addRepository( groupRepository );
 

@@ -59,12 +59,6 @@ public class M2Repository
     extends AbstractMavenRepository
 {
     /**
-     * The ContentClass.
-     */
-    @Requirement( hint = "maven2" )
-    private ContentClass contentClass;
-
-    /**
      * The GAV Calculator.
      */
     @Requirement( hint = "maven2" )
@@ -75,6 +69,9 @@ public class M2Repository
      */
     @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
+
+    @Requirement( hint = "maven2" )
+    private ContentClass contentClass;
 
     public ContentClass getRepositoryContentClass()
     {

@@ -26,9 +26,8 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.jettytestsuite.WebappContext;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven1.M1GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
-import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
-import org.sonatype.nexus.proxy.repository.DefaultGroupRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
@@ -57,8 +56,8 @@ public class M1TestsuiteEnvironmentBuilder
         List<String> reposes = new ArrayList<String>();
         for ( WebappContext remoteRepo : getServletServer().getWebappContexts() )
         {
-
             M1Repository repo = (M1Repository) container.lookup( Repository.class, "maven1" );
+
             // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
             repo.setId( remoteRepo.getName() );
             repo.setRemoteUrl( getServletServer().getUrl( remoteRepo.getName() ) );
@@ -102,7 +101,7 @@ public class M1TestsuiteEnvironmentBuilder
         reposes.add( repo.getId() );
         env.getRepositoryRegistry().addRepository( repo );
 
-        DefaultGroupRepository group = (DefaultGroupRepository) container.lookup( GroupRepository.class );
+        M1GroupRepository group = (M1GroupRepository) container.lookup( GroupRepository.class, "maven1" );
 
         group.setId( "test" );
 
@@ -111,8 +110,6 @@ public class M1TestsuiteEnvironmentBuilder
             .toString() );
 
         group.setLocalStorage( env.getLocalRepositoryStorage() );
-
-        group.setRepositoryContentClass( new Maven1ContentClass() );
 
         group.setMemberRepositories( reposes );
 

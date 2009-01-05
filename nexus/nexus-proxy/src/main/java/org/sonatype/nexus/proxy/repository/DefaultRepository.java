@@ -16,32 +16,16 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.proxy.registry.ContentClass;
-
 /**
  * This is default implementation of a repository. It supports age calculation, a repeated retrieval if item is found
  * locally but it's age is more then allowed.
  * 
  * @author cstamas
  */
-@Component( role = Repository.class, hint = "default", instantiationStrategy = "per-lookup", description = "Default proxy capable repository" )
-public class DefaultRepository
+public abstract class DefaultRepository
     extends AbstractProxyRepository
 {
-    private ContentClass contentClass;
-
     private MutableProxyRepositoryKind repositoryKind;
-
-    public ContentClass getRepositoryContentClass()
-    {
-        return contentClass;
-    }
-
-    public void setRepositoryContentClass( ContentClass contentClass )
-    {
-        this.contentClass = contentClass;
-    }
 
     public RepositoryKind getRepositoryKind()
     {
