@@ -37,8 +37,8 @@ import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecur
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
 import org.sonatype.nexus.plugin.migration.artifactory.security.builder.ArtifactorySecurityConfigBuilder;
 import org.sonatype.nexus.plugin.migration.artifactory.util.VirtualRepositoryUtil;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -225,7 +225,7 @@ public class ArtifactoryUploadBackupPlexusResource
             validateUser( user );
 
             resolution.setId( user.getUsername() );
-            
+
             resolution.setPassword( user.getPassword() );
 
             resolution.setAdmin( user.isAdmin() );
@@ -262,15 +262,15 @@ public class ArtifactoryUploadBackupPlexusResource
         Collection<Repository> repositories = getNexus().getRepositories();
         for ( Repository repository : repositories )
         {
-            if ( !RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
+            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
-                continue;
+                ProxyRepository remote = repository.adaptToFacet( ProxyRepository.class );
+                if ( url.equals( remote.getRemoteUrl() ) )
+                {
+                    return repository.getId();
+                }
             }
 
-            if ( url.equals( repository.getRemoteUrl() ) )
-            {
-                return repository.getId();
-            }
         }
         return null;
     }

@@ -9,7 +9,7 @@
       <!--This sends everything else to /public -->
       <id>nexus</id>
       <mirrorOf>central</mirrorOf>
-      <url>${nexus-base-url}content/groups/public</url>
+      <url>${nexus-base-url}content/repositories/fake-central</url>
     </mirror>
   </mirrors>
 

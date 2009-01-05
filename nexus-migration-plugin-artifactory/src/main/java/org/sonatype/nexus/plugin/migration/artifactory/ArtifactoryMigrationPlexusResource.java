@@ -25,7 +25,6 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
-import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryProxy;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryRepository;
@@ -49,8 +48,6 @@ import org.sonatype.nexus.plugin.migration.artifactory.util.VirtualRepositoryUti
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.ReindexTask;
-import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.tools.repository.RepositoryConvertor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -530,17 +527,17 @@ public class ArtifactoryMigrationPlexusResource
     {
         String repoId = nexusRepo.getId();
 
-        ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTaskDescriptor.ID );
+        ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
         rt.setRepositoryId( repoId );
         nexusScheduler.submit( "reindex-" + repoId, rt );
 
-        RebuildMavenMetadataTask mt = (RebuildMavenMetadataTask) nexusScheduler
-            .createTaskInstance( RebuildMavenMetadataTaskDescriptor.ID );
+        RebuildMavenMetadataTask mt = nexusScheduler
+            .createTaskInstance( RebuildMavenMetadataTask.class );
         mt.setRepositoryId( repoId );
         nexusScheduler.submit( "rebuild-maven-metadata-" + repoId, mt );
 
-        RebuildAttributesTask at = (RebuildAttributesTask) nexusScheduler
-            .createTaskInstance( RebuildAttributesTaskDescriptor.ID );
+        RebuildAttributesTask at = nexusScheduler
+            .createTaskInstance( RebuildAttributesTask.class );
         at.setRepositoryId( repoId );
         nexusScheduler.submit( "rebuild-attributes-" + repoId, at );
     }
