@@ -33,6 +33,7 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -136,11 +137,17 @@ public class M2GroupRepository
                     mergedMetadata.merge( imd );
                 }
             }
-            catch ( Exception ex )
+            catch ( XmlPullParserException ex )
             {
-                getLogger().warn(
-                    "Got Exception during merge of M2 metadata: " + currentItem.getRepositoryItemUid(),
+                getLogger().info(
+                    "Got Exception during parsing of M2 metadata: " + currentItem.getRepositoryItemUid()
+                        + ", skipping it!",
                     ex );
+            }
+            catch ( IOException ex )
+            {
+                throw new StorageException( "Got IOException during merge of Maven2 metadata, UID='"
+                    + currentItem.getRepositoryItemUid() + "'", ex );
             }
             finally
             {
@@ -156,6 +163,12 @@ public class M2GroupRepository
                     }
                 }
             }
+        }
+
+        if ( mergedMetadata == null )
+        {
+            // may happen if only one or all metadatas are unparseable
+            throw new ItemNotFoundException( uid );
         }
 
         try
