@@ -142,7 +142,7 @@
 	<properties>
 		<plexus.appbooter.version>1.6.5-SNAPSHOT</plexus.appbooter.version>
 		<jsw.binaries.version>3.2.3.2</jsw.binaries.version>
-		<plexus-jsecurity-realms.version>1.0.5-SNAPSHOT</plexus-jsecurity-realms.version>
+		<plexus-jsecurity-realms.version>1.0.5</plexus-jsecurity-realms.version>
 		<slf4j.version>1.5.5</slf4j.version>
 		<maven.version>2.1-SONATYPE-653485</maven.version>
 		<nexus.indexer.version>1.1.3-SNAPSHOT</nexus.indexer.version>
