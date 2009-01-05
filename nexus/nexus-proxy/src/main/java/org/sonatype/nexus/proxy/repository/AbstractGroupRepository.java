@@ -141,18 +141,33 @@ public abstract class AbstractGroupRepository
             // ignored
         }
 
-        List<StorageItem> items = doRetrieveItems( uid, context );
-
-        if ( !items.isEmpty() )
+        for ( Repository repo : getRequestRepositories( uid ) )
         {
-            StorageItem item = items.get( 0 );
-
-            if ( item instanceof StorageCollectionItem )
+            try
             {
-                item = new DefaultStorageCollectionItem( this, uid.getPath(), true, false );
-            }
+                RepositoryItemUid memberUid = repo.createUid( uid.getPath() );
 
-            return item;
+                StorageItem item = repo.retrieveItem( memberUid, context );
+
+                if ( item instanceof StorageCollectionItem )
+                {
+                    item = new DefaultStorageCollectionItem( this, uid.getPath(), true, false );
+                }
+
+                return item;
+            }
+            catch ( IllegalOperationException e )
+            {
+                // ignored
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // ignored
+            }
+            catch ( StorageException e )
+            {
+                // ignored
+            }
         }
 
         throw new ItemNotFoundException( uid );
