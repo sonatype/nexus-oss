@@ -242,6 +242,9 @@ public interface Nexus
     ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException;
 
+    NexusTask<?> createTaskInstance( String taskType )
+        throws IllegalArgumentException;
+
     <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException;
 

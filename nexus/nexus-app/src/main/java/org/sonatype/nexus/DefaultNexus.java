@@ -1330,6 +1330,12 @@ public class DefaultNexus
         return nexusScheduler.getTaskById( id );
     }
 
+    public NexusTask<?> createTaskInstance( String taskType )
+        throws IllegalArgumentException
+    {
+        return nexusScheduler.createTaskInstance( taskType );
+    }
+
     public <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException
     {

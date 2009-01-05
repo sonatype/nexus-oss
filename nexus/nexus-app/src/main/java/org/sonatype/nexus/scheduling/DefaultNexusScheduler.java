@@ -135,7 +135,14 @@ public class DefaultNexusScheduler
         scheduler.stopService();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
+    public NexusTask<?> createTaskInstance( String taskType )
+        throws IllegalArgumentException
+    {
+        return (NexusTask) scheduler.createTaskInstance( taskType );
+    }
+
+    @SuppressWarnings( "unchecked" )
     public <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException
     {

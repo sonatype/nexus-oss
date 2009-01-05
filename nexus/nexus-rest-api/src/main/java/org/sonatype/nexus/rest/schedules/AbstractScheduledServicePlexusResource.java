@@ -310,24 +310,15 @@ public abstract class AbstractScheduledServicePlexusResource
     {
         String serviceType = model.getTypeId();
 
-        try
+        NexusTask<?> task = (NexusTask<?>) getNexus().createTaskInstance( serviceType );
+
+        for ( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
         {
-            Class<?> taskClass = Class.forName( serviceType );
-
-            NexusTask<?> task = (NexusTask<?>) getNexus().createTaskInstance( taskClass );
-
-            for ( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
-            {
-                ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
-                task.addParameter( prop.getId(), prop.getValue() );
-            }
-
-            return task;
+            ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
+            task.addParameter( prop.getId(), prop.getValue() );
         }
-        catch ( ClassNotFoundException e )
-        {
-            throw new IllegalArgumentException( "Unknown service type: " + serviceType, e );
-        }
+
+        return task;
     }
 
     public void validateStartDate( String date )
