@@ -98,13 +98,15 @@ public class M2GroupRepository
     {
         List<StorageItem> listOfStorageItems = doRetrieveItems( uid, context );
 
+        if ( listOfStorageItems.isEmpty() )
+        {
+            // empty: not found
+            throw new ItemNotFoundException( uid );
+        }
+
         if ( !mergeMetadata )
         {
-            if ( listOfStorageItems.size() <= 0 )
-            {
-                throw new ItemNotFoundException( uid );
-            }
-
+            // not merging: return the 1st and ciao
             return listOfStorageItems.get( 0 );
         }
 
