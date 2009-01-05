@@ -36,6 +36,7 @@ import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchResponse;
+import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -325,6 +326,38 @@ public interface Nexus
     // ----------------------------------------------------------------------------
     // Search/identify
     // ----------------------------------------------------------------------------
+
+    /**
+     * Returns the local index (the true index for hosted ones, and the true cacheds index for proxy reposes). Every
+     * repo has local index.
+     * 
+     * @param repositoryId
+     * @return
+     * @throws NoSuchRepositoryException
+     */
+    IndexingContext getRepositoryLocalIndexContext( String repositoryId )
+        throws NoSuchRepositoryException;
+
+    /**
+     * Returns the remote index. Only proxy repositories have remote index, otherwise null is returnded.
+     * 
+     * @param repositoryId
+     * @return
+     * @throws NoSuchRepositoryException
+     */
+    IndexingContext getRepositoryRemoteIndexContext( String repositoryId )
+        throws NoSuchRepositoryException;
+
+    /**
+     * Returns the "best" indexing context. If it has remoteIndex, and it is bigger then local, remote is considered
+     * "best", otherwise local.
+     * 
+     * @param repositoryId
+     * @return
+     * @throws NoSuchRepositoryException
+     */
+    IndexingContext getRepositoryBestIndexContext( String repositoryId )
+        throws NoSuchRepositoryException;
 
     ArtifactInfo identifyArtifact( String type, String checksum )
         throws IOException;

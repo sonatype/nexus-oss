@@ -60,6 +60,7 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
+import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
@@ -1456,6 +1457,28 @@ public class DefaultNexus
         {
             repo.recreateAttributes( path, null );
         }
+    }
+
+    //
+    // Indexing
+    //
+
+    public IndexingContext getRepositoryLocalIndexContext( String repositoryId )
+        throws NoSuchRepositoryException
+    {
+        return indexerManager.getRepositoryLocalIndexContext( repositoryId );
+    }
+
+    public IndexingContext getRepositoryRemoteIndexContext( String repositoryId )
+        throws NoSuchRepositoryException
+    {
+        return indexerManager.getRepositoryRemoteIndexContext( repositoryId );
+    }
+
+    public IndexingContext getRepositoryBestIndexContext( String repositoryId )
+        throws NoSuchRepositoryException
+    {
+        return indexerManager.getRepositoryBestIndexContext( repositoryId );
     }
 
     public ArtifactInfo identifyArtifact( String type, String checksum )
