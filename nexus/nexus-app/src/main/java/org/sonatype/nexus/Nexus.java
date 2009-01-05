@@ -242,9 +242,24 @@ public interface Nexus
     ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException;
 
+    /**
+     * A factory for tasks.
+     * 
+     * @param taskType
+     * @return
+     * @throws IllegalArgumentException
+     * @deprecated prefer the createTaskInstance(Class<T> type) method instead.
+     */
     NexusTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException;
 
+    /**
+     * A factory for tasks.
+     * 
+     * @param taskType
+     * @return
+     * @throws IllegalArgumentException
+     */
     <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException;
 
