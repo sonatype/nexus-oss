@@ -1546,13 +1546,17 @@ public class DefaultNexus
             // applies configuration and notifies listeners
             nexusConfiguration.loadConfiguration( true );
 
-            nexusConfiguration.createInternals();
-
-            nexusConfiguration.notifyProximityEventListeners( new ConfigurationChangeEvent( nexusConfiguration ) );
-
+            // essential service
             security.startService();
 
+            // essential service
             cacheManager.startService();
+
+            // create internals
+            nexusConfiguration.createInternals();
+
+            // notify about start
+            nexusConfiguration.notifyProximityEventListeners( new ConfigurationChangeEvent( nexusConfiguration ) );
 
             feedRecorder.startService();
 
