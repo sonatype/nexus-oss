@@ -497,6 +497,10 @@ public abstract class AbstractProxyRepository
                                 getLogger().debug( "Item " + uid.toString() + " found in remote storage." );
                             }
                         }
+                        catch ( RemoteAccessException e )
+                        {
+                            remoteItem = null;
+                        }
                         catch ( StorageException e )
                         {
                             remoteItem = null;
@@ -607,13 +611,15 @@ public abstract class AbstractProxyRepository
      * Validates integrity of content of <code>item</code>.
      */
     protected ContentValidationResult doValidateRemoteItemContent( AbstractStorageItem item, Map<String, Object> context )
-        throws StorageException
+        throws RemoteAccessException,
+            StorageException
     {
         return new ContentValidationResult();
     }
 
     protected AbstractStorageItem doRetrieveRemoteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws ItemNotFoundException,
+            RemoteAccessException,
             StorageException
     {
         AbstractStorageItem result = null;
@@ -634,6 +640,8 @@ public abstract class AbstractProxyRepository
                 ex );
 
             autoBlockProxying( ex );
+
+            throw ex;
         }
         catch ( StorageException ex )
         {

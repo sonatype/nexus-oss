@@ -30,6 +30,7 @@ import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
@@ -492,6 +493,7 @@ public abstract class AbstractMavenRepository
     @Override
     protected AbstractStorageItem doRetrieveRemoteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws ItemNotFoundException,
+            RemoteAccessException,
             StorageException
     {
         if ( !isChecksum( uid ) )
@@ -506,7 +508,8 @@ public abstract class AbstractMavenRepository
 
     @Override
     protected ContentValidationResult doValidateRemoteItemContent( AbstractStorageItem item, Map<String, Object> context )
-        throws StorageException
+        throws RemoteAccessException,
+            StorageException
     {
         if ( isChecksum( item.getRepositoryItemUid() ) )
         {
