@@ -1273,7 +1273,23 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   },
   
   saveHandler : function(formInfoObj){
-    if (formInfoObj.formPanel.form.isValid()) {
+	  
+	  var allValid = false;
+	  allValid = formInfoObj.formPanel.form.isValid();
+
+	  //form validation for weekdays tree, only when it's shown
+	  var scheduleWeekConfig = Ext.getCmp(formInfoObj.formPanel.id + '_schedule-config-card-panel').items.itemAt(4);
+
+	  if ( scheduleWeekConfig.isVisible() ){
+		  var selectedTree = Ext.getCmp(formInfoObj.formPanel.id + '_weekdays_tree');
+		  var treeValid = selectedTree.validate.call(selectedTree);
+	      if (!treeValid) {
+	    	  this.markTreeInvalid(selectedTree);
+	      }
+	      allValid = ( allValid && treeValid);
+	  }
+
+	  if ( allValid) {
       var isNew = formInfoObj.isNew;
       var serviceSchedule = formInfoObj.formPanel.find('name', 'schedule')[0].getValue().toLowerCase();
       var createUri = Sonatype.config.repos.urls.schedules;
