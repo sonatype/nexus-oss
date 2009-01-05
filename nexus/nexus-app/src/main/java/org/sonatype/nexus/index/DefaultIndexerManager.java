@@ -187,12 +187,15 @@ public class DefaultIndexerManager
                 NexusIndexer.FULL_INDEX );
             ctxLocal.setSearchable( repository.isIndexable() );
 
+            String remoteUrl = repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) ? repository
+                .adaptToFacet( ProxyRepository.class ).getRemoteUrl() : null;
+
             IndexingContext ctxRemote = nexusIndexer.addIndexingContextForced(
                 getRemoteContextId( repository.getId() ),
                 repository.getId(),
                 repoRoot,
                 new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ),
-                null,
+                remoteUrl,
                 null,
                 NexusIndexer.FULL_INDEX );
             ctxRemote.setSearchable( repository.isIndexable() );
