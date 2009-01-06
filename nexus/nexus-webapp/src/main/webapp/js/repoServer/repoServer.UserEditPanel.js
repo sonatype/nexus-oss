@@ -40,10 +40,42 @@ Sonatype.repoServer.UserEditPanel = function( config ) {
     }
   };
   
+  this.displaySelector = new Ext.Button( {
+    text: 'Default Realm Users',
+    icon: Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
+    cls: 'x-btn-text-icon',
+    value: 'default',
+    menu: {
+      items: [
+        {
+          text: 'Default Realm Users',
+          checked: true,
+          handler: this.showUsers,
+          value: 'default',
+          group: 'user-realm-selector',
+          scope: this
+        },
+        {
+          text: 'All Users With Nexus Roles',
+          checked: false,
+          handler: this.showUsers,
+          group: 'user-realm-selector',
+          value: 'allConfigured',
+          scope: this
+        }
+      ]
+    }
+  } );
+  
   this.searchField = new Ext.app.SearchField( { 
     searchPanel: this,
     width: 240,
-    emptyText: 'Show All Users With Nexus Roles'
+    emptyText: 'Display All',
+
+    onTrigger2Click : function(){
+      var v = this.getRawValue();
+      this.searchPanel.startSearch( this.searchPanel );
+    }
   } );
 
   Sonatype.Events.on( 'userAddMenuInit', this.onAddMenuInit, this );
@@ -54,7 +86,7 @@ Sonatype.repoServer.UserEditPanel = function( config ) {
     deleteButton: this.sp.checkPermission( 'nexus:users', this.sp.DELETE ),
     rowClickEvent: 'userViewInit',
     rowContextClickEvent: 'userMenuInit',
-    url: Sonatype.config.repos.urls.plexusUsersAllConfigured,
+    url: Sonatype.config.repos.urls.plexusUsersDefault,
     dataAutoLoad: true,
     dataId: 'userId',
     columns: [
@@ -108,25 +140,7 @@ Sonatype.repoServer.UserEditPanel = function( config ) {
     },
     tbar: [
       ' ',
-      {
-        text: 'Find',
-        icon: Sonatype.config.resourcePath + '/images/icons/search.gif',
-        cls: 'x-btn-text-icon',
-        menu: {
-          items: [
-            {
-              text: 'Show Default Realm Users',
-              handler: this.showDefaultUsers,
-              scope: this
-            },
-            {
-              text: 'Show All Users With Nexus Roles',
-              handler: this.showMappedUsers,
-              scope: this
-            }
-          ]
-        }
-      },
+      this.displaySelector,
       this.searchField
     ]
   } );
@@ -251,7 +265,7 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
   refreshHandler: function( button, e ) {
     this.clearCards();
     if ( this.lastUrl ) {
-      this.searchByUrl( this.lastUrl );
+      this.searchByUrl();
     }
     else {
       this.dataStore.reload();
@@ -295,12 +309,11 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
     }
   },
   
-  searchByUrl: function( url ) {
-    this.lastUrl = url;
+  searchByUrl: function() {
     this.gridPanel.loadMask.show();
     Ext.Ajax.request( {
       scope: this,
-      url: url,
+      url: this.lastUrl,
       callback: function( options, success, response ) {
         this.gridPanel.loadMask.hide();
         if ( success ) {
@@ -316,23 +329,26 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
     } );
   },
 
-  showDefaultUsers: function( button, e ) {
-    this.searchField.emptyText = button.text;
-    this.stopSearch( this );
-    this.searchByUrl( Sonatype.config.repos.urls.plexusUsersDefault );
-  },
-
-  showMappedUsers: function( button, e ) {
-    this.searchField.emptyText = button.text;
-    this.stopSearch( this );
-    this.searchByUrl( Sonatype.config.repos.urls.plexusUsersAllConfigured );
+  showUsers: function( button, e ) {
+    this.displaySelector.setText( button.text );
+    this.displaySelector.value = button.value;
+    this.calculateSearchUrl( this );
   },
   
   startSearch: function( panel ) {
-    this.searchField.emptyText = null;
-    panel.searchField.triggers[0].show();
-    panel.searchByUrl( Sonatype.config.repos.urls.searchUsers + '/all/' +
-      panel.searchField.getValue() );
+    panel.calculateSearchUrl( panel );
+    panel.searchByUrl();
+  },
+
+  calculateSearchUrl: function( panel ) {
+    var v = panel.searchField.getValue();
+    var prefix = '/' + panel.displaySelector.value; 
+    if ( v.length > 0 ) {
+      panel.lastUrl = Sonatype.config.repos.urls.searchUsers + prefix + '/' + panel.searchField.getValue();
+    }
+    else {
+      panel.lastUrl = Sonatype.config.repos.urls.plexusUsers + prefix;
+    }
   },
   
   stopSearch: function( panel ) {

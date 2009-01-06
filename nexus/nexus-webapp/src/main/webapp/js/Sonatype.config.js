@@ -96,6 +96,7 @@ Sonatype.config = function() {
         trash: servicePath + '/wastebasket',
         plexusUsersAllConfigured: servicePath + '/plexus_users/allConfigured',
         plexusUsersDefault: servicePath + '/plexus_users/default',
+        plexusUsers: servicePath + '/plexus_users',
         searchUsers: servicePath + '/user_search',
         plexusUser: servicePath + '/plexus_user',
         userToRoles: servicePath + '/user_to_roles',
