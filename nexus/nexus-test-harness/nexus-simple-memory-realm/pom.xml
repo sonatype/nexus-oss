@@ -16,6 +16,13 @@
 		</plugins>
 	</build>
     <dependencies>
+    
+        <dependency>
+        	<artifactId>plexus-delegating-realm</artifactId>
+            <groupId>org.sonatype.jsecurity</groupId>
+            <version>${plexus-jsecurity-realms.version}</version>	
+        </dependency>
+    
         <dependency>
             <groupId>org.jsecurity</groupId>
             <artifactId>jsecurity</artifactId>
@@ -47,6 +54,32 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
+        </dependency>
+        <!-- For realm tests -->
+        <dependency>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-app</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-app</artifactId>
+            <scope>test</scope>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-rest-api</artifactId>
+            <scope>test</scope>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-proxy</artifactId>
+            <scope>test</scope>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
