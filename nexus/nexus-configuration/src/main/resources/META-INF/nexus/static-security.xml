@@ -215,6 +215,7 @@
                 <privilege>40</privilege>
                 <privilege>41</privilege>
                 <privilege>72</privilege>
+                <privilege>75</privilege>
             </privileges>
         </role>
         <role>
@@ -1488,6 +1489,22 @@
                 <property>
                     <key>permission</key>
                     <value>nexus:componentsrepotypes</value>
+                </property>
+            </properties>
+        </privilege>
+        <privilege>
+            <id>75</id>
+            <type>method</type>
+            <name>User Locator Types Component - (read)</name>
+            <description>Give permission to retrieve the list of User Locator types supported by nexus.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:componentsuserlocatortypes</value>
                 </property>
             </properties>
         </privilege>
