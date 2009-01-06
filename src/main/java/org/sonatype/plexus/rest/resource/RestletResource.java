@@ -117,11 +117,13 @@ public class RestletResource
         {
             // check is this variant a supported one, to avoid calling getText() on potentially huge representations
             if ( MediaType.APPLICATION_JSON.equals( variant.getMediaType(), true )
-                || MediaType.APPLICATION_XML.equals( variant.getMediaType(), true ) )
+                || MediaType.APPLICATION_XML.equals( variant.getMediaType(), true )
+                || MediaType.TEXT_HTML.equals( variant.getMediaType(), true ) )
             {
                 String text = ( variant instanceof Representation ) ? ( (Representation) variant ).getText() : "";
 
-                if ( MediaType.APPLICATION_JSON.equals( variant.getMediaType(), true ) )
+                if ( MediaType.APPLICATION_JSON.equals( variant.getMediaType(), true ) 
+                    || MediaType.TEXT_HTML.equals( variant.getMediaType(), true ) )
                 {
                     representation = new XStreamRepresentation( (XStream) getContext().getAttributes().get(
                         PlexusRestletApplicationBridge.JSON_XSTREAM ), text, variant.getMediaType() );
