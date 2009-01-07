@@ -38,7 +38,7 @@ public class OSSApplicationStatusSource
 
     public OSSApplicationStatusSource()
     {
-        systemStatus.setEdition( "OSS" );
+        systemStatus.setEdition( "Open Source" );
         systemStatus.setAppName( "Sonatype Nexus Maven Repository Manager" );
         systemStatus.setFormattedAppName( "Sonatype Nexus&trade;" );
         
