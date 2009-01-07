@@ -684,12 +684,12 @@
 		      </executions>
 		    </plugin>
 			
-			<!--plugin>
+			<plugin>
                 <groupId>com.google.code.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
                 <version>1.4.0</version>
                 <configuration>
-                    <header>c:\Development\Code\nexus\nexus\header.txt</header>
+                    <header>${basedir}/header.txt</header>
                     <includes>
                         <include>**/*.java</include>
                         <include>**/*.js</include>
@@ -698,8 +698,10 @@
 						<exclude>**/ext-2.2/**</exclude>
 						<exclude>**/js/filetree/**</exclude>
 					</excludes>
+					<!-- this is important for muti-module project -->
+					<aggregate>true</aggregate>
                 </configuration>
-            </plugin-->
+            </plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
