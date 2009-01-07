@@ -16,12 +16,14 @@ public class DefaultDownloadMirrors
     implements DownloadMirrors
 {
     private static final long NO_EXPIRATION = -1;
+    
+    private static final long DEFAULT_EXPIRATION = 3 * 3600 * 1000L; // three hours
 
     private LinkedHashSet<String> urls = new LinkedHashSet<String>();
 
     private Map<String, BlaclistEntry> blacklist = new HashMap<String, BlaclistEntry>();
 
-    private long blacklistExpiration = NO_EXPIRATION;
+    private long blacklistExpiration = DEFAULT_EXPIRATION;
 
     private static class BlaclistEntry
     {
