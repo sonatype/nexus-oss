@@ -52,6 +52,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
+import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
@@ -1205,6 +1206,11 @@ public class DefaultNexus
     {
         feedRecorder.addSystemEvent( action, message );
     }
+    
+    public void addAuthcAuthzEvent( AuthcAuthzEvent evt )
+    {
+        feedRecorder.addAuthcAuthzEvent( evt );
+    }
 
     public SystemProcess systemProcessStarted( String action, String message )
     {
@@ -1289,6 +1295,11 @@ public class DefaultNexus
     public List<SystemEvent> getSystemEvents( Integer from, Integer count )
     {
         return feedRecorder.getSystemEvents( null, from, count, null );
+    }
+    
+    public List<AuthcAuthzEvent> getAuthcAuthzEvents( Integer from, Integer count )
+    {
+        return feedRecorder.getAuthcAuthzEvents( null, from, count, null );
     }
 
     // =============

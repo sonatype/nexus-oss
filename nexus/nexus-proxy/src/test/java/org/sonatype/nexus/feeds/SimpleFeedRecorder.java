@@ -47,6 +47,10 @@ public class SimpleFeedRecorder
     {
     }
 
+    public void addAuthcAuthzEvent( AuthcAuthzEvent evt )
+    {
+    }
+
     public SystemProcess systemProcessStarted( String action, String message )
     {
         return new SystemProcess( action, message, new Date() );
@@ -79,6 +83,12 @@ public class SimpleFeedRecorder
     }
 
     public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter )
+    {
+        return Collections.emptyList();
+    }
+
+    public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count,
+        TimelineFilter filter )
     {
         return Collections.emptyList();
     }

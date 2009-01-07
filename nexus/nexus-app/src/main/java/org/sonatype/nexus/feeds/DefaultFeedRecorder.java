@@ -81,6 +81,16 @@ public class DefaultFeedRecorder
     }
 
     /**
+     * Event type: authc/authz
+     */
+    private static final String AUTHC_AUTHZ_EVENT_TYPE = "AUTHC_AUTHZ";
+
+    private static final Set<String> AUTHC_AUTHZ_EVENT_TYPE_SET = new HashSet<String>( 1 );
+    {
+        AUTHC_AUTHZ_EVENT_TYPE_SET.add( AUTHC_AUTHZ_EVENT_TYPE );
+    }
+
+    /**
      * The timeline for persistent events and feeds.
      */
     @Requirement
@@ -189,6 +199,42 @@ public class DefaultFeedRecorder
         return result;
     }
 
+    protected List<AuthcAuthzEvent> getAaesFromMaps( List<Map<String, String>> data )
+    {
+        List<AuthcAuthzEvent> result = new ArrayList<AuthcAuthzEvent>( data.size() );
+
+        for ( Map<String, String> map : data )
+        {
+            AuthcAuthzEvent evt = new AuthcAuthzEvent( map.get( ACTION ), map.get( MESSAGE ) );
+
+            try
+            {
+                evt.setEventDate( eventDateFormat.parse( map.get( DATE ) ) );
+            }
+            catch ( ParseException e )
+            {
+                getLogger().warn( "Could not format event date!", e );
+            }
+
+            HashMap<String, Object> ctx = new HashMap<String, Object>();
+
+            for ( String key : map.keySet() )
+            {
+                if ( key.startsWith( CTX_PREFIX ) )
+                {
+                    ctx.put( key.substring( 4 ), map.get( key ) );
+                }
+            }
+
+            evt.getEventContext().putAll( ctx );
+
+            result.add( evt );
+
+        }
+
+        return result;
+    }
+
     public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
         TimelineFilter filter )
     {
@@ -215,11 +261,35 @@ public class DefaultFeedRecorder
         return getSesFromMaps( getEvents( SYSTEM_EVENT_TYPE_SET, subtypes, from, count, filter ) );
     }
 
+    public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count,
+        TimelineFilter filter )
+    {
+        return getAaesFromMaps( getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, from, count, filter ) );
+    }
+
     public void addSystemEvent( String action, String message )
     {
         SystemEvent event = new SystemEvent( action, message );
 
         addToTimeline( event );
+    }
+
+    public void addAuthcAuthzEvent( AuthcAuthzEvent evt )
+    {
+        Map<String, String> map = new HashMap<String, String>();
+
+        for ( String key : evt.getEventContext().keySet() )
+        {
+            map.put( CTX_PREFIX + key, evt.getEventContext().get( key ).toString() );
+        }
+
+        map.put( ACTION, evt.getAction() );
+
+        map.put( MESSAGE, evt.getMessage() );
+
+        map.put( DATE, eventDateFormat.format( evt.getEventDate() ) );
+
+        addToTimeline( map, AUTHC_AUTHZ_EVENT_TYPE, evt.getAction() );
     }
 
     public void addNexusArtifactEvent( NexusArtifactEvent nae )

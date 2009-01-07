@@ -32,6 +32,8 @@ import org.jsecurity.subject.Subject;
 import org.jsecurity.web.WebUtils;
 import org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.feeds.AuthcAuthzEvent;
+import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 
 public class NexusHttpAuthenticationFilter
@@ -219,6 +221,14 @@ public class NexusHttpAuthenticationFilter
     protected boolean onLoginFailure( AuthenticationToken token, AuthenticationException ae, ServletRequest request,
         ServletResponse response )
     {
+
+        String msg = "Unable to authenticate user [" + token.getPrincipal() + "] from address/host ["
+            + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
+
+        AuthcAuthzEvent aaEvt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHC, msg );
+
+        getNexus( request ).addAuthcAuthzEvent( aaEvt );
+
         HttpServletResponse httpResponse = WebUtils.toHttp( response );
 
         if ( ExpiredCredentialsException.class.isAssignableFrom( ae.getClass() ) )

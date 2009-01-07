@@ -31,6 +31,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
@@ -196,6 +197,8 @@ public interface Nexus
     void addNexusArtifactEvent( NexusArtifactEvent nae );
 
     void addSystemEvent( String action, String message );
+    
+    void addAuthcAuthzEvent( AuthcAuthzEvent evt );
 
     SystemProcess systemProcessStarted( String action, String message );
 
@@ -219,6 +222,8 @@ public interface Nexus
     List<SystemEvent> getRepositoryStatusChanges( Integer from, Integer count );
 
     List<SystemEvent> getSystemEvents( Integer from, Integer count );
+    
+    List<AuthcAuthzEvent> getAuthcAuthzEvents( Integer from, Integer count );
 
     // ----------------------------------------------------------------------------
     // Scheduler

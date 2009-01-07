@@ -62,7 +62,6 @@ public interface FeedRecorder
      */
     public static final String SYSTEM_REBUILDATTRIBUTES_ACTION = "REBUILDATTRIBUTES";
 
-    
     /**
      * System event action: repository local status changes
      */
@@ -102,12 +101,24 @@ public interface FeedRecorder
      * System event action: remove repository folder
      */
     public static final String SYSTEM_REMOVE_REPO_FOLDER_ACTION = "REMOVE_REPO_FOLDER";
+    
+    /**
+     * System event action: authentication
+     */
+    public static final String SYSTEM_AUTHC = "AUTHC";
+    
+    /**
+     * System event action: authorization
+     */
+    public static final String SYSTEM_AUTHZ = "AUTHZ";
 
     // creating
 
     void addNexusArtifactEvent( NexusArtifactEvent nae );
 
     void addSystemEvent( String action, String message );
+
+    void addAuthcAuthzEvent( AuthcAuthzEvent evt );
 
     SystemProcess systemProcessStarted( String action, String message );
 
@@ -124,4 +135,6 @@ public interface FeedRecorder
         TimelineFilter filter );
 
     List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter );
+
+    List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter );
 }

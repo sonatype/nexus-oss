@@ -29,6 +29,8 @@ import org.apache.commons.logging.LogFactory;
 import org.jsecurity.subject.Subject;
 import org.jsecurity.web.filter.authz.PermissionsAuthorizationFilter;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.feeds.AuthcAuthzEvent;
+import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 
@@ -128,13 +130,16 @@ public class HttpVerbMappingAuthorizationFilter
     {
         Subject subject = getSubject( request, response );
 
-        getLogger().info(
-            "Unable to authorize user [" + subject.getPrincipal() + "] for " + getActionFromHttpVerb( request )
-                + " to " + ( (HttpServletRequest) request ).getRequestURI() + " from address/host ["
-                + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]" );
+        String msg = "Unable to authorize user [" + subject.getPrincipal() + "] for " + getActionFromHttpVerb( request )
+            + " to " + ( (HttpServletRequest) request ).getRequestURI() + " from address/host ["
+            + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
 
+        AuthcAuthzEvent aaEvt = new AuthcAuthzEvent(FeedRecorder.SYSTEM_AUTHZ, msg);
+        
+        getNexus( request ).addAuthcAuthzEvent( aaEvt );
+        
         request.setAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE );
-
+        
         return false;
     }
 
