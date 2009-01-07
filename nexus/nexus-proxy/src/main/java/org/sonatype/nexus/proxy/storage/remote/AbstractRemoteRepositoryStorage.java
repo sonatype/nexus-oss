@@ -136,14 +136,6 @@ public abstract class AbstractRemoteRepositoryStorage
         return repository.getRemoteStorageContext();
     }
 
-    public boolean isReachable( ProxyRepository repository, Map<String, Object> context )
-        throws RemoteAuthenticationNeededException,
-            RemoteAccessException,
-            StorageException
-    {
-        return containsItem( repository, context, RepositoryItemUid.PATH_ROOT );
-    }
-
     public boolean containsItem( ProxyRepository repository, Map<String, Object> context, String path )
         throws RemoteAuthenticationNeededException,
             RemoteAccessException,

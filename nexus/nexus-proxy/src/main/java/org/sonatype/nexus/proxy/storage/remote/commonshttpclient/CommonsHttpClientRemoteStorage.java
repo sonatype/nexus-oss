@@ -57,6 +57,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -86,6 +87,11 @@ public class CommonsHttpClientRemoteStorage
     // ===============================================================================
     // RemoteStorage iface
 
+    public String getName()
+    {
+        return CTX_KEY;
+    }
+
     public void validateStorageUrl( String url )
         throws StorageException
     {
@@ -104,76 +110,23 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
-    public boolean containsItem( long newerThen, ProxyRepository repository, Map<String, Object> context, String path )
-        throws StorageException
+    public boolean isReachable( ProxyRepository repository, Map<String, Object> context )
+        throws RemoteAccessException,
+            StorageException
     {
-        URL remoteURL = getAbsoluteUrlFromBase( repository, context, path );
+        return checkRemoteAvailability( 0, repository, context, RepositoryItemUid.PATH_ROOT, isReachableCheckRelaxed() );
+    }
 
-        HttpMethodBase method = new HeadMethod( remoteURL.toString() );
-
-        int response = HttpStatus.SC_BAD_REQUEST;
-
-        boolean doGet = false;
-
-        try
-        {
-            response = executeMethod( repository, context, path, method );
-        }
-        catch ( StorageException e )
-        {
-            // If HEAD failed, attempt a GET. Some repos may not support HEAD method
-            doGet = true;
-
-            getLogger().debug( "HEAD method failed, will attempt GET.  Exception: " + e.getMessage() );
-        }
-        finally
-        {
-            method.releaseConnection();
-
-            // HEAD returned error, but not exception, try GET before failing
-            if ( doGet == false && response != HttpStatus.SC_OK )
-            {
-                doGet = true;
-                getLogger().debug( "HEAD method failed, will attempt GET.  Status: " + response );
-            }
-        }
-
-        if ( doGet )
-        {
-            // create a GET
-            method = new GetMethod( remoteURL.toString() );
-
-            try
-            {
-                // execute it
-                response = executeMethod( repository, context, path, method );
-            }
-            finally
-            {
-                // and release it immediately
-                method.releaseConnection();
-            }
-        }
-
-        if ( response == HttpStatus.SC_OK )
-        {
-            // we have newer if this below is true
-            return makeDateFromHeader( method.getResponseHeader( "last-modified" ) ) > newerThen;
-        }
-        else if ( ( response >= HttpStatus.SC_MULTIPLE_CHOICES && response < HttpStatus.SC_BAD_REQUEST )
-            || response == HttpStatus.SC_NOT_FOUND )
-        {
-            return false;
-        }
-        else
-        {
-            throw new StorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code "
-                + response + " : " + HttpStatus.getStatusText( response ) );
-        }
+    public boolean containsItem( long newerThen, ProxyRepository repository, Map<String, Object> context, String path )
+        throws RemoteAccessException,
+            StorageException
+    {
+        return checkRemoteAvailability( 0, repository, context, RepositoryItemUid.PATH_ROOT, false );
     }
 
     public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String path )
         throws ItemNotFoundException,
+            RemoteAccessException,
             StorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( repository, context, path );
@@ -182,7 +135,7 @@ public class CommonsHttpClientRemoteStorage
 
         method = new GetMethod( remoteURL.toString() );
 
-        int response = executeMethod( repository, context, path, method );
+        int response = executeMethod( repository, context, path, method, remoteURL );
 
         if ( response == HttpStatus.SC_OK )
         {
@@ -286,20 +239,10 @@ public class CommonsHttpClientRemoteStorage
             method.setRequestEntity( new InputStreamRequestEntity( fItem.getInputStream(), fItem.getLength(), fItem
                 .getMimeType() ) );
 
-            int response = executeMethod( repository, context, item.getPath(), method );
+            int response = executeMethod( repository, context, item.getPath(), method, remoteURL );
 
-            if ( response == HttpStatus.SC_FORBIDDEN )
-            {
-                throw new RemoteAccessDeniedException( repository, remoteURL, HttpStatus
-                    .getStatusText( HttpStatus.SC_FORBIDDEN ) );
-            }
-            else if ( response == HttpStatus.SC_UNAUTHORIZED )
-            {
-                throw new RemoteAuthenticationNeededException( repository, HttpStatus
-                    .getStatusText( HttpStatus.SC_UNAUTHORIZED ) );
-            }
-            else if ( response != HttpStatus.SC_OK && response != HttpStatus.SC_NO_CONTENT
-                && response != HttpStatus.SC_ACCEPTED )
+            if ( response != HttpStatus.SC_OK && response != HttpStatus.SC_CREATED
+                && response != HttpStatus.SC_NO_CONTENT && response != HttpStatus.SC_ACCEPTED )
             {
                 throw new StorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code "
                     + response + " : " + HttpStatus.getStatusText( response ) );
@@ -318,6 +261,7 @@ public class CommonsHttpClientRemoteStorage
     public void deleteItem( ProxyRepository repository, Map<String, Object> context, String path )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
+            RemoteAccessException,
             StorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( repository, context, path );
@@ -326,7 +270,7 @@ public class CommonsHttpClientRemoteStorage
 
         try
         {
-            int response = executeMethod( repository, context, path, method );
+            int response = executeMethod( repository, context, path, method, remoteURL );
 
             if ( response != HttpStatus.SC_OK && response != HttpStatus.SC_NO_CONTENT
                 && response != HttpStatus.SC_ACCEPTED )
@@ -485,8 +429,10 @@ public class CommonsHttpClientRemoteStorage
      * @param method the method
      * @return the int
      */
-    protected int executeMethod( ProxyRepository repository, Map<String, Object> context, String path, HttpMethod method )
-        throws StorageException
+    protected int executeMethod( ProxyRepository repository, Map<String, Object> context, String path,
+        HttpMethod method, URL remoteUrl )
+        throws RemoteAccessException,
+            StorageException
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -531,6 +477,17 @@ public class CommonsHttpClientRemoteStorage
         try
         {
             resultCode = httpClient.executeMethod( httpConfiguration, method );
+
+            if ( resultCode == HttpStatus.SC_FORBIDDEN )
+            {
+                throw new RemoteAccessDeniedException( repository, remoteUrl, HttpStatus
+                    .getStatusText( HttpStatus.SC_FORBIDDEN ) );
+            }
+            else if ( resultCode == HttpStatus.SC_UNAUTHORIZED )
+            {
+                throw new RemoteAuthenticationNeededException( repository, HttpStatus
+                    .getStatusText( HttpStatus.SC_UNAUTHORIZED ) );
+            }
         }
         catch ( HttpException ex )
         {
@@ -577,9 +534,116 @@ public class CommonsHttpClientRemoteStorage
         return result;
     }
 
-    public String getName()
+    /**
+     * Are we "relaxed" regarding the interpretation of responses when checking remote availability.
+     * 
+     * @return
+     */
+    protected boolean isReachableCheckRelaxed()
     {
-        return CTX_KEY;
+        return true;
+    }
+
+    /**
+     * Initially, this method is here only to share the code for "availability check" and for "contains" check.
+     * Unfortunately, the "availability" check cannot be done at RemoteStorage level, since it is completely repository
+     * layout unaware and is able to tell only about the existence of remote server and that the URI on it exists. This
+     * "availability" check will have to be moved upper into repository, since it is aware of "what it holds".
+     * Ultimately, this method will check is the remote server "present" and is responding or not. But nothing more.
+     * 
+     * @param newerThen
+     * @param repository
+     * @param context
+     * @param path
+     * @param relaxedCheck
+     * @return
+     * @throws RemoteAuthenticationNeededException
+     * @throws RemoteAccessException
+     * @throws StorageException
+     */
+    protected boolean checkRemoteAvailability( long newerThen, ProxyRepository repository, Map<String, Object> context,
+        String path, boolean relaxedCheck )
+        throws RemoteAuthenticationNeededException,
+            RemoteAccessException,
+            StorageException
+    {
+        URL remoteURL = getAbsoluteUrlFromBase( repository, context, path );
+
+        HttpMethodBase method = new HeadMethod( remoteURL.toString() );
+
+        int response = HttpStatus.SC_BAD_REQUEST;
+
+        // artifactory hack, it pukes on HEAD so we will try with GET if HEAD fails
+        boolean doGet = false;
+
+        try
+        {
+            response = executeMethod( repository, context, path, method, remoteURL );
+        }
+        catch ( StorageException e )
+        {
+            // If HEAD failed, attempt a GET. Some repos may not support HEAD method
+            doGet = true;
+
+            getLogger().debug( "HEAD method failed, will attempt GET.  Exception: " + e.getMessage() );
+        }
+        finally
+        {
+            method.releaseConnection();
+
+            // HEAD returned error, but not exception, try GET before failing
+            if ( doGet == false && response != HttpStatus.SC_OK )
+            {
+                doGet = true;
+                getLogger().debug( "HEAD method failed, will attempt GET.  Status: " + response );
+            }
+        }
+
+        if ( doGet )
+        {
+            // create a GET
+            method = new GetMethod( remoteURL.toString() );
+
+            try
+            {
+                // execute it
+                response = executeMethod( repository, context, path, method, remoteURL );
+            }
+            finally
+            {
+                // and release it immediately
+                method.releaseConnection();
+            }
+        }
+
+        if ( relaxedCheck )
+        {
+            // if we are relaxed, we will accept any HTTP response code below 500. This means anyway the HTTP
+            // transaction succeeded. This method was never really detecting that the remoteUrl really denotes a root of
+            // repository (how could we do that?)
+            // this "relaxed" check will help us to "pass" S3 remote storage.
+            return response >= HttpStatus.SC_OK && response <= HttpStatus.SC_INTERNAL_SERVER_ERROR;
+        }
+        else
+        {
+            // non relaxed check is strict, and will select only the OK response
+            if ( response == HttpStatus.SC_OK )
+            {
+                // we have it
+                // we have newer if this below is true
+                return makeDateFromHeader( method.getResponseHeader( "last-modified" ) ) > newerThen;
+            }
+            else if ( ( response >= HttpStatus.SC_MULTIPLE_CHOICES && response < HttpStatus.SC_BAD_REQUEST )
+                || response == HttpStatus.SC_NOT_FOUND )
+            {
+                return false;
+            }
+            else
+            {
+                throw new StorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code "
+                    + response + " : " + HttpStatus.getStatusText( response ) );
+            }
+        }
     }
 
 }

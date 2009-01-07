@@ -33,8 +33,11 @@ import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -132,6 +135,14 @@ public class JettyClientRemoteRepositoryStorage
         {
             throw new StorageException( "Could not configure Jetty HttpClient instance", e );
         }
+    }
+
+    public boolean isReachable( ProxyRepository repository, Map<String, Object> context )
+        throws RemoteAuthenticationNeededException,
+            RemoteAccessException,
+            StorageException
+    {
+        return containsItem( repository, context, RepositoryItemUid.PATH_ROOT );
     }
 
     public boolean containsItem( long newerThen, ProxyRepository repository, Map<String, Object> context, String path )
