@@ -541,8 +541,8 @@ public class NexusApplication
         // ==========
         // INDEX.HTML and WAR contents
         // To redirect "uncaught" requests to indexTemplateResource
-        attach( root, false, "", new PlexusResourceFinder( getContext(), indexRedirectingResource ) );
-        attach( root, false, "/", new PlexusResourceFinder( getContext(), indexRedirectingResource ) );
+        attach( root, true, "", new PlexusResourceFinder( getContext(), indexRedirectingResource ) );
+        attach( root, true, "/", new PlexusResourceFinder( getContext(), indexRedirectingResource ) );
 
         // the indexTemplateResource
         attach( root, true, indexTemplateResource );
