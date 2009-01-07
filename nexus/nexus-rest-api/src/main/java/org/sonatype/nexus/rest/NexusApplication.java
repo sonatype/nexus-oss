@@ -75,6 +75,9 @@ public class NexusApplication
 
     @Requirement( hint = "indexTemplate" )
     private ManagedPlexusResource indexTemplateResource;
+    
+    @Requirement( hint = "IndexPlexusResource" )
+    private ManagedPlexusResource indexResource;
 
     @Requirement( hint = "content" )
     private ManagedPlexusResource contentResource;
@@ -538,13 +541,9 @@ public class NexusApplication
 
         // ==========
         // INDEX.HTML and WAR contents
-        // redirector, to redirect "uncaught" requests to indexTemplateResource
-        Redirector redirector = new Redirector(
-            getContext(),
-            "{op}" + indexTemplateResource.getResourceUri(),
-            Redirector.MODE_CLIENT_PERMANENT );
-        attach( root, true, "", redirector );
-        attach( root, true, "/", redirector );
+        // To redirect "uncaught" requests to indexTemplateResource
+        attach( root, true, indexResource );
+//        attach( root, true, indexResource ); // needs to be a different resource....
 
         // the indexTemplateResource
         attach( root, true, indexTemplateResource );
