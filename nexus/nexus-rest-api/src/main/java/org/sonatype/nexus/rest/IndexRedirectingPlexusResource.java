@@ -13,8 +13,8 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 /**
  * Resource to redirect to the absolute URI to the index.html.
  */
-@Component(role=ManagedPlexusResource.class, hint="IndexPlexusResource")
-public class IndexPlexusResource
+@Component(role=ManagedPlexusResource.class, hint="IndexRedirectingPlexusResource")
+public class IndexRedirectingPlexusResource
     extends AbstractNexusPlexusResource implements ManagedPlexusResource
 {
 
@@ -43,7 +43,7 @@ public class IndexPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {   
-        response.redirectPermanent( createRootReference(request,indexTemplateResource.getResourceUri() ));
+        response.redirectPermanent( createRootReference(request, indexTemplateResource.getResourceUri().replaceFirst( "/", "" ) ));
         
         return null;
     }
