@@ -25,7 +25,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
 import org.restlet.Directory;
-import org.restlet.Redirector;
 import org.restlet.Router;
 import org.sonatype.jsecurity.web.PlexusMutableWebConfiguration;
 import org.sonatype.jsecurity.web.PlexusWebConfiguration;
@@ -75,7 +74,7 @@ public class NexusApplication
 
     @Requirement( hint = "indexTemplate" )
     private ManagedPlexusResource indexTemplateResource;
-    
+
     @Requirement( hint = "IndexPlexusResource" )
     private ManagedPlexusResource indexResource;
 
@@ -458,44 +457,44 @@ public class NexusApplication
             new AliasingListConverter( ClientPermission.class, "permission" ) );
 
         xstream.omitField( ClientPermission.class, "modelEncoding" );
-        
+
         xstream.omitField( UserToRoleResourceRequest.class, "modelEncoding" );
         xstream.omitField( UserToRoleResource.class, "modelEncoding" );
         xstream.alias( "user-to-role", UserToRoleResourceRequest.class );
-        
+
         xstream.omitField( PlexusUserResourceResponse.class, "modelEncoding" );
         xstream.alias( "plexus-user", PlexusUserResourceResponse.class );
         xstream.omitField( PlexusUserResource.class, "modelEncoding" );
         xstream.registerLocalConverter( PlexusUserResource.class, "roles", new AliasingListConverter(
             PlexusRoleResource.class,
-              "plexus-role" ) );
-        
+            "plexus-role" ) );
+
         xstream.omitField( PlexusRoleResource.class, "modelEncoding" );
         xstream.alias( "plexus-role", PlexusRoleResource.class );
-        
+
         xstream.omitField( PlexusUserListResourceResponse.class, "modelEncoding" );
         xstream.alias( "plexus-user-list", PlexusUserListResourceResponse.class );
         xstream.registerLocalConverter( PlexusUserListResourceResponse.class, "data", new AliasingListConverter(
             PlexusUserResource.class,
-              "plexus-user" ) );
-        
+            "plexus-user" ) );
+
         xstream.omitField( ExternalRoleMappingResourceResponse.class, "modelEncoding" );
         xstream.alias( "external-role-mapping", ExternalRoleMappingResourceResponse.class );
         xstream.registerLocalConverter( ExternalRoleMappingResourceResponse.class, "data", new AliasingListConverter(
             ExternalRoleMappingResource.class,
-              "mapping" ) );
+            "mapping" ) );
         xstream.omitField( ExternalRoleMappingResource.class, "modelEncoding" );
-        xstream.alias( "mapping", ExternalRoleMappingResource.class );        
+        xstream.alias( "mapping", ExternalRoleMappingResource.class );
         xstream.registerLocalConverter( ExternalRoleMappingResource.class, "mappedRoles", new AliasingListConverter(
             PlexusRoleResource.class,
-              "plexus-role" ) );
-        
+            "plexus-role" ) );
+
         xstream.omitField( PlexusRoleListResourceResponse.class, "modelEncoding" );
         xstream.alias( "plexus-roles", PlexusRoleListResourceResponse.class );
         xstream.registerLocalConverter( PlexusRoleListResourceResponse.class, "data", new AliasingListConverter(
             PlexusRoleResource.class,
-              "plexus-role" ) );
-        
+            "plexus-role" ) );
+
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );
         xstream.omitField( ModelBase.class, "modelEncoding" );
@@ -542,8 +541,8 @@ public class NexusApplication
         // ==========
         // INDEX.HTML and WAR contents
         // To redirect "uncaught" requests to indexTemplateResource
-        attach( root, true, indexResource );
-//        attach( root, true, indexResource ); // needs to be a different resource....
+        attach( root, false, "", new PlexusResourceFinder( getContext(), indexResource ) );
+        attach( root, false, "/", new PlexusResourceFinder( getContext(), indexResource ) );
 
         // the indexTemplateResource
         attach( root, true, indexTemplateResource );
