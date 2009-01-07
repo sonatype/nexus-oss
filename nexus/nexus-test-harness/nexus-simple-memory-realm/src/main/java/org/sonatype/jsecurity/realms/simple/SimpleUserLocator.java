@@ -1,11 +1,9 @@
 package org.sonatype.jsecurity.realms.simple;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
 import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
 
@@ -16,7 +14,7 @@ import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
  * source might be associated with the group 'projectA-developer', when the user 'jcoder' is returned from this class
  * the association is contained in a PlexusUser object.
  */
-// This class must have a role of 'PlexusUserLocator', and the hint, must match the result of getSource()
+// This class must have a role of 'PlexusUserLocator', and the hint, must match the result of getSource() and the hint of the corresponding Realm.
 @Component( role = PlexusUserLocator.class, hint = "Simple", description = "Simple User Locator" )
 public class SimpleUserLocator
     implements PlexusUserLocator
