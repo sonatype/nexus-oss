@@ -96,12 +96,11 @@ public interface RemoteRepositoryStorage
     /**
      * Retrieve item unconditionally.
      * 
-     * @param uid the uid
      * @return the abstract storage item
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
      */
-    AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String path )
+    AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String baseUrl, String path )
         throws ItemNotFoundException,
             RemoteAccessException,
             StorageException;

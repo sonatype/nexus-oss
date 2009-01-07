@@ -1,6 +1,8 @@
 package org.sonatype.nexus.proxy.repository;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -22,6 +24,8 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.mirror.DownloadMirrorSelector;
+import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -75,6 +79,9 @@ public abstract class AbstractProxyRepository
      * The item max age.
      */
     private int itemMaxAge = 24 * 60;
+
+    @Requirement
+    private DownloadMirrors mirrors;
 
     protected void resetRemoteStatus()
     {
@@ -318,6 +325,16 @@ public abstract class AbstractProxyRepository
         setAllowWrite( remoteStorage == null );
     }
 
+    public DownloadMirrors getDownloadMirrors()
+    {
+        return mirrors;
+    }
+
+    public void setMirrorUrls( List<String> urls )
+    {
+        mirrors.setUrls( urls );
+    }
+
     protected AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws StorageException
     {
@@ -454,52 +471,12 @@ public abstract class AbstractProxyRepository
                         // this will GET it unconditionally
                         try
                         {
-                            ContentValidationResult result = null;
-
-                            for ( int retry = 0; retry < DOWNLOAD_RETRY_COUNT; retry++ )
-                            {
-                                remoteItem = doRetrieveRemoteItem( uid, context );
-
-                                remoteItem = doCacheItem( remoteItem );
-
-                                result = doValidateRemoteItemContent( remoteItem, context );
-
-                                if ( result == null || result.isContentValid() )
-                                {
-                                    break;
-                                }
-                            }
-
-                            if ( result != null )
-                            {
-                                // send validation error/warning events
-                                for ( NexusArtifactEvent event : result.getEvents() )
-                                {
-                                    feedRecorder.addNexusArtifactEvent( event );
-                                }
-
-                                if ( !result.isContentValid() )
-                                {
-                                    if ( getLogger().isDebugEnabled() )
-                                    {
-                                        getLogger().debug(
-                                            "Item " + uid.toString() + " failed content integrity validation." );
-                                    }
-
-                                    getLocalStorage().retrieveItem( this, context, uid.getPath() );
-
-                                    throw new ItemNotFoundException( uid );
-                                }
-                            }
+                            remoteItem = doRetrieveRemoteItem( uid, context );
 
                             if ( getLogger().isDebugEnabled() )
                             {
                                 getLogger().debug( "Item " + uid.toString() + " found in remote storage." );
                             }
-                        }
-                        catch ( RemoteAccessException e )
-                        {
-                            remoteItem = null;
                         }
                         catch ( StorageException e )
                         {
@@ -599,6 +576,25 @@ public abstract class AbstractProxyRepository
         return item;
     }
 
+    private void sendContentValidationEvents( RepositoryItemUid uid, ContentValidationResult result )
+    {
+        if ( result == null )
+        {
+            return;
+        }
+        
+        if ( getLogger().isDebugEnabled() && !result.isContentValid() )
+        {
+            getLogger().debug(
+                "Item " + uid.toString() + " failed content integrity validation." );
+        }
+        
+        for ( NexusArtifactEvent event : result.getEvents() )
+        {
+            feedRecorder.addNexusArtifactEvent( event );
+        }
+    }
+
     protected void markItemRemotelyChecked( RepositoryItemUid uid, Map<String, Object> context )
         throws StorageException,
             ItemNotFoundException
@@ -609,8 +605,15 @@ public abstract class AbstractProxyRepository
 
     /**
      * Validates integrity of content of <code>item</code>.
+     * 
+     * Note that this method is called doRetrieveRemoteItem, so implementation
+     * must retrieve checksum files directly from remote storage 
+     * 
+     * <code>
+     *   getRemoteStorage().retrieveItem( this, context, getRemoteUrl(), checksumUid.getPath() );
+     * </code>
      */
-    protected ContentValidationResult doValidateRemoteItemContent( AbstractStorageItem item, Map<String, Object> context )
+    protected ContentValidationResult doValidateRemoteItemContent( String baseUrl, AbstractStorageItem item, Map<String, Object> context )
         throws RemoteAccessException,
             StorageException
     {
@@ -622,42 +625,73 @@ public abstract class AbstractProxyRepository
             RemoteAccessException,
             StorageException
     {
-        AbstractStorageItem result = null;
+        ContentValidationResult result = null;
+
+        DownloadMirrorSelector selector = getDownloadMirrors().openSelector();
+
+        ArrayList<String> urls = new ArrayList<String>( selector.getUrls() );
+
+        for ( int retry = 0; retry < DOWNLOAD_RETRY_COUNT; retry++ )
+        {
+            urls.add( getRemoteUrl() );
+        }
+
+        for ( String baseUrl : urls )
+        {
+            try
+            {
+                result = null;
+                
+                AbstractStorageItem remoteItem = getRemoteStorage().retrieveItem( this, context, baseUrl, uid.getPath() );
+
+                remoteItem.getItemContext().putAll( context );
+
+                remoteItem = doCacheItem( remoteItem );
+
+                result = doValidateRemoteItemContent( baseUrl, remoteItem, context );
+
+                if ( result != null && !result.isContentValid() )
+                {
+                    selector.feedbackFailure( baseUrl );
+
+                    continue; // try next url
+                }
+
+                sendContentValidationEvents( uid, result );
+
+                selector.feedbackSuccess( baseUrl );
+
+                return remoteItem; 
+            }
+            catch ( StorageException e )
+            {
+                selector.feedbackFailure( baseUrl );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                selector.feedbackFailure( baseUrl );
+            }
+        }
+
+        // if we got here, requested item was not found or item content was not valid
+
+        sendContentValidationEvents( uid, result );
 
         try
         {
-            result = getRemoteStorage().retrieveItem( this, context, uid.getPath() );
-
-            result.getItemContext().putAll( context );
+            getLocalStorage().deleteItem( this, context, uid.getPath() );
         }
-        catch ( RemoteAccessException ex )
+        catch ( ItemNotFoundException e )
         {
-            getLogger().warn(
-                "RemoteStorage of repository " + getId()
-                    + " throws RemoteAccessException. Please set up authorization information for repository ID='"
-                    + this.getId()
-                    + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
-                ex );
-
-            autoBlockProxying( ex );
-
-            throw ex;
+            // good, we want this item deleted
         }
-        catch ( StorageException ex )
+        catch ( UnsupportedStorageOperationException e )
         {
-            getLogger()
-                .warn(
-                    "RemoteStorage of repository "
-                        + getId()
-                        + " throws StorageException. Are we online? Is storage properly set up? Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
-                    ex );
-
-            autoBlockProxying( ex );
-
-            throw ex;
+            getLogger().warn( "Unexpected Exception", e );
         }
 
-        return result;
+        throw new ItemNotFoundException( uid );
+
     }
 
     /**

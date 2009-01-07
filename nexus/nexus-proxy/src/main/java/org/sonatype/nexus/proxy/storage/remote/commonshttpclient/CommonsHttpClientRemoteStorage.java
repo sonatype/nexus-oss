@@ -36,6 +36,7 @@ import org.apache.commons.httpclient.HttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NTCredentials;
+import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -124,12 +125,12 @@ public class CommonsHttpClientRemoteStorage
         return checkRemoteAvailability( 0, repository, context, RepositoryItemUid.PATH_ROOT, false );
     }
 
-    public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String path )
+    public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String baseUrl, String path )
         throws ItemNotFoundException,
             RemoteAccessException,
             StorageException
     {
-        URL remoteURL = getAbsoluteUrlFromBase( repository, context, path );
+        URL remoteURL = getAbsoluteUrlFromBase( baseUrl, path );
 
         HttpMethod method = null;
 
@@ -436,9 +437,16 @@ public class CommonsHttpClientRemoteStorage
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug(
-                "Invoking HTTP " + method.getName() + " method against remote location "
-                    + getAbsoluteUrlFromBase( repository, context, path ) );
+            try
+            {
+                getLogger().debug(
+                    "Invoking HTTP " + method.getName() + " method against remote location "
+                        + method.getURI() );
+            }
+            catch ( URIException e )
+            {
+                getLogger().debug( "Could not format debug log message", e );
+            }
         }
 
         RemoteStorageContext ctx = getRemoteStorageContext( repository );

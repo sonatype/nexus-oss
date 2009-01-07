@@ -166,7 +166,7 @@ public class JettyClientRemoteRepositoryStorage
         }
     }
 
-    public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String path )
+    public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String baseUrl, String path )
         throws ItemNotFoundException,
             StorageException
     {

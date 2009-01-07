@@ -507,7 +507,7 @@ public abstract class AbstractMavenRepository
     }
 
     @Override
-    protected ContentValidationResult doValidateRemoteItemContent( AbstractStorageItem item, Map<String, Object> context )
+    protected ContentValidationResult doValidateRemoteItemContent( String baseUrl, AbstractStorageItem item, Map<String, Object> context )
         throws RemoteAccessException,
             StorageException
     {
@@ -531,16 +531,18 @@ public abstract class AbstractMavenRepository
         // we prefer SHA1 ...
         try
         {
-            hashItem = (DefaultStorageFileItem) super.doRetrieveRemoteItem( uid.getRepository().createUid(
-                uid.getPath() + ".sha1" ), context );
+            String path = uid.getRepository().createUid( uid.getPath() + ".sha1" ).getPath();
+
+            hashItem = (DefaultStorageFileItem) getRemoteStorage().retrieveItem( this, context, getRemoteUrl(), path );
         }
         catch ( ItemNotFoundException sha1e )
         {
             // ... but MD5 will do too
             try
             {
-                hashItem = (DefaultStorageFileItem) super.doRetrieveRemoteItem( uid.getRepository().createUid(
-                    uid.getPath() + ".md5" ), context );
+                String path = uid.getRepository().createUid( uid.getPath() + ".md5" ).getPath();
+
+                hashItem = (DefaultStorageFileItem) getRemoteStorage().retrieveItem( this, context, getRemoteUrl(), path );
             }
             catch ( ItemNotFoundException md5e )
             {

@@ -1116,8 +1116,41 @@
 					</association>
 					<required>false</required>
 				</field>
+				<field>
+				  <name>mirrors</name>
+				  <version>1.0.8+</version>
+				  <description>
+				    Repository mirrors configuration.
+				  </description>
+          <association>
+            <type>CMirrors</type>
+          </association>
+          <required>false</required>
+				</field>
 			</fields>
 		</class>
+
+    <class>
+      <name>CMirrors</name>
+      <version>1.0.8+</version>
+      <description>
+        Repository mirrors configuration.
+      </description>
+      <fields>
+        <field>
+          <name>urls</name>
+          <version>1.0.8+</version>
+          <description>
+            List of mirror URLs.
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+      </fields>
+    </class>
 
 		<!-- SHADOW REPOSES -->
 		<class>

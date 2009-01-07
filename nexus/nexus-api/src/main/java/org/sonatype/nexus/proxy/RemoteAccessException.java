@@ -8,7 +8,7 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
  * @author cstamas
  */
 public abstract class RemoteAccessException
-    extends Exception
+    extends StorageException
 {
     private static final long serialVersionUID = 391662938886542734L;
 

@@ -67,7 +67,13 @@ public abstract class AbstractRemoteRepositoryStorage
     public URL getAbsoluteUrlFromBase( ProxyRepository repository, Map<String, Object> context, String path )
         throws StorageException
     {
-        StringBuffer urlStr = new StringBuffer( repository.getRemoteUrl() );
+        return getAbsoluteUrlFromBase( repository.getRemoteUrl(), path );
+    }
+
+    protected URL getAbsoluteUrlFromBase( String baseUrl, String path ) 
+        throws StorageException
+    {
+        StringBuffer urlStr = new StringBuffer( baseUrl );
 
         if ( path.startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
@@ -86,8 +92,9 @@ public abstract class AbstractRemoteRepositoryStorage
         {
             throw new StorageException( "The repository has broken URL!", e );
         }
+        
     }
-
+    
     /**
      * Remote storage specific, when the remote connection settings are actually applied.
      * 

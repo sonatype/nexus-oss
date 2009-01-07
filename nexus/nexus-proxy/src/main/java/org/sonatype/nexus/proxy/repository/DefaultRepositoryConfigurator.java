@@ -25,6 +25,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.RepositoryStatusConverter;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.validator.ApplicationValidationResponse;
+import org.sonatype.nexus.configuration.model.CMirrors;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
@@ -134,6 +135,16 @@ public class DefaultRepositoryConfigurator
 
                 repository.setRemoteUrl( repo.getRemoteStorage().getUrl() );
                 repository.setRemoteStorage( rs );
+                
+                CMirrors mirrors = repo.getRemoteStorage().getMirrors();
+                if ( mirrors != null )
+                {
+                    repository.setMirrorUrls( mirrors.getUrls() );
+                }
+                else
+                {
+                    repository.setMirrorUrls( null );
+                }
 
                 DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( rsc );
 
