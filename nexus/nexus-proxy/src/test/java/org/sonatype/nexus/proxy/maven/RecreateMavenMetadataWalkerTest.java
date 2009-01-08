@@ -66,7 +66,9 @@ public class RecreateMavenMetadataWalkerTest
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.jar",
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.pom",
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.jar",
-        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.pom" };
+        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.pom",
+        "/nexus1332/artifact-interp-main/14.0.0-SNAPSHOT/artifact-interp-main-14.0.0-20090108.150441-1.jar",
+        "/nexus1332/artifact-interp-main/14.0.0-SNAPSHOT/artifact-interp-main-14.0.0-20090108.150441-1.pom"};
 
     private String[] pluginArtifactFiles = {
         "/org/apache/maven/plugins/maven-antrun-plugin/1.1/maven-antrun-plugin-1.1.jar",
@@ -172,6 +174,26 @@ public class RecreateMavenMetadataWalkerTest
 
         assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest(
             "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/maven-metadata.xml",
+            false ) ) );
+    }
+    
+    public void BROKENtestRecreateMavenMetadataWalkerWalkerSnapshotWithInterpolation()
+        throws Exception
+    {
+        RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
+
+        DefaultWalkerContext ctx = new DefaultWalkerContext( inhouseSnapshot );
+
+        ctx.getProcessors().add( wp );
+
+        walker.walk( ctx );
+
+        assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest(
+            "/nexus1332/artifact-interp-main/maven-metadata.xml",
+            false ) ) );
+
+        assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest(
+            "/nexus1332/artifact-interp-main/14.0.0-SNAPSHOT/maven-metadata.xml",
             false ) ) );
     }
 
