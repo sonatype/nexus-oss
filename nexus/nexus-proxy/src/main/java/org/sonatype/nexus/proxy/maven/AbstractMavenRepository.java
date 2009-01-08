@@ -18,6 +18,7 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -45,7 +46,10 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.repository.ContentValidationResult;
 import org.sonatype.nexus.proxy.repository.DefaultRepository;
+import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
+import org.sonatype.nexus.proxy.repository.MutableProxyRepositoryKind;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 
@@ -63,6 +67,8 @@ public abstract class AbstractMavenRepository
      */
     @Requirement
     private MetadataManager metadataManager;
+
+    private MutableProxyRepositoryKind repositoryKind;
 
     /** Maven repository policy */
     private RepositoryPolicy repositoryPolicy = RepositoryPolicy.RELEASE;
@@ -92,6 +98,22 @@ public abstract class AbstractMavenRepository
      * Checksum policy applied in this Maven repository.
      */
     private ChecksumPolicy checksumPolicy;
+
+    /**
+     * Override the "default" kind with Maven specifics.
+     */
+    public RepositoryKind getRepositoryKind()
+    {
+        if ( repositoryKind == null )
+        {
+            repositoryKind = new MutableProxyRepositoryKind( this, Arrays
+                .asList( new Class<?>[] { MavenRepository.class } ), new DefaultRepositoryKind(
+                MavenHostedRepository.class,
+                null ), new DefaultRepositoryKind( MavenProxyRepository.class, null ) );
+        }
+
+        return repositoryKind;
+    }
 
     public Collection<String> evictUnusedItems( final long timestamp )
     {
@@ -507,7 +529,8 @@ public abstract class AbstractMavenRepository
     }
 
     @Override
-    protected ContentValidationResult doValidateRemoteItemContent( String baseUrl, AbstractStorageItem item, Map<String, Object> context )
+    protected ContentValidationResult doValidateRemoteItemContent( String baseUrl, AbstractStorageItem item,
+        Map<String, Object> context )
         throws RemoteAccessException,
             StorageException
     {
@@ -542,7 +565,11 @@ public abstract class AbstractMavenRepository
             {
                 String path = uid.getRepository().createUid( uid.getPath() + ".md5" ).getPath();
 
-                hashItem = (DefaultStorageFileItem) getRemoteStorage().retrieveItem( this, context, getRemoteUrl(), path );
+                hashItem = (DefaultStorageFileItem) getRemoteStorage().retrieveItem(
+                    this,
+                    context,
+                    getRemoteUrl(),
+                    path );
             }
             catch ( ItemNotFoundException md5e )
             {

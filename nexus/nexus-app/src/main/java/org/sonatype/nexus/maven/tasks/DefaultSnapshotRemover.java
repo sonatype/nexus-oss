@@ -34,6 +34,8 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RecreateMavenMetadataWalkerProcessor;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -44,6 +46,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.proxy.walker.DottedStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 
@@ -170,7 +173,7 @@ public class DefaultSnapshotRemover
             request,
             recreateMavenMetadataWalker );
 
-        DefaultWalkerContext ctx = new DefaultWalkerContext( repository );
+        DefaultWalkerContext ctx = new DefaultWalkerContext( repository, new DottedStoreWalkerFilter() );
 
         ctx.getProcessors().add( snapshotRemoverWalker );
 
@@ -485,9 +488,15 @@ public class DefaultSnapshotRemover
         {
             for ( Repository repository : repositoryRegistry.getRepositories() )
             {
-                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                // we need to filter for:
+                // repository that is MavenRepository and is hosted or proxy
+                // repository that has release policy
+                if ( repository.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class )
+                    || repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
                 {
-                    MavenRepository mrepository = (MavenRepository) repository;
+                    // actually, we don't care is it proxy or hosted, we only need to filter out groups and other
+                    // "composite" reposes like shadows
+                    MavenRepository mrepository = repository.adaptToFacet( MavenRepository.class );
 
                     // look in release reposes only
                     if ( RepositoryPolicy.RELEASE.equals( mrepository.getRepositoryPolicy() ) )
