@@ -160,7 +160,7 @@ public abstract class AbstractRemoteRepositoryStorage
             SystemStatus status = applicationStatusSource.getSystemStatus();
 
             userAgentPlatformInfo = new StringBuffer( "Nexus/" ).append( status.getVersion() ).append( " (" ).append(
-                status.getEdition() ).append( "; " ).append( System.getProperty( "os.name" ) ).append( "; " ).append(
+                status.getEditionUserAgent() ).append( "; " ).append( System.getProperty( "os.name" ) ).append( "; " ).append(
                 System.getProperty( "os.version" ) ).append( "; " ).append( System.getProperty( "os.arch" ) ).append(
                 "; " ).append( System.getProperty( "java.version" ) ).append( ") " ).toString();
         }

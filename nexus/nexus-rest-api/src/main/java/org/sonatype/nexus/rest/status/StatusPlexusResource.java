@@ -111,7 +111,7 @@ public class StatusPlexusResource
 
         resource.setClientPermissions( getClientPermissionsForCurrentUser( request ) );
         
-        resource.setEdition( status.getEdition() );
+        resource.setEdition( status.getEditionUI() );
 
         StatusResourceResponse result = new StatusResourceResponse();
 

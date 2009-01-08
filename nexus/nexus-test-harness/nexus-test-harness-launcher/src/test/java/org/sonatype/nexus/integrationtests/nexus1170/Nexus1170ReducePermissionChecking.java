@@ -51,7 +51,7 @@ public class Nexus1170ReducePermissionChecking
 
         List<ClientPermission> permissions = this.getPermissions();
         
-        Assert.assertEquals( 37, permissions.size() );
+        Assert.assertEquals( 38, permissions.size() );
 
         for ( ClientPermission clientPermission : permissions )
         {
@@ -68,7 +68,7 @@ public class Nexus1170ReducePermissionChecking
 
         List<ClientPermission> permissions = this.getPermissions();
 
-        Assert.assertEquals( 37, permissions.size() );
+        Assert.assertEquals( 38, permissions.size() );
         this.checkPermission( permissions, "nexus:*", 0 );
         this.checkPermission( permissions, "nexus:status", 1 );
         this.checkPermission( permissions, "nexus:authentication", 1 );
@@ -109,6 +109,7 @@ public class Nexus1170ReducePermissionChecking
         this.checkPermission( permissions, "nexus:userssetpw", 0 );
         this.checkPermission( permissions, "nexus:componentrealmtypes", 0 );
         this.checkPermission( permissions, "nexus:componentsrepotypes", 1 );
+        this.checkPermission( permissions, "nexus:componentsuserlocatortypes", 0 );
         
         for ( ClientPermission outPermission : permissions )
         {
