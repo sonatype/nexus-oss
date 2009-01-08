@@ -25,7 +25,7 @@ import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "RebuildMavenMetadata", description = "Rebuild Maven Medata Files" )
+@Component( role = ScheduledTaskDescriptor.class, hint = "RebuildMavenMetadata", description = "Rebuild Maven Metadata Files" )
 public class RebuildMavenMetadataTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
@@ -42,7 +42,7 @@ public class RebuildMavenMetadataTaskDescriptor
 
     public String getName()
     {
-        return "Rebuild Maven Medata Files";
+        return "Rebuild Maven Metadata Files";
     }
 
     public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
