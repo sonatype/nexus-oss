@@ -21,7 +21,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.index.context.DefaultIndexingContext;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
@@ -243,14 +245,62 @@ public class DefaultNexusIndexer
         throws IOException
     {
         File repositoryDirectory = context.getRepository();
-  
+
         if ( !repositoryDirectory.exists() )
         {
             throw new IOException( "Repository directory " + repositoryDirectory + " does not exist" );
         }
-  
-        scanner.scan( new DefaultScanningRequest( context, //
-            new DefaultNexusIndexerListener( context, this, indexerEngine, update, listener ) ) );
+
+        // always use temporary context when reindexing
+        File indexDir = context.getIndexDirectoryFile();
+        File dir = null;
+        if ( indexDir != null )
+        {
+            dir = indexDir.getParentFile();
+        }
+
+        File tmpFile = File.createTempFile( context.getId() + "-tmp", "", dir );
+        File tmpDir = new File( tmpFile.getParentFile(), tmpFile.getName() + ".dir" );
+        IndexingContext tmpContext = null;
+
+        try
+        {
+            if (!tmpDir.mkdirs())
+            {
+                throw new Exception("Cannot create temporary directory: " + tmpDir);
+            }
+
+            tmpContext = addIndexingContextForced( context.getId() + "-tmp", context.getRepositoryId(), context
+                .getRepository(), FSDirectory.getDirectory( tmpDir ), context.getRepositoryUrl(), context
+                .getIndexUpdateUrl(), context.getIndexCreators() );
+
+            scanner.scan( new DefaultScanningRequest( tmpContext, //
+                new DefaultNexusIndexerListener( tmpContext, this, indexerEngine, update, listener ) ) );
+
+            tmpContext.updateTimestamp( true );
+            context.replace( tmpContext.getIndexDirectory() );
+
+            removeIndexingContext( tmpContext, true );
+        }
+        catch ( Exception ex )
+        {
+            throw new IOException( "Error scanning context: " + context.getId(), ex );
+        }
+        finally
+        {
+            if ( tmpContext != null )
+            {
+                tmpContext.close( true );
+            }
+
+            if ( tmpFile.exists() )
+            {
+                tmpFile.delete();
+            }
+
+            FileUtils.deleteDirectory( tmpDir );
+        }
+
     }
 
     public void artifactDiscovered( ArtifactContext ac, IndexingContext context )
