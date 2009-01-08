@@ -471,6 +471,11 @@ Ext.override( Ext.form.Field, {
 Ext.override( Ext.form.TextField, {
   onEnable : function(){
     this.getActionEl().removeClass(this.disabledClass);
+    if ( this.actionMode == 'container' ) {
+      // in some cases the action mode seems to change after rendering,
+      // so we may need to clean up the disabled class from this.el
+      this.el.removeClass(this.disabledClass);
+    }
     this.el.dom.readOnly = false;
   },
   onDisable : function(){
