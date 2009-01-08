@@ -698,28 +698,9 @@ public class DefaultIndexerManager
         {
             repository.setIndexable( false );
 
-            tmpdir = new File( getTempDirectory(), "nx-remote-index" + System.currentTimeMillis() );
-
-            tmpdir.mkdirs();
-
-            FSDirectory directory = FSDirectory.getDirectory( tmpdir );
-
             IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
 
-            tmpContext = nexusIndexer.addIndexingContextForced(
-                context.getId() + "-tmp",
-                context.getRepositoryId(),
-                context.getRepository(),
-                directory,
-                context.getRepositoryUrl(),
-                context.getIndexUpdateUrl(),
-                context.getIndexCreators() );
-
-            nexusIndexer.scan( tmpContext );
-
-            tmpContext.updateTimestamp( true );
-
-            context.replace( tmpContext.getIndexDirectory() );
+            nexusIndexer.scan( context );
 
             updateIndexForRemoteRepository( repository );
 
