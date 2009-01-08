@@ -633,7 +633,9 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       }
     }
     else {
-      Sonatype.MessageBox.alert('The server did not delete the file/folder from the repository');
+      Sonatype.MessageBox.alert( 'Error', response.status == 401 ?
+        'You don\'t have permissions to delete artifacts in this repository' :
+        'The server did not delete the file/folder from the repository' );
     }
   },
   
