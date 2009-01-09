@@ -30,7 +30,7 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
  * 
  * @author cstamas
  */
-@Component( role = ShadowRepository.class, hint = "m2-m1-shadow", instantiationStrategy = "per-lookup" )
+@Component( role = ShadowRepository.class, hint = "m2-m1-shadow", instantiationStrategy = "per-lookup", description = "Maven1" )
 public class M1LayoutedM2ShadowRepository
     extends LayoutConverterShadowRepository
 {
