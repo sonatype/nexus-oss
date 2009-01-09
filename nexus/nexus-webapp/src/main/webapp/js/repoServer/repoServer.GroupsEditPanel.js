@@ -144,6 +144,12 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
                 }
                 return this.dropAllowed;
               },
+              onNodeDrop:function(node, source, e, data){
+                return this.onContainerDrop( source, e, data );
+              },
+              onNodeOver:function(node, source, e, data){
+                return this.onContainerOver( source, e, data );
+              },
               // passign padding to make whole treePanel the drop zone.  This is dependent
               // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
               // because treepanel.dropZone.setPadding is never available in time to be useful.
