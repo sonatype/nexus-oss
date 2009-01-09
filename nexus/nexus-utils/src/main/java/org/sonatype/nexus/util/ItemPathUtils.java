@@ -78,7 +78,7 @@ public class ItemPathUtils
 
         int lastSepratorPos = path.lastIndexOf( PATH_SEPARATOR );
 
-        if ( lastSepratorPos == 1 )
+        if ( lastSepratorPos == 0 )
         {
             return PATH_SEPARATOR;
         }
