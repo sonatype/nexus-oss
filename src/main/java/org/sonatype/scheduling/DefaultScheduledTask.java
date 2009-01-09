@@ -310,7 +310,7 @@ public class DefaultScheduledTask<T>
         
         Future<T> nextFuture = null;
 
-        if ( isEnabled() && getTaskState().isActiveOrSubmitted() )
+        if ( ( isEnabled() || manualRun ) && getTaskState().isActiveOrSubmitted()) 
         {
             setTaskState( TaskState.RUNNING );
 
@@ -366,7 +366,7 @@ public class DefaultScheduledTask<T>
             }
         }
 
-        // If manually running or having future, park this task to waiting
+        // If manually running or having future, park this task to waiting        
         if ( isManualRunScheduled() )
         {
             setTaskState( TaskState.SUBMITTED );
