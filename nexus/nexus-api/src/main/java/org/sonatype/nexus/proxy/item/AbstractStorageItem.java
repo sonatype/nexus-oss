@@ -20,10 +20,10 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.util.ItemPathUtils;
 
 /**
  * The Class AbstractStorageItem.
@@ -265,19 +265,7 @@ public abstract class AbstractStorageItem
      */
     public void setPath( String path )
     {
-        if ( StringUtils.isEmpty( path ) )
-        {
-            path = RepositoryItemUid.PATH_ROOT;
-        }
-
-        if ( path.length() > 1 && path.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
-        {
-            this.path = path.substring( 0, path.length() - 1 );
-        }
-        else
-        {
-            this.path = path;
-        }
+        this.path = ItemPathUtils.cleanUpTrailingSlash( path );
     }
 
     public boolean isExpired()
@@ -302,13 +290,7 @@ public abstract class AbstractStorageItem
 
     public String getParentPath()
     {
-        String parent = getPath().substring( 0, getPath().lastIndexOf( "/" ) );
-
-        if ( StringUtils.isEmpty( parent ) )
-        {
-            parent = RepositoryItemUid.PATH_ROOT;
-        }
-        return parent;
+        return ItemPathUtils.getParentPath( getPath() );
     }
 
     public Map<String, String> getAttributes()

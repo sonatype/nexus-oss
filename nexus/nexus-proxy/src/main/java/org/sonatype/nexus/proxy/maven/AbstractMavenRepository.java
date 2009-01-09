@@ -53,6 +53,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.util.ItemPathUtils;
 
 /**
  * The abstract (layout unaware) Maven Repository.
@@ -757,7 +758,7 @@ public abstract class AbstractMavenRepository
             super.markItemRemotelyChecked( md5Uid, context );
         }
     }
-    
+
     public void deleteItem( ResourceStoreRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
@@ -776,11 +777,11 @@ public abstract class AbstractMavenRepository
 
         if ( item instanceof StorageCollectionItem )
         {
-            path = getParentPath( item.getPath() );
+            path = ItemPathUtils.getParentPath( item.getPath() );
         }
         else if ( item instanceof StorageFileItem )
         {
-            path = getParentPath( getParentPath( item.getPath() ) );
+            path = ItemPathUtils.getParentPath( ItemPathUtils.getParentPath( item.getPath() ) );
         }
 
         // then delete the item
@@ -788,25 +789,5 @@ public abstract class AbstractMavenRepository
 
         // finally rebuild metadata
         recreateMavenMetadata( path );
-    }
-
-    // TODO: maybe it's better to move this method to RepositoryItemUid
-    private String getParentPath( String path )
-    {
-        if ( RepositoryItemUid.PATH_ROOT.equals( path ) )
-        {
-            return path;
-        }
-
-        int lastSepratorPos = path.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR );
-
-        if ( lastSepratorPos == 1 )
-        {
-            return RepositoryItemUid.PATH_ROOT;
-        }
-        else
-        {
-            return path.substring( 0, lastSepratorPos );
-        }
     }
 }

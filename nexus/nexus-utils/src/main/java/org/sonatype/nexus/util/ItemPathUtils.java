@@ -14,6 +14,13 @@ public class ItemPathUtils
 
     public static final int PATH_SEPARATOR_LENGTH = PATH_SEPARATOR.length();
 
+    /**
+     * Simple concat method. It only watches that there is only one PATH_SEPARATOR betwen parts passed in. It DOES NOT
+     * checks that parts are fine or not.
+     * 
+     * @param p
+     * @return
+     */
     public static String concatPaths( String... p )
     {
         StringBuffer result = new StringBuffer();
@@ -34,4 +41,51 @@ public class ItemPathUtils
 
         return result.toString();
     }
+
+    /**
+     * Simple path cleanup.
+     * 
+     * @param path
+     * @return
+     */
+    public static String cleanUpTrailingSlash( String path )
+    {
+        if ( StringUtils.isEmpty( path ) )
+        {
+            path = PATH_SEPARATOR;
+        }
+
+        if ( path.length() > 1 && path.endsWith( PATH_SEPARATOR ) )
+        {
+            path = path.substring( 0, path.length() - PATH_SEPARATOR.length() );
+        }
+
+        return path;
+    }
+
+    /**
+     * Calculates the parent path for a path.
+     * 
+     * @param path
+     * @return
+     */
+    public static String getParentPath( String path )
+    {
+        if ( PATH_SEPARATOR.equals( path ) )
+        {
+            return path;
+        }
+
+        int lastSepratorPos = path.lastIndexOf( PATH_SEPARATOR );
+
+        if ( lastSepratorPos == 1 )
+        {
+            return PATH_SEPARATOR;
+        }
+        else
+        {
+            return path.substring( 0, lastSepratorPos );
+        }
+    }
+
 }
