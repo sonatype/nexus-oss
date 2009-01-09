@@ -56,7 +56,7 @@ public class DefaultAttributesHandlerTest
         FileUtils.deleteDirectory( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .getWorkingDirectory() );
 
-        repository = (Repository) lookup( Repository.class, "maven2" );
+        repository = lookup( Repository.class, "maven2" );
 
         repository.setId( "dummy" );
 

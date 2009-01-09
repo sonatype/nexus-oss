@@ -139,7 +139,7 @@ public class RecreateMavenMetadataWalkerTest
             fis.close();
         }
 
-        walker = (Walker) lookup( Walker.class );
+        walker = lookup( Walker.class );
     }
 
     public void testRecreateMavenMetadataWalkerWalkerRelease()

@@ -104,7 +104,7 @@ public abstract class LayoutConverterShadowRepository
 
     public RepositoryPolicy getRepositoryPolicy()
     {
-        return ( (MavenRepository) getMasterRepository() ).getRepositoryPolicy();
+        return getMasterRepository().getRepositoryPolicy();
     }
 
     public MetadataManager getMetadataManager()

@@ -30,7 +30,7 @@ public class DefaultTargetRegistryTest
 
         maven2 = new Maven2ContentClass();
 
-        targetRegistry = (TargetRegistry) lookup( TargetRegistry.class );
+        targetRegistry = lookup( TargetRegistry.class );
 
         // adding two targets
         Target t1 = new Target( "maven2-public", "Maven2 (public)", maven2, Arrays

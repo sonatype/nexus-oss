@@ -87,6 +87,7 @@ public class EhCachePathCache
 
     public boolean removeWithChildren( String path )
     {
+        @SuppressWarnings("unchecked")
         List<String> keys = ec.getKeys();
 
         String keyToRemove = makeKeyFromPath( path );
@@ -118,7 +119,8 @@ public class EhCachePathCache
     {
         ec.evictExpiredElements();
 
-        List<String> keys = (List<String>) ec.getKeys();
+        @SuppressWarnings("unchecked")
+        List<String> keys = ec.getKeys();
 
         return keys;
     }

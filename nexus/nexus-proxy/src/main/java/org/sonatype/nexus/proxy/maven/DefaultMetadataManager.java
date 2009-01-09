@@ -621,7 +621,8 @@ public class DefaultMetadataManager
         }
 
         // remove if already exists
-        for ( Iterator<Plugin> i = (Iterator<Plugin>) md.getPlugins().iterator(); i.hasNext(); )
+        List<Plugin> plugins = md.getPlugins();
+        for ( Iterator<Plugin> i = plugins.iterator(); i.hasNext(); )
         {
             Plugin p = i.next();
 
@@ -709,7 +710,8 @@ public class DefaultMetadataManager
         }
 
         // remove if already exists
-        for ( Iterator<Plugin> i = (Iterator<Plugin>) md.getPlugins().iterator(); i.hasNext(); )
+        List<Plugin> plugins = md.getPlugins();
+        for ( Iterator<Plugin> i = plugins.iterator(); i.hasNext(); )
         {
             Plugin p = i.next();
 

@@ -38,7 +38,7 @@ public class WalkerTest
     {
         super.setUp();
 
-        walker = (Walker) lookup( Walker.class );
+        walker = lookup( Walker.class );
     }
 
     @Override

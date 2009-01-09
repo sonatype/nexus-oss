@@ -734,7 +734,7 @@ public abstract class AbstractProxyRepository
         // else check age
         else
         {
-            return ( ( System.currentTimeMillis() - item.getRemoteChecked() ) > ( (long) maxAge * 60L * 1000L ) );
+            return ( ( System.currentTimeMillis() - item.getRemoteChecked() ) > ( maxAge * 60L * 1000L ) );
         }
     }
 

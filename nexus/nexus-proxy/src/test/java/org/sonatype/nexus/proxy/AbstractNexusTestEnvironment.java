@@ -42,15 +42,15 @@ public abstract class AbstractNexusTestEnvironment
         WORK_HOME.mkdirs();
         CONF_HOME.mkdirs();
 
-        scheduler = (Scheduler) lookup( Scheduler.class );
+        scheduler = lookup( Scheduler.class );
         
         scheduler.startService();
         
-        cacheManager = (CacheManager) lookup( CacheManager.class );
+        cacheManager = lookup( CacheManager.class );
 
         cacheManager.startService();
 
-        repositoryItemUidFactory = (RepositoryItemUidFactory) lookup( RepositoryItemUidFactory.class );
+        repositoryItemUidFactory = lookup( RepositoryItemUidFactory.class );
     }
 
     protected void tearDown()

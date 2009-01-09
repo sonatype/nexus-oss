@@ -67,11 +67,11 @@ public class PathBasedRequestRepositoryMapperTest
         Map<String, String[]> exclusions, Map<String, String[]> blockings )
         throws Exception
     {
-        applicationConfiguration = (ApplicationConfiguration) lookup( ApplicationConfiguration.class );
+        applicationConfiguration = lookup( ApplicationConfiguration.class );
 
         applicationConfiguration.getConfiguration().getRepositoryGrouping().getPathMappings().clear();
 
-        registry = (RepositoryRegistry) lookup( RepositoryRegistry.class );
+        registry = lookup( RepositoryRegistry.class );
 
         // clean this up?
 

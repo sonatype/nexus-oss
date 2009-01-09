@@ -209,29 +209,29 @@ public abstract class AbstractProxyTestEnvironment
 
         this.logger = loggerManager.getLoggerForComponent( this.getClass().toString() );
 
-        applicationConfiguration = (ApplicationConfiguration) lookup( ApplicationConfiguration.class );
+        applicationConfiguration = lookup( ApplicationConfiguration.class );
 
         // deleting files
         FileUtils.forceDelete( getApplicationConfiguration().getWorkingDirectory() );
 
-        repositoryRegistry = (RepositoryRegistry) lookup( RepositoryRegistry.class );
+        repositoryRegistry = lookup( RepositoryRegistry.class );
 
         testEventListener = new TestItemEventListener();
 
         repositoryRegistry.addProximityEventListener( testEventListener );
 
-        attributesHandler = (AttributesHandler) lookup( AttributesHandler.class );
+        attributesHandler = lookup( AttributesHandler.class );
 
         ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .setWorkingDirectory( getApplicationConfiguration().getWorkingDirectory( "proxy/attributes" ) );
 
-        localRepositoryStorage = (LocalRepositoryStorage) lookup( LocalRepositoryStorage.class, "file" );
+        localRepositoryStorage = lookup( LocalRepositoryStorage.class, "file" );
 
         remoteStorageContext = new DefaultRemoteStorageContext( null );
 
-        remoteRepositoryStorage = (RemoteRepositoryStorage) lookup( RemoteRepositoryStorage.class, "apacheHttpClient3x" );
+        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, "apacheHttpClient3x" );
 
-        rootRouter = (RepositoryRouter) lookup( RepositoryRouter.class );
+        rootRouter = lookup( RepositoryRouter.class );
 
         getEnvironmentBuilder().buildEnvironment( this );
 
@@ -471,7 +471,7 @@ public abstract class AbstractProxyTestEnvironment
         }
         finally
         {
-            isr.close();
+            IOUtil.close( isr );
         }
         return md;
     }

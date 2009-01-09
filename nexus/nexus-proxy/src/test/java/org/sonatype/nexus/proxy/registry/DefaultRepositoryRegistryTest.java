@@ -45,7 +45,7 @@ public class DefaultRepositoryRegistryTest
     {
         super.setUp();
 
-        this.repositoryRegistry = (RepositoryRegistry) lookup( RepositoryRegistry.class );
+        this.repositoryRegistry = lookup( RepositoryRegistry.class );
     }
 
     protected void tearDown()

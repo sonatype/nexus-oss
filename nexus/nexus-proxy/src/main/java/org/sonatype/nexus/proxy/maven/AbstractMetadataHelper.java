@@ -48,7 +48,7 @@ import org.codehaus.plexus.util.StringUtils;
 abstract public class AbstractMetadataHelper
 {
 
-    private static final String VERSION_REGEX = "^[0-9].*$";
+    // private static final String VERSION_REGEX = "^[0-9].*$";
 
     private static final String MD5_SUFFIX = ".md5";
 

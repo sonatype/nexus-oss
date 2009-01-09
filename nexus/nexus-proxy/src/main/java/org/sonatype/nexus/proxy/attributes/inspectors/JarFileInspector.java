@@ -85,7 +85,7 @@ public class JarFileInspector
 
             for ( Enumeration<JarEntry> e = jFile.entries(); e.hasMoreElements(); )
             {
-                JarEntry entry = (JarEntry) e.nextElement();
+                JarEntry entry = e.nextElement();
                 String name = entry.getName();
 
                 if ( name.endsWith( ".class" ) )

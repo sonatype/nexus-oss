@@ -83,7 +83,7 @@ public abstract class AbstractNexusTestCase
     protected LoggerManager getLoggerManager()
         throws ComponentLookupException
     {
-        return (LoggerManager) getContainer().lookup( LoggerManager.class );
+        return getContainer().lookup( LoggerManager.class );
     }
 
     protected boolean contentEquals( File f1, File f2 ) throws IOException
