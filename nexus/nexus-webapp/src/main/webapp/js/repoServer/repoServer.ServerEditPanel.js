@@ -35,7 +35,12 @@ Sonatype.repoServer.ServerEditPanel = function(config){
   this.realmTypeDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.realmComponents,
     reader: this.realmTypeReader,
-    autoLoad: true
+    listeners: {
+      load: {
+        fn: this.loadServerConfig,
+        scope: this
+      }
+    }
   });
   
   // help text alias
@@ -490,7 +495,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
 //  this.buttons = this.formPanel.buttons;
   
   this.formPanel.on('beforerender', this.beforeRenderHandler, this.formPanel);
-  this.formPanel.on('afterlayout', this.afterLayoutHandler, this.formPanel, {single:true});
+  this.formPanel.on('afterlayout', this.afterLayoutHandler, this, {single:true});
   this.formPanel.form.on('actioncomplete', this.actionCompleteHandler, this.formPanel);
   this.formPanel.form.on('actionfailed', this.actionFailedHandler, this.formPanel);
   
@@ -579,14 +584,36 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   },
   
   afterLayoutHandler : function(){
+
+    this.realmTypeDataStore.load();
+
+    var fpanel = this.formPanel;
+    
+    // register required field quicktip, but have to wait for elements to show up in DOM
+    var temp = function(){
+      var els = Ext.select('.required-field .x-form-item-label', fpanel.getEl());
+      els.each(function(el, els, i){
+        Ext.QuickTips.register({
+          target: el,
+          cls: 'required-field',
+          title: '',
+          text: 'Required Field',
+          enabled: true
+        });
+      });
+    }.defer(300, fpanel);
+    
+  },
   
-    var appSettingsPanel = this.findById( this.id + '_applicationServerSettings' );
-    var anonSettingsPanel = this.findById( this.id + '_anonymousAccessSettings' );
-    // invoke form data load
-    this.getForm().doAction('sonatypeLoad', {
+  loadServerConfig: function() {
+    
+    var fpanel = this.formPanel;
+    var appSettingsPanel = fpanel.findById( fpanel.id + '_applicationServerSettings' );
+
+    this.formPanel.getForm().doAction('sonatypeLoad', {
       url:Sonatype.config.repos.urls.globalSettingsState,
       method:'GET',
-      fpanel:this,
+      fpanel:fpanel,
       dataModifiers: {
         "routing.followLinks" : Sonatype.utils.capitalize,
         "routing.groups.stopItemSearchOnFirstFoundFile" : Sonatype.utils.capitalize,
@@ -603,21 +630,6 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
           }
       }
     });
-    
-    // register required field quicktip, but have to wait for elements to show up in DOM
-    var temp = function(){
-      var els = Ext.select('.required-field .x-form-item-label', this.getEl());
-      els.each(function(el, els, i){
-        Ext.QuickTips.register({
-          target: el,
-          cls: 'required-field',
-          title: '',
-          text: 'Required Field',
-          enabled: true
-        });
-      });
-    }.defer(300, this);
-    
   },
   
   //(Ext.form.BasicForm, Ext.form.Action)
