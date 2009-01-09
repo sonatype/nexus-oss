@@ -10,6 +10,10 @@ import org.codehaus.plexus.util.StringUtils;
  */
 public class ItemPathUtils
 {
+    public static final String PATH_SEPARATOR = "/";
+
+    public static final int PATH_SEPARATOR_LENGTH = PATH_SEPARATOR.length();
+
     public static String concatPaths( String... p )
     {
         StringBuffer result = new StringBuffer();
@@ -18,12 +22,13 @@ public class ItemPathUtils
         {
             if ( !StringUtils.isEmpty( path ) )
             {
-                if ( !path.startsWith( "/" ) )
+                if ( !path.startsWith( PATH_SEPARATOR ) )
                 {
-                    result.append( "/" );
+                    result.append( PATH_SEPARATOR );
                 }
 
-                result.append( path.endsWith( "/" ) ? path.substring( 0, path.length() - 1 ) : path );
+                result.append( path.endsWith( PATH_SEPARATOR ) ? path.substring( 0, path.length()
+                    - PATH_SEPARATOR_LENGTH ) : path );
             }
         }
 
