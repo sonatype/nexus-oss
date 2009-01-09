@@ -30,7 +30,7 @@
 				</property>
 				<property>
 					<key>permission</key>
-					<value>artifactoryupload</value>
+					<value>nexus:artifactoryupload</value>
 				</property>
 			</properties>
 		</privilege>
@@ -47,7 +47,7 @@
 				</property>
 				<property>
 					<key>permission</key>
-					<value>artifactorymigrate</value>
+					<value>nexus:artifactorymigrate</value>
 				</property>
 			</properties>
 		</privilege>
