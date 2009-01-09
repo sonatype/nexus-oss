@@ -341,7 +341,8 @@ public class DefaultTimeline
                     query,
                     new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
 
-                Iterator<Hit> i = (Iterator<Hit>) hits.iterator();
+                @SuppressWarnings("unchecked")
+                Iterator<Hit> i = hits.iterator();
 
                 // step over the unneeded stuff
                 for ( long idx = 0; i.hasNext() && idx < from; idx++ )

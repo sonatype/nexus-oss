@@ -19,25 +19,11 @@ package org.sonatype.nexus.integrationtests.nexus477;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Date;
 
 import junit.framework.Assert;
 
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.maven.wagon.ConnectionException;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.TransferFailedException;
-import org.apache.maven.wagon.authentication.AuthenticationException;
-import org.apache.maven.wagon.authorization.AuthorizationException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.Method;

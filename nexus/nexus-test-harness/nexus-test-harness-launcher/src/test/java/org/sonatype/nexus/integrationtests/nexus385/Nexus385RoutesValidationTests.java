@@ -43,7 +43,6 @@ public class Nexus385RoutesValidationTests
         this.messageUtil = new RoutesMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void createNoGroupIdTest()
         throws IOException
@@ -71,7 +70,6 @@ public class Nexus385RoutesValidationTests
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void createNoRuleTypeTest()
         throws IOException
@@ -99,7 +97,6 @@ public class Nexus385RoutesValidationTests
 
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void createNoPatternTest()
         throws IOException
@@ -126,7 +123,6 @@ public class Nexus385RoutesValidationTests
 
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void createWithInvalidPatternTest()
         throws IOException
@@ -153,7 +149,6 @@ public class Nexus385RoutesValidationTests
 
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void createWithInvalidGroupTest()
         throws IOException
@@ -179,7 +174,6 @@ public class Nexus385RoutesValidationTests
         this.messageUtil.validateResponseErrorXml( responseText );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void createWithInvalidRuleTypeTest()
         throws IOException
@@ -206,7 +200,6 @@ public class Nexus385RoutesValidationTests
         this.messageUtil.validateResponseErrorXml( responseText );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void createNoReposTest()
         throws IOException
@@ -232,7 +225,6 @@ public class Nexus385RoutesValidationTests
         this.messageUtil.validateResponseErrorXml( responseText );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void createWithInvalidReposTest()
         throws IOException

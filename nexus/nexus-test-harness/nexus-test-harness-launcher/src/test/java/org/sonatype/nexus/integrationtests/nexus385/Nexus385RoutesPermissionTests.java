@@ -25,9 +25,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
-import org.sonatype.nexus.rest.model.RoleResource;
 
 /**
  * Test the privilege for CRUD operations.

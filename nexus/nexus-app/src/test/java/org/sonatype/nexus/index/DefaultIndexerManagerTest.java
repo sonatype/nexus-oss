@@ -18,6 +18,7 @@ package org.sonatype.nexus.index;
 
 import java.util.Collection;
 
+import org.apache.lucene.search.Query;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.scheduling.ScheduledTask;
@@ -32,7 +33,7 @@ public class DefaultIndexerManagerTest
     {
         super.setUp();
 
-        indexerManager = (IndexerManager) lookup( IndexerManager.class );
+        indexerManager = lookup( IndexerManager.class );
     }
 
     protected void tearDown()
@@ -55,8 +56,12 @@ public class DefaultIndexerManagerTest
         // make it block until finished
         st.get();
 
-        Collection<ArtifactInfo> result = indexerManager.getNexusIndexer().searchFlat(
-            indexerManager.getNexusIndexer().constructQuery( ArtifactInfo.GROUP_ID, "org.sonatype.nexus" ) );
+        Query query = indexerManager.getNexusIndexer().constructQuery( ArtifactInfo.GROUP_ID, "org.sonatype.nexus" );
+        FlatSearchRequest request = new FlatSearchRequest( query );
+        
+        FlatSearchResponse response = indexerManager.getNexusIndexer().searchFlat( request );
+        
+        Collection<ArtifactInfo> result = response.getResults(); 
 
         // expected result set
         // org.sonatype.nexus:nexus-indexer:1.0-beta-5-SNAPSHOT

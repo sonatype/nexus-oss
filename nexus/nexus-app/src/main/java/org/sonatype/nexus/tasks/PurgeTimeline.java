@@ -104,16 +104,16 @@ public class PurgeTimeline
     {
         if ( getTypes().size() == 0 )
         {
-            timeline.purgeOlderThan( System.currentTimeMillis() - ( (long) getPurgeOlderThan() * A_DAY ) );
+            timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ) );
         }
         else if ( getSubTypes().size() == 0 )
         {
-            timeline.purgeOlderThan( System.currentTimeMillis() - ( (long) getPurgeOlderThan() * A_DAY ), getTypes() );
+            timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), getTypes() );
         }
         else
         {
             timeline.purgeOlderThan(
-                System.currentTimeMillis() - ( (long) getPurgeOlderThan() * A_DAY ),
+                System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ),
                 getTypes(),
                 getSubTypes(),
                 null );

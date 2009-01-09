@@ -102,7 +102,7 @@ public abstract class AbstractNexusTestCase
 
         if ( loadConfigurationAtSetUp() )
         {
-            nexusConfiguration = (NexusConfiguration) this.lookup( NexusConfiguration.class );
+            nexusConfiguration = this.lookup( NexusConfiguration.class );
 
             nexusConfiguration.loadConfiguration();
 
@@ -121,7 +121,7 @@ public abstract class AbstractNexusTestCase
 
     protected LoggerManager getLoggerManager() throws ComponentLookupException
     {
-        return (LoggerManager) getContainer().lookup( LoggerManager.class );
+        return getContainer().lookup( LoggerManager.class );
     }
 
     protected boolean contentEquals( File f1, File f2 ) throws IOException

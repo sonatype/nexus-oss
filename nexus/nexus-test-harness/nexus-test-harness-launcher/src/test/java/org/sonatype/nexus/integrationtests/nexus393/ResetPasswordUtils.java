@@ -18,7 +18,6 @@ package org.sonatype.nexus.integrationtests.nexus393;
 
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 
 public class ResetPasswordUtils

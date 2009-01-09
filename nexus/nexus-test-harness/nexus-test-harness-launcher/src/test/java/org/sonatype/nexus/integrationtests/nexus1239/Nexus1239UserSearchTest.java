@@ -40,7 +40,6 @@ public class Nexus1239UserSearchTest extends AbstractNexusIntegrationTest
         Assert.assertEquals( "default", role.getSource() );
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void userSearchTest() throws IOException
     {
@@ -60,7 +59,6 @@ public class Nexus1239UserSearchTest extends AbstractNexusIntegrationTest
         Assert.assertTrue( userIds.contains( "anonymous" ) );
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void emptySearchTest() throws IOException
     {

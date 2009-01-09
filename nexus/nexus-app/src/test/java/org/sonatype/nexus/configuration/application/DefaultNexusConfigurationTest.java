@@ -102,11 +102,11 @@ public class DefaultNexusConfigurationTest
 
         config = nexusConfiguration.getConfiguration();
 
-        String proxyHostName = ( (CRemoteHttpProxySettings) ( (DefaultNexusConfiguration) nexusConfiguration )
+        String proxyHostName = ( (CRemoteHttpProxySettings) nexusConfiguration
             .getRemoteStorageContext().getRemoteConnectionContextObject(
                 RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS ) ).getProxyHostname();
 
-        int proxyPort = ( (CRemoteHttpProxySettings) ( (DefaultNexusConfiguration) nexusConfiguration )
+        int proxyPort = ( (CRemoteHttpProxySettings) nexusConfiguration
             .getRemoteStorageContext().getRemoteConnectionContextObject(
                 RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS ) ).getProxyPort();
 

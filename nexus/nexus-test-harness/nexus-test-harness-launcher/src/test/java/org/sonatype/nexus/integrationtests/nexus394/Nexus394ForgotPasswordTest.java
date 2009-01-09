@@ -21,9 +21,7 @@ import javax.mail.internet.MimeMessage;
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
-import org.sonatype.nexus.integrationtests.TestContainer;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 

@@ -19,7 +19,6 @@ package org.sonatype.nexus.integrationtests.nexus394;
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 

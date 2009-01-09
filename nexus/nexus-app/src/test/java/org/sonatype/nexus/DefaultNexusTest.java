@@ -39,7 +39,7 @@ public class DefaultNexusTest
     {
         super.setUp();
 
-        defaultNexus = (Nexus) lookup( Nexus.class );
+        defaultNexus = lookup( Nexus.class );
     }
 
     protected boolean loadConfigurationAtSetUp()

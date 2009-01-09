@@ -47,7 +47,6 @@ public class Nexus133TargetCrudJsonTests
             new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void createTargetTest()
         throws IOException
@@ -150,7 +149,7 @@ public class Nexus133TargetCrudJsonTests
 
 
         // NEED to work around a GET problem with the REST client
-        List<RepositoryTargetListResource> targets = this.messageUtil.getList();
+        List<RepositoryTargetListResource> targets = TargetMessageUtil.getList();
         // the response is a list of RepositoryTargetListResource, so we need a different compare method.
         this.messageUtil.verifyCompleteTargetsConfig( targets );
 

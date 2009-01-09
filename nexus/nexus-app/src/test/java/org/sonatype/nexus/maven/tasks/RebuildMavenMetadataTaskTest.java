@@ -30,7 +30,7 @@ public class RebuildMavenMetadataTaskTest
     {
         super.setUp();
 
-        nexusScheduler = (NexusScheduler) lookup( NexusScheduler.class );
+        nexusScheduler = lookup( NexusScheduler.class );
 
         nexusScheduler.startService();
     }
@@ -48,8 +48,8 @@ public class RebuildMavenMetadataTaskTest
     {
         fillInRepo();
 
-        RebuildMavenMetadataTask task = (RebuildMavenMetadataTask) nexusScheduler
-            .createTaskInstance( RebuildMavenMetadataTask.class );
+        RebuildMavenMetadataTask task = nexusScheduler.createTaskInstance( //
+            RebuildMavenMetadataTask.class);
 
         task.setRepositoryId( snapshots.getId() );
 

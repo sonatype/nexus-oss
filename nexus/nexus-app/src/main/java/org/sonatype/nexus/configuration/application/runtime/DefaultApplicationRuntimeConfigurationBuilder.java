@@ -118,7 +118,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
             }
 
             // Setting contentClass specific things on a repository
-            RepositoryConfigurator configurator = (RepositoryConfigurator) plexusContainer.lookup(
+            RepositoryConfigurator configurator = plexusContainer.lookup(
                 RepositoryConfigurator.class,
                 type );
 
@@ -152,7 +152,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
         try
         {
-            master = (Repository) repositoryRegistry.getRepository( shadow.getShadowOf() );
+            master = repositoryRegistry.getRepository( shadow.getShadowOf() );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -164,7 +164,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
         {
 
             // Setting contentClass specific things on a repository
-            ShadowRepositoryConfigurator configurator = (ShadowRepositoryConfigurator) plexusContainer.lookup(
+            ShadowRepositoryConfigurator configurator = plexusContainer.lookup(
                 ShadowRepositoryConfigurator.class,
                 shadow.getType() );
 
@@ -220,7 +220,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
             }
 
             // Setting contentClass specific things on a repository
-            GroupRepositoryConfigurator configurator = (GroupRepositoryConfigurator) plexusContainer.lookup(
+            GroupRepositoryConfigurator configurator = plexusContainer.lookup(
                 GroupRepositoryConfigurator.class,
                 type );
 
@@ -256,7 +256,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
     {
         try
         {
-            return (LocalRepositoryStorage) plexusContainer.lookup( LocalRepositoryStorage.class, provider );
+            return plexusContainer.lookup( LocalRepositoryStorage.class, provider );
         }
         catch ( ComponentLookupException e )
         {
@@ -270,7 +270,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
     {
         try
         {
-            return (RemoteRepositoryStorage) plexusContainer.lookup( RemoteRepositoryStorage.class, provider );
+            return plexusContainer.lookup( RemoteRepositoryStorage.class, provider );
         }
         catch ( ComponentLookupException e )
         {

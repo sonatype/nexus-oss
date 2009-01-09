@@ -34,7 +34,7 @@ public class RemoveRepoFolderTaskTest extends AbstractNexusTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		nexusScheduler = (NexusScheduler) lookup(NexusScheduler.class);
+		nexusScheduler = lookup(NexusScheduler.class);
 
 		nexusScheduler.startService();
 	}

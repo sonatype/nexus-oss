@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousResetPasswordTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 

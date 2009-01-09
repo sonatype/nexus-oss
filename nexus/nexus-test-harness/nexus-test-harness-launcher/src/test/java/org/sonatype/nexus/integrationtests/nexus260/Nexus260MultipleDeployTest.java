@@ -23,7 +23,6 @@ import java.io.File;
 
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 

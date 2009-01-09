@@ -210,7 +210,6 @@ public class Nexus233PrivilegesValidationTests
         Assert.assertNull( SecurityConfigUtil.getCPrivilegeByName( "createWithInvalidAndValidMethodsTest - (read)" ) );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void createApplicationResource()
         throws IOException

@@ -44,7 +44,8 @@ public class Log4jLogFileManager
     {
         Logger logger = Logger.getRootLogger();
 
-        Enumeration<Appender> appenders = (Enumeration<Appender>) logger.getAllAppenders();
+        @SuppressWarnings("unchecked")
+        Enumeration<Appender> appenders = logger.getAllAppenders();
 
         while ( appenders.hasMoreElements() )
         {
@@ -68,7 +69,8 @@ public class Log4jLogFileManager
     {
         Logger logger = Logger.getRootLogger();
 
-        Enumeration<Appender> appenders = (Enumeration<Appender>) logger.getAllAppenders();
+        @SuppressWarnings("unchecked")
+        Enumeration<Appender> appenders = logger.getAllAppenders();
 
         HashSet<File> files = new HashSet<File>();
 

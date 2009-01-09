@@ -40,7 +40,6 @@ public class Nexus874SecurityRealmReplacementTest
 {    
     private GroupMessageUtil groupUtil;
     private RepositoryMessageUtil repoUtil;
-    private TargetMessageUtil targetUtil;
     private RoleMessageUtil roleUtil;
     private UserMessageUtil userUtil;
     
@@ -49,7 +48,7 @@ public class Nexus874SecurityRealmReplacementTest
         TestContainer.getInstance().getTestContext().setSecureTest( true );
         groupUtil = new GroupMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
         repoUtil = new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
-        targetUtil = new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        // targetUtil = new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
         roleUtil = new RoleMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
         userUtil = new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
@@ -128,7 +127,7 @@ public class Nexus874SecurityRealmReplacementTest
         NexusStateUtil.getNexusStatus();
         groupUtil.getList();
         repoUtil.getList();
-        targetUtil.getList();
+        TargetMessageUtil.getList();
         TaskScheduleUtil.getTasks();
         
         TestContainer.getInstance().getTestContext().setUsername( "deployment" );
@@ -155,7 +154,7 @@ public class Nexus874SecurityRealmReplacementTest
         
         try
         {
-            targetUtil.getList();
+            TargetMessageUtil.getList();
             Assert.fail();
         }
         catch ( Exception e )
@@ -178,7 +177,7 @@ public class Nexus874SecurityRealmReplacementTest
         
         try
         {
-            targetUtil.getList();
+            TargetMessageUtil.getList();
             Assert.fail();
         }
         catch ( Exception e )

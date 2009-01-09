@@ -22,9 +22,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
 /**

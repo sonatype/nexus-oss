@@ -35,7 +35,6 @@ import java.util.Map;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.store.FSDirectory;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -355,7 +354,7 @@ public class DefaultIndexerManager
         if ( !ctx.isSearchable() && searchable )
         {
             // we have a !searchable -> searchable transition, reindex it
-            ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTask.class );
+            ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
 
             rt.setRepositoryId( repositoryId );
 
@@ -690,10 +689,6 @@ public class DefaultIndexerManager
 
         boolean repositoryIndexable = repository.isIndexable();
 
-        IndexingContext tmpContext = null;
-
-        File tmpdir = null;
-
         try
         {
             repository.setIndexable( false );
@@ -709,16 +704,6 @@ public class DefaultIndexerManager
         finally
         {
             repository.setIndexable( repositoryIndexable );
-
-            if ( tmpContext != null )
-            {
-                nexusIndexer.removeIndexingContext( tmpContext, true );
-            }
-
-            if ( tmpdir != null )
-            {
-                FileUtils.deleteDirectory( tmpdir );
-            }
         }
     }
 

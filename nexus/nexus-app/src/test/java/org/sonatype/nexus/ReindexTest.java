@@ -30,7 +30,7 @@ public class ReindexTest
     {
         super.setUp();
 
-        servletServer = (ServletServer) lookup( ServletServer.class );
+        servletServer = lookup( ServletServer.class );
 
         servletServer.start();
     }

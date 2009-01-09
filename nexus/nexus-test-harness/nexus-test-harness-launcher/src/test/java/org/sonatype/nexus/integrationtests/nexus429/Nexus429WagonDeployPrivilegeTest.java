@@ -26,13 +26,6 @@ import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.apache.maven.wagon.ConnectionException;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.TransferFailedException;
-import org.apache.maven.wagon.authentication.AuthenticationException;
-import org.apache.maven.wagon.authorization.AuthorizationException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.cli.CommandLineException;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -41,8 +34,6 @@ import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.MavenDeployer;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * Test the privilege wagon style deployments.

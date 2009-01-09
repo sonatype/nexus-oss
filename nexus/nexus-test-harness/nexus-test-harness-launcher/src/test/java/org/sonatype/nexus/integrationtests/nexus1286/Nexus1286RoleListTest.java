@@ -9,11 +9,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
-import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ExternalRoleMappingResource;
 import org.sonatype.nexus.rest.model.PlexusRoleResource;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;

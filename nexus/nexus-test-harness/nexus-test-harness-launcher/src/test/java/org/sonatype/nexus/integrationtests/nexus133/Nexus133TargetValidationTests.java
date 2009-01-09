@@ -301,7 +301,6 @@ public class Nexus133TargetValidationTests
 
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void maven1ContentClassTest()
         throws IOException
@@ -337,7 +336,6 @@ public class Nexus133TargetValidationTests
         this.messageUtil.verifyTargetsConfig( responseResource );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void maven2ContentClassTest()
         throws IOException
@@ -373,7 +371,6 @@ public class Nexus133TargetValidationTests
         this.messageUtil.verifyTargetsConfig( responseResource );
     }
 
-    @SuppressWarnings( "unchecked" )
     //@Test
     // eclipseContentClass is disabled for beta5!
     public void eclipseContentClassTest()
@@ -410,7 +407,6 @@ public class Nexus133TargetValidationTests
         this.messageUtil.verifyTargetsConfig( responseResource );
     }
 
-    @SuppressWarnings( "unchecked" )
     //@Test
     // m2NamespaceContentclass is disabled for beta5!
     public void m2NamespaceContentClassTest()
@@ -447,7 +443,6 @@ public class Nexus133TargetValidationTests
         this.messageUtil.verifyTargetsConfig( responseResource );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void createTestWithId()
         throws IOException
