@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 
 @Component( role = DownloadMirrors.class, instantiationStrategy = "per-lookup" )
 public class DefaultDownloadMirrors
@@ -17,13 +18,21 @@ public class DefaultDownloadMirrors
 {
     private static final long NO_EXPIRATION = -1;
     
-    private static final long DEFAULT_EXPIRATION = 3 * 3600 * 1000L; // three hours
+    private static final long DEFAULT_EXPIRATION = 30 * 60 * 1000L; // 30 minutes
 
     private LinkedHashSet<String> urls = new LinkedHashSet<String>();
 
     private Map<String, BlaclistEntry> blacklist = new HashMap<String, BlaclistEntry>();
 
     private long blacklistExpiration = DEFAULT_EXPIRATION;
+
+    /**
+     * Maximum number of mirror url to consider before operation falls back to
+     * canonical url.
+     * 
+     * @see AbstractProxyRepository#doRetrieveRemoteItem
+     */
+    private int maxMirrors = 1;
 
     private static class BlaclistEntry
     {
@@ -131,6 +140,16 @@ public class DefaultDownloadMirrors
     public long getBlacklistExpiration()
     {
         return blacklistExpiration;
+    }
+
+    public int getMaxMirrors()
+    {
+        return maxMirrors;
+    }
+    
+    public void setMaxMirrors( int maxMirrors )
+    {
+        this.maxMirrors = maxMirrors;
     }
 
 }

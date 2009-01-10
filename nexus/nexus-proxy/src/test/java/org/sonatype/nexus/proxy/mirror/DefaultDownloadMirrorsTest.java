@@ -44,14 +44,19 @@ public class DefaultDownloadMirrorsTest
     {
         String[] urls = new String[] { "mirror1", "mirror2" };
 
+        int maxMirrors = 2;
+
         DefaultDownloadMirrors mirrors = newDefaultDownloadMirrors( urls );
+        
+        mirrors.setMaxMirrors( maxMirrors );
 
         assertEquals( urls.length, mirrors.getUrls().size() );
 
         DownloadMirrorSelector selector = mirrors.openSelector();
-        
+
         List<String> _urls = selector.getUrls();
 
+        assertEquals( maxMirrors, _urls.size() );
         assertEquals( urls[0], _urls.get( 0 ) );
         assertEquals( urls[1], _urls.get( 1 ) );
 
@@ -71,20 +76,21 @@ public class DefaultDownloadMirrorsTest
         selector.feedbackSuccess( urls[1] );
 
         // feedback has not been applied yet
-        assertEquals( urls[0], mirrors.openSelector().getUrls().get(0) );
+        assertEquals( urls[0], mirrors.openSelector().getUrls().get( 0 ) );
 
         selector.close();
-        assertEquals( urls[1], mirrors.openSelector().getUrls().get(0) );
+        assertEquals( urls[1], mirrors.openSelector().getUrls().get( 0 ) );
     }
 
-    public void testBlacklistDecay() throws Exception
+    public void testBlacklistDecay()
+        throws Exception
     {
         String[] urls = new String[] { "mirror1", "mirror2" };
-        
+
         long blacklistTTL = 100L; // milliseconds
 
         DefaultDownloadMirrors mirrors = newDefaultDownloadMirrors( urls );
-        
+
         mirrors.setBlacklistExpiration( blacklistTTL );
 
         DownloadMirrorSelector selector = mirrors.openSelector();
@@ -102,5 +108,47 @@ public class DefaultDownloadMirrorsTest
         assertEquals( false, mirrors.isBlacklisted( urls[0] ) );
 
     }
-    
+
+    public void testSetUrls()
+        throws Exception
+    {
+        String[] urls = new String[] { "mirror1", "mirror2" };
+
+        DefaultDownloadMirrors mirrors = newDefaultDownloadMirrors( urls );
+
+        DownloadMirrorSelector selector = mirrors.openSelector();
+
+        selector.feedbackFailure( urls[0] );
+
+        selector.feedbackSuccess( urls[1] );
+
+        selector.close();
+
+        // sanity check
+
+        assertEquals( true, mirrors.isBlacklisted( urls[0] ) );
+
+        mirrors.setUrls( Arrays.asList( "another-mirror", "one-more-mirror", "mirror1" ) );
+
+        assertEquals( true, mirrors.isBlacklisted( urls[0] ) );
+    }
+
+    public void testFailureThenSuccess()
+    {
+        String[] urls = new String[] { "mirror1", "mirror2" };
+
+        DefaultDownloadMirrors mirrors = newDefaultDownloadMirrors( urls );
+
+        DownloadMirrorSelector selector = mirrors.openSelector();
+
+        selector.feedbackFailure( urls[0] );
+
+        selector.feedbackSuccess( urls[0] );
+
+        selector.close();
+
+        // sanity check
+
+        assertEquals( false, mirrors.isBlacklisted( urls[0] ) );
+    }
 }

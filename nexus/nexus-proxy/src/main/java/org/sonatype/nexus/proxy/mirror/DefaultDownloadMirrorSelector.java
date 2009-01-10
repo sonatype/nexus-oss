@@ -25,6 +25,11 @@ public class DefaultDownloadMirrorSelector
             {
                 urls.add( url );
             }
+            
+            if ( urls.size() >= mirrors.getMaxMirrors() )
+            {
+                break;
+            }
         }
     }
 
@@ -44,6 +49,8 @@ public class DefaultDownloadMirrorSelector
     public void feedbackSuccess( String url )
     {
         // XXX validate URL
+
+        failedMirrors.remove( url );
 
         this.success = true;
     }

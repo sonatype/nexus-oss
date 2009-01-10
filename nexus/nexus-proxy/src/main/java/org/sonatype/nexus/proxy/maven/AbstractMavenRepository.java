@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -45,7 +46,6 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
-import org.sonatype.nexus.proxy.repository.ContentValidationResult;
 import org.sonatype.nexus.proxy.repository.DefaultRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.MutableProxyRepositoryKind;
@@ -531,22 +531,21 @@ public abstract class AbstractMavenRepository
     }
 
     @Override
-    protected ContentValidationResult doValidateRemoteItemContent( String baseUrl, AbstractStorageItem item,
-        Map<String, Object> context )
-        throws RemoteAccessException,
-            StorageException
+    protected boolean doValidateRemoteItemContent( String baseUrl, AbstractStorageItem item,
+        Map<String, Object> context, List<NexusArtifactEvent> events )
+        throws StorageException
     {
         if ( isChecksum( item.getRepositoryItemUid() ) )
         {
             // do not validate checksum files
-            return null;
+            return true;
         }
 
         if ( getChecksumPolicy() == null || !getChecksumPolicy().shouldCheckChecksum()
             || !( item instanceof DefaultStorageFileItem ) )
         {
             // there is either no need to validate or we can't validate the item content
-            return null;
+            return true;
         }
 
         RepositoryItemUid uid = item.getRepositoryItemUid();
@@ -610,8 +609,6 @@ public abstract class AbstractMavenRepository
         String msg;
         boolean contentValid;
 
-        ContentValidationResult result = new ContentValidationResult();
-
         if ( remoteHash == null && ChecksumPolicy.STRICT.equals( getChecksumPolicy() ) )
         {
             msg = "The artifact " + item.getPath() + " has no remote checksum in repository " + item.getRepositoryId()
@@ -635,7 +632,7 @@ public abstract class AbstractMavenRepository
             if ( remoteHash != null && remoteHash.equals( item.getAttributes().get( hashKey ) ) )
             {
                 // remote hash exists and matches item content
-                return null;
+                return true;
             }
 
             if ( ChecksumPolicy.WARN.equals( getChecksumPolicy() ) )
@@ -655,8 +652,7 @@ public abstract class AbstractMavenRepository
             }
         }
 
-        result.addEvent( newChechsumFailureEvent( item, msg ) );
-        result.setContentValid( contentValid );
+        events.add( newChechsumFailureEvent( item, msg ) );
 
         if ( !contentValid && hashItem != null )
         {
@@ -674,8 +670,8 @@ public abstract class AbstractMavenRepository
                 // huh?
             }
         }
-
-        return result;
+        
+        return contentValid;
     }
 
     private NexusArtifactEvent newChechsumFailureEvent( AbstractStorageItem item, String msg )
