@@ -90,6 +90,24 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     sortInfo: {field: 'name', direction: 'ASC'},
     autoLoad: true
   });
+
+  this.sourceStore = new Ext.data.JsonStore( {
+    root: 'data',
+    id: 'roleHint',
+    autoLoad: true,
+    url: Sonatype.config.repos.urls.userLocators,
+    sortInfo: { field: 'description', direction: 'ASC' },
+    fields: [
+      { name: 'roleHint' },
+      { name: 'description', sortType:Ext.data.SortTypes.asUCString }
+    ],
+    listeners: {
+      load: {
+        fn: this.loadSources,
+        scope: this
+      }
+    }
+  } );
   
   this.COMBO_WIDTH = 300;
   
@@ -338,6 +356,15 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         scope:this,
         handler: this.deleteHandler,
         disabled: !this.sp.checkPermission('nexus:roles', this.sp.DELETE)
+      },
+      {
+        id: 'role-map-btn',
+        text: 'Map External Role',
+        icon: Sonatype.config.resourcePath + '/images/icons/page_white_put.png',
+        cls: 'x-btn-text-icon',
+        scope: this,
+        handler: this.mapExternalRoles,
+        disabled: true
       }
     ],
 
@@ -1028,5 +1055,186 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     var tree = Ext.getCmp(fpanel.id + '_roles_privs_tree');
     this.markTreeInvalid(tree);
     tree.errorEl.update(error.msg);
+  },
+
+  loadSources: function( store, records, options ) {
+
+    // find and remove dummy realms
+    for ( var i = 0; i < records.length; i++ ) {
+      var rec = records[i];
+      var v = rec.data.roleHint;
+      if ( v == 'allConfigured' || v == 'mappedExternal' || v == 'default' ) {
+        store.remove( rec );
+      }
+    }
+
+    // if there are any realms left, enable the mapping button
+    if ( store.getCount() > 0 ) { //&& this.sp.checkPermission( 'nexus:roles', this.sp.CREATE ) ) {
+      Ext.getCmp( 'role-map-btn' ).enable();
+    }
+  },
+  
+  mapExternalRoles: function() {
+    new Sonatype.repoServer.ExternapRoleMappingPopup( {
+      hostPanel: this,
+      sourceStore: this.sourceStore 
+    } ).show();
   }
 });
+
+Sonatype.repoServer.ExternapRoleMappingPopup = function( config ) {
+  var config = config || {};
+  var defaultConfig = {
+    title: 'Map External Role'
+  };
+  Ext.apply( this, config, defaultConfig );
+
+  this.roleStore = new Ext.data.JsonStore( {
+    root: 'data',
+    id: 'roleId',
+    fields: [
+      { name: 'roleId' },
+      { name: 'source' },
+      { name: 'name', sortType: Ext.data.SortTypes.asUCString }
+    ],
+    sortInfo: { field: 'name', direction: 'asc' },
+    url: Sonatype.config.repos.urls.plexusRolesAll,
+    autoLoad: true
+  } );
+  
+  Sonatype.repoServer.ExternapRoleMappingPopup.superclass.constructor.call( this, {
+    closable: true,
+    autoWidth: false,
+    width: 400,
+    autoHeight: true,
+    modal: true,
+    constrain: true,
+    resizable: false,
+    draggable: false,
+    items: [
+      {
+        xtype: 'form',
+        layoutConfig: {
+          labelSeparator: ''
+        },
+        labelWidth: 60,
+        frame: true,  
+        defaultType: 'textfield',
+        monitorValid: true,
+        items:[
+          { 
+            xtype: 'combo',
+            fieldLabel: 'Realm',
+            itemCls: 'required-field',
+            helpText: 'Security realm to select roles from.',
+            name: 'source',
+            anchor: Sonatype.view.FIELD_OFFSET,
+            width: 200,
+            store: this.sourceStore,
+            displayField: 'description',
+            valueField: 'roleHint',
+            editable: false,
+            forceSelection: true,
+            mode: 'local',
+            triggerAction: 'all',
+            emptyText: 'Select...',
+            selectOnFocus: true,
+            allowBlank: false,
+            listeners: {
+              select: {
+                fn: this.onSourceSelect,
+                scope: this
+              }
+            }
+          },
+          { 
+            xtype: 'combo',
+            fieldLabel: 'Role',
+            itemCls: 'required-field',
+            helpText: 'External role to map.',
+            name: 'roleId',
+            anchor: Sonatype.view.FIELD_OFFSET,
+            width: 200,
+            store: this.roleStore,
+            displayField: 'name',
+            valueField: 'roleId',
+            editable: false,
+            forceSelection: true,
+            mode: 'local',
+            lastQuery: '',
+            emptyText: 'Select...',
+            selectOnFocus: true,
+            allowBlank: false,
+            lazyInit: false
+          }
+        ],
+        buttons: [
+          {
+            text: 'Create Mapping',
+            formBind: true,
+            handler: this.createRoleMapping,
+            scope: this,
+            disabled: true
+          },
+          {
+            text: 'Cancel',
+            formBind: false,
+            handler: function( button, e ) {
+              this.close();
+            },
+            scope: this
+          }
+        ]
+      }
+    ]
+  } );
+};
+
+Ext.extend( Sonatype.repoServer.ExternapRoleMappingPopup, Ext.Window, {
+  onSourceSelect: function( combo, rec, index ) {
+    this.filterRoleList( rec.data.roleHint );
+  },
+  
+  filterRoleList: function( source ) {
+    this.roleStore.clearFilter();
+    this.roleStore.filterBy( function( rec, id ) {
+      return rec.data.source == source;
+    } );
+    this.find( 'name', 'roleId' )[0].reset();
+  },
+
+  createRoleMapping: function( button, e ) {
+//    var source = this.find( 'name', 'source' )[0].getValue();
+//    var roleId = this.find( 'name', 'roleId' )[0].getValue();
+//
+//    Ext.Ajax.request({
+//      scope: this,
+//      method: 'POST',
+//      jsonData: {
+//        data: {
+//          source: source,
+//          roleId: roleId
+//        }
+//      },
+//      url: Sonatype.config.repos.urls.externalRoleMapping,
+//      success: this.mappingSuccess,
+//      failure: this.mappingFailure,
+//      scope: this
+//    } );
+//  },
+//  
+//  mappingSuccess: function( response, options ){
+//    this.close();
+//    this.hostPanel.dataStore.reload();
+//  },
+//  
+//  mappingFailure: function( response, options ) {
+//    var r = Ext.decode( response.responseText );
+//    if ( r.errors ) {
+//      this.find( 'name', 'roleId' )[0].markInvalid( r.errors[0].msg );
+//    }
+//    else {
+//      Sonatype.utils.connectionError( response, 'There was a problem mapping an external role.' );
+//    }
+  }
+} );

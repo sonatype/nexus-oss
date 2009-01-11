@@ -108,6 +108,8 @@ Sonatype.config = function() {
         usersChangePassword: servicePath + '/users_changepw',
         usersSetPassword: servicePath + '/users_setpw',
         roles: servicePath + '/roles',
+        plexusRoles: servicePath + '/plexus_roles',
+        plexusRolesAll: servicePath + '/plexus_roles/all',
         privileges: servicePath + '/privileges',
         repoTargets: servicePath + '/repo_targets',
         repoContentClasses: servicePath + '/components/repo_content_classes',
