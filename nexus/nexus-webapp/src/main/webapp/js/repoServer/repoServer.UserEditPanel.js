@@ -323,6 +323,10 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
   
   searchByUrl: function() {
     this.clearCards();
+    if ( this.warningLabel ) {
+      this.warningLabel.destroy();
+      this.warningLabel = null;
+    }
     this.gridPanel.loadMask.show();
     Ext.Ajax.request( {
       scope: this,
@@ -358,6 +362,10 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
       this.searchField.setValue( '' );
       this.searchField.enable();
       this.calculateSearchUrl( this );
+      if ( ! this.warningLabel ) {
+        this.warningLabel = this.getTopToolbar().addText(
+          '<span class="x-toolbar-warning">Click "Search" to refresh the view</span>' );
+      }
     }
   },
   
