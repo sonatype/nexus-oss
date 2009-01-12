@@ -71,10 +71,4 @@ public class RebuildAttributesTask
         }
     }
     
-    @Override
-    public boolean isExposed()
-    {
-        return false;
-    }
-
 }
