@@ -620,30 +620,53 @@ public abstract class AbstractProxyRepository
      * Retrieves item with specified uid from remote storage according to the
      * following retry-fallback-blacklist rules.
      *
-     * * Only retrieve item operation will use mirrors, other operations,
+     * <li>
+     * Only retrieve item operation will use mirrors, other operations,
      *   like check availability and retrieve checksum file, will always
      *   use repository canonical url.
-     *
-     * * Only one mirror url will be considered before retrieve item operation
+     *   </li>
+     * <li>
+     * Only one mirror url will be considered before retrieve item operation
      *   falls back to repository canonical url.
-     *
-     * * Repository canonical url will never be put on the blacklist.
-     * 
-     * * If retrieve item operation fails with ItemNotFound or AccessDenied
+     *   </li>
+     * <li>
+     * Repository canonical url will never be put on the blacklist.
+     *   </li>
+     * <li>
+     * If retrieve item operation fails with ItemNotFound or AccessDenied
      *   error, the operation will be retried with another url or original
      *   error will be reported if there are no more urls.
-     *   
-     * * If retrieve item operation fails with generic StorageException or
+     *   </li>
+     * <li>  
+     * If retrieve item operation fails with generic StorageException or
      *   item content is corrupt, the operation will be retried one more
      *   time from the same url. After that, the operation will be retried
      *   with another url or original error will be returned if there are
      *   no more urls.
-     *   
-     * * Mirror url will be put on the blacklist if retrieve item operation
+     *   </li>
+     * <li>  
+     * Mirror url will be put on the blacklist if retrieve item operation
      *   from the url failed with StorageException, AccessDenied or InvalidItemContent error
      *   but the item was successfully retrieve from another url.
-     *   
-     * * Mirror url will be removed from blacklist after 30 minutes.
+     *   </li>
+     * <li>
+     * Mirror url will be removed from blacklist after 30 minutes.
+     *   </li>
+     * 
+     * 
+     * The following matrix summarises retry/blacklist behaviour
+     * 
+     * <pre>
+     * Error condition      Retry?        Blacklist?
+     * 
+     * InetNotFound         no            no
+     * AccessDedied         no            yes
+     * InvalidContent       yes           yes
+     * Other                yes           yes
+     * </pre>
+     * 
+     * 
+     * 
      */
     protected AbstractStorageItem doRetrieveRemoteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws ItemNotFoundException,
