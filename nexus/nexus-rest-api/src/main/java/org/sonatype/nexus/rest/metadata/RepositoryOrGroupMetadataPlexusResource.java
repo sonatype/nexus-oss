@@ -32,7 +32,7 @@ public class RepositoryOrGroupMetadataPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/metadata/*/**", "authcBasic,perms[nexus:cache]" );
+        return new PathProtectionDescriptor( "/metadata/*/**", "authcBasic,perms[nexus:metadata]" );
     }
 
     @Override

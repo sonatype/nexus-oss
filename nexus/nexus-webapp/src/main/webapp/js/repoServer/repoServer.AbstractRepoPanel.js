@@ -375,7 +375,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     }
 
     if ( this.sp.checkPermission(
-          'nexus:cache', this.sp.DELETE ) ){
+          'nexus:metadata', this.sp.DELETE ) ){
       menu.add( this.repoActions.rebuildMetadata );
     }
 

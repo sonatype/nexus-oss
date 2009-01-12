@@ -1508,6 +1508,22 @@
                 </property>
             </properties>
         </privilege>
+        <privilege>
+            <id>76</id>
+            <type>method</type>
+            <name>Rebuild Maven Metadata</name>
+            <description>Give permission to rebuild the maven metadata of repository content.  The extents of this privilege are related to the allowed targets.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>delete,read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:metadata</value>
+                </property>
+            </properties>
+        </privilege>
 		
     </privileges>
 </security>
