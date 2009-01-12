@@ -183,8 +183,8 @@ Sonatype.repoServer.RepoPermissionsPanel = function( config ){
               },
               {
                 xtype: 'checkbox',
-                boxLabel: 'Rebuild Attributes',
-                name: 'rebuildAttributes'
+                boxLabel: 'Rebuild Metadata',
+                name: 'rebuildMetadata'
               },
               {
                 xtype: 'checkbox',

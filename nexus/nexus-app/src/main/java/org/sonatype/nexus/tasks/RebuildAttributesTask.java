@@ -70,5 +70,11 @@ public class RebuildAttributesTask
             return "Rebuilding attributes of all registered repositories";
         }
     }
+    
+    @Override
+    public boolean isExposed()
+    {
+        return false;
+    }
 
 }

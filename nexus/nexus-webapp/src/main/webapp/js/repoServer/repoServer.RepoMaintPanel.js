@@ -1066,7 +1066,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       }
       if ( this.sp.checkPermission(
             'nexus:attributes', this.sp.DELETE ) ){
-        menu.add( this.repoActions.rebuildAttributes );
+        menu.add( this.repoActions.rebuildMetadata );
       }
     }
   },

@@ -50,4 +50,10 @@ public class RebuildAttributesTaskDescriptor
 
         return properties;
     }
+    
+    @Override
+    public boolean isExposed()
+    {
+        return false;
+    }
 }

@@ -43,9 +43,9 @@ Sonatype.repoServer.AbstractRepoPanel = function(config){
       text: 'Re-Index',
       handler: this.reIndexHandler
     },
-    rebuildAttributes: {
-      text: 'Rebuild Attributes',
-      handler: this.rebuildAttributesHandler
+    rebuildMetadata: {
+      text: 'Rebuild Metadata',
+      handler: this.rebuildMetadataHandler
     },
     uploadArtifact: {
       text: 'Upload Artifact...',
@@ -132,8 +132,8 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     }
   },
   
-  rebuildAttributesHandler: function( rec ){
-    var url = Sonatype.config.repos.urls.attributes +
+  rebuildMetadataHandler: function( rec ){
+    var url = Sonatype.config.repos.urls.metadata +
       rec.data.resourceURI.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
     
     if ( url.indexOf( Sonatype.config.browseIndexPathSnippet ) > -1 ) {
@@ -147,19 +147,19 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     
     Ext.Ajax.request({
       url: url,
-      callback: this.rebuildAttributesCallback,
+      callback: this.rebuildMetadataCallback,
       scope: this,
       method: 'DELETE'
     });
   },
   
-  rebuildAttributesCallback : function(options, isSuccess, response){
+  rebuildMetadataCallback : function(options, isSuccess, response){
     //@todo: stop updating messaging here
     if(isSuccess){
 
     }
     else {
-      Sonatype.utils.connectionError( response, 'The server did not rebuild attributes in the repository.' );
+      Sonatype.utils.connectionError( response, 'The server did not rebuild metadata in the repository.' );
     }
   },
   
@@ -375,8 +375,8 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     }
 
     if ( this.sp.checkPermission(
-          'nexus:attributes', this.sp.DELETE ) ){
-      menu.add( this.repoActions.rebuildAttributes );
+          'nexus:cache', this.sp.DELETE ) ){
+      menu.add( this.repoActions.rebuildMetadata );
     }
 
     if ( this.sp.checkPermission(

@@ -74,7 +74,7 @@ Sonatype.config = function() {
           proxy_snapshot : servicePath + '/templates/repositories/default_proxy_snapshot'
         },
         index : servicePath + '/data_index',
-        attributes : servicePath + '/attributes',
+        metadata : servicePath + '/metadata',
         cache : servicePath + '/data_cache',
         groups : servicePath + '/repo_groups',
         routes : servicePath + '/repo_routes',
