@@ -203,9 +203,6 @@ Sonatype.panels.GridViewer = function( config ) {
     columns: columns,
     autoExpandColumn: this.autoExpandColumn,
     disableSelection: false,
-    viewConfig: {
-      emptyText: 'No records currently available'
-    },
     
     listeners: {
       rowclick: {

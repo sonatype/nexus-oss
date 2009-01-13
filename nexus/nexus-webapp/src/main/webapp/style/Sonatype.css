@@ -262,3 +262,9 @@ button.st-icon-refresh {
     top:auto;
     vertical-align:top;
 }
+
+.x-toolbar-warning {
+  background:transparent url(../ext-2.2/resources/images/default/shared/warning.gif) no-repeat scroll 0 2px;
+  color:#EE0000;
+  padding: 2px 2px 2px 18px;
+}

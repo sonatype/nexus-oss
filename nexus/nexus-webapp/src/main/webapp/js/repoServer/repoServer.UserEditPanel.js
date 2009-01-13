@@ -322,7 +322,7 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
   },
   
   searchByUrl: function() {
-    this.clearCards();
+    this.clearAll();
     if ( this.warningLabel ) {
       this.warningLabel.destroy();
       this.warningLabel = null;
@@ -338,9 +338,6 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
           if ( r.data ) {
             this.dataStore.loadData( r );
           }
-          else {
-            this.clearAll();
-          }
         }
       }
     } );
@@ -349,6 +346,7 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
   showUsers: function( button, e ) {
     this.displaySelector.setText( button.text );
     this.displaySelector.value = button.value;
+    this.clearAll();
 
     if ( button.value == 'allConfigured' ) {
       this.searchField.emptyText = 'Select a filter to enable username search';
