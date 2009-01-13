@@ -19,6 +19,7 @@
 // ********* Set ExtJS options *************************************************
   
 Ext.Ajax.defaultHeaders = {'accept' : 'application/json'};
+Ext.Ajax.timeout = 60000;
 
 //Set default HTTP headers //@todo: move this to some other common init section
 Ext.lib.Ajax.defaultPostHeader = 'application/json';
