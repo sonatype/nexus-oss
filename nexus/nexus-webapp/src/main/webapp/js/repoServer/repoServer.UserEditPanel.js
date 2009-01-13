@@ -967,9 +967,28 @@ Ext.extend( Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
   },
 
   actionFailedHandler: function( form, action ) {
-    if ( action.response.status == 404 && action.options.testField ) {
-      action.options.testField.markInvalid( 'User record not found.' );
-      action.options.testField.userFound = false;
+    if ( action.response.status == 404 ) {
+      if ( action.options.testField ) {
+        action.options.testField.markInvalid( 'User record not found.' );
+        action.options.testField.userFound = false;
+      }
+      else {
+        var s;
+        if ( this.payload && this.payload.data ) {
+          s = this.payload.data.source;
+        }
+        Sonatype.MessageBox.show( {
+          title: 'Error',
+          msg: 'Unable to retrieve user details.' +
+            '<br/><br/>' +
+            'Please make sure the ' +
+            ( s ? s : 'selected' ) +
+            ' realm is enabled<br/>on the server administration panel.',
+          buttons: Sonatype.MessageBox.OK,
+          icon: Sonatype.MessageBox.ERROR,
+          animEl: 'mb3'
+        } );
+      }
     }
     else {
       return Sonatype.repoServer.UserMappingEditor.superclass.actionFailedHandler.call(
