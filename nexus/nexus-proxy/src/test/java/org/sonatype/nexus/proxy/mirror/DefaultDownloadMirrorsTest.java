@@ -103,7 +103,7 @@ public class DefaultDownloadMirrorsTest
 
         assertEquals( true, mirrors.isBlacklisted( urls[0] ) );
 
-        Thread.sleep( blacklistTTL );
+        Thread.sleep( blacklistTTL * 2 );
 
         assertEquals( false, mirrors.isBlacklisted( urls[0] ) );
 
