@@ -680,8 +680,10 @@ Sonatype.utils = {
     });
   },
   
-  loadNexusStatus: function( loggedInUserSource ) {
-    Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);
+  loadNexusStatus: function( loggedInUserSource, versionOnly ) {
+    if ( !versionOnly ){
+      Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);
+    }
 
     Ext.Ajax.request({
       method: 'GET',
@@ -695,21 +697,23 @@ Sonatype.utils = {
   
           Sonatype.utils.version = "Version " + respObj.data.version;
           Sonatype.utils.edition = respObj.data.edition;
-          
-          Sonatype.user.curr.repoServer = respObj.data.clientPermissions.permissions;
-          Sonatype.user.curr.isLoggedIn = respObj.data.clientPermissions.loggedIn;
-          Sonatype.user.curr.username = respObj.data.clientPermissions.loggedInUsername;
-          Sonatype.user.curr.loggedInUserSource = loggedInUserSource;
-          
-          var availSvrs = Sonatype.config.installedServers;
-          for(var srv in availSvrs) {
-            if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined') {
-              Sonatype[srv][Sonatype.utils.capitalize(srv)].statusComplete(respObj);
-            }
-          }
 
-          var baseUrl = respObj.data.baseUrl;
-          baseUrlMismatch = ( baseUrl != window.location.href.substring( 0, baseUrl.length ) );
+          if ( !versionOnly ){
+            Sonatype.user.curr.repoServer = respObj.data.clientPermissions.permissions;
+            Sonatype.user.curr.isLoggedIn = respObj.data.clientPermissions.loggedIn;
+            Sonatype.user.curr.username = respObj.data.clientPermissions.loggedInUsername;
+            Sonatype.user.curr.loggedInUserSource = loggedInUserSource;
+            
+            var availSvrs = Sonatype.config.installedServers;
+            for(var srv in availSvrs) {
+              if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined') {
+                Sonatype[srv][Sonatype.utils.capitalize(srv)].statusComplete(respObj);
+              }
+            }
+  
+            var baseUrl = respObj.data.baseUrl;
+            baseUrlMismatch = ( baseUrl != window.location.href.substring( 0, baseUrl.length ) );
+          }
         }
         else {
           Sonatype.utils.version = 'Version unavailable';
@@ -717,24 +721,26 @@ Sonatype.utils = {
         }
         
         Ext.get('version').update(Sonatype.utils.version);
-        Sonatype.view.updateLoginLinkText();
-        Sonatype.repoServer.RepoServer.resetMainTabPanel();
-        Sonatype.repoServer.RepoServer.createSubComponents();
-        Sonatype.view.serverTabPanel.doLayout();
-
-        if ( baseUrlMismatch ) {
-          Sonatype.view.welcomeTab.add( {
-            xtype: 'panel',
-            html: '<div class="x-toolbar"><div class="x-form-invalid-msg">' +
-              '<b>WARNING:</b> ' +
-              'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' +
-              'does not match your actual URL!<br/>' +
-              'If you\'re running Apache mod_proxy, ' +
-              '<a href="http://nexus.sonatype.org/about/faq.html#' +
-              'QHowcanIforceNexustogenerateHTTPSURLswhenintegratedwithApacheHttpdandModProxy">' +
-              'here\'s more information</a> on configuring Nexus with it.</div></div>'
-          } );
-          Sonatype.view.welcomeTab.doLayout();
+        if ( !versionOnly ){
+          Sonatype.view.updateLoginLinkText();
+          Sonatype.repoServer.RepoServer.resetMainTabPanel();
+          Sonatype.repoServer.RepoServer.createSubComponents();
+          Sonatype.view.serverTabPanel.doLayout();
+  
+          if ( baseUrlMismatch ) {
+            Sonatype.view.welcomeTab.add( {
+              xtype: 'panel',
+              html: '<div class="x-toolbar"><div class="x-form-invalid-msg">' +
+                '<b>WARNING:</b> ' +
+                'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' +
+                'does not match your actual URL!<br/>' +
+                'If you\'re running Apache mod_proxy, ' +
+                '<a href="http://nexus.sonatype.org/about/faq.html#' +
+                'QHowcanIforceNexustogenerateHTTPSURLswhenintegratedwithApacheHttpdandModProxy">' +
+                'here\'s more information</a> on configuring Nexus with it.</div></div>'
+            } );
+            Sonatype.view.welcomeTab.doLayout();
+          }
         }
       }
     });
