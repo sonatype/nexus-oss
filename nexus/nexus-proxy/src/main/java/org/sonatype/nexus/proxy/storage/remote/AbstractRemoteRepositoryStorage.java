@@ -49,6 +49,11 @@ public abstract class AbstractRemoteRepositoryStorage
     private ApplicationStatusSource applicationStatusSource;
 
     /**
+     * The edtion, that will tell us is there some change happened with installation.
+     */
+    private String platformEditionShort;
+
+    /**
      * The lazily calculated invariant part of the UserAgentString.
      */
     private String userAgentPlatformInfo;
@@ -162,9 +167,13 @@ public abstract class AbstractRemoteRepositoryStorage
 
     private String getUserAgentPlatformInfo()
     {
-        if ( userAgentPlatformInfo == null )
+        // TODO: this is a workaround, see NXCM-363
+        SystemStatus status = applicationStatusSource.getSystemStatus();
+
+        if ( platformEditionShort == null || !platformEditionShort.equals( status.getEditionShort() )
+            || userAgentPlatformInfo == null )
         {
-            SystemStatus status = applicationStatusSource.getSystemStatus();
+            platformEditionShort = status.getEditionShort();
 
             userAgentPlatformInfo = new StringBuffer( "Nexus/" )
                 .append( status.getVersion() ).append( " (" ).append( status.getEditionShort() ).append( "; " ).append(
