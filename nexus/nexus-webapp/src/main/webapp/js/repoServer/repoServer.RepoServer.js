@@ -369,7 +369,7 @@ Sonatype.repoServer.RepoServer = function(){
         id: 'st-nexus-security',
         items: [
           {
-            enabled: Sonatype.user.curr.isLoggedIn && 
+            enabled: Sonatype.user.curr.isLoggedIn && Sonatype.user.curr.loggedInUserSource == 'default' && 
               sp.checkPermission( 'nexus:userschangepw', sp.CREATE ),
             title: 'Change Password',
             handler: Sonatype.utils.changePassword
