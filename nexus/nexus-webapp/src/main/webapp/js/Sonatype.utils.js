@@ -695,8 +695,16 @@ Sonatype.utils = {
         if ( success ) {
           var respObj = Ext.decode(response.responseText);
   
-          Sonatype.utils.version = "Version " + respObj.data.version;
+          Sonatype.utils.version = 'Version ' + respObj.data.version + ' ' + respObj.data.editionLong;
+          if ( respObj.data.version != respObj.data.apiVersion ){
+            Sonatype.utils.version += ' (Core ' + respObj.data.apiVersion + ')';
+          }
+          
           Sonatype.utils.edition = respObj.data.edition;
+          
+          Ext.get('logo').update('<span>' 
+              + respObj.data.formattedAppName 
+              + '</span>');
 
           if ( !versionOnly ){
             Sonatype.user.curr.repoServer = respObj.data.clientPermissions.permissions;
