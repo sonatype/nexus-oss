@@ -728,7 +728,11 @@ Sonatype.utils = {
             html: '<div class="x-toolbar"><div class="x-form-invalid-msg">' +
               '<b>WARNING:</b> ' +
               'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' +
-              'does not match your actual URL. Check your Nexus configuration!</div></div>'
+              'does not match your actual URL!<br/>' +
+              'If you\'re running Apache mod_proxy, ' +
+              '<a href="http://nexus.sonatype.org/about/faq.html#' +
+              'QHowcanIforceNexustogenerateHTTPSURLswhenintegratedwithApacheHttpdandModProxy">' +
+              'here\'s more information</a> on configuring Nexus with it.</div></div>'
           } );
           Sonatype.view.welcomeTab.doLayout();
         }
