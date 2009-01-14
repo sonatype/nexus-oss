@@ -325,7 +325,10 @@ Date.formatCodeToRegex = function(character, currentGroup) {
 };
 */
 
-Ext.override(Ext.Component,{ stateful:false });
+Ext.override( Ext.Component, { 
+  stateful: false,
+  saveState: function() {}
+} );
 
 Ext.dd.DropTarget = function(el, config){
   this.el = Ext.get(el);
