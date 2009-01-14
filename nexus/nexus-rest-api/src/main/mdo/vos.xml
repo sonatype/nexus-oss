@@ -2567,7 +2567,37 @@
 			<version>1.0.0+</version>
 			<fields>
 				<field>
+					<name>appName</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>formattedAppName</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
 					<name>version</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>apiVersion</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>editionLong</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>editionShort</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
@@ -2648,12 +2678,6 @@
 					<type>String</type>
 					<required>true</required>
 				</field>
-        <field>
-          <name>edition</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
 			</fields>
 		</class>
 

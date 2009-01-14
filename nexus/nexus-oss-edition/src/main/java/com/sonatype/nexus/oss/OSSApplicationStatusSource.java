@@ -37,13 +37,13 @@ public class OSSApplicationStatusSource
     private SystemStatus systemStatus = new SystemStatus();
 
     public OSSApplicationStatusSource()
-    {        
+    {
         try
         {
             Properties props = new Properties();
 
             InputStream is = getClass().getResourceAsStream(
-                "/META-INF/maven/org.sonatype.nexus/nexus-oss-edition/pom.properties" );
+                "/META-INF/maven/org.sonatype.nexus/nexus-api/pom.properties" );
 
             if ( is != null )
             {
@@ -54,12 +54,15 @@ public class OSSApplicationStatusSource
         }
         catch ( IOException e )
         {
-            getLogger().warn(
-                "Could not load/read Nexus version from /META-INF/maven/org.sonatype.nexus/nexus-oss-edition/pom.properties",
-                e );
+            getLogger()
+                .warn(
+                    "Could not load/read Nexus version from /META-INF/maven/org.sonatype.nexus/nexus-oss-edition/pom.properties",
+                    e );
 
             systemStatus.setVersion( "unknown" );
         }
+
+        systemStatus.setApiVersion( systemStatus.getVersion() );
     }
 
     public SystemStatus getSystemStatus()

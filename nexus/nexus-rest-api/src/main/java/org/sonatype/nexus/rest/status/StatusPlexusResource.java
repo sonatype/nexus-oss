@@ -62,12 +62,25 @@ public class StatusPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-
         SystemStatus status = getNexus().getSystemStatus();
 
         StatusResource resource = new StatusResource();
 
+        resource.setAppName( status.getAppName() );
+
+        resource.setFormattedAppName( status.getFormattedAppName() );
+
         resource.setVersion( status.getVersion() );
+
+        resource.setApiVersion( status.getApiVersion() );
+
+        resource.setEditionLong( status.getEditionLong() );
+
+        resource.setEditionShort( status.getEditionShort() );
+
+        resource.setState( status.getState().toString() );
+
+        resource.setOperationMode( status.getOperationMode().toString() );
 
         resource.setInitializedAt( status.getInitializedAt() );
 
@@ -81,13 +94,7 @@ public class StatusPlexusResource
 
         resource.setConfigurationUpgraded( status.isConfigurationUpgraded() );
 
-        resource.setState( status.getState().toString() );
-
-        resource.setOperationMode( status.getOperationMode().toString() );
-
         resource.setErrorCause( spit( status.getErrorCause() ) );
-        
-        resource.setBaseUrl( getContextRoot( request ).toString() );
 
         if ( status.getConfigurationValidationResponse() != null )
         {
@@ -110,8 +117,8 @@ public class StatusPlexusResource
         }
 
         resource.setClientPermissions( getClientPermissionsForCurrentUser( request ) );
-        
-        resource.setEdition( status.getEditionUI() );
+
+        resource.setBaseUrl( getContextRoot( request ).toString() );
 
         StatusResourceResponse result = new StatusResourceResponse();
 
