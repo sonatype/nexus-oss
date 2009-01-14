@@ -700,7 +700,7 @@ Sonatype.utils = {
             Sonatype.utils.version += ' (Core ' + respObj.data.apiVersion + ')';
           }
           
-          Sonatype.utils.edition = respObj.data.edition;
+          Sonatype.utils.edition = respObj.data.editionLong;
           
           Ext.get('logo').update('<span>' 
               + respObj.data.formattedAppName 
