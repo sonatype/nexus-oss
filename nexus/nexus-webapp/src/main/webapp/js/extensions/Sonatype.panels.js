@@ -205,16 +205,13 @@ Sonatype.panels.GridViewer = function( config ) {
     disableSelection: false,
     
     listeners: {
-      rowclick: {
-        fn: this.rowClickHandler,
-        scope: this
-      },
       rowcontextmenu: {
         fn: this.rowContextMenuHandler,
         scope: this
       }
     }
   } );
+  this.gridPanel.getSelectionModel().on( 'rowselect', this.rowSelectHandler, this );
 
   var toolbar = this.tbar;
   this.tbar = [
@@ -504,16 +501,6 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
     this.clearCards();
     this.gridPanel.store.reload();
   },
-
-  rowClickHandler: function( grid, index, e ) {
-    if ( e.target.nodeName == 'A' ) return; // no menu on links
-
-    if ( this.rowClickEvent ) {
-      var rec = grid.store.getAt( index );
-      
-      this.createChildPanel( rec );
-    }
-  },
   
   rowContextMenuHandler: function( grid, index, e ) {
     if ( e.target.nodeName == 'A' ) return; // no menu on links
@@ -532,6 +519,12 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
 
       e.stopEvent();
       menu.showAt( e.getXY() );
+    }
+  },
+
+  rowSelectHandler: function( selectionModel, index, rec ) {
+    if ( this.rowClickEvent ) {
+      this.createChildPanel( rec );
     }
   }
 } );

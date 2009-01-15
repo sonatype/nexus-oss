@@ -283,8 +283,8 @@ Sonatype.repoServer.SearchPanel = function(config){
     },
     scope: this
   });
-  
-  this.grid.on( 'rowclick', this.displayArtifactInformation, this );
+
+  this.grid.getSelectionModel().on( 'rowselect', this.displayArtifactInformation, this );
   this.grid.clearButton.on( 'click', this.clearArtifactInformation, this );
 };
 
@@ -299,8 +299,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
     }, true );
   },
 
-  displayArtifactInformation: function( grid, index, e ) {
-    var rec = grid.store.getAt( index );
+  displayArtifactInformation: function( selectionModel, index, rec ) {
     this.artifactInformationPanel.showArtifact( rec.data );
   },
   
