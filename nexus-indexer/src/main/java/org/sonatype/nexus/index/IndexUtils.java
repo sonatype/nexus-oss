@@ -307,7 +307,10 @@ public class IndexUtils
         }
         finally
         {
-            w.close();
+            if ( w != null )
+            {
+                w.close();
+            }
         }
     }
 

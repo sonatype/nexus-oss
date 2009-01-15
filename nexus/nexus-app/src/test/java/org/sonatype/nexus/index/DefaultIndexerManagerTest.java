@@ -64,11 +64,13 @@ public class DefaultIndexerManagerTest
         Collection<ArtifactInfo> result = response.getResults(); 
 
         // expected result set
-        // org.sonatype.nexus:nexus-indexer:1.0-beta-5-SNAPSHOT
-        // org.sonatype.nexus:nexus-indexer:1.0-beta-4
-        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT
-        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT :: cli
-        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT :: jdk14
-        assertEquals( 5, result.size() );
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-5-SNAPSHOT:null:jar, 
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-4:null:jar, 
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT:null:jar, 
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT:cli:jar, 
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT:jdk14:jar, 
+        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT:sources:jar
+
+        assertEquals( result.toString(), 6, result.size() );
     }
 }

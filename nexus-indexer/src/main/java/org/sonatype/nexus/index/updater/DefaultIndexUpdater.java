@@ -181,16 +181,13 @@ public class DefaultIndexUpdater
                 directory.close();
             }
             
-            if( indexDir != null )
+            try
             {
-                try
-                {
-                    FileUtils.deleteDirectory( indexDir );
-                }
-                catch ( IOException ex )
-                {
-                    // ignore
-                }
+                FileUtils.deleteDirectory( indexDir );
+            }
+            catch ( IOException ex )
+            {
+                // ignore
             }
         }
     }

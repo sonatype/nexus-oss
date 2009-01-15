@@ -45,12 +45,12 @@ public class DefaultArtifactContextProducer
         // protection from IndexOutOfBounds
         if ( artifactPath.length() <= repositoryPath.length() ) 
         {
-            return null;  // this is junk path?
+            return null;  // not an artifact
         }
         
         if ( !AbstractIndexCreator.isIndexable( file ) )
         {
-            return null;
+            return null;  // skipped
         }
 
         String path = artifactPath.substring( repositoryPath.length() + 1 ).replace( '\\', '/' );
@@ -59,9 +59,7 @@ public class DefaultArtifactContextProducer
 
         if ( gav == null )
         {
-            // XXX what then? Without GAV we are screwed (look below).
-            // It should simply stop/skip, since it is not an artifact.
-            return null;
+            return null; // not an artifact
         }
 
         String groupId = gav.getGroupId();
@@ -72,59 +70,33 @@ public class DefaultArtifactContextProducer
 
         String classifier = gav.getClassifier();
 
-        File pom;
-
-        File artifact;
-
-        if ( file.getName().endsWith( ".pom" ) )
-        {
-            pom = file;
-
-            // there is no "reliable" way to go from pom to artifact!
-            // this is completely unimportant here, since if artifact exists,
-            // scan will find it and will do an "update" on existing "pom only" Lucene document.
-            // And API consumers should send artifacts to being added to index, not only poms.
-            // (but if sending both, again, will be ok coz of that above)
-            artifact = null;
-        }
-        else
-        {
-            artifact = file;
-
-            pom = pl.locate( file, context.getGavCalculator(), gav );
-
-            // if ( !pom.exists() )
-            // {
-            // return null;
-            // }
-        }
-
         ArtifactInfo ai = new ArtifactInfo( context.getRepositoryId(), groupId, artifactId, version, classifier );
         
-        // Assign the packaging if classifier is valid
+        // store extension if classifier is not empty
         if ( !StringUtils.isEmpty( ai.classifier ) )
         {
             ai.packaging = gav.getExtension();
         }
+        
+        ai.fextension = gav.getExtension();
+        ai.fname = file.getName();
+        
+        File pom;
+        File artifact;
 
-
-        // ArtifactInfo ai = new ArtifactInfo(
-        // fname,
-        // groupId,
-        // artifactId,
-        // version,
-        // classifier,
-        // packaging,
-        // name,
-        // description,
-        // artifact.lastModified(),
-        // artifact.length(),
-        // md5Text,
-        // sha1Text,
-        // sourcesExists,
-        // javadocExists,
-        // signatureExists,
-        // context.getRepositoryId() );
+        if ( file.getName().endsWith( ".pom" ) )
+        {
+            // there is no "reliable" way to go from pom to artifact.
+            // if artifact exists, scan will find it and will "update" existing Lucene document.
+            // API consumers should send artifacts to being added to index, not only poms.
+            artifact = null;
+            pom = file;
+        }
+        else
+        {
+            artifact = file;
+            pom = pl.locate( file, context.getGavCalculator(), gav );
+        }
 
         File metadata = ml.locate( pom );
 

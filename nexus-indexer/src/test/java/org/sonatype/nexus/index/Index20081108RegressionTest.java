@@ -10,7 +10,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.index.Term;
@@ -129,4 +131,135 @@ public class Index20081108RegressionTest
         assertGroup( 0, "org.apache.maven.plugins.maven-core-it-plugin", context );
     }
 
+    @Override
+    public void testSearchFlatPaged()
+        throws Exception
+    {
+        FlatSearchRequest request = new FlatSearchRequest( nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "org" ) );
+    
+        request.setStart( 0 );
+    
+        request.setAiCount( 50 );
+    
+        FlatSearchResponse response = nexusIndexer.searchFlat( request );
+    
+        assertEquals( response.getResults().toString(), 15, response.getTotalHits() );
+    }
+    
+    public void testSearchGroupedProblematicNames()
+        throws Exception
+    {
+    
+        // ----------------------------------------------------------------------------
+        // Artifacts with "problematic" names
+        // ----------------------------------------------------------------------------
+        {
+            // "-" in the name
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-logg*" );
+    
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+    
+            assertEquals( 1, r.size() );
+    
+            ArtifactInfoGroup ig = r.values().iterator().next();
+    
+            assertEquals( "commons-logging : commons-logging", ig.getGroupKey() );
+    
+            assertEquals( ig.getArtifactInfos().toString(), 6, ig.getArtifactInfos().size() );
+        }
+    
+        {
+            // numbers and "-" in the name
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "jcl104-over-slf4*" );
+    
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults();
+    
+            assertEquals( 1, r.size() );
+    
+            ArtifactInfoGroup ig = r.values().iterator().next();
+    
+            assertEquals( ig.getArtifactInfos().toString(), 1, ig.getArtifactInfos().size() );
+    
+            assertEquals( "org.slf4j : jcl104-over-slf4j", ig.getGroupKey() );
+        }
+    }
+
+    public void testPaging()
+        throws Exception
+    {
+        // we have 15 artifact for this search
+        int total = 15;
+        
+        int pageSize = 4;
+        
+        Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "org" );
+    
+        FlatSearchRequest req = new FlatSearchRequest( q );
+    
+        // have page size of 4, that will make us 4 pages
+        req.setAiCount( pageSize );
+        
+        List<ArtifactInfo> constructedPageList = new ArrayList<ArtifactInfo>();
+        
+        int offset = 0;
+        
+        while( true ) 
+        {
+            req.setStart( offset );
+            
+            FlatSearchResponse resp = nexusIndexer.searchFlat( req );
+      
+            Collection<ArtifactInfo> p = resp.getResults();
+            
+            assertEquals( p.toString(), total, resp.getTotalHits() );
+      
+            assertEquals( Math.min( pageSize, total - offset ), p.size() );
+    
+            constructedPageList.addAll( p );
+            
+            offset += pageSize;
+            
+            if( offset > total )
+            {
+                break;
+            }
+        }
+        
+        // 
+        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( q ) );
+        Collection<ArtifactInfo> onePage = response.getResults(); 
+    
+        List<ArtifactInfo> onePageList = new ArrayList<ArtifactInfo>( onePage );
+    
+        // onePage and constructedPage should hold equal elems in the same order
+        assertTrue( resultsAreEqual( onePageList, constructedPageList ) );
+    }
+    
+    public void testPurge()
+        throws Exception
+    {
+        // we have 14 artifact for this search
+        Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "org" );
+        FlatSearchRequest request = new FlatSearchRequest( q );
+        
+        FlatSearchResponse response1 = nexusIndexer.searchFlat( request );
+        Collection<ArtifactInfo> p1 = response1.getResults();
+    
+        assertEquals( 15, p1.size() );
+    
+        context.purge();
+    
+        FlatSearchResponse response2 = nexusIndexer.searchFlat( request );
+        Collection<ArtifactInfo> p2 = response2.getResults();
+    
+        assertEquals( 0, p2.size() );
+    }
+    
 }

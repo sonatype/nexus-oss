@@ -25,7 +25,6 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchRequest;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.NexusIndexer;
-import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.treeview.TreeNode.Type;
 
@@ -43,8 +42,7 @@ public class DefaultIndexTreeView
     }
 
     public TreeNode listNodes( TreeNodeFactory factory, String path )
-        throws IndexContextInInconsistentStateException,
-            IOException
+        throws IOException
     {
         // get the last path elem
         String name = null;
@@ -103,12 +101,10 @@ public class DefaultIndexTreeView
      * @param root
      * @param factory
      * @param allGroups
-     * @throws IndexContextInInconsistentStateException
      * @throws IOException
      */
     protected void listChildren( TreeNode root, TreeNodeFactory factory, Set<String> allGroups )
-        throws IndexContextInInconsistentStateException,
-            IOException
+        throws IOException
     {
         String path = root.getPath();
 
@@ -205,8 +201,7 @@ public class DefaultIndexTreeView
     }
 
     protected Set<String> getGroups( String path, Set<String> allGroups )
-        throws IndexContextInInconsistentStateException,
-            IOException
+        throws IOException
     {
         path = path.substring( 1 ).replace( '/', '.' );
 
@@ -238,8 +233,7 @@ public class DefaultIndexTreeView
     }
 
     protected Set<ArtifactInfo> getArtifacts( String path, IndexingContext indexingContext )
-        throws IndexContextInInconsistentStateException,
-            IOException
+        throws IOException
     {
         Set<ArtifactInfo> result = null;
 
@@ -323,8 +317,7 @@ public class DefaultIndexTreeView
     }
 
     protected Set<ArtifactInfo> getArtifactsByG( String g, IndexingContext indexingContext )
-        throws IndexContextInInconsistentStateException,
-            IOException
+        throws IOException
     {
         Query q = new TermQuery( new Term( ArtifactInfo.GROUP_ID, g ) );
 
@@ -336,8 +329,7 @@ public class DefaultIndexTreeView
     }
 
     protected Set<ArtifactInfo> getArtifactsByGA( String g, String a, IndexingContext indexingContext )
-        throws IndexContextInInconsistentStateException,
-            IOException
+        throws IOException
     {
         BooleanQuery q = new BooleanQuery();
 
@@ -353,8 +345,7 @@ public class DefaultIndexTreeView
     }
 
     protected Set<ArtifactInfo> getArtifactsByGAV( String g, String a, String v, IndexingContext indexingContext )
-        throws IndexContextInInconsistentStateException,
-            IOException
+        throws IOException
     {
         BooleanQuery q = new BooleanQuery();
 

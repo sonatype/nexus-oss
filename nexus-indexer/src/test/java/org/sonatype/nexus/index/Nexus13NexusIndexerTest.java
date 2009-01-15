@@ -39,7 +39,7 @@ public class Nexus13NexusIndexerTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX, false );
+            NexusIndexer.DEFAULT_INDEX );
         nexusIndexer.scan( context );
     }
 
@@ -50,25 +50,30 @@ public class Nexus13NexusIndexerTest
         // Classes and packages
         // ----------------------------------------------------------------------------
 
-        Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "cisco" );
+        {
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "cisco" );
+    
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            assertEquals( r.toString(), 4, r.size() ); // qdox and testng
+    
+            assertTrue( r.containsKey( "cisco.infra.dft : dma.plugin.utils" ) );
+            assertTrue( r.containsKey( "cisco.infra.dft : dma.pom.enforcer" ) );
+            assertTrue( r.containsKey( "cisco.infra.dft : maven-dma-mgmt-plugin" ) );
+            assertTrue( r.containsKey( "cisco.infra.dft : maven-dma-plugin" ) );
+        }
 
-        Map<String, ArtifactInfoGroup> r = nexusIndexer.searchGrouped( new GAGrouping(), q );
-
-        assertEquals( r.toString(), 4, r.size() ); // qdox and testng
-
-        assertTrue( r.containsKey( "cisco.infra.dft : dma.plugin.utils" ) );
-        assertTrue( r.containsKey( "cisco.infra.dft : dma.pom.enforcer" ) );
-        assertTrue( r.containsKey( "cisco.infra.dft : maven-dma-mgmt-plugin" ) );
-        assertTrue( r.containsKey( "cisco.infra.dft : maven-dma-plugin" ) );
-
-        q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "*dma.plugin.utils" );
-
-        r = nexusIndexer.searchGrouped( new GAGrouping(), q );
-
-        assertEquals( r.toString(), 1, r.size() );
-
-        assertTrue( r.containsKey( "cisco.infra.dft : dma.plugin.utils" ) );
-        assertEquals( "cisco.infra.dft : dma.plugin.utils", r.get( "cisco.infra.dft : dma.plugin.utils" ).getGroupKey() );
+        {
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "*dma.plugin.utils" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            assertEquals( r.toString(), 1, r.size() );
+    
+            assertTrue( r.containsKey( "cisco.infra.dft : dma.plugin.utils" ) );
+            assertEquals( "cisco.infra.dft : dma.plugin.utils", r.get( "cisco.infra.dft : dma.plugin.utils" ).getGroupKey() );
+        }
     }
 
     public void testSearchArchetypes()
@@ -80,11 +85,11 @@ public class Nexus13NexusIndexerTest
         // bq.add(new WildcardQuery(new Term(ArtifactInfo.ARTIFACT_ID, term + "*")), Occur.SHOULD);
         // FilteredQuery query = new FilteredQuery(tq, new QueryWrapperFilter(bq));
 
-        Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-archetype" ) );
+        Query q = new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-archetype" ) );
 
-        Collection<ArtifactInfo> r = nexusIndexer.searchFlat( ArtifactInfo.VERSION_COMPARATOR, query );
-
-        assertEquals( 1, r.size() );
+        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( q ) );
+        Collection<ArtifactInfo> r = response.getResults(); 
+        assertEquals( r.toString(), 1, r.size() );
 
         ArtifactInfo ai = r.iterator().next();
         assertEquals( "cisco.infra.dft", ai.groupId );
@@ -112,7 +117,7 @@ public class Nexus13NexusIndexerTest
             newIndexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX, false );
+            NexusIndexer.DEFAULT_INDEX );
 
         assertEquals( 0, newContext.getTimestamp().getTime() - context.getTimestamp().getTime() );
 
@@ -120,9 +125,10 @@ public class Nexus13NexusIndexerTest
 
         // make sure context has the same artifacts
 
-        Query query = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "cisco" );
+        Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "cisco" );
 
-        Collection<ArtifactInfo> r = nexusIndexer.searchFlat( query, newContext );
+        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( q, newContext ) );
+        Collection<ArtifactInfo> r = response.getResults(); 
 
         assertEquals( 8, r.size() );
 
@@ -157,9 +163,9 @@ public class Nexus13NexusIndexerTest
     {
         Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "cisco.infra" );
 
-        Collection<ArtifactInfo> r = nexusIndexer.searchFlat( q );
-
-        assertEquals( 8, r.size() );
+        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( q ) );
+        Collection<ArtifactInfo> r = response.getResults(); 
+        assertEquals( r.toString(), 8, r.size() );
 
         List<ArtifactInfo> list = new ArrayList<ArtifactInfo>( r );
 
@@ -183,8 +189,9 @@ public class Nexus13NexusIndexerTest
         // ----------------------------------------------------------------------------
         Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "cisco.infra" );
 
-        Map<String, ArtifactInfoGroup> r = nexusIndexer.searchGrouped( new GAGrouping(), q );
-
+        GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+        GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+        Map<String, ArtifactInfoGroup> r = response.getResults(); 
         assertEquals( 8, r.size() );
 
         ArtifactInfoGroup ig = r.values().iterator().next();
@@ -213,7 +220,9 @@ public class Nexus13NexusIndexerTest
         // "-" in the name
         Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "dma.integr*" );
 
-        Map<String, ArtifactInfoGroup> r = nexusIndexer.searchGrouped( new GAGrouping(), q );
+        GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+        GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+        Map<String, ArtifactInfoGroup> r = response.getResults(); 
 
         assertEquals( 1, r.size() );
 

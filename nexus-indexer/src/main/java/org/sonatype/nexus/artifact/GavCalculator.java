@@ -7,9 +7,10 @@
 package org.sonatype.nexus.artifact;
 
 /**
- * The GavCalculator component.
+ * An interface to calculate <code>Gav</code> based on provided artifact path and 
+ * to calculate an artifact path from provided <code>Gav</code>.
  * 
- * @author cstamas
+ * @author Tamas Cservenak
  */
 public interface GavCalculator
 {

@@ -26,7 +26,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.index.context.DefaultIndexingContext;
-import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
 import org.sonatype.nexus.index.creator.IndexCreator;
@@ -107,13 +106,13 @@ public class DefaultNexusIndexer
                 indexUpdateUrl,
                 indexers,
                 true );
+            
+            indexingContexts.put( context.getId(), context );
         }
         catch ( UnsupportedExistingLuceneIndexException e )
         {
             // will not be thrown
         }
-
-        indexingContexts.put( context.getId(), context );
 
         return context;
     }
@@ -177,13 +176,13 @@ public class DefaultNexusIndexer
                 indexUpdateUrl,
                 indexers,
                 true );
+            
+            indexingContexts.put( context.getId(), context );
         }
         catch ( UnsupportedExistingLuceneIndexException e )
         {
             // will not be thrown
         }
-
-        indexingContexts.put( context.getId(), context );
 
         return context;
     }
@@ -310,6 +309,8 @@ public class DefaultNexusIndexer
         if ( ac != null )
         {
             indexerEngine.index( context, ac );
+            
+            // updateMainEntry( context, ac, false );
 
             context.updateTimestamp();
         }
@@ -326,12 +327,14 @@ public class DefaultNexusIndexer
         {
             indexerEngine.update( context, ac );
 
+            // updateMainEntry( context, ac, false );
+
             context.updateGroups( ac );
             
             context.updateTimestamp();
         }
     }
-
+    
     public void deleteArtifactFromIndex( ArtifactContext ac, IndexingContext context )
         throws IOException
     {
@@ -339,10 +342,51 @@ public class DefaultNexusIndexer
         {
             indexerEngine.remove( context, ac );
 
+            // updateMainEntry( context, ac, true );
+            
             context.updateTimestamp();
         }
     }
 
+//    private void updateMainEntry( IndexingContext context, ArtifactContext ac, boolean remove ) 
+//        throws IOException 
+//    {
+//        ArtifactInfo ai = ac.getArtifactInfo();
+//        
+//        if( ai.classifier == null )
+//        {
+//            return;  // main artifact or pom
+//        }
+//
+//        // TODO can be too slow to do a search and update for every artifact
+//        
+//        String uinfo = AbstractIndexCreator.getGAV( ai.groupId, ai.artifactId, ai.version, null );
+//        
+//        Query query = new TermQuery( new Term( ArtifactInfo.UINFO, uinfo ) );
+//        
+//        IndexSearcher searcher = context.getIndexSearcher();
+//        
+//        Hits hits = searcher.search( query );
+//        
+//        if ( hits.length() > 0 )
+//        {
+//            Document doc = hits.doc( 0 );
+//            
+//            ArtifactInfo mai = context.constructArtifactInfo( doc );
+//            
+//            if( remove )
+//            {
+//                mai.getArtifacts().add( ac.getGav() );
+//            }
+//            else
+//            {
+//                mai.getArtifacts().remove( ac.getGav() );
+//            }
+//            
+//            indexerEngine.update( context, new ArtifactContext( null, null, null, mai, ac.getGav() ) );
+//        }
+//    }
+    
     // ----------------------------------------------------------------------------
     // Root groups
     // ----------------------------------------------------------------------------
@@ -393,8 +437,7 @@ public class DefaultNexusIndexer
      * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead
      */
     public Collection<ArtifactInfo> searchFlat( Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return searchFlat( ArtifactInfo.VERSION_COMPARATOR, query );
     }
@@ -403,8 +446,7 @@ public class DefaultNexusIndexer
      * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead
      */
     public Collection<ArtifactInfo> searchFlat( Query query, IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return searchFlat( ArtifactInfo.VERSION_COMPARATOR, query, context );
     }
@@ -413,8 +455,7 @@ public class DefaultNexusIndexer
      * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead
      */
     public Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return searcher.searchFlat( artifactInfoComparator, indexingContexts.values(), query );
     }
@@ -424,15 +465,13 @@ public class DefaultNexusIndexer
      */
     public Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query,
         IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return searcher.searchFlat( artifactInfoComparator, context, query );
     }
 
     public FlatSearchResponse searchFlat( FlatSearchRequest request )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         if ( request.getContext() == null )
         {
@@ -448,8 +487,7 @@ public class DefaultNexusIndexer
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
      */
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return searchGrouped( grouping, String.CASE_INSENSITIVE_ORDER, query );
     }
@@ -458,8 +496,7 @@ public class DefaultNexusIndexer
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
      */
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query, IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return searchGrouped( grouping, String.CASE_INSENSITIVE_ORDER, query, context );
     }
@@ -469,8 +506,7 @@ public class DefaultNexusIndexer
      */
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
         Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return searcher.searchGrouped(
             new GroupedSearchRequest( query, grouping, groupKeyComparator ),
@@ -482,16 +518,14 @@ public class DefaultNexusIndexer
      */
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
         Query query, IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return searcher
             .searchGrouped( new GroupedSearchRequest( query, grouping, groupKeyComparator, context ) ).getResults();
     }
 
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         if ( request.getContext() == null )
         {
@@ -517,8 +551,7 @@ public class DefaultNexusIndexer
     // ----------------------------------------------------------------------------
 
     public ArtifactInfo identify( File artifact )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         FileInputStream is = null;
         
@@ -570,22 +603,19 @@ public class DefaultNexusIndexer
     }
 
     public ArtifactInfo identify( String field, String query )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return identify( constructQuery( field, query ) );
     }
 
     public ArtifactInfo identify( Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return identify( query, indexingContexts.values() );
     }
 
     public ArtifactInfo identify( Query query, Collection<IndexingContext> contexts )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         Set<ArtifactInfo> result = searcher.searchFlatPaged(
             new FlatSearchRequest( query, ArtifactInfo.VERSION_COMPARATOR ),

@@ -59,16 +59,18 @@ public class MinimalArtifactInfoIndexCreator
 
     private Locator sha1l = new Sha1Locator();
 
-    public void populateArtifactInfo( ArtifactIndexingContext context )
+    public void populateArtifactInfo( ArtifactIndexingContext aic )
     {
-        ArtifactContext artifactContext = context.getArtifactContext();
+        ArtifactContext ac = aic.getArtifactContext();
 
-        File artifact = artifactContext.getArtifact();
+        File artifact = ac.getArtifact();
 
-        File pom = artifactContext.getPom();
+        File pom = ac.getPom();
 
-        ArtifactInfo ai = artifactContext.getArtifactInfo();
+        ArtifactInfo ai = ac.getArtifactInfo();
 
+        // boolean isSnapshot = VersionUtils.isSnapshot( ai.version );
+        
         if ( pom != null )
         {
             Model model = modelReader.readModel( pom, ai.groupId, ai.artifactId, ai.version );
@@ -89,25 +91,90 @@ public class MinimalArtifactInfoIndexCreator
             ai.lastModified = pom.lastModified();
             
             ai.fextension = "pom";
+            
+//            ai.getArtifacts().add( new Gav( //
+//                ai.groupId, //
+//                ai.artifactId, //
+//                ai.version, //
+//                null, // classifier
+//                "pom", // extension
+//                null, //
+//                null, //
+//                pom.getName(), // name
+//                isSnapshot,
+//                false,
+//                null,
+//                false,
+//                null) );
         }
-
-        if ( pom != null && ai.classifier == null )
+        
+        // TODO handle artifacts without poms
+        if ( pom != null )
         {
-            File sources = sl.locate( pom );
-            ai.sourcesExists = sources.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
-
-            File javadoc = jl.locate( pom );
-            ai.javadocExists = javadoc.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
-        }
-        else if ( pom != null && ai.classifier != null )
-        {
-            ai.sourcesExists = ArtifactAvailablility.NOT_AVAILABLE;
-
-            ai.javadocExists = ArtifactAvailablility.NOT_AVAILABLE;
+            if ( ai.classifier != null )
+            {
+                ai.sourcesExists = ArtifactAvailablility.NOT_AVAILABLE;
+                
+                ai.javadocExists = ArtifactAvailablility.NOT_AVAILABLE;
+            }
+            else
+            {
+                File sources = sl.locate( pom );
+                if ( !sources.exists() )
+                {
+                    ai.sourcesExists = ArtifactAvailablility.NOT_PRESENT;
+                }
+                else
+                {
+                    ai.sourcesExists = ArtifactAvailablility.PRESENT;
+                    
+//                    ai.getArtifacts().add( new Gav( //
+//                        ai.groupId, //
+//                        ai.artifactId, //
+//                        ai.version, //
+//                        "sources", // classifier
+//                        "jar", // extension
+//                        null, //
+//                        null, //
+//                        sources.getName(), // name
+//                        isSnapshot,
+//                        false,
+//                        null,
+//                        false,
+//                        null) );
+                }
+                
+                File javadoc = jl.locate( pom );
+                if ( !javadoc.exists() )
+                {
+                    ai.javadocExists = ArtifactAvailablility.NOT_PRESENT;
+                }
+                else
+                {
+                    ai.javadocExists = ArtifactAvailablility.PRESENT;
+                    
+//                    ai.getArtifacts().add( new Gav( //
+//                        ai.groupId, //
+//                        ai.artifactId, //
+//                        ai.version, //
+//                        "javadoc", // classifier
+//                        "jar", // extension
+//                        null, //
+//                        null, //
+//                        javadoc.getName(), // name
+//                        isSnapshot,
+//                        false,
+//                        null,
+//                        false,
+//                        null) );
+                }
+            }
         }
 
         if ( artifact != null )
         {
+            // ai.getArtifacts().add( ac.getGav() );
+            
             File signature = sigl.locate( artifact );
             ai.signatureExists = signature.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
 
@@ -121,7 +188,7 @@ public class MinimalArtifactInfoIndexCreator
                 }
                 catch ( IOException e )
                 {
-                    e.printStackTrace();
+                    ac.addError( e );
                 }
             }
 
@@ -129,7 +196,7 @@ public class MinimalArtifactInfoIndexCreator
 
             ai.size = artifact.length();
 
-            ai.fextension = getExtension( artifact, artifactContext.getGav() );
+            ai.fextension = getExtension( artifact, ac.getGav() );
 
             if ( ai.packaging == null )
             {
@@ -146,26 +213,22 @@ public class MinimalArtifactInfoIndexCreator
         {
             return gav.getExtension();
         }
-        else
+
+        // last resort, the extension of the file
+        String artifactFileName = artifact.getName().toLowerCase();
+
+        // tar.gz? and other "special" combinations?
+        if ( artifactFileName.endsWith( "tar.gz" ) )
         {
-            // last resort, the extension of the file
-            String artifactFileName = artifact.getName().toLowerCase();
-  
-            // tar.gz? and other "special" combinations?
-            if ( artifactFileName.endsWith( "tar.gz" ) )
-            {
-                return "tar.gz";
-            }
-            else if ( artifactFileName.equals( "tar.bz2" ) )
-            {
-                return "tar.bz2";
-            }
-            else
-            {
-                // javadoc: gets the part _AFTER_ last dot!
-                return FileUtils.getExtension( artifactFileName );
-            }
+            return "tar.gz";
         }
+        else if ( artifactFileName.equals( "tar.bz2" ) )
+        {
+            return "tar.bz2";
+        }
+
+        // javadoc: gets the part _AFTER_ last dot!
+        return FileUtils.getExtension( artifactFileName );
     }
 
     private void checkMavenPlugin( ArtifactInfo ai, File artifact )

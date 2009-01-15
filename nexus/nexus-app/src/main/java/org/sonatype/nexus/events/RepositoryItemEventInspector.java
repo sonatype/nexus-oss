@@ -259,7 +259,7 @@ public class RepositoryItemEventInspector
 
                                 ai.classifier = gav.getClassifier();
 
-                                ArtifactContext ac = new ArtifactContext( null, null, null, ai, null );
+                                ArtifactContext ac = new ArtifactContext( null, null, null, ai, gav );
 
                                 // remove file from index
                                 if ( getLogger().isDebugEnabled() )

@@ -35,27 +35,27 @@ public abstract class AbstractRepoNexusIndexerTest
 
         assertGroup( 1, "proptest", context );
         
-        assertGroup( 1, "junit", context );
+        assertGroup( 3, "junit", context );
 
-        assertGroup( 6, "commons-logging", context );
+        assertGroup( 13, "commons-logging", context );
 
         assertGroup( 1, "regexp", context );
 
-        assertGroup( 1, "commons-cli", context );
+        assertGroup( 2, "commons-cli", context );
 
-        assertGroup( 15, "org", context );
+        assertGroup( 22, "org", context );
 
-        assertGroup( 6, "org.slf4j", context );
+        assertGroup( 10, "org.slf4j", context );
 
-        assertGroup( 3, "org.testng", context );
+        assertGroup( 4, "org.testng", context );
 
-        assertGroup( 3, "org.apache", context );
+        assertGroup( 5, "org.apache", context );
 
         assertGroup( 1, "org.apache.directory", context );
         assertGroup( 1, "org.apache.directory.server", context );
 
-        assertGroup( 1, "org.apache.maven", context );
-        assertGroup( 1, "org.apache.maven.plugins", context );
+        assertGroup( 3, "org.apache.maven", context );
+        assertGroup( 3, "org.apache.maven.plugins", context );
         assertGroup( 0, "org.apache.maven.plugins.maven-core-it-plugin", context );
     }
 
@@ -70,7 +70,7 @@ public abstract class AbstractRepoNexusIndexerTest
 
         FlatSearchResponse response = nexusIndexer.searchFlat( request );
 
-        assertEquals( 15, response.getTotalHits() );
+        assertEquals( response.getResults().toString(), 22, response.getTotalHits() );
     }
 
     public void testSearchFlat()
@@ -78,7 +78,9 @@ public abstract class AbstractRepoNexusIndexerTest
     {
         Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "qdox" );
 
-        Collection<ArtifactInfo> r = nexusIndexer.searchFlat( q );
+        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( q ) );
+        
+        Collection<ArtifactInfo> r = response.getResults(); 
 
         assertEquals( 2, r.size() );
 
@@ -139,32 +141,42 @@ public abstract class AbstractRepoNexusIndexerTest
         // ----------------------------------------------------------------------------
         // Artifacts with "problematic" names
         // ----------------------------------------------------------------------------
+        {
+            // "-" in the name
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-logg*" );
+    
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+    
+            assertEquals( 1, r.size() );
+    
+            ArtifactInfoGroup ig = r.values().iterator().next();
+    
+            assertEquals( "commons-logging : commons-logging", ig.getGroupKey() );
+    
+            assertEquals( ig.getArtifactInfos().toString(), 13, ig.getArtifactInfos().size() );
+        }
 
-        // "-" in the name
-        Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-logg*" );
-
-        Map<String, ArtifactInfoGroup> r = nexusIndexer.searchGrouped( new GAGrouping(), q );
-
-        assertEquals( 1, r.size() );
-
-        ArtifactInfoGroup ig = r.values().iterator().next();
-
-        assertEquals( "commons-logging : commons-logging", ig.getGroupKey() );
-
-        assertEquals( 6, ig.getArtifactInfos().size() );
-
-        // numbers and "-" in the name
-        q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "jcl104-over-slf4*" );
-
-        r = nexusIndexer.searchGrouped( new GAGrouping(), q );
-
-        assertEquals( 1, r.size() );
-
-        ig = r.values().iterator().next();
-
-        assertEquals( 1, ig.getArtifactInfos().size() );
-
-        assertEquals( "org.slf4j : jcl104-over-slf4j", ig.getGroupKey() );
+        {
+            // numbers and "-" in the name
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "jcl104-over-slf4*" );
+    
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults();
+    
+            assertEquals( 1, r.size() );
+    
+            ArtifactInfoGroup ig = r.values().iterator().next();
+    
+            assertEquals( ig.getArtifactInfos().toString(), 2, ig.getArtifactInfos().size() );
+    
+            assertEquals( "org.slf4j : jcl104-over-slf4j", ig.getGroupKey() );
+        }
     }
 
     public void testConstructQuery()
@@ -206,8 +218,8 @@ public abstract class AbstractRepoNexusIndexerTest
     public void testPaging()
         throws Exception
     {
-        // we have 15 artifact for this search
-        int total = 15;
+        // we have 22 artifact for this search
+        int total = 22;
         
         int pageSize = 4;
         
@@ -228,9 +240,9 @@ public abstract class AbstractRepoNexusIndexerTest
             
             FlatSearchResponse resp = nexusIndexer.searchFlat( req );
       
-            assertEquals( total, resp.getTotalHits() );
-      
             Collection<ArtifactInfo> p = resp.getResults();
+            
+            assertEquals( p.toString(), total, resp.getTotalHits() );
       
             assertEquals( Math.min( pageSize, total - offset ), p.size() );
 
@@ -245,7 +257,8 @@ public abstract class AbstractRepoNexusIndexerTest
         }
         
         // 
-        Collection<ArtifactInfo> onePage = nexusIndexer.searchFlat( q );
+        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( q ) );
+        Collection<ArtifactInfo> onePage = response.getResults(); 
 
         List<ArtifactInfo> onePageList = new ArrayList<ArtifactInfo>( onePage );
 
@@ -258,14 +271,17 @@ public abstract class AbstractRepoNexusIndexerTest
     {
         // we have 14 artifact for this search
         Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "org" );
+        FlatSearchRequest request = new FlatSearchRequest( q );
+        
+        FlatSearchResponse response1 = nexusIndexer.searchFlat( request );
+        Collection<ArtifactInfo> p1 = response1.getResults();
 
-        Collection<ArtifactInfo> p1 = nexusIndexer.searchFlat( q );
-
-        assertEquals( 15, p1.size() );
+        assertEquals( 22, p1.size() );
 
         context.purge();
 
-        Collection<ArtifactInfo> p2 = nexusIndexer.searchFlat( q );
+        FlatSearchResponse response2 = nexusIndexer.searchFlat( request );
+        Collection<ArtifactInfo> p2 = response2.getResults();
 
         assertEquals( 0, p2.size() );
     }

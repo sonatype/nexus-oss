@@ -59,91 +59,89 @@ public class DefaultIndexNexusIndexerTest
         // Classes and packages
         // ----------------------------------------------------------------------------
 
-        Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "com/thoughtworks/qdox" );
+        {
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "com/thoughtworks/qdox" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+    
+            assertEquals( r.toString(), 2, r.size() ); // qdox and testng
+    
+            assertTrue( r.containsKey( "qdox : qdox" ) );
+            assertTrue( r.containsKey( "org.testng : testng" ) );
+            assertEquals( "qdox : qdox", r.get( "qdox : qdox" ).getGroupKey() );
+            assertEquals( "org.testng : testng", r.get( "org.testng : testng" ).getGroupKey() );
+        }
 
-        Map<String, ArtifactInfoGroup> r = nexusIndexer.searchGrouped( new GAGrouping(), q );
+        {
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "com.thoughtworks.qdox" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            assertEquals( r.toString(), 2, r.size() );
+    
+            assertTrue( r.containsKey( "qdox : qdox" ) );
+            assertTrue( r.containsKey( "org.testng : testng" ) );
+            assertEquals( "qdox : qdox", r.get( "qdox : qdox" ).getGroupKey() );
+            assertEquals( "org.testng : testng", r.get( "org.testng : testng" ).getGroupKey() );
+        }
 
-        assertEquals( r.toString(), 2, r.size() ); // qdox and testng
+        {
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "thoughtworks" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            assertEquals( r.toString(), 2, r.size() );
+            assertTrue( r.containsKey( "qdox : qdox" ) );
+            assertTrue( r.containsKey( "org.testng : testng" ) );
+            assertEquals( "qdox : qdox", r.get( "qdox : qdox" ).getGroupKey() );
+            assertEquals( "org.testng : testng", r.get( "org.testng : testng" ).getGroupKey() );
+        }
+        
 
-        assertTrue( r.containsKey( "qdox : qdox" ) );
-        assertTrue( r.containsKey( "org.testng : testng" ) );
-        assertEquals( "qdox : qdox", r.get( "qdox : qdox" ).getGroupKey() );
-        assertEquals( "org.testng : testng", r.get( "org.testng : testng" ).getGroupKey() );
-
-        q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "com.thoughtworks.qdox" );
-
-        r = nexusIndexer.searchGrouped( new GAGrouping(), q );
-
-        assertEquals( r.toString(), 2, r.size() );
-
-        assertTrue( r.containsKey( "qdox : qdox" ) );
-        assertTrue( r.containsKey( "org.testng : testng" ) );
-        assertEquals( "qdox : qdox", r.get( "qdox : qdox" ).getGroupKey() );
-        assertEquals( "org.testng : testng", r.get( "org.testng : testng" ).getGroupKey() );
-
-        q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "thoughtworks" );
-
-        r = nexusIndexer.searchGrouped( new GAGrouping(), q );
-
-        assertEquals( r.toString(), 2, r.size() );
-
-        assertTrue( r.containsKey( "qdox : qdox" ) );
-        assertTrue( r.containsKey( "org.testng : testng" ) );
-        assertEquals( "qdox : qdox", r.get( "qdox : qdox" ).getGroupKey() );
-        assertEquals( "org.testng : testng", r.get( "org.testng : testng" ).getGroupKey() );
-
-        q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "Logger" );
-
-        r = nexusIndexer.searchGrouped( new GGrouping(), q );
-
-        assertEquals( r.toString(), 1, r.size() );
-
-        ArtifactInfoGroup ig = r.values().iterator().next();
-
-        assertEquals( r.toString(), "org.slf4j", ig.getGroupKey() );
-
-        q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "*slf4j*Logg*" );
-
-        r = nexusIndexer.searchGrouped( new GAGrouping(), q );
-
-        assertEquals( r.toString(), 2, r.size() );
-
-        ig = r.values().iterator().next();
-
-        List<ArtifactInfo> list = new ArrayList<ArtifactInfo>( ig.getArtifactInfos() );
-
-        assertEquals( r.toString(), 2, list.size() );
-
-        ArtifactInfo ai = list.get( 0 );
-
-        assertEquals( "org.slf4j", ai.groupId );
-
-        assertEquals( "slf4j-api", ai.artifactId );
-
-        assertEquals( "1.4.2", ai.version );
-
-        ai = list.get( 1 );
-
-        assertEquals( "org.slf4j", ai.groupId );
-
-        assertEquals( "slf4j-api", ai.artifactId );
-
-        assertEquals( "1.4.1", ai.version );
-
-        // This was error, since slf4j-log4j12 DOES NOT HAVE any class for this search!
-        ig = r.get( "org.slf4j : slf4j-log4j12" );
-
-        list = new ArrayList<ArtifactInfo>( ig.getArtifactInfos() );
-
-        assertEquals( list.toString(), 1, list.size() );
-
-        ai = list.get( 0 );
-
-        assertEquals( "org.slf4j", ai.groupId );
-
-        assertEquals( "slf4j-log4j12", ai.artifactId );
-
-        assertEquals( "1.4.1", ai.version );
+        {
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "Logger" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            assertEquals( r.toString(), 1, r.size() );
+            ArtifactInfoGroup ig = r.values().iterator().next();
+            assertEquals( r.toString(), "org.slf4j", ig.getGroupKey() );
+        }
+        
+        {
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "*slf4j*Logg*" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            assertEquals( r.toString(), 2, r.size() );
+            
+            {
+                ArtifactInfoGroup ig = r.values().iterator().next();
+                ArrayList<ArtifactInfo> list = new ArrayList<ArtifactInfo>( ig.getArtifactInfos() );
+                assertEquals( r.toString(), 2, list.size() );
+                ArtifactInfo ai1;
+                ai1 = list.get( 0 );
+                assertEquals( "org.slf4j", ai1.groupId );
+                assertEquals( "slf4j-api", ai1.artifactId );
+                assertEquals( "1.4.2", ai1.version );
+                ArtifactInfo ai2 = list.get( 1 );
+                assertEquals( "org.slf4j", ai2.groupId );
+                assertEquals( "slf4j-api", ai2.artifactId );
+                assertEquals( "1.4.1", ai2.version );
+            }
+            
+            {
+                // This was error, since slf4j-log4j12 DOES NOT HAVE any class for this search!
+                ArtifactInfoGroup ig = r.get( "org.slf4j : slf4j-log4j12" );
+                ArrayList<ArtifactInfo> list = new ArrayList<ArtifactInfo>( ig.getArtifactInfos() );
+                assertEquals( list.toString(), 1, list.size() );
+                ArtifactInfo ai = list.get( 0 );
+                assertEquals( "org.slf4j", ai.groupId );
+                assertEquals( "slf4j-log4j12", ai.artifactId );
+                assertEquals( "1.4.1", ai.version );
+            }
+        }
     }
 
     public void testSearchArchetypes()
@@ -155,9 +153,9 @@ public class DefaultIndexNexusIndexerTest
         // bq.add(new WildcardQuery(new Term(ArtifactInfo.ARTIFACT_ID, term + "*")), Occur.SHOULD);
         // FilteredQuery query = new FilteredQuery(tq, new QueryWrapperFilter(bq));
 
-        Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-archetype" ) );
-
-        Collection<ArtifactInfo> r = nexusIndexer.searchFlat( ArtifactInfo.VERSION_COMPARATOR, query );
+        Query q = new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-archetype" ) );
+        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( q ) );
+        Collection<ArtifactInfo> r = response.getResults(); 
 
         assertEquals( 4, r.size() );
 
@@ -220,7 +218,9 @@ public class DefaultIndexNexusIndexerTest
 
         Query query = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "qdox" );
 
-        Collection<ArtifactInfo> r = nexusIndexer.searchFlat( query, newContext );
+        FlatSearchRequest request = new FlatSearchRequest( query, newContext );
+        FlatSearchResponse response = nexusIndexer.searchFlat( request );
+        Collection<ArtifactInfo> r = response.getResults(); 
 
         assertEquals( 2, r.size() );
 

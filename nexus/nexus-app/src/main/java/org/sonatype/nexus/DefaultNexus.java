@@ -60,7 +60,6 @@ import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
@@ -1495,15 +1494,7 @@ public class DefaultNexus
     public ArtifactInfo identifyArtifact( String type, String checksum )
         throws IOException
     {
-        try
-        {
-            return indexerManager.identifyArtifact( type, checksum );
-        }
-        catch ( IndexContextInInconsistentStateException e )
-        {
-            getLogger().error( "Index is corrupt.", e );
-            return null;
-        }
+        return indexerManager.identifyArtifact( type, checksum );
     }
 
     public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,

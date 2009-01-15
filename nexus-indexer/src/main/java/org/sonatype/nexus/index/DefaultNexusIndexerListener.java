@@ -64,8 +64,6 @@ class DefaultNexusIndexerListener implements
             {
                 initialize( ctx );
             }
-      
-            indexerEngine.beginIndexing( ctx );
         } 
         catch ( IOException ex ) 
         {
@@ -80,10 +78,7 @@ class DefaultNexusIndexerListener implements
 
     public void artifactDiscovered( ArtifactContext ac )
     {
-        ArtifactInfo ai = ac.getArtifactInfo();
-        
-        String uinfo = AbstractIndexCreator.getGAV(
-            ai.groupId, ai.artifactId, ai.version, ai.classifier, ai.packaging );
+        String uinfo = ac.getArtifactInfo().getUinfo();
         
         if ( uinfos.contains( uinfo ) )
         {
@@ -94,6 +89,11 @@ class DefaultNexusIndexerListener implements
       
         try
         {
+            if ( listener != null )
+            {
+                listener.artifactDiscovered( ac );
+            }
+
             indexer.artifactDiscovered( ac, context );
             
             for ( Exception e : ac.getErrors() )
@@ -105,11 +105,6 @@ class DefaultNexusIndexerListener implements
             allGroups.add( ac.getArtifactInfo().groupId );
             
             count++;
-            
-            if ( listener != null )
-            {
-                listener.artifactDiscovered( ac );
-            }
         }
         catch ( IOException ex )
         {
@@ -128,7 +123,7 @@ class DefaultNexusIndexerListener implements
         
         try 
         {
-            indexerEngine.endIndexing( context );
+            indexerEngine.optimize( context );
             
             indexer.setRootGroups( context, groups );
             
@@ -212,13 +207,13 @@ class DefaultNexusIndexerListener implements
             Term term = new Term( ArtifactInfo.UINFO, uinfo );
             
             Hits hits = context.getIndexSearcher().search( new TermQuery( term ) );
-            
-            for ( int i = 0; i < hits.length(); i++ ) 
+
+            if( hits.length() > 0 )
             {
+                String[] ra = AbstractIndexCreator.FS_PATTERN.split( uinfo );
+
                 ArtifactInfo ai = new ArtifactInfo();
                 
-                String[] ra = AbstractIndexCreator.FS_PATTERN.split( uinfo );
-       
                 ai.repository = context.getRepositoryId();
        
                 ai.groupId = ra[0];
@@ -236,14 +231,16 @@ class DefaultNexusIndexerListener implements
                 {
                     ai.packaging = AbstractIndexCreator.renvl( ra[4] );
                 }
-    
+            
                 // minimal ArtifactContext for removal
+                ArtifactContext ac = new ArtifactContext( null, null, null, ai, ai.calculateGav() );
                 
-                ArtifactContext ac = new ArtifactContext( null, null, null, ai, null );
-                
-                indexer.deleteArtifactFromIndex( ac, context );
-                
-                deleted++;
+                for ( int i = 0; i < hits.length(); i++ )
+                {
+                    indexer.deleteArtifactFromIndex( ac, context );
+                    
+                    deleted++;
+                }
             }
         }
         

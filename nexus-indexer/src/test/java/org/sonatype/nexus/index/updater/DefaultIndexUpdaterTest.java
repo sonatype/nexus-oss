@@ -42,8 +42,6 @@ public class DefaultIndexUpdaterTest
 {
     private String repositoryId = "test";
 
-    private File repositoryDir = null;
-
     private String repositoryUrl = "http://repo1.maven.org/maven2/";
 
     private NexusIndexer indexer;
@@ -59,16 +57,16 @@ public class DefaultIndexUpdaterTest
     {
         super.setUp();
 
-        indexer = (NexusIndexer) lookup( NexusIndexer.class );
+        indexer = lookup( NexusIndexer.class );
 
-        updater = (IndexUpdater) lookup( IndexUpdater.class );
+        updater = lookup( IndexUpdater.class );
         
         Directory indexDirectory = new RAMDirectory();
 
         context = indexer.addIndexingContext(
             repositoryId,
             repositoryId,
-            repositoryDir,
+            null,
             indexDirectory,
             repositoryUrl,
             null,
@@ -84,7 +82,8 @@ public class DefaultIndexUpdaterTest
 
         Query q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
 
-        Collection<ArtifactInfo> content1 = indexer.searchFlat( q );
+        FlatSearchResponse response1 = indexer.searchFlat( new FlatSearchRequest( q ) );
+        Collection<ArtifactInfo> content1 = response1.getResults(); 
 
         assertEquals( content1.toString(), 1, content1.size() );
 
@@ -95,7 +94,7 @@ public class DefaultIndexUpdaterTest
         IndexingContext tempContext = indexer.addIndexingContext(
             repositoryId + "temp",
             repositoryId,
-            repositoryDir,
+            null,
             tempIndexDirectory,
             repositoryUrl,
             null,
@@ -109,10 +108,8 @@ public class DefaultIndexUpdaterTest
             createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.4", null ),
             tempContext );
 
-        q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
-
-        Collection<ArtifactInfo> tempContent = indexer.searchFlat( q, tempContext );
-
+        FlatSearchResponse response2 = indexer.searchFlat( new FlatSearchRequest( q, tempContext ) );
+        Collection<ArtifactInfo> tempContent = response2.getResults(); 
         assertEquals( tempContent.toString(), 2, tempContent.size() );
 
         // RAMDirectory is closed with context, forcing timestamp update
@@ -128,10 +125,8 @@ public class DefaultIndexUpdaterTest
 
         assertEquals( newIndexTimestamp, context.getTimestamp() );
 
-        q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
-
-        Collection<ArtifactInfo> content2 = indexer.searchFlat( q );
-
+        FlatSearchResponse response3 = indexer.searchFlat( new FlatSearchRequest( q ) );
+        Collection<ArtifactInfo> content2 = response3.getResults(); 
         assertEquals( content2.toString(), 2, content2.size() );
     }
 
@@ -142,10 +137,11 @@ public class DefaultIndexUpdaterTest
             createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.2", null ),
             context );
 
+        Query q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
+        
         {
-            Query q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
-
-            Collection<ArtifactInfo> content1 = indexer.searchFlat( q );
+            FlatSearchResponse response1 = indexer.searchFlat( new FlatSearchRequest( q ) );
+            Collection<ArtifactInfo> content1 = response1.getResults(); 
 
             assertEquals( content1.toString(), 1, content1.size() );
         }
@@ -158,7 +154,7 @@ public class DefaultIndexUpdaterTest
             IndexingContext tempContext = indexer.addIndexingContext(
                 repositoryId + "temp",
                 repositoryId,
-                repositoryDir,
+                null,
                 tempIndexDirectory,
                 repositoryUrl,
                 null,
@@ -182,10 +178,8 @@ public class DefaultIndexUpdaterTest
                 "2.4",
                 null ), tempContext );
 
-            Query q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
-
-            Collection<ArtifactInfo> tempContent = indexer.searchFlat( q );
-
+            FlatSearchResponse tempResponse = indexer.searchFlat( new FlatSearchRequest( q ) );
+            Collection<ArtifactInfo> tempContent = tempResponse.getResults(); 
             assertEquals( tempContent.toString(), 3, tempContent.size() );
 
             RAMDirectory tempDir2 = new RAMDirectory( tempContext.getIndexDirectory() );
@@ -194,10 +188,8 @@ public class DefaultIndexUpdaterTest
 
             context.merge( tempDir2 );
 
-            q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
-
-            Collection<ArtifactInfo> content2 = indexer.searchFlat( q );
-
+            FlatSearchResponse response2 = indexer.searchFlat( new FlatSearchRequest( q ) );
+            Collection<ArtifactInfo> content2 = response2.getResults(); 
             assertEquals( content2.toString(), 3, content2.size() );
         }
     }
@@ -223,7 +215,7 @@ public class DefaultIndexUpdaterTest
             IndexingContext tempContext = indexer.addIndexingContext(
                 repositoryId + "temp",
                 repositoryId,
-                repositoryDir,
+                null,
                 tempIndexDirectory,
                 repositoryUrl,
                 null,
@@ -266,7 +258,8 @@ public class DefaultIndexUpdaterTest
 
         Query q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
 
-        Collection<ArtifactInfo> content2 = indexer.searchFlat( q );
+        FlatSearchResponse response = indexer.searchFlat( new FlatSearchRequest( q ) );
+        Collection<ArtifactInfo> content2 = response.getResults();
 
         assertEquals( content2.toString(), 1, content2.size() );
     }
@@ -339,7 +332,7 @@ public class DefaultIndexUpdaterTest
             IndexingContext tempContext = indexer.addIndexingContext(
                 repositoryId + "temp",
                 repositoryId,
-                repositoryDir,
+                null,
                 tempIndexDirectory,
                 repositoryUrl,
                 null,

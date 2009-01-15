@@ -28,7 +28,9 @@ import org.sonatype.nexus.index.DocumentFilter;
 import org.sonatype.nexus.index.creator.IndexCreator;
 
 /**
- * This is the indexing context.
+ * An indexing context representing artifact repository for indexing and searching.
+ * Indexing context is a statefull component, it keeps state of index readers 
+ * and writers. 
  * 
  * @author Jason van Zyl
  * @author Tamas Cservenak
@@ -151,22 +153,14 @@ public interface IndexingContext
 
     /**
      * Constructs an artifacts infos for a Lucene document, probably that came from Hits as a search result.
-     * 
-     * @param doc
-     * @return
      */
     @Deprecated
-    ArtifactInfo constructArtifactInfo( IndexingContext ctx, Document doc )
-        throws IndexContextInInconsistentStateException;
+    ArtifactInfo constructArtifactInfo( IndexingContext ctx, Document doc );
 
     /**
      * Constructs an artifacts infos for a Lucene document, probably that came from Hits as a search result.
-     * 
-     * @param doc
-     * @return
      */
-    ArtifactInfo constructArtifactInfo( Document doc )
-        throws IndexContextInInconsistentStateException;
+    ArtifactInfo constructArtifactInfo( Document doc );
 
     /**
      * Optimizes index

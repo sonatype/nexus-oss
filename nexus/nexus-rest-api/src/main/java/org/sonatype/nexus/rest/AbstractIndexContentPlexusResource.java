@@ -39,7 +39,6 @@ import org.sonatype.nexus.index.FlatSearchRequest;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.NexusIndexer;
-import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
@@ -279,10 +278,6 @@ public abstract class AbstractIndexContentPlexusResource
             return searchResponse.getResults();
         }
         catch ( IOException e )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
-        }
-        catch ( IndexContextInInconsistentStateException e )
         {
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
         }

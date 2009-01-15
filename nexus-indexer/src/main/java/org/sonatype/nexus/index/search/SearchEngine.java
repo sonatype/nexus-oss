@@ -17,13 +17,12 @@ import org.sonatype.nexus.index.FlatSearchRequest;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.GroupedSearchRequest;
 import org.sonatype.nexus.index.GroupedSearchResponse;
-import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
  * @author Eugene Kuleshov
  * @author Jason van Zyl
- * @author cstamas
+ * @author Tamas Cservenak
  */
 public interface SearchEngine
 {
@@ -36,29 +35,23 @@ public interface SearchEngine
     @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
         IndexingContext indexingContext, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
         Collection<IndexingContext> indexingContexts, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     public FlatSearchResponse searchFlatPaged( FlatSearchRequest request )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     public FlatSearchResponse searchFlatPaged( FlatSearchRequest request, Collection<IndexingContext> indexingContexts )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request,
         Collection<IndexingContext> indexingContexts )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 }

@@ -14,7 +14,6 @@ import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 public abstract class AbstractNexusIndexerTest
@@ -32,7 +31,7 @@ public abstract class AbstractNexusIndexerTest
     {
         super.setUp();
         // FileUtils.deleteDirectory( indexDir );
-        nexusIndexer = (NexusIndexer) lookup( NexusIndexer.class );
+        nexusIndexer = lookup( NexusIndexer.class );
         prepareNexusIndexer( nexusIndexer );
     }
 
@@ -56,8 +55,7 @@ public abstract class AbstractNexusIndexerTest
     }
 
     protected void assertGroup( int expected, String group, IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         // ArtifactInfo.UINFO - UN_TOKENIZED
         // ArtifactInfo.GROUP_ID - TOKENIZED
@@ -69,7 +67,8 @@ public abstract class AbstractNexusIndexerTest
         // PhraseQuery pq = new PhraseQuery();
         // pq.add( new Term( ArtifactInfo.UINFO, group + "*" ) );
 
-        Collection<ArtifactInfo> artifacts = nexusIndexer.searchFlat( ArtifactInfo.VERSION_COMPARATOR, pq, context );
+        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( pq, context ) );
+        Collection<ArtifactInfo> artifacts = response.getResults();
         assertEquals( artifacts.toString(), expected, artifacts.size() );
     }
 

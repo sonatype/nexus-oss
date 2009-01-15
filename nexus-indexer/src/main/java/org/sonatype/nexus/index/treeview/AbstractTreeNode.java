@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 
 public abstract class AbstractTreeNode
     implements TreeNode
@@ -135,8 +134,7 @@ public abstract class AbstractTreeNode
     }
 
     public List<TreeNode> listChildren()
-        throws IndexContextInInconsistentStateException,
-            IOException
+        throws IOException
     {
         if ( !isLeaf() && getChildren().isEmpty() && !isLeaf() )
         {
@@ -147,8 +145,7 @@ public abstract class AbstractTreeNode
     }
 
     public TreeNode findChildByPath( String path, Type type )
-        throws IndexContextInInconsistentStateException,
-            IOException
+        throws IOException
     {
         for ( TreeNode child : getChildren() )
         {

@@ -35,6 +35,7 @@ import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.log4j.Logger;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
+import org.codehaus.plexus.util.IOUtil;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.data.ChallengeResponse;
@@ -120,7 +121,6 @@ public class RequestFacade
     public static File downloadFile( URL url, String targetFile )
         throws IOException
     {
-
         OutputStream out = null;
         InputStream in = null;
         File downloadedFile = new File( targetFile );
@@ -143,31 +143,12 @@ public class RequestFacade
             in = response.getEntity().getStream();
             out = new BufferedOutputStream( new FileOutputStream( downloadedFile ) );
 
-            byte[] buffer = new byte[1024];
-            int numRead;
-            long numWritten = 0;
-            while ( ( numRead = in.read( buffer ) ) != -1 )
-            {
-                out.write( buffer, 0, numRead );
-                numWritten += numRead;
-            }
+            IOUtil.copy( in, out, 1024 );
         }
         finally
         {
-            try
-            {
-                if ( out != null )
-                {
-                    out.close();
-                }
-                if ( in != null )
-                {
-                    in.close();
-                }
-            }
-            catch ( IOException e )
-            {
-            }
+            IOUtil.close( in );
+            IOUtil.close( out );
         }
         return downloadedFile;
     }

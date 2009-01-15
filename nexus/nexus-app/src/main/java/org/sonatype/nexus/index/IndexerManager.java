@@ -19,7 +19,6 @@ package org.sonatype.nexus.index;
 import java.io.IOException;
 
 import org.apache.lucene.search.Query;
-import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
@@ -131,8 +130,7 @@ public interface IndexerManager
     // ----------------------------------------------------------------------------
 
     ArtifactInfo identifyArtifact( String type, String checksum )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     // ----------------------------------------------------------------------------
     // Combined searching

@@ -77,14 +77,14 @@ public abstract class AbstractIndexCreator
         return getGAV( groupId, artifactId, version, classifier, null );
     }
 
-    public static String getGAV( String groupId, String artifactId, String version, String classifier, String packaging )
+    public static String getGAV( String groupId, String artifactId, String version, String classifier, String extension )
     {
         return new StringBuilder() //
             .append( groupId ).append( FS ) //
             .append( artifactId ).append( FS ) //
             .append( version ).append( FS ) //
             .append( nvl( classifier ) ) //
-            .append( StringUtils.isEmpty( classifier ) || StringUtils.isEmpty( packaging ) ? "" : FS + packaging ) //
+            .append( StringUtils.isEmpty( classifier ) || StringUtils.isEmpty( extension ) ? "" : FS + extension ) //
             .toString();
     }
     
@@ -109,9 +109,9 @@ public abstract class AbstractIndexCreator
         String filename = file.getName();
         
         if (   filename.startsWith( "maven-metadata" )
-            || filename.endsWith( "-javadoc.jar" )
-            || filename.endsWith( "-javadocs.jar" )
-            || filename.endsWith( "-sources.jar" )
+            // || filename.endsWith( "-javadoc.jar" )
+            // || filename.endsWith( "-javadocs.jar" )
+            // || filename.endsWith( "-sources.jar" )
             || filename.endsWith( ".properties" )
             || filename.endsWith( ".xml" )
             || filename.endsWith( ".asc" ) 

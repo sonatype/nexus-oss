@@ -34,11 +34,16 @@ public class ArtifactContext
 
     public ArtifactContext( File pom, File artifact, File metadata, ArtifactInfo artifactInfo, Gav gav )
     {
+        if( artifactInfo == null )
+        {
+           throw new IllegalArgumentException( "Parameter artifactInfo must not be null");
+        }
+        
         this.pom = pom;
         this.artifact = artifact;
         this.metadata = metadata;
         this.artifactInfo = artifactInfo;
-        this.gav = gav;
+        this.gav = gav == null ? artifactInfo.calculateGav() : gav;
     }
 
     public File getPom()

@@ -43,13 +43,12 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.packer.IndexPackingRequest;
 import org.sonatype.nexus.index.updater.IndexUpdateRequest;
-import org.sonatype.nexus.index.updater.ResourceFetcher;
 import org.sonatype.nexus.index.updater.IndexUpdater;
+import org.sonatype.nexus.index.updater.ResourceFetcher;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -920,8 +919,7 @@ public class DefaultIndexerManager
     // ----------------------------------------------------------------------------
 
     public ArtifactInfo identifyArtifact( String type, String checksum )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return nexusIndexer.identify( type, checksum );
     }
@@ -984,10 +982,6 @@ public class DefaultIndexerManager
 
             return result;
         }
-        catch ( IndexContextInInconsistentStateException e )
-        {
-            getLogger().error( "Inconsistent index context state while searching for query \"" + term + "\"", e );
-        }
         catch ( IOException e )
         {
             getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
@@ -1048,10 +1042,6 @@ public class DefaultIndexerManager
             postprocessResults( result.getResults() );
 
             return result;
-        }
-        catch ( IndexContextInInconsistentStateException e )
-        {
-            getLogger().error( "Inconsistent index context state while searching for query \"" + term + "\"", e );
         }
         catch ( IOException e )
         {
@@ -1138,12 +1128,6 @@ public class DefaultIndexerManager
             postprocessResults( result.getResults() );
 
             return result;
-        }
-        catch ( IndexContextInInconsistentStateException e )
-        {
-            getLogger().error(
-                "Inconsistent index context state while searching for query \"" + bq.toString() + "\"",
-                e );
         }
         catch ( IOException e )
         {

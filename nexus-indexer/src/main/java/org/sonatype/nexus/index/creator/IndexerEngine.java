@@ -11,22 +11,33 @@ import java.io.IOException;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.context.IndexingContext;
 
+/**
+ * An indexer engine 
+ */
 public interface IndexerEngine
 {
-
-    void beginIndexing( IndexingContext context )
-        throws IOException;
-
+    /**
+     * Add new artifact to the index
+     */
     void index( IndexingContext context, ArtifactContext ac )
         throws IOException;
 
+    /**
+     * Replace data for a previously indexed artifact
+     */
+    void update( IndexingContext context, ArtifactContext ac )
+        throws IOException;
+    
+    /**
+     * Remove artifact to the index
+     */
     void remove( IndexingContext context, ArtifactContext ac )
         throws IOException;
 
-    void endIndexing( IndexingContext context )
+    /**
+     * Optimize index store after multiple operations
+     */
+    void optimize( IndexingContext context )
         throws IOException;
-
-    void update( IndexingContext context, ArtifactContext ac )
-        throws IOException;
-
+    
 }

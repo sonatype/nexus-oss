@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.codehaus.plexus.PlexusContainer;
@@ -24,7 +25,6 @@ import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
 import org.sonatype.nexus.index.creator.IndexCreator;
-import org.sonatype.nexus.index.packer.IndexChunker;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.packer.IndexPackingRequest;
 import org.sonatype.nexus.index.scan.ScanningResult;
@@ -44,11 +44,11 @@ public class NexusIndexerCli
 
     public static final char TARGET_DIR = 'd';
 
-    public static final char CHUNK_RESOLUTION = 'c';
-
     public static final String CHUNK_RESOLUTION_NONE = "none";
 
     private static final long MB = 1024 * 1024;
+
+    private Options options;
 
     public static void main( String[] args )
         throws Exception
@@ -66,6 +66,8 @@ public class NexusIndexerCli
     @SuppressWarnings( "static-access" )
     public Options buildCliOptions( Options options )
     {
+        this.options = options;
+        
         options.addOption( OptionBuilder.withLongOpt( "index" ).hasArg() //
         .withDescription( "Path to the index folder." ).create( INDEX ) );
 
@@ -81,14 +83,23 @@ public class NexusIndexerCli
         options.addOption( OptionBuilder.withLongOpt( "type" ).hasArg() //
         .withDescription( "Indexer type (default, min, full or coma separated list of custom types)." ).create( TYPE ) );
 
-        options.addOption( OptionBuilder
-            .withLongOpt( "resolution" ).hasArg()
-            //
-            .withDescription(
-                "Incremental index chunk resolution: 'day' (default), 'week', 'month' and 'none'." ).create(
-                CHUNK_RESOLUTION ) );
+//        options.addOption( OptionBuilder
+//            .withLongOpt( "resolution" ).hasArg()
+//            //
+//            .withDescription(
+//                "Incremental index chunk resolution: 'day' (default), 'week', 'month' and 'none'." ).create(
+//                CHUNK_RESOLUTION ) );
 
         return options;
+    }
+
+    @Override
+    public void displayHelp() {
+        System.out.println();
+
+        HelpFormatter formatter = new HelpFormatter();
+
+        formatter.printHelp("nexus-indexer [options]", "\nOptions:", options, "\n");
     }
 
     @Override
@@ -128,7 +139,7 @@ public class NexusIndexerCli
         System.err.printf( "Repository name:   %s\n", repositoryName );
         System.err.printf( "Indexers: %s\n", indexers.toString() );
 
-        NexusIndexer indexer = (NexusIndexer) plexus.lookup( NexusIndexer.class );
+        NexusIndexer indexer = plexus.lookup( NexusIndexer.class );
 
         long tstart = System.currentTimeMillis();
 
@@ -141,7 +152,7 @@ public class NexusIndexerCli
             null, // index update url
             indexers );
 
-        IndexPacker packer = (IndexPacker) plexus.lookup( IndexPacker.class );
+        IndexPacker packer = plexus.lookup( IndexPacker.class );
 
         boolean debug = cli.hasOption( DEBUG );
 
@@ -151,21 +162,21 @@ public class NexusIndexerCli
 
         IndexPackingRequest request = new IndexPackingRequest( context, outputFolder );
 
-        if ( cli.hasOption( CHUNK_RESOLUTION ) )
-        {
-            String resolution = cli.getOptionValue( CHUNK_RESOLUTION );
-
-            if ( CHUNK_RESOLUTION_NONE.equalsIgnoreCase( resolution ) )
-            {
-                request.setCreateIncrementalChunks( false );
-            }
-            else
-            {
-                IndexChunker indexChunker = (IndexChunker) plexus.lookup( IndexChunker.class, resolution );
-
-                request.setIndexChunker( indexChunker );
-            }
-        }
+//        if ( cli.hasOption( CHUNK_RESOLUTION ) )
+//        {
+//            String resolution = cli.getOptionValue( CHUNK_RESOLUTION );
+//
+//            if ( CHUNK_RESOLUTION_NONE.equalsIgnoreCase( resolution ) )
+//            {
+//                request.setCreateIncrementalChunks( false );
+//            }
+//            else
+//            {
+//                IndexChunker indexChunker = plexus.lookup( IndexChunker.class, "day" );
+//
+//                request.setIndexChunker( indexChunker );
+//            }
+//        }
 
         packIndex( packer, request, debug );
 
@@ -207,8 +218,8 @@ public class NexusIndexerCli
 
         if ( "default".equals( type ) )
         {
-            indexers.add( (IndexCreator) plexus.lookup( IndexCreator.class, "min" ) );
-            indexers.add( (IndexCreator) plexus.lookup( IndexCreator.class, "jarContent" ) );
+            indexers.add( plexus.lookup( IndexCreator.class, "min" ) );
+            indexers.add( plexus.lookup( IndexCreator.class, "jarContent" ) );
         }
         else if ( "full".equals( type ) )
         {
@@ -221,7 +232,7 @@ public class NexusIndexerCli
         {
             for ( String hint : type.split( "," ) )
             {
-                indexers.add( (IndexCreator) plexus.lookup( IndexCreator.class, hint ) );
+                indexers.add( plexus.lookup( IndexCreator.class, hint ) );
             }
         }
         return indexers;
@@ -287,7 +298,7 @@ public class NexusIndexerCli
                     "" + ai.goals );
             }
 
-            if ( ( t - ts ) > 2000L )
+            if ( debug || ( t - ts ) > 2000L )
             {
                 System.err.printf( "  %6d %s\n", count, formatFile( ac.getPom() ) );
                 ts = t;

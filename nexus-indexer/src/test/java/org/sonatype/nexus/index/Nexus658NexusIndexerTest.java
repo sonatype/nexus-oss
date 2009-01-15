@@ -38,47 +38,51 @@ public class Nexus658NexusIndexerTest
         throws Exception
     {
         Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "org.sonatype.nexus" );
-
-        Collection<ArtifactInfo> r = nexusIndexer.searchFlat( q );
-
-        assertEquals( 3, r.size() );
+        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( q ) );
+        Collection<ArtifactInfo> r = response.getResults(); 
+        assertEquals( r.toString(), 4, r.size() );
 
         List<ArtifactInfo> list = new ArrayList<ArtifactInfo>( r );
 
-        ArtifactInfo ai = null;
-
         // g a v p c #1
-        ai = list.get( 0 );
-
-        assertEquals( "org.sonatype.nexus", ai.groupId );
-        assertEquals( "nexus-webapp", ai.artifactId );
-        assertEquals( "1.0.0-SNAPSHOT", ai.version );
-        assertEquals( "jar", ai.packaging );
-        assertEquals( null, ai.classifier );
-        assertEquals( ArtifactAvailablility.PRESENT, ai.sourcesExists );
-        assertEquals( "nexus-658", ai.repository );
+        ArtifactInfo ai1 = list.get( 0 );
+        assertEquals( "org.sonatype.nexus", ai1.groupId );
+        assertEquals( "nexus-webapp", ai1.artifactId );
+        assertEquals( "1.0.0-SNAPSHOT", ai1.version );
+        assertEquals( "jar", ai1.packaging );
+        assertEquals( null, ai1.classifier );
+        assertEquals( ArtifactAvailablility.PRESENT, ai1.sourcesExists );
+        assertEquals( "nexus-658", ai1.repository );
 
         // g a v p c #2
-        ai = list.get( 1 );
-
-        assertEquals( "org.sonatype.nexus", ai.groupId );
-        assertEquals( "nexus-webapp", ai.artifactId );
-        assertEquals( "1.0.0-SNAPSHOT", ai.version );
-        assertEquals( "tar.gz", ai.packaging );
-        assertEquals( "bundle", ai.classifier );
-        assertEquals( ArtifactAvailablility.NOT_AVAILABLE, ai.sourcesExists );
-        assertEquals( "nexus-658", ai.repository );
+        ArtifactInfo ai2 = list.get( 1 );
+        assertEquals( "org.sonatype.nexus", ai2.groupId );
+        assertEquals( "nexus-webapp", ai2.artifactId );
+        assertEquals( "1.0.0-SNAPSHOT", ai2.version );
+        assertEquals( "tar.gz", ai2.packaging );
+        assertEquals( "bundle", ai2.classifier );
+        assertEquals( ArtifactAvailablility.NOT_AVAILABLE, ai2.sourcesExists );
+        assertEquals( "nexus-658", ai2.repository );
 
         // g a v p c #3
-        ai = list.get( 2 );
-
-        assertEquals( "org.sonatype.nexus", ai.groupId );
-        assertEquals( "nexus-webapp", ai.artifactId );
-        assertEquals( "1.0.0-SNAPSHOT", ai.version );
-        assertEquals( "zip", ai.packaging );
-        assertEquals( "bundle", ai.classifier );
-        assertEquals( ArtifactAvailablility.NOT_AVAILABLE, ai.sourcesExists );
-        assertEquals( "nexus-658", ai.repository );
+        ArtifactInfo ai3 = list.get( 2 );
+        assertEquals( "org.sonatype.nexus", ai3.groupId );
+        assertEquals( "nexus-webapp", ai3.artifactId );
+        assertEquals( "1.0.0-SNAPSHOT", ai3.version );
+        assertEquals( "zip", ai3.packaging );
+        assertEquals( "bundle", ai3.classifier );
+        assertEquals( ArtifactAvailablility.NOT_AVAILABLE, ai3.sourcesExists );
+        assertEquals( "nexus-658", ai3.repository );
+        
+        // g a v p c #3
+        ArtifactInfo ai4 = list.get( 3 );
+        assertEquals( "org.sonatype.nexus", ai4.groupId );
+        assertEquals( "nexus-webapp", ai4.artifactId );
+        assertEquals( "1.0.0-SNAPSHOT", ai4.version );
+        assertEquals( "jar", ai4.packaging );
+        assertEquals( "sources", ai4.classifier );
+        assertEquals( ArtifactAvailablility.NOT_AVAILABLE, ai4.sourcesExists );
+        assertEquals( "nexus-658", ai4.repository );
     }
 
 }

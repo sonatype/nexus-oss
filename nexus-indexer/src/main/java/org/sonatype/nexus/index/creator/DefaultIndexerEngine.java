@@ -20,7 +20,7 @@ import org.sonatype.nexus.index.context.DefaultArtifactIndexingContext;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
- * Default Indexer implementation.
+ * A default indexer engine implementation.
  * 
  * @author Tamas Cservenak
  * @plexus.component
@@ -30,15 +30,10 @@ public class DefaultIndexerEngine
     implements IndexerEngine
 {
 
-    public void beginIndexing( IndexingContext context )
-        throws IOException
-    {
-    }
-
     public void index( IndexingContext context, ArtifactContext ac )
         throws IOException
     {
-        // skip artifacts not obeying repo layout (whether m1 or m2) 
+        // skip artifacts not obeying repository layout (whether m1 or m2) 
         if ( ac.getGav() != null )
         {
             Document d = createDocument( context, ac );
@@ -50,7 +45,24 @@ public class DefaultIndexerEngine
         }
     }
 
-    public void endIndexing( IndexingContext context )
+    public void update( IndexingContext context, ArtifactContext ac )
+        throws IOException
+    {
+        Document d = createDocument( context, ac );
+        
+        if ( d != null )
+        {
+            IndexWriter w = context.getIndexWriter();
+
+            w.updateDocument( new Term( ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo() ), d );
+            
+            w.flush();
+        
+            context.updateTimestamp();
+        }
+    }
+    
+    public void optimize( IndexingContext context )
         throws IOException
     {
         IndexWriter w = context.getIndexWriter();
@@ -65,7 +77,7 @@ public class DefaultIndexerEngine
     {
         IndexWriter w = context.getIndexWriter();
 
-        String uinfo = getUinfo( ac );
+        String uinfo = ac.getArtifactInfo().getUinfo();
 
         // add artifact deletion marker
         Document doc = new Document();
@@ -82,51 +94,26 @@ public class DefaultIndexerEngine
         context.updateTimestamp();
     }
 
-    public void update( IndexingContext context, ArtifactContext ac )
-        throws IOException
-    {
-        IndexWriter w = context.getIndexWriter();
-
-        w.updateDocument( new Term( ArtifactInfo.UINFO, getUinfo( ac ) ), createDocument( context, ac ) );
-
-        w.flush();
-
-        context.updateTimestamp();
-    }
-
     //
-
-    private String getUinfo( ArtifactContext ac )
-    {
-        ArtifactInfo ai = ac.getArtifactInfo();
-
-        return AbstractIndexCreator.getGAV( ai.groupId, ai.artifactId, ai.version, ai.classifier, ai.packaging );
-    }
 
     private Document createDocument( IndexingContext context, ArtifactContext ac )
     {
-        ArtifactInfo ai = ac.getArtifactInfo();
-
         Document doc = new Document();
 
         // unique key
-        doc.add( new Field( ArtifactInfo.UINFO, AbstractIndexCreator.getGAV(
-            ai.groupId,
-            ai.artifactId,
-            ai.version,
-            ai.classifier,
-            ai.packaging ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+        doc.add( new Field( ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo(), //
+            Field.Store.YES, Field.Index.UN_TOKENIZED ) );
 
         doc.add( new Field( ArtifactInfo.LAST_MODIFIED, //
             Long.toString( System.currentTimeMillis() ), Field.Store.YES, Field.Index.NO ) );
         
-        ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext( ac );
+        ArtifactIndexingContext aic = new DefaultArtifactIndexingContext( ac );
 
         for ( IndexCreator indexCreator : context.getIndexCreators() )
         {
             try 
             {
-                indexCreator.populateArtifactInfo( indexingContext );
+                indexCreator.populateArtifactInfo( aic );
             } 
             catch ( IOException ex ) 
             {
@@ -137,7 +124,7 @@ public class DefaultIndexerEngine
         // need a second pass in case index creators updated document attributes
         for ( IndexCreator indexCreator : context.getIndexCreators() )
         {
-            indexCreator.updateDocument( indexingContext, doc );
+            indexCreator.updateDocument( aic, doc );
         }
 
         return doc;

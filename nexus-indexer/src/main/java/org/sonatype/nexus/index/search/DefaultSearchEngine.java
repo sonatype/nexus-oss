@@ -27,7 +27,6 @@ import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.GroupedSearchRequest;
 import org.sonatype.nexus.index.GroupedSearchResponse;
 import org.sonatype.nexus.index.Grouping;
-import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
@@ -45,8 +44,7 @@ public class DefaultSearchEngine
 
     protected int searchFlat( Collection<ArtifactInfo> result, IndexingContext indexingContext, Query query, int from,
         int aiCount )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         Hits hits = indexingContext.getIndexSearcher().search(
             query,
@@ -100,8 +98,7 @@ public class DefaultSearchEngine
 
     protected int searchGrouped( Map<String, ArtifactInfoGroup> result, Grouping grouping,
         IndexingContext indexingContext, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         Hits hits = indexingContext.getIndexSearcher().search(
             query,
@@ -142,8 +139,7 @@ public class DefaultSearchEngine
     @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
         IndexingContext indexingContext, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return searchFlatPaged( new FlatSearchRequest( query, artifactInfoComparator, indexingContext ) ).getResults();
     }
@@ -151,15 +147,13 @@ public class DefaultSearchEngine
     @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
         Collection<IndexingContext> indexingContexts, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         return searchFlatPaged( new FlatSearchRequest( query, artifactInfoComparator ), indexingContexts ).getResults();
     }
 
     public FlatSearchResponse searchFlatPaged( FlatSearchRequest request )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         TreeSet<ArtifactInfo> result = new TreeSet<ArtifactInfo>( request.getArtifactInfoComparator() );
 
@@ -170,8 +164,7 @@ public class DefaultSearchEngine
     }
 
     public FlatSearchResponse searchFlatPaged( FlatSearchRequest request, Collection<IndexingContext> indexingContexts )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         TreeSet<ArtifactInfo> result = new TreeSet<ArtifactInfo>( request.getArtifactInfoComparator() );
 
@@ -189,8 +182,7 @@ public class DefaultSearchEngine
     }
 
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         TreeMap<String, ArtifactInfoGroup> result = new TreeMap<String, ArtifactInfoGroup>( request
             .getGroupKeyComparator() );
@@ -202,8 +194,7 @@ public class DefaultSearchEngine
 
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request,
         Collection<IndexingContext> indexingContexts )
-        throws IOException,
-            IndexContextInInconsistentStateException
+        throws IOException
     {
         TreeMap<String, ArtifactInfoGroup> result = new TreeMap<String, ArtifactInfoGroup>( request
             .getGroupKeyComparator() );

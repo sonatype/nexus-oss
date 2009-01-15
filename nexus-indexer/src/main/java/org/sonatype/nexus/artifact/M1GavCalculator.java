@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * The M1 GAV Calculator.
  * 
  * @author Jason van Zyl
- * @author cstamas
+ * @author Tamas Cservenak
  * @plexus.component role-hint="maven1"
  */
 public class M1GavCalculator
@@ -151,6 +151,12 @@ public class M1GavCalculator
         }
     }
 
+    /**
+     * // XXX this is not accurate, m1 is using packaging as an artifact folder name.
+     *  
+     * @see org.apache.maven.artifact.repository.layout.LegacyRepositoryLayout#pathOf(org.apache.maven.artifact.Artifact)
+     * @see org.apache.maven.artifact.handler.DefaultArtifactHandler#getDirectory()
+     */
     public String gavToPath( Gav gav )
     {
         StringBuffer path = new StringBuffer( "/" );

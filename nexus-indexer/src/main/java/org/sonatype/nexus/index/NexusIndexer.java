@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
-import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
 import org.sonatype.nexus.index.creator.IndexCreator;
@@ -207,8 +206,7 @@ public interface NexusIndexer
      * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead 
      */
     Collection<ArtifactInfo> searchFlat( Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     /**
      * Will search the given context. The default comparator will be used (VersionComparator) to sort the results.
@@ -216,8 +214,7 @@ public interface NexusIndexer
      * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead
      */ 
     Collection<ArtifactInfo> searchFlat( Query query, IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     /**
      * Will search all searchable contexts know to Nexus indexer and merge the results. The given comparator will be
@@ -226,8 +223,7 @@ public interface NexusIndexer
      * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead
      */ 
     Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     /**
      * Will search the given context. The given comparator will be used to sort the results.
@@ -236,8 +232,7 @@ public interface NexusIndexer
      */ 
     Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query,
         IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     /**
      * Will search according the request parameters.
@@ -245,11 +240,9 @@ public interface NexusIndexer
      * @param request
      * @return
      * @throws IOException
-     * @throws IndexContextInInconsistentStateException
      */
     FlatSearchResponse searchFlat( FlatSearchRequest request )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     /**
      * Will search all searchable contexts know to Nexus indexer and merge the results.
@@ -258,13 +251,11 @@ public interface NexusIndexer
      * @param query
      * @return
      * @throws IOException
-     * @throws IndexContextInInconsistentStateException
      * 
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
      */
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     /**
      * Will search the given context.
@@ -274,13 +265,11 @@ public interface NexusIndexer
      * @param context
      * @return
      * @throws IOException
-     * @throws IndexContextInInconsistentStateException
      * 
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
      */
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query, IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     /**
      * Will search all searchable contexts know to Nexus indexer and merge the results.
@@ -290,13 +279,11 @@ public interface NexusIndexer
      * @param query
      * @return
      * @throws IOException
-     * @throws IndexContextInInconsistentStateException
      * 
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
      */
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     /**
      * Will search the given context.
@@ -307,14 +294,12 @@ public interface NexusIndexer
      * @param context
      * @return
      * @throws IOException
-     * @throws IndexContextInInconsistentStateException
      * 
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
      */
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
         Query query, IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     /**
      * Will search according the request parameters.
@@ -322,11 +307,9 @@ public interface NexusIndexer
      * @param request
      * @return
      * @throws IOException
-     * @throws IndexContextInInconsistentStateException
      */
     GroupedSearchResponse searchGrouped( GroupedSearchRequest request )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     // ----------------------------------------------------------------------------
     // Query construction
@@ -339,20 +322,16 @@ public interface NexusIndexer
     // ----------------------------------------------------------------------------
 
     ArtifactInfo identify( File artifact )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     ArtifactInfo identify( String field, String query )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     ArtifactInfo identify( Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     ArtifactInfo identify( Query query, Collection<IndexingContext> contexts )
-        throws IOException,
-            IndexContextInInconsistentStateException;
+        throws IOException;
 
     // ----------------------------------------------------------------------------
     // Root groups

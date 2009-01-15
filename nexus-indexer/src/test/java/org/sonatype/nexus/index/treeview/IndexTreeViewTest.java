@@ -26,7 +26,7 @@ public class IndexTreeViewTest
     {
         super.setUp();
 
-        indexTreeView = (IndexTreeView) lookup( IndexTreeView.class );
+        indexTreeView = lookup( IndexTreeView.class );
     }
 
     @Override
@@ -81,7 +81,7 @@ public class IndexTreeViewTest
 
         assertEquals( "The group name should be here", "/", root.getNodeName() );
         assertEquals( 10, root.getChildren().size() );
-        assertEquals( 30, leafsFound );
+        assertEquals( 47, leafsFound );
     }
 
     public void testPathIsAboveRealGroup()
@@ -93,7 +93,7 @@ public class IndexTreeViewTest
 
         assertEquals( "The group name should be here", "org", root.getNodeName() );
         assertEquals( 4, root.getChildren().size() );
-        assertEquals( 15, leafsFound );
+        assertEquals( 22, leafsFound );
     }
 
     public void testPathIsRealGroup()
@@ -105,7 +105,7 @@ public class IndexTreeViewTest
 
         assertEquals( "The group name should be here", "slf4j", root.getNodeName() );
         assertEquals( 3, root.getChildren().size() );
-        assertEquals( 6, leafsFound );
+        assertEquals( 10, leafsFound );
     }
 
     public void testPathIsRealGroupArtifact()
@@ -117,7 +117,7 @@ public class IndexTreeViewTest
 
         assertEquals( "The group name should be here", "slf4j-log4j12", root.getNodeName() );
         assertEquals( 1, root.getChildren().size() );
-        assertEquals( 3, leafsFound );
+        assertEquals( 4, leafsFound );
     }
 
     public void testPathIsRealGroupArtifactVersion()
@@ -131,6 +131,6 @@ public class IndexTreeViewTest
 
         assertEquals( "The group name should be here", "1.4.1", root.getNodeName() );
         assertEquals( 1, root.getChildren().size() );
-        assertEquals( 3, leafsFound );
+        assertEquals( 4, leafsFound );
     }
 }

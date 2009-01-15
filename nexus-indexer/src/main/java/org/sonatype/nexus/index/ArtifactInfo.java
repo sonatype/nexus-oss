@@ -12,6 +12,9 @@ import java.util.List;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.VersionUtils;
+import org.sonatype.nexus.index.creator.AbstractIndexCreator;
 
 /**
  * ArtifactInfo holds the values known about an repository artifact. This is a simple Value Object kind of stuff.
@@ -133,10 +136,13 @@ public class ArtifactInfo
 
     public String version;
 
-    private ArtifactVersion artifactVersion;
+    private transient ArtifactVersion artifactVersion;
 
     public String classifier;
 
+    /**
+     * Artifact packaging for the main artifact and extension for secondary artifact (no classifier)
+     */
     public String packaging;
 
     public String name;
@@ -176,6 +182,8 @@ public class ArtifactInfo
      * Plugin goals (only if packaging is "maven-plugin")
      */
     public List<String> goals;
+
+    private String uinfo = null;
 
     public ArtifactInfo()
     {
@@ -223,6 +231,39 @@ public class ArtifactInfo
             artifactVersion = new DefaultArtifactVersion( version );
         }
         return artifactVersion;
+    }
+
+    public String getUinfo() 
+    {
+        if( uinfo == null )
+        {
+            uinfo = AbstractIndexCreator.getGAV( //
+              groupId, //
+              artifactId, //
+              version, //
+              classifier, //
+              packaging );  // extension is stored in the packaging field when classifier is not used
+        }
+        
+        return uinfo;    
+    }
+    
+    public Gav calculateGav() 
+    {
+        return new Gav( 
+            groupId, 
+            artifactId, 
+            version, 
+            classifier, 
+            fextension,
+            null,  // snapshotBuildNumber
+            null,  // snapshotTimeStamp 
+            fname,  // name
+            VersionUtils.isSnapshot( version ),  // isSnapshot
+            false,  // hash
+            null,   // hashType
+            false,  // signature
+            null ); // signatureType
     }
 
     @Override

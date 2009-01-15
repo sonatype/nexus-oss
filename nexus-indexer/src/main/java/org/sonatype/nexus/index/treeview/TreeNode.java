@@ -9,8 +9,6 @@ package org.sonatype.nexus.index.treeview;
 import java.io.IOException;
 import java.util.List;
 
-import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
-
 public interface TreeNode
 {
     public enum Type
@@ -53,10 +51,8 @@ public interface TreeNode
     List<TreeNode> getChildren();
 
     List<TreeNode> listChildren()
-        throws IndexContextInInconsistentStateException,
-            IOException;
+        throws IOException;
 
     TreeNode findChildByPath( String path, Type type )
-        throws IndexContextInInconsistentStateException,
-            IOException;
+        throws IOException;
 }

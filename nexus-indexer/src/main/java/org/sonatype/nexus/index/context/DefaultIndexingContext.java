@@ -40,7 +40,7 @@ import org.sonatype.nexus.index.creator.AbstractIndexCreator;
 import org.sonatype.nexus.index.creator.IndexCreator;
 
 /**
- * The default nexus implementation.
+ * The default indexing context implementation.
  * 
  * @author Jason van Zyl
  * @author Tamas Cservenak
@@ -91,7 +91,11 @@ public class DefaultIndexingContext
 
     private List<? extends IndexCreator> indexCreators;
 
-    /** Currently nexus-indexer knows only M2 reposes */
+    /** 
+     * Currently nexus-indexer knows only M2 reposes
+     * <p>
+     * XXX move this into a concrete Scanner implementation
+     */
     private GavCalculator gavCalculator;
 
     private DefaultIndexingContext( String id, String repositoryId, File repository, //
@@ -583,22 +587,17 @@ public class DefaultIndexingContext
             IOException
     {
         ArtifactInfo info = constructArtifactInfo( d );
-        ArtifactContext artifactContext = new ArtifactContext( null, null, null, info, null );
-        ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext( artifactContext );
+        ArtifactContext ac = new ArtifactContext( null, null, null, info, info.calculateGav() );
+        ArtifactIndexingContext aic = new DefaultArtifactIndexingContext( ac );
 
         Document doc = new Document();
 
-        doc.add( new Field( ArtifactInfo.UINFO, AbstractIndexCreator.getGAV(
-            info.groupId,
-            info.artifactId,
-            info.version,
-            info.classifier,
-            info.packaging ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+        doc.add( new Field( ArtifactInfo.UINFO, info.getUinfo(), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
 
         // recreate document to index not stored fields
         for ( IndexCreator ic : getIndexCreators() )
         {
-            ic.updateDocument( indexingContext, doc );
+            ic.updateDocument( aic, doc );
         }
 
         w.addDocument( doc );

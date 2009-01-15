@@ -35,7 +35,7 @@ public class FSDirectoryDeleteTest
     {
         super.setUp();
         
-        nexusIndexer = (NexusIndexer) lookup( NexusIndexer.class );
+        nexusIndexer = lookup( NexusIndexer.class );
         
         indexDir = FSDirectory.getDirectory( indexDirFile );
         
@@ -46,7 +46,7 @@ public class FSDirectoryDeleteTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX, false );
+            NexusIndexer.DEFAULT_INDEX );
         
         nexusIndexer.scan( context );
         
@@ -59,7 +59,7 @@ public class FSDirectoryDeleteTest
             otherIndexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX, false );
+            NexusIndexer.DEFAULT_INDEX );
         
         nexusIndexer.scan( otherContext );
     }

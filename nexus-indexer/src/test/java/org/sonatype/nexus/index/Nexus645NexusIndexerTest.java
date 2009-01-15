@@ -38,8 +38,8 @@ public class Nexus645NexusIndexerTest
         throws Exception
     {
         Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "org.codehaus.tycho" );
-
-        Collection<ArtifactInfo> r = nexusIndexer.searchFlat( q );
+        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( q ) );
+        Collection<ArtifactInfo> r = response.getResults(); 
 
         assertEquals( 3, r.size() );
 
