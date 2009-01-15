@@ -203,8 +203,7 @@ public abstract class AbstractShadowRepository
      * @param path the path
      * @return the shadow path
      */
-    protected abstract String transformMaster2Shadow( String path )
-        throws ItemNotFoundException;
+    protected abstract String transformMaster2Shadow( String path );
 
     /**
      * Gets the master path from shadow path. If path is not transformable, return null.
@@ -212,8 +211,7 @@ public abstract class AbstractShadowRepository
      * @param path the path
      * @return the master path
      */
-    protected abstract String transformShadow2Master( String path )
-        throws ItemNotFoundException;
+    protected abstract String transformShadow2Master( String path );
 
     protected class SyncWalker
         extends AbstractFileWalkerProcessor

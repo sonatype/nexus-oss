@@ -70,7 +70,7 @@ public class DefaultWalker
 
         if ( context.isStopped() )
         {
-            reportWalkEnd( context );
+            reportWalkEnd( context, fromPath );
 
             return;
         }
@@ -101,7 +101,7 @@ public class DefaultWalker
 
             context.stop( ex );
 
-            reportWalkEnd( context );
+            reportWalkEnd( context, fromPath );
 
             return;
         }
@@ -111,7 +111,7 @@ public class DefaultWalker
 
             context.stop( ex );
 
-            reportWalkEnd( context );
+            reportWalkEnd( context, fromPath );
 
             return;
         }
@@ -134,7 +134,7 @@ public class DefaultWalker
             {
                 context.stop( e );
 
-                reportWalkEnd( context );
+                reportWalkEnd( context, fromPath );
 
                 return;
             }
@@ -145,20 +145,40 @@ public class DefaultWalker
             afterWalk( context );
         }
 
-        reportWalkEnd( context );
+        reportWalkEnd( context, fromPath );
     }
 
-    protected void reportWalkEnd( WalkerContext context )
+    protected void reportWalkEnd( WalkerContext context, String fromPath )
     {
         if ( context.isStopped() )
         {
             if ( context.getStopCause() != null )
             {
-                getLogger().warn( "Walking aborted, cause:", context.getStopCause() );
+                // we have a cause, report any non-ItemNotFounds with stack trace
+                if ( context instanceof ItemNotFoundException )
+                {
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                            "Walking on repository ID='" + context.getRepository().getId() + "' from path='" + fromPath
+                                + "' aborted, cause:",
+                            context.getStopCause() );
+                    }
+                }
+                else
+                {
+                    getLogger().info(
+                        "Walking on repository ID='" + context.getRepository().getId() + "' from path='" + fromPath
+                            + "' aborted, cause:",
+                        context.getStopCause() );
+                }
             }
             else
             {
-                getLogger().warn( "Walking aborted." );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Walking stopped." );
+                }
             }
         }
         else

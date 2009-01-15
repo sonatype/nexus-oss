@@ -19,7 +19,6 @@ package org.sonatype.nexus.proxy.maven.maven1;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.GavCalculator;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -67,13 +66,11 @@ public class M1LayoutedM2ShadowRepository
     }
 
     protected String transformMaster2Shadow( String path )
-        throws ItemNotFoundException
     {
         return transformM2toM1( path );
     }
 
     protected String transformShadow2Master( String path )
-        throws ItemNotFoundException
     {
         return transformM1toM2( path );
     }
