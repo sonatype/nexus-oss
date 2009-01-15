@@ -1205,7 +1205,7 @@ public class DefaultNexus
     {
         feedRecorder.addSystemEvent( action, message );
     }
-    
+
     public void addAuthcAuthzEvent( AuthcAuthzEvent evt )
     {
         feedRecorder.addAuthcAuthzEvent( evt );
@@ -1295,7 +1295,7 @@ public class DefaultNexus
     {
         return feedRecorder.getSystemEvents( null, from, count, null );
     }
-    
+
     public List<AuthcAuthzEvent> getAuthcAuthzEvents( Integer from, Integer count )
     {
         return feedRecorder.getAuthcAuthzEvents( null, from, count, null );
@@ -1594,7 +1594,7 @@ public class DefaultNexus
             nexusScheduler.startService();
 
             addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Starting Nexus (version "
-                + applicationStatusSource.getSystemStatus().getVersion() + ")" );
+                + getSystemStatus().getVersion() + " " + getSystemStatus().getEditionShort() + ")" );
 
             applicationStatusSource.getSystemStatus().setLastConfigChange( new Date() );
 
@@ -1648,7 +1648,9 @@ public class DefaultNexus
             getLogger().info(
                 "Nexus Work Directory : " + nexusConfiguration.getWorkingDirectory().getAbsolutePath().toString() );
 
-            getLogger().info( "Started Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + ")" );
+            getLogger().info(
+                "Started Nexus (version " + getSystemStatus().getVersion() + " " + getSystemStatus().getEditionShort()
+                    + ")" );
 
             nexusConfiguration.notifyProximityEventListeners( new NexusStartedEvent() );
         }
@@ -1685,8 +1687,8 @@ public class DefaultNexus
     {
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPING );
 
-        addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version "
-            + applicationStatusSource.getSystemStatus().getVersion() + ")" );
+        addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version " + getSystemStatus().getVersion()
+            + " " + getSystemStatus().getEditionShort() + ")" );
 
         nexusConfiguration.notifyProximityEventListeners( new NexusStoppedEvent() );
 
@@ -1720,7 +1722,9 @@ public class DefaultNexus
 
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPED );
 
-        getLogger().info( "Stopped Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + ")" );
+        getLogger().info(
+            "Stopped Nexus (version " + getSystemStatus().getVersion() + " " + getSystemStatus().getEditionShort()
+                + ")" );
     }
 
     private void synchronizeShadowsAtStartup()
