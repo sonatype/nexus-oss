@@ -19,21 +19,28 @@ package org.sonatype.nexus.proxy.repository;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
 @Component( role = GroupRepositoryConfigurator.class )
 public class DefaultGroupRepositoryConfigurator
     implements GroupRepositoryConfigurator
 {
+    @Requirement
+    private RepositoryRegistry repositoryRegistry;
+    
     @SuppressWarnings( "unchecked" )
     public GroupRepository updateRepositoryFromModel( GroupRepository old, ApplicationConfiguration configuration,
         CRepositoryGroup group, LocalRepositoryStorage ls )
@@ -42,7 +49,7 @@ public class DefaultGroupRepositoryConfigurator
         AbstractGroupRepository repository = (AbstractGroupRepository) old;
 
         repository.setId( group.getGroupId() );
-        repository.setName( group.getName() );
+        repository.setName( group.getName() );        
 
         File defaultStorageFile = new File( new File( configuration.getWorkingDirectory(), "storage" ), repository
             .getId() );
@@ -90,6 +97,41 @@ public class DefaultGroupRepositoryConfigurator
             throw new InvalidConfigurationException( response );
         }
 
+        for ( String repoId : (List<String>)group.getRepositories() )
+        {
+            try
+            {
+                Repository repo = repositoryRegistry.getRepository( repoId );
+                
+                if ( !repository.getRepositoryContentClass().isCompatible( repo.getRepositoryContentClass() ) )
+                {
+                    ValidationResponse response = new ApplicationValidationResponse();
+
+                    ValidationMessage error = new ValidationMessage(
+                        "repositories",
+                        "Repository has incompatible content type",
+                        "Invalid content type" );
+
+                    response.addValidationError( error );
+
+                    throw new InvalidConfigurationException( response );
+                }
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                ValidationResponse response = new ApplicationValidationResponse();
+
+                ValidationMessage error = new ValidationMessage(
+                    "repositories",
+                    e.getMessage(),
+                    "Invalid repository selected" );
+
+                response.addValidationError( error );
+
+                throw new InvalidConfigurationException( response );
+            }
+        }
+        
         repository.setMemberRepositories( new ArrayList<String>( group.getRepositories() ) );
 
         return repository;

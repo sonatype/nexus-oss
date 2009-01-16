@@ -172,11 +172,11 @@ public class RepositoryGroupListPlexusResource
                 group.setGroupId( resource.getId() );
 
                 group.setName( resource.getName() );
+                
+                group.setType( resource.getFormat() );
 
                 try
                 {
-                    validateGroup( resource, request );
-
                     for ( RepositoryGroupMemberRepository member : (List<RepositoryGroupMemberRepository>) resource
                         .getRepositories() )
                     {

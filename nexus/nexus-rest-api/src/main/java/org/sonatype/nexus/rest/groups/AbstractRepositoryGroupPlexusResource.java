@@ -16,48 +16,10 @@
  */
 package org.sonatype.nexus.rest.groups;
 
-import java.util.Collection;
-
-import org.restlet.data.Request;
-import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
-import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 
 public abstract class AbstractRepositoryGroupPlexusResource
     extends AbstractNexusPlexusResource
 {
     public static final String GROUP_ID_KEY = "groupId";
-
-    public void validateGroup( RepositoryGroupResource resource, Request request )
-        throws NoSuchRepositoryException,
-            InvalidGroupingException,
-            ResourceException
-    {
-        ContentClass cc = null;
-
-        for ( RepositoryGroupMemberRepository member : (Collection<RepositoryGroupMemberRepository>) resource
-            .getRepositories() )
-        {
-            Repository repo = getNexus().getRepository( member.getId() );
-
-            if ( cc == null )
-            {
-                cc = repo.getRepositoryContentClass();
-            }
-            else
-            {
-                if ( !cc.isCompatible( repo.getRepositoryContentClass() ) )
-                {
-                    throw new InvalidGroupingException( cc, repo.getRepositoryContentClass() );
-                }
-            }
-
-        }
-    }
-
 }

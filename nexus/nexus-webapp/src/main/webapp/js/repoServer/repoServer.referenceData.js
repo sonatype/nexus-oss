@@ -139,6 +139,7 @@ Sonatype.repoServer.referenceData = {
   group : {
     id : "",
     name: "",
+    format: "",
     repositories:[]
       //note: internal record structure is the responsibility of data modifier func
       //{

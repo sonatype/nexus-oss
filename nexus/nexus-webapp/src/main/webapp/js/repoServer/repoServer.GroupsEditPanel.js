@@ -23,26 +23,37 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
   var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
   
-  this.reposList = null;
-  
-  this.listeners = {
-    'beforerender' : {
-      fn : function(){
-        //note: this isn't pre-render dependent, we just need an early event to start this off
-        Ext.Ajax.request({
-          callback: this.processRepoList,
-          scope: this,
-          method: 'GET',
-          url: Sonatype.config.repos.urls.repositories
-        });
-        return true;
-      },
-      scoope: this
-    }
-  };
-  
   var tfStore = new Ext.data.SimpleStore({fields:['value'], data:[['True'],['False']]});
   var ht = Sonatype.repoServer.resources.help.groups;
+  
+  //A record to hold the contentClasses
+  this.contentClassRecordConstructor = Ext.data.Record.create([
+    {name:'roleHint'},
+    {name:'description', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+  
+  //Reader and datastore that queries the server for the list of content classes
+  this.contentClassesReader = new Ext.data.JsonReader({root: 'data', id: 'roleHint'}, this.contentClassRecordConstructor );
+  this.contentClassesDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.repoContentClasses,
+    reader: this.contentClassesReader,
+    sortInfo: {field: 'description', direction: 'ASC'},
+    autoLoad: true
+  });
+  
+  this.repositoryDataStore = new Ext.data.JsonStore( {
+    root: 'data',
+    id: 'id',
+    fields: [
+      { name: 'id' },
+      { name: 'format' },
+      { name: 'repoType' },
+      { name: 'name', sortType: Ext.data.SortTypes.asUCString }
+    ],
+    sortInfo: { field: 'name', direction: 'asc' },
+    url: Sonatype.config.repos.urls.repositories,
+  autoLoad: true
+  } );
 
   this.loadDataModFuncs = {
     group : {
@@ -94,6 +105,32 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
         allowBlank:false
       },
       {
+        xtype: 'combo',
+        fieldLabel: 'Group Type',
+        itemCls: 'required-field',
+        helpText: ht.contentClass,
+        name: 'format',
+        width: this.COMBO_WIDTH,
+        store: this.contentClassesDataStore,
+        displayField:'description',
+        valueField:'roleHint',
+        editable: false,
+        forceSelection: true,
+        mode: 'local',
+        triggerAction: 'all',
+        emptyText:'Select...',
+        selectOnFocus:true,
+        allowBlank: false,
+        listeners: {
+          'select': {
+            fn: function(combo, record, index) {
+              this.onGroupTypeChange( record );
+            },
+            scope: this
+          }
+        }       
+      },
+      {
         xtype: 'panel',
         layout: 'column',
         autoHeight: true,
@@ -135,13 +172,6 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
                 }
               },
               onContainerOver:function(source, e, data){
-                var repos = this.tree.root.childNodes;
-                var draggedRepo = data.node.attributes.payload;
-                for ( var i = 0; i < repos.length; i++ ) {
-                  if ( repos[i].attributes.payload.format != draggedRepo.format ) {
-                    return this.dropNotAllowed;
-                  }
-                }
                 return this.dropAllowed;
               },
               onNodeDrop:function(node, source, e, data){
@@ -195,7 +225,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
             
           },
           {
-          	xtype: 'twinpanelcontroller'
+            xtype: 'twinpanelcontroller'
           },
           {
             xtype: 'treepanel',
@@ -267,7 +297,8 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
     {name:'repositories'},
     {name:'sRepositories', mapping:'repositories', convert: this.nameConcatinator},
-    {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl }
+    {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl },
+    {name:'format'}
   ]);
 
   this.groupsReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.groupRecordConstructor );
@@ -331,6 +362,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
     deferredRender: false,
     columns: [
       {header: 'Group', dataIndex: 'name', width:175},
+      {header: 'Type', dataIndex: 'format', width:100},
       {header: 'Repositories', dataIndex: 'sRepositories', width:300},
       {header: 'Group Path', dataIndex: 'contentUri', id: 'groups-config-url-col', width:300,renderer: function(s){return '<a href="' + s + ((s != null && (s.charAt(s.length)) == '/') ? '' : '/') +'" target="_blank">' + s + '</a>';},menuDisabled:true}
     ],
@@ -382,19 +414,14 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
 //},
 
   reloadAll : function(){
+    this.contentClassesDataStore.reload();
     this.groupsDataStore.reload();
+    this.repositoryDataStore.reload();
     this.formCards.items.each(function(item, i, len){
       if(i>0){this.remove(item, true);}
     }, this.formCards);
     
     this.formCards.getLayout().setActiveItem(0);
-    //Repopulate the repo lists
-    Ext.Ajax.request({
-      callback: this.processRepoList,
-      scope: this,
-      method: 'GET',
-      url: Sonatype.config.repos.urls.repositories
-    });
   },
   
   markTreeInvalid : function(tree, errortext) {
@@ -696,6 +723,7 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
 
         var idTextField = action.options.fpanel.find('name', 'id')[0];
         idTextField.disable();
+    action.options.fpanel.find('name', 'format')[0].disable();
 //note: the label doesn't delete with its text field.  So just disable for now        
 //        var resourceId = idTextField.getValue();
         
@@ -732,6 +760,7 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
         
         rec.beginEdit();
         rec.set('name', sentData.name);
+        rec.set('format', sendData.format);
         rec.set('repositories', sentData.repositories);
         rec.set('sRepositories', Sonatype.utils.joinArrayObject(sentData.repositories, 'name'));
         rec.commit();
@@ -742,6 +771,10 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
       }
 
       Sonatype.Events.fireEvent( 'groupChanged' );
+    }
+    else{
+      //When load is complete, reload to update the repos
+      this.loadRepoListHelper([], {}, action.options.fpanel);
     }
   },
 
@@ -812,6 +845,8 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
       //cancel button event handler
       formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
       
+      formPanel.find( 'name' , 'format' )[0].disable();
+      
       this.formDataLoader(formPanel, rec.data.resourceURI, this.loadDataModFuncs.group);
       this.formCards.add(formPanel);
     }
@@ -846,8 +881,8 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
 //    }
 
     var trees = [
-      {obj : newConfig.items[2].items[0], postpend : '_group-repos-tree'},
-      {obj : newConfig.items[2].items[2], postpend : '_group-all-repos-tree'}
+      {obj : newConfig.items[3].items[0], postpend : '_group-repos-tree'},
+      {obj : newConfig.items[3].items[2], postpend : '_group-all-repos-tree'}
     ];
 
     for (var i = 0; i<trees.length; i++) {
@@ -860,61 +895,60 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
   
   // requires being scoped to GroupsConfigPanel to get shared reposList data
   loadRepoListHelper : function(arr, srcObj, fpanel){
-    //block until the list of repos becomes known
-    if (this.reposList === null){
-      return this.loadRepoListHelper.defer(300, this, arguments);
-    }
-    
     var grpTree = Ext.getCmp(fpanel.id + '_group-repos-tree');
     var allTree = Ext.getCmp(fpanel.id + '_group-all-repos-tree');
     
-    var repo;
+  var format = fpanel.find('name', 'format')[0].value;
+  
+  if ( arr.length == 0) {
+      for (var i=grpTree.root.childNodes.length - 1; i>=0; i--){
+        if ( grpTree.root.childNodes[i].attributes.payload.format != format) {
+        grpTree.root.childNodes[i].remove();
+      }
+      }
+  }
+    
+    for (var i=allTree.root.childNodes.length - 1; i>=0; i--){
+      allTree.root.childNodes[i].remove();
+    }
     
     for(var i=0; i<arr.length; i++){
-      repo = arr[i];
-      grpTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: repo.id,
-          text: repo.name,
-          payload: repo, //sonatype added attribute
+      var repo = this.repositoryDataStore.getById(arr[i].id);
+    if ( typeof(format) == 'undefined'
+       || repo.data.format == format) {
+        grpTree.root.appendChild(
+          new Ext.tree.TreeNode({
+            id: repo.data.id,
+            text: repo.data.name,
+            payload: repo.data, //sonatype added attribute
           
-          allowChildren: false,
-          draggable: true,
-          leaf: true
-        })
-      );
-    }
-    
-    var rList = this.reposList;
-    
-    if(rList){
-      for(var i=0; i<rList.length; i++){
-        repo = rList[i];
-
-        var assignedNode = grpTree.getNodeById(repo.id);
-        if(typeof(assignedNode) == 'undefined'){
-          
-          allTree.root.appendChild(
-            new Ext.tree.TreeNode({
-              id: repo.id,
-              text: repo.name,
-              payload: repo, //sonatype added attribute
-
-              allowChildren: false,
-              draggable: true,
-              leaf: true
-            })
-          );
-        }
-        else {
-          assignedNode.attributes.payload.format = repo.format;
-        }
+            allowChildren: false,
+            draggable: true,
+            leaf: true
+          })
+        );
       }
     }
-    else {
-      //@todo: race condition or error retrieving repos list
-    }
     
+    this.repositoryDataStore.each(function(item, i, len){
+      var assignedNode = grpTree.getNodeById(item.data.id);
+      if(typeof(assignedNode) == 'undefined' 
+        && (typeof(format) == 'undefined'
+       || item.data.format == format)){        
+        allTree.root.appendChild(
+          new Ext.tree.TreeNode({
+            id: item.data.id,
+            text: item.data.name,
+            payload: item.data, //sonatype added attribute
+
+            allowChildren: false,
+            draggable: true,
+            leaf: true
+          })
+        );
+      }
+    }, this);
+        
     return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
   },
   
@@ -934,5 +968,9 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
     }
     
     return outputArr;
+  },
+  
+  onGroupTypeChange : function( groupType ){  
+    this.loadRepoListHelper([], {}, this.formCards.getLayout().activeItem);
   }
 });

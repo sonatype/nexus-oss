@@ -159,11 +159,11 @@ public class RepositoryGroupPlexusResource
 
             try
             {
-                validateGroup( resource, request );
-
                 CRepositoryGroup group = getNexus().readRepositoryGroup( resource.getId() );
 
                 group.setName( resource.getName() );
+                
+                group.setType( resource.getFormat() );
 
                 group.getRepositories().clear();
 
