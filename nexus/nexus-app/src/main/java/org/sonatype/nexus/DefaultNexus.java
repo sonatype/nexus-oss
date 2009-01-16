@@ -62,6 +62,7 @@ import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
+import org.sonatype.nexus.log.SimpleLog4jConfig;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
@@ -1893,5 +1894,17 @@ public class DefaultNexus
         response.setInputStream( nexusConfiguration.getConfigurationAsStreamByKey( key ) );
 
         return response;
+    }
+
+    public SimpleLog4jConfig getLogConfig()
+        throws IOException
+    {
+        return logFileManager.getLogConfig();
+    }
+
+    public void setLogConfig( SimpleLog4jConfig config )
+        throws IOException
+    {
+        logFileManager.setLogConfig( config );
     }
 }

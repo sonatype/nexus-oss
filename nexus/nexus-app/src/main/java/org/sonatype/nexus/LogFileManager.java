@@ -17,7 +17,10 @@
 package org.sonatype.nexus;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Set;
+
+import org.sonatype.nexus.log.SimpleLog4jConfig;
 
 public interface LogFileManager
 {
@@ -26,4 +29,10 @@ public interface LogFileManager
     File getLogFile( String filename );
 
     void createLogDirectory();
+
+    SimpleLog4jConfig getLogConfig()
+        throws IOException;
+
+    void setLogConfig( SimpleLog4jConfig logConfig )
+        throws IOException;
 }

@@ -17,14 +17,20 @@
 package org.sonatype.nexus;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.log.LogConfiguration;
+import org.sonatype.nexus.log.SimpleLog4jConfig;
 
 /**
  * Log4J file manager.
@@ -33,8 +39,12 @@ import org.codehaus.plexus.component.annotations.Component;
  */
 @Component( role = LogFileManager.class )
 public class Log4jLogFileManager
+    extends AbstractLogEnabled
     implements LogFileManager
 {
+    @Requirement
+    private LogConfiguration<Properties> logConfiguration;
+
     public Log4jLogFileManager()
     {
         createLogDirectory();
@@ -44,7 +54,7 @@ public class Log4jLogFileManager
     {
         Logger logger = Logger.getRootLogger();
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         Enumeration<Appender> appenders = logger.getAllAppenders();
 
         while ( appenders.hasMoreElements() )
@@ -67,9 +77,10 @@ public class Log4jLogFileManager
 
     public Set<File> getLogFiles()
     {
+
         Logger logger = Logger.getRootLogger();
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         Enumeration<Appender> appenders = logger.getAllAppenders();
 
         HashSet<File> files = new HashSet<File>();
@@ -98,6 +109,26 @@ public class Log4jLogFileManager
                 parent.mkdirs();
             }
         }
+    }
+
+    public SimpleLog4jConfig getLogConfig()
+        throws IOException
+    {
+        logConfiguration.load();
+
+        return new SimpleLog4jConfig( logConfiguration.getConfig() );
+    }
+
+    public void setLogConfig( SimpleLog4jConfig simpleLog4jConfig )
+        throws IOException
+    {
+        Properties config = logConfiguration.getConfig();
+
+        config.putAll( simpleLog4jConfig.toMap() );
+
+        logConfiguration.apply();
+
+        logConfiguration.save();
     }
 
 }

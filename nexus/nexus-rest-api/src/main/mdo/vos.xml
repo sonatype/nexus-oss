@@ -3130,5 +3130,46 @@
       </fields>
     </class>
 
+	<class>
+		<name>LogConfigResource</name>
+		<version>1.0.0+</version>
+		<fields>
+			<field>
+				<name>rootLogger</name>
+				<version>1.0.0+</version>
+				<type>String</type>
+				<required>true</required>
+			</field>
+			<field>
+				<name>fileAppenderLocation</name>
+				<version>1.0.0+</version>
+				<type>String</type>
+				<required>true</required>
+			</field>
+			<field>
+				<name>fileAppenderPattern</name>
+				<version>1.0.0+</version>
+				<type>String</type>
+				<required>true</required>
+			</field>
+		</fields>
+	</class>
+
+	<class>
+		<name>LogConfigResourceResponse</name>
+		<version>1.0.0+</version>
+		<superClass>NexusResponse</superClass>
+		<fields>
+			<field>
+				<name>data</name>
+				<version>1.0.0+</version>
+				<association>
+					<type>LogConfigResource</type>
+				</association>
+				<required>true</required>
+			</field>
+		</fields>
+	</class>
+	
 	</classes>
 </model>

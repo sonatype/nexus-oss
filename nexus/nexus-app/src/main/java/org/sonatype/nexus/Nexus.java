@@ -38,6 +38,7 @@ import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.log.SimpleLog4jConfig;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -393,6 +394,12 @@ public interface Nexus
      * @throws IOException
      */
     NexusStreamResponse getConfigurationAsStreamByKey( String key )
+        throws IOException;
+    
+    SimpleLog4jConfig getLogConfig()
+        throws IOException;
+    
+    void setLogConfig(SimpleLog4jConfig config)
         throws IOException;
 
 }

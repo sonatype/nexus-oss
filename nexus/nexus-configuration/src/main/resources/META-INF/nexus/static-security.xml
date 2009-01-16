@@ -1524,6 +1524,22 @@
                 </property>
             </properties>
         </privilege>
+        <privilege>
+        	<id>77</id>
+        	<type>method</type>
+        	<name>Log Configuration - (read,update)</name>
+        	<description>Give permission to read and update log configuration</description>
+        	<properties>
+        		<property>
+        			<key>method</key>
+        			<value>read,update</value>
+        		</property>
+        		<property>
+        			<key>permission</key>
+        			<value>nexus:logconfig</value>
+        		</property>
+        	</properties>
+        </privilege>
 		
     </privileges>
 </security>

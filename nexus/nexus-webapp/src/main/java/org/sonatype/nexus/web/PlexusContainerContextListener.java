@@ -26,14 +26,14 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 
 /**
- * 
  * @author Juven Xu
- *
  */
 public class PlexusContainerContextListener
     implements ServletContextListener
 {
     private static final String KEY_PLEXUS = "plexus";
+
+    private static final String KEY_LOG_CONFIG_FILE = "plexus.log4j-prop-file";
 
     PlexusContainerConfigurationUtils plexusContainerConfigurationUtils = new PlexusContainerConfigurationUtils();
 
@@ -41,24 +41,18 @@ public class PlexusContainerContextListener
 
     public void contextInitialized( ServletContextEvent sce )
     {
-        ServletContext servletContext = sce.getServletContext();
+        ServletContext context = sce.getServletContext();
+
+        ContainerConfiguration plexusContainerConfiguration = plexusContainerConfigurationUtils
+            .buildContainerConfiguration( context );
+
+        NexusWorkDirUtils.setUpNexusWorkDir( plexusContainerConfiguration.getContext() );
+
+        initializeLogConfig( context );
 
         try
         {
-            ContainerConfiguration plexusContainerConfiguration = plexusContainerConfigurationUtils
-                .buildContainerConfiguration( servletContext );
-
-            NexusWorkDirUtils.setUpNexusWorkDir( plexusContainerConfiguration.getContext() );
-
-            //initialize log4j
-            String log4jFile = servletContext.getRealPath( "/" ) + "/WEB-INF/log4j.properties";
-
-            PropertyConfigurator.configure( log4jFile );
-
-            //initialize plexus container
-            PlexusContainer plexusContainer = plexusContainerUtils.startContainer( plexusContainerConfiguration );
-
-            servletContext.setAttribute( KEY_PLEXUS, plexusContainer );
+            initizlizePlexusContainer( context, plexusContainerConfiguration );
         }
         catch ( PlexusContainerException e )
         {
@@ -69,5 +63,23 @@ public class PlexusContainerContextListener
     public void contextDestroyed( ServletContextEvent sce )
     {
         plexusContainerUtils.stopContainer();
+    }
+
+    private void initializeLogConfig( ServletContext context )
+    {
+        String logConfigFilePath = context.getRealPath( "/" ) + "/WEB-INF/log4j.properties";
+
+        // when we want to configure log dynamically, this value is used to local the log configuration file
+        System.getProperties().put( KEY_LOG_CONFIG_FILE, logConfigFilePath );
+
+        PropertyConfigurator.configure( logConfigFilePath );
+    }
+
+    private void initizlizePlexusContainer( ServletContext context, ContainerConfiguration configuration )
+        throws PlexusContainerException
+    {
+        PlexusContainer plexusContainer = plexusContainerUtils.startContainer( configuration );
+
+        context.setAttribute( KEY_PLEXUS, plexusContainer );
     }
 }
