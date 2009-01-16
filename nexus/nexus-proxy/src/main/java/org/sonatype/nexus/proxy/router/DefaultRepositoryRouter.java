@@ -12,10 +12,10 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.EventMulticasterComponent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -41,7 +41,7 @@ import org.sonatype.nexus.util.ItemPathUtils;
  */
 @Component( role = RepositoryRouter.class )
 public class DefaultRepositoryRouter
-    extends EventMulticasterComponent
+    extends LoggingComponent
     implements RepositoryRouter, Initializable
 {
     @Requirement
