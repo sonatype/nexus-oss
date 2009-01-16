@@ -23,6 +23,8 @@ import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.scheduling.NexusTask;
 
@@ -44,28 +46,55 @@ public abstract class AbstractRestorePlexusResource
     }
 
     protected String getRepositoryId( Request request )
+        throws ResourceException
     {
         String repoId = null;
+
         if ( ( request.getAttributes().containsKey( DOMAIN ) && request.getAttributes().containsKey( TARGET_ID ) )
             && DOMAIN_REPOSITORIES.equals( request.getAttributes().get( DOMAIN ) ) )
         {
             repoId = request.getAttributes().get( TARGET_ID ).toString();
+
+            try
+            {
+                // simply to throw NoSuchRepository exception
+                getNexus().getRepositoryWithFacet( repoId, Repository.class );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository not found!", e );
+            }
         }
+
         return repoId;
     }
 
     protected String getRepositoryGroupId( Request request )
+        throws ResourceException
     {
         String groupId = null;
+
         if ( ( request.getAttributes().containsKey( DOMAIN ) && request.getAttributes().containsKey( TARGET_ID ) )
             && DOMAIN_REPO_GROUPS.equals( request.getAttributes().get( DOMAIN ) ) )
         {
             groupId = request.getAttributes().get( TARGET_ID ).toString();
+
+            try
+            {
+                // simply to throw NoSuchRepository exception
+                getNexus().getRepositoryWithFacet( groupId, GroupRepository.class );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository group not found!", e );
+            }
         }
+
         return groupId;
     }
 
     protected String getResourceStorePath( Request request )
+        throws ResourceException
     {
         String path = null;
 
