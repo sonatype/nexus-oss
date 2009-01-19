@@ -20,6 +20,7 @@ Sonatype.utils = {
   passwordPlaceholder : '|$|N|E|X|U|S|$|',
   version : '',
   edition : '',
+  editionShort : '',
   lowercase : function(str){
     if (Ext.isEmpty(str)) {return str;}
     str = str.toString();
@@ -705,6 +706,7 @@ Sonatype.utils = {
           }
           
           Sonatype.utils.edition = respObj.data.editionLong;
+          Sonatype.utils.editionShort = respObj.data.editionShort;
           
           var formattedAppName = Sonatype.utils.parseFormattedAppName( respObj.data.formattedAppName );
           
