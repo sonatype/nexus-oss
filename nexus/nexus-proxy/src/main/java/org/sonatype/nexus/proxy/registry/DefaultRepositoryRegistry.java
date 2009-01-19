@@ -219,6 +219,11 @@ public class DefaultRepositoryRegistry
                 ( (EventMulticaster) repository ).addProximityEventListener( this );
             }
 
+            if ( repository instanceof EventListener )
+            {
+                addProximityEventListener( repository );
+            }
+
             notifyProximityEventListeners( new RepositoryRegistryEventAdd( this, repository ) );
         }
         else
@@ -246,6 +251,11 @@ public class DefaultRepositoryRegistry
         if ( repository instanceof EventMulticaster )
         {
             ( (EventMulticaster) repository ).removeProximityEventListener( this );
+        }
+        
+        if ( repository instanceof EventListener )
+        {
+            removeProximityEventListener( repository );
         }
     }
 

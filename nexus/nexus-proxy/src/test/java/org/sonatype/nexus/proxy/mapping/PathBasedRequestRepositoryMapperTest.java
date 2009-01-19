@@ -27,9 +27,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.easymock.EasyMock;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.DefaultRepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -79,26 +81,43 @@ public class PathBasedRequestRepositoryMapperTest
         makeThreadSafe( repoA, true );
         expect( repoA.getId() ).andReturn( "repoA" ).anyTimes();
         expect( repoA.isUserManaged() ).andReturn( true ).anyTimes();
+        repoA.onProximityEvent( EasyMock.isA( AbstractEvent.class ) );
+        EasyMock.expectLastCall().anyTimes();
+
         repoB = createMock( Repository.class );
         makeThreadSafe( repoB, true );
         expect( repoB.getId() ).andReturn( "repoB" ).anyTimes();
         expect( repoB.isUserManaged() ).andReturn( true ).anyTimes();
+        repoB.onProximityEvent( EasyMock.isA( AbstractEvent.class ) );
+        EasyMock.expectLastCall().anyTimes();
+
         repoC = createMock( Repository.class );
         makeThreadSafe( repoC, true );
         expect( repoC.getId() ).andReturn( "repoC" ).anyTimes();
         expect( repoC.isUserManaged() ).andReturn( true ).anyTimes();
+        repoC.onProximityEvent( EasyMock.isA( AbstractEvent.class ) );
+        EasyMock.expectLastCall().anyTimes();
+
         repoD = createMock( Repository.class );
         makeThreadSafe( repoD, true );
         expect( repoD.getId() ).andReturn( "repoD" ).anyTimes();
         expect( repoD.isUserManaged() ).andReturn( true ).anyTimes();
+        repoD.onProximityEvent( EasyMock.isA( AbstractEvent.class ) );
+        EasyMock.expectLastCall().anyTimes();
+
         repoE = createMock( Repository.class );
         makeThreadSafe( repoE, true );
         expect( repoE.getId() ).andReturn( "repoE" ).anyTimes();
         expect( repoE.isUserManaged() ).andReturn( true ).anyTimes();
+        repoE.onProximityEvent( EasyMock.isA( AbstractEvent.class ) );
+        EasyMock.expectLastCall().anyTimes();
+
         repoF = createMock( Repository.class );
         makeThreadSafe( repoF, true );
         expect( repoF.getId() ).andReturn( "repoF" ).anyTimes();
         expect( repoF.isUserManaged() ).andReturn( true ).anyTimes();
+        repoF.onProximityEvent( EasyMock.isA( AbstractEvent.class ) );
+        EasyMock.expectLastCall().anyTimes();
 
         expect( repoA.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
         expect( repoB.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();

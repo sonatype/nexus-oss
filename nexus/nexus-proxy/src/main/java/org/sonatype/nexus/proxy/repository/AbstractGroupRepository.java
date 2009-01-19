@@ -30,6 +30,8 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -53,6 +55,19 @@ public abstract class AbstractGroupRepository
     private RequestRepositoryMapper requestRepositoryMapper;
 
     private List<String> memberRepoIds = new ArrayList<String>();
+
+    public void onProximityEvent( AbstractEvent evt )
+    {
+        super.onProximityEvent( evt );
+
+        // act automatically on repo removal. Remove it from myself if member.
+        if ( evt instanceof RepositoryRegistryEventRemove )
+        {
+            RepositoryRegistryEventRemove revt = (RepositoryRegistryEventRemove) evt;
+
+            removeMemberRepository( revt.getRepository().getId() );
+        }
+    }
 
     @Override
     protected Collection<StorageItem> doListItems( RepositoryItemUid uid, Map<String, Object> context )

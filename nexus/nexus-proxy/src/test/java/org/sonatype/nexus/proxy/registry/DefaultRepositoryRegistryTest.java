@@ -26,6 +26,7 @@ import java.util.List;
 import org.easymock.EasyMock;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
@@ -92,6 +93,13 @@ public class DefaultRepositoryRegistryTest
         repoA.removeProximityEventListener( (EventListener) repositoryRegistry );
         repoB.removeProximityEventListener( (EventListener) repositoryRegistry );
         repoC.removeProximityEventListener( (EventListener) repositoryRegistry );
+        
+        repoA.onProximityEvent( EasyMock.isA( AbstractEvent.class ) );
+        EasyMock.expectLastCall().anyTimes();
+        repoB.onProximityEvent( EasyMock.isA( AbstractEvent.class ) );
+        EasyMock.expectLastCall().anyTimes();
+        repoC.onProximityEvent( EasyMock.isA( AbstractEvent.class ) );
+        EasyMock.expectLastCall().anyTimes();
 
         replay( repoA, repoB, repoC );
 

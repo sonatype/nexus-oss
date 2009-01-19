@@ -1020,10 +1020,71 @@ public class DefaultNexusConfiguration
 
     public void deleteRepositoryShadow( String id )
         throws NoSuchRepositoryException,
+            ConfigurationException,
             IOException
     {
-        repositoryRegistry.getRepositoryWithFacet( id, ShadowRepository.class );
+        ShadowRepository repository = repositoryRegistry.getRepositoryWithFacet( id, ShadowRepository.class );
 
+        repository.setLocalStatus( LocalStatus.OUT_OF_SERVICE );
+
+        // remove dependants too
+
+        // =======
+        // shadows
+        // (fail if any repo references the currently processing one)
+        if ( getConfiguration().getRepositoryShadows() != null && getConfiguration().getRepositoryShadows().size() > 0 )
+        {
+            List<CRepositoryShadow> shadows = getConfiguration().getRepositoryShadows();
+
+            for ( Iterator<CRepositoryShadow> i = shadows.iterator(); i.hasNext(); )
+            {
+                CRepositoryShadow shadow = i.next();
+
+                if ( repository.getId().equals( shadow.getShadowOf() ) )
+                {
+                    throw new ConfigurationException( "The repository with ID='" + id
+                        + "' is not deletable, it has dependant repositories!" );
+                }
+            }
+        }
+
+        // ======
+        // groups
+        // (correction in config only, registry DOES handle it)
+
+        // do we have groups at all?
+        if ( getConfiguration().getRepositoryGrouping() != null
+            && getConfiguration().getRepositoryGrouping().getRepositoryGroups() != null )
+        {
+            // all existing groups
+            List<CRepositoryGroup> groups = getConfiguration().getRepositoryGrouping().getRepositoryGroups();
+
+            // if any group reference this repository, remove that reference
+            for ( CRepositoryGroup group : groups )
+            {
+                if ( group.getRepositories().contains( id ) )
+                {
+                    group.getRepositories().remove( id );
+                }
+            }
+        }
+
+        // ===========
+        // pahMappings
+        // (correction, since registry is completely unaware of this component)
+
+        List<CGroupsSettingPathMappingItem> pathMappings = getConfiguration().getRepositoryGrouping().getPathMappings();
+
+        for ( Iterator<CGroupsSettingPathMappingItem> i = pathMappings.iterator(); i.hasNext(); )
+        {
+            CGroupsSettingPathMappingItem item = i.next();
+
+            item.removeRepository( id );
+        }
+
+        // ===========
+        // and finally
+        // this cleans it properly from the registry (from reposes and repo groups)
         repositoryRegistry.removeRepository( id );
 
         List<CRepositoryShadow> shadows = getConfiguration().getRepositoryShadows();
