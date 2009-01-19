@@ -310,6 +310,12 @@ Sonatype.repoServer.referenceData = {
   contentClasses : {
     contentClass : "",
     name : ""
+  },
+  
+  logConfig : {
+    rootLogger : "",
+    fileAppenderLocation : "",
+    fileAppenderPattern : ""
   }
   
 };

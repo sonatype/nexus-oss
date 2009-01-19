@@ -82,6 +82,7 @@ Sonatype.config = function() {
         configs : servicePath + '/configs',
         configCurrent : servicePath + '/configs/current',
         logs : servicePath + '/logs',
+        logConfig : servicePath + '/log/config',
         feeds : servicePath + '/feeds',
         recentlyChangedArtifactsRss: servicePath + '/feeds/recentChanges',
         recentlyCachedArtifactsRss: servicePath + '/feeds/recentlyCached',

@@ -359,7 +359,16 @@ Sonatype.repoServer.RepoServer = function(){
             title: 'Repository Targets',
             tabId: 'config-repoTargets',
             tabCode: Sonatype.repoServer.RepoTargetEditPanel
-          }
+          },
+          {
+            enabled: sp.checkPermission('nexus:logconfig', sp.READ) &&
+              ( sp.checkPermission('nexus:logconfig', sp.CREATE) ||
+                sp.checkPermission('nexus:logconfig', sp.DELETE) ||
+                sp.checkPermission('nexus:logconfig', sp.EDIT)),
+            title: 'Log',
+            tabId: 'log-config',
+            tabCode: Sonatype.repoServer.LogEditPanel
+          }          
         ]
       } );
 
