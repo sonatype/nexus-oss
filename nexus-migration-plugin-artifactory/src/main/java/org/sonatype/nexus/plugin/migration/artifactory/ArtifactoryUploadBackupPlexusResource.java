@@ -30,10 +30,12 @@ import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
+import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
@@ -328,5 +330,17 @@ public class ArtifactoryUploadBackupPlexusResource
 
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage() );
         }
+    }
+
+    @Override
+    public List<Variant> getVariants()
+    {
+    	List<Variant> variants = new ArrayList<Variant>();
+
+    	//text/html is required for upload response, for ext to handle properly
+        variants.add( new Variant( MediaType.TEXT_HTML) );
+        variants.add( new Variant( MediaType.APPLICATION_JSON ) );
+        variants.add( new Variant( MediaType.APPLICATION_XML ) );
+        return variants;
     }
 }
