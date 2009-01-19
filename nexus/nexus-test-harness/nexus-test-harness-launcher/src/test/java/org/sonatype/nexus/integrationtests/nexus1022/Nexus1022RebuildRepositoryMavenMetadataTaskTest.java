@@ -47,7 +47,7 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskTest
 
         repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
 
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask("RebuildMavenMetadata-Nexus1022", RebuildMavenMetadataTaskDescriptor.ID, 300, repo );
+        ScheduledServiceListResource task = TaskScheduleUtil.runTask("RebuildMavenMetadata-Nexus1022", RebuildMavenMetadataTaskDescriptor.ID, repo );
         Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
 
         File artifactDirMd = new File( nexusBaseDir, releaseRepoPath + "nexus1022/foo/bar/artifact/maven-metadata.xml" );

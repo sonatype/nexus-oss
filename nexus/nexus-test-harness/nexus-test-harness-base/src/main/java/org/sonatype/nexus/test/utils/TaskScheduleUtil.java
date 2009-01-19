@@ -21,6 +21,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -37,7 +38,8 @@ import com.thoughtworks.xstream.XStream;
 
 public class TaskScheduleUtil
 {
-
+    private static final Logger LOG = Logger.getLogger( TaskScheduleUtil.class );
+    
     private static XStream xstream;
 
     static
@@ -127,7 +129,8 @@ public class TaskScheduleUtil
     public static ScheduledServiceListResource waitForTask( String name, int maxAttempts )
         throws Exception
     {
-        long sleep = 200;
+        // Wait 1 full second between checks
+        long sleep = 1000;
 
         Thread.sleep( 500 ); // give an time to task start
 
@@ -137,6 +140,7 @@ public class TaskScheduleUtil
 
             ScheduledServiceListResource task = getTask( name );
 
+            LOG.info( "Task: " + task.getName() + ", Attempt: " + attempt + ", LastRunResult: " + task.getLastRunResult() + ", Status: " + task.getStatus() );
             if ( task.getLastRunResult() != "n/a"
                 && ( task.getStatus().equals( "SUBMITTED" ) || task.getStatus().equals( "WAITING" ) ) )
             {
@@ -215,7 +219,7 @@ public class TaskScheduleUtil
                                                         ScheduledServicePropertyResource... properties )
         throws Exception
     {
-        return runTask( taskName, typeId, 40, properties );
+        return runTask( taskName, typeId, 300, properties );
     }
 
 }

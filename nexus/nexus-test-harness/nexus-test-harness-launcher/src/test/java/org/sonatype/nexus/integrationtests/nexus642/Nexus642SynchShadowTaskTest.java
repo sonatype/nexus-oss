@@ -84,7 +84,7 @@ public class Nexus642SynchShadowTaskTest
         age.setValue( shadowRepo );
 
         // clean unused
-        return TaskScheduleUtil.runTask( taskName, SynchronizeShadowTaskDescriptor.ID, 100, repo, age );
+        return TaskScheduleUtil.runTask( taskName, SynchronizeShadowTaskDescriptor.ID, repo, age );
     }
 
 }

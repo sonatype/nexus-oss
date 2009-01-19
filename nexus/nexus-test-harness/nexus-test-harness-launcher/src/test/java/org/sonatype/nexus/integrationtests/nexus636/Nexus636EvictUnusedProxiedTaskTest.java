@@ -149,7 +149,7 @@ public class Nexus636EvictUnusedProxiedTaskTest
 
         // clean unused
         ScheduledServiceListResource task =
-            TaskScheduleUtil.runTask( taskName, EvictUnusedItemsTaskDescriptor.ID, 40, repo, age );
+            TaskScheduleUtil.runTask( taskName, EvictUnusedItemsTaskDescriptor.ID, repo, age );
         Assert.assertNotNull( "Task '" + taskName + "' didn't execute!", task );
         Assert.assertEquals( "SUBMITTED", task.getStatus() );
     }
