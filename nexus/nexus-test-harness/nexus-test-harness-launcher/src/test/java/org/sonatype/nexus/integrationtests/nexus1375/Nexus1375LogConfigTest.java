@@ -54,9 +54,11 @@ public class Nexus1375LogConfigTest
 
         Assert.assertEquals( "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n", resource.getFileAppenderPattern() );
 
-        File logConfigFile = new File( getBasedir(), "target/logs/nexus.log" );
+        File expectedLoggerLocation = new File( getBasedir(), "target/logs/nexus.log" );
 
-        Assert.assertEquals( logConfigFile.getAbsolutePath(), resource.getFileAppenderLocation() );
+        File actualLoggerLocation = new File( resource.getFileAppenderLocation() );
+
+        Assert.assertEquals( expectedLoggerLocation.getAbsolutePath(), actualLoggerLocation.getAbsolutePath() );
     }
 
     @Test
