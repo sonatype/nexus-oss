@@ -2144,7 +2144,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
         emptyText: 'Select...',
         selectOnFocus: true,
         allowBlank: false,
-        disabled: true          
+        disabled: ! this.isNew
       },
       {
         xtype: 'combo',
