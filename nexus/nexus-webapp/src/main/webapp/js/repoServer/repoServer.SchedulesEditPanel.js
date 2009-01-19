@@ -556,7 +556,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                       padding: [0,0,274,0]
                     },
                     // added Field values to simulate form field validation
-                    invalidText: 'One or more day is required',
+                    invalidText: 'One or more days are required',
                     validate: function(){
                       return (this.root.childNodes.length > 0);
                     },
