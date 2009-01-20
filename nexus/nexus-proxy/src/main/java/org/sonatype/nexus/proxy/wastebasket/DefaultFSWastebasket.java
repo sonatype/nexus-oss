@@ -275,7 +275,7 @@ public class DefaultFSWastebasket
             {
                 removeForever( subFile, age );
             }
-            if ( file.list().length == 0 && isOlderThan( file, age ) )
+            if ( file.list().length == 0 )
             {
                 FileUtils.forceDelete( file );
             }
