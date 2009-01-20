@@ -13,7 +13,7 @@
 package org.sonatype.plexus.rest;
 
 import org.restlet.Context;
-import org.restlet.Restlet;
+import org.restlet.Filter;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -24,39 +24,26 @@ import org.restlet.data.Status;
  * @author cstamas
  */
 public class RetargetableRestlet
-    extends Restlet
+    extends Filter
 {
-    private Restlet root;
-
     public RetargetableRestlet( Context context )
     {
         super( context );
     }
 
     @Override
-    public void handle( Request request, Response response )
+    protected int doHandle( Request request, Response response )
     {
-        super.handle( request, response );
-
-        Restlet next = getRoot();
-
-        if ( next != null )
+        if ( getNext() != null )
         {
-            next.handle( request, response );
+            return super.doHandle( request, response );
         }
         else
         {
             response.setStatus( Status.CLIENT_ERROR_NOT_FOUND );
+
+            return CONTINUE;
         }
-    }
 
-    public Restlet getRoot()
-    {
-        return root;
-    }
-
-    public void setRoot( Restlet root )
-    {
-        this.root = root;
     }
 }
