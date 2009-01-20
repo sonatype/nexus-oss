@@ -347,6 +347,7 @@ public class ArtifactInfo
     public static class RepositoryVersionComparator
         extends VersionComparator
     {
+        @Override
         public int compare( ArtifactInfo f1, ArtifactInfo f2 )
         {
             int n = super.compare( f1, f2 );

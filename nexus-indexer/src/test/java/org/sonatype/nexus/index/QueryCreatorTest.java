@@ -15,6 +15,7 @@ public class QueryCreatorTest
 
     protected QueryCreator queryCreator;
 
+    @Override
     protected void setUp()
         throws Exception
     {
@@ -23,6 +24,7 @@ public class QueryCreatorTest
         queryCreator = (QueryCreator) lookup( QueryCreator.ROLE );
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {

@@ -18,6 +18,7 @@ public class M1GavCalculatorTest
 
     private SimpleDateFormat formatter = new SimpleDateFormat( "yyyyMMdd.HHmmss" );
 
+    @Override
     public void setUp()
         throws Exception
     {

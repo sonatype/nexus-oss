@@ -146,6 +146,7 @@ public class Index20081108RegressionTest
         assertEquals( response.getResults().toString(), 15, response.getTotalHits() );
     }
     
+    @Override
     public void testSearchGroupedProblematicNames()
         throws Exception
     {
@@ -191,6 +192,7 @@ public class Index20081108RegressionTest
         }
     }
 
+    @Override
     public void testPaging()
         throws Exception
     {
@@ -242,6 +244,7 @@ public class Index20081108RegressionTest
         assertTrue( resultsAreEqual( onePageList, constructedPageList ) );
     }
     
+    @Override
     public void testPurge()
         throws Exception
     {

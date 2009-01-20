@@ -40,18 +40,19 @@ import org.sonatype.nexus.index.context.IndexingContext;
 public class DefaultIndexUpdaterTest
     extends PlexusTestCase
 {
-    private String repositoryId = "test";
+    String repositoryId = "test";
 
-    private String repositoryUrl = "http://repo1.maven.org/maven2/";
+    String repositoryUrl = "http://repo1.maven.org/maven2/";
 
-    private NexusIndexer indexer;
+    NexusIndexer indexer;
 
-    private IndexUpdater updater;
+    IndexUpdater updater;
     
-    private IndexingContext context;
+    IndexingContext context;
 
-    private SimpleDateFormat df = new SimpleDateFormat( "yyyyMMddHHmmss.SSS Z" );
+    SimpleDateFormat df = new SimpleDateFormat( "yyyyMMddHHmmss.SSS Z" );
 
+    @Override
     protected void setUp()
         throws Exception
     {
@@ -438,6 +439,7 @@ public class DefaultIndexUpdaterTest
                 with( any( File.class ) ) );
             will(new PropertiesAction() 
             {
+                @Override
                 Properties getProperties() 
                 {
                     Properties properties = new Properties();
@@ -490,6 +492,7 @@ public class DefaultIndexUpdaterTest
                 with( any( File.class ) ) );
             will(new PropertiesAction() 
             {
+                @Override
                 Properties getProperties() 
                 {
                     Properties properties = new Properties();
@@ -548,6 +551,7 @@ public class DefaultIndexUpdaterTest
                 with( any( File.class ) ) );
             will(new PropertiesAction() 
             {
+                @Override
                 Properties getProperties() 
                 {
                     Properties properties = new Properties();
@@ -615,6 +619,7 @@ public class DefaultIndexUpdaterTest
     
     abstract static class PropertiesAction extends VoidAction 
     {
+        @Override
         public Object invoke(Invocation invocation) throws Throwable 
         {
             File file = (File) invocation.getParameter( 1 );

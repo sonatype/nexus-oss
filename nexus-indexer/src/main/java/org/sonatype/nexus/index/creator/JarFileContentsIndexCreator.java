@@ -121,6 +121,7 @@ public class JarFileContentsIndexCreator
         }
     }
 
+    @Override
     public String toString() 
     {
         return "jarContent";

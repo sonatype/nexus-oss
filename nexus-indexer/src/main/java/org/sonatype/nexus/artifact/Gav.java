@@ -22,6 +22,7 @@ public class Gav
     {
         gpg;
 
+        @Override
         public String toString()
         {
             switch ( this )
@@ -211,6 +212,7 @@ public class Gav
         return signatureType;
     }
 
+    @Override
     public int hashCode() 
     {
         int result = 1;
@@ -231,6 +233,7 @@ public class Gav
         return result;
     }
 
+    @Override
     public boolean equals( Object obj )
     {
         if ( this == obj )

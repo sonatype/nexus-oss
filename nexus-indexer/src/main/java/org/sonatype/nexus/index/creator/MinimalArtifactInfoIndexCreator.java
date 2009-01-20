@@ -590,6 +590,7 @@ public class MinimalArtifactInfoIndexCreator
 
     }
 
+    @Override
     public String toString()
     {
         return "min";

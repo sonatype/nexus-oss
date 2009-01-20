@@ -87,7 +87,7 @@ public class MinimalIndexNexusIndexerTest
     {
         Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-plugin" ) );
         FlatSearchResponse response = nexusIndexer.searchFlat(new FlatSearchRequest(query));
-        assertEquals(response.getResults().toString(), 2, response.getTotalHits());
+        assertEquals(response.getResults().toString(), 3, response.getTotalHits());
     }
     
 }

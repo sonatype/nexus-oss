@@ -29,7 +29,7 @@ public abstract class AbstractRepoNexusIndexerTest
         throws Exception
     {
         Set<String> rootGroups = nexusIndexer.getRootGroups( context );
-        assertEquals( rootGroups.toString(), 10, rootGroups.size() );
+        assertEquals( rootGroups.toString(), 11, rootGroups.size() );
 
         assertGroup( 2, "qdox", context );
 

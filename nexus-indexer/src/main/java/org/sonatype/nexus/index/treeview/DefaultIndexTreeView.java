@@ -201,7 +201,6 @@ public class DefaultIndexTreeView
     }
 
     protected Set<String> getGroups( String path, Set<String> allGroups )
-        throws IOException
     {
         path = path.substring( 1 ).replace( '/', '.' );
 

@@ -102,7 +102,7 @@ public class NexusIndexerTest
         WildcardQuery q = new WildcardQuery( new Term( ArtifactInfo.PACKAGING, "maven-plugin" ) );
         FlatSearchResponse response = indexer.searchFlat( new FlatSearchRequest( q ) );
         Set<ArtifactInfo> r = response.getResults();
-        assertEquals( r.toString(), 1, r.size() );
+        assertEquals( r.toString(), 2, r.size() );
     }
 
     public void testIdentity()
@@ -217,7 +217,7 @@ public class NexusIndexerTest
         FlatSearchResponse response = indexer.searchFlat( new FlatSearchRequest( q ) );
         Collection<ArtifactInfo> infos = response.getResults(); 
 
-        assertEquals( infos.toString(), 1, infos.size() );
+        assertEquals( infos.toString(), 2, infos.size() );
     }
 
     private NexusIndexer prepare()

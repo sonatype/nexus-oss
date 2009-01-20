@@ -22,6 +22,7 @@ public class NexusAnalyzer
 
     private static Analyzer DEFAULT_ANALYZER = new StandardAnalyzer();
 
+    @Override
     public TokenStream tokenStream( String field, final Reader reader )
     {
         if ( !isTextField( field ) )
@@ -47,6 +48,7 @@ public class NexusAnalyzer
         }
     }
 
+    @Override
     public TokenStream reusableTokenStream( String field, Reader reader )
         throws IOException
     {

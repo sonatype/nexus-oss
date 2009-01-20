@@ -820,6 +820,7 @@ public class DefaultIndexingContext
         return groupDoc;
     }
 
+    @Override
     public String toString()
     {
         return id + " : " + timestamp;

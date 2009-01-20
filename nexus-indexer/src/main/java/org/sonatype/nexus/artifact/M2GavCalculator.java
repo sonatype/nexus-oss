@@ -13,12 +13,11 @@ import java.text.SimpleDateFormat;
  * The M2 GAV Calculator.
  * 
  * @author Jason van Zyl
- * @author cstamas
+ * @author Tamas Cservenak
  * @plexus.component role-hint="maven2"
  */
 public class M2GavCalculator
     extends AbstractGavCalculator
-    implements GavCalculator
 {
     public Gav pathToGav( String str )
     {

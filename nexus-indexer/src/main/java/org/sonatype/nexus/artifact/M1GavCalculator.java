@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
  */
 public class M1GavCalculator
     extends AbstractGavCalculator
-    implements GavCalculator
 {
 
     private static final Pattern pat1 = Pattern.compile( "^([^0-9]+)-([0-9].+)\\.([^0-9]+)(\\.md5|\\.sha1){0,1}$" );
