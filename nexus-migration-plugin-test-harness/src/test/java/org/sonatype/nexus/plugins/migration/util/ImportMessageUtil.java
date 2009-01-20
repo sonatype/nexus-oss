@@ -53,6 +53,7 @@ public class ImportMessageUtil
         // the method we are calling
         PostMethod filePost = new PostMethod( restServiceURL );
         filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
+        filePost.addRequestHeader( "accept", "application/xml" );
 
         /*
          * new StringPart( "r", repositoryId ), new StringPart( "g", gav.getGroupId() ), new StringPart( "a",
