@@ -58,6 +58,11 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
         mapping: 'type',
         convert: function( v, rec ) { return v.toLowerCase(); }
       },
+      {
+        name: 'displayMixedResolution',
+        mapping: 'isMixed',
+        convert: function( v, rec ) { return v ? rec.mixResolution.toLowerCase() : ''; }
+      },
       { name: 'import', type: 'bool', defaultValue: true }
     ]
   } );
@@ -114,7 +119,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
   var mergeWithColumn = new mergeWithColumnClass( {
     header: 'Merge With', 
     dataIndex: 'mergeSimilarRepository', 
-    width: 100
+    width: 120
   } );
 
   var userImportColumn = new Ext.grid.CheckColumn( {
@@ -264,7 +269,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                       { header: 'Type', dataIndex: 'displayType', width: 55 },
                       mapUrlsColumn,
                       copyCachedArtifactsColumn,
-                      { header: 'Mix Resolution', dataIndex: 'mixResolution', width: 100 },
+                      { header: 'Releases/Snapshots', dataIndex: 'displayMixedResolution', width: 120 },
                       mergeWithColumn
                     ]
                   }
