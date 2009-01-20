@@ -21,6 +21,96 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
   };
   Ext.apply( this, config, defaultConfig );
 
+  this.groupStore = new Ext.data.JsonStore( {
+    id: 'groupId',
+    autoLoad: false,
+    sortInfo: { field: 'groupId', direction: 'ASC' },
+    data: [],
+    fields: [
+      { name: 'groupId', sortType:Ext.data.SortTypes.asUCString },
+      { name: 'repositoryTypeResolution' },
+      { name: 'isMixed' },
+      { 
+        name: 'displayType',
+        mapping: 'repositoryTypeResolution',
+        convert: function( v, rec ) { return v.toLowerCase().replace( /_/g, ' ' ); }
+      },
+      { name: 'import', type: 'bool', defaultValue: true }
+    ]
+  } );
+
+  this.repoStore = new Ext.data.JsonStore( {
+    id: 'repositoryId',
+    autoLoad: false,
+    sortInfo: { field: 'repositoryId', direction: 'ASC' },
+    data: [],
+    fields: [
+      { name: 'repositoryId', sortType:Ext.data.SortTypes.asUCString },
+      { name: 'type' },
+      { name: 'mapUrls', type: 'bool' },
+      { name: 'copyCachedArtifacts', type: 'bool' },
+      { name: 'similarRepositoryId' },
+      { name: 'mergeSimilarRepository' },
+      { name: 'isMixed' },
+      { name: 'mixResolution' },
+      { 
+        name: 'displayType',
+        mapping: 'type',
+        convert: function( v, rec ) { return v.toLowerCase(); }
+      },
+      { name: 'import', type: 'bool', defaultValue: true }
+    ]
+  } );
+
+  this.userStore = new Ext.data.JsonStore( {
+    id: 'id',
+    autoLoad: false,
+    sortInfo: { field: 'id', direction: 'ASC' },
+    data: [],
+    fields: [
+      { name: 'id', sortType:Ext.data.SortTypes.asUCString },
+      { name: 'email' },
+      { name: 'isAdmin', type: 'bool' },
+      { name: 'import', type: 'bool', defaultValue: true }
+    ]
+  } );
+
+  var groupImportColumn = new Ext.grid.CheckColumn( {
+    header: 'Import',
+    dataIndex: 'import',
+    width: 45
+  } );
+
+  var repoImportColumn = new Ext.grid.CheckColumn( {
+    header: 'Import',
+    dataIndex: 'import',
+    width: 45
+  } );
+
+  var mapUrlsColumn = new Ext.grid.CheckColumn( {
+    header: 'Map URLs',
+    dataIndex: 'mapUrls',
+    width: 70
+  } );
+
+  var copyCachedArtifactsColumn = new Ext.grid.CheckColumn( {
+    header: 'Copy Cached Artifacts',
+    dataIndex: 'copyCachedArtifacts',
+    width: 120
+  } );
+
+  var userImportColumn = new Ext.grid.CheckColumn( {
+    header: 'Import',
+    dataIndex: 'import',
+    width: 45
+  } );
+
+  var adminColumn = new Ext.grid.CheckColumn( {
+    header: 'Admin',
+    dataIndex: 'isAdmin',
+    width: 45
+  } );
+
   this.formPanel = new Ext.form.FormPanel( {
     region: 'center',
     trackResetOnLoad: true,
@@ -28,7 +118,6 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
     border: false,
     frame: true,
     width: '100%',
-//    autoWidth: true,
     collapsible: false,
     collapsed: false,
     labelWidth: 175,
@@ -110,6 +199,83 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                 style: 'padding-bottom: 10px',
                 cls: 'x-form-item',
                 html: 'Select groups and repositories you wish to import:'
+              },
+              {
+                height: 164,
+                width: 'auto',
+                autoScroll: true,
+                layout: 'border',
+                items: [ 
+                  {
+                    xtype: 'grid',
+                    title: 'Groups',
+                    region: 'center',
+                    frame: true,
+                    ds: this.groupStore,
+                    sortInfo: { field: 'groupId', direction: 'asc' },
+                    loadMask: true,
+                    deferredRender: true,
+                    plugins: groupImportColumn,
+                    columns: [
+                      groupImportColumn,
+                      { header: 'Group ID', dataIndex: 'groupId', width: 200 },
+                      { header: 'Type', dataIndex: 'displayType', width: 200 }
+                    ]
+                  }
+                ]
+              },
+              {
+                height: 200,
+                width: 'auto',
+                autoScroll: true,
+                layout: 'border',
+                items: [
+                  {
+                    xtype: 'grid',
+                    title: 'Repositories',
+                    region: 'center',
+                    frame: true,
+                    ds: this.repoStore,
+                    sortInfo: { field: 'repositoryId', direction: 'asc' },
+                    loadMask: true,
+                    deferredRender: true,
+                    plugins: [ repoImportColumn, mapUrlsColumn, copyCachedArtifactsColumn ],
+                    columns: [
+                      repoImportColumn,
+                      { header: 'Repository ID', dataIndex: 'repositoryId', width: 200 },
+                      { header: 'Type', dataIndex: 'displayType', width: 55 },
+                      mapUrlsColumn,
+                      copyCachedArtifactsColumn,
+                      { header: 'Mix Resolution', dataIndex: 'mixResolution', width: 100 },
+                      { header: 'Merge With', dataIndex: 'similarRepositoryId', width: 100 }
+                    ]
+                  }
+                ]
+              },
+              {
+                height: 164,
+                width: 'auto',
+                autoScroll: true,
+                layout: 'border',
+                items: [
+                  {
+                    xtype: 'grid',
+                    title: 'Users',
+                    region: 'center',
+                    frame: true,
+                    ds: this.userStore,
+                    sortInfo: { field: 'id', direction: 'asc' },
+                    loadMask: true,
+                    deferredRender: true,
+                    plugins: [ userImportColumn, adminColumn ],
+                    columns: [
+                      userImportColumn,
+                      { header: 'User ID', dataIndex: 'id', width: 200 },
+                      { header: 'Email', dataIndex: 'email', width: 200 },
+                      adminColumn
+                    ]
+                  }
+                ]
               }
             ]
           }
@@ -142,160 +308,17 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
   cancelImport: function() {
     Sonatype.view.mainTabPanel.remove( this.id, true );
   },
-  
-  cleanupImportForm: function() {
-    var fieldset = this.findById( 'artifactory-import-step2-fieldset' );
-    if ( this.importPanel ) {
-      fieldset.remove( this.importPanel );
-      this.importPanel = null;
-    }
-    fieldset.collapse();
 
-    this.findById( 'artifactory-import-browse-button' ).enable();
-  },
+  loadImportData: function( data ) {
+    this.importData = data;
+    this.groupStore.loadData( data.groupsResolution );
+    this.repoStore.loadData( data.repositoriesResolution );
+    this.userStore.loadData( data.userResolution );
 
-  createImportForm: function( data ) {
     var fieldset1 = this.findById( 'artifactory-import-step1-fieldset' );
     var fieldset2 = this.findById( 'artifactory-import-step2-fieldset' );
     fieldset2.expand();
-    
-    this.importData = data;
-    this.importPanel = new Ext.Panel( {
-      items: [
-        {
-          xtype: 'hidden',
-          name: 'backupLocation',
-          value: data.backupLocation
-        },
-        {
-          xtype: 'hidden',
-          name: 'resolvePermission',
-          value: data.resolvePermission
-        }
-      ]
-    } );
-    this.createGroupForms( data.groupsResolution );
-    this.createRepositoryForms( data.repositoriesResolution );
-    this.createUserForms( data.userResolution );
-    fieldset2.add( this.importPanel );
-    this.doLayout();
     fieldset1.setWidth( fieldset2.getSize().width ); // weird layout issue, fieldset1 wouldn't resize without this
-  },
-
-  createGroupForms: function( groups ) {
-    if ( groups && groups.length > 0 ) {
-      var items = [];
-      for ( var i = 0; i < groups.length; i++ ) {
-        var group = groups[i];
-        var prefix = 'groupsResolution_' + i;
-        items.push( {
-          xtype: 'checkbox',
-          hideLabel: true,
-          boxLabel: group.groupId + ' (' + group.repositoryTypeResolution.toLowerCase().replace( /_/g, ' ' ) + ')',
-          name: prefix,
-          checked: true
-        } );
-      }
-
-      this.importPanel.add( {
-        xtype: 'fieldset',
-        checkboxToggle: true,
-        checked: true,
-        name: 'groupsResolution',
-        title: 'Groups',
-        anchor: Sonatype.view.FIELDSET_OFFSET_WITH_SCROLL,
-        autoHeight: true,
-        items: items
-      } );
-    }
-  },
-
-  createRepositoryForms: function( repositories ) {
-    if ( repositories && repositories.length > 0 ) {
-      var items = [];
-      for ( var i = 0; i < repositories.length; i++ ) {
-        var repo = repositories[i];
-        var prefix = 'repositoriesResolution_' + i;
-        items.push( {
-          xtype: 'fieldset',
-          checkboxToggle: true,
-          checked: true,
-          border: false,
-          name: prefix,
-          title: repo.repositoryId + ' (' + repo.type.toLowerCase() + ')',
-          anchor: Sonatype.view.FIELDSET_OFFSET_WITH_SCROLL,
-          autoHeight: true,
-          labelWidth: 40,
-          layoutConfig: {
-            labelSeparator: ''
-          },
-  
-          items: [
-            {
-              style: 'padding-left: 30px',
-              xtype: 'checkbox',
-              boxLabel: 'Map URLs',
-              name: prefix + '.mapUrls',
-              checked: repo.mapUrls
-            },
-            {
-              style: 'padding-left: 30px',
-              xtype: 'checkbox',
-              boxLabel: 'Copy Cached Artifacts',
-              name: prefix + '.copyCachedArtifacts',
-              checked: repo.copyCachedArtifacts
-            }
-          ]
-        } );
-      }
-
-      this.importPanel.add( {
-        xtype: 'fieldset',
-        checkboxToggle: true,
-        checked: true,
-        name: 'repositoriesResolution',
-        title: 'Repositories',
-        anchor: Sonatype.view.FIELDSET_OFFSET_WITH_SCROLL,
-        autoHeight: true,
-        items: items
-      } );
-    }
-  },
-
-  createUserForms: function( users ) {
-    if ( users && users.length > 0 ) {
-      var items = [];
-      for ( var i = 0; i < users.length; i++ ) {
-        var user = users[i];
-        var prefix = 'userResolution_' + i;
-        var text = user.id;
-        user.email = 'bebe@bebe.be';
-        if ( user.email ) {
-          text += ' <a href="mailto:' + user.email + '">&lt;' + user.email + '&gt;</a>';
-        }
-        if ( user.isAdmin ) {
-          text += ' (admin)';
-        }
-        items.push( {
-          xtype: 'checkbox',
-          hideLabel: true,
-          boxLabel: text,
-          name: prefix,
-          checked: true
-        } );
-      }
-
-      this.importPanel.add( {
-        xtype: 'fieldset',
-        checkboxToggle: true,
-        checked: true,
-        name: 'userResolution',
-        title: 'Users',
-        anchor: Sonatype.view.FIELDSET_OFFSET_WITH_SCROLL,
-        autoHeight: true,
-        items: items
-      } );
-    }
   },
 
   uploadBackup: function() {
@@ -321,7 +344,7 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
         if ( response.responseXML.title == '' ) {
           var r = Ext.decode( response.responseText );
           if ( r.data ) {
-            this.createImportForm( r.data );
+            this.loadImportData( r.data );
             return;
           }
         }
