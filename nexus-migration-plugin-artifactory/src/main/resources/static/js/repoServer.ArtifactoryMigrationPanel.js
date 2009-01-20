@@ -98,6 +98,24 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
     dataIndex: 'copyCachedArtifacts',
     width: 120
   } );
+  
+  var mergeWithColumnClass = Ext.extend( Ext.grid.CheckColumn, {
+    renderer: function( v, p, record, rowIndex ) {
+      if ( record.data.similarRepositoryId ) {
+        p.css += ' x-grid3-check-col-td'; 
+        return '<div style="padding-left:16px; background-position: center left;" class="x-grid3-check-col'+(v?'-on':'')+' x-grid3-cc-'+this.id+'">' + record.data.similarRepositoryId + '</div>';
+      }
+      else {
+        return '';
+      }
+    }
+  } );
+  
+  var mergeWithColumn = new mergeWithColumnClass( {
+    header: 'Merge With', 
+    dataIndex: 'mergeSimilarRepository', 
+    width: 100
+  } );
 
   var userImportColumn = new Ext.grid.CheckColumn( {
     header: 'Import',
@@ -239,7 +257,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                     sortInfo: { field: 'repositoryId', direction: 'asc' },
                     loadMask: true,
                     deferredRender: true,
-                    plugins: [ repoImportColumn, mapUrlsColumn, copyCachedArtifactsColumn ],
+                    plugins: [ repoImportColumn, mapUrlsColumn, copyCachedArtifactsColumn, mergeWithColumn ],
                     columns: [
                       repoImportColumn,
                       { header: 'Repository ID', dataIndex: 'repositoryId', width: 200 },
@@ -247,7 +265,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                       mapUrlsColumn,
                       copyCachedArtifactsColumn,
                       { header: 'Mix Resolution', dataIndex: 'mixResolution', width: 100 },
-                      { header: 'Merge With', dataIndex: 'similarRepositoryId', width: 100 }
+                      mergeWithColumn
                     ]
                   }
                 ]
