@@ -198,7 +198,7 @@ public class SecurityConfigConvertorTest
         Assert.assertEquals( "arti-admin", admin.getId() );
         Assert.assertEquals( "5f4dcc3b5aa765d61d8327deb882cf99", admin.getPassword() );
         Assert.assertEquals( "arti-admin", admin.getName() );
-        Assert.assertTrue( StringUtils.isEmpty( admin.getEmail() ) );
+        Assert.assertEquals( "changeme@yourcompany.com", admin.getEmail() );
         Assert.assertEquals( "active", admin.getStatus() );
 
         Assert.assertTrue( admin.getRoles().contains( "admin" ) );
@@ -215,7 +215,7 @@ public class SecurityConfigConvertorTest
         Assert.assertEquals( "arti-user", user.getId() );
         Assert.assertEquals( "arti-user", user.getName() );
         Assert.assertEquals("5f4dcc3b5aa765d61d8327deb882cf99", user.getPassword());
-        Assert.assertTrue( StringUtils.isEmpty( user.getEmail() ) );
+        Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
         Assert.assertEquals( "active", user.getStatus() );
 
         Assert.assertEquals( 5, user.getRoles().size() );

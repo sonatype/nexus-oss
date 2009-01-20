@@ -24,7 +24,7 @@ public class ArtifactoryUser
      */
     private String password;
 
-    private String email = "";
+    private String email = "changeme@yourcompany.com";
 
     private boolean isAdmin = false;
 
