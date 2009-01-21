@@ -350,6 +350,12 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                     ]
                   }
                 ]
+              },
+              {
+                xtype: 'checkbox',
+                boxLabel: 'Import Permissions',
+                hideLabel: true,
+                name: 'resolvePermission'
               }
             ]
           }
@@ -390,6 +396,7 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
     this.groupStore.loadData( data.groupsResolution );
     this.repoStore.loadData( data.repositoriesResolution );
     this.userStore.loadData( data.usersResolution );
+    this.formPanel.form.setValues( { resolvePermission: data.resolvePermission } );
 
     var fieldset1 = this.findById( 'artifactory-import-step1-fieldset' );
     var fieldset2 = this.findById( 'artifactory-import-step2-fieldset' );
@@ -403,6 +410,7 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
 
     var data = {
       backupLocation: this.importData.backupLocation,
+      resolvePermission: this.formPanel.form.findField( 'resolvePermission' ).checked,
       groupsResolution: [],
       repositoriesResolution: [],
       usersResolution: []
@@ -432,7 +440,7 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
         } );
       }
     }, this );
-    
+
     this.userStore.each( function( rec ) {
       if ( rec.data.import ) {
         data.usersResolution.push( {
@@ -490,10 +498,8 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
         //success = true
         if ( response.responseXML.title == '' ) {
           var r = Ext.decode( response.responseText );
-          if ( r.data ) {
-            this.loadImportData( r.data );
-            return;
-          }
+          this.loadImportData( r.data );
+          return;
         }
 
         var s = 'Artifact upload failed.<br />';
