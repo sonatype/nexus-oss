@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.plugin.migration.artifactory.dto;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias( "userResolution" )
 public class UserResolutionDTO
 {
 

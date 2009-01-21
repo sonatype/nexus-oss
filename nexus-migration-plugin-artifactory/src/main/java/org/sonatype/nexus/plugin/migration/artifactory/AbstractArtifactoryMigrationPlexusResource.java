@@ -19,6 +19,7 @@ import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRespo
 import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -42,6 +43,18 @@ public abstract class AbstractArtifactoryMigrationPlexusResource
         xstream.processAnnotations( RepositoryResolutionDTO.class );
         xstream.processAnnotations( GroupResolutionDTO.class );
         xstream.processAnnotations( UserResolutionDTO.class );
+
+        xstream.registerLocalConverter( MigrationSummaryDTO.class, "usersResolution", new AliasingListConverter(
+            UserResolutionDTO.class,
+            "usersResolution" ) );
+
+        xstream.registerLocalConverter( MigrationSummaryDTO.class, "repositoriesResolution", new AliasingListConverter(
+            RepositoryResolutionDTO.class,
+            "repositoriesResolution" ) );
+
+        xstream.registerLocalConverter( MigrationSummaryDTO.class, "groupsResolution", new AliasingListConverter(
+            GroupResolutionDTO.class,
+            "groupsResolution" ) );
     }
 
 }
