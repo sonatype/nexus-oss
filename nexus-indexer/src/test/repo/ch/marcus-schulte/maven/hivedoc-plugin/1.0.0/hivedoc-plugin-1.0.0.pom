@@ -1,0 +1,94 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ch.marcus-schulte.maven</groupId>
+  <artifactId>hivedoc-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <version>1.0.0</version>
+  <name>hivedoc-plugin for Maven</name>
+  <description>A plugin to generate Maven-site-docs for HiveMind descriptors</description>
+  <url>http://www.marcus-schulte.ch</url>
+    <developers>
+	  <developer> 
+      <id>MS</id>
+      <name>Marcus Schulte</name> 
+      <email>marcus-schulte@s-i.ch</email>
+    </developer> 
+  </developers>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:svn:http://svn.javaforge.com/svn/</connection>
+    <url>http://svn.javaforge.com/svn/</url>
+  </scm>
+  <organization>
+    <name>marcus-schulte</name>
+    <url>http://marcus-schulte.ch</url>
+  </organization>
+  <build>
+		<plugins>
+			<plugin> 
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>	
+  <dependencies>
+    <dependency>
+		<groupId>xom</groupId>
+        <artifactId>xom</artifactId>
+        <version>1.1</version>
+	</dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>2.0</version>
+    </dependency>
+     <dependency>
+      <groupId>org.apache.maven.reporting</groupId>
+      <artifactId>maven-reporting-impl</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.doxia</groupId>
+      <artifactId>doxia-site-renderer</artifactId>
+      <version>1.0-alpha-8</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.doxia</groupId>
+      <artifactId>doxia-sink-api</artifactId>
+      <version>1.0-alpha-8</version> 
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+    
+    <distributionManagement>
+		<repository>
+			<id>myrepo</id>
+			<name>Local  Repository</name>
+			<url>file:/Users/marcus/Honeycombrepo</url>
+		</repository>
+		<site>
+			<url>file:/Users/marcus/hivedocsite</url>
+		</site>
+	</distributionManagement>
+</project>
