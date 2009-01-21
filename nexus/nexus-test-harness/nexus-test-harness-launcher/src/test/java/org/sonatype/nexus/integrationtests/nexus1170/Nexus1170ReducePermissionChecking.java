@@ -14,7 +14,9 @@
 package org.sonatype.nexus.integrationtests.nexus1170;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -22,6 +24,9 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.sonatype.jsecurity.model.CProperty;
+import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -34,6 +39,25 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 public class Nexus1170ReducePermissionChecking
     extends AbstractNexusIntegrationTest
 {
+    
+    @SuppressWarnings("unchecked")
+    private int getExpectedPrivilegeCount() throws Exception
+    {
+        ConfigurationManager configManager = (ConfigurationManager) TestContainer.getInstance().lookup( ConfigurationManager.class, "resourceMerging");
+        
+        Set<String> privIds = new HashSet<String>();
+        for ( SecurityPrivilege priv : configManager.listPrivileges() )
+        {
+            for ( CProperty prop : (List<CProperty>) priv.getProperties() )
+            {
+                if ( prop.getKey().equals( "permission" ) )
+                {
+                    privIds.add( prop.getValue() );
+                }
+            }
+        }
+        return privIds.size();
+    }
 
     public Nexus1170ReducePermissionChecking()
     {
@@ -48,7 +72,7 @@ public class Nexus1170ReducePermissionChecking
 
         List<ClientPermission> permissions = this.getPermissions();
         
-        Assert.assertEquals( 40, permissions.size() );
+        Assert.assertEquals( this.getExpectedPrivilegeCount(), permissions.size() );
 
         for ( ClientPermission clientPermission : permissions )
         {
@@ -65,7 +89,7 @@ public class Nexus1170ReducePermissionChecking
 
         List<ClientPermission> permissions = this.getPermissions();
 
-        Assert.assertEquals( 40, permissions.size() );
+        Assert.assertEquals( this.getExpectedPrivilegeCount(), permissions.size() );
         this.checkPermission( permissions, "nexus:*", 0 );
         this.checkPermission( permissions, "nexus:status", 1 );
         this.checkPermission( permissions, "nexus:authentication", 1 );
