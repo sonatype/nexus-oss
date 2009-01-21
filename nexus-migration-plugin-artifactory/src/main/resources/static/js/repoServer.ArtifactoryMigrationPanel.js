@@ -21,6 +21,16 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
   };
   Ext.apply( this, config, defaultConfig );
 
+  var mixResolutionStore = new Ext.data.SimpleStore( {
+    fields: ['value'], 
+    data: [['releases only'], ['snapshots only'], ['both']]
+  } );
+
+  var typeResolutionStore = new Ext.data.SimpleStore( {
+    fields: ['value'], 
+    data: [['maven 1 only'], ['maven 2 only'], ['virtual both']]
+  } );
+
   this.groupStore = new Ext.data.JsonStore( {
     id: 'groupId',
     autoLoad: false,
@@ -30,10 +40,10 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
       { name: 'groupId', sortType:Ext.data.SortTypes.asUCString },
       { name: 'repositoryTypeResolution' },
       { name: 'isMixed' },
-      { 
+      {
         name: 'displayType',
-        mapping: 'repositoryTypeResolution',
-        convert: function( v, rec ) { return v.toLowerCase().replace( /_/g, ' ' ); }
+        mapping: 'isMixed',
+        convert: function( v, rec ) { return v ? rec.repositoryTypeResolution.toLowerCase().replace( /_/g, ' ' ) : ''; }
       },
       { name: 'import', type: 'bool', defaultValue: true }
     ]
@@ -61,7 +71,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
       {
         name: 'displayMixedResolution',
         mapping: 'isMixed',
-        convert: function( v, rec ) { return v ? rec.mixResolution.toLowerCase() : ''; }
+        convert: function( v, rec ) { return v ? rec.mixResolution.toLowerCase().replace( /_/g, ' ' ) : ''; }
       },
       { name: 'import', type: 'bool', defaultValue: true }
     ]
@@ -230,7 +240,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                 layout: 'border',
                 items: [ 
                   {
-                    xtype: 'grid',
+                    xtype: 'editorgrid',
                     title: 'Groups',
                     region: 'center',
                     frame: true,
@@ -238,11 +248,28 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                     sortInfo: { field: 'groupId', direction: 'asc' },
                     loadMask: true,
                     deferredRender: true,
+                    clicksToEdit: 1,
                     plugins: groupImportColumn,
                     columns: [
                       groupImportColumn,
                       { header: 'Group ID', dataIndex: 'groupId', width: 200 },
-                      { header: 'Type', dataIndex: 'displayType', width: 200 }
+                      { 
+                        header: 'Content Type Resolution', 
+                        dataIndex: 'displayType', 
+                        width: 200, 
+                        editor: new Ext.form.ComboBox( {
+                          typeAhead: true,
+                          forceSelection: true,
+                          selectOnFocus: true,
+                          triggerAction: 'all',
+                          store: typeResolutionStore,
+                          mode: 'local',
+                          displayField: 'value',
+                          valueField: 'value',
+                          lazyRender: true,
+                          listClass: 'x-combo-list-small'
+                        } )
+                      }
                     ]
                   }
                 ]
@@ -254,7 +281,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                 layout: 'border',
                 items: [
                   {
-                    xtype: 'grid',
+                    xtype: 'editorgrid',
                     title: 'Repositories',
                     region: 'center',
                     frame: true,
@@ -262,6 +289,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                     sortInfo: { field: 'repositoryId', direction: 'asc' },
                     loadMask: true,
                     deferredRender: true,
+                    clicksToEdit: 1,
                     plugins: [ repoImportColumn, mapUrlsColumn, copyCachedArtifactsColumn, mergeWithColumn ],
                     columns: [
                       repoImportColumn,
@@ -269,9 +297,31 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                       { header: 'Type', dataIndex: 'displayType', width: 55 },
                       mapUrlsColumn,
                       copyCachedArtifactsColumn,
-                      { header: 'Releases/Snapshots', dataIndex: 'displayMixedResolution', width: 120 },
+                      { 
+                        header: 'Releases/Snapshots', 
+                        dataIndex: 'displayMixedResolution', 
+                        width: 120, 
+                        editor: new Ext.form.ComboBox( {
+                          typeAhead: true,
+                          forceSelection: true,
+                          selectOnFocus: true,
+                          triggerAction: 'all',
+                          store: mixResolutionStore,
+                          mode: 'local',
+                          displayField: 'value',
+                          valueField: 'value',
+                          lazyRender: true,
+                          listClass: 'x-combo-list-small'
+                        } )
+                      },
                       mergeWithColumn
-                    ]
+                    ],
+                    listeners: {
+                      beforeedit: function( e ) {
+                        return e.value != '';
+                      },
+                      scope: this
+                    }
                   }
                 ]
               },
@@ -282,7 +332,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                 layout: 'border',
                 items: [
                   {
-                    xtype: 'grid',
+                    xtype: 'editorgrid',
                     title: 'Users',
                     region: 'center',
                     frame: true,
