@@ -473,6 +473,23 @@ public abstract class AbstractProxyRepository
                             // let the user do proper setup and probably it will try again
                             shouldGetRemote = false;
                         }
+                        catch ( StorageException ex )
+                        {
+                            getLogger()
+                                .warn(
+                                    "RemoteStorage of repository "
+                                        + getId()
+                                        + " throws StorageException. Problem connecting to remote repository='"
+                                        + this.getId()
+                                        + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
+                                    ex );
+
+                            autoBlockProxying( ex );
+
+                            // do not go remote, but we did not mark it as "remote checked" also.
+                            // let the user do proper setup and probably it will try again
+                            shouldGetRemote = false;
+                        }
                     }
                     else
                     {

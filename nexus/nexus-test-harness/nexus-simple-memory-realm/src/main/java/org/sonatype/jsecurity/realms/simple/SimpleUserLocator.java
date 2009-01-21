@@ -19,6 +19,7 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
 import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
+import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 
 /**
  * This is a simple implementation that will expose a custom user store as PlexusUsers. A plexusUserLocator exposes
@@ -97,14 +98,14 @@ public class SimpleUserLocator
         
         return users;
     }
-
-    public Set<PlexusUser> searchUserById( String userId )
+    
+    public Set<PlexusUser> searchUsers( PlexusUserSearchCriteria criteria )
     {
         // this is expected to be a starts with search, so 'jcod' would find 'jcoder'
         Set<PlexusUser> users = new HashSet<PlexusUser>();
         for ( SimpleUser user : this.userStore.getAllUsers() )
         {
-            if( user.getUserId().toLowerCase().startsWith( userId.toLowerCase() ))
+            if( user.getUserId().toLowerCase().startsWith( criteria.getUserId().toLowerCase() ))
             {
                 users.add( this.toPlexusUser( user ) );
             }

@@ -3005,6 +3005,41 @@
     </class>
     
     <class>
+      <name>PlexusUserSearchCriteriaResourceRequest</name>
+      <version>1.0.0+</version>
+      <superClass>NexusResponse</superClass>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>PlexusUserSearchCriteriaResource</type>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>PlexusUserSearchCriteriaResource</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>userId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
+          <name>effectiveUsers</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>false</required>
+        </field>
+      </fields>
+    </class>  
+    
+    <class>
       <name>PlexusRoleResource</name>
       <version>1.0.0+</version>
       <fields>

@@ -19,33 +19,33 @@ import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.PlexusUserManager;
-import org.sonatype.nexus.rest.model.PlexusUserListResourceResponse;
-import org.sonatype.nexus.rest.model.PlexusUserResource;
+import org.sonatype.jsecurity.locators.users.PlexusRoleLocator;
+import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.nexus.rest.model.PlexusUserSearchCriteriaResource;
+import org.sonatype.nexus.rest.model.PlexusUserSearchCriteriaResourceRequest;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "UserSearchPlexusResource" )
-public class UserSearchPlexusResource extends AbstractPlexusUserPlexusResource
+public class UserSearchPlexusResource
+    extends AbstractUserSearchPlexusResource
 {
     public static final String USER_ID_KEY = "userId";
-    
+
     public static final String USER_SOURCE_KEY = "userSource";
     
-    @Requirement( role = PlexusUserManager.class, hint="additinalRoles" )
-    private PlexusUserManager userManager;
-    
+    @Requirement
+    private PlexusRoleLocator roleLocator;
+
     public UserSearchPlexusResource()
     {
-        setModifiable( false );
+        setModifiable( true );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
-        return null;
+        return new PlexusUserSearchCriteriaResourceRequest();
     }
 
     @Override
@@ -57,36 +57,34 @@ public class UserSearchPlexusResource extends AbstractPlexusUserPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/user_search/{" + USER_SOURCE_KEY +"}/{" + USER_ID_KEY + "}";
+        return "/user_search/{" + USER_SOURCE_KEY + "}";
     }
 
     @Override
-    public Object get( Context context, Request request, Response response, Variant variant )
+    public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
-        PlexusUserListResourceResponse result = new PlexusUserListResourceResponse();
+        PlexusUserSearchCriteriaResource criteriaResource = ( (PlexusUserSearchCriteriaResourceRequest) payload )
+            .getData();
+
+        PlexusUserSearchCriteria criteria = this.toPlexusSearchCriteria( criteriaResource );
+
+        return this.search( criteria, this.getUserSource( request ) );
+    }
+    
+    private PlexusUserSearchCriteria toPlexusSearchCriteria( PlexusUserSearchCriteriaResource criteriaResource )
+    {
+        PlexusUserSearchCriteria criteria = new PlexusUserSearchCriteria();
+        criteria.setUserId( criteriaResource.getUserId() );
         
-        for ( PlexusUser user : userManager.searchUserById( this.getSearchArg( request ), this.getUserSource( request ) ) )
+        // NOTE: in the future we could expand the REST resource to send back a list of roles, (or a single role)
+        // to get a list of all users of Role 'XYZ'
+        if( criteriaResource.isEffectiveUsers() )
         {
-            PlexusUserResource res = nexusToRestModel( user, request );
-
-            if ( res != null )
-            {
-                result.addData( res );
-            }
+            criteria.setOneOfRoleIds( this.roleLocator.listRoleIds() );
         }
+        
+        return criteria;
+    }
 
-        return result;
-    }
-    
-    protected String getUserSource( Request request )
-    {
-        return request.getAttributes().get( USER_SOURCE_KEY ).toString();
-    }
-    
-    protected String getSearchArg( Request request )
-    {
-        return request.getAttributes().get( USER_ID_KEY ).toString();
-    }
-    
 }

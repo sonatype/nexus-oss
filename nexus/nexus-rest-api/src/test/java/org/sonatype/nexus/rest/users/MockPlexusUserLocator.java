@@ -19,6 +19,7 @@ import java.util.Set;
 import org.sonatype.jsecurity.locators.users.PlexusRole;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
 import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
+import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 
 public class MockPlexusUserLocator implements PlexusUserLocator
 {
@@ -102,21 +103,19 @@ public class MockPlexusUserLocator implements PlexusUserLocator
         return result;
     }
 
-    public Set<PlexusUser> searchUserById( String userId )
+    public Set<PlexusUser> searchUsers( PlexusUserSearchCriteria criteria )
     {
-        // TODO: not sure what this should actually be... regex?
 
         Set<PlexusUser> result = new HashSet<PlexusUser>();
         for ( PlexusUser plexusUser : this.listUsers() )
         {
-            if ( plexusUser.getUserId().toLowerCase().startsWith( userId.toLowerCase() ) )
+            if ( plexusUser.getUserId().toLowerCase().startsWith( criteria.getUserId() ) );
             {
                 result.add( plexusUser );
             }
         }
         return result;
     }
-
     protected PlexusRole createFakeRole( String roleId )
     {
         PlexusRole role = new PlexusRole();

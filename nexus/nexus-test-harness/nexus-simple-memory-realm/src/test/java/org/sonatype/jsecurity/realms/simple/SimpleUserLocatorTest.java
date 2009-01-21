@@ -20,6 +20,7 @@ import junit.framework.Assert;
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
 import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
+import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 
 public class SimpleUserLocatorTest
     extends PlexusTestCase
@@ -37,7 +38,7 @@ public class SimpleUserLocatorTest
     {
         PlexusUserLocator userLocator = this.lookup( PlexusUserLocator.class, "Simple" );
 
-        Set<PlexusUser> result = userLocator.searchUserById( "adm" );
+        Set<PlexusUser> result = userLocator.searchUsers( new PlexusUserSearchCriteria( "adm" ) );
         Assert.assertEquals( 1, result.size() );
         // your test could be a bit more robust
         Assert.assertEquals( result.iterator().next().getUserId(), "admin-simple" );

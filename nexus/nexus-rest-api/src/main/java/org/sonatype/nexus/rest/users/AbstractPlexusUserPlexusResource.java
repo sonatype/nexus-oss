@@ -13,7 +13,6 @@
  */
 package org.sonatype.nexus.rest.users;
 
-import org.restlet.data.Request;
 import org.sonatype.jsecurity.locators.users.PlexusRole;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
@@ -23,7 +22,7 @@ import org.sonatype.nexus.rest.model.PlexusUserResource;
 public abstract class AbstractPlexusUserPlexusResource
     extends AbstractNexusPlexusResource
 {
-    protected PlexusUserResource nexusToRestModel( PlexusUser user, Request request )
+    protected PlexusUserResource nexusToRestModel( PlexusUser user )
     {
         PlexusUserResource resource = new PlexusUserResource();
         

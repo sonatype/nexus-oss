@@ -492,6 +492,12 @@ public class NexusApplication
             PlexusRoleResource.class,
             "plexus-role" ) );
 
+        
+        xstream.omitField( PlexusUserSearchCriteriaResourceRequest.class, "modelEncoding" );
+        xstream.alias( "user-search", PlexusUserSearchCriteriaResourceRequest.class );
+        xstream.omitField( PlexusUserSearchCriteriaResource.class, "modelEncoding" );
+        
+        
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );
         xstream.omitField( ModelBase.class, "modelEncoding" );

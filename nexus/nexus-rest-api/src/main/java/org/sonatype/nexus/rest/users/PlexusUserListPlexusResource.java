@@ -67,7 +67,7 @@ public class PlexusUserListPlexusResource
         
         for ( PlexusUser user : userManager.listUsers( getUserSource( request ) ) )
         {
-            PlexusUserResource res = nexusToRestModel( user, request );
+            PlexusUserResource res = nexusToRestModel( user );
 
             if ( res != null )
             {

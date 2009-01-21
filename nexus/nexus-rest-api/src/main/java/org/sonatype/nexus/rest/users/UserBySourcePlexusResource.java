@@ -75,7 +75,7 @@ public static final String USER_ID_KEY = "userId";
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
         }
         
-        PlexusUserResource resource = nexusToRestModel( user, request );
+        PlexusUserResource resource = nexusToRestModel( user );
         
         result.setData( resource );
             
