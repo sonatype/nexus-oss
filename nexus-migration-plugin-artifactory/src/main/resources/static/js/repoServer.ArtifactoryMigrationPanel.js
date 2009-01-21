@@ -86,6 +86,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
       { name: 'id', sortType:Ext.data.SortTypes.asUCString },
       { name: 'email' },
       { name: 'isAdmin', type: 'bool' },
+      { name: 'password' },
       { name: 'import', type: 'bool', defaultValue: true }
     ]
   } );
@@ -358,7 +359,9 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
     buttons: [
       {
         text: 'Start Import',
-        disabled: true
+        disabled: true,
+        handler: this.startImport,
+        scope: this
       },
       {
         text: 'Cancel',
@@ -392,6 +395,77 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
     var fieldset2 = this.findById( 'artifactory-import-step2-fieldset' );
     fieldset2.expand();
     fieldset1.setWidth( fieldset2.getSize().width ); // weird layout issue, fieldset1 wouldn't resize without this
+    this.formPanel.buttons[0].enable();
+  },
+  
+  startImport: function() {
+    this.el.mask( 'Importing...' );
+
+    var data = {
+      backupLocation: this.importData.backupLocation,
+      groupsResolution: [],
+      repositoriesResolution: [],
+      userResolution: []
+    };
+    
+    this.groupStore.each( function( rec ) {
+      if ( rec.data.import ) {
+        data.groupsResolution.push( {
+          groupId: rec.data.groupId,
+          isMixed: rec.data.isMixed,
+          repositoryTypeResolution: rec.data.displayType.toUpperCase().replace( /\ /g, '_' )
+        } );
+      }
+    }, this );
+    
+    this.repoStore.each( function( rec ) {
+      if ( rec.data.import ) {
+        data.repositoriesResolution.push( {
+          repositoryId: rec.data.repositoryId,
+          type: rec.data.type,
+          mapUrls: rec.data.mapUrls,
+          copyCachedArtifacts: rec.data.copyCachedArtifacts,
+          isMixed: rec.data.isMixed,
+          mixResolution: rec.data.displayMixedResolution.toUpperCase().replace( /\ /g, '_' ),
+          similarRepositoryId: rec.data.similarRepositoryId, 
+          mergeSimilarRepository: rec.data.mergeSimilarRepository
+        } );
+      }
+    }, this );
+    
+    this.userStore.each( function( rec ) {
+      if ( rec.data.import ) {
+        data.userResolution.push( {
+          id: rec.data.id,
+          email: rec.data.email,
+          password: rec.data.password,
+          isAdmin: rec.data.isAdmin
+        } );
+      }
+    }, this );
+
+    Ext.Ajax.request( {
+      method: 'POST',
+      url: Sonatype.config.servicePath + '/migration/artifactory/content',
+      jsonData: { data: data },
+      callback: function( options, success, response ) {
+        this.el.unmask();
+
+        if ( success ) {
+          var r = Ext.decode( response.responseText );
+          Sonatype.MessageBox.show( {
+            title: 'Import Successful',
+            msg: 'Artifactory backup import completed successfully',
+            buttons: Sonatype.MessageBox.OK,
+            icon: Sonatype.MessageBox.INFO
+          } );
+        }
+        else {
+          Sonatype.utils.connectionError( response, 'Artifactory import failed!' );
+        }
+      },
+      scope : this
+    } );
   },
 
   uploadBackup: function() {
