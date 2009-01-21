@@ -48,7 +48,7 @@ public class NexusArtifactEventEntryBuilder
 
         msg.append( "' in repository '" );
 
-        msg.append( event.getNexusItemInfo().getRepositoryId() );
+        msg.append( getRepositoryName( event ) );
 
         msg.append( "'" );
 

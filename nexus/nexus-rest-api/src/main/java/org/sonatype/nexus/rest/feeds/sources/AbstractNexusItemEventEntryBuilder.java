@@ -118,6 +118,24 @@ abstract public class AbstractNexusItemEventEntryBuilder
 
         return content;
     }
+    
+    protected String getRepositoryName( NexusArtifactEvent event )
+    {
+        String repoId = event.getNexusItemInfo().getRepositoryId();
+
+        try
+        {
+            Repository repository = getNexus().getRepository( repoId );
+
+            return repository.getName();
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            getLogger().warn( "Could not find Respotiroy with id '" + repoId + "'.", e );
+
+            return repoId;
+        }
+    }
 
     abstract protected String buildDescriptionMsgItem( NexusArtifactEvent event );
 

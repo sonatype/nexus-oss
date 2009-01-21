@@ -53,7 +53,7 @@ public class NexusFileEventEntryBuilder
 
         msg.append( "' in repository '" );
 
-        msg.append( event.getNexusItemInfo().getRepositoryId() );
+        msg.append( getRepositoryName( event ) );
 
         msg.append( "' with path '" );
 
