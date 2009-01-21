@@ -7,9 +7,11 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.model.CMirrors;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.rest.model.MirrorListResourceResponse;
+import org.sonatype.nexus.rest.model.MirrorResourceRequest;
+import org.sonatype.nexus.rest.model.MirrorResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -26,7 +28,7 @@ public class RepositoryMirrorListPlexusResource
     //TODO: define payload object
     public Object getPayloadInstance()
     {
-        return null;
+        return new MirrorResourceRequest();
     }
 
     @Override
@@ -46,16 +48,18 @@ public class RepositoryMirrorListPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
+        MirrorListResourceResponse dto  = new MirrorListResourceResponse();
+        
         try
         {
-            CMirrors mirrors = getNexus().readRepository( getRepositoryId( request ) ).getRemoteStorage().getMirrors();
+            CRepository repository = getNexus().readRepository( getRepositoryId( request ) );
         }
         catch ( NoSuchRepositoryException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid repository id " + getRepositoryId( request ), e);
         }
         
-        return null;
+        return dto;
     }
     
     @Override
@@ -63,16 +67,17 @@ public class RepositoryMirrorListPlexusResource
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
+        MirrorResourceResponse dto = new MirrorResourceResponse();
+        
         try
         {
             CRepository repository = getNexus().readRepository( getRepositoryId( request ) );
-            repository.getRemoteStorage().getMirrors().addUrl( "someurl" );
         }
         catch ( NoSuchRepositoryException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid repository id " + getRepositoryId( request ), e);
         }
         
-        return null;
+        return dto;
     }
 }

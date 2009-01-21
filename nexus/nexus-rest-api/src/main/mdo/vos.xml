@@ -3170,6 +3170,106 @@
 			</field>
 		</fields>
 	</class>
+    
+    <class>
+      <name>MirrorListResourceResponse</name>
+      <superClass>NexusResponse</superClass>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>MirrorResource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+  
+    <class>
+      <name>MirrorResourceRequest</name>
+      <superClass>NexusResponse</superClass>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>MirrorResource</type>
+          </association>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>MirrorResourceResponse</name>
+      <superClass>NexusResponse</superClass>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>MirrorResource</type>
+          </association>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>MirrorStatusResourceResponse</name>
+      <superClass>NexusResponse</superClass>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>MirrorStatusResource</type>
+          </association>
+        </field>
+      </fields>    
+    </class>
+  
+    <class>
+      <name>MirrorResource</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>MirrorStatusResource</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+        </field>
+        <field>
+          <name>status</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>    
 	
 	</classes>
 </model>

@@ -7,8 +7,9 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.model.CMirrors;
+import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.rest.model.MirrorStatusResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -44,15 +45,17 @@ public class RepositoryMirrorStatusPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
+        MirrorStatusResourceResponse dto = new MirrorStatusResourceResponse();
+        
         try
         {
-            CMirrors mirrors = getNexus().readRepository( getRepositoryId( request ) ).getRemoteStorage().getMirrors();
+            CRepository repository = getNexus().readRepository( getRepositoryId( request ) );
         }
         catch ( NoSuchRepositoryException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid repository id " + getRepositoryId( request ), e);
         }
         
-        return null;
+        return dto;
     }
 }
