@@ -143,6 +143,10 @@
                 <privilege>7</privilege>
                 <privilege>8</privilege>
                 <privilege>10</privilege>
+                <privilege>78</privilege>
+                <privilege>79</privilege>
+                <privilege>80</privilege>
+                <privilege>81</privilege>
             </privileges>
         </role>
         <role>
@@ -1539,6 +1543,70 @@
         			<value>nexus:logconfig</value>
         		</property>
         	</properties>
+        </privilege>
+        <privilege>
+          <id>78</id>
+          <type>method</type>
+          <name>Repository Mirrors - (read)</name>
+          <description>Give permission to read repository mirror configuration</description>
+          <properties>
+            <property>
+              <key>method</key>
+              <value>read</value>
+            </property>
+            <property>
+              <key>permission</key>
+              <value>nexus:repositorymirrors</value>
+            </property>
+          </properties>
+        </privilege>
+        <privilege>
+          <id>79</id>
+          <type>method</type>
+          <name>Repository Mirrors - (create,read)</name>
+          <description>Give permission to create repository mirror configuration</description>
+          <properties>
+            <property>
+              <key>method</key>
+              <value>create,read</value>
+            </property>
+            <property>
+              <key>permission</key>
+              <value>nexus:repositorymirrors</value>
+            </property>
+          </properties>
+        </privilege>
+        <privilege>
+          <id>80</id>
+          <type>method</type>
+          <name>Repository Mirrors - (update,read)</name>
+          <description>Give permission to update repository mirror configuration</description>
+          <properties>
+            <property>
+              <key>method</key>
+              <value>update,read</value>
+            </property>
+            <property>
+              <key>permission</key>
+              <value>nexus:repositorymirrors</value>
+            </property>
+          </properties>
+        </privilege>
+        <privilege>
+          <id>81</id>
+          <type>method</type>
+          <name>Repository Mirrors - (delete,read)</name>
+          <description>Give permission to delete repository mirror configuration</description>
+          <properties>
+            <property>
+              <key>method</key>
+              <value>delete,read</value>
+            </property>
+            <property>
+              <key>permission</key>
+              <value>nexus:repositorymirrors</value>
+            </property>
+          </properties>
         </privilege>
 		
     </privileges>
