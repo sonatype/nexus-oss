@@ -138,18 +138,18 @@ public class DefaultRepositoryConfigurator
                 List<CMirror> mirrors = ( List<CMirror> )repo.getRemoteStorage().getMirrors();
                 if ( mirrors != null && mirrors.size() > 0 )
                 {
-                    List<String> urls = new ArrayList<String>();
+                    List<Mirror> runtimeMirrors = new ArrayList<Mirror>();
                     
                     for ( CMirror mirror : mirrors )
                     {
-                        urls.add( mirror.getUrl() );  
+                        runtimeMirrors.add( new Mirror( mirror.getId(), mirror.getUrl() ) );  
                     }
                     
-                    repository.setMirrorUrls( urls );
+                    repository.setMirrors( runtimeMirrors );
                 }
                 else
                 {
-                    repository.setMirrorUrls( null );
+                    repository.setMirrors( null );
                 }
 
                 DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( rsc );

@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.artifact.InvalidRepositoryException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -1649,6 +1648,15 @@ public class DefaultNexusConfiguration
                 {
                     repository.getRemoteStorage().addMirror( mirror );
                     applyAndSaveConfiguration();
+                    try
+                    {
+                        updateRepository( repository );
+                    }
+                    catch ( ConfigurationException e )
+                    {
+                        //Shouldn't be able to get to this case
+                        getLogger().error( "Invalid configuration applied when updating mirrors", e );
+                    }
                     found = true;
                     break;
                 }
@@ -1681,6 +1689,15 @@ public class DefaultNexusConfiguration
                     {
                         repository.getRemoteStorage().removeMirror( existingMirror );
                         applyAndSaveConfiguration();
+                        try
+                        {
+                            updateRepository( repository );
+                        }
+                        catch ( ConfigurationException e )
+                        {
+                            //Shouldn't be able to get to this case
+                            getLogger().error( "Invalid configuration applied when updating mirrors", e );
+                        }
                         break;
                     }
                 }
@@ -1759,6 +1776,15 @@ public class DefaultNexusConfiguration
                     found = true;
                     repository.getRemoteStorage().addMirror( mirror );
                     applyAndSaveConfiguration();
+                    try
+                    {
+                        updateRepository( repository );
+                    }
+                    catch ( ConfigurationException e )
+                    {
+                        //Shouldn't be able to get to this case
+                        getLogger().error( "Invalid configuration applied when updating mirrors", e );
+                    }
                     break;
                 }
             }

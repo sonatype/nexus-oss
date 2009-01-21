@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
+import org.sonatype.nexus.proxy.repository.Mirror;
 
 public class DefaultDownloadMirrorsTest
     extends AbstractNexusTestCase
@@ -35,133 +36,135 @@ public class DefaultDownloadMirrorsTest
 
         DownloadMirrorSelector selector = mirrors.openSelector();
 
-        assertEquals( 0, mirrors.getUrls().size() );
-        assertEquals( 0, selector.getUrls().size() );
+        assertEquals( 0, mirrors.getMirrors().size() );
+        assertEquals( 0, selector.getMirrors().size() );
 
         selector.close();
     }
 
-    private DefaultDownloadMirrors newDefaultDownloadMirrors( String[] urls )
+    private DefaultDownloadMirrors newDefaultDownloadMirrors( Mirror[] mirrors )
     {
-        DefaultDownloadMirrors mirrors = new DefaultDownloadMirrors();
+        DefaultDownloadMirrors dMirrors = new DefaultDownloadMirrors();
 
-        if ( urls != null )
+        if ( mirrors != null )
         {
-            mirrors.setUrls( Arrays.asList( urls ) );
+            dMirrors.setMirrors( Arrays.asList( mirrors ) );
         }
 
-        return mirrors;
+        return dMirrors;
     }
 
     public void testSimpleMirrorSelection()
     {
-        String[] urls = new String[] { "mirror1", "mirror2" };
+        Mirror[] mirrors = new Mirror[] { new Mirror( "1", "mirror1" ), new Mirror( "2", "mirror2" ) };
 
         int maxMirrors = 2;
 
-        DefaultDownloadMirrors mirrors = newDefaultDownloadMirrors( urls );
+        DefaultDownloadMirrors dMirrors = newDefaultDownloadMirrors( mirrors );
         
-        mirrors.setMaxMirrors( maxMirrors );
+        dMirrors.setMaxMirrors( maxMirrors );
 
-        assertEquals( urls.length, mirrors.getUrls().size() );
+        assertEquals( mirrors.length, dMirrors.getMirrors().size() );
 
-        DownloadMirrorSelector selector = mirrors.openSelector();
+        DownloadMirrorSelector selector = dMirrors.openSelector();
 
-        List<String> _urls = selector.getUrls();
+        List<Mirror> _mirrors = selector.getMirrors();
 
-        assertEquals( maxMirrors, _urls.size() );
-        assertEquals( urls[0], _urls.get( 0 ) );
-        assertEquals( urls[1], _urls.get( 1 ) );
+        assertEquals( maxMirrors, _mirrors.size() );
+        assertEquals( mirrors[0], _mirrors.get( 0 ) );
+        assertEquals( mirrors[1], _mirrors.get( 1 ) );
 
         selector.close();
     }
 
     public void testFailure()
     {
-        String[] urls = new String[] { "mirror1", "mirror2" };
+        Mirror[] mirrors = new Mirror[] { new Mirror( "1", "mirror1" ), new Mirror( "2", "mirror2" ) };
 
-        DefaultDownloadMirrors mirrors = newDefaultDownloadMirrors( urls );
+        DefaultDownloadMirrors dMirrors = newDefaultDownloadMirrors( mirrors );
 
-        DownloadMirrorSelector selector = mirrors.openSelector();
+        DownloadMirrorSelector selector = dMirrors.openSelector();
 
-        selector.feedbackFailure( urls[0] );
+        selector.feedbackFailure( mirrors[0] );
 
-        selector.feedbackSuccess( urls[1] );
+        selector.feedbackSuccess( mirrors[1] );
 
         // feedback has not been applied yet
-        assertEquals( urls[0], mirrors.openSelector().getUrls().get( 0 ) );
+        assertEquals( mirrors[0], dMirrors.openSelector().getMirrors().get( 0 ) );
 
         selector.close();
-        assertEquals( urls[1], mirrors.openSelector().getUrls().get( 0 ) );
+        assertEquals( mirrors[1], dMirrors.openSelector().getMirrors().get( 0 ) );
     }
 
     public void testBlacklistDecay()
         throws Exception
     {
-        String[] urls = new String[] { "mirror1", "mirror2" };
+        Mirror[] mirrors = new Mirror[] { new Mirror( "1", "mirror1" ), new Mirror( "2", "mirror2" ) };
 
         long blacklistTTL = 100L; // milliseconds
 
-        DefaultDownloadMirrors mirrors = newDefaultDownloadMirrors( urls );
+        DefaultDownloadMirrors dMirrors = newDefaultDownloadMirrors( mirrors );
 
-        mirrors.setBlacklistExpiration( blacklistTTL );
+        dMirrors.setBlacklistExpiration( blacklistTTL );
 
-        DownloadMirrorSelector selector = mirrors.openSelector();
+        DownloadMirrorSelector selector = dMirrors.openSelector();
 
-        selector.feedbackFailure( urls[0] );
+        selector.feedbackFailure( mirrors[0] );
 
-        selector.feedbackSuccess( urls[1] );
+        selector.feedbackSuccess( mirrors[1] );
 
         selector.close();
 
-        assertEquals( true, mirrors.isBlacklisted( urls[0] ) );
+        assertEquals( true, dMirrors.isBlacklisted( mirrors[0] ) );
 
         Thread.sleep( blacklistTTL * 2 );
 
-        assertEquals( false, mirrors.isBlacklisted( urls[0] ) );
+        assertEquals( false, dMirrors.isBlacklisted( mirrors[0] ) );
 
     }
 
     public void testSetUrls()
         throws Exception
     {
-        String[] urls = new String[] { "mirror1", "mirror2" };
+        Mirror[] mirrors = new Mirror[] { new Mirror( "1", "mirror1" ), new Mirror( "2", "mirror2" ) };
 
-        DefaultDownloadMirrors mirrors = newDefaultDownloadMirrors( urls );
+        DefaultDownloadMirrors dMirrors = newDefaultDownloadMirrors( mirrors );
 
-        DownloadMirrorSelector selector = mirrors.openSelector();
+        DownloadMirrorSelector selector = dMirrors.openSelector();
 
-        selector.feedbackFailure( urls[0] );
+        selector.feedbackFailure( mirrors[0] );
 
-        selector.feedbackSuccess( urls[1] );
+        selector.feedbackSuccess( mirrors[1] );
 
         selector.close();
 
         // sanity check
 
-        assertEquals( true, mirrors.isBlacklisted( urls[0] ) );
+        assertEquals( true, dMirrors.isBlacklisted( mirrors[0] ) );
 
-        mirrors.setUrls( Arrays.asList( "another-mirror", "one-more-mirror", "mirror1" ) );
+        dMirrors.setMirrors( Arrays.asList( new Mirror( "3", "another-mirror" ), 
+            new Mirror( "4", "one-more-mirror" ), 
+            mirrors[0] ) );
 
-        assertEquals( true, mirrors.isBlacklisted( urls[0] ) );
+        assertEquals( true, dMirrors.isBlacklisted( mirrors[0] ) );
     }
 
     public void testFailureThenSuccess()
     {
-        String[] urls = new String[] { "mirror1", "mirror2" };
+        Mirror[] mirrors = new Mirror[] { new Mirror( "1", "mirror1" ), new Mirror( "2", "mirror2" ) };
 
-        DefaultDownloadMirrors mirrors = newDefaultDownloadMirrors( urls );
+        DefaultDownloadMirrors dMirrors = newDefaultDownloadMirrors( mirrors );
 
-        DownloadMirrorSelector selector = mirrors.openSelector();
+        DownloadMirrorSelector selector = dMirrors.openSelector();
 
-        selector.feedbackFailure( urls[0] );
+        selector.feedbackFailure( mirrors[0] );
 
-        selector.feedbackSuccess( urls[0] );
+        selector.feedbackSuccess( mirrors[0] );
 
         selector.close();
 
         // sanity check
 
-        assertEquals( false, mirrors.isBlacklisted( urls[0] ) );
+        assertEquals( false, dMirrors.isBlacklisted( mirrors[0] ) );
     }
 }

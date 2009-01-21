@@ -17,61 +17,63 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import org.sonatype.nexus.proxy.repository.Mirror;
+
 public class DefaultDownloadMirrorSelector
     implements DownloadMirrorSelector
 {
-    private final DefaultDownloadMirrors mirrors;
+    private final DefaultDownloadMirrors dMirrors;
 
-    private final LinkedHashSet<String> urls = new LinkedHashSet<String>();
+    private final LinkedHashSet<Mirror> mirrors = new LinkedHashSet<Mirror>();
 
-    private final LinkedHashSet<String> failedMirrors = new LinkedHashSet<String>();
+    private final LinkedHashSet<Mirror> failedMirrors = new LinkedHashSet<Mirror>();
 
     private boolean success;
 
-    public DefaultDownloadMirrorSelector( DefaultDownloadMirrors mirrors )
+    public DefaultDownloadMirrorSelector( DefaultDownloadMirrors dMirrors )
     {
-        this.mirrors = mirrors;
+        this.dMirrors = dMirrors;
 
-        for ( String url : mirrors.getUrls() )
+        for ( Mirror mirror : dMirrors.getMirrors() )
         {
-            if ( !mirrors.isBlacklisted( url ) )
+            if ( !dMirrors.isBlacklisted( mirror ) )
             {
-                urls.add( url );
+                mirrors.add( mirror );
             }
             
-            if ( urls.size() >= mirrors.getMaxMirrors() )
+            if ( mirrors.size() >= dMirrors.getMaxMirrors() )
             {
                 break;
             }
         }
     }
 
-    public List<String> getUrls()
+    public List<Mirror> getMirrors()
     {
-        return new ArrayList<String>( urls );
+        return new ArrayList<Mirror>( mirrors );
     }
 
     public void close()
     {
         if ( success )
         {
-            mirrors.blacklist( failedMirrors );
+            dMirrors.blacklist( failedMirrors );
         }
     }
 
-    public void feedbackSuccess( String url )
+    public void feedbackSuccess( Mirror mirror )
     {
         // XXX validate URL
 
-        failedMirrors.remove( url );
+        failedMirrors.remove( mirror );
 
         this.success = true;
     }
 
-    public void feedbackFailure( String url )
+    public void feedbackFailure( Mirror mirror )
     {
         // XXX validate URL
 
-        failedMirrors.add( url );
+        failedMirrors.add( mirror );
     }
 }

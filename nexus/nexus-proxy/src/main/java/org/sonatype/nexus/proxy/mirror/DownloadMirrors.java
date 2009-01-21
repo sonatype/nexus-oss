@@ -15,19 +15,21 @@ package org.sonatype.nexus.proxy.mirror;
 
 import java.util.List;
 
+import org.sonatype.nexus.proxy.repository.Mirror;
+
 
 public interface DownloadMirrors
 {
 
-    void setUrls( List<String> urls );
+    void setMirrors( List<Mirror> mirrors );
 
     /**
      * Returns list of all configured mirror urls, including urls of mirrors
      * added to the blacklist.
      */
-    List<String> getUrls();
+    List<Mirror> getMirrors();
 
-    boolean isBlacklisted( String url );
+    boolean isBlacklisted( Mirror mirror );
 
     DownloadMirrorSelector openSelector();
 }

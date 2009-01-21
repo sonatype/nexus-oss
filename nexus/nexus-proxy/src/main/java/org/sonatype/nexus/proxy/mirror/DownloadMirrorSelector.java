@@ -15,25 +15,27 @@ package org.sonatype.nexus.proxy.mirror;
 
 import java.util.List;
 
+import org.sonatype.nexus.proxy.repository.Mirror;
+
 public interface DownloadMirrorSelector
 {
 
     /**
      * Returns possibly empty list of available urls.
      */
-    List<String> getUrls();
+    List<Mirror> getMirrors();
 
     /**
      * Requested item was successfully downloaded from specified mirror url.
      */
-    void feedbackSuccess( String url );
+    void feedbackSuccess( Mirror mirror );
 
     /**
      * There was a problem (like IOException or ItemNotFound) retrieving requested item from specified mirror url.
      * 
      * @throws IllegalStateException if there is no selected mirror.
      */
-    void feedbackFailure( String url );
+    void feedbackFailure( Mirror mirror );
 
     /**
      * Updates mirror statistics and closes this mirror selector.

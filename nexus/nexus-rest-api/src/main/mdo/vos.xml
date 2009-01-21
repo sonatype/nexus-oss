@@ -3262,6 +3262,7 @@
           <version>1.0.0+</version>
           <association>
             <type>MirrorStatusResource</type>
+            <multiplicity>*</multiplicity>
           </association>
         </field>
       </fields>    
@@ -3286,18 +3287,9 @@
     
     <class>
       <name>MirrorStatusResource</name>
+      <superClass>MirrorResource</superClass>
       <version>1.0.0+</version>
       <fields>
-        <field>
-          <name>id</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-        </field>
-        <field>
-          <name>url</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-        </field>
         <field>
           <name>status</name>
           <version>1.0.0+</version>

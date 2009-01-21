@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
+import org.sonatype.nexus.proxy.repository.Mirror;
 
 @Component( role = DownloadMirrors.class, instantiationStrategy = "per-lookup" )
 public class DefaultDownloadMirrors
@@ -33,7 +34,7 @@ public class DefaultDownloadMirrors
     
     private static final long DEFAULT_EXPIRATION = 30 * 60 * 1000L; // 30 minutes
 
-    private LinkedHashSet<String> urls = new LinkedHashSet<String>();
+    private LinkedHashSet<Mirror> mirrors = new LinkedHashSet<Mirror>();
 
     private Map<String, BlaclistEntry> blacklist = new HashMap<String, BlaclistEntry>();
 
@@ -49,20 +50,20 @@ public class DefaultDownloadMirrors
 
     private static class BlaclistEntry
     {
-        private String url;
+        private String id;
 
         private long timestamp;
 
-        public BlaclistEntry( String url, long timestamp )
+        public BlaclistEntry( String id, long timestamp )
         {
-            this.url = url;
+            this.id = id;
 
             this.timestamp = timestamp;
         }
 
-        public String getUrl()
+        public String getId()
         {
-            return url;
+            return id;
         }
 
         public long getTimestamp()
@@ -76,23 +77,24 @@ public class DefaultDownloadMirrors
         return new DefaultDownloadMirrorSelector( this );
     }
 
-    public void setUrls( List<String> urls )
+    public void setMirrors( List<Mirror> mirrors )
     {
-        if ( urls == null || urls.isEmpty() )
+        if ( mirrors == null || mirrors.isEmpty() )
         {
-            this.urls.clear();
+            this.mirrors.clear();
             this.blacklist.clear();
         }
         else
         {
-            this.urls = new LinkedHashSet<String>( urls );
+            this.mirrors = new LinkedHashSet<Mirror>( mirrors );
 
             Iterator<Entry<String, BlaclistEntry>> i = blacklist.entrySet().iterator();
 
             while ( i.hasNext() )
             {
-                String url = i.next().getKey();
-                if ( !this.urls.contains( url ) )
+                String id = i.next().getKey();
+                
+                if ( getMirror( id ) == null )
                 {
                     i.remove();
                 }
@@ -100,14 +102,14 @@ public class DefaultDownloadMirrors
         }
     }
 
-    public List<String> getUrls()
+    public List<Mirror> getMirrors()
     {
-        return new ArrayList<String>( urls );
+        return new ArrayList<Mirror>( mirrors );
     }
 
-    public boolean isBlacklisted( String url )
+    public boolean isBlacklisted( Mirror mirror )
     {
-        BlaclistEntry entry = blacklist.get( url );
+        BlaclistEntry entry = blacklist.get( mirror.getId() );
 
         if ( entry == null )
         {
@@ -124,7 +126,7 @@ public class DefaultDownloadMirrors
             return true;
         }
 
-        blacklist.remove( url );
+        blacklist.remove( mirror.getId() );
 
         return false;
     }
@@ -132,15 +134,15 @@ public class DefaultDownloadMirrors
     /**
      * Adds specified mirror URLs to the black list.
      */
-    public void blacklist( Set<String> urls )
+    public void blacklist( Set<Mirror> mirrors )
     {
-        for ( String url : urls )
+        for ( Mirror mirror : mirrors )
         {
-            blacklist.remove( url );
+            blacklist.remove( mirror.getId() );
 
-            if ( this.urls.contains( url ) )
+            if ( this.mirrors.contains( mirror ) )
             {
-                blacklist.put( url, new BlaclistEntry( url, System.currentTimeMillis() ) );
+                blacklist.put( mirror.getId(), new BlaclistEntry( mirror.getId(), System.currentTimeMillis() ) );
             }
         }
     }
@@ -163,6 +165,22 @@ public class DefaultDownloadMirrors
     public void setMaxMirrors( int maxMirrors )
     {
         this.maxMirrors = maxMirrors;
+    }
+    
+    private Mirror getMirror( String id )
+    {
+        if ( this.mirrors != null )
+        {
+            for ( Mirror mirror : this.mirrors )
+            {
+                if ( mirror.getId().equals( id ) )
+                {
+                    return mirror;
+                }
+            }
+        }
+        
+        return null;
     }
 
 }

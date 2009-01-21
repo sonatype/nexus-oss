@@ -13,9 +13,15 @@
  */
 package org.sonatype.nexus.proxy.mirror;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.checkOrder;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.same;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
@@ -32,6 +38,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
+import org.sonatype.nexus.proxy.repository.Mirror;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
@@ -45,9 +52,9 @@ public class RepositoryMirrorDownloadTest
 
     private static final String ITEM_PATH = "/path";
 
-    private static final String MIRROR1_URL = "mirror1-url";
+    private static final Mirror MIRROR1 = new Mirror( "1", "mirror1-url" );
 
-    private static final String MIRROR2_URL = "mirror2-url";
+    private static final Mirror MIRROR2 = new Mirror( "2", "mirror2-url" );
 
     private static final String CANONICAL_URL = "canonical-url";
 
@@ -74,7 +81,7 @@ public class RepositoryMirrorDownloadTest
         /**
          * Mirrors
          */
-        public String[] mirrors = new String[] { MIRROR1_URL, MIRROR2_URL };
+        public Mirror[] mirrors = new Mirror[] { MIRROR1, MIRROR2 };
 
         /**
          * Mirror failures
@@ -117,12 +124,12 @@ public class RepositoryMirrorDownloadTest
     public void testDownloadFromMirror()
         throws Exception
     {
-        M2Repository repo = createM2Repository( new String[] { MIRROR1_URL } );
+        M2Repository repo = createM2Repository( new Mirror[] { MIRROR1 } );
 
         RepositoryItemUid uid = repo.createUid( ITEM_PATH );
 
         RemoteRepositoryStorage rs = createMock( RemoteRepositoryStorage.class );
-        expect( rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( MIRROR1_URL ), eq( uid.getPath() ) ) )
+        expect( rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( MIRROR1.getUrl() ), eq( uid.getPath() ) ) )
             .andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
 
         repo.setRemoteStorage( rs );
@@ -264,7 +271,7 @@ public class RepositoryMirrorDownloadTest
         {
             if ( exception instanceof InvalidItemContentException )
             {
-                expect( rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( request.mirrors[0] ), eq( uid.getPath() ) ) )
+                expect( rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( request.mirrors[0].getUrl() ), eq( uid.getPath() ) ) )
                     .andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
     
                 expect( rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( CANONICAL_URL ), eq( hashUid.getPath() ) ) )
@@ -272,14 +279,14 @@ public class RepositoryMirrorDownloadTest
             }
             else
             {
-                expect( rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( request.mirrors[0] ), eq( uid.getPath() ) ) )
+                expect( rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( request.mirrors[0].getUrl() ), eq( uid.getPath() ) ) )
                     .andThrow( exception );
             }
         }
 
         if ( request.mirrorSuccess )
         {
-            expect( rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( request.mirrors[0] ), eq( uid.getPath() ) ) )
+            expect( rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( request.mirrors[0].getUrl() ), eq( uid.getPath() ) ) )
                 .andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
 
             expect( rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( CANONICAL_URL ), eq( hashUid.getPath() ) ) )
@@ -340,14 +347,14 @@ public class RepositoryMirrorDownloadTest
             assertEquals( request.assertFailureType, failure.getClass() );
         }
 
-        assertEquals( request.assertMirrorBlacklisted, repo.getDownloadMirrors().isBlacklisted( MIRROR1_URL ) );
+        assertEquals( request.assertMirrorBlacklisted, repo.getDownloadMirrors().isBlacklisted( MIRROR1 ) );
     }
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     
-    private M2Repository createM2Repository( String[] mirrors )
+    private M2Repository createM2Repository( Mirror[] mirrors )
         throws Exception
     {
         M2Repository repo = (M2Repository) getContainer().lookup( Repository.class, "maven2" );
@@ -361,9 +368,7 @@ public class RepositoryMirrorDownloadTest
 
         repo.setRemoteUrl( CANONICAL_URL );
 
-        ArrayList<String> urls = new ArrayList<String>();
-        urls.addAll( Arrays.asList( mirrors ) );
-        repo.setMirrorUrls( urls );
+        repo.setMirrors( Arrays.asList( mirrors ) );
         return repo;
     }
 

@@ -95,7 +95,7 @@ public abstract class AbstractProxyRepository
     private int itemMaxAge = 24 * 60;
 
     @Requirement
-    private DownloadMirrors mirrors;
+    private DownloadMirrors dMirrors;
 
     protected void resetRemoteStatus()
     {
@@ -341,12 +341,12 @@ public abstract class AbstractProxyRepository
 
     public DownloadMirrors getDownloadMirrors()
     {
-        return mirrors;
+        return dMirrors;
     }
 
-    public void setMirrorUrls( List<String> urls )
+    public void setMirrors( List<Mirror> mirrors )
     {
-        mirrors.setUrls( urls );
+        dMirrors.setMirrors( mirrors );
     }
 
     protected AbstractStorageItem doCacheItem( AbstractStorageItem item )
@@ -705,8 +705,8 @@ public abstract class AbstractProxyRepository
     {
         DownloadMirrorSelector selector = getDownloadMirrors().openSelector();
 
-        ArrayList<String> urls = new ArrayList<String>( selector.getUrls() );
-        urls.add( getRemoteUrl() );
+        ArrayList<Mirror> mirrors = new ArrayList<Mirror>( selector.getMirrors() );
+        mirrors.add( new Mirror( "default", getRemoteUrl() ) );
 
         ArrayList<NexusArtifactEvent> events = new ArrayList<NexusArtifactEvent>();
 
@@ -715,7 +715,7 @@ public abstract class AbstractProxyRepository
         try
         {
             all_urls:
-            for ( String baseUrl : urls )
+            for ( Mirror mirror : mirrors )
             {
                 for ( int i = 0; i < DOWNLOAD_RETRY_COUNT; i++ )
                 {
@@ -723,23 +723,23 @@ public abstract class AbstractProxyRepository
                     {
                         // events.clear();
     
-                        AbstractStorageItem remoteItem = getRemoteStorage().retrieveItem( this, context, baseUrl, uid.getPath() );
+                        AbstractStorageItem remoteItem = getRemoteStorage().retrieveItem( this, context, mirror.getUrl(), uid.getPath() );
     
                         remoteItem.getItemContext().putAll( context );
     
                         remoteItem = doCacheItem( remoteItem );
     
-                        if ( doValidateRemoteItemContent( baseUrl, remoteItem, context, events ) )
+                        if ( doValidateRemoteItemContent( mirror.getUrl(), remoteItem, context, events ) )
                         {
                             sendContentValidationEvents( uid, events, true );
 
-                            selector.feedbackSuccess( baseUrl );
+                            selector.feedbackSuccess( mirror );
 
                             return remoteItem; 
                         }
                         else
                         {
-                            selector.feedbackFailure( baseUrl );
+                            selector.feedbackFailure( mirror );
 
                             lastException = new InvalidItemContentException( uid );
                         }
@@ -754,7 +754,7 @@ public abstract class AbstractProxyRepository
                     {
                         lastException = e;
     
-                        selector.feedbackFailure( baseUrl );
+                        selector.feedbackFailure( mirror );
     
                         continue all_urls; // retry with next url
                     }
@@ -762,7 +762,7 @@ public abstract class AbstractProxyRepository
                     {
                         lastException = e;
     
-                        selector.feedbackFailure( baseUrl );
+                        selector.feedbackFailure( mirror );
                     }
                     
                     // retry with same url
