@@ -30,6 +30,7 @@ import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.model.CGroupsSetting;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -709,6 +710,39 @@ public class DefaultApplicationConfigurationValidator
 
         response.append( validateRemoteAuthentication( ctx, settings.getAuthentication() ) );
 
+        return response;
+    }
+    
+    public ValidationResponse validateRepositoryMirror( ApplicationValidationContext ctx, CMirror mirror )
+    {
+        ValidationResponse response = new ApplicationValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+        
+        if ( StringUtils.isEmpty( mirror.getId() ) )
+        {
+            String newId = idGenerator.generateId();
+
+            mirror.setId( newId );
+
+            response.addValidationWarning( "Fixed wrong mirror ID from '" + mirror.getId() + "' to '" + newId + "'" );
+
+            response.setModified( true );
+        }
+        
+        if ( StringUtils.isEmpty( mirror.getId() ) )
+        {
+            response.addValidationError( "The Mirror may have no empty/null ID!" );
+        }
+        
+        if ( StringUtils.isEmpty( mirror.getUrl() ) )
+        {
+            response.addValidationError( "The Mirror may have no empty/null URL!" );
+        }
+        
         return response;
     }
 

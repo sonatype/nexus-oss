@@ -15,6 +15,7 @@ package org.sonatype.nexus.configuration.application.validator;
 
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -180,4 +181,13 @@ public interface ApplicationConfigurationValidator
      * @return
      */
     ValidationResponse validateSmtpConfiguration( ApplicationValidationContext ctx, CSmtpConfiguration settings );
+    
+    /**
+     * Validate mirror config
+     * 
+     * @param ctx
+     * @param mirror
+     * @return
+     */
+    ValidationResponse validateRepositoryMirror( ApplicationValidationContext ctx, CMirror mirror );
 }

@@ -38,6 +38,7 @@ import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
+import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
@@ -1903,5 +1904,41 @@ public class DefaultNexus
         throws IOException
     {
         logFileManager.setLogConfig( config );
+    }
+    
+    // Mirrors
+    public void createMirror( String repositoryId, CMirror mirror )
+        throws NoSuchRepositoryException,
+            ConfigurationException,
+            IOException
+    {
+        this.nexusConfiguration.createMirror( repositoryId, mirror );
+    }
+    
+    public void deleteMirror( String repositoryId, String mirrorId )
+        throws NoSuchRepositoryException,
+            IOException
+    {
+        this.nexusConfiguration.deleteMirror( repositoryId, mirrorId );
+    }
+    
+    public Collection<CMirror> listMirrors( String repositoryId )
+        throws NoSuchRepositoryException
+    {
+        return this.nexusConfiguration.listMirrors( repositoryId );
+    }
+    
+    public CMirror readMirror( String repositoryId, String mirrorId )
+        throws NoSuchRepositoryException
+    {
+        return this.nexusConfiguration.readMirror( repositoryId, mirrorId );
+    }
+    
+    public void updateMirror( String repositoryId, CMirror mirror )
+        throws NoSuchRepositoryException,
+            ConfigurationException,
+            IOException
+    {
+        this.nexusConfiguration.updateMirror( repositoryId, mirror );        
     }
 }

@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -35,6 +36,7 @@ import org.sonatype.nexus.configuration.application.source.ApplicationConfigurat
 import org.sonatype.nexus.configuration.application.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.application.validator.ApplicationValidationContext;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
+import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
@@ -1628,5 +1630,147 @@ public class DefaultNexusConfiguration
         String fileName = configurationFiles.get( key );
 
         return new FileInputStream( new File( getConfigurationDirectory(), fileName ) );
+    }
+    
+    public void createMirror( String repositoryId, CMirror mirror )
+        throws NoSuchRepositoryException,
+            ConfigurationException,
+            IOException
+    {
+        ValidationResponse res = configurationValidator.validateRepositoryMirror( null, mirror );
+
+        if ( res.isValid() )
+        {
+            boolean found = false;
+            
+            for ( CRepository repository : ( List<CRepository> ) getConfiguration().getRepositories() )
+            {
+                if ( repository.getId().equals( repositoryId ) )
+                {
+                    repository.getRemoteStorage().addMirror( mirror );
+                    applyAndSaveConfiguration();
+                    found = true;
+                    break;
+                }
+            }
+            
+            if ( !found )
+            {
+                throw new NoSuchRepositoryException( repositoryId );
+            }
+        }
+        else
+        {
+            throw new InvalidConfigurationException( res );
+        }
+    }
+    
+    public void deleteMirror( String repositoryId, String mirrorId )
+        throws NoSuchRepositoryException,
+            IOException
+    {
+        boolean found = false;
+        
+        for ( CRepository repository : ( List<CRepository> ) getConfiguration().getRepositories() )
+        {
+            if ( repository.getId().equals( repositoryId ) )
+            {
+                for ( CMirror existingMirror : ( List<CMirror> ) repository.getRemoteStorage().getMirrors() )
+                {
+                    if ( existingMirror.getId().equals( mirrorId ) )
+                    {
+                        repository.getRemoteStorage().removeMirror( existingMirror );
+                        applyAndSaveConfiguration();
+                        break;
+                    }
+                }
+        
+                found = true;
+                break;
+            }
+        }
+        
+        if ( !found )
+        {
+            throw new NoSuchRepositoryException( repositoryId );
+        }
+    }
+    
+    public Collection<CMirror> listMirrors( String repositoryId )
+        throws NoSuchRepositoryException
+    {
+        for ( CRepository repository : ( List<CRepository> ) getConfiguration().getRepositories() )
+        {
+            if ( repository.getId().equals( repositoryId ) )
+            {
+                return repository.getRemoteStorage().getMirrors();
+            }
+        }
+        
+        throw new NoSuchRepositoryException( repositoryId );
+    }
+    
+    public CMirror readMirror( String repositoryId, String mirrorId )
+        throws NoSuchRepositoryException
+    {
+        for ( CRepository repository : ( List<CRepository> ) getConfiguration().getRepositories() )
+        {
+            if ( repository.getId().equals( repositoryId ) )
+            {
+                for ( CMirror existingMirror : ( List<CMirror> ) repository.getRemoteStorage().getMirrors() )
+                {
+                    if ( existingMirror.getId().equals( mirrorId ) )
+                    {
+                        return existingMirror;
+                    }
+                }
+                
+                break;
+            }
+        }
+        
+        throw new NoSuchRepositoryException( repositoryId );
+    }
+    
+    public void updateMirror( String repositoryId, CMirror mirror )
+        throws NoSuchRepositoryException,
+            ConfigurationException,
+            IOException
+    {        
+        ValidationResponse res = configurationValidator.validateRepositoryMirror( null, mirror );
+
+        if ( res.isValid() )
+        {
+            boolean found = false;
+            
+            for ( CRepository repository : ( List<CRepository> ) getConfiguration().getRepositories() )
+            {
+                if ( repository.getId().equals( repositoryId ) )
+                {
+                    for ( CMirror existingMirror : ( List<CMirror> ) repository.getRemoteStorage().getMirrors() )
+                    {
+                        if ( existingMirror.getId().equals( mirror.getId() ) )
+                        {
+                            repository.getRemoteStorage().removeMirror( existingMirror );
+                            break;
+                        }
+                    }
+            
+                    found = true;
+                    repository.getRemoteStorage().addMirror( mirror );
+                    applyAndSaveConfiguration();
+                    break;
+                }
+            }
+            
+            if ( !found )
+            {
+                throw new NoSuchRepositoryException( repositoryId );
+            }
+        }
+        else
+        {
+            throw new InvalidConfigurationException( res );
+        }
     }
 }

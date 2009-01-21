@@ -1123,31 +1123,32 @@
 				    Repository mirrors configuration.
 				  </description>
           <association>
-            <type>CMirrors</type>
+            <type>CMirror</type>
+            <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
 				</field>
 			</fields>
 		</class>
-
+    
     <class>
-      <name>CMirrors</name>
+      <name>CMirror</name>
       <version>1.0.8+</version>
       <description>
-        Repository mirrors configuration.
+        Mirror config
       </description>
       <fields>
         <field>
-          <name>urls</name>
+          <name>id</name>
           <version>1.0.8+</version>
-          <description>
-            List of mirror URLs.
-          </description>
-          <association>
-            <type>String</type>
-            <multiplicity>*</multiplicity>
-          </association>
-          <required>false</required>
+          <type>String</type>
+          <description>mirror id</description>
+        </field>
+        <field>
+          <name>url</name>
+          <version>1.0.8+</version>
+          <type>String</type>
+          <description>mirror url</description>
         </field>
       </fields>
     </class>

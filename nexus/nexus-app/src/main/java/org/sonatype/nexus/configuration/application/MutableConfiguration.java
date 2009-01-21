@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
+import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
@@ -244,4 +245,25 @@ public interface MutableConfiguration
     void updateSmtpConfiguration( CSmtpConfiguration settings )
         throws ConfigurationException,
             IOException;
+    
+    // Mirrors
+    void createMirror( String repositoryId, CMirror mirror )
+        throws NoSuchRepositoryException,
+            ConfigurationException,
+            IOException;
+    
+    void updateMirror( String repositoryId, CMirror mirror )
+        throws NoSuchRepositoryException,
+            ConfigurationException,
+            IOException;
+    
+    void deleteMirror( String repositoryId, String mirrorId )
+        throws NoSuchRepositoryException,
+            IOException;    
+    
+    CMirror readMirror( String repositoryId, String mirrorId )
+        throws NoSuchRepositoryException;
+    
+    Collection<CMirror> listMirrors( String repositoryId )
+        throws NoSuchRepositoryException;
 }

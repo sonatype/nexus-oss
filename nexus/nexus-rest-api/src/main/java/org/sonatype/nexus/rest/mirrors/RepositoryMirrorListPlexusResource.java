@@ -1,5 +1,7 @@
 package org.sonatype.nexus.rest.mirrors;
 
+import java.io.IOException;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -7,7 +9,8 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.model.MirrorListResourceResponse;
 import org.sonatype.nexus.rest.model.MirrorResourceRequest;
@@ -44,7 +47,6 @@ public class RepositoryMirrorListPlexusResource
     }
     
     @Override
-    //TODO: return mirrors in a rest object
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -52,7 +54,10 @@ public class RepositoryMirrorListPlexusResource
         
         try
         {
-            CRepository repository = getNexus().readRepository( getRepositoryId( request ) );
+            for ( CMirror mirror : getNexus().listMirrors( getRepositoryId( request ) ) )
+            {
+                dto.addData( nexusToRestModel( mirror ) );
+            }
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -71,11 +76,23 @@ public class RepositoryMirrorListPlexusResource
         
         try
         {
-            CRepository repository = getNexus().readRepository( getRepositoryId( request ) );
+            CMirror mirror = restToNexusModel( ( ( MirrorResourceRequest ) payload ).getData(), null );
+            
+            getNexus().createMirror( getRepositoryId( request ), mirror );
+         
+            dto.setData( nexusToRestModel( mirror ) );
         }
         catch ( NoSuchRepositoryException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid repository id " + getRepositoryId( request ), e);
+        }
+        catch ( ConfigurationException e )
+        {
+            handleConfigurationException( e );
+        }
+        catch ( IOException e )
+        {
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to create mirror", e );
         }
         
         return dto;

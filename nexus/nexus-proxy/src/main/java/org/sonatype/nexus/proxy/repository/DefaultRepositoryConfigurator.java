@@ -15,6 +15,8 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -22,7 +24,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.RepositoryStatusConverter;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.validator.ApplicationValidationResponse;
-import org.sonatype.nexus.configuration.model.CMirrors;
+import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
@@ -133,10 +135,17 @@ public class DefaultRepositoryConfigurator
                 repository.setRemoteUrl( repo.getRemoteStorage().getUrl() );
                 repository.setRemoteStorage( rs );
                 
-                CMirrors mirrors = repo.getRemoteStorage().getMirrors();
-                if ( mirrors != null )
+                List<CMirror> mirrors = ( List<CMirror> )repo.getRemoteStorage().getMirrors();
+                if ( mirrors != null && mirrors.size() > 0 )
                 {
-                    repository.setMirrorUrls( mirrors.getUrls() );
+                    List<String> urls = new ArrayList<String>();
+                    
+                    for ( CMirror mirror : mirrors )
+                    {
+                        urls.add( mirror.getUrl() );  
+                    }
+                    
+                    repository.setMirrorUrls( urls );
                 }
                 else
                 {
