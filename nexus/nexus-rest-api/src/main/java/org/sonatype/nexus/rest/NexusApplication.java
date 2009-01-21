@@ -497,6 +497,21 @@ public class NexusApplication
         xstream.alias( "user-search", PlexusUserSearchCriteriaResourceRequest.class );
         xstream.omitField( PlexusUserSearchCriteriaResource.class, "modelEncoding" );
         
+        xstream.omitField( MirrorResourceListRequest.class, "modelEncoding" );
+        xstream.omitField( MirrorResourceListResponse.class, "modelEncoding" );
+        xstream.omitField( MirrorStatusResourceListResponse.class, "modelEncoding" );
+        xstream.omitField( MirrorResource.class, "modelEncoding" );
+        xstream.omitField( MirrorStatusResource.class, "modelEncoding" );
+        
+        xstream.registerLocalConverter( MirrorResourceListRequest.class, "data", new AliasingListConverter(
+            MirrorResource.class,
+            "mirrorResource" ) );
+        xstream.registerLocalConverter( MirrorResourceListResponse.class, "data", new AliasingListConverter(
+            MirrorResource.class,
+            "mirrorResource" ) );
+        xstream.registerLocalConverter( MirrorStatusResourceListResponse.class, "data", new AliasingListConverter(
+            MirrorStatusResource.class,
+            "mirrorResource" ) );
         
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );

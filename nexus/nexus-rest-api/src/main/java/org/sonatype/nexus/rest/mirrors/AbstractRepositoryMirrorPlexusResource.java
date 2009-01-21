@@ -1,5 +1,8 @@
 package org.sonatype.nexus.rest.mirrors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.restlet.data.Request;
 import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
@@ -24,6 +27,18 @@ public abstract class AbstractRepositoryMirrorPlexusResource
         return request.getAttributes().get( MIRROR_ID_KEY ).toString();
     }
     
+    protected List<MirrorResource> nexusToRestModel( List<CMirror> mirrors )
+    {
+        List<MirrorResource> sortedList = new ArrayList<MirrorResource>();
+        
+        for ( CMirror mirror : mirrors )
+        {
+            sortedList.add( nexusToRestModel( mirror ) );
+        }
+        
+        return sortedList;
+    }
+    
     protected MirrorResource nexusToRestModel( CMirror mirror )
     {
         MirrorResource resource = new MirrorResource();
@@ -34,13 +49,23 @@ public abstract class AbstractRepositoryMirrorPlexusResource
         return resource;
     }
     
-    protected CMirror restToNexusModel( MirrorResource resource, CMirror mirror )
+    protected List<CMirror> restToNexusModel( List<MirrorResource> resources )
     {
-        if ( mirror == null )
-        {
-            mirror = new CMirror();
-        }
+        List<CMirror> sortedList = new ArrayList<CMirror>();
         
+        for ( MirrorResource resource : resources )
+        {
+            sortedList.add( restToNexusModel( resource ) );
+        }
+
+        return sortedList;
+    }
+    
+    protected CMirror restToNexusModel( MirrorResource resource )
+    {
+        CMirror mirror = new CMirror();
+        
+        mirror.setId( resource.getId() );
         mirror.setUrl( resource.getUrl() );
         
         return mirror;

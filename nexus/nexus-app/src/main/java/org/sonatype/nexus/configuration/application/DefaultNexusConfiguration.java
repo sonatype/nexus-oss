@@ -1631,12 +1631,12 @@ public class DefaultNexusConfiguration
         return new FileInputStream( new File( getConfigurationDirectory(), fileName ) );
     }
     
-    public void createMirror( String repositoryId, CMirror mirror )
+    public void setMirrors( String repositoryId, List<CMirror> mirrors )
         throws NoSuchRepositoryException,
             ConfigurationException,
             IOException
     {
-        ValidationResponse res = configurationValidator.validateRepositoryMirror( null, mirror );
+        ValidationResponse res = configurationValidator.validateRepositoryMirrors( null, mirrors );
 
         if ( res.isValid() )
         {
@@ -1646,7 +1646,7 @@ public class DefaultNexusConfiguration
             {
                 if ( repository.getId().equals( repositoryId ) )
                 {
-                    repository.getRemoteStorage().addMirror( mirror );
+                    repository.getRemoteStorage().setMirrors( mirrors );
                     applyAndSaveConfiguration();
                     try
                     {
@@ -1670,46 +1670,6 @@ public class DefaultNexusConfiguration
         else
         {
             throw new InvalidConfigurationException( res );
-        }
-    }
-    
-    public void deleteMirror( String repositoryId, String mirrorId )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        boolean found = false;
-        
-        for ( CRepository repository : ( List<CRepository> ) getConfiguration().getRepositories() )
-        {
-            if ( repository.getId().equals( repositoryId ) )
-            {
-                for ( CMirror existingMirror : ( List<CMirror> ) repository.getRemoteStorage().getMirrors() )
-                {
-                    if ( existingMirror.getId().equals( mirrorId ) )
-                    {
-                        repository.getRemoteStorage().removeMirror( existingMirror );
-                        applyAndSaveConfiguration();
-                        try
-                        {
-                            updateRepository( repository );
-                        }
-                        catch ( ConfigurationException e )
-                        {
-                            //Shouldn't be able to get to this case
-                            getLogger().error( "Invalid configuration applied when updating mirrors", e );
-                        }
-                        break;
-                    }
-                }
-        
-                found = true;
-                break;
-            }
-        }
-        
-        if ( !found )
-        {
-            throw new NoSuchRepositoryException( repositoryId );
         }
     }
     
@@ -1725,78 +1685,5 @@ public class DefaultNexusConfiguration
         }
         
         throw new NoSuchRepositoryException( repositoryId );
-    }
-    
-    public CMirror readMirror( String repositoryId, String mirrorId )
-        throws NoSuchRepositoryException
-    {
-        for ( CRepository repository : ( List<CRepository> ) getConfiguration().getRepositories() )
-        {
-            if ( repository.getId().equals( repositoryId ) )
-            {
-                for ( CMirror existingMirror : ( List<CMirror> ) repository.getRemoteStorage().getMirrors() )
-                {
-                    if ( existingMirror.getId().equals( mirrorId ) )
-                    {
-                        return existingMirror;
-                    }
-                }
-                
-                break;
-            }
-        }
-        
-        throw new NoSuchRepositoryException( repositoryId );
-    }
-    
-    public void updateMirror( String repositoryId, CMirror mirror )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {        
-        ValidationResponse res = configurationValidator.validateRepositoryMirror( null, mirror );
-
-        if ( res.isValid() )
-        {
-            boolean found = false;
-            
-            for ( CRepository repository : ( List<CRepository> ) getConfiguration().getRepositories() )
-            {
-                if ( repository.getId().equals( repositoryId ) )
-                {
-                    for ( CMirror existingMirror : ( List<CMirror> ) repository.getRemoteStorage().getMirrors() )
-                    {
-                        if ( existingMirror.getId().equals( mirror.getId() ) )
-                        {
-                            repository.getRemoteStorage().removeMirror( existingMirror );
-                            break;
-                        }
-                    }
-            
-                    found = true;
-                    repository.getRemoteStorage().addMirror( mirror );
-                    applyAndSaveConfiguration();
-                    try
-                    {
-                        updateRepository( repository );
-                    }
-                    catch ( ConfigurationException e )
-                    {
-                        //Shouldn't be able to get to this case
-                        getLogger().error( "Invalid configuration applied when updating mirrors", e );
-                    }
-                    break;
-                }
-            }
-            
-            if ( !found )
-            {
-                throw new NoSuchRepositoryException( repositoryId );
-            }
-        }
-        else
-        {
-            throw new InvalidConfigurationException( res );
-        }
     }
 }

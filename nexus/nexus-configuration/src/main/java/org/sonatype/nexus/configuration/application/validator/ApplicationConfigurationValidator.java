@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.configuration.application.validator;
 
+import java.util.List;
+
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CMirror;
@@ -189,5 +191,5 @@ public interface ApplicationConfigurationValidator
      * @param mirror
      * @return
      */
-    ValidationResponse validateRepositoryMirror( ApplicationValidationContext ctx, CMirror mirror );
+    ValidationResponse validateRepositoryMirrors( ApplicationValidationContext ctx, List<CMirror> mirrors );
 }

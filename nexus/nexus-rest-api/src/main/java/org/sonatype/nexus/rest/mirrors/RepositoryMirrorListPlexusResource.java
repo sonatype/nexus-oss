@@ -1,6 +1,7 @@
 package org.sonatype.nexus.rest.mirrors;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
@@ -12,9 +13,9 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.rest.model.MirrorListResourceResponse;
-import org.sonatype.nexus.rest.model.MirrorResourceRequest;
-import org.sonatype.nexus.rest.model.MirrorResourceResponse;
+import org.sonatype.nexus.rest.model.MirrorResource;
+import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
+import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -31,7 +32,7 @@ public class RepositoryMirrorListPlexusResource
     //TODO: define payload object
     public Object getPayloadInstance()
     {
-        return new MirrorResourceRequest();
+        return new MirrorResourceListRequest();
     }
 
     @Override
@@ -50,7 +51,7 @@ public class RepositoryMirrorListPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        MirrorListResourceResponse dto  = new MirrorListResourceResponse();
+        MirrorResourceListResponse dto  = new MirrorResourceListResponse();
         
         try
         {
@@ -71,16 +72,18 @@ public class RepositoryMirrorListPlexusResource
     //TODO: get url from rest object and update repository
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
-    {
-        MirrorResourceResponse dto = new MirrorResourceResponse();
+    {   
+        MirrorResourceListResponse dto  = new MirrorResourceListResponse();
         
         try
         {
-            CMirror mirror = restToNexusModel( ( ( MirrorResourceRequest ) payload ).getData(), null );
+            List<MirrorResource> resources = ( List<MirrorResource> ) ( ( MirrorResourceListRequest ) payload ).getData();
             
-            getNexus().createMirror( getRepositoryId( request ), mirror );
-         
-            dto.setData( nexusToRestModel( mirror ) );
+            List<CMirror> mirrors = restToNexusModel( resources );
+            
+            getNexus().setMirrors( getRepositoryId( request ), mirrors );
+            
+            dto.setData( nexusToRestModel( mirrors ) );
         }
         catch ( NoSuchRepositoryException e )
         {

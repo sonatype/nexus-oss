@@ -713,7 +713,7 @@ public class DefaultApplicationConfigurationValidator
         return response;
     }
     
-    public ValidationResponse validateRepositoryMirror( ApplicationValidationContext ctx, CMirror mirror )
+    public ValidationResponse validateRepositoryMirrors( ApplicationValidationContext ctx, List<CMirror> mirrors )
     {
         ValidationResponse response = new ApplicationValidationResponse();
 
@@ -722,25 +722,28 @@ public class DefaultApplicationConfigurationValidator
             response.setContext( ctx );
         }
         
-        if ( StringUtils.isEmpty( mirror.getId() ) )
-        {
-            String newId = idGenerator.generateId();
-
-            mirror.setId( newId );
-
-            response.addValidationWarning( "Fixed wrong mirror ID from '" + mirror.getId() + "' to '" + newId + "'" );
-
-            response.setModified( true );
-        }
-        
-        if ( StringUtils.isEmpty( mirror.getId() ) )
-        {
-            response.addValidationError( "The Mirror may have no empty/null ID!" );
-        }
-        
-        if ( StringUtils.isEmpty( mirror.getUrl() ) )
-        {
-            response.addValidationError( "The Mirror may have no empty/null URL!" );
+        for ( CMirror mirror : mirrors )
+        {        
+            if ( StringUtils.isEmpty( mirror.getId() ) )
+            {
+                String newId = idGenerator.generateId();
+    
+                mirror.setId( newId );
+    
+                response.addValidationWarning( "Fixed wrong mirror ID from '" + mirror.getId() + "' to '" + newId + "'" );
+    
+                response.setModified( true );
+            }
+            
+            if ( StringUtils.isEmpty( mirror.getId() ) )
+            {
+                response.addValidationError( "The Mirror may have no empty/null ID!" );
+            }
+            
+            if ( StringUtils.isEmpty( mirror.getUrl() ) )
+            {
+                response.addValidationError( "The Mirror may have no empty/null URL!" );
+            }
         }
         
         return response;

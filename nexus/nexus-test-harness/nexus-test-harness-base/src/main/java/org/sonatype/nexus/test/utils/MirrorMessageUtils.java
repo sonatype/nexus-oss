@@ -1,6 +1,7 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -10,8 +11,8 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.MirrorResource;
-import org.sonatype.nexus.rest.model.MirrorResourceRequest;
-import org.sonatype.nexus.rest.model.MirrorResourceResponse;
+import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
+import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -31,82 +32,45 @@ public class MirrorMessageUtils
         this.mediaType = mediaType;
     }
 
-    public MirrorResource createMirror( String repositoryId, MirrorResource mirror )
-        throws IOException
-    {
-        Response response = this.sendMessage( Method.POST, repositoryId, mirror );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not create mirror: " + response.getStatus() + ":\n" + responseText );
-        }
-
-        // get the Resource object
-        MirrorResource responseResource = this.getResourceFromResponse( response );
-
-        // make sure the id != null
-        Assert.assertNotNull( "Mirror ID shouldn't be null: " + response.getEntity().getText(), responseResource.getId() );
-        mirror.setId( responseResource.getId() );
-
-        Assert.assertEquals( mirror.getUrl(), responseResource.getUrl() );
-        Assert.assertEquals( mirror.getId(), responseResource.getId() );
-
-        return mirror;
-    }
-    
-    public MirrorResource updateMirror( String repositoryId, MirrorResource mirror )
-        throws IOException
-    {
-        Response response = this.sendMessage( Method.PUT, repositoryId, mirror );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not update mirror: " + response.getStatus() + "\n" + responseText );
-        }
-
-        // get the Resource object
-        MirrorResource responseResource = this.getResourceFromResponse( response );
-
-        // make sure the id != null
-
-        Assert.assertEquals( mirror.getId(), responseResource.getId() );
-        Assert.assertEquals( mirror.getUrl(), responseResource.getUrl() );
-
-        return responseResource;
-    }
-    
-    public Response sendMessage( Method method, String repositoryId, MirrorResource resource )
+    public MirrorResourceListResponse setMirrors( String repositoryId, MirrorResourceListRequest resourceRequest )
         throws IOException
     {
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
-        String id = ( method == Method.POST ) ? "" : "/" + resource.getId();
-
-        String serviceURI = "service/local/repository_mirrors/" + repositoryId + id;
-
-        MirrorResourceRequest request = new MirrorResourceRequest();
-        request.setData( resource );
+        String serviceURI = "service/local/repository_mirrors/" + repositoryId;
 
         // now set the payload
-        representation.setPayload( request );
+        representation.setPayload( resourceRequest );
 
-        return RequestFacade.sendMessage( serviceURI, method, representation );
-    }
-    
-    public MirrorResource getResourceFromResponse( Response response )
-        throws IOException
-    {
+        Response response = RequestFacade.sendMessage( serviceURI, Method.POST, representation );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            String responseText = response.getEntity().getText();
+            Assert.fail( "Could not set mirrors: " + response.getStatus() + ":\n" + responseText );
+        }
+
         String responseString = response.getEntity().getText();
         LOG.debug( " getResourceFromResponse: " + responseString );
 
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
+        representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
         // this
-        MirrorResourceResponse resourceResponse = (MirrorResourceResponse) representation
-            .getPayload( new MirrorResourceResponse() );
+        MirrorResourceListResponse resourceResponse = (MirrorResourceListResponse) representation
+            .getPayload( new MirrorResourceListResponse() );
 
-        return resourceResponse.getData();
+        Assert.assertNotNull( "Resource Response shouldn't be null", resourceResponse );
+        
+        for ( MirrorResource resource : ( List<MirrorResource> ) resourceResponse.getData() )
+        {
+            Assert.assertNotNull( "Id shouldn't be null", resource.getId() );
+        }
+        
+        for ( int i = 0 ; i < resourceResponse.getData().size() ; i++ )
+        {
+            Assert.assertEquals( ( ( MirrorResource ) resourceResponse.getData().get( i ) ).getUrl(), ( ( MirrorResource ) resourceRequest.getData().get( i ) ).getUrl() ); 
+        }
+        
+        return resourceResponse;
     }
 }

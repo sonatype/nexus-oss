@@ -3207,7 +3207,7 @@
 	</class>
     
     <class>
-      <name>MirrorListResourceResponse</name>
+      <name>MirrorResourceListResponse</name>
       <superClass>NexusResponse</superClass>
       <version>1.0.0+</version>
       <fields>
@@ -3221,9 +3221,9 @@
         </field>
       </fields>
     </class>
-  
+    
     <class>
-      <name>MirrorResourceRequest</name>
+      <name>MirrorResourceListRequest</name>
       <superClass>NexusResponse</superClass>
       <version>1.0.0+</version>
       <fields>
@@ -3232,28 +3232,14 @@
           <version>1.0.0+</version>
           <association>
             <type>MirrorResource</type>
+            <multiplicity>*</multiplicity>
           </association>
         </field>
       </fields>
     </class>
     
     <class>
-      <name>MirrorResourceResponse</name>
-      <superClass>NexusResponse</superClass>
-      <version>1.0.0+</version>
-      <fields>
-        <field>
-          <name>data</name>
-          <version>1.0.0+</version>
-          <association>
-            <type>MirrorResource</type>
-          </association>
-        </field>
-      </fields>
-    </class>
-    
-    <class>
-      <name>MirrorStatusResourceResponse</name>
+      <name>MirrorStatusResourceListResponse</name>
       <superClass>NexusResponse</superClass>
       <version>1.0.0+</version>
       <fields>

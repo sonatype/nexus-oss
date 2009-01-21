@@ -7,9 +7,12 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.rest.model.MirrorStatusResourceResponse;
+import org.sonatype.nexus.proxy.repository.DefaultRepository;
+import org.sonatype.nexus.proxy.repository.Mirror;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.rest.model.MirrorStatusResource;
+import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -31,13 +34,13 @@ public class RepositoryMirrorStatusPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/repository_mirrors_status/*/*", "authcBasic,perms[nexus:repositorymirrorsstatus]" );
+        return new PathProtectionDescriptor( "/repository_mirrors_status/*", "authcBasic,perms[nexus:repositorymirrorsstatus]" );
     }
 
     @Override
     public String getResourceUri()
     {
-        return "/repository_mirrors_status/{" + REPOSITORY_ID_KEY + "}/{" + MIRROR_ID_KEY + "}";
+        return "/repository_mirrors_status/{" + REPOSITORY_ID_KEY + "}";
     }
 
     @Override
@@ -45,11 +48,28 @@ public class RepositoryMirrorStatusPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        MirrorStatusResourceResponse dto = new MirrorStatusResourceResponse();
+        MirrorStatusResourceListResponse dto = new MirrorStatusResourceListResponse();
         
         try
         {
-            CRepository repository = getNexus().readRepository( getRepositoryId( request ) );
+            Repository repository = getNexus().getRepository( getRepositoryId( request ) );
+            
+            if ( DefaultRepository.class.isAssignableFrom( repository.getClass() ) )
+            {
+                DefaultRepository dRepository = ( DefaultRepository ) repository;
+                
+                for ( Mirror mirror : dRepository.getDownloadMirrors().getMirrors() )
+                {
+                    MirrorStatusResource resource = new MirrorStatusResource();
+                    resource.setId( mirror.getId() );
+                    resource.setUrl( mirror.getUrl() );
+                    resource.setStatus( dRepository.getDownloadMirrors().isBlacklisted( mirror ) ? "Blacklisted" : "Available" );
+                }
+            }
+            else
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository is invalid type" );
+            }
         }
         catch ( NoSuchRepositoryException e )
         {

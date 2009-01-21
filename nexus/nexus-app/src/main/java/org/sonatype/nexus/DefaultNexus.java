@@ -1907,38 +1907,17 @@ public class DefaultNexus
     }
     
     // Mirrors
-    public void createMirror( String repositoryId, CMirror mirror )
+    public void setMirrors( String repositoryId, List<CMirror> mirrors )
         throws NoSuchRepositoryException,
             ConfigurationException,
             IOException
     {
-        this.nexusConfiguration.createMirror( repositoryId, mirror );
-    }
-    
-    public void deleteMirror( String repositoryId, String mirrorId )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        this.nexusConfiguration.deleteMirror( repositoryId, mirrorId );
+        this.nexusConfiguration.setMirrors( repositoryId, mirrors );
     }
     
     public Collection<CMirror> listMirrors( String repositoryId )
         throws NoSuchRepositoryException
     {
         return this.nexusConfiguration.listMirrors( repositoryId );
-    }
-    
-    public CMirror readMirror( String repositoryId, String mirrorId )
-        throws NoSuchRepositoryException
-    {
-        return this.nexusConfiguration.readMirror( repositoryId, mirrorId );
-    }
-    
-    public void updateMirror( String repositoryId, CMirror mirror )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {
-        this.nexusConfiguration.updateMirror( repositoryId, mirror );        
     }
 }
