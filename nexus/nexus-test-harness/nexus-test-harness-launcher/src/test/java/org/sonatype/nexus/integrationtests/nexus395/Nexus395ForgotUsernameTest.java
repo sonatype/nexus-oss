@@ -57,4 +57,14 @@ public class Nexus395ForgotUsernameTest
         Assert.assertNotNull( username );
     }
 
+    @Test
+    public void recoverAnonymousUserName()
+        throws Exception
+    {
+        String anonymousEmail = "changeme2@yourcompany.com";
+
+        Status status = ForgotUsernameUtils.recoverUsername( anonymousEmail );
+
+        Assert.assertEquals( Status.CLIENT_ERROR_BAD_REQUEST.getCode(), status.getCode() );
+    }
 }

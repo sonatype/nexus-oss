@@ -19,6 +19,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
 import org.sonatype.nexus.jsecurity.NoSuchEmailException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -59,6 +60,12 @@ public class UserForgotIdPlexusResource
         throws ResourceException
     {
         String email = request.getAttributes().get( USER_EMAIL_KEY ).toString();
+        
+        if ( isAnonymousEmail( email ) )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Cannot recover anonymous user id" );
+        }
+        
         try
         {
             getNexusSecurity().forgotUsername( email );
@@ -74,6 +81,24 @@ public class UserForgotIdPlexusResource
         }
         // don't return anything because we are setting the status to 202
         return null;
+    }
+    
+    private boolean isAnonymousEmail( String email )
+    {
+        String anonymousEmail = "";
+
+        try
+        {
+            anonymousEmail = getNexusSecurity().readUser( getNexus().getAnonymousUsername() ).getEmail();
+        }
+        catch ( NoSuchUserException e )
+        {
+            getLogger().warn( "Could not read anonymous user with id '" + getNexus().getAnonymousUsername() + "'.", e );
+
+            return false;
+        }
+
+        return anonymousEmail.equals( email );
     }
 
 }
