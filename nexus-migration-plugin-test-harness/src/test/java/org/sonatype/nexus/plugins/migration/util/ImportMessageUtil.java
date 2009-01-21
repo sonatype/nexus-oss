@@ -95,16 +95,5 @@ public class ImportMessageUtil
 
         return response;
     }
-    
-    public static void fillDefaultEmailIfNotExist( List<UserResolutionDTO> resolutions )
-    {
-        for ( UserResolutionDTO resolution : resolutions )
-        {
-            if ( StringUtils.isEmpty( resolution.getEmail() ) )
-            {
-                resolution.setEmail( DEFAULT_EMAIL );
-            }
-        }
-    }
 
 }

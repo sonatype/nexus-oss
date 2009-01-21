@@ -40,8 +40,6 @@ public abstract class AbstractMigrationPrivilegeTest
     {
         MigrationSummaryDTO migrationSummary = ImportMessageUtil.importBackup( getBackupFile() );
 
-        ImportMessageUtil.fillDefaultEmailIfNotExist( migrationSummary.getUserResolution() );
-
         return ImportMessageUtil.commitImport( migrationSummary ).getStatus();
     }
 

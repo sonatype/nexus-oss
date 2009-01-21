@@ -139,7 +139,7 @@ public class ArtifactoryUploadBackupPlexusResource
 
                 List<UserResolutionDTO> userResolution = resolve( securityCfg.getUsers() );
 
-                data.setUserResolution( userResolution );
+                data.setUsersResolution( userResolution );
 
                 // set response
                 MigrationSummaryResponseDTO res = new MigrationSummaryResponseDTO();
@@ -238,7 +238,7 @@ public class ArtifactoryUploadBackupPlexusResource
 
             validateUser( user );
 
-            resolution.setId( user.getUsername() );
+            resolution.setUserId( user.getUsername() );
 
             resolution.setPassword( user.getPassword() );
 

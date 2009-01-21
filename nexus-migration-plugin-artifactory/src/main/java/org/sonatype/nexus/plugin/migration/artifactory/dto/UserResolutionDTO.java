@@ -15,7 +15,7 @@ package org.sonatype.nexus.plugin.migration.artifactory.dto;
 public class UserResolutionDTO
 {
 
-    private String id;
+    private String userId;
     
     private String password;
 
@@ -23,14 +23,14 @@ public class UserResolutionDTO
 
     private String email;
 
-    public String getId()
+    public String getUserId()
     {
-        return id;
+        return userId;
     }
 
-    public void setId( String id )
+    public void setUserId( String userId )
     {
-        this.id = id;
+        this.userId = userId;
     }
 
     public String getPassword()

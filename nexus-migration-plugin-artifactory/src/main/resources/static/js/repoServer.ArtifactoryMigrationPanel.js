@@ -78,12 +78,12 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
   } );
 
   this.userStore = new Ext.data.JsonStore( {
-    id: 'id',
+    id: 'userId',
     autoLoad: false,
-    sortInfo: { field: 'id', direction: 'ASC' },
+    sortInfo: { field: 'userId', direction: 'ASC' },
     data: [],
     fields: [
-      { name: 'id', sortType:Ext.data.SortTypes.asUCString },
+      { name: 'userId', sortType:Ext.data.SortTypes.asUCString },
       { name: 'email' },
       { name: 'isAdmin', type: 'bool' },
       { name: 'password' },
@@ -338,13 +338,13 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                     region: 'center',
                     frame: true,
                     ds: this.userStore,
-                    sortInfo: { field: 'id', direction: 'asc' },
+                    sortInfo: { field: 'userId', direction: 'asc' },
                     loadMask: true,
                     deferredRender: true,
                     plugins: [ userImportColumn, adminColumn ],
                     columns: [
                       userImportColumn,
-                      { header: 'User ID', dataIndex: 'id', width: 200 },
+                      { header: 'User ID', dataIndex: 'userId', width: 200 },
                       { header: 'Email', dataIndex: 'email', width: 200 },
                       adminColumn
                     ]
@@ -389,7 +389,7 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
     this.importData = data;
     this.groupStore.loadData( data.groupsResolution );
     this.repoStore.loadData( data.repositoriesResolution );
-    this.userStore.loadData( data.userResolution );
+    this.userStore.loadData( data.usersResolution );
 
     var fieldset1 = this.findById( 'artifactory-import-step1-fieldset' );
     var fieldset2 = this.findById( 'artifactory-import-step2-fieldset' );
@@ -405,7 +405,7 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
       backupLocation: this.importData.backupLocation,
       groupsResolution: [],
       repositoriesResolution: [],
-      userResolution: []
+      usersResolution: []
     };
     
     this.groupStore.each( function( rec ) {
@@ -435,8 +435,8 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
     
     this.userStore.each( function( rec ) {
       if ( rec.data.import ) {
-        data.userResolution.push( {
-          id: rec.data.id,
+        data.usersResolution.push( {
+          userId: rec.data.userId,
           email: rec.data.email,
           password: rec.data.password,
           isAdmin: rec.data.isAdmin

@@ -23,7 +23,7 @@ public class MigrationSummaryDTO
 
     private String backupLocation;
 
-    private List<UserResolutionDTO> userResolution;
+    private List<UserResolutionDTO> usersResolution;
 
     private boolean resolvePermission;
 
@@ -55,18 +55,18 @@ public class MigrationSummaryDTO
         this.backupLocation = backupLocation;
     }
 
-    public List<UserResolutionDTO> getUserResolution()
+    public List<UserResolutionDTO> getUsersResolution()
     {
-        if ( userResolution == null )
+        if ( usersResolution == null )
         {
-            userResolution = new ArrayList<UserResolutionDTO>();
+            usersResolution = new ArrayList<UserResolutionDTO>();
         }
-        return userResolution;
+        return usersResolution;
     }
 
-    public void setUserResolution( List<UserResolutionDTO> userResolution )
+    public void setUsersResolution( List<UserResolutionDTO> userResolution )
     {
-        this.userResolution = userResolution;
+        this.usersResolution = userResolution;
     }
 
     public boolean isResolvePermission()

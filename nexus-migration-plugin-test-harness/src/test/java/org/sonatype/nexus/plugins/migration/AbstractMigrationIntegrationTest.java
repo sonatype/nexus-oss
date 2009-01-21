@@ -165,7 +165,6 @@ public class AbstractMigrationIntegrationTest
     {
         MigrationSummaryDTO migrationSummary = ImportMessageUtil.importBackup( artifactoryBackup );
         Assert.assertNotNull( "Unexpected result from server: " + migrationSummary, migrationSummary );
-        ImportMessageUtil.fillDefaultEmailIfNotExist( migrationSummary.getUserResolution() );
         return migrationSummary;
     }
 

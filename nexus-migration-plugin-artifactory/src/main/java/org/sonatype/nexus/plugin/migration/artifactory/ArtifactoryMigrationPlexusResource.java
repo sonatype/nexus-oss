@@ -142,10 +142,10 @@ public class ArtifactoryMigrationPlexusResource
     {
         List<ArtifactoryUser> userList = new ArrayList<ArtifactoryUser>();
 
-        for ( UserResolutionDTO userResolution : migrationSummary.getUserResolution() )
+        for ( UserResolutionDTO userResolution : migrationSummary.getUsersResolution() )
         {
             ArtifactoryUser user = new ArtifactoryUser(
-                userResolution.getId(),
+                userResolution.getUserId(),
                 userResolution.getPassword(),
                 userResolution.getEmail() );
 

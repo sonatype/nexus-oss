@@ -35,7 +35,7 @@ public class NXCM254ImportSecurity125RemoveUserTest
     {
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactory-security-125.zip" ) );
 
-        List<UserResolutionDTO> userList = migrationSummary.getUserResolution();
+        List<UserResolutionDTO> userList = migrationSummary.getUsersResolution();
 
         List<UserResolutionDTO> returnUserList = new ArrayList<UserResolutionDTO>();
 
@@ -43,7 +43,7 @@ public class NXCM254ImportSecurity125RemoveUserTest
 
         returnUserList.add( userList.get( 1 ) );
 
-        migrationSummary.setUserResolution( returnUserList );
+        migrationSummary.setUsersResolution( returnUserList );
 
         commitMigration( migrationSummary );
     }
