@@ -11,23 +11,34 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.maven.maven1;
+package org.sonatype.nexus.rest.groups;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.repository.DefaultGroupRepository;
+import org.restlet.data.Request;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.rest.repositories.AbstractRepositoryTypeRegistryPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = GroupRepository.class, hint = "maven1", instantiationStrategy = "per-lookup", description = "Maven1 Repository Group" )
-public class M1GroupRepository
-    extends DefaultGroupRepository
+@Component( role = PlexusResource.class, hint = "RepositoryGroupTypesComponentListPlexusResource" )
+public class RepositoryGroupTypesComponentListPlexusResource
+    extends AbstractRepositoryTypeRegistryPlexusResource
 {
-    @Requirement( hint = "maven1" )
-    private ContentClass contentClass;
-
-    public ContentClass getRepositoryContentClass()
+    @Override
+    public String getResourceUri()
     {
-        return contentClass;
+        return "/components/group_repo_types";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:componentsrepotypes]" );
+    }
+
+    @Override
+    protected Class<?> getRole( Request request )
+    {
+        return GroupRepository.class;
     }
 }

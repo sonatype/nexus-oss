@@ -47,7 +47,7 @@ import org.sonatype.nexus.proxy.repository.DefaultGroupRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
-@Component( role = GroupRepository.class, hint = "maven2", instantiationStrategy = "per-lookup" )
+@Component( role = GroupRepository.class, hint = "maven2", instantiationStrategy = "per-lookup", description = "Maven2 Repository Group" )
 public class M2GroupRepository
     extends DefaultGroupRepository
 {

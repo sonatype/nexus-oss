@@ -32,7 +32,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
   //Reader and datastore that queries the server for the list of content classes
   this.contentClassesReader = new Ext.data.JsonReader({root: 'data', id: 'roleHint'}, this.contentClassRecordConstructor );
   this.contentClassesDataStore = new Ext.data.Store({
-    url: Sonatype.config.repos.urls.repoContentClasses,
+    url: Sonatype.config.repos.urls.groupRepoTypes,
     reader: this.contentClassesReader,
     sortInfo: {field: 'description', direction: 'ASC'},
     autoLoad: true

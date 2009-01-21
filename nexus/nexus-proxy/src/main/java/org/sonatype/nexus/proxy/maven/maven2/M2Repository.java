@@ -51,7 +51,7 @@ import org.sonatype.nexus.util.AlphanumComparator;
  * 
  * @author cstamas
  */
-@Component( role = Repository.class, hint = "maven2", instantiationStrategy = "per-lookup" )
+@Component( role = Repository.class, hint = "maven2", instantiationStrategy = "per-lookup", description = "Maven2 Repository" )
 public class M2Repository
     extends AbstractMavenRepository
 {

@@ -32,7 +32,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * 
  * @author cstamas
  */
-@Component( role = Repository.class, hint = "maven1", instantiationStrategy = "per-lookup" )
+@Component( role = Repository.class, hint = "maven1", instantiationStrategy = "per-lookup", description = "Maven1 Repository" )
 public class M1Repository
     extends AbstractMavenRepository
 {
