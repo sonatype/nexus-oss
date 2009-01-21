@@ -26,6 +26,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.cache.CacheStatistics;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.RepositoryMetaResource;
 import org.sonatype.nexus.rest.model.RepositoryMetaResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -75,7 +76,7 @@ public class RepositoryMetaPlexusResource
 
                 resource.setRepoType( getRestRepoType( model ) );
 
-                resource.setFormat( model.getType() );
+                resource.setFormat( getRepoFormat( Repository.class, model.getType() ) );
             }
             catch ( NoSuchRepositoryException e )
             {
@@ -83,7 +84,7 @@ public class RepositoryMetaPlexusResource
 
                 resource.setRepoType( getRestRepoType( model ) );
 
-                resource.setFormat( model.getType() );
+                resource.setFormat( getRepoFormat( ShadowRepository.class, model.getType() ) );
             }
 
             resource.setId( repoId );

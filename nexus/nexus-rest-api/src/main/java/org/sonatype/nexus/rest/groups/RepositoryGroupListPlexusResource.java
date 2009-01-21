@@ -13,7 +13,6 @@
  */
 package org.sonatype.nexus.rest.groups;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,10 +23,8 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
@@ -72,6 +69,7 @@ public class RepositoryGroupListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:repogroups]" );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
@@ -164,60 +162,10 @@ public class RepositoryGroupListPlexusResource
             }
             catch ( NoSuchRepositoryException ex )
             {
-                CRepositoryGroup group = new CRepositoryGroup();
-
-                group.setGroupId( resource.getId() );
-
-                group.setName( resource.getName() );
-                
-                group.setType( resource.getFormat() );
-
-                try
-                {
-                    for ( RepositoryGroupMemberRepository member : (List<RepositoryGroupMemberRepository>) resource
-                        .getRepositories() )
-                    {
-                        group.addRepository( member.getId() );
-                    }
-
-                    getNexus().createRepositoryGroup( group );
-                    //
-                    // response.setStatus( Status.SUCCESS_NO_CONTENT );
-                }
-                catch ( ConfigurationException e )
-                {
-                    handleConfigurationException( e );
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    getLogger().warn(
-                        "Repository referenced by Repository Group Not Found, GroupId=" + group.getGroupId(),
-                        e );
-
-                    throw new PlexusResourceException(
-                        Status.CLIENT_ERROR_BAD_REQUEST,
-                        "Repository referenced by Repository Group Not Found, GroupId=" + group.getGroupId(),
-                        getNexusErrorResponse( "repositories", "Repository referenced by Repository Group Not Found" ) );
-                }
-                catch ( InvalidGroupingException e )
-                {
-                    getLogger().warn( "Invalid grouping detected!, GroupId=" + group.getGroupId(), e );
-
-                    throw new PlexusResourceException(
-                        Status.CLIENT_ERROR_BAD_REQUEST,
-                        "Invalid grouping requested, GroupId=" + group.getGroupId(),
-                        getNexusErrorResponse(
-                            "repositories",
-                            "Repository referenced by Repository Group does not share same content type!" ) );
-                }
-                catch ( IOException e )
-                {
-                    getLogger().warn( "Got IO Exception!", e );
-
-                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-                }
+                createOrUpdateRepositoryGroup( resource, true );
             }
         }
+        
         // TODO: return the group
         return null;
     }

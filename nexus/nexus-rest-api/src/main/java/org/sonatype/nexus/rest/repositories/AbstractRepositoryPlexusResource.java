@@ -15,6 +15,7 @@ package org.sonatype.nexus.rest.repositories;
 
 import java.util.Collection;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -30,9 +31,12 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
@@ -59,6 +63,12 @@ public abstract class AbstractRepositoryPlexusResource
     /** Repo type virtual (shadow in nexus). */
     public static final String REPO_TYPE_VIRTUAL = "virtual";
 
+    /** Repo type group. */
+    public static final String REPO_TYPE_GROUP = "group";
+
+    @Requirement
+    private RepositoryTypeRegistry repositoryTypeRegistry;
+
     /**
      * Pull the repository Id out of the Request.
      * 
@@ -68,6 +78,51 @@ public abstract class AbstractRepositoryPlexusResource
     protected String getRepositoryId( Request request )
     {
         return request.getAttributes().get( REPOSITORY_ID_KEY ).toString();
+    }
+
+    protected String getRepoFormat( Class<?> role, String type )
+    {
+        ContentClass cc = repositoryTypeRegistry.getRepositoryContentClass( role.getName(), type );
+
+        if ( cc != null )
+        {
+            return cc.getId();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    protected String getHintForRoleAndFormat( Class<?> role, String format )
+    {
+        if ( Repository.class.equals( role ) )
+        {
+            // "simple" repositories
+            // we are lucky here, they pair 1:1
+            // XXX: but is not future proof!
+            return format;
+        }
+        else if ( ShadowRepository.class.equals( role ) )
+        {
+            // "shadows", we need a tweak here
+            if ( "maven2".equals( format ) )
+            {
+                return "m1-m2-shadow";
+            }
+            else if ( "maven1".equals( format ) )
+            {
+                return "m2-m1-shadow";
+            }
+            else
+            {
+                return format;
+            }
+        }
+        else
+        {
+            return format;
+        }
     }
 
     /**
@@ -85,7 +140,7 @@ public abstract class AbstractRepositoryPlexusResource
 
         resource.setShadowOf( model.getShadowOf() );
 
-        resource.setFormat( model.getType() );
+        resource.setFormat( getRepoFormat( ShadowRepository.class, model.getType() ) );
 
         resource.setSyncAtStartup( model.isSyncAtStartup() );
 
@@ -121,7 +176,7 @@ public abstract class AbstractRepositoryPlexusResource
 
         appModel.setSyncAtStartup( model.isSyncAtStartup() );
 
-        appModel.setType( model.getFormat() );
+        appModel.setType( getHintForRoleAndFormat( ShadowRepository.class, model.getFormat() ) );
 
         return appModel;
     }
@@ -142,7 +197,7 @@ public abstract class AbstractRepositoryPlexusResource
             resource = new RepositoryResource();
         }
 
-        resource.setFormat( model.getType() );
+        resource.setFormat( getRepoFormat( Repository.class, model.getType() ) );
 
         resource.setRepoType( repoType );
 
@@ -220,7 +275,7 @@ public abstract class AbstractRepositoryPlexusResource
 
         appModel.setName( model.getName() );
 
-        appModel.setType( model.getFormat() );
+        appModel.setType( getHintForRoleAndFormat( Repository.class, model.getFormat() ) );
 
         appModel.setAllowWrite( model.isAllowWrite() );
 
@@ -561,7 +616,7 @@ public abstract class AbstractRepositoryPlexusResource
 
                 repoRes.setRepoType( getRestRepoType( repository ) );
 
-                repoRes.setFormat( repository.getType() );
+                repoRes.setFormat( getRepoFormat( Repository.class, repository.getType() ) );
 
                 repoRes.setId( repository.getId() );
 
@@ -600,7 +655,7 @@ public abstract class AbstractRepositoryPlexusResource
 
                 repoRes.setId( shadow.getId() );
 
-                repoRes.setFormat( shadow.getType() );
+                repoRes.setFormat( getRepoFormat( ShadowRepository.class, shadow.getType() ) );
 
                 repoRes.setResourceURI( createRepositoryReference( request, shadow.getId() ).toString() );
 
@@ -612,11 +667,12 @@ public abstract class AbstractRepositoryPlexusResource
 
                 repoRes.setEffectiveLocalStorageUrl( shadow.defaultLocalStorageUrl );
 
+                repoRes.setExposed( shadow.isExposed() );
+
                 result.addData( repoRes );
             }
         }
 
         return result;
     }
-
 }

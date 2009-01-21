@@ -23,6 +23,8 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.RepositoryStatusListResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
@@ -77,7 +79,7 @@ public class RepositoryStatusesListPlexusResource
 
             repoRes.setRepoPolicy( getRestRepoPolicy( repository ) );
 
-            repoRes.setFormat( repository.getType() );
+            repoRes.setFormat( getRepoFormat( Repository.class, repository.getType() ) );
 
             repoRes.setStatus( new RepositoryStatusResource() );
 
@@ -101,9 +103,13 @@ public class RepositoryStatusesListPlexusResource
 
             repoRes.setResourceURI( createChildReference( request, shadow.getId() ).toString() );
 
-            repoRes.setRepoType( getRestRepoType( shadow ) );
+            repoRes.setId( shadow.getId() );
 
             repoRes.setName( shadow.getName() );
+
+            repoRes.setRepoType( getRestRepoType( shadow ) );
+
+            repoRes.setFormat( getRepoFormat( ShadowRepository.class, shadow.getType() ) );
 
             repoRes.setStatus( new RepositoryStatusResource() );
 

@@ -13,10 +13,98 @@
  */
 package org.sonatype.nexus.rest.groups;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.codehaus.plexus.util.StringUtils;
+import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.model.CRepositoryGroup;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
+import org.sonatype.nexus.rest.model.RepositoryGroupResource;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 public abstract class AbstractRepositoryGroupPlexusResource
     extends AbstractNexusPlexusResource
 {
     public static final String GROUP_ID_KEY = "groupId";
+
+    @SuppressWarnings( "unchecked" )
+    protected void createOrUpdateRepositoryGroup( RepositoryGroupResource model, boolean create )
+        throws ResourceException
+    {
+        try
+        {
+            CRepositoryGroup group = null;
+
+            if ( create )
+            {
+                group = new CRepositoryGroup();
+
+                group.setGroupId( model.getId() );
+            }
+            else
+            {
+                group = getNexus().readRepositoryGroup( model.getId() );
+            }
+
+            group.setName( model.getName() );
+
+            // TODO: we must be smart here, the REST API is limes -> broken
+            // XXX: right now, contentClass ID and group repo component does pair (but is not at all future proof!)
+            // XXX: fix is here, if no format is given, fallback to "default" maven2, since it is the only possibility
+            // with UI now
+            group.setType( StringUtils.isEmpty( model.getFormat() ) ? "maven2" : model.getFormat() );
+
+            group.getRepositories().clear();
+
+            for ( RepositoryGroupMemberRepository member : (List<RepositoryGroupMemberRepository>) model
+                .getRepositories() )
+            {
+                group.addRepository( member.getId() );
+            }
+
+            if ( create )
+            {
+                getNexus().createRepositoryGroup( group );
+            }
+            else
+            {
+                getNexus().updateRepositoryGroup( group );
+            }
+        }
+        catch ( ConfigurationException e )
+        {
+            handleConfigurationException( e );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            getLogger().warn( "Repository referenced by Repository Group Not Found, ID=" + model.getId(), e );
+
+            throw new PlexusResourceException(
+                Status.CLIENT_ERROR_BAD_REQUEST,
+                "Repository referenced by Repository Group Not Found, GroupId=" + model.getId(),
+                e,
+                getNexusErrorResponse( "repositories", "Repository referenced by Repository Group Not Found" ) );
+        }
+        catch ( InvalidGroupingException e )
+        {
+            getLogger().warn( "Invalid grouping detected!, GroupId=" + model.getId(), e );
+
+            throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid grouping requested, GroupId="
+                + model.getId(), e, getNexusErrorResponse(
+                "repositories",
+                "Repository referenced by Repository Group does not share same content type!" ) );
+        }
+        catch ( IOException e )
+        {
+            getLogger().warn( "Got IO Exception!", e );
+
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
+        }
+    }
 }

@@ -15,11 +15,9 @@ package org.sonatype.nexus.rest.component;
 
 import java.util.List;
 
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -33,10 +31,10 @@ import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 
 public abstract class AbstractComponentListPlexusResource
     extends AbstractNexusPlexusResource
-    implements Contextualizable
 {
     public static final String ROLE_ID = "role";
 
+    @Requirement
     private PlexusContainer container;
 
     @Override
@@ -61,7 +59,7 @@ public abstract class AbstractComponentListPlexusResource
         String role = getRole( request );
 
         // get component descriptors
-        List<ComponentDescriptor<?>> componentMap = this.container.getComponentDescriptorList( role );
+        List<ComponentDescriptor<?>> componentMap = container.getComponentDescriptorList( role );
 
         // check if valid role
         if ( componentMap == null || componentMap.isEmpty() )
@@ -78,19 +76,11 @@ public abstract class AbstractComponentListPlexusResource
             resource.setDescription( ( StringUtils.isNotEmpty( componentDescriptor.getDescription() ) )
                 ? componentDescriptor.getDescription()
                 : componentDescriptor.getRoleHint() );
-            
+
             // add it to the collection
             result.addData( resource );
         }
 
         return result;
     }
-
-    public void contextualize( org.codehaus.plexus.context.Context context )
-        throws ContextException
-    {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-
-    }
-
 }

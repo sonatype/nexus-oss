@@ -15,6 +15,7 @@ package org.sonatype.nexus.rest.repositories;
 
 import java.io.IOException;
 
+import org.apache.maven.model.Repository;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -26,6 +27,7 @@ import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.RepositoryDependentStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
@@ -81,7 +83,7 @@ public class RepositoryStatusPlexusResource
 
                 resource.setRepoType( getRestRepoType( model ) );
 
-                resource.setFormat( model.getType() );
+                resource.setFormat( getRepoFormat( Repository.class, model.getType() ) );
 
                 resource.setLocalStatus( getRestRepoLocalStatus( model ) );
 
@@ -100,6 +102,8 @@ public class RepositoryStatusPlexusResource
                 resource.setId( model.getId() );
 
                 resource.setRepoType( getRestRepoType( model ) );
+
+                resource.setFormat( getRepoFormat( ShadowRepository.class, model.getType() ) );
 
                 resource.setLocalStatus( getRestRepoLocalStatus( model ) );
             }
@@ -181,7 +185,7 @@ public class RepositoryStatusPlexusResource
 
                             dependent.setRepoType( getRestRepoType( shadow ) );
 
-                            dependent.setFormat( shadow.getType() );
+                            dependent.setFormat( getRepoFormat( ShadowRepository.class, shadow.getType() ) );
 
                             dependent.setLocalStatus( getRestRepoLocalStatus( shadow ) );
 

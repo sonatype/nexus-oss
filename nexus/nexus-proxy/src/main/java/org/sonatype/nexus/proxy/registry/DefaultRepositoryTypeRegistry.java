@@ -13,33 +13,90 @@
  */
 package org.sonatype.nexus.proxy.registry;
 
-import java.util.Map;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 @Component( role = RepositoryTypeRegistry.class )
 public class DefaultRepositoryTypeRegistry
     extends AbstractLogEnabled
     implements RepositoryTypeRegistry
 {
-    @Requirement( role = Repository.class )
-    private Map<String, Repository> existingRepositoryTypes;
+    @Requirement
+    private PlexusContainer container;
 
-    public Set<String> getExistingRepositoryTypes()
+    private Set<String> repositoryRoles;
+
+    public Set<String> getRepositoryRoles()
     {
-        return existingRepositoryTypes.keySet();
+        if ( repositoryRoles == null )
+        {
+            repositoryRoles = new HashSet<String>();
+
+            // fill in the defaults
+            repositoryRoles.add( Repository.class.getName() );
+            repositoryRoles.add( ShadowRepository.class.getName() );
+            repositoryRoles.add( GroupRepository.class.getName() );
+        }
+
+        return repositoryRoles;
     }
 
-    public ContentClass getTypeContentClass( String repositoryType )
+    public Set<String> getExistingRepositoryHints( String role )
     {
-        if ( existingRepositoryTypes.containsKey( repositoryType ) )
+        if ( !getRepositoryRoles().contains( role ) )
         {
-            return existingRepositoryTypes.get( repositoryType ).getRepositoryContentClass();
+            return Collections.emptySet();
+        }
+
+        List<ComponentDescriptor<Repository>> components = container
+            .getComponentDescriptorList( Repository.class, role );
+
+        HashSet<String> result = new HashSet<String>( components.size() );
+
+        for ( ComponentDescriptor<Repository> component : components )
+        {
+            result.add( component.getRoleHint() );
+        }
+
+        return result;
+    }
+
+    public ContentClass getRepositoryContentClass( String role, String hint )
+    {
+        if ( !getRepositoryRoles().contains( role ) )
+        {
+            return null;
+        }
+
+        if ( container.hasComponent( Repository.class, role, hint ) )
+        {
+            try
+            {
+                // Note: this is very heavy to do on every call, we need some better solution.
+                // but if we think about plugins, and having runtime changes about available repository
+                // implementations...
+                Repository repository = container.lookup( Repository.class, role, hint );
+
+                return repository.getRepositoryContentClass();
+            }
+            catch ( ComponentLookupException e )
+            {
+                // should not happen, we checked for it
+                return null;
+            }
         }
         else
         {
@@ -47,16 +104,38 @@ public class DefaultRepositoryTypeRegistry
         }
     }
 
-    public RepositoryKind getTypeRepositoryKind( String repositoryType )
+    public String getRepositoryDescription( String role, String hint )
     {
-        if ( existingRepositoryTypes.containsKey( repositoryType ) )
-        {
-            return existingRepositoryTypes.get( repositoryType ).getRepositoryKind();
-        }
-        else
+        if ( !getRepositoryRoles().contains( role ) )
         {
             return null;
         }
-    }
 
+        if ( container.hasComponent( Repository.class, role, hint ) )
+        {
+            ComponentDescriptor<Repository> component = container.getComponentDescriptor( Repository.class, role, hint );
+
+            if ( component != null ) // but we asked for it with hasComponent()?
+            {
+                if ( !StringUtils.isEmpty( component.getDescription() ) )
+                {
+                    return component.getDescription();
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            else
+            {
+                // component descriptor is null?
+                return null;
+            }
+        }
+        else
+        {
+            // component is not found
+            return null;
+        }
+    }
 }
