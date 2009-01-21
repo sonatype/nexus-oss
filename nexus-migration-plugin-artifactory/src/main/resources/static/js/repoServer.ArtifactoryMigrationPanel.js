@@ -460,7 +460,8 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
         this.el.unmask();
 
         if ( success ) {
-          var r = Ext.decode( response.responseText );
+          this.formPanel.buttons[0].disable();
+          this.formPanel.buttons[1].setText( 'Close' );
           Sonatype.MessageBox.show( {
             title: 'Import Successful',
             msg: 'Artifactory backup import completed successfully',
