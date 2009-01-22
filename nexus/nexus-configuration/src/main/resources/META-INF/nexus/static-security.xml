@@ -145,8 +145,6 @@
                 <privilege>10</privilege>
                 <privilege>78</privilege>
                 <privilege>79</privilege>
-                <privilege>80</privilege>
-                <privilege>81</privilege>
             </privileges>
         </role>
         <role>
@@ -1576,38 +1574,5 @@
             </property>
           </properties>
         </privilege>
-        <privilege>
-          <id>80</id>
-          <type>method</type>
-          <name>Repository Mirrors - (update,read)</name>
-          <description>Give permission to update repository mirror configuration</description>
-          <properties>
-            <property>
-              <key>method</key>
-              <value>update,read</value>
-            </property>
-            <property>
-              <key>permission</key>
-              <value>nexus:repositorymirrors</value>
-            </property>
-          </properties>
-        </privilege>
-        <privilege>
-          <id>81</id>
-          <type>method</type>
-          <name>Repository Mirrors - (delete,read)</name>
-          <description>Give permission to delete repository mirror configuration</description>
-          <properties>
-            <property>
-              <key>method</key>
-              <value>delete,read</value>
-            </property>
-            <property>
-              <key>permission</key>
-              <value>nexus:repositorymirrors</value>
-            </property>
-          </properties>
-        </privilege>
-		
     </privileges>
 </security>
