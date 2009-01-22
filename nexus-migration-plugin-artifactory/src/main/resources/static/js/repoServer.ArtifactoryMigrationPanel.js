@@ -164,8 +164,10 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
         style: 'padding: 10px;',
         cls: 'x-form-item',
         html: 'Import an existing Artifactory configuration into Nexus.<br/><br/>' +
-          'Start by uploading a .zip file with a configuration backup. Once the upload is complete, ' +
-          'you will be presented with a list of available repositories and import options.'
+          'In order to proceed, you first need to upload a .zip file with a configuration backup to ' +
+          'the server where Nexus is running. Once the file upload is complete you can specify its ' +
+          'location in the form below, and then you will be presented with a list of available ' +
+          'repositories and import options.'
       },
       { 
         xtype: 'panel',
@@ -174,7 +176,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
           {
             xtype: 'fieldset',
             checkboxToggle: false,
-            title: '1. Upload Artifactory Configuration',
+            title: '1. Load Artifactory Configuration',
             id: 'artifactory-import-step1-fieldset',
             anchor: Sonatype.view.FIELDSET_OFFSET_WITH_SCROLL,
             autoHeight: true,
@@ -186,7 +188,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
               {
                 style: 'padding-bottom: 10px',
                 cls: 'x-form-item',
-                html: 'Click "Browse" to upload a .zip file with your Artifactory configuration backup:'
+                html: 'Enter the path to your .zip file with Artifactory configuration backup and click "Load":'
               },
               {
                 xtype: 'panel',
@@ -196,21 +198,21 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                   {
                     xtype: 'textfield',
                     name: 'filenameField',
-                    readOnly: true,
-                    columnWidth: .85
+                    columnWidth: .85,
+                    validator: function( v ) {
+                      Ext.getCmp( 'artifactory-import-browse-button' ).setDisabled( v == '' );
+                      return true;
+                    }
                   },
                   {
-                    xtype: 'browsebutton',
-                    text: 'Browse...',
+                    xtype: 'button',
+                    text: 'Load',
                     id: 'artifactory-import-browse-button',
                     columnWidth: .1,
-                    uploadPanel: this,
-                    handler: function( b ) {
-                      b.uploadPanel.fileInput = b.detachInputFile(); 
-                      var filename = b.uploadPanel.fileInput.getValue();
-                      b.uploadPanel.formPanel.find( 'name', 'filenameField' )[0].setValue( filename );
-                      b.uploadPanel.uploadBackup();
-                    }
+                    handler: this.loadBackup,
+                    scope: this,
+                    disabled: true,
+                    setSize: function() {}
                   }
                 ] 
               }
@@ -391,6 +393,33 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
     Sonatype.view.mainTabPanel.remove( this.id, true );
   },
 
+  loadBackup: function() {
+    this.el.mask( 'Loading...' );
+
+    var filenameField = this.formPanel.form.findField( 'filenameField' );
+    var filename = filenameField.getValue( filename );
+    filenameField.disable();
+    this.findById( 'artifactory-import-browse-button' ).disable();
+
+    Ext.Ajax.request( {
+      method: 'POST',
+      url: Sonatype.config.servicePath + '/migration/artifactory/filelocation',
+      jsonData: { data: { fileLocation: filename } },
+      callback: function( options, success, response ) {
+        this.el.unmask();
+
+        if ( success ) {
+          var r = Ext.decode( response.responseText );
+          this.loadImportData( r.data );
+          return;
+        }
+
+        this.formPanel.form.findField( 'filenameField' ).enable();
+      },
+      scope : this
+    } );
+  },
+
   loadImportData: function( data ) {
     this.importData = data;
     this.groupStore.loadData( data.groupsResolution );
@@ -475,60 +504,13 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
       },
       scope : this
     } );
-  },
-
-  uploadBackup: function() {
-    this.findById( 'artifactory-import-browse-button' ).disable();
-    this.el.mask( 'Uploading...' );
-    var tmpForm = Ext.getBody().createChild( {
-      tag: 'form',
-      cls: 'x-hidden',
-      id: Ext.id()
-    } );
-    this.fileInput.appendTo( tmpForm );
-
-    Ext.Ajax.request( {
-      url: Sonatype.config.servicePath + '/migration/artifactory/upload',
-      form: tmpForm,
-      isUpload : true,
-      callback: function( options, success, response ) {
-        this.el.unmask();
-        tmpForm.remove();
-
-        //This is a hack to get around the fact that upload submit always returns
-        //success = true
-        if ( response.responseXML.title == '' ) {
-          var r = Ext.decode( response.responseText );
-          this.loadImportData( r.data );
-          return;
-        }
-
-        var s = 'Artifact upload failed.<br />';
-        var r = response.responseText;
-        var n1 = r.toLowerCase().indexOf( '<h3>' ) + 4;
-        var n2 = r.toLowerCase().indexOf( '</h3>' );
-        if ( n2 > n1 ) {
-          s += r.substring( n1, n2 );
-        }
-        else {
-          s += 'Check Nexus logs for more information.';
-        }
-        Sonatype.MessageBox.show( {
-          title: 'Upload Failed',
-          msg: s,
-          buttons: Sonatype.MessageBox.OK,
-          icon: Sonatype.MessageBox.ERROR
-        } );
-      },
-      scope : this
-    } );
   }
 } );
 
 Sonatype.Events.addListener( 'nexusNavigationInit', function( nexusPanel ) {
   nexusPanel.add( {
     enabled: Sonatype.lib.Permissions.checkPermission( 'nexus:artifactorymigrate', Sonatype.lib.Permissions.CREATE ) &&
-      Sonatype.lib.Permissions.checkPermission( 'nexus:artifactoryupload', Sonatype.lib.Permissions.CREATE ),
+      Sonatype.lib.Permissions.checkPermission( 'nexus:artifactoryfilelocation', Sonatype.lib.Permissions.CREATE ),
     sectionId: 'st-nexus-config',
     title: 'Artifactory Import',
     tabId: 'migration-artifactory',
