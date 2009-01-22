@@ -623,6 +623,10 @@
 						<goals>
 							<goal>enforce</goal>
 						</goals>
+            <!-- we don't need these until JUST BEFORE integration testing, 
+                 so moving to a later phase to get out of 
+                 the way of m2eclipse. -->
+						<phase>package</phase>
 						<id>enforce</id>
 						<configuration>
 							<rules>
