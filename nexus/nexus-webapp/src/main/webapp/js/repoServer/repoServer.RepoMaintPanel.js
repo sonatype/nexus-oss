@@ -1168,6 +1168,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
     tbar: toolbar,
     columns: [
       { name: 'resourceURI' },
+      { name: 'id' },
       {
         name: 'name',
         sortType: Ext.data.SortTypes.asUCString,

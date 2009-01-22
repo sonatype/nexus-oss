@@ -313,7 +313,12 @@ Sonatype.repoServer.referenceData = {
     rootLogger : "",
     fileAppenderLocation : "",
     fileAppenderPattern : ""
-  }
+  },
+  
+  repoMirrors : [{
+    id : "",
+    url : ""
+  }]
   
 };
 

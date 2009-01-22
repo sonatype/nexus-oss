@@ -12,28 +12,192 @@
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
 
-Sonatype.repoServer.MirrorConfigPanel = function(config){
+Sonatype.repoServer.MirrorConfigPanel = function(config) {
   var config = config || {};
-  var defaultConfig = {};
-  Ext.apply(this, config, defaultConfig);
   
+  this.mirrorRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
+    {name:'url', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+  
+  this.mirrorReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.mirrorRecordConstructor );
+  
+  this.mirrorDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.repoMirrors + '/' + config.payload.data.id,
+    reader: this.mirrorReader,
+    sortInfo: { field: 'url', direction: 'ASC' },
+    autoLoad: false
+ });
+  
+  var defaultConfig = {
+    uri :Sonatype.config.repos.urls.repoMirrors + '/' + config.payload.data.id,
+    referenceData: Sonatype.repoServer.referenceData.repoMirrors,
+    dataStores: [this.mirrorDataStore]
+  };
+
+  Ext.apply(this, config, defaultConfig);
+
+  var ht = Sonatype.repoServer.resources.help.repoMirrors;
+
   Sonatype.repoServer.MirrorConfigPanel.superclass.constructor.call(this, {
-    autoScroll: true
+    listeners : {
+      submit : {
+        fn :this.submitHandler,
+        scope :this
+      }
+    },
+    items : [
+        {
+          xtype :'panel',
+          style :'padding-top: 20px',
+          layout :'column',
+          items : [
+              {
+                xtype :'panel',
+                layout :'form',
+                width :380,
+                items : [
+                  {
+                    xtype :'textfield',
+                    fieldLabel :'Mirror URL',
+                    helpText :ht.mirrorUrl,
+                    name :'mirrorUrl',
+                    width :205
+                  }
+                ]
+              }, {
+                xtype :'panel',
+                width :120,
+                items : [
+                  {
+                    xtype :'button',
+                    text :'Add',
+                    style :'padding-left: 7px',
+                    minWidth :100,
+                    id :'button-add',
+                    handler :this.addNewMirrorUrl,
+                    scope :this
+                  }
+                ]
+              }
+          ]
+        }, {
+          xtype :'panel',
+          layout :'column',
+          autoHeight :true,
+          style :'padding-left: 155px',
+          items : [
+              {
+                xtype :'treepanel',
+                name :'mirror-url-list',
+                title :'Mirror URLs',
+                cls :'required-field',
+                border :true,
+                bodyBorder :true,
+                bodyStyle :'background-color:#FFFFFF; border: 1px solid #B5B8C8',
+                style :'padding: 0 20px 0 0',
+                width :225,
+                height :300,
+                animate :true,
+                lines :false,
+                autoScroll :true,
+                containerScroll :true,
+                rootVisible :false,
+                enableDD :false
+              }, {
+                xtype :'panel',
+                width :120,
+                items : [
+                    {
+                      xtype :'button',
+                      text :'Remove',
+                      style :'padding-left: 6px',
+                      minWidth :100,
+                      id :'button-remove',
+                      handler :this.removeMirrorUrl,
+                      scope :this
+                    }, {
+                      xtype :'button',
+                      text :'Remove All',
+                      style :'padding-left: 6px; margin-top: 5px',
+                      minWidth :100,
+                      id :'button-remove-all',
+                      handler :this.removeAllMirrorUrls,
+                      scope :this
+                    }
+                ]
+              }
+          ]
+        }
+    ]
   });
 };
 
+Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
+  addNewMirrorUrl : function() {
+    var treePanel = this.find('name', 'mirror-url-list');
+    var urlField = this.find('name', 'mirrorUrl')[0];
+    var url = urlField.getRawValue();
 
-Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Ext.Panel, {
+    if (url) {
+      var nodes = treePanel.root.childNodes;
+      for ( var i = 0; i < nodes.length; i++) {
+        if (url == nodes[i].attributes.payload.url) {
+          urlField.markInvalid('This URL already exists');
+          return;
+        }
+      }
+
+      this.addUrlNode(treePanel, url);
+      urlField.setRawValue('');
+    }
+  },
+
+  addUrlNode : function(treePanel, url) {
+    var id = Ext.id();
+
+    treePanel.root.appendChild(new Ext.tree.TreeNode( {
+      id :id,
+      text :url,
+      payload : {
+        id :id,
+        url :url
+      },
+      allowChildren :false,
+      draggable :false,
+      leaf :true,
+      icon :Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif'
+    }));
+  },
+
+  removeMirrorUrl : function() {
+    var treePanel = this.find('name', 'mirror-url-list');
+
+    var selectedNode = treePanel.getSelectionModel().getSelectedNode();
+    if (selectedNode) {
+      treePanel.root.removeChild(selectedNode);
+    }
+  },
+
+  removeAllMirrorUrls : function() {
+    var treePanel = this.find('name', 'mirror-url-list');
+    var treeRoot = treePanel.root;
+
+    while (treeRoot.lastChild) {
+      treeRoot.removeChild(treeRoot.lastChild);
+    }
+  },
+
+  submitHandler : function(form, action, receivedData) {
+  }
 });
 
-Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
+Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
   var sp = Sonatype.lib.Permissions;
-  if ( rec.data.resourceURI 
-      && sp.checkPermission( 'nexus:repositorymirrors', sp.READ )
-      && rec.data.repoType == 'proxy') {
-    cardPanel.add( new Sonatype.repoServer.MirrorConfigPanel( { 
-      payload: rec,
-      tabTitle: 'Mirrors'
-    } ) );
+  if (rec.data.resourceURI && sp.checkPermission('nexus:repositorymirrors', sp.READ) && rec.data.repoType == 'proxy') {
+    cardPanel.add(new Sonatype.repoServer.MirrorConfigPanel( {
+      payload :rec,
+      tabTitle :'Mirrors'
+    }));
   }
-} );
+});
