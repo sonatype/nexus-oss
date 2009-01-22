@@ -6,31 +6,31 @@
 		<role>
 			<id>artifactory-migrator-role</id>
 			<name>Artifactory: Migrator</name>
-			<description>Give access to migrate artifactory to nexus.
+			<description>Give right to migrate artifactory to nexus.
 			</description>
 			<sessionTimeout>60</sessionTimeout>
 			<privileges>
-				<privilege>artifactory-upload</privilege>
+				<privilege>artifactory-file-location
+				</privilege>
 				<privilege>artifactory-migrate</privilege>
 			</privileges>
 		</role>
 	</roles>
 	<privileges>
 		<privilege>
-			<id>artifactory-upload</id>
+			<id>artifactory-file-location</id>
 			<type>method</type>
-			<name>Artifactory: Upload Backup File(read, update,
-				create)</name>
-			<description>Give permission to upload a artifactory backup file.
+			<name>Artifactory: File Location(read, create)</name>
+			<description>Set the location of artifactory file
 			</description>
 			<properties>
 				<property>
 					<key>method</key>
-					<value>read,update,create</value>
+					<value>read,create</value>
 				</property>
 				<property>
 					<key>permission</key>
-					<value>nexus:artifactoryupload</value>
+					<value>nexus:artifactoryfilelocation</value>
 				</property>
 			</properties>
 		</privilege>

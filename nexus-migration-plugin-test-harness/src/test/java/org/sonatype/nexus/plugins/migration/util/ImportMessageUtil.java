@@ -12,71 +12,69 @@
  */
 package org.sonatype.nexus.plugins.migration.util;
 
-import hidden.org.codehaus.plexus.util.StringUtils;
-
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.List;
 
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.junit.Assert;
+import org.mortbay.log.Log;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.FileLocationRequestDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.FileLocationResource;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRequestDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryResponseDTO;
-import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
-import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
 
 public class ImportMessageUtil
 {
-    public static final String DEFAULT_EMAIL = "juven@mars.com";
+    private static XStream xstream;
+
+    private static MediaType mediaType;
+
+    static
+    {
+        xstream = XStreamFactory.getXmlXStream();
+
+        mediaType = MediaType.APPLICATION_XML;
+    }
 
     public static MigrationSummaryDTO importBackup( File testFile )
         throws IOException
     {
-        String restServiceURL =
-            TestProperties.getString( "nexus.base.url" ) + "service/local/migration/artifactory/upload";
 
-        // the method we are calling
-        PostMethod filePost = new PostMethod( restServiceURL );
-        filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
-        filePost.addRequestHeader( "accept", "application/xml" );
+        String serviceURI = "service/local/migration/artifactory/filelocation";
 
-        /*
-         * new StringPart( "r", repositoryId ), new StringPart( "g", gav.getGroupId() ), new StringPart( "a",
-         * gav.getArtifactId() ), new StringPart( "v", gav.getVersion() ), new StringPart( "p", gav.getExtension() ),
-         * new StringPart( "c", "" ),
-         */
-        Part[] parts = { new FilePart( testFile.getName(), testFile ) };
+        FileLocationResource data = new FileLocationResource();
 
-        filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
+        data.setFileLocation( testFile.getAbsolutePath() );
 
-        HttpMethod method = RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost );
-        if ( Status.isSuccess( method.getStatusCode() ) )
-        {
-            XStream xs = XStreamFactory.getXmlXStream();
-            MigrationSummaryResponseDTO response =
-                (MigrationSummaryResponseDTO) xs.fromXML( method.getResponseBodyAsString() );
-            return response.getData();
-        }
-        else
-        {
-            Assert.fail( "Returned code: " + method.getStatusCode() );
-            return null;
-        }
+        FileLocationRequestDTO request = new FileLocationRequestDTO();
+
+        request.setData( data );
+
+        XStreamRepresentation requestRepresentation = new XStreamRepresentation( xstream, "", mediaType );
+
+        requestRepresentation.setPayload( request );
+
+        Response response = RequestFacade.sendMessage( serviceURI, Method.POST, requestRepresentation );
+
+        Assert.assertEquals( 201, response.getStatus().getCode() );
+
+        String responseString = response.getEntity().getText();
+
+        Log.debug( "Response Text: " + responseString );
+
+        XStreamRepresentation responseRepresentation = new XStreamRepresentation( xstream, responseString, mediaType );
+
+        MigrationSummaryResponseDTO migrationSummaryResponse = (MigrationSummaryResponseDTO) responseRepresentation
+            .getPayload( new MigrationSummaryResponseDTO() );
+
+        return migrationSummaryResponse.getData();
 
     }
 
@@ -86,12 +84,16 @@ public class ImportMessageUtil
         MigrationSummaryRequestDTO request = new MigrationSummaryRequestDTO();
         request.setData( migrationSummary );
 
-        XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), "", MediaType.APPLICATION_XML );
+        XStreamRepresentation representation = new XStreamRepresentation(
+            XStreamFactory.getXmlXStream(),
+            "",
+            MediaType.APPLICATION_XML );
         representation.setPayload( request );
 
-        Response response =
-            RequestFacade.sendMessage( "service/local/migration/artifactory/content", Method.POST, representation );
+        Response response = RequestFacade.sendMessage(
+            "service/local/migration/artifactory/content",
+            Method.POST,
+            representation );
 
         return response;
     }

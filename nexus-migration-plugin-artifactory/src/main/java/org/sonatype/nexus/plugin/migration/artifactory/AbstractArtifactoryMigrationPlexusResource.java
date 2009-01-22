@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugin.migration.artifactory;
 
+import org.sonatype.nexus.plugin.migration.artifactory.dto.FileLocationRequestDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.FileLocationResource;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.GroupResolutionDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRequestDTO;
@@ -43,6 +45,8 @@ public abstract class AbstractArtifactoryMigrationPlexusResource
         xstream.processAnnotations( RepositoryResolutionDTO.class );
         xstream.processAnnotations( GroupResolutionDTO.class );
         xstream.processAnnotations( UserResolutionDTO.class );
+        xstream.processAnnotations( FileLocationRequestDTO.class );
+        xstream.processAnnotations( FileLocationResource.class );
 
         xstream.registerLocalConverter( MigrationSummaryDTO.class, "usersResolution", new AliasingListConverter(
             UserResolutionDTO.class,
