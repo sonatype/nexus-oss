@@ -46,15 +46,15 @@ public abstract class AbstractArtifactoryMigrationPlexusResource
 
         xstream.registerLocalConverter( MigrationSummaryDTO.class, "usersResolution", new AliasingListConverter(
             UserResolutionDTO.class,
-            "usersResolution" ) );
+            "userResolution" ) );
 
         xstream.registerLocalConverter( MigrationSummaryDTO.class, "repositoriesResolution", new AliasingListConverter(
             RepositoryResolutionDTO.class,
-            "repositoriesResolution" ) );
+            "repositoryResolution" ) );
 
         xstream.registerLocalConverter( MigrationSummaryDTO.class, "groupsResolution", new AliasingListConverter(
             GroupResolutionDTO.class,
-            "groupsResolution" ) );
+            "groupResolution" ) );
     }
 
 }
