@@ -109,6 +109,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>com.noelios.restlet</groupId>
+      <artifactId>com.noelios.restlet.ext.jetty</artifactId>
+      <version>${restlet.version}</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Jetty integration -->
     <dependency>
@@ -157,6 +164,11 @@
       <scope>compile</scope>
     </dependency>
 
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -164,6 +176,14 @@
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

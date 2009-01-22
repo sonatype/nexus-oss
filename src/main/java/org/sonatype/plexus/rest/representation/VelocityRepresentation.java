@@ -19,12 +19,13 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.ext.velocity.TemplateRepresentation;
-import org.sonatype.logging.RestletLogChute;
+import org.sonatype.logging.Slf4jLogChute;
 
 public class VelocityRepresentation
     extends TemplateRepresentation
 {
-    public VelocityRepresentation( Context context, String templateName, Map<String, Object> dataModel, MediaType mediaType )
+    public VelocityRepresentation( Context context, String templateName, Map<String, Object> dataModel,
+        MediaType mediaType )
     {
         super( templateName, dataModel, mediaType );
         configureEngine( context );
@@ -39,8 +40,8 @@ public class VelocityRepresentation
     protected void configureEngine( Context context )
     {
         VelocityEngine engine = getEngine();
-        
-        engine.setProperty( RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, new RestletLogChute( context ) );
+
+        engine.setProperty( RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, new Slf4jLogChute() );
 
         engine.setProperty( RuntimeConstants.RESOURCE_LOADER, "class" );
 
