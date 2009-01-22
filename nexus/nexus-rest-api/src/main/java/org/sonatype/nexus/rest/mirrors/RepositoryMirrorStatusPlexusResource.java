@@ -64,6 +64,8 @@ public class RepositoryMirrorStatusPlexusResource
                     resource.setId( mirror.getId() );
                     resource.setUrl( mirror.getUrl() );
                     resource.setStatus( dRepository.getDownloadMirrors().isBlacklisted( mirror ) ? "Blacklisted" : "Available" );
+                    
+                    dto.addData( resource );
                 }
             }
             else
