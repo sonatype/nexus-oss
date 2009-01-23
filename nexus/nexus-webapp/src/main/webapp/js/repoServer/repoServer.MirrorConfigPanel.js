@@ -14,25 +14,48 @@
 
 Sonatype.repoServer.MirrorConfigPanel = function(config) {
   var config = config || {};
-  
-  this.mirrorRecordConstructor = Ext.data.Record.create([
-    {name:'id'},
-    {name:'url', sortType:Ext.data.SortTypes.asUCString}
+
+  this.mirrorRecordConstructor = Ext.data.Record.create( [
+      {
+        name :'id'
+      }, {
+        name :'url',
+        sortType :Ext.data.SortTypes.asUCString
+      }
   ]);
+
+  this.mirrorReader = new Ext.data.JsonReader( {
+    root :'data',
+    id :'id'
+  }, this.mirrorRecordConstructor);
+
+  this.mirrorDataStore = new Ext.data.Store( {
+    url :Sonatype.config.repos.urls.repoMirrors + '/' + config.payload.data.id,
+    reader :this.mirrorReader,
+    sortInfo : {
+      field :'url',
+      direction :'ASC'
+    },
+    autoLoad :false
+  });
   
-  this.mirrorReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.mirrorRecordConstructor );
-  
-  this.mirrorDataStore = new Ext.data.Store({
-    url: Sonatype.config.repos.urls.repoMirrors + '/' + config.payload.data.id,
-    reader: this.mirrorReader,
-    sortInfo: { field: 'url', direction: 'ASC' },
-    autoLoad: false
- });
-  
+  this.predefinedMirrorDataStore = new Ext.data.Store( {
+    url :Sonatype.config.repos.urls.repoPredefinedMirrors + '/' + config.payload.data.id,
+    reader :this.mirrorReader,
+    sortInfo : {
+      field :'url',
+      direction :'ASC'
+    },
+    autoLoad :false
+  });
+
   var defaultConfig = {
     uri :Sonatype.config.repos.urls.repoMirrors + '/' + config.payload.data.id,
-    referenceData: Sonatype.repoServer.referenceData.repoMirrors,
-    dataStores: [this.mirrorDataStore]
+    referenceData :Sonatype.repoServer.referenceData.repoMirrors,
+    dataStores : [
+      this.mirrorDataStore,
+      this.predefinedMirrorDataStore
+    ]
   };
 
   Ext.apply(this, config, defaultConfig);
@@ -55,14 +78,26 @@ Sonatype.repoServer.MirrorConfigPanel = function(config) {
               {
                 xtype :'panel',
                 layout :'form',
-                width :380,
+                labelWidth: 150,
+                width :430,
                 items : [
                   {
-                    xtype :'textfield',
-                    fieldLabel :'Mirror URL',
-                    helpText :ht.mirrorUrl,
-                    name :'mirrorUrl',
-                    width :205
+                    xtype: 'combo',
+                    fieldLabel: 'Mirror URL',
+                    helpText: ht.mirrorUrl,
+                    name: 'mirrorUrl',
+                    width: 238,
+                    listWidth: 238,
+                    store: this.predefinedMirrorDataStore,
+                    displayField:'url',
+                    valueField:'id',
+                    editable: true,
+                    forceSelection: false,
+                    mode: 'local',
+                    triggerAction: 'all',
+                    emptyText:'Enter or Select URL...',
+                    selectOnFocus:true,
+                    allowBlank: true       
                   }
                 ]
               }, {
@@ -91,19 +126,19 @@ Sonatype.repoServer.MirrorConfigPanel = function(config) {
                 xtype :'treepanel',
                 name :'mirror-url-list',
                 title :'Mirror URLs',
-                cls :'required-field',
                 border :true,
                 bodyBorder :true,
                 bodyStyle :'background-color:#FFFFFF; border: 1px solid #B5B8C8',
                 style :'padding: 0 20px 0 0',
-                width :225,
+                width :275,
                 height :300,
                 animate :true,
                 lines :false,
                 autoScroll :true,
                 containerScroll :true,
                 rootVisible :false,
-                enableDD :false
+                enableDD :false,
+                root :new Ext.tree.TreeNode({text: 'root'})
               }, {
                 xtype :'panel',
                 width :120,
@@ -135,9 +170,10 @@ Sonatype.repoServer.MirrorConfigPanel = function(config) {
 
 Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
   addNewMirrorUrl : function() {
-    var treePanel = this.find('name', 'mirror-url-list');
+    var treePanel = this.find('name', 'mirror-url-list')[0];
     var urlField = this.find('name', 'mirrorUrl')[0];
     var url = urlField.getRawValue();
+    var id = urlField.getValue();
 
     if (url) {
       var nodes = treePanel.root.childNodes;
@@ -147,20 +183,31 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
           return;
         }
       }
+      
+      urlField.clearInvalid();
 
-      this.addUrlNode(treePanel, url);
+      this.addUrlNode(treePanel, url, id);
       urlField.setRawValue('');
     }
   },
 
-  addUrlNode : function(treePanel, url) {
-    var id = Ext.id();
+  addUrlNode : function(treePanel, url, id) {
+    var validId;
+    var manualUrl;
+    if ( url == id ){
+      validId = Ext.id();
+      manualUrl = true;
+    }
+    else{
+      validId = id;
+      manualUrl = false;
+    }
 
     treePanel.root.appendChild(new Ext.tree.TreeNode( {
       id :id,
       text :url,
       payload : {
-        id :id,
+        id :manualUrl ? '' : id,
         url :url
       },
       allowChildren :false,
@@ -171,7 +218,7 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
   },
 
   removeMirrorUrl : function() {
-    var treePanel = this.find('name', 'mirror-url-list');
+    var treePanel = this.find('name', 'mirror-url-list')[0];
 
     var selectedNode = treePanel.getSelectionModel().getSelectedNode();
     if (selectedNode) {
@@ -180,7 +227,7 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
   },
 
   removeAllMirrorUrls : function() {
-    var treePanel = this.find('name', 'mirror-url-list');
+    var treePanel = this.find('name', 'mirror-url-list')[0];
     var treeRoot = treePanel.root;
 
     while (treeRoot.lastChild) {
