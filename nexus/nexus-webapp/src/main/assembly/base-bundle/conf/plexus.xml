@@ -2,9 +2,6 @@
 
 	<load-on-start>
 		<component>
-			<role>org.sonatype.logging.Slf4jHandlerInstaller</role>
-		</component>
-		<component>
 			<role>org.sonatype.plexus.jetty.ServletContainer</role>
 		</component>
 	</load-on-start>

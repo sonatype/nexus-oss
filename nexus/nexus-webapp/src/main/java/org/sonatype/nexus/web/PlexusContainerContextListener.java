@@ -13,6 +13,9 @@
  */
 package org.sonatype.nexus.web;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -30,8 +33,6 @@ public class PlexusContainerContextListener
 {
     private static final String KEY_PLEXUS = "plexus";
 
-    private static final String KEY_LOG_CONFIG_FILE = "plexus.log4j-prop-file";
-
     PlexusContainerConfigurationUtils plexusContainerConfigurationUtils = new PlexusContainerConfigurationUtils();
 
     PlexusContainerUtils plexusContainerUtils = new PlexusContainerUtils();
@@ -44,8 +45,6 @@ public class PlexusContainerContextListener
             .buildContainerConfiguration( context );
 
         NexusWorkDirUtils.setUpNexusWorkDir( plexusContainerConfiguration.getContext() );
-
-        initializeLogConfig( context );
 
         try
         {
@@ -62,19 +61,24 @@ public class PlexusContainerContextListener
         plexusContainerUtils.stopContainer();
     }
 
-    private void initializeLogConfig( ServletContext context )
-    {
-        String logConfigFilePath = context.getRealPath( "/" ) + "/WEB-INF/log4j.properties";
-
-        // when we want to configure log dynamically, this value is used to local the log configuration file
-        System.getProperties().put( KEY_LOG_CONFIG_FILE, logConfigFilePath );
-
-        PropertyConfigurator.configure( logConfigFilePath );
-    }
-
     private void initizlizePlexusContainer( ServletContext context, ContainerConfiguration configuration )
         throws PlexusContainerException
     {
+        String path = "/WEB-INF/log4j.properties";
+
+        try
+        {
+            // a simple logger only for plexus container, note that nexus will use another log4j.properties which will
+            // supersede this one
+            URL simpleLog4j = context.getResource( path );
+
+            PropertyConfigurator.configure( simpleLog4j );
+        }
+        catch ( MalformedURLException e )
+        {
+            context.log( "Could not load simple log config from: " + path, e );
+        }
+
         PlexusContainer plexusContainer = plexusContainerUtils.startContainer( configuration );
 
         context.setAttribute( KEY_PLEXUS, plexusContainer );

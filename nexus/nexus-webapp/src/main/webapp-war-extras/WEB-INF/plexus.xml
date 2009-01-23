@@ -1,11 +1,4 @@
 <plexus>
-
-	<load-on-start>
-		<component>
-			<role>org.sonatype.logging.Slf4jHandlerInstaller</role>
-		</component>
-	</load-on-start>
-
 	<components>
 
 		<component>
