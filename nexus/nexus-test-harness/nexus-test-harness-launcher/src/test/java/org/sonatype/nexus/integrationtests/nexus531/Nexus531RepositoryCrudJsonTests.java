@@ -14,8 +14,10 @@
 package org.sonatype.nexus.integrationtests.nexus531;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -237,12 +239,20 @@ public class Nexus531RepositoryCrudJsonTests
 
                 Assert.assertEquals( cShadow.getId(), listRepo.getId() );
                 Assert.assertEquals( cShadow.getName(), listRepo.getName() );
-                Assert.assertEquals( cShadow.getType(), listRepo.getFormat() );
+                Assert.assertEquals( cShadow.getType(), this.formatToType( listRepo.getFormat() ) );
                 Assert.assertEquals( AbstractRepositoryPlexusResource.REPO_TYPE_VIRTUAL, listRepo.getRepoType() );
             }
 
         }
+    }
+    
+    private String formatToType( String format )
+    {
+        Map<String, String> formatToTypeMap = new HashMap<String, String>();
+        formatToTypeMap.put( "maven2", "m1-m2-shadow" );
+        formatToTypeMap.put( "maven1", "m2-m1-shadow" );
 
+        return formatToTypeMap.get( format );
     }
 
 }
