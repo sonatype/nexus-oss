@@ -98,9 +98,9 @@
 								<packagedVersion>1.0.4</packagedVersion>
 								<packagedVersion>1.0.5</packagedVersion>
 								<packagedVersion>1.0.6</packagedVersion>
-                <packagedVersion>1.0.7</packagedVersion>
+								<packagedVersion>1.0.7</packagedVersion>
 							</packagedVersions>
-							<model>src/main/mdo/nexus.xml</model>
+							<models><model>src/main/mdo/nexus.xml</model></models>
 						</configuration>
 					</execution>
 					<execution>
@@ -112,7 +112,7 @@
 						</goals>
 						<configuration>
 							<version>1.0.0</version>
-							<model>src/main/mdo/security.xml</model>
+							<models><model>src/main/mdo/security.xml</model></models>
 						</configuration>
 					</execution>
 				</executions>
@@ -143,7 +143,7 @@
 							<packagedVersions>
 								<packagedVersion>1.0.7</packagedVersion>
 							</packagedVersions>
-							<model>src/main/mdo/nexus.xml</model>
+							<models><model>src/main/mdo/nexus.xml</model></models>
 						</configuration>
 					</execution>
 				</executions>
