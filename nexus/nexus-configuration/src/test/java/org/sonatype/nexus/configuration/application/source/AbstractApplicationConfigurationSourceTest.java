@@ -29,7 +29,7 @@ public abstract class AbstractApplicationConfigurationSourceTest
 
     protected abstract InputStream getOriginatingConfigurationInputStream()
         throws IOException;
-    
+
     public void testConfigStream()
         throws Exception
     {
@@ -38,20 +38,29 @@ public abstract class AbstractApplicationConfigurationSourceTest
         // not using load here since File config would load it and store it
         // thus changing it (but no content change!)
         copyDefaultConfigToPlace();
-        
+
         InputStream configStream = null;
-        
+
+        InputStream originalStream = null;
+
         try
         {
             configStream = configurationSource.getConfigurationAsStream();
-            
-            assertTrue( IOUtil.contentEquals( configStream, getOriginatingConfigurationInputStream() ) );
+
+            originalStream = getOriginatingConfigurationInputStream();
+
+            assertTrue( IOUtil.contentEquals( configStream, originalStream ) );
         }
         finally
         {
             if ( configStream != null )
             {
                 configStream.close();
+            }
+
+            if ( originalStream != null )
+            {
+                originalStream.close();
             }
         }
     }
