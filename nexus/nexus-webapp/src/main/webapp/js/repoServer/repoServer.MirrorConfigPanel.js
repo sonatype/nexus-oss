@@ -15,6 +15,18 @@
 Sonatype.repoServer.MirrorConfigPanel = function(config) {
   var config = config || {};
 
+  this.mirrorStatusTask = {
+    run : function() {
+      Ext.Ajax.request( {
+        url :Sonatype.config.repos.urls.repoMirrorStatus + '/' + this.payload.data.id,
+        callback :this.statusCallback,
+        scope :this
+      });
+    },
+    interval :5000, // poll every 5 seconds
+    scope :this
+  };
+
   this.mirrorRecordConstructor = Ext.data.Record.create( [
       {
         name :'id'
@@ -66,6 +78,18 @@ Sonatype.repoServer.MirrorConfigPanel = function(config) {
     listeners : {
       submit : {
         fn :this.submitHandler,
+        scope :this
+      },
+      activate : {
+        fn :this.activateHandler,
+        scope :this
+      },
+      deactivate : {
+        fn :this.deactivateHandler,
+        scope :this
+      },
+      destroy : {
+        fn :this.destroyHandler,
         scope :this
       }
     }
@@ -182,7 +206,6 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
     var treePanel = this.find('name', 'mirror-url-list')[0];
     var urlField = this.find('name', 'mirrorUrl')[0];
     var url = urlField.getRawValue();
-    var id = urlField.getValue();
 
     if (url) {
       var nodes = treePanel.root.childNodes;
@@ -195,8 +218,9 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
 
       urlField.clearInvalid();
 
-      this.addUrlNode(treePanel, url, id);
+      this.addUrlNode(treePanel, url, url);
       urlField.setRawValue('');
+      urlField.setValue('');
     }
   },
 
@@ -274,10 +298,61 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
   getSaveMethod : function() {
     return 'POST';
   },
-  
-  submitHandler: function( form, action, receivedData ) {
-    //reload the mirrors to get ids setup properly
+
+  statusCallback : function(options, success, response) {
+    if (success) {
+      var statusResp = Ext.decode(response.responseText);
+      if (statusResp.data) {
+        var data = statusResp.data;
+        if (data && data.length) {
+          for ( var i = 0; i < data.length; i++) {
+            var item = data[i];
+            var treePanel = this.find('name', 'mirror-url-list')[0];
+            var childNodes = treePanel.getRootNode().childNodes;
+            if (childNodes && childNodes.length) {
+              for ( var j = 0; j < childNodes.length; j++) {
+                if (item.id == childNodes[j].id) {
+                  var newNode = new Ext.tree.TreeNode( {
+                    id :item.id,
+                    text :item.url,
+                    payload : {
+                      id :item.id,
+                      url :item.url
+                    },
+                    allowChildren :false,
+                    draggable :false,
+                    leaf :true,
+                    icon :item.status == 'Blacklisted' ? (Sonatype.config.extPath + '/resources/images/default/tree/drop-no.gif')
+                        : (Sonatype.config.extPath + '/resources/images/default/tree/drop-yes.gif')
+                  });
+
+                  treePanel.getRootNode().replaceChild(newNode, childNodes[j]);
+                }
+              }
+            }
+          }
+        }
+      }
+    } else {
+      Ext.TaskMgr.stop(this.mirrorStatusTask);
+      Sonatype.MessageBox.alert('Status retrieval failed');
+    }
+  },
+
+  submitHandler : function(form, action, receivedData) {
     this.loadMirrors(receivedData, null, this);
+  },
+
+  activateHandler : function( panel ) {
+    Ext.TaskMgr.start(this.mirrorStatusTask);
+  },
+  
+  deactivateHandler : function( panel ) {
+    Ext.TaskMgr.stop(this.mirrorStatusTask);
+  },
+  
+  destroyHandler : function( component ) {
+    Ext.TaskMgr.stop(this.mirrorStatusTask);
   }
 });
 

@@ -117,7 +117,8 @@ Sonatype.config = function() {
         shadowRepoTypes: servicePath + '/components/shadow_repo_types',
         groupRepoTypes: servicePath + '/components/group_repo_types',
         repoMirrors: servicePath + '/repository_mirrors',
-        repoPredefinedMirrors: servicePath + '/repository_predefined_mirrors'        
+        repoPredefinedMirrors: servicePath + '/repository_predefined_mirrors',
+        repoMirrorStatus: servicePath + '/repository_mirrors_status'
       }
     },
     
