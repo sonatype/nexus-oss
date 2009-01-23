@@ -517,7 +517,7 @@ Ext.form.Action.ACTION_TYPES.sonatypeSubmit = Ext.form.Action.sonatypeSubmit;
 Sonatype.ext.FormPanel = function( config ) {
   var config = config || {};
   var defaultConfig = {
-//    region: 'center',
+    region: 'center',
     width: '100%',
     height: '100%',
     autoScroll: true,
