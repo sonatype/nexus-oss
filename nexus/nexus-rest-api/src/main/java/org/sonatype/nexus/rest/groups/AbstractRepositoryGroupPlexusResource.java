@@ -16,7 +16,6 @@ package org.sonatype.nexus.rest.groups;
 import java.io.IOException;
 import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.configuration.ConfigurationException;
@@ -54,11 +53,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
 
             group.setName( model.getName() );
 
-            // TODO: we must be smart here, the REST API is limes -> broken
-            // XXX: right now, contentClass ID and group repo component does pair (but is not at all future proof!)
-            // XXX: fix is here, if no format is given, fallback to "default" maven2, since it is the only possibility
-            // with UI now
-            group.setType( StringUtils.isEmpty( model.getFormat() ) ? "maven2" : model.getFormat() );
+            group.setType( model.getProvider() );
 
             group.getRepositories().clear();
 

@@ -536,18 +536,6 @@
       <version>1.0.0+</version>
       <fields>
         <field>
-          <name>format</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
-        <field>
-          <name>repoType</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
-        <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
@@ -555,6 +543,24 @@
         </field>
         <field>
           <name>name</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>provider</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>format</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>repoType</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
@@ -975,26 +981,9 @@
 
     <class>
       <name>RepositoryGroupResource</name>
+      <superClass>RepositoryBaseResource</superClass>
       <version>1.0.0+</version>
       <fields>
-        <field>
-          <name>id</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
-        <field>
-          <name>name</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
-        <field>
-          <name>format</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
         <field>
           <name>repositories</name>
           <version>1.0.0+</version>
@@ -2887,6 +2876,7 @@
       </fields>
     </class>
 
+    <!-- Plexus components -->
     <class>
       <name>PlexusComponentListResource</name>
       <version>1.0.0+</version>
@@ -2915,6 +2905,47 @@
           <version>1.0.0+</version>
           <association>
             <type>PlexusComponentListResource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>NexusRepositoryTypeListResource</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>provider</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>format</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>description</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>NexusRepositoryTypeListResourceResponse</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>NexusRepositoryTypeListResource</type>
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>

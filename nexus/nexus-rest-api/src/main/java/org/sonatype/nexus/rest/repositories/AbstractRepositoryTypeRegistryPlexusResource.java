@@ -10,10 +10,11 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.nexus.rest.model.PlexusComponentListResource;
-import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
+import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResource;
+import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResourceResponse;
 
 public abstract class AbstractRepositoryTypeRegistryPlexusResource
     extends AbstractNexusPlexusResource
@@ -33,7 +34,7 @@ public abstract class AbstractRepositoryTypeRegistryPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        PlexusComponentListResourceResponse result = new PlexusComponentListResourceResponse();
+        NexusRepositoryTypeListResourceResponse result = new NexusRepositoryTypeListResourceResponse();
 
         // get role from request
         Class<?> role = getRole( request );
@@ -49,9 +50,21 @@ public abstract class AbstractRepositoryTypeRegistryPlexusResource
         // loop and convert all objects of this role to a PlexusComponentListResource
         for ( String hint : hints )
         {
-            PlexusComponentListResource resource = new PlexusComponentListResource();
 
-            resource.setRoleHint( hint );
+            NexusRepositoryTypeListResource resource = new NexusRepositoryTypeListResource();
+
+            resource.setProvider( hint );
+
+            ContentClass contentClass = repositoryTypeRegistry.getRepositoryContentClass( role.getName(), hint );
+
+            if ( contentClass != null )
+            {
+                resource.setFormat( contentClass.getId() );
+            }
+            else
+            {
+                resource.setFormat( null );
+            }
 
             String description = repositoryTypeRegistry.getRepositoryDescription( role.getName(), hint );
 

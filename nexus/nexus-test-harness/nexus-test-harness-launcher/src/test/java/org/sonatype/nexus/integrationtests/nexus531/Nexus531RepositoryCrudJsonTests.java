@@ -64,6 +64,8 @@ public class Nexus531RepositoryCrudJsonTests
         resource.setRepoType( "hosted" ); // [hosted, proxy, virtual]
         resource.setName( "Create Test Repo" );
         // resource.setRepoType( ? )
+        resource.setProvider( "maven2" );
+        // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
         // resource.setAllowWrite( true );
         // resource.setBrowseable( true );
@@ -91,6 +93,8 @@ public class Nexus531RepositoryCrudJsonTests
         resource.setRepoType( "hosted" ); // [hosted, proxy, virtual]
         resource.setName( "Read Test Repo" );
         // resource.setRepoType( ? )
+        resource.setProvider( "maven2" );
+        // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
         // resource.setAllowWrite( true );
         // resource.setBrowseable( true );
@@ -124,6 +128,8 @@ public class Nexus531RepositoryCrudJsonTests
         resource.setRepoType( "hosted" ); // [hosted, proxy, virtual]
         resource.setName( "Update Test Repo" );
         // resource.setRepoType( ? )
+        resource.setProvider( "maven2" );
+        // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
         // resource.setAllowWrite( true );
         // resource.setBrowseable( true );
@@ -156,6 +162,8 @@ public class Nexus531RepositoryCrudJsonTests
         resource.setRepoType( "hosted" ); // [hosted, proxy, virtual]
         resource.setName( "Delete Test Repo" );
         // resource.setRepoType( ? )
+        resource.setProvider( "maven2" );
+        // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
         // resource.setAllowWrite( true );
         // resource.setBrowseable( true );
@@ -192,6 +200,8 @@ public class Nexus531RepositoryCrudJsonTests
         repo.setId( "listTestRepo" );
         repo.setRepoType( "hosted" ); // [hosted, proxy, virtual]
         repo.setName( "List Test Repo" );
+        repo.setProvider( "maven2" );
+        // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
         repo.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
         repo.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
@@ -242,20 +252,20 @@ public class Nexus531RepositoryCrudJsonTests
 
                 Assert.assertEquals( cShadow.getId(), listRepo.getId() );
                 Assert.assertEquals( cShadow.getName(), listRepo.getName() );
-                Assert.assertEquals( cShadow.getType(), this.formatToType( listRepo.getFormat() ) );
+                // Assert.assertEquals( cShadow.getType(), this.formatToType( listRepo.getFormat() ) );
                 Assert.assertEquals( AbstractRepositoryPlexusResource.REPO_TYPE_VIRTUAL, listRepo.getRepoType() );
             }
 
         }
     }
 
-    private String formatToType( String format )
-    {
-        Map<String, String> formatToTypeMap = new HashMap<String, String>();
-        formatToTypeMap.put( "maven2", "m1-m2-shadow" );
-        formatToTypeMap.put( "maven1", "m2-m1-shadow" );
-
-        return formatToTypeMap.get( format );
-    }
+//    private String formatToType( String format )
+//    {
+//        Map<String, String> formatToTypeMap = new HashMap<String, String>();
+//        formatToTypeMap.put( "maven2", "m1-m2-shadow" );
+//        formatToTypeMap.put( "maven1", "m2-m1-shadow" );
+//
+//        return formatToTypeMap.get( format );
+//    }
 
 }

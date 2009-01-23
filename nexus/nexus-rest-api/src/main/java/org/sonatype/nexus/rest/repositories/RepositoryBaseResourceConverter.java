@@ -14,6 +14,7 @@
 package org.sonatype.nexus.rest.repositories;
 
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
+import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
@@ -61,21 +62,25 @@ public class RepositoryBaseResourceConverter
                 repoType = ( (LookAheadStreamReader) reader.underlyingReader() ).getFieldValue( "repoType" );
             }
 
-            if ( repoType == null )
-            {
-                return super.instantiateNewInstance( reader, context );
-            }
-            else if ( AbstractRepositoryPlexusResource.REPO_TYPE_VIRTUAL.equals( repoType ) )
+            if ( AbstractRepositoryPlexusResource.REPO_TYPE_VIRTUAL.equals( repoType ) )
             {
                 return new RepositoryShadowResource();
             }
-            else if (AbstractRepositoryPlexusResource.REPO_TYPE_PROXIED.equals( repoType ) )
+            else if ( AbstractRepositoryPlexusResource.REPO_TYPE_PROXIED.equals( repoType ) )
             {
                 return new RepositoryProxyResource();
             }
-            else
+            else if ( AbstractRepositoryPlexusResource.REPO_TYPE_HOSTED.equals( repoType ) )
             {
                 return new RepositoryResource();
+            }
+            else if ( AbstractRepositoryPlexusResource.REPO_TYPE_GROUP.equals( repoType ) )
+            {
+                return new RepositoryGroupResource();
+            }
+            else
+            {
+                return super.instantiateNewInstance( reader, context );
             }
         }
         else

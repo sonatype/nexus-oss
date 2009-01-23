@@ -28,6 +28,7 @@ import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -94,37 +95,8 @@ public abstract class AbstractRepositoryPlexusResource
         }
     }
 
-    protected String getHintForRoleAndFormat( Class<?> role, String format )
+    protected String _getHintForRoleAndFormat( Class<?> role, String format )
     {
-        // Circumvention
-        // if ( Repository.class.equals( role ) )
-        // {
-        // // "simple" repositories
-        // // we are lucky here, they pair 1:1
-        // // XXX: but is not future proof!
-        // return format;
-        // }
-        // else if ( ShadowRepository.class.equals( role ) )
-        // {
-        // // "shadows", we need a tweak here
-        // if ( "maven2".equals( format ) )
-        // {
-        // return "m1-m2-shadow";
-        // }
-        // else if ( "maven1".equals( format ) )
-        // {
-        // return "m2-m1-shadow";
-        // }
-        // else
-        // {
-        // return format;
-        // }
-        // }
-        // else
-        // {
-        // return format;
-        // }
-
         // going strict
         if ( Repository.class.equals( role ) )
         {
@@ -169,15 +141,17 @@ public abstract class AbstractRepositoryPlexusResource
     {
         RepositoryShadowResource resource = new RepositoryShadowResource();
 
-        resource.setRepoType( REPO_TYPE_VIRTUAL );
-
         resource.setId( model.getId() );
 
         resource.setName( model.getName() );
 
-        resource.setShadowOf( model.getShadowOf() );
+        resource.setProvider( model.getType() );
+
+        resource.setRepoType( REPO_TYPE_VIRTUAL );
 
         resource.setFormat( getRepoFormat( ShadowRepository.class, model.getType() ) );
+
+        resource.setShadowOf( model.getShadowOf() );
 
         resource.setSyncAtStartup( model.isSyncAtStartup() );
 
@@ -213,7 +187,7 @@ public abstract class AbstractRepositoryPlexusResource
 
         appModel.setSyncAtStartup( model.isSyncAtStartup() );
 
-        appModel.setType( getHintForRoleAndFormat( ShadowRepository.class, model.getFormat() ) );
+        appModel.setType( model.getProvider() );
 
         return appModel;
     }
@@ -224,7 +198,9 @@ public abstract class AbstractRepositoryPlexusResource
     public RepositoryResource getRepositoryRestModel( CRepository model )
     {
         String repoType = getRestRepoType( model );
+
         RepositoryResource resource = null;
+
         if ( REPO_TYPE_PROXIED.equals( repoType ) )
         {
             resource = getRepositoryProxyRestModel( model );
@@ -233,6 +209,8 @@ public abstract class AbstractRepositoryPlexusResource
         {
             resource = new RepositoryResource();
         }
+
+        resource.setProvider( model.getType() );
 
         resource.setFormat( getRepoFormat( Repository.class, model.getType() ) );
 
@@ -312,7 +290,7 @@ public abstract class AbstractRepositoryPlexusResource
 
         appModel.setName( model.getName() );
 
-        appModel.setType( getHintForRoleAndFormat( Repository.class, model.getFormat() ) );
+        appModel.setType( model.getProvider() );
 
         appModel.setAllowWrite( model.isAllowWrite() );
 
@@ -488,6 +466,10 @@ public abstract class AbstractRepositoryPlexusResource
         else if ( CRepositoryShadow.class.isAssignableFrom( model.getClass() ) )
         {
             return REPO_TYPE_VIRTUAL;
+        }
+        else if ( CRepositoryGroup.class.isAssignableFrom( model.getClass() ) )
+        {
+            return REPO_TYPE_GROUP;
         }
         else
         {

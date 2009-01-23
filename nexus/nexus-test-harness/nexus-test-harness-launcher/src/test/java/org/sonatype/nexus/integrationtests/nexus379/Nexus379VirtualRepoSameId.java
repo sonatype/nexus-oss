@@ -55,6 +55,8 @@ public class Nexus379VirtualRepoSameId
         repo.setId( "testVirtualRepoWithSameId" );
         repo.setRepoType( "hosted" ); // [hosted, proxy, virtual]
         repo.setName( "testVirtualRepoWithSameId" );
+        repo.setProvider( "maven2" );
+        // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven2" );
         repo.setRepoPolicy( "release" );
         repo.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
@@ -68,6 +70,8 @@ public class Nexus379VirtualRepoSameId
         virtualRepo.setId( "testVirtualRepoWithSameId" );
         virtualRepo.setRepoType( "virtual" ); // [hosted, proxy, virtual]
         virtualRepo.setName( "testVirtualRepoWithSameId" );
+        virtualRepo.setProvider( "m2-m1-shadow" );
+        // format is neglected by server from now on, provider is the new guy in the town
         virtualRepo.setFormat( "maven1" );
         virtualRepo.setShadowOf( "testVirtualRepoWithSameId" );
         Response response = this.messageUtil.sendMessage( Method.POST, virtualRepo );

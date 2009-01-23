@@ -61,6 +61,8 @@ public class Nexus688ReindexOnRepoAdd
         resource.setId( "nexus688-repoTestIndexable" );
         resource.setRepoType( "hosted" );
         resource.setName( "Create Test Repo" );
+        resource.setProvider( "maven2" );
+        // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( "release" );
         resource.setChecksumPolicy( "ignore" );
@@ -92,6 +94,8 @@ public class Nexus688ReindexOnRepoAdd
         resource.setId( "nexus688-repoTestNotIndexable" );
         resource.setRepoType( "hosted" );
         resource.setName( "Create Test Repo" );
+        resource.setProvider( "maven2" );
+        // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( "release" );
         resource.setChecksumPolicy( "ignore" );
@@ -127,6 +131,8 @@ public class Nexus688ReindexOnRepoAdd
         resource.setId( "nexus688-proxyRepoTestIndexableWithInvalidURL" );
         resource.setRepoType( "proxy" );
         resource.setName( "Create Test Repo" );
+        resource.setProvider( "maven2" );
+        // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( "release" );
         resource.setChecksumPolicy( "ignore" );
@@ -162,6 +168,8 @@ public class Nexus688ReindexOnRepoAdd
         resource.setId( "nexus688-proxyRepoTestIndexable" );
         resource.setRepoType( "proxy" );
         resource.setName( "Create Test Repo" );
+        resource.setProvider( "maven2" );
+        // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( "release" );
         resource.setChecksumPolicy( "ignore" );
@@ -197,6 +205,8 @@ public class Nexus688ReindexOnRepoAdd
         resource.setId( "nexus688-proxyRepoTestNotIndexable" );
         resource.setRepoType( "proxy" );
         resource.setName( "Create Test Repo" );
+        resource.setProvider( "maven2" );
+        // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( "release" );
         resource.setChecksumPolicy( "ignore" );

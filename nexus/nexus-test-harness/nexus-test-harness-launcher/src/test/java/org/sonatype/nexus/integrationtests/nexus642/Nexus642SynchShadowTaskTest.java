@@ -47,6 +47,8 @@ public class Nexus642SynchShadowTaskTest
 
         RepositoryShadowResource repo = new RepositoryShadowResource();
         repo.setId( shadowRepoId );
+        repo.setProvider( "m2-m1-shadow" );
+        // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven1" );
         repo.setName( shadowRepoId );
         repo.setRepoType( "virtual" );

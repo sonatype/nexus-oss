@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
+import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -72,7 +73,7 @@ public class RepositoryGroupPlexusResource
         return request.getAttributes().get( GROUP_ID_KEY ).toString();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
@@ -90,6 +91,10 @@ public class RepositoryGroupPlexusResource
             resource.setId( group.getGroupId() );
 
             resource.setName( group.getName() );
+
+            resource.setProvider( group.getType() );
+
+            resource.setRepoType( AbstractRepositoryPlexusResource.REPO_TYPE_GROUP );
 
             resource.setFormat( groupRepo.getRepositoryContentClass().getId() );
 
