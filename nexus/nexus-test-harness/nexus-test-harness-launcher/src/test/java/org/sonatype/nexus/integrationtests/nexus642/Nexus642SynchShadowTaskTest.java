@@ -38,13 +38,16 @@ public class Nexus642SynchShadowTaskTest
         throws Exception
     {
         // create shadow repo 'nexus-shadow-repo'
-        RepositoryMessageUtil repoUtil = new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(
+            this.getXMLXStream(),
+            MediaType.APPLICATION_XML,
+            getRepositoryTypeRegistry() );
         String shadowRepoId = "nexus-shadow-repo";
         String taskName = "synchShadowTest";
 
         RepositoryShadowResource repo = new RepositoryShadowResource();
         repo.setId( shadowRepoId );
-        repo.setFormat( "m2-m1-shadow" );
+        repo.setFormat( "maven1" );
         repo.setName( shadowRepoId );
         repo.setRepoType( "virtual" );
         repo.setShadowOf( this.getTestRepositoryId() );

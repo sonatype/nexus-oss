@@ -21,6 +21,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -44,9 +45,12 @@ public class Nexus531RepositoryCrudJsonTests
     protected RepositoryMessageUtil messageUtil;
 
     public Nexus531RepositoryCrudJsonTests()
+        throws ComponentLookupException
     {
-        this.messageUtil =
-            new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        this.messageUtil = new RepositoryMessageUtil(
+            this.getJsonXStream(),
+            MediaType.APPLICATION_JSON,
+            getRepositoryTypeRegistry() );
     }
 
     @Test
@@ -211,9 +215,8 @@ public class Nexus531RepositoryCrudJsonTests
                 Assert.assertEquals( repo.getRepoType(), listRepo.getRepoType() );
                 Assert.assertEquals( repo.getRemoteStorage(), listRepo.getRemoteUri() );
 
-                String storageURL =
-                    repo.getDefaultLocalStorageUrl() != null ? repo.getDefaultLocalStorageUrl()
-                                    : repo.getOverrideLocalStorageUrl();
+                String storageURL = repo.getDefaultLocalStorageUrl() != null ? repo.getDefaultLocalStorageUrl() : repo
+                    .getOverrideLocalStorageUrl();
                 Assert.assertEquals( storageURL, listRepo.getEffectiveLocalStorageUrl() );
             }
 
@@ -245,7 +248,7 @@ public class Nexus531RepositoryCrudJsonTests
 
         }
     }
-    
+
     private String formatToType( String format )
     {
         Map<String, String> formatToTypeMap = new HashMap<String, String>();

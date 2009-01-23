@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import junit.framework.Assert;
+
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.After;
 import org.junit.Before;
 import org.restlet.data.MediaType;
@@ -57,18 +60,34 @@ public abstract class AbstractPrivilegeTest
 
     protected GroupMessageUtil groupUtil;
 
-    public AbstractPrivilegeTest( String testRepositoryId)
+    public AbstractPrivilegeTest( String testRepositoryId )
     {
-      super( testRepositoryId );
-      this.init();
+        super( testRepositoryId );
+
+        try
+        {
+            this.init();
+        }
+        catch ( ComponentLookupException e )
+        {
+            Assert.fail( e.getMessage() );
+        }
     }
 
     public AbstractPrivilegeTest()
     {
-        this.init();
+        try
+        {
+            this.init();
+        }
+        catch ( ComponentLookupException e )
+        {
+            Assert.fail( e.getMessage() );
+        }
     }
 
     private void init()
+        throws ComponentLookupException
     {
         // turn on security for the test
         TestContainer.getInstance().getTestContext().setSecureTest( true );
@@ -77,19 +96,13 @@ public abstract class AbstractPrivilegeTest
 
         this.userUtil = new UserMessageUtil( xstream, MediaType.APPLICATION_XML );
         this.roleUtil = new RoleMessageUtil( xstream, MediaType.APPLICATION_XML );
-        this.privUtil =
-            new PrivilegesMessageUtil( xstream, MediaType.APPLICATION_XML );
-        this.targetUtil =
-            new TargetMessageUtil( xstream, MediaType.APPLICATION_XML );
+        this.privUtil = new PrivilegesMessageUtil( xstream, MediaType.APPLICATION_XML );
+        this.targetUtil = new TargetMessageUtil( xstream, MediaType.APPLICATION_XML );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
-        this.routeUtil =
-            new RoutesMessageUtil( xstream, MediaType.APPLICATION_XML );
-        this.repoUtil = new RepositoryMessageUtil( xstream, MediaType.APPLICATION_XML );
+        this.routeUtil = new RoutesMessageUtil( xstream, MediaType.APPLICATION_XML );
+        this.repoUtil = new RepositoryMessageUtil( xstream, MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
         this.groupUtil = new GroupMessageUtil( xstream, MediaType.APPLICATION_XML );
     }
-
-
-
 
     @Before
     public void resetTestUserPrivs()
@@ -182,17 +195,17 @@ public abstract class AbstractPrivilegeTest
         this.giveUserRole( userId, role.getId() );
     }
 
-    protected void giveUserRole( String userId, String roleId ) throws IOException
+    protected void giveUserRole( String userId, String roleId )
+        throws IOException
     {
-     // use admin
+        // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-     // add it
+        // add it
         UserResource testUser = this.userUtil.getUser( userId );
         testUser.addRole( roleId );
         this.userUtil.updateUser( testUser );
     }
-
 
     protected void overwriteUserRole( String userId, String newRoleName, String... permissions )
         throws Exception
@@ -250,7 +263,6 @@ public abstract class AbstractPrivilegeTest
         // reset any password
         TestContainer.getInstance().getTestContext().useAdminForRequests();
     }
-
 
     protected void addPrivilege( String userId, String privilege, String... privs )
         throws IOException

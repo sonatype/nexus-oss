@@ -15,6 +15,7 @@ package org.sonatype.nexus.integrationtests.nexus379;
 
 import java.io.IOException;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.MediaType;
@@ -35,8 +36,12 @@ public class Nexus379VirtualRepoSameId
     protected RepositoryMessageUtil messageUtil;
 
     public Nexus379VirtualRepoSameId()
+        throws ComponentLookupException
     {
-        this.messageUtil = new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.messageUtil = new RepositoryMessageUtil(
+            this.getXMLXStream(),
+            MediaType.APPLICATION_XML,
+            getRepositoryTypeRegistry() );
     }
 
     @Test

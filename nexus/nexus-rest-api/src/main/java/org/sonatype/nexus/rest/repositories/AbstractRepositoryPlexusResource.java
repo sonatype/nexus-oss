@@ -96,16 +96,53 @@ public abstract class AbstractRepositoryPlexusResource
 
     protected String getHintForRoleAndFormat( Class<?> role, String format )
     {
+        // Circumvention
+        // if ( Repository.class.equals( role ) )
+        // {
+        // // "simple" repositories
+        // // we are lucky here, they pair 1:1
+        // // XXX: but is not future proof!
+        // return format;
+        // }
+        // else if ( ShadowRepository.class.equals( role ) )
+        // {
+        // // "shadows", we need a tweak here
+        // if ( "maven2".equals( format ) )
+        // {
+        // return "m1-m2-shadow";
+        // }
+        // else if ( "maven1".equals( format ) )
+        // {
+        // return "m2-m1-shadow";
+        // }
+        // else
+        // {
+        // return format;
+        // }
+        // }
+        // else
+        // {
+        // return format;
+        // }
+
+        // going strict
         if ( Repository.class.equals( role ) )
         {
-            // "simple" repositories
-            // we are lucky here, they pair 1:1
-            // XXX: but is not future proof!
-            return format;
+            if ( "maven1".equals( format ) )
+            {
+                return format;
+            }
+            else if ( "maven2".equals( format ) )
+            {
+                return format;
+            }
+            else
+            {
+                return null;
+            }
         }
         else if ( ShadowRepository.class.equals( role ) )
         {
-            // "shadows", we need a tweak here
             if ( "maven2".equals( format ) )
             {
                 return "m1-m2-shadow";
@@ -116,12 +153,12 @@ public abstract class AbstractRepositoryPlexusResource
             }
             else
             {
-                return format;
+                return null;
             }
         }
         else
         {
-            return format;
+            return null;
         }
     }
 

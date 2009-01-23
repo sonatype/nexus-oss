@@ -26,6 +26,10 @@ import org.restlet.data.Status;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
@@ -45,13 +49,16 @@ public class RepositoryMessageUtil
 
     private MediaType mediaType;
 
+    private RepositoryTypeRegistry repositoryTypeRegistry;
+
     private static final Logger LOG = Logger.getLogger( RepositoryMessageUtil.class );
 
-    public RepositoryMessageUtil( XStream xstream, MediaType mediaType )
+    public RepositoryMessageUtil( XStream xstream, MediaType mediaType, RepositoryTypeRegistry registry )
     {
         super();
         this.xstream = xstream;
         this.mediaType = mediaType;
+        this.repositoryTypeRegistry = registry;
     }
 
     public RepositoryBaseResource createRepository( RepositoryBaseResource repo )
@@ -260,7 +267,11 @@ public class RepositoryMessageUtil
             Assert.assertEquals( expected.getShadowOf(), cRepo.getShadowOf() );
             Assert.assertEquals( expected.getId(), cRepo.getId() );
             Assert.assertEquals( expected.getName(), cRepo.getName() );
-            Assert.assertEquals( expected.getFormat(), cRepo.getType() );
+
+            ContentClass expectedCc = repositoryTypeRegistry.getRepositoryContentClass( ShadowRepository.class
+                .getName(), cRepo.getType() );
+            Assert.assertNotNull( "Unknown shadow repo type='" + cRepo.getType() + "'!", expectedCc );
+            Assert.assertEquals( expected.getFormat(), expectedCc.getId() );
         }
         else
         {
@@ -270,7 +281,13 @@ public class RepositoryMessageUtil
             Assert.assertEquals( expected.getId(), cRepo.getId() );
             Assert.assertEquals( expected.getChecksumPolicy(), cRepo.getChecksumPolicy() );
             Assert.assertEquals( expected.getName(), cRepo.getName() );
-            Assert.assertEquals( expected.getFormat(), cRepo.getType() );
+
+            ContentClass expectedCc = repositoryTypeRegistry.getRepositoryContentClass(
+                Repository.class.getName(),
+                cRepo.getType() );
+            Assert.assertNotNull( "Unknown repo type='" + cRepo.getType() + "'!", expectedCc );
+            Assert.assertEquals( expected.getFormat(), expectedCc.getId() );
+
             Assert.assertEquals( expected.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL() );
             Assert.assertEquals( expected.getOverrideLocalStorageUrl(), cRepo.getLocalStorage() );
 
@@ -338,8 +355,8 @@ public class RepositoryMessageUtil
 
         Response response = RequestFacade.sendMessage( uriPart, Method.PUT, representation );
         Status status = response.getStatus();
-        Assert.assertTrue( "Fail to update '" + repoStatus.getId() + "' repository status " + status +"\nResponse:\n"+ response.getEntity().getText() +"\nrepresentation:\n"+ representation.getText(), status
-            .isSuccess() );
+        Assert.assertTrue( "Fail to update '" + repoStatus.getId() + "' repository status " + status + "\nResponse:\n"
+            + response.getEntity().getText() + "\nrepresentation:\n" + representation.getText(), status.isSuccess() );
 
     }
 

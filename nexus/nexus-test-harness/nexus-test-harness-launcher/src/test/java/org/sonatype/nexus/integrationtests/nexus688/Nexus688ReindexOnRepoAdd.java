@@ -23,6 +23,7 @@ import java.net.URL;
 import junit.framework.Assert;
 
 import org.apache.commons.io.IOUtils;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -34,13 +35,20 @@ import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 public class Nexus688ReindexOnRepoAdd
     extends AbstractNexusIntegrationTest
 {
-
-    private RepositoryMessageUtil messageUtil =
-        new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+    private RepositoryMessageUtil messageUtil;
 
     private static final String INDEX_FILE = ".index/nexus-maven-repository-index.zip";
 
     private static final int SLEEP_TIME = 200;
+
+    public Nexus688ReindexOnRepoAdd()
+        throws ComponentLookupException
+    {
+        messageUtil = new RepositoryMessageUtil(
+            this.getXMLXStream(),
+            MediaType.APPLICATION_XML,
+            getRepositoryTypeRegistry() );
+    }
 
     @Test
     public void repoTestIndexable()
@@ -219,7 +227,8 @@ public class Nexus688ReindexOnRepoAdd
     }
 
     private File downloadIndexFromRepository( String repoId )
-        throws MalformedURLException, IOException
+        throws MalformedURLException,
+            IOException
     {
         String repositoryUrl = this.getRepositoryUrl( repoId );
         URL url = new URL( repositoryUrl + INDEX_FILE );
@@ -241,7 +250,7 @@ public class Nexus688ReindexOnRepoAdd
             }
             catch ( FileNotFoundException e )
             {
-                //means index was not created yet
+                // means index was not created yet
             }
         }
 

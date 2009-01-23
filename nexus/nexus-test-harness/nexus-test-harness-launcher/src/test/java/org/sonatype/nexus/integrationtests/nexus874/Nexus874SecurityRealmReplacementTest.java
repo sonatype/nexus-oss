@@ -17,6 +17,7 @@ import java.net.ConnectException;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -34,49 +35,56 @@ import org.sonatype.nexus.test.utils.UserMessageUtil;
  */
 public class Nexus874SecurityRealmReplacementTest
     extends AbstractNexusIntegrationTest
-{    
+{
     private GroupMessageUtil groupUtil;
+
     private RepositoryMessageUtil repoUtil;
+
     private RoleMessageUtil roleUtil;
+
     private UserMessageUtil userUtil;
-    
+
     public Nexus874SecurityRealmReplacementTest()
+        throws ComponentLookupException
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
         groupUtil = new GroupMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
-        repoUtil = new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        repoUtil = new RepositoryMessageUtil(
+            this.getJsonXStream(),
+            MediaType.APPLICATION_JSON,
+            getRepositoryTypeRegistry() );
         // targetUtil = new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
         roleUtil = new RoleMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
         userUtil = new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
-        
+
     @Test
     public void authentication()
         throws Exception
-    {           
+    {
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
-        
+
         NexusStateUtil.getNexusStatus();
-        
+
         TestContainer.getInstance().getTestContext().setUsername( "deployment" );
         TestContainer.getInstance().getTestContext().setPassword( "deployment123" );
-        
+
         NexusStateUtil.getNexusStatus();
-        
+
         TestContainer.getInstance().getTestContext().setUsername( "anonymous" );
         TestContainer.getInstance().getTestContext().setPassword( "anonymous" );
-        
+
         NexusStateUtil.getNexusStatus();
     }
-    
+
     @Test
     public void negativeAuthentication()
         throws Exception
-    {           
+    {
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "badpassword" );
-        
+
         try
         {
             NexusStateUtil.getNexusStatus();
@@ -84,12 +92,12 @@ public class Nexus874SecurityRealmReplacementTest
         }
         catch ( ConnectException e )
         {
-            //good
+            // good
         }
-        
+
         TestContainer.getInstance().getTestContext().setUsername( "deployment" );
         TestContainer.getInstance().getTestContext().setPassword( "badpassword" );
-        
+
         try
         {
             NexusStateUtil.getNexusStatus();
@@ -97,12 +105,12 @@ public class Nexus874SecurityRealmReplacementTest
         }
         catch ( ConnectException e )
         {
-            //good
+            // good
         }
-        
+
         TestContainer.getInstance().getTestContext().setUsername( "anonymous" );
         TestContainer.getInstance().getTestContext().setPassword( "badpassword" );
-        
+
         try
         {
             NexusStateUtil.getNexusStatus();
@@ -110,45 +118,45 @@ public class Nexus874SecurityRealmReplacementTest
         }
         catch ( ConnectException e )
         {
-            //good
+            // good
         }
     }
-    
+
     @Test
     public void authorization()
         throws Exception
-    {        
+    {
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
-        
+
         NexusStateUtil.getNexusStatus();
         groupUtil.getList();
         repoUtil.getList();
         TargetMessageUtil.getList();
         TaskScheduleUtil.getTasks();
-        
+
         TestContainer.getInstance().getTestContext().setUsername( "deployment" );
         TestContainer.getInstance().getTestContext().setPassword( "deployment123" );
-        
+
         NexusStateUtil.getNexusStatus();
         groupUtil.getList();
         repoUtil.getList();
-        
+
         TestContainer.getInstance().getTestContext().setUsername( "anonymous" );
         TestContainer.getInstance().getTestContext().setPassword( "anonymous" );
-        
+
         NexusStateUtil.getNexusStatus();
         groupUtil.getList();
         repoUtil.getList();
     }
-    
+
     @Test
     public void negativeAuthorization()
         throws Exception
     {
         TestContainer.getInstance().getTestContext().setUsername( "deployment" );
         TestContainer.getInstance().getTestContext().setPassword( "deployment123" );
-        
+
         try
         {
             TargetMessageUtil.getList();
@@ -158,7 +166,7 @@ public class Nexus874SecurityRealmReplacementTest
         {
             // OK
         }
-        
+
         try
         {
             TaskScheduleUtil.getTasks();
@@ -168,10 +176,10 @@ public class Nexus874SecurityRealmReplacementTest
         {
             // OK
         }
-        
+
         TestContainer.getInstance().getTestContext().setUsername( "anonymous" );
         TestContainer.getInstance().getTestContext().setPassword( "anonymous" );
-        
+
         try
         {
             TargetMessageUtil.getList();
@@ -181,7 +189,7 @@ public class Nexus874SecurityRealmReplacementTest
         {
             // OK
         }
-        
+
         try
         {
             TaskScheduleUtil.getTasks();
@@ -191,10 +199,10 @@ public class Nexus874SecurityRealmReplacementTest
         {
             // OK
         }
-        
+
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
-        
+
         try
         {
             userUtil.getList();
@@ -204,7 +212,7 @@ public class Nexus874SecurityRealmReplacementTest
         {
             // OK
         }
-        
+
         try
         {
             roleUtil.getList();
