@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.CollectionUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
 import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
 import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
@@ -28,7 +30,8 @@ import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
  * source might be associated with the group 'projectA-developer', when the user 'jcoder' is returned from this class
  * the association is contained in a PlexusUser object.
  */
-// This class must have a role of 'PlexusUserLocator', and the hint, must match the result of getSource() and the hint of the corresponding Realm.
+// This class must have a role of 'PlexusUserLocator', and the hint, must match the result of getSource() and the hint
+// of the corresponding Realm.
 @Component( role = PlexusUserLocator.class, hint = "Simple", description = "Simple User Locator" )
 public class SimpleUserLocator
     implements PlexusUserLocator
@@ -41,7 +44,8 @@ public class SimpleUserLocator
      */
     private UserStore userStore = new UserStore();
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.sonatype.jsecurity.locators.users.PlexusUserLocator#getSource()
      */
     public String getSource()
@@ -49,7 +53,8 @@ public class SimpleUserLocator
         return SOURCE;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.sonatype.jsecurity.locators.users.PlexusUserLocator#getUser(java.lang.String)
      */
     public PlexusUser getUser( String userId )
@@ -63,16 +68,18 @@ public class SimpleUserLocator
         return null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.sonatype.jsecurity.locators.users.PlexusUserLocator#isPrimary()
      */
     public boolean isPrimary()
     {
-        // Set this to true if this UserLocator should priority over other PlexusUserLocators 
+        // Set this to true if this UserLocator should priority over other PlexusUserLocators
         return true;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.sonatype.jsecurity.locators.users.PlexusUserLocator#listUserIds()
      */
     public Set<String> listUserIds()
@@ -83,7 +90,7 @@ public class SimpleUserLocator
         {
             userIds.add( user.getUserId() );
         }
-        
+
         return userIds;
     }
 
@@ -95,23 +102,45 @@ public class SimpleUserLocator
         {
             users.add( this.toPlexusUser( user ) );
         }
-        
+
         return users;
     }
-    
+
     public Set<PlexusUser> searchUsers( PlexusUserSearchCriteria criteria )
     {
-        // this is expected to be a starts with search, so 'jcod' would find 'jcoder'
+
         Set<PlexusUser> users = new HashSet<PlexusUser>();
         for ( SimpleUser user : this.userStore.getAllUsers() )
         {
-            if( user.getUserId().toLowerCase().startsWith( criteria.getUserId().toLowerCase() ))
+            if ( this.userMatchesCriteria( user, criteria ) )
             {
                 users.add( this.toPlexusUser( user ) );
             }
         }
-        // return anything that matches
         return users;
+    }
+
+    public boolean userMatchesCriteria( SimpleUser simpleUser, PlexusUserSearchCriteria criteria )
+    {
+        // You would most likely replace this code with some query and let you back end do the work.
+
+        // this is expected to be a starts with search, so 'jcod' would find 'jcoder'
+        if ( StringUtils.isNotEmpty( criteria.getUserId() )
+            && !simpleUser.getUserId().toLowerCase().startsWith( criteria.getUserId() ) )
+        {
+            return false;
+        }
+
+        if ( criteria.getOneOfRoleIds() != null && !criteria.getOneOfRoleIds().isEmpty() )
+        {
+            // we are checking if any of the roles in the criteria are also in the users roles.
+            if ( CollectionUtils.intersection( simpleUser.getRoles(), criteria.getOneOfRoleIds() ).isEmpty() )
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private PlexusUser toPlexusUser( SimpleUser simpleUser )
