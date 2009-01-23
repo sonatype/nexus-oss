@@ -15,6 +15,7 @@ import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.nexus.rest.model.MirrorStatusResource;
 import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
+import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -139,6 +140,41 @@ public class MirrorMessageUtils
         for ( MirrorStatusResource resource : ( List<MirrorStatusResource> ) resourceResponse.getData() )
         {
             Assert.assertNotNull( "Id shouldn't be null", resource.getId() );
+        }
+        
+        return resourceResponse;
+    }
+    
+    public MirrorResourceListResponse getPredefinedMirrors( String repositoryId )
+        throws IOException
+    {
+        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
+
+        String serviceURI = "service/local/repository_predefined_mirrors/" + repositoryId;
+
+        Response response = RequestFacade.sendMessage( serviceURI, Method.GET, representation );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            String responseText = response.getEntity().getText();
+            Assert.fail( "Could not get predefined mirrors: " + response.getStatus() + ":\n" + responseText );
+        }
+
+        String responseString = response.getEntity().getText();
+        LOG.debug( " getResourceFromResponse: " + responseString );
+
+        representation = new XStreamRepresentation( xstream, responseString, mediaType );
+
+        // this
+        MirrorResourceListResponse resourceResponse = (MirrorResourceListResponse) representation
+            .getPayload( new MirrorResourceListResponse() );
+
+        Assert.assertNotNull( "Resource Response shouldn't be null", resourceResponse );
+        
+        for ( MirrorResource resource : ( List<MirrorResource> ) resourceResponse.getData() )
+        {
+            Assert.assertNotNull( "URL shouldn't be null", resource.getUrl() );
+            Assert.assertEquals( StringDigester.getSha1Digest( resource.getUrl() ), resource.getId() );
         }
         
         return resourceResponse;

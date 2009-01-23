@@ -15,7 +15,7 @@ import org.sonatype.nexus.rest.model.MirrorStatusResource;
 import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
 import org.sonatype.nexus.test.utils.MirrorMessageUtils;
 
-public class Nexus1328RepositoryMirrorCRUDTest
+public class Nexus1328RepositoryMirrorRESTTest
     extends AbstractNexusIntegrationTest
 {   
     @BeforeClass
@@ -35,7 +35,7 @@ public class Nexus1328RepositoryMirrorCRUDTest
     
     private String repositoryId = "release-proxy-repo-1";
     
-    public Nexus1328RepositoryMirrorCRUDTest()
+    public Nexus1328RepositoryMirrorRESTTest()
     {
         this.messageUtil = new MirrorMessageUtils( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
@@ -142,5 +142,12 @@ public class Nexus1328RepositoryMirrorCRUDTest
         Assert.assertEquals( "http://mirrorStatusTest2", two.getUrl() );
         Assert.assertEquals( "Available", one.getStatus() );
         Assert.assertEquals( "Available", two.getStatus() );
+    }
+    
+    @Test
+    public void predefinedMirrorTest()
+        throws IOException
+    {
+        this.messageUtil.getPredefinedMirrors( repositoryId );
     }
 }
