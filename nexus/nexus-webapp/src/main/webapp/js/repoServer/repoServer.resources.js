@@ -222,9 +222,9 @@ Sonatype.repoServer.resources.help = {
   },
   
   log: {
-	rootLogger: 'The root logger of log4j configuration.',
-	fileAppenderLocation: 'The file appender location of log4j configuration.',
-	fileAppenderPattern: 'The file appender pattern of log4j configuration.' 
+	rootLogger: 'The root logger for your log4j configuration.',
+	fileAppenderLocation: 'The file appender location for your log4j configuration.',
+	fileAppenderPattern: 'The file appender pattern for your log4j configuration.' 
   },
   
   repoMirrors: {
