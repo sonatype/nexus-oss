@@ -3,12 +3,14 @@ package org.sonatype.plexus.rest.jaxrs;
 import javax.ws.rs.core.Application;
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.restlet.Component;
 import org.restlet.Server;
 import org.restlet.data.Protocol;
 import org.restlet.ext.jaxrs.JaxRsApplication;
 
+@Ignore
 public class JaxRsTest
     extends PlexusTestCase
 {
