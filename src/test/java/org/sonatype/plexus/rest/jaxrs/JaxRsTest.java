@@ -3,13 +3,12 @@ package org.sonatype.plexus.rest.jaxrs;
 import javax.ws.rs.core.Application;
 
 import org.codehaus.plexus.PlexusTestCase;
-import org.junit.Ignore;
+import org.junit.Test;
 import org.restlet.Component;
 import org.restlet.Server;
 import org.restlet.data.Protocol;
 import org.restlet.ext.jaxrs.JaxRsApplication;
 
-@Ignore // turned OFF
 public class JaxRsTest
     extends PlexusTestCase
 {
@@ -19,6 +18,13 @@ public class JaxRsTest
         return lookup( Application.class );
     }
 
+    public PlexusObjectFactory getPlexusObjectFactory()
+        throws Exception
+    {
+        return lookup( PlexusObjectFactory.class );
+    }
+
+    @Test
     public void testSimple()
         throws Exception
     {
@@ -27,6 +33,9 @@ public class JaxRsTest
 
         // create JAX-RS runtime environment
         JaxRsApplication application = new JaxRsApplication( comp.getContext() );
+
+        // plexus goes here
+        application.setObjectFactory( getPlexusObjectFactory() );
 
         // attach ApplicationConfig
         application.add( getApplication() );

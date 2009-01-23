@@ -18,7 +18,7 @@ public class TestJaxRsResource
     extends AbstractLogEnabled
 {
     @GET
-    @Produces( { "application/xml", "application/json" } )
+    @Produces( { "text/xml", "application/json" } )
     public TestDto get( String param )
     {
         getLogger().info( "Got GET request with param '" + param + "'" );

@@ -4,12 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-
-@XmlRootElement
-@XStreamAlias( "test" )
 public class TestDto
 {
     private String aString;
