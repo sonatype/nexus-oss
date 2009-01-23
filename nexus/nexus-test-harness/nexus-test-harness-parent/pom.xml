@@ -126,13 +126,7 @@
         <executions>
           <execution>
             <id>unpack-bundle</id>
-            <!-- we don't need these until JUST BEFORE integration testing, 
-                 so moving to a later phase to get out of 
-                 the way of m2eclipse. -->
-						<phase>package</phase>
-						<!--
             <phase>generate-test-resources</phase>
-            -->
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
@@ -144,13 +138,7 @@
           </execution>
           <execution>
             <id>copy-dependencies</id>
-            <!-- we don't need these until JUST BEFORE integration testing, 
-                 so moving to a later phase to get out of 
-                 the way of m2eclipse. -->
-						<phase>package</phase>
-						<!--
             <phase>generate-resources</phase>
-            -->
             <goals>
               <goal>copy</goal>
             </goals>
@@ -170,13 +158,7 @@
 
           <execution>
             <id>get-emma</id>
-            <!-- we don't need these until JUST BEFORE integration testing, 
-                 so moving to a later phase to get out of 
-                 the way of m2eclipse. -->
-						<phase>package</phase>
-						<!--
             <phase>generate-test-resources</phase>
-            -->
             <goals>
               <goal>copy</goal>
             </goals>
@@ -244,13 +226,7 @@
             <goals>
               <goal>unpack</goal>
             </goals>
-            <!-- we don't need these until JUST BEFORE integration testing, 
-                 so moving to a later phase to get out of 
-                 the way of m2eclipse. -->
-						<phase>package</phase>
-						<!--
             <phase>generate-test-resources</phase>
-            -->
             <configuration>
               <artifactItems>
                 <artifactItem>
@@ -276,13 +252,7 @@
 
           <execution>
             <id>unpack-maven</id>
-            <!-- we don't need these until JUST BEFORE integration testing, 
-                 so moving to a later phase to get out of 
-                 the way of m2eclipse. -->
-						<phase>package</phase>
-						<!--
             <phase>generate-resources</phase>
-            -->
             <goals>
               <goal>unpack</goal>
             </goals>
