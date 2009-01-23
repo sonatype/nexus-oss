@@ -517,7 +517,7 @@ Ext.form.Action.ACTION_TYPES.sonatypeSubmit = Ext.form.Action.sonatypeSubmit;
 Sonatype.ext.FormPanel = function( config ) {
   var config = config || {};
   var defaultConfig = {
-    region: 'center',
+//    region: 'center',
     width: '100%',
     height: '100%',
     autoScroll: true,
@@ -563,8 +563,7 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
   checkPayload: function() {
     this.isNew = false;
     if ( this.payload ) {
-      this.id = this.payload.id;
-      if ( this.id.substring( 0, 4 ) == 'new_' ) {
+      if ( this.payload.id.substring( 0, 4 ) == 'new_' ) {
         this.isNew = true;
       }
     }
