@@ -63,7 +63,7 @@ public class UserForgotIdPlexusResource
         
         if ( isAnonymousEmail( email ) )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Cannot recover anonymous user id" );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Cannot recover the username for anonymous users" );
         }
         
         try
