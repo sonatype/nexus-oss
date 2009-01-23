@@ -38,7 +38,7 @@ Sonatype.repoServer.MirrorConfigPanel = function(config) {
     },
     autoLoad :false
   });
-  
+
   this.predefinedMirrorDataStore = new Ext.data.Store( {
     url :Sonatype.config.repos.urls.repoPredefinedMirrors + '/' + config.payload.data.id,
     reader :this.mirrorReader,
@@ -53,9 +53,16 @@ Sonatype.repoServer.MirrorConfigPanel = function(config) {
     uri :Sonatype.config.repos.urls.repoMirrors + '/' + config.payload.data.id,
     referenceData :Sonatype.repoServer.referenceData.repoMirrors,
     dataStores : [
-      this.mirrorDataStore,
-      this.predefinedMirrorDataStore
-    ]
+        this.mirrorDataStore, this.predefinedMirrorDataStore
+    ],
+    dataModifiers : {
+      load : {
+        'rootData' :this.loadMirrors.createDelegate(this)
+      },
+      submit : {
+        'rootData' :this.saveMirrors.createDelegate(this)
+      }
+    }
   };
 
   Ext.apply(this, config, defaultConfig);
@@ -78,26 +85,26 @@ Sonatype.repoServer.MirrorConfigPanel = function(config) {
               {
                 xtype :'panel',
                 layout :'form',
-                labelWidth: 150,
+                labelWidth :150,
                 width :430,
                 items : [
                   {
-                    xtype: 'combo',
-                    fieldLabel: 'Mirror URL',
-                    helpText: ht.mirrorUrl,
-                    name: 'mirrorUrl',
-                    width: 238,
-                    listWidth: 238,
-                    store: this.predefinedMirrorDataStore,
-                    displayField:'url',
-                    valueField:'id',
-                    editable: true,
-                    forceSelection: false,
-                    mode: 'local',
-                    triggerAction: 'all',
-                    emptyText:'Enter or Select URL...',
-                    selectOnFocus:true,
-                    allowBlank: true       
+                    xtype :'combo',
+                    fieldLabel :'Mirror URL',
+                    helpText :ht.mirrorUrl,
+                    name :'mirrorUrl',
+                    width :238,
+                    listWidth :238,
+                    store :this.predefinedMirrorDataStore,
+                    displayField :'url',
+                    valueField :'id',
+                    editable :true,
+                    forceSelection :false,
+                    mode :'local',
+                    triggerAction :'all',
+                    emptyText :'Enter or Select URL...',
+                    selectOnFocus :true,
+                    allowBlank :true
                   }
                 ]
               }, {
@@ -138,7 +145,9 @@ Sonatype.repoServer.MirrorConfigPanel = function(config) {
                 containerScroll :true,
                 rootVisible :false,
                 enableDD :false,
-                root :new Ext.tree.TreeNode({text: 'root'})
+                root :new Ext.tree.TreeNode( {
+                  text :'root'
+                })
               }, {
                 xtype :'panel',
                 width :120,
@@ -183,7 +192,7 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
           return;
         }
       }
-      
+
       urlField.clearInvalid();
 
       this.addUrlNode(treePanel, url, id);
@@ -194,11 +203,10 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
   addUrlNode : function(treePanel, url, id) {
     var validId;
     var manualUrl;
-    if ( url == id ){
+    if (url == id) {
       validId = Ext.id();
       manualUrl = true;
-    }
-    else{
+    } else {
       validId = id;
       manualUrl = false;
     }
@@ -233,6 +241,29 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
     while (treeRoot.lastChild) {
       treeRoot.removeChild(treeRoot.lastChild);
     }
+  },
+  
+  loadMirrors : function(arr, srcObj, fpanel){
+    var treePanel = this.find('name', 'mirror-url-list')[0];
+
+    for(var i=0; i<arr.length; i++){
+      this.addUrlNode( fpanel, arr[i].url, arr[i].id );
+    }
+    
+    return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
+  },
+  
+  saveMirrors : function(val, fpanel){
+    var treePanel = this.find('name', 'mirror-url-list')[0];
+    
+    var outputArr = [];
+    var nodes = treePanel.root.childNodes;
+    
+    for(var i = 0; i < nodes.length; i++){
+      outputArr[i] = nodes[i].attributes.payload;
+    }
+    
+    return outputArr;
   },
 
   submitHandler : function(form, action, receivedData) {

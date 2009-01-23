@@ -272,9 +272,16 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
             return; //skip recursive calls for children form items
           }
         }
-
-        for (var i in value){
-          this.serializeFormHelper(fpanel, accObj, value, nextPrepend, i);
+        
+        if ( this.options.dataModifiers && this.options.dataModifiers['rootData'] ){
+          var fieldValue = null;
+          fieldValue = (this.options.dataModifiers['rootData'])(fieldValue, fpanel);
+          eval('accObj = fieldValue;');
+        }
+        else {
+          for (var i in value){
+            this.serializeFormHelper(fpanel, accObj, value, nextPrepend, i);
+          }
         }
       }
       else { //only non-root case should ever get in here
@@ -414,21 +421,27 @@ Ext.extend(Ext.form.Action.sonatypeLoad, Ext.form.Action, {
     
     if (Ext.type(value) === 'object'){
       var hasNonEmptyChildren = false;
-      for (var i in value){
-        var thisChildNotEmpty = this.translateHelper(fpanel, accObj, value, nextPrepend, i);
-        hasNonEmptyChildren = hasNonEmptyChildren || thisChildNotEmpty;
+      //first check for rootData, to push everything in result object
+      if ( this.options.dataModifiers && this.options.dataModifiers['rootData']){
+        accObj['rootData'] = this.options.dataModifiers['rootData'](value, srcObj, fpanel);
       }
-      if (sVal){ //only write object serialization for non-root objects
-        if(hasNonEmptyChildren){
-          var fieldSet = Ext.getCmp(fpanel.id + '_' + sPrepend + sVal);
-          if ( ! fieldSet ) {
-            fieldSet = fpanel.find( 'name', 'fieldset_' + sPrepend + sVal )[0];
-          }
-          if(fieldSet){
-            fieldSet.expand(true);
-          }
+      else {
+        for (var i in value){
+          var thisChildNotEmpty = this.translateHelper(fpanel, accObj, value, nextPrepend, i);
+          hasNonEmptyChildren = hasNonEmptyChildren || thisChildNotEmpty;
         }
-        accObj['.' + sPrepend + sVal] = hasNonEmptyChildren;
+        if (sVal){ //only write object serialization for non-root objects
+          if(hasNonEmptyChildren){
+            var fieldSet = Ext.getCmp(fpanel.id + '_' + sPrepend + sVal);
+            if ( ! fieldSet ) {
+              fieldSet = fpanel.find( 'name', 'fieldset_' + sPrepend + sVal )[0];
+            }
+            if(fieldSet){
+              fieldSet.expand(true);
+            }
+          }
+          accObj['.' + sPrepend + sVal] = hasNonEmptyChildren;
+        }
       }
       return hasNonEmptyChildren;
     }
