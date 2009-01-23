@@ -52,6 +52,9 @@ public class RepositoryMirrorListPlexusResource
         throws ResourceException
     {
         MirrorResourceListResponse dto  = new MirrorResourceListResponse();
+        //Hack to get the object created, so response contains the 'data'
+        //element even if no mirrors defined
+        dto.getData();
         
         try
         {

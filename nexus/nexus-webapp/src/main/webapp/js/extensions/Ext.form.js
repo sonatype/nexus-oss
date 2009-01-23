@@ -237,8 +237,8 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
     serializeForm : function(fpanel, form){
       var output = Sonatype.utils.cloneObj(this.options.serviceDataObj);
       //note: srcObj (form.sonatypeLoadedData) is not modified only walked
-      this.serializeFormHelper(fpanel, output, this.options.serviceDataObj, '');
-      this.output = {"data":output};
+      var resultOutput = this.serializeFormHelper(fpanel, output, this.options.serviceDataObj, '');
+      this.output = {"data": resultOutput ? resultOutput : output };
       if(Sonatype.config.isDebug){ console.info(this.options.method + ' ' + this.options.url + ' ' , this.output); }
       return Ext.encode(this.output);
     },
@@ -259,8 +259,13 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
         nextPrepend = sPrepend;
         value = srcObj;
       }
-
-      if (Ext.type(value) === 'object'){
+      
+      if ( this.options.dataModifiers && this.options.dataModifiers['rootData'] ){
+        var fieldValue = null;
+        fieldValue = (this.options.dataModifiers['rootData'])(fieldValue, fpanel);
+        return fieldValue;
+      }
+      else if (Ext.type(value) === 'object'){
         if (sVal){ //only write object serialization for non-root objects
           var fieldSet = Ext.getCmp(fpanel.id + '_' + sPrepend + sVal);
           if ( ! fieldSet ) {
@@ -273,15 +278,8 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
           }
         }
         
-        if ( this.options.dataModifiers && this.options.dataModifiers['rootData'] ){
-          var fieldValue = null;
-          fieldValue = (this.options.dataModifiers['rootData'])(fieldValue, fpanel);
-          eval('accObj = fieldValue;');
-        }
-        else {
-          for (var i in value){
-            this.serializeFormHelper(fpanel, accObj, value, nextPrepend, i);
-          }
+        for (var i in value){
+          this.serializeFormHelper(fpanel, accObj, value, nextPrepend, i);
         }
       }
       else { //only non-root case should ever get in here
@@ -419,29 +417,26 @@ Ext.extend(Ext.form.Action.sonatypeLoad, Ext.form.Action, {
       value = srcObj;
     }
     
-    if (Ext.type(value) === 'object'){
+    if ( this.options.dataModifiers && this.options.dataModifiers['rootData']){
+      accObj = this.options.dataModifiers['rootData'](value, srcObj, fpanel);
+    }
+    else if (Ext.type(value) === 'object'){
       var hasNonEmptyChildren = false;
-      //first check for rootData, to push everything in result object
-      if ( this.options.dataModifiers && this.options.dataModifiers['rootData']){
-        accObj['rootData'] = this.options.dataModifiers['rootData'](value, srcObj, fpanel);
+      for (var i in value){
+        var thisChildNotEmpty = this.translateHelper(fpanel, accObj, value, nextPrepend, i);
+        hasNonEmptyChildren = hasNonEmptyChildren || thisChildNotEmpty;
       }
-      else {
-        for (var i in value){
-          var thisChildNotEmpty = this.translateHelper(fpanel, accObj, value, nextPrepend, i);
-          hasNonEmptyChildren = hasNonEmptyChildren || thisChildNotEmpty;
-        }
-        if (sVal){ //only write object serialization for non-root objects
-          if(hasNonEmptyChildren){
-            var fieldSet = Ext.getCmp(fpanel.id + '_' + sPrepend + sVal);
-            if ( ! fieldSet ) {
-              fieldSet = fpanel.find( 'name', 'fieldset_' + sPrepend + sVal )[0];
-            }
-            if(fieldSet){
-              fieldSet.expand(true);
-            }
+      if (sVal){ //only write object serialization for non-root objects
+        if(hasNonEmptyChildren){
+          var fieldSet = Ext.getCmp(fpanel.id + '_' + sPrepend + sVal);
+          if ( ! fieldSet ) {
+            fieldSet = fpanel.find( 'name', 'fieldset_' + sPrepend + sVal )[0];
           }
-          accObj['.' + sPrepend + sVal] = hasNonEmptyChildren;
+          if(fieldSet){
+            fieldSet.expand(true);
+          }
         }
+        accObj['.' + sPrepend + sVal] = hasNonEmptyChildren;
       }
       return hasNonEmptyChildren;
     }
@@ -478,6 +473,10 @@ Ext.form.Action.ACTION_TYPES.sonatypeSubmit = Ext.form.Action.sonatypeSubmit;
  *               invoker can subscribe to a "cancel" event and do the necessary 
  *               cleanup (e.g. close the panel). By default, the form will display
  *               a "Reset" button instead, which reloads the form when clicked.
+ * 
+ * Note a special dataModifier of 'rootData' will work with entire contents of json response
+ * rather than on a field by field basis.  Using this modifier will then render other modifiers
+ * useless
  * 
  * dataModifiers: { // data modifiers on form submit/load 
  *   load: {
@@ -661,7 +660,7 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
   saveHandler : function( button, event ){
     if ( this.isValid() ) {
       this.form.doAction( 'sonatypeSubmit', {
-        method: this.isNew ? 'POST' : 'PUT',
+        method: this.getSaveMethod(),
         url: this.getActionURL(),
         waitMsg: this.isNew ? 'Creating a new record...' : 'Updating records...',
         fpanel: this,
@@ -726,6 +725,10 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
       ( this.payload.data.resourceURI ?  // if resouceURI is supplied, return it
           this.payload.data.resourceURI :
           this.uri + '/' + this.payload.id ); // otherwise construct a uri
+  },
+  
+  getSaveMethod: function() {
+    return this.isNew ? 'POST' : 'PUT';
   },
   
   optionalFieldsetExpandHandler: function( panel ) {

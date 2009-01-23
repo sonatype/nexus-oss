@@ -62,6 +62,12 @@ Sonatype.repoServer.MirrorConfigPanel = function(config) {
       submit : {
         'rootData' :this.saveMirrors.createDelegate(this)
       }
+    },
+    listeners : {
+      submit : {
+        fn :this.submitHandler,
+        scope :this
+      }
     }
   };
 
@@ -70,12 +76,6 @@ Sonatype.repoServer.MirrorConfigPanel = function(config) {
   var ht = Sonatype.repoServer.resources.help.repoMirrors;
 
   Sonatype.repoServer.MirrorConfigPanel.superclass.constructor.call(this, {
-    listeners : {
-      submit : {
-        fn :this.submitHandler,
-        scope :this
-      }
-    },
     items : [
         {
           xtype :'panel',
@@ -210,7 +210,6 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
       validId = id;
       manualUrl = false;
     }
-
     treePanel.root.appendChild(new Ext.tree.TreeNode( {
       id :id,
       text :url,
@@ -242,31 +241,43 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
       treeRoot.removeChild(treeRoot.lastChild);
     }
   },
-  
-  loadMirrors : function(arr, srcObj, fpanel){
+
+  loadMirrors : function(arr, srcObj, fpanel) {
     var treePanel = this.find('name', 'mirror-url-list')[0];
 
-    for(var i=0; i<arr.length; i++){
-      this.addUrlNode( fpanel, arr[i].url, arr[i].id );
+    this.removeAllMirrorUrls();
+
+    for ( var i = 0; i < arr.length; i++) {
+      this.addUrlNode(treePanel, arr[i].url, arr[i].id);
     }
-    
-    return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
+
+    return arr;
   },
-  
-  saveMirrors : function(val, fpanel){
+
+  saveMirrors : function(val, fpanel) {
     var treePanel = this.find('name', 'mirror-url-list')[0];
-    
+
     var outputArr = [];
     var nodes = treePanel.root.childNodes;
-    
-    for(var i = 0; i < nodes.length; i++){
+
+    for ( var i = 0; i < nodes.length; i++) {
       outputArr[i] = nodes[i].attributes.payload;
     }
-    
+
     return outputArr;
   },
 
-  submitHandler : function(form, action, receivedData) {
+  getActionURL : function() {
+    return this.uri;
+  },
+
+  getSaveMethod : function() {
+    return 'POST';
+  },
+  
+  submitHandler: function( form, action, receivedData ) {
+    //reload the mirrors to get ids setup properly
+    this.loadMirrors(receivedData, null, this);
   }
 });
 
