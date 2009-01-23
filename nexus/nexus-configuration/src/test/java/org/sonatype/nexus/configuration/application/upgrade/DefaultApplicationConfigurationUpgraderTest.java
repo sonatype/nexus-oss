@@ -14,13 +14,11 @@
 package org.sonatype.nexus.configuration.application.upgrade;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.StringWriter;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
-import org.sonatype.nexus.configuration.application.upgrade.ApplicationConfigurationUpgrader;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 
@@ -59,9 +57,7 @@ public class DefaultApplicationConfigurationUpgraderTest
     public void testFromDEC()
         throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/nexus-001-1.xml" ),
-            new FileOutputStream( getNexusConfiguration() ) );
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-001-1.xml", getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -81,9 +77,7 @@ public class DefaultApplicationConfigurationUpgraderTest
     public void testFromDECDmz()
         throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/nexus-001-2.xml" ),
-            new FileOutputStream( getNexusConfiguration() ) );
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-001-2.xml", getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -103,9 +97,7 @@ public class DefaultApplicationConfigurationUpgraderTest
     public void testFromDECInt()
         throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/nexus-001-3.xml" ),
-            new FileOutputStream( getNexusConfiguration() ) );
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-001-3.xml", getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -125,9 +117,7 @@ public class DefaultApplicationConfigurationUpgraderTest
     public void testFrom100()
         throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/nexus-100.xml" ),
-            new FileOutputStream( getNexusConfiguration() ) );
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-100.xml", getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -147,9 +137,7 @@ public class DefaultApplicationConfigurationUpgraderTest
     public void testFrom101()
         throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/nexus-101.xml" ),
-            new FileOutputStream( getNexusConfiguration() ) );
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-101.xml", getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -169,14 +157,13 @@ public class DefaultApplicationConfigurationUpgraderTest
     public void testFrom103_1()
         throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/103-1/nexus-103.xml" ),
-            new FileOutputStream( getNexusConfiguration() ) );
+        copyFromClasspathToFile(
+            "/org/sonatype/nexus/configuration/upgrade/103-1/nexus-103.xml",
+            getNexusConfiguration() );
 
         // trick: copying by nexus.xml the tasks.xml too
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/103-1/tasks.xml" ),
-            new FileOutputStream( new File( new File( getNexusConfiguration() ).getParentFile(), "tasks.xml" ) ) );
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/103-1/tasks.xml", new File( new File(
+            getNexusConfiguration() ).getParentFile(), "tasks.xml" ) );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -197,9 +184,9 @@ public class DefaultApplicationConfigurationUpgraderTest
         throws Exception
     {
         // same as above, but we have no tasks.xml
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/103-2/nexus-103.xml" ),
-            new FileOutputStream( getNexusConfiguration() ) );
+        copyFromClasspathToFile(
+            "/org/sonatype/nexus/configuration/upgrade/103-2/nexus-103.xml",
+            getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -215,13 +202,11 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/103-2/nexus-103.xml", configuration );
     }
-    
+
     public void testFrom104()
         throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/nexus-104.xml" ),
-            new FileOutputStream( getNexusConfiguration() ) );
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-104.xml", getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -229,18 +214,16 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-104.xml", configuration );
     }
-    
+
     public void testFrom105()
         throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/nexus-105.xml" ),
-            new FileOutputStream( getNexusConfiguration() ) );
-    
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-105.xml", getNexusConfiguration() );
+
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
-    
+
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
-    
+
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-105.xml", configuration );
     }
 }

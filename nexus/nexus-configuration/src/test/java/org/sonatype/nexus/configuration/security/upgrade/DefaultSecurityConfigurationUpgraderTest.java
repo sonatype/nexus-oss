@@ -14,7 +14,6 @@
 package org.sonatype.nexus.configuration.security.upgrade;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.StringWriter;
 
 import org.codehaus.plexus.util.FileUtils;
@@ -35,15 +34,15 @@ public class DefaultSecurityConfigurationUpgraderTest
         super.setUp();
 
         FileUtils.cleanDirectory( new File( getSecurityConfiguration() ).getParentFile() );
-        
-        this.configurationUpgrader = ( SecurityConfigurationUpgrader ) lookup( SecurityConfigurationUpgrader.class );
+
+        this.configurationUpgrader = (SecurityConfigurationUpgrader) lookup( SecurityConfigurationUpgrader.class );
     }
 
     protected void resultIsFine( String path, Configuration configuration )
         throws Exception
     {
         SecurityConfigurationXpp3Writer w = new SecurityConfigurationXpp3Writer();
-        
+
         StringWriter sw = new StringWriter();
 
         w.write( sw, configuration );
@@ -52,46 +51,49 @@ public class DefaultSecurityConfigurationUpgraderTest
 
         assertEquals( shouldBe, sw.toString() );
     }
-    
+
     public void testFrom100()
         throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/security/upgrade/security-100.xml" ),
-            new FileOutputStream( getSecurityConfiguration() ) );
-    
-        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getSecurityConfiguration() ) );
-    
+        copyFromClasspathToFile(
+            "/org/sonatype/nexus/configuration/security/upgrade/security-100.xml",
+            getSecurityConfiguration() );
+
+        Configuration configuration = configurationUpgrader
+            .loadOldConfiguration( new File( getSecurityConfiguration() ) );
+
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
-    
+
         resultIsFine( "/org/sonatype/nexus/configuration/security/upgrade/security-100.xml", configuration );
     }
-    
+
     public void testFrom100Part2()
         throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/security/upgrade/security-100-2.xml" ),
-            new FileOutputStream( getSecurityConfiguration() ) );
-    
-        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getSecurityConfiguration() ) );
-    
+        copyFromClasspathToFile(
+            "/org/sonatype/nexus/configuration/security/upgrade/security-100-2.xml",
+            getSecurityConfiguration() );
+
+        Configuration configuration = configurationUpgrader
+            .loadOldConfiguration( new File( getSecurityConfiguration() ) );
+
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
-    
+
         resultIsFine( "/org/sonatype/nexus/configuration/security/upgrade/security-100-2.xml", configuration );
     }
-    
+
     public void testFrom201to202()
-    throws Exception
+        throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/security/upgrade/security-100-2.xml" ),
-            new FileOutputStream( getSecurityConfiguration() ) );
-    
-        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getSecurityConfiguration() ) );
-    
+        copyFromClasspathToFile(
+            "/org/sonatype/nexus/configuration/security/upgrade/security-100-2.xml",
+            getSecurityConfiguration() );
+
+        Configuration configuration = configurationUpgrader
+            .loadOldConfiguration( new File( getSecurityConfiguration() ) );
+
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
-    
+
         resultIsFine( "/org/sonatype/nexus/configuration/security/upgrade/security-100-2.xml", configuration );
     }
 }

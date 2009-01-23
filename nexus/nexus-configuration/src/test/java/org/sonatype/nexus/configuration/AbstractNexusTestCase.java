@@ -31,10 +31,13 @@ public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
+
     public static final String APPS_CONFIGURATION_KEY = "apps";
 
     protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
+
     protected static final File WORK_HOME = new File( PLEXUS_HOME, "nexus-work" );
+
     protected static final File CONF_HOME = new File( WORK_HOME, "conf" );
 
     protected void customizeContext( Context ctx )
@@ -47,7 +50,7 @@ public abstract class AbstractNexusTestCase
     {
         return CONF_HOME + "/nexus.xml";
     }
-    
+
     protected String getSecurityConfiguration()
     {
         return CONF_HOME + "/security.xml";
@@ -59,21 +62,21 @@ public abstract class AbstractNexusTestCase
         IOUtil.copy( getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" ), new FileOutputStream(
             getNexusConfiguration() ) );
     }
-    
+
     protected void copyDefaultSecurityConfigToPlace()
-    throws IOException
+        throws IOException
     {
         IOUtil.copy( getClass().getResourceAsStream( "/META-INF/nexus/security.xml" ), new FileOutputStream(
             getSecurityConfiguration() ) );
     }
-    
+
     protected void setUp()
         throws Exception
     {
         super.setUp();
-    
+
         FileUtils.deleteDirectory( PLEXUS_HOME );
-        
+
         PLEXUS_HOME.mkdirs();
         WORK_HOME.mkdirs();
         CONF_HOME.mkdirs();
@@ -83,6 +86,29 @@ public abstract class AbstractNexusTestCase
         throws Exception
     {
         super.tearDown();
+    }
+
+    protected void copyFromClasspathToFile( String path, String outputFilename )
+        throws IOException
+    {
+        copyFromClasspathToFile( path, new File( outputFilename ) );
+    }
+
+    protected void copyFromClasspathToFile( String path, File output )
+        throws IOException
+    {
+        FileOutputStream fos = null;
+
+        try
+        {
+            fos = new FileOutputStream( output );
+
+            IOUtil.copy( getClass().getResourceAsStream( path ), fos );
+        }
+        finally
+        {
+            IOUtil.close( fos );
+        }
     }
 
 }
