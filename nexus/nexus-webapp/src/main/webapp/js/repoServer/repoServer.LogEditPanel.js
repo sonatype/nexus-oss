@@ -55,7 +55,7 @@ Sonatype.repoServer.LogEditPanel = function(config){
           allowBlank: false,
           helpText: ht.rootLogger,
           name: 'rootLogger',
-          anchor: Sonatype.view.FIELD_OFFSET,
+          anchor: Sonatype.view.FIELD_OFFSET
         },
         {
           xtype: 'textfield',
@@ -64,7 +64,7 @@ Sonatype.repoServer.LogEditPanel = function(config){
           allowBlank: false,
           name: 'fileAppenderLocation',
           helpText: ht.fileAppenderLocation,
-          anchor: Sonatype.view.FIELD_OFFSET,
+          anchor: Sonatype.view.FIELD_OFFSET
         },
         {
           xtype: 'textfield',
@@ -73,7 +73,7 @@ Sonatype.repoServer.LogEditPanel = function(config){
           allowBlank: false,
           helpText: ht.fileAppenderPattern,
           name: 'fileAppenderPattern',
-          anchor: Sonatype.view.FIELD_OFFSET,
+          anchor: Sonatype.view.FIELD_OFFSET
         }
       ]
       },
@@ -141,7 +141,7 @@ Ext.extend(Sonatype.repoServer.LogEditPanel, Ext.Panel, {
     this.formPanel.getForm().doAction('sonatypeLoad',{
       url: Sonatype.config.repos.urls.logConfig,
       method: 'GET',
-      fpanel: fpanel,
+      fpanel: fpanel
     }    
     );
   },
