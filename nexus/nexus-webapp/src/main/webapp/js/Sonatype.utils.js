@@ -16,6 +16,7 @@
 Sonatype.utils = {
   passwordPlaceholder : '|$|N|E|X|U|S|$|',
   version : '',
+  versionShort: '',
   edition : '',
   editionShort : '',
   lowercase : function(str){
@@ -700,6 +701,7 @@ Sonatype.utils = {
         if ( success ) {
           var respObj = Ext.decode(response.responseText);
   
+          Sonatype.utils.versionShort = respObj.data.version;
           Sonatype.utils.version = 'Version ' + respObj.data.version + ' ' + respObj.data.editionLong;
           if ( respObj.data.version != respObj.data.apiVersion ){
             Sonatype.utils.version += ' (Core ' + respObj.data.apiVersion + ')';
@@ -734,6 +736,7 @@ Sonatype.utils = {
         else {
           Sonatype.utils.version = 'Version unavailable';
           Sonatype.utils.edition = '';
+          Sonatype.utils.versionShort = '';
         }
         
         Ext.get('version').update(Sonatype.utils.version);
@@ -744,22 +747,29 @@ Sonatype.utils = {
           Sonatype.view.serverTabPanel.doLayout();
   
           if ( baseUrlMismatch ) {
-            Sonatype.view.welcomeTab.add( {
-              xtype: 'panel',
-              html: '<div class="x-toolbar"><div class="x-form-invalid-msg">' +
-                '<b>WARNING:</b> ' +
-                'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' +
-                'does not match your actual URL!<br/>' +
-                'If you\'re running Apache mod_proxy, ' +
-                '<a href="http://nexus.sonatype.org/about/faq.html#' +
-                'QHowcanIforceNexustogenerateHTTPSURLswhenintegratedwithApacheHttpdandModProxy">' +
-                'here\'s more information</a> on configuring Nexus with it.</div></div>'
-            } );
-            Sonatype.view.welcomeTab.doLayout();
+            Sonatype.utils.postWelcomePageAlert(
+              '<b>WARNING:</b> ' +
+              'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' +
+              'does not match your actual URL!<br/>' +
+              'If you\'re running Apache mod_proxy, here\'s ' +
+              '<a href="http://nexus.sonatype.org/about/faq.html#' +
+              'QHowcanIforceNexustogenerateHTTPSURLswhenintegratedwithApacheHttpdandModProxy">' +
+              'more information</a> on configuring Nexus with it.'
+            );
           }
         }
+
+        Sonatype.Events.fireEvent( 'nexusStatus' );
       }
     });
+  },
+  
+  postWelcomePageAlert: function( msg ) {
+    Sonatype.view.welcomeTab.add( {
+      xtype: 'panel',
+      html: '<div class="x-toolbar"><div class="x-form-invalid-msg">' + msg + '</div></div>'
+    } );
+    Sonatype.view.welcomeTab.doLayout();
   }
 };
 
