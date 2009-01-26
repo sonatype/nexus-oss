@@ -7,6 +7,8 @@
 package org.sonatype.nexus.index.packer;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.sonatype.nexus.index.context.IndexingContext;
 
@@ -24,6 +26,8 @@ public class IndexPackingRequest
 
     private int maxIndexChunks;
 
+    private Collection<IndexFormat> formats;
+
     public IndexPackingRequest( IndexingContext context, File targetDir )
     {
         this.context = context;
@@ -35,6 +39,8 @@ public class IndexPackingRequest
         this.indexChunker = new DefaultIndexChunker();
 
         this.maxIndexChunks = MAX_CHUNKS;
+        
+        this.formats = Arrays.asList( IndexFormat.FORMAT_LEGACY, IndexFormat.FORMAT_V1 );
     }
 
     public IndexingContext getContext()
@@ -45,6 +51,22 @@ public class IndexPackingRequest
     public void setContext( IndexingContext context )
     {
         this.context = context;
+    }
+
+    /**
+     * Sets index formats to be created
+     */
+    public void setFormats( Collection<IndexFormat> formats )
+    {
+        this.formats = formats;
+    }
+    
+    /**
+     * Returns index formats to be created. 
+     */
+    public Collection<IndexFormat> getFormats()
+    {
+        return formats;
     }
 
     public File getTargetDir()
@@ -87,4 +109,13 @@ public class IndexPackingRequest
         this.maxIndexChunks = maxIndexChunks;
     }
 
+
+    /**
+     * Index format enumeration.
+     */
+    public static enum IndexFormat 
+    {
+        FORMAT_LEGACY, FORMAT_V1;
+
+    }
 }

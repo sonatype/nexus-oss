@@ -50,7 +50,7 @@ public interface IndexingContext
 
     public static final String INDEX_TIMESTAMP = INDEX_PROPERTY_PREFIX + "time";
 
-    public static final String INDEX_CHUNK_PREFIX = INDEX_PROPERTY_PREFIX + "chunk-";
+    public static final String INDEX_CHUNK_PREFIX = INDEX_PROPERTY_PREFIX + "update-";
 
     public static final String INDEX_TIME_FORMAT = "yyyyMMddHHmmss.SSS Z";
 
@@ -152,13 +152,7 @@ public interface IndexingContext
     Analyzer getAnalyzer();
 
     /**
-     * Constructs an artifacts infos for a Lucene document, probably that came from Hits as a search result.
-     */
-    @Deprecated
-    ArtifactInfo constructArtifactInfo( IndexingContext ctx, Document doc );
-
-    /**
-     * Constructs an artifacts infos for a Lucene document, probably that came from Hits as a search result.
+     * Constructs an artifacts infos for a Lucene document using context index creators.
      */
     ArtifactInfo constructArtifactInfo( Document doc );
 

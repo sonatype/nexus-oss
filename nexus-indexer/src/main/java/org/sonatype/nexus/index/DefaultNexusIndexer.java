@@ -260,18 +260,29 @@ public class DefaultNexusIndexer
 
         File tmpFile = File.createTempFile( context.getId() + "-tmp", "", dir );
         File tmpDir = new File( tmpFile.getParentFile(), tmpFile.getName() + ".dir" );
-        IndexingContext tmpContext = null;
+        if (!tmpDir.mkdirs())
+        {
+            throw new IOException("Cannot create temporary directory: " + tmpDir);
+        }
 
+        IndexingContext tmpContext = null;
         try
         {
-            if (!tmpDir.mkdirs())
+            FSDirectory directory = FSDirectory.getDirectory( tmpDir );
+            
+            if ( update )
             {
-                throw new Exception("Cannot create temporary directory: " + tmpDir);
+                Directory.copy( context.getIndexDirectory(), directory, false );
             }
-
-            tmpContext = addIndexingContextForced( context.getId() + "-tmp", context.getRepositoryId(), context
-                .getRepository(), FSDirectory.getDirectory( tmpDir ), context.getRepositoryUrl(), context
-                .getIndexUpdateUrl(), context.getIndexCreators() );
+            
+            tmpContext = new DefaultIndexingContext( context.getId() + "-tmp", //
+                context.getRepositoryId(), //
+                context.getRepository(), //
+                directory, //
+                context.getRepositoryUrl(), // 
+                context.getIndexUpdateUrl(), //
+                context.getIndexCreators(), //
+                true );
 
             scanner.scan( new DefaultScanningRequest( tmpContext, //
                 new DefaultNexusIndexerListener( tmpContext, this, indexerEngine, update, listener ) ) );

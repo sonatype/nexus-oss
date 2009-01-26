@@ -6,11 +6,12 @@
  */
 package org.sonatype.nexus.index;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -23,6 +24,12 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.context.NexusAnalyzer;
+import org.sonatype.nexus.index.context.NexusIndexWriter;
+import org.sonatype.nexus.index.creator.IndexCreator;
+import org.sonatype.nexus.index.updater.IndexDataReader;
+import org.sonatype.nexus.index.updater.IndexDataWriter;
+import org.sonatype.nexus.index.updater.IndexDataReader.IndexDataReadResult;
 
 public class IndexUtils
 {
@@ -105,37 +112,75 @@ public class IndexUtils
 
     // pack/unpack
 
-    public static Date getIndexArchiveTime( InputStream is )
+    /**
+     * Pack index data into a specified output stream
+     * 
+     * @return number of documents saved
+     */
+    public static int packIndexData( OutputStream os, IndexingContext context, List<Integer> docIndexes )
         throws IOException
     {
-        ZipInputStream zis = null;
-        try
-        {
-            zis = new ZipInputStream( is );
-
-            long timestamp = -1;
-
-            ZipEntry entry;
-            while ( ( entry = zis.getNextEntry() ) != null )
-            {
-                if ( entry.getName() == IndexUtils.TIMESTAMP_FILE )
-                {
-                    return new Date( new DataInputStream( zis ).readLong() );
-                }
-                timestamp = entry.getTime();
-            }
-
-            return timestamp == -1 ? null : new Date( timestamp );
-        }
-        finally
-        {
-            close( zis );
-            close( is );
-        }
+        IndexDataWriter dw = new IndexDataWriter( os );
+        return dw.write( context, docIndexes );
     }
 
     /**
-     * Unpacks index data into specified Lucene <code>Directory</code>
+     * Unpack index data using specified Lucene Index writer
+     * 
+     * @param is an input stream to unpack index data from
+     * @param w a writer to save index data
+     * @param ics a collection of index creators for updating unpacked documents.
+     */
+    public static Date unpackIndexData( InputStream is, Directory d, Collection<? extends IndexCreator> ics )
+        throws IOException
+    {
+        NexusIndexWriter w = new NexusIndexWriter( d, new NexusAnalyzer(), true );
+
+        try
+        {
+            IndexDataReader dr = new IndexDataReader( is );
+            
+            IndexDataReadResult result = dr.readIndex( w, ics );
+            
+            return result.getTimestamp();
+        }
+        finally
+        {
+            w.close();
+        }
+    }
+
+//    public static Date getIndexArchiveTime( InputStream is )
+//        throws IOException
+//    {
+//        ZipInputStream zis = null;
+//        try
+//        {
+//            zis = new ZipInputStream( is );
+//
+//            long timestamp = -1;
+//
+//            ZipEntry entry;
+//            while ( ( entry = zis.getNextEntry() ) != null )
+//            {
+//                if ( entry.getName() == IndexUtils.TIMESTAMP_FILE )
+//                {
+//                    return new Date( new DataInputStream( zis ).readLong() );
+//                }
+//                timestamp = entry.getTime();
+//            }
+//
+//            return timestamp == -1 ? null : new Date( timestamp );
+//        }
+//        finally
+//        {
+//            close( zis );
+//            close( is );
+//        }
+//    }
+
+    /**
+     * Unpack legacy index archive into a specified Lucene <code>Directory</code>
      * 
      * @param is a <code>ZipInputStream</code> with index data
      * @param directory Lucene <code>Directory</code> to unpack index data to
@@ -144,7 +189,6 @@ public class IndexUtils
     public static Date unpackIndexArchive( InputStream is, Directory directory )
         throws IOException
     {
-
         ZipInputStream zis = new ZipInputStream( is );
         try
         {
@@ -184,6 +228,9 @@ public class IndexUtils
         return IndexUtils.getTimestamp( directory );
     }
 
+    /**
+     * Pack legacy index archive into a specified output stream
+     */
     public static void packIndexArchive( IndexingContext context, OutputStream os )
         throws IOException
     {
@@ -314,18 +361,21 @@ public class IndexUtils
         }
     }
 
-    //
-
-    public static void copyAll( final InputStream input, final OutputStream output, byte[] buffer )
-        throws IOException
+    public static ArtifactInfo constructArtifactInfo( Document doc, Collection<? extends IndexCreator> ics )
     {
-        int n = 0;
+        boolean res = false;
 
-        while ( -1 != ( n = input.read( buffer ) ) )
+        ArtifactInfo artifactInfo = new ArtifactInfo();
+        
+        for ( IndexCreator ic : ics )
         {
-            output.write( buffer, 0, n );
+            res |= ic.updateArtifactInfo( doc, artifactInfo );
         }
+
+        return res ? artifactInfo : null;
     }
+    
+    // close
 
     private static void close( OutputStream os )
     {

@@ -1,14 +1,14 @@
 /**
- * Copyright (c) 2007-2008 Sonatype, Inc. All rights reserved.
- *
- * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
- * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ * Copyright (c) 2007-2008 Sonatype, Inc. All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License Version 1.0, which accompanies this distribution and is
+ * available at http://www.eclipse.org/legal/epl-v10.html.
  */
 package org.sonatype.nexus.index.updater;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -49,44 +49,52 @@ public class DefaultIndexUpdater
         throws IOException
     {
         ResourceFetcher fetcher = updateRequest.getResourceFetcher();
-        
+
         IndexingContext context = updateRequest.getIndexingContext();
-        
+
         fetcher.connect( context.getId(), context.getIndexUpdateUrl() );
-        
+
         try
         {
             Date contextTimestamp = context.getTimestamp();
-            
-            if ( contextTimestamp != null ) 
+
+            if ( contextTimestamp != null )
             {
                 Properties properties = downloadIndexProperties( fetcher );
-    
-                Date updateTimestamp = getTimestamp(properties,
-                    IndexingContext.INDEX_TIMESTAMP);
-    
-                if ( updateTimestamp != null
-                    && !updateTimestamp.after( contextTimestamp ) ) {
-                  return null; // index is up to date
+
+                Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
+
+                if ( updateTimestamp != null && !updateTimestamp.after( contextTimestamp ) )
+                {
+                    return null; // index is up to date
                 }
-    
+
                 String chunkName = getUpdateChunkName( contextTimestamp, properties );
-    
-                if ( chunkName != null ) 
+
+                if ( chunkName != null )
                 {
                     loadIndexDirectory( updateRequest, true, chunkName );
-    
+
                     return updateTimestamp;
                 }
             }
-            return loadIndexDirectory( updateRequest, false, IndexingContext.INDEX_FILE + ".zip" );
-        } 
-        finally 
+
+            try
+            {
+                return loadIndexDirectory( updateRequest, false, IndexingContext.INDEX_FILE + ".gz" );
+            }
+            catch ( FileNotFoundException ex )
+            {
+                // try to look for legacy index transfer format
+                return loadIndexDirectory( updateRequest, false, IndexingContext.INDEX_FILE + ".zip" );
+            }
+        }
+        finally
         {
             fetcher.disconnect();
         }
     }
-    
+
     /**
      * @deprecated use {@link #fetchAndUpdateIndex(IndexingContext, ResourceFetcher)}
      */
@@ -103,9 +111,9 @@ public class DefaultIndexUpdater
         throws IOException
     {
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( context );
-        
+
         updateRequest.setResourceFetcher( new WagonFetcher( wagonManager, listener, null ) );
-        
+
         return fetchAndUpdateIndex( updateRequest );
     }
 
@@ -113,35 +121,35 @@ public class DefaultIndexUpdater
         throws IOException
     {
         fetcher.connect( context.getId(), context.getIndexUpdateUrl() );
-        
+
         try
         {
             return downloadIndexProperties( fetcher );
-        } 
-        finally 
+        }
+        finally
         {
             fetcher.disconnect();
         }
     }
-    
+
     /**
      * @deprecated use {@link #fetchIndexProperties(IndexingContext, ResourceFetcher)}
      */
     public Properties fetchIndexProperties( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
         throws IOException
     {
-        return fetchIndexProperties(context, new WagonFetcher( wagonManager, listener, proxyInfo ));
+        return fetchIndexProperties( context, new WagonFetcher( wagonManager, listener, proxyInfo ) );
     }
 
     private Date loadIndexDirectory( IndexUpdateRequest updateRequest, boolean merge, String remoteIndexFile )
         throws IOException
     {
-        File indexArchive = File.createTempFile( "nexus", "index.zip" );
+        File indexArchive = File.createTempFile( remoteIndexFile, "" );
 
         File indexDir = new File( indexArchive.getAbsoluteFile().getParentFile(), indexArchive.getName() + ".dir" );
-        
+
         indexDir.mkdirs();
-        
+
         FSDirectory directory = FSDirectory.getDirectory( indexDir );
 
         BufferedInputStream is = null;
@@ -150,37 +158,52 @@ public class DefaultIndexUpdater
         {
             updateRequest.getResourceFetcher().retrieve( remoteIndexFile, indexArchive );
 
-            is = new BufferedInputStream( new FileInputStream( indexArchive ) );
+            Date timestamp = null;
 
-            Date timestamp = IndexUtils.unpackIndexArchive( is, directory );
-            
-            if( updateRequest.getDocumentFilter() != null )
+            if ( indexArchive.length() > 0 )
+            {
+                is = new BufferedInputStream( new FileInputStream( indexArchive ) );
+
+
+                if ( remoteIndexFile.endsWith( ".gz" ) )
+                {
+                    timestamp = IndexUtils.unpackIndexData( is, directory, //
+                        updateRequest.getIndexingContext().getIndexCreators() );
+                }
+                else
+                {
+                    // legacy transfer format
+                    timestamp = IndexUtils.unpackIndexArchive( is, directory );
+                }
+            }
+
+            if ( updateRequest.getDocumentFilter() != null )
             {
                 IndexUtils.filterDirectory( directory, updateRequest.getDocumentFilter() );
             }
-            
-            if( merge )
+
+            if ( merge )
             {
-               updateRequest.getIndexingContext().merge( directory );
+                updateRequest.getIndexingContext().merge( directory );
             }
             else
             {
-               updateRequest.getIndexingContext().replace( directory );
+                updateRequest.getIndexingContext().replace( directory );
             }
-            
+
             return timestamp;
         }
         finally
         {
             IOUtil.close( is );
-            
+
             indexArchive.delete();
 
-            if( directory != null ) 
+            if ( directory != null )
             {
                 directory.close();
             }
-            
+
             try
             {
                 FileUtils.deleteDirectory( indexDir );
@@ -195,66 +218,66 @@ public class DefaultIndexUpdater
     private Properties downloadIndexProperties( ResourceFetcher fetcher )
         throws IOException
     {
-        File indexProperties = File.createTempFile( "nexus", "index.properties" );
-  
+        String remoteIndexProperties = IndexingContext.INDEX_FILE + ".properties";
+
+        File indexProperties = File.createTempFile( remoteIndexProperties, "" );
+
         FileInputStream fis = null;
-        
+
         try
         {
-            String remoteIndexProperties = IndexingContext.INDEX_FILE + ".properties";
-  
             fetcher.retrieve( remoteIndexProperties, indexProperties );
-  
+
             Properties properties = new Properties();
-  
+
             fis = new FileInputStream( indexProperties );
 
             properties.load( fis );
-  
+
             return properties;
         }
         finally
         {
-            IOUtil.close(fis);
+            IOUtil.close( fis );
             indexProperties.delete();
         }
     }
-    
+
     /**
-     * Returns chunk name for downloading that contain all required updates since
-     * given <code>contextTimestamp</code> or null.
+     * Returns chunk name for downloading that contain all required updates since given <code>contextTimestamp</code> or
+     * null.
      */
     public String getUpdateChunkName( Date contextTimestamp, Properties properties )
     {
         Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
-        
+
         if ( updateTimestamp == null || updateTimestamp.before( contextTimestamp ) )
         {
-            return null;  // no updates
+            return null; // no updates
         }
-        
+
         int n = 0;
-        
-        while ( true ) 
+
+        while ( true )
         {
             Date chunkTimestamp = getTimestamp( properties, IndexingContext.INDEX_CHUNK_PREFIX + n );
 
-            if( chunkTimestamp == null )
+            if ( chunkTimestamp == null )
             {
                 break;
             }
-            
-            if( contextTimestamp.after( chunkTimestamp ) )
+
+            if ( contextTimestamp.after( chunkTimestamp ) )
             {
                 SimpleDateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_DAY_FORMAT );
                 df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
-                return IndexingContext.INDEX_FILE + "." + df.format( chunkTimestamp ) + ".zip";                
+                return IndexingContext.INDEX_FILE + "." + df.format( chunkTimestamp ) + ".gz";
             }
-        
+
             n++;
         }
-        
-        return null;  // no update chunk available
+
+        return null; // no update chunk available
     }
 
     public Date getTimestamp( Properties properties, String key )
@@ -277,39 +300,43 @@ public class DefaultIndexUpdater
     }
 
     /**
-     * A ResourceFetcher implementation based on Wagon 
+     * A ResourceFetcher implementation based on Wagon
      */
-    public static class WagonFetcher implements ResourceFetcher
+    public static class WagonFetcher
+        implements ResourceFetcher
     {
         private final WagonManager wagonManager;
+
         private final TransferListener listener;
+
         private final ProxyInfo proxyInfo;
-        
+
         private Wagon wagon = null;
-        
-        public WagonFetcher( WagonManager wagonManager, TransferListener listener, ProxyInfo proxyInfo ) 
+
+        public WagonFetcher( WagonManager wagonManager, TransferListener listener, ProxyInfo proxyInfo )
         {
             this.wagonManager = wagonManager;
             this.listener = listener;
             this.proxyInfo = proxyInfo;
         }
 
-        public void connect( String id, String url ) throws IOException 
+        public void connect( String id, String url )
+            throws IOException
         {
             Repository repository = new Repository( id, url );
-    
+
             try
             {
                 wagon = wagonManager.getWagon( repository );
-    
+
                 if ( listener != null )
                 {
                     wagon.addTransferListener( listener );
                 }
-    
+
                 // when working in the context of Maven, the WagonManager is already
                 // populated with proxy information from the Maven environment
-    
+
                 if ( proxyInfo != null )
                 {
                     wagon.connect( repository, proxyInfo );
@@ -333,7 +360,7 @@ public class DefaultIndexUpdater
             }
         }
 
-        public void disconnect() 
+        public void disconnect()
         {
             if ( wagon != null )
             {
@@ -343,12 +370,14 @@ public class DefaultIndexUpdater
                 }
                 catch ( ConnectionException ex )
                 {
-                    logError( "Failed to close connection", ex);
+                    logError( "Failed to close connection", ex );
                 }
             }
         }
-  
-        public void retrieve( String name, File targetFile ) throws IOException 
+
+        public void retrieve( String name, File targetFile )
+            throws IOException,
+                FileNotFoundException
         {
             try
             {
@@ -364,7 +393,7 @@ public class DefaultIndexUpdater
             {
                 String msg = "Resource " + name + " does not exist";
                 logError( msg, e );
-                throw new IOException( msg );
+                throw new FileNotFoundException( msg );
             }
             catch ( WagonException e )
             {
@@ -373,15 +402,15 @@ public class DefaultIndexUpdater
                 throw new IOException( msg + "; " + e.getMessage() );
             }
         }
-      
-        private void logError( String msg, Exception ex ) 
+
+        private void logError( String msg, Exception ex )
         {
             if ( listener != null )
             {
                 listener.debug( msg + "; " + ex.getMessage() );
             }
         }
-      
+
     }
-    
+
 }

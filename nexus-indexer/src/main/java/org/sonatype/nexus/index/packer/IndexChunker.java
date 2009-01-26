@@ -8,16 +8,18 @@ package org.sonatype.nexus.index.packer;
 
 import java.util.Date;
 
+import org.sonatype.nexus.index.ArtifactInfo;
+
 /**
- * A component responsible to cut index into chunks.
+ * An index chunker converts timestamp (e.g. {@link ArtifactInfo#LAST_MODIFIED}) to corresponding index chunk name.
  * 
  * @author Tamas Cservenak
  */
 public interface IndexChunker
 {
     /**
-     * Returns the chunkId (which is a date in string format, suitable for using in file names), where this document
-     * should be.
+     * Returns the chunk id corresponding to a given timestamp. Chunk id could be a string representation of the 
+     * date suitable for using in file names.
      * 
      * @param d
      * @return
@@ -25,7 +27,7 @@ public interface IndexChunker
     String getChunkId( Date d );
 
     /**
-     * Returns the associated Date with the chunk ID.
+     * Returns the associated Date for given chunk id.
      * 
      * @param d
      * @return

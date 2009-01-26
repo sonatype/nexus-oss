@@ -15,6 +15,7 @@ package org.sonatype.nexus.index;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -376,23 +377,24 @@ public class DefaultIndexerManager
         if ( repository.getLocalUrl() != null
             && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
         {
-            URL url = null;
-
             try
             {
-                url = new URL( repository.getLocalUrl() );
-
-                repoRoot = new File( url.toURI() );
+                URL url = new URL( repository.getLocalUrl() );
+                try
+                {
+                    repoRoot = new File( url.toURI() );
+                }
+                catch ( Throwable t )
+                {
+                    repoRoot = new File( url.getPath() );
+                }
             }
             catch ( MalformedURLException e )
             {
                 // Try just a regular file
                 repoRoot = new File( repository.getLocalUrl() );
             }
-            catch ( Throwable t )
-            {
-                repoRoot = new File( url.getPath() );
-            }
+
         }
 
         return repoRoot;
@@ -716,26 +718,24 @@ public class DefaultIndexerManager
 
             IndexingContext context = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryGroupId ) );
 
-            IndexingContext bestContext = null;
-
-            // local idx has every repo
+            // local index include all repositories
             try
             {
-                bestContext = getRepositoryBestIndexContext( repository.getId() );
+                IndexingContext bestContext = getRepositoryBestIndexContext( repository.getId() );
+                
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug(
+                        " ...found best context " + bestContext.getId() + " for repository "
+                            + bestContext.getRepositoryId() + ", merging it..." );
+                }
+    
+                context.merge( bestContext.getIndexDirectory() );
             }
             catch ( NoSuchRepositoryException e )
             {
-                // not to happen, we are iterating over them
+              // not to happen, we are iterating over them
             }
-
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    " ...found best context " + bestContext.getId() + " for repository "
-                        + bestContext.getRepositoryId() + ", merging it..." );
-            }
-
-            context.merge( bestContext.getIndexDirectory() );
 
             if ( getLogger().isDebugEnabled() )
             {
@@ -896,7 +896,7 @@ public class DefaultIndexerManager
                 }
                 catch ( ItemNotFoundException ex )
                 {
-                    throw new IOException( "Item not found " + name );
+                    throw new FileNotFoundException( "Item not found " + name );
                 }
                 finally
                 {
@@ -940,39 +940,39 @@ public class DefaultIndexerManager
             context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
         }
 
+        Query q1 = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, term );
+
+        Query q2 = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, term );
+
+        BooleanQuery bq = new BooleanQuery();
+
+        bq.add( q1, BooleanClause.Occur.SHOULD );
+
+        bq.add( q2, BooleanClause.Occur.SHOULD );
+
         FlatSearchRequest req = null;
+        
+        if ( context == null )
+        {
+            req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+        }
+        else
+        {
+            req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, context );
+        }
+
+        if ( from != null )
+        {
+            req.setStart( from );
+        }
+
+        if ( count != null )
+        {
+            req.setAiCount( count );
+        }
 
         try
         {
-            Query q1 = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, term );
-
-            Query q2 = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, term );
-
-            BooleanQuery bq = new BooleanQuery();
-
-            bq.add( q1, BooleanClause.Occur.SHOULD );
-
-            bq.add( q2, BooleanClause.Occur.SHOULD );
-
-            if ( context == null )
-            {
-                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
-            }
-            else
-            {
-                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, context );
-            }
-
-            if ( from != null )
-            {
-                req.setStart( from );
-            }
-
-            if ( count != null )
-            {
-                req.setAiCount( count );
-            }
-
             FlatSearchResponse result = nexusIndexer.searchFlat( req );
 
             postprocessResults( result.getResults() );
@@ -982,9 +982,9 @@ public class DefaultIndexerManager
         catch ( IOException e )
         {
             getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
+            
+            return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
         }
-
-        return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
     }
 
     public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, String groupId, Integer from,
@@ -1002,38 +1002,38 @@ public class DefaultIndexerManager
             context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
         }
 
+        if ( term.endsWith( ".class" ) )
+        {
+            term = term.substring( 0, term.length() - 6 );
+        }
+
+        term = StringUtils.replace( term, '.', '/' );
+
+        Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, term );
+
         FlatSearchRequest req = null;
+        
+        if ( context == null )
+        {
+            req = new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+        }
+        else
+        {
+            req = new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, context );
+        }
+
+        if ( from != null )
+        {
+            req.setStart( from );
+        }
+
+        if ( count != null )
+        {
+            req.setAiCount( count );
+        }
 
         try
         {
-            if ( term.endsWith( ".class" ) )
-            {
-                term = term.substring( 0, term.length() - 6 );
-            }
-
-            term = StringUtils.replace( term, '.', '/' );
-
-            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, term );
-
-            if ( context == null )
-            {
-                req = new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
-            }
-            else
-            {
-                req = new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, context );
-            }
-
-            if ( from != null )
-            {
-                req.setStart( from );
-            }
-
-            if ( count != null )
-            {
-                req.setAiCount( count );
-            }
-
             FlatSearchResponse result = nexusIndexer.searchFlat( req );
 
             postprocessResults( result.getResults() );
@@ -1043,9 +1043,9 @@ public class DefaultIndexerManager
         catch ( IOException e )
         {
             getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
+            
+            return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
         }
-
-        return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
     }
 
     public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
@@ -1068,58 +1068,57 @@ public class DefaultIndexerManager
             context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
         }
 
-        BooleanQuery bq = null;
+        BooleanQuery bq = new BooleanQuery();;
 
+        if ( gTerm != null )
+        {
+            bq.add( nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, gTerm ), BooleanClause.Occur.MUST );
+        }
+
+        if ( aTerm != null )
+        {
+            bq.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, aTerm ), BooleanClause.Occur.MUST );
+        }
+
+        if ( vTerm != null )
+        {
+            bq.add( nexusIndexer.constructQuery( ArtifactInfo.VERSION, vTerm ), BooleanClause.Occur.MUST );
+        }
+
+        if ( pTerm != null )
+        {
+            bq.add( nexusIndexer.constructQuery( ArtifactInfo.PACKAGING, pTerm ), BooleanClause.Occur.MUST );
+        }
+
+        if ( cTerm != null )
+        {
+            // classifiers are sadly not indexed
+        }
+
+        
         FlatSearchRequest req = null;
+        
+        if ( context == null )
+        {
+            req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+        }
+        else
+        {
+            req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, context );
+        }
+
+        if ( from != null )
+        {
+            req.setStart( from );
+        }
+
+        if ( count != null )
+        {
+            req.setAiCount( count );
+        }
 
         try
         {
-            bq = new BooleanQuery();
-
-            if ( gTerm != null )
-            {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, gTerm ), BooleanClause.Occur.MUST );
-            }
-
-            if ( aTerm != null )
-            {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, aTerm ), BooleanClause.Occur.MUST );
-            }
-
-            if ( vTerm != null )
-            {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.VERSION, vTerm ), BooleanClause.Occur.MUST );
-            }
-
-            if ( pTerm != null )
-            {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.PACKAGING, pTerm ), BooleanClause.Occur.MUST );
-            }
-
-            if ( cTerm != null )
-            {
-                // classifiers are sadly not indexed
-            }
-
-            if ( context == null )
-            {
-                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
-            }
-            else
-            {
-                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, context );
-            }
-
-            if ( from != null )
-            {
-                req.setStart( from );
-            }
-
-            if ( count != null )
-            {
-                req.setAiCount( count );
-            }
-
             FlatSearchResponse result = nexusIndexer.searchFlat( req );
 
             postprocessResults( result.getResults() );
@@ -1129,9 +1128,9 @@ public class DefaultIndexerManager
         catch ( IOException e )
         {
             getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
+            
+            return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
         }
-
-        return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
     }
 
     protected void postprocessResults( Collection<ArtifactInfo> res )

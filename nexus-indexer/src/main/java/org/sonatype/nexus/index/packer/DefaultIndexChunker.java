@@ -1,8 +1,7 @@
 /**
- * Copyright (c) 2007-2008 Sonatype, Inc. All rights reserved.
- *
- * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
- * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ * Copyright (c) 2007-2008 Sonatype, Inc. All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License Version 1.0, which accompanies this distribution and is
+ * available at http://www.eclipse.org/legal/epl-v10.html.
  */
 package org.sonatype.nexus.index.packer;
 
@@ -12,9 +11,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.sonatype.nexus.index.ArtifactInfo;
+
 /**
- * Daily chunker cut the index into days, based on LAST_MODIFIED, the timestamp when the file get to
- * index (not the file timestamp).
+ * Default chunker converts timestamp (e.g. {@link ArtifactInfo#LAST_MODIFIED}) to corresponding index chunk name using
+ * day as a base.
  * 
  * @author Tamas Cservenak
  * @plexus.component role-hint="day"
@@ -55,7 +56,7 @@ public class DefaultIndexChunker
         }
     }
 
-    protected DateFormat getDateFormat()
+    private DateFormat getDateFormat()
     {
         DateFormat df = new SimpleDateFormat( INDEX_TIME_DAY_FORMAT );
         df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );

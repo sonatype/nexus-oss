@@ -379,10 +379,10 @@ public class DefaultIndexUpdaterTest
         Properties properties = new Properties();
         properties.setProperty( "nexus.index.id", "central" );
         properties.setProperty( "nexus.index.time", "20081129174241.859 -0600" );
-        properties.setProperty( "nexus.index.chunk-0", "20081129000000.000 -0600" );
-        properties.setProperty( "nexus.index.chunk-1", "20081128000000.000 -0600" );
-        properties.setProperty( "nexus.index.chunk-2", "20081127000000.000 -0600" );
-        properties.setProperty( "nexus.index.chunk-3", "20081126000000.000 -0600" );
+        properties.setProperty( "nexus.index.update-0", "20081129000000.000 -0600" );
+        properties.setProperty( "nexus.index.update-1", "20081128000000.000 -0600" );
+        properties.setProperty( "nexus.index.update-2", "20081127000000.000 -0600" );
+        properties.setProperty( "nexus.index.update-3", "20081126000000.000 -0600" );
 
         {
             String updateChunkName = updater.getUpdateChunkName(df.parse("20081125010000.000 -0600"), properties);
@@ -390,19 +390,19 @@ public class DefaultIndexUpdaterTest
         }
         {
             String updateChunkName = updater.getUpdateChunkName(df.parse("20081126010000.000 -0600"), properties);
-            assertEquals("nexus-maven-repository-index.20081126.zip", updateChunkName);
+            assertEquals("nexus-maven-repository-index.20081126.gz", updateChunkName);
         }
         {
             String updateChunkName = updater.getUpdateChunkName(df.parse("20081127010000.000 -0600"), properties);
-            assertEquals("nexus-maven-repository-index.20081127.zip", updateChunkName);
+            assertEquals("nexus-maven-repository-index.20081127.gz", updateChunkName);
         }
         {
             String updateChunkName = updater.getUpdateChunkName(df.parse("20081128010000.000 -0600"), properties);
-            assertEquals("nexus-maven-repository-index.20081128.zip", updateChunkName);
+            assertEquals("nexus-maven-repository-index.20081128.gz", updateChunkName);
         }
         {
             String updateChunkName = updater.getUpdateChunkName(df.parse("20081129010000.000 -0600"), properties);
-            assertEquals("nexus-maven-repository-index.20081129.zip", updateChunkName);
+            assertEquals("nexus-maven-repository-index.20081129.gz", updateChunkName);
         }
         {
             String updateChunkName = updater.getUpdateChunkName(df.parse("20081130010000.000 -0600"), properties);
@@ -431,6 +431,9 @@ public class DefaultIndexUpdaterTest
             
             allowing( tempContext ).getIndexUpdateUrl();
             will( returnValue( indexUrl ) );
+
+            allowing( tempContext ).getIndexCreators();
+            will( returnValue( NexusIndexer.DEFAULT_INDEX ) );
             
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
             
@@ -485,6 +488,9 @@ public class DefaultIndexUpdaterTest
             allowing( tempContext ).getIndexUpdateUrl();
             will( returnValue( indexUrl ) );
             
+            allowing( tempContext ).getIndexCreators();
+            will( returnValue( NexusIndexer.DEFAULT_INDEX ) );
+            
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
             
             oneOf( mockFetcher ).retrieve( //
@@ -503,7 +509,7 @@ public class DefaultIndexUpdaterTest
             });
             
             oneOf( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".zip" ), //
+                with( IndexingContext.INDEX_FILE + ".gz" ), //
                 with( Expectations.<File>anything() ) );
             
             oneOf( tempContext ).replace( with( any( Directory.class ) ) );
@@ -543,6 +549,9 @@ public class DefaultIndexUpdaterTest
             
             allowing( tempContext ).getIndexUpdateUrl();
             will( returnValue( indexUrl ) );
+
+            allowing( tempContext ).getIndexCreators();
+            will( returnValue( NexusIndexer.DEFAULT_INDEX ) );
             
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
             
@@ -557,15 +566,15 @@ public class DefaultIndexUpdaterTest
                     Properties properties = new Properties();
                     properties.setProperty( "nexus.index.id", "central" );
                     properties.setProperty( "nexus.index.time", "20081129174241.859 -0600" );
-                    properties.setProperty( "nexus.index.chunk-0", "20081129000000.000 -0600" );
-                    properties.setProperty( "nexus.index.chunk-1", "20081127000000.000 -0600" );
-                    properties.setProperty( "nexus.index.chunk-2", "20081126000000.000 -0600" );
+                    properties.setProperty( "nexus.index.update-0", "20081129000000.000 -0600" );
+                    properties.setProperty( "nexus.index.update-1", "20081127000000.000 -0600" );
+                    properties.setProperty( "nexus.index.update-2", "20081126000000.000 -0600" );
                     return properties;
                 }
             });
             
             oneOf( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".20081127.zip" ), //
+                with( IndexingContext.INDEX_FILE + ".20081127.gz" ), //
                 with( Expectations.<File>anything() ) );
             // could create index archive there and verify that it is merged correctly
             

@@ -252,10 +252,6 @@ public class DefaultIndexingContext
     private void storeDescriptor()
         throws IOException
     {
-        IndexWriter w = getIndexWriter();
-
-        w.deleteDocuments( DESCRIPTOR_TERM );
-
         Document hdr = new Document();
 
         hdr.add( new Field( FLD_DESCRIPTOR, FLD_DESCRIPTOR_CONTENTS, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
@@ -265,7 +261,10 @@ public class DefaultIndexingContext
             VERSION + AbstractIndexCreator.FS + getRepositoryId(),
             Field.Store.YES,
             Field.Index.NO ) );
-        w.addDocument( hdr );
+
+        IndexWriter w = getIndexWriter();
+        
+        w.updateDocument( DESCRIPTOR_TERM, hdr );
 
         w.flush();
     }
@@ -656,26 +655,9 @@ public class DefaultIndexingContext
         return Collections.unmodifiableList( indexCreators );
     }
 
-    @Deprecated
-    public ArtifactInfo constructArtifactInfo( IndexingContext ctx, Document doc )
-    {
-        return constructArtifactInfo( doc );
-    }
-
     public ArtifactInfo constructArtifactInfo( Document doc )
     {
-        boolean res = false;
-
-        ArtifactInfo artifactInfo = new ArtifactInfo();
-
-        artifactInfo.context = getId();
-
-        for ( IndexCreator ic : getIndexCreators() )
-        {
-            res |= ic.updateArtifactInfo( this, doc, artifactInfo );
-        }
-
-        return res ? artifactInfo : null;
+        return IndexUtils.constructArtifactInfo( doc, getIndexCreators() );
     }
 
     /**

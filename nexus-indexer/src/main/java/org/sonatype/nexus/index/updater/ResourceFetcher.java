@@ -7,6 +7,7 @@
 package org.sonatype.nexus.index.updater;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -16,7 +17,21 @@ import java.io.IOException;
  */
 public interface ResourceFetcher 
 {
+    /**
+     * Connect and start transfer session
+     */
     void connect( String id, String url ) throws IOException;
+    
+    /**
+     * Disconnect and complete transfer session
+     */
     void disconnect() throws IOException;
-    void retrieve( String name, File targetFile ) throws IOException;
+    
+    /**
+     * Retrieve file
+     * 
+     * @param name a name of resource to retrieve
+     * @param targetFile a target file to save retrieved resource to 
+     */
+    void retrieve( String name, File targetFile ) throws IOException, FileNotFoundException ;
 }

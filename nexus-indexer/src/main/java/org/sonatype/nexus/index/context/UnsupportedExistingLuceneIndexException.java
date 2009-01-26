@@ -11,7 +11,7 @@ package org.sonatype.nexus.index.context;
  * throwing this exception may be multiple: non-NexusIndexer Lucene index, index version is wrong, repositoryId does not
  * matches the context repositoryId, etc.
  * 
- * @author cstamas
+ * @author Tamas Cservenak
  */
 public class UnsupportedExistingLuceneIndexException
     extends Exception

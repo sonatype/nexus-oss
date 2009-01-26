@@ -1,8 +1,7 @@
 /**
- * Copyright (c) 2007-2008 Sonatype, Inc. All rights reserved.
- *
- * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
- * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ * Copyright (c) 2007-2008 Sonatype, Inc. All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License Version 1.0, which accompanies this distribution and is
+ * available at http://www.eclipse.org/legal/epl-v10.html.
  */
 package org.sonatype.nexus.index.packer;
 
@@ -24,15 +23,11 @@ import java.util.Map.Entry;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.store.RAMDirectory;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexUtils;
-import org.sonatype.nexus.index.context.DefaultIndexingContext;
 import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
 
 /**
  * Default provider for IndexPacker. Creates the properties and zip files.
@@ -85,7 +80,17 @@ public class DefaultIndexPacker
             writeIndexChunks( info, chunks, request );
         }
 
-        writeIndexArchive( request.getContext(), new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".zip" ) );
+        if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_LEGACY ) )
+        {
+            writeIndexArchive( request.getContext(), new File( request.getTargetDir(), IndexingContext.INDEX_FILE
+                + ".zip" ) );
+        }
+
+        if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_V1 ) )
+        {
+            writeIndexData( request.getContext(), null, new File( request.getTargetDir(), IndexingContext.INDEX_FILE
+                + ".gz" ) );
+        }
 
         writeIndexProperties( request, info, new File( request.getTargetDir(), IndexingContext.INDEX_FILE
             + ".properties" ) );
@@ -131,52 +136,30 @@ public class DefaultIndexPacker
             return; // no updates available
         }
 
-        RAMDirectory chunkDir = new RAMDirectory();
-
-        IndexingContext chunkContext;
-        try
-        {
-            chunkContext = new DefaultIndexingContext(
-                request.getContext().getId(),
-                request.getContext().getRepositoryId(),
-                null,
-                chunkDir,
-                null,
-                null,
-                request.getContext().getIndexCreators(),
-                false );
-        }
-        catch ( UnsupportedExistingLuceneIndexException ex )
-        {
-            throw new IOException( "Can't create temporary indexing context" );
-        }
-
-        IndexReader r = request.getContext().getIndexReader();
-
-        IndexWriter w = chunkContext.getIndexWriter();
+        IndexingContext context = request.getContext();
 
         int n = 0;
+
+        List<Integer> currentIndexes = null;
 
         for ( Entry<String, List<Integer>> e : chunks.entrySet() )
         {
             String key = e.getKey();
 
-            for ( int i : e.getValue() )
+            info.put( IndexingContext.INDEX_CHUNK_PREFIX + n, format( request.getIndexChunker().getChunkDate( key ) ) );
+
+            List<Integer> indexes = e.getValue();
+            
+            if ( currentIndexes != null )
             {
-                request.getContext().copyDocument( r.document( i ), w );
+                indexes.addAll(currentIndexes);
             }
+            
+            currentIndexes = indexes;
 
-            w.flush();
-
-            w.optimize();
-
-            info.put(
-                IndexingContext.INDEX_CHUNK_PREFIX + n,
-                format( request.getIndexChunker().getChunkDate( key ) ) );
-
-            writeIndexArchive( chunkContext, //
-                new File( request.getTargetDir(), //
-                    IndexingContext.INDEX_FILE + "." + key + ".zip") );
+            writeIndexData( context, //
+                indexes, new File( request.getTargetDir(), //
+                    IndexingContext.INDEX_FILE + "." + key + ".gz" ) );
 
             n++;
 
@@ -185,16 +168,6 @@ public class DefaultIndexPacker
                 break;
             }
         }
-
-        w.close();
-
-        r.close();
-
-        chunkContext.close( /* delete files */false );
-
-        // ctxDir.delete();
-
-        chunkDir.close();
     }
 
     void writeIndexArchive( IndexingContext context, File targetArchive )
@@ -212,6 +185,30 @@ public class DefaultIndexPacker
             os = new BufferedOutputStream( new FileOutputStream( targetArchive ), 4096 );
 
             IndexUtils.packIndexArchive( context, os );
+        }
+        finally
+        {
+            IOUtil.close( os );
+        }
+    }
+
+    void writeIndexData( IndexingContext context, List<Integer> docIndexes, File targetArchive )
+        throws IOException
+    {
+        if ( targetArchive.exists() )
+        {
+            targetArchive.delete();
+        }
+
+        OutputStream os = null;
+
+        try
+        {
+            os = new FileOutputStream( targetArchive );
+
+            IndexUtils.packIndexData( os, context, docIndexes );
+
+            os.flush();
         }
         finally
         {

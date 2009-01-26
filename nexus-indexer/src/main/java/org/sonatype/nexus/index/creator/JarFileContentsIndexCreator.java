@@ -1,8 +1,7 @@
 /**
- * Copyright (c) 2007-2008 Sonatype, Inc. All rights reserved.
- *
- * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
- * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ * Copyright (c) 2007-2008 Sonatype, Inc. All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License Version 1.0, which accompanies this distribution and is
+ * available at http://www.eclipse.org/legal/epl-v10.html.
  */
 package org.sonatype.nexus.index.creator;
 
@@ -17,19 +16,21 @@ import org.apache.lucene.document.Field;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.ArtifactIndexingContext;
-import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
+ * An index creator used to index Java class names from a Maven artifact.
+ * 
  * @plexus.component role-hint="jarContent"
  */
 public class JarFileContentsIndexCreator
     extends AbstractIndexCreator
 {
-  
-    public void populateArtifactInfo( ArtifactIndexingContext context ) throws IOException 
+
+    public void populateArtifactInfo( ArtifactIndexingContext context )
+        throws IOException
     {
         ArtifactContext artifactContext = context.getArtifactContext();
-        
+
         ArtifactInfo ai = artifactContext.getArtifactInfo();
 
         File artifactFile = artifactContext.getArtifact();
@@ -39,7 +40,7 @@ public class JarFileContentsIndexCreator
             updateArtifactInfo( ai, artifactFile );
         }
     }
-  
+
     public void updateDocument( ArtifactIndexingContext context, Document doc )
     {
         ArtifactInfo ai = context.getArtifactContext().getArtifactInfo();
@@ -50,7 +51,7 @@ public class JarFileContentsIndexCreator
         }
     }
 
-    public boolean updateArtifactInfo( IndexingContext ctx, Document doc, ArtifactInfo artifactInfo )
+    public boolean updateArtifactInfo( Document doc, ArtifactInfo artifactInfo )
     {
         String names = doc.get( ArtifactInfo.NAMES );
 
@@ -95,8 +96,7 @@ public class JarFileContentsIndexCreator
                         sb.append( name.substring( 0, name.length() - 6 ) ).append( "\n" );
                     }
                 }
-                else if ( "META-INF/archetype.xml".equals( name )
-                    || "META-INF/maven/archetype.xml".equals( name )
+                else if ( "META-INF/archetype.xml".equals( name ) || "META-INF/maven/archetype.xml".equals( name )
                     || "META-INF/maven/archetype-metadata.xml".equals( name ) )
                 {
                     ai.packaging = "maven-archetype";
@@ -122,9 +122,9 @@ public class JarFileContentsIndexCreator
     }
 
     @Override
-    public String toString() 
+    public String toString()
     {
         return "jarContent";
     }
-    
+
 }
