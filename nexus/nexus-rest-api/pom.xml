@@ -72,6 +72,10 @@
       <artifactId>plexus-slf4j-logging</artifactId>
       <exclusions>
         <exclusion>
+		  <groupId>org.codehaus.plexus</groupId>
+		  <artifactId>plexus-component-api</artifactId>
+		</exclusion>
+        <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-simple</artifactId>
         </exclusion>
