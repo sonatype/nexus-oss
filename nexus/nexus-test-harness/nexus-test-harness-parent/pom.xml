@@ -140,19 +140,11 @@
             <id>copy-dependencies</id>
             <phase>generate-resources</phase>
             <goals>
-              <goal>copy</goal>
+              <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus-simple-memory-realm</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${lib-target-dir}</outputDirectory>
-                </artifactItem>
-              </artifactItems>
+			  <includeArtifactIds>nexus-simple-memory-realm</includeArtifactIds>
+			  <outputDirectory>${lib-target-dir}</outputDirectory>
             </configuration>
           </execution>
 
@@ -222,31 +214,30 @@
           </execution>
 
           <execution>
-            <id>unpack-config</id>
+            <id>unpack-test-harness-base-resources</id>
             <goals>
-              <goal>unpack</goal>
+              <goal>unpack-dependencies</goal>
             </goals>
             <phase>generate-test-resources</phase>
             <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus-test-harness-base</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>resources</classifier>
-                  <type>zip</type>
-                  <outputDirectory>${config-resource}</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus-test-harness-base</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>bundle-conf</classifier>
-                  <type>zip</type>
-                  <outputDirectory>${bundle-conf-resource}</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-
+			  <classifier>resources</classifier>
+			  <type>zip</type>
+			  <includeArtifactIds>nexus-test-harness-base</includeArtifactIds>
+			  <outputDirectory>${config-resource}</outputDirectory>
+            </configuration>
+          </execution>
+		  
+		  <execution>
+            <id>unpack-test-harness-base-bundle-conf</id>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <phase>generate-test-resources</phase>
+            <configuration>
+			  <classifier>bundle-conf</classifier>
+			  <type>zip</type>
+			  <includeArtifactIds>nexus-test-harness-base</includeArtifactIds>
+			  <outputDirectory>${bundle-conf-resource}</outputDirectory>
             </configuration>
           </execution>
 
