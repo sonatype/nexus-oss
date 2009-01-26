@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -48,7 +49,14 @@ public class AbstractMigrationIntegrationTest
 
     public AbstractMigrationIntegrationTest()
     {
-        this.repositoryUtil = new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        try
+        {
+            this.repositoryUtil = new RepositoryMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML, this.getRepositoryTypeRegistry() );
+        }
+        catch ( ComponentLookupException e )
+        {
+            Assert.fail( "Failed to lookup component: "+ e.getMessage() );
+        }
         this.groupUtil = new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
         this.searchUtil = new SearchMessageUtil();
     }

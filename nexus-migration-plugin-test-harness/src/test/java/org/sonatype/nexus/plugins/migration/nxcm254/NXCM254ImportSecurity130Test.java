@@ -25,10 +25,6 @@ import org.sonatype.nexus.rest.model.RoleResource;
 public class NXCM254ImportSecurity130Test
     extends AbstractImportSecurityTest
 {
-    public NXCM254ImportSecurity130Test()
-    {
-        super();
-    }
 
     @Override
     protected void importSecurity()

@@ -15,6 +15,9 @@ package org.sonatype.nexus.plugins.migration.nxcm254;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -65,7 +68,14 @@ public abstract class AbstractImportSecurityTest
         repoTargetUtil = new TargetMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
         privilegeUtil = new PrivilegesMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
         roleUtil = new RoleMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
-        repoUtil = new RepositoryMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        try
+        {
+            repoUtil = new RepositoryMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML, this.getRepositoryTypeRegistry() );
+        }
+        catch ( ComponentLookupException e )
+        {
+            Assert.fail( "Failed to lookup component: "+ e.getMessage() );
+        }
         groupUtil = new GroupMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
     }
     

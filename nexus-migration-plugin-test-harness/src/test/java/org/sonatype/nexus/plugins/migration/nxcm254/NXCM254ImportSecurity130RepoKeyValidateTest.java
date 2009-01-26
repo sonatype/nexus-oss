@@ -25,10 +25,6 @@ import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
 public class NXCM254ImportSecurity130RepoKeyValidateTest
     extends AbstractImportSecurityTest
 {
-    public NXCM254ImportSecurity130RepoKeyValidateTest()
-    {
-        super();
-    }
 
     @Override
     public void importSecurity()

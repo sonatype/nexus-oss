@@ -18,6 +18,11 @@ import org.sonatype.nexus.artifact.Gav;
 public class NXCM280DeployArtifactsTest
     extends AbstractDeployBridgeTest
 {
+    
+    public NXCM280DeployArtifactsTest()
+    {
+
+    }
 
     @Test
     public void mavenDeployRelease()

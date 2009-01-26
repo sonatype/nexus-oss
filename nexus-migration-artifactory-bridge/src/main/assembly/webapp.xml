@@ -17,10 +17,28 @@
     </fileSet>
   </fileSets>
 
+  <files>
+    <file>
+      <source>target/${project.artifactId}-${project.version}.${project.packaging}</source>
+      <outputDirectory>runtime/apps/nexus/lib</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+  </files>
+
   <dependencySets>
     <dependencySet>
       <unpack>false</unpack>
       <outputDirectory>runtime/apps/nexus/lib</outputDirectory>
+      <includes>
+	  	<include>org.sonatype.nexus.plugins:nexus-migration-plugin-artifactory</include>
+	  	<include>org.sonatype.nexus.plugins:nexus-migration-plugin-configuration</include>
+	  	
+	  	<include>org.sonatype.nexus.tools:nexus-repository-conversion-tool</include>
+	  	<include>org.codehaus.plexus:plexus-archiver</include>
+	  	<include>com.google.code.google-collections:google-collect</include>
+	  	<include>org.codehaus.plexus:plexus-io</include>
+	  	
+  	  </includes>
     </dependencySet>
   </dependencySets>
 

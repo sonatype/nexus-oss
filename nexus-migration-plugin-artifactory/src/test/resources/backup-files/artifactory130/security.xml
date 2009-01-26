@@ -1,0 +1,17 @@
+<security>
+  <users>
+    <user>
+      <username>admin</username>
+      <password>5f4dcc3b5aa765d61d8327deb882cf99</password>
+      <admin>true</admin>
+      <enabled>true</enabled>
+      <updatableProfile>true</updatableProfile>
+      <accountNonExpired>true</accountNonExpired>
+      <credentialsNonExpired>true</credentialsNonExpired>
+      <accountNonLocked>true</accountNonLocked>
+      <groups/>
+    </user>
+  </users>
+  <groups/>
+  <acls/>
+</security>

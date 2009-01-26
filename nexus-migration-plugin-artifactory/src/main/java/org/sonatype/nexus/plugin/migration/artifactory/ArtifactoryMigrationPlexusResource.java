@@ -13,6 +13,11 @@
 package org.sonatype.nexus.plugin.migration.artifactory;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -21,8 +26,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.codehaus.plexus.archiver.ArchiverException;
+import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -73,6 +82,9 @@ public class ArtifactoryMigrationPlexusResource
     private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER = new NotFileFilter( new SuffixFileFilter(
         ".artifactory-metadata" ) );
 
+    @Requirement( role = org.codehaus.plexus.archiver.UnArchiver.class, hint = "zip" )
+    private ZipUnArchiver zipUnArchiver;
+
     @Requirement
     private NexusScheduler nexusScheduler;
 
@@ -110,16 +122,17 @@ public class ArtifactoryMigrationPlexusResource
         MigrationSummaryDTO migrationSummary = ( (MigrationSummaryRequestDTO) payload ).getData();
 
         // need to resolve that on posts
-        File artifactoryBackup = new File( migrationSummary.getBackupLocation() );
+        File artifactoryBackupZip = this.validateBackupFileLocation( migrationSummary.getBackupLocation() );
+        File artifactoryBackupDir = this.unzipArtifactoryBackup( artifactoryBackupZip );
         ArtifactoryConfig cfg;
 
         ArtifactorySecurityConfig securityCfg;
 
         try
         {
-            cfg = ArtifactoryConfig.read( new File( artifactoryBackup, "artifactory.config.xml" ) );
+            cfg = ArtifactoryConfig.read( new File( artifactoryBackupDir, "artifactory.config.xml" ) );
 
-            securityCfg = ArtifactorySecurityConfigBuilder.read( new File( artifactoryBackup, "security.xml" ) );
+            securityCfg = ArtifactorySecurityConfigBuilder.read( new File( artifactoryBackupDir, "security.xml" ) );
         }
         catch ( Exception e )
         {
@@ -127,7 +140,7 @@ public class ArtifactoryMigrationPlexusResource
             throw new ResourceException( e );
         }
 
-        importRepositories( migrationSummary, cfg );
+        importRepositories( migrationSummary, cfg, artifactoryBackupDir );
         // importRepositories( cfg.getRemoteRepositories(), cfg.getProxies(), repositoriesBackup );
 
         importGroups( migrationSummary, cfg );
@@ -177,10 +190,10 @@ public class ArtifactoryMigrationPlexusResource
         }
     }
 
-    private void importRepositories( MigrationSummaryDTO migrationSummary, ArtifactoryConfig cfg )
+    private void importRepositories( MigrationSummaryDTO migrationSummary, ArtifactoryConfig cfg, File artifactoryBackupDir )
         throws ResourceException
     {
-        final File repositoriesBackup = new File( migrationSummary.getBackupLocation(), "repositories" );
+        final File repositoriesBackup = new File( artifactoryBackupDir, "repositories" );
 
         final Map<String, ArtifactoryRepository> artifactoryRepositories = cfg.getRepositories();
         final Map<String, ArtifactoryProxy> artifactoryProxies = cfg.getProxies();
@@ -543,13 +556,11 @@ public class ArtifactoryMigrationPlexusResource
         rt.setRepositoryId( repoId );
         nexusScheduler.submit( "reindex-" + repoId, rt );
 
-        RebuildMavenMetadataTask mt = nexusScheduler
-            .createTaskInstance( RebuildMavenMetadataTask.class );
+        RebuildMavenMetadataTask mt = nexusScheduler.createTaskInstance( RebuildMavenMetadataTask.class );
         mt.setRepositoryId( repoId );
         nexusScheduler.submit( "rebuild-maven-metadata-" + repoId, mt );
 
-        RebuildAttributesTask at = nexusScheduler
-            .createTaskInstance( RebuildAttributesTask.class );
+        RebuildAttributesTask at = nexusScheduler.createTaskInstance( RebuildAttributesTask.class );
         at.setRepositoryId( repoId );
         nexusScheduler.submit( "rebuild-attributes-" + repoId, at );
     }
@@ -575,6 +586,51 @@ public class ArtifactoryMigrationPlexusResource
     public Object getPayloadInstance()
     {
         return new MigrationSummaryRequestDTO();
+    }
+    
+  private File unzipArtifactoryBackup( File fileItem )
+        throws ResourceException
+    {
+        File tempDir = getNexus().getNexusConfiguration().getTemporaryDirectory();
+
+        try
+        {
+            File artifactoryBackupZip = File.createTempFile(
+                FilenameUtils.getBaseName( fileItem.getName() ),
+                ".zip",
+                tempDir );
+
+            InputStream in = new FileInputStream( fileItem );
+            OutputStream out = new FileOutputStream( artifactoryBackupZip );
+
+            IOUtils.copy( in, out );
+
+            in.close();
+            out.close();
+
+            File artifactoryBackup = new File( artifactoryBackupZip.getParentFile(), FilenameUtils
+                .getBaseName( artifactoryBackupZip.getAbsolutePath() )
+                + "content" );
+            artifactoryBackup.mkdirs();
+
+            zipUnArchiver.setSourceFile( artifactoryBackupZip );
+            zipUnArchiver.setDestDirectory( artifactoryBackup );
+            zipUnArchiver.extract();
+
+            return artifactoryBackup;
+        }
+        catch ( IOException e )
+        {
+            getLogger().warn( "Unable to retrieve artifactory backup", e );
+
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage() );
+        }
+        catch ( ArchiverException e )
+        {
+            getLogger().warn( "Unable to extract artifactory backup", e );
+
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage() );
+        }
     }
 
 }

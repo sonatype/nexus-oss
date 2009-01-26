@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<config xmlns="http://artifactory.jfrog.org/xsd/1.3.4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://artifactory.jfrog.org/xsd/1.3.4 http://www.jfrog.org/xsd/artifactory-v1_3_4.xsd">
+    
+    
+    <backups>
+<backup>
+<key>backup1</key>
+        
+        
+        
+        <cronExp>0 0 /12 * * ?</cronExp>
+        
+        <retentionPeriodHours>168</retentionPeriodHours>
+        
+        <excludedRepositories>
+            <repositoryRef>repo1</repositoryRef>
+            <repositoryRef>codehaus-snapshots</repositoryRef>
+            <repositoryRef>java.net</repositoryRef>
+        </excludedRepositories>
+    </backup>
+</backups>
+    <localRepositories>
+        <localRepository>
+            <key>libs-releases</key>
+            <description>Local repository for in-house libraries</description>
+            <handleReleases>true</handleReleases>
+            <handleSnapshots>false</handleSnapshots>
+        </localRepository>
+        <localRepository>
+            <key>libs-snapshots</key>
+            <description>Local repository for in-house snapshots</description>
+            <handleReleases>false</handleReleases>
+            <handleSnapshots>true</handleSnapshots>
+        </localRepository>
+        <localRepository>
+            <key>plugins-releases</key>
+            <description>Local repository for plugins</description>
+            <handleReleases>true</handleReleases>
+            <handleSnapshots>false</handleSnapshots>
+        </localRepository>
+        <localRepository>
+            <key>plugins-snapshots</key>
+            <description>Local repository for plugins snapshots</description>
+            <handleReleases>false</handleReleases>
+            <handleSnapshots>true</handleSnapshots>
+        </localRepository>
+        <localRepository>
+            <key>ext-releases</key>
+            <description>Local repository for third party libraries</description>
+            <handleReleases>true</handleReleases>
+            <handleSnapshots>false</handleSnapshots>
+        </localRepository>
+        <localRepository>
+            <key>ext-snapshots</key>
+            <description>Local repository for third party snapshots</description>
+            <handleReleases>false</handleReleases>
+            <handleSnapshots>true</handleSnapshots>
+        </localRepository>
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    </localRepositories>
+
+    <remoteRepositories>
+        <remoteRepository>
+            <key>repo1</key>
+            <handleReleases>true</handleReleases>
+            <handleSnapshots>false</handleSnapshots>
+            <excludesPattern>org/artifactory/**,org/jfrog/**</excludesPattern>
+            <url>http://repo1.maven.org/maven2</url>
+        </remoteRepository>
+        <remoteRepository>
+            <key>codehaus-snapshots</key>
+            <blackedOut>true</blackedOut>
+            <handleReleases>false</handleReleases>
+            <handleSnapshots>true</handleSnapshots>
+            <excludesPattern>org/artifactory/**,org/jfrog/**</excludesPattern>
+            <url>http://snapshots.repository.codehaus.org</url>
+        </remoteRepository>
+        <remoteRepository>
+            <key>java.net</key>
+            <description>java.net</description>
+            <handleReleases>true</handleReleases>
+            <handleSnapshots>false</handleSnapshots>
+            <excludesPattern>org/artifactory/**,org/jfrog/**</excludesPattern>
+            <url>http://download.java.net/maven/2</url>
+        </remoteRepository>
+        
+        
+        
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    </remoteRepositories>
+
+    <virtualRepositories>
+        
+        <virtualRepository>
+            <key>snapshots-only</key>
+            <repositories>
+                <repositoryRef>libs-snapshots</repositoryRef>
+                <repositoryRef>plugins-snapshots</repositoryRef>
+                <repositoryRef>ext-snapshots</repositoryRef>
+                <repositoryRef>codehaus-snapshots</repositoryRef>
+            </repositories>
+        </virtualRepository>
+</virtualRepositories>
+
+    <proxies>
+        <proxy>
+            <key>unused-proxy</key>
+            <host>host</host>
+            <port>8080</port>
+            <username>un</username>
+            <password>pw</password>
+            <domain>mydomain</domain>
+        </proxy>
+    </proxies>
+
+</config>

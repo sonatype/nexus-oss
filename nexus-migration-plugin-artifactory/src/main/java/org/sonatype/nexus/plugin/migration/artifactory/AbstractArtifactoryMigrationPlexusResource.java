@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.plugin.migration.artifactory;
 
+import java.io.File;
+
+import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.FileLocationRequestDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.FileLocationResource;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.GroupResolutionDTO;
@@ -59,6 +63,19 @@ public abstract class AbstractArtifactoryMigrationPlexusResource
         xstream.registerLocalConverter( MigrationSummaryDTO.class, "groupsResolution", new AliasingListConverter(
             GroupResolutionDTO.class,
             "groupResolution" ) );
+    }
+
+    protected File validateBackupFileLocation( String fileLocation )
+        throws ResourceException
+    {
+        File file = new File( fileLocation );
+
+        if ( file.exists() && file.isFile() )
+        {
+            return file;
+        }
+
+        throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid File Location." );
     }
 
 }

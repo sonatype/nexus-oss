@@ -10,22 +10,6 @@
 
   <name>Nexus Migration plugin for Artifactory</name>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate-metadata</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
@@ -35,6 +19,13 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-app</artifactId>
+      <scope>test</scope>
+      <classifier>tests</classifier>
+      <version>${nexus.version}</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -51,6 +42,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.4</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.tools</groupId>

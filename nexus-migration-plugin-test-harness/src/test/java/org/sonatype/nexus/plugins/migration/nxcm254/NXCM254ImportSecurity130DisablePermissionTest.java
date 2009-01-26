@@ -26,10 +26,6 @@ public class NXCM254ImportSecurity130DisablePermissionTest
     extends AbstractImportSecurityTest
 {
 
-    public NXCM254ImportSecurity130DisablePermissionTest()
-    {
-        super();
-    }
 
     @Override
     protected void importSecurity()
