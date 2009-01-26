@@ -63,7 +63,7 @@ Sonatype.repoServer.referenceData = {
       id: "",
       name: "",
       shadowOf: "",
-      format: "",
+      provider: "",
       syncAtStartup: false
       //realmId: ""
     },
@@ -77,7 +77,7 @@ Sonatype.repoServer.referenceData = {
       indexable: true,
       notFoundCacheTTL: 0,
       repoPolicy: "",
-      format: "",
+      provider: "",
       //realmId: "",
       overrideLocalStorageUrl: "",
       defaultLocalStorageUrl: "",
@@ -95,7 +95,7 @@ Sonatype.repoServer.referenceData = {
       artifactMaxAge: 0,
       metadataMaxAge: 0,
       repoPolicy: "",
-      format: "",
+      provider: "",
       //realmId: "",
       overrideLocalStorageUrl: "",
       defaultLocalStorageUrl: "",

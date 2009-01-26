@@ -1740,6 +1740,10 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
       Sonatype.repoServer.AbstractRepositoryEditor.superclass.loadData.call( this );
     }
   },
+  
+  providerSelectHandler: function( combo, rec, index ) {
+    this.form.findField( 'format' ).setValue( rec.data.format );
+  },
 
   repoPolicySelectHandler: function( combo, rec, index ) {
     var repoPolicy = rec.data.value.toLowerCase();
@@ -1851,14 +1855,15 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
     data: [['Release'], ['Snapshot']]
   } );
   
-  this.formatStore = new Ext.data.JsonStore( {
+  this.providerStore = new Ext.data.JsonStore( {
     root: 'data',
-    id: 'roleHint',
+    id: 'provider',
     fields: [
-      { name:'description' },
-      { name:'roleHint', sortType:Ext.data.SortTypes.asUCString }
+      { name: 'description', sortType:Ext.data.SortTypes.asUCString },
+      { name: 'format' },
+      { name: 'provider' }
     ],
-    sortInfo: { field: 'roleHint', direction: 'asc' },
+    sortInfo: { field: 'description', direction: 'asc' },
     url: Sonatype.config.repos.urls.repoTypes,
     autoLoad: true
   } );
@@ -1899,14 +1904,14 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
       },
       {
         xtype: 'combo',
-        fieldLabel: 'Format',
+        fieldLabel: 'Provider',
         itemCls: 'required-field',
-        helpText: ht.format,
-        name: 'format',
+        helpText: ht.provider,
+        name: 'provider',
         width: 150,
-        store: this.formatStore,
+        store: this.providerStore,
         displayField: 'description',
-        valueField: 'roleHint',
+        valueField: 'provider',
         editable: false,
         forceSelection: true,
         mode: 'local',
@@ -1914,7 +1919,21 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
         emptyText: 'Select...',
         selectOnFocus: true,
         allowBlank: false,
-        disabled: ! this.isNew
+        disabled: ! this.isNew,
+        listeners: {
+          select: this.providerSelectHandler,
+          scope: this
+        }
+      },
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Format',
+        itemCls: 'required-field',
+        helpText: ht.format,
+        name: 'format',
+        width: 100,
+        disabled: true,
+        allowBlank: false
       },
       {
         xtype: 'combo',
@@ -2078,14 +2097,15 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
     data: [['Ignore'], ['Warn'], ['StrictIfExists'], ['Strict']]
   } );
 
-  this.formatStore = new Ext.data.JsonStore( {
+  this.providerStore = new Ext.data.JsonStore( {
     root: 'data',
-    id: 'roleHint',
+    id: 'provider',
     fields: [
-      { name:'description' },
-      { name:'roleHint', sortType:Ext.data.SortTypes.asUCString }
+      { name: 'description', sortType:Ext.data.SortTypes.asUCString },
+      { name: 'format' },
+      { name: 'provider' }
     ],
-    sortInfo: { field: 'roleHint', direction: 'asc' },
+    sortInfo: { field: 'description', direction: 'asc' },
     url: Sonatype.config.repos.urls.repoTypes,
     autoLoad: true
   } );
@@ -2126,14 +2146,14 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
       },
       {
         xtype: 'combo',
-        fieldLabel: 'Format',
+        fieldLabel: 'Provider',
         itemCls: 'required-field',
-        helpText: ht.format,
-        name: 'format',
+        helpText: ht.provider,
+        name: 'provider',
         width: 150,
-        store: this.formatStore,
+        store: this.providerStore,
         displayField: 'description',
-        valueField: 'roleHint',
+        valueField: 'provider',
         editable: false,
         forceSelection: true,
         mode: 'local',
@@ -2141,7 +2161,21 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
         emptyText: 'Select...',
         selectOnFocus: true,
         allowBlank: false,
-        disabled: ! this.isNew
+        disabled: ! this.isNew,
+        listeners: {
+          select: this.providerSelectHandler,
+          scope: this
+        }
+      },
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Format',
+        itemCls: 'required-field',
+        helpText: ht.format,
+        name: 'format',
+        width: 100,
+        disabled: true,
+        allowBlank: false
       },
       {
         xtype: 'combo',
@@ -2637,14 +2671,15 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
     autoLoad: true
   } );
 
-  this.formatStore = new Ext.data.JsonStore( {
+  this.providerStore = new Ext.data.JsonStore( {
     root: 'data',
-    id: 'roleHint',
+    id: 'provider',
     fields: [
-      { name: 'description' },
-      { name: 'roleHint', sortType:Ext.data.SortTypes.asUCString }
+      { name: 'description', sortType:Ext.data.SortTypes.asUCString },
+      { name: 'format' },
+      { name: 'provider' }
     ],
-    sortInfo: { field: 'roleHint', direction: 'asc' },
+    sortInfo: { field: 'description', direction: 'asc' },
     url: Sonatype.config.repos.urls.shadowRepoTypes,
     autoLoad: true
   } );
@@ -2685,15 +2720,14 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
       },
       {
         xtype: 'combo',
-        fieldLabel: 'Format',
+        fieldLabel: 'Provider',
         itemCls: 'required-field',
-        helpText: ht.format,
-        name: 'format',
-        width: 200,
-        midWidth: 200,
-        store: this.formatStore,
+        helpText: ht.provider,
+        name: 'provider',
+        width: 150,
+        store: this.providerStore,
         displayField: 'description',
-        valueField: 'roleHint',
+        valueField: 'provider',
         editable: false,
         forceSelection: true,
         mode: 'local',
@@ -2701,7 +2735,21 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
         emptyText: 'Select...',
         selectOnFocus: true,
         allowBlank: false,
-        disabled: ! this.isNew
+        disabled: ! this.isNew,
+        listeners: {
+          select: this.providerSelectHandler,
+          scope: this
+        }
+      },
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Format',
+        itemCls: 'required-field',
+        helpText: ht.format,
+        name: 'format',
+        width: 100,
+        disabled: true,
+        allowBlank: false
       },
       {
         xtype: 'combo',
