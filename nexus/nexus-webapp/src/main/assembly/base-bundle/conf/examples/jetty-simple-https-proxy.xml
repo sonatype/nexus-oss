@@ -3,7 +3,7 @@
 
 <!-- =============================================================== -->
 <!--                                                                 -->
-<!--  NOTE: Copy this file to ../../jetty.xml to use it.             -->
+<!--  NOTE: Copy this file to ../jetty.xml to use it.                -->
 <!--                                                                 -->
 <!-- Configure the Jetty Server                                      -->
 <!--                                                                 -->
@@ -58,13 +58,7 @@
                         <New id="forwardedHttps"
                             class="org.mortbay.jetty.handler.rewrite.ForwardedSchemeHeaderRule">
                             
-                            <!-- If this header is present, and the specified headerValue matches, 
-                                 then the specified scheme will be passed on. If the headerValue isn't
-                                 specified, then the presence of the header with any value will trigger
-                                 the scheme modification.
-                            -->
-                            <Set name="header">X-Forwarded-Scheme</Set>
-                            <Set name="headerValue">https</Set>
+                            <!-- No matter what scheme or X-Forwarded-Scheme header comes through, ALWAYS use HTTPS. -->
                             <Set name="scheme">https</Set>
                         </New>
                     </Item>
