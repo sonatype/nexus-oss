@@ -185,7 +185,7 @@
 				<executions>
 					<execution>
 						<id>unpack-bundle</id>
-						<phase>generate-resources</phase>
+						<phase>generate-test-resources</phase>
 						<goals>
 							<goal>unpack-dependencies</goal>
 						</goals>

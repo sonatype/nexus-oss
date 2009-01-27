@@ -58,7 +58,7 @@
 				<executions>
 					<execution>
 						<id>copy-fake-central-repo</id>
-						<phase>generate-resources</phase>
+						<phase>generate-test-resources</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
