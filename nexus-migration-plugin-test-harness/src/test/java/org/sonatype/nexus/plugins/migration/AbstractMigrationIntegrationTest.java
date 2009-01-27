@@ -177,10 +177,13 @@ public class AbstractMigrationIntegrationTest
     }
 
     protected void commitMigration( MigrationSummaryDTO migrationSummary )
-        throws IOException
+        throws Exception
     {
         Status status = ImportMessageUtil.commitImport( migrationSummary ).getStatus();
         Assert.assertTrue( "Unable to commit import " + status, status.isSuccess() );
+        
+        // the import is scheduled task now, so we need to wait for it to finish
+        TaskScheduleUtil.waitForTasks( 40 );
     }
 
 }

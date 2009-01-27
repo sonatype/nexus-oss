@@ -1,0 +1,595 @@
+package org.sonatype.nexus.plugin.migration.artifactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.NotFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.codehaus.plexus.archiver.ArchiverException;
+import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteStorage;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryGroup;
+import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
+import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
+import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryProxy;
+import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryRepository;
+import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryVirtualRepository;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.EMixResolution;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.ERepositoryType;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.ERepositoryTypeResolution;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.GroupResolutionDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
+import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
+import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecurityConfig;
+import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
+import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigConvertor;
+import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigReceiver;
+import org.sonatype.nexus.plugin.migration.artifactory.security.builder.ArtifactorySecurityConfigBuilder;
+import org.sonatype.nexus.plugin.migration.artifactory.util.VirtualRepositoryUtil;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.tasks.RebuildAttributesTask;
+import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tools.repository.RepositoryConvertor;
+
+@Component( role=ArtifactoryMigrator.class )
+public class ArtifactoryMigrator
+    extends AbstractLogEnabled
+{
+
+    private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER = new NotFileFilter( new SuffixFileFilter(
+        ".artifactory-metadata" ) );
+
+    @Requirement( role = org.codehaus.plexus.archiver.UnArchiver.class, hint = "zip" )
+    private ZipUnArchiver zipUnArchiver;
+
+    @Requirement
+    private NexusScheduler nexusScheduler;
+
+    @Requirement
+    private RepositoryConvertor repositoryConvertor;
+
+    @Requirement( role = MappingConfiguration.class, hint = "default" )
+    private MappingConfiguration mappingConfiguration;
+
+    @Requirement
+    private SecurityConfigReceiver securityConfigAdaptorPersistor;
+
+    @Requirement
+    private Nexus nexus;
+
+    public void migrate( MigrationSummaryDTO migrationSummary )
+        throws ResourceException
+    {
+        // need to resolve that on posts
+        File artifactoryBackupZip = new File( migrationSummary.getBackupLocation() );
+        File artifactoryBackupDir = this.unzipArtifactoryBackup( artifactoryBackupZip );
+        ArtifactoryConfig cfg;
+
+        ArtifactorySecurityConfig securityCfg;
+
+        try
+        {
+            cfg = ArtifactoryConfig.read( new File( artifactoryBackupDir, "artifactory.config.xml" ) );
+
+            securityCfg = ArtifactorySecurityConfigBuilder.read( new File( artifactoryBackupDir, "security.xml" ) );
+        }
+        catch ( Exception e )
+        {
+            getLogger().error( e.getMessage(), e );
+            throw new ResourceException( e );
+        }
+
+        importRepositories( migrationSummary, cfg, artifactoryBackupDir );
+        // importRepositories( cfg.getRemoteRepositories(), cfg.getProxies(), repositoriesBackup );
+
+        importGroups( migrationSummary, cfg );
+
+        importSecurity( migrationSummary, securityCfg );
+
+    }
+
+    private void importSecurity( MigrationSummaryDTO migrationSummary, ArtifactorySecurityConfig cfg )
+        throws ResourceException
+    {
+        List<ArtifactoryUser> userList = new ArrayList<ArtifactoryUser>();
+
+        for ( UserResolutionDTO userResolution : migrationSummary.getUsersResolution() )
+        {
+            ArtifactoryUser user = new ArtifactoryUser(
+                userResolution.getUserId(),
+                userResolution.getPassword(),
+                userResolution.getEmail() );
+
+            user.setAdmin( userResolution.isAdmin() );
+
+            userList.add( user );
+        }
+
+        cfg.getUsers().clear();
+
+        cfg.getUsers().addAll( userList );
+
+        SecurityConfigConvertor convertor = new SecurityConfigConvertor(
+            cfg,
+            securityConfigAdaptorPersistor,
+            mappingConfiguration );
+
+        convertor.setResolvePermission( migrationSummary.isResolvePermission() );
+
+        try
+        {
+            convertor.convert();
+        }
+        catch ( ArtifactoryMigrationException e )
+        {
+            getLogger().error( e.getMessage(), e );
+
+            throw new ResourceException( e );
+        }
+    }
+
+    private void importRepositories( MigrationSummaryDTO migrationSummary, ArtifactoryConfig cfg,
+        File artifactoryBackupDir )
+        throws ResourceException
+    {
+        final File repositoriesBackup = new File( artifactoryBackupDir, "repositories" );
+
+        final Map<String, ArtifactoryRepository> artifactoryRepositories = cfg.getRepositories();
+        final Map<String, ArtifactoryProxy> artifactoryProxies = cfg.getProxies();
+        final List<RepositoryResolutionDTO> repositories = migrationSummary.getRepositoriesResolution();
+
+        for ( RepositoryResolutionDTO resolution : repositories )
+        {
+            final ArtifactoryRepository repo = artifactoryRepositories.get( resolution.getRepositoryId() );
+
+            if ( resolution.isMixed() )
+            {
+                if ( EMixResolution.RELEASES_ONLY.equals( resolution.getMixResolution() ) )
+                {
+                    importRepository( repositoriesBackup, artifactoryProxies, resolution, repo, false, null );
+                }
+                else if ( EMixResolution.SNAPSHOTS_ONLY.equals( resolution.getMixResolution() ) )
+                {
+                    importRepository( repositoriesBackup, artifactoryProxies, resolution, repo, true, null );
+                }
+                else
+                // BOTH
+                {
+                    CRepository nexusRepoReleases = createRepository( repo, artifactoryProxies, false, "releases" );
+                    CRepository nexusRepoSnapshots = createRepository( repo, artifactoryProxies, true, "snapshots" );
+
+                    CRepositoryGroup nexusGroup = createGroup(
+                        repo.getKey(),
+                        nexusRepoReleases.getId(),
+                        nexusRepoSnapshots.getId() );
+
+                    if ( resolution.isCopyCachedArtifacts() )
+                    {
+                        File repositoryBackup = new File( repositoriesBackup, repo.getKey() );
+                        copyArtifacts( nexusRepoSnapshots, nexusRepoReleases, repositoryBackup );
+                    }
+
+                    if ( resolution.isMapUrls() )
+                    {
+                        CMapping map = new CMapping(
+                            resolution.getRepositoryId(),
+                            nexusGroup.getGroupId(),
+                            nexusRepoReleases.getId(),
+                            nexusRepoSnapshots.getId() );
+                        mappingConfiguration.addMapping( map );
+                    }
+
+                }
+            }
+            else
+            {
+                if ( ERepositoryType.PROXIED.equals( resolution.getType() ) && resolution.isMergeSimilarRepository() )
+                {
+                    if ( resolution.isMapUrls() )
+                    {
+                        CMapping map = new CMapping( resolution.getRepositoryId(), resolution.getSimilarRepositoryId() );
+                        mappingConfiguration.addMapping( map );
+                    }
+                }
+                else
+                {
+                    importRepository( repositoriesBackup, artifactoryProxies, resolution, repo, repo
+                        .getHandleSnapshots(), null );
+                }
+            }
+        }
+    }
+
+    private void copyArtifacts( CRepository nexusRepoSnapshots, CRepository nexusRepoReleases, File repositoryBackup )
+        throws ResourceException
+    {
+        try
+        {
+            repositoryConvertor.convertRepositoryWithCopy(
+                repositoryBackup,
+                getStorage( nexusRepoReleases ),
+                getStorage( nexusRepoSnapshots ),
+                ARTIFACTORY_METADATA_FILE_FILTER );
+        }
+        catch ( Exception e )
+        {
+            getLogger().error( e.getMessage(), e );
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to converto mixed repository", e );
+        }
+    }
+
+    private CRepositoryGroup createGroup( String groupId, String... repositoriesIds )
+        throws ResourceException
+    {
+        CRepositoryGroup group = new CRepositoryGroup();
+        group.setGroupId( groupId );
+        group.setName( groupId );
+
+        for ( String repo : repositoriesIds )
+        {
+            group.addRepository( repo );
+        }
+
+        try
+        {
+            this.nexus.createRepositoryGroup( group );
+        }
+        catch ( Exception e )
+        {
+            getLogger().error( e.getMessage(), e );
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to create group " + groupId, e );
+        }
+
+        return group;
+    }
+
+    private void importRepository( File repositoriesBackup, Map<String, ArtifactoryProxy> artifactoryProxies,
+        RepositoryResolutionDTO resolution, ArtifactoryRepository repo, boolean isSnapshot, String suffix )
+        throws ResourceException
+    {
+        CRepository nexusRepo = createRepository( repo, artifactoryProxies, isSnapshot, suffix );
+
+        if ( resolution.isCopyCachedArtifacts() )
+        {
+            File repositoryBackup = new File( repositoriesBackup, repo.getKey() );
+            copyArtifacts( nexusRepo, repositoryBackup );
+        }
+        if ( resolution.isMapUrls() )
+        {
+            CMapping map = new CMapping( resolution.getRepositoryId(), nexusRepo.getId() );
+            mappingConfiguration.addMapping( map );
+        }
+    }
+
+    private CRepository createRepository( ArtifactoryRepository repo, Map<String, ArtifactoryProxy> artifactoryProxies,
+        boolean isSnapshot, String suffix )
+        throws ResourceException
+    {
+        String repoId = repo.getKey();
+        String repoName = repo.getDescription();
+        if ( suffix != null )
+        {
+            repoId += "-" + suffix;
+            repoName += "-" + suffix;
+        }
+
+        CRepository nexusRepo = new CRepository();
+        nexusRepo.setId( repoId );
+        nexusRepo.setName( repoName );
+        if ( isSnapshot )
+        {
+            nexusRepo.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_SNAPSHOT );
+        }
+        // supported on artifactory 1.3
+        if ( "maven1".equals( repo.getType() ) )
+        {
+            nexusRepo.setType( "maven1" );
+        }
+
+        String url = repo.getUrl();
+        if ( url != null )
+        {
+            CRemoteStorage remote = new CRemoteStorage();
+            remote.setUrl( url );
+
+            String proxyId = repo.getProxy();
+            if ( proxyId != null )
+            {
+                ArtifactoryProxy proxy = artifactoryProxies.get( proxyId );
+
+                CRemoteHttpProxySettings nexusProxy = new CRemoteHttpProxySettings();
+                nexusProxy.setProxyHostname( proxy.getHost() );
+                nexusProxy.setProxyPort( proxy.getPort() );
+
+                CRemoteAuthentication authentication = new CRemoteAuthentication();
+                authentication.setUsername( proxy.getUsername() );
+                authentication.setPassword( proxy.getPassword() );
+                nexusProxy.setAuthentication( authentication );
+
+                remote.setHttpProxySettings( nexusProxy );
+            }
+            nexusRepo.setRemoteStorage( remote );
+        }
+
+        try
+        {
+            this.nexus.createRepository( nexusRepo );
+        }
+        catch ( Exception e )
+        {
+            getLogger().error( e.getMessage(), e );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error creating repository " + repoId );
+        }
+
+        return nexusRepo;
+
+    }
+
+    private void importGroups( MigrationSummaryDTO migrationSummary, ArtifactoryConfig cfg )
+        throws ResourceException
+    {
+        final Map<String, ArtifactoryVirtualRepository> virtualRepositories = cfg.getVirtualRepositories();
+        VirtualRepositoryUtil.resolveRepositories( virtualRepositories );
+        final Map<String, ArtifactoryRepository> repositories = cfg.getRepositories();
+        final List<GroupResolutionDTO> groups = migrationSummary.getGroupsResolution();
+
+        for ( GroupResolutionDTO resolution : groups )
+        {
+            ArtifactoryVirtualRepository virtualRepo = virtualRepositories.get( resolution.getGroupId() );
+            CRepositoryGroup group = new CRepositoryGroup();
+            group.setGroupId( virtualRepo.getKey() );
+            group.setName( virtualRepo.getKey() );
+
+            for ( final String repoId : virtualRepo.getResolvedRepositories() )
+            {
+                RepositoryResolutionDTO repoResolution = migrationSummary.getRepositoryResolution( repoId );
+
+                if ( ERepositoryType.PROXIED.equals( repoResolution.getType() )
+                    && repoResolution.isMergeSimilarRepository() )
+                {
+                    group.addRepository( repoResolution.getSimilarRepositoryId() );
+                }
+                else if ( !resolution.isMixed() )
+                {
+                    addRepository( group, repoId );
+                }
+                else
+                {
+                    ArtifactoryRepository repo = repositories.get( repoId );
+                    String type = repo.getType();
+                    if ( ERepositoryTypeResolution.MAVEN_1_ONLY.equals( resolution.getRepositoryTypeResolution() ) )
+                    {
+                        if ( "maven1".equals( type ) )
+                        {
+                            addRepository( group, repoId );
+                        }
+                    }
+                    else if ( ERepositoryTypeResolution.VIRTUAL_BOTH.equals( resolution.getRepositoryTypeResolution() ) )
+                    {
+                        if ( "maven1".equals( type ) )
+                        {
+                            addVirtualRepository( group, repoId );
+                        }
+                        else
+                        {
+                            addRepository( group, repoId );
+                        }
+                    }
+                    else
+                    // MAVEN2 only
+                    {
+                        if ( type == null || "maven2".equals( type ) )
+                        {
+                            addRepository( group, repoId );
+                        }
+
+                    }
+                }
+            }
+
+            try
+            {
+                this.nexus.createRepositoryGroup( group );
+            }
+            catch ( Exception e )
+            {
+                getLogger().error( e.getMessage(), e );
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to create group "
+                    + virtualRepo.getKey(), e );
+            }
+
+            CMapping map = new CMapping( virtualRepo.getKey(), group.getGroupId(), null, null );
+            mappingConfiguration.addMapping( map );
+
+        }
+    }
+
+    private void addVirtualRepository( CRepositoryGroup group, String repoId )
+        throws ResourceException
+    {
+
+        CMapping map = mappingConfiguration.getMapping( repoId );
+
+        if ( map.getNexusGroupId() == null )
+        {
+            CRepositoryShadow shadowRepo = createShadowRepo( map.getNexusRepositoryId() );
+            group.addRepository( shadowRepo.getId() );
+        }
+        else
+        {
+            CRepositoryShadow releasesRepo = createShadowRepo( map.getReleasesRepositoryId() );
+            group.addRepository( releasesRepo.getId() );
+            CRepositoryShadow snapshotsRepo = createShadowRepo( map.getSnapshotsRepositoryId() );
+            group.addRepository( snapshotsRepo.getId() );
+        }
+    }
+
+    private void addRepository( CRepositoryGroup group, String repoId )
+    {
+        CMapping map = mappingConfiguration.getMapping( repoId );
+
+        if ( map.getNexusGroupId() == null )
+        {
+            group.addRepository( map.getNexusRepositoryId() );
+        }
+        else
+        {
+            group.addRepository( map.getReleasesRepositoryId() );
+            group.addRepository( map.getSnapshotsRepositoryId() );
+        }
+    }
+
+    private CRepositoryShadow createShadowRepo( String shadowOfRepoId )
+        throws ResourceException
+    {
+        CRepositoryShadow shadowRepo = new CRepositoryShadow();
+        String shadowId = shadowOfRepoId + "-virtual";
+        shadowRepo.setId( shadowId );
+        shadowRepo.setName( shadowId );
+        shadowRepo.setShadowOf( shadowOfRepoId );
+        shadowRepo.setType( "m1-m2-shadow" );
+
+        try
+        {
+            this.nexus.createRepositoryShadow( shadowRepo );
+        }
+        catch ( Exception e )
+        {
+            getLogger().error( e.getMessage(), e );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error creating repository "
+                + shadowRepo.getId() );
+        }
+
+        return shadowRepo;
+    }
+
+    private void copyArtifacts( CRepository nexusRepo, File repositoryBackup )
+        throws ResourceException
+    {
+        if ( repositoryBackup.isDirectory() && repositoryBackup.list().length > 0 )
+        {
+            try
+            {
+                File storage = getStorage( nexusRepo );
+
+                // filter artifactory metadata
+                FileUtils.copyDirectory( repositoryBackup, storage, ARTIFACTORY_METADATA_FILE_FILTER );
+            }
+            catch ( Exception e )
+            {
+                getLogger().error( e.getMessage(), e );
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to copy artifacts to "
+                    + nexusRepo.getId(), e );
+            }
+
+            createMetadatas( nexusRepo );
+        }
+
+    }
+
+    private void createMetadatas( CRepository nexusRepo )
+    {
+        String repoId = nexusRepo.getId();
+
+        ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+        rt.setRepositoryId( repoId );
+        nexusScheduler.submit( "reindex-" + repoId, rt );
+
+        RebuildMavenMetadataTask mt = nexusScheduler.createTaskInstance( RebuildMavenMetadataTask.class );
+        mt.setRepositoryId( repoId );
+        nexusScheduler.submit( "rebuild-maven-metadata-" + repoId, mt );
+
+        RebuildAttributesTask at = nexusScheduler.createTaskInstance( RebuildAttributesTask.class );
+        at.setRepositoryId( repoId );
+        nexusScheduler.submit( "rebuild-attributes-" + repoId, at );
+    }
+
+    private File getStorage( CRepository nexusRepo )
+        throws MalformedURLException,
+            URISyntaxException
+    {
+        URL storage;
+        if ( nexusRepo.getLocalStorage() == null )
+        {
+            storage = new URL( nexusRepo.defaultLocalStorageUrl );
+        }
+        else
+        {
+            storage = new URL( nexusRepo.getLocalStorage().getUrl() );
+        }
+
+        return new File( storage.toURI() );
+    }
+
+    private File unzipArtifactoryBackup( File fileItem )
+        throws ResourceException
+    {
+        File tempDir = this.nexus.getNexusConfiguration().getTemporaryDirectory();
+
+        try
+        {
+            File artifactoryBackupZip = File.createTempFile(
+                FilenameUtils.getBaseName( fileItem.getName() ),
+                ".zip",
+                tempDir );
+
+            InputStream in = new FileInputStream( fileItem );
+            OutputStream out = new FileOutputStream( artifactoryBackupZip );
+
+            IOUtils.copy( in, out );
+
+            in.close();
+            out.close();
+
+            File artifactoryBackup = new File( artifactoryBackupZip.getParentFile(), FilenameUtils
+                .getBaseName( artifactoryBackupZip.getAbsolutePath() )
+                + "content" );
+            artifactoryBackup.mkdirs();
+
+            zipUnArchiver.setSourceFile( artifactoryBackupZip );
+            zipUnArchiver.setDestDirectory( artifactoryBackup );
+            zipUnArchiver.extract();
+
+            return artifactoryBackup;
+        }
+        catch ( IOException e )
+        {
+            getLogger().warn( "Unable to retrieve artifactory backup", e );
+
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage() );
+        }
+        catch ( ArchiverException e )
+        {
+            getLogger().warn( "Unable to extract artifactory backup", e );
+
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage() );
+        }
+    }
+
+}
