@@ -229,19 +229,6 @@ public class DefaultIndexerManager
                 NexusIndexer.FULL_INDEX );
             ctxRemote.setSearchable( repository.isIndexable() );
         }
-
-        // TODO: a cleanup is needed here
-        // I don't want to track which context is "virgin" (has null timestamp)
-        // and IndexPacker NPEs on those. So, simply set the new context timestamps
-        // (detected by null timestamp) to have some "virgin" value
-        if ( ctxLocal.getTimestamp() == null )
-        {
-            ctxLocal.updateTimestamp( false, VIRGIN_CONTEXT_DATE );
-        }
-        if ( ctxRemote.getTimestamp() == null )
-        {
-            ctxRemote.updateTimestamp( false, VIRGIN_CONTEXT_DATE );
-        }
     }
 
     public void removeRepositoryIndexContext( String repositoryId, boolean deleteFiles )
@@ -514,11 +501,27 @@ public class DefaultIndexerManager
                 }
                 else
                 {
+                    // XXX: a hack follows, remove it when fixed!
+                    boolean hacked = context.getTimestamp() == null;
+
+                    if ( hacked )
+                    {
+                        context.updateTimestamp( false, VIRGIN_CONTEXT_DATE );
+                    }
+                    // XXX: end of the hack
+
                     IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
 
                     packReq.setCreateIncrementalChunks( false );
 
                     indexPacker.packIndex( packReq );
+
+                    // XXX: a hack follows, remove it when fixed!
+                    if ( hacked )
+                    {
+                        context.updateTimestamp( false, null );
+                    }
+                    // XXX: end of the hack
 
                     File[] files = targetDir.listFiles();
 
@@ -610,11 +613,27 @@ public class DefaultIndexerManager
                     getLogger().debug( "Packing the merged index context." );
                 }
 
+                // XXX: a hack follows, remove it when fixed!
+                boolean hacked = context.getTimestamp() == null;
+
+                if ( hacked )
+                {
+                    context.updateTimestamp( false, VIRGIN_CONTEXT_DATE );
+                }
+                // XXX: end of the hack
+
                 IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
 
                 packReq.setCreateIncrementalChunks( false );
 
                 indexPacker.packIndex( packReq );
+
+                // XXX: a hack follows, remove it when fixed!
+                if ( hacked )
+                {
+                    context.updateTimestamp( false, null );
+                }
+                // XXX: end of the hack
 
                 File[] files = targetDir.listFiles();
 
