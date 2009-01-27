@@ -938,7 +938,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
       allowBlank: false,
       validator: function( v ) {
         var rec = this.store.getAt( this.selectedIndex );
-        if ( rec && rec.id.substring( 0, 8 ) == 'new_repo' ) {
+        if ( rec && rec.data.id.substring( 0, 8 ) == 'new_repo' ) {
           return 'Cannot source from a non-existent repository';
         }
         return true;
@@ -1281,7 +1281,8 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
     var newRec = new this.repoRecordConstructor({
         repoType : repoType,
         resourceURI : 'new',
-        name : 'New Repository'
+        name : 'New Repository',
+        id : id
 //      effectiveLocalStorageUrl : '-'
       },
       id); //use "new_repo_" id instead of resourceURI like the reader does
