@@ -88,6 +88,9 @@ public class DefaultIndexerManager
     /** Context id remote suffix */
     public static final String CTX_REMOTE_SUFIX = "-remote";
 
+    /** Virgin date :) */
+    private static final Date VIRGIN_CONTEXT_DATE = new Date( 1 );
+
     @Requirement
     private NexusIndexer nexusIndexer;
 
@@ -159,6 +162,9 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
+        IndexingContext ctxLocal = null;
+        IndexingContext ctxRemote = null;
+
         if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
         {
             // shadows are left out completely for now
@@ -173,7 +179,7 @@ public class DefaultIndexerManager
             File repoRoot = getRepositoryLocalStorageAsFile( repository );
 
             // add context for repository
-            IndexingContext ctxLocal = nexusIndexer.addIndexingContextForced(
+            ctxLocal = nexusIndexer.addIndexingContextForced(
                 getLocalContextId( repository.getId() ),
                 repository.getId(),
                 repoRoot,
@@ -186,7 +192,7 @@ public class DefaultIndexerManager
             String remoteUrl = repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) ? repository
                 .adaptToFacet( ProxyRepository.class ).getRemoteUrl() : null;
 
-            IndexingContext ctxRemote = nexusIndexer.addIndexingContextForced(
+            ctxRemote = nexusIndexer.addIndexingContextForced(
                 getRemoteContextId( repository.getId() ),
                 repository.getId(),
                 repoRoot,
@@ -203,7 +209,7 @@ public class DefaultIndexerManager
             File repoRoot = getRepositoryLocalStorageAsFile( repository );
 
             // add context for repository
-            IndexingContext ctxLocal = nexusIndexer.addIndexingContextForced(
+            ctxLocal = nexusIndexer.addIndexingContextForced(
                 getLocalContextId( repository.getId() ),
                 repository.getId(),
                 repoRoot,
@@ -213,7 +219,7 @@ public class DefaultIndexerManager
                 NexusIndexer.FULL_INDEX );
             ctxLocal.setSearchable( repository.isIndexable() );
 
-            IndexingContext ctxRemote = nexusIndexer.addIndexingContextForced(
+            ctxRemote = nexusIndexer.addIndexingContextForced(
                 getRemoteContextId( repository.getId() ),
                 repository.getId(),
                 repoRoot,
@@ -222,6 +228,19 @@ public class DefaultIndexerManager
                 null,
                 NexusIndexer.FULL_INDEX );
             ctxRemote.setSearchable( repository.isIndexable() );
+        }
+
+        // TODO: a cleanup is needed here
+        // I don't want to track which context is "virgin" (has null timestamp)
+        // and IndexPacker NPEs on those. So, simply set the new context timestamps
+        // (detected by null timestamp) to have some "virgin" value
+        if ( ctxLocal.getTimestamp() == null )
+        {
+            ctxLocal.updateTimestamp( false, VIRGIN_CONTEXT_DATE );
+        }
+        if ( ctxRemote.getTimestamp() == null )
+        {
+            ctxRemote.updateTimestamp( false, VIRGIN_CONTEXT_DATE );
         }
     }
 
@@ -722,19 +741,19 @@ public class DefaultIndexerManager
             try
             {
                 IndexingContext bestContext = getRepositoryBestIndexContext( repository.getId() );
-                
+
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug(
                         " ...found best context " + bestContext.getId() + " for repository "
                             + bestContext.getRepositoryId() + ", merging it..." );
                 }
-    
+
                 context.merge( bestContext.getIndexDirectory() );
             }
             catch ( NoSuchRepositoryException e )
             {
-              // not to happen, we are iterating over them
+                // not to happen, we are iterating over them
             }
 
             if ( getLogger().isDebugEnabled() )
@@ -951,7 +970,7 @@ public class DefaultIndexerManager
         bq.add( q2, BooleanClause.Occur.SHOULD );
 
         FlatSearchRequest req = null;
-        
+
         if ( context == null )
         {
             req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
@@ -982,7 +1001,7 @@ public class DefaultIndexerManager
         catch ( IOException e )
         {
             getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
-            
+
             return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
         }
     }
@@ -1012,7 +1031,7 @@ public class DefaultIndexerManager
         Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, term );
 
         FlatSearchRequest req = null;
-        
+
         if ( context == null )
         {
             req = new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
@@ -1043,7 +1062,7 @@ public class DefaultIndexerManager
         catch ( IOException e )
         {
             getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
-            
+
             return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
         }
     }
@@ -1095,9 +1114,8 @@ public class DefaultIndexerManager
             // classifiers are sadly not indexed
         }
 
-        
         FlatSearchRequest req = null;
-        
+
         if ( context == null )
         {
             req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
@@ -1128,7 +1146,7 @@ public class DefaultIndexerManager
         catch ( IOException e )
         {
             getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
-            
+
             return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
         }
     }
