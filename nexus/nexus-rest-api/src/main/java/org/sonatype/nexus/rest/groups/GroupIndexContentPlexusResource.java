@@ -24,7 +24,6 @@ import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.rest.AbstractIndexContentPlexusResource;
@@ -112,20 +111,10 @@ public class GroupIndexContentPlexusResource
                 false,
                 null );
 
-            String path = indexingContext.getGavCalculator().gavToPath( gav );
+            Reference repoRoot = createRepositoryGroupReference( request, groupId, indexingContext
+                .getGavCalculator().gavToPath( gav ) );
 
-            // make path relative
-            if ( path.startsWith( RepositoryItemUid.PATH_ROOT ) )
-            {
-                path = path.substring( RepositoryItemUid.PATH_ROOT.length() );
-            }
-
-            path = "content/" + path;
-
-            Reference repoRoot = createReference( getContextRoot( request ), "service/local/repo_groups/" + groupId )
-                .getTargetRef();
-
-            a.setResourceURI( createReference( repoRoot, path ).toString() );
+            a.setResourceURI( repoRoot.toString() );
         }
         catch ( NoSuchRepositoryException e )
         {

@@ -30,7 +30,6 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 public class IndexRedirectingPlexusResource
     extends AbstractNexusPlexusResource implements ManagedPlexusResource
 {
-
     @Requirement( hint = "indexTemplate" )
     private ManagedPlexusResource indexTemplateResource;
     
@@ -60,7 +59,4 @@ public class IndexRedirectingPlexusResource
         
         return null;
     }
-
-    
-    
 }

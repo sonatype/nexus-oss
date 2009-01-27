@@ -104,6 +104,22 @@ public abstract class AbstractNexusPlexusResource
         return result;
     }
 
+    private Reference createReference( Reference base, String relPart )
+    {
+        Reference ref = new Reference( base, relPart );
+
+        if ( ref.getBaseRef().getPath() == null )
+        {
+            ref.getBaseRef().setPath( "/" );
+        }
+        else if ( !ref.getBaseRef().getPath().endsWith( "/" ) )
+        {
+            ref.getBaseRef().setPath( ref.getBaseRef().getPath() + "/" );
+        }
+
+        return ref.getTargetRef();
+    }
+
     protected Reference createChildReference( Request request, String childPath )
     {
         Reference result = new Reference( request.getResourceRef() ).addSegment( childPath ).getTargetRef();
@@ -128,40 +144,45 @@ public abstract class AbstractNexusPlexusResource
         return ref.getTargetRef();
     }
 
-    /**
-     * Calculates a reference to Repository based on Repository ID.
-     * 
-     * @param base
-     * @param repoId
-     * @return
-     */
     protected Reference createRepositoryReference( Request request, String repoId )
     {
         return createReference( getContextRoot( request ), "service/local/repositories/" + repoId ).getTargetRef();
     }
 
-    /**
-     * Calculates Reference.
-     * 
-     * @param base
-     * @param relPart
-     * @return
-     */
-    protected Reference createReference( Reference base, String relPart )
+    protected Reference createRepositoryReference( Request request, String repoId, String repoPath )
     {
-        Reference ref = new Reference( base, relPart );
+        Reference repoRootRef = createRepositoryReference( request, repoId );
 
-        if ( ref.getBaseRef().getPath() == null )
+        if ( repoPath.startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
-            ref.getBaseRef().setPath( "/" );
-        }
-        else if ( !ref.getBaseRef().getPath().endsWith( "/" ) )
-        {
-            ref.getBaseRef().setPath( ref.getBaseRef().getPath() + "/" );
+            repoPath = repoPath.substring( 1 );
         }
 
-        return ref.getTargetRef();
+        repoPath = "content/" + repoPath;
+
+        return createReference( repoRootRef, repoPath );
     }
+
+    protected Reference createRepositoryGroupReference( Request request, String groupId )
+    {
+        return createReference( getContextRoot( request ), "service/local/repo_groups/" + groupId ).getTargetRef();
+    }
+
+    protected Reference createRepositoryGroupReference( Request request, String groupId, String repoPath )
+    {
+        Reference groupRootRef = createRepositoryGroupReference( request, groupId );
+
+        if ( repoPath.startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        {
+            repoPath = repoPath.substring( 1 );
+        }
+
+        repoPath = "content/" + repoPath;
+
+        return createReference( groupRootRef, repoPath );
+    }
+
+    // ===
 
     protected PlexusContainer getPlexusContainer( Context context )
     {

@@ -46,7 +46,6 @@ import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreHelper;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
@@ -246,19 +245,8 @@ public abstract class AbstractArtifactPlexusResource
 
             if ( redirectTo )
             {
-                String filePath = file.getRepositoryItemUid().getPath();
-
-                if ( filePath.startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
-                {
-                    filePath = filePath.substring( 1 );
-                }
-
-                filePath = "content/" + filePath;
-
-                Reference repoRoot = createRepositoryReference( request, file
-                    .getRepositoryItemUid().getRepository().getId() );
-
-                Reference fileReference = createReference( repoRoot, filePath );
+                Reference fileReference = createRepositoryReference( request, file
+                    .getRepositoryItemUid().getRepository().getId(), file.getRepositoryItemUid().getPath() );
 
                 response.setLocationRef( fileReference );
 
