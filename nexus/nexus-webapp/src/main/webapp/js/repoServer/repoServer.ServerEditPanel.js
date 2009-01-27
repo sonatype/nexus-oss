@@ -327,7 +327,15 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             helpText: ht.baseUrl,
             name: 'baseUrl',
             anchor: Sonatype.view.FIELD_OFFSET,
-            allowBlank:true
+            allowBlank: true
+          },
+          {
+            xtype: 'checkbox',
+            fieldLabel: 'Force Base URL',
+            helpText: ht.forceBaseUrl,
+            name: 'forceBaseUrl',
+            anchor: Sonatype.view.FIELD_OFFSET,
+            allowBlank: true
           }
         ]
       },
