@@ -321,17 +321,7 @@ public abstract class AbstractNexusPlexusResource
                     return null;
                 }
 
-                // make path relative
-                if ( path.startsWith( RepositoryItemUid.PATH_ROOT ) )
-                {
-                    path = path.substring( RepositoryItemUid.PATH_ROOT.length() );
-                }
-
-                path = "content/" + path;
-
-                Reference repoRoot = createRepositoryReference( request, ai.repository );
-
-                a.setResourceURI( createReference( repoRoot, path ).toString() );
+                a.setResourceURI( createRepositoryReference( request, ai.repository, path ).toString() );
             }
         }
         catch ( NoSuchRepositoryException e )
