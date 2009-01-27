@@ -419,6 +419,17 @@ public class DefaultNexus
         nexusConfiguration.setBaseUrl( baseUrl );
     }
 
+    public boolean isForceBaseUrl()
+    {
+        return nexusConfiguration.isForceBaseUrl();
+    }
+
+    public void setForceBaseUrl( boolean force )
+        throws IOException
+    {
+        nexusConfiguration.setForceBaseUrl( force );
+    }
+
     // Globals are mandatory: RU
 
     // CRemoteConnectionSettings are mandatory: RU
@@ -1905,7 +1916,7 @@ public class DefaultNexus
     {
         logFileManager.setLogConfig( config );
     }
-    
+
     // Mirrors
     public void setMirrors( String repositoryId, List<CMirror> mirrors )
         throws NoSuchRepositoryException,
@@ -1914,7 +1925,7 @@ public class DefaultNexus
     {
         this.nexusConfiguration.setMirrors( repositoryId, mirrors );
     }
-    
+
     public Collection<CMirror> listMirrors( String repositoryId )
         throws NoSuchRepositoryException
     {

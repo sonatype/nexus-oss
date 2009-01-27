@@ -88,6 +88,11 @@ public interface MutableConfiguration
     void setBaseUrl( String baseUrl )
         throws IOException;
 
+    boolean isForceBaseUrl();
+
+    void setForceBaseUrl( boolean force )
+        throws IOException;
+
     // ------------------------------------------------------------------
     // CRUD-like ops on config sections
 
@@ -245,13 +250,13 @@ public interface MutableConfiguration
     void updateSmtpConfiguration( CSmtpConfiguration settings )
         throws ConfigurationException,
             IOException;
-    
+
     // Mirrors
     void setMirrors( String repositoryId, List<CMirror> mirrors )
         throws NoSuchRepositoryException,
             ConfigurationException,
             IOException;
-    
+
     Collection<CMirror> listMirrors( String repositoryId )
         throws NoSuchRepositoryException;
 }

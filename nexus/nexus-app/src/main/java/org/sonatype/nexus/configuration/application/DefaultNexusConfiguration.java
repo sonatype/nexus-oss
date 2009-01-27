@@ -44,6 +44,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
+import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -569,7 +570,37 @@ public class DefaultNexusConfiguration
     public void setBaseUrl( String baseUrl )
         throws IOException
     {
+        if ( getConfiguration().getRestApi() == null )
+        {
+            getConfiguration().setRestApi( new CRestApiSettings() );
+        }
+
         getConfiguration().getRestApi().setBaseUrl( baseUrl );
+
+        applyAndSaveConfiguration();
+    }
+
+    public boolean isForceBaseUrl()
+    {
+        if ( getConfiguration().getRestApi() != null )
+        {
+            return getConfiguration().getRestApi().isForceBaseUrl();
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void setForceBaseUrl( boolean force )
+        throws IOException
+    {
+        if ( getConfiguration().getRestApi() == null )
+        {
+            getConfiguration().setRestApi( new CRestApiSettings() );
+        }
+
+        getConfiguration().getRestApi().setForceBaseUrl( force );
 
         applyAndSaveConfiguration();
     }
@@ -1630,7 +1661,7 @@ public class DefaultNexusConfiguration
 
         return new FileInputStream( new File( getConfigurationDirectory(), fileName ) );
     }
-    
+
     public void setMirrors( String repositoryId, List<CMirror> mirrors )
         throws NoSuchRepositoryException,
             ConfigurationException,
@@ -1641,8 +1672,8 @@ public class DefaultNexusConfiguration
         if ( res.isValid() )
         {
             boolean found = false;
-            
-            for ( CRepository repository : ( List<CRepository> ) getConfiguration().getRepositories() )
+
+            for ( CRepository repository : (List<CRepository>) getConfiguration().getRepositories() )
             {
                 if ( repository.getId().equals( repositoryId ) )
                 {
@@ -1654,14 +1685,14 @@ public class DefaultNexusConfiguration
                     }
                     catch ( ConfigurationException e )
                     {
-                        //Shouldn't be able to get to this case
+                        // Shouldn't be able to get to this case
                         getLogger().error( "Invalid configuration applied when updating mirrors", e );
                     }
                     found = true;
                     break;
                 }
             }
-            
+
             if ( !found )
             {
                 throw new NoSuchRepositoryException( repositoryId );
@@ -1672,18 +1703,18 @@ public class DefaultNexusConfiguration
             throw new InvalidConfigurationException( res );
         }
     }
-    
+
     public Collection<CMirror> listMirrors( String repositoryId )
         throws NoSuchRepositoryException
     {
-        for ( CRepository repository : ( List<CRepository> ) getConfiguration().getRepositories() )
+        for ( CRepository repository : (List<CRepository>) getConfiguration().getRepositories() )
         {
             if ( repository.getId().equals( repositoryId ) )
             {
                 return repository.getRemoteStorage().getMirrors();
             }
         }
-        
+
         throw new NoSuchRepositoryException( repositoryId );
     }
 }

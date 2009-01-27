@@ -1614,7 +1614,7 @@
 			<version>1.0.2+</version>
 			<description>The REST API Settings.</description>
 			<fields>
-				<field>
+  				<field>
 					<name>baseUrl</name>
 					<version>1.0.3+</version>
 					<type>String</type>
@@ -1639,6 +1639,15 @@
 					<description>The auth token expiration in minutes. Default is one week.</description>
 					<defaultValue>10080</defaultValue>
 				</field>
+        <field>
+          <name>forceBaseUrl</name>
+          <version>1.0.8+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>
+            Should the base URL be used always in case of response or try to build response against incoming request.
+          </description>
+        </field>
 			</fields>
 		</class>
 
