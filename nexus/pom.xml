@@ -123,20 +123,8 @@
 		<module>nexus-migration-tool</module>
 		<module>nexus-webapp</module>
 		<module>nexus-clients</module>
+		<module>nexus-test-harness</module>
 	</modules>
-	<profiles>
-		<profile>
-			<id>test-harness</id>
-			<activation>
-				<property>
-					<name>!skip-test-harness</name>
-				</property>
-			</activation>
-			<modules>
-				<module>nexus-test-harness</module>
-			</modules>
-		</profile>
-	</profiles>
 	<!-- Shortcuts for outnumbered deps :) -->
 	<properties>
 		<plexus.appbooter.version>1.6.5-SNAPSHOT</plexus.appbooter.version>
