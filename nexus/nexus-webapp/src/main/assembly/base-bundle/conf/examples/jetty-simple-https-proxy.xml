@@ -58,7 +58,11 @@
                         <New id="forwardedHttps"
                             class="org.mortbay.jetty.handler.rewrite.ForwardedSchemeHeaderRule">
                             
-                            <!-- No matter what scheme or X-Forwarded-Scheme header comes through, ALWAYS use HTTPS. -->
+                            <!-- 
+                               Use a header that will always come through in some form, and leave off the value so 
+                               the mere presence of the header will trigger this rule. That way, we ALWAYS use HTTPS. 
+                            -->
+                            <Set name="header">Host</Set>
                             <Set name="scheme">https</Set>
                         </New>
                     </Item>
