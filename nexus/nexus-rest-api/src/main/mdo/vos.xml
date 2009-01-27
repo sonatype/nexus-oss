@@ -335,6 +335,12 @@
           <required>true</required>
         </field>
         <field>
+          <name>forceBaseUrl</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+        </field>
+        <field>
           <name>globalConnectionSettings</name>
           <version>1.0.0+</version>
           <association>

@@ -28,7 +28,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.jsecurity.realms.PlexusSecurity;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -105,11 +104,11 @@ public class GlobalConfigurationPlexusResource
 
             if ( DEFAULT_CONFIG_NAME.equals( configurationName ) )
             {
-                fillDefaultConfiguration( resource, getNexus() );
+                fillDefaultConfiguration( request, resource );
             }
             else
             {
-                fillCurrentConfiguration( resource, getNexus() );
+                fillCurrentConfiguration( request, resource );
             }
 
             GlobalConfigurationResourceResponse result = new GlobalConfigurationResourceResponse();
@@ -295,6 +294,8 @@ public class GlobalConfigurationPlexusResource
                             // setting it
                             getNexus().setBaseUrl( resource.getBaseUrl() );
                         }
+
+                        getNexus().setForceBaseUrl( resource.isForceBaseUrl() );
                     }
                 }
                 catch ( ConfigurationException e )
@@ -325,23 +326,27 @@ public class GlobalConfigurationPlexusResource
      * 
      * @param resource
      */
-    protected void fillDefaultConfiguration( GlobalConfigurationResource resource, Nexus nexus )
+    protected void fillDefaultConfiguration( Request request, GlobalConfigurationResource resource )
     {
-        resource.setSecurityEnabled( nexus.isDefaultSecurityEnabled() );
+        resource.setSecurityEnabled( getNexus().isDefaultSecurityEnabled() );
 
-        resource.setSecurityAnonymousAccessEnabled( nexus.isDefaultAnonymousAccessEnabled() );
+        resource.setSecurityAnonymousAccessEnabled( getNexus().isDefaultAnonymousAccessEnabled() );
 
-        resource.setSecurityRealms( nexus.getDefaultRealms() );
+        resource.setSecurityRealms( getNexus().getDefaultRealms() );
 
-        resource.setSecurityAnonymousUsername( nexus.getDefaultAnonymousUsername() );
+        resource.setSecurityAnonymousUsername( getNexus().getDefaultAnonymousUsername() );
 
-        resource.setSecurityAnonymousPassword( nexus.getDefaultAnonymousPassword() );
+        resource.setSecurityAnonymousPassword( getNexus().getDefaultAnonymousPassword() );
 
-        resource.setGlobalConnectionSettings( convert( nexus.readDefaultGlobalRemoteConnectionSettings() ) );
+        resource.setGlobalConnectionSettings( convert( getNexus().readDefaultGlobalRemoteConnectionSettings() ) );
 
-        resource.setGlobalHttpProxySettings( convert( nexus.readDefaultGlobalRemoteHttpProxySettings() ) );
+        resource.setGlobalHttpProxySettings( convert( getNexus().readDefaultGlobalRemoteHttpProxySettings() ) );
 
-        resource.setSmtpSettings( convert( nexus.readDefaultSmtpConfiguration() ) );
+        resource.setBaseUrl( getContextRoot( request ).getTargetRef().toString() );
+
+        resource.setForceBaseUrl( getNexus().isForceBaseUrl() );
+
+        resource.setSmtpSettings( convert( getNexus().readDefaultSmtpConfiguration() ) );
     }
 
     /**
@@ -349,25 +354,27 @@ public class GlobalConfigurationPlexusResource
      * 
      * @param resource
      */
-    protected void fillCurrentConfiguration( GlobalConfigurationResource resource, Nexus nexus )
+    protected void fillCurrentConfiguration( Request request, GlobalConfigurationResource resource )
     {
-        resource.setSecurityEnabled( nexus.isSecurityEnabled() );
+        resource.setSecurityEnabled( getNexus().isSecurityEnabled() );
 
-        resource.setSecurityAnonymousAccessEnabled( nexus.isAnonymousAccessEnabled() );
+        resource.setSecurityAnonymousAccessEnabled( getNexus().isAnonymousAccessEnabled() );
 
-        resource.setSecurityRealms( nexus.getRealms() );
+        resource.setSecurityRealms( getNexus().getRealms() );
 
-        resource.setSecurityAnonymousUsername( nexus.getAnonymousUsername() );
+        resource.setSecurityAnonymousUsername( getNexus().getAnonymousUsername() );
 
-        resource.setSecurityAnonymousPassword( nexus.getAnonymousPassword() );
+        resource.setSecurityAnonymousPassword( getNexus().getAnonymousPassword() );
 
-        resource.setGlobalConnectionSettings( convert( nexus.readGlobalRemoteConnectionSettings() ) );
+        resource.setGlobalConnectionSettings( convert( getNexus().readGlobalRemoteConnectionSettings() ) );
 
-        resource.setGlobalHttpProxySettings( convert( nexus.readGlobalRemoteHttpProxySettings() ) );
+        resource.setGlobalHttpProxySettings( convert( getNexus().readGlobalRemoteHttpProxySettings() ) );
 
-        resource.setBaseUrl( nexus.getBaseUrl() );
+        resource.setBaseUrl( getContextRoot( request ).getTargetRef().toString() );
 
-        resource.setSmtpSettings( convert( nexus.readSmtpConfiguration() ) );
+        resource.setForceBaseUrl( getNexus().isForceBaseUrl() );
+
+        resource.setSmtpSettings( convert( getNexus().readSmtpConfiguration() ) );
     }
 
     protected String getSecurityConfiguration( boolean enabled, String authSourceType )

@@ -84,8 +84,18 @@ public abstract class AbstractNexusPlexusResource
      */
     protected Reference getContextRoot( Request request )
     {
-        Reference result = request.getRootRef();
+        Reference result = null;
 
+        if ( getNexus().isForceBaseUrl() && getNexus().getBaseUrl() != null )
+        {
+            result = new Reference( getNexus().getBaseUrl() );
+        }
+        else
+        {
+            result = request.getRootRef();
+        }
+
+        // fix for when restlet is at webapp root
         if ( StringUtils.isEmpty( result.getPath() ) )
         {
             result.setPath( "/" );
