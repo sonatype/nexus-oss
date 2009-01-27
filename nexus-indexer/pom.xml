@@ -11,7 +11,7 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-indexer</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2.1-SNAPSHOT</version>
 
   <name>Sonatype Nexus: Indexer</name>
 
