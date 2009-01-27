@@ -97,18 +97,7 @@ public abstract class AbstractNexusTestCase
     protected void copyFromClasspathToFile( String path, File output )
         throws IOException
     {
-        FileOutputStream fos = null;
-
-        try
-        {
-            fos = new FileOutputStream( output );
-
-            IOUtil.copy( getClass().getResourceAsStream( path ), fos );
-        }
-        finally
-        {
-            IOUtil.close( fos );
-        }
+        org.sonatype.nexus.util.IOUtil.copyFromStreamToFile( getClass().getResourceAsStream( path ), output );
     }
 
 }
