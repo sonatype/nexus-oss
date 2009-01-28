@@ -7,6 +7,7 @@ package org.sonatype.nexus.index.updater;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,8 +36,8 @@ public class IndexDataTest
     protected void prepareNexusIndexer( NexusIndexer nexusIndexer )
         throws Exception
     {
-        indexDir = FSDirectory.getDirectory( "111" );
-        
+        indexDir = FSDirectory.getDirectory( new File( new File( getBasedir() ), "target/111" ) );
+
         context = nexusIndexer.addIndexingContext(
             "test-default",
             "test",
@@ -51,10 +52,10 @@ public class IndexDataTest
         nexusIndexer.scan( context );
 
         Date timestamp = context.getTimestamp();
-        
+
         assertNotNull( timestamp );
 
-        // save and restore index to be used by common tests 
+        // save and restore index to be used by common tests
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
@@ -62,32 +63,32 @@ public class IndexDataTest
 
         ByteArrayInputStream is = new ByteArrayInputStream( bos.toByteArray() );
 
-        newDir = FSDirectory.getDirectory( "123" );
+        newDir = FSDirectory.getDirectory( new File( new File( getBasedir() ), "target/123" ) );
 
         Date newTimestamp = IndexUtils.unpackIndexData( is, newDir, context.getIndexCreators() );
 
         assertEquals( timestamp, newTimestamp );
-        
+
         context.replace( newDir );
     }
-    
+
     public void testData()
         throws Exception
     {
         IndexReader r1 = context.getIndexReader();
-        
+
         Map<String, ArtifactInfo> r1map = readIndex( r1 );
-        
+
         IndexReader r2 = IndexReader.open( newDir );
 
         Map<String, ArtifactInfo> r2map = readIndex( r2 );
-        
+
         for ( Entry<String, ArtifactInfo> e : r1map.entrySet() )
         {
             String key = e.getKey();
             assertTrue( "Expected for find " + key, r2map.containsKey( key ) );
         }
-        
+
         assertEquals( r1map.size(), r2map.size() );
     }
 
@@ -95,20 +96,20 @@ public class IndexDataTest
         throws CorruptIndexException,
             IOException
     {
-        Map<String,ArtifactInfo> map = new HashMap<String, ArtifactInfo>(); 
+        Map<String, ArtifactInfo> map = new HashMap<String, ArtifactInfo>();
 
         for ( int i = 0; i < r1.maxDoc(); i++ )
         {
             Document document = r1.document( i );
-            
+
             ArtifactInfo ai = context.constructArtifactInfo( document );
-            
-            if( ai != null)
+
+            if ( ai != null )
             {
                 map.put( ai.getUinfo(), ai );
             }
         }
-        
+
         return map;
     }
 
