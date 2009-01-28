@@ -1,0 +1,101 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-repository-metadata</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>nexus-repository-metadata-model</artifactId>
+
+  <name>Sonatype Nexus: Nexus Repository Metadata Model</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>repository-metadata.xml</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+            <configuration>
+              <version>1.0.0</version>
+              <useJava5>true</useJava5>
+              <models>
+                <model>src/main/mdo/repository-metadata.xml</model>
+              </models>
+            </configuration>
+          </execution>
+          <execution>
+            <id>mirror-list-metadata.xml</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+            <configuration>
+              <version>1.0.0</version>
+              <useJava5>true</useJava5>
+              <models>
+                <model>src/main/mdo/mirror-list-metadata.xml</model>
+              </models>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <packageWithVersion>false</packageWithVersion>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>com.google.code.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+        <version>1.4.0</version>
+        <configuration>
+          <header>${basedir}/header.txt</header>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+          <!-- this is important for muti-module project
+          <aggregate>true</aggregate>
+          -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

@@ -29,6 +29,7 @@ under the License.
     <modules>
       <module>nexus-parent</module>
       <module>nexus-indexer</module>
+      <module>nexus-repository-metadata</module>
       <module>nexus</module>
     </modules>
     
