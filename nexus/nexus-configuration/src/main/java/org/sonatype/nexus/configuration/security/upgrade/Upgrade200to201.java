@@ -16,10 +16,9 @@ package org.sonatype.nexus.configuration.security.upgrade;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -65,6 +64,7 @@ public class Upgrade200to201
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
@@ -88,7 +88,7 @@ public class Upgrade200to201
             newc.addUser( newu );
         }
         
-        Map<String,String> roleIdMap = new HashMap<String,String>();
+        List<RoleMap> roleMapList = new ArrayList<RoleMap>();
 
         for ( CRole oldr : (List<CRole>) oldc.getRoles() )
         {
@@ -120,7 +120,7 @@ public class Upgrade200to201
     
                 newc.addRole( newr );
                 
-                roleIdMap.put( oldr.getId(), newr.getId() );
+                roleMapList.add( new RoleMap( oldr.getId(), newr.getId() ) );
             }
             // else the role will be removed, if it is now internal, and the user hasn't changed it
         }
@@ -148,9 +148,9 @@ public class Upgrade200to201
         }
         
         // Fix to use the archived roles
-        for ( String key : roleIdMap.keySet() )
+        for ( RoleMap roleMap : roleMapList )
         {
-            applyArchivedRoles( key, roleIdMap.get( key ), newc );
+            applyArchivedRoles( roleMap, newc );
         }
         
         // Fix the new anon and deployment roles if assigned to users
@@ -160,6 +160,7 @@ public class Upgrade200to201
         message.setConfiguration( newc );
     }
     
+    @SuppressWarnings("unchecked")
     private void applyNewRepoRoles( org.sonatype.jsecurity.model.v2_0_1.Configuration config )
     {
         for ( org.sonatype.jsecurity.model.v2_0_1.CUser user : ( List<org.sonatype.jsecurity.model.v2_0_1.CUser> )config.getUsers() )
@@ -189,23 +190,26 @@ public class Upgrade200to201
         }
     }
     
-    private void applyArchivedRoles( String oldRoleId, String newRoleId, org.sonatype.jsecurity.model.v2_0_1.Configuration config )
+    @SuppressWarnings("unchecked")
+    private void applyArchivedRoles( RoleMap roleMap, org.sonatype.jsecurity.model.v2_0_1.Configuration config )
     {
         for ( org.sonatype.jsecurity.model.v2_0_1.CUser user : ( List<org.sonatype.jsecurity.model.v2_0_1.CUser> )config.getUsers() )
         {
-            if ( user.getRoles().contains( oldRoleId ) )
+            if ( user.getRoles().contains( roleMap.oldId ) )
             {
-                user.getRoles().remove( oldRoleId );
-                user.getRoles().add( newRoleId );
+                int index = user.getRoles().indexOf( roleMap.oldId );
+                user.getRoles().remove( roleMap.oldId );
+                user.getRoles().add( index, roleMap.newId );
             }
         }
         
         for ( org.sonatype.jsecurity.model.v2_0_1.CRole role : ( List<org.sonatype.jsecurity.model.v2_0_1.CRole> )config.getRoles() )
         {
-            if ( role.getRoles().contains( oldRoleId ) )
+            if ( role.getRoles().contains( roleMap.oldId ) )
             {
-                role.getRoles().remove( oldRoleId );
-                role.getRoles().add( newRoleId );
+                int index = role.getRoles().indexOf( roleMap.oldId );
+                role.getRoles().remove( roleMap.oldId );
+                role.getRoles().add( index, roleMap.newId );
             }
         }
     }
@@ -541,5 +545,27 @@ public class Upgrade200to201
         set.add( "72" );
         
         return set;
+    }
+    
+    private static class RoleMap
+    {
+        private String oldId;
+        private String newId;
+        
+        protected RoleMap( String oldId, String newId )
+        {
+            this.oldId = oldId;
+            this.newId = newId;
+        }
+        
+        public String getNewId()
+        {
+            return newId;
+        }
+        
+        public String getOldId()
+        {
+            return oldId;
+        }
     }
 }
