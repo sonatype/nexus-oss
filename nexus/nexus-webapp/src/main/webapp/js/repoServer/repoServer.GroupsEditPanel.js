@@ -25,12 +25,13 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
   
   //A record to hold the contentClasses
   this.contentClassRecordConstructor = Ext.data.Record.create([
-    {name:'roleHint'},
+    {name:'provider'},
+    {name:'format'},
     {name:'description', sortType:Ext.data.SortTypes.asUCString}
   ]);
   
   //Reader and datastore that queries the server for the list of content classes
-  this.contentClassesReader = new Ext.data.JsonReader({root: 'data', id: 'roleHint'}, this.contentClassRecordConstructor );
+  this.contentClassesReader = new Ext.data.JsonReader({root: 'data', id: 'provider'}, this.contentClassRecordConstructor );
   this.contentClassesDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.groupRepoTypes,
     reader: this.contentClassesReader,
@@ -110,7 +111,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
         width: this.COMBO_WIDTH,
         store: this.contentClassesDataStore,
         displayField:'description',
-        valueField:'roleHint',
+        valueField:'format',
         editable: false,
         forceSelection: true,
         mode: 'local',
@@ -170,12 +171,6 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
               },
               onContainerOver:function(source, e, data){
                 return this.dropAllowed;
-              },
-              onNodeDrop:function(node, source, e, data){
-                return this.onContainerDrop( source, e, data );
-              },
-              onNodeOver:function(node, source, e, data){
-                return this.onContainerOver( source, e, data );
               },
               // passign padding to make whole treePanel the drop zone.  This is dependent
               // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
