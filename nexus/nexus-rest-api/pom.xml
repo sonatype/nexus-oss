@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.nexus</groupId>
@@ -72,9 +73,9 @@
       <artifactId>plexus-slf4j-logging</artifactId>
       <exclusions>
         <exclusion>
-		  <groupId>org.codehaus.plexus</groupId>
-		  <artifactId>plexus-component-api</artifactId>
-		</exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-api</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-simple</artifactId>
@@ -97,7 +98,7 @@
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
-	<!-- For testing -->
+    <!-- For testing -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -106,24 +107,43 @@
   </dependencies>
   <build>
     <plugins>
-		<plugin>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-component-metadata</artifactId>
-		</plugin>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <executions>
           <execution>
+            <id>vos.xml</id>
             <goals>
               <goal>java</goal>
             </goals>
+            <configuration>
+              <version>1.0.0</version>
+              <models>
+                <model>src/main/mdo/vos.xml</model>
+              </models>
+            </configuration>
+          </execution>
+          <execution>
+            <id>lvo-config.xml</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+            <configuration>
+              <version>1.0.0</version>
+              <models>
+                <model>src/main/mdo/lvo-config.xml</model>
+              </models>
+            </configuration>
           </execution>
         </executions>
         <configuration>
-          <version>1.0.0</version>
           <packageWithVersion>false</packageWithVersion>
-          <models><model>src/main/mdo/vos.xml</model></models>
         </configuration>
       </plugin>
     </plugins>
