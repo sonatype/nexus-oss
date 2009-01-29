@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.events.EventMulticaster;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryStatusCheckerThread;
@@ -163,14 +164,26 @@ public class DefaultRepositoryRegistry
     {
         ArrayList<String> result = new ArrayList<String>();
 
-        /*
-         * GroupRepository group = groupRepositories.get( repositoryId ); if ( group != null ) { for ( Repository member
-         * : group.getMemberRepositories() ) { if ( member.getId().equals( repositoryId ) ) { result.add( group.getId()
-         * ); break; } } }
-         */
+        for ( Repository repository : getRepositories() )
+        {
+            if ( !repository.getId().equals( repositoryId )
+                && repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            {
+                GroupRepository group = repository.adaptToFacet( GroupRepository.class );
+
+                for ( Repository member : group.getMemberRepositories() )
+                {
+                    if ( repositoryId.equals( member.getId() ) )
+                    {
+                        result.add( group.getId() );
+
+                        break;
+                    }
+                }
+            }
+        }
 
         return result;
-
     }
 
     /**
@@ -249,7 +262,7 @@ public class DefaultRepositoryRegistry
         {
             ( (EventMulticaster) repository ).removeProximityEventListener( this );
         }
-        
+
         if ( repository instanceof EventListener )
         {
             removeProximityEventListener( repository );
