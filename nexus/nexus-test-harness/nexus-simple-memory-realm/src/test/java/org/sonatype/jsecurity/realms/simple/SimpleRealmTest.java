@@ -16,6 +16,7 @@ package org.sonatype.jsecurity.realms.simple;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import junit.framework.Assert;
 
@@ -144,13 +145,27 @@ public class SimpleRealmTest
     private void copyTestConfigToPlace()
         throws FileNotFoundException,
             IOException
-    {
-        IOUtil.copy(
-            Thread.currentThread().getContextClassLoader().getResourceAsStream( "nexus.xml" ),
-            new FileOutputStream( getNexusConfiguration() ) );
-
-        IOUtil.copy(
-            Thread.currentThread().getContextClassLoader().getResourceAsStream( "security.xml" ),
-            new FileOutputStream( getNexusSecurityConfiguration() ) );
+    {   
+        InputStream nexusConf = null;
+        InputStream securityConf = null;
+        
+        try
+        {
+            nexusConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "nexus.xml" );
+            IOUtil.copy(
+                nexusConf,
+                new FileOutputStream( getNexusConfiguration() ) );
+    
+            securityConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security.xml" );
+            IOUtil.copy(
+                securityConf,
+                new FileOutputStream( getNexusSecurityConfiguration() ) );
+        }
+        finally
+        {   
+            IOUtil.close( nexusConf );
+            IOUtil.close( securityConf );
+            
+        }
     }
 }
