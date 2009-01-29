@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.List;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.repository.metadata.model.OrderedMirrorMetadata;
@@ -121,7 +122,7 @@ public class DefaultRepositoryMetadataHandler
 
         result.setRequestTimestamp( System.currentTimeMillis() );
 
-        for ( RepositoryMirrorMetadata mmd : metadata.getMirrors() )
+        for ( RepositoryMirrorMetadata mmd : ( List<RepositoryMirrorMetadata> ) metadata.getMirrors() )
         {
             OrderedMirrorMetadata omd = new OrderedMirrorMetadata();
 
