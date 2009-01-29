@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import junit.framework.Assert;
 
@@ -149,17 +150,18 @@ public class SimpleRealmTest
         InputStream nexusConf = null;
         InputStream securityConf = null;
         
+        OutputStream nexusOut = null;
+        OutputStream securityOut = null;
+        
         try
         {
             nexusConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "nexus.xml" );
-            IOUtil.copy(
-                nexusConf,
-                new FileOutputStream( getNexusConfiguration() ) );
+            nexusOut = new FileOutputStream( getNexusConfiguration() );
+            IOUtil.copy( nexusConf, nexusOut );
     
             securityConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security.xml" );
-            IOUtil.copy(
-                securityConf,
-                new FileOutputStream( getNexusSecurityConfiguration() ) );
+            securityOut = new FileOutputStream( getNexusSecurityConfiguration() );
+            IOUtil.copy( securityConf, securityOut);
         }
         finally
         {   
