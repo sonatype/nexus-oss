@@ -99,6 +99,14 @@
     </component>
 
     <component>
+      <role>org.sonatype.jettytestsuite.ControlledServer</role>
+      <implementation>org.sonatype.jettytestsuite.ControlledServer</implementation>
+      <configuration>
+        <port>${webproxy-server-port}</port>
+      </configuration>
+    </component>
+
+    <component>
       <role>org.sonatype.jettytestsuite.ServletServer</role>
       <role-hint>secure</role-hint>
       <implementation>org.sonatype.jettytestsuite.ServletServer</implementation>

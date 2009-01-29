@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.0.7</version>
+  <version>1.0.8</version>
   <applicationLogDirectory>${project.build.directory}/logs/</applicationLogDirectory>
 
   <smtpConfiguration>
@@ -35,20 +35,24 @@
     <groups />
   </routing>
   <repositories>
-
-
     <repository>
       <id>nexus1329-repo</id>
       <name>Repo NEXUS-1329 With Mirrors</name>
       <remoteStorage>
-        <url>${proxy-repo-base-url}nexus1329/repository</url>
+        <url>http://localhost:${webproxy-server-port}/repository</url>
+        <mirrors>
+          <mirror>
+            <id>b31d7d17f2ab</id>
+            <url>http://localhost:${webproxy-server-port}/mirror1</url>
+          </mirror>
+          <mirror>
+            <id>b31d7d241165</id>
+            <url>http://localhost:${webproxy-server-port}/mirror2</url>
+          </mirror>
+        </mirrors>
       </remoteStorage>
-      <!-- TODO: Add mirror to config, if not configured via test -->
-      <!-- <mirror>${proxy-repo-base-url}nexus1326/mirror1<mirror>-->
-      <!-- <mirror>${proxy-repo-base-url}nexus1326/mirror2<mirror>-->
     </repository>
   </repositories>
-  
   <repositoryGrouping>
     <repositoryGroups>
 
