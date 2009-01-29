@@ -41,11 +41,13 @@ public interface RepositoryMetadataHandler
      * <p>
      * The "strategy" fields tells how the result should be interpreted:
      * <ul>
-     * <li>SERVER - the list should be consumed as is, since server strategy already formed the "best" mirror for us.</li>
-     * <li>CLIENT_AUTO - if it is possible, local side GeoIP matchind is applied to the list, so it should be consumed
-     * as-is.</li>
+     * <li>SERVER - the list should be consumed as is, since mirror service already formed the "best" order for us. The
+     * mirror server will be contacted only when the "mirrorListSource" field is given in metadata.</li>
+     * <li>CLIENT_AUTO - if "SERVER" strategy is failed or is not possible, will try (determined at runtime) to apply
+     * client side GeoIP matching and ordering to the list. The list should be consumed as is, since GeoIP service
+     * already formed the "best" order for us.</li>
      * <li>CLIENT_MANUAL - the list is 1:1 copy of the "static" mirror list without any reordering. In this scenario,
-     * the client of this API would have to offer the list to the user over some sort of UI to introspection.</li>
+     * the client of this API would have to offer the list to the user over some sort of UI for further introspection.</li>
      * </ul>
      * 
      * @param url
