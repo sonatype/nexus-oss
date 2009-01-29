@@ -167,6 +167,8 @@ public class SimpleRealmTest
         {   
             IOUtil.close( nexusConf );
             IOUtil.close( securityConf );
+            IOUtil.close( nexusOut );
+            IOUtil.close( securityOut );
             
         }
     }
