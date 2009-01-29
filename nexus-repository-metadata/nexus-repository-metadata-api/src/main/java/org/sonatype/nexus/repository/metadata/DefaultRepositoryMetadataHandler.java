@@ -8,7 +8,9 @@ import java.io.OutputStreamWriter;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.repository.metadata.model.OrderedMirrorMetadata;
+import org.sonatype.nexus.repository.metadata.model.OrderedRepositoryMirrorsMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
+import org.sonatype.nexus.repository.metadata.model.RepositoryMirrorMetadata;
 import org.sonatype.nexus.repository.metadata.model.io.xpp3.OrderedRepositoryMirrorsMetadataXpp3Reader;
 import org.sonatype.nexus.repository.metadata.model.io.xpp3.RepositoryMetadataXpp3Reader;
 import org.sonatype.nexus.repository.metadata.model.io.xpp3.RepositoryMetadataXpp3Writer;
@@ -105,9 +107,30 @@ public class DefaultRepositoryMetadataHandler
         req.getTransport().writeRawData( request, bos.toByteArray() );
     }
 
-    public OrderedMirrorMetadata fetchOrderedMirrorMetadata( String url, RawTransport transport )
+    public OrderedRepositoryMirrorsMetadata fetchOrderedMirrorMetadata( RepositoryMetadata metadata,
+        RawTransport transport )
         throws IOException
     {
-        throw new UnsupportedOperationException( "Not yet implemented!" );
+        OrderedRepositoryMirrorsMetadata result = new OrderedRepositoryMirrorsMetadata();
+
+        result.setVersion( OrderedRepositoryMirrorsMetadata.MODEL_VERSION );
+
+        result.setStrategy( OrderedRepositoryMirrorsMetadata.STRATEGY_CLIENT_MANUAL );
+
+        result.setRequestIp( null );
+
+        result.setRequestTimestamp( System.currentTimeMillis() );
+
+        for ( RepositoryMirrorMetadata mmd : metadata.getMirrors() )
+        {
+            OrderedMirrorMetadata omd = new OrderedMirrorMetadata();
+
+            omd.setId( mmd.getId() );
+            omd.setUrl( mmd.getUrl() );
+
+            result.addMirror( omd );
+        }
+
+        return result;
     }
 }

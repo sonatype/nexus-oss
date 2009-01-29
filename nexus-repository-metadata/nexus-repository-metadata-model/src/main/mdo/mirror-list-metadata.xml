@@ -47,6 +47,13 @@
           <required>true</required>
         </field>
         <field>
+          <name>strategy</name>
+          <version>1.0.0+</version>
+          <description>The strategy how this list is obtained and how should be interpreted.</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
           <name>requestIp</name>
           <version>1.0.0+</version>
           <description>The IP address of the request for what this list was created.</description>
@@ -76,6 +83,14 @@
           <version>1.0.0</version>
           <code><![CDATA[
     public static final String MODEL_VERSION = "1.0.0";
+]]></code>
+        </codeSegment>
+        <codeSegment>
+          <version>1.0.0+</version>
+          <code><![CDATA[
+    public static final String STRATEGY_SERVER = "server";
+    public static final String STRATEGY_CLIENT_AUTO = "clientAuto";
+    public static final String STRATEGY_CLIENT_MANUAL = "clientManual";
 ]]></code>
         </codeSegment>
       </codeSegments>
