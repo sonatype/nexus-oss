@@ -1,7 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-<!-- the version of maven's project object model -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <!-- the version of maven's project object model -->
   <modelVersion>4.0.0</modelVersion>
-<!-- Parent POM -->
+  <!-- Parent POM -->
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
@@ -14,24 +15,26 @@
   <!-- a short but descriptive name for the project -->
   <name>Nexus (Web Application frontend)</name>
   <properties>
-    <!-- NOTE: MNG-3355 will fix this so we can use ${project.build.directory} instead of the hard-coded target directory.-->
+    <!--
+      NOTE: MNG-3355 will fix this so we can use ${project.build.directory} instead of the hard-coded target directory.
+    -->
     <jsw-input>target/jsw-template</jsw-input>
     <jsw-output>jsw-filtered</jsw-output>
     <nexus-tools-input>target/nexus-tools</nexus-tools-input>
   </properties>
   <dependencies>
-		<dependency>
-			<groupId>httpunit</groupId>
-			<artifactId>httpunit</artifactId>
-			<version>1.6.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-			<scope>provided</scope>
-		</dependency>
+    <dependency>
+      <groupId>httpunit</groupId>
+      <artifactId>httpunit</artifactId>
+      <version>1.6.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
       <artifactId>plexus-platform-jsw</artifactId>
@@ -124,20 +127,20 @@
         <version>2.1-alpha-2</version>
         <configuration>
           <warSourceIncludes>
-          	*, 
-          	ext-2.2/ext-all.js,
-          	ext-2.2/adapter/ext/ext-base.js,
-          	ext-2.2/resources/css/ext-all.css,
-          	ext-2.2/resources/css/xtheme-gray.css,
-          	ext-2.2/resources/images/**,
-          	images/**,
-          	js/*,
-          	js/extensions/*,
-          	js/filetree/js/Ext.ux.form.BrowseButton.js,
-          	js/repoServer/*,
-          	style/Sonatype.css,
-          	style/Sonatype-content.css,
-          	WEB-INF/*
+            *,
+            ext-2.2/ext-all.js,
+            ext-2.2/adapter/ext/ext-base.js,
+            ext-2.2/resources/css/ext-all.css,
+            ext-2.2/resources/css/xtheme-gray.css,
+            ext-2.2/resources/images/**,
+            images/**,
+            js/*,
+            js/extensions/*,
+            js/filetree/js/Ext.ux.form.BrowseButton.js,
+            js/repoServer/*,
+            style/Sonatype.css,
+            style/Sonatype-content.css,
+            WEB-INF/*
           </warSourceIncludes>
           <webResources>
             <webResource>
@@ -150,7 +153,7 @@
           <webXml>${basedir}/src/main/webapp-war-extras/WEB-INF/web.xml</webXml>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
@@ -165,8 +168,9 @@
           <descriptors>
             <descriptor>src/main/assembly/bundle.xml</descriptor>
             <!--base changed...no updates for this version-->
-            <!--<descriptor>src/main/assembly/base.xml</descriptor>
-                               <descriptor>src/main/assembly/app.xml</descriptor>-->
+            <!--
+              <descriptor>src/main/assembly/base.xml</descriptor> <descriptor>src/main/assembly/app.xml</descriptor>
+            -->
           </descriptors>
           <tarLongFileMode>gnu</tarLongFileMode>
         </configuration>
@@ -185,9 +189,10 @@
         <version>1.4</version>
         <configuration>
           <includeTestClasspath>true</includeTestClasspath>
-          <!-- prependClasspaths>
-            <prependClasspath>${project.build.directory}/plexus-home/conf</prependClasspath>
-          </prependClasspaths-->
+          <!--
+            prependClasspaths> <prependClasspath>${project.build.directory}/plexus-home/conf</prependClasspath>
+            </prependClasspaths
+          -->
           <systemProperties>
             <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
           </systemProperties>
