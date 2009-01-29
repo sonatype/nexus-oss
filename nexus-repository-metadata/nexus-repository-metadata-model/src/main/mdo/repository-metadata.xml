@@ -46,37 +46,44 @@
           <required>true</required>
         </field>
         <field>
+          <name>url</name>
+          <version>1.0.0+</version>
+          <description>The repository "canonical url".</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
           <name>id</name>
           <version>1.0.0+</version>
-          <description>The repository 'id'.</description>
+          <description>The repository recommended ID.</description>
           <type>String</type>
           <required>true</required>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
-          <description>The repository 'name'.</description>
+          <description>The repository recommended name.</description>
           <type>String</type>
           <required>true</required>
         </field>
         <field>
           <name>layout</name>
           <version>1.0.0+</version>
-          <description>The repository 'layout'.</description>
+          <description>The repository "layout".</description>
           <type>String</type>
           <required>true</required>
         </field>
         <field>
           <name>policy</name>
           <version>1.0.0+</version>
-          <description>The repository 'policy'.</description>
+          <description>The repository "policy".</description>
           <type>String</type>
           <required>true</required>
         </field>
         <field>
-          <name>url</name>
+          <name>publicKey</name>
           <version>1.0.0+</version>
-          <description>The repository 'canonical url'.</description>
+          <description>The repository public key.</description>
           <type>String</type>
           <required>true</required>
         </field>
