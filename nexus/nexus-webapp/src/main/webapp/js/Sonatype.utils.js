@@ -746,7 +746,8 @@ Sonatype.utils = {
           Sonatype.repoServer.RepoServer.createSubComponents();
           Sonatype.view.serverTabPanel.doLayout();
   
-          if ( baseUrlMismatch ) {
+          if ( baseUrlMismatch && Sonatype.lib.Permissions.checkPermission(
+              'nexus:settings', Sonatype.lib.Permissions.READ ) ) {
             Sonatype.utils.postWelcomePageAlert(
               '<b>WARNING:</b> ' +
               'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' +
