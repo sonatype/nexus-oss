@@ -2,10 +2,13 @@ package org.sonatype.nexus.repository.metadata.restlet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 
 import org.restlet.Client;
+import org.restlet.data.ClientInfo;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.data.Preference;
 import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -60,7 +63,7 @@ public class RestletRawTransport
             request.setPath( request.getPath().substring( 1 ) );
         }
 
-        Request rr = createRequest( Method.GET, new Reference( request.getUrl(), request.getPath() ) );
+        Request rr = createRequest( Method.GET, request );
 
         Response response = client.handle( rr );
 
@@ -86,7 +89,7 @@ public class RestletRawTransport
             request.setPath( request.getPath().substring( 1 ) );
         }
 
-        Request rr = createRequest( Method.PUT, new Reference( request.getUrl(), request.getPath() ) );
+        Request rr = createRequest( Method.PUT, request );
 
         rr.setEntity( new ByteArrayRepresentation( MediaType.APPLICATION_XML, data ) );
 
@@ -98,9 +101,18 @@ public class RestletRawTransport
         }
     }
 
-    protected Request createRequest( Method method, Reference reference )
+    protected Request createRequest( Method method, RawTransportRequest req )
     {
-        Request request = new Request( method, reference );
+        Request request = new Request( method, new Reference( req.getUrl(), req.getPath() ) );
+
+        ClientInfo ci = new ClientInfo();
+
+        ci.setAgent( "NexusRM/1.0.0" );
+
+        ci.setAcceptedMediaTypes( Collections
+            .singletonList( new Preference<MediaType>( MediaType.APPLICATION_XML ) ) );
+
+        request.setClientInfo( ci );
 
         return request;
     }
