@@ -38,9 +38,9 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-lvo-plugin</artifactId>
-      <version>${nexus-lvo-plugin.version}</version>
-    </dependency>
+      <artifactId>nexus-lvo-plugin</artifactId>
+      <version>${nexus-lvo-plugin.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
       <artifactId>plexus-platform-jsw</artifactId>
