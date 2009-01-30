@@ -403,7 +403,16 @@ public abstract class AbstractProxyRepository
         boolean localOnly = context != null && context.containsKey( ResourceStoreRequest.CTX_LOCAL_ONLY_FLAG )
             && Boolean.TRUE.equals( context.get( ResourceStoreRequest.CTX_LOCAL_ONLY_FLAG ) );
 
-        AbstractStorageItem localItem = (AbstractStorageItem) super.doRetrieveItem( uid, context );
+        AbstractStorageItem localItem = null;
+
+        try
+        {
+            localItem = (AbstractStorageItem) super.doRetrieveItem( uid, context );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            localItem = null;
+        }
 
         boolean shouldProxy = true;
 
@@ -607,12 +616,12 @@ public abstract class AbstractProxyRepository
         return item;
     }
 
-    private void sendContentValidationEvents( RepositoryItemUid uid, List<NexusArtifactEvent> events, boolean isContentValid )
+    private void sendContentValidationEvents( RepositoryItemUid uid, List<NexusArtifactEvent> events,
+        boolean isContentValid )
     {
         if ( getLogger().isDebugEnabled() && !isContentValid )
         {
-            getLogger().debug(
-                "Item " + uid.toString() + " failed content integrity validation." );
+            getLogger().debug( "Item " + uid.toString() + " failed content integrity validation." );
         }
 
         for ( NexusArtifactEvent event : events )
@@ -630,60 +639,31 @@ public abstract class AbstractProxyRepository
     }
 
     /**
-     * Validates integrity of content of <code>item</code>. Retruns <code>true</code>
-     * if item content is valid and <code>false</code> if item content is corrupted.
-     * 
-     * Note that this method is called doRetrieveRemoteItem, so implementation
-     * must retrieve checksum files directly from remote storage 
-     * 
-     * <code>
+     * Validates integrity of content of <code>item</code>. Retruns <code>true</code> if item content is valid and
+     * <code>false</code> if item content is corrupted. Note that this method is called doRetrieveRemoteItem, so
+     * implementation must retrieve checksum files directly from remote storage <code>
      *   getRemoteStorage().retrieveItem( this, context, getRemoteUrl(), checksumUid.getPath() );
      * </code>
      */
-    protected boolean doValidateRemoteItemContent( String baseUrl, AbstractStorageItem item, Map<String, Object> context, List<NexusArtifactEvent> events )
+    protected boolean doValidateRemoteItemContent( String baseUrl, AbstractStorageItem item,
+        Map<String, Object> context, List<NexusArtifactEvent> events )
         throws StorageException
     {
         return true;
     }
 
     /**
-     * Retrieves item with specified uid from remote storage according to the
-     * following retry-fallback-blacklist rules.
-     *
-     * <li>
-     * Only retrieve item operation will use mirrors, other operations,
-     *   like check availability and retrieve checksum file, will always
-     *   use repository canonical url.
-     *   </li>
-     * <li>
-     * Only one mirror url will be considered before retrieve item operation
-     *   falls back to repository canonical url.
-     *   </li>
-     * <li>
-     * Repository canonical url will never be put on the blacklist.
-     *   </li>
-     * <li>
-     * If retrieve item operation fails with ItemNotFound or AccessDenied
-     *   error, the operation will be retried with another url or original
-     *   error will be reported if there are no more urls.
-     *   </li>
-     * <li>  
-     * If retrieve item operation fails with generic StorageException or
-     *   item content is corrupt, the operation will be retried one more
-     *   time from the same url. After that, the operation will be retried
-     *   with another url or original error will be returned if there are
-     *   no more urls.
-     *   </li>
-     * <li>  
-     * Mirror url will be put on the blacklist if retrieve item operation
-     *   from the url failed with StorageException, AccessDenied or InvalidItemContent error
-     *   but the item was successfully retrieve from another url.
-     *   </li>
-     * <li>
-     * Mirror url will be removed from blacklist after 30 minutes.
-     *   </li>
-     * 
-     * 
+     * Retrieves item with specified uid from remote storage according to the following retry-fallback-blacklist rules.
+     * <li>Only retrieve item operation will use mirrors, other operations, like check availability and retrieve
+     * checksum file, will always use repository canonical url.</li> <li>Only one mirror url will be considered before
+     * retrieve item operation falls back to repository canonical url.</li> <li>Repository canonical url will never be
+     * put on the blacklist.</li> <li>If retrieve item operation fails with ItemNotFound or AccessDenied error, the
+     * operation will be retried with another url or original error will be reported if there are no more urls.</li> <li>
+     * If retrieve item operation fails with generic StorageException or item content is corrupt, the operation will be
+     * retried one more time from the same url. After that, the operation will be retried with another url or original
+     * error will be returned if there are no more urls.</li> <li>Mirror url will be put on the blacklist if retrieve
+     * item operation from the url failed with StorageException, AccessDenied or InvalidItemContent error but the item
+     * was successfully retrieve from another url.</li> <li>Mirror url will be removed from blacklist after 30 minutes.</li>
      * The following matrix summarises retry/blacklist behaviour
      * 
      * <pre>
@@ -694,9 +674,6 @@ public abstract class AbstractProxyRepository
      * InvalidContent       yes           yes
      * Other                yes           yes
      * </pre>
-     * 
-     * 
-     * 
      */
     protected AbstractStorageItem doRetrieveRemoteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws ItemNotFoundException,
@@ -714,28 +691,31 @@ public abstract class AbstractProxyRepository
 
         try
         {
-            all_urls:
-            for ( Mirror mirror : mirrors )
+            all_urls: for ( Mirror mirror : mirrors )
             {
                 for ( int i = 0; i < DOWNLOAD_RETRY_COUNT; i++ )
                 {
                     try
                     {
                         // events.clear();
-    
-                        AbstractStorageItem remoteItem = getRemoteStorage().retrieveItem( this, context, mirror.getUrl(), uid.getPath() );
-    
+
+                        AbstractStorageItem remoteItem = getRemoteStorage().retrieveItem(
+                            this,
+                            context,
+                            mirror.getUrl(),
+                            uid.getPath() );
+
                         remoteItem.getItemContext().putAll( context );
-    
+
                         remoteItem = doCacheItem( remoteItem );
-    
+
                         if ( doValidateRemoteItemContent( mirror.getUrl(), remoteItem, context, events ) )
                         {
                             sendContentValidationEvents( uid, events, true );
 
                             selector.feedbackSuccess( mirror );
 
-                            return remoteItem; 
+                            return remoteItem;
                         }
                         else
                         {
@@ -753,18 +733,18 @@ public abstract class AbstractProxyRepository
                     catch ( RemoteAccessException e )
                     {
                         lastException = e;
-    
+
                         selector.feedbackFailure( mirror );
-    
+
                         continue all_urls; // retry with next url
                     }
                     catch ( StorageException e )
                     {
                         lastException = e;
-    
+
                         selector.feedbackFailure( mirror );
                     }
-                    
+
                     // retry with same url
                 }
             }

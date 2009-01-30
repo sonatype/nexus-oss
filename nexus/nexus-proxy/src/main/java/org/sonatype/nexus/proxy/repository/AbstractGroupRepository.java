@@ -146,7 +146,7 @@ public abstract class AbstractGroupRepository
         try
         {
             // local always wins
-            return getLocalStorage().retrieveItem( this, context, uid.getPath() );
+            return super.doRetrieveItem( uid, context );
         }
         catch ( ItemNotFoundException ignored )
         {

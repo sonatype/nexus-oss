@@ -1151,7 +1151,7 @@ public abstract class AbstractRepository
                 getLogger().debug( "Item " + uid.toString() + " not found in local storage." );
             }
 
-            localItem = null;
+            throw ex;
         }
 
         return localItem;
