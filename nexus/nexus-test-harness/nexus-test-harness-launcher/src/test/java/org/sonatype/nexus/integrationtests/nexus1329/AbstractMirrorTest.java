@@ -1,7 +1,10 @@
 package org.sonatype.nexus.integrationtests.nexus1329;
 
+import java.io.IOException;
+
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.restlet.data.MediaType;
 import org.sonatype.jettytestsuite.ControlledServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -13,11 +16,19 @@ public class AbstractMirrorTest
 {
 
     public static final String REPO = "nexus1329-repo";
+
     protected static final int webProxyPort;
 
     static
     {
         webProxyPort = TestProperties.getInteger( "webproxy.server.port" );
+    }
+
+    @BeforeClass
+    public static void init()
+        throws IOException
+    {
+        cleanWorkDir();
     }
 
     protected ControlledServer server;
