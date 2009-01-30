@@ -121,6 +121,7 @@
 		<module>nexus-app</module>
 		<module>nexus-rest-api</module>
 		<module>nexus-migration-tool</module>
+		<module>nexus-core-plugins</module>
 		<module>nexus-webapp</module>
 		<module>nexus-clients</module>
 		<module>nexus-test-harness</module>
