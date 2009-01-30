@@ -429,7 +429,7 @@ public class DefaultNexusSecurity
 
         if ( methodProperty != null )
         {
-            Set<String> inheritedMethods = privInheritance.getInheritedMethods( methodProperty.getValue() );
+            List<String> inheritedMethods = privInheritance.getInheritedMethods( methodProperty.getValue() );
 
             StringBuffer buf = new StringBuffer();
 

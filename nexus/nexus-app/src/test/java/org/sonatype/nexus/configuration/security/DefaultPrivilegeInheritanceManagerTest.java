@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.configuration.security;
 
+import java.util.List;
 import java.util.Set;
 
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -36,7 +37,7 @@ public class DefaultPrivilegeInheritanceManagerTest
     public void testCreateInherit()
         throws Exception
     {
-        Set<String> methods = manager.getInheritedMethods( "create" );
+        List<String> methods = manager.getInheritedMethods( "create" );
         
         assertTrue( methods.size() == 2 );
         assertTrue( methods.contains( "read" ) );
@@ -46,7 +47,7 @@ public class DefaultPrivilegeInheritanceManagerTest
     public void testReadInherit()
         throws Exception
     {
-        Set<String> methods = manager.getInheritedMethods( "read" );
+        List<String> methods = manager.getInheritedMethods( "read" );
         
         assertTrue( methods.size() == 1 );
         assertTrue( methods.contains( "read" ) );
@@ -57,7 +58,7 @@ public class DefaultPrivilegeInheritanceManagerTest
     public void testUpdateInherit()
         throws Exception
     {
-        Set<String> methods = manager.getInheritedMethods( "update" );
+        List<String> methods = manager.getInheritedMethods( "update" );
             
         assertTrue( methods.size() == 2 );
         assertTrue( methods.contains( "read" ) );
@@ -67,7 +68,7 @@ public class DefaultPrivilegeInheritanceManagerTest
     public void testDeleteInherit()
         throws Exception
     {
-        Set<String> methods = manager.getInheritedMethods( "delete" );
+        List<String> methods = manager.getInheritedMethods( "delete" );
         
         assertTrue( methods.size() == 2 );
         assertTrue( methods.contains( "read" ) );

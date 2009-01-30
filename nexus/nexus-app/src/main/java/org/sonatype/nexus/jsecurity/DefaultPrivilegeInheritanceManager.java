@@ -13,8 +13,8 @@
  */
 package org.sonatype.nexus.jsecurity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -22,9 +22,9 @@ import org.codehaus.plexus.component.annotations.Component;
 public class DefaultPrivilegeInheritanceManager
     implements PrivilegeInheritanceManager
 {
-    public Set<String> getInheritedMethods( String method )
+    public List<String> getInheritedMethods( String method )
     {
-        HashSet<String> methods = new HashSet<String>();
+        List<String> methods = new ArrayList<String>();
 
         methods.add( method );
 

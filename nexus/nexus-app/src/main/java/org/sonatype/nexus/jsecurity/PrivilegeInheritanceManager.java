@@ -13,7 +13,7 @@
  */
 package org.sonatype.nexus.jsecurity;
 
-import java.util.Set;
+import java.util.List;
 
 public interface PrivilegeInheritanceManager
 {
@@ -23,5 +23,5 @@ public interface PrivilegeInheritanceManager
      * @param method
      * @return
      */
-    Set<String> getInheritedMethods( String method );
+    List<String> getInheritedMethods( String method );
 }
