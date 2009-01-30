@@ -751,7 +751,7 @@ Sonatype.utils = {
             Sonatype.utils.postWelcomePageAlert(
               '<b>WARNING:</b> ' +
               'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' +
-              'does not match your actual URL!<br/>' +
+              'does not match your actual URL! ' +
               'If you\'re running Apache mod_proxy, here\'s ' +
               '<a href="http://nexus.sonatype.org/about/faq.html#' +
               'QHowcanIforceNexustogenerateHTTPSURLswhenintegratedwithApacheHttpdandModProxy">' +
@@ -768,7 +768,7 @@ Sonatype.utils = {
   postWelcomePageAlert: function( msg ) {
     Sonatype.view.welcomeTab.add( {
       xtype: 'panel',
-      html: '<div class="x-toolbar"><div class="x-form-invalid-msg">' + msg + '</div></div>'
+      html: '<div class="x-toolbar-warning-box"><div class="x-form-invalid-msg" style="width: 95%;">' + msg + '</div></div>'
     } );
     Sonatype.view.welcomeTab.doLayout();
   }

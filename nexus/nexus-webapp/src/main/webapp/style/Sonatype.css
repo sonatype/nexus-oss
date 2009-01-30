@@ -270,3 +270,14 @@ button.st-icon-refresh {
   color:#EE0000;
   padding: 2px 2px 2px 18px;
 }
+
+.x-toolbar-warning-box {
+  border-color:#a9bfd3;
+  border-style:solid;
+  border-width:0 0 1px 0;
+  display:block;
+  padding:2px;
+  background:#d0def0 url(../ext-2.2/resources/images/gray/toolbar/bg.gif) repeat-x top left;
+  position:relative;
+  zoom:1;
+}
