@@ -27,4 +27,11 @@ public interface StorageLinkItem
      */
     RepositoryItemUid getTarget();
 
+    /**
+     * Sets the link target.
+     * 
+     * @param target
+     */
+    void setTarget( RepositoryItemUid target );
+
 }

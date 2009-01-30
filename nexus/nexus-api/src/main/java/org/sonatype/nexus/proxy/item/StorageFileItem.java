@@ -30,11 +30,25 @@ public interface StorageFileItem
     long getLength();
 
     /**
+     * Sets the length of file.
+     * 
+     * @param length
+     */
+    void setLength( long length );
+
+    /**
      * Gets the mime type.
      * 
      * @return the mime type
      */
     String getMimeType();
+
+    /**
+     * Sets the mime type.
+     * 
+     * @param mimeType
+     */
+    void setMimeType( String mimeType );
 
     /**
      * Shorthand method, goes to ContentLocator. Reusable stream. See {@link ContentLocator}
