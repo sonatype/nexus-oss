@@ -951,6 +951,9 @@ Ext.extend( Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
     testField.clearInvalid();
     testField.userFound = true;
     this.lastLoadedId = testField.getValue();
+    var roleBox = this.find( 'name', 'roles' )[0];
+    roleBox.setValue( [] );
+    roleBox.nexusRolesEmptyOnLoad = true;
 
     this.form.doAction( 'sonatypeLoad', {
       url: this.uri + '/' + testField.getValue(),
