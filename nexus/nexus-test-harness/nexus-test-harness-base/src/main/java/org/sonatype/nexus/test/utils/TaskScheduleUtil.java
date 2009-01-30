@@ -96,10 +96,16 @@ public class TaskScheduleUtil
         return task.getLastRunResult();
     }
     
+    public static void waitForTasks()
+        throws Exception
+    {
+        waitForTasks( 300 );
+    }
+    
     public static void waitForTasks( int maxAttempts )
         throws Exception
     {
-        long sleep = 200;
+        long sleep = 1000;
 
         Thread.sleep( 500 ); // give an time to task start
 

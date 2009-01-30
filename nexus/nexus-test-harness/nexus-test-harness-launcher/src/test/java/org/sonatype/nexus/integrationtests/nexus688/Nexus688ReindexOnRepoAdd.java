@@ -31,6 +31,7 @@ import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus688ReindexOnRepoAdd
     extends AbstractNexusIntegrationTest
@@ -73,7 +74,7 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        waitForIndexCreation( 40, resource.getId() );
+        TaskScheduleUtil.waitForTasks();
 
         // check to see if it has an index to download
         File indexFile = this.downloadIndexFromRepository( resource.getId() );
@@ -106,7 +107,7 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        waitForIndexCreation( 40, resource.getId() );
+        TaskScheduleUtil.waitForTasks();
 
         // check to see if it has an index to download
         try
@@ -147,7 +148,7 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        waitForIndexCreation( 40, resource.getId() );
+        TaskScheduleUtil.waitForTasks();
 
         // check to see if it has an index to download
         File indexFile = this.downloadIndexFromRepository( resource.getId() );
@@ -184,7 +185,7 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        waitForIndexCreation( 40, resource.getId() );
+        TaskScheduleUtil.waitForTasks();
 
         // check to see if it has an index to download
         File indexFile = this.downloadIndexFromRepository( resource.getId() );
@@ -221,7 +222,7 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        waitForIndexCreation( 40, resource.getId() );
+        TaskScheduleUtil.waitForTasks();
 
         // check to see if it has an index to download
         try
@@ -243,28 +244,6 @@ public class Nexus688ReindexOnRepoAdd
         String repositoryUrl = this.getRepositoryUrl( repoId );
         URL url = new URL( repositoryUrl + INDEX_FILE );
         return this.downloadFile( url, "target/downloads/index.zip" );
-    }
-
-    private boolean waitForIndexCreation( int maxTimesTowait, String repoId )
-        throws Exception
-    {
-        String repositoryUrl = this.getRepositoryUrl( repoId );
-        for ( int i = 0; i < maxTimesTowait; i++ )
-        {
-            Thread.sleep( SLEEP_TIME );
-
-            try
-            {
-                IOUtils.toString( (InputStream) new URL( repositoryUrl + ".index/" ).getContent() );
-                return true;
-            }
-            catch ( FileNotFoundException e )
-            {
-                // means index was not created yet
-            }
-        }
-
-        return false;
     }
 
 }
