@@ -539,6 +539,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     var isGroup = (node.getOwnerTree().root.attributes.repoType == 'group');
     
     this.ctxBrowseNode = node;
+    this.ctxBrowseNode.data = this.ctxBrowseNode.attributes;
     
     var menu = new Sonatype.menu.Menu({
       id: 'repo-maint-browse-ctx',
