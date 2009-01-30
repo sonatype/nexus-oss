@@ -72,14 +72,17 @@ public abstract class AbstractNexusTestCase
     protected void copyResource(String resource, String dest ) throws IOException
     {
         InputStream stream = null;
+        FileOutputStream ostream = null;
         try
         {
             stream = getClass().getResourceAsStream( resource );
-            IOUtil.copy( stream, new FileOutputStream( dest ) );
+            ostream = new FileOutputStream( dest );
+            IOUtil.copy( stream, ostream );
         }
         finally
         {
             IOUtil.close( stream );
+            IOUtil.close( ostream );
         }
     }
 
