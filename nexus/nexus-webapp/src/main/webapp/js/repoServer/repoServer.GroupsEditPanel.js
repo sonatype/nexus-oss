@@ -104,7 +104,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
       },
       {
         xtype: 'combo',
-        fieldLabel: 'Group Type',
+        fieldLabel: 'Format',
         itemCls: 'required-field',
         helpText: ht.contentClass,
         name: 'format',
@@ -354,7 +354,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
     deferredRender: false,
     columns: [
       {header: 'Group', dataIndex: 'name', width:175},
-      {header: 'Type', dataIndex: 'format', width:100},
+      {header: 'Format', dataIndex: 'format', width:60},
       {header: 'Repositories', dataIndex: 'sRepositories', width:300},
       {header: 'Group Path', dataIndex: 'contentUri', id: 'groups-config-url-col', width:300,renderer: function(s){return '<a href="' + s + ((s != null && (s.charAt(s.length)) == '/') ? '' : '/') +'" target="_blank">' + s + '</a>';},menuDisabled:true}
     ],
