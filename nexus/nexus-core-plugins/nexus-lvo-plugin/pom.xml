@@ -54,6 +54,29 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>lvo-config.xml</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+            <configuration>
+              <version>1.0.0</version>
+              <models>
+                <model>src/main/mdo/lvo-config.xml</model>
+              </models>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <packageWithVersion>false</packageWithVersion>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
