@@ -502,14 +502,16 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
     for ( var i = 0; i < records.length; i++ ) {
       var rec = records[i];
       var v = rec.data.roleHint;
-      menu.addMenuItem( {
-        text: v == 'default' ? 'Default Realm Users' : rec.data.description,
-        value: v,
-        checked: v == 'allConfigured',
-        handler: this.showUsers,
-        group: 'user-realm-selector',
-        scope: this
-      } );
+      if ( v != 'mappedExternal' ) {
+        menu.addMenuItem( {
+          text: v == 'default' ? 'Default Realm Users' : rec.data.description,
+          value: v,
+          checked: v == 'allConfigured',
+          handler: this.showUsers,
+          group: 'user-realm-selector',
+          scope: this
+        } );
+      }
     }
   }
 } );
@@ -954,6 +956,7 @@ Ext.extend( Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
     var roleBox = this.find( 'name', 'roles' )[0];
     roleBox.setValue( [] );
     roleBox.nexusRolesEmptyOnLoad = true;
+    roleBox.clearInvalid();
 
     this.form.doAction( 'sonatypeLoad', {
       url: this.uri + '/' + testField.getValue(),
