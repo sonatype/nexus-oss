@@ -15,7 +15,7 @@
       </tr>
       <tr>
         <td>
-          <a href="$request.resourceRef.parentRef">Parent Directory</a>
+          <a href="../">Parent Directory</a>
         </td>
       </tr>
         #foreach( $listItem in $listItems )
@@ -25,11 +25,11 @@
                 #set( $uriLength = $listItem.resourceURI.length() - 2 )
                 #set( $startIndex = $listItem.resourceURI.lastIndexOf( '/', $uriLength ) + 1 )
                 #set( $linkName = $listItem.resourceURI.substring( $startIndex ) )
-                <a href="$listItem.resourceURI">$linkName</a>
+                <a href="$linkName">$linkName</a>
               #else
                 #set( $startIndex = $listItem.resourceURI.lastIndexOf( '/' ) + 1 )
                 #set( $linkName = $listItem.resourceURI.substring( $startIndex ) )
-                <a href="$listItem.resourceURI">$linkName</a>
+                <a href="$linkName">$linkName</a>
               #end
             </td>
             <td>
@@ -37,7 +37,7 @@
             </td>
             <td align="right">
               #if( $listItem.sizeOnDisk == -1 )
-                -
+                &nbsp;
               #else
                 $listItem.sizeOnDisk
               #end
