@@ -30,6 +30,11 @@ public class ItemNotFoundException
         super( "Item not found on path " + path );
     }
 
+    public ItemNotFoundException( String path, Throwable cause )
+    {
+        super( "Item not found on path " + path, cause );
+    }
+
     public ItemNotFoundException( String path, String repo )
     {
         super( "Item not found on path " + path + " in repository " + repo );
