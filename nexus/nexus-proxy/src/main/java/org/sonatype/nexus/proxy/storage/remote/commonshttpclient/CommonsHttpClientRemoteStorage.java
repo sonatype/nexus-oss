@@ -494,6 +494,12 @@ public class CommonsHttpClientRemoteStorage
                     .getStatusText( HttpStatus.SC_UNAUTHORIZED ) );
             }
         }
+        catch (StorageException e)
+        {
+            method.releaseConnection();
+
+            throw e;
+        }
         catch ( HttpException ex )
         {
             method.releaseConnection();
