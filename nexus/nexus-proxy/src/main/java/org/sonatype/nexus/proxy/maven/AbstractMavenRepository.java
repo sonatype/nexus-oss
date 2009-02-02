@@ -554,7 +554,7 @@ public abstract class AbstractMavenRepository
         {
             String path = uid.getRepository().createUid( uid.getPath() + ".sha1" ).getPath();
 
-            hashItem = (DefaultStorageFileItem) getRemoteStorage().retrieveItem( this, context, getRemoteUrl(), path );
+            hashItem = doRetriveRemoteChecksumItem( context, path );
         }
         catch ( ItemNotFoundException sha1e )
         {
@@ -563,11 +563,7 @@ public abstract class AbstractMavenRepository
             {
                 String path = uid.getRepository().createUid( uid.getPath() + ".md5" ).getPath();
 
-                hashItem = (DefaultStorageFileItem) getRemoteStorage().retrieveItem(
-                    this,
-                    context,
-                    getRemoteUrl(),
-                    path );
+                hashItem = doRetriveRemoteChecksumItem( context, path );
             }
             catch ( ItemNotFoundException md5e )
             {
@@ -669,6 +665,29 @@ public abstract class AbstractMavenRepository
         }
         
         return contentValid;
+    }
+
+    /**
+     * Special implementation of doRetrieveRemoteItem that treats all exceptions
+     * as ItemNotFoundException. 
+     * 
+     * To be used form #doValidateRemoteItemContent only!
+     */
+    private DefaultStorageFileItem doRetriveRemoteChecksumItem( Map<String, Object> context, String path )
+        throws ItemNotFoundException
+    {
+        try
+        {
+            return (DefaultStorageFileItem) getRemoteStorage().retrieveItem( this, context, getRemoteUrl(), path );
+        }
+        catch ( RemoteAccessException e )
+        {
+            throw new ItemNotFoundException( path, e );
+        }
+        catch ( StorageException e )
+        {
+            throw new ItemNotFoundException( path, e );
+        }
     }
 
     private NexusArtifactEvent newChechsumFailureEvent( AbstractStorageItem item, String msg )
