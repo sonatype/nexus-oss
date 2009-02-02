@@ -71,18 +71,9 @@ public abstract class AbstractArtifactPlexusResource
      * @return
      */
     protected ArtifactStoreRequest getResourceStoreRequest( Request request, boolean localOnly, String repositoryId,
-        String repositoryGroupId, String g, String a, String v, String p, String c, String e )
+        String g, String a, String v, String p, String c, String e )
     {
-        ArtifactStoreRequest result = new ArtifactStoreRequest(
-            localOnly,
-            repositoryId,
-            repositoryGroupId,
-            g,
-            a,
-            v,
-            p,
-            c,
-            e );
+        ArtifactStoreRequest result = new ArtifactStoreRequest( localOnly, repositoryId, g, a, v, p, c, e );
 
         if ( getLogger().isDebugEnabled() )
         {
@@ -134,7 +125,6 @@ public abstract class AbstractArtifactPlexusResource
             request,
             false,
             repositoryId,
-            null,
             groupId,
             artifactId,
             version,
@@ -222,7 +212,6 @@ public abstract class AbstractArtifactPlexusResource
             request,
             false,
             repositoryId,
-            null,
             groupId,
             artifactId,
             version,
@@ -376,7 +365,6 @@ public abstract class AbstractArtifactPlexusResource
                                 request,
                                 true,
                                 repositoryId,
-                                null,
                                 "G",
                                 "A",
                                 "V",
@@ -418,7 +406,6 @@ public abstract class AbstractArtifactPlexusResource
                             request,
                             true,
                             repositoryId,
-                            null,
                             groupId,
                             artifactId,
                             version,

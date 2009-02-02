@@ -33,10 +33,10 @@ public class ArtifactStoreRequest
 
     private String extension;
 
-    public ArtifactStoreRequest( boolean localOnly, String repositoryId, String repositoryGroupId, String g, String a,
-        String v, String p, String c, String e )
+    public ArtifactStoreRequest( boolean localOnly, String repositoryId, String g, String a, String v, String p,
+        String c, String e )
     {
-        super( DUMMY_PATH, localOnly, repositoryId, repositoryGroupId );
+        super( DUMMY_PATH, localOnly, repositoryId );
 
         if ( StringUtils.isEmpty( g ) || StringUtils.isEmpty( a ) || StringUtils.isEmpty( v ) )
         {
@@ -79,12 +79,12 @@ public class ArtifactStoreRequest
 
     public ArtifactStoreRequest( String g, String a, String v, String p, String c )
     {
-        this( false, null, null, g, a, v, p, c, null );
+        this( false, null, g, a, v, p, c, null );
     }
 
     public ArtifactStoreRequest( String g, String a, String v )
     {
-        this( false, null, null, g, a, v, null, null, null );
+        this( false, null, g, a, v, null, null, null );
     }
 
     public String getGroupId()

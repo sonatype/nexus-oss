@@ -112,7 +112,6 @@ public class PomArtifactManager
         
         return new ArtifactStoreRequest( request.isRequestLocalOnly(), 
                                          request.getRequestRepositoryId(), 
-                                         request.getRequestRepositoryGroupId(), 
                                          request.getGroupId(),
                                          request.getArtifactId(),
                                          request.getVersion(),

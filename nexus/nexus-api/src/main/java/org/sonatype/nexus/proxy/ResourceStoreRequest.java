@@ -13,7 +13,9 @@
  */
 package org.sonatype.nexus.proxy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -38,18 +40,17 @@ public class ResourceStoreRequest
     /** Explicitly targets a repository (only if accessed over Routers!). */
     private String requestRepositoryId;
 
-    /** Explicitly targets a repository group (only if accessed over Routers!). */
-    private String requestRepositoryGroupId;
+    /** List with repository IDs that were taking part in processing of this request */
+    private List<String> processedRepositories;
 
     /** Used internally by Routers. */
     private Stack<String> pathStack;
 
-    public ResourceStoreRequest( String requestPath, boolean localOnly, String repositoryId, String repositoryGroupId )
+    public ResourceStoreRequest( String requestPath, boolean localOnly, String repositoryId )
     {
         super();
         this.requestPath = requestPath;
         this.requestRepositoryId = repositoryId;
-        this.requestRepositoryGroupId = repositoryGroupId;
         this.pathStack = new Stack<String>();
         this.requestContext = new HashMap<String, Object>();
         this.requestContext.put( CTX_LOCAL_ONLY_FLAG, localOnly );
@@ -62,7 +63,7 @@ public class ResourceStoreRequest
      */
     public ResourceStoreRequest( String requestPath, boolean localOnly )
     {
-        this( requestPath, localOnly, null, null );
+        this( requestPath, localOnly, null );
     }
 
     /**
@@ -72,7 +73,7 @@ public class ResourceStoreRequest
      */
     public ResourceStoreRequest( RepositoryItemUid uid, boolean localOnly )
     {
-        this( uid.getPath(), localOnly, uid.getRepository().getId(), null );
+        this( uid.getPath(), localOnly, uid.getRepository().getId() );
     }
 
     /**
@@ -178,23 +179,18 @@ public class ResourceStoreRequest
     }
 
     /**
-     * Gets the request repository group id.
+     * Returns the list of processed repositories.
      * 
-     * @return the request repository group id
+     * @return
      */
-    public String getRequestRepositoryGroupId()
+    public List<String> getProcessedRepositories()
     {
-        return requestRepositoryGroupId;
-    }
+        if ( processedRepositories == null )
+        {
+            processedRepositories = new ArrayList<String>();
+        }
 
-    /**
-     * Sets the request repository group id.
-     * 
-     * @param requestRepositoryGroupId the new request repository group id
-     */
-    public void setRequestRepositoryGroupId( String requestRepositoryGroupId )
-    {
-        this.requestRepositoryGroupId = requestRepositoryGroupId;
+        return processedRepositories;
     }
 
     /**
