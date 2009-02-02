@@ -7,7 +7,7 @@ public class ContextUtils
 {
     public static boolean collContains( Map<String, Object> context, String key, Object value )
     {
-        if ( context.containsKey( key ) )
+        if ( context != null && context.containsKey( key ) )
         {
             if ( context.get( key ) instanceof Collection )
             {
@@ -23,7 +23,7 @@ public class ContextUtils
     @SuppressWarnings( "unchecked" )
     public static boolean collAdd( Map<String, Object> context, String key, Object value )
     {
-        if ( context.containsKey( key ) )
+        if ( context != null && context.containsKey( key ) )
         {
             if ( context.get( key ) instanceof Collection )
             {
