@@ -13,10 +13,10 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -31,6 +31,9 @@ public class ResourceStoreRequest
     /** Context flag to mark a request local only. */
     public static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
 
+    /** Context key for set of processed repositories. */
+    public static final String CTX_PROCESSED_REPOSITORIES = "request.processedRepositories";
+
     /** The path we want to retrieve. */
     private String requestPath;
 
@@ -39,9 +42,6 @@ public class ResourceStoreRequest
 
     /** Explicitly targets a repository (only if accessed over Routers!). */
     private String requestRepositoryId;
-
-    /** List with repository IDs that were taking part in processing of this request */
-    private List<String> processedRepositories;
 
     /** Used internally by Routers. */
     private Stack<String> pathStack;
@@ -54,6 +54,7 @@ public class ResourceStoreRequest
         this.pathStack = new Stack<String>();
         this.requestContext = new HashMap<String, Object>();
         this.requestContext.put( CTX_LOCAL_ONLY_FLAG, localOnly );
+        this.requestContext.put( CTX_PROCESSED_REPOSITORIES, new HashSet<String>() );
     }
 
     /**
@@ -183,14 +184,10 @@ public class ResourceStoreRequest
      * 
      * @return
      */
-    public List<String> getProcessedRepositories()
+    @SuppressWarnings( "unchecked" )
+    public Set<String> getProcessedRepositories()
     {
-        if ( processedRepositories == null )
-        {
-            processedRepositories = new ArrayList<String>();
-        }
-
-        return processedRepositories;
+        return (Set<String>) getRequestContext().get( CTX_PROCESSED_REPOSITORIES );
     }
 
     /**

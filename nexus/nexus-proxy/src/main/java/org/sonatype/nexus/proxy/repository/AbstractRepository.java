@@ -66,6 +66,7 @@ import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskActivityDescriptor;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
+import org.sonatype.nexus.util.ContextUtils;
 
 /**
  * <p>
@@ -732,6 +733,8 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this );
         }
 
+        ContextUtils.collAdd( context, ResourceStoreRequest.CTX_PROCESSED_REPOSITORIES, this.getId() );
+
         maintainNotFoundCache( uid.getPath() );
 
         try
@@ -953,6 +956,8 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this );
         }
 
+        ContextUtils.collAdd( context, ResourceStoreRequest.CTX_PROCESSED_REPOSITORIES, this.getId() );
+
         maintainNotFoundCache( uid.getPath() );
 
         Collection<StorageItem> items = doListItems( uid, context );
@@ -1101,17 +1106,17 @@ public abstract class AbstractRepository
             getAccessManager().decide( request, repository, action );
         }
 
-        boolean result = true;
+        boolean shouldProcess = true;
 
         if ( getRequestProcessors().size() > 0 )
         {
             for ( RequestProcessor processor : getRequestProcessors() )
             {
-                result = result && processor.process( repository, request, action );
+                shouldProcess = shouldProcess && processor.process( repository, request, action );
             }
         }
 
-        return result;
+        return shouldProcess;
     }
 
     public boolean isCompatible( Repository repository )
