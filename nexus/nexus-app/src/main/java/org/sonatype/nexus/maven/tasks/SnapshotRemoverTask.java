@@ -103,11 +103,11 @@ public class SnapshotRemoverTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Removing snapshots from repository group with ID=" + getRepositoryGroupId();
+            return "Removing snapshots from repository group " + getRepositoryGroupName();
         }
         else if ( getRepositoryId() != null )
         {
-            return "Removing snapshots from repository with ID=" + getRepositoryId();
+            return "Removing snapshots from repository " + getRepositoryName();
         }
         else
         {

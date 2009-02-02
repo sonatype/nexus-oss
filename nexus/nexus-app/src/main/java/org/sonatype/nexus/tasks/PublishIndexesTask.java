@@ -68,11 +68,11 @@ public class PublishIndexesTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Publishing indexes for repository group with ID=" + getRepositoryGroupId();
+            return "Publishing indexes for repository group " + getRepositoryGroupName();
         }
         else if ( getRepositoryId() != null )
         {
-            return "Publishing indexes for repository with ID=" + getRepositoryId();
+            return "Publishing indexes for repository " + getRepositoryName();
         }
         else
         {

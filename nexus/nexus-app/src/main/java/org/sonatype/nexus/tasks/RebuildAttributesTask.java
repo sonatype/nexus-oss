@@ -27,7 +27,7 @@ import org.sonatype.scheduling.SchedulerTask;
 @Component( role = SchedulerTask.class, hint = RebuildAttributesTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class RebuildAttributesTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
-{    
+{
     public Object doRun()
         throws Exception
     {
@@ -56,16 +56,16 @@ public class RebuildAttributesTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Rebuilding attributes of repository group with ID=" + getRepositoryGroupId();
+            return "Rebuilding attributes of repository group " + getRepositoryGroupName();
         }
         else if ( getRepositoryId() != null )
         {
-            return "Rebuilding attributes of repository with ID=" + getRepositoryId();
+            return "Rebuilding attributes of repository " + getRepositoryName();
         }
         else
         {
             return "Rebuilding attributes of all registered repositories";
         }
     }
-    
+
 }

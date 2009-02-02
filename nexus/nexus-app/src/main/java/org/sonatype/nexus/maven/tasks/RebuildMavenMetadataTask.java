@@ -56,11 +56,13 @@ public class RebuildMavenMetadataTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Rebuilding maven metadata of repository group with ID=" + getRepositoryGroupId();
+            return "Rebuilding maven metadata of repository group " + getRepositoryGroupName() + " from path "
+                + getResourceStorePath() + " and below.";
         }
         else if ( getRepositoryId() != null )
         {
-            return "Rebuilding maven metadata of repository with ID=" + getRepositoryId();
+            return "Rebuilding maven metadata of repository " + getRepositoryName() + " from path "
+                + getResourceStorePath() + " and below.";
         }
         else
         {

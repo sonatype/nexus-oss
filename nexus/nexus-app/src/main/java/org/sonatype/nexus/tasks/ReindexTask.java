@@ -56,11 +56,11 @@ public class ReindexTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Reindexing repository group with ID=" + getRepositoryGroupId();
+            return "Reindexing repository group " + getRepositoryGroupName();
         }
         else if ( getRepositoryId() != null )
         {
-            return "Reindexing repository with ID=" + getRepositoryId();
+            return "Reindexing repository " + getRepositoryName();
         }
         else
         {

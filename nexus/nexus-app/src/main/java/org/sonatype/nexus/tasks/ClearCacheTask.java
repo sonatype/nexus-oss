@@ -56,13 +56,13 @@ public class ClearCacheTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Clearing caches for repository group with ID=" + getRepositoryGroupId() + " from path "
+            return "Clearing caches for repository group " + getRepositoryGroupName() + " from path "
                 + getResourceStorePath() + " and below.";
         }
         else if ( getRepositoryId() != null )
         {
-            return "Clearing caches for repository with ID=" + getRepositoryId() + " from path "
-                + getResourceStorePath() + " and below.";
+            return "Clearing caches for repository " + getRepositoryName() + " from path " + getResourceStorePath()
+                + " and below.";
         }
         else
         {

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -62,6 +63,34 @@ public abstract class AbstractNexusRepositoriesTask<T>
         return getIdFromPrefixedString( GROUP_PREFIX, getParameters().get( RepositoryOrGroupPropertyDescriptor.ID ) );
     }
 
+    public String getRepositoryGroupName()
+    {
+        try
+        {
+            return getNexus().readRepositoryGroup( getRepositoryGroupId() ).getName();
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            this.getLogger().warn( "Could not read repository group!", e );
+
+            return getRepositoryGroupId();
+        }
+    }
+
+    public String getRepositoryName()
+    {
+        try
+        {
+            return getNexus().readRepository( getRepositoryId() ).getName();
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            this.getLogger().warn( "Could not read repository!", e );
+
+            return getRepositoryId();
+        }
+    }
+    
     public void setRepositoryGroupId( String repositoryGroupId )
     {
         if ( !StringUtils.isEmpty( repositoryGroupId ) )
