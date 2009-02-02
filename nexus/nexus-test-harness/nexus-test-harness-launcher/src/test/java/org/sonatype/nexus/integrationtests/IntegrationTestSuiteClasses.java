@@ -72,6 +72,7 @@ import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousChangePassw
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousForgotPasswordTest;
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousForgotUserIdTest;
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousResetPasswordTest;
+import org.sonatype.nexus.integrationtests.nexus597.Nexus597ForgotUserNameSharedEmailTest;
 import org.sonatype.nexus.integrationtests.nexus598.Nexus598ClassnameSearchTest;
 import org.sonatype.nexus.integrationtests.nexus602.Nexus602SearchSnapshotArtifactTest;
 import org.sonatype.nexus.integrationtests.nexus606.Nexus606DownloadLogsAndConfigFilesTest;
@@ -200,7 +201,8 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1116.Nexus1116InvalidPr
     Nexus1239PlexusUserResourceTest.class,
     Nexus1239UserSearchTest.class,
     Nexus1286RoleListTest.class,
-    Nexus1375LogConfigTest.class
+    Nexus1375LogConfigTest.class,
+    Nexus597ForgotUserNameSharedEmailTest.class
 } )
 public class IntegrationTestSuiteClasses
 {

@@ -60,15 +60,10 @@ public class UserForgotIdPlexusResource
         throws ResourceException
     {
         String email = request.getAttributes().get( USER_EMAIL_KEY ).toString();
-        
-        if ( isAnonymousEmail( email ) )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Cannot recover the username for anonymous users" );
-        }
-        
+
         try
         {
-            getNexusSecurity().forgotUsername( email );
+            getNexusSecurity().forgotUsername( email, getNexus().getAnonymousUsername() );
 
             response.setStatus( Status.SUCCESS_ACCEPTED );
         }
@@ -81,24 +76,6 @@ public class UserForgotIdPlexusResource
         }
         // don't return anything because we are setting the status to 202
         return null;
-    }
-    
-    private boolean isAnonymousEmail( String email )
-    {
-        String anonymousEmail = "";
-
-        try
-        {
-            anonymousEmail = getNexusSecurity().readUser( getNexus().getAnonymousUsername() ).getEmail();
-        }
-        catch ( NoSuchUserException e )
-        {
-            getLogger().warn( "Could not read anonymous user with id '" + getNexus().getAnonymousUsername() + "'.", e );
-
-            return false;
-        }
-
-        return anonymousEmail.equals( email );
     }
 
 }

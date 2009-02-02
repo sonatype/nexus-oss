@@ -43,6 +43,8 @@ import org.sonatype.nexus.email.NexusEmailer;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 @Component( role = NexusSecurity.class )
 public class DefaultNexusSecurity
     extends AbstractLogEnabled
@@ -372,13 +374,18 @@ public class DefaultNexusSecurity
         resetPassword( userId );
     }
 
-    public void forgotUsername( String email )
+    public void forgotUsername( String email, String... ignoredUserIds )
         throws NoSuchEmailException
     {
         List<String> userIds = new ArrayList<String>();
 
         for ( SecurityUser user : listUsers() )
         {
+            if ( Arrays.asList( ignoredUserIds ).contains( user.getId() ) )
+            {
+                continue;
+            }
+
             if ( user.getEmail().equals( email ) )
             {
                 userIds.add( user.getId() );

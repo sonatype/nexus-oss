@@ -25,7 +25,7 @@ public interface NexusSecurity
         throws NoSuchUserException,
             NoSuchEmailException;
 
-    void forgotUsername( String email )
+    void forgotUsername( String email, String... ignoredUserIds )
         throws NoSuchEmailException;
 
     void resetPassword( String userId )
