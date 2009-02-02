@@ -15,8 +15,8 @@ package org.sonatype.nexus.jsecurity;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -42,8 +42,6 @@ import org.sonatype.nexus.configuration.security.source.SecurityConfigurationSou
 import org.sonatype.nexus.email.NexusEmailer;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 @Component( role = NexusSecurity.class )
 public class DefaultNexusSecurity
