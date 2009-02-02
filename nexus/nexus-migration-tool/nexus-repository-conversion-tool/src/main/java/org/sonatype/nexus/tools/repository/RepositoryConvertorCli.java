@@ -117,7 +117,7 @@ public class RepositoryConvertorCli
 
         if ( !repository.exists() || !repository.canRead() || !repository.isDirectory() )
         {
-            System.err.printf( "Invalid options. Repository '" + repository.getCanonicalPath()
+            System.err.println( "Invalid options.  Repository '" + repository.getCanonicalPath()
                 + "' (the repository directory) must exists and be readable!" );
 
             return;
@@ -125,10 +125,21 @@ public class RepositoryConvertorCli
 
         File output = new File( cli.getOptionValue( OUTPUT ) );
 
-        if ( !output.exists() || !output.canWrite() || !output.isDirectory() )
+        if ( !output.exists() )
         {
-            System.err.printf( "Invalid options. Output '" + output.getCanonicalPath()
-                + "' (where the output repositories locate) must exists and be writale!" );
+            if ( !output.mkdirs() )
+            {
+                System.err.println( "Invalid options.  Output '" + output.getCanonicalPath()
+                    + "' (where the output repositories locate) does not exist and can not be created!" );
+                
+                return;
+            }
+        }
+        
+        if ( !output.canWrite() || !output.isDirectory() )
+        {
+            System.err.println( "Invalid options.  Output '" + output.getCanonicalPath()
+                + "' (where the output repositories locate) must be readable and writale!" );
 
             return;
         }
