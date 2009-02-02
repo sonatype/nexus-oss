@@ -1017,6 +1017,16 @@ public class DefaultIndexerManager
 
             return result;
         }
+        catch ( BooleanQuery.TooManyClauses e )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Too many clauses exception caught:", e );
+            }
+            
+            // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+            return new FlatSearchResponse( req.getQuery(), -1, new HashSet<ArtifactInfo>() );
+        }
         catch ( IOException e )
         {
             getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
@@ -1077,6 +1087,16 @@ public class DefaultIndexerManager
             postprocessResults( result.getResults() );
 
             return result;
+        }
+        catch ( BooleanQuery.TooManyClauses e )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Too many clauses exception caught:", e );
+            }
+            
+            // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+            return new FlatSearchResponse( req.getQuery(), -1, new HashSet<ArtifactInfo>() );
         }
         catch ( IOException e )
         {
@@ -1161,6 +1181,16 @@ public class DefaultIndexerManager
             postprocessResults( result.getResults() );
 
             return result;
+        }
+        catch ( BooleanQuery.TooManyClauses e )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Too many clauses exception caught:", e );
+            }
+            
+            // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+            return new FlatSearchResponse( req.getQuery(), -1, new HashSet<ArtifactInfo>() );
         }
         catch ( IOException e )
         {

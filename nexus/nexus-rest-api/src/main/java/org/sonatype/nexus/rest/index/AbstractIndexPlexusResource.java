@@ -154,6 +154,8 @@ public abstract class AbstractIndexPlexusResource
         if ( searchResult != null )
         {
             // non-identify search happened
+            result.setTooManyResults( searchResult.getTotalHits() == -1 );
+
             result.setTotalCount( searchResult.getTotalHits() );
 
             result.setFrom( from == null ? -1 : from.intValue() );

@@ -2289,6 +2289,12 @@
           <required>true</required>
         </field>
         <field>
+          <name>tooManyResults</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+        </field>
+        <field>
           <name>data</name>
           <version>1.0.0+</version>
           <association>
