@@ -73,7 +73,7 @@ public class Log4jLogConfiguration
 
         try
         {
-            config.store( outputStream, "Automatically created by Nexus" );
+            config.store( outputStream, null );
         }
         finally
         {
