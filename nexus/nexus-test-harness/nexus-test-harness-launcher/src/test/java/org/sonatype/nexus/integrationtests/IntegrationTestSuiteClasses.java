@@ -24,6 +24,12 @@ import org.sonatype.nexus.integrationtests.nexus1197.Nexus1197CheckUserAgentTest
 import org.sonatype.nexus.integrationtests.nexus1239.Nexus1239PlexusUserResourceTest;
 import org.sonatype.nexus.integrationtests.nexus1239.Nexus1239UserSearchTest;
 import org.sonatype.nexus.integrationtests.nexus1286.Nexus1286RoleListTest;
+import org.sonatype.nexus.integrationtests.nexus1329.Nexus1329ChecksumTest;
+import org.sonatype.nexus.integrationtests.nexus1329.Nexus1329MirrorFailAndRetriesTest;
+import org.sonatype.nexus.integrationtests.nexus1329.Nexus1329MirrorFailNoRetiesTest;
+import org.sonatype.nexus.integrationtests.nexus1329.Nexus1329MirrorOnlyTest;
+import org.sonatype.nexus.integrationtests.nexus1329.Nexus1329RetryMirrorTest;
+import org.sonatype.nexus.integrationtests.nexus1329.Nexus1329UnavailableTest;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetValidationTests;
@@ -72,7 +78,6 @@ import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousChangePassw
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousForgotPasswordTest;
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousForgotUserIdTest;
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousResetPasswordTest;
-import org.sonatype.nexus.integrationtests.nexus597.Nexus597ForgotUserNameSharedEmailTest;
 import org.sonatype.nexus.integrationtests.nexus598.Nexus598ClassnameSearchTest;
 import org.sonatype.nexus.integrationtests.nexus602.Nexus602SearchSnapshotArtifactTest;
 import org.sonatype.nexus.integrationtests.nexus606.Nexus606DownloadLogsAndConfigFilesTest;
@@ -202,7 +207,12 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1116.Nexus1116InvalidPr
     Nexus1239UserSearchTest.class,
     Nexus1286RoleListTest.class,
     Nexus1375LogConfigTest.class,
-    Nexus597ForgotUserNameSharedEmailTest.class
+    Nexus1329ChecksumTest.class,
+    Nexus1329MirrorFailAndRetriesTest.class,
+    Nexus1329MirrorFailNoRetiesTest.class,
+    Nexus1329MirrorOnlyTest.class,
+    Nexus1329RetryMirrorTest.class,
+    Nexus1329UnavailableTest.class
 } )
 public class IntegrationTestSuiteClasses
 {
