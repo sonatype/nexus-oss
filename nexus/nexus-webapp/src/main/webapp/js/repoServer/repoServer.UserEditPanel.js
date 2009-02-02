@@ -52,6 +52,14 @@ Sonatype.repoServer.UserEditPanel = function( config ) {
           value: 'all',
           group: 'user-realm-selector',
           scope: this
+        },
+        {
+          text: 'All Authorized Users',
+          checked: false,
+          handler: this.showUsers,
+          value: 'effectiveUsers',
+          group: 'user-realm-selector',
+          scope: this
         }
       ]
     }
@@ -372,11 +380,19 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
   calculateSearchUrl: function( panel ) {
     var v = panel.searchField.getValue();
     var prefix = '/' + panel.displaySelector.value; 
+    var suffix = '';
+    
+    // this is somewhat ugly, since effectiveUsers is a flag, not a locator
+    if ( panel.displaySelector.value == 'effectiveUsers' ) {
+      prefix = '/all';
+      suffix = '?effectiveUsers=true';
+    }
+
     if ( v.length > 0 ) {
-      panel.lastUrl = Sonatype.config.repos.urls.searchUsers + prefix + '/' + panel.searchField.getValue();
+      panel.lastUrl = Sonatype.config.repos.urls.searchUsers + prefix + '/' + panel.searchField.getValue() + suffix;
     }
     else {
-      panel.lastUrl = Sonatype.config.repos.urls.plexusUsers + prefix;
+      panel.lastUrl = Sonatype.config.repos.urls.plexusUsers + prefix + suffix;
     }
   },
   
