@@ -191,14 +191,7 @@ Sonatype.ext.TwinPanelChooser = function( config ){
         listeners: {
           'append' : {
             fn: function(tree, parentNode, insertedNode, i) {
-              if (tree.invalid) {
-                //remove error messaging
-                tree.getEl().child('.x-panel-body').setStyle({
-                  'background-color' : '#FFFFFF',
-                  border : '1px solid #B5B8C8'
-                });
-                Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
-              }
+              this.clearInvalid();
             },
             scope: this
           },
@@ -207,13 +200,8 @@ Sonatype.ext.TwinPanelChooser = function( config ){
               if(tree.root.childNodes.length < 1 && this.required) {
                 this.markTreeInvalid(tree,null);
               }
-              else if (tree.invalid) {
-                //remove error messaging
-                tree.getEl().child('.x-panel-body').setStyle({
-                  'background-color' : '#FFFFFF',
-                  border : '1px solid #B5B8C8'
-                });
-                Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
+              else {
+                this.clearInvalid();
               }
             },
             scope: this
@@ -289,6 +277,18 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
       this.store.each( function( rec ) {
         this.createNode( root, rec );
       }, this );
+    }
+  },
+  
+  clearInvalid: function() {
+    var tree = this.getComponent( 0 );
+    if (tree.invalid) {
+      //remove error messaging
+      tree.getEl().child('.x-panel-body').setStyle( {
+        'background-color' : '#FFFFFF',
+        border : '1px solid #B5B8C8'
+      } );
+      Ext.form.Field.msgFx['normal'].hide( tree.errorEl, tree );
     }
   },
   
