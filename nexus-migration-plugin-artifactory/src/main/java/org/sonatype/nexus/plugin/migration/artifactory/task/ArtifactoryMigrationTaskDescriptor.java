@@ -30,4 +30,12 @@ public class ArtifactoryMigrationTaskDescriptor
         return new ArrayList<ScheduledTaskPropertyDescriptor>();
     }
 
+    @Override
+    public boolean isExposed()
+    {
+        return false;
+    }
+
+    
+    
 }

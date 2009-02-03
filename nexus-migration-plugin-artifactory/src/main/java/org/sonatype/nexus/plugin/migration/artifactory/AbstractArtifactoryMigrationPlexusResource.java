@@ -62,7 +62,7 @@ public abstract class AbstractArtifactoryMigrationPlexusResource
 
         xstream.registerLocalConverter( MigrationSummaryDTO.class, "groupsResolution", new AliasingListConverter(
             GroupResolutionDTO.class,
-            "groupResolution" ) );
+            "groupResolution" ) );        
     }
 
     protected File validateBackupFileLocation( String fileLocation )

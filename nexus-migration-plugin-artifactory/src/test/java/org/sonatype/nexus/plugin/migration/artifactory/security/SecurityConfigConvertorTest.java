@@ -25,6 +25,7 @@ import org.sonatype.jsecurity.realms.tools.dao.SecurityProperty;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
+import org.sonatype.nexus.plugin.migration.artifactory.MigrationResult;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
 
@@ -95,7 +96,7 @@ public class SecurityConfigConvertorTest
         groupAcl.addPermission( ArtifactoryPermission.READER );
         config.addAcl( groupAcl );
 
-        configConvertor = new SecurityConfigConvertor( config, new FakeReceiver(), new FakeMappingConfiguration() );
+        configConvertor = new SecurityConfigConvertor( config, new FakeReceiver(), new FakeMappingConfiguration(), new MockMigrationResults() );
     }
 
     @Test
@@ -306,6 +307,47 @@ public class SecurityConfigConvertorTest
             // nothing
         }
 
+    }
+    
+    class MockMigrationResults implements MigrationResult
+    {
+
+        public void addErrorMessage( String errorMessage )
+        {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void addWarningMessage( String warningMessage )
+        {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void clear()
+        {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public List<String> getErrorMessages()
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public List<String> getWarningMessages()
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public void mergeResult( MigrationResult migrationResult )
+        {
+            // TODO Auto-generated method stub
+            
+        }
+        
     }
 
 }

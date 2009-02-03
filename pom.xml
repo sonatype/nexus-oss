@@ -23,6 +23,8 @@
 	<properties>
 		<nexus.version>1.3.0-SNAPSHOT</nexus.version>
         <plexus.version>1.0-beta-3.0.5-SNAPSHOT</plexus.version>
+        <commons-collections.version>3.2</commons-collections.version>
+        <modello-maven-plugin.version>1.0-alpha-21</modello-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>

@@ -37,13 +37,17 @@ public class ArtifactoryMigrationPlexusResource
     @Requirement
     private Nexus nexus;
     
-    @Requirement
-    private ArtifactoryMigrator artifactoryMigrator;
 
     public ArtifactoryMigrationPlexusResource()
     {
         this.setReadable( false );
         this.setModifiable( true );
+    }
+    
+    @Override
+    public Object getPayloadInstance()
+    {
+        return new MigrationSummaryRequestDTO();
     }
 
     @Override
@@ -66,10 +70,7 @@ public class ArtifactoryMigrationPlexusResource
 
         // need to resolve that on posts
        this.validateBackupFileLocation( migrationSummary.getBackupLocation() );
-       
-//       // do the migration
-//       this.artifactoryMigrator.migrate( migrationSummary );
-       
+              
        // lookup task and run it
        ArtifactoryMigrationTask migrationTask = this.nexus.createTaskInstance( ArtifactoryMigrationTask.class );
        migrationTask.setMigrationSummary( migrationSummary );
@@ -77,13 +78,6 @@ public class ArtifactoryMigrationPlexusResource
        
        return null;
         
-    }
-
-
-    @Override
-    public Object getPayloadInstance()
-    {
-        return new MigrationSummaryRequestDTO();
     }
 
 

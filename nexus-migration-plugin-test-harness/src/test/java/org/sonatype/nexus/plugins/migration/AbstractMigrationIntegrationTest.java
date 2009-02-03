@@ -140,7 +140,7 @@ public class AbstractMigrationIntegrationTest
     {
         List<NexusArtifact> artifacts = searchUtil.searchFor( groupId, artifactId, version );
         Assert.assertEquals( "Expected to found only one artifact (" + artifactId + ") instead of " + artifacts.size()
-            + "\n" + artifacts, 1, artifacts.size() );
+            + "\n" + this.getXMLXStream().toXML( artifacts ), 1, artifacts.size() );
     }
 
     protected void checkGroup( String groupId )

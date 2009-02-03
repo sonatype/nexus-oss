@@ -372,6 +372,16 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
         scope: this
       },
       {
+        xtype: 'button',
+        text: 'Show Log',
+        id: 'artifactory-view-log-button',
+        columnWidth: .1,
+        handler: this.showMigrationLog,
+        scope: this,
+        disabled: false,
+        setSize: function() {}
+      },
+      {
         text: 'Cancel',
         handler: this.cancelImport,
         scope: this
@@ -419,6 +429,18 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
       scope : this
     } );
   },
+
+  showMigrationLog: function() {
+
+//	  FIXME, tabe title is duplicated here
+	  var panel = Sonatype.view.mainTabPanel.addOrShowTab(
+              'st-nexus-search-panel', Sonatype.repoServer.LogsViewPanel, { title: 'Logs and Config Files' } );
+	  
+	  // FIXME: Add check to see if log exists
+	  panel.showLog('migration.log');
+
+  },
+  
 
   loadImportData: function( data ) {
     this.importData = data;

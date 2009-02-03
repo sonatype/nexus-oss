@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<nexusConfiguration>
+<nexusConfiguration>nexusConfiguration>
   <version>1.0.8</version>
   <applicationLogDirectory>${project.build.directory}/logs/</applicationLogDirectory>
 
@@ -21,8 +21,7 @@
     <anonymousPassword>anonymous</anonymousPassword>
     <realms>
       <realm>XmlAuthenticatingRealm</realm>
-      <realm>NexusMethodAuthorizingRealm</realm>
-      <realm>NexusTargetAuthorizingRealm</realm>
+      <realm>XmlAuthorizingRealm</realm>
     </realms>
   </security>
   <globalConnectionSettings />

@@ -309,7 +309,7 @@ public class ArtifactoryFileLocationPlexusResource
             resolution.setAdmin( user.isAdmin() );
 
             resolution.setEmail( user.getEmail() );
-
+            
             resolutions.add( resolution );
         }
 

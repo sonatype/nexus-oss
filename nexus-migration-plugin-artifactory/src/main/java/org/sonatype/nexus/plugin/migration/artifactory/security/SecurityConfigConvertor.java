@@ -17,13 +17,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityProperty;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
+import org.sonatype.nexus.plugin.migration.artifactory.DefaultMigrationResult;
+import org.sonatype.nexus.plugin.migration.artifactory.MigrationResult;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
 
@@ -37,6 +40,9 @@ public class SecurityConfigConvertor
     private boolean resolvePermission = true;
 
     private List<SecurityUser> users = new ArrayList<SecurityUser>();
+    
+    // TODO: fix logger
+    private Logger logger = Logger.getLogger( this.getClass() );
 
     /**
      * Mapping between the target id and target suite
@@ -48,14 +54,18 @@ public class SecurityConfigConvertor
      */
     private MappingConfiguration mappingConfiguration;
 
+    private MigrationResult migrationResult;
+    
     public SecurityConfigConvertor( ArtifactorySecurityConfig config, SecurityConfigReceiver persistor,
-        MappingConfiguration mappingConfiguration )
+        MappingConfiguration mappingConfiguration, MigrationResult migrationResult )
     {
         this.config = config;
 
         this.receiver = persistor;
 
         this.mappingConfiguration = mappingConfiguration;
+        
+        this.migrationResult = migrationResult;
     }
 
     public boolean isResolvePermission()
@@ -73,14 +83,32 @@ public class SecurityConfigConvertor
         return users;
     }
 
-    public void convert()
-        throws ArtifactoryMigrationException
+    public MigrationResult convert()
     {
-        buildTargetSuites();
+        this.logger.info( "Starging Artifactory Security Migration." );
+        try
+        {
+            this.buildTargetSuites();
+        }
+        catch ( ArtifactoryMigrationException e )
+        {
+            this.logger.error( "Failed to import Target Suites.", e );
+            this.migrationResult.addErrorMessage( "Failed to import Target Suites: "+ e.getMessage() );
+        }
 
-        buildGroupRoles();
+        try
+        {
+            this.buildGroupRoles();
+        }
+        catch ( ArtifactoryMigrationException e )
+        {
+            this.logger.error( "Failed to import Group Roles.", e );
+            this.migrationResult.addErrorMessage( "Failed to import Group Roles: "+ e.getMessage() );
+        }
 
-        buildSecurityUsers();
+        this.buildSecurityUsers();
+
+        return this.migrationResult;
 
     }
 
@@ -306,35 +334,51 @@ public class SecurityConfigConvertor
     }
 
     private void buildSecurityUsers()
-        throws ArtifactoryMigrationException
     {
         for ( ArtifactoryUser artifactoryUser : config.getUsers() )
         {
-            SecurityUser user = buildSecurityUser( artifactoryUser );
-
-            if ( artifactoryUser.isAdmin() )
+            if ( StringUtils.isEmpty( artifactoryUser.getPassword() ) )
             {
-                user.addRole( "admin" );
+                // assuming that the user is from a external realm (LDAP)
+                this.migrationResult.addWarningMessage( "Failed to add user: '" + artifactoryUser.getUsername() + "'.  User was missing a password. Usually this means the user is from an external Realm, e.g., LDAP." );
             }
             else
             {
-                buildUserAclRole( user );
-            }
 
-            // add group roles
-            for ( ArtifactoryGroup group : artifactoryUser.getGroups() )
-            {
-                user.addRole( group.getName() );
-            }
+                SecurityUser user = buildSecurityUser( artifactoryUser );
 
-            // nexus doesn't allow a user has no role assigned
-            if ( user.getRoles().isEmpty() )
-            {
-                user.addRole( "anonymous" );
-            }
-            receiver.receiveSecurityUser( user );
+                if ( artifactoryUser.isAdmin() )
+                {
+                    user.addRole( "admin" );
+                }
+                else
+                {
+                    buildUserAclRole( user );
+                }
 
-            users.add( user );
+                // add group roles
+                for ( ArtifactoryGroup group : artifactoryUser.getGroups() )
+                {
+                    user.addRole( group.getName() );
+                }
+
+                // nexus doesn't allow a user has no role assigned
+                if ( user.getRoles().isEmpty() )
+                {
+                    user.addRole( "anonymous" );
+                }
+                // save the user
+                try
+                {
+                    receiver.receiveSecurityUser( user );
+                }
+                catch ( ArtifactoryMigrationException e )
+                {
+                    this.migrationResult.addErrorMessage( "Failed to add user: '" + user.getId() + "'." );
+                }
+
+                users.add( user );
+            }
         }
     }
 
@@ -343,8 +387,8 @@ public class SecurityConfigConvertor
         SecurityUser securityUser = new SecurityUser();
 
         securityUser.setId( artifactoryUser.getUsername() );
-        
-        securityUser.setPassword( artifactoryUser.getPassword());
+
+        securityUser.setPassword( artifactoryUser.getPassword() );
 
         securityUser.setName( artifactoryUser.getUsername() );
 
