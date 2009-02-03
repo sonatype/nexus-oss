@@ -10,12 +10,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.wagon.ConnectionException;
@@ -32,6 +35,10 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.index.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.context.NexusAnalyzer;
+import org.sonatype.nexus.index.context.NexusIndexWriter;
+import org.sonatype.nexus.index.creator.IndexCreator;
+import org.sonatype.nexus.index.updater.IndexDataReader.IndexDataReadResult;
 
 /**
  * @author Jason van Zyl
@@ -164,16 +171,16 @@ public class DefaultIndexUpdater
             {
                 is = new BufferedInputStream( new FileInputStream( indexArchive ) );
 
-
                 if ( remoteIndexFile.endsWith( ".gz" ) )
                 {
-                    timestamp = IndexUtils.unpackIndexData( is, directory, //
+                    timestamp = DefaultIndexUpdater.unpackIndexData( is, directory, //
                         updateRequest.getIndexingContext().getIndexCreators() );
                 }
                 else
                 {
                     // legacy transfer format
-                    timestamp = IndexUtils.unpackIndexArchive( is, directory );
+                    timestamp = IndexUtils.unpackIndexArchive( is, directory, //
+                        updateRequest.getIndexingContext().getIndexCreators() );
                 }
             }
 
@@ -297,6 +304,32 @@ public class DefaultIndexUpdater
             }
         }
         return null;
+    }
+
+    /**
+     * Unpack index data using specified Lucene Index writer
+     * 
+     * @param is an input stream to unpack index data from
+     * @param w a writer to save index data
+     * @param ics a collection of index creators for updating unpacked documents.
+     */
+    public static Date unpackIndexData( InputStream is, Directory d, Collection<? extends IndexCreator> ics )
+        throws IOException
+    {
+        NexusIndexWriter w = new NexusIndexWriter( d, new NexusAnalyzer(), true );
+    
+        try
+        {
+            IndexDataReader dr = new IndexDataReader( is );
+            
+            IndexDataReadResult result = dr.readIndex( w, ics );
+            
+            return result.getTimestamp();
+        }
+        finally
+        {
+            IndexUtils.close( w );
+        }
     }
 
     /**

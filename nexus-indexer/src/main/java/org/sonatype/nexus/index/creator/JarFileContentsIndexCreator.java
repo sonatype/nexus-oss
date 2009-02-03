@@ -57,7 +57,21 @@ public class JarFileContentsIndexCreator
 
         if ( names != null )
         {
-            artifactInfo.classNames = names;
+            if( names.length() == 0 || names.charAt( 0 ) == '/' )
+            {
+                artifactInfo.classNames = names;
+            }
+            else
+            {
+                // conversion from the old format
+                String[] lines = names.split( "\\n" );
+                StringBuilder sb = new StringBuilder();
+                for ( String line : lines )
+                {
+                    sb.append( '/' ).append( line ).append( '\n' );
+                }
+                artifactInfo.classNames = sb.toString();
+            }
 
             return true;
         }
@@ -89,14 +103,21 @@ public class JarFileContentsIndexCreator
                     // TODO verify if class is public or protected
                     // TODO skip all inner classes for now
 
-                    int i = name.lastIndexOf( "$" );
+                    int i = name.indexOf( "$" );
 
                     if ( i == -1 )
                     {
-                        sb.append( name.substring( 0, name.length() - 6 ) ).append( "\n" );
+                        if( name.charAt( 0 ) != '/' )
+                        {
+                            sb.append( '/' );
+                        }
+                        
+                        // class name without ".class"
+                        sb.append( name.substring( 0, name.length() - 6 ) ).append( '\n' );
                     }
                 }
-                else if ( "META-INF/archetype.xml".equals( name ) || "META-INF/maven/archetype.xml".equals( name )
+                else if ( "META-INF/archetype.xml".equals( name ) //
+                    || "META-INF/maven/archetype.xml".equals( name ) //
                     || "META-INF/maven/archetype-metadata.xml".equals( name ) )
                 {
                     ai.packaging = "maven-archetype";

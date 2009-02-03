@@ -22,11 +22,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.IndexWriter;
-import org.sonatype.nexus.index.ArtifactContext;
-import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexUtils;
-import org.sonatype.nexus.index.context.ArtifactIndexingContext;
-import org.sonatype.nexus.index.context.DefaultArtifactIndexingContext;
 import org.sonatype.nexus.index.creator.IndexCreator;
 
 /**
@@ -62,18 +58,7 @@ public class IndexDataReader
         Document doc;
         while ( ( doc = readDocument() ) != null )
         {
-            ArtifactInfo ai = IndexUtils.constructArtifactInfo( doc, ics );
-            
-            if( ai != null )
-            {
-                ArtifactContext ac = new ArtifactContext( null, null, null, ai, ai.calculateGav() );
-                ArtifactIndexingContext aic = new DefaultArtifactIndexingContext( ac );
-    
-                for ( IndexCreator ic : ics )
-                {
-                    ic.updateDocument( aic, doc );
-                }
-            }
+            IndexUtils.updateDocument( doc, ics );
             
             w.addDocument( doc );
             

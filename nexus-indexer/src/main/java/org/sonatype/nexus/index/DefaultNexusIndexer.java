@@ -19,7 +19,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -44,7 +46,7 @@ public class DefaultNexusIndexer
     extends AbstractLogEnabled
     implements NexusIndexer
 {
-    private static final char[] DIGITS = "0123456789ABCDEF".toCharArray();
+    private static final char[] DIGITS = "0123456789abcdef".toCharArray();
 
     /** @plexus.requirement */
     private Scanner scanner;
@@ -616,7 +618,7 @@ public class DefaultNexusIndexer
     public ArtifactInfo identify( String field, String query )
         throws IOException
     {
-        return identify( constructQuery( field, query ) );
+        return identify( new TermQuery( new Term( field, query ) ) );
     }
 
     public ArtifactInfo identify( Query query )

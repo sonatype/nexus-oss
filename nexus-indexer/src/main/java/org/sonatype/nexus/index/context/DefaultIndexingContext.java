@@ -210,6 +210,7 @@ public class DefaultIndexingContext
         {
             // forcefully "reclaiming" the ownership of the index as ours
             storeDescriptor();
+            return;
         }
 
         Hits hits = getIndexSearcher().search( new TermQuery( DESCRIPTOR_TERM ) );
@@ -224,6 +225,7 @@ public class DefaultIndexingContext
         if ( hits.length() != 1 )
         {
             storeDescriptor();
+            return;
         }
 
         String[] h = StringUtils.split( descriptor.get( FLD_IDXINFO ), AbstractIndexCreator.FS );
@@ -233,14 +235,13 @@ public class DefaultIndexingContext
         // // compare version
         // if ( !VERSION.equals( version ) )
         // {
-        // throw new UnsupportedExistingLuceneIndexException( "The existing index has version [" + version
-        // + "] and not [" + VERSION + "] version!" );
+        //     throw new UnsupportedExistingLuceneIndexException( 
+        //         "The existing index has version [" + version + "] and not [" + VERSION + "] version!" );
         // }
 
         if ( getRepositoryId() == null )
         {
             repositoryId = repoId;
-
         }
         else if ( !getRepositoryId().equals( repoId ) )
         {

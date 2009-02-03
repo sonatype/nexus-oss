@@ -9,6 +9,7 @@ package org.sonatype.nexus.index;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -137,10 +138,6 @@ public abstract class AbstractRepoNexusIndexerTest
     public void testSearchGroupedProblematicNames()
         throws Exception
     {
-
-        // ----------------------------------------------------------------------------
-        // Artifacts with "problematic" names
-        // ----------------------------------------------------------------------------
         {
             // "-" in the name
             Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-logg*" );
@@ -151,7 +148,7 @@ public abstract class AbstractRepoNexusIndexerTest
             
             Map<String, ArtifactInfoGroup> r = response.getResults(); 
     
-            assertEquals( 1, r.size() );
+            assertEquals( r.toString(), 1, r.size() );
     
             ArtifactInfoGroup ig = r.values().iterator().next();
     
@@ -161,6 +158,142 @@ public abstract class AbstractRepoNexusIndexerTest
         }
 
         {
+            // "-" in the name
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "*logging" );
+            
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            
+            assertEquals( r.toString(), 1, r.size() );
+            
+            ArtifactInfoGroup ig = r.values().iterator().next();
+            
+            assertEquals( "commons-logging : commons-logging", ig.getGroupKey() );
+            
+            assertEquals( ig.getArtifactInfos().toString(), 13, ig.getArtifactInfos().size() );
+        }
+        
+        {
+            // "-" in the name
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "*-logging" );
+            
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            
+            assertEquals( r.toString(), 1, r.size() );
+            
+            ArtifactInfoGroup ig = r.values().iterator().next();
+            
+            assertEquals( "commons-logging : commons-logging", ig.getGroupKey() );
+            
+            assertEquals( ig.getArtifactInfos().toString(), 13, ig.getArtifactInfos().size() );
+        }
+        
+        {
+            // "-" in the name
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "comm*-logg*" );
+            
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            
+            assertEquals( r.toString(), 1, r.size() );
+            
+            ArtifactInfoGroup ig = r.values().iterator().next();
+            
+            assertEquals( "commons-logging : commons-logging", ig.getGroupKey() );
+            
+            assertEquals( ig.getArtifactInfos().toString(), 13, ig.getArtifactInfos().size() );
+        }
+        
+        {
+            // "-" in the name
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "*mmons-log*" );
+            
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            
+            assertEquals( r.toString(), 1, r.size() );
+            
+            ArtifactInfoGroup ig = r.values().iterator().next();
+            
+            assertEquals( "commons-logging : commons-logging", ig.getGroupKey() );
+            
+            assertEquals( ig.getArtifactInfos().toString(), 13, ig.getArtifactInfos().size() );
+        }
+        
+        {
+            // "-" in the name
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-" );
+            
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            
+            assertEquals( r.toString(), 2, r.size() );
+            
+            Iterator<ArtifactInfoGroup> it = r.values().iterator();
+            
+            ArtifactInfoGroup ig1 = it.next();
+            assertEquals( "commons-cli : commons-cli", ig1.getGroupKey() );
+            assertEquals( ig1.getArtifactInfos().toString(), 2, ig1.getArtifactInfos().size() );
+            
+            ArtifactInfoGroup ig2 = it.next();
+            assertEquals( "commons-logging : commons-logging", ig2.getGroupKey() );
+            assertEquals( ig2.getArtifactInfos().toString(), 13, ig2.getArtifactInfos().size() );
+        }
+        
+        {
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "logging-commons" );
+            
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            
+            assertEquals( r.toString(), 0, r.size() );
+        }
+        
+        {
+            // numbers and "-" in the name
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "*slf4*" );
+            
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults();
+            
+            assertEquals( r.toString(), 3, r.size() );
+            
+            Iterator<ArtifactInfoGroup> it = r.values().iterator();
+            
+            ArtifactInfoGroup ig1 = it.next();
+            assertEquals( ig1.getArtifactInfos().toString(), 2, ig1.getArtifactInfos().size() );
+            assertEquals( "org.slf4j : jcl104-over-slf4j", ig1.getGroupKey() );
+            
+            ArtifactInfoGroup ig2 = it.next();
+            assertEquals( ig2.getArtifactInfos().toString(), 4, ig2.getArtifactInfos().size() );
+            assertEquals( "org.slf4j : slf4j-api", ig2.getGroupKey() );
+            
+            ArtifactInfoGroup ig3 = it.next();
+            assertEquals( ig3.getArtifactInfos().toString(), 4, ig3.getArtifactInfos().size() );
+            assertEquals( "org.slf4j : slf4j-log4j12", ig3.getGroupKey() );
+        }
+        {
             // numbers and "-" in the name
             Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "jcl104-over-slf4*" );
     
@@ -169,7 +302,7 @@ public abstract class AbstractRepoNexusIndexerTest
             GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
             Map<String, ArtifactInfoGroup> r = response.getResults();
     
-            assertEquals( 1, r.size() );
+            assertEquals( r.toString(), 1, r.size() );
     
             ArtifactInfoGroup ig = r.values().iterator().next();
     
@@ -179,13 +312,13 @@ public abstract class AbstractRepoNexusIndexerTest
         }
     }
 
-    public void testConstructQuery()
-    {
-        Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "jcl104-over-slf4*" );
-
-        assertEquals( "+a:jcl104 +a:over +a:slf4*", q.toString() );
-
-    }
+//    public void testConstructQuery()
+//    {
+//        Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "jcl104-over-slf4*" );
+//
+//        assertEquals( "+a:jcl104 +a:over +a:slf4*", q.toString() );
+//
+//    }
 
     public void testIdentify()
         throws Exception
@@ -206,7 +339,7 @@ public abstract class AbstractRepoNexusIndexerTest
 
         ai = nexusIndexer.identify( artifact );
 
-        assertNotNull( ai );
+        assertNotNull( "Can't identify qdox-1.5.jar", ai );
 
         assertEquals( "qdox", ai.groupId );
 

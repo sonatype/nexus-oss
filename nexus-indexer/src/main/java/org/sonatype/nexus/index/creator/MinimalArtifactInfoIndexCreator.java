@@ -67,8 +67,6 @@ public class MinimalArtifactInfoIndexCreator
 
         ArtifactInfo ai = ac.getArtifactInfo();
 
-        // boolean isSnapshot = VersionUtils.isSnapshot( ai.version );
-
         if ( pom != null )
         {
             Model model = modelReader.readModel( pom, ai.groupId, ai.artifactId, ai.version );
@@ -89,21 +87,6 @@ public class MinimalArtifactInfoIndexCreator
             ai.lastModified = pom.lastModified();
 
             ai.fextension = "pom";
-
-//            ai.getArtifacts().add( new Gav( //
-//                ai.groupId, //
-//                ai.artifactId, //
-//                ai.version, //
-//                null, // classifier
-//                "pom", // extension
-//                null, //
-//                null, //
-//                pom.getName(), // name
-//                isSnapshot,
-//                false,
-//                null,
-//                false,
-//                null) );
         }
 
         // TODO handle artifacts without poms
@@ -125,21 +108,6 @@ public class MinimalArtifactInfoIndexCreator
                 else
                 {
                     ai.sourcesExists = ArtifactAvailablility.PRESENT;
-
-//                    ai.getArtifacts().add( new Gav( //
-//                        ai.groupId, //
-//                        ai.artifactId, //
-//                        ai.version, //
-//                        "sources", // classifier
-//                        "jar", // extension
-//                        null, //
-//                        null, //
-//                        sources.getName(), // name
-//                        isSnapshot,
-//                        false,
-//                        null,
-//                        false,
-//                        null) );
                 }
 
                 File javadoc = jl.locate( pom );
@@ -150,29 +118,12 @@ public class MinimalArtifactInfoIndexCreator
                 else
                 {
                     ai.javadocExists = ArtifactAvailablility.PRESENT;
-
-//                    ai.getArtifacts().add( new Gav( //
-//                        ai.groupId, //
-//                        ai.artifactId, //
-//                        ai.version, //
-//                        "javadoc", // classifier
-//                        "jar", // extension
-//                        null, //
-//                        null, //
-//                        javadoc.getName(), // name
-//                        isSnapshot,
-//                        false,
-//                        null,
-//                        false,
-//                        null) );
                 }
             }
         }
 
         if ( artifact != null )
         {
-            // ai.getArtifacts().add( ac.getGav() );
-
             File signature = sigl.locate( artifact );
             ai.signatureExists = signature.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
 
@@ -215,7 +166,7 @@ public class MinimalArtifactInfoIndexCreator
         // last resort, the extension of the file
         String artifactFileName = artifact.getName().toLowerCase();
 
-        // tar.gz? and other "special" combinations?
+        // tar.gz? and other "special" combinations
         if ( artifactFileName.endsWith( "tar.gz" ) )
         {
             return "tar.gz";
@@ -225,7 +176,7 @@ public class MinimalArtifactInfoIndexCreator
             return "tar.bz2";
         }
 
-        // javadoc: gets the part _AFTER_ last dot!
+        // get the part after the last dot
         return FileUtils.getExtension( artifactFileName );
     }
 
@@ -287,7 +238,7 @@ public class MinimalArtifactInfoIndexCreator
 
         doc.add( new Field( ArtifactInfo.INFO, info, Field.Store.YES, Field.Index.NO ) );
 
-        doc.add( new Field( ArtifactInfo.GROUP_ID, ai.groupId, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
+        doc.add( new Field( ArtifactInfo.GROUP_ID, ai.groupId, Field.Store.NO, Field.Index.TOKENIZED ) );
 
         doc.add( new Field( ArtifactInfo.ARTIFACT_ID, ai.artifactId, Field.Store.NO, Field.Index.TOKENIZED ) );
 
@@ -307,10 +258,15 @@ public class MinimalArtifactInfoIndexCreator
         {
             doc.add( new Field( ArtifactInfo.PACKAGING, ai.packaging, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
         }
+        
+        if ( ai.classifier != null )
+        {
+            doc.add( new Field( ArtifactInfo.CLASSIFIER, ai.classifier, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
+        }
 
         if ( ai.prefix != null )
         {
-            doc.add( new Field( ArtifactInfo.PLUGIN_PREFIX, ai.prefix, Field.Store.YES, Field.Index.NO ) );
+            doc.add( new Field( ArtifactInfo.PLUGIN_PREFIX, ai.prefix, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
         }
 
         if ( ai.goals != null )
@@ -372,7 +328,9 @@ public class MinimalArtifactInfoIndexCreator
             }
             else
             {
-                if ( ai.classifier != null || "pom".equals( ai.packaging ) || "war".equals( ai.packaging )
+                if ( ai.classifier != null //
+                    || "pom".equals( ai.packaging ) //
+                    || "war".equals( ai.packaging ) //
                     || "ear".equals( ai.packaging ) )
                 {
                     ai.fextension = ai.packaging;

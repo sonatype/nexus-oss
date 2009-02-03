@@ -46,17 +46,13 @@ public class Nexus13NexusIndexerTest
     public void testSearchGroupedClasses()
         throws Exception
     {
-        // ----------------------------------------------------------------------------
-        // Classes and packages
-        // ----------------------------------------------------------------------------
-
         {
             Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "cisco" );
     
             GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
             GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
             Map<String, ArtifactInfoGroup> r = response.getResults(); 
-            assertEquals( r.toString(), 4, r.size() ); // qdox and testng
+            assertEquals( r.toString(), 4, r.size() );
     
             assertTrue( r.containsKey( "cisco.infra.dft : dma.plugin.utils" ) );
             assertTrue( r.containsKey( "cisco.infra.dft : dma.pom.enforcer" ) );
@@ -65,7 +61,7 @@ public class Nexus13NexusIndexerTest
         }
 
         {
-            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "*dma.plugin.utils" );
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "*dft.plugin.utils" );
             GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
             GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
             Map<String, ArtifactInfoGroup> r = response.getResults(); 
@@ -108,7 +104,10 @@ public class Nexus13NexusIndexerTest
 
         Directory newIndexDir = FSDirectory.getDirectory( new File( getBasedir(), "target/test-new" ) );
 
-        IndexUtils.unpackIndexArchive( new ByteArrayInputStream( os.toByteArray() ), newIndexDir );
+        IndexUtils.unpackIndexArchive(
+            new ByteArrayInputStream( os.toByteArray() ),
+            newIndexDir,
+            NexusIndexer.DEFAULT_INDEX );
 
         IndexingContext newContext = nexusIndexer.addIndexingContext(
             "test-new",
@@ -217,7 +216,6 @@ public class Nexus13NexusIndexerTest
         // Artifacts with "problematic" names
         // ----------------------------------------------------------------------------
 
-        // "-" in the name
         Query q = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "dma.integr*" );
 
         GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );

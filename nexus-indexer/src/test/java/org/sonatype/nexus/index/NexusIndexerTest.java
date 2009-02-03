@@ -206,12 +206,18 @@ public class NexusIndexerTest
 
         IndexUtils.packIndexArchive( context, bos );
 
-        IndexUtils.unpackIndexArchive( new ByteArrayInputStream( bos.toByteArray() ), newDirectory );
+        IndexUtils.unpackIndexArchive( new ByteArrayInputStream( bos.toByteArray() ), newDirectory, //
+            context.getIndexCreators() );
 
         indexer.removeIndexingContext( context, false );
 
-        indexer
-            .addIndexingContext( indexId, repositoryId, repository, newDirectory, repositoryUrl, null, indexCreators );
+        indexer.addIndexingContext( indexId, //
+            repositoryId,
+            repository,
+            newDirectory,
+            repositoryUrl,
+            null,
+            indexCreators );
 
         WildcardQuery q = new WildcardQuery( new Term( ArtifactInfo.PACKAGING, "maven-plugin" ) );
         FlatSearchResponse response = indexer.searchFlat( new FlatSearchRequest( q ) );

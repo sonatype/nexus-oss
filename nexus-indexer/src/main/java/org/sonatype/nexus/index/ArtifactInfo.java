@@ -40,7 +40,7 @@ public class ArtifactInfo
     public static final String ALL_GROUPS_LIST = "allGroupsList";
 
     /**
-     * Unique groupId, artifactId, version, classifier, packaging. 
+     * Unique groupId, artifactId, version, classifier, extension (or packaging). 
      * Stored, indexed untokenized
      */
     public static final String UINFO = "u";
@@ -69,6 +69,12 @@ public class ArtifactInfo
      */
     public static final String PACKAGING = "p";
 
+    /**
+     * Classifier.
+     * Not stored, indexed untokenized
+     */
+    public static final String CLASSIFIER = "l";
+    
     /**
      * Info: packaging, lastModified, size, sourcesExists, javadocExists, signatureExists. 
      * Stored, not indexed.

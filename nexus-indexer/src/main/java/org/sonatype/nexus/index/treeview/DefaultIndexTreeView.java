@@ -187,8 +187,11 @@ public class DefaultIndexTreeView
 
     protected String getPathForAi( String path, ArtifactInfo ai )
     {
-        StringBuffer sb = new StringBuffer( path ).append( ai.artifactId ).append( "/" ).append( ai.version ).append(
-            "/" ).append( ai.artifactId ).append( "-" ).append( ai.version );
+        StringBuffer sb = new StringBuffer( path ) //
+            .append( ai.artifactId ) //
+            .append( "/" ).append( ai.version ) //
+            .append( "/" ).append( ai.artifactId ) //
+            .append( "-" ).append( ai.version );
 
         if ( ai.classifier != null )
         {
@@ -334,7 +337,8 @@ public class DefaultIndexTreeView
 
         q.add( new TermQuery( new Term( ArtifactInfo.GROUP_ID, g ) ), BooleanClause.Occur.MUST );
 
-        q.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "\"" + a + "\"" ), BooleanClause.Occur.MUST );
+        // q.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "\"" + a + "\"" ), BooleanClause.Occur.MUST );
+        q.add( new TermQuery( new Term( ArtifactInfo.ARTIFACT_ID, a ) ), BooleanClause.Occur.MUST );
 
         FlatSearchRequest searchRequest = new FlatSearchRequest( q, indexingContext );
 
@@ -350,9 +354,11 @@ public class DefaultIndexTreeView
 
         q.add( new TermQuery( new Term( ArtifactInfo.GROUP_ID, g ) ), BooleanClause.Occur.MUST );
 
-        q.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "\"" + a + "\"" ), BooleanClause.Occur.MUST );
+        // q.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "\"" + a + "\"" ), BooleanClause.Occur.MUST );
+        q.add( new TermQuery( new Term( ArtifactInfo.ARTIFACT_ID, a ) ), BooleanClause.Occur.MUST );
 
-        q.add( nexusIndexer.constructQuery( ArtifactInfo.VERSION, "\"" + v + "\"" ), BooleanClause.Occur.MUST );
+        // q.add( nexusIndexer.constructQuery( ArtifactInfo.VERSION, "\"" + v + "\"" ), BooleanClause.Occur.MUST );
+        q.add( new TermQuery( new Term( ArtifactInfo.VERSION, v ) ), BooleanClause.Occur.MUST );
 
         FlatSearchRequest searchRequest = new FlatSearchRequest( q, indexingContext );
 

@@ -18,8 +18,6 @@ import java.util.Set;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
 
 /** 
  * @author Eugene Kuleshov
@@ -31,7 +29,14 @@ public class Index20081108RegressionTest
     protected void prepareNexusIndexer( NexusIndexer nexusIndexer )
         throws Exception
     {
-        context = nexusIndexer.addIndexingContext(
+        InputStream is = new FileInputStream( getBasedir() +  //
+            File.separator + "src" +  // 
+            File.separator + "test" + //
+            File.separator  + "nexus-maven-repository-index.20081108.zip" );
+        
+        IndexUtils.unpackIndexArchive( is, indexDir, NexusIndexer.DEFAULT_INDEX );
+        
+        context = nexusIndexer.addIndexingContextForced(
             "test",
             "test",
             null,
@@ -39,16 +44,6 @@ public class Index20081108RegressionTest
             null,
             null,
             NexusIndexer.DEFAULT_INDEX );
-        
-        InputStream is = new FileInputStream( getBasedir() +  //
-            File.separator + "src" +  // 
-            File.separator + "test" + //
-            File.separator  + "nexus-maven-repository-index.20081108.zip" );
-        Directory archiveDir = new RAMDirectory();
-        
-        IndexUtils.unpackIndexArchive( is, archiveDir );
-        
-        context.replace( archiveDir );
     }
     
     public void testExtension() throws Exception 
@@ -263,6 +258,12 @@ public class Index20081108RegressionTest
         Collection<ArtifactInfo> p2 = response2.getResults();
     
         assertEquals( 0, p2.size() );
+    }
+
+    @Override
+    public void testIdentify()
+    {
+        // skip test (sha1 field wasn't stored in the old index format)
     }
     
 }

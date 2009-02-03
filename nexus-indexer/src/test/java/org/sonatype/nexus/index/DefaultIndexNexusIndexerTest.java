@@ -55,10 +55,6 @@ public class DefaultIndexNexusIndexerTest
     public void testSearchGroupedClasses()
         throws Exception
     {
-        // ----------------------------------------------------------------------------
-        // Classes and packages
-        // ----------------------------------------------------------------------------
-
         {
             Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "com/thoughtworks/qdox" );
             GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
@@ -98,34 +94,147 @@ public class DefaultIndexNexusIndexerTest
             assertEquals( "org.testng : testng", r.get( "org.testng : testng" ).getGroupKey() );
         }
         
-
         {
+            // an implicit class name wildcard
             Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "Logger" );
             GroupedSearchRequest request = new GroupedSearchRequest( q, new GGrouping() );
             GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+
             Map<String, ArtifactInfoGroup> r = response.getResults(); 
-            assertEquals( r.toString(), 1, r.size() );
-            ArtifactInfoGroup ig = r.values().iterator().next();
-            assertEquals( r.toString(), "org.slf4j", ig.getGroupKey() );
+            assertEquals( r.toString(), 2, r.size() );
+
+            Iterator<ArtifactInfoGroup> it = r.values().iterator();
+            
+            ArtifactInfoGroup ig1 = it.next();
+            assertEquals( r.toString(), "org.slf4j", ig1.getGroupKey() );
+
+            ArtifactInfoGroup ig2 = it.next();
+            assertEquals( r.toString(), "org.testng", ig2.getGroupKey() );
+        }
+
+        {
+            // a lower case search
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "logger" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            assertEquals( r.toString(), 2, r.size() );
+
+            Iterator<ArtifactInfoGroup> it = r.values().iterator();
+            
+            ArtifactInfoGroup ig1 = it.next();
+            assertEquals( r.toString(), "org.slf4j", ig1.getGroupKey() );
+            
+            ArtifactInfoGroup ig2 = it.next();
+            assertEquals( r.toString(), "org.testng", ig2.getGroupKey() );
+        }
+        
+        {
+            // explicit class name wildcard without terminator
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "*.Logger" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            assertEquals( r.toString(), 2, r.size() );
+            Iterator<ArtifactInfoGroup> it = r.values().iterator();
+            ArtifactInfoGroup ig1 = it.next();
+            assertEquals( r.toString(), "org.slf4j", ig1.getGroupKey() );
+            ArtifactInfoGroup ig2 = it.next();
+            assertEquals( r.toString(), "org.testng", ig2.getGroupKey() );
+        }
+        
+        {
+            // explicit class name wildcard with terminator
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "*.Logger " );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            assertEquals( r.toString(), 2, r.size() );
+            Iterator<ArtifactInfoGroup> it = r.values().iterator();
+            ArtifactInfoGroup ig1 = it.next();
+            assertEquals( r.toString(), "org.slf4j", ig1.getGroupKey() );
+            ArtifactInfoGroup ig2 = it.next();
+            assertEquals( r.toString(), "org.testng", ig2.getGroupKey() );
+        }
+        
+        {
+            // a class name wildcard
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "*Logger" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            assertEquals( r.toString(), 3, r.size() );
+            
+            Iterator<ArtifactInfoGroup> it = r.values().iterator();
+            
+            ArtifactInfoGroup ig1 = it.next();
+            assertEquals( r.toString(), "commons-logging", ig1.getGroupKey() );  // Jdk14Logger and LogKitLogger
+            
+            ArtifactInfoGroup ig2 = it.next();
+            assertEquals( r.toString(), "org.slf4j", ig2.getGroupKey() );
+            
+            ArtifactInfoGroup ig3 = it.next();
+            assertEquals( r.toString(), "org.testng", ig3.getGroupKey() );
+        }
+
+        {
+            // exact class name
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "org/apache/commons/logging/LogConfigurationException" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults();
+            assertEquals( r.toString(), 2, r.size() );  // jcl104-over-slf4j and commons-logging
+        }
+        
+        {
+            // implicit class name pattern
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "org.apache.commons.logging.LogConfigurationException" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults();
+            assertEquals( r.toString(), 2, r.size() );  // jcl104-over-slf4j and commons-logging
+        }
+        
+        {
+            // exact class name
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "^org.apache.commons.logging.LogConfigurationException$" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults();
+            assertEquals( r.toString(), 2, r.size() );  // jcl104-over-slf4j and commons-logging
+        }
+        
+        {
+            // package name prefix
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "^org.apache.commons.logging" );
+            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
+            GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults();
+            assertEquals( r.toString(), 2, r.size() );  // jcl104-over-slf4j and commons-logging
         }
         
         {
             Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, "*slf4j*Logg*" );
             GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
             GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
-            Map<String, ArtifactInfoGroup> r = response.getResults(); 
+            
+            Map<String, ArtifactInfoGroup> r = response.getResults();
             assertEquals( r.toString(), 2, r.size() );
             
             {
                 ArtifactInfoGroup ig = r.values().iterator().next();
-                ArrayList<ArtifactInfo> list = new ArrayList<ArtifactInfo>( ig.getArtifactInfos() );
-                assertEquals( r.toString(), 2, list.size() );
-                ArtifactInfo ai1;
-                ai1 = list.get( 0 );
+                ArrayList<ArtifactInfo> list1 = new ArrayList<ArtifactInfo>( ig.getArtifactInfos() );
+                assertEquals( r.toString(), 2, list1.size() );
+                
+                ArtifactInfo ai1 = list1.get( 0 );
                 assertEquals( "org.slf4j", ai1.groupId );
                 assertEquals( "slf4j-api", ai1.artifactId );
                 assertEquals( "1.4.2", ai1.version );
-                ArtifactInfo ai2 = list.get( 1 );
+                ArtifactInfo ai2 = list1.get( 1 );
                 assertEquals( "org.slf4j", ai2.groupId );
                 assertEquals( "slf4j-api", ai2.artifactId );
                 assertEquals( "1.4.1", ai2.version );
@@ -136,6 +245,7 @@ public class DefaultIndexNexusIndexerTest
                 ArtifactInfoGroup ig = r.get( "org.slf4j : slf4j-log4j12" );
                 ArrayList<ArtifactInfo> list = new ArrayList<ArtifactInfo>( ig.getArtifactInfos() );
                 assertEquals( list.toString(), 1, list.size() );
+                
                 ArtifactInfo ai = list.get( 0 );
                 assertEquals( "org.slf4j", ai.groupId );
                 assertEquals( "slf4j-log4j12", ai.artifactId );
@@ -199,7 +309,10 @@ public class DefaultIndexNexusIndexerTest
 
         Directory newIndexDir = FSDirectory.getDirectory( newIndex );
 
-        IndexUtils.unpackIndexArchive( new ByteArrayInputStream( os.toByteArray() ), newIndexDir );
+        IndexUtils.unpackIndexArchive(
+            new ByteArrayInputStream( os.toByteArray() ),
+            newIndexDir,
+            NexusIndexer.DEFAULT_INDEX );
 
         IndexingContext newContext = nexusIndexer.addIndexingContext(
             "test-new",

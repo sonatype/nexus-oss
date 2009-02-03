@@ -115,7 +115,7 @@ public class IndexTreeViewTest
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
-        assertEquals( "The group name should be here", "slf4j-log4j12", root.getNodeName() );
+        assertEquals( "slf4j-log4j12", root.getNodeName() );
         assertEquals( 1, root.getChildren().size() );
         assertEquals( 4, leafsFound );
     }

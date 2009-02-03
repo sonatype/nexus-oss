@@ -6,30 +6,32 @@
  */
 package org.sonatype.nexus.index;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
+import org.apache.lucene.store.LockObtainFailedException;
+import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.nexus.index.context.ArtifactIndexingContext;
+import org.sonatype.nexus.index.context.DefaultArtifactIndexingContext;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.NexusAnalyzer;
-import org.sonatype.nexus.index.context.NexusIndexWriter;
 import org.sonatype.nexus.index.creator.IndexCreator;
-import org.sonatype.nexus.index.updater.IndexDataReader;
-import org.sonatype.nexus.index.updater.IndexDataWriter;
-import org.sonatype.nexus.index.updater.IndexDataReader.IndexDataReadResult;
 
 public class IndexUtils
 {
@@ -90,15 +92,10 @@ public class IndexUtils
                         ii = directory.openInput( TIMESTAMP_FILE );
 
                         result = new Date( ii.readLong() );
-
-                        ii.close();
                     }
                     finally
                     {
-                        if ( ii != null )
-                        {
-                            ii.close();
-                        }
+                        close( ii );
                     }
                 }
             }
@@ -112,43 +109,23 @@ public class IndexUtils
 
     // pack/unpack
 
-    /**
-     * Pack index data into a specified output stream
-     * 
-     * @return number of documents saved
-     */
-    public static int packIndexData( OutputStream os, IndexingContext context, List<Integer> docIndexes )
-        throws IOException
+    public static void updateDocument( Document doc, Collection<? extends IndexCreator> ics )
     {
-        IndexDataWriter dw = new IndexDataWriter( os );
-        return dw.write( context, docIndexes );
-    }
-
-    /**
-     * Unpack index data using specified Lucene Index writer
-     * 
-     * @param is an input stream to unpack index data from
-     * @param w a writer to save index data
-     * @param ics a collection of index creators for updating unpacked documents.
-     */
-    public static Date unpackIndexData( InputStream is, Directory d, Collection<? extends IndexCreator> ics )
-        throws IOException
-    {
-        NexusIndexWriter w = new NexusIndexWriter( d, new NexusAnalyzer(), true );
-
-        try
+        ArtifactInfo ai = IndexUtils.constructArtifactInfo( doc, ics );
+        
+        if( ai != null )
         {
-            IndexDataReader dr = new IndexDataReader( is );
-            
-            IndexDataReadResult result = dr.readIndex( w, ics );
-            
-            return result.getTimestamp();
-        }
-        finally
-        {
-            w.close();
+            ArtifactContext ac = new ArtifactContext( null, null, null, ai, ai.calculateGav() );
+            ArtifactIndexingContext aic = new DefaultArtifactIndexingContext( ac );
+   
+            for ( IndexCreator ic : ics )
+            {
+                ic.updateDocument( aic, doc );
+            }
         }
     }
+
+    
 
 //    public static Date getIndexArchiveTime( InputStream is )
 //        throws IOException
@@ -186,46 +163,105 @@ public class IndexUtils
      * @param directory Lucene <code>Directory</code> to unpack index data to
      * @return {@link Date} of the index update or null if it can't be read
      */
-    public static Date unpackIndexArchive( InputStream is, Directory directory )
+    public static Date unpackIndexArchive( InputStream is, Directory directory, Collection<? extends IndexCreator> ics )
         throws IOException
     {
+        File indexArchive = File.createTempFile( "nexus-index", "" );
+
+        File indexDir = new File( indexArchive.getAbsoluteFile().getParentFile(), indexArchive.getName() + ".dir" );
+
+        indexDir.mkdirs();
+
+        FSDirectory fdir = FSDirectory.getDirectory( indexDir );
+
         ZipInputStream zis = new ZipInputStream( is );
         try
         {
-            byte[] buf = new byte[4096];
-
-            ZipEntry entry;
-
-            while ( ( entry = zis.getNextEntry() ) != null )
-            {
-                if ( entry.isDirectory() || entry.getName().indexOf( '/' ) > -1 )
-                {
-                    continue;
-                }
-
-                IndexOutput io = directory.createOutput( entry.getName() );
-
-                try
-                {
-                    int n = 0;
-
-                    while ( ( n = zis.read( buf ) ) != -1 )
-                    {
-                        io.writeBytes( buf, n );
-                    }
-                }
-                finally
-                {
-                    close( io );
-                }
-            }
+            unpackDirectory( fdir, zis );
+            copyUpdatedDocuments( fdir, directory, ics );
+            
+            Date timestamp = IndexUtils.getTimestamp( fdir );
+            updateTimestamp( directory, timestamp );
+            return timestamp;
         }
         finally
         {
             close( zis );
-        }
+            close( fdir );
+            
+            indexArchive.delete();
 
-        return IndexUtils.getTimestamp( directory );
+            try
+            {
+                FileUtils.deleteDirectory( indexDir );
+            }
+            catch ( IOException ex )
+            {
+                // ignore
+            }
+        }
+    }
+
+    private static void copyUpdatedDocuments( Directory sourcedir, Directory targetdir,
+        Collection<? extends IndexCreator> ics )
+        throws CorruptIndexException,
+            LockObtainFailedException,
+            IOException
+    {
+        IndexWriter w = null;
+        IndexReader r = null;
+
+        try
+        {
+            r = IndexReader.open( sourcedir );
+            w = new IndexWriter( targetdir, false, new NexusAnalyzer(), true );
+
+            for ( int i = 0; i < r.maxDoc(); i++ )
+            {
+                Document d = r.document( i );
+                updateDocument( d, ics );
+                w.addDocument( d );
+            }
+
+            w.optimize();
+            w.flush();
+        }
+        finally
+        {
+            close( w );
+            close( r );
+        }
+    }
+
+    private static void unpackDirectory( Directory directory, ZipInputStream zis )
+        throws IOException
+    {
+        byte[] buf = new byte[4096];
+
+        ZipEntry entry;
+
+        while ( ( entry = zis.getNextEntry() ) != null )
+        {
+            if ( entry.isDirectory() || entry.getName().indexOf( '/' ) > -1 )
+            {
+                continue;
+            }
+
+            IndexOutput io = directory.createOutput( entry.getName() );
+            try
+            {
+                int n = 0;
+
+                while ( ( n = zis.read( buf ) ) != -1 )
+                {
+                    io.writeBytes( buf, n );
+                }
+            }
+            finally
+            {
+                close( io );
+            }
+        }
     }
 
     /**
@@ -343,7 +379,7 @@ public class IndexUtils
             }
             finally
             {
-                r.close();
+                close( r );
             }
 
             w = new IndexWriter( directory, new SimpleAnalyzer() );
@@ -354,10 +390,7 @@ public class IndexUtils
         }
         finally
         {
-            if ( w != null )
-            {
-                w.close();
-            }
+            close( w );
         }
     }
 
@@ -375,9 +408,9 @@ public class IndexUtils
         return res ? artifactInfo : null;
     }
     
-    // close
+    // close helpers
 
-    private static void close( OutputStream os )
+    public static void close( OutputStream os )
     {
         if ( os != null )
         {
@@ -392,7 +425,7 @@ public class IndexUtils
         }
     }
 
-    private static void close( InputStream is )
+    public static void close( InputStream is )
     {
         if ( is != null )
         {
@@ -407,7 +440,7 @@ public class IndexUtils
         }
     }
 
-    private static void close( IndexOutput io )
+    public static void close( IndexOutput io )
     {
         if ( io != null )
         {
@@ -422,13 +455,58 @@ public class IndexUtils
         }
     }
 
-    private static void close( IndexInput in )
+    public static void close( IndexInput in )
     {
         if ( in != null )
         {
             try
             {
                 in.close();
+            }
+            catch ( IOException e )
+            {
+                // ignore
+            }
+        }
+    }
+    
+    public static void close( IndexReader r )
+    {
+        if ( r != null )
+        {
+            try
+            {
+                r.close();
+            }
+            catch ( IOException e )
+            {
+                // ignore
+            }
+        }
+    }
+
+    public static void close( IndexWriter w )
+    {
+        if ( w != null )
+        {
+            try
+            {
+                w.close();
+            }
+            catch ( IOException e )
+            {
+                // ignore
+            }
+        }
+    }
+
+    public static void close( Directory d )
+    {
+        if ( d != null )
+        {
+            try
+            {
+                d.close();
             }
             catch ( IOException e )
             {

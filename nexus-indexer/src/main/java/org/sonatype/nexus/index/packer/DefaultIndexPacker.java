@@ -28,6 +28,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.updater.IndexDataWriter;
 
 /**
  * Default provider for IndexPacker. Creates the properties and zip files.
@@ -205,9 +206,10 @@ public class DefaultIndexPacker
         try
         {
             os = new FileOutputStream( targetArchive );
-
-            IndexUtils.packIndexData( os, context, docIndexes );
-
+            
+            IndexDataWriter dw = new IndexDataWriter( os );
+            dw.write( context, docIndexes );
+            
             os.flush();
         }
         finally

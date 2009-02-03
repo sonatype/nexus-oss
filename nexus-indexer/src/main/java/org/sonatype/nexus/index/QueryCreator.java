@@ -11,7 +11,7 @@ import org.apache.lucene.search.Query;
 /**
  * A component that creates Query objects from Strings, that can be later combined into one Query.
  * 
- * @author cstamas
+ * @author Tamas Cservenak
  */
 public interface QueryCreator
 {
