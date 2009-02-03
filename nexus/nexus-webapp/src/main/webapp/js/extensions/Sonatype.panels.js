@@ -184,7 +184,7 @@ Sonatype.panels.GridViewer = function( config ) {
     layout: 'fit',
     collapsible: true,
     split: true,
-    height: 200,
+    height: Sonatype.view.mainTabPanel.getInnerHeight() / 3,
     minHeight: 100,
     maxHeight: 500,
     frame: false,
