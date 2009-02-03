@@ -13,16 +13,6 @@
  */
 Sonatype.utils.Observable = function(){
   this.addEvents({
-    /* 
-     * Fired when a repository is created, edited or deleted on the repository config tab.
-     */
-    'repositoryChanged': true,
-
-    /* 
-     * Fired when a group is created, edited or deleted on the group config tab.
-     */
-    'groupChanged': true,
-    
     /*
      * Fired when the main Nexus navigation panel is being built.
      * Subscribers can use this event to add items to the navigation panel.
@@ -128,25 +118,7 @@ Sonatype.utils.Observable = function(){
      *   }
      * },
      */
-    'userMenuInit': true,
-
-    /*
-     * Fired when a user list is loaded (e.g. on the user editor panel).
-     * Subscribers can add more users to the list and assign editors.
-     * 
-     * A container object is passed as parameter. Some container implementations
-     * may be read only, so they will ignore the editor supplied.
-     * 
-     * init: function() {
-     *   Sonatype.Events.addListener( 'userListInit', this.populateUsers, this );
-     * },
-     * 
-     * populateUsers: function( userPanel ) {
-     *   userPanel.addRecords( myReadOnlyUsers, 'System Users' );
-     *   userPanel.addRecords( myEditableUsers, 'Other Users', My.ext.UserFormPanel );
-     * },
-     */
-    'userListInit': true
+    'userMenuInit': true
   });
 };
 Ext.extend( Sonatype.utils.Observable, Ext.util.Observable );
