@@ -8,7 +8,7 @@ import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1448ImportSnapshotsOnlyTest
-extends AbstractMigrationIntegrationTest
+    extends AbstractMigrationIntegrationTest
 {
     @Test
     public void importSnapshotsOnly()
