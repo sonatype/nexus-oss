@@ -381,7 +381,6 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
 
     if ( ! menu.items.first() ) return;
 
-    menu.on( 'hide', this.onBrowseContextHideHandler, this );
     e.stopEvent();
     menu.showAt( e.getXY() );
   }
