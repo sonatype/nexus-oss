@@ -36,7 +36,8 @@ public abstract class AbstractNexusTask<T>
     @Requirement
     private PlexusContainer plexusContainer;
 
-    @Requirement
+    // DO NOT, EVER AGAIN ADD @REQ here, since you will introduce a cycle
+    // Look below, nexus is looked up "lazily"
     private Nexus nexus = null;
 
     private Map<String, String> parameters;

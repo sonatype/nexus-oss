@@ -116,9 +116,9 @@ public class DefaultTaskConfigManager
                     // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class
                     // name
                     getLogger()
-                        .error(
+                        .warn(
                             "Unable to initialize task " + task.getName() + ", couldn't load service class "
-                                + task.getId() );
+                                + task.getId(), e );
                 }
             }
         }
