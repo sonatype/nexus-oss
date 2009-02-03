@@ -89,14 +89,14 @@ public class ArtifactoryRepository
         return getValue( dom, "url" );
     }
 
-    public String getProxy()
-    {
-        return getValue( dom, "proxy" );
-    }
-
     public String getType()
     {
         return getValue( dom, "type" );
+    }
+
+    public String getProxy()
+    {
+        return getValue( dom, "proxyRef" );
     }
 
 }
