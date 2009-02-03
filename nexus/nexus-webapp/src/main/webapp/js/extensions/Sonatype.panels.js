@@ -420,7 +420,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
   dataStoreLoadHandler: function( store, records, options ) {
     if ( this.checkStores() && this.dataAutoLoad ) {
       this.dataAutoLoad = false;
-      this.dataStore.load();
+      this.dataStore.reload();
     }
   },
   
@@ -496,7 +496,18 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
 
   refreshHandler: function( button, e ) {
     this.clearCards();
-    this.gridPanel.store.reload();
+
+    if ( this.dataStores ) {
+      this.dataAutoLoad = true;
+      for ( var i = 0; i < this.dataStores.length; i++ ) {
+        var store = this.dataStores[i];
+        store.lastOptions = null;
+        store.reload();
+      }
+    }
+    else {
+      this.gridPanel.store.reload();
+    }
   },
   
   rowContextMenuHandler: function( grid, index, e ) {
