@@ -13,6 +13,9 @@
  */
 package org.sonatype.nexus.security.filter.authc;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -47,6 +50,16 @@ public class NexusHttpAuthenticationFilter
     private final Log logger = LogFactory.getLog( this.getClass() );
 
     private boolean fakeAuthScheme;
+    
+    private long lastLoginFailureTime = 0L;
+    
+    private Map<String, String> lastLoginFailureContext = new HashMap<String, String>();
+    
+    private static final String C_PRINCIPAL_KEY = "k_principal";
+
+    private static final String C_ADDRESS_KEY = "k_address";
+
+    private static final String C_HOST_KEY = "k_host";
 
     protected Log getLogger()
     {
@@ -218,19 +231,47 @@ public class NexusHttpAuthenticationFilter
     protected boolean onLoginFailure( AuthenticationToken token, AuthenticationException ae, ServletRequest request,
         ServletResponse response )
     {
+        // to make feeds entries be more concise, ignore similar events which occurs in a small period of time
+        if ( !isSimilarLoginFailure( token, request ) )
+        {
+            String msg = "Unable to authenticate user [" + token.getPrincipal() + "] from address/host ["
+                + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
 
-        String msg = "Unable to authenticate user [" + token.getPrincipal() + "] from address/host ["
-            + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
+            AuthcAuthzEvent aaEvt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHC, msg );
 
-        AuthcAuthzEvent aaEvt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHC, msg );
+            getNexus( request ).addAuthcAuthzEvent( aaEvt );
 
-        getNexus( request ).addAuthcAuthzEvent( aaEvt );
+            lastLoginFailureTime = System.currentTimeMillis();
+            
+            lastLoginFailureContext.put( C_PRINCIPAL_KEY, token.getPrincipal().toString() );
+
+            lastLoginFailureContext.put( C_ADDRESS_KEY, request.getRemoteAddr() );
+
+            lastLoginFailureContext.put( C_HOST_KEY, request.getRemoteHost() );
+        }
 
         HttpServletResponse httpResponse = WebUtils.toHttp( response );
 
         if ( ExpiredCredentialsException.class.isAssignableFrom( ae.getClass() ) )
         {
             httpResponse.addHeader( "X-Nexus-Reason", "expired" );
+        }
+
+        return false;
+    }
+
+    private boolean isSimilarLoginFailure( AuthenticationToken token, ServletRequest request )
+    {
+        if ( System.currentTimeMillis() - lastLoginFailureTime > 1000L )
+        {
+            return false;
+        }
+
+        if ( lastLoginFailureContext.get( C_PRINCIPAL_KEY ).equals( token.getPrincipal() )
+            && lastLoginFailureContext.get( C_ADDRESS_KEY ).equals( request.getRemoteAddr() )
+            && lastLoginFailureContext.get( C_HOST_KEY ).equals( request.getRemoteHost() ) )
+        {
+            return true;
         }
 
         return false;
