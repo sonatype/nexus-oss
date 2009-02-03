@@ -13,6 +13,7 @@
 package org.sonatype.nexus.plugins.migration;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -114,6 +115,22 @@ public class AbstractMigrationIntegrationTest
                            FileTestingUtils.compareFileSHA1s( artifact, downloaded ) );
     }
 
+    protected void checkArtifactNotPresent( String repositoryId, String groupId, String artifactId, String version )
+    throws IOException
+    {
+        Gav gav =
+            new Gav( groupId, artifactId, version, null, "jar", null, null, null, false, false, null, false, null );
+        try
+        {
+            downloadArtifactFromRepository( repositoryId, gav, "target/downloads/" + groupId );
+            Assert.fail( "Unable to download artifact " + artifactId );
+        }
+        catch ( FileNotFoundException e )
+        {
+            //expected
+        }
+    }
+
     protected void checkArtifactOnGroup( String nexusGroupId, String groupId, String artifactId, String version )
         throws IOException
     {
@@ -181,7 +198,7 @@ public class AbstractMigrationIntegrationTest
     {
         Status status = ImportMessageUtil.commitImport( migrationSummary ).getStatus();
         Assert.assertTrue( "Unable to commit import " + status, status.isSuccess() );
-        
+
         // the import is scheduled task now, so we need to wait for it to finish
         TaskScheduleUtil.waitForTasks( 40 );
     }
