@@ -58,6 +58,12 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
                 var statusResp = Ext.decode(response.responseText);
                 if ( statusResp ) {
                   this.totalRecords = statusResp.totalCount;
+                  if ( statusResp.tooManyResults ) {
+                    this.setWarningLabel( 'Too many results, please refine the search condition.' );
+                  }
+                  else {
+                    this.clearWarningLabel();
+                  }
                 }
               }
             }, this, { single: true } );
@@ -322,7 +328,7 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
   
   updateRowTotals: function( p ) {
     var count = p.store.getCount();
-    
+
     p.clearButton.setDisabled( count == 0 );
     
     if ( count == 0 || count > p.totalRecords ) {
@@ -335,10 +341,23 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
 
     p.fetchMoreButton.setDisabled( count >= p.totalRecords );
   },
+
+  setWarningLabel: function( s ) {
+    this.clearWarningLabel();
+    this.warningLabel = this.fetchMoreBar.addText( '<span class="x-toolbar-warning">' + s + '</span>' );
+  },
+
+  clearWarningLabel: function() {
+    if ( this.warningLabel ) {
+      this.warningLabel.destroy();
+      this.warningLabel = null;
+    }
+  },
   
   clearResults: function() {
     this.store.baseParams = {};
     this.store.removeAll();
     this.updateRowTotals( this );
+    this.clearWarningLabel();
   }
 });
