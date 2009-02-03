@@ -49,6 +49,10 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   
   //Methods that will take the incoming json data and map over to the ui controls
   this.loadDataModFuncs = {
+    internal : {
+      schedule : Sonatype.utils.capitalize,
+      properties : this.importServicePropertiesHelper.createDelegate(this)
+    },
     manual : {
       schedule : Sonatype.utils.capitalize,
       properties : this.importServicePropertiesHelper.createDelegate(this)
