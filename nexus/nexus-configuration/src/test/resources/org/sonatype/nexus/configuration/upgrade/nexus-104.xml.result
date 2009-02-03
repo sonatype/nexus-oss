@@ -8,8 +8,7 @@
     <anonymousPassword>anonymous2</anonymousPassword>
     <realms>
       <realm>XmlAuthenticatingRealm</realm>
-      <realm>NexusMethodAuthorizingRealm</realm>
-      <realm>NexusTargetAuthorizingRealm</realm>
+      <realm>XmlAuthorizingRealm</realm>
     </realms>
   </security>
   <globalConnectionSettings />

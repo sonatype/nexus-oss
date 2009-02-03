@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.rest.privileges;
 
+import org.sonatype.jsecurity.realms.privileges.application.ApplicationPrivilegeDescriptor;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
@@ -57,11 +59,11 @@ public class PrivilegeBaseStatusResourceConverter
             {
                 return super.instantiateNewInstance( reader, context );
             }
-            else if ( AbstractPrivilegePlexusResource.TYPE_REPO_TARGET.equals( type ))
+            else if ( TargetPrivilegeDescriptor.TYPE.equals( type ))
             {
                 return new PrivilegeTargetStatusResource();
             }
-            else if ( AbstractPrivilegePlexusResource.TYPE_APPLICATION.equals( type ))
+            else if ( ApplicationPrivilegeDescriptor.TYPE.equals( type ))
             {
                 return new PrivilegeApplicationStatusResource();
             }

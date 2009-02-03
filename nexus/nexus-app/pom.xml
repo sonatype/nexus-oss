@@ -83,7 +83,7 @@
 
 		<dependency>
 			<groupId>org.sonatype.jsecurity</groupId>
-			<artifactId>method-realm</artifactId>
+			<artifactId>security-xml-realm</artifactId>
 			<exclusions>
 				<exclusion>
 					<groupId>org.mortbay.jetty</groupId>

@@ -43,10 +43,10 @@ public class Nexus448PrivilegeURLTest extends AbstractNexusIntegrationTest
     {
         
         PrivilegeBaseStatusResource resource = this.messageUtil.getPrivilegeResource( "T2" );
-        Assert.assertEquals( "Type", "repositoryTarget", resource.getType() );
+        Assert.assertEquals( "Type", "target", resource.getType() );
         
         resource = this.messageUtil.getPrivilegeResource( "1" );
-        Assert.assertEquals( "Type", "application", resource.getType() );
+        Assert.assertEquals( "Type", "method", resource.getType() );
         
     }
     

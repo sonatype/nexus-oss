@@ -23,9 +23,14 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.jsecurity.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityProperty;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
@@ -102,7 +107,7 @@ public class PrivilegeListPlexusResource
             PrivilegeBaseResource resource = resourceRequest.getData();
 
             // currently we are allowing only of repotarget privs, so enforcing checkfor it
-            if ( !TYPE_REPO_TARGET.equals( resource.getType() ) )
+            if ( !TargetPrivilegeDescriptor.TYPE.equals( resource.getType() ) )
             {
                 throw new PlexusResourceException(
                     Status.CLIENT_ERROR_BAD_REQUEST,
@@ -135,28 +140,28 @@ public class PrivilegeListPlexusResource
 
                             priv.setName( res.getName() != null ? res.getName() + " - (" + method + ")" : null );
                             priv.setDescription( res.getDescription() );
-                            priv.setType( "target" );
+                            priv.setType( TargetPrivilegeDescriptor.TYPE );
 
                             SecurityProperty prop = new SecurityProperty();
-                            prop.setKey( "method" );
+                            prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
                             prop.setValue( method );
 
                             priv.addProperty( prop );
 
                             prop = new SecurityProperty();
-                            prop.setKey( "repositoryTargetId" );
+                            prop.setKey( TargetPrivilegeRepositoryTargetPropertyDescriptor.ID );
                             prop.setValue( res.getRepositoryTargetId() );
 
                             priv.addProperty( prop );
 
                             prop = new SecurityProperty();
-                            prop.setKey( "repositoryId" );
+                            prop.setKey( TargetPrivilegeRepositoryPropertyDescriptor.ID );
                             prop.setValue( res.getRepositoryId() );
 
                             priv.addProperty( prop );
 
                             prop = new SecurityProperty();
-                            prop.setKey( "repositoryGroupId" );
+                            prop.setKey( TargetPrivilegeGroupPropertyDescriptor.ID );
                             prop.setValue( res.getRepositoryGroupId() );
 
                             priv.addProperty( prop );

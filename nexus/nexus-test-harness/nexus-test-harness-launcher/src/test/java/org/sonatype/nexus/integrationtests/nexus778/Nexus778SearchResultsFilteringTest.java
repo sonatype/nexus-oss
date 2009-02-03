@@ -170,7 +170,7 @@ public class Nexus778SearchResultsFilteringTest
 
         resource.setName( name );
         resource.setDescription( "some description" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( targetId );
         resource.addMethod( "read" );
 

@@ -20,9 +20,9 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.jsecurity.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.nexus.jsecurity.realms.NexusMethodAuthorizingRealm;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -95,7 +95,7 @@ public class PrivilegePlexusResource
         {
             priv = getNexusSecurity().readPrivilege( getPrivilegeId( request ) );
 
-            if ( priv.getType().equals( NexusMethodAuthorizingRealm.PRIVILEGE_TYPE_METHOD ) )
+            if ( priv.getType().equals( ApplicationPrivilegeDescriptor.TYPE ) )
             {
                 throw new ResourceException(
                     Status.CLIENT_ERROR_BAD_REQUEST,

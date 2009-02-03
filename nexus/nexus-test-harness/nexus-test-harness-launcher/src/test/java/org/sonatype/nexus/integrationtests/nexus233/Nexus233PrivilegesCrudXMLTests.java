@@ -57,7 +57,7 @@ public class Nexus233PrivilegesCrudXMLTests
         methods.add( "read" );
         resource.setMethod( methods );
         resource.setName( "createReadMethodTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( "testTarget" );
 
         // get the Resource object
@@ -71,7 +71,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( statusResources.get( 0 ).getMethod(), "read" );
         Assert.assertEquals( statusResources.get( 0 ).getName(), "createReadMethodTest - (read)" ); // ' - (read)' is
         // automatically added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), "repositoryTarget" );
+        Assert.assertEquals( statusResources.get( 0 ).getType(), "target" );
         Assert.assertEquals( ( (PrivilegeTargetStatusResource) statusResources.get( 0 ) ).getRepositoryTargetId(),
                              "testTarget" );
 
@@ -89,7 +89,7 @@ public class Nexus233PrivilegesCrudXMLTests
         methods.add( "create" );
         resource.setMethod( methods );
         resource.setName( "createCreateMethodTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( "testTarget" );
 
         // get the Resource object
@@ -107,7 +107,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( statusResources.get( 0 ).getName(), "createCreateMethodTest - (create)" ); // ' - (read)'
         // is
         // automatically added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), "repositoryTarget" );
+        Assert.assertEquals( statusResources.get( 0 ).getType(), "target" );
         Assert.assertEquals( ( (PrivilegeTargetStatusResource) statusResources.get( 0 ) ).getRepositoryTargetId(),
                              "testTarget" );
 
@@ -125,7 +125,7 @@ public class Nexus233PrivilegesCrudXMLTests
         methods.add( "update" );
         resource.setMethod( methods );
         resource.setName( "createUpdateMethodTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( "testTarget" );
 
         // get the Resource object
@@ -140,7 +140,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( statusResources.get( 0 ).getName(), "createUpdateMethodTest - (update)" ); // ' - (read)'
         // is
         // automatically added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), "repositoryTarget" );
+        Assert.assertEquals( statusResources.get( 0 ).getType(), "target" );
         Assert.assertEquals( ( (PrivilegeTargetStatusResource) statusResources.get( 0 ) ).getRepositoryTargetId(),
                              "testTarget" );
 
@@ -158,7 +158,7 @@ public class Nexus233PrivilegesCrudXMLTests
         methods.add( "delete" );
         resource.setMethod( methods );
         resource.setName( "createDeleteMethodTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( "testTarget" );
 
         // get the Resource object
@@ -173,7 +173,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( statusResources.get( 0 ).getName(), "createDeleteMethodTest - (delete)" ); // ' - (read)'
         // is
         // automatically added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), "repositoryTarget" );
+        Assert.assertEquals( statusResources.get( 0 ).getType(), "target" );
         Assert.assertEquals( ( (PrivilegeTargetStatusResource) statusResources.get( 0 ) ).getRepositoryTargetId(),
                              "testTarget" );
 
@@ -194,7 +194,7 @@ public class Nexus233PrivilegesCrudXMLTests
         methods.add( "delete" );
         resource.setMethod( methods );
         resource.setName( "createAllMethodTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( "testTarget" );
 
         // get the Resource object
@@ -218,7 +218,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertTrue( method.contains( "read" ) );
 
         Assert.assertEquals( createPriv.getName(), "createAllMethodTest - (create)" );
-        Assert.assertEquals( createPriv.getType(), "repositoryTarget" );
+        Assert.assertEquals( createPriv.getType(), "target" );
         Assert.assertEquals( createPriv.getRepositoryTargetId(), "testTarget" );
 
         PrivilegeTargetStatusResource readPriv =
@@ -227,7 +227,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertNotNull( readPriv.getId() );
         Assert.assertEquals( readPriv.getMethod(), "read" );
         Assert.assertEquals( readPriv.getName(), "createAllMethodTest - (read)" );
-        Assert.assertEquals( readPriv.getType(), "repositoryTarget" );
+        Assert.assertEquals( readPriv.getType(), "target" );
         Assert.assertEquals( readPriv.getRepositoryTargetId(), "testTarget" );
 
         PrivilegeTargetStatusResource updatePriv =
@@ -236,7 +236,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertNotNull( updatePriv.getId() );
         Assert.assertEquals( updatePriv.getMethod(), "update,read" );
         Assert.assertEquals( updatePriv.getName(), "createAllMethodTest - (update)" );
-        Assert.assertEquals( updatePriv.getType(), "repositoryTarget" );
+        Assert.assertEquals( updatePriv.getType(), "target" );
         Assert.assertEquals( updatePriv.getRepositoryTargetId(), "testTarget" );
 
         PrivilegeTargetStatusResource deletePriv =
@@ -245,7 +245,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertNotNull( deletePriv.getId() );
         Assert.assertEquals( deletePriv.getMethod(), "delete,read" );
         Assert.assertEquals( deletePriv.getName(), "createAllMethodTest - (delete)" );
-        Assert.assertEquals( deletePriv.getType(), "repositoryTarget" );
+        Assert.assertEquals( deletePriv.getType(), "target" );
         Assert.assertEquals( deletePriv.getRepositoryTargetId(), "testTarget" );
 
         SecurityConfigUtil.verifyRepoTargetPrivileges( statusResources );
@@ -277,7 +277,7 @@ public class Nexus233PrivilegesCrudXMLTests
         methods.add( "read" );
         resource.setMethod( methods );
         resource.setName( "readTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( "testTarget" );
 
         // get the Resource object
@@ -293,7 +293,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( statusResources.get( 0 ).getMethod(), "read" );
         Assert.assertEquals( statusResources.get( 0 ).getName(), "readTest - (read)" ); // ' - (read)' is automatically
         // added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), "repositoryTarget" );
+        Assert.assertEquals( statusResources.get( 0 ).getType(), "target" );
         Assert.assertEquals( ( (PrivilegeTargetStatusResource) statusResources.get( 0 ) ).getRepositoryTargetId(),
                              "testTarget" );
 
@@ -314,7 +314,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( statusResources.get( 0 ).getMethod(), "read" );
         Assert.assertEquals( statusResources.get( 0 ).getName(), "readTest - (read)" ); // ' - (read)' is automatically
         // added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), "repositoryTarget" );
+        Assert.assertEquals( statusResources.get( 0 ).getType(), "target" );
         Assert.assertEquals( ( (PrivilegeTargetStatusResource) statusResources.get( 0 ) ).getRepositoryTargetId(),
                              "testTarget" );
 
@@ -333,7 +333,7 @@ public class Nexus233PrivilegesCrudXMLTests
         methods.add( "read" );
         resource.setMethod( methods );
         resource.setName( "updateTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( "testTarget" );
 
         // get the Resource object
@@ -350,7 +350,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( statusResources.get( 0 ).getName(), "updateTest - (read)" ); // ' - (read)' is
         // automatically
         // added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), "repositoryTarget" );
+        Assert.assertEquals( statusResources.get( 0 ).getType(), "target" );
         Assert.assertEquals( ( (PrivilegeTargetStatusResource) statusResources.get( 0 ) ).getRepositoryTargetId(),
                              "testTarget" );
 
@@ -374,7 +374,7 @@ public class Nexus233PrivilegesCrudXMLTests
         methods.add( "read" );
         resource.setMethod( methods );
         resource.setName( "deleteTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( "testTarget" );
 
         // get the Resource object
@@ -391,7 +391,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( statusResources.get( 0 ).getName(), "deleteTest - (read)" ); // ' - (read)' is
         // automatically
         // added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), "repositoryTarget" );
+        Assert.assertEquals( statusResources.get( 0 ).getType(), "target" );
         Assert.assertEquals( ( (PrivilegeTargetStatusResource) statusResources.get( 0 ) ).getRepositoryTargetId(),
                              "testTarget" );
 
@@ -417,7 +417,7 @@ public class Nexus233PrivilegesCrudXMLTests
         methods.add( "read" );
         resource.setMethod( methods );
         resource.setName( "listTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( "testTarget" );
 
         // get the Resource object
@@ -431,7 +431,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( statusResources.get( 0 ).getMethod(), "read" );
         Assert.assertEquals( statusResources.get( 0 ).getName(), "listTest - (read)" ); // ' - (read)' is
         // automatically added
-        Assert.assertEquals( statusResources.get( 0 ).getType(), "repositoryTarget" );
+        Assert.assertEquals( statusResources.get( 0 ).getType(), "target" );
         Assert.assertEquals( ( (PrivilegeTargetStatusResource) statusResources.get( 0 ) ).getRepositoryTargetId(),
                              "testTarget" );
 

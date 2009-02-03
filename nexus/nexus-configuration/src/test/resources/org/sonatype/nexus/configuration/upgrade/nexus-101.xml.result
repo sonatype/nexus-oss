@@ -6,8 +6,7 @@
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
     <realms>
       <realm>XmlAuthenticatingRealm</realm>
-      <realm>NexusMethodAuthorizingRealm</realm>
-      <realm>NexusTargetAuthorizingRealm</realm>
+      <realm>XmlAuthorizingRealm</realm>
     </realms>
   </security>
   <globalConnectionSettings />

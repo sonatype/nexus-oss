@@ -57,7 +57,7 @@ public class Nexus233PrivilegesValidationTests
         methods.add( "INVALID" );
         resource.setMethod( methods );
         resource.setName( "createWithInvalidMethodTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
@@ -83,7 +83,7 @@ public class Nexus233PrivilegesValidationTests
         // methods.add( "read" );
         resource.setMethod( methods );
         resource.setName( "createNoMethodTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
@@ -110,7 +110,7 @@ public class Nexus233PrivilegesValidationTests
         methods.add( "read" );
         resource.setMethod( methods );
         // resource.setName( "createNoMethodTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
@@ -137,7 +137,7 @@ public class Nexus233PrivilegesValidationTests
         methods.add( "read" );
         resource.setMethod( methods );
         resource.setName( "createNoTypeTest" );
-        // resource.setType( "repositoryTarget" );
+        // resource.setType( "target" );
 //        resource.setRepositoryTargetId( "testTarget" );
 
         try
@@ -162,7 +162,7 @@ public class Nexus233PrivilegesValidationTests
         methods.add( "read" );
         resource.setMethod( methods );
         resource.setName( "createNoRepoTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         // resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
@@ -190,7 +190,7 @@ public class Nexus233PrivilegesValidationTests
         methods.add( "INVALID" );
         resource.setMethod( methods );
         resource.setName( "createWithInvalidAndValidMethodsTest" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
         // resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
@@ -214,7 +214,7 @@ public class Nexus233PrivilegesValidationTests
         PrivilegeBaseResource resource = new PrivilegeTargetResource();
         resource.addMethod( "read" );
         resource.setName( "createApplicationResource" );
-        resource.setType( "application" );
+        resource.setType( "method" );
         //resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );

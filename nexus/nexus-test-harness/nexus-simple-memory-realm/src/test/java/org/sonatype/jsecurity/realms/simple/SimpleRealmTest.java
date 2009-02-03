@@ -21,6 +21,7 @@ import java.io.OutputStream;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
@@ -30,6 +31,7 @@ import org.jsecurity.subject.PrincipalCollection;
 import org.jsecurity.subject.SimplePrincipalCollection;
 import org.sonatype.jsecurity.realms.PlexusSecurity;
 import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 
 public class SimpleRealmTest
     extends AbstractNexusTestCase
@@ -138,9 +140,26 @@ public class SimpleRealmTest
         throws Exception
     {
         // call super
-        super.setUp();
+        FileUtils.deleteDirectory( PLEXUS_HOME );
+
+        PLEXUS_HOME.mkdirs();
+        WORK_HOME.mkdirs();
+        CONF_HOME.mkdirs();
+        
         // copy the tests nexus.xml and security.xml to the correct location
         this.copyTestConfigToPlace();
+
+        if ( loadConfigurationAtSetUp() )
+        {
+            nexusConfiguration = this.lookup( NexusConfiguration.class );
+
+            nexusConfiguration.loadConfiguration();
+
+            // TODO: SEE WHY IS SEC NOT STARTING? (Max, JSec changes)
+            nexusConfiguration.setSecurityEnabled( false );
+
+            nexusConfiguration.applyConfiguration();
+        }     
     }
 
     private void copyTestConfigToPlace()

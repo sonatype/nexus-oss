@@ -20,8 +20,7 @@
 		<anonymousPassword>anonymous</anonymousPassword>
 		<realms>
 			<realm>Simple</realm> <!-- Changed from XmlAuthenticatingRealm  -->
-			<realm>NexusMethodAuthorizingRealm</realm>
-			<realm>NexusTargetAuthorizingRealm</realm>
+			<realm>XmlAuthorizingRealm</realm>
 		</realms>
 	</security>
 

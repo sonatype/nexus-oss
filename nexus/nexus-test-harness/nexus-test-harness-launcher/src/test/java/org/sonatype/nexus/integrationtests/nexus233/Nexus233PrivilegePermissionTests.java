@@ -39,7 +39,7 @@ public class Nexus233PrivilegePermissionTests
         PrivilegeTargetResource privilege = new PrivilegeTargetResource();
         privilege.addMethod( "read" );
         privilege.setName( "createReadMethodTest" );
-        privilege.setType( "repositoryTarget" );
+        privilege.setType( "target" );
         privilege.setRepositoryTargetId( "testTarget" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -88,7 +88,7 @@ public class Nexus233PrivilegePermissionTests
         PrivilegeTargetResource privilege = new PrivilegeTargetResource();
         privilege.addMethod( "read" );
         privilege.setName( "createReadMethodTest" );
-        privilege.setType( "repositoryTarget" );
+        privilege.setType( "target" );
         privilege.setRepositoryTargetId( "testTarget" );
 
         Response response = this.privUtil.sendMessage( Method.POST, privilege );
@@ -141,7 +141,7 @@ public class Nexus233PrivilegePermissionTests
         PrivilegeTargetResource privilege = new PrivilegeTargetResource();
         privilege.addMethod( "read" );
         privilege.setName( "createReadMethodTest" );
-        privilege.setType( "repositoryTarget" );
+        privilege.setType( "target" );
         privilege.setRepositoryTargetId( "testTarget" );
 
         Response response = this.privUtil.sendMessage( Method.POST, privilege );

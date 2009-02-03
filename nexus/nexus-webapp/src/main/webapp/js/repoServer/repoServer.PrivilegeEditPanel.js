@@ -27,8 +27,8 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
   this.typeStore = new Ext.data.SimpleStore( {
     fields: ['value', 'display'], 
     data: [
-      ['repositoryTarget', 'Repository Target'],
-      ['application', 'Application']
+      ['target', 'Repository Target'],
+      ['method', 'Application']
     ]
   } );
 
@@ -164,8 +164,8 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
           autoCreateNewRecord: true,
           handler: function( container, rec, item, e ) {
             rec.beginEdit();
-            rec.set( 'type', 'repositoryTarget' );
-            rec.set( 'sType', this.convertType( 'repositoryTarget' ) );
+            rec.set( 'type', 'target' );
+            rec.set( 'sType', this.convertType( 'target' ) );
             rec.commit();
             rec.endEdit();
           },
@@ -218,7 +218,7 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
           }
         },
         id: function( value, parent, fpanel ) {
-          if ( parent.type == 'repositoryTarget' &&
+          if ( parent.type == 'target' &&
               ! ( parent.repositoryId || parent.repositoryGroupId ) ) {
             fpanel.form.findField( 'repositoryOrGroup' ).setValue( 'all_repo' );
           }
@@ -242,7 +242,7 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
       repositoryId: "repositoryOrGroup",
       repositoryGroupId: "repositoryOrGroup"
     },
-    referenceData: Sonatype.repoServer.referenceData.privileges.repositoryTarget
+    referenceData: Sonatype.repoServer.referenceData.privileges.target
   };
   Ext.apply( this, config, defaultConfig );
 
@@ -309,13 +309,13 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
       selectOnFocus: true,
       allowBlank: false,
       width: this.COMBO_WIDTH,
-      value: 'repositoryTarget',
+      value: 'target',
       lazyInit: false,
       disabled: true
     }
   ];
   
-  if ( this.payload.data.type == 'repositoryTarget' ) {
+  if ( this.payload.data.type == 'target' ) {
 
     // clone the target store
     var targetStore2 = new Ext.data.JsonStore( {

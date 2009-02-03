@@ -115,7 +115,7 @@ public class SecurityConfigUtil
 
                 Assert.assertEquals( targetPriv.getId(), secPriv.getId() );
                 Assert.assertEquals( targetPriv.getName(), secPriv.getName() );
-                Assert.assertEquals( targetPriv.getType(), "repositoryTarget" );
+                Assert.assertEquals( targetPriv.getType(), "target" );
                 
                 for ( CProperty prop : ( List<CProperty> ) secPriv.getProperties() )
                 {
@@ -146,7 +146,7 @@ public class SecurityConfigUtil
 
                 Assert.assertEquals( targetPriv.getId(), secPriv.getId() );
                 Assert.assertEquals( targetPriv.getName(), secPriv.getName() );
-                Assert.assertEquals( targetPriv.getType(), "application" );
+                Assert.assertEquals( targetPriv.getType(), "method" );
                 
                 for ( CProperty prop : ( List<CProperty> ) secPriv.getProperties() )
                 {

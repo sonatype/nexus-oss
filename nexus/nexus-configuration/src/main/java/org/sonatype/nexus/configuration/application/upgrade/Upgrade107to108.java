@@ -20,6 +20,7 @@ import java.io.IOException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_8.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
@@ -38,6 +39,18 @@ public class Upgrade107to108
             org.sonatype.nexus.configuration.model.CRepositoryGroup group = super.upgradeCRepositoryGroup( repositoryGroup, value );
             group.setType( "maven2" );
             return group;
+        }
+        
+        @Override
+        public CSecurity upgradeCSecurity( org.sonatype.nexus.configuration.model.v1_0_7.CSecurity security,
+            CSecurity value )
+        {
+            org.sonatype.nexus.configuration.model.CSecurity newSecurity = super.upgradeCSecurity( security, value );
+            newSecurity.removeRealm( "NexusMethodAuthorizingRealm" );
+            newSecurity.removeRealm( "NexusTargetAuthorizingRealm" );
+            newSecurity.addRealm( "XmlAuthorizingRealm" );
+            
+            return newSecurity;
         }
     };
 

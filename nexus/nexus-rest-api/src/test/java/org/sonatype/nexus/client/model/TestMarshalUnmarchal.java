@@ -1124,7 +1124,7 @@ public class TestMarshalUnmarchal
         resource.addMethod( "Method1" );
         resource.addMethod( "Method2" );
         resource.setDescription( "Description" );
-        resource.setType( "repositoryTarget" );
+        resource.setType( "target" );
 
         resourceRequest.setData( resource );
 
@@ -1196,7 +1196,7 @@ public class TestMarshalUnmarchal
         appResource1.setName( "Name1" );
         appResource1.setMethod( "Method1" );
         appResource1.setDescription( "Description1" );
-        appResource1.setType( "application" );
+        appResource1.setType( "method" );
 
         PrivilegeStatusResourceResponse resourceResponse = new PrivilegeStatusResourceResponse();
         resourceResponse.setData( appResource1 );
@@ -1217,7 +1217,7 @@ public class TestMarshalUnmarchal
         targetResource1.setName( "Name1" );
         targetResource1.setMethod( "Method1" );
         targetResource1.setDescription( "Description1" );
-        targetResource1.setType( "repositoryTarget" );
+        targetResource1.setType( "target" );
 
         PrivilegeStatusResourceResponse resourceResponse = new PrivilegeStatusResourceResponse();
         resourceResponse.setData( targetResource1 );

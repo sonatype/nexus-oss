@@ -287,7 +287,7 @@ Sonatype.repoServer.referenceData = {
   },
   
   privileges : {
-    repositoryTarget : {
+    target : {
       name: "",
       description: "",
       type: "",

@@ -41,7 +41,7 @@ public class SimpleRealm
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
     {
-        // Unless your realm is very specific the NexusMethodAuthorizingRealm and NexusTargetAuthorizingRealm, will take
+        // Unless your realm is very specific the XmlAuthorizingRealm will take
         // care of this. (provided you implement the PlexusUserLocator interface).
         return null;
     }

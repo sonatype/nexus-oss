@@ -24,7 +24,11 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
+import org.jsecurity.realm.Realm;
+import org.sonatype.jsecurity.locators.RealmLocator;
 import org.sonatype.jsecurity.model.CProperty;
+import org.sonatype.jsecurity.realms.XmlAuthenticatingRealm;
+import org.sonatype.jsecurity.realms.XmlAuthorizingRealm;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
 import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
@@ -62,6 +66,9 @@ public class DefaultNexusSecurity
 
     @Requirement
     private NexusEmailer emailer;
+    
+    @Requirement
+    private RealmLocator realmLocator;
 
     private List<EventListener> listeners = new ArrayList<EventListener>();
 
@@ -232,6 +239,19 @@ public class DefaultNexusSecurity
         manager.save();
 
         notifyProximityEventListeners( new ConfigurationChangeEvent( this ) );
+        
+        for ( Realm realm : realmLocator.getRealms() )
+        {
+            if ( XmlAuthenticatingRealm.class.isAssignableFrom( realm.getClass() ) )
+            {
+                ( ( XmlAuthenticatingRealm ) realm ).getConfigurationManager().clearCache();
+            }
+            
+            if ( XmlAuthorizingRealm.class.isAssignableFrom( realm.getClass() ) )
+            {
+                ( ( XmlAuthorizingRealm ) realm ).getAuthorizationCache().clear();
+            }
+        }
     }
 
     public void updatePrivilege( SecurityPrivilege privilege )

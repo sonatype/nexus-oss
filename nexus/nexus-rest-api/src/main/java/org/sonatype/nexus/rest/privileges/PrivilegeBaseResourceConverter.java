@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.rest.privileges;
 
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
 import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
 import org.sonatype.plexus.rest.xstream.LookAheadStreamReader;
@@ -56,7 +57,7 @@ public class PrivilegeBaseResourceConverter
             {
                 return super.instantiateNewInstance( reader, context );
             }
-            else if ( AbstractPrivilegePlexusResource.TYPE_REPO_TARGET.equals( type ))
+            else if ( TargetPrivilegeDescriptor.TYPE.equals( type ))
             {
                 return new PrivilegeTargetResource();
             }

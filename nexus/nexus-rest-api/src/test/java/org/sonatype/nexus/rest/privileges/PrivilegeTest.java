@@ -14,6 +14,7 @@
 package org.sonatype.nexus.rest.privileges;
 
 import org.restlet.data.MediaType;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
@@ -26,7 +27,7 @@ public class PrivilegeTest
     public void testTargetRequest()
         throws Exception
     {
-        String jsonString = "{\"data\":{\"name\":\"Test Priv\",\"type\":\"repositoryTarget\",\"method\":[\"read\",\"create\"],"
+        String jsonString = "{\"data\":{\"name\":\"Test Priv\",\"type\":\"target\",\"method\":[\"read\",\"create\"],"
             + "\"repositoryTargetId\":\"targetId\",\"repositoryId\":\"repoId\",\"repositoryGroupId\":\"groupId\"}}";
         XStreamRepresentation representation = new XStreamRepresentation(
             xstream,
@@ -37,7 +38,7 @@ public class PrivilegeTest
             .getPayload( new PrivilegeResourceRequest() );
 
         assert request.getData().getName().equals( "Test Priv" );
-        assert request.getData().getType().equals( AbstractPrivilegePlexusResource.TYPE_REPO_TARGET );
+        assert request.getData().getType().equals( TargetPrivilegeDescriptor.TYPE );
         assert request.getData().getMethod().size() == 2;
         assert request.getData().getMethod().contains( "read" );
         assert request.getData().getMethod().contains( "create" );
