@@ -343,15 +343,11 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
   },
 
   setWarningLabel: function( s ) {
-    this.clearWarningLabel();
-    this.warningLabel = this.fetchMoreBar.addText( '<span class="x-toolbar-warning">' + s + '</span>' );
+    this.searchPanel.setWarningLabel( s );
   },
 
   clearWarningLabel: function() {
-    if ( this.warningLabel ) {
-      this.warningLabel.destroy();
-      this.warningLabel = null;
-    }
+    this.searchPanel.clearWarningLabel();
   },
   
   clearResults: function() {

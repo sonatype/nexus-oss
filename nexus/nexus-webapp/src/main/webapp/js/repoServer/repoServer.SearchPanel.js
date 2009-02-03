@@ -48,7 +48,7 @@ Sonatype.repoServer.SearchPanel = function(config){
   };
     
   this.grid = new Sonatype.repoServer.SearchResultGrid({
-    
+    searchPanel: this
   });
   this.paramName = 'q';
 
@@ -318,6 +318,18 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       }
     });
   },
+
+  setWarningLabel: function( s ) {
+    this.clearWarningLabel();
+    this.warningLabel = this.searchToolbar.addText( '<span class="x-toolbar-warning">' + s + '</span>' );
+  },
+
+  clearWarningLabel: function() {
+    if ( this.warningLabel ) {
+      this.warningLabel.destroy();
+      this.warningLabel = null;
+    }
+  },
   
   setFilenameLabel: function( p, s ) {
     if ( p.filenameLabel ) {
@@ -327,6 +339,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   },
   
   switchSearchType: function( button, event ) {
+    this.clearWarningLabel();
     this.setSearchType( this, button.value );
   },
 
