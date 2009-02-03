@@ -25,6 +25,9 @@ Sonatype.repoServer.LogsViewPanel = function(config){
   this.tailed = true;
   this.tailEnabled = true;
   
+  this.logListLoaded = false;
+  this.logToShowWhenLoaded = null;
+  
 
   
   this.listeners = {
@@ -258,12 +261,13 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
         }
         else {
           myMenu.addMenuItem({
+        	id: name,
             logUri: uri, 
             text: text,
             value: size,
             checked: false,
             group:'rp-group',
-            checkHandler: this.logMenuBtnClick.createDelegate(this, [uri,'text/plain'], 0),
+            checkHandler: this.showItem.createDelegate(this, [name,'text/plain'], 0 ),
             scope:this
           });
         }
@@ -272,6 +276,15 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       if ( this.doUpdateTail ) {
         this.doUpdateTail = false;
         this.getLogFile();
+      }
+      
+      // we might be waiting to show a log file
+      this.logListLoaded = true;
+      if( this.logToShowWhenLoaded )
+      {
+    	  // show the log
+    	  this.showLog(this.logToShowWhenLoaded);
+    	  this.logToShowWhenLoaded = null;
       }
     }
     else {
@@ -294,12 +307,13 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
         
         if ( !existingItem ){
         	  myMenu.addMenuItem({
+            id: name,
             logUri: uri, 
             text: name,
             value: 0,
             checked: false,
             group:'rp-group',
-            checkHandler: this.logMenuBtnClick.createDelegate(this, [uri,'application/xml'], 0),
+            checkHandler: this.showItem.createDelegate(this, [name,'application/xml'], 0 ),
             scope:this
           });
         }
@@ -310,24 +324,49 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
     }
   },
   
-  logMenuBtnClick : function(resourceURI, contentType, mItem, pressed){
-    if ( ! pressed ) return;
-    this.logTextArea.setRawValue('');
-    this.currentSize = 0;
-    this.currentOffset = 0;
-    this.totalSize = mItem.value;
-    this.currentContentType = contentType;
-    this.getTopToolbar().items.get(2).setText(mItem.text);
-    this.currentLogUrl = resourceURI;
-    this.tailed = this.tailEnabled;
-    
-    if ( this.tailed ) {
-      this.doUpdateTail = true;
-      this.updateLogFileList();
-    }
-    else {
-      this.getLogFile();
-    }
+  showItem : function( shortLogName, contentType, mItem, pressed ){
+	  if ( ! pressed ) return;
+	    this.logTextArea.setRawValue('');
+	    this.currentSize = 0;
+	    this.currentOffset = 0;
+	    this.totalSize = mItem.value;
+	    this.currentContentType = contentType;
+	    this.getTopToolbar().items.get(2).setText(mItem.text);
+	    this.currentLogUrl = mItem.logUri;
+	    this.tailed = this.tailEnabled;
+	    
+	    if ( this.tailed ) {
+	      this.doUpdateTail = true;
+	      this.updateLogFileList();
+	    }
+	    else {
+	      this.getLogFile();
+	    }
+  },
+  
+  showLog : function( logName )
+  {
+	// check to make sure the menubar is rendered
+	  if( this.logListLoaded)
+	  {
+		  var logsAndConfMenu = Ext.menu.MenuMgr.get('log-menu');
+		  for(var ii=0; ii< logsAndConfMenu.items.length; ii++ )
+		  {
+			  var tmpMenuItem = logsAndConfMenu.items.itemAt(ii);
+			  if( tmpMenuItem != null && tmpMenuItem.id == logName )
+			  {
+				  this.showItem(tmpMenuItem.logUri, 'text/plain', tmpMenuItem, true);
+				  break;
+			  }
+		  }
+		  
+	  }
+	  else
+	  {
+		  // load it when when the list is done rendering
+		 this.logToShowWhenLoaded = logName;
+	  }
+	  
   },
   
   //gets the log file specified by this.currentLogUrl

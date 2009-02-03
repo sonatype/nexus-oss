@@ -37,9 +37,17 @@ Sonatype.view = {
     Ext.Ajax.on( {
       "requestexception" : { 
         fn: function(conn, response, options) {
-          if ( options.suppressStatus != response.status ) {
-            Sonatype.utils.connectionError( response, null, null, options );
-          }
+    	
+	    	if( Ext.isArray(options.suppressStatus) )
+	    	{
+	    		if ( options.suppressStatus.indexOf( response.status ) < 0 ) {
+	    			Sonatype.utils.connectionError( response, null, null, options );
+	    		}
+	    	}
+	    	else if ( options.suppressStatus != response.status )
+    		{
+    			Sonatype.utils.connectionError( response, null, null, options );
+    		}
         },
         scope: this } 
     } );

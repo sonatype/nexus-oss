@@ -114,8 +114,18 @@ public class TaskScheduleUtil
             Thread.sleep( sleep );
 
             List<ScheduledServiceListResource> tasks = getTasks();
+            
+            int brokenCount = 0;
+            
+            for ( ScheduledServiceListResource task : tasks )
+            {
+                if("BROKEN".equals( task.getStatus()))
+                {
+                    brokenCount++;
+                }
+            }
 
-            if ( tasks.size() == 0 )
+            if ( tasks.size() - brokenCount == 0 )
             {
                 return;
             }
