@@ -166,8 +166,7 @@ public class DefaultWalker
                 {
                     getLogger().info(
                         "Walking on repository ID='" + context.getRepository().getId() + "' from path='" + fromPath
-                            + "' aborted, cause:",
-                        context.getStopCause() );
+                            + "' aborted, cause:" + context.getStopCause().getMessage() );
                 }
             }
             else

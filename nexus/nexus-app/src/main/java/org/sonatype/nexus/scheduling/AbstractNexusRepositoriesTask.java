@@ -99,6 +99,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
         }
     }
 
+    @Override
     public boolean allowConcurrentExecution( Map<String, List<ScheduledTask<?>>> activeTasks )
     {
         return !hasIntersectingTasksThatRuns( activeTasks );
