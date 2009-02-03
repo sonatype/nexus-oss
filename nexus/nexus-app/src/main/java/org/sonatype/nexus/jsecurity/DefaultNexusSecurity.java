@@ -29,6 +29,7 @@ import org.sonatype.jsecurity.locators.RealmLocator;
 import org.sonatype.jsecurity.model.CProperty;
 import org.sonatype.jsecurity.realms.XmlAuthenticatingRealm;
 import org.sonatype.jsecurity.realms.XmlAuthorizingRealm;
+import org.sonatype.jsecurity.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
 import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
@@ -535,4 +536,8 @@ public class DefaultNexusSecurity
         save();
     }
 
+    public List<PrivilegeDescriptor> listPrivilegeDescriptors()
+    {
+        return this.manager.listPrivilegeDescriptors();
+    }
 }

@@ -572,6 +572,15 @@ Sonatype.ext.FormPanel = function( config ) {
 };
 
 Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
+  convertDataValue: function( value, store, idProperty, nameProperty ) {
+    if ( value ) {
+      var rec = store.getAt( store.find( idProperty, value ) );
+      if ( rec ) {
+        return rec.data[nameProperty];
+      }
+    }
+    return '';
+  },
   checkPayload: function() {
     this.isNew = false;
     if ( this.payload ) {

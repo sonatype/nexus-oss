@@ -21,9 +21,10 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.model.ContentListResource;
-import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
-import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
+import org.sonatype.nexus.rest.model.PrivilegeResource;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.test.utils.ContentListMessageUtil;
 
@@ -44,21 +45,21 @@ public class Nexus923BrowseRootWithTarget
         target = this.targetUtil.createTarget( target );
 
         // now create a priv
-        PrivilegeTargetResource browseRootTestPriv = new PrivilegeTargetResource();
+        PrivilegeResource browseRootTestPriv = new PrivilegeResource();
         browseRootTestPriv.addMethod( "create" );
         browseRootTestPriv.addMethod( "read" );
         browseRootTestPriv.addMethod( "update" );
         browseRootTestPriv.addMethod( "delete" );
         browseRootTestPriv.setName( "browseRootTestPriv" );
-        browseRootTestPriv.setType( "repositoryTarget" );
+        browseRootTestPriv.setType( TargetPrivilegeDescriptor.TYPE );
         browseRootTestPriv.setRepositoryTargetId( target.getId() );
         browseRootTestPriv.setRepositoryId( this.getTestRepositoryId() );
         // get the Resource object
-        List<PrivilegeBaseStatusResource> browseRootTestPrivs = this.privUtil.createPrivileges( browseRootTestPriv );
+        List<PrivilegeStatusResource> browseRootTestPrivs = this.privUtil.createPrivileges( browseRootTestPriv );
         String[] pivsStrings = new String[browseRootTestPrivs.size()];
         for ( int ii = 0; ii < browseRootTestPrivs.size(); ii++ )
         {
-            PrivilegeBaseStatusResource priv = browseRootTestPrivs.get(ii);
+            PrivilegeStatusResource priv = browseRootTestPrivs.get(ii);
             pivsStrings[ii] =  priv.getId();
         }
 

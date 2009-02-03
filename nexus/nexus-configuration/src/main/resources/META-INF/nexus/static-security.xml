@@ -246,6 +246,7 @@
                 <privilege>32</privilege>
                 <privilege>33</privilege>
                 <privilege>46</privilege>
+                <privilege>80</privilege>
             </privileges>
         </role>
         <role>
@@ -1573,6 +1574,22 @@
               <value>nexus:repositorymirrors</value>
             </property>
           </properties>
+        </privilege>
+        <privilege>
+            <id>80</id>
+            <type>method</type>
+            <name>User Privilege Types - (read)</name>
+            <description>Give permission to read existing privilege types.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:privilegetypes</value>
+                </property>
+            </properties>
         </privilege>
     </privileges>
 </security>

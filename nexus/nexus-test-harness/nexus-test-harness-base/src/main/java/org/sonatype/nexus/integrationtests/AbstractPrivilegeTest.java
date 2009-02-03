@@ -24,7 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.restlet.data.MediaType;
 import org.sonatype.jsecurity.model.CPrivilege;
-import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
@@ -139,7 +139,7 @@ public abstract class AbstractPrivilegeTest
                 }
                 else
                 {
-                    PrivilegeBaseStatusResource basePriv = this.privUtil.getPrivilegeResource( privId );
+                    PrivilegeStatusResource basePriv = this.privUtil.getPrivilegeResource( privId );
                     privs.add( basePriv.getName() );
                 }
 

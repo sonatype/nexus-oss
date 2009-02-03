@@ -22,8 +22,9 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
-import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
+import org.sonatype.nexus.rest.model.PrivilegeResource;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 
 /**
  * Test the privileges for CRUD operations.
@@ -36,10 +37,10 @@ public class Nexus233PrivilegePermissionTests
     public void testCreatePermission()
         throws IOException
     {
-        PrivilegeTargetResource privilege = new PrivilegeTargetResource();
+        PrivilegeResource privilege = new PrivilegeResource();
         privilege.addMethod( "read" );
         privilege.setName( "createReadMethodTest" );
-        privilege.setType( "target" );
+        privilege.setType( TargetPrivilegeDescriptor.TYPE );
         privilege.setRepositoryTargetId( "testTarget" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -60,8 +61,8 @@ public class Nexus233PrivilegePermissionTests
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.privUtil.sendMessage( Method.POST, privilege );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
-        PrivilegeBaseStatusResource responsePrivilege = this.privUtil.getResourceFromResponse( response );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        PrivilegeStatusResource responsePrivilege = this.privUtil.getResourceListFromResponse( response ).get( 0 );
 
         // read should succeed (inherited by create)
         response = this.privUtil.sendMessage( Method.GET, null, responsePrivilege.getId() );
@@ -85,15 +86,15 @@ public class Nexus233PrivilegePermissionTests
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        PrivilegeTargetResource privilege = new PrivilegeTargetResource();
+        PrivilegeResource privilege = new PrivilegeResource();
         privilege.addMethod( "read" );
         privilege.setName( "createReadMethodTest" );
-        privilege.setType( "target" );
+        privilege.setType( TargetPrivilegeDescriptor.TYPE );
         privilege.setRepositoryTargetId( "testTarget" );
 
         Response response = this.privUtil.sendMessage( Method.POST, privilege );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
-        PrivilegeBaseStatusResource responsePrivilege = this.privUtil.getResourceFromResponse( response );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        PrivilegeStatusResource responsePrivilege = this.privUtil.getResourceListFromResponse( response ).get( 0 );
         
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
@@ -114,11 +115,11 @@ public class Nexus233PrivilegePermissionTests
 
         // should work now...
         response = this.privUtil.sendMessage( Method.PUT, privilege, responsePrivilege.getId() );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // read should fail
         response = this.privUtil.sendMessage( Method.GET, null, responsePrivilege.getId() );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
         response = this.privUtil.sendMessage( Method.POST, privilege );
@@ -138,15 +139,15 @@ public class Nexus233PrivilegePermissionTests
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        PrivilegeTargetResource privilege = new PrivilegeTargetResource();
+        PrivilegeResource privilege = new PrivilegeResource();
         privilege.addMethod( "read" );
         privilege.setName( "createReadMethodTest" );
-        privilege.setType( "target" );
+        privilege.setType( TargetPrivilegeDescriptor.TYPE );
         privilege.setRepositoryTargetId( "testTarget" );
 
         Response response = this.privUtil.sendMessage( Method.POST, privilege );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
-        PrivilegeBaseStatusResource responsePrivilege = this.privUtil.getResourceFromResponse( response );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        PrivilegeStatusResource responsePrivilege = this.privUtil.getResourceListFromResponse( response ).get( 0 );
         
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
@@ -178,7 +179,7 @@ public class Nexus233PrivilegePermissionTests
 
         // delete should fail
         response = this.privUtil.sendMessage( Method.DELETE, null, responsePrivilege.getId() );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 204, response.getStatus().getCode() );
 
     }
 }

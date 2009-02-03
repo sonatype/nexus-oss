@@ -31,11 +31,10 @@ import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
-import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
-import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
+import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
-import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -82,7 +81,7 @@ public class PrivilegeListPlexusResource
 
         for ( SecurityPrivilege priv : privs )
         {
-            PrivilegeBaseStatusResource res = nexusToRestModel( priv, request );
+            PrivilegeStatusResource res = nexusToRestModel( priv, request );
 
             if ( res != null )
             {
@@ -104,7 +103,7 @@ public class PrivilegeListPlexusResource
         {
             result = new PrivilegeListResourceResponse();
 
-            PrivilegeBaseResource resource = resourceRequest.getData();
+            PrivilegeResource resource = resourceRequest.getData();
 
             // currently we are allowing only of repotarget privs, so enforcing checkfor it
             if ( !TargetPrivilegeDescriptor.TYPE.equals( resource.getType() ) )
@@ -131,54 +130,40 @@ public class PrivilegeListPlexusResource
                     // Add a new privilege for each method
                     for ( String method : methods )
                     {
-                        // Currently can only add new target types, application types are hardcoded
-                        if ( PrivilegeTargetResource.class.isAssignableFrom( resource.getClass() ) )
-                        {
-                            PrivilegeTargetResource res = (PrivilegeTargetResource) resource;
+                        SecurityPrivilege priv = new SecurityPrivilege();
 
-                            SecurityPrivilege priv = new SecurityPrivilege();
+                        priv.setName( resource.getName() != null ? resource.getName() + " - (" + method + ")" : null );
+                        priv.setDescription( resource.getDescription() );
+                        priv.setType( TargetPrivilegeDescriptor.TYPE );
 
-                            priv.setName( res.getName() != null ? res.getName() + " - (" + method + ")" : null );
-                            priv.setDescription( res.getDescription() );
-                            priv.setType( TargetPrivilegeDescriptor.TYPE );
+                        SecurityProperty prop = new SecurityProperty();
+                        prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
+                        prop.setValue( method );
 
-                            SecurityProperty prop = new SecurityProperty();
-                            prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
-                            prop.setValue( method );
+                        priv.addProperty( prop );
 
-                            priv.addProperty( prop );
+                        prop = new SecurityProperty();
+                        prop.setKey( TargetPrivilegeRepositoryTargetPropertyDescriptor.ID );
+                        prop.setValue( resource.getRepositoryTargetId() );
 
-                            prop = new SecurityProperty();
-                            prop.setKey( TargetPrivilegeRepositoryTargetPropertyDescriptor.ID );
-                            prop.setValue( res.getRepositoryTargetId() );
+                        priv.addProperty( prop );
 
-                            priv.addProperty( prop );
+                        prop = new SecurityProperty();
+                        prop.setKey( TargetPrivilegeRepositoryPropertyDescriptor.ID );
+                        prop.setValue( resource.getRepositoryId() );
 
-                            prop = new SecurityProperty();
-                            prop.setKey( TargetPrivilegeRepositoryPropertyDescriptor.ID );
-                            prop.setValue( res.getRepositoryId() );
+                        priv.addProperty( prop );
 
-                            priv.addProperty( prop );
+                        prop = new SecurityProperty();
+                        prop.setKey( TargetPrivilegeGroupPropertyDescriptor.ID );
+                        prop.setValue( resource.getRepositoryGroupId() );
 
-                            prop = new SecurityProperty();
-                            prop.setKey( TargetPrivilegeGroupPropertyDescriptor.ID );
-                            prop.setValue( res.getRepositoryGroupId() );
+                        priv.addProperty( prop );
 
-                            priv.addProperty( prop );
+                        getNexusSecurity().createPrivilege( priv );
 
-                            getNexusSecurity().createPrivilege( priv );
-
-                            result.addData( nexusToRestModel( priv, request ) );
-                        }
-                        else
-                        {
-                            throw new PlexusResourceException(
-                                Status.CLIENT_ERROR_BAD_REQUEST,
-                                "Configuration error.",
-                                getNexusErrorResponse( "type", "An invalid type was entered." ) );
-                        }
+                        result.addData( nexusToRestModel( priv, request ) );
                     }
-
                 }
                 catch ( InvalidConfigurationException e )
                 {

@@ -17,7 +17,6 @@ import org.restlet.data.MediaType;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
-import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 public class PrivilegeTest
@@ -42,8 +41,8 @@ public class PrivilegeTest
         assert request.getData().getMethod().size() == 2;
         assert request.getData().getMethod().contains( "read" );
         assert request.getData().getMethod().contains( "create" );
-        assert ( (PrivilegeTargetResource) request.getData() ).getRepositoryTargetId().equals( "targetId" );
-        assert ( (PrivilegeTargetResource) request.getData() ).getRepositoryId().equals( "repoId" );
-        assert ( (PrivilegeTargetResource) request.getData() ).getRepositoryGroupId().equals( "groupId" );
+        assert request.getData().getRepositoryTargetId().equals( "targetId" );
+        assert request.getData().getRepositoryId().equals( "repoId" );
+        assert request.getData().getRepositoryGroupId().equals( "groupId" );
     }
 }

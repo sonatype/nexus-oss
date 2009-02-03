@@ -23,13 +23,16 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
   Ext.apply( this, config, defaultConfig );
 
   this.sp = Sonatype.lib.Permissions;
-
-  this.typeStore = new Ext.data.SimpleStore( {
-    fields: ['value', 'display'], 
-    data: [
-      ['target', 'Repository Target'],
-      ['method', 'Application']
-    ]
+  
+  this.privilegeTypeStore = new Ext.data.JsonStore( {
+    root: 'data',
+    id: 'id',
+    fields: [
+      { name: 'id' },
+      { name: 'name' },
+      { name: 'properties' }
+    ],
+    url: Sonatype.config.repos.urls.privilegeTypes
   } );
 
   this.groupStore = new Ext.data.JsonStore( {
@@ -77,7 +80,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
     rowClickEvent: 'privilegeViewInit',
     deleteButton: this.sp.checkPermission( 'nexus:privileges', this.sp.DELETE ),
     url: Sonatype.config.repos.urls.privileges,
-    dataStores: [this.groupStore, this.repoStore, this.targetStore],
+    dataStores: [this.privilegeTypeStore, this.groupStore, this.repoStore, this.targetStore],
     columns: [
       { name: 'resourceURI' },
       { name: 'id' },
@@ -101,25 +104,25 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
         width: 100
       },
       { name: 'description' },
-      { name: 'repositoryTargetId' },
+      { name: 'properties' },
       { 
         name: 'sTarget', 
-        mapping: 'repositoryTargetId', 
+        mapping: 'properties', 
         convert: this.convertTarget.createDelegate( this ),
         header: 'Target',
         width: 120
       },
-      { name: 'repositoryId' },
-      { name: 'repositoryGroupId' },
       { 
         name: 'sRepository', 
-        mapping: 'repositoryId', 
+        mapping: 'properties', 
         convert: this.convertRepository.createDelegate( this ),
         header: 'Repository',
         width: 150
       },
       { 
-        name: 'method',
+        name: 'sMethod', 
+        mapping: 'properties', 
+        convert: this.convertMethod.createDelegate( this ),
         header: 'Method',
         width: 150
       }
@@ -138,21 +141,51 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
 
 Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, {
   convertRepository: function( value, parent ) {
-    if ( parent.repositoryId ) {
-      return this.convertDataValue( parent.repositoryId, this.repoStore, 'id', 'name' );
+    var targetPriv = false;
+    for ( var i = 0; i < parent.properties.length; i++){
+      if ( parent.properties[i].key == 'repositoryId'
+        && !Ext.isEmpty(parent.properties[i].value) ){
+        return this.convertDataValue( parent.properties[i].value, this.repoStore, 'id', 'name' );
+      }
+      else if ( parent.properties[i].key == 'repositoryGroupId'
+        && !Ext.isEmpty(parent.properties[i].value) ){
+        return this.convertDataValue( parent.properties[i].value, this.groupStore, 'id', 'name' );
+      }
+      else if ( parent.properties[i].key == 'repositoryTargetId' ){
+        targetPriv = true;
+      }
     }
-    else if ( parent.repositoryGroupId ) {
-      return this.convertDataValue( parent.repositoryGroupId, this.groupStore, 'id', 'name' );
+    
+    if ( targetPriv ){
+      return 'All Repositories';
+    }
+    else {
+      return '';
+    }
+  },
+
+  convertTarget: function( value, parent ) {
+    for ( var i = 0; i < parent.properties.length; i++){
+      if ( parent.properties[i].key == 'repositoryTargetId'
+        && !Ext.isEmpty(parent.properties[i].value) ){
+        return this.convertDataValue( parent.properties[i].value, this.targetStore, 'id', 'name' );
+      }
     }
     return '';
   },
 
-  convertTarget: function( value, parent ) {
-    return this.convertDataValue( value, this.targetStore, 'id', 'name' );
-  },
-
   convertType: function( value, parent ) {
-    return this.convertDataValue( value, this.typeStore, 'value', 'display' );
+    return this.convertDataValue( value, this.privilegeTypeStore, 'id', 'name' );
+  },
+  
+  convertMethod: function( value, parent ) {
+    for ( var i = 0; i < parent.properties.length; i++){
+      if ( parent.properties[i].key == 'method'
+        && !Ext.isEmpty(parent.properties[i].value) ){
+        return parent.properties[i].value;
+      }
+    }
+    return '';
   },
   
   onAddMenuInit: function( menu ) {
@@ -178,7 +211,7 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
   onViewInit: function( cardPanel, rec ) {
     var editor = new Sonatype.repoServer.PrivilegeEditor( {
       payload: rec,
-      typeStore: this.typeStore,
+      privilegeTypeStore: this.privilegeTypeStore,
       repoStore: this.repoStore,
       targetStore: this.targetStore,
       groupStore: this.groupStore
@@ -207,21 +240,13 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
     uri: Sonatype.config.repos.urls.privileges,
     dataModifiers: {
       load: {
-        repositoryId: function( value, parent, fpanel ) {
-          if ( value ) {
-            fpanel.form.findField( 'repositoryOrGroup' ).setValue( 'repo_' + value );
+        properties: function( value, parent, fpanel ) {
+          for ( var i = 0; i < value.length; i++ ){
+            fpanel.form.findField( value[i].key ).setValue( value[i].value );
           }
         },
-        repositoryGroupId: function( value, parent, fpanel ) {
-          if ( value ) {
-            fpanel.form.findField( 'repositoryOrGroup' ).setValue( 'group_' + value );
-          }
-        },
-        id: function( value, parent, fpanel ) {
-          if ( parent.type == 'target' &&
-              ! ( parent.repositoryId || parent.repositoryGroupId ) ) {
-            fpanel.form.findField( 'repositoryOrGroup' ).setValue( 'all_repo' );
-          }
+        type: function( value, parent, fpanel ) {
+          return fpanel.convertDataValue( value, fpanel.privilegeTypeStore, 'id', 'name' );
         }
       },
       submit: { 
@@ -275,7 +300,7 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
     {
       xtype: 'textfield',
       fieldLabel: 'Name',
-      itemCls: 'required-field',
+      itemCls: this.readOnly ? '' : 'required-field',
       helpText: ht.name,
       name: 'name',
       allowBlank: false,
@@ -285,38 +310,40 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
     {
       xtype: 'textfield',
       fieldLabel: 'Description',
-      itemCls: 'required-field',
+      itemCls: this.readOnly ? '' : 'required-field',
       helpText: ht.description,
       name: 'description',
       allowBlank: false,
       width: this.COMBO_WIDTH,
       disabled: this.readOnly
-    },
-    {
-      xtype: 'combo',
-      fieldLabel: 'Type',
-      itemCls: 'required-field',
-      helpText: ht.type,
-      name: 'type',
-      store: this.typeStore,
-      displayField: 'display',
-      valueField: 'value',
-      editable: false,
-      forceSelection: true,
-      mode: 'local',
-      triggerAction: 'all',
-      emptyText: 'Select...',
-      selectOnFocus: true,
-      allowBlank: false,
-      width: this.COMBO_WIDTH,
-      value: 'target',
-      lazyInit: false,
-      disabled: true
     }
   ];
   
-  if ( this.payload.data.type == 'target' ) {
-
+  if ( this.isNew ) {
+    items.push(
+      {
+        xtype: 'combo',
+        fieldLabel: 'Type',
+        itemCls: 'required-field',
+        helpText: ht.type,
+        name: 'type',
+        store: this.privilegeTypeStore,
+        displayField: 'name',
+        valueField: 'id',
+        editable: false,
+        forceSelection: true,
+        mode: 'local',
+        triggerAction: 'all',
+        emptyText: 'Select...',
+        selectOnFocus: true,
+        allowBlank: false,
+        width: this.COMBO_WIDTH,
+        value: 'target',
+        lazyInit: false,
+        disabled: true
+      }
+    );
+    
     // clone the target store
     var targetStore2 = new Ext.data.JsonStore( {
       root: 'data',
@@ -350,7 +377,6 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
       width: this.COMBO_WIDTH,
       minListWidth: this.COMBO_WIDTH,
       value: "all_repo",
-      disabled: this.readOnly,
       listeners: {
         select: {
           fn: this.repositorySelectHandler,
@@ -374,22 +400,33 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
       emptyText:'Select...',
       selectOnFocus:true,
       allowBlank: false,
-      width: this.COMBO_WIDTH,
-      disabled: this.readOnly
+      width: this.COMBO_WIDTH
     } );
   }
-  
-  if ( ! this.isNew ) {
+  else {
     items.push( {
       xtype: 'textfield',
-      fieldLabel: 'Method',
-      itemCls: 'required-field',
-      helpText: '',
-      name: 'method',
-      allowBlank: false,
+      fieldLabel: 'Type',
+      helpText: ht.type,
+      name: 'type',
       width: this.COMBO_WIDTH,
       disabled: true
     } );
+    
+    var typeRec = this.privilegeTypeStore.getById(this.payload.data.type);
+    
+    if ( !Ext.isEmpty(typeRec) ) {
+      for ( var i = 0; i < typeRec.data.properties.length; i++){
+        items.push( {
+          xtype: 'textfield',
+          fieldLabel: typeRec.data.properties[i].name,
+          helpText: typeRec.data.properties[i].helpText,
+          name: typeRec.data.properties[i].id,
+          width: this.COMBO_WIDTH,
+          disabled: true
+        } );
+      }
+    }
   }
   
   Sonatype.repoServer.PrivilegeEditor.superclass.constructor.call( this, {

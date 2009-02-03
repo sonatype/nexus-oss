@@ -34,10 +34,6 @@ import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.rest.model.*;
-import org.sonatype.nexus.rest.privileges.PrivilegeBaseResourceConverter;
-import org.sonatype.nexus.rest.privileges.PrivilegeBaseStatusResourceConverter;
-import org.sonatype.nexus.rest.privileges.PrivilegeResourceRequestConverter;
-import org.sonatype.nexus.rest.privileges.PrivilegeStatusResourceResponseConverter;
 import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
 import org.sonatype.nexus.rest.repositories.RepositoryResourceResponseConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter;
@@ -131,20 +127,6 @@ public class NexusApplication
         xstream.registerConverter( new ScheduledServiceResourceResponseConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH ); // strips the class="class.name" attribute from
         // data
-
-        xstream.registerConverter( new PrivilegeBaseResourceConverter( xstream.getMapper(), xstream
-            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
-        xstream.registerConverter( new PrivilegeResourceRequestConverter( xstream.getMapper(), xstream
-            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH ); // strips the class="class.name" attribute from
-        // data
-        xstream.registerConverter( new PrivilegeBaseStatusResourceConverter( xstream.getMapper(), xstream
-            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
-        xstream.registerConverter( new PrivilegeStatusResourceResponseConverter( xstream.getMapper(), xstream
-            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH ); // strips the class="class.name" attribute from
-        // data
-
-        // xstream.registerLocalConverter( PrivilegeListResourceResponse.class, "data", new AliasingListConverter(
-        // PrivilegeApplicationStatusResource.class, "privilege-application-status"));
 
         // Maven POM
         xstream.alias( "project", Model.class );
@@ -388,22 +370,34 @@ public class NexusApplication
             "privilege" ) );
 
         xstream.omitField( PrivilegeResourceRequest.class, "modelEncoding" );
-        xstream.omitField( PrivilegeTargetResource.class, "modelEncoding" );
-        xstream.omitField( PrivilegeBaseStatusResource.class, "modelEncoding" );
-        xstream.omitField( PrivilegeApplicationStatusResource.class, "modelEncoding" );
-        xstream.omitField( PrivilegeTargetStatusResource.class, "modelEncoding" );
+        xstream.omitField( PrivilegeResource.class, "modelEncoding" );
+        xstream.omitField( PrivilegeStatusResource.class, "modelEncoding" );
         xstream.omitField( PrivilegeListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( PrivilegeBaseResource.class, "modelEncoding" );
         xstream.omitField( PrivilegeStatusResourceResponse.class, "modelEncoding" );
-        xstream.alias( "privilege", PrivilegeResourceRequest.class );
-        xstream.alias( "privileges-status-list", PrivilegeListResourceResponse.class );
-        xstream.alias( "privilege-target-status", PrivilegeTargetStatusResource.class );
-        xstream.alias( "privilege-application-status", PrivilegeApplicationStatusResource.class );
-        xstream.alias( "privilege-status", PrivilegeStatusResourceResponse.class );
-        xstream.aliasField( "methods", PrivilegeBaseResource.class, "method" );
-        xstream.registerLocalConverter( PrivilegeBaseResource.class, "method", new AliasingListConverter(
+        xstream.omitField( PrivilegeProperty.class, "modelEncoding" );
+        xstream.omitField( PrivilegeTypeResource.class, "modelEncoding" );
+        xstream.omitField( PrivilegeTypePropertyResource.class, "modelEncoding" );
+        xstream.omitField( PrivilegeTypeResourceResponse.class, "modelEncoding" );
+        xstream.alias( "privilege-request", PrivilegeResourceRequest.class );
+        xstream.alias( "privilege-list-response", PrivilegeListResourceResponse.class );
+        xstream.alias( "privilege-status-response", PrivilegeStatusResourceResponse.class );
+        xstream.alias( "privilege-type-response", PrivilegeTypeResourceResponse.class );
+        xstream.aliasField( "methods", PrivilegeResource.class, "method" );
+        xstream.registerLocalConverter( PrivilegeListResourceResponse.class, "data", new AliasingListConverter(
+            PrivilegeStatusResource.class,
+            "privilege-item" ) );
+        xstream.registerLocalConverter( PrivilegeResource.class, "method", new AliasingListConverter(
             String.class,
             "method" ) );
+        xstream.registerLocalConverter( PrivilegeStatusResource.class, "properties", new AliasingListConverter(
+            PrivilegeProperty.class,
+            "privilege-property" ) );
+        xstream.registerLocalConverter( PrivilegeTypeResourceResponse.class, "data", new AliasingListConverter(
+            PrivilegeTypeResource.class,
+            "privilege-type" ) );
+        xstream.registerLocalConverter( PrivilegeTypeResource.class, "properties", new AliasingListConverter(
+            PrivilegeTypePropertyResource.class,
+            "privilege-type-property" ) );
 
         xstream.omitField( NFCResourceResponse.class, "modelEncoding" );
         xstream.omitField( NFCResource.class, "modelEncoding" );

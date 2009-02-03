@@ -19,8 +19,10 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.restlet.data.MediaType;
+import org.sonatype.jsecurity.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 
 /**
@@ -42,11 +44,11 @@ public class Nexus448PrivilegeURLTest extends AbstractNexusIntegrationTest
     public void testUrls() throws IOException
     {
         
-        PrivilegeBaseStatusResource resource = this.messageUtil.getPrivilegeResource( "T2" );
-        Assert.assertEquals( "Type", "target", resource.getType() );
+        PrivilegeStatusResource resource = this.messageUtil.getPrivilegeResource( "T2" );
+        Assert.assertEquals( "Type", TargetPrivilegeDescriptor.TYPE, resource.getType() );
         
         resource = this.messageUtil.getPrivilegeResource( "1" );
-        Assert.assertEquals( "Type", "method", resource.getType() );
+        Assert.assertEquals( "Type", ApplicationPrivilegeDescriptor.TYPE, resource.getType() );
         
     }
     

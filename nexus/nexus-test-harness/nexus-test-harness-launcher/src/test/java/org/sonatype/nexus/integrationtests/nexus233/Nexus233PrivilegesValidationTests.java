@@ -23,9 +23,10 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.sonatype.jsecurity.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
-import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
+import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 
@@ -51,13 +52,13 @@ public class Nexus233PrivilegesValidationTests
     public void createWithInvalidMethodTest()
         throws IOException
     {
-        PrivilegeTargetResource resource = new PrivilegeTargetResource();
+        PrivilegeResource resource = new PrivilegeResource();
 
         List methods = new ArrayList<String>();
         methods.add( "INVALID" );
         resource.setMethod( methods );
         resource.setName( "createWithInvalidMethodTest" );
-        resource.setType( "target" );
+        resource.setType( TargetPrivilegeDescriptor.TYPE );
         resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
@@ -77,13 +78,13 @@ public class Nexus233PrivilegesValidationTests
     public void createNoMethodTest()
         throws IOException
     {
-        PrivilegeTargetResource resource = new PrivilegeTargetResource();
+        PrivilegeResource resource = new PrivilegeResource();
 
         List methods = new ArrayList<String>();
         // methods.add( "read" );
         resource.setMethod( methods );
         resource.setName( "createNoMethodTest" );
-        resource.setType( "target" );
+        resource.setType( TargetPrivilegeDescriptor.TYPE );
         resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
@@ -104,13 +105,13 @@ public class Nexus233PrivilegesValidationTests
     public void createNoNameTest()
         throws IOException
     {
-        PrivilegeTargetResource resource = new PrivilegeTargetResource();
+        PrivilegeResource resource = new PrivilegeResource();
 
         List methods = new ArrayList<String>();
         methods.add( "read" );
         resource.setMethod( methods );
         // resource.setName( "createNoMethodTest" );
-        resource.setType( "target" );
+        resource.setType( TargetPrivilegeDescriptor.TYPE );
         resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
@@ -131,7 +132,7 @@ public class Nexus233PrivilegesValidationTests
     public void createNoTypeTest()
         throws IOException
     {
-        PrivilegeBaseResource resource = new PrivilegeBaseResource();
+        PrivilegeResource resource = new PrivilegeResource();
 
         List methods = new ArrayList<String>();
         methods.add( "read" );
@@ -140,14 +141,11 @@ public class Nexus233PrivilegesValidationTests
         // resource.setType( "target" );
 //        resource.setRepositoryTargetId( "testTarget" );
 
-        try
+        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+        
+        if ( response.getStatus().isSuccess())
         {
-          Response response = this.messageUtil.sendMessage( Method.POST, resource );
-          Assert.fail( "Expected to throw a ConversionException" );
-        }
-        catch( ConversionException e )
-        {
-            // expected
+            Assert.fail( "No type, POST should've failed");
         }
     }
 
@@ -156,13 +154,13 @@ public class Nexus233PrivilegesValidationTests
     public void createNoRepoTest()
         throws IOException
     {
-        PrivilegeTargetResource resource = new PrivilegeTargetResource();
+        PrivilegeResource resource = new PrivilegeResource();
 
         List methods = new ArrayList<String>();
         methods.add( "read" );
         resource.setMethod( methods );
         resource.setName( "createNoRepoTest" );
-        resource.setType( "target" );
+        resource.setType( TargetPrivilegeDescriptor.TYPE );
         // resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
@@ -183,14 +181,14 @@ public class Nexus233PrivilegesValidationTests
     public void createWithInvalidAndValidMethodsTest()
         throws IOException
     {
-        PrivilegeTargetResource resource = new PrivilegeTargetResource();
+        PrivilegeResource resource = new PrivilegeResource();
 
         List methods = new ArrayList<String>();
         methods.add( "read" );
         methods.add( "INVALID" );
         resource.setMethod( methods );
         resource.setName( "createWithInvalidAndValidMethodsTest" );
-        resource.setType( "target" );
+        resource.setType( TargetPrivilegeDescriptor.TYPE );
         // resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
@@ -211,10 +209,10 @@ public class Nexus233PrivilegesValidationTests
     public void createApplicationResource()
         throws IOException
     {
-        PrivilegeBaseResource resource = new PrivilegeTargetResource();
+        PrivilegeResource resource = new PrivilegeResource();
         resource.addMethod( "read" );
         resource.setName( "createApplicationResource" );
-        resource.setType( "method" );
+        resource.setType( ApplicationPrivilegeDescriptor.TYPE );
         //resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );

@@ -33,9 +33,8 @@ import org.sonatype.jsecurity.model.CUser;
 import org.sonatype.jsecurity.model.Configuration;
 import org.sonatype.jsecurity.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
-import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
-import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
+import org.sonatype.nexus.rest.model.PrivilegeProperty;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
 
@@ -96,69 +95,39 @@ public class SecurityConfigUtil
 
         }
     }
+    
+    public static String getPrivilegeProperty( PrivilegeStatusResource priv, String key )
+    {
+        for ( PrivilegeProperty prop : ( List<PrivilegeProperty> ) priv.getProperties() )
+        {
+            if ( prop.getKey().equals( key ) )
+            {
+                return prop.getValue();
+            }
+        }
+        
+        return null;
+    }
 
     @SuppressWarnings( "unchecked" )
-    public static void verifyRepoTargetPrivileges( List<PrivilegeBaseStatusResource> privs )
+    public static void verifyPrivileges( List<PrivilegeStatusResource> privs )
         throws IOException
     {
-
-        for ( Iterator<PrivilegeBaseStatusResource> iter = privs.iterator(); iter.hasNext(); )
+        for ( Iterator<PrivilegeStatusResource> iter = privs.iterator(); iter.hasNext(); )
         {
-            PrivilegeBaseStatusResource privResource = iter.next();
+            PrivilegeStatusResource privResource = iter.next();
+            
+            CPrivilege secPriv = getCPrivilege( privResource.getId() );
 
-            if ( privResource instanceof PrivilegeTargetStatusResource )
+            Assert.assertNotNull( secPriv );
+
+            Assert.assertEquals( privResource.getId(), secPriv.getId() );
+            Assert.assertEquals( privResource.getName(), secPriv.getName() );
+            Assert.assertEquals( privResource.getDescription(), secPriv.getDescription() );
+            
+            for ( CProperty prop : ( List<CProperty> ) secPriv.getProperties() )
             {
-                CPrivilege secPriv = getCPrivilege( privResource.getId() );
-
-                Assert.assertNotNull( secPriv );
-                PrivilegeTargetStatusResource targetPriv = (PrivilegeTargetStatusResource) privResource;
-
-                Assert.assertEquals( targetPriv.getId(), secPriv.getId() );
-                Assert.assertEquals( targetPriv.getName(), secPriv.getName() );
-                Assert.assertEquals( targetPriv.getType(), "target" );
-                
-                for ( CProperty prop : ( List<CProperty> ) secPriv.getProperties() )
-                {
-                    if ( prop.getKey().equals( "repositoryGroupId" ) )
-                    {
-                        Assert.assertEquals( targetPriv.getRepositoryGroupId(), prop.getValue() );
-                    }
-                    else if ( prop.getKey().equals( "repositoryId" ) )
-                    {
-                        Assert.assertEquals( targetPriv.getRepositoryId(), prop.getValue() );
-                    }
-                    else if ( prop.getKey().equals( "repositoryTargetId" ) )
-                    {
-                        Assert.assertEquals( targetPriv.getRepositoryTargetId(), prop.getValue() );
-                    }
-                    else if ( prop.getKey().equals( "method" ) )
-                    {
-                        Assert.assertEquals( targetPriv.getMethod(), prop.getValue() );
-                    }
-                }
-            }
-            else if ( privResource instanceof PrivilegeApplicationStatusResource )
-            {
-                CPrivilege secPriv = getCPrivilege( privResource.getId() );
-
-                Assert.assertNotNull( secPriv );
-                PrivilegeApplicationStatusResource targetPriv = (PrivilegeApplicationStatusResource) privResource;
-
-                Assert.assertEquals( targetPriv.getId(), secPriv.getId() );
-                Assert.assertEquals( targetPriv.getName(), secPriv.getName() );
-                Assert.assertEquals( targetPriv.getType(), "method" );
-                
-                for ( CProperty prop : ( List<CProperty> ) secPriv.getProperties() )
-                {
-                    if ( prop.getKey().equals( "permission" ) )
-                    {
-                        Assert.assertEquals( targetPriv.getPermission(), prop.getValue() );
-                    }
-                    else if ( prop.getKey().equals( "method" ) )
-                    {
-                        Assert.assertEquals( targetPriv.getMethod(), prop.getValue() );
-                    }
-                }
+                Assert.assertEquals( getPrivilegeProperty( privResource, prop.getKey() ), prop.getValue() );
             }
         }
     }

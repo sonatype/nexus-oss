@@ -24,9 +24,10 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
-import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
+import org.sonatype.nexus.rest.model.PrivilegeResource;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
@@ -71,8 +72,8 @@ public class Nexus778SearchResultsFilteringTest
             createTarget( "filterTarget2", Collections.singletonList( "/nexus778/test2/.*" ) );
 
         // Then create the privileges
-        PrivilegeTargetStatusResource priv1 = createPrivilege( "filterPriv1", test1Target.getId() );
-        PrivilegeTargetStatusResource priv2 = createPrivilege( "filterPriv2", test2Target.getId() );
+        PrivilegeStatusResource priv1 = createPrivilege( "filterPriv1", test1Target.getId() );
+        PrivilegeStatusResource priv2 = createPrivilege( "filterPriv2", test2Target.getId() );
 
         // Then create the roles
         List<String> combined = new ArrayList<String>();
@@ -163,18 +164,18 @@ public class Nexus778SearchResultsFilteringTest
         return this.targetUtil.createTarget( resource );
     }
 
-    private PrivilegeTargetStatusResource createPrivilege( String name, String targetId )
+    private PrivilegeStatusResource createPrivilege( String name, String targetId )
         throws Exception
     {
-        PrivilegeTargetResource resource = new PrivilegeTargetResource();
+        PrivilegeResource resource = new PrivilegeResource();
 
         resource.setName( name );
         resource.setDescription( "some description" );
-        resource.setType( "target" );
+        resource.setType( TargetPrivilegeDescriptor.TYPE );
         resource.setRepositoryTargetId( targetId );
         resource.addMethod( "read" );
 
-        return (PrivilegeTargetStatusResource) privUtil.createPrivileges( resource ).iterator().next();
+        return (PrivilegeStatusResource) privUtil.createPrivileges( resource ).iterator().next();
     }
 
     private RoleResource createRole( String name, List<String> privilegeIds )

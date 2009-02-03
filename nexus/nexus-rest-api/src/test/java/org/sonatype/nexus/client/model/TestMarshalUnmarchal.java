@@ -26,9 +26,15 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang.time.DateUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.jsecurity.realms.privileges.application.ApplicationPrivilegeDescriptor;
+import org.sonatype.jsecurity.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
+import org.sonatype.jsecurity.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.nexus.rest.NexusApplication;
 import org.sonatype.nexus.rest.model.*;
-import org.sonatype.nexus.rest.roles.PlexusRoleListPlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
@@ -1116,7 +1122,7 @@ public class TestMarshalUnmarchal
     {
         PrivilegeResourceRequest resourceRequest = new PrivilegeResourceRequest();
 
-        PrivilegeTargetResource resource = new PrivilegeTargetResource();
+        PrivilegeResource resource = new PrivilegeResource();
         resource.setRepositoryGroupId( "RepositoryGroupId" );
         resource.setRepositoryId( "RepositoryId" );
         resource.setRepositoryTargetId( "RepositoryTargetId" );
@@ -1136,45 +1142,93 @@ public class TestMarshalUnmarchal
     {
         PrivilegeListResourceResponse resourceResponse = new PrivilegeListResourceResponse();
 
-        PrivilegeApplicationStatusResource appResource1 = new PrivilegeApplicationStatusResource();
-        appResource1.setPermission( "Permission1" );
+        PrivilegeStatusResource appResource1 = new PrivilegeStatusResource();
         appResource1.setId( "Id1" );
         appResource1.setResourceURI( "ResourceURI1" );
         appResource1.setName( "Name1" );
-        appResource1.setMethod( "Method1" );
         appResource1.setDescription( "Description1" );
-        appResource1.setType( "Type1" );
+        appResource1.setType( ApplicationPrivilegeDescriptor.TYPE );
+        
+        PrivilegeProperty prop = new PrivilegeProperty();
+        prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
+        prop.setValue( "Method1" );        
+        appResource1.addProperty( prop );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( ApplicationPrivilegePermissionPropertyDescriptor.ID );
+        prop.setValue( "Permission1" );        
+        appResource1.addProperty( prop );
 
-        PrivilegeApplicationStatusResource appResource2 = new PrivilegeApplicationStatusResource();
-        appResource2.setPermission( "Permission2" );
+        PrivilegeStatusResource appResource2 = new PrivilegeStatusResource();
         appResource2.setId( "Id2" );
         appResource2.setResourceURI( "ResourceURI2" );
         appResource2.setName( "Name2" );
-        appResource2.setMethod( "Method2" );
         appResource2.setDescription( "Description2" );
-        appResource2.setType( "Type2" );
+        appResource2.setType( ApplicationPrivilegeDescriptor.TYPE );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
+        prop.setValue( "Method2" );        
+        appResource2.addProperty( prop );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( ApplicationPrivilegePermissionPropertyDescriptor.ID );
+        prop.setValue( "Permission2" );        
+        appResource2.addProperty( prop );
 
-        PrivilegeTargetStatusResource targetResource1 = new PrivilegeTargetStatusResource();
-        targetResource1.setRepositoryGroupId( "RepositoryGroupId1" );
-        targetResource1.setRepositoryId( "RepositoryId1" );
-        targetResource1.setRepositoryTargetId( "RepositoryTargetId1" );
+        PrivilegeStatusResource targetResource1 = new PrivilegeStatusResource();
         targetResource1.setId( "Id1" );
         targetResource1.setResourceURI( "ResourceURI1" );
         targetResource1.setName( "Name1" );
-        targetResource1.setMethod( "Method1" );
         targetResource1.setDescription( "Description1" );
-        targetResource1.setType( "Type1" );
+        targetResource1.setType( TargetPrivilegeDescriptor.TYPE );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( TargetPrivilegeGroupPropertyDescriptor.ID );
+        prop.setValue( "RepositoryGroupId1" );        
+        targetResource1.addProperty( prop );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( TargetPrivilegeRepositoryPropertyDescriptor.ID );
+        prop.setValue( "RepositoryId1" );        
+        targetResource1.addProperty( prop );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( TargetPrivilegeRepositoryTargetPropertyDescriptor.ID );
+        prop.setValue( "RepositoryTargetId1" );        
+        targetResource1.addProperty( prop );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
+        prop.setValue( "Method1" );        
+        targetResource1.addProperty( prop );
 
-        PrivilegeTargetStatusResource targetResource2 = new PrivilegeTargetStatusResource();
-        targetResource2.setRepositoryGroupId( "RepositoryGroupId2" );
-        targetResource2.setRepositoryId( "RepositoryId2" );
-        targetResource2.setRepositoryTargetId( "RepositoryTargetId2" );
+        PrivilegeStatusResource targetResource2 = new PrivilegeStatusResource();
         targetResource2.setId( "Id2" );
         targetResource2.setResourceURI( "ResourceURI2" );
         targetResource2.setName( "Name2" );
-        targetResource2.setMethod( "Method2" );
         targetResource2.setDescription( "Description2" );
-        targetResource2.setType( "Type2" );
+        targetResource2.setType( TargetPrivilegeDescriptor.TYPE );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( TargetPrivilegeGroupPropertyDescriptor.ID );
+        prop.setValue( "RepositoryGroupId2" );        
+        targetResource2.addProperty( prop );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( TargetPrivilegeRepositoryPropertyDescriptor.ID );
+        prop.setValue( "RepositoryId2" );        
+        targetResource2.addProperty( prop );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( TargetPrivilegeRepositoryTargetPropertyDescriptor.ID );
+        prop.setValue( "RepositoryTargetId2" );        
+        targetResource2.addProperty( prop );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
+        prop.setValue( "Method2" );        
+        targetResource2.addProperty( prop );
 
         resourceResponse.addData( appResource1 );
         resourceResponse.addData( targetResource1 );
@@ -1186,44 +1240,111 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
-    public void testPrivilegeApplicationStatusResource()
+    public void testPrivilegeStatusResource()
     {
-
-        PrivilegeApplicationStatusResource appResource1 = new PrivilegeApplicationStatusResource();
-        appResource1.setPermission( "Permission1" );
+        PrivilegeStatusResource appResource1 = new PrivilegeStatusResource();
         appResource1.setId( "Id1" );
         appResource1.setResourceURI( "ResourceURI1" );
         appResource1.setName( "Name1" );
-        appResource1.setMethod( "Method1" );
         appResource1.setDescription( "Description1" );
-        appResource1.setType( "method" );
+        appResource1.setType( ApplicationPrivilegeDescriptor.TYPE );
+        
+        PrivilegeProperty prop = new PrivilegeProperty();
+        prop.setKey( ApplicationPrivilegePermissionPropertyDescriptor.ID );
+        prop.setValue( "Permission1" );
+        appResource1.addProperty( prop );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
+        prop.setValue( "Method1" );
+        appResource1.addProperty( prop );
 
         PrivilegeStatusResourceResponse resourceResponse = new PrivilegeStatusResourceResponse();
         resourceResponse.setData( appResource1 );
 
         this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
-    }
-
-    public void testPrivilegeTargetStatusResource()
-    {
-
-        PrivilegeTargetStatusResource targetResource1 = new PrivilegeTargetStatusResource();
-        targetResource1.setRepositoryGroupId( "RepositoryGroupId1" );
-        targetResource1.setRepositoryId( "RepositoryId1" );
-        targetResource1.setRepositoryTargetId( "RepositoryTargetId1" );
+        
+        PrivilegeStatusResource targetResource1 = new PrivilegeStatusResource();
         targetResource1.setId( "Id1" );
         targetResource1.setResourceURI( "ResourceURI1" );
         targetResource1.setName( "Name1" );
-        targetResource1.setMethod( "Method1" );
         targetResource1.setDescription( "Description1" );
-        targetResource1.setType( "target" );
+        targetResource1.setType( TargetPrivilegeDescriptor.TYPE );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( TargetPrivilegeGroupPropertyDescriptor.ID );
+        prop.setValue( "RepositoryGroupId1" );
+        targetResource1.addProperty( prop );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( TargetPrivilegeRepositoryPropertyDescriptor.ID );
+        prop.setValue( "RepositoryId1" );
+        targetResource1.addProperty( prop );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( TargetPrivilegeRepositoryTargetPropertyDescriptor.ID );
+        prop.setValue( "RepositoryTargetId1" );
+        targetResource1.addProperty( prop );
+        
+        prop = new PrivilegeProperty();
+        prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
+        prop.setValue( "Method1" );
+        targetResource1.addProperty( prop );
 
-        PrivilegeStatusResourceResponse resourceResponse = new PrivilegeStatusResourceResponse();
+        resourceResponse = new PrivilegeStatusResourceResponse();
         resourceResponse.setData( targetResource1 );
 
         this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
+    }
+    
+    public void testPrivilegeTypeResourceResponse()
+    {
+        PrivilegeTypeResourceResponse response = new PrivilegeTypeResourceResponse();
+        
+        PrivilegeTypeResource type = new PrivilegeTypeResource();
+        type.setId( "id1" );
+        type.setName( "name1" );
+        
+        PrivilegeTypePropertyResource property = new PrivilegeTypePropertyResource();
+        property.setId( "id1" );
+        property.setName( "name1" );
+        property.setHelpText( "help1" );
+        
+        type.addProperty( property );
+        
+        property = new PrivilegeTypePropertyResource();
+        property.setId( "id2" );
+        property.setName( "name2" );
+        property.setHelpText( "help2" );
+        
+        type.addProperty( property );
+        
+        response.addData( type );
+        
+        type = new PrivilegeTypeResource();
+        type.setId( "id2" );
+        type.setName( "name2" );
+        
+        property = new PrivilegeTypePropertyResource();
+        property.setId( "id3" );
+        property.setName( "name3" );
+        property.setHelpText( "help3" );
+        
+        type.addProperty( property );
+        
+        property = new PrivilegeTypePropertyResource();
+        property.setId( "id4" );
+        property.setName( "name4" );
+        property.setHelpText( "help4" );
+        
+        type.addProperty( property );
+        
+        response.addData( type );
+        
+        this.marshalUnmarchalThenCompare( response );
+        this.validateXmlHasNoPackageNames( response );
     }
 
     public void testNFCResourceResponse()

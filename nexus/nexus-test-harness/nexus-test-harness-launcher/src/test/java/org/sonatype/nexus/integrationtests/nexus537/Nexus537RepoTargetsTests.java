@@ -16,8 +16,6 @@ package org.sonatype.nexus.integrationtests.nexus537;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -30,15 +28,18 @@ import org.apache.maven.it.Verifier;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.sonatype.jsecurity.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
-import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
+import org.sonatype.nexus.rest.model.PrivilegeResource;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
+import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 
 /**
@@ -456,74 +457,74 @@ public class Nexus537RepoTargetsTests
         barTarget = this.targetUtil.createTarget( barTarget );
 
         // now create a couple privs
-        PrivilegeTargetResource fooPriv = new PrivilegeTargetResource();
+        PrivilegeResource fooPriv = new PrivilegeResource();
         fooPriv.addMethod( "create" );
         fooPriv.addMethod( "read" );
         fooPriv.addMethod( "update" );
         fooPriv.addMethod( "delete" );
         fooPriv.setName( "FooPriv" );
-        fooPriv.setType( "target" );
+        fooPriv.setType( TargetPrivilegeDescriptor.TYPE );
         fooPriv.setRepositoryTargetId( fooTarget.getId() );
         fooPriv.setRepositoryId( "repo1" );
         // get the Resource object
-        List<PrivilegeBaseStatusResource> fooPrivs = this.privUtil.createPrivileges( fooPriv );
+        List<PrivilegeStatusResource> fooPrivs = this.privUtil.createPrivileges( fooPriv );
 
-        for ( Iterator<PrivilegeBaseStatusResource> iter = fooPrivs.iterator(); iter.hasNext(); )
+        for ( Iterator<PrivilegeStatusResource> iter = fooPrivs.iterator(); iter.hasNext(); )
         {
-            PrivilegeBaseStatusResource privilegeBaseStatusResource = iter.next();
+            PrivilegeStatusResource privilegeBaseStatusResource = iter.next();
 
-            if ( contains( privilegeBaseStatusResource.getMethod(), "create", "read" ) )
+            if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "create,read" ) )
                 fooPrivCreateId = privilegeBaseStatusResource.getId();
-            else if ( contains( privilegeBaseStatusResource.getMethod(), "read" ) )
+            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "read" ) )
                 fooPrivReadId = privilegeBaseStatusResource.getId();
-            else if ( contains( privilegeBaseStatusResource.getMethod(), "update", "read" ) )
+            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "update,read" ) )
                 fooPrivUpdateId = privilegeBaseStatusResource.getId();
-            else if ( contains( privilegeBaseStatusResource.getMethod(), "delete", "read" ) )
+            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "delete,read" ) )
                 fooPrivDeleteId = privilegeBaseStatusResource.getId();
             else
                 Assert.fail( "Unknown Privilege found, id: " + privilegeBaseStatusResource.getId() + " method: "
-                    + privilegeBaseStatusResource.getMethod() );
+                    + SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
         }
 
         // now create a couple privs
-        PrivilegeTargetResource barPriv = new PrivilegeTargetResource();
+        PrivilegeResource barPriv = new PrivilegeResource();
         barPriv.addMethod( "create" );
         barPriv.addMethod( "read" );
         barPriv.addMethod( "update" );
         barPriv.addMethod( "delete" );
         barPriv.setName( "BarPriv" );
-        barPriv.setType( "target" );
+        barPriv.setType( TargetPrivilegeDescriptor.TYPE );
         barPriv.setRepositoryTargetId( barTarget.getId() );
         barPriv.setRepositoryId( "repo1" );
 
         // get the Resource object
-        List<PrivilegeBaseStatusResource> barPrivs = this.privUtil.createPrivileges( barPriv );
+        List<PrivilegeStatusResource> barPrivs = this.privUtil.createPrivileges( barPriv );
 
-        for ( Iterator<PrivilegeBaseStatusResource> iter = barPrivs.iterator(); iter.hasNext(); )
+        for ( Iterator<PrivilegeStatusResource> iter = barPrivs.iterator(); iter.hasNext(); )
         {
-            PrivilegeBaseStatusResource privilegeBaseStatusResource = iter.next();
+            PrivilegeStatusResource privilegeBaseStatusResource = iter.next();
 
-            if ( contains( privilegeBaseStatusResource.getMethod(), "create", "read" ) )
+            if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "create,read" ) )
                 barPrivCreateId = privilegeBaseStatusResource.getId();
-            else if ( contains( privilegeBaseStatusResource.getMethod(), "read" ) )
+            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "read" ) )
                 barPrivReadId = privilegeBaseStatusResource.getId();
-            else if ( contains( privilegeBaseStatusResource.getMethod(), "update", "read" ) )
+            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "update,read" ) )
                 barPrivUpdateId = privilegeBaseStatusResource.getId();
-            else if ( contains( privilegeBaseStatusResource.getMethod(), "delete", "read" ) )
+            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "delete,read" ) )
                 barPrivDeleteId = privilegeBaseStatusResource.getId();
             else
                 Assert.fail( "Unknown Privilege found, id: " + privilegeBaseStatusResource.getId() + " method: "
-                    + privilegeBaseStatusResource.getMethod() );
+                    + SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
         }
 
         // now create a couple privs
-        PrivilegeTargetResource groupPriv = new PrivilegeTargetResource();
+        PrivilegeResource groupPriv = new PrivilegeResource();
         groupPriv.addMethod( "create" );
         groupPriv.addMethod( "read" );
         groupPriv.addMethod( "update" );
         groupPriv.addMethod( "delete" );
         groupPriv.setName( "GroupPriv" );
-        groupPriv.setType( "target" );
+        groupPriv.setType( TargetPrivilegeDescriptor.TYPE );
         groupPriv.setRepositoryTargetId( fooTarget.getId() );
         groupPriv.setRepositoryGroupId( "test-group" );
         // groupPriv.setRepositoryId( repositoryId )
@@ -531,40 +532,24 @@ public class Nexus537RepoTargetsTests
         // groupPriv.setDescription( description )
 
         // get the Resource object
-        List<PrivilegeBaseStatusResource> groupPrivs = this.privUtil.createPrivileges( groupPriv );
+        List<PrivilegeStatusResource> groupPrivs = this.privUtil.createPrivileges( groupPriv );
 
-        for ( Iterator<PrivilegeBaseStatusResource> iter = groupPrivs.iterator(); iter.hasNext(); )
+        for ( Iterator<PrivilegeStatusResource> iter = groupPrivs.iterator(); iter.hasNext(); )
         {
-            PrivilegeBaseStatusResource privilegeBaseStatusResource = iter.next();
+            PrivilegeStatusResource privilegeBaseStatusResource = iter.next();
 
-            if ( contains( privilegeBaseStatusResource.getMethod(), "create", "read" ) )
+            if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "create,read" ) )
                 groupFooPrivCreateId = privilegeBaseStatusResource.getId();
-            else if ( contains( privilegeBaseStatusResource.getMethod(), "read" ) )
+            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "read" ) )
                 groupFooPrivReadId = privilegeBaseStatusResource.getId();
-            else if ( contains( privilegeBaseStatusResource.getMethod(), "update", "read" ) )
+            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "update,read" ) )
                 groupFooPrivUpdateId = privilegeBaseStatusResource.getId();
-            else if ( contains( privilegeBaseStatusResource.getMethod(), "delete", "read" ) )
+            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "delete,read" ) )
                 groupFooPrivDeleteId = privilegeBaseStatusResource.getId();
             else
                 Assert.fail( "Unknown Privilege found, id: " + privilegeBaseStatusResource.getId() + " method: "
-                    + privilegeBaseStatusResource.getMethod() );
+                    + SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
         }
 
     }
-
-    // TODO This will be no longer required when NEXUS-1018 is fixed
-    private boolean contains( String foundMethod, String... expectedMethods )
-    {
-        List<String> foundMethods = new ArrayList<String>( Arrays.asList( foundMethod.split( "," ) ) );
-        for ( String expectedMethod : expectedMethods )
-        {
-            if ( !foundMethods.remove( expectedMethod ) )
-            {
-                return false;
-            }
-        }
-
-        return foundMethods.isEmpty();
-    }
-
 }

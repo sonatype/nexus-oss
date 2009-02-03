@@ -27,10 +27,10 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
-import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
-import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
+import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
@@ -52,7 +52,7 @@ public class PrivilegesMessageUtil
         this.mediaType = mediaType;
     }
     
-    public List<PrivilegeBaseStatusResource> createPrivileges( PrivilegeBaseResource resource ) throws IOException
+    public List<PrivilegeStatusResource> createPrivileges( PrivilegeResource resource ) throws IOException
     {
         Response response = this.sendMessage( Method.POST, resource );
 
@@ -62,13 +62,13 @@ public class PrivilegesMessageUtil
         }
 
         // get the Resource object
-        List<PrivilegeBaseStatusResource> statusResources = this.getResourceListFromResponse( response );
-        SecurityConfigUtil.verifyRepoTargetPrivileges( statusResources );
+        List<PrivilegeStatusResource> statusResources = this.getResourceListFromResponse( response );
+        SecurityConfigUtil.verifyPrivileges( statusResources );
         
         return statusResources;
     }
 
-    public PrivilegeBaseStatusResource getPrivilegeResource( String id ) throws IOException
+    public PrivilegeStatusResource getPrivilegeResource( String id ) throws IOException
     {
         Response response = this.sendMessage( Method.GET, null, id );
         if ( !response.getStatus().isSuccess() )
@@ -78,14 +78,13 @@ public class PrivilegesMessageUtil
         return this.getResourceFromResponse( response );
     }
     
-    public Response sendMessage( Method method, PrivilegeBaseResource resource ) throws IOException
+    public Response sendMessage( Method method, PrivilegeResource resource ) throws IOException
     {
         return this.sendMessage( method, resource, "" );
     }
 
-    public Response sendMessage( Method method, PrivilegeBaseResource resource, String id ) throws IOException
+    public Response sendMessage( Method method, PrivilegeResource resource, String id ) throws IOException
     {
-
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
         String privId = ( method == Method.POST ) ? "" : "/" + id;
@@ -104,7 +103,7 @@ public class PrivilegesMessageUtil
         return RequestFacade.sendMessage( serviceURI, method, representation );
     }
 
-    public PrivilegeBaseStatusResource getResourceFromResponse( Response response )
+    public PrivilegeStatusResource getResourceFromResponse( Response response )
         throws IOException
     {
         String responseString = response.getEntity().getText();
@@ -114,11 +113,11 @@ public class PrivilegesMessageUtil
         PrivilegeStatusResourceResponse resourceResponse =
             (PrivilegeStatusResourceResponse) representation.getPayload( new PrivilegeStatusResourceResponse() );
 
-        return (PrivilegeBaseStatusResource) resourceResponse.getData();
+        return (PrivilegeStatusResource) resourceResponse.getData();
 
     }
 
-    public List<PrivilegeBaseStatusResource> getResourceListFromResponse( Response response )
+    public List<PrivilegeStatusResource> getResourceListFromResponse( Response response )
         throws IOException
     {
         String responseString = response.getEntity().getText();
