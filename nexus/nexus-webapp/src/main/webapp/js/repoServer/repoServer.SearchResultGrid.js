@@ -18,6 +18,8 @@
 Sonatype.repoServer.SearchResultGrid = function(config) {
 
   Ext.apply(this, config);
+  
+  this.sp = Sonatype.lib.Permissions;
 
   var resultRecordConstructor = Ext.data.Record.create([
       {name:'groupId'},
@@ -228,6 +230,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       },
       
       listeners: {
+        rowcontextmenu: this.rowContextMenuHandler, 
         render: function(panel){
           panel.body.on(
             {
@@ -244,7 +247,8 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
               delegate:'a.pom-link',
               scope:panel
             });
-        }
+        },
+        scope: this
       }
   });
 };
@@ -355,5 +359,30 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     this.store.removeAll();
     this.updateRowTotals( this );
     this.clearWarningLabel();
+  },
+  
+  rowContextMenuHandler: function( grid, rowIndex, e ) {
+    var rec = this.store.getAt( rowIndex );
+    
+    var menu = new Sonatype.menu.Menu( {
+      id: 'search-result-context-menu',
+      payload: rec
+    } );
+
+    if ( this.sp.checkPermission( 'nexus:cache', this.sp.DELETE ) ){
+      menu.add( Sonatype.repoServer.DefaultRepoHandler.repoActions.clearCache );
+    }
+//    if ( this.sp.checkPermission( 'nexus:index', this.sp.DELETE ) ) {
+//      menu.add( Sonatype.repoServer.DefaultRepoHandler.repoActions.reIndex );
+//    }
+    if ( this.sp.checkPermission( 'nexus:metadata', this.sp.DELETE ) ) {
+      menu.add( Sonatype.repoServer.DefaultRepoHandler.repoActions.rebuildMetadata );
+    }
+
+    if ( ! menu.items.first() ) return;
+
+    menu.on( 'hide', this.onBrowseContextHideHandler, this );
+    e.stopEvent();
+    menu.showAt( e.getXY() );
   }
 });
