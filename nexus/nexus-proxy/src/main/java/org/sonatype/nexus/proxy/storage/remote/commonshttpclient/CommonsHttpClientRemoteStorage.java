@@ -22,14 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.HttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NTCredentials;
@@ -42,7 +40,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.util.DateParseException;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.codehaus.plexus.component.annotations.Component;
@@ -77,8 +75,6 @@ public class CommonsHttpClientRemoteStorage
     public static final String CTX_KEY = "apacheHttpClient3x";
 
     public static final String CTX_KEY_CLIENT = CTX_KEY + ".client";
-
-    public static final String CTX_KEY_HTTP_RETRY_HANDLER = CTX_KEY + ".httpRetryHandler";
 
     public static final String CTX_KEY_HTTP_CONFIGURATION = CTX_KEY + ".httpConfiguration";
 
@@ -122,7 +118,8 @@ public class CommonsHttpClientRemoteStorage
         return checkRemoteAvailability( 0, repository, context, RepositoryItemUid.PATH_ROOT, false );
     }
 
-    public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String baseUrl, String path )
+    public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String baseUrl,
+        String path )
         throws ItemNotFoundException,
             RemoteAccessException,
             StorageException
@@ -292,15 +289,23 @@ public class CommonsHttpClientRemoteStorage
     {
         HttpClient httpClient = null;
 
-        HttpMethodRetryHandler httpRetryHandler = null;
-
         HostConfiguration httpConfiguration = null;
 
         getLogger().debug( "Creating CommonsHttpClient instance" );
-        httpRetryHandler = new DefaultHttpMethodRetryHandler( getRemoteConnectionSettings( ctx )
-            .getRetrievalRetryCount(), false );
-        httpClient = new HttpClient( new MultiThreadedHttpConnectionManager() );
-        httpClient.getParams().setConnectionManagerTimeout( getRemoteConnectionSettings( ctx ).getConnectionTimeout() );
+        
+        int timeout = getRemoteConnectionSettings( ctx ).getConnectionTimeout();
+        
+        HttpConnectionManagerParams connManagerParams = new HttpConnectionManagerParams();
+        connManagerParams.setConnectionTimeout( timeout );
+        connManagerParams.setSoTimeout( timeout );
+        connManagerParams.setTcpNoDelay( true );
+        
+        MultiThreadedHttpConnectionManager connManager = new MultiThreadedHttpConnectionManager();
+        connManager.setParams( connManagerParams );
+        
+        httpClient = new HttpClient( connManager);
+        httpClient.getParams().setConnectionManagerTimeout( timeout );
+        httpClient.getParams().setSoTimeout( timeout );
 
         httpConfiguration = httpClient.getHostConfiguration();
 
@@ -416,8 +421,6 @@ public class CommonsHttpClientRemoteStorage
         ctx.getRemoteConnectionContext().put( CTX_KEY_CLIENT, httpClient );
 
         ctx.getRemoteConnectionContext().put( CTX_KEY_HTTP_CONFIGURATION, httpConfiguration );
-
-        ctx.getRemoteConnectionContext().put( CTX_KEY_HTTP_RETRY_HANDLER, httpRetryHandler );
     }
 
     /**
@@ -437,8 +440,7 @@ public class CommonsHttpClientRemoteStorage
             try
             {
                 getLogger().debug(
-                    "Invoking HTTP " + method.getName() + " method against remote location "
-                        + method.getURI() );
+                    "Invoking HTTP " + method.getName() + " method against remote location " + method.getURI() );
             }
             catch ( URIException e )
             {
@@ -449,9 +451,6 @@ public class CommonsHttpClientRemoteStorage
         RemoteStorageContext ctx = getRemoteStorageContext( repository );
 
         HttpClient httpClient = (HttpClient) ctx.getRemoteConnectionContext().get( CTX_KEY_CLIENT );
-
-        HttpMethodRetryHandler httpRetryHandler = (HttpMethodRetryHandler) ctx.getRemoteConnectionContext().get(
-            CTX_KEY_HTTP_RETRY_HANDLER );
 
         HostConfiguration httpConfiguration = (HostConfiguration) ctx.getRemoteConnectionContext().get(
             CTX_KEY_HTTP_CONFIGURATION );
@@ -470,7 +469,6 @@ public class CommonsHttpClientRemoteStorage
         // method.setRequestHeader( new Header( "Connection", "Keep-Alive" ) );
 
         method.setFollowRedirects( true );
-        method.getParams().setParameter( HttpMethodParams.RETRY_HANDLER, httpRetryHandler );
 
         if ( !StringUtils.isEmpty( getRemoteConnectionSettings( ctx ).getQueryString() ) )
         {
@@ -494,7 +492,7 @@ public class CommonsHttpClientRemoteStorage
                     .getStatusText( HttpStatus.SC_UNAUTHORIZED ) );
             }
         }
-        catch (StorageException e)
+        catch ( StorageException e )
         {
             method.releaseConnection();
 

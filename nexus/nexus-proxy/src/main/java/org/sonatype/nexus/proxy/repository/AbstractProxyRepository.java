@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -57,8 +58,6 @@ public abstract class AbstractProxyRepository
 {
     /** The time while we do NOT check an already known remote status: 5 mins */
     protected static final long REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
-
-    protected static final int DOWNLOAD_RETRY_COUNT = 2;
 
     private static final ExecutorService exec = Executors.newCachedThreadPool();
 
@@ -693,7 +692,17 @@ public abstract class AbstractProxyRepository
         {
             all_urls: for ( Mirror mirror : mirrors )
             {
-                for ( int i = 0; i < DOWNLOAD_RETRY_COUNT; i++ )
+                int retryCount = 1;
+
+                if ( getRemoteStorageContext() != null )
+                {
+                    CRemoteConnectionSettings remoteConnectionSettings = (CRemoteConnectionSettings) getRemoteStorageContext()
+                        .getRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS );
+
+                    retryCount = remoteConnectionSettings.getRetrievalRetryCount();
+                }
+
+                for ( int i = 0; i < retryCount; i++ )
                 {
                     try
                     {

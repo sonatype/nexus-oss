@@ -39,6 +39,13 @@ public interface RemoteRepositoryStorage
     String getName();
 
     /**
+     * Returns a version to identify the version of remote storage implementation.
+     * 
+     * @return
+     */
+    String getVersion();
+
+    /**
      * Check remote storage for reachability.
      * 
      * @param uid the uid
@@ -97,7 +104,8 @@ public interface RemoteRepositoryStorage
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
      */
-    AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String baseUrl, String path )
+    AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String baseUrl,
+        String path )
         throws ItemNotFoundException,
             RemoteAccessException,
             StorageException;
@@ -127,11 +135,4 @@ public interface RemoteRepositoryStorage
             UnsupportedStorageOperationException,
             RemoteAccessException,
             StorageException;
-
-    /**
-     * Returns a version to identify the version of remote storage implementation.
-     * 
-     * @return
-     */
-    String getVersion();
 }
