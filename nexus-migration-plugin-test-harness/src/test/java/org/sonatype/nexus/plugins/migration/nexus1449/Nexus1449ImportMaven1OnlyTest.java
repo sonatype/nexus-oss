@@ -10,45 +10,50 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.nexus.plugins.migration.nexus1445;
+package org.sonatype.nexus.plugins.migration.nexus1449;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.ERepositoryTypeResolution;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.GroupResolutionDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
-import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
+import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
+import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-public class Nexus1445Maven1GroupTest
+public class Nexus1449ImportMaven1OnlyTest
     extends AbstractMigrationIntegrationTest
 {
 
     @Test
-    public void testMaven1Group()
+    public void importMaven2()
         throws Exception
     {
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
 
-        RepositoryResolutionDTO repo = migrationSummary.getRepositoryResolution( "repo1" );
-        Assert.assertNotNull( "Central repository not found", repo );
-        Assert.assertNotNull( "Central repository not marked to merge", repo.getSimilarRepositoryId() );
-        repo.setMergeSimilarRepository( true );
-
         GroupResolutionDTO group = migrationSummary.getGroupResolution( "remote-repos" );
         Assert.assertNotNull( "Group not found", group );
         Assert.assertTrue( "Group should contains maven 1 and 2 repositories", group.isMixed() );
-        group.setRepositoryTypeResolution( ERepositoryTypeResolution.VIRTUAL_BOTH );
+        group.setRepositoryTypeResolution( ERepositoryTypeResolution.MAVEN_1_ONLY );
 
         commitMigration( migrationSummary );
         TaskScheduleUtil.waitForTasks( 40 );
 
-        RepositoryBaseResource virtualRepo = repositoryUtil.getRepository( "java.net.m1-releases-virtual" );
-        Assert.assertNotNull( "Virtual release repository was not created", virtualRepo );
-        virtualRepo = repositoryUtil.getRepository( "java.net.m1-snapshots-virtual" );
-        Assert.assertNotNull( "Virtual snapshot repository was not created", virtualRepo );
+        // just be sure if repos are there
+        RepositoryBaseResource javaRepo = repositoryUtil.getRepository( "java.net.m2" );
+        Assert.assertNotNull( "Virtual release repository was not created", javaRepo );
+        javaRepo = repositoryUtil.getRepository( "java.net.m1" );
+        Assert.assertNotNull( "Virtual release repository was not created", javaRepo );
+
+        RepositoryGroupResource remoteGroup = groupUtil.getGroup( "remote-repos" );
+        Assert.assertEquals( "Only one repo should be included", 1, remoteGroup.getRepositories().size() );
+
+        RepositoryGroupMemberRepository m2Repo =
+            (RepositoryGroupMemberRepository) remoteGroup.getRepositories().get( 0 );
+        Assert.assertEquals( "m2 releases is not imported", "java.net.m1", m2Repo.getId() );
+
     }
 
 }

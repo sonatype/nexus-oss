@@ -431,6 +431,11 @@ public class ArtifactoryMigrator
             group.setGroupId( virtualRepo.getKey() );
             group.setName( virtualRepo.getKey() );
 
+            if ( ERepositoryTypeResolution.MAVEN_1_ONLY.equals( resolution.getRepositoryTypeResolution() ) )
+            {
+                group.setType( "maven1" );
+            }
+
             for ( final String repoId : virtualRepo.getResolvedRepositories() )
             {
                 RepositoryResolutionDTO repoResolution = migrationSummary.getRepositoryResolution( repoId );
