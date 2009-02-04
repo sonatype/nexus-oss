@@ -145,6 +145,8 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
       }
     }
   } );  
+  
+  Sonatype.Events.fireEvent( 'privilegePanelInit', this );
 };
 
 Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, {
@@ -255,6 +257,8 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
     } );
     editor.on( 'submit', this.submitHandler, this );
 
+    Sonatype.Events.fireEvent( 'privilegeEditorInit', editor );
+    
     cardPanel.add( editor );
   },
   
@@ -280,7 +284,7 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
         properties: function( value, parent, fpanel ) {
           for ( var i = 0; i < value.length; i++ ){
             var field = fpanel.form.findField( value[i].key );
-            field.setValue( field.fieldConverter(value[i].value, value) );
+            field.setValue( fpanel.propertyTypeStore.getAt( fpanel.propertyTypeStore.find('type', field.fieldConverterType) ).data.converter(value[i].value, value) );
           }
         },
         type: function( value, parent, fpanel ) {
@@ -457,7 +461,7 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
       for ( var i = 0; i < typeRec.data.properties.length; i++){
         items.push( {
           xtype: 'textfield',
-          fieldConverter: this.propertyTypeStore.getAt( this.propertyTypeStore.find('type', typeRec.data.properties[i].type) ).data.converter,
+          fieldConverterType: typeRec.data.properties[i].type,
           fieldLabel: typeRec.data.properties[i].name,
           helpText: typeRec.data.properties[i].helpText,
           name: typeRec.data.properties[i].id,

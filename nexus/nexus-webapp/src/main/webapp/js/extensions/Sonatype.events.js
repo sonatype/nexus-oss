@@ -118,7 +118,35 @@ Sonatype.utils.Observable = function(){
      *   }
      * },
      */
-    'userMenuInit': true
+    'userMenuInit': true,
+    
+    /*
+     * Fired when a privilege formPanel initializes
+     * Subscribers can mangle the PrivilegeEditor as they see fit
+     * 
+     * init: function() {
+     *   Sonatype.Events.addListener( 'privilegeEditorInit', this.onPrivilegeEditorInit, this );
+     * },
+     * 
+     * onPrivilegeEditorInit: function( editor ) {
+     *   editor.mangle();
+     * },
+     */
+    'privilegeEditorInit': true,
+    
+    /*
+     * Fired when a privilege panel initializes
+     * Subscribers can mangle the PrivilegePanel as they see fit
+     * 
+     * init: function() {
+     *   Sonatype.Events.addListener( 'privilegePanelInit', this.onPrivilegePanelInit, this );
+     * },
+     * 
+     * onPrivilegePanelInit: function( panel ) {
+     *   panel.mangle();
+     * },
+     */
+    'privilegePanelInit': true
   });
 };
 Ext.extend( Sonatype.utils.Observable, Ext.util.Observable );
