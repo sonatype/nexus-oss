@@ -23,4 +23,9 @@ public class TargetPrivilegeRepositoryPropertyDescriptor
     {
         return "Repository";
     }
+    
+    public String getType()
+    {
+        return "repository";
+    }
 }

@@ -23,4 +23,9 @@ public class TargetPrivilegeGroupPropertyDescriptor
     {
         return "Repository Group";
     }
+    
+    public String getType()
+    {
+        return "repogroup";
+    }
 }

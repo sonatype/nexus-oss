@@ -277,6 +277,14 @@
                     <key>repositoryTargetId</key>
                     <value>1</value>
                 </property>
+                <property>
+                    <key>repositoryId</key>
+                    <value></value>
+                </property>
+                <property>
+                    <key>repositoryGroupId</key>
+                    <value></value>
+                </property>
             </properties>
         </privilege>
         <privilege>
@@ -292,6 +300,14 @@
                 <property>
                     <key>repositoryTargetId</key>
                     <value>2</value>
+                </property>
+                <property>
+                    <key>repositoryId</key>
+                    <value></value>
+                </property>
+                <property>
+                    <key>repositoryGroupId</key>
+                    <value></value>
                 </property>
             </properties>
         </privilege>
@@ -309,6 +325,14 @@
                     <key>repositoryTargetId</key>
                     <value>1</value>
                 </property>
+                <property>
+                    <key>repositoryId</key>
+                    <value></value>
+                </property>
+                <property>
+                    <key>repositoryGroupId</key>
+                    <value></value>
+                </property>
             </properties>
         </privilege>
         <privilege>
@@ -324,6 +348,14 @@
                 <property>
                     <key>repositoryTargetId</key>
                     <value>2</value>
+                </property>
+                <property>
+                    <key>repositoryId</key>
+                    <value></value>
+                </property>
+                <property>
+                    <key>repositoryGroupId</key>
+                    <value></value>
                 </property>
             </properties>
         </privilege>
@@ -341,6 +373,14 @@
                     <key>repositoryTargetId</key>
                     <value>1</value>
                 </property>
+                <property>
+                    <key>repositoryId</key>
+                    <value></value>
+                </property>
+                <property>
+                    <key>repositoryGroupId</key>
+                    <value></value>
+                </property>
             </properties>
         </privilege>
         <privilege>
@@ -356,6 +396,14 @@
                 <property>
                     <key>repositoryTargetId</key>
                     <value>2</value>
+                </property>
+                <property>
+                    <key>repositoryId</key>
+                    <value></value>
+                </property>
+                <property>
+                    <key>repositoryGroupId</key>
+                    <value></value>
                 </property>
             </properties>
         </privilege>
@@ -373,6 +421,14 @@
                     <key>repositoryTargetId</key>
                     <value>1</value>
                 </property>
+                <property>
+                    <key>repositoryId</key>
+                    <value></value>
+                </property>
+                <property>
+                    <key>repositoryGroupId</key>
+                    <value></value>
+                </property>
             </properties>
         </privilege>
         <privilege>
@@ -388,6 +444,14 @@
                 <property>
                     <key>repositoryTargetId</key>
                     <value>2</value>
+                </property>
+                <property>
+                    <key>repositoryId</key>
+                    <value></value>
+                </property>
+                <property>
+                    <key>repositoryGroupId</key>
+                    <value></value>
                 </property>
             </properties>
         </privilege>

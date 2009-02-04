@@ -58,6 +58,7 @@ public class PrivilegeTypePlexusResource
                 typeProp.setId( propDescriptor.getId() );
                 typeProp.setName( propDescriptor.getName() );
                 typeProp.setHelpText( propDescriptor.getHelpText() );
+                typeProp.setType( propDescriptor.getType() );
                 
                 type.addProperty( typeProp );
             }

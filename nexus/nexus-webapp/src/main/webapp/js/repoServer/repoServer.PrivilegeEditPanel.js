@@ -24,6 +24,14 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
 
   this.sp = Sonatype.lib.Permissions;
   
+  this.propertyTypeStore = new Ext.data.SimpleStore( {
+    fields: [{name: 'type'},{name: 'converter'}],
+    data: [['repository',this.convertRepositoryProperty.createDelegate( this )],
+           ['repogroup',this.convertRepoGroupProperty.createDelegate( this )],
+           ['repotarget',this.convertRepoTargetProperty.createDelegate( this )],
+           ['string',this.convertStringProperty.createDelegate( this )]] 
+  });
+  
   this.privilegeTypeStore = new Ext.data.JsonStore( {
     root: 'data',
     id: 'id',
@@ -188,6 +196,34 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
     return '';
   },
   
+  convertStringProperty: function( value, parent ) {
+    return value;
+  },
+  
+  convertRepositoryProperty: function( value, parent ) {
+    if ( Ext.isEmpty( value ) ){
+      for ( var i = 0; i < parent.length; i++ ){
+        if ( parent[i].key == 'repositoryGroupId'
+          && !Ext.isEmpty(parent[i].value) ){
+          return '';
+        }
+      }
+      return 'All Repositories';
+    }
+    return this.convertDataValue( value, this.repoStore, 'id', 'name' );
+  },
+  
+  convertRepoGroupProperty: function( value, parent ) {
+    if ( !Ext.isEmpty( value ) ){
+      return this.convertDataValue( value, this.groupStore, 'id', 'name' );
+    }
+    return '';
+  },
+  
+  convertRepoTargetProperty: function( value, parent ) {
+    return this.convertDataValue( value, this.targetStore, 'id', 'name' );
+  },
+  
   onAddMenuInit: function( menu ) {
     if ( this.sp.checkPermission( 'nexus:privileges', this.sp.CREATE ) ) {
       menu.add( [
@@ -214,7 +250,8 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
       privilegeTypeStore: this.privilegeTypeStore,
       repoStore: this.repoStore,
       targetStore: this.targetStore,
-      groupStore: this.groupStore
+      groupStore: this.groupStore,
+      propertyTypeStore: this.propertyTypeStore
     } );
     editor.on( 'submit', this.submitHandler, this );
 
@@ -242,7 +279,8 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
       load: {
         properties: function( value, parent, fpanel ) {
           for ( var i = 0; i < value.length; i++ ){
-            fpanel.form.findField( value[i].key ).setValue( value[i].value );
+            var field = fpanel.form.findField( value[i].key );
+            field.setValue( field.fieldConverter(value[i].value, value) );
           }
         },
         type: function( value, parent, fpanel ) {
@@ -419,6 +457,7 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
       for ( var i = 0; i < typeRec.data.properties.length; i++){
         items.push( {
           xtype: 'textfield',
+          fieldConverter: this.propertyTypeStore.getAt( this.propertyTypeStore.find('type', typeRec.data.properties[i].type) ).data.converter,
           fieldLabel: typeRec.data.properties[i].name,
           helpText: typeRec.data.properties[i].helpText,
           name: typeRec.data.properties[i].id,
