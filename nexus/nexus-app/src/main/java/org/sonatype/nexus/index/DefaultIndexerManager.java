@@ -179,6 +179,8 @@ public class DefaultIndexerManager
             File repoRoot = getRepositoryLocalStorageAsFile( repository );
 
             // add context for repository
+            // context do not take part in "search all" ops, since they contain
+            // the member reposes only, so it would duplicate results
             ctxLocal = nexusIndexer.addIndexingContextForced(
                 getLocalContextId( repository.getId() ),
                 repository.getId(),
@@ -187,20 +189,17 @@ public class DefaultIndexerManager
                 null,
                 null,
                 NexusIndexer.FULL_INDEX );
-            ctxLocal.setSearchable( repository.isIndexable() );
-
-            String remoteUrl = repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) ? repository
-                .adaptToFacet( ProxyRepository.class ).getRemoteUrl() : null;
+            ctxLocal.setSearchable( false );
 
             ctxRemote = nexusIndexer.addIndexingContextForced(
                 getRemoteContextId( repository.getId() ),
                 repository.getId(),
                 repoRoot,
                 new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ),
-                remoteUrl,
+                null,
                 null,
                 NexusIndexer.FULL_INDEX );
-            ctxRemote.setSearchable( repository.isIndexable() );
+            ctxRemote.setSearchable( false );
         }
         else
         {
