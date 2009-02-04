@@ -76,7 +76,7 @@ Sonatype.repoServer.SearchPanel = function(config){
       { 
         xtype: 'textfield',
         id: 'gavsearch-group',
-        size: 100,
+        size: 80,
         listeners: {
           'specialkey': {
             fn: this.gavEnterHandler,
@@ -89,7 +89,7 @@ Sonatype.repoServer.SearchPanel = function(config){
       { 
         xtype: 'textfield',
         id: 'gavsearch-artifact',
-        size: 100,
+        size: 80,
         listeners: {
           'specialkey': {
             fn: this.gavEnterHandler,
@@ -102,7 +102,7 @@ Sonatype.repoServer.SearchPanel = function(config){
       { 
         xtype: 'textfield',
         id: 'gavsearch-version',
-        size: 100,
+        size: 80,
         listeners: {
           'specialkey': {
             fn: this.gavEnterHandler,
@@ -114,8 +114,21 @@ Sonatype.repoServer.SearchPanel = function(config){
       'Packaging:',
       { 
         xtype: 'textfield',
+        id: 'gavsearch-packaging',
+        size: 80,
+        listeners: {
+          'specialkey': {
+            fn: this.gavEnterHandler,
+            scope: this
+          }
+        }
+      },
+      { xtype: 'tbspacer' },
+      'Classifier:',
+      { 
+        xtype: 'textfield',
         id: 'gavsearch-classifier',
-        size: 100,
+        size: 80,
         listeners: {
           'specialkey': {
             fn: this.gavEnterHandler,
@@ -248,7 +261,7 @@ Sonatype.repoServer.SearchPanel = function(config){
   }
   
   this.gavFields = [];
-  this.gavParams = [ 'g', 'a', 'v', 'p' ];
+  this.gavParams = [ 'g', 'a', 'v', 'p', 'c' ];
 
   this.searchTypeButton = new Ext.Button( this.searchTypeButtonConfig );
 
