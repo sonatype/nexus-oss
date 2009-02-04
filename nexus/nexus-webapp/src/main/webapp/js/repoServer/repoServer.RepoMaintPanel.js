@@ -1014,7 +1014,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       enableAll( treePanel.root );
     }
   },
-  
+
   browseSelectorHandler: function( item, e ) {
     if ( this.browseSelector.value != item.value ) {
       this.browseSelector.value = item.value;
@@ -1256,6 +1256,36 @@ Sonatype.repoServer.RepositoryBrowsePanel = function( config ) {
   };
   Ext.apply( this, config, defaultConfig );
 
+  this.browseSelector = new Ext.Toolbar.Button(          
+    {
+      text: 'Browse Local Storage',
+      icon: Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
+      value: 0,
+      cls: 'x-btn-text-icon',
+      menu: {
+        items: [
+          {
+            text: 'Browse Local Storage',
+            value: 0,
+            checked: true,
+            group: 'repo-browse-selector-group',
+            checkHandler: this.browseSelectorHandler,
+            scope: this
+          },
+          {
+            text: 'Browse Index',
+            value: 1,
+            checked: false,
+            group: 'repo-browse-selector-group',
+            checkHandler: this.browseSelectorHandler,
+            scope: this,
+            disabled: this.payload.data.repoType == 'virtual'
+          }
+        ]
+      }
+    }
+  );
+  
   Sonatype.repoServer.RepositoryBrowsePanel.superclass.constructor.call( this, {
     anchor: '0 -2',
     bodyStyle: 'background-color:#FFFFFF',
@@ -1272,9 +1302,16 @@ Sonatype.repoServer.RepositoryBrowsePanel = function( config ) {
         cls: 'x-btn-text-icon',
         scope: this,
         handler: this.refreshHandler
-      }
+      },
+      this.browseSelector
     ],
-    loader: new Ext.tree.SonatypeTreeLoader({url:''}),
+    loader: new Ext.tree.SonatypeTreeLoader( {
+      url: '',
+      listeners: {
+        loadexception: this.treeLoadExceptionHandler,
+        scope: this
+      }
+    } ),
 /*
     loader : new Ext.tree.TreeLoader( {
       requestMethod: 'GET',
@@ -1364,14 +1401,10 @@ Sonatype.repoServer.RepositoryBrowsePanel = function( config ) {
       }
     } ),*/
     listeners: {
-      click: {
-        fn: this.nodeClickHandler,
-        scope: this
-      },
-      contextMenu: {
-        fn: this.nodeContextMenuHandler,
-        scope: this
-      } 
+      click: this.nodeClickHandler,
+      contextMenu: this.nodeContextMenuHandler,
+      expandnode: this.indexBrowserExpandFollowup,
+      scope: this
     } 
   } );
 
@@ -1388,6 +1421,60 @@ Sonatype.repoServer.RepositoryBrowsePanel = function( config ) {
 };
 
 Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
+
+  browseSelectorHandler: function( item, e ) {
+    if ( this.browseSelector.value != item.value ) {
+      this.browseSelector.value = item.value;
+      this.browseSelector.setText( item.text );
+      this.browseIndex = item.value == 1;
+
+      this.refreshHandler( item, e );
+    }
+  },
+
+  getBrowsePath: function( baseUrl ) {
+    return baseUrl + this.getBrowsePathSnippet() + '/'; 
+  },
+
+  getBrowsePathSnippet: function() {
+    return this.browseIndex ?
+      Sonatype.config.browseIndexPathSnippet : Sonatype.config.browsePathSnippet;
+  },
+  
+  indexBrowserExpandFollowup: function( node ) {
+    if ( this.browseIndex && ! node.attributes.localStorageUpdated && node.firstChild ) {
+      node.attributes.localStorageUpdated = true;
+      Ext.Ajax.request({
+        url: node.id.replace( Sonatype.config.browseIndexPathSnippet, Sonatype.config.browsePathSnippet ) + '?isLocal',
+        suppressStatus: 404,
+        success: function( response, options ) {
+          var decodedResponse = Ext.decode( response.responseText );
+          if ( decodedResponse.data ) {
+            var data = decodedResponse.data;
+            for ( var j = 0; j < node.childNodes.length; j++ ) {
+              var indexNode = node.childNodes[j];
+              indexNode.attributes.localStorageUpdated = true;
+              for ( var i = 0; i < data.length; i++ ) {
+                var contentNode = data[i];
+                if ( contentNode.text == indexNode.text ) {
+                  indexNode.ui.iconNode.className = 'x-tree-node-nexus-icon';
+                  indexNode.attributes.localStorageUpdated = false;
+                  break;
+                }
+              }
+            }
+          }
+        },
+        failure: function( response, options ) {
+          for ( var j = 0; j < node.childNodes.length; j++ ) {
+            node.childNodes[j].attributes.localStorageUpdated = true;
+          }
+        },
+        scope: this
+      });
+    }
+  },
+
   nodeClickHandler: function( node, e ) {
     if ( e.target.nodeName == 'A' ) return; // no menu on links
 
@@ -1418,6 +1505,7 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
   refreshHandler: function( button, e ) {
     this.root.setText( this.payload ? this.payload.get( this.titleColumn ) : '/' );
     this.root.attributes.localStorageUpdated = false;
+    this.root.id = this.getBrowsePath( this.payload.data.resourceURI );
     this.root.reload();
   },
 
