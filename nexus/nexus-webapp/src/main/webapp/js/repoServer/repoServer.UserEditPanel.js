@@ -883,10 +883,9 @@ Sonatype.repoServer.UserMappingEditor = function( config ) {
       }
     ],
     listeners: {
-      submit: {
-        fn: this.submitHandler,
-        scope: this
-      }
+      load: this.loadHandler,
+      submit: this.submitHandler,
+      scope: this
     }
   } );
 };
@@ -939,29 +938,45 @@ Ext.extend( Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
     }
     
     if ( store ) {
+      var s = '';
+      var roles = [];
+      var sentRoles = action.output.data.roles;
+      for ( var i = 0; i < sentRoles.length; i++ ) {
+        var roleName = sentRoles[i];
+        var roleRec = this.roleDataStore.getAt( this.roleDataStore.find( 'id', roleName ) );
+        if ( roleRec ) {
+          roles.push( roleRec.data );
+          roleName = roleRec.data.name;
+        }
+        if ( s ) {
+          s += ', ';
+        }
+        s += roleName;
+      }
+
       var rec = store.getById( action.output.data.userId );
       if ( rec ) {
-        var s = '';
-        var roles = [];
-        var sentRoles = action.output.data.roles;
-        for ( var i = 0; i < sentRoles.length; i++ ) {
-          var roleName = sentRoles[i];
-          var roleRec = this.roleDataStore.getAt( this.roleDataStore.find( 'id', roleName ) );
-          if ( roleRec ) {
-            roles.push( roleRec.data );
-            roleName = roleRec.data.name;
-          }
-          if ( s ) {
-            s += ', ';
-          }
-          s += roleName;
-        }
-        
         rec.beginEdit();
         rec.set( 'roles', roles );
         rec.set( 'displayRoles', s );
         rec.commit();
         rec.endEdit();
+      }
+      else if ( this.payload.hostPanel && this.loadedUserData ) {
+        var resourceURI = Sonatype.config.host + 
+          Sonatype.config.repos.urls.plexusUser + '/' + this.loadedUserData.userId; 
+        var rec = new store.reader.recordType( {
+          name: this.loadedUserData.name,
+          email: this.loadedUserData.email,
+          source: this.loadedUserData.source,
+          userId: this.loadedUserData.userId,
+          resourceURI: resourceURI,
+          roles: roles,
+          displayRoles: s
+        },
+        resourceURI );
+        rec.autoCreateNewRecord = true;
+        store.addSorted( rec );
       }
     }
   },
@@ -970,6 +985,10 @@ Ext.extend( Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
     return this.form.findField( 'userId' ).userFound &&
       this.form.findField( 'source' ).getValue() && 
       this.find( 'name', 'roles' )[0].validate();
+  },
+  
+  loadHandler: function( form, action, receivedData ) {
+    this.loadedUserData = receivedData;
   },
 
   loadUserId: function() {
