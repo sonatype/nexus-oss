@@ -48,7 +48,7 @@ public class SimpleTaskConfigManager
         return null;
     }
 
-    public SchedulerTask<?> createTaskInstance( Class<?> taskType )
+    public <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException
     {
         return null;

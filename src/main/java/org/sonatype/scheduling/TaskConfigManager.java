@@ -23,7 +23,7 @@ public interface TaskConfigManager
      * @param <T>
      * @param task
      */
-    public <T> void addTask( ScheduledTask<T> task );
+    <T> void addTask( ScheduledTask<T> task );
 
     /**
      * Remove an existing scheduled task
@@ -31,14 +31,14 @@ public interface TaskConfigManager
      * @param <T>
      * @param task
      */
-    public <T> void removeTask( ScheduledTask<T> task );
+    <T> void removeTask( ScheduledTask<T> task );
 
     /**
      * Create and start all tasks, usually done once upon starting system (to start tasks that should be recurring)
      * 
      * @param scheduler
      */
-    public void initializeTasks( Scheduler scheduler );
+    void initializeTasks( Scheduler scheduler );
 
     /**
      * A factory for tasks.
@@ -57,6 +57,6 @@ public interface TaskConfigManager
      * @return
      * @throws IllegalArgumentException
      */
-    SchedulerTask<?> createTaskInstance( Class<?> taskType )
+    <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException;
 }

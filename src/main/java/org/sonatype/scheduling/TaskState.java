@@ -21,26 +21,49 @@ package org.sonatype.scheduling;
  */
 public enum TaskState
 {
+    /**
+     * Submitted, not runned yet.
+     */
     SUBMITTED, // -> RUNNING, CANCELLED
 
-    RUNNING, // -> WAITING, FINISHED, BROKEN, CANCELLED
+    /**
+     * Is currently running.
+     */
+    RUNNING, // -> WAITING, FINISHED, BROKEN, CANCELLED, SLEEPING
 
+    /**
+     * Should run but is blocked by another clashing task. Will try to run later.
+     */
+    SLEEPING, // -> RUNNING
+
+    /**
+     * Was running and is finished. Waiting for next execution.
+     */
     WAITING, // -> RUNNING, CANCELLED
 
+    /**
+     * Was running and is finished. No more execution scheduled.
+     */
     FINISHED, // END
 
+    /**
+     * Was running and is broken.
+     */
     BROKEN, // END
 
+    /**
+     * Was running and is cancelled.
+     */
     CANCELLED; // END
     
     public boolean isActiveOrSubmitted()
     {
-        return this.equals( SUBMITTED ) || this.equals( RUNNING ) || this.equals( WAITING );
+        return this.equals( SUBMITTED ) || this.equals( RUNNING ) || this.equals( SLEEPING ) || this.equals( WAITING );
     }
     
     public boolean isActive()
     {
-        return this.equals( RUNNING ) || this.equals( WAITING );
+        return this.equals( RUNNING ) || this.equals( SLEEPING ) || this.equals( WAITING );
     }
 
     public boolean isEndingState()

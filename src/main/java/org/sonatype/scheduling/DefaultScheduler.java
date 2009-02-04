@@ -26,14 +26,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
@@ -48,9 +44,13 @@ import org.sonatype.scheduling.schedules.Schedule;
 @Component( role = Scheduler.class )
 public class DefaultScheduler
     extends AbstractLogEnabled
-    implements Scheduler, Contextualizable
+    implements Scheduler
 {
+    @Requirement
     private PlexusContainer plexusContainer;
+
+    @Requirement
+    private TaskConfigManager taskConfig;
 
     private PlexusThreadFactory plexusThreadFactory;
 
@@ -61,15 +61,6 @@ public class DefaultScheduler
     private AtomicInteger idGen = new AtomicInteger( 0 );
 
     private int threadPriority = Thread.MIN_PRIORITY;
-
-    @Requirement
-    private TaskConfigManager taskConfig;
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        plexusContainer = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
 
     public void startService()
         throws StartingException
@@ -122,7 +113,7 @@ public class DefaultScheduler
         return taskConfig.createTaskInstance( taskType );
     }
 
-    public SchedulerTask<?> createTaskInstance( Class<?> taskType )
+    public <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException
     {
         return taskConfig.createTaskInstance( taskType );
@@ -201,13 +192,13 @@ public class DefaultScheduler
                 }
 
                 Collections.sort( list );
-                
+
                 if ( list.size() > 0 )
                 {
                     idGen.set( list.get( list.size() - 1 ) );
                 }
-                
-                id = String.valueOf( idGen.incrementAndGet() );                    
+
+                id = String.valueOf( idGen.incrementAndGet() );
             }
             else
             {

@@ -146,6 +146,6 @@ public interface Scheduler
      * @return
      * @throws IllegalArgumentException
      */
-    SchedulerTask<?> createTaskInstance( Class<?> taskType )
+    <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException;
 }

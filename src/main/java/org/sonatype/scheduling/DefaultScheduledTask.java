@@ -303,6 +303,8 @@ public class DefaultScheduledTask<T>
                 nextRun = new Date( nextRun.getTime() + 10000 );
                 
                 setFuture( getScheduler().getScheduledExecutorService().schedule( this, 10000, TimeUnit.MILLISECONDS ) );
+                
+                setTaskState( TaskState.SLEEPING );
 
                 return result;
             };
