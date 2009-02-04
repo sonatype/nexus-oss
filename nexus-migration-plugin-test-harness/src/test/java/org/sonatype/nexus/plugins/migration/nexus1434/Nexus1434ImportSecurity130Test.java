@@ -18,7 +18,7 @@ import junit.framework.Assert;
 
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.rest.model.PlexusUserResource;
-import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 
@@ -33,7 +33,7 @@ public class Nexus1434ImportSecurity130Test
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactory-security-130.zip" ) );
 
         migrationSummary.setResolvePermission( true );
-        
+
         commitMigration( migrationSummary );
 
     }
@@ -45,20 +45,20 @@ public class Nexus1434ImportSecurity130Test
     {
         List<PlexusUserResource> userList = getImportedUserList();
         List<RepositoryTargetListResource> targetList = getImportedRepoTargetList();
-        List<PrivilegeBaseStatusResource> privilegeList = getImportedPrivilegeList();
+        List<PrivilegeStatusResource> privilegeList = getImportedPrivilegeList();
         List<RoleResource> roleList = getImportedRoleList();
 
         Assert.assertEquals( "4 users imported", 4, userList.size() );
         Assert.assertEquals( "3 repo targets imported", 3, targetList.size() );
         Assert.assertEquals( "4 privileges for each repo target", targetList.size() * 4, privilegeList.size() );
         Assert.assertEquals( "4 roles for each repo target, plus a group", targetList.size() * 4 + 1, roleList.size() );
-        
+
         // these users are imported
         Assert.assertTrue( containUser( userList, "anonymous-artifactory" ) );
         Assert.assertTrue( containUser( userList, "admin-artifactory" ) );
         Assert.assertTrue( containUser( userList, "user" ) );
         Assert.assertTrue( containUser( userList, "user1" ) );
-        
+
         for ( RepositoryTargetListResource target : targetList )
         {
             String key = target.getId();
@@ -75,7 +75,7 @@ public class Nexus1434ImportSecurity130Test
             Assert.assertTrue( containRole( roleList, key + "-delete" ) );
             Assert.assertTrue( containRole( roleList, key + "-admin" ) );
         }
-        
+
         // verify user-role mapping
         PlexusUserResource anonymous = getUserById( userList, "anonymous-artifactory" );
         Assert.assertEquals( 1, anonymous.getRoles().size() );
@@ -92,7 +92,7 @@ public class Nexus1434ImportSecurity130Test
         PlexusUserResource user1 = getUserById( userList, "user1" );
         Assert.assertEquals( 1, user1.getRoles().size() );
         containPlexusRole( user1.getRoles(), "permTarget1-delete" );
-        
+
         // verify the group role
         RoleResource groupRole = getRoleById(roleList, "group");
         Assert.assertNotNull ( groupRole);

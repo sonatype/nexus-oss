@@ -25,7 +25,7 @@ import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.plugins.migration.util.PlexusUserMessageUtil;
 import org.sonatype.nexus.rest.model.PlexusRoleResource;
 import org.sonatype.nexus.rest.model.PlexusUserResource;
-import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
@@ -53,7 +53,7 @@ public abstract class AbstractImportSecurityTest
     /**
      * System user, role, privilege, repoTarget, before importing artifactory
      */
-    protected List<PrivilegeBaseStatusResource> prePrivilegeList;
+    protected List<PrivilegeStatusResource> prePrivilegeList;
 
     protected List<RoleResource> preRoleList;
 
@@ -143,15 +143,15 @@ public abstract class AbstractImportSecurityTest
         return addedList;
     }
 
-    protected List<PrivilegeBaseStatusResource> getImportedPrivilegeList()
+    protected List<PrivilegeStatusResource> getImportedPrivilegeList()
         throws Exception
     {
-        List<PrivilegeBaseStatusResource> privilegeList = privilegeUtil.getResourceListFromResponse( privilegeUtil
+        List<PrivilegeStatusResource> privilegeList = privilegeUtil.getResourceListFromResponse( privilegeUtil
             .sendMessage( Method.GET, null, "" ) );
 
-        List<PrivilegeBaseStatusResource> addedList = new ArrayList<PrivilegeBaseStatusResource>();
+        List<PrivilegeStatusResource> addedList = new ArrayList<PrivilegeStatusResource>();
 
-        for ( PrivilegeBaseStatusResource privilege : privilegeList )
+        for ( PrivilegeStatusResource privilege : privilegeList )
         {
             if ( !containPrivilege( prePrivilegeList, privilege.getId() ) )
             {
@@ -226,9 +226,9 @@ public abstract class AbstractImportSecurityTest
         return false;
     }
 
-    protected boolean containPrivilege( List<PrivilegeBaseStatusResource> privList, String privId )
+    protected boolean containPrivilege( List<PrivilegeStatusResource> privList, String privId )
     {
-        for ( PrivilegeBaseStatusResource priv : privList )
+        for ( PrivilegeStatusResource priv : privList )
         {
             if ( priv.getId().equals( privId ) )
             {
@@ -238,9 +238,9 @@ public abstract class AbstractImportSecurityTest
         return false;
     }
 
-    protected boolean containPrivilegeName( List<PrivilegeBaseStatusResource> privList, String privName )
+    protected boolean containPrivilegeName( List<PrivilegeStatusResource> privList, String privName )
     {
-        for ( PrivilegeBaseStatusResource priv : privList )
+        for ( PrivilegeStatusResource priv : privList )
         {
             if ( priv.getName().equals( privName ) )
             {

@@ -18,7 +18,7 @@ import junit.framework.Assert;
 
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.rest.model.PlexusUserResource;
-import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 
@@ -37,7 +37,7 @@ public class Nexus1434ImportSecurity125Test
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactory-security-125.zip" ) );
 
         migrationSummary.setResolvePermission( true );
-        
+
         commitMigration( migrationSummary );
     }
 
@@ -48,7 +48,7 @@ public class Nexus1434ImportSecurity125Test
     {
         List<PlexusUserResource> userList = getImportedUserList();
         List<RepositoryTargetListResource> targetList = getImportedRepoTargetList();
-        List<PrivilegeBaseStatusResource> privilegeList = getImportedPrivilegeList();
+        List<PrivilegeStatusResource> privilegeList = getImportedPrivilegeList();
         List<RoleResource> roleList = getImportedRoleList();
 
         Assert.assertEquals( "4 users imported", 4, userList.size() );

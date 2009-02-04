@@ -18,9 +18,11 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
-import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
-import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
+import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 
 public class Nexus1434ImportSecurity130RepoKeyValidateTest
     extends AbstractImportSecurityTest
@@ -41,15 +43,14 @@ public class Nexus1434ImportSecurity130RepoKeyValidateTest
     protected void verifySecurity()
         throws Exception
     {
-        List<PrivilegeBaseStatusResource> privilegeList = getImportedPrivilegeList();
+        List<PrivilegeStatusResource> privilegeList = getImportedPrivilegeList();
 
-        for ( PrivilegeBaseStatusResource priv : privilegeList )
+        for ( PrivilegeStatusResource priv : privilegeList )
         {
-            PrivilegeTargetStatusResource targetPriv = (PrivilegeTargetStatusResource) priv;
+            String repoId =
+                SecurityConfigUtil.getPrivilegeProperty( priv, TargetPrivilegeRepositoryPropertyDescriptor.ID );
 
-            String repoId = targetPriv.getRepositoryId();
-
-            String groupId = targetPriv.getRepositoryGroupId();
+            String groupId = SecurityConfigUtil.getPrivilegeProperty( priv, TargetPrivilegeGroupPropertyDescriptor.ID );
 
             if ( !StringUtils.isEmpty( repoId ) )
             {
