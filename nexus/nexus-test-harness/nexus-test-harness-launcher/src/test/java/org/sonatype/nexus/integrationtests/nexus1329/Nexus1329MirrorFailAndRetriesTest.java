@@ -53,7 +53,7 @@ public class Nexus1329MirrorFailAndRetriesTest
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( originalFile, artifactFile ) );
 
         Assert.assertFalse( "Nexus should access first mirror " + mirror1Urls, mirror1Urls.isEmpty() );
-        Assert.assertEquals( "Nexus should retry mirror " + mirror1Urls, 2, mirror1Urls.size() );
+        Assert.assertEquals( "Nexus should retry mirror " + mirror1Urls, 3, mirror1Urls.size() );
         Assert.assertTrue( "Nexus should not access second mirror " + mirror2Urls, mirror2Urls.isEmpty() );
 
         MirrorStatusResourceListResponse response = this.messageUtil.getMirrorsStatus( REPO );

@@ -137,7 +137,7 @@ public class Nexus384DotAndDashSearchTest
         throws Exception
     { // both
         
-        List<NexusArtifact> results = messageUtil.searchFor( "dashed doted" );
+        List<NexusArtifact> results = messageUtil.searchFor( "dashed.doted" );
         Assert.assertEquals( 1, results.size() );
     }
 
