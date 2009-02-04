@@ -38,7 +38,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -962,19 +961,14 @@ public class DefaultIndexerManager
     // Combined searching
     // ----------------------------------------------------------------------------
 
-    public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
-        Integer count )
+    public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count )
+        throws NoSuchRepositoryException
     {
         IndexingContext context = null;
 
-        if ( groupId != null )
-        {
-            context = nexusIndexer.getIndexingContexts().get( getLocalContextId( groupId ) );
-        }
-
         if ( repositoryId != null )
         {
-            context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
+            context = getRepositoryBestIndexContext( repositoryId );
         }
 
         Query q1 = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, term );
@@ -1022,7 +1016,7 @@ public class DefaultIndexerManager
             {
                 getLogger().debug( "Too many clauses exception caught:", e );
             }
-            
+
             // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
             return new FlatSearchResponse( req.getQuery(), -1, new HashSet<ArtifactInfo>() );
         }
@@ -1034,27 +1028,20 @@ public class DefaultIndexerManager
         }
     }
 
-    public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, String groupId, Integer from,
-        Integer count )
+    public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count )
+        throws NoSuchRepositoryException
     {
         IndexingContext context = null;
 
-        if ( groupId != null )
-        {
-            context = nexusIndexer.getIndexingContexts().get( getLocalContextId( groupId ) );
-        }
-
         if ( repositoryId != null )
         {
-            context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
+            context = getRepositoryBestIndexContext( repositoryId );
         }
 
         if ( term.endsWith( ".class" ) )
         {
             term = term.substring( 0, term.length() - 6 );
         }
-
-        term = StringUtils.replace( term, '.', '/' );
 
         Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, term );
 
@@ -1093,7 +1080,7 @@ public class DefaultIndexerManager
             {
                 getLogger().debug( "Too many clauses exception caught:", e );
             }
-            
+
             // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
             return new FlatSearchResponse( req.getQuery(), -1, new HashSet<ArtifactInfo>() );
         }
@@ -1106,7 +1093,8 @@ public class DefaultIndexerManager
     }
 
     public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
-        String repositoryId, String groupId, Integer from, Integer count )
+        String repositoryId, Integer from, Integer count )
+        throws NoSuchRepositoryException
     {
         IndexingContext context = null;
 
@@ -1115,17 +1103,12 @@ public class DefaultIndexerManager
             return new FlatSearchResponse( null, 0, new HashSet<ArtifactInfo>() );
         }
 
-        if ( groupId != null )
-        {
-            context = nexusIndexer.getIndexingContexts().get( getLocalContextId( groupId ) );
-        }
-
         if ( repositoryId != null )
         {
-            context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
+            context = getRepositoryBestIndexContext( repositoryId );
         }
 
-        BooleanQuery bq = new BooleanQuery();;
+        BooleanQuery bq = new BooleanQuery();
 
         if ( gTerm != null )
         {
@@ -1149,7 +1132,7 @@ public class DefaultIndexerManager
 
         if ( cTerm != null )
         {
-            // classifiers are sadly not indexed
+            bq.add( nexusIndexer.constructQuery( ArtifactInfo.CLASSIFIER, cTerm ), BooleanClause.Occur.MUST );
         }
 
         FlatSearchRequest req = null;
@@ -1187,7 +1170,7 @@ public class DefaultIndexerManager
             {
                 getLogger().debug( "Too many clauses exception caught:", e );
             }
-            
+
             // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
             return new FlatSearchResponse( req.getQuery(), -1, new HashSet<ArtifactInfo>() );
         }

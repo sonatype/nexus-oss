@@ -27,6 +27,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchResponse;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
@@ -96,57 +97,46 @@ public abstract class AbstractIndexPlexusResource
 
         NexusArtifact na = null;
 
-        if ( !StringUtils.isEmpty( sha1 ) )
+        try
         {
-            try
+            if ( !StringUtils.isEmpty( sha1 ) )
             {
-                na = ai2Na( request, getNexus().identifyArtifact( ArtifactInfo.SHA1, sha1 ) );
+                try
+                {
+                    na = ai2Na( request, getNexus().identifyArtifact( ArtifactInfo.SHA1, sha1 ) );
+                }
+                catch ( IOException e )
+                {
+                    throw new ResourceException(
+                        Status.SERVER_ERROR_INTERNAL,
+                        "IOException during configuration retrieval!",
+                        e );
+                }
             }
-            catch ( IOException e )
+            else if ( !StringUtils.isEmpty( query ) )
+            {
+                searchResult = getNexus().searchArtifactFlat( query, getRepositoryId( request ), from, count );
+            }
+            else if ( !StringUtils.isEmpty( className ) )
+            {
+                searchResult = getNexus().searchArtifactClassFlat( className, getRepositoryId( request ), from, count );
+            }
+            else if ( !StringUtils.isEmpty( g ) || !StringUtils.isEmpty( a ) || !StringUtils.isEmpty( v )
+                || !StringUtils.isEmpty( p ) || !StringUtils.isEmpty( c ) )
+            {
+                searchResult = getNexus().searchArtifactFlat( g, a, v, p, c, getRepositoryId( request ), from, count );
+            }
+            else
             {
                 throw new ResourceException(
-                    Status.SERVER_ERROR_INTERNAL,
-                    "IOException during configuration retrieval!",
-                    e );
+                    Status.CLIENT_ERROR_BAD_REQUEST,
+                    "Search query not found in request! (q OR cn OR g,a,v,p,c)" );
             }
         }
-        else if ( !StringUtils.isEmpty( query ) )
+        catch ( NoSuchRepositoryException e )
         {
-            searchResult = getNexus().searchArtifactFlat(
-                query,
-                getRepositoryId( request ),
-                getRepositoryGroupId( request ),
-                from,
-                count );
-        }
-        else if ( !StringUtils.isEmpty( className ) )
-        {
-            searchResult = getNexus().searchArtifactClassFlat(
-                className,
-                getRepositoryId( request ),
-                getRepositoryGroupId( request ),
-                from,
-                count );
-        }
-        else if ( !StringUtils.isEmpty( g ) || !StringUtils.isEmpty( a ) || !StringUtils.isEmpty( v )
-            || !StringUtils.isEmpty( p ) || !StringUtils.isEmpty( c ) )
-        {
-            searchResult = getNexus().searchArtifactFlat(
-                g,
-                a,
-                v,
-                p,
-                c,
-                getRepositoryId( request ),
-                getRepositoryGroupId( request ),
-                from,
-                count );
-        }
-        else
-        {
-            throw new ResourceException(
-                Status.CLIENT_ERROR_BAD_REQUEST,
-                "Search query not found in request! (q OR cn OR g,a,v,p,c)" );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with ID='"
+                + getRepositoryId( request ) + "' does not exists!", e );
         }
 
         SearchResponse result = new SearchResponse();

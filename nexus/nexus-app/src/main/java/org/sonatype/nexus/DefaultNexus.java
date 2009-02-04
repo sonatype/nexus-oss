@@ -1507,23 +1507,23 @@ public class DefaultNexus
         return indexerManager.identifyArtifact( type, checksum );
     }
 
-    public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
-        Integer count )
+    public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count )
+        throws NoSuchRepositoryException
     {
-        return indexerManager.searchArtifactFlat( term, repositoryId, groupId, from, count );
+        return indexerManager.searchArtifactFlat( term, repositoryId, from, count );
     }
 
-    public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, String groupId, Integer from,
-        Integer count )
+    public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count )
+        throws NoSuchRepositoryException
     {
-        return indexerManager.searchArtifactClassFlat( term, repositoryId, groupId, from, count );
+        return indexerManager.searchArtifactClassFlat( term, repositoryId, from, count );
     }
 
     public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
-        String repositoryId, String groupId, Integer from, Integer count )
+        String repositoryId, Integer from, Integer count )
+        throws NoSuchRepositoryException
     {
-        return indexerManager
-            .searchArtifactFlat( gTerm, aTerm, vTerm, pTerm, cTerm, repositoryId, groupId, from, count );
+        return indexerManager.searchArtifactFlat( gTerm, aTerm, vTerm, pTerm, cTerm, repositoryId, from, count );
     }
 
     // ===========================

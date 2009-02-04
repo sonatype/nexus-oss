@@ -195,7 +195,7 @@ public interface Nexus
     void addNexusArtifactEvent( NexusArtifactEvent nae );
 
     void addSystemEvent( String action, String message );
-    
+
     void addAuthcAuthzEvent( AuthcAuthzEvent evt );
 
     SystemProcess systemProcessStarted( String action, String message );
@@ -220,7 +220,7 @@ public interface Nexus
     List<SystemEvent> getRepositoryStatusChanges( Integer from, Integer count );
 
     List<SystemEvent> getSystemEvents( Integer from, Integer count );
-    
+
     List<AuthcAuthzEvent> getAuthcAuthzEvents( Integer from, Integer count );
 
     // ----------------------------------------------------------------------------
@@ -365,13 +365,15 @@ public interface Nexus
     ArtifactInfo identifyArtifact( String type, String checksum )
         throws IOException;
 
-    FlatSearchResponse searchArtifactFlat( String term, String repositoryId, String groupId, Integer from, Integer count );
+    FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count )
+        throws NoSuchRepositoryException;
 
-    FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, String groupId, Integer from,
-        Integer count );
+    FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count )
+        throws NoSuchRepositoryException;
 
     FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
-        String repositoryId, String groupId, Integer from, Integer count );
+        String repositoryId, Integer from, Integer count )
+        throws NoSuchRepositoryException;
 
     /**
      * Remove the repository's storage folder
@@ -392,11 +394,11 @@ public interface Nexus
      */
     NexusStreamResponse getConfigurationAsStreamByKey( String key )
         throws IOException;
-    
+
     SimpleLog4jConfig getLogConfig()
         throws IOException;
-    
-    void setLogConfig(SimpleLog4jConfig config)
+
+    void setLogConfig( SimpleLog4jConfig config )
         throws IOException;
 
 }
