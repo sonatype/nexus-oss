@@ -56,13 +56,18 @@ public abstract class AbstractNexusTask<T>
         return null;
     }
 
+    protected PlexusContainer getPlexusContainer()
+    {
+        return plexusContainer;
+    }
+
     protected Nexus getNexus()
     {
         if ( nexus == null )
         {
             try
             {
-                nexus = plexusContainer.lookup( Nexus.class );
+                nexus = getPlexusContainer().lookup( Nexus.class );
             }
             catch ( ComponentLookupException e )
             {

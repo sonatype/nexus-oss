@@ -139,11 +139,10 @@ public class DefaultNexusScheduler
         return (NexusTask) scheduler.createTaskInstance( taskType );
     }
 
-    @SuppressWarnings( "unchecked" )
     public <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException
     {
-        return (T) scheduler.createTaskInstance( taskType );
+        return scheduler.createTaskInstance( taskType );
     }
 
 }

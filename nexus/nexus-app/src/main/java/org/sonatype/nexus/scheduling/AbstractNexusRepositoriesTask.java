@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -26,6 +27,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.tasks.descriptors.properties.RepositoryOrGroupPropertyDescriptor;
 import org.sonatype.scheduling.DefaultScheduledTask;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.TaskState;
 
 public abstract class AbstractNexusRepositoriesTask<T>
@@ -90,7 +92,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
             return getRepositoryId();
         }
     }
-    
+
     public void setRepositoryGroupId( String repositoryGroupId )
     {
         if ( !StringUtils.isEmpty( repositoryGroupId ) )
@@ -108,30 +110,40 @@ public abstract class AbstractNexusRepositoriesTask<T>
     protected boolean hasIntersectingTasksThatRuns( Map<String, List<ScheduledTask<?>>> activeTasks )
     {
         // get all activeTasks that runs and are descendants of AbstractNexusRepositoriesTask
-        for ( String taskClz : activeTasks.keySet() )
+        for ( String taskType : activeTasks.keySet() )
         {
             try
             {
-                Class<?> taskClazz = Class.forName( taskClz );
+                ComponentDescriptor<?> cd = getPlexusContainer().getComponentDescriptor(
+                    SchedulerTask.class,
+                    SchedulerTask.class.getName(),
+                    taskType );
 
-                if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( taskClazz ) )
+                if ( cd != null )
                 {
-                    List<ScheduledTask<?>> tasks = activeTasks.get( taskClz );
+                    Class<?> taskClazz = Class.forName( cd.getImplementation() );
 
-                    for ( ScheduledTask<?> task : tasks )
+                    if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( taskClazz ) )
                     {
-                        // check against RUNNING intersection
-                        if ( TaskState.RUNNING.equals( task.getTaskState() )
-                            && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
-                            && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get(
-                                RepositoryOrGroupPropertyDescriptor.ID ) ) )
+                        List<ScheduledTask<?>> tasks = activeTasks.get( taskType );
+
+                        for ( ScheduledTask<?> task : tasks )
                         {
-                            getLogger()
-                                .debug(
-                                    "Task "
-                                        + task.getName()
-                                        + " is running and shares same repo or group, so this task will be rescheduled for a later time." );
-                            return true;
+                            // check against RUNNING intersection
+                            if ( TaskState.RUNNING.equals( task.getTaskState() )
+                                && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
+                                && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get(
+                                    RepositoryOrGroupPropertyDescriptor.ID ) ) )
+                            {
+                                if ( getLogger().isDebugEnabled() )
+                                {
+                                    getLogger().debug(
+                                        "Task " + task.getName() + " is already running and is conflicting with task "
+                                            + this.getClass().getName() );
+                                }
+
+                                return true;
+                            }
                         }
                     }
                 }
@@ -139,6 +151,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
             catch ( ClassNotFoundException e )
             {
                 // ignore, cannot happen
+                getLogger().warn( "Could not find component that implements SchedulerTask of type='" + taskType + "'!" );
             }
         }
 

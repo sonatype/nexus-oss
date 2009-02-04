@@ -200,11 +200,11 @@ public class DefaultTaskConfigManager
         }
     }
 
-    public SchedulerTask<?> createTaskInstance( Class<?> taskType )
+    public <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException
     {
         // the convention is to use the simple class name as the plexus hint
-        return createTaskInstance( taskType.getSimpleName() );
+        return (T) createTaskInstance( taskType.getSimpleName() );
     }
 
     private CScheduledTask findTask( String id )
