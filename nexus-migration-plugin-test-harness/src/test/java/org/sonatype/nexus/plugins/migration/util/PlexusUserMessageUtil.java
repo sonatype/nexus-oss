@@ -26,21 +26,9 @@ import org.sonatype.nexus.rest.model.PlexusUserResource;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
-import com.thoughtworks.xstream.XStream;
-
 public class PlexusUserMessageUtil
 {
-    private XStream xstream;
-
-    private MediaType mediaType;
-
     private static final Logger LOG = Logger.getLogger( UserMessageUtil.class );
-
-    public PlexusUserMessageUtil( XStream xstream, MediaType mediaType )
-    {
-        this.xstream = xstream;
-        this.mediaType = mediaType;
-    }
 
     @SuppressWarnings( "unchecked" )
     public List<PlexusUserResource> getList()

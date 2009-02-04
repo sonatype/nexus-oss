@@ -21,7 +21,6 @@ import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
-import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
 
 @Component( role = SecurityConfigReceiver.class )

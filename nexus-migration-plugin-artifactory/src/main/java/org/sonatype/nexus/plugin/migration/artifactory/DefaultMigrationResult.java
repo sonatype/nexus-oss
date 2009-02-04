@@ -4,16 +4,12 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Configuration;
 
 @Component(role=MigrationResult.class)
 public class DefaultMigrationResult
     implements MigrationResult
 {
-    
-    private Logger logger = Logger.getLogger( this.getClass() );
 
     List<String> errorMessages = new ArrayList<String>();
 
@@ -55,6 +51,7 @@ public class DefaultMigrationResult
         this.warningMessages.addAll( migrationResult.getWarningMessages() );
     }
 
+    @Override
     public String toString()
     {
         StringWriter sw = new StringWriter();

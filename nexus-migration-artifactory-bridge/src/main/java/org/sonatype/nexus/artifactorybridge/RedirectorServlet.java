@@ -45,12 +45,11 @@ public class RedirectorServlet
         return (PlexusContainer) getServletContext().getAttribute( PlexusConstants.PLEXUS_KEY );
     }
 
-    @SuppressWarnings("unchecked")
     private <E> E getComponent( Class<E> clazz )
     {
         try
         {
-            return (E) getPlexusContainer().lookup( clazz );
+            return getPlexusContainer().lookup( clazz );
         }
         catch ( ComponentLookupException e )
         {

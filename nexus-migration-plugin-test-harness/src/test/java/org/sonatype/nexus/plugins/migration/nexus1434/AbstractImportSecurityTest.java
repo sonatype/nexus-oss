@@ -45,9 +45,9 @@ public abstract class AbstractImportSecurityTest
     protected RoleMessageUtil roleUtil;
 
     protected PrivilegesMessageUtil privilegeUtil;
-    
+
     protected RepositoryMessageUtil repoUtil;
-    
+
     protected GroupMessageUtil groupUtil;
 
     /**
@@ -64,7 +64,7 @@ public abstract class AbstractImportSecurityTest
     public AbstractImportSecurityTest()
     {
         // initialize the utils
-        userUtil = new PlexusUserMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        userUtil = new PlexusUserMessageUtil( );
         repoTargetUtil = new TargetMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
         privilegeUtil = new PrivilegesMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
         roleUtil = new RoleMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
@@ -78,7 +78,7 @@ public abstract class AbstractImportSecurityTest
         }
         groupUtil = new GroupMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
     }
-    
+
     abstract protected void importSecurity()
         throws Exception;
 
@@ -261,7 +261,7 @@ public abstract class AbstractImportSecurityTest
         }
         return null;
     }
-    
+
     protected RoleResource getRoleById( List<RoleResource> roleList, String id )
     {
         for ( RoleResource role : roleList )
@@ -273,7 +273,7 @@ public abstract class AbstractImportSecurityTest
         }
         return null;
     }
-    
+
     protected boolean containRoleEndWith( List<PlexusRoleResource> roleList, String suffix )
     {
         for ( PlexusRoleResource role : roleList )

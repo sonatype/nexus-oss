@@ -3,7 +3,6 @@ package org.sonatype.nexus.plugin.migration.artifactory.task;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrator;
-import org.sonatype.nexus.plugin.migration.artifactory.MigrationResult;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -25,8 +24,8 @@ public class ArtifactoryMigrationTask
         throws Exception
     {
         // run the migration
-        MigrationResult result = this.artifactoryMigrator.migrate( this.migrationSummary );
-        
+        /*MigrationResult result =*/ this.artifactoryMigrator.migrate( this.migrationSummary );
+
 //        this.getTaskActivityDescriptor().
         return null;
     }

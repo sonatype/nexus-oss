@@ -22,12 +22,8 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRequestDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.task.ArtifactoryMigrationTask;
-import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.scheduling.TaskConfigManager;
-import org.sonatype.scheduling.schedules.ManualRunSchedule;
-import org.sonatype.scheduling.schedules.Schedule;
 
 @Component( role = PlexusResource.class, hint = "artifactoryMigration" )
 public class ArtifactoryMigrationPlexusResource
@@ -36,14 +32,13 @@ public class ArtifactoryMigrationPlexusResource
 {
     @Requirement
     private Nexus nexus;
-    
 
     public ArtifactoryMigrationPlexusResource()
     {
         this.setReadable( false );
         this.setModifiable( true );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -70,14 +65,14 @@ public class ArtifactoryMigrationPlexusResource
 
         // need to resolve that on posts
        this.validateBackupFileLocation( migrationSummary.getBackupLocation() );
-              
+
        // lookup task and run it
        ArtifactoryMigrationTask migrationTask = this.nexus.createTaskInstance( ArtifactoryMigrationTask.class );
        migrationTask.setMigrationSummary( migrationSummary );
        this.nexus.submit( "Importing Artifactory Backup.", migrationTask );
-       
+
        return null;
-        
+
     }
 
 
