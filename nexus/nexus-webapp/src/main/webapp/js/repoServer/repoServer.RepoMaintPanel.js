@@ -22,6 +22,7 @@
   }
 */
 
+/** Old repository browser code - don't extend, see the new version below */
 
 Sonatype.repoServer.RepoMaintPanel = function(config){
   var config = config || {};
@@ -36,7 +37,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
 
   Sonatype.Events.addListener( 'repositoryChanged', this.onRepoChange, this );
   Sonatype.Events.addListener( 'groupChanged', this.onRepoChange, this );
-  Sonatype.Events.addListener( 'repositoryContentMenuInit', this.onRepositoryContentMenuInit, this );
 
   this.actions = {
     view : {
@@ -50,26 +50,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
       scope:this,
       handler: this.reloadAll
     },
-    download : {
-      text: 'Download',
-      scope:this,
-      handler: this.downloadHandler
-    },
-    downloadFromRemote : {
-      text: 'Download From Remote',
-      scope:this,
-      handler: this.downloadFromRemoteHandler
-    },
-    viewRemote : {
-      text: 'View Remote',
-      scope:this,
-      handler: this.downloadFromRemoteHandler
-    },
-        deleteRepoItem : {
-          text: 'Delete',
-          scope:this,
-          handler: this.deleteRepoItemHandler
-        },
         putInService : {
           text: 'Put in Service',
           scope:this,
@@ -135,28 +115,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     ]
 };
       
-
-  this.restToContentUrl = function(r) {
-    var isGroup = r.indexOf( Sonatype.config.repos.urls.groups ) > -1;
-    var hasHost = r.indexOf(Sonatype.config.host) > -1;
-
-    var snippet = r.indexOf( Sonatype.config.browseIndexPathSnippet ) == -1 ? Sonatype.config.browsePathSnippet : Sonatype.config.browseIndexPathSnippet;
-    r = r.replace(snippet, '');
-
-    if ( isGroup ) {
-      r = r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
-    }
-    else {
-      r = r.replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
-    }
-
-    return hasHost ? r : ( Sonatype.config.host + r );
-  };
-  
-  this.restToRemoteUrl = function(node, repoRecord) {
-    var restUrl = node.id.replace( node.isLeaf() ? Sonatype.config.browsePathSnippet : this.getBrowsePathSnippet(), '' );
-    return repoRecord.get('remoteUri') + restUrl.replace(repoRecord.get('resourceURI'), '');
-  };
 
   this.groupRecordConstructor = Ext.data.Record.create([
     {name:'id'},
@@ -359,7 +317,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
           Ext.TaskMgr.stop( this.repoStatusTask );
           Sonatype.Events.removeListener( 'repositoryChanged', this.onRepoChange, this );
           Sonatype.Events.removeListener( 'groupChanged', this.onRepoChange, this );
-          Sonatype.Events.removeListener( 'repositoryContentMenuInit', this.onRepositoryContentMenuInit, this );
         },
         scope: this
       }
@@ -538,6 +495,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     var isProxyRepo = (node.getOwnerTree().root.attributes.repoType == 'proxy');
     var isGroup = (node.getOwnerTree().root.attributes.repoType == 'group');
     
+    node.attributes.repoRecord = rec;
     this.ctxBrowseNode = node;
     this.ctxBrowseNode.data = this.ctxBrowseNode.attributes;
     
@@ -546,26 +504,10 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       payload: node
     });
 
-    Sonatype.Events.fireEvent( 'repositoryContentMenuInit', menu,
-      this.reposGridPanel.store.getById(node.getOwnerTree().root.contentUrl),
-      this.ctxBrowseNode );
-    
-    if (node.isLeaf()){
-      if (isProxyRepo){      
-        this.actions.downloadFromRemote.href = this.restToRemoteUrl(node,rec);
-        menu.add(this.actions.downloadFromRemote);
-      }
-      this.actions.download.href = this.restToContentUrl(node.id);
-      menu.add(this.actions.download);
-    }
-    
-    if (!node.isRoot && !isGroup){
-      if ( ! this.browseIndex ) {
-        menu.add(this.actions.deleteRepoItem);
-      }
-      if (isProxyRepo && !node.isLeaf()){
-        menu.add(this.actions.viewRemote);
-      }
+    if ( this.browseTypeButton.value != 'nexus' ) {
+      Sonatype.Events.fireEvent( 'repositoryContentMenuInit', menu,
+        this.reposGridPanel.store.getById(node.getOwnerTree().root.contentUrl),
+        this.ctxBrowseNode );
     }
 
     if ( ! menu.items.first() ) return;
@@ -597,48 +539,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       window.open(this.restToRemoteUrl(this.ctxBrowseNode,rec));
     }
   },  
-  
-  deleteRepoItemHandler : function(){
-    if (this.ctxBrowseNode){      
-      var url = Sonatype.config.repos.urls.repositories + this.ctxBrowseNode.id.slice(Sonatype.config.host.length + Sonatype.config.repos.urls.repositories.length);
-      //make sure to provide /content path for repository root requests like ../repositories/central
-      if (/.*\/repositories\/[^\/]*$/i.test(url)){
-        url += '/content';
-      }
-      Sonatype.MessageBox.show({
-        animEl: this.reposGridPanel.getEl(),
-        title : 'Delete Repository Item?',
-        msg : 'Delete the selected file/folder?',
-        buttons: Sonatype.MessageBox.YESNO,
-        scope: this,
-        icon: Sonatype.MessageBox.QUESTION,
-        fn: function(btnName){
-          if (btnName == 'yes' || btnName == 'ok') {
-            Ext.Ajax.request({
-              url: url,
-              callback: this.deleteRepoItemCallback,
-              scope: this,
-              method: 'DELETE'
-            });
-          }
-        }
-      });
-    }
-  },
-  
-  deleteRepoItemCallback : function(options, isSuccess, response){
-    //@todo: stop updating messaging here
-    if(isSuccess){
-      if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-        this.viewRepo((this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected());
-      }
-    }
-    else {
-      Sonatype.MessageBox.alert( 'Error', response.status == 401 ?
-        'You don\'t have permission to delete artifacts in this repository' :
-        'The server did not delete the file/folder from the repository' );
-    }
-  },
   
   updateRepoStatuses : function(repoStatus){
     var rec = this.reposDataStore.getById(Sonatype.config.host + Sonatype.config.repos.urls.repositories + '/' + repoStatus.id);
@@ -1050,27 +950,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       }
     }
   },
-
-  onRepositoryContentMenuInit: function( menu, repoRecord, contentRecord ) {
-    var isVirtual = repoRecord.get( 'repoType' ) == 'virtual';
-
-    if ( this.browseTypeButton.value != 'nexus' ){
-      if ( this.sp.checkPermission(
-            'nexus:cache', this.sp.DELETE ) &&
-          ! isVirtual ){
-        menu.add( this.repoActions.clearCache );
-      }
-      if ( this.sp.checkPermission(
-            'nexus:index', this.sp.DELETE ) &&
-          ! isVirtual ) {
-        menu.add( this.repoActions.reIndex );
-      }
-      if ( this.sp.checkPermission(
-            'nexus:metadata', this.sp.DELETE ) ){
-        menu.add( this.repoActions.rebuildMetadata );
-      }
-    }
-  },
   
   indexBrowserExpandFollowup: function( node ) {
     if ( this.browseIndex && ! node.attributes.localStorageUpdated && node.firstChild ) {
@@ -1134,6 +1013,8 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
 });
 
 
+/** New repository browser starts here */
+
 Sonatype.repoServer.RepositoryPanel = function( config ) {
   var config = config || {};
   var defaultConfig = {
@@ -1172,6 +1053,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
     tbar: toolbar,
     columns: [
       { name: 'resourceURI' },
+      { name: 'remoteUri' },
       { name: 'id' },
       {
         name: 'name',
@@ -1192,11 +1074,6 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
         header: 'Format', 
         width: 50 
       },
-//      { 
-//        name: 'displayStatus',
-//        header: 'Status',
-//        width: 300
-//      },
       { 
         name: 'repoPolicy',
         header: 'Policy',
@@ -1258,6 +1135,7 @@ Sonatype.repoServer.RepositoryBrowsePanel = function( config ) {
   
   this.oldSearchText = '';
   this.searchTask = new Ext.util.DelayedTask( this.startSearch, this, [this]);
+  this.nodeContextMenuEvent = 'repositoryContentMenuInit';
 
   this.browseSelector = new Ext.Toolbar.Button(          
     {
@@ -1428,14 +1306,17 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
     if ( e.target.nodeName == 'A' ) return; // no menu on links
 
     if ( this.nodeContextMenuEvent ) { 
+
+      node.attributes.repoRecord = this.payload;
+      node.data = node.attributes;
   
-      var menu = new Sonatype.menu.Menu({
+      var menu = new Sonatype.menu.Menu( {
         payload: node,
         scope: this,
         items: []
-      });
+      } );
   
-      Sonatype.Events.fireEvent( this.nodeContextMenuEvent, menu, node );
+      Sonatype.Events.fireEvent( this.nodeContextMenuEvent, menu, this.payload, node );
       if ( ! menu.items.first() ) return;
 
       e.stopEvent();
@@ -1449,7 +1330,7 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
     this.root.id = this.getBrowsePath( this.payload.data.resourceURI );
     this.root.reload();
   },
-  
+
   startSearch: function( p ) {
     var field = p.searchField;
     var searchText = field.getRawValue();

@@ -100,9 +100,6 @@ Sonatype.repoServer.RepoServer = function(){
 
       Sonatype.Events.addListener( 'nexusNavigationInit',
         this.addNexusNavigationItems, this );
-      Sonatype.Events.addListener( 'repositoryMenuInit',
-        Sonatype.repoServer.DefaultRepoHandler.onRepositoryMenuInit,
-        Sonatype.repoServer.DefaultRepoHandler );
       
       // Left Panel
       this.nexusPanel = new Sonatype.navigation.NavigationPanel({

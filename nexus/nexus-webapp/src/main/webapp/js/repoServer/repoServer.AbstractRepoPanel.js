@@ -44,6 +44,11 @@ Sonatype.repoServer.AbstractRepoPanel = function(config){
       text: 'Rebuild Metadata',
       handler: this.rebuildMetadataHandler
     },
+    deleteRepoItem: {
+      text: 'Delete',
+      scope:this,
+      handler: this.deleteRepoItemHandler
+    },
     uploadArtifact: {
       text: 'Upload Artifact...',
       handler: this.uploadArtifactHandler
@@ -355,6 +360,84 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       }
     });
   },
+
+  restToContentUrl: function( r ) {
+    var isGroup = r.indexOf( Sonatype.config.repos.urls.groups ) > -1;
+    var hasHost = r.indexOf( Sonatype.config.host ) > -1;
+
+    var snippet = r.indexOf( Sonatype.config.browseIndexPathSnippet ) == -1 ?
+      Sonatype.config.browsePathSnippet : Sonatype.config.browseIndexPathSnippet;
+    r = r.replace( snippet, '' );
+
+    if ( isGroup ) {
+      r = r.replace( Sonatype.config.repos.urls.groups, Sonatype.config.content.groups );
+    }
+    else {
+      r = r.replace( Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories );
+    }
+
+    return hasHost ? r : ( Sonatype.config.host + r );
+  },
+  
+  restToRemoteUrl: function( node, repoRecord ) {
+    var r = node.id;
+
+    var snippet = r.indexOf( Sonatype.config.browseIndexPathSnippet ) == -1 ?
+        Sonatype.config.browsePathSnippet : Sonatype.config.browseIndexPathSnippet;
+    r = r.replace( snippet, '' );
+
+    return repoRecord.data.remoteUri + r.replace( repoRecord.data.resourceURI, '' );
+  },
+  
+  downloadHandler: function( node, item, event ) {
+    event.stopEvent();
+    window.open( this.restToContentUrl( node.id ) );
+  },
+  
+  downloadFromRemoteHandler: function( node, item, event ) {
+    event.stopEvent();
+    window.open( this.restToRemoteUrl( node, node.attributes.repoRecord ) );
+  },  
+  
+  deleteRepoItemHandler : function( node ) {
+    var url = Sonatype.config.repos.urls.repositories + 
+      node.id.slice( Sonatype.config.host.length + Sonatype.config.repos.urls.repositories.length );
+    //make sure to provide /content path for repository root requests like ../repositories/central
+    if (/.*\/repositories\/[^\/]*$/i.test(url)){
+      url += '/content';
+    }
+    Sonatype.MessageBox.show( {
+      animEl: node.getOwnerTree().getEl(),
+      title : 'Delete Repository Item?',
+      msg : 'Delete the selected ' + ( node.isLeaf() ? 'file' : 'folder' ) + '?',
+      buttons: Sonatype.MessageBox.YESNO,
+      scope: this,
+      icon: Sonatype.MessageBox.QUESTION,
+      fn: function( btnName ) {
+        if (btnName == 'yes' || btnName == 'ok') {
+          Ext.Ajax.request( {
+            url: url,
+            callback: this.deleteRepoItemCallback,
+            scope: this,
+            contentNode: node,
+            method: 'DELETE'
+          } );
+        }
+      }
+    } );
+  },
+  
+  deleteRepoItemCallback: function( options, isSuccess, response ) {
+    //@todo: stop updating messaging here
+    if ( isSuccess ) {
+      options.contentNode.getOwnerTree().root.reload();
+    }
+    else {
+      Sonatype.MessageBox.alert( 'Error', response.status == 401 ?
+        'You don\'t have permission to delete artifacts in this repository' :
+        'The server did not delete the file/folder from the repository' );
+    }
+  },
   
   onRepositoryMenuInit: function( menu, repoRecord ) {
     var isVirtual = repoRecord.get( 'repoType' ) == 'virtual';
@@ -382,7 +465,66 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         repoRecord.get('repoPolicy') == 'release' ){
       menu.add( this.repoActions.uploadArtifact );
     }
+  },
+  
+  onRepositoryContentMenuInit: function( menu, repoRecord, contentRecord ) {
+    if ( contentRecord.data.resourceURI == null ) {
+      contentRecord.data.resourceURI = contentRecord.data.id;
+    }
+
+    var isVirtual = repoRecord.data.repoType == 'virtual';
+    var isProxy = repoRecord.data.repoType == 'proxy';
+    var isGroup = repoRecord.data.repoType == 'group';
+
+    if ( this.sp.checkPermission( 'nexus:cache', this.sp.DELETE ) && ! isVirtual ) {
+      menu.add( this.repoActions.clearCache );
+    }
+    if ( this.sp.checkPermission( 'nexus:index', this.sp.DELETE ) && ! isVirtual ) {
+      menu.add( this.repoActions.reIndex );
+    }
+    if ( this.sp.checkPermission( 'nexus:metadata', this.sp.DELETE ) ) {
+      menu.add( this.repoActions.rebuildMetadata );
+    }
+
+    if ( contentRecord.isLeaf() ) {
+      if ( isProxy ) {
+        menu.add( {
+          text: 'Download From Remote',
+          scope: this,
+          handler: this.downloadFromRemoteHandler,
+          href: this.restToRemoteUrl( contentRecord, repoRecord )
+        } );
+      }
+      menu.add( {
+        text: 'Download',
+        scope: this,
+        handler: this.downloadHandler,
+        href: this.restToContentUrl( contentRecord.id )
+      } );
+    }
+
+    if ( ! contentRecord.isRoot && ! isGroup ) {
+      if ( isProxy && ! contentRecord.isLeaf() ) {
+        menu.add( {
+          text: 'View Remote',
+          scope: this,
+          handler: this.downloadFromRemoteHandler,
+          href: this.restToRemoteUrl( contentRecord, repoRecord )
+        } );
+      }
+      
+      // only allow delete for local browsing
+      if ( contentRecord.data.resourceURI.indexOf( Sonatype.config.browseIndexPathSnippet ) == -1 ) {
+        menu.add( this.repoActions.deleteRepoItem );
+      }
+    }
   }
-});
+} );
 
 Sonatype.repoServer.DefaultRepoHandler = new Sonatype.repoServer.AbstractRepoPanel();
+Sonatype.Events.addListener( 'repositoryMenuInit',
+  Sonatype.repoServer.DefaultRepoHandler.onRepositoryMenuInit,
+  Sonatype.repoServer.DefaultRepoHandler );
+Sonatype.Events.addListener( 'repositoryContentMenuInit',
+  Sonatype.repoServer.DefaultRepoHandler.onRepositoryContentMenuInit,
+  Sonatype.repoServer.DefaultRepoHandler );
