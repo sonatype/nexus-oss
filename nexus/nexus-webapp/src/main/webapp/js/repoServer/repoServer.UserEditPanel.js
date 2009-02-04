@@ -417,7 +417,7 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
       } );
     }
     menu.add( {
-      text: 'User Role Mapping',
+      text: 'External User Role Mapping',
       handler: this.mapRolesHandler,
       scope: this
     } );
