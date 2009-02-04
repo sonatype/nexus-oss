@@ -19,6 +19,7 @@ import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.sonatype.jsecurity.locators.users.PlexusRoleLocator;
 import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 import org.sonatype.nexus.rest.model.PlexusUserSearchCriteriaResource;
@@ -85,6 +86,18 @@ public class UserSearchPlexusResource
         }
         
         return criteria;
+    }
+    
+    @Override
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
+    {
+        PlexusUserSearchCriteria criteria = new PlexusUserSearchCriteria();
+
+        // match all userIds
+        criteria.setUserId( "" );
+
+        return this.search( criteria, this.getUserSource( request ) );
     }
 
 }
