@@ -30,6 +30,8 @@ import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -43,13 +45,14 @@ import org.sonatype.nexus.index.updater.IndexDataReader.IndexDataReadResult;
 /**
  * @author Jason van Zyl
  * @author Eugene Kuleshov
- * @plexus.component
  */
+@Component(role=IndexUpdater.class)
 public class DefaultIndexUpdater
     extends AbstractLogEnabled
     implements IndexUpdater
 {
-    /** @plexus.requirement */
+    
+    @Requirement
     private WagonManager wagonManager;
 
     public Date fetchAndUpdateIndex( IndexUpdateRequest updateRequest )

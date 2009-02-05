@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.index.ArtifactInfo;
 
 /**
@@ -18,8 +19,8 @@ import org.sonatype.nexus.index.ArtifactInfo;
  * day as a base.
  * 
  * @author Tamas Cservenak
- * @plexus.component role-hint="day"
  */
+@Component(role=IndexChunker.class, hint="day")
 public class DefaultIndexChunker
     implements IndexChunker
 {

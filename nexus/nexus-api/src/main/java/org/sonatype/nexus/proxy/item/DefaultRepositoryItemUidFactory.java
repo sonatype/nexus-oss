@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -27,16 +29,15 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * A default factory for UIDs.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component(role=RepositoryItemUidFactory.class)
 public class DefaultRepositoryItemUidFactory
     implements RepositoryItemUidFactory
 {
     /**
      * The registry.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private RepositoryRegistry repositoryRegistry;
 
     private final ConcurrentHashMap<String, List<RepositoryItemUid>> uidMap = new ConcurrentHashMap<String, List<RepositoryItemUid>>();

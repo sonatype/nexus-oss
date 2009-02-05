@@ -23,6 +23,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -42,8 +43,8 @@ import org.sonatype.nexus.index.locator.SourcesLocator;
 /**
  * A minimal index creator used to provide basic information about Maven artifact.
  * 
- * @plexus.component role-hint="min"
  */
+@Component(role=IndexCreator.class, hint="min")
 public class MinimalArtifactInfoIndexCreator
     extends AbstractIndexCreator
 {

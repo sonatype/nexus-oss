@@ -16,6 +16,9 @@ package org.sonatype.nexus.proxy.http;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Configuration;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -30,8 +33,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * Nexus features (grouping and route mappings for example).
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component(role=NexusURLResolver.class)
 public class DefaultNexusURLResolver
     extends AbstractLogEnabled
     implements NexusURLResolver, Contextualizable
@@ -39,19 +42,13 @@ public class DefaultNexusURLResolver
 
     public static final String APPLICATION_PORT = "applicationPort";
 
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    /**
-     * @plexus.configuration default-value="localhost"
-     */
+    @Configuration(value="localhost")
     private String nexusHost;
 
-    /**
-     * @plexus.configuration default-value="8081"
-     */
+    @Configuration(value="8081")
     private int nexusPort;
 
     public void contextualize( Context ctx )

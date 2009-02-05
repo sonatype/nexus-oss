@@ -12,6 +12,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
@@ -23,8 +24,8 @@ import org.sonatype.nexus.index.context.IndexingContext;
  * A default indexer engine implementation.
  * 
  * @author Tamas Cservenak
- * @plexus.component
  */
+@Component(role=IndexerEngine.class)
 public class DefaultIndexerEngine
     extends AbstractLogEnabled
     implements IndexerEngine

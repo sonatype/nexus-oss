@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -30,17 +32,15 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
  * "defaults" in this class, simply add lines to properties file with same keys.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component(role=ArtifactPackagingMapper.class)
 public class DefaultArtifactPackagingMapper
     extends AbstractLogEnabled
     implements ArtifactPackagingMapper
 {
     public static final String MAPPING_PROPERTIES_FILE = "packaging2extension-mapping.properties";
 
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
     private Map<String, String> packaging2extensionMapping;

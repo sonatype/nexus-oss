@@ -19,6 +19,9 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Configuration;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -32,27 +35,21 @@ import org.sonatype.nexus.proxy.events.EventListener;
  * A default HTTP Proxy service. A very simple network service based on Java 5 ExecutorService.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component(role=HttpProxyService.class)
 public class DefaultHttpProxyService
     extends AbstractLogEnabled
     implements HttpProxyService, Initializable, EventListener
 {
     public static final int DEFAULT_TIMEOUT = 20 * 1000;
 
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private NexusURLResolver nexusURLResolver;
 
-    /**
-     * @plexus.configuration default-value="10"
-     */
+    @Configuration(value="10")
     private int poolSize;
 
     private int port;

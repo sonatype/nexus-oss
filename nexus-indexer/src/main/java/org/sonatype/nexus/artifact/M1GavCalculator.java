@@ -9,13 +9,15 @@ package org.sonatype.nexus.artifact;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * The M1 GAV Calculator.
  * 
  * @author Jason van Zyl
  * @author Tamas Cservenak
- * @plexus.component role-hint="maven1"
  */
+@Component(role=GavCalculator.class, hint="maven1")
 public class M1GavCalculator
     extends AbstractGavCalculator
 {

@@ -8,6 +8,7 @@ package org.sonatype.nexus.index;
 
 import java.io.File;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -23,8 +24,8 @@ import org.sonatype.nexus.index.locator.PomLocator;
  * @author Tamas Cservenak
  * @author Eugene Kuleshov
  * 
- * @plexus.component
  */
+@Component(role=ArtifactContextProducer.class)
 public class DefaultArtifactContextProducer
     implements ArtifactContextProducer
 {

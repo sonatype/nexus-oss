@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
@@ -34,15 +36,13 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
  * The default configuration validator provider. It checks the model for semantical validity.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component(role=SecurityConfigurationValidator.class)
 public class DefaultSecurityConfigurationValidator
     extends AbstractLogEnabled
     implements SecurityConfigurationValidator
 {
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private ConfigurationIdGenerator idGenerator;
     
     @SuppressWarnings( "unchecked" )

@@ -16,6 +16,7 @@ package org.sonatype.jsecurity.realms;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
@@ -38,8 +39,8 @@ import org.jsecurity.subject.PrincipalCollection;
  * org.sonatype.jsecurity.realms.MemoryAuthenticationOnlyRealm, or
  * use the role-hint of MemoryAuthenticationOnlyRealm.
  * 
- * @plexus.component role="org.jsecurity.realm.Realm" role-hint="MemoryAuthenticationOnlyRealm"
  */
+@Component(role=org.jsecurity.realm.Realm.class, hint="MemoryAuthenticationOnlyRealm")
 public class MemoryAuthenticationOnlyRealm
     extends AuthorizingRealm
 {

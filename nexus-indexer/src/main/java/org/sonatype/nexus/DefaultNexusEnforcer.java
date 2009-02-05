@@ -6,12 +6,14 @@
  */
 package org.sonatype.nexus;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * The Default Nexus Enforcer.  At some piont this can all be config based, but for now
  * we are just always using strict mode of false
  * 
- * @plexus.component
  */
+@Component(role=NexusEnforcer.class)
 public class DefaultNexusEnforcer
     implements NexusEnforcer
 {

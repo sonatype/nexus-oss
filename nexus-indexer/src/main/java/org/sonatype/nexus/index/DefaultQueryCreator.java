@@ -11,6 +11,7 @@ import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
@@ -38,8 +39,8 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  * 
  * @author Tamas Cservenak
  * @author Eugene Kuleshov
- * @plexus.component
  */
+@Component(role=QueryCreator.class)
 public class DefaultQueryCreator
     extends AbstractLogEnabled
     implements QueryCreator

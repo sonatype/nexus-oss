@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
@@ -23,13 +25,13 @@ import org.sonatype.nexus.index.creator.AbstractIndexCreator;
 /**
  * @author Jason Van Zyl
  * @author Tamas Cservenak
- * @plexus.component
  */
+@Component(role=Scanner.class)
 public class DefaultScanner
     extends AbstractLogEnabled
     implements Scanner
 {
-    /** @plexus.requirement */
+    @Requirement
     private ArtifactContextProducer artifactContextProducer;
 
     public ScanningResult scan( ScanningRequest request )

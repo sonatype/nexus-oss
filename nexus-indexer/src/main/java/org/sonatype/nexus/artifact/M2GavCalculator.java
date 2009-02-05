@@ -9,13 +9,15 @@ package org.sonatype.nexus.artifact;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * The M2 GAV Calculator.
  * 
  * @author Jason van Zyl
  * @author Tamas Cservenak
- * @plexus.component role-hint="maven2"
  */
+@Component(role=GavCalculator.class, hint="maven2")
 public class M2GavCalculator
     extends AbstractGavCalculator
 {

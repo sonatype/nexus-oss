@@ -35,6 +35,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -55,8 +56,8 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  * Component responsible for metadata maintenance.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component(role=MetadataManager.class)
 public class DefaultMetadataManager
     extends AbstractLogEnabled
     implements MetadataManager

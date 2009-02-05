@@ -13,6 +13,7 @@ import java.util.zip.ZipFile;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.ArtifactIndexingContext;
@@ -20,8 +21,8 @@ import org.sonatype.nexus.index.context.ArtifactIndexingContext;
 /**
  * An index creator used to index Java class names from a Maven artifact.
  * 
- * @plexus.component role-hint="jarContent"
  */
+@Component(role=IndexCreator.class, hint="jarContent")
 public class JarFileContentsIndexCreator
     extends AbstractIndexCreator
 {

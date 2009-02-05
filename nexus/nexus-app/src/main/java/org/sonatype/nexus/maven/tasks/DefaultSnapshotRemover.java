@@ -23,6 +23,8 @@ import java.util.TreeSet;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -54,22 +56,19 @@ import org.sonatype.nexus.proxy.walker.WalkerContext;
  * removed.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component(role=SnapshotRemover.class)
 public class DefaultSnapshotRemover
     extends AbstractLogEnabled
     implements SnapshotRemover
 {
     /**
      * The registry.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private Walker walker;
 
     private ContentClass contentClass = new Maven2ContentClass();

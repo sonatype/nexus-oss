@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.index.ArtifactInfo;
@@ -35,8 +36,8 @@ import org.sonatype.nexus.index.updater.IndexDataWriter;
  * 
  * @author Tamas Cservenak
  * @author Eugene Kuleshov
- * @plexus.component
  */
+@Component(role=IndexPacker.class)
 public class DefaultIndexPacker
     extends AbstractLogEnabled
     implements IndexPacker

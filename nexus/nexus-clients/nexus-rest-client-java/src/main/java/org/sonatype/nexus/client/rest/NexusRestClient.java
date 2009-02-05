@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.client.NexusClientException;
@@ -30,9 +31,7 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 
-/**
- * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.client.NexusClient"
- */
+@Component(role=NexusClient.class, instantiationStrategy="per-lookup")
 public class NexusRestClient
     implements NexusClient
 {

@@ -16,6 +16,8 @@ import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.archetype.source.ArchetypeDataSourceException;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchRequest;
@@ -25,13 +27,13 @@ import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
  * @author Eugene Kuleshov
- * @plexus.component role-hint="nexus"
  */
+@Component(role=ArchetypeDataSource.class, hint="nexus")
 public class NexusArchetypeDataSource
     extends AbstractLogEnabled
     implements ArchetypeDataSource
 {
-    /** @plexus.requirement */
+    @Requirement
     private NexusIndexer indexer;
 
     public ArchetypeCatalog getArchetypeCatalog( Properties properties )

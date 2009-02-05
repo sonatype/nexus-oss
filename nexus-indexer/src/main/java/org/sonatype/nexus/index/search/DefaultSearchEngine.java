@@ -19,6 +19,7 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactInfoGroup;
@@ -33,8 +34,8 @@ import org.sonatype.nexus.index.context.IndexingContext;
  * @author Eugene Kuleshov
  * @author Tamas Cservenak
  * 
- * @plexus.component
  */
+@Component(role=SearchEngine.class)
 public class DefaultSearchEngine
     extends AbstractLogEnabled
     implements SearchEngine

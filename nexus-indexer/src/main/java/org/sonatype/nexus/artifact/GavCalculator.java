@@ -14,8 +14,6 @@ package org.sonatype.nexus.artifact;
  */
 public interface GavCalculator
 {
-    String ROLE = GavCalculator.class.getName();
-
     Gav pathToGav( String path );
 
     String gavToPath( Gav gav );

@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
@@ -45,8 +46,8 @@ import org.jsecurity.subject.PrincipalCollection;
  * and add this realm as either org.sonatype.jsecurity.realms.MemoryRealm, or
  * use the role-hint of MemoryRealm.
  * 
- * @plexus.component role="org.jsecurity.realm.Realm" role-hint="MemoryRealm"
  */
+@Component(role=org.jsecurity.realm.Realm.class, hint="MemoryRealm")
 public class MemoryRealm
     extends AuthorizingRealm
 {

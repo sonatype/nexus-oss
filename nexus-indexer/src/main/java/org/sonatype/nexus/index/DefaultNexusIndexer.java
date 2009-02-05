@@ -24,6 +24,8 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -40,24 +42,24 @@ import org.sonatype.nexus.index.search.SearchEngine;
  * The default nexus indexer implementation.
  * 
  * @author Tamas Cservenak
- * @plexus.component
  */
+@Component(role=NexusIndexer.class)
 public class DefaultNexusIndexer
     extends AbstractLogEnabled
     implements NexusIndexer
 {
     private static final char[] DIGITS = "0123456789abcdef".toCharArray();
 
-    /** @plexus.requirement */
+    @Requirement
     private Scanner scanner;
 
-    /** @plexus.requirement */
+    @Requirement
     private SearchEngine searcher;
 
-    /** @plexus.requirement */
+    @Requirement
     private IndexerEngine indexerEngine;
 
-    /** @plexus.requirement */
+    @Requirement
     private QueryCreator queryCreator;
 
     private Map<String, IndexingContext> indexingContexts;
