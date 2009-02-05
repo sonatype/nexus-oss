@@ -450,6 +450,12 @@ public class DefaultRepositoryRouter
             try
             {
                 repository = repositoryRegistry.getRepositoryWithFacet( explodedPath[1], kind );
+
+                if ( !repository.isExposed() )
+                {
+                    // the repo is not exposed
+                    throw new ItemNotFoundException( request.getRequestPath() );
+                }
             }
             catch ( NoSuchRepositoryException e )
             {
@@ -546,12 +552,15 @@ public class DefaultRepositoryRouter
 
             for ( Repository repository : repositories )
             {
-                DefaultStorageCollectionItem repoItem = new DefaultStorageCollectionItem( this, ItemPathUtils
-                    .concatPaths( request.getRequestPath(), repository.getId() ), true, false );
+                if ( repository.isExposed() )
+                {
+                    DefaultStorageCollectionItem repoItem = new DefaultStorageCollectionItem( this, ItemPathUtils
+                        .concatPaths( request.getRequestPath(), repository.getId() ), true, false );
 
-                repoItem.getItemContext().putAll( request.getRequestContext() );
+                    repoItem.getItemContext().putAll( request.getRequestContext() );
 
-                result.add( repoItem );
+                    result.add( repoItem );
+                }
             }
 
             return result;
