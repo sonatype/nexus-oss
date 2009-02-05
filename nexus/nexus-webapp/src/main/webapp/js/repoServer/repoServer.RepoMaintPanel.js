@@ -1305,6 +1305,8 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
   nodeContextMenuHandler: function( node, e ) {
     if ( e.target.nodeName == 'A' ) return; // no menu on links
 
+    if ( this.payload.data.exposed == false ) return; // no menu on non-managed repos
+
     if ( this.nodeContextMenuEvent ) { 
 
       node.attributes.repoRecord = this.payload;
