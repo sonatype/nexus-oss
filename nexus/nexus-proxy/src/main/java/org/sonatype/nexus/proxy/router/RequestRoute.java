@@ -25,6 +25,8 @@ public class RequestRoute
     private String strippedPrefix;
 
     private String originalRequestPath;
+    
+    private int requestDepth;
 
     private ResourceStoreRequest resourceStoreRequest;
 
@@ -71,6 +73,16 @@ public class RequestRoute
     public void setOriginalRequestPath( String originalRequestPath )
     {
         this.originalRequestPath = originalRequestPath;
+    }
+
+    public int getRequestDepth()
+    {
+        return requestDepth;
+    }
+
+    public void setRequestDepth( int depth )
+    {
+        this.requestDepth = depth;
     }
 
     public ResourceStoreRequest getResourceStoreRequest()

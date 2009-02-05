@@ -17,11 +17,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -34,6 +36,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -42,7 +45,6 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.util.ItemPathUtils;
@@ -405,9 +407,20 @@ public class DefaultRepositoryRouter
         String correctedPath = request.getRequestPath().startsWith( RepositoryItemUid.PATH_SEPARATOR ) ? request
             .getRequestPath().substring( 1, request.getRequestPath().length() ) : request.getRequestPath();
 
-        String[] explodedPath = correctedPath.split( RepositoryItemUid.PATH_SEPARATOR );
+        String[] explodedPath = null;
+
+        if ( StringUtils.isEmpty( correctedPath ) )
+        {
+            explodedPath = new String[0];
+        }
+        else
+        {
+            explodedPath = correctedPath.split( RepositoryItemUid.PATH_SEPARATOR );
+        }
 
         Class<? extends Repository> kind = null;
+
+        result.setRequestDepth( explodedPath.length );
 
         if ( explodedPath.length >= 1 )
         {
@@ -419,10 +432,6 @@ public class DefaultRepositoryRouter
             else if ( explodedPath[0].equals( "groups" ) )
             {
                 kind = GroupRepository.class;
-            }
-            else if ( explodedPath[0].equals( "virtuals" ) )
-            {
-                kind = ShadowRepository.class;
             }
             else
             {
@@ -473,13 +482,84 @@ public class DefaultRepositoryRouter
     protected StorageItem retrieveVirtualPath( ResourceStoreRequest request, RequestRoute route )
         throws ItemNotFoundException
     {
-        return null;
+        DefaultStorageCollectionItem result = new DefaultStorageCollectionItem(
+            this,
+            route.getOriginalRequestPath(),
+            true,
+            false );
+
+        result.getItemContext().putAll( request.getRequestContext() );
+
+        return result;
     }
 
     protected Collection<StorageItem> listVirtualPath( ResourceStoreRequest request, RequestRoute route )
         throws ItemNotFoundException
     {
-        return null;
+        // XXX: A crude implementation with wired-in items like collections "repositories" and "groups".
+        // We will need to make it smarter, for example sort out dirs based on their Roles, and extend RepoTypeRegistry
+        // for role 2 path mapping or so.
+        if ( route.getRequestDepth() == 0 )
+        {
+            // 1st level
+            ArrayList<StorageItem> result = new ArrayList<StorageItem>();
+
+            DefaultStorageCollectionItem repositories = new DefaultStorageCollectionItem( this, ItemPathUtils
+                .concatPaths( request.getRequestPath(), "repositories" ), true, false );
+
+            repositories.getItemContext().putAll( request.getRequestContext() );
+
+            result.add( repositories );
+
+            DefaultStorageCollectionItem groups = new DefaultStorageCollectionItem( this, ItemPathUtils.concatPaths(
+                request.getRequestPath(),
+                "groups" ), true, false );
+
+            groups.getItemContext().putAll( request.getRequestContext() );
+
+            result.add( groups );
+
+            return result;
+        }
+        else if ( route.getRequestDepth() == 1 )
+        {
+            // 2nd level
+            List<? extends Repository> repositories = null;
+
+            if ( route.getStrippedPrefix().startsWith( "/repositories" ) )
+            {
+                // repositories (all, even groups from now on!)
+
+                repositories = repositoryRegistry.getRepositoriesWithFacet( Repository.class );
+            }
+            else if ( route.getStrippedPrefix().startsWith( "/groups" ) )
+            {
+                // groups only
+                repositories = repositoryRegistry.getRepositoriesWithFacet( GroupRepository.class );
+            }
+            else
+            {
+                throw new ItemNotFoundException( request.getRequestPath() );
+            }
+
+            ArrayList<StorageItem> result = new ArrayList<StorageItem>( repositories.size() );
+
+            for ( Repository repository : repositories )
+            {
+                DefaultStorageCollectionItem repoItem = new DefaultStorageCollectionItem( this, ItemPathUtils
+                    .concatPaths( request.getRequestPath(), repository.getId() ), true, false );
+
+                repoItem.getItemContext().putAll( request.getRequestContext() );
+
+                result.add( repoItem );
+            }
+
+            return result;
+        }
+        else
+        {
+            throw new ItemNotFoundException( request.getRequestPath() );
+        }
     }
 
 }
