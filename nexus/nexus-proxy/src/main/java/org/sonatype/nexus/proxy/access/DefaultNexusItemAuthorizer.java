@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy.access;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +57,11 @@ public class DefaultNexusItemAuthorizer
         TargetSet matched = root.getTargetsForRequest( rsr );
 
         return authorizePath( matched, action );
+    }
+    
+    public boolean authorizePermission( String permission )
+    {
+        return isPermitted( Collections.singletonList( permission ) );
     }
 
     protected boolean authorizePath( TargetSet matched, Action action )

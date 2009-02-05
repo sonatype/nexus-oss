@@ -43,4 +43,12 @@ public interface NexusItemAuthorizer
      * @return
      */
     boolean authorizePath( ResourceStoreRequest rsr, Action action );
+    
+    /**
+     * Used to authorize a simple permission string
+     * 
+     * @param permission
+     * @return
+     */
+    boolean authorizePermission( String permission );
 }
