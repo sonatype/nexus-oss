@@ -13,19 +13,35 @@
  */
 package org.sonatype.nexus;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.lucene.store.RAMDirectory;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.NexusIndexer;
+import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.packer.IndexPacker;
+import org.sonatype.nexus.index.packer.IndexPackingRequest;
 
 public class ReindexTest
     extends AbstractMavenRepoContentTests
 {
     private ServletServer servletServer;
 
+    private NexusIndexer nexusIndexer;
+
+    private IndexPacker indexPacker;
+
     protected void setUp()
         throws Exception
     {
         super.setUp();
+
+        nexusIndexer = lookup( NexusIndexer.class );
+
+        indexPacker = lookup( IndexPacker.class );
 
         servletServer = lookup( ServletServer.class );
 
@@ -43,6 +59,7 @@ public class ReindexTest
     protected void makeCentralPointTo( String url )
         throws Exception
     {
+
         CRepository repoConfig = defaultNexus.readRepository( "central" );
 
         // redirect it to our "sppof" jetty (see ReindexTest.xml in src/test/resources....
@@ -54,6 +71,33 @@ public class ReindexTest
         // update repo --> this will _NOT_ spawn one task doing reindex on central (coz we are modifying the same model
         // got from readRepo())
         defaultNexus.updateRepository( repoConfig );
+    }
+
+    protected void reindexRemoteRepositoryAndPublish( String repositoryId )
+        throws IOException
+    {
+        File root = new File( new File( getBasedir() ), "target/test-classes/reposes-remote/" + repositoryId );
+        
+        IndexingContext ctx = nexusIndexer.addIndexingContextForced(
+            repositoryId + "-temp",
+            repositoryId,
+            root,
+            new RAMDirectory(),
+            null,
+            null,
+            NexusIndexer.FULL_INDEX );
+
+        nexusIndexer.scan( ctx );
+
+        File targetDir = new File( root, ".index" );
+
+        targetDir.mkdirs();
+
+        IndexPackingRequest ipr = new IndexPackingRequest( ctx, targetDir );
+
+        indexPacker.packIndex( ipr );
+
+        nexusIndexer.removeIndexingContext( ctx, true );
     }
 
     protected void validateIndexWithIdentify( boolean shouldBePresent, String sha1Hash, String gid, String aid,
@@ -96,6 +140,8 @@ public class ReindexTest
     {
         fillInRepo();
 
+        reindexRemoteRepositoryAndPublish( "central" );
+        
         makeCentralPointTo( "http://localhost:12345/central/" );
 
         defaultNexus.reindexRepository( null, "central" );
@@ -108,6 +154,8 @@ public class ReindexTest
     {
         fillInRepo();
 
+        reindexRemoteRepositoryAndPublish( "central" );
+        
         makeCentralPointTo( "http://localhost:12345/central/" );
 
         // central is member of public group
@@ -120,8 +168,10 @@ public class ReindexTest
         throws Exception
     {
         // day 1
-        makeCentralPointTo( "http://localhost:12345/central-inc1/" );
+        reindexRemoteRepositoryAndPublish( "central-inc1" );
 
+        makeCentralPointTo( "http://localhost:12345/central-inc1/" );
+        
         defaultNexus.reindexRepository( null, "central" );
 
         // validation
@@ -133,6 +183,8 @@ public class ReindexTest
         validateIndexWithIdentify( false, "f0a0d2e29ed910808c33135a3a5a51bba6358f7b", "log4j", "log4j", "1.2.15" );
 
         // day 2
+        reindexRemoteRepositoryAndPublish( "central-inc2" );
+
         makeCentralPointTo( "http://localhost:12345/central-inc2/" );
 
         defaultNexus.reindexRepository( null, "central" );
@@ -146,6 +198,8 @@ public class ReindexTest
         validateIndexWithIdentify( false, "f0a0d2e29ed910808c33135a3a5a51bba6358f7b", "log4j", "log4j", "1.2.15" );
 
         // day 3
+        reindexRemoteRepositoryAndPublish( "central-inc3" );
+
         makeCentralPointTo( "http://localhost:12345/central-inc3/" );
 
         defaultNexus.reindexRepository( null, "central" );
