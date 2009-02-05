@@ -27,6 +27,7 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.timeline.TimelineFilter;
@@ -270,15 +271,29 @@ public class DefaultFeedRecorder
 
         addToTimeline( event );
     }
+    
+    private void putContext( Map<String, String> map, Map<String, Object> context )
+    {
+        for ( String key : context.keySet() )
+        {
+            Object value = context.get( key );
+
+            if ( value == null )
+            {
+                getLogger().warn( "The attribute with key '" + key + "' in event context is NULL!" );
+
+                value = "";
+            }
+
+            map.put( CTX_PREFIX + key, value.toString() );
+        }
+    }
 
     public void addAuthcAuthzEvent( AuthcAuthzEvent evt )
     {
         Map<String, String> map = new HashMap<String, String>();
 
-        for ( String key : evt.getEventContext().keySet() )
-        {
-            map.put( CTX_PREFIX + key, evt.getEventContext().get( key ).toString() );
-        }
+        putContext( map, evt.getEventContext() );
 
         map.put( ACTION, evt.getAction() );
 
@@ -302,10 +317,7 @@ public class DefaultFeedRecorder
             map.put( REMOTE_URL, nae.getNexusItemInfo().getRemoteUrl() );
         }
 
-        for ( String key : nae.getEventContext().keySet() )
-        {
-            map.put( CTX_PREFIX + key, nae.getEventContext().get( key ).toString() );
-        }
+        putContext( map, nae.getEventContext() );
 
         if ( nae.getMessage() != null )
         {
@@ -352,10 +364,7 @@ public class DefaultFeedRecorder
     {
         Map<String, String> map = new HashMap<String, String>();
 
-        for ( String key : se.getEventContext().keySet() )
-        {
-            map.put( CTX_PREFIX + key, se.getEventContext().get( key ).toString() );
-        }
+        putContext( map, se.getEventContext() );
 
         map.put( DATE, eventDateFormat.format( se.getEventDate() ) );
 
