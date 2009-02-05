@@ -458,6 +458,7 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
   
   startImport: function() {
     this.el.mask( 'Importing...' );
+    this.formPanel.buttons[0].disable();
 
     var data = {
       backupLocation: this.importData.backupLocation,
@@ -511,7 +512,6 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
         this.el.unmask();
 
         if ( success ) {
-          this.formPanel.buttons[0].disable();
           this.formPanel.buttons[1].setText( 'Close' );
           Sonatype.MessageBox.show( {
             title: 'Import Successful',
@@ -521,6 +521,7 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
           } );
         }
         else {
+          this.formPanel.buttons[0].enable();
           Sonatype.utils.connectionError( response, 'Artifactory import failed!' );
         }
       },
