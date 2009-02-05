@@ -131,6 +131,8 @@ public class ArtifactoryFileLocationPlexusResource
             }
 
             MigrationSummaryDTO data = new MigrationSummaryDTO();
+            data.setId( Long.toHexString( System.nanoTime() ) );
+
             result.setData( data );
 
             buildBackupLoaction( backupFile, data );
@@ -309,7 +311,7 @@ public class ArtifactoryFileLocationPlexusResource
             resolution.setAdmin( user.isAdmin() );
 
             resolution.setEmail( user.getEmail() );
-            
+
             resolutions.add( resolution );
         }
 

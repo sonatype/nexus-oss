@@ -21,6 +21,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public class MigrationSummaryDTO
 {
 
+    private String id;
+
     private String backupLocation;
 
     private List<UserResolutionDTO> usersResolution;
@@ -30,6 +32,11 @@ public class MigrationSummaryDTO
     private List<RepositoryResolutionDTO> repositoriesResolution;
 
     private List<GroupResolutionDTO> groupsResolution;
+
+    public MigrationSummaryDTO()
+    {
+        super();
+    }
 
     public List<RepositoryResolutionDTO> getRepositoriesResolution()
     {
@@ -125,6 +132,16 @@ public class MigrationSummaryDTO
             }
         }
         return null;
+    }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId( String id )
+    {
+        this.id = id;
     }
 
 }

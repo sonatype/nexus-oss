@@ -77,8 +77,8 @@ public class ArtifactoryMigrator
     implements Initializable
 {
 
-    private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER = new NotFileFilter( new SuffixFileFilter(
-        ".artifactory-metadata" ) );
+    private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER =
+        new NotFileFilter( new SuffixFileFilter( ".artifactory-metadata" ) );
 
     private static final String LOGFILE_NAME = "migration.log";
 
@@ -117,10 +117,24 @@ public class ArtifactoryMigrator
 
     private Logger logger = Logger.getLogger( this.getClass() );
 
+    private static final List<String> migrated = new ArrayList<String>();
+
     public MigrationResult migrate( MigrationSummaryDTO migrationSummary )
     {
         // reset the resultLogger
         this.migrationResult.clear();
+
+        if ( migrated.contains( migrationSummary.getId() ) )
+        {
+            this.logger.info( "Trying to import the same package twice: '" + migrationSummary.getId() + "'." );
+            migrationResult.addWarningMessage( "Trying to import the same package twice: '" + migrationSummary.getId()
+                + "'." );
+            return migrationResult;
+        }
+        else
+        {
+            migrated.add( migrationSummary.getId() );
+        }
 
         this.logger.info( "Importing Artifactory Backup from file: '" + migrationSummary.getBackupLocation() + "'." );
 
@@ -194,10 +208,9 @@ public class ArtifactoryMigrator
 
         for ( UserResolutionDTO userResolution : migrationSummary.getUsersResolution() )
         {
-            ArtifactoryUser user = new ArtifactoryUser(
-                userResolution.getUserId(),
-                userResolution.getPassword(),
-                userResolution.getEmail() );
+            ArtifactoryUser user =
+                new ArtifactoryUser( userResolution.getUserId(), userResolution.getPassword(),
+                                     userResolution.getEmail() );
 
             user.setAdmin( userResolution.isAdmin() );
 
@@ -209,11 +222,9 @@ public class ArtifactoryMigrator
 
         cfg.getUsers().addAll( userList );
 
-        SecurityConfigConvertor convertor = new SecurityConfigConvertor(
-            cfg,
-            securityConfigAdaptorPersistor,
-            mappingConfiguration,
-            this.migrationResult );
+        SecurityConfigConvertor convertor =
+            new SecurityConfigConvertor( cfg, securityConfigAdaptorPersistor, mappingConfiguration,
+                                         this.migrationResult );
 
         convertor.setResolvePermission( migrationSummary.isResolvePermission() );
 
@@ -222,7 +233,7 @@ public class ArtifactoryMigrator
     }
 
     private void importRepositories( MigrationSummaryDTO migrationSummary, ArtifactoryConfig cfg,
-        File artifactoryBackupDir )
+                                     File artifactoryBackupDir )
     {
         final File repositoriesBackup = new File( artifactoryBackupDir, "repositories" );
 
@@ -253,8 +264,9 @@ public class ArtifactoryMigrator
                         CRepository nexusRepoReleases = createRepository( repo, artifactoryProxies, false, "releases" );
                         CRepository nexusRepoSnapshots = createRepository( repo, artifactoryProxies, true, "snapshots" );
 
-                        CRepositoryGroup nexusGroup = createGroup( repo.getKey(), repo.getType(), nexusRepoReleases
-                            .getId(), nexusRepoSnapshots.getId() );
+                        CRepositoryGroup nexusGroup =
+                            createGroup( repo.getKey(), repo.getType(), nexusRepoReleases.getId(),
+                                         nexusRepoSnapshots.getId() );
 
                         if ( resolution.isCopyCachedArtifacts() )
                         {
@@ -264,11 +276,9 @@ public class ArtifactoryMigrator
 
                         if ( resolution.isMapUrls() )
                         {
-                            CMapping map = new CMapping(
-                                resolution.getRepositoryId(),
-                                nexusGroup.getGroupId(),
-                                nexusRepoReleases.getId(),
-                                nexusRepoSnapshots.getId() );
+                            CMapping map =
+                                new CMapping( resolution.getRepositoryId(), nexusGroup.getGroupId(),
+                                              nexusRepoReleases.getId(), nexusRepoSnapshots.getId() );
                             mappingConfiguration.addMapping( map );
                         }
 
@@ -281,15 +291,15 @@ public class ArtifactoryMigrator
                     {
                         if ( resolution.isMapUrls() )
                         {
-                            CMapping map = new CMapping( resolution.getRepositoryId(), resolution
-                                .getSimilarRepositoryId() );
+                            CMapping map =
+                                new CMapping( resolution.getRepositoryId(), resolution.getSimilarRepositoryId() );
                             mappingConfiguration.addMapping( map );
                         }
                     }
                     else
                     {
-                        importRepository( repositoriesBackup, artifactoryProxies, resolution, repo, repo
-                            .getHandleSnapshots(), null );
+                        importRepository( repositoriesBackup, artifactoryProxies, resolution, repo,
+                                          repo.getHandleSnapshots(), null );
                     }
                 }
 
@@ -304,24 +314,17 @@ public class ArtifactoryMigrator
     }
 
     private void copyArtifacts( CRepository nexusRepoSnapshots, CRepository nexusRepoReleases, File repositoryBackup )
-        throws MalformedURLException,
-            IOException,
-            URISyntaxException
+        throws MalformedURLException, IOException, URISyntaxException
     {
 
-        repositoryConvertor.convertRepositoryWithCopy(
-            repositoryBackup,
-            getStorage( nexusRepoReleases ),
-            getStorage( nexusRepoSnapshots ),
-            ARTIFACTORY_METADATA_FILE_FILTER );
+        repositoryConvertor.convertRepositoryWithCopy( repositoryBackup, getStorage( nexusRepoReleases ),
+                                                       getStorage( nexusRepoSnapshots ),
+                                                       ARTIFACTORY_METADATA_FILE_FILTER );
 
     }
 
     private CRepositoryGroup createGroup( String groupId, String repoType, String... repositoriesIds )
-        throws NoSuchRepositoryException,
-            InvalidGroupingException,
-            IOException,
-            ConfigurationException
+        throws NoSuchRepositoryException, InvalidGroupingException, IOException, ConfigurationException
     {
         CRepositoryGroup group = new CRepositoryGroup();
         group.setGroupId( groupId );
@@ -339,10 +342,9 @@ public class ArtifactoryMigrator
     }
 
     private void importRepository( File repositoriesBackup, Map<String, ArtifactoryProxy> artifactoryProxies,
-        RepositoryResolutionDTO resolution, ArtifactoryRepository repo, boolean isSnapshot, String suffix )
-        throws ConfigurationException,
-            IOException,
-            URISyntaxException
+                                   RepositoryResolutionDTO resolution, ArtifactoryRepository repo, boolean isSnapshot,
+                                   String suffix )
+        throws ConfigurationException, IOException, URISyntaxException
     {
         CRepository nexusRepo = createRepository( repo, artifactoryProxies, isSnapshot, suffix );
 
@@ -359,9 +361,8 @@ public class ArtifactoryMigrator
     }
 
     private CRepository createRepository( ArtifactoryRepository repo, Map<String, ArtifactoryProxy> artifactoryProxies,
-        boolean isSnapshot, String suffix )
-        throws ConfigurationException,
-            IOException
+                                          boolean isSnapshot, String suffix )
+        throws ConfigurationException, IOException
     {
         String repoId = repo.getKey();
         String repoName = repo.getDescription();
@@ -472,9 +473,8 @@ public class ArtifactoryMigrator
                             {
                                 this.logger.error( "Failed to add a 'maven1' virtual repository for repository '"
                                     + repoId + "'.", e );
-                                migrationResult
-                                    .addErrorMessage( "Failed to add a 'maven1' virtual repository for repository '"
-                                        + repoId + "': " + e.getMessage() );
+                                migrationResult.addErrorMessage( "Failed to add a 'maven1' virtual repository for repository '"
+                                    + repoId + "': " + e.getMessage() );
                             }
                         }
                         else
@@ -512,8 +512,7 @@ public class ArtifactoryMigrator
     }
 
     private void addVirtualRepository( CRepositoryGroup group, String repoId )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
 
         CMapping map = mappingConfiguration.getMapping( repoId );
@@ -548,8 +547,7 @@ public class ArtifactoryMigrator
     }
 
     private CRepositoryShadow createShadowRepo( String shadowOfRepoId )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         CRepositoryShadow shadowRepo = new CRepositoryShadow();
         String shadowId = shadowOfRepoId + "-virtual";
@@ -564,8 +562,7 @@ public class ArtifactoryMigrator
     }
 
     private void copyArtifacts( CRepository nexusRepo, File repositoryBackup )
-        throws URISyntaxException,
-            IOException
+        throws URISyntaxException, IOException
     {
         if ( repositoryBackup.isDirectory() && repositoryBackup.list().length > 0 )
         {
@@ -597,8 +594,7 @@ public class ArtifactoryMigrator
     }
 
     private File getStorage( CRepository nexusRepo )
-        throws MalformedURLException,
-            URISyntaxException
+        throws MalformedURLException, URISyntaxException
     {
         URL storage;
         if ( nexusRepo.getLocalStorage() == null )
@@ -614,15 +610,12 @@ public class ArtifactoryMigrator
     }
 
     private File unzipArtifactoryBackup( File fileItem )
-        throws IOException,
-            ArchiverException
+        throws IOException, ArchiverException
     {
         File tempDir = this.nexus.getNexusConfiguration().getTemporaryDirectory();
 
-        File artifactoryBackupZip = File.createTempFile(
-            FilenameUtils.getBaseName( fileItem.getName() ),
-            ".zip",
-            tempDir );
+        File artifactoryBackupZip =
+            File.createTempFile( FilenameUtils.getBaseName( fileItem.getName() ), ".zip", tempDir );
 
         InputStream in = new FileInputStream( fileItem );
         OutputStream out = new FileOutputStream( artifactoryBackupZip );
@@ -632,9 +625,9 @@ public class ArtifactoryMigrator
         in.close();
         out.close();
 
-        File artifactoryBackup = new File( artifactoryBackupZip.getParentFile(), FilenameUtils
-            .getBaseName( artifactoryBackupZip.getAbsolutePath() )
-            + "content" );
+        File artifactoryBackup =
+            new File( artifactoryBackupZip.getParentFile(),
+                      FilenameUtils.getBaseName( artifactoryBackupZip.getAbsolutePath() ) + "content" );
         artifactoryBackup.mkdirs();
 
         zipUnArchiver.setSourceFile( artifactoryBackupZip );
@@ -656,7 +649,8 @@ public class ArtifactoryMigrator
 
             if ( logDir != null )
             {
-                this.logFile = new File( logDir, LOGFILE_NAME ).getAbsolutePath();;
+                this.logFile = new File( logDir, LOGFILE_NAME ).getAbsolutePath();
+                ;
             }
         }
         catch ( IOException e )
