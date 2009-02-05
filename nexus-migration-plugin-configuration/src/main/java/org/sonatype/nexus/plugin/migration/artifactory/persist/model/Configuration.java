@@ -22,6 +22,8 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 public class Configuration
 {
 
+    private String nexusContext;
+
     @XStreamImplicit
     private List<CMapping> urlsMapping;
 
@@ -43,4 +45,15 @@ public class Configuration
     {
         getUrlsMapping().add( map );
     }
+
+    public String getNexusContext()
+    {
+        return nexusContext;
+    }
+
+    public void setNexusContext( String nexusContext )
+    {
+        this.nexusContext = nexusContext;
+    }
+
 }

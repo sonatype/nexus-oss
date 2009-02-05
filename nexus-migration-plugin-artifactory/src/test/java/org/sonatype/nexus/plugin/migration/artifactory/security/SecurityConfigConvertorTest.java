@@ -306,27 +306,39 @@ public class SecurityConfigConvertorTest
             // nothing
         }
 
+        public String getNexusContext()
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public void setNexusContext( String nexusContext )
+        {
+            // TODO Auto-generated method stub
+
+        }
+
     }
-    
+
     class MockMigrationResults implements MigrationResult
     {
 
         public void addErrorMessage( String errorMessage )
         {
             // TODO Auto-generated method stub
-            
+
         }
 
         public void addWarningMessage( String warningMessage )
         {
             // TODO Auto-generated method stub
-            
+
         }
 
         public void clear()
         {
             // TODO Auto-generated method stub
-            
+
         }
 
         public List<String> getErrorMessages()
@@ -344,9 +356,9 @@ public class SecurityConfigConvertorTest
         public void mergeResult( MigrationResult migrationResult )
         {
             // TODO Auto-generated method stub
-            
+
         }
-        
+
     }
 
 }

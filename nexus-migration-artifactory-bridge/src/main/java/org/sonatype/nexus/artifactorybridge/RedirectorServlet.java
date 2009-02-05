@@ -170,7 +170,7 @@ public class RedirectorServlet
 
     private String getNexusUrl( HttpServletRequest request )
     {
-        String nexusUrl = "http://" + request.getLocalAddr() + ":" + request.getLocalPort() + "/nexus";
+        String nexusUrl = "http://" + request.getLocalAddr() + ":" + request.getLocalPort();
         return nexusUrl;
     }
 

@@ -23,4 +23,8 @@ public interface MappingConfiguration
 
     CMapping getMapping( String repositoryId );
 
+    String getNexusContext();
+
+    void setNexusContext( String nexusContext );
+
 }

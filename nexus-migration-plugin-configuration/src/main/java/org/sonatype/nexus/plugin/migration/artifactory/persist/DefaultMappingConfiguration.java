@@ -213,4 +213,24 @@ public class DefaultMappingConfiguration
         return null;
     }
 
+    public String getNexusContext()
+    {
+        return getConfiguration().getNexusContext();
+    }
+
+    public void setNexusContext( String nexusContext )
+    {
+        lock.lock();
+        try
+        {
+            getConfiguration().setNexusContext( nexusContext );
+
+            save();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
 }

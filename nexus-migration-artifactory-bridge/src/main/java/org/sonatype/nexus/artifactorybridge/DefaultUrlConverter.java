@@ -55,6 +55,12 @@ public class DefaultUrlConverter
             return null;
         }
 
+        String nexusContext = mappingConfiguration.getNexusContext();
+        if(nexusContext == null)
+        {
+            nexusContext = "/nexus";
+        }
+
         String repository = servletPath.substring( 1, artifactPathIndex );
 
         CMapping map = mappingConfiguration.getMapping( repository );
@@ -88,21 +94,21 @@ public class DefaultUrlConverter
                 String version = artifactPath.substring( previousSlash, lastSlash );
                 if ( version.endsWith( "-SNAPSHOT" ) )
                 {
-                    return REPOSITORY + map.getSnapshotsRepositoryId() + artifactPath;
+                    return nexusContext + REPOSITORY + map.getSnapshotsRepositoryId() + artifactPath;
                 }
                 else
                 {
-                    return REPOSITORY + map.getReleasesRepositoryId() + artifactPath;
+                    return nexusContext + REPOSITORY + map.getReleasesRepositoryId() + artifactPath;
                 }
             }
             else
             {
-                return GROUP + map.getNexusGroupId() + artifactPath;
+                return nexusContext + GROUP + map.getNexusGroupId() + artifactPath;
             }
         }
         else
         {
-            return REPOSITORY + map.getNexusRepositoryId() + artifactPath;
+            return nexusContext + REPOSITORY + map.getNexusRepositoryId() + artifactPath;
         }
     }
 

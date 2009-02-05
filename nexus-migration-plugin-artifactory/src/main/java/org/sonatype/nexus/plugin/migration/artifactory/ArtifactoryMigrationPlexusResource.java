@@ -13,12 +13,10 @@
 package org.sonatype.nexus.plugin.migration.artifactory;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRequestDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.task.ArtifactoryMigrationTask;
@@ -30,8 +28,6 @@ public class ArtifactoryMigrationPlexusResource
     extends AbstractArtifactoryMigrationPlexusResource
 
 {
-    @Requirement
-    private Nexus nexus;
 
     public ArtifactoryMigrationPlexusResource()
     {
@@ -64,16 +60,18 @@ public class ArtifactoryMigrationPlexusResource
         MigrationSummaryDTO migrationSummary = ( (MigrationSummaryRequestDTO) payload ).getData();
 
         // need to resolve that on posts
-       this.validateBackupFileLocation( migrationSummary.getBackupLocation() );
+        this.validateBackupFileLocation( migrationSummary.getBackupLocation() );
 
-       // lookup task and run it
-       ArtifactoryMigrationTask migrationTask = this.nexus.createTaskInstance( ArtifactoryMigrationTask.class );
-       migrationTask.setMigrationSummary( migrationSummary );
-       this.nexus.submit( "Importing Artifactory Backup.", migrationTask );
+        String nexusContext = getContextRoot( request ).getPath();
+        migrationSummary.setNexusContext( nexusContext );
 
-       return null;
+        // lookup task and run it
+        ArtifactoryMigrationTask migrationTask = this.getNexus().createTaskInstance( ArtifactoryMigrationTask.class );
+        migrationTask.setMigrationSummary( migrationSummary );
+        this.getNexus().submit( "Importing Artifactory Backup.", migrationTask );
+
+        return null;
 
     }
-
 
 }

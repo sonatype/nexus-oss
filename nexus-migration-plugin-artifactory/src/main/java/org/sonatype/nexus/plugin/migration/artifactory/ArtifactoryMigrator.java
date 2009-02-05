@@ -192,6 +192,8 @@ public class ArtifactoryMigrator
             return migrationResult;
         }
 
+        this.mappingConfiguration.setNexusContext( migrationSummary.getNexusContext() );
+
         importRepositories( migrationSummary, cfg, artifactoryBackupDir );
 
         importGroups( migrationSummary, cfg );

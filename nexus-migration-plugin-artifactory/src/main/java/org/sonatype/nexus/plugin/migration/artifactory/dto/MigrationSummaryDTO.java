@@ -33,6 +33,8 @@ public class MigrationSummaryDTO
 
     private List<GroupResolutionDTO> groupsResolution;
 
+    private String nexusContext;
+
     public MigrationSummaryDTO()
     {
         super();
@@ -142,6 +144,16 @@ public class MigrationSummaryDTO
     public void setId( String id )
     {
         this.id = id;
+    }
+
+    public String getNexusContext()
+    {
+        return nexusContext;
+    }
+
+    public void setNexusContext( String nexusContext )
+    {
+        this.nexusContext = nexusContext;
     }
 
 }
