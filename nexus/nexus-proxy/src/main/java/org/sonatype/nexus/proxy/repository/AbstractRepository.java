@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -45,6 +46,7 @@ import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentGenerator;
@@ -178,13 +180,24 @@ public abstract class AbstractRepository
     private List<RequestProcessor> requestProcessors;
 
     public void initialize()
+        throws InitializationException
     {
         applicationConfiguration.addProximityEventListener( this );
     }
 
     public void onProximityEvent( AbstractEvent evt )
     {
-        // TODO
+        // act automatically on repo removal
+        if ( evt instanceof RepositoryRegistryEventRemove )
+        {
+            RepositoryRegistryEventRemove revt = (RepositoryRegistryEventRemove) evt;
+
+            if ( revt.getRepository() == this )
+            {
+                // we are being removed
+                applicationConfiguration.removeProximityEventListener( this );
+            }
+        }
     }
 
     protected ApplicationConfiguration getApplicationConfiguration()

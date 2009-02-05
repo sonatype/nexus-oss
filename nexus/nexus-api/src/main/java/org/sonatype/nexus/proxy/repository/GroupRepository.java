@@ -32,6 +32,20 @@ public interface GroupRepository
     extends Repository
 {
     /**
+     * Sets the members of this group.
+     * 
+     * @param repositories
+     */
+    void setMemberRepositories( List<String> repositories );
+
+    /**
+     * Removes a member from this group.
+     * 
+     * @param repositoryId
+     */
+    void removeMemberRepository( String repositoryId );
+
+    /**
      * Returns the unmodifiable list of Repositories that are group members in this GroupRepository. The repo order
      * within list is repo rank (the order how they will be processed), so processing is possible by simply iterating
      * over resulting list.

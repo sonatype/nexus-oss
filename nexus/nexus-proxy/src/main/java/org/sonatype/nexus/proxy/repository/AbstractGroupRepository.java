@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -53,6 +54,16 @@ public abstract class AbstractGroupRepository
 
     private List<String> memberRepoIds = new ArrayList<String>();
 
+    @Override
+    public void initialize()
+        throws InitializationException
+    {
+        super.initialize();
+
+        repoRegistry.addProximityEventListener( this );
+    }
+
+    @Override
     public void onProximityEvent( AbstractEvent evt )
     {
         super.onProximityEvent( evt );
@@ -62,7 +73,16 @@ public abstract class AbstractGroupRepository
         {
             RepositoryRegistryEventRemove revt = (RepositoryRegistryEventRemove) evt;
 
-            removeMemberRepository( revt.getRepository().getId() );
+            if ( revt.getRepository() == this )
+            {
+                // we are being removed
+                repoRegistry.removeProximityEventListener( this );
+            }
+            else
+            {
+                // remove it from members (will nothing happen if not amongs them)
+                removeMemberRepository( revt.getRepository().getId() );
+            }
         }
     }
 

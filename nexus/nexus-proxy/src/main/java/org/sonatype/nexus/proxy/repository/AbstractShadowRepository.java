@@ -23,7 +23,6 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -86,6 +85,7 @@ public abstract class AbstractShadowRepository
     /**
      * The shadow is delegating it's availability to it's master, but we can still shot down the shadow onlu.
      */
+    @Override
     public LocalStatus getLocalStatus()
     {
         return super.getLocalStatus().shouldServiceRequest()
@@ -94,43 +94,55 @@ public abstract class AbstractShadowRepository
             : LocalStatus.OUT_OF_SERVICE;
     }
 
+    @Override
     public void onProximityEvent( AbstractEvent evt )
     {
+        super.onProximityEvent( evt );
+
         if ( evt instanceof RepositoryItemEvent )
         {
             RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 
-            try
+            // is this event coming from our master?
+            if ( getMasterRepository() == ievt.getRepository() )
             {
-                String shadowPath = transformMaster2Shadow( ievt.getItemUid().getPath() );
-
-                if ( shadowPath != null )
+                try
                 {
-                    if ( ievt instanceof RepositoryItemEventStore || ievt instanceof RepositoryItemEventCache )
-                    {
-                        DefaultStorageLinkItem link = new DefaultStorageLinkItem( this, shadowPath, true, true, ievt
-                            .getItemUid() );
+                    String shadowPath = transformMaster2Shadow( ievt.getItemUid().getPath() );
 
-                        if ( ievt.getContext() != null )
+                    if ( shadowPath != null )
+                    {
+                        if ( ievt instanceof RepositoryItemEventStore || ievt instanceof RepositoryItemEventCache )
                         {
-                            link.getItemContext().putAll( ievt.getContext() );
-                        }
+                            DefaultStorageLinkItem link = new DefaultStorageLinkItem(
+                                this,
+                                shadowPath,
+                                true,
+                                true,
+                                ievt.getItemUid() );
 
-                        storeItem( link );
-                    }
-                    else if ( ievt instanceof RepositoryItemEventDelete )
-                    {
-                        deleteItem( createUid( shadowPath ), ievt.getContext() );
+                            if ( ievt.getContext() != null )
+                            {
+                                link.getItemContext().putAll( ievt.getContext() );
+                            }
+
+                            storeItem( link );
+                        }
+                        else if ( ievt instanceof RepositoryItemEventDelete )
+                        {
+                            deleteItem( createUid( shadowPath ), ievt.getContext() );
+                        }
                     }
                 }
-            }
-            catch ( Exception e )
-            {
-                getLogger().warn( "Could not sync shadow repository because of exception", e );
+                catch ( Exception e )
+                {
+                    getLogger().warn( "Could not sync shadow repository because of exception", e );
+                }
             }
         }
     }
 
+    @Override
     protected StorageItem doRetrieveItem( RepositoryItemUid uid, Map<String, Object> context )
         throws IllegalOperationException,
             ItemNotFoundException,
@@ -161,7 +173,8 @@ public abstract class AbstractShadowRepository
         }
     }
 
-    public void storeItem( AbstractStorageItem item )
+    @Override
+    public void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException
