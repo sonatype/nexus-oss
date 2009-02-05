@@ -456,13 +456,22 @@ public abstract class AbstractProxyRepository
                             if ( !shouldGetRemote )
                             {
                                 markItemRemotelyChecked( uid, context );
+
+                                if ( getLogger().isDebugEnabled() )
+                                {
+                                    getLogger().debug(
+                                        "Newer version of item " + uid.toString() + " is found on remote storage." );
+                                }
+                            }
+                            else
+                            {
+                                if ( getLogger().isDebugEnabled() )
+                                {
+                                    getLogger().debug(
+                                        "No newer version of item " + uid.toString() + " found on remote storage." );
+                                }
                             }
 
-                            if ( getLogger().isDebugEnabled() )
-                            {
-                                getLogger().debug(
-                                    "Newer version of item " + uid.toString() + " is found on remote storage." );
-                            }
                         }
                         catch ( RemoteAccessException ex )
                         {

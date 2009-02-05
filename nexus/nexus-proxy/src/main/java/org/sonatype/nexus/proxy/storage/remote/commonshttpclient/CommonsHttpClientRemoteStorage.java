@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -115,7 +116,7 @@ public class CommonsHttpClientRemoteStorage
         throws RemoteAccessException,
             StorageException
     {
-        return checkRemoteAvailability( 0, repository, context, path, false );
+        return checkRemoteAvailability( newerThen, repository, context, path, false );
     }
 
     public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String baseUrl,
