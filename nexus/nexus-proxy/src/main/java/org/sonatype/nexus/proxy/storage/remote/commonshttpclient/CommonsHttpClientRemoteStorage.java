@@ -115,7 +115,7 @@ public class CommonsHttpClientRemoteStorage
         throws RemoteAccessException,
             StorageException
     {
-        return checkRemoteAvailability( 0, repository, context, RepositoryItemUid.PATH_ROOT, false );
+        return checkRemoteAvailability( 0, repository, context, path, false );
     }
 
     public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String baseUrl,
@@ -292,18 +292,18 @@ public class CommonsHttpClientRemoteStorage
         HostConfiguration httpConfiguration = null;
 
         getLogger().debug( "Creating CommonsHttpClient instance" );
-        
+
         int timeout = getRemoteConnectionSettings( ctx ).getConnectionTimeout();
-        
+
         HttpConnectionManagerParams connManagerParams = new HttpConnectionManagerParams();
         connManagerParams.setConnectionTimeout( timeout );
         connManagerParams.setSoTimeout( timeout );
         connManagerParams.setTcpNoDelay( true );
-        
+
         MultiThreadedHttpConnectionManager connManager = new MultiThreadedHttpConnectionManager();
         connManager.setParams( connManagerParams );
-        
-        httpClient = new HttpClient( connManager);
+
+        httpClient = new HttpClient( connManager );
         httpClient.getParams().setConnectionManagerTimeout( timeout );
         httpClient.getParams().setSoTimeout( timeout );
 

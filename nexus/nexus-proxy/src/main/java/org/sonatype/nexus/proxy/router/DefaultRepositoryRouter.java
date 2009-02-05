@@ -552,7 +552,7 @@ public class DefaultRepositoryRouter
 
             for ( Repository repository : repositories )
             {
-                if ( repository.isExposed() )
+                if ( repository.isExposed() && repository.isBrowseable() )
                 {
                     DefaultStorageCollectionItem repoItem = new DefaultStorageCollectionItem( this, ItemPathUtils
                         .concatPaths( request.getRequestPath(), repository.getId() ), true, false );

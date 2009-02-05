@@ -44,7 +44,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
-import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -497,10 +496,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
         else if ( t instanceof RepositoryNotAvailableException )
         {
             throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, t.getMessage() );
-        }
-        else if ( t instanceof RepositoryNotListableException )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
         }
         else if ( t instanceof IllegalRequestException )
         {

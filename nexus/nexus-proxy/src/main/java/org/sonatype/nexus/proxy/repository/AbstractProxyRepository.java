@@ -524,7 +524,10 @@ public abstract class AbstractProxyRepository
                             // cleanup if any remnant is here
                             try
                             {
-                                deleteItem( uid, context );
+                                if ( localItem == null )
+                                {
+                                    deleteItem( uid, context );
+                                }
                             }
                             catch ( ItemNotFoundException ex1 )
                             {
