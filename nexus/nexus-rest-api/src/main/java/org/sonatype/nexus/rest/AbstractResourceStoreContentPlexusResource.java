@@ -260,7 +260,10 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             List<?> certs = (List<?>) request.getAttributes().get( "org.restlet.https.clientCertificates" );
 
-            result.getRequestContext().put( AccessManager.REQUEST_CERTIFICATES, certs );
+            if ( certs != null )
+            {
+                result.getRequestContext().put( AccessManager.REQUEST_CERTIFICATES, certs );
+            }
         }
 
         return result;
