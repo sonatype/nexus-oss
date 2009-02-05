@@ -280,7 +280,10 @@ public class DefaultFeedRecorder
 
             if ( value == null )
             {
-                getLogger().warn( "The attribute with key '" + key + "' in event context is NULL!" );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "The attribute with key '" + key + "' in event context is NULL!" );
+                }
 
                 value = "";
             }
