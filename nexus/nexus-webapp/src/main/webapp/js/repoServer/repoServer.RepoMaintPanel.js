@@ -490,7 +490,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     
     if ( rec.get( 'exposed' ) == false )
       return;
-        
     
     var isProxyRepo = (node.getOwnerTree().root.attributes.repoType == 'proxy');
     var isGroup = (node.getOwnerTree().root.attributes.repoType == 'group');
@@ -504,11 +503,9 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       payload: node
     });
 
-    if ( this.browseTypeButton.value != 'nexus' ) {
-      Sonatype.Events.fireEvent( 'repositoryContentMenuInit', menu,
-        this.reposGridPanel.store.getById(node.getOwnerTree().root.contentUrl),
-        this.ctxBrowseNode );
-    }
+    Sonatype.Events.fireEvent( 'repositoryContentMenuInit', menu,
+      this.reposGridPanel.store.getById(node.getOwnerTree().root.contentUrl),
+      this.ctxBrowseNode );
 
     if ( ! menu.items.first() ) return;
 
