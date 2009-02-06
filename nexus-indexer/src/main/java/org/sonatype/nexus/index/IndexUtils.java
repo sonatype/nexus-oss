@@ -111,73 +111,72 @@ public class IndexUtils
     public static Document updateDocument( Document doc, Collection<? extends IndexCreator> ics )
     {
         ArtifactInfo ai = IndexUtils.constructArtifactInfo( doc, ics );
-        if( ai == null )
+        if ( ai == null )
         {
             return doc;
         }
-        
+
         Document document = new Document();
         document.add( new Field( ArtifactInfo.UINFO, ai.getUinfo(), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
-        
+
         for ( IndexCreator ic : ics )
         {
             ic.updateDocument( ai, document );
         }
-        
+
         return document;
     }
 
     public static Document updateLegacyDocument( Document doc, Collection<? extends IndexCreator> ics )
     {
         ArtifactInfo ai = IndexUtils.constructArtifactInfo( doc, ics );
-        if( ai == null )
+        if ( ai == null )
         {
             return doc;
         }
-        
+
         Document document = new Document();
         document.add( new Field( ArtifactInfo.UINFO, ai.getUinfo(), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
-        
+
         for ( IndexCreator ic : ics )
         {
-            if( ic instanceof LegacyDocumentUpdater )
+            if ( ic instanceof LegacyDocumentUpdater )
             {
                 ( (LegacyDocumentUpdater) ic ).updateLegacyDocument( ai, document );
             }
         }
-        
+
         return document;
     }
-    
 
-//    public static Date getIndexArchiveTime( InputStream is )
-//        throws IOException
-//    {
-//        ZipInputStream zis = null;
-//        try
-//        {
-//            zis = new ZipInputStream( is );
-//
-//            long timestamp = -1;
-//
-//            ZipEntry entry;
-//            while ( ( entry = zis.getNextEntry() ) != null )
-//            {
-//                if ( entry.getName() == IndexUtils.TIMESTAMP_FILE )
-//                {
-//                    return new Date( new DataInputStream( zis ).readLong() );
-//                }
-//                timestamp = entry.getTime();
-//            }
-//
-//            return timestamp == -1 ? null : new Date( timestamp );
-//        }
-//        finally
-//        {
-//            close( zis );
-//            close( is );
-//        }
-//    }
+    // public static Date getIndexArchiveTime( InputStream is )
+    // throws IOException
+    // {
+    // ZipInputStream zis = null;
+    // try
+    // {
+    // zis = new ZipInputStream( is );
+    //
+    // long timestamp = -1;
+    //
+    // ZipEntry entry;
+    // while ( ( entry = zis.getNextEntry() ) != null )
+    // {
+    // if ( entry.getName() == IndexUtils.TIMESTAMP_FILE )
+    // {
+    // return new Date( new DataInputStream( zis ).readLong() );
+    // }
+    // timestamp = entry.getTime();
+    // }
+    //
+    // return timestamp == -1 ? null : new Date( timestamp );
+    // }
+    // finally
+    // {
+    // close( zis );
+    // close( is );
+    // }
+    // }
 
     /**
      * Unpack legacy index archive into a specified Lucene <code>Directory</code>
@@ -201,7 +200,7 @@ public class IndexUtils
         {
             unpackDirectory( fdir, is );
             copyUpdatedDocuments( fdir, directory, ics );
-            
+
             Date timestamp = getTimestamp( fdir );
             updateTimestamp( directory, timestamp );
             return timestamp;
@@ -233,7 +232,7 @@ public class IndexUtils
             // force the timestamp update
             updateTimestamp( context.getIndexDirectory(), context.getTimestamp() );
             updateTimestamp( fdir, context.getTimestamp() );
-            
+
             copyLegacyDocuments( context.getIndexReader(), fdir, context.getIndexCreators() );
             packDirectory( fdir, os );
         }
@@ -289,7 +288,7 @@ public class IndexUtils
         try
         {
             r = IndexReader.open( directory );
-            
+
             int numDocs = r.numDocs();
 
             for ( int i = 0; i < numDocs; i++ )
@@ -333,7 +332,7 @@ public class IndexUtils
         boolean res = false;
 
         ArtifactInfo artifactInfo = new ArtifactInfo();
-        
+
         for ( IndexCreator ic : ics )
         {
             res |= ic.updateArtifactInfo( doc, artifactInfo );
@@ -341,32 +340,32 @@ public class IndexUtils
 
         return res ? artifactInfo : null;
     }
-    
+
     private static void unpackDirectory( Directory directory, InputStream is )
         throws IOException
     {
         byte[] buf = new byte[4096];
-    
+
         ZipEntry entry;
-    
+
         ZipInputStream zis = null;
-        
+
         try
         {
             zis = new ZipInputStream( is );
-            
+
             while ( ( entry = zis.getNextEntry() ) != null )
             {
                 if ( entry.isDirectory() || entry.getName().indexOf( '/' ) > -1 )
                 {
                     continue;
                 }
-        
+
                 IndexOutput io = directory.createOutput( entry.getName() );
                 try
                 {
                     int n = 0;
-        
+
                     while ( ( n = zis.read( buf ) ) != -1 )
                     {
                         io.writeBytes( buf, n );
@@ -383,34 +382,34 @@ public class IndexUtils
             close( zis );
         }
     }
-    
+
     private static void packDirectory( Directory directory, OutputStream os )
         throws IOException
     {
         ZipOutputStream zos = null;
         try
         {
-            zos = new ZipOutputStream( os );         
+            zos = new ZipOutputStream( os );
             zos.setLevel( 9 );
-    
+
             String[] names = directory.list();
-    
+
             boolean savedTimestamp = false;
-    
+
             byte[] buf = new byte[8192];
-    
+
             for ( int i = 0; i < names.length; i++ )
             {
                 String name = names[i];
-    
+
                 writeFile( name, zos, directory, buf );
-    
+
                 if ( name.equals( TIMESTAMP_FILE ) )
                 {
                     savedTimestamp = true;
                 }
             }
-    
+
             // FSDirectory filter out the foreign files
             if ( !savedTimestamp && directory.fileExists( TIMESTAMP_FILE ) )
             {
@@ -422,7 +421,7 @@ public class IndexUtils
             close( zos );
         }
     }
-    
+
     private static void copyUpdatedDocuments( Directory sourcedir, Directory targetdir,
         Collection<? extends IndexCreator> ics )
         throws CorruptIndexException,
@@ -438,7 +437,10 @@ public class IndexUtils
 
             for ( int i = 0; i < r.maxDoc(); i++ )
             {
-                w.addDocument( updateDocument( r.document( i ), ics ) );
+                if ( !r.isDeleted( i ) )
+                {
+                    w.addDocument( updateDocument( r.document( i ), ics ) );
+                }
             }
 
             w.optimize();
@@ -451,8 +453,7 @@ public class IndexUtils
         }
     }
 
-    private static void copyLegacyDocuments( IndexReader r, Directory targetdir,
-        Collection<? extends IndexCreator> ics )
+    private static void copyLegacyDocuments( IndexReader r, Directory targetdir, Collection<? extends IndexCreator> ics )
         throws CorruptIndexException,
             LockObtainFailedException,
             IOException
@@ -461,12 +462,15 @@ public class IndexUtils
         try
         {
             w = new IndexWriter( targetdir, false, new NexusLegacyAnalyzer(), true );
-            
+
             for ( int i = 0; i < r.maxDoc(); i++ )
             {
-                w.addDocument( updateLegacyDocument( r.document( i ), ics ) );
+                if ( !r.isDeleted( i ) )
+                {
+                    w.addDocument( updateLegacyDocument( r.document( i ), ics ) );
+                }
             }
-            
+
             w.optimize();
             w.flush();
         }
@@ -475,7 +479,7 @@ public class IndexUtils
             close( w );
         }
     }
-    
+
     // close helpers
 
     public static void close( OutputStream os )
@@ -537,7 +541,7 @@ public class IndexUtils
             }
         }
     }
-    
+
     public static void close( IndexReader r )
     {
         if ( r != null )
@@ -594,5 +598,5 @@ public class IndexUtils
             // ignore
         }
     }
-    
+
 }
