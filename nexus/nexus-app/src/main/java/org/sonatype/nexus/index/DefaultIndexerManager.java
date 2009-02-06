@@ -49,7 +49,6 @@ import org.sonatype.nexus.index.updater.ResourceFetcher;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -918,17 +917,33 @@ public class DefaultIndexerManager
 
                 try
                 {
-                    StorageFileItem item = retrieveItem( repository, ctx, uid );
+                    StorageFileItem item = null;
+
+                    // XXX: ensure it goes to remote only and throws FileNotFoundException if nothing found on remote
+                    // kinda turn off transparent proxying for this method
+                    // We need to use ProxyRepository and get it's RemoteStorage stuff to completely
+                    // avoid "transparent" proxying, and even the slightest possibility to return
+                    // some stale file from cache to the updater.
+                    if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                    {
+                        ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
+
+                        item = (StorageFileItem) proxy.getRemoteStorage().retrieveItem(
+                            proxy,
+                            ctx,
+                            proxy.getRemoteUrl(),
+                            uid.getPath() );
+                    }
+                    else
+                    {
+                        throw new ItemNotFoundException( uid );
+                    }
 
                     is = item.getInputStream();
 
                     fos = new FileOutputStream( targetFile );
 
                     IOUtil.copy( is, fos, 8192 );
-                }
-                catch ( IllegalOperationException ex )
-                {
-                    throw new IOException( "Illegal operation retrieving " + name );
                 }
                 catch ( ItemNotFoundException ex )
                 {
@@ -1247,13 +1262,4 @@ public class DefaultIndexerManager
     {
         return repositoryId + CTX_REMOTE_SUFIX;
     }
-
-    private StorageFileItem retrieveItem( Repository repository, Map<String, Object> ctx, RepositoryItemUid uid )
-        throws StorageException,
-            IllegalOperationException,
-            ItemNotFoundException
-    {
-        return (StorageFileItem) repository.retrieveItem( uid, ctx );
-    }
-
 }

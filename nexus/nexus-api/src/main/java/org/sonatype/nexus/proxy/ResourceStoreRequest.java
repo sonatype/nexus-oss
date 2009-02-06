@@ -31,6 +31,9 @@ public class ResourceStoreRequest
     /** Context flag to mark a request local only. */
     public static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
 
+    /** Context flag to mark a request local only. */
+    public static final String CTX_REMOTE_ONLY_FLAG = "request.remoteOnly";
+
     /** Context key for set of processed repositories. */
     public static final String CTX_PROCESSED_REPOSITORIES = "request.processedRepositories";
 
@@ -46,7 +49,7 @@ public class ResourceStoreRequest
     /** Used internally by Routers. */
     private Stack<String> pathStack;
 
-    public ResourceStoreRequest( String requestPath, boolean localOnly, String repositoryId )
+    public ResourceStoreRequest( String requestPath, boolean localOnly, boolean remoteOnly, String repositoryId )
     {
         super();
         this.requestPath = requestPath;
@@ -54,7 +57,13 @@ public class ResourceStoreRequest
         this.pathStack = new Stack<String>();
         this.requestContext = new HashMap<String, Object>();
         this.requestContext.put( CTX_LOCAL_ONLY_FLAG, localOnly );
+        this.requestContext.put( CTX_REMOTE_ONLY_FLAG, remoteOnly );
         this.requestContext.put( CTX_PROCESSED_REPOSITORIES, new HashSet<String>() );
+    }
+
+    public ResourceStoreRequest( String requestPath, boolean localOnly, String repositoryId )
+    {
+        this( requestPath, localOnly, false, repositoryId );
     }
 
     /**
