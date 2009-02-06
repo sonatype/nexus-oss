@@ -27,7 +27,6 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.timeline.TimelineFilter;
@@ -89,15 +88,15 @@ public class DefaultFeedRecorder
     }
 
     /**
+     * The time format used in events.
+     */
+    private static final String EVENT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSZ";
+
+    /**
      * The timeline for persistent events and feeds.
      */
     @Requirement
     private Timeline timeline;
-
-    /**
-     * DateFormat used to format dates in events.
-     */
-    private DateFormat eventDateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss.SSSZ" );
 
     public void startService()
         throws Exception
@@ -109,6 +108,11 @@ public class DefaultFeedRecorder
         throws Exception
     {
         timeline.stopService();
+    }
+
+    protected DateFormat getDateFormat()
+    {
+        return new SimpleDateFormat( EVENT_DATE_FORMAT );
     }
 
     protected List<NexusArtifactEvent> getAisFromMaps( List<Map<String, String>> data )
@@ -131,7 +135,7 @@ public class DefaultFeedRecorder
 
             try
             {
-                nae.setEventDate( eventDateFormat.parse( map.get( DATE ) ) );
+                nae.setEventDate( getDateFormat().parse( map.get( DATE ) ) );
             }
             catch ( ParseException e )
             {
@@ -172,7 +176,7 @@ public class DefaultFeedRecorder
 
             try
             {
-                se.setEventDate( eventDateFormat.parse( map.get( DATE ) ) );
+                se.setEventDate( getDateFormat().parse( map.get( DATE ) ) );
             }
             catch ( ParseException e )
             {
@@ -207,7 +211,7 @@ public class DefaultFeedRecorder
 
             try
             {
-                evt.setEventDate( eventDateFormat.parse( map.get( DATE ) ) );
+                evt.setEventDate( getDateFormat().parse( map.get( DATE ) ) );
             }
             catch ( ParseException e )
             {
@@ -271,7 +275,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( event );
     }
-    
+
     private void putContext( Map<String, String> map, Map<String, Object> context )
     {
         for ( String key : context.keySet() )
@@ -302,7 +306,7 @@ public class DefaultFeedRecorder
 
         map.put( MESSAGE, evt.getMessage() );
 
-        map.put( DATE, eventDateFormat.format( evt.getEventDate() ) );
+        map.put( DATE, getDateFormat().format( evt.getEventDate() ) );
 
         addToTimeline( map, AUTHC_AUTHZ_EVENT_TYPE, evt.getAction() );
     }
@@ -327,7 +331,7 @@ public class DefaultFeedRecorder
             map.put( MESSAGE, nae.getMessage() );
         }
 
-        map.put( DATE, eventDateFormat.format( nae.getEventDate() ) );
+        map.put( DATE, getDateFormat().format( nae.getEventDate() ) );
 
         map.put( ACTION, nae.getAction() );
 
@@ -369,7 +373,7 @@ public class DefaultFeedRecorder
 
         putContext( map, se.getEventContext() );
 
-        map.put( DATE, eventDateFormat.format( se.getEventDate() ) );
+        map.put( DATE, getDateFormat().format( se.getEventDate() ) );
 
         map.put( ACTION, se.getAction() );
 
