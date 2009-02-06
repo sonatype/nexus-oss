@@ -126,10 +126,10 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
   submitHandler: function( form, action, receivedData ) {
     if ( this.isNew ) {
       if ( ! receivedData.resourceURI ) {
-        var url = action.options.url + '/' + receivedData.id;
-        receivedData.resourceURI = url;
-        receivedData.displayURI = url.replace(
-          Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories );
+        receivedData.resourceURI =
+          Sonatype.config.host + Sonatype.config.repos.urls.repositories + '/' + receivedData.id;
+        receivedData.displayURI =
+          Sonatype.config.host + Sonatype.config.content.repositories + '/' + receivedData.id;
       }
       return;
     }

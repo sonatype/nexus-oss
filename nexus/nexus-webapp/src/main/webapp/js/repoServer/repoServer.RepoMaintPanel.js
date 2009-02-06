@@ -433,12 +433,16 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     {
         return;
     }
+
     var repoStatusPriv = this.sp.checkPermission('nexus:repostatus', this.sp.EDIT);
     
     if ( e.target.nodeName == 'A' ) return; // no menu on links
     
     this.ctxRow = this.reposGridPanel.view.getRow(index);
     this.ctxRecord = this.reposGridPanel.store.getAt(index);
+
+    if ( this.ctxRecord.id.substring( 0, 4 ) == 'new_' ) return;
+
     Ext.fly(this.ctxRow).addClass('x-node-ctx');
     
     var isGroup = this.ctxRecord.get('repoType') == 'group';

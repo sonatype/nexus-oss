@@ -440,6 +440,8 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
   },
   
   onRepositoryMenuInit: function( menu, repoRecord ) {
+    if ( repoRecord.id.substring( 0, 4 ) == 'new_' ) return;
+
     var isVirtual = repoRecord.get( 'repoType' ) == 'virtual';
 
     if ( this.sp.checkPermission(
