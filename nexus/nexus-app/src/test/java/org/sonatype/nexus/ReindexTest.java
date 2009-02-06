@@ -51,7 +51,7 @@ public class ReindexTest
         nexusIndexer = lookup( NexusIndexer.class );
 
         indexPacker = lookup( IndexPacker.class );
-        
+
         servletServer = lookup( ServletServer.class );
 
         servletServer.start();
@@ -258,9 +258,6 @@ public class ReindexTest
     public void testCurrentIncrementalIndexes()
         throws Exception
     {
-        // clean up 1st
-        FileUtils.deleteDirectory( getIndexFamilyDirectory( "central" ) );
-
         // day 1
         reindexRemoteRepositoryAndPublish( getRemoteRepositoryRoot( "central-inc1" ), "central", false, 0 );
 
