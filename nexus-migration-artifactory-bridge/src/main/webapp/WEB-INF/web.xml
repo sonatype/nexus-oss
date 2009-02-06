@@ -12,6 +12,7 @@
 
     <display-name>Nexus/Artifactory Bridge</display-name>
 
+    <!--
     <servlet>
         <servlet-name>artifactory</servlet-name>
         <servlet-class>org.sonatype.nexus.artifactorybridge.RedirectorServlet</servlet-class>
@@ -21,10 +22,32 @@
         <servlet-name>artifactory</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
+    -->
 
-    <!-- Welcome File -->
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
+    <!-- Artifactory bridge -->
+    <servlet>
+        <servlet-name>artifactory</servlet-name>
+        <servlet-class>org.sonatype.plexus.rest.PlexusServerServlet</servlet-class>
+        <init-param>
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter -->
+            <param-name>artifactory.role</param-name>
+            <param-value>org.restlet.Application</param-value>
+        </init-param>
+        <init-param>
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter -->
+            <param-name>artifactory.org.restlet.clients</param-name>
+            <param-value>FILE CLAP</param-value>
+        </init-param>
+        <init-param>
+            <param-name>plexus.discoverResources</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>artifactory</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
 
 </web-app>
