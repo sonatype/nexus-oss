@@ -44,6 +44,7 @@ import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.util.ContextUtils;
 
 /**
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
@@ -399,18 +400,36 @@ public abstract class AbstractProxyRepository
     {
         AbstractStorageItem item = null;
         AbstractStorageItem remoteItem = null;
-        boolean localOnly = context != null && context.containsKey( ResourceStoreRequest.CTX_LOCAL_ONLY_FLAG )
-            && Boolean.TRUE.equals( context.get( ResourceStoreRequest.CTX_LOCAL_ONLY_FLAG ) );
-
         AbstractStorageItem localItem = null;
 
-        try
+        boolean localOnly = ContextUtils.isFlagTrue( context, ResourceStoreRequest.CTX_LOCAL_ONLY_FLAG );
+        boolean remoteOnly = ContextUtils.isFlagTrue( context, ResourceStoreRequest.CTX_REMOTE_ONLY_FLAG );
+
+        if ( getLogger().isDebugEnabled() )
         {
-            localItem = (AbstractStorageItem) super.doRetrieveItem( uid, context );
+            StringBuffer db = new StringBuffer( uid.toString() );
+
+            db.append( " :: localOnly=" ).append( localOnly );
+            db.append( ", remoteOnly=" ).append( remoteOnly );
+
+            if ( getProxyMode() != null )
+            {
+                db.append( ", ProxyMode=" + getProxyMode().toString() );
+            }
+
+            getLogger().debug( db.toString() );
         }
-        catch ( ItemNotFoundException e )
+
+        if ( !remoteOnly )
         {
-            localItem = null;
+            try
+            {
+                localItem = (AbstractStorageItem) super.doRetrieveItem( uid, context );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                localItem = null;
+            }
         }
 
         boolean shouldProxy = true;
@@ -422,10 +441,6 @@ public abstract class AbstractProxyRepository
 
         if ( getProxyMode() != null && getProxyMode().shouldProxy() && !localOnly && shouldProxy )
         {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "ProxyMode is " + getProxyMode().toString() );
-            }
 
             // we are able to go remote
             if ( localItem == null || isOld( localItem ) )

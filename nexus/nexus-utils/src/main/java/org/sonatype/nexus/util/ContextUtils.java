@@ -5,6 +5,19 @@ import java.util.Map;
 
 public class ContextUtils
 {
+    public static boolean isFlagTrue( Map<String, Object> context, String key )
+    {
+        if ( context != null )
+        {
+            if ( context.containsKey( key ) )
+            {
+                return Boolean.TRUE.equals( context.get( key ) );
+            }
+        }
+
+        return false;
+    }
+
     public static boolean collContains( Map<String, Object> context, String key, Object value )
     {
         if ( context != null && context.containsKey( key ) )
