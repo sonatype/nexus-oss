@@ -16,8 +16,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -27,15 +27,14 @@ import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.index.context.ArtifactIndexingContext;
-import org.sonatype.nexus.index.context.DefaultArtifactIndexingContext;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.NexusAnalyzer;
+import org.sonatype.nexus.index.context.NexusLegacyAnalyzer;
 import org.sonatype.nexus.index.creator.IndexCreator;
+import org.sonatype.nexus.index.creator.LegacyDocumentUpdater;
 
 public class IndexUtils
 {
-
     public static final String TIMESTAMP_FILE = "timestamp";
 
     // timestamp
@@ -109,22 +108,46 @@ public class IndexUtils
 
     // pack/unpack
 
-    public static void updateDocument( Document doc, Collection<? extends IndexCreator> ics )
+    public static Document updateDocument( Document doc, Collection<? extends IndexCreator> ics )
     {
         ArtifactInfo ai = IndexUtils.constructArtifactInfo( doc, ics );
-        
-        if( ai != null )
+        if( ai == null )
         {
-            ArtifactContext ac = new ArtifactContext( null, null, null, ai, ai.calculateGav() );
-            ArtifactIndexingContext aic = new DefaultArtifactIndexingContext( ac );
-   
-            for ( IndexCreator ic : ics )
-            {
-                ic.updateDocument( aic, doc );
-            }
+            return doc;
         }
+        
+        Document document = new Document();
+        document.add( new Field( ArtifactInfo.UINFO, ai.getUinfo(), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+        
+        for ( IndexCreator ic : ics )
+        {
+            ic.updateDocument( ai, document );
+        }
+        
+        return document;
     }
 
+    public static Document updateLegacyDocument( Document doc, Collection<? extends IndexCreator> ics )
+    {
+        ArtifactInfo ai = IndexUtils.constructArtifactInfo( doc, ics );
+        if( ai == null )
+        {
+            return doc;
+        }
+        
+        Document document = new Document();
+        document.add( new Field( ArtifactInfo.UINFO, ai.getUinfo(), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+        
+        for ( IndexCreator ic : ics )
+        {
+            if( ic instanceof LegacyDocumentUpdater )
+            {
+                ( (LegacyDocumentUpdater) ic ).updateLegacyDocument( ai, document );
+            }
+        }
+        
+        return document;
+    }
     
 
 //    public static Date getIndexArchiveTime( InputStream is )
@@ -174,93 +197,20 @@ public class IndexUtils
 
         FSDirectory fdir = FSDirectory.getDirectory( indexDir );
 
-        ZipInputStream zis = new ZipInputStream( is );
         try
         {
-            unpackDirectory( fdir, zis );
+            unpackDirectory( fdir, is );
             copyUpdatedDocuments( fdir, directory, ics );
             
-            Date timestamp = IndexUtils.getTimestamp( fdir );
+            Date timestamp = getTimestamp( fdir );
             updateTimestamp( directory, timestamp );
             return timestamp;
         }
         finally
         {
-            close( zis );
             close( fdir );
-            
             indexArchive.delete();
-
-            try
-            {
-                FileUtils.deleteDirectory( indexDir );
-            }
-            catch ( IOException ex )
-            {
-                // ignore
-            }
-        }
-    }
-
-    private static void copyUpdatedDocuments( Directory sourcedir, Directory targetdir,
-        Collection<? extends IndexCreator> ics )
-        throws CorruptIndexException,
-            LockObtainFailedException,
-            IOException
-    {
-        IndexWriter w = null;
-        IndexReader r = null;
-
-        try
-        {
-            r = IndexReader.open( sourcedir );
-            w = new IndexWriter( targetdir, false, new NexusAnalyzer(), true );
-
-            for ( int i = 0; i < r.maxDoc(); i++ )
-            {
-                Document d = r.document( i );
-                updateDocument( d, ics );
-                w.addDocument( d );
-            }
-
-            w.optimize();
-            w.flush();
-        }
-        finally
-        {
-            close( w );
-            close( r );
-        }
-    }
-
-    private static void unpackDirectory( Directory directory, ZipInputStream zis )
-        throws IOException
-    {
-        byte[] buf = new byte[4096];
-
-        ZipEntry entry;
-
-        while ( ( entry = zis.getNextEntry() ) != null )
-        {
-            if ( entry.isDirectory() || entry.getName().indexOf( '/' ) > -1 )
-            {
-                continue;
-            }
-
-            IndexOutput io = directory.createOutput( entry.getName() );
-            try
-            {
-                int n = 0;
-
-                while ( ( n = zis.read( buf ) ) != -1 )
-                {
-                    io.writeBytes( buf, n );
-                }
-            }
-            finally
-            {
-                close( io );
-            }
+            delete( indexDir );
         }
     }
 
@@ -270,44 +220,28 @@ public class IndexUtils
     public static void packIndexArchive( IndexingContext context, OutputStream os )
         throws IOException
     {
-        ZipOutputStream zos = null;
+        File indexArchive = File.createTempFile( "nexus-index", "" );
 
-        // force the timestamp update
-        updateTimestamp( context.getIndexDirectory(), context.getTimestamp() );
+        File indexDir = new File( indexArchive.getAbsoluteFile().getParentFile(), indexArchive.getName() + ".dir" );
+
+        indexDir.mkdirs();
+
+        FSDirectory fdir = FSDirectory.getDirectory( indexDir );
 
         try
         {
-            zos = new ZipOutputStream( os );
-
-            zos.setLevel( 9 );
-
-            String[] names = context.getIndexDirectory().list();
-
-            boolean savedTimestamp = false;
-
-            byte[] buf = new byte[8192];
-
-            for ( int i = 0; i < names.length; i++ )
-            {
-                String name = names[i];
-
-                writeFile( name, zos, context.getIndexDirectory(), buf );
-
-                if ( name.equals( TIMESTAMP_FILE ) )
-                {
-                    savedTimestamp = true;
-                }
-            }
-
-            // FSDirectory filter out the foreign files
-            if ( !savedTimestamp && context.getIndexDirectory().fileExists( TIMESTAMP_FILE ) )
-            {
-                writeFile( TIMESTAMP_FILE, zos, context.getIndexDirectory(), buf );
-            }
+            // force the timestamp update
+            updateTimestamp( context.getIndexDirectory(), context.getTimestamp() );
+            updateTimestamp( fdir, context.getTimestamp() );
+            
+            copyLegacyDocuments( context.getIndexReader(), fdir, context.getIndexCreators() );
+            packDirectory( fdir, os );
         }
         finally
         {
-            close( zos );
+            close( fdir );
+            indexArchive.delete();
+            delete( indexDir );
         }
     }
 
@@ -351,38 +285,38 @@ public class IndexUtils
     public static void filterDirectory( Directory directory, DocumentFilter filter )
         throws IOException
     {
-        // analyzer is unimportant, since we are not adding/searching to/on index, only reading/deleting
-        IndexWriter w = null;
-
-        IndexReader r = IndexReader.open( directory );
-
+        IndexReader r = null;
         try
         {
-            try
+            r = IndexReader.open( directory );
+            
+            int numDocs = r.numDocs();
+
+            for ( int i = 0; i < numDocs; i++ )
             {
-                int numDocs = r.numDocs();
-
-                for ( int i = 0; i < numDocs; i++ )
+                if ( r.isDeleted( i ) )
                 {
-                    if ( r.isDeleted( i ) )
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    Document d = r.document( i );
+                Document d = r.document( i );
 
-                    if ( !filter.accept( d ) )
-                    {
-                        r.deleteDocument( i );
-                    }
+                if ( !filter.accept( d ) )
+                {
+                    r.deleteDocument( i );
                 }
             }
-            finally
-            {
-                close( r );
-            }
+        }
+        finally
+        {
+            close( r );
+        }
 
-            w = new IndexWriter( directory, new SimpleAnalyzer() );
+        IndexWriter w = null;
+        try
+        {
+            // analyzer is unimportant, since we are not adding/searching to/on index, only reading/deleting
+            w = new IndexWriter( directory, new NexusAnalyzer() );
 
             w.optimize();
 
@@ -406,6 +340,140 @@ public class IndexUtils
         }
 
         return res ? artifactInfo : null;
+    }
+    
+    private static void unpackDirectory( Directory directory, InputStream is )
+        throws IOException
+    {
+        byte[] buf = new byte[4096];
+    
+        ZipEntry entry;
+    
+        ZipInputStream zis = null;
+        
+        try
+        {
+            zis = new ZipInputStream( is );
+            
+            while ( ( entry = zis.getNextEntry() ) != null )
+            {
+                if ( entry.isDirectory() || entry.getName().indexOf( '/' ) > -1 )
+                {
+                    continue;
+                }
+        
+                IndexOutput io = directory.createOutput( entry.getName() );
+                try
+                {
+                    int n = 0;
+        
+                    while ( ( n = zis.read( buf ) ) != -1 )
+                    {
+                        io.writeBytes( buf, n );
+                    }
+                }
+                finally
+                {
+                    close( io );
+                }
+            }
+        }
+        finally
+        {
+            close( zis );
+        }
+    }
+    
+    private static void packDirectory( Directory directory, OutputStream os )
+        throws IOException
+    {
+        ZipOutputStream zos = null;
+        try
+        {
+            zos = new ZipOutputStream( os );         
+            zos.setLevel( 9 );
+    
+            String[] names = directory.list();
+    
+            boolean savedTimestamp = false;
+    
+            byte[] buf = new byte[8192];
+    
+            for ( int i = 0; i < names.length; i++ )
+            {
+                String name = names[i];
+    
+                writeFile( name, zos, directory, buf );
+    
+                if ( name.equals( TIMESTAMP_FILE ) )
+                {
+                    savedTimestamp = true;
+                }
+            }
+    
+            // FSDirectory filter out the foreign files
+            if ( !savedTimestamp && directory.fileExists( TIMESTAMP_FILE ) )
+            {
+                writeFile( TIMESTAMP_FILE, zos, directory, buf );
+            }
+        }
+        finally
+        {
+            close( zos );
+        }
+    }
+    
+    private static void copyUpdatedDocuments( Directory sourcedir, Directory targetdir,
+        Collection<? extends IndexCreator> ics )
+        throws CorruptIndexException,
+            LockObtainFailedException,
+            IOException
+    {
+        IndexWriter w = null;
+        IndexReader r = null;
+        try
+        {
+            r = IndexReader.open( sourcedir );
+            w = new IndexWriter( targetdir, false, new NexusAnalyzer(), true );
+
+            for ( int i = 0; i < r.maxDoc(); i++ )
+            {
+                w.addDocument( updateDocument( r.document( i ), ics ) );
+            }
+
+            w.optimize();
+            w.flush();
+        }
+        finally
+        {
+            close( w );
+            close( r );
+        }
+    }
+
+    private static void copyLegacyDocuments( IndexReader r, Directory targetdir,
+        Collection<? extends IndexCreator> ics )
+        throws CorruptIndexException,
+            LockObtainFailedException,
+            IOException
+    {
+        IndexWriter w = null;
+        try
+        {
+            w = new IndexWriter( targetdir, false, new NexusLegacyAnalyzer(), true );
+            
+            for ( int i = 0; i < r.maxDoc(); i++ )
+            {
+                w.addDocument( updateLegacyDocument( r.document( i ), ics ) );
+            }
+            
+            w.optimize();
+            w.flush();
+        }
+        finally
+        {
+            close( w );
+        }
     }
     
     // close helpers
@@ -515,4 +583,16 @@ public class IndexUtils
         }
     }
 
+    private static void delete( File indexDir )
+    {
+        try
+        {
+            FileUtils.deleteDirectory( indexDir );
+        }
+        catch ( IOException ex )
+        {
+            // ignore
+        }
+    }
+    
 }

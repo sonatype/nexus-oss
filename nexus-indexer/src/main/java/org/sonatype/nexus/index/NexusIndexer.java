@@ -27,7 +27,7 @@ import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
  * The Nexus indexer interface.
  * 
  * @author Jason van Zyl
- * @author cstamas
+ * @author Tamas Cservenak
  */
 public interface NexusIndexer
 {
@@ -47,9 +47,10 @@ public interface NexusIndexer
     /**
      * The full set of index creators.
      */
-    public static final List<? extends IndexCreator> FULL_INDEX = Arrays.asList(
+    public static final List<? extends IndexCreator> FULL_INDEX = Arrays.<IndexCreator>asList(
         new MinimalArtifactInfoIndexCreator(),
         new JarFileContentsIndexCreator() );
+    
     /**
      * The "default" set of index creators. It adds Jar contents (classes) to minimal index.
      */

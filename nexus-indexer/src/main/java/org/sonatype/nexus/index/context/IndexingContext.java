@@ -23,7 +23,6 @@ import org.apache.lucene.store.Directory;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.ArtifactInfoFilter;
 import org.sonatype.nexus.index.DocumentFilter;
 import org.sonatype.nexus.index.creator.IndexCreator;
 
@@ -201,21 +200,6 @@ public interface IndexingContext
      */
     void replace( Directory directory )
         throws IOException;
-
-    /**
-     * Filter the context with supplied ArtifactInfoFilter.
-     * 
-     * @throws IOException
-     */
-    void filter( ArtifactInfoFilter filter )
-        throws IOException;
-
-    /**
-     * Copy document to the target writer
-     */
-    void copyDocument( Document document, IndexWriter w )
-        throws CorruptIndexException,
-            IOException;
 
     Directory getIndexDirectory();
 

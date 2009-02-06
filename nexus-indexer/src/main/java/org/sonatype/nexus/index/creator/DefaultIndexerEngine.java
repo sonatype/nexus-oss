@@ -16,8 +16,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.context.ArtifactIndexingContext;
-import org.sonatype.nexus.index.context.DefaultArtifactIndexingContext;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
@@ -108,13 +106,11 @@ public class DefaultIndexerEngine
         doc.add( new Field( ArtifactInfo.LAST_MODIFIED, //
             Long.toString( System.currentTimeMillis() ), Field.Store.YES, Field.Index.NO ) );
         
-        ArtifactIndexingContext aic = new DefaultArtifactIndexingContext( ac );
-
         for ( IndexCreator indexCreator : context.getIndexCreators() )
         {
             try 
             {
-                indexCreator.populateArtifactInfo( aic );
+                indexCreator.populateArtifactInfo( ac );
             } 
             catch ( IOException ex ) 
             {
@@ -125,7 +121,7 @@ public class DefaultIndexerEngine
         // need a second pass in case index creators updated document attributes
         for ( IndexCreator indexCreator : context.getIndexCreators() )
         {
-            indexCreator.updateDocument( aic, doc );
+            indexCreator.updateDocument( ac.getArtifactInfo(), doc );
         }
 
         return doc;

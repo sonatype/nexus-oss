@@ -33,7 +33,6 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.ArtifactAvailablility;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.context.ArtifactIndexingContext;
 import org.sonatype.nexus.index.locator.JavadocLocator;
 import org.sonatype.nexus.index.locator.Locator;
 import org.sonatype.nexus.index.locator.Sha1Locator;
@@ -42,11 +41,10 @@ import org.sonatype.nexus.index.locator.SourcesLocator;
 
 /**
  * A minimal index creator used to provide basic information about Maven artifact.
- * 
  */
-@Component(role=IndexCreator.class, hint="min")
+@Component( role = IndexCreator.class, hint = "min" )
 public class MinimalArtifactInfoIndexCreator
-    extends AbstractIndexCreator
+    extends AbstractIndexCreator implements LegacyDocumentUpdater
 {
     private ModelReader modelReader = new ModelReader();
 
@@ -58,10 +56,8 @@ public class MinimalArtifactInfoIndexCreator
 
     private Locator sha1l = new Sha1Locator();
 
-    public void populateArtifactInfo( ArtifactIndexingContext aic )
+    public void populateArtifactInfo( ArtifactContext ac )
     {
-        ArtifactContext ac = aic.getArtifactContext();
-
         File artifact = ac.getArtifact();
 
         File pom = ac.getPom();
@@ -226,10 +222,8 @@ public class MinimalArtifactInfoIndexCreator
         }
     }
 
-    public void updateDocument( ArtifactIndexingContext context, Document doc )
+    public void updateDocument( ArtifactInfo ai, Document doc )
     {
-        ArtifactInfo ai = context.getArtifactContext().getArtifactInfo();
-
         String info = new StringBuilder()
             .append( ai.packaging ).append( AbstractIndexCreator.FS ).append( Long.toString( ai.lastModified ) )
             .append( AbstractIndexCreator.FS ).append( Long.toString( ai.size ) ).append( AbstractIndexCreator.FS )
@@ -279,6 +273,14 @@ public class MinimalArtifactInfoIndexCreator
         {
             doc.add( new Field( ArtifactInfo.SHA1, ai.sha1, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
         }
+    }
+    
+    public void updateLegacyDocument( ArtifactInfo ai, Document doc )
+    {
+        updateDocument( ai, doc );
+        
+        doc.removeField( ArtifactInfo.GROUP_ID );
+        doc.add( new Field( ArtifactInfo.GROUP_ID, ai.groupId, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
     }
 
     public boolean updateArtifactInfo( Document doc, ArtifactInfo ai )
@@ -392,7 +394,6 @@ public class MinimalArtifactInfoIndexCreator
         return res;
 
         // artifactInfo.fname = ???
-
     }
 
     private void close( ZipFile zf )

@@ -58,9 +58,7 @@ public class IndexDataReader
         Document doc;
         while ( ( doc = readDocument() ) != null )
         {
-            IndexUtils.updateDocument( doc, ics );
-            
-            w.addDocument( doc );
+            w.addDocument( IndexUtils.updateDocument( doc, ics ) );
             
             n++;
         }

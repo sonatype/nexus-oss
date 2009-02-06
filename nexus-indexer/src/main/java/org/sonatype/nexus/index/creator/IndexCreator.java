@@ -8,13 +8,11 @@ package org.sonatype.nexus.index.creator;
 import java.io.IOException;
 
 import org.apache.lucene.document.Document;
+import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.context.ArtifactIndexingContext;
 
 /**
  * An index creator is responsible for storing and reading data to and from Lucene index.
- * <p>
- * An <code>ArtifactIndexingContext</code> is used as a value object.
  * 
  * @author Jason van Zyl
  * @see MinimalArtifactInfoIndexCreator
@@ -23,21 +21,21 @@ import org.sonatype.nexus.index.context.ArtifactIndexingContext;
 public interface IndexCreator
 {
     /**
-     * Populate an <code>ArtifactIndexingContext</code> with information about corresponding artifact.
+     * Populate an <code>ArtifactContext</code> with information about corresponding artifact.
      */
-    void populateArtifactInfo( ArtifactIndexingContext indexingContext )
+    void populateArtifactInfo( ArtifactContext artifactContext )
         throws IOException;
 
     /**
-     * Update Lucene <code>Document</code> from given <code>ArtifactIndexingContext</code>.
+     * Update Lucene <code>Document</code> from a given <code>ArtifactInfo</code>.
      */
-    void updateDocument( ArtifactIndexingContext context, Document doc );
+    void updateDocument( ArtifactInfo artifactInfo, Document document );
 
     /**
-     * Update artifact info from given Lucene <code>Document</code>.
+     * Update an <code>ArtifactInfo</code> from given Lucene <code>Document</code>.
      * 
      * @return true is artifact info has been updated
      */
-    boolean updateArtifactInfo( Document d, ArtifactInfo artifactInfo );
+    boolean updateArtifactInfo( Document document, ArtifactInfo artifactInfo );
 
 }

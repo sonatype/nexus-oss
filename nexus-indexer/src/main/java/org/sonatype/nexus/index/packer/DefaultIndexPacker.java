@@ -84,18 +84,18 @@ public class DefaultIndexPacker
 
         if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_LEGACY ) )
         {
-            writeIndexArchive( request.getContext(), new File( request.getTargetDir(), IndexingContext.INDEX_FILE
-                + ".zip" ) );
+            writeIndexArchive( request.getContext(), new File( request.getTargetDir(), //
+                IndexingContext.INDEX_FILE + ".zip" ) );
         }
 
         if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_V1 ) )
         {
-            writeIndexData( request.getContext(), null, new File( request.getTargetDir(), IndexingContext.INDEX_FILE
-                + ".gz" ) );
+            writeIndexData( request.getContext(), null, new File( request.getTargetDir(), //
+                IndexingContext.INDEX_FILE + ".gz" ) );
         }
 
-        writeIndexProperties( request, info, new File( request.getTargetDir(), IndexingContext.INDEX_FILE
-            + ".properties" ) );
+        writeIndexProperties( request, info, new File( request.getTargetDir(), //
+            IndexingContext.INDEX_FILE + ".properties" ) );
     }
 
     private Map<String, List<Integer>> getIndexChunks( IndexPackingRequest request )

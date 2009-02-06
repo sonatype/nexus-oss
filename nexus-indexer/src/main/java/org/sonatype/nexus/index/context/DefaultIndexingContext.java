@@ -33,7 +33,6 @@ import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2GavCalculator;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.ArtifactInfoFilter;
 import org.sonatype.nexus.index.DocumentFilter;
 import org.sonatype.nexus.index.IndexUtils;
 import org.sonatype.nexus.index.creator.AbstractIndexCreator;
@@ -543,7 +542,7 @@ public class DefaultIndexingContext
 
                     if ( hits.length() == 0 )
                     {
-                        copyDocument( d, w );
+                        w.addDocument( IndexUtils.updateDocument( d, getIndexCreators() ) );
                     }
                 }
                 else
@@ -580,70 +579,6 @@ public class DefaultIndexingContext
         }
 
         optimize();
-    }
-
-    public void copyDocument( Document d, IndexWriter w )
-        throws CorruptIndexException,
-            IOException
-    {
-        ArtifactInfo info = constructArtifactInfo( d );
-        ArtifactContext ac = new ArtifactContext( null, null, null, info, info.calculateGav() );
-        ArtifactIndexingContext aic = new DefaultArtifactIndexingContext( ac );
-
-        Document doc = new Document();
-
-        doc.add( new Field( ArtifactInfo.UINFO, info.getUinfo(), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
-
-        // recreate document to index not stored fields
-        for ( IndexCreator ic : getIndexCreators() )
-        {
-            ic.updateDocument( aic, doc );
-        }
-
-        w.addDocument( doc );
-    }
-
-    public void filter( ArtifactInfoFilter filter )
-        throws IOException
-    {
-        IndexWriter w = getIndexWriter();
-
-        IndexReader r = getIndexReader();
-
-        try
-        {
-            int numDocs = r.numDocs();
-
-            for ( int i = 0; i < numDocs; i++ )
-            {
-                if ( r.isDeleted( i ) )
-                {
-                    continue;
-                }
-
-                Document d = r.document( i );
-
-                ArtifactInfo info = constructArtifactInfo( d );
-
-                if ( info != null )
-                {
-                    if ( !filter.accept( info ) )
-                    {
-                        r.deleteDocument( i );
-                    }
-                }
-            }
-
-            w.optimize();
-
-            w.flush();
-        }
-        finally
-        {
-            r.close();
-        }
-
-        updateTimestamp();
     }
 
     public GavCalculator getGavCalculator()

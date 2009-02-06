@@ -16,22 +16,18 @@ import org.apache.lucene.document.Field;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.context.ArtifactIndexingContext;
 
 /**
  * An index creator used to index Java class names from a Maven artifact.
- * 
  */
-@Component(role=IndexCreator.class, hint="jarContent")
+@Component( role = IndexCreator.class, hint = "jarContent" )
 public class JarFileContentsIndexCreator
-    extends AbstractIndexCreator
+    extends AbstractIndexCreator implements LegacyDocumentUpdater
 {
 
-    public void populateArtifactInfo( ArtifactIndexingContext context )
+    public void populateArtifactInfo( ArtifactContext artifactContext )
         throws IOException
     {
-        ArtifactContext artifactContext = context.getArtifactContext();
-
         ArtifactInfo ai = artifactContext.getArtifactInfo();
 
         File artifactFile = artifactContext.getArtifact();
@@ -42,16 +38,19 @@ public class JarFileContentsIndexCreator
         }
     }
 
-    public void updateDocument( ArtifactIndexingContext context, Document doc )
+    public void updateDocument( ArtifactInfo ai, Document doc )
     {
-        ArtifactInfo ai = context.getArtifactContext().getArtifactInfo();
-
         if ( ai.classNames != null )
         {
             doc.add( new Field( ArtifactInfo.NAMES, ai.classNames, Field.Store.COMPRESS, Field.Index.TOKENIZED ) );
         }
     }
 
+    public void updateLegacyDocument( ArtifactInfo ai, Document doc )
+    {
+        updateDocument( ai, doc );
+    }
+    
     public boolean updateArtifactInfo( Document doc, ArtifactInfo artifactInfo )
     {
         String names = doc.get( ArtifactInfo.NAMES );
