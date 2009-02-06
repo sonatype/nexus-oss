@@ -23,7 +23,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.index.ArtifactInfo;
@@ -177,7 +176,9 @@ public class ReindexTest
         shiftContextInTime( ctx, shiftDays );
 
         // and scan "today"
-        nexusIndexer.scan( ctx, null, true );
+        nexusIndexer.scan( ctx );
+
+        ctx.updateTimestamp( true );
 
         // pack it up
         File targetDir = new File( repositoryRoot, ".index" );
