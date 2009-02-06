@@ -34,6 +34,15 @@ Sonatype.view = {
       title: 'Welcome'
     });
     
+    Sonatype.view.headerPanel = new Ext.Panel( {
+      contentEl: 'header',
+      region: 'north',
+      margins: '5 5 5 5',
+      bodyStyle: 'background-color: #F0F0F0;',
+      border: false,
+      autoHeight: true
+    } );
+    
     Ext.Ajax.on( {
       "requestexception" : { 
         fn: function(conn, response, options) {
@@ -55,20 +64,7 @@ Sonatype.view = {
     var viewport = new Ext.Viewport({
       layout:'border',
       items:[
-        {
-          xtype: 'box',
-          region:'north',
-          el: 'header',
-          margins:'5 5 5 5',
-          height:'auto'
-        },
-//      {
-//        xtype: 'box',  
-//        region:'south',
-//        el: 'footer',
-//        height: 10,
-//        margins: '5 5 5 5'
-//      },
+        Sonatype.view.headerPanel,
         {
           region:'west',
           title: 'Sonatype&trade; Servers',

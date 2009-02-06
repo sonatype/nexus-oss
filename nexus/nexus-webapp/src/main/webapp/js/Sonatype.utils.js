@@ -715,6 +715,7 @@ Sonatype.utils = {
           Ext.get('logo').update('<span>' 
               + formattedAppName 
               + '</span>');
+          Sonatype.view.viewport.doLayout();
 
           if ( !versionOnly ){
             Sonatype.user.curr.repoServer = respObj.data.clientPermissions.permissions;

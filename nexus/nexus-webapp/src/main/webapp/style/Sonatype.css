@@ -19,14 +19,15 @@ body {
 
 #header {
   font-family: "Trebuchet MS",verdana,lucida,arial,helvetica,sans-serif;
+  background-color: #F0F0F0;
 }
 
 #logo {
   font-size: 16px;
   float: left;
-  display:inline;
+  display: inline;
   padding-top: 3px;
-  padding-bottom: 3px;
+  padding-bottom: 6px;
 }
 
 #header div.right-side {
@@ -35,7 +36,7 @@ body {
   font-size: 14px;
   display:block;
   text-align: right;
-  background-color: #eee;
+  background-color: #F0F0F0;
 }
 
 #username {
