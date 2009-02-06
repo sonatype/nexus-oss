@@ -104,15 +104,15 @@ public abstract class AbstractFeedPlexusResource
                 {
                     feed.setFeedType( ATOM_1_0 );
                 }
-                else if ( FeedRepresentation.RSS_MEDIA_TYPE.equals( mediaType, true ) )
-                {
-                    feed.setFeedType( RSS_2_0 );
-                }
                 else
                 {
                     feed.setFeedType( RSS_2_0 );
 
-                    mediaType = FeedRepresentation.RSS_MEDIA_TYPE;
+                    // set the content type to RSS by default,
+                    // however keep text/xml if it was requested this way (IE bug, see NEXUS-991)
+                    if ( ! MediaType.TEXT_XML.equals( mediaType, true ) ) {
+                      mediaType = FeedRepresentation.RSS_MEDIA_TYPE;
+                    }
                 }
 
                 feed.setLink( request.getResourceRef().toString() );
