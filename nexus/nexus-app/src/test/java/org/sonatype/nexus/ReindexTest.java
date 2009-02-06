@@ -51,7 +51,7 @@ public class ReindexTest
         nexusIndexer = lookup( NexusIndexer.class );
 
         indexPacker = lookup( IndexPacker.class );
-
+        
         servletServer = lookup( ServletServer.class );
 
         servletServer.start();
@@ -165,7 +165,7 @@ public class ReindexTest
         Directory directory = FSDirectory.getDirectory( indexDirectory );
 
         IndexingContext ctx = nexusIndexer.addIndexingContextForced(
-            repositoryId,
+            repositoryId + "-temp",
             repositoryId,
             repositoryRoot,
             directory,
