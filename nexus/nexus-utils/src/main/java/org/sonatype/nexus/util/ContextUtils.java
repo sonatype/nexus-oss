@@ -18,6 +18,21 @@ public class ContextUtils
         return false;
     }
 
+    public static void setFlag( Map<String, Object> context, String key, boolean value )
+    {
+        if ( context != null )
+        {
+            if ( value )
+            {
+                context.put( key, Boolean.TRUE );
+            }
+            else
+            {
+                context.remove( key );
+            }
+        }
+    }
+
     public static boolean collContains( Map<String, Object> context, String key, Object value )
     {
         if ( context != null && context.containsKey( key ) )
