@@ -359,6 +359,12 @@ public class SecurityConfigConvertorTest
 
         }
 
+        public void addErrorMessage( String errorMessage, Exception e )
+        {
+            // TODO Auto-generated method stub
+
+        }
+
     }
 
 }

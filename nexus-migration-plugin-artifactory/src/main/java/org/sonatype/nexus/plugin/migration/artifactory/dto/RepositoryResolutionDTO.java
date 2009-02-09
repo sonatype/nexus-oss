@@ -34,18 +34,11 @@ public class RepositoryResolutionDTO
 
     private boolean mergeSimilarRepository = false;
 
+    private boolean alreadyExists;
 
     public RepositoryResolutionDTO()
     {
         super();
-    }
-
-    public RepositoryResolutionDTO( String repositoryId, ERepositoryType type, String similarRepositoryId )
-    {
-        this();
-        this.repositoryId = repositoryId;
-        this.type = type.name();
-        this.similarRepositoryId = similarRepositoryId;
     }
 
     public EMixResolution getMixResolution()
@@ -126,6 +119,16 @@ public class RepositoryResolutionDTO
     public void setMergeSimilarRepository( boolean mergeSimilarRepository )
     {
         this.mergeSimilarRepository = mergeSimilarRepository;
+    }
+
+    public void setAlreadyExists(boolean alreadyExists)
+    {
+        this.alreadyExists = alreadyExists;
+    }
+
+    public boolean isAlreadyExists()
+    {
+        return alreadyExists;
     }
 
 }

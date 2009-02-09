@@ -45,6 +45,7 @@ public class DefaultMappingConfiguration
     private Configuration configuration;
 
     public void addMapping( CMapping map )
+        throws IOException
     {
         lock.lock();
         try
@@ -60,6 +61,7 @@ public class DefaultMappingConfiguration
     }
 
     public void save()
+        throws IOException
     {
         lock.lock();
 
@@ -85,6 +87,7 @@ public class DefaultMappingConfiguration
         catch ( IOException e )
         {
             getLogger().error( "Unable to save mapping configuration", e );
+            throw e;
         }
         finally
         {
@@ -219,6 +222,7 @@ public class DefaultMappingConfiguration
     }
 
     public void setNexusContext( String nexusContext )
+        throws IOException
     {
         lock.lock();
         try

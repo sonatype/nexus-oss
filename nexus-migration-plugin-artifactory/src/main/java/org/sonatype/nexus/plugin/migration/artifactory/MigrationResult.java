@@ -5,16 +5,18 @@ import java.util.List;
 public interface MigrationResult
 {
 
-    public abstract List<String> getErrorMessages();
+    List<String> getErrorMessages();
 
-    public abstract void addErrorMessage( String errorMessage );
+    void addErrorMessage( String errorMessage );
 
-    public abstract List<String> getWarningMessages();
+    void addErrorMessage( String errorMessage, Exception e );
 
-    public abstract void addWarningMessage( String warningMessage );
+    List<String> getWarningMessages();
 
-    public abstract void mergeResult( MigrationResult migrationResult );
-    
-    public void clear();
+    void addWarningMessage( String warningMessage );
+
+    void mergeResult( MigrationResult migrationResult );
+
+    void clear();
 
 }

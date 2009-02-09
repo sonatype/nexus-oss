@@ -12,19 +12,19 @@
  */
 package org.sonatype.nexus.plugin.migration.artifactory.persist;
 
+import java.io.IOException;
+
 import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
 
 public interface MappingConfiguration
 {
 
-    void save();
-
-    void addMapping(CMapping map);
+    void addMapping(CMapping map) throws IOException;
 
     CMapping getMapping( String repositoryId );
 
     String getNexusContext();
 
-    void setNexusContext( String nexusContext );
+    void setNexusContext( String nexusContext ) throws IOException;
 
 }

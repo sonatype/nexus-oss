@@ -49,6 +49,7 @@ import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecur
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
 import org.sonatype.nexus.plugin.migration.artifactory.security.builder.ArtifactorySecurityConfigBuilder;
 import org.sonatype.nexus.plugin.migration.artifactory.util.VirtualRepositoryUtil;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -117,17 +118,15 @@ public class ArtifactoryFileLocationPlexusResource
             ZipEntry artifactoryConfEntry = zipFile.getEntry( ARTIFACTORY_CONF_FILE );
             if ( artifactoryConfEntry == null )
             {
-                throw new ResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Artifactory backup is invalid, missing: '" + ARTIFACTORY_CONF_FILE + "'" );
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
+                                             "Artifactory backup is invalid, missing: '" + ARTIFACTORY_CONF_FILE + "'" );
             }
 
             ZipEntry securityEntry = zipFile.getEntry( SECURITY_FILE );
             if ( securityEntry == null )
             {
-                throw new ResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Artifactory backup is invalid, missing: '" + SECURITY_FILE + "'" );
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
+                                             "Artifactory backup is invalid, missing: '" + SECURITY_FILE + "'" );
             }
 
             MigrationSummaryDTO data = new MigrationSummaryDTO();
@@ -173,9 +172,7 @@ public class ArtifactoryFileLocationPlexusResource
     }
 
     private void buildArtifactoryConfig( InputStream stream, MigrationSummaryDTO data )
-        throws ResourceException,
-            IOException,
-            XmlPullParserException
+        throws ResourceException, IOException, XmlPullParserException
     {
         // read artifactory.config.xml
         ArtifactoryConfig cfg = ArtifactoryConfig.read( stream );
@@ -192,8 +189,7 @@ public class ArtifactoryFileLocationPlexusResource
     }
 
     private void buildSecurityConfig( InputStream stream, MigrationSummaryDTO data )
-        throws IOException,
-            XmlPullParserException
+        throws IOException, XmlPullParserException
     {
         // read security.xml
         ArtifactorySecurityConfig securityCfg = ArtifactorySecurityConfigBuilder.read( stream );
@@ -229,7 +225,7 @@ public class ArtifactoryFileLocationPlexusResource
     }
 
     private List<GroupResolutionDTO> resolve( Map<String, ArtifactoryVirtualRepository> virtualRepos,
-        Map<String, ArtifactoryRepository> repositories )
+                                              Map<String, ArtifactoryRepository> repositories )
     {
         VirtualRepositoryUtil.resolveRepositories( virtualRepos );
 
@@ -271,7 +267,10 @@ public class ArtifactoryFileLocationPlexusResource
         List<RepositoryResolutionDTO> resolutions = new ArrayList<RepositoryResolutionDTO>();
         for ( ArtifactoryRepository repoArtifactory : artifactoryRepos )
         {
+            RepositoryResolutionDTO resolution = new RepositoryResolutionDTO();
             String repoId = repoArtifactory.getKey();
+            resolution.setRepositoryId( repoId );
+
             ERepositoryType type = ERepositoryType.HOSTED;
             String similarId = null;
 
@@ -281,17 +280,39 @@ public class ArtifactoryFileLocationPlexusResource
                 similarId = findSimilarRepository( repoArtifactory.getUrl() );
             }
 
-            RepositoryResolutionDTO resolution = new RepositoryResolutionDTO( repoId, type, similarId );
+            resolution.setType( type );
+            resolution.setSimilarRepositoryId( similarId );
 
-            if ( repoArtifactory.getHandleReleases() && repoArtifactory.getHandleSnapshots() )
+            Repository nexusRepo = getRepository( repoId );
+            if ( nexusRepo != null )
             {
-                resolution.setMixed( true );
+                resolution.setAlreadyExists( true );
+            }
+            else
+            {
+                if ( repoArtifactory.getHandleReleases() && repoArtifactory.getHandleSnapshots() )
+                {
+                    resolution.setMixed( true );
+                }
             }
 
             resolutions.add( resolution );
 
         }
         return resolutions;
+    }
+
+    private Repository getRepository( String repoId )
+    {
+        try
+        {
+            return getNexus().getRepository( repoId );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // that is not a problem
+            return null;
+        }
     }
 
     private List<UserResolutionDTO> resolve( List<ArtifactoryUser> users )

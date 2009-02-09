@@ -1,5 +1,6 @@
 package org.sonatype.nexus.plugin.migration.artifactory;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,5 +84,13 @@ public class DefaultMigrationResult
     {
         this.errorMessages.clear();
         this.warningMessages.clear();
+    }
+
+    public void addErrorMessage( String errorMessage, Exception e )
+    {
+        StringWriter sw = new StringWriter();
+        e.printStackTrace( new PrintWriter( sw) );
+        StringBuffer buff = sw.getBuffer();
+        addErrorMessage( errorMessage + "\n" + buff.toString() );
     }
 }
