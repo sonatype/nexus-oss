@@ -1,7 +1,5 @@
 package org.sonatype.nexus.repository.metadata;
 
-import org.restlet.data.Protocol;
-import org.sonatype.nexus.repository.metadata.restlet.RestletRawTransport;
 import org.sonatype.nexus.repository.metadata.validation.DefaultRepositoryMetadataValidator;
 import org.sonatype.nexus.repository.metadata.validation.RepositoryMetadataValidator;
 
@@ -10,8 +8,6 @@ public class MetadataRequest
     private String id;
 
     private String url;
-
-    private RawTransport transport;
 
     private RepositoryMetadataValidator validator;
 
@@ -27,20 +23,6 @@ public class MetadataRequest
 
         setUrl( url );
 
-        if ( url != null )
-        {
-            if ( url.startsWith( "http:" ) )
-            {
-                setTransport( new RestletRawTransport() );
-            }
-            else
-            {
-                String protocol = url.substring( 0, url.indexOf( "://" ) );
-
-                setTransport( new RestletRawTransport( Protocol.valueOf( protocol.toUpperCase() ) ) );
-            }
-        }
-
         setValidator( new DefaultRepositoryMetadataValidator() );
     }
 
@@ -51,8 +33,6 @@ public class MetadataRequest
         setId( id );
 
         setUrl( url );
-
-        setTransport( transport );
 
         setValidator( new DefaultRepositoryMetadataValidator() );
     }
@@ -75,16 +55,6 @@ public class MetadataRequest
     public void setUrl( String url )
     {
         this.url = url;
-    }
-
-    public RawTransport getTransport()
-    {
-        return transport;
-    }
-
-    public void setTransport( RawTransport transport )
-    {
-        this.transport = transport;
     }
 
     public RepositoryMetadataValidator getValidator()

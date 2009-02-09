@@ -1,9 +1,11 @@
 package org.sonatype.nexus.repository.metadata;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
@@ -16,14 +18,14 @@ import org.sonatype.nexus.repository.metadata.model.RepositoryMirrorMetadata;
 import org.sonatype.nexus.repository.metadata.model.io.xpp3.OrderedRepositoryMirrorsMetadataXpp3Reader;
 import org.sonatype.nexus.repository.metadata.model.io.xpp3.RepositoryMetadataXpp3Reader;
 import org.sonatype.nexus.repository.metadata.model.io.xpp3.RepositoryMetadataXpp3Writer;
+import org.sonatype.nexus.repository.metadata.validation.DefaultRepositoryMetadataValidator;
+import org.sonatype.nexus.repository.metadata.validation.RepositoryMetadataValidator;
 import org.sonatype.nexus.repository.metadata.validation.ValidationException;
 
 @Component( role = RepositoryMetadataHandler.class )
 public class DefaultRepositoryMetadataHandler
     implements RepositoryMetadataHandler
 {
-    private String repositoryMetadataPath = "/.meta/nexus-repository-metadata.xml";
-
     protected RepositoryMetadataXpp3Reader repositoryMetadataXpp3Reader = new RepositoryMetadataXpp3Reader();
 
     protected RepositoryMetadataXpp3Writer repositoryMetadataXpp3Writer = new RepositoryMetadataXpp3Writer();
@@ -50,15 +52,15 @@ public class DefaultRepositoryMetadataHandler
         return result;
     }
 
-    public RepositoryMetadata readRepositoryMetadata( MetadataRequest req )
+    public RepositoryMetadata readRepositoryMetadata( MetadataRequest req, RawTransport transport )
         throws MetadadaHandlerException,
             IOException
     {
-        RawTransportRequest request = new RawTransportRequest( req.getId(), req.getUrl(), repositoryMetadataPath );
+        RawTransportRequest request = new RawTransportRequest( req.getId(), req.getUrl(), REPOSITORY_METADATA_PATH );
 
         try
         {
-            byte[] data = req.getTransport().readRawData( request );
+            byte[] data = transport.readRawData( request );
 
             // TODO: add means for transparent on-the-fly metadata upgrade
 
@@ -110,37 +112,43 @@ public class DefaultRepositoryMetadataHandler
         }
     }
 
-    public void writeRepositoryMetadata( MetadataRequest req, RepositoryMetadata metadata )
+    public void writeRepositoryMetadata( File file, RepositoryMetadata metadata )
+        throws MetadadaHandlerException,
+            IOException
+    {
+        writeRepositoryMetadata( new FileOutputStream( file ), metadata, new DefaultRepositoryMetadataValidator() );
+    }
+
+    public void writeRepositoryMetadata( OutputStream output, RepositoryMetadata metadata )
+        throws MetadadaHandlerException,
+            IOException
+    {
+        writeRepositoryMetadata( output, metadata, new DefaultRepositoryMetadataValidator() );
+    }
+
+    public void writeRepositoryMetadata( OutputStream output, RepositoryMetadata metadata,
+        RepositoryMetadataValidator validator )
         throws MetadadaHandlerException,
             IOException
     {
         try
         {
-            if ( req.getValidator() != null )
+            try
             {
-                try
-                {
-                    req.getValidator().validate( metadata );
-                }
-                catch ( ValidationException e )
-                {
-                    IOException ex = new IOException( "Metadata to store is invalid!" );
+                validator.validate( metadata );
+            }
+            catch ( ValidationException e )
+            {
+                IOException ex = new IOException( "Metadata to store is invalid!" );
 
-                    ex.initCause( e );
+                ex.initCause( e );
 
-                    throw ex;
-                }
+                throw ex;
             }
 
-            RawTransportRequest request = new RawTransportRequest( req.getId(), req.getUrl(), repositoryMetadataPath );
+            OutputStreamWriter writer = new OutputStreamWriter( output, "UTF-8" );
 
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-            OutputStreamWriter osw = new OutputStreamWriter( bos, "UTF-8" );
-
-            repositoryMetadataXpp3Writer.write( osw, metadata );
-
-            req.getTransport().writeRawData( request, bos.toByteArray() );
+            repositoryMetadataXpp3Writer.write( writer, metadata );
         }
         catch ( Exception e )
         {

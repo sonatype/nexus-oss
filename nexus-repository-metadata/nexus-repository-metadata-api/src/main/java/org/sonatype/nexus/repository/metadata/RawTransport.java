@@ -6,11 +6,9 @@
  */
 package org.sonatype.nexus.repository.metadata;
 
-import java.io.IOException;
-
 /**
- * An interface defining raw resource downloading and uploading contract. This transport is suitable to move payloads
- * that are small enough to not be streamed. Just like repository metadata.
+ * An interface defining raw resource remote downloading contract. This transport is suitable to move payloads that are
+ * small enough to not be streamed. Just like repository metadata.
  * 
  * @author Eugene Kuleshov
  * @author cstamas
@@ -18,21 +16,11 @@ import java.io.IOException;
 public interface RawTransport
 {
     /**
-     * Retrieve the raw content of the path from repository.
+     * Retrieve the raw content of the path from repository. If the path is not found, null should be returned.
      * 
-     * @param name a name of resource to retrieve
-     * @param targetFile a target file to save retrieved resource to
+     * @param request
+     * @return the raw data from path, or null if not found.
      */
     byte[] readRawData( RawTransportRequest request )
-        throws Exception;
-
-    /**
-     * Writes raw content to the path in repository.
-     * 
-     * @param path
-     * @param data
-     * @throws IOException
-     */
-    void writeRawData( RawTransportRequest request, byte[] data )
         throws Exception;
 }

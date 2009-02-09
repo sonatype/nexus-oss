@@ -79,6 +79,13 @@
           <required>true</required>
         </field>
         <field>
+          <name>localUrl</name>
+          <version>1.0.0+</version>
+          <description>The repository "local url".</description>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
           <name>publicKey</name>
           <version>1.0.0+</version>
           <description>The repository public key.</description>

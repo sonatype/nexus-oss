@@ -13,6 +13,7 @@ import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.sonatype.nexus.repository.metadata.RawTransport;
 import org.sonatype.nexus.repository.metadata.RawTransportRequest;
 
@@ -75,27 +76,11 @@ public class RestletRawTransport
 
             return baos.toByteArray();
         }
+        else if ( response.getStatus().equals( Status.CLIENT_ERROR_NOT_FOUND ) )
+        {
+            return null;
+        }
         else
-        {
-            throw new IOException( "The response was not successful: " + response.getStatus() );
-        }
-    }
-
-    public void writeRawData( RawTransportRequest request, byte[] data )
-        throws IOException
-    {
-        while ( request.getPath().startsWith( "/" ) )
-        {
-            request.setPath( request.getPath().substring( 1 ) );
-        }
-
-        Request rr = createRequest( Method.PUT, request );
-
-        rr.setEntity( new ByteArrayRepresentation( MediaType.APPLICATION_XML, data ) );
-
-        Response response = client.handle( rr );
-
-        if ( !response.getStatus().isSuccess() )
         {
             throw new IOException( "The response was not successful: " + response.getStatus() );
         }
@@ -109,8 +94,7 @@ public class RestletRawTransport
 
         ci.setAgent( "NexusRM/1.0.0" );
 
-        ci.setAcceptedMediaTypes( Collections
-            .singletonList( new Preference<MediaType>( MediaType.APPLICATION_XML ) ) );
+        ci.setAcceptedMediaTypes( Collections.singletonList( new Preference<MediaType>( MediaType.APPLICATION_XML ) ) );
 
         request.setClientInfo( ci );
 

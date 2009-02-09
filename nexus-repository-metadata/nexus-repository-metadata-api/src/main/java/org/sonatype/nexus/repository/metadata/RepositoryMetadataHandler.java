@@ -1,9 +1,12 @@
 package org.sonatype.nexus.repository.metadata;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.sonatype.nexus.repository.metadata.model.OrderedRepositoryMirrorsMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
+import org.sonatype.nexus.repository.metadata.validation.RepositoryMetadataValidator;
 
 /**
  * The repository metadata handler interface. Defines the basic operations for retrieving and storing the metadata, and
@@ -13,6 +16,8 @@ import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
  */
 public interface RepositoryMetadataHandler
 {
+    String REPOSITORY_METADATA_PATH = "/.meta/nexus-repository-metadata.xml";
+
     /**
      * Creates a new "virgin" medata. Utility method.
      * 
@@ -35,19 +40,46 @@ public interface RepositoryMetadataHandler
      * @throws MetadadaHandlerException
      * @throws IOException
      */
-    RepositoryMetadata readRepositoryMetadata( MetadataRequest request )
+    RepositoryMetadata readRepositoryMetadata( MetadataRequest request, RawTransport transport )
         throws MetadadaHandlerException,
             IOException;
 
     /**
-     * Stores the metadata. In case of transport or other IO problem, IOException is raised.
+     * Stores the metadata in a file. In case of transport or other IO problem, IOException is raised. Will use the
+     * default validator.
      * 
-     * @param request
+     * @param file
      * @param metadata
      * @throws MetadadaHandlerException
      * @throws IOException
      */
-    void writeRepositoryMetadata( MetadataRequest request, RepositoryMetadata metadata )
+    void writeRepositoryMetadata( File file, RepositoryMetadata metadata )
+        throws MetadadaHandlerException,
+            IOException;
+
+    /**
+     * Stores the metadata in a writer. In case of transport or other IO problem, IOException is raised. Will use the
+     * default validator.
+     * 
+     * @param output
+     * @param metadata
+     * @throws MetadadaHandlerException
+     * @throws IOException
+     */
+    void writeRepositoryMetadata( OutputStream output, RepositoryMetadata metadata )
+        throws MetadadaHandlerException,
+            IOException;
+
+    /**
+     * Stores the metadata in a writer. In case of transport or other IO problem, IOException is raised.
+     * 
+     * @param writer
+     * @param metadata
+     * @param validator
+     * @throws MetadadaHandlerException
+     * @throws IOException
+     */
+    void writeRepositoryMetadata( OutputStream output, RepositoryMetadata metadata, RepositoryMetadataValidator validator )
         throws MetadadaHandlerException,
             IOException;
 
