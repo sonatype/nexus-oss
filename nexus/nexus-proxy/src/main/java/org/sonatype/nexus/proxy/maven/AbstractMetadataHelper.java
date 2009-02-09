@@ -39,16 +39,13 @@ import org.codehaus.plexus.util.StringUtils;
 import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
- * a maven metadata helper containing all the logic for creating maven-metadata.xml <br/>
+ * a Maven metadata helper containing all the logic for creating maven-metadata.xml <br/>
  * and logic for creating md5 and sh1 checksum files
  * 
  * @author Juven Xu
  */
 abstract public class AbstractMetadataHelper
 {
-
-    // private static final String VERSION_REGEX = "^[0-9].*$";
-
     private static final String MD5_SUFFIX = ".md5";
 
     private static final String SHA1_SUFFIX = ".sha1";
@@ -76,62 +73,72 @@ abstract public class AbstractMetadataHelper
     }
 
     public void onDirExit( String path )
-        throws Exception
     {
-
-        if ( shouldCreateMetadataForSnapshotVersionDir( path ) )
+        try
         {
-            createMetadataForSnapshotVersionDir( path );
+            if ( shouldCreateMetadataForSnapshotVersionDir( path ) )
+            {
+                createMetadataForSnapshotVersionDir( path );
 
-            rebuildChecksum( path + METADATA_SUFFIX );
+                rebuildChecksum( path + METADATA_SUFFIX );
 
-            currentArtifacts.clear();
+                currentArtifacts.clear();
+            }
+            else if ( shouldCreateMetadataForArtifactDir( path ) )
+            {
+                createMetadataForArtifactDir( path );
+
+                rebuildChecksum( path + METADATA_SUFFIX );
+
+                currentVersions.clear();
+            }
+            else if ( shouldCreateMetadataForPluginGroupDir( path ) )
+            {
+                createMetadataForPluginGroupDir( path );
+
+                rebuildChecksum( path + METADATA_SUFFIX );
+
+                currentPlugins.clear();
+            }
+
+            cleanGAV( path );
         }
-        else if ( shouldCreateMetadataForArtifactDir( path ) )
+        catch ( Exception e )
         {
-            createMetadataForArtifactDir( path );
-
-            rebuildChecksum( path + METADATA_SUFFIX );
-
-            currentVersions.clear();
+            // TODO: add error info to system error feeds
         }
-        else if ( shouldCreateMetadataForPluginGroupDir( path ) )
-        {
-            createMetadataForPluginGroupDir( path );
-
-            rebuildChecksum( path + METADATA_SUFFIX );
-
-            currentPlugins.clear();
-        }
-
-        cleanGAV( path );
     }
 
     public void processFile( String path )
-        throws Exception
     {
-        // remove old metadata files
-        if ( isMavenMetadataFile( path ) )
+        try
         {
-            remove( path );
+            // remove old metadata files
+            if ( isMavenMetadataFile( path ) )
+            {
+                remove( path );
 
-            return;
+                return;
+            }
+            // remove rotten checksum
+            if ( isRottenChecksum( path ) )
+            {
+                remove( path );
+
+                return;
+            }
+
+            if ( path.endsWith( "pom" ) )
+            {
+                updateMavenInfo( path );
+            }
+
+            rebuildChecksum( path );
         }
-        // remove rotten checksum
-        if ( isRottenChecksum( path ) )
+        catch ( Exception e )
         {
-            remove( path );
-
-            return;
+            // TODO: add error info to system error feeds
         }
-
-        if ( path.endsWith( "pom" ) )
-        {
-            updateMavenInfo( path );
-        }
-
-        rebuildChecksum( path );
-
     }
 
     private boolean isRottenChecksum( String path )
@@ -380,7 +387,7 @@ abstract public class AbstractMetadataHelper
         store( mdString, path + METADATA_SUFFIX );
     }
 
-    protected Versioning versioningForArtifactDir(List<String> versions )
+    protected Versioning versioningForArtifactDir( List<String> versions )
     {
         Versioning versioning = new Versioning();
 
@@ -432,12 +439,11 @@ abstract public class AbstractMetadataHelper
         }
 
         versioning.setLastUpdated( TimeUtil.getUTCTimestamp() );
-        
+
         Collections.sort( versioning.getVersions(), versionComparator );
 
         return versioning;
     }
-
 
     public void createMetadataForSnapshotVersionDir( String path )
         throws Exception
@@ -475,7 +481,7 @@ abstract public class AbstractMetadataHelper
         Snapshot snapshot = new Snapshot();
 
         snapshot.setLocalCopy( false );
-        
+
         snapshot.setBuildNumber( 1 );
 
         for ( String artifact : currentArtifacts )
