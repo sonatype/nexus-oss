@@ -327,7 +327,30 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             helpText: ht.baseUrl,
             name: 'baseUrl',
             anchor: Sonatype.view.FIELD_OFFSET,
-            allowBlank: true
+            allowBlank: true,
+            validator: function( v ) {
+              var forceCheckbox = this.ownerCt.find( 'name', 'forceBaseUrl' )[0];
+              if ( this.allowBlank == false && forceCheckbox.checked &&
+                  v != window.location.href.substring( 0, v.length ) ) {
+                if ( ! this.warningEl ) {
+                  var elp = this.getErrorCt();
+                  if ( ! elp ) {                         
+                    return;
+                  }
+                  this.warningEl = elp.createChild( { cls:'x-form-invalid-msg' } );
+                  this.warningEl.setWidth( elp.getWidth( true ) );
+                }
+                this.warningEl.update( '<span style="color:black"><b>WARNING:</b> ' +
+                  'this Base URL setting does not match your actual URL!</span>' );
+                Ext.form.Field.msgFx[this.msgFx].show(this.warningEl, this);
+              }
+              else {
+                if ( this.warningEl ) {
+                  Ext.form.Field.msgFx[this.msgFx].hide( this.warningEl, this );
+                }
+              }
+              return true;
+            }
           },
           {
             xtype: 'checkbox',
@@ -335,7 +358,11 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             helpText: ht.forceBaseUrl,
             name: 'forceBaseUrl',
             anchor: Sonatype.view.FIELD_OFFSET,
-            allowBlank: true
+            allowBlank: true,
+            handler: function( checkbox, checked ) {
+              var baseUrlField = checkbox.ownerCt.find( 'name', 'baseUrl' )[0];
+              baseUrlField.validate();
+            }
           }
         ]
       },
