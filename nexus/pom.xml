@@ -154,7 +154,7 @@
 				<groupId>org.sonatype.jsw-binaries</groupId>
 				<artifactId>jsw-binaries</artifactId>
 				<version>${jsw.binaries.version}</version>
-				<type>zip</type>
+				<type>tar.gz</type>
 				<!--make sure this doesn't get into any classpaths-->
 				<scope>provided</scope>
 			</dependency>
