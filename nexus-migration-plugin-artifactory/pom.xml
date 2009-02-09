@@ -8,7 +8,7 @@
 
   <artifactId>nexus-migration-plugin-artifactory</artifactId>
 
-  <name>Nexus Migration plugin for Artifactory</name>
+  <name>Nexus Migration Plugin - Artifactory</name>
 
   <dependencies>
     <dependency>

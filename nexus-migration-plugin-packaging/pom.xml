@@ -8,6 +8,8 @@
 
   <artifactId>nexus-migration-plugin-packaging</artifactId>
   <packaging>war</packaging>
+  
+  <name>Nexus Migration Plugin - Packaging</name>
 
   <build>
     <plugins>
@@ -40,7 +42,7 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-migration-artifactory-bridge</artifactId>
+      <artifactId>nexus-migration-plugin-artifactory-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

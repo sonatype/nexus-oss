@@ -16,7 +16,7 @@
   <modules>
     <module>nexus-migration-plugin-configuration</module>
     <module>nexus-migration-plugin-artifactory</module>
-    <module>nexus-migration-artifactory-bridge</module>
+    <module>nexus-migration-plugin-artifactory-bridge</module>
     <module>nexus-migration-plugin-packaging</module>
     <module>nexus-migration-plugin-test-harness</module>
   </modules>
