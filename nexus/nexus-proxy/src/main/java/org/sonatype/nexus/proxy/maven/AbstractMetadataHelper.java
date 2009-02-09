@@ -36,6 +36,8 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 
+import edu.emory.mathcs.backport.java.util.Collections;
+
 /**
  * a maven metadata helper containing all the logic for creating maven-metadata.xml <br/>
  * and logic for creating md5 and sh1 checksum files
@@ -365,7 +367,7 @@ abstract public class AbstractMetadataHelper
 
         md.setArtifactId( currentArtifactId );
 
-        versioningForArtifactDir( md );
+        md.setVersioning( versioningForArtifactDir( currentVersions ) );
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -378,7 +380,7 @@ abstract public class AbstractMetadataHelper
         store( mdString, path + METADATA_SUFFIX );
     }
 
-    private void versioningForArtifactDir( Metadata md )
+    protected Versioning versioningForArtifactDir(List<String> versions )
     {
         Versioning versioning = new Versioning();
 
@@ -388,7 +390,7 @@ abstract public class AbstractMetadataHelper
 
         VersionComparator versionComparator = new VersionComparator();
 
-        for ( String version : currentVersions )
+        for ( String version : versions )
         {
             if ( !versioning.getVersions().contains( version ) )
             {
@@ -430,9 +432,12 @@ abstract public class AbstractMetadataHelper
         }
 
         versioning.setLastUpdated( TimeUtil.getUTCTimestamp() );
+        
+        Collections.sort( versioning.getVersions(), versionComparator );
 
-        md.setVersioning( versioning );
+        return versioning;
     }
+
 
     public void createMetadataForSnapshotVersionDir( String path )
         throws Exception
