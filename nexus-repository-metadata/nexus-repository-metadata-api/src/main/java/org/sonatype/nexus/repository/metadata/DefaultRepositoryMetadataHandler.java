@@ -149,6 +149,8 @@ public class DefaultRepositoryMetadataHandler
             OutputStreamWriter writer = new OutputStreamWriter( output, "UTF-8" );
 
             repositoryMetadataXpp3Writer.write( writer, metadata );
+            
+            writer.flush();
         }
         catch ( Exception e )
         {
