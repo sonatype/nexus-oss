@@ -20,14 +20,28 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
+            <id>migration-plugin</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeArtifactIds>nexus-migration-plugin-packaging</includeArtifactIds>
+              <includeTypes>zip</includeTypes>
+              <includeClassifiers>plugins</includeClassifiers>
+              <outputDirectory>${nexus-abs-basedir}/runtime/apps/nexus/lib</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
             <id>artifactory-bridge</id>
             <phase>generate-test-resources</phase>
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>nexus-migration-artifactory-bridge</includeArtifactIds>
+              <includeArtifactIds>nexus-migration-plugin-packaging</includeArtifactIds>
               <includeTypes>zip</includeTypes>
+              <includeClassifiers>webapp</includeClassifiers>
               <outputDirectory>${nexus-abs-basedir}</outputDirectory>
             </configuration>
           </execution>
@@ -96,10 +110,17 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-migration-artifactory-bridge</artifactId>
+      <artifactId>nexus-migration-plugin-packaging</artifactId>
       <version>${migration-plugin-version}</version>
       <type>zip</type>
       <classifier>webapp</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-migration-plugin-packaging</artifactId>
+      <version>${migration-plugin-version}</version>
+      <type>zip</type>
+      <classifier>plugins</classifier>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

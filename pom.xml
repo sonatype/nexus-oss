@@ -4,6 +4,7 @@
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-plugins-parent</artifactId>
     <version>3-SNAPSHOT</version>
+    <relativePath>../nexus-plugins-parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>nexus-migration-plugin</artifactId>
@@ -16,6 +17,7 @@
     <module>nexus-migration-plugin-configuration</module>
     <module>nexus-migration-plugin-artifactory</module>
     <module>nexus-migration-artifactory-bridge</module>
+    <module>nexus-migration-plugin-packaging</module>
     <module>nexus-migration-plugin-test-harness</module>
   </modules>
 

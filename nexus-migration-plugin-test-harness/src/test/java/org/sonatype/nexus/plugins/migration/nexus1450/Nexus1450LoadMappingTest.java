@@ -32,7 +32,7 @@ public class Nexus1450LoadMappingTest
                 + "/artifactory/artifactory-repo/nexus1450/artifact/1.0/artifact-1.0.jar" );
 
         Status status = RequestFacade.sendMessage( url, Method.GET, null ).getStatus();
-        Assert.assertTrue( "Unable to download artifact", status.isSuccess() );
+        Assert.assertTrue( "Unable to download artifact " + status + " " + url, status.isSuccess() );
     }
 
 }

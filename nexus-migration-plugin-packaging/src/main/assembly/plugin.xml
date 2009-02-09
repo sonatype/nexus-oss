@@ -1,0 +1,27 @@
+<assembly>
+  <id>plugins</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <!--
+    <dependencySets> <dependencySet> <unpack>false</unpack> <outputDirectory>artifactory-migration-plugin</outputDirectory> <includes> <include>*:jar</include> </includes> </dependencySet> </dependencySets>
+  -->
+  <dependencySets>
+    <dependencySet>
+      <unpack>false</unpack>
+      <scope>provided</scope>
+      <includes>
+        <include>org.sonatype.nexus.plugins:nexus-migration-plugin-artifactory</include>
+        <include>org.sonatype.nexus.plugins:nexus-migration-plugin-configuration</include>
+
+        <include>org.sonatype.nexus.tools:nexus-repository-conversion-tool</include>
+        <include>org.codehaus.plexus:plexus-archiver</include>
+        <include>org.codehaus.plexus:plexus-io</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+
+</assembly>
