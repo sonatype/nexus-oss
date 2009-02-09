@@ -14,25 +14,42 @@ import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
 public interface RepositoryMetadataHandler
 {
     /**
+     * Creates a new "virgin" medata. Utility method.
+     * 
+     * @param url
+     * @param recommendedId
+     * @param recommendedName
+     * @param layout
+     * @param policy
+     * @return
+     */
+    RepositoryMetadata createMetadata( String url, String recommendedId, String recommendedName, String layout,
+        String policy );
+
+    /**
      * Fetches the metadata. Returns null if metadata is not found. In case of transport or other IO problem,
      * IOException is raised.
      * 
      * @param request
      * @return the metadata or null if not found.
+     * @throws MetadadaHandlerException
      * @throws IOException
      */
     RepositoryMetadata readRepositoryMetadata( MetadataRequest request )
-        throws IOException;
+        throws MetadadaHandlerException,
+            IOException;
 
     /**
      * Stores the metadata. In case of transport or other IO problem, IOException is raised.
      * 
      * @param request
      * @param metadata
+     * @throws MetadadaHandlerException
      * @throws IOException
      */
     void writeRepositoryMetadata( MetadataRequest request, RepositoryMetadata metadata )
-        throws IOException;
+        throws MetadadaHandlerException,
+            IOException;
 
     /**
      * Returns the ordered list of mirrors for given metadata. What (or from where) is returned depends on metadata: if
@@ -53,8 +70,10 @@ public interface RepositoryMetadataHandler
      * @param url
      * @param transport
      * @return
+     * @throws MetadadaHandlerException
      * @throws IOException
      */
     OrderedRepositoryMirrorsMetadata fetchOrderedMirrorMetadata( RepositoryMetadata metadata, RawTransport transport )
-        throws IOException;
+        throws MetadadaHandlerException,
+            IOException;
 }

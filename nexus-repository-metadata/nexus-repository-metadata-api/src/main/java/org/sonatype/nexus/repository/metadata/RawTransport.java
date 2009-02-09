@@ -24,7 +24,7 @@ public interface RawTransport
      * @param targetFile a target file to save retrieved resource to
      */
     byte[] readRawData( RawTransportRequest request )
-        throws IOException;
+        throws Exception;
 
     /**
      * Writes raw content to the path in repository.
@@ -34,5 +34,5 @@ public interface RawTransport
      * @throws IOException
      */
     void writeRawData( RawTransportRequest request, byte[] data )
-        throws IOException;
+        throws Exception;
 }

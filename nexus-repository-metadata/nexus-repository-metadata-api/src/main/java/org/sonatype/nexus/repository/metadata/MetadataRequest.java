@@ -27,15 +27,18 @@ public class MetadataRequest
 
         setUrl( url );
 
-        if ( url.startsWith( "http:" ) )
+        if ( url != null )
         {
-            setTransport( new RestletRawTransport() );
-        }
-        else
-        {
-            String protocol = url.substring( 0, url.indexOf( "://" ) );
+            if ( url.startsWith( "http:" ) )
+            {
+                setTransport( new RestletRawTransport() );
+            }
+            else
+            {
+                String protocol = url.substring( 0, url.indexOf( "://" ) );
 
-            setTransport( new RestletRawTransport( Protocol.valueOf( protocol.toUpperCase() ) ) );
+                setTransport( new RestletRawTransport( Protocol.valueOf( protocol.toUpperCase() ) ) );
+            }
         }
 
         setValidator( new DefaultRepositoryMetadataValidator() );
