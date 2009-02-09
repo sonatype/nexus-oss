@@ -141,6 +141,11 @@ public class ArtifactoryRedirectorPlexusResource
             IOUtil.copy( in, out );
 
             int statusCode = getReturnCode( urlConn );
+            if ( !Status.isSuccess( statusCode ) )
+            {
+                throw new ResourceException( new Status( statusCode ), "URL connection return: " + statusCode + " - "
+                    + urlConn.getResponseMessage() );
+            }
             getLogger().debug( "URL connection return: " + statusCode + " - " + urlConn.getResponseMessage() );
         }
         catch ( Throwable e )
