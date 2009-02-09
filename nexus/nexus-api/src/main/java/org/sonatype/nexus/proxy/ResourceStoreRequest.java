@@ -28,6 +28,12 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
  */
 public class ResourceStoreRequest
 {
+    /** Context URL of the app root on the incoming connector. */
+    public static final String CTX_REQUEST_APP_ROOT_URL = "request.appRootUrl";
+
+    /** Context URL of the original resource requested on the incoming connector. */
+    public static final String CTX_REQUEST_URL = "request.url";
+
     /** Context flag to mark a request local only. */
     public static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
 
