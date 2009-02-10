@@ -497,6 +497,10 @@ public class NexusApplication
         xstream.omitField( MirrorResource.class, "modelEncoding" );
         xstream.omitField( MirrorStatusResource.class, "modelEncoding" );
         
+        xstream.alias( "mirror-list-request", MirrorResourceListRequest.class );
+        xstream.alias( "mirror-list-response", MirrorResourceListResponse.class );
+        xstream.alias( "mirror-status-list-response", MirrorStatusResourceListResponse.class );
+        
         xstream.registerLocalConverter( MirrorResourceListRequest.class, "data", new AliasingListConverter(
             MirrorResource.class,
             "mirrorResource" ) );
