@@ -1,6 +1,5 @@
 package org.sonatype.nexus.proxy.repository.metadata;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,15 +13,14 @@ import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
-import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentGenerator;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.repository.metadata.MetadadaHandlerException;
+import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
 import org.sonatype.nexus.repository.metadata.RepositoryMetadataHandler;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMemberMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
@@ -89,12 +87,12 @@ public class NexusRepositoryMetadataEventInspector
                 return;
             }
 
-            RepositoryMetadata rm = repositoryMetadataHandler.createMetadata(
-                repositoryUrl,
-                repository.getId(),
-                repository.getName(),
-                repository.getRepositoryContentClass().getId(),
-                getRepositoryPolicy( repository ) );
+            RepositoryMetadata rm = new RepositoryMetadata();
+            rm.setUrl( repositoryUrl );
+            rm.setId( repository.getId() );
+            rm.setName( repository.getName() );
+            rm.setLayout( repository.getRepositoryContentClass().getId() );
+            rm.setPolicy( getRepositoryPolicy( repository ) );
 
             if ( repositoryLocalUrl != null )
             {
@@ -118,7 +116,7 @@ public class NexusRepositoryMetadataEventInspector
 
                     memberMetadata.setUrl( getRepositoryLocalUrl( member ) );
 
-                    memberMetadata.setPolicy( getRepositoryPolicy( repository ) );
+                    memberMetadata.setPolicy( getRepositoryPolicy( member ) );
 
                     memberMetadatas.add( memberMetadata );
                 }
@@ -128,24 +126,20 @@ public class NexusRepositoryMetadataEventInspector
 
             try
             {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                NexusRawTransport nrt = new NexusRawTransport( repository, true, false );
 
-                repositoryMetadataHandler.writeRepositoryMetadata( bos, rm );
+                repositoryMetadataHandler.writeRepositoryMetadata( rm, nrt );
 
-                DefaultStorageFileItem file = new DefaultStorageFileItem(
-                    repository,
-                    RepositoryMetadataHandler.REPOSITORY_METADATA_PATH,
-                    true,
-                    true,
-                    new ByteArrayContentLocator( bos.toByteArray() ) );
+                // "decorate" the file attrs
+                StorageFileItem file = nrt.getLastWriteFile();
 
                 file.getAttributes().put(
                     ContentGenerator.CONTENT_GENERATOR_ID,
                     "NexusRepositoryMetadataContentGenerator" );
 
-                repository.storeItem( file );
+                repository.getLocalStorage().updateItemAttributes( repository, file.getItemContext(), file );
             }
-            catch ( MetadadaHandlerException e )
+            catch ( MetadataHandlerException e )
             {
                 getLogger().info( "Could not write repository metadata!", e );
             }

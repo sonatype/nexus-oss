@@ -8,7 +8,7 @@ public class DefaultRepositoryMetadataValidator
     public void validate( RepositoryMetadata metadata )
         throws ValidationException
     {
-        // TODO: also allow 3rd parties to "hook in" for validation.
+        metadata.setVersion( RepositoryMetadata.MODEL_VERSION );
     }
 
 }

@@ -15,7 +15,6 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.repository.metadata.RawTransport;
-import org.sonatype.nexus.repository.metadata.RawTransportRequest;
 
 /**
  * A very simple RawTransport that uses Restlet under the hud.
@@ -27,44 +26,52 @@ public class RestletRawTransport
 {
     private Client client;
 
+    private String repositoryRoot;
+
     /**
      * Creates a default instance of RestletRawTransport using the HTTP protocol.
+     * 
+     * @param ulr the repo root
      */
-    public RestletRawTransport()
+    public RestletRawTransport( String url )
     {
-        this( Protocol.HTTP );
+        this( url, Protocol.HTTP );
     }
 
     /**
      * Creates an instance of RestletRawRTransport using the supplied protocol. The invoker must care about connector
      * availability.
      * 
+     * @param url the repo root
      * @param protocol
      */
-    public RestletRawTransport( Protocol protocol )
+    public RestletRawTransport( String url, Protocol protocol )
     {
-        this( new Client( protocol ) );
+        this( url, new Client( protocol ) );
     }
 
     /**
      * Creates an instance of RestletRawTransport using the supplied Restlet Client.
      * 
+     * @param url the repo root
      * @param client
      */
-    public RestletRawTransport( Client client )
+    public RestletRawTransport( String url, Client client )
     {
         this.client = client;
+
+        this.repositoryRoot = url;
     }
 
-    public byte[] readRawData( RawTransportRequest request )
+    public byte[] readRawData( String path )
         throws IOException
     {
-        while ( request.getPath().startsWith( "/" ) )
+        while ( path.startsWith( "/" ) )
         {
-            request.setPath( request.getPath().substring( 1 ) );
+            path = path.substring( 1 );
         }
 
-        Request rr = createRequest( Method.GET, request );
+        Request rr = createRequest( Method.GET, path );
 
         Response response = client.handle( rr );
 
@@ -86,9 +93,31 @@ public class RestletRawTransport
         }
     }
 
-    protected Request createRequest( Method method, RawTransportRequest req )
+    public void writeRawData( String path, byte[] data )
+        throws IOException
     {
-        Request request = new Request( method, new Reference( req.getUrl(), req.getPath() ) );
+        while ( path.startsWith( "/" ) )
+        {
+            path = path.substring( 1 );
+        }
+
+        Request rr = createRequest( Method.PUT, path );
+
+        ByteArrayRepresentation entity = new ByteArrayRepresentation( MediaType.APPLICATION_XML, data );
+
+        rr.setEntity( entity );
+
+        Response response = client.handle( rr );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            throw new IOException( "The response was not successful: " + response.getStatus() );
+        }
+    }
+
+    protected Request createRequest( Method method, String path )
+    {
+        Request request = new Request( method, new Reference( repositoryRoot, path ) );
 
         ClientInfo ci = new ClientInfo();
 

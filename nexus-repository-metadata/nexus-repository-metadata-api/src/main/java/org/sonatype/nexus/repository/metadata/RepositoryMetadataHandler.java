@@ -1,8 +1,6 @@
 package org.sonatype.nexus.repository.metadata;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import org.sonatype.nexus.repository.metadata.model.OrderedRepositoryMirrorsMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
@@ -16,20 +14,18 @@ import org.sonatype.nexus.repository.metadata.validation.RepositoryMetadataValid
  */
 public interface RepositoryMetadataHandler
 {
-    String REPOSITORY_METADATA_PATH = "/.meta/nexus-repository-metadata.xml";
-
     /**
-     * Creates a new "virgin" medata. Utility method.
+     * Fetches the metadata. Returns null if metadata is not found. In case of transport or other IO problem,
+     * IOException is raised.
      * 
-     * @param url
-     * @param recommendedId
-     * @param recommendedName
-     * @param layout
-     * @param policy
-     * @return
+     * @param request
+     * @return the metadata or null if not found.
+     * @throws MetadataHandlerException
+     * @throws IOException
      */
-    RepositoryMetadata createMetadata( String url, String recommendedId, String recommendedName, String layout,
-        String policy );
+    RepositoryMetadata readRepositoryMetadata( RawTransport transport )
+        throws MetadataHandlerException,
+            IOException;
 
     /**
      * Fetches the metadata. Returns null if metadata is not found. In case of transport or other IO problem,
@@ -37,24 +33,11 @@ public interface RepositoryMetadataHandler
      * 
      * @param request
      * @return the metadata or null if not found.
-     * @throws MetadadaHandlerException
+     * @throws MetadataHandlerException
      * @throws IOException
      */
-    RepositoryMetadata readRepositoryMetadata( MetadataRequest request, RawTransport transport )
-        throws MetadadaHandlerException,
-            IOException;
-
-    /**
-     * Stores the metadata in a file. In case of transport or other IO problem, IOException is raised. Will use the
-     * default validator.
-     * 
-     * @param file
-     * @param metadata
-     * @throws MetadadaHandlerException
-     * @throws IOException
-     */
-    void writeRepositoryMetadata( File file, RepositoryMetadata metadata )
-        throws MetadadaHandlerException,
+    RepositoryMetadata readRepositoryMetadata( RawTransport transport, RepositoryMetadataValidator validator )
+        throws MetadataHandlerException,
             IOException;
 
     /**
@@ -63,11 +46,11 @@ public interface RepositoryMetadataHandler
      * 
      * @param output
      * @param metadata
-     * @throws MetadadaHandlerException
+     * @throws MetadataHandlerException
      * @throws IOException
      */
-    void writeRepositoryMetadata( OutputStream output, RepositoryMetadata metadata )
-        throws MetadadaHandlerException,
+    void writeRepositoryMetadata( RepositoryMetadata metadata, RawTransport transport )
+        throws MetadataHandlerException,
             IOException;
 
     /**
@@ -76,11 +59,12 @@ public interface RepositoryMetadataHandler
      * @param writer
      * @param metadata
      * @param validator
-     * @throws MetadadaHandlerException
+     * @throws MetadataHandlerException
      * @throws IOException
      */
-    void writeRepositoryMetadata( OutputStream output, RepositoryMetadata metadata, RepositoryMetadataValidator validator )
-        throws MetadadaHandlerException,
+    void writeRepositoryMetadata( RepositoryMetadata metadata, RawTransport transport,
+        RepositoryMetadataValidator validator )
+        throws MetadataHandlerException,
             IOException;
 
     /**
@@ -102,10 +86,10 @@ public interface RepositoryMetadataHandler
      * @param url
      * @param transport
      * @return
-     * @throws MetadadaHandlerException
+     * @throws MetadataHandlerException
      * @throws IOException
      */
     OrderedRepositoryMirrorsMetadata fetchOrderedMirrorMetadata( RepositoryMetadata metadata, RawTransport transport )
-        throws MetadadaHandlerException,
+        throws MetadataHandlerException,
             IOException;
 }

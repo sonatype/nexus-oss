@@ -1,7 +1,9 @@
 package org.sonatype.nexus.repository.metadata.validation;
 
+import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
+
 public class ValidationException
-    extends Exception
+    extends MetadataHandlerException
 {
     private static final long serialVersionUID = -8892632174114363043L;
 
