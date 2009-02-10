@@ -419,9 +419,14 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       }
     }
     
-    if ( n ) {
-      this.fetchFirst50( this );
+    if ( this.grid.store.baseParams['g'] == null && this.grid.store.baseParams['a'] == null && 
+        this.grid.store.baseParams['v'] == null ) {
+      this.setWarningLabel( 'A group, an artifact or a version is required to run a search.' );
+      return;
     }
+    this.clearWarningLabel();
+ 
+    this.fetchFirst50( this );
   },
   
   gavEnterHandler: function(f, e) {
