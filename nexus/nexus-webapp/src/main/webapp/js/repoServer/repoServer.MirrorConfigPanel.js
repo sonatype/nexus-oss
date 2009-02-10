@@ -237,6 +237,8 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
     treePanel.root.appendChild(new Ext.tree.TreeNode( {
       id :id,
       text :url,
+      href: url,
+      hrefTarget: '_new',
       payload : {
         id :manualUrl ? '' : id,
         url :url
