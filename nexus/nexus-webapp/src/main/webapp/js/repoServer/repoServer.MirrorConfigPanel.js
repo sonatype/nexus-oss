@@ -332,21 +332,8 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
             if (childNodes && childNodes.length) {
               for ( var j = 0; j < childNodes.length; j++) {
                 if (item.id == childNodes[j].id) {
-                  var newNode = new Ext.tree.TreeNode( {
-                    id :item.id,
-                    text :item.url,
-                    payload : {
-                      id :item.id,
-                      url :item.url
-                    },
-                    allowChildren :false,
-                    draggable :false,
-                    leaf :true,
-                    icon :item.status == 'Blacklisted' ? (Sonatype.config.extPath + '/resources/images/default/tree/drop-no.gif')
-                        : (Sonatype.config.extPath + '/resources/images/default/tree/drop-yes.gif')
-                  });
-
-                  treePanel.getRootNode().replaceChild(newNode, childNodes[j]);
+                  childNodes[j].getUI().getIconEl().src = item.status == 'Blacklisted' ? (Sonatype.config.extPath + '/resources/images/default/tree/drop-no.gif')
+                      : (Sonatype.config.extPath + '/resources/images/default/tree/drop-yes.gif');
                   break;
                 }
               }
