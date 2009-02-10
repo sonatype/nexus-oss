@@ -49,6 +49,7 @@ import org.sonatype.nexus.index.updater.ResourceFetcher;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -945,9 +946,14 @@ public class DefaultIndexerManager
 
                     IOUtil.copy( is, fos, 8192 );
                 }
+                catch ( RemoteAccessException ex )
+                {
+                    // XXX: But we should detect this? Maybe a permission problem?
+                    throw new FileNotFoundException( name + " (" + ex.getMessage() + ")" );
+                }
                 catch ( ItemNotFoundException ex )
                 {
-                    throw new FileNotFoundException( "Item not found " + name );
+                    throw new FileNotFoundException( name + " (item not found)" );
                 }
                 finally
                 {
