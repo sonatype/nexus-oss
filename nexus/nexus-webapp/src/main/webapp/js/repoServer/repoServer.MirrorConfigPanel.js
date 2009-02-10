@@ -218,13 +218,13 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
 
       urlField.clearInvalid();
 
-      this.addUrlNode(treePanel, url, url);
+      this.addUrlNode(treePanel, url, url, Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif');
       urlField.setRawValue('');
       urlField.setValue('');
     }
   },
 
-  addUrlNode : function(treePanel, url, id) {
+  addUrlNode : function(treePanel, url, id, icon ) {
     var validId;
     var manualUrl;
     if (url == id) {
@@ -244,7 +244,7 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
       allowChildren :false,
       draggable :false,
       leaf :true,
-      icon :Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif'
+      icon : icon
     }));
   },
 
@@ -268,11 +268,31 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
 
   loadMirrors : function(arr, srcObj, fpanel) {
     var treePanel = this.find('name', 'mirror-url-list')[0];
-
+    
+    var mirrorArray = new Array();
+    
+    for ( var i = 0; i < arr.length; i++) {
+      var treePanel = this.find('name', 'mirror-url-list')[0];
+      var childNodes = treePanel.getRootNode().childNodes;
+      var found = false;
+      if (childNodes && childNodes.length) {
+        for ( var j = 0; j < childNodes.length; j++) {
+          if (arr[i].id == childNodes[j].id) {            
+            mirrorArray[i] = { id: arr[i].id, url: arr[i].url, icon: childNodes[j].ui.iconNode.src};
+            found = true;
+            break;
+          }
+        }
+      }      
+      if ( !found ){
+        mirrorArray[i] = { id: arr[i].id, url: arr[i].url, icon: Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif'};        
+      }
+    }
+    
     this.removeAllMirrorUrls();
 
     for ( var i = 0; i < arr.length; i++) {
-      this.addUrlNode(treePanel, arr[i].url, arr[i].id);
+      this.addUrlNode(treePanel, mirrorArray[i].url, mirrorArray[i].id, mirrorArray[i].icon);
     }
 
     return arr;
@@ -327,6 +347,7 @@ Ext.extend(Sonatype.repoServer.MirrorConfigPanel, Sonatype.ext.FormPanel, {
                   });
 
                   treePanel.getRootNode().replaceChild(newNode, childNodes[j]);
+                  break;
                 }
               }
             }
