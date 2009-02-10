@@ -1115,7 +1115,7 @@ public class DefaultIndexerManager
 
         if ( gTerm == null && aTerm == null && vTerm == null )
         {
-            return new FlatSearchResponse( null, 0, new HashSet<ArtifactInfo>() );
+            return new FlatSearchResponse( null, -1, new HashSet<ArtifactInfo>() );
         }
 
         if ( repositoryId != null )
