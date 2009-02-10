@@ -776,7 +776,14 @@ public abstract class AbstractRepository
                 {
                     ContentGenerator generator = getContentGenerators().get( key );
 
-                    file.setContentLocator( generator.generateContent( this, uid.getPath(), file ) );
+                    try
+                    {
+                        file.setContentLocator( generator.generateContent( this, uid.getPath(), file ) );
+                    }
+                    catch ( Exception e )
+                    {
+                        throw new StorageException( "Could not generate content:", e );
+                    }
                 }
                 else
                 {

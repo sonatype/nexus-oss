@@ -37,8 +37,17 @@ public class NexusRepositoryMetadataContentGenerator
 
             String body = new String( bos.toByteArray(), "UTF-8" );
 
-            StringContentLocator result = new StringContentLocator( body.replace( "@rootUrl@", (String) item
-                .getItemContext().get( ResourceStoreRequest.CTX_REQUEST_APP_ROOT_URL ) ) );
+            StringContentLocator result = null;
+
+            if ( item.getItemContext().containsKey( ResourceStoreRequest.CTX_REQUEST_APP_ROOT_URL ) )
+            {
+                result = new StringContentLocator( body.replace( "@rootUrl@", (String) item.getItemContext().get(
+                    ResourceStoreRequest.CTX_REQUEST_APP_ROOT_URL ) ) );
+            }
+            else
+            {
+                result = new StringContentLocator( body.replace( "@rootUrl@", "" ) );
+            }
 
             item.setLength( result.getByteArray().length );
 
