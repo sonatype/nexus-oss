@@ -329,6 +329,10 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             anchor: Sonatype.view.FIELD_OFFSET,
             allowBlank: true,
             validator: function( v ) {
+              if ( ! v.match( /^(?:http|https):\/\//i ) ) { 
+                return 'Protocol must be http://, https:// or ftp://'; 
+              }
+
               var forceCheckbox = this.ownerCt.find( 'name', 'forceBaseUrl' )[0];
               if ( this.allowBlank == false && forceCheckbox.checked &&
                   v != window.location.href.substring( 0, v.length ) ) {
