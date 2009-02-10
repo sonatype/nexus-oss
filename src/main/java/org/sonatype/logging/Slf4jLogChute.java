@@ -66,14 +66,19 @@ public class Slf4jLogChute
         {
             case TRACE_ID:
                 logger.trace( msg );
+                break;
             case DEBUG_ID:
                 logger.debug( msg );
+                break;
             case INFO_ID:
                 logger.info( msg );
+                break;
             case WARN_ID:
                 logger.warn( msg );
+                break;
             case ERROR_ID:
                 logger.error( msg );
+                break;
             default:
                 // huh?
                 logger.info( msg );
@@ -86,14 +91,19 @@ public class Slf4jLogChute
         {
             case TRACE_ID:
                 logger.trace( msg, t );
+                break;
             case DEBUG_ID:
                 logger.debug( msg, t );
+                break;
             case INFO_ID:
                 logger.info( msg, t );
+                break;
             case WARN_ID:
                 logger.warn( msg, t );
+                break;
             case ERROR_ID:
                 logger.error( msg, t );
+                break;
             default:
                 // huh?
                 logger.info( msg, t );
