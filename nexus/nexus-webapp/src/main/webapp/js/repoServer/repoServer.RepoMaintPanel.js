@@ -188,7 +188,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     listeners: {
       'load' : {
         fn: function() {
-          this.searchField.triggers[1].hide();
           this.groupsDataStore.reload();
           Ext.TaskMgr.start(this.repoStatusTask);
         },
@@ -205,7 +204,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     listeners: {
       'load' : {
         fn: function() {
-          this.searchField.triggers[1].hide();
           this.allReposDataStore.each(function(item,i,len){
               if ( item.data.userManaged == true )
               {
@@ -268,42 +266,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   // END: Repo List ******************************************************
   // *********************************************************************
 
-  this.browseLocalMenuItem = new Ext.menu.CheckItem(          
-    {
-      text: 'Browse local storage',
-      value: 0,
-      checked: true,
-      group:'browse-group',
-      checkHandler: this.browseSelectorHandler,
-      scope:this
-    }
-  );
-  this.browseIndexMenuItem = new Ext.menu.CheckItem(
-    {
-      text: 'Browse index',
-      value: 1,
-      checked: false,
-      group:'browse-group',
-      checkHandler: this.browseSelectorHandler,
-      scope:this
-    }
-  );
-  this.browseSelector = new Ext.Toolbar.Button(          
-    {
-      text: 'Browse local storage',
-      icon: Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
-      value: 0,
-      cls: 'x-btn-text-icon',
-      menu:{
-        id:'browse-content-menu',
-        width:200,
-        items: [
-          this.browseLocalMenuItem,
-          this.browseIndexMenuItem
-        ]
-      }
-    }
-  );
   
   Sonatype.repoServer.RepoMaintPanel.superclass.constructor.call(this, {
     layout: 'border',
@@ -333,41 +295,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
         deferredRender: false,
         autoScroll: false,
         frame: false,
-        tbar: [
-          {
-            text: 'Refresh',
-            iconCls: 'st-icon-refresh',
-            scope:this,
-            handler: this.reloadTree
-          },
-          ' ',
-          'Path Lookup:',
-          {
-            xtype: 'nexussearchfield',
-            searchPanel: this,
-            width: 400,
-            enableKeyEvents: true,
-            listeners: {
-              'keyup': {
-                fn: function( field, event ) {
-                  var key = event.getKey();
-                  if ( ! event.isNavKeyPress() ) {
-                    this.searchTask.delay( 200 );
-                  }
-                },
-                scope: this
-              },
-              'render': function(c) {
-                Ext.QuickTips.register({
-                  target: c.getEl(),
-                  text: 'Enter a complete path to lookup, for example org/sonatype/nexus'
-                });
-              }
-            }
-          },
-          ' ',
-          this.browseSelector
-        ],
         items: [
           {
             xtype: 'panel',
@@ -487,43 +414,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     }
   },
   
-  onBrowseContextClickHandler : function(node, e){
-    this.onBrowseContextHideHandler();
-    
-    var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-    
-    if ( rec.get( 'exposed' ) == false )
-      return;
-    
-    var isProxyRepo = (node.getOwnerTree().root.attributes.repoType == 'proxy');
-    var isGroup = (node.getOwnerTree().root.attributes.repoType == 'group');
-    
-    node.attributes.repoRecord = rec;
-    this.ctxBrowseNode = node;
-    this.ctxBrowseNode.data = this.ctxBrowseNode.attributes;
-    
-    var menu = new Sonatype.menu.Menu({
-      id: 'repo-maint-browse-ctx',
-      payload: node
-    });
-
-    Sonatype.Events.fireEvent( 'repositoryContentMenuInit', menu,
-      this.reposGridPanel.store.getById(node.getOwnerTree().root.contentUrl),
-      this.ctxBrowseNode );
-
-    if ( ! menu.items.first() ) return;
-
-    menu.on('hide', this.onBrowseContextHideHandler, this);
-    e.stopEvent();
-    menu.showAt(e.getXY());
-  },
-
-  onBrowseContextHideHandler : function(){
-    if(this.ctxBrowseNode){
-      this.ctxBrowseNode = null;
-    }
-  },
-  
   //for downloading artifacts from the browse view
   downloadHandler : function( item, button, event ){
     event.stopEvent();
@@ -568,196 +458,17 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   
   //rec is grid store record
   viewRepo : function(rec){
-    var repoType = rec.get('repoType'); 
-    if ( repoType != 'virtual' ) {
-      this.browseSelector.enable();
-    }
-    else {
-      this.browseLocalMenuItem.setChecked( true );
-      this.browseSelector.disable();
-    }
-    this.searchField.triggers[1].show();
     
-    //change in behavior.  Always load a new detail view until we work out all the cache
-    // and browse dependencies
-    
-    var id = rec.id;
-    //var config = this.detailPanelConfig;
-    //config.id = id;
-    //config = this.configUniqueIdHelper(id, rec.get('name'), rec.get('repoType'), config);
-    var panel = new Ext.FormPanel(this.makeBrowseTree(id, rec.get('name'), rec.get('repoType')));
-    panel.__repoRec = rec;
-    
-    //panel.on('beforerender', this.beforeRenderHandler, this);
-//  panel.on('show', function(tp){
-//    var temp = new Ext.tree.TreeSorter(tp, {folderSort:true});
-//  },
-//  this,
-//  {single: true}
-//  );
+    var panel = new Sonatype.repoServer.RepositoryBrowsePanel( { id: rec.id, payload: rec } );
     
     var oldItem = this.formCards.getLayout().activeItem;
     this.formCards.remove(oldItem, true);
     this.formCards.insert(1, panel);
 
-    if ( this.formCards.tbar ) {
-      if ( this.formCards.tbar.oldSize ) {
-        this.formCards.tbar.setSize( this.formCards.tbar.oldSize );
-      }
-      this.formCards.tbar.show();
-    }
-    
     //always set active and re-layout
     this.formCards.getLayout().setActiveItem(panel);
     panel.doLayout();
     
-
-    //old behavior
-//  var id = rec.id; //note: rec.id is unique for new repos and equal to resourceURI for existing ones
-//  var panel = this.formCards.findById(id);
-//  
-//  if(!panel){ //create form and populate current data
-//    var config = this.detailPanelConfig;
-//    config.id = id;
-//    config = this.configUniqueIdHelper(id, rec.get('name'), config);
-//    panel = new Ext.Panel(config);
-//
-//    panel.on('beforerender', this.beforeRenderHandler, this);
-//    
-//    this.formCards.add(panel);
-//  }
-//  
-//  //always set active and re-layout
-//  this.formCards.getLayout().setActiveItem(panel);
-//  panel.doLayout();    
-  },
-  
-  //creates a unique config object with specific IDs on the two tree items
-  configUniqueIdHelper : function(id, name, repoType, config){
-    //@note: there has to be a better way to do this.  Depending on offsets is very error prone
-
-    var newConfig = config;
-
-    var trees = [
-      {obj : newConfig.items[0], postpend : '_repo-browse'}
-//    {obj : newConfig.items[0].items[0], postpend : '_repo-browse'}
-    ];
-
-    for (var i = 0; i<trees.length; i++) {
-      trees[i].obj.title = name + ' Repository Content';
-      trees[i].obj.id = id + trees[i].postpend;
-      trees[i].obj.root = new Ext.tree.AsyncTreeNode({
-                            text: name,
-                            id: id + '/content/',
-                            singleClickExpand: true,
-                            expanded: true,
-                            repoType: repoType
-                          });
-                          
-      trees[i].obj.loader = new Ext.tree.SonatypeTreeLoader({
-        dataUrl: '', //note: all node ids are their own full path
-        listeners: {
-          loadexception: this.treeLoadExceptionHandler,
-          scope: this
-        }
-      });
-    }
-
-    return newConfig;
-  },
-  
-  makeBrowseTree : function(id, name, repoType){
-    var tp = new Ext.tree.TreePanel(
-    {
-      anchor: '0 -2',
-      id: id + '_repo-browse',
-      loader: null, //note: created uniquely per repo
-      //note: this style matches the expected behavior
-      bodyStyle: 'background-color:#FFFFFF',//; border: 1px solid #99BBE8',
-      animate:true,
-      lines: false,
-      autoScroll:true,
-      containerScroll: true,
-      rootVisible: true,
-      enableDD: false,
-      loader : new Ext.tree.SonatypeTreeLoader({
-        dataUrl: '', //note: all node ids are their own full path
-        listeners: {
-          loadexception: this.treeLoadExceptionHandler,
-          scope: this
-        }
-      }),
-      listeners: {
-        contextmenu: this.onBrowseContextClickHandler,
-        scope: this,
-        expandnode: this.indexBrowserExpandFollowup
-      }
-    });
-    
-//    loader = new Ext.tree.SonatypeTreeLoader({
-//      dataUrl: '', //note: all node ids are their own full path
-//      listeners: {
-//        loadexception: this.treeLoadExceptionHandler,
-//        scope: this
-//      },
-//    });
-    
-    var temp = new Ext.tree.TreeSorter(tp, {folderSort:true});
-    //note: async treenode needs to be added after sorter to avoid race condition where child node can appear unsorted
-    
-    var rNode = new Ext.tree.AsyncTreeNode({
-      text: name,
-      id: this.getBrowsePath( id ),
-      singleClickExpand: true,
-      expanded: true,
-      repoType: repoType,
-      listeners: {
-        load: {
-          fn: this.indexBrowserExpandFollowup,
-          scope: this
-        }
-      }
-    });
-    rNode.contentUrl = id;
-    
-    tp.setRootNode(rNode);
-    
-    var uniqueConfig = {
-      id : id + '_repo-browse-top',
-      autoScroll: false,
-      border: false,
-      frame: false,
-      collapsible: false,
-      collapsed: false,
-      labelWidth: 100,
-      layoutConfig: {
-        labelSeparator: ''
-      },
-      items: [tp]
-    };
-    
-    return uniqueConfig;
-  },
-  
-  treeLoadExceptionHandler : function(treeLoader, node, response){
-    if (response.status == 503){
-      if ( Sonatype.MessageBox.isVisible() ) {
-        Sonatype.MessageBox.hide();
-      }
-      node.setText(node.text + ' (Out of Service)');
-    }
-    else if ( response.status == 404 ) {
-      if ( Sonatype.MessageBox.isVisible() ) {
-        Sonatype.MessageBox.hide();
-      }
-      node.setText( node.text + ( node.isRoot ? ' (Not Available)' : ' (Not Found)'));
-    }
-    else if ( response.status == 401) {
-      if ( Sonatype.MessageBox.isVisible() ) {
-        Sonatype.MessageBox.hide();   
-      }
-      node.setText( node.text + ' (Access Denied)' );
-    }
   },
 
   statusCallback : function(options, success, response) {
@@ -816,175 +527,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     this.formCards.getLayout().setActiveItem(0);
   },
   
-  startSearch: function( p ) {
-    var field = p.searchField;
-    var searchText = field.getRawValue();
-
-    var activePanel = p.formCards.getLayout().activeItem;
-    if ( activePanel ) {
-      var treePanel = activePanel.items.first();
-      if ( searchText ) {
-        field.triggers[0].show();
-        var justEdited = p.oldSearchText.length > searchText.length;
-
-        var findMatchingNodes = function( root, textToMatch ) {
-          var n = textToMatch.indexOf( '/' );
-          var remainder = '';
-          if ( n > -1 ) {
-            remainder = textToMatch.substring( n + 1 );
-            textToMatch = textToMatch.substring( 0, n );
-          }
-
-          var matchingNodes = [];
-          var found = false;
-          for ( var i = 0; i < root.childNodes.length; i++ ) {
-            var node = root.childNodes[i];
-
-            var text = node.text;
-            if ( text == textToMatch ) {
-              node.enable();
-              node.ensureVisible();
-              node.expand();
-              found = true;
-              if ( ! node.isLeaf() ) {
-                var autoComplete = false;
-                if ( ! remainder && node.childNodes.length == 1 ) {
-                  remainder = node.firstChild.text;
-                  autoComplete = true;
-                }
-                if ( remainder ) {
-                  var s = findMatchingNodes( node, remainder );
-                  if ( autoComplete || ( s && s != remainder ) ) {
-                    return textToMatch + '/' + ( s ? s : remainder );
-                  }
-                }
-              }
-            }
-            else if ( text.substring( 0, textToMatch.length ) == textToMatch ) {
-              matchingNodes[matchingNodes.length] = node;
-              node.enable();
-              if ( matchingNodes.length == 1 ) {
-                node.ensureVisible();
-              }
-            }
-            else {
-              node.disable();
-              node.collapse( false, false );
-            }
-          }
-          
-          // if only one non-exact match found, suggest the name
-          return ! found && matchingNodes.length == 1 ?
-            matchingNodes[0].text + '/' : null;
-        };
-        
-        var s = findMatchingNodes( treePanel.root, searchText );
-
-        p.oldSearchText = searchText;
-
-        // if auto-complete is suggested, and the user hasn't just started deleting
-        // their own typing, try the suggestion
-        if ( s && ! justEdited && s != searchText ) {
-          field.setRawValue( s );
-          p.startSearch( p );
-        }
-
-      }
-      else {
-        p.stopSearch( p );
-      }
-    }
-  },
-
-  stopSearch: function( p ) {
-    p.searchField.triggers[0].hide();
-    p.oldSearchText = '';
-
-    var activePanel = p.formCards.getLayout().activeItem;
-    if ( activePanel ) {
-      var treePanel = activePanel.items.first();
-
-      var enableAll = function( root ) {
-        for ( var i = 0; i < root.childNodes.length; i++ ) {
-          var node = root.childNodes[i];
-          node.enable();
-          node.collapse( false, false );
-          enableAll( node );
-        }
-      };
-      enableAll( treePanel.root );
-    }
-  },
-
-  browseSelectorHandler: function( item, e ) {
-    if ( this.browseSelector.value != item.value ) {
-      this.browseSelector.value = item.value;
-      this.browseSelector.setText( item.text );
-      this.browseIndex = item.value == 1
-
-      this.reloadTree();
-    }
-  },
-  
-  getBrowsePath: function( baseUrl ) {
-    return baseUrl + this.getBrowsePathSnippet() + '/'; 
-  },
-
-  getBrowsePathSnippet: function() {
-    return this.browseIndex ?
-      Sonatype.config.browseIndexPathSnippet : Sonatype.config.browsePathSnippet;
-  },
-  
-  reloadTree: function() {
-    var activePanel = this.formCards.getLayout().activeItem;
-    if ( activePanel ) {
-      var treePanel = activePanel.items.first();
-      if ( treePanel ) {
-        var root = treePanel.root;
-        var i = root.text.search(/\(.*\)$/);
-        if(i > -1){
-          root.setText(root.text.slice(0, i-1));
-        }
-        root.id = this.getBrowsePath( root.contentUrl );
-        root.attributes.localStorageUpdated = false;
-        root.reload();
-      }
-    }
-  },
-  
-  indexBrowserExpandFollowup: function( node ) {
-    if ( this.browseIndex && ! node.attributes.localStorageUpdated && node.firstChild ) {
-      node.attributes.localStorageUpdated = true;
-      Ext.Ajax.request({
-        url: node.id.replace( Sonatype.config.browseIndexPathSnippet, Sonatype.config.browsePathSnippet ) + '?isLocal',
-        suppressStatus: 404,
-        success: function( response, options ) {
-          var decodedResponse = Ext.decode( response.responseText );
-          if ( decodedResponse.data ) {
-            var data = decodedResponse.data;
-            for ( var j = 0; j < node.childNodes.length; j++ ) {
-              var indexNode = node.childNodes[j];
-              indexNode.attributes.localStorageUpdated = true;
-              for ( var i = 0; i < data.length; i++ ) {
-                var contentNode = data[i];
-                if ( contentNode.text == indexNode.text ) {
-                  indexNode.ui.iconNode.className = 'x-tree-node-nexus-icon';
-                  indexNode.attributes.localStorageUpdated = false;
-                  break;
-                }
-              }
-            }
-          }
-        },
-        failure: function( response, options ) {
-          for ( var j = 0; j < node.childNodes.length; j++ ) {
-            node.childNodes[j].attributes.localStorageUpdated = true;
-          }
-        },
-        scope: this
-      });
-    }
-  },
   switchBrowseType: function( button, event ) {
     this.setBrowseType( this, button.value );
     
