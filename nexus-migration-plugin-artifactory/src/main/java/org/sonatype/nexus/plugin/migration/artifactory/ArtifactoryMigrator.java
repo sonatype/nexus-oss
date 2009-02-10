@@ -33,7 +33,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.nexus.LogFileManager;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -79,13 +78,6 @@ public class ArtifactoryMigrator
         new NotFileFilter( new SuffixFileFilter( ".artifactory-metadata" ) );
 
     private static final String LOGFILE_NAME = "migration.log";
-
-    /**
-     * The LogFile Manager
-     */
-    @Requirement
-    private LogFileManager logFileManager;
-
     /**
      * If the log directory cannot be figured out from the LogFileManager, this path is used.
      */
@@ -731,7 +723,7 @@ public class ArtifactoryMigrator
         // try to figure out the log directory
         try
         {
-            SimpleLog4jConfig log4jConf = this.logFileManager.getLogConfig();
+            SimpleLog4jConfig log4jConf = this.nexus.getLogConfig();
             String nexusLogFilePath = log4jConf.getFileAppenderLocation();
             File logDir = new File( nexusLogFilePath ).getParentFile();
 
