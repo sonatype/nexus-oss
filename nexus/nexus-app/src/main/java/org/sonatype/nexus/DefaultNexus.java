@@ -60,6 +60,7 @@ import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
+import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.SimpleLog4jConfig;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
@@ -188,7 +189,7 @@ public class DefaultNexus
      * The LogFile Manager
      */
     @Requirement
-    private LogFileManager logFileManager;
+    private LogManager logManager;
 
     /**
      * The event inspector host.
@@ -771,7 +772,7 @@ public class DefaultNexus
     {
         getLogger().debug( "List log files." );
 
-        Set<File> files = logFileManager.getLogFiles();
+        Set<File> files = logManager.getLogFiles();
 
         ArrayList<NexusStreamResponse> result = new ArrayList<NexusStreamResponse>( files.size() );
 
@@ -808,7 +809,7 @@ public class DefaultNexus
         {
             getLogger().debug( "Retrieving " + logFile + " log file." );
 
-            File log = logFileManager.getLogFile( logFile );
+            File log = logManager.getLogFile( logFile );
 
             // "chroot"ing it to nexus log dir
             if ( log.exists() )
@@ -1908,13 +1909,13 @@ public class DefaultNexus
     public SimpleLog4jConfig getLogConfig()
         throws IOException
     {
-        return logFileManager.getLogConfig();
+        return logManager.getLogConfig();
     }
 
     public void setLogConfig( SimpleLog4jConfig config )
         throws IOException
     {
-        logFileManager.setLogConfig( config );
+        logManager.setLogConfig( config );
     }
 
     // Mirrors

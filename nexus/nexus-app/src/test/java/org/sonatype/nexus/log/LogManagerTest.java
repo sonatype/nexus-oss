@@ -14,20 +14,22 @@
 package org.sonatype.nexus.log;
 
 import java.io.File;
+import java.util.Set;
 
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.sonatype.nexus.AbstractNexusTestCase;
-import org.sonatype.nexus.LogFileManager;
 
 /**
  * @author juven
  */
-public class LogFileManagerTest
+public class LogManagerTest
     extends AbstractNexusTestCase
 {
+    private LogManager manager;
 
-    private LogFileManager manager;
-
-    public LogFileManagerTest()
+    public LogManagerTest()
         throws Exception
     {
         super.setUp();
@@ -43,7 +45,7 @@ public class LogFileManagerTest
 
         System.getProperties().put( "plexus.log4j-prop-file", logFile.getAbsolutePath() );
 
-        manager = (LogFileManager) lookup( LogFileManager.class );
+        manager = (LogManager) lookup( LogManager.class );
     }
 
     public void testLogConfig()
@@ -54,7 +56,7 @@ public class LogFileManagerTest
         assertEquals( "DEBUG, console", config.getRootLogger() );
 
         config.setRootLogger( "INFO, console" );
-        
+
         manager.setLogConfig( config );
 
         assertEquals( "INFO, console", manager.getLogConfig().getRootLogger() );
@@ -64,5 +66,37 @@ public class LogFileManagerTest
         manager.setLogConfig( config );
 
         assertEquals( "DEBUG, console", manager.getLogConfig().getRootLogger() );
+    }
+
+    public void testGetLogFiles()
+        throws Exception
+    {
+        Set<File> files = manager.getLogFiles();
+        assertTrue( files.isEmpty() );
+
+        // add file appender A to my logger
+        Logger testLogger = Logger.getLogger( getClass() );
+        File appenderFileA = new File( getBasedir(), "target/logs/appenderA.log" );
+        testLogger.addAppender( new FileAppender( new PatternLayout(), appenderFileA.getAbsolutePath() ) );
+        testLogger.info( "test log A" );
+
+        files = manager.getLogFiles();
+        assertEquals( 1, files.size() );
+        assertTrue( files.contains( appenderFileA ) );
+
+        // add file appender B to root logger
+        Logger rootLogger = Logger.getRootLogger();
+        File appenderFileB = new File( getBasedir(), "target/logs/appenderB.log" );
+        rootLogger.addAppender( new FileAppender( new PatternLayout(), appenderFileB.getAbsolutePath() ) );
+        rootLogger.info( "test log B" );
+
+        files = manager.getLogFiles();
+        assertEquals( 2, files.size() );
+        assertTrue( files.contains( appenderFileA ) );
+        assertTrue( files.contains( appenderFileB ) );
+        
+        // test getLogFile() method
+        assertEquals(appenderFileA, manager.getLogFile( "appenderA.log" ));
+        assertEquals(appenderFileB, manager.getLogFile( "appenderB.log" ));
     }
 }

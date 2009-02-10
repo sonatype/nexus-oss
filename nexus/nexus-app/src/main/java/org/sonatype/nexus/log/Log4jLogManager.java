@@ -11,7 +11,7 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus;
+package org.sonatype.nexus.log;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,72 +21,78 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Appender;
+import org.apache.log4j.Category;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.sonatype.nexus.log.LogConfiguration;
-import org.sonatype.nexus.log.SimpleLog4jConfig;
 
 /**
- * Log4J file manager.
+ * Log4J log manager.
  * 
  * @author cstamas
+ * @author juven
  */
-@Component( role = LogFileManager.class )
-public class Log4jLogFileManager
+@Component( role = LogManager.class )
+public class Log4jLogManager
     extends AbstractLogEnabled
-    implements LogFileManager
+    implements LogManager
 {
     @Requirement
     private LogConfiguration<Properties> logConfiguration;
 
-    public Log4jLogFileManager()
+    public Log4jLogManager()
     {
         createLogDirectory();
     }
 
     public File getLogFile( String filename )
     {
-        Logger logger = Logger.getRootLogger();
+        Set<File> logFiles = getLogFiles();
 
-        @SuppressWarnings( "unchecked" )
-        Enumeration<Appender> appenders = logger.getAllAppenders();
-
-        while ( appenders.hasMoreElements() )
+        for ( File logFile : logFiles )
         {
-            Appender appender = appenders.nextElement();
-
-            if ( FileAppender.class.isAssignableFrom( appender.getClass() ) )
+            if ( logFile.getName().equals( filename ) )
             {
-                File logfile = new File( ( (FileAppender) appender ).getFile() );
-
-                if ( logfile.getName().equals( filename ) )
-                {
-                    return logfile;
-                }
+                return logFile;
             }
         }
 
         return null;
     }
 
+    @SuppressWarnings( { "deprecation", "unchecked" } )
     public Set<File> getLogFiles()
     {
-
-        Logger logger = Logger.getRootLogger();
-
-        @SuppressWarnings( "unchecked" )
-        Enumeration<Appender> appenders = logger.getAllAppenders();
-
         HashSet<File> files = new HashSet<File>();
+
+        files.addAll( getLogFiles( Logger.getRootLogger() ) );
+
+        Enumeration<Category> loggers = Logger.getCurrentCategories();
+
+        while ( loggers.hasMoreElements() )
+        {
+            Category logger = loggers.nextElement();
+
+            files.addAll( getLogFiles( logger ) );
+        }
+
+        return files;
+    }
+
+    @SuppressWarnings( "unchecked" )
+    protected Set<File> getLogFiles( Category logger )
+    {
+        HashSet<File> files = new HashSet<File>();
+
+        Enumeration<Appender> appenders = logger.getAllAppenders();
 
         while ( appenders.hasMoreElements() )
         {
             Appender appender = appenders.nextElement();
 
-            if ( FileAppender.class.isAssignableFrom( appender.getClass() ) )
+            if ( appender instanceof FileAppender )
             {
                 files.add( new File( ( (FileAppender) appender ).getFile() ) );
             }
