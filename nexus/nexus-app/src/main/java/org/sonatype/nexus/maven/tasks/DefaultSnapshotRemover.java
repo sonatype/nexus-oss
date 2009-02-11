@@ -145,7 +145,7 @@ public class DefaultSnapshotRemover
     protected SnapshotRemovalRepositoryResult removeSnapshotsFromMavenRepository( MavenRepository repository,
         SnapshotRemovalRequest request )
     {
-        SnapshotRemovalRepositoryResult result = new SnapshotRemovalRepositoryResult( repository.getId(), 0, 0 );
+        SnapshotRemovalRepositoryResult result = new SnapshotRemovalRepositoryResult( repository.getId(), 0, 0, true );
 
         // if this is not snap repo, do nothing
         if ( !RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
@@ -175,6 +175,11 @@ public class DefaultSnapshotRemover
 
         walker.walk( ctx );
 
+        if ( ctx.getStopCause() != null )
+        {
+            result.setSuccessful( false );
+        }
+        
         // and collect results
         result.setDeletedSnapshots( snapshotRemoverWalker.getDeletedSnapshots() );
         result.setDeletedFiles( snapshotRemoverWalker.getDeletedFiles() );
@@ -401,14 +406,25 @@ public class DefaultSnapshotRemover
                             TreeSet<ArtifactVersion> keys = new TreeSet<ArtifactVersion>( deletableSnapshotsAndFiles
                                 .keySet() );
 
-                            while ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
+                            while ( !keys.isEmpty()
+                                && remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
                             {
-                                remainingSnapshotsAndFiles.put( keys.last(), deletableSnapshotsAndFiles.get( keys
-                                    .last() ) );
+                                ArtifactVersion keyToMove = keys.last();
 
-                                deletableSnapshotsAndFiles.remove( keys.last() );
+                                if ( remainingSnapshotsAndFiles.containsKey( keyToMove ) )
+                                {
+                                    remainingSnapshotsAndFiles.get( keyToMove ).addAll(
+                                        deletableSnapshotsAndFiles.get( keyToMove ) );
+                                }
+                                else
+                                {
+                                    remainingSnapshotsAndFiles.put( keyToMove, deletableSnapshotsAndFiles
+                                        .get( keyToMove ) );
+                                }
 
-                                keys.remove( keys.last() );
+                                deletableSnapshotsAndFiles.remove( keyToMove );
+
+                                keys.remove( keyToMove );
                             }
 
                         }

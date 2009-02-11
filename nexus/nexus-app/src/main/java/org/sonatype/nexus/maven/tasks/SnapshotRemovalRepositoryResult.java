@@ -20,14 +20,18 @@ public class SnapshotRemovalRepositoryResult
     private int deletedSnapshots;
 
     private int deletedFiles;
+    
+    private boolean isSuccessful;
 
-    public SnapshotRemovalRepositoryResult( String repoId, int deletedSnapshots, int deletedFiles )
+    public SnapshotRemovalRepositoryResult( String repoId, int deletedSnapshots, int deletedFiles, boolean isSucceful )
     {
         this.repoId = repoId;
 
         this.deletedSnapshots = deletedSnapshots;
 
         this.deletedFiles = deletedFiles;
+        
+        this.isSuccessful = isSucceful;
     }
 
     public String getRepositoryId()
@@ -54,5 +58,17 @@ public class SnapshotRemovalRepositoryResult
     {
         this.deletedFiles = deletedFiles;
     }
+
+    public boolean isSuccessful()
+    {
+        return isSuccessful;
+    }
+
+    public void setSuccessful( boolean isSuccessful )
+    {
+        this.isSuccessful = isSuccessful;
+    }
+    
+    
 
 }

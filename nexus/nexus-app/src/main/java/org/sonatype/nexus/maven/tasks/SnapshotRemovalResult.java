@@ -20,11 +20,15 @@ public class SnapshotRemovalResult
 {
     private Map<String, SnapshotRemovalRepositoryResult> processedRepositories;
 
+    private boolean isSuccessful;
+
     public SnapshotRemovalResult()
     {
         super();
 
         this.processedRepositories = new HashMap<String, SnapshotRemovalRepositoryResult>();
+
+        this.isSuccessful = true;
     }
 
     public Map<String, SnapshotRemovalRepositoryResult> getProcessedRepositories()
@@ -46,6 +50,16 @@ public class SnapshotRemovalResult
         {
             processedRepositories.put( res.getRepositoryId(), res );
         }
+
+        if ( !res.isSuccessful() )
+        {
+            isSuccessful = false;
+        }
+    }
+
+    public boolean isSuccessful()
+    {
+        return isSuccessful;
     }
 
 }

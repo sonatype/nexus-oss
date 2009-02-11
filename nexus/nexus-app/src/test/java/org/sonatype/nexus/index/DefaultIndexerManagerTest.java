@@ -68,6 +68,6 @@ public class DefaultIndexerManagerTest
         // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT:jdk14:jar, 
         // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT:sources:jar
 
-        assertEquals( result.toString(), 6, result.size() );
+        assertEquals( result.toString(), 7, result.size() );
     }
 }

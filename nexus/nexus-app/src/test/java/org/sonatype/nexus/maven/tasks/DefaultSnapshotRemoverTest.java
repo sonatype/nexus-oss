@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +44,40 @@ public class DefaultSnapshotRemoverTest
             }
         }
     }
+    
+    /**
+     * @see <a href='https://issues.sonatype.org/browse/NEXUS-1331'>https://issues.sonatype.org/browse/NEXUS-1331</a>
+     * @throws Exception
+     */
+    public void testNexus1331()
+        throws Exception
+    {
+        fillInRepo();
+
+        getNexus().getRepository( "central" ).setLocalStatus( LocalStatus.OUT_OF_SERVICE );
+
+        // ---------------------------------
+        // make the jar should be deleted, while the pom should be kept
+        long threeDayAgo = System.currentTimeMillis() - 3 * 86400000L;
+
+        final URL snapshotsRootUrl = new URL( snapshots.getLocalUrl() );
+
+        final File snapshotsRoot = new File( snapshotsRootUrl.toURI() ).getAbsoluteFile();
+
+        File itemFile = new File(
+            snapshotsRoot,
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-3-SNAPSHOT/nexus-indexer-1.0-beta-3-SNAPSHOT.jar" );
+
+        itemFile.setLastModified( threeDayAgo );
+        // -----------------------------
+
+        SnapshotRemovalRequest snapshotRemovalRequest = new SnapshotRemovalRequest( snapshots.getId(), null, 3, 1, true );
+
+        SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
+
+        assertTrue( result.isSuccessful() );
+
+    }
 
     public void testSnapshotRemoverRemoveReleased()
         throws Exception
@@ -58,6 +94,8 @@ public class DefaultSnapshotRemoverTest
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
 
         assertEquals( 1, result.getProcessedRepositories().size() );
+        
+        assertTrue( result.isSuccessful() );
 
         HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
 
@@ -158,6 +196,8 @@ public class DefaultSnapshotRemoverTest
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
 
         assertEquals( 1, result.getProcessedRepositories().size() );
+        
+        assertTrue( result.isSuccessful() );
 
         HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
 
