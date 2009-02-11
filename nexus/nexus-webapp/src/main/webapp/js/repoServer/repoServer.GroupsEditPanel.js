@@ -370,7 +370,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
       emptyText: 'Click "Add" to create a Repository Group'
     }
   });
-  this.groupsGridPanel.on('rowclick', this.rowClick, this);
+  this.groupsGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
 // END: List ******************************************************
   // *********************************************************************
 
@@ -816,8 +816,7 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
     formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
   },
 
-  rowClick : function(grid, rowIndex, e){
-    var rec = grid.store.getAt(rowIndex);
+  rowSelect : function( selectionModel, index, rec ){
     var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
     var formPanel = this.formCards.findById(id);
 
