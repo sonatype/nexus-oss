@@ -104,14 +104,14 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
       },
       {
         xtype: 'combo',
-        fieldLabel: 'Format',
+        fieldLabel: 'Provider',
         itemCls: 'required-field',
-        helpText: ht.contentClass,
-        name: 'format',
+        helpText: ht.provider,
+        name: 'provider',
         width: this.COMBO_WIDTH,
         store: this.contentClassesDataStore,
         displayField:'description',
-        valueField:'format',
+        valueField: 'provider',
         editable: false,
         forceSelection: true,
         mode: 'local',
@@ -120,13 +120,19 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
         selectOnFocus:true,
         allowBlank: false,
         listeners: {
-          'select': {
-            fn: function(combo, record, index) {
-              this.onGroupTypeChange( record );
-            },
-            scope: this
-          }
-        }       
+          select: this.providerSelectHandler,
+          scope: this
+        }
+      },
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Format',
+        itemCls: 'required-field',
+        helpText: ht.format,
+        name: 'format',
+        width: 100,
+        disabled: true,
+        allowBlank: false
       },
       {
         xtype: 'panel',
@@ -873,8 +879,8 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
 //    }
 
     var trees = [
-      {obj : newConfig.items[3].items[0], postpend : '_group-repos-tree'},
-      {obj : newConfig.items[3].items[2], postpend : '_group-all-repos-tree'}
+      {obj : newConfig.items[4].items[0], postpend : '_group-repos-tree'},
+      {obj : newConfig.items[4].items[2], postpend : '_group-all-repos-tree'}
     ];
 
     for (var i = 0; i<trees.length; i++) {
@@ -961,8 +967,9 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
     
     return outputArr;
   },
-  
-  onGroupTypeChange : function( groupType ){  
+
+  providerSelectHandler: function( combo, rec, index ) {
+    combo.ownerCt.find( 'name', 'format' )[0].setValue( rec.data.format );
     this.loadRepoListHelper([], {}, this.formCards.getLayout().activeItem);
   }
 });
