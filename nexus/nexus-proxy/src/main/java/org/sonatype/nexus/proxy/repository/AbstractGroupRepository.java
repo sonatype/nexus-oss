@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.util.ContextUtils;
 
 /**
  * An abstract group repository. The specific behaviour (ie. metadata merge) should be implemented in subclases.
@@ -175,30 +176,41 @@ public abstract class AbstractGroupRepository
 
         for ( Repository repo : getRequestRepositories( uid ) )
         {
-            try
+            if ( !ContextUtils.collContains( context, ResourceStoreRequest.CTX_PROCESSED_REPOSITORIES, repo.getId() ) )
             {
-                RepositoryItemUid memberUid = repo.createUid( uid.getPath() );
-
-                StorageItem item = repo.retrieveItem( memberUid, context );
-
-                if ( item instanceof StorageCollectionItem )
+                try
                 {
-                    item = new DefaultStorageCollectionItem( this, uid.getPath(), true, false );
-                }
+                    RepositoryItemUid memberUid = repo.createUid( uid.getPath() );
 
-                return item;
+                    StorageItem item = repo.retrieveItem( memberUid, context );
+
+                    if ( item instanceof StorageCollectionItem )
+                    {
+                        item = new DefaultStorageCollectionItem( this, uid.getPath(), true, false );
+                    }
+
+                    return item;
+                }
+                catch ( IllegalOperationException e )
+                {
+                    // ignored
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    // ignored
+                }
+                catch ( StorageException e )
+                {
+                    // ignored
+                }
             }
-            catch ( IllegalOperationException e )
+            else
             {
-                // ignored
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // ignored
-            }
-            catch ( StorageException e )
-            {
-                // ignored
+                getLogger()
+                    .info(
+                        "A repository CYCLE detected (doRetrieveItem()), while processing group ID='" + this.getId()
+                            + "'. The repository with ID='" + repo.getId()
+                            + "' was already processed during this request! Requested: " + uid.toString() );
             }
         }
 
@@ -258,25 +270,37 @@ public abstract class AbstractGroupRepository
 
         for ( Repository repository : getRequestRepositories( uid ) )
         {
-            RepositoryItemUid muid = repository.createUid( uid.getPath() );
+            if ( !ContextUtils.collContains( context, ResourceStoreRequest.CTX_PROCESSED_REPOSITORIES, repository
+                .getId() ) )
+            {
+                RepositoryItemUid muid = repository.createUid( uid.getPath() );
 
-            try
-            {
-                StorageItem item = repository.retrieveItem( muid, context );
+                try
+                {
+                    StorageItem item = repository.retrieveItem( muid, context );
 
-                items.add( item );
+                    items.add( item );
+                }
+                catch ( StorageException e )
+                {
+                    throw e;
+                }
+                catch ( IllegalOperationException e )
+                {
+                    getLogger().warn( "Member repository request failed", e );
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    // that's okay
+                }
             }
-            catch ( StorageException e )
+            else
             {
-                throw e;
-            }
-            catch ( IllegalOperationException e )
-            {
-                getLogger().warn( "Member repository request failed", e );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // that's okay
+                getLogger()
+                .info(
+                    "A repository CYCLE detected (doRetrieveItems()), while processing group ID='" + this.getId()
+                        + "'. The repository with ID='" + repository.getId()
+                        + "' was already processed during this request! Requested: " + uid.toString() );
             }
         }
 
