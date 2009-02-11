@@ -27,6 +27,7 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.proxy.cache.CacheManager;
 
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase
@@ -46,6 +47,8 @@ public abstract class AbstractNexusTestCase
     protected static final File CONF_HOME = new File( WORK_HOME, "conf" );
 
     protected NexusConfiguration nexusConfiguration;
+    
+    protected CacheManager cacheManager;
 
     protected void customizeContext( Context ctx )
     {
@@ -103,6 +106,8 @@ public abstract class AbstractNexusTestCase
         throws Exception
     {
         super.setUp();
+        
+        this.cacheManager = this.lookup( CacheManager.class );
 
         FileUtils.deleteDirectory( PLEXUS_HOME );
 
@@ -127,6 +132,7 @@ public abstract class AbstractNexusTestCase
         throws Exception
     {
         super.tearDown();
+        this.cacheManager.stopService();
     }
 
     protected LoggerManager getLoggerManager() throws ComponentLookupException
