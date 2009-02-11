@@ -109,6 +109,7 @@ Sonatype.config = function() {
         roles: servicePath + '/roles',
         plexusRoles: servicePath + '/plexus_roles',
         plexusRolesAll: servicePath + '/plexus_roles/all',
+        externalRolesAll: servicePath + '/external_role_map/all',
         privileges: servicePath + '/privileges',
         repoTargets: servicePath + '/repo_targets',
         repoContentClasses: servicePath + '/components/repo_content_classes',

@@ -61,7 +61,8 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     {name:'sessionTimeout'},
     {name:'privileges'},
     {name:'roles'},
-    {name:'userManaged'}
+    {name:'userManaged'},
+    {name:'displayValues', mapping: 'id', convert: this.convertMapping.createDelegate( this )}
   ]);
   
   this.privRecordConstructor = Ext.data.Record.create([
@@ -70,6 +71,21 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     {name:'name', sortType:Ext.data.SortTypes.asUCString}
   ]);
   
+
+  this.externalMappingStore = new Ext.data.JsonStore( {
+    root: 'data',
+    id: 'defaultRole.roleId',
+    fields: [
+      { name: 'defaultRole' },
+      { name: 'mappedRoles' }
+    ],
+    url: Sonatype.config.repos.urls.externalRolesAll,
+    autoLoad: true,
+    listeners: {
+      load: function() { this.rolesDataStore.load(); },
+      scope: this
+    }
+  } );
   
   //Reader and datastore that queries the server for the list of currently defined roles
   this.rolesReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.roleRecordConstructor );
@@ -77,7 +93,6 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     url: Sonatype.config.repos.urls.roles,
     reader: this.rolesReader,
     sortInfo: {field: 'name', direction: 'ASC'},
-    autoLoad: true
   });
   
   this.privReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.privRecordConstructor );
@@ -371,8 +386,9 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     loadMask: true,
     deferredRender: false,
     columns: [
-      {header: 'Role Id', dataIndex: 'id', width:120, id: 'role-config-id-col'},
-      {header: 'Name', dataIndex: 'name', width:200, id: 'role-config-name-col'},
+      {header: 'Role Id', dataIndex: 'displayValues', width:120, id: 'role-config-id-col', renderer: function(v) { return v.id; }},
+      {header: 'Name', dataIndex: 'displayValues', width:200, id: 'role-config-name-col', renderer: function(v) { return v.name; }},
+      {header: 'Mapping', dataIndex: 'displayValues', width:100, id: 'role-config-mapping-col', renderer: function(v) { return v.mapping; }},
       {header: 'User Managed', dataIndex: 'userManaged', width:100, id: 'role-config-readonly-col'},
       {header: 'Session Timeout', dataIndex: 'sessionTimeout', width:100, id: 'role-config-session-timeout-col'},
       {header: 'Description', dataIndex: 'description', width:175, id: 'role-config-description-col'}      
@@ -430,6 +446,30 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     }, this.formCards);
     
     this.formCards.getLayout().setActiveItem(0);
+  },
+
+  convertMapping: function( value, parent ) {
+    var mappingRec = this.externalMappingStore.getById( parent.id );
+    if ( mappingRec ) {
+      var mappings = mappingRec.data.mappedRoles;
+      var s = '';
+      for ( var i = 0; i < mappings.length; i++ ) {
+        if ( s ) s += ', ';
+        s += mappings[i].source;
+      }
+      return {
+        id: '<b>' + parent.id + '</b>',
+        name: '<b>' + parent.name + '</b>',
+        mapping: s
+      };
+    }
+    else {
+      return {
+        id: parent.id,
+        name: parent.name,
+        mapping: ''
+      };
+    }
   },
   
   saveHandler : function(formInfoObj){
