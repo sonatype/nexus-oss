@@ -246,6 +246,82 @@ public class M1GavCalculatorTest
         assertEquals( "/xpp3/poms/xpp3_min-1.1.3.4.O.pom", path );
     }
 
+    public void testNEXUS1336()
+    	throws Exception 
+    {
+      Gav gav = gavCalculator.pathToGav( "/castor/ejbs/castor-ejb-1.0.7-SNAPSHOT-client.jar" );
+    	
+        assertEquals( "castor", gav.getGroupId() );
+        assertEquals( "castor-ejb", gav.getArtifactId() );
+        assertEquals( "1.0.7-SNAPSHOT", gav.getVersion() );
+        assertEquals( "1.0.7-SNAPSHOT", gav.getBaseVersion() );
+        assertEquals( "client", gav.getClassifier() );
+        assertEquals( "jar", gav.getExtension() );
+        assertEquals( null, gav.getSnapshotBuildNumber() );
+        assertEquals( null, gav.getSnapshotTimeStamp() );
+        assertEquals( "castor-ejb-1.0.7-SNAPSHOT-client.jar", gav.getName() );
+        assertEquals( true, gav.isSnapshot() );
+        assertEquals( false, gav.isHash() );
+        assertEquals( null, gav.getHashType() );
+
+        String path = gavCalculator.gavToPath( gav );
+        assertEquals( "/castor/ejbs/castor-ejb-1.0.7-SNAPSHOT-client.jar", path );
+        
+        gav = gavCalculator.pathToGav( "/castor/ejbs/castor-ejb-1.0.7.jar" );
+
+        assertEquals( "castor", gav.getGroupId() );
+        assertEquals( "castor-ejb", gav.getArtifactId() );
+        assertEquals( "1.0.7", gav.getVersion() );
+        assertEquals( "1.0.7", gav.getBaseVersion() );
+        assertEquals( null, gav.getClassifier() );
+        assertEquals( "jar", gav.getExtension() );
+        assertEquals( null, gav.getSnapshotBuildNumber() );
+        assertEquals( null, gav.getSnapshotTimeStamp() );
+        assertEquals( "castor-ejb-1.0.7.jar", gav.getName() );
+        assertEquals( false, gav.isSnapshot() );
+        assertEquals( false, gav.isHash() );
+        assertEquals( null, gav.getHashType() );
+
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/castor/jars/castor-ejb-1.0.7.jar", path );
+        
+        gav = gavCalculator.pathToGav( "/castor/ejbs/castor-ejb-1.0.7-SNAPSHOT-client.jar.sha1" );
+
+        assertEquals( "castor", gav.getGroupId() );
+        assertEquals( "castor-ejb", gav.getArtifactId() );
+        assertEquals( "1.0.7-SNAPSHOT", gav.getVersion() );
+        assertEquals( "1.0.7-SNAPSHOT", gav.getBaseVersion() );
+        assertEquals( "client", gav.getClassifier() );
+        assertEquals( "jar", gav.getExtension() );
+        assertEquals( null, gav.getSnapshotBuildNumber() );
+        assertEquals( null, gav.getSnapshotTimeStamp() );
+        assertEquals( "castor-ejb-1.0.7-SNAPSHOT-client.jar.sha1", gav.getName() );
+        assertEquals( true, gav.isSnapshot() );
+        assertEquals( true, gav.isHash() );
+        assertEquals( Gav.HashType.sha1, gav.getHashType() );
+
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/castor/ejbs/castor-ejb-1.0.7-SNAPSHOT-client.jar.sha1", path );
+        
+        gav = gavCalculator.pathToGav( "/castor/ejbs/castor-ejb-1.0.7-client.jar" );
+
+        assertEquals( "castor", gav.getGroupId() );
+        assertEquals( "castor-ejb", gav.getArtifactId() );
+        assertEquals( "1.0.7", gav.getVersion() );
+        assertEquals( "1.0.7", gav.getBaseVersion() );
+        assertEquals( "client", gav.getClassifier() );
+        assertEquals( "jar", gav.getExtension() );
+        assertEquals( null, gav.getSnapshotBuildNumber() );
+        assertEquals( null, gav.getSnapshotTimeStamp() );
+        assertEquals( "castor-ejb-1.0.7-client.jar", gav.getName() );
+        assertEquals( false, gav.isSnapshot() );
+        assertEquals( false, gav.isHash() );
+        assertEquals( null, gav.getHashType() );
+
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/castor/ejbs/castor-ejb-1.0.7-client.jar", path );
+    }
+    
     public void testGavExtreme()
         throws Exception
     {

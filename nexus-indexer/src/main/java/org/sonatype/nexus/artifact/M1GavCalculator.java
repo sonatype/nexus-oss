@@ -59,6 +59,13 @@ public class M1GavCalculator
             {
                 classifier = "javadoc";
             }
+            else if ( "ejbs".equals( middle )
+            		&& ( n.endsWith( "client.jar" ) 
+                		|| n.endsWith( "client.jar.sha1" ) 
+                		|| n.endsWith( "client.jar.md5" ) ) )
+            {
+            	classifier = "client";
+            }
 
             boolean snapshot = s.contains( "SNAPSHOT" );
 
@@ -178,6 +185,10 @@ public class M1GavCalculator
             {
                 path.append( "java-source" );
             }
+            else if ( gav.getClassifier().startsWith( "client" ) )
+            {
+            	path.append( "ejb" );
+        	}
             else
             {
                 path.append( gav.getClassifier() );
