@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1170;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,8 @@ import org.restlet.data.Response;
 import org.sonatype.jsecurity.model.CProperty;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.application.source.FileConfigurationSource;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -43,6 +46,9 @@ public class Nexus1170ReducePermissionChecking
     @SuppressWarnings("unchecked")
     private int getExpectedPrivilegeCount() throws Exception
     {
+        NexusConfiguration configuration = (NexusConfiguration) TestContainer.getInstance().lookup( NexusConfiguration.class );
+        ( ( FileConfigurationSource )configuration.getConfigurationSource()).setConfigurationFile( new File( getBasedir(), "target/plexus-home/nexus-work/conf/nexus.xml" ) );
+        configuration.loadConfiguration();
         ConfigurationManager configManager = (ConfigurationManager) TestContainer.getInstance().lookup( ConfigurationManager.class, "resourceMerging");
         
         Set<String> privIds = new HashSet<String>();
