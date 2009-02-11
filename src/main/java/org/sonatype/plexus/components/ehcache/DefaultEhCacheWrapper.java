@@ -76,7 +76,7 @@ public class DefaultEhCacheWrapper
     public void stop()
         throws StoppingException
     {
-        if ( this.ehCacheManager == null )
+        if ( this.ehCacheManager != null )
         {
 
             getLogger().info( "Shutting down EHCache manager." );
