@@ -83,6 +83,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     autoLoad: true,
     listeners: {
       load: function() { this.rolesDataStore.load(); },
+      loadexception: function() { this.rolesDataStore.load(); },
       scope: this
     }
   } );
@@ -438,7 +439,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   //Dump the currently stored data and requery for everything
   reloadAll : function(){
     this.rolesDataStore.removeAll();
-    this.rolesDataStore.reload();
+    this.externalMappingStore.removeAll();
+    this.externalMappingStore.reload();
     this.privDataStore.removeAll();
     this.privDataStore.reload();
     this.formCards.items.each(function(item, i, len){
