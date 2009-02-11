@@ -502,7 +502,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     }
   },
   
-  addResourceHandler : function() {
+  addResourceHandler : function( valueRec ) {
 	
     var id = 'new_role_' + new Date().getTime();
 
@@ -546,6 +546,15 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     
     //add new form
     this.formCards.add(formPanel);
+
+    if ( valueRec ) {
+      formPanel.initialData = { 
+        id: valueRec.data.roleId, 
+        name: valueRec.data.name,
+        description: 'External mapping for ' + valueRec.data.name + ' (' + valueRec.data.source + ')', 
+        sessionTimeout: 60
+      };
+    }
     
     //always set active and re-layout
     this.formCards.getLayout().setActiveItem(formPanel);
@@ -566,6 +575,9 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         });
       });
     }.defer(300, formPanel);
+    if ( formPanel.initialData ) {
+      formPanel.getForm().setValues( formPanel.initialData );
+    }
   },
     
   deleteHandler : function(){
@@ -1201,37 +1213,11 @@ Ext.extend( Sonatype.repoServer.ExternapRoleMappingPopup, Ext.Window, {
   },
 
   createRoleMapping: function( button, e ) {
-//    var source = this.find( 'name', 'source' )[0].getValue();
-//    var roleId = this.find( 'name', 'roleId' )[0].getValue();
-//
-//    Ext.Ajax.request({
-//      scope: this,
-//      method: 'POST',
-//      jsonData: {
-//        data: {
-//          source: source,
-//          roleId: roleId
-//        }
-//      },
-//      url: Sonatype.config.repos.urls.externalRoleMapping,
-//      success: this.mappingSuccess,
-//      failure: this.mappingFailure,
-//      scope: this
-//    } );
-//  },
-//  
-//  mappingSuccess: function( response, options ){
-//    this.close();
-//    this.hostPanel.dataStore.reload();
-//  },
-//  
-//  mappingFailure: function( response, options ) {
-//    var r = Ext.decode( response.responseText );
-//    if ( r.errors ) {
-//      this.find( 'name', 'roleId' )[0].markInvalid( r.errors[0].msg );
-//    }
-//    else {
-//      Sonatype.utils.connectionError( response, 'There was a problem mapping an external role.' );
-//    }
+    if ( this.hostPanel ) {
+      var roleId = this.find( 'name', 'roleId' )[0].getValue();
+      var roleRec = this.roleStore.getById( roleId );
+      this.hostPanel.addResourceHandler( roleRec );
+      this.close();
+    }
   }
 } );
