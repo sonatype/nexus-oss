@@ -174,7 +174,6 @@ public class MirrorMessageUtils
         for ( MirrorResource resource : ( List<MirrorResource> ) resourceResponse.getData() )
         {
             Assert.assertNotNull( "URL shouldn't be null", resource.getUrl() );
-            Assert.assertEquals( StringDigester.getSha1Digest( resource.getUrl() ), resource.getId() );
         }
         
         return resourceResponse;
