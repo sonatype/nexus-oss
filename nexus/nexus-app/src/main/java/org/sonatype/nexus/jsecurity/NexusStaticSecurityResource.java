@@ -22,12 +22,8 @@ import org.sonatype.jsecurity.model.CProperty;
 import org.sonatype.jsecurity.model.Configuration;
 import org.sonatype.jsecurity.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.jsecurity.realms.tools.StaticSecurityResource;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-import org.sonatype.nexus.jsecurity.realms.RepositoryGroupViewPrivilegeDescriptor;
+import org.sonatype.nexus.jsecurity.realms.RepositoryPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.RepositoryViewPrivilegeDescriptor;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
@@ -35,6 +31,7 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 @Component( role = StaticSecurityResource.class, hint = "NexusStaticSecurityResource" )
 public class NexusStaticSecurityResource
@@ -42,10 +39,7 @@ public class NexusStaticSecurityResource
     implements StaticSecurityResource,
         EventListener,
         Initializable
-{
-    @Requirement
-    NexusConfiguration nexusConfig;
-    
+{    
     @Requirement
     RepositoryRegistry repoRegistry;
     
@@ -64,66 +58,37 @@ public class NexusStaticSecurityResource
     {
         Configuration configuration = new Configuration();
         
-        configuration.addPrivilege( buildRepositoryPrivilege(
+        configuration.addPrivilege( buildPrivilege(
             "Repository (All) - (view)",
             "Privilege that gives view access to all repositories.",
             "*" ) );
         
-        configuration.addPrivilege( buildGroupPrivilege(
-            "Repository Group (All) - (view)",
-            "Privilege that gives view access to all repository groups.",
-            "*" ) );
-        
-        for ( CRepository repo : nexusConfig.listRepositories() )
+        for ( Repository repo : repoRegistry.getRepositories() )
         {
-            configuration.addPrivilege( buildRepositoryPrivilege(
+            configuration.addPrivilege( buildPrivilege(
                 "Repository (" + repo.getName() + ") - (view)",
                 "Privilege that gives view access to the " + repo.getName() + " repository.",
                 repo.getId() ) );
         }
         
-        for ( CRepositoryGroup group : nexusConfig.listRepositoryGroups() )
-        {
-            configuration.addPrivilege( buildGroupPrivilege(
-                "Repository Group (" + group.getName() + ") - (view)",
-                "Privilege that gives view access to the " + group.getName() + " repository group.",
-                group.getGroupId() ) );
-        }
             
         setDirty( false );
         
         return configuration;
     }
     
-    protected CPrivilege buildRepositoryPrivilege( String name, String description, String repoId )
+    protected CPrivilege buildPrivilege( String name, String description, String repoId )
     {
         CPrivilege priv = new CPrivilege();
         
-        priv.setId( "repository-" + ( repoId.equals( "*" ) ? "admin" : repoId ) );
+        priv.setId( "repository-" + ( repoId.equals( "*" ) ? "all" : repoId ) );
         priv.setName( name );
         priv.setDescription( description );
         priv.setType( RepositoryViewPrivilegeDescriptor.TYPE );
         
         CProperty prop = new CProperty();
-        prop.setKey( TargetPrivilegeRepositoryPropertyDescriptor.ID );
+        prop.setKey( RepositoryPropertyDescriptor.ID );
         prop.setValue( repoId );        
-        priv.addProperty( prop );
-        
-        return priv;
-    }
-    
-    protected CPrivilege buildGroupPrivilege( String name, String description, String groupId )
-    {
-        CPrivilege priv = new CPrivilege();
-        
-        priv.setId( "group-" + ( groupId.equals( "*" ) ? "admin" : groupId ) );
-        priv.setName( name );
-        priv.setDescription( description );
-        priv.setType( RepositoryGroupViewPrivilegeDescriptor.TYPE );
-        
-        CProperty prop = new CProperty();
-        prop.setKey( TargetPrivilegeGroupPropertyDescriptor.ID );
-        prop.setValue( groupId );        
         priv.addProperty( prop );
         
         return priv;

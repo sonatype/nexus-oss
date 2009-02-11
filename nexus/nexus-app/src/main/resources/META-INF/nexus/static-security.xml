@@ -63,6 +63,7 @@
             <privileges>
                 <privilege>T1</privilege>
                 <privilege>T2</privilege>
+                <privilege>repository-all</privilege>
             </privileges>
         </role>
         <role>
@@ -79,6 +80,7 @@
                 <privilege>T6</privilege>
                 <privilege>T7</privilege>
                 <privilege>T8</privilege>
+                <privilege>repository-all</privilege>
             </privileges>
         </role>
         <role>

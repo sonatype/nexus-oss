@@ -29,7 +29,8 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
     data: [['repository',this.convertRepositoryProperty.createDelegate( this )],
            ['repogroup',this.convertRepoGroupProperty.createDelegate( this )],
            ['repotarget',this.convertRepoTargetProperty.createDelegate( this )],
-           ['string',this.convertStringProperty.createDelegate( this )]] 
+           ['string',this.convertStringProperty.createDelegate( this )],
+           ['repoOrGroup',this.convertRepoOrGroupProperty.createDelegate( this )]] 
   });
   
   this.privilegeTypeStore = new Ext.data.JsonStore( {
@@ -153,7 +154,21 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
   convertRepository: function( value, parent ) {
     var targetPriv = false;
     for ( var i = 0; i < parent.properties.length; i++){
-      if ( parent.properties[i].key == 'repositoryId'
+      if ( parent.properties[i].key == 'repositoryOrGroupId'){
+        if ( Ext.isEmpty(parent.properties[i].value)
+            || '*' == parent.properties[i].value){
+          return 'All Repositories';
+        }
+        else {
+          var result = this.convertDataValue( parent.properties[i].value, this.repoStore, 'id', 'name' );
+          
+          if ( Ext.isEmpty( result ) ){
+            result = this.convertDataValue( parent.properties[i].value, this.groupStore, 'id', 'name' );
+          }
+          return result;
+        }
+      }
+      else if ( parent.properties[i].key == 'repositoryId'
         && !Ext.isEmpty(parent.properties[i].value) ){
         if ( '*' == parent.properties[i].value){
           return 'All Repositories';
@@ -235,6 +250,22 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
     }
     else if ( !Ext.isEmpty( value ) ){
       return this.convertDataValue( value, this.groupStore, 'id', 'name' );
+    }
+    return '';
+  },
+  
+  convertRepoOrGroupProperty: function( value, parent ) {
+    if ( Ext.isEmpty( value ) 
+        || '*' == value ) {
+      return 'All Repositories';
+    }
+    else {
+      var result = this.convertDataValue( value, this.repoStore, 'id', 'name' );
+      
+      if ( Ext.isEmpty( result ) ){
+        result = this.convertDataValue( value, this.groupStore, 'id', 'name' );
+      }
+      return result;        
     }
     return '';
   },

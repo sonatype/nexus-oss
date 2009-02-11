@@ -20,7 +20,7 @@ public class RepositoryViewPrivilegeDescriptor
 {
     public static final String TYPE = "repository";
     
-    @Requirement( role = PrivilegePropertyDescriptor.class, hint = "TargetPrivilegeRepositoryPropertyDescriptor" )
+    @Requirement( role = PrivilegePropertyDescriptor.class, hint = "RepositoryPropertyDescriptor" )
     private PrivilegePropertyDescriptor repoProperty;
     
     public String getName()
@@ -56,7 +56,7 @@ public class RepositoryViewPrivilegeDescriptor
             repoId = "*";
         }
   
-        return "nexus:repogroup:" + repoId;
+        return "nexus:repoview:" + repoId;
     }
     
     @Override
@@ -74,6 +74,6 @@ public class RepositoryViewPrivilegeDescriptor
     
     public static String buildPermission( String repoId )
     {
-        return "nexus:repogroup:" + repoId;
+        return "nexus:repoview:" + repoId;
     }
 }
