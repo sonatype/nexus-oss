@@ -62,7 +62,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     {name:'privileges'},
     {name:'roles'},
     {name:'userManaged'},
-    {name:'displayValues', mapping: 'id', convert: this.convertMapping.createDelegate( this )}
+    {name:'mapping', mapping: 'id', convert: this.convertMapping.createDelegate( this )}
   ]);
   
   this.privRecordConstructor = Ext.data.Record.create([
@@ -387,9 +387,17 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     loadMask: true,
     deferredRender: false,
     columns: [
-      {header: 'Role Id', dataIndex: 'displayValues', width:120, id: 'role-config-id-col', renderer: function(v) { return v.id; }},
-      {header: 'Name', dataIndex: 'displayValues', width:200, id: 'role-config-name-col', renderer: function(v) { return v.name; }},
-      {header: 'Mapping', dataIndex: 'displayValues', width:100, id: 'role-config-mapping-col', renderer: function(v) { return v.mapping; }},
+      { header: 'Role Id', dataIndex: 'id', width:120, id: 'role-config-id-col', 
+        renderer: function( value, meta, rec, index ) { 
+          return rec.data.mapping ? ( '<b>' + value + '</b' ) : value; 
+        }
+      },
+      { header: 'Name', dataIndex: 'name', width:200, id: 'role-config-name-col',
+        renderer: function( value, meta, rec, index ) { 
+          return rec.data.mapping ? ( '<b>' + value + '</b' ) : value;
+        }
+      },
+      {header: 'Mapping', dataIndex: 'mapping', width:100, id: 'role-config-mapping-col'},
       {header: 'User Managed', dataIndex: 'userManaged', width:100, id: 'role-config-readonly-col'},
       {header: 'Session Timeout', dataIndex: 'sessionTimeout', width:100, id: 'role-config-session-timeout-col'},
       {header: 'Description', dataIndex: 'description', width:175, id: 'role-config-description-col'}      
@@ -451,7 +459,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   },
 
   convertMapping: function( value, parent ) {
-    var mappingRec = this.externalMappingStore.getById( parent.id );
+    var mappingRec = this.externalMappingStore.getById( value );
     if ( mappingRec ) {
       var mappings = mappingRec.data.mappedRoles;
       var s = '';
@@ -459,18 +467,10 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         if ( s ) s += ', ';
         s += mappings[i].source;
       }
-      return {
-        id: '<b>' + parent.id + '</b>',
-        name: '<b>' + parent.name + '</b>',
-        mapping: s
-      };
+      return s;
     }
     else {
-      return {
-        id: parent.id,
-        name: parent.name,
-        mapping: ''
-      };
+      return '';
     }
   },
   
@@ -544,7 +544,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     }
   },
   
-  addResourceHandler : function( valueRec ) {
+  addResourceHandler : function( button, event, valueRec ) {
 	
     var id = 'new_role_' + new Date().getTime();
 
@@ -574,13 +574,16 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     this.initializePrivilegesTreeHelper(formPanel);
     
     //add place holder to grid
-    var newRec = new this.roleRecordConstructor({
+    var newRec = new this.roleRecordConstructor(
+      {
         id : 'new_role_',
         name : 'New Role',
         resourceURI : 'new',
-        userManaged : true
+        userManaged : true,
+        mapping: valueRec ? valueRec.data.source : ''
       },
       id); //use "new_role_" id instead of resourceURI like the reader does
+    newRec.data.valueRec = valueRec;
     this.rolesDataStore.insert(0, [newRec]);
     this.rolesGridPanel.getSelectionModel().selectRow(0);
     
@@ -719,6 +722,26 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
       var isNew = action.options.isNew;
       var receivedData = action.handleResponse(action.response).data;
       if (isNew) {
+        var oldRec = this.rolesDataStore.getById( action.options.fpanel.id );
+        if ( oldRec.data.valueRec ) {
+          var valueRec = oldRec.data.valueRec; 
+          // fake a new mapping so we won't have to reload the whole external mapping resource
+          var mappingRec = this.externalMappingStore.getById( oldRec );
+          if ( ! mappingRec ) {
+            mappingRec = new this.externalMappingStore.reader.recordType( {
+              defaultRole: {
+                roleId: receivedData.id,
+                name: receivedData.name,
+                source: 'default'
+              },
+              mappedRoles: []
+            },
+            receivedData.id );
+            this.externalMappingStore.add( [mappingRec] );
+          }
+          mappingRec.data.mappedRoles.push( valueRec.data );
+        }
+
         //successful create        
         var dataObj = {
           id : receivedData.id,
@@ -728,14 +751,15 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
           privileges : receivedData.privileges,
           roles : receivedData.roles,
           sessionTimeout : receivedData.sessionTimeout,
-          userManaged : receivedData.userManaged
+          userManaged : receivedData.userManaged,
+          mapping: this.convertMapping( receivedData.id, receivedData )
         };
         
         var newRec = new this.roleRecordConstructor(
           dataObj,
           action.options.fpanel.id);
         
-        this.rolesDataStore.remove(this.rolesDataStore.getById(action.options.fpanel.id)); //remove old one
+        this.rolesDataStore.remove(oldRec); //remove old one
         this.rolesDataStore.addSorted(newRec);
         this.rolesGridPanel.getSelectionModel().selectRecords([newRec], false);
 
@@ -793,6 +817,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         rec.set('sessionTimeout', receivedData.sessionTimeout);
         rec.set('roles', receivedData.roles);
         rec.set('userManaged', receivedData.userManaged);
+        rec.set('mapping', this.convertMapping( receivedData.id, receivedData ));
         rec.commit();
         rec.endEdit();
   },
@@ -1258,7 +1283,7 @@ Ext.extend( Sonatype.repoServer.ExternapRoleMappingPopup, Ext.Window, {
     if ( this.hostPanel ) {
       var roleId = this.find( 'name', 'roleId' )[0].getValue();
       var roleRec = this.roleStore.getById( roleId );
-      this.hostPanel.addResourceHandler( roleRec );
+      this.hostPanel.addResourceHandler( button, e, roleRec );
       this.close();
     }
   }
