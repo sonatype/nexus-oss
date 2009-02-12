@@ -577,6 +577,15 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     
     //add new form
     this.formCards.add(formPanel);
+
+    if ( valueRec ) {
+      formPanel.initialData = { 
+        id: valueRec.data.roleId, 
+        name: valueRec.data.name,
+        description: 'External mapping for ' + valueRec.data.name + ' (' + valueRec.data.source + ')', 
+        sessionTimeout: 60
+      };
+    }
     
     //add place holder to grid
     var newRec = new this.roleRecordConstructor(
@@ -591,15 +600,6 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     newRec.data.valueRec = valueRec;
     this.rolesDataStore.insert(0, [newRec]);
     this.rolesGridPanel.getSelectionModel().selectRow(0);
-
-    if ( valueRec ) {
-      formPanel.initialData = { 
-        id: valueRec.data.roleId, 
-        name: valueRec.data.name,
-        description: 'External mapping for ' + valueRec.data.name + ' (' + valueRec.data.source + ')', 
-        sessionTimeout: 60
-      };
-    }
     
     //always set active and re-layout
     formPanel.doLayout();
