@@ -72,8 +72,23 @@ public class RepositoryViewPrivilegeDescriptor
         return response;
     }
     
+    /**
+     * Util method that returns the permission string used by jsecurity.
+     * @param repoId
+     * @return
+     */
     public static String buildPermission( String repoId )
     {
         return "nexus:repoview:" + repoId;
+    }
+    
+    /**
+     * Util method that returns the privilege string as it would be added to a role.
+     * @param repoId
+     * @return
+     */
+    public static String buildPrivilege( String repoId )
+    {
+        return "repository-" + ( repoId.equals( "*" ) ? "all" : repoId );
     }
 }

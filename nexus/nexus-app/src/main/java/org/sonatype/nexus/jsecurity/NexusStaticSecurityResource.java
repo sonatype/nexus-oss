@@ -81,7 +81,7 @@ public class NexusStaticSecurityResource
     {
         CPrivilege priv = new CPrivilege();
         
-        priv.setId( "repository-" + ( repoId.equals( "*" ) ? "all" : repoId ) );
+        priv.setId( RepositoryViewPrivilegeDescriptor.buildPrivilege( repoId ) );
         priv.setName( name );
         priv.setDescription( description );
         priv.setType( RepositoryViewPrivilegeDescriptor.TYPE );
