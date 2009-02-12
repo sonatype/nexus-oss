@@ -897,7 +897,7 @@
             <properties>
                 <property>
                     <key>method</key>
-                    <value>nexus:tasks</value>
+                    <value>read</value>
                 </property>
                 <property>
                     <key>permission</key>
