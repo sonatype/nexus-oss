@@ -48,7 +48,7 @@ public class DefaultSecurityConfigurationUpgraderTest
         w.write( sw, configuration );
 
         String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path + ".result" ) );
-
+        
         assertEquals( shouldBe, sw.toString() );
     }
 

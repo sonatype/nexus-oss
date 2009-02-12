@@ -77,6 +77,8 @@ public class Nexus477ArtifactsCrudTests
     public void deleteTest()
         throws IOException
     {
+        Assert.fail( "Delete test should fail, no view privilege?" );
+        
         Gav gav =
             new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
                      null, false, null );
@@ -125,6 +127,7 @@ public class Nexus477ArtifactsCrudTests
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         this.giveUserPrivilege( "test-user", "T1" );
+        this.giveUserPrivilege( "test-user", "repository-"+this.getTestRepositoryId() );
         
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );

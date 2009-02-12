@@ -395,7 +395,7 @@ public class DefaultRepositoryRouter
     // XXX: a todo here is to make the "aliases" ("groups" for GroupRepository.class) dynamic,
     // and even think about new layout: every kind should have it's own "folder", you don't want to see
     // maven2 and P2 repositories along each other...
-    protected RequestRoute getRequestRouteForRequest( ResourceStoreRequest request )
+    public RequestRoute getRequestRouteForRequest( ResourceStoreRequest request )
         throws ItemNotFoundException
     {
         RequestRoute result = new RequestRoute();

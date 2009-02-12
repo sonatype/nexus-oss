@@ -28,8 +28,11 @@ import org.jsecurity.web.WebUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.proxy.router.RequestRoute;
 
 /**
  * A filter that maps the targetId from the Request.
@@ -45,7 +48,9 @@ public class NexusTargetMappingAuthorizationFilter
 
     private String pathReplacement;
 
-    private NexusItemAuthorizer authorizer = null;
+    private AccessManager accessManager = null;
+
+    private RepositoryRouter repoRouter = null;
 
     public String getPathPrefix()
     {
@@ -172,13 +177,14 @@ public class NexusTargetMappingAuthorizationFilter
             }
         }
 
-        if ( authorizer == null )
+        if ( accessManager == null || repoRouter == null )
         {
             PlexusContainer plexus = (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
 
             try
             {
-                authorizer = (NexusItemAuthorizer) plexus.lookup( NexusItemAuthorizer.class );
+                accessManager = plexus.lookup( AccessManager.class );
+                repoRouter = plexus.lookup( RepositoryRouter.class );
             }
             catch ( ComponentLookupException e )
             {
@@ -186,6 +192,22 @@ public class NexusTargetMappingAuthorizationFilter
             }
         }
 
-        return authorizer.authorizePath( getResourceStoreRequest( request, true ), getActionFromHttpVerb( request ) );
+        // try to authorize the request
+        try
+        {
+            ResourceStoreRequest resourceStoreRequest = getResourceStoreRequest( request, true );
+            RequestRoute route = repoRouter.getRequestRouteForRequest( resourceStoreRequest );
+            accessManager.decide( resourceStoreRequest, route.getTargetedRepository(), getActionFromHttpVerb( request ) );
+            return true;
+        }
+        catch ( AccessDeniedException e )
+        {
+            return false;
+        }
+        catch ( ItemNotFoundException e )
+        {
+           return false;
+        }
+
     }
 }

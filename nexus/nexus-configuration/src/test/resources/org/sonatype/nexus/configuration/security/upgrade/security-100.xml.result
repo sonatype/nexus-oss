@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <security>
-  <version>2.0.2</version>
+  <version>2.0.3</version>
   <users>
     <user>
       <id>admin</id>
@@ -41,6 +41,7 @@
         <privilege>T8</privilege>
         <privilege>64</privilege>
         <privilege>2</privilege>
+        <privilege>repository-all</privilege>
       </privileges>
       <roles>
         <role>anonymous-customized</role>
@@ -67,6 +68,7 @@
         <privilege>T1</privilege>
         <privilege>T2</privilege>
         <privilege>T3</privilege>
+        <privilege>repository-all</privilege>
       </privileges>
     </role>
     <role>

@@ -34,15 +34,15 @@ public interface NexusItemAuthorizer
      */
     boolean authorizePath( RepositoryItemUid uid, Map<String, Object> context, Action action );
 
-    /**
-     * Authorizes a root level ResourceStoreRequest against an Action.
-     * 
-     * @param request
-     * @param rsr
-     * @param action
-     * @return
-     */
-    boolean authorizePath( ResourceStoreRequest rsr, Action action );
+//    /**
+//     * Authorizes a root level ResourceStoreRequest against an Action.
+//     * 
+//     * @param request
+//     * @param rsr
+//     * @param action
+//     * @return
+//     */
+//    boolean authorizePath( ResourceStoreRequest rsr, Action action );
     
     /**
      * Used to authorize a simple permission string

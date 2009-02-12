@@ -90,8 +90,13 @@ public class Nexus537RepoTargetsTests
     private Gav repo2FooArtifactDelete;
 
     private static final String REPO1_ID = "repo1";
+    private static final String REPO1_VIEW_PERMISSION = "repository-"+ REPO1_ID;
 
     private static final String REPO2_ID = "repo2";
+    private static final String REPO2_VIEW_PERMISSION = "repository-"+ REPO2_ID;
+    
+    private static final String GROUP_ID = "test-group";
+    private static final String GROUP_VIEW_PERMISSION = "repository-"+ GROUP_ID;
 
     public Nexus537RepoTargetsTests()
     {
@@ -134,7 +139,7 @@ public class Nexus537RepoTargetsTests
     public void resetTestUserPrivs()
         throws Exception
     {
-        this.overwriteUserRole( TEST_USER_NAME, "doReadTest-noAccess", "17" );
+        this.overwriteUserRole( TEST_USER_NAME, "doReadTest-noAccess", "17", GROUP_VIEW_PERMISSION, REPO1_VIEW_PERMISSION, REPO2_VIEW_PERMISSION );
         // "6", "14","19","44","54","55","56","57","58","64","70"
         this.printUserPrivs( TEST_USER_NAME );
 
@@ -154,7 +159,7 @@ public class Nexus537RepoTargetsTests
         this.download( REPO2_ID, repo2FooArtifact, false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "fooPrivReadId", this.fooPrivReadId );
+        this.overwriteUserRole( TEST_USER_NAME, "fooPrivReadId", this.fooPrivReadId, GROUP_VIEW_PERMISSION, REPO1_VIEW_PERMISSION, REPO2_VIEW_PERMISSION );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -165,7 +170,7 @@ public class Nexus537RepoTargetsTests
         this.download( REPO2_ID, repo2FooArtifact, false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "barPrivReadId", this.barPrivReadId );
+        this.overwriteUserRole( TEST_USER_NAME, "barPrivReadId", this.barPrivReadId, GROUP_VIEW_PERMISSION, REPO1_VIEW_PERMISSION, REPO2_VIEW_PERMISSION );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -176,7 +181,7 @@ public class Nexus537RepoTargetsTests
         this.download( REPO2_ID, repo2FooArtifact, false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "groupPrivReadId", this.groupFooPrivReadId );
+        this.overwriteUserRole( TEST_USER_NAME, "groupPrivReadId", this.groupFooPrivReadId, GROUP_VIEW_PERMISSION, REPO1_VIEW_PERMISSION, REPO2_VIEW_PERMISSION );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -188,9 +193,9 @@ public class Nexus537RepoTargetsTests
         this.groupDownload( repo2FooArtifact, true );
 
         this.download( REPO1_ID, repo1BarArtifact, false ); 
-        this.download( REPO1_ID, repo1FooArtifact, false ); // can't access directly
+        this.download( REPO1_ID, repo1FooArtifact, true ); // has direct access
         this.download( REPO2_ID, repo2BarArtifact, false );
-        this.download( REPO2_ID, repo2FooArtifact, false ); // can't access directly
+        this.download( REPO2_ID, repo2FooArtifact, true ); // has access to group
 
     }
 
@@ -206,10 +211,10 @@ public class Nexus537RepoTargetsTests
         this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
         this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
         this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
+        this.deploy( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "fooPrivUpdateId", this.fooPrivUpdateId, this.fooPrivCreateId );
+        this.overwriteUserRole( TEST_USER_NAME, "fooPrivUpdateId", this.fooPrivUpdateId, this.fooPrivCreateId, GROUP_VIEW_PERMISSION, REPO1_VIEW_PERMISSION, REPO2_VIEW_PERMISSION );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -217,10 +222,10 @@ public class Nexus537RepoTargetsTests
         this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
         this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true );
         this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
+        this.deploy( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "barPrivUpdateId", this.barPrivUpdateId, this.barPrivCreateId );
+        this.overwriteUserRole( TEST_USER_NAME, "barPrivUpdateId", this.barPrivUpdateId, this.barPrivCreateId, GROUP_VIEW_PERMISSION, REPO1_VIEW_PERMISSION, REPO2_VIEW_PERMISSION );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -228,18 +233,18 @@ public class Nexus537RepoTargetsTests
         this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), true );
         this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
         this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
+        this.deploy( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "groupFooPrivUpdateId", this.groupFooPrivUpdateId );
+        this.overwriteUserRole( TEST_USER_NAME, "groupFooPrivUpdateId", this.groupFooPrivUpdateId, this.groupFooPrivCreateId, GROUP_VIEW_PERMISSION, REPO1_VIEW_PERMISSION, REPO2_VIEW_PERMISSION );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
-        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
+        this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false ); 
+        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true ); // has direct access
         this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
+        this.deploy( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true ); // has access from group
 
     }
 
@@ -254,10 +259,10 @@ public class Nexus537RepoTargetsTests
         this.upload( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
         this.upload( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
         this.upload( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.upload( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
+        this.upload( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "fooPrivUpdateId", this.fooPrivUpdateId, this.fooPrivCreateId, "65" ); // 65
+        this.overwriteUserRole( TEST_USER_NAME, "fooPrivUpdateId", this.fooPrivUpdateId, this.fooPrivCreateId, "65", GROUP_VIEW_PERMISSION, REPO1_VIEW_PERMISSION, REPO2_VIEW_PERMISSION ); // 65
         // is
         // upload
         // priv
@@ -268,10 +273,10 @@ public class Nexus537RepoTargetsTests
         this.upload( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
         this.upload( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true );
         this.upload( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.upload( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
+        this.upload( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "barPrivUpdateId", this.barPrivUpdateId, this.barPrivCreateId, "65" );
+        this.overwriteUserRole( TEST_USER_NAME, "barPrivUpdateId", this.barPrivUpdateId, this.barPrivCreateId, "65", GROUP_VIEW_PERMISSION, REPO1_VIEW_PERMISSION, REPO2_VIEW_PERMISSION );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -279,18 +284,18 @@ public class Nexus537RepoTargetsTests
         this.upload( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), true );
         this.upload( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
         this.upload( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.upload( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
+        this.upload( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "groupFooPrivUpdateId", this.groupFooPrivUpdateId, "65" );
+        this.overwriteUserRole( TEST_USER_NAME, "groupFooPrivUpdateId", this.groupFooPrivUpdateId, "65", GROUP_VIEW_PERMISSION, REPO1_VIEW_PERMISSION, REPO2_VIEW_PERMISSION );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         this.upload( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
-        this.upload( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
+        this.upload( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true ); // has direct access
         this.upload( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.upload( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
+        this.upload( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true ); // has access from group
     }
 
     @Test
@@ -318,7 +323,7 @@ public class Nexus537RepoTargetsTests
         this.delete( repo2FooArtifactDelete, REPO2_ID, false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "fooPrivDeleteId", this.fooPrivDeleteId );
+        this.overwriteUserRole( TEST_USER_NAME, "fooPrivDeleteId", this.fooPrivDeleteId, GROUP_VIEW_PERMISSION, REPO1_VIEW_PERMISSION, REPO2_VIEW_PERMISSION );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -329,7 +334,7 @@ public class Nexus537RepoTargetsTests
         this.delete( repo2FooArtifactDelete, REPO2_ID, false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "fooPrivDeleteId", this.barPrivDeleteId );
+        this.overwriteUserRole( TEST_USER_NAME, "fooPrivDeleteId", this.barPrivDeleteId, GROUP_VIEW_PERMISSION, REPO1_VIEW_PERMISSION, REPO2_VIEW_PERMISSION );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -426,7 +431,7 @@ public class Nexus537RepoTargetsTests
         File result = null;
         try
         {
-            result = this.downloadArtifactFromGroup( "test-group", gav, "target/nexus537jars/" );
+            result = this.downloadArtifactFromGroup( GROUP_ID, gav, "target/nexus537jars/" );
             Assert.assertTrue( "Artifact download should have thrown exception", shouldDownload );
         }
         catch ( IOException e )
@@ -526,7 +531,7 @@ public class Nexus537RepoTargetsTests
         groupPriv.setName( "GroupPriv" );
         groupPriv.setType( TargetPrivilegeDescriptor.TYPE );
         groupPriv.setRepositoryTargetId( fooTarget.getId() );
-        groupPriv.setRepositoryGroupId( "test-group" );
+        groupPriv.setRepositoryGroupId( GROUP_ID );
         // groupPriv.setRepositoryId( repositoryId )
         // groupPriv.setName( name )
         // groupPriv.setDescription( description )

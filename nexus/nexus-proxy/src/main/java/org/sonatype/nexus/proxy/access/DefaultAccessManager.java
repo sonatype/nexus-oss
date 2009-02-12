@@ -37,7 +37,8 @@ public class DefaultAccessManager
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
-        if ( !nexusItemAuthorizer.authorizePath( uid, request.getRequestContext(), action ) )
+        if ( !nexusItemAuthorizer.authorizePermission( "nexus:repoview:" + repository.getId() )
+            || !nexusItemAuthorizer.authorizePath( uid, request.getRequestContext(), action ) )
         {
             // deny the access
             throw new AccessDeniedException( request, "Access denied on repository ID='" + repository.getId()

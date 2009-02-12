@@ -83,6 +83,9 @@ public class Nexus429WagonDeployPrivilegeTest
 
         // we need to delete the files...
         this.deleteFromRepository( this.getTestId() + "/" );
+        
+        // the user needs to start out with the view permission, so we are testing the targets
+        this.giveUserPrivilege( "test-user", "repository-"+ this.getTestRepositoryId() );
 
         // deploy
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
@@ -128,6 +131,7 @@ public class Nexus429WagonDeployPrivilegeTest
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         this.giveUserPrivilege( "test-user", "T5" );
+        this.giveUserPrivilege( "test-user", "repository-"+ this.getTestRepositoryId() );
 
         // if this fails it will throw an error
         verifier =

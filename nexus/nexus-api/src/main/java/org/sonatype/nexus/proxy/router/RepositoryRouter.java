@@ -18,6 +18,7 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStore;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -55,4 +56,7 @@ public interface RepositoryRouter
             ItemNotFoundException,
             IllegalOperationException,
             StorageException;
+    
+    RequestRoute getRequestRouteForRequest( ResourceStoreRequest request )
+        throws ItemNotFoundException;
 }
