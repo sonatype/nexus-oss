@@ -104,12 +104,7 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
             if ( priv.getType().equals( "method" ) )
             {
                 String permission = nexusSecurity.getPrivilegeProperty( priv, "permission" );
-
-                // check this shit her
-                // FAIL COMPILE
-                // subject.checkPermissions( permissions )
                 privilegeMap.put( permission, NONE );
-
             }
         }
 
