@@ -311,7 +311,7 @@ public class CommonsHttpClientRemoteStorage
 
         // BASIC and DIGEST auth only
         if ( getRemoteAuthenticationSettings( ctx ) != null
-            && getRemoteAuthenticationSettings( ctx ).getUsername() != null )
+            && StringUtils.isNotBlank( getRemoteAuthenticationSettings( ctx ).getUsername() ) )
         {
             // we have proxy authentication, let's do it preemptive
             httpClient.getParams().setAuthenticationPreemptive( true );
@@ -320,7 +320,7 @@ public class CommonsHttpClientRemoteStorage
             authPrefs.add( AuthPolicy.DIGEST );
             authPrefs.add( AuthPolicy.BASIC );
 
-            if ( getRemoteAuthenticationSettings( ctx ).getNtlmDomain() != null )
+            if ( StringUtils.isNotBlank( getRemoteAuthenticationSettings( ctx ).getNtlmDomain() ) )
             {
                 // Using NTLM auth, adding it as first in policies
                 authPrefs.add( 0, AuthPolicy.NTLM );
@@ -356,7 +356,8 @@ public class CommonsHttpClientRemoteStorage
             httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
         }
 
-        if ( getRemoteHttpProxySettings( ctx ) != null && getRemoteHttpProxySettings( ctx ).getProxyHostname() != null )
+        if ( getRemoteHttpProxySettings( ctx ) != null
+            && StringUtils.isNotBlank( getRemoteHttpProxySettings( ctx ).getProxyHostname() ) )
         {
             getLogger().info( "... proxy setup with host " + getRemoteHttpProxySettings( ctx ).getProxyHostname() );
             httpConfiguration.setProxy(
@@ -364,13 +365,13 @@ public class CommonsHttpClientRemoteStorage
                 getRemoteHttpProxySettings( ctx ).getProxyPort() );
 
             if ( getRemoteHttpProxySettings( ctx ).getAuthentication() != null
-                && getRemoteHttpProxySettings( ctx ).getAuthentication().getUsername() != null )
+                && StringUtils.isNotBlank( getRemoteHttpProxySettings( ctx ).getAuthentication().getUsername() ) )
             {
                 List<String> authPrefs = new ArrayList<String>( 2 );
                 authPrefs.add( AuthPolicy.DIGEST );
                 authPrefs.add( AuthPolicy.BASIC );
 
-                if ( getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmDomain() != null )
+                if ( StringUtils.isNotBlank( getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmDomain() ) )
                 {
 
                     // Using NTLM auth, adding it as first in policies
