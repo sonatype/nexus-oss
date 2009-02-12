@@ -261,7 +261,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
       emptyText: 'No repositories currently configured'
     }
   });
-  this.reposGridPanel.on('rowclick', this.repoRowClickHandler, this);
+  this.reposGridPanel.getSelectionModel().on('rowselect', this.repoRowSelectHandler, this);
   this.reposGridPanel.on('rowcontextmenu', this.onContextClickHandler, this);
   // END: Repo List ******************************************************
   // *********************************************************************
@@ -451,8 +451,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   beforeRenderHandler : function(component){
   },
   
-  repoRowClickHandler : function(grid, rowIndex, e){
-    var rec = grid.store.getAt(rowIndex);
+  repoRowSelectHandler : function( selectionModel, index, rec ){
     this.viewRepo(rec);
   },
   
