@@ -424,6 +424,9 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     //cancel button event handler
     formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
     
+    //add new form
+    this.formCards.add(formPanel);
+    
     //add place holder to grid
     var newRec = new this.repoTargetRecordConstructor({
         name : 'New Target',
@@ -433,11 +436,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     this.repoTargetsDataStore.insert(0, [newRec]);
     this.repoTargetsGridPanel.getSelectionModel().selectRow(0);
     
-    //add new form
-    this.formCards.add(formPanel);
-    
     //always set active and re-layout
-    this.formCards.getLayout().setActiveItem(formPanel);
     formPanel.doLayout();
   },
   

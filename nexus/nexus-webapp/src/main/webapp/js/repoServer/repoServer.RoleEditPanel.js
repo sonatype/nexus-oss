@@ -573,6 +573,11 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     this.initializeRolesTreeHelper(formPanel);
     this.initializePrivilegesTreeHelper(formPanel);
     
+    this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').enable();
+    
+    //add new form
+    this.formCards.add(formPanel);
+    
     //add place holder to grid
     var newRec = new this.roleRecordConstructor(
       {
@@ -586,11 +591,6 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     newRec.data.valueRec = valueRec;
     this.rolesDataStore.insert(0, [newRec]);
     this.rolesGridPanel.getSelectionModel().selectRow(0);
-    
-    this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').enable();
-    
-    //add new form
-    this.formCards.add(formPanel);
 
     if ( valueRec ) {
       formPanel.initialData = { 
@@ -602,7 +602,6 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     }
     
     //always set active and re-layout
-    this.formCards.getLayout().setActiveItem(formPanel);
     formPanel.doLayout();
   },
   

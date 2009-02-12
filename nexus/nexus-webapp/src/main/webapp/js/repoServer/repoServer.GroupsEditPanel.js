@@ -525,6 +525,12 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
     //cancel button event handler
     formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
 
+    //load available repos tree list.  note: this is kind of awkward to reuse the data mod function
+    this.loadRepoListHelper([], {}, formPanel);
+    
+    //add new form
+    this.formCards.add(formPanel);
+
     //add place holder to grid
     var newRec = new this.groupRecordConstructor({
         name : 'New Group',
@@ -534,15 +540,8 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
       id); //use "new_group_" id instead of resourceURI like the reader does
     this.groupsDataStore.insert(0, [newRec]);
     this.groupsGridPanel.getSelectionModel().selectRow(0);
-
-    //load available repos tree list.  note: this is kind of awkward to reuse the data mod function
-    this.loadRepoListHelper([], {}, formPanel);
-    
-    //add new form
-    this.formCards.add(formPanel);
     
     //always set active and re-layout
-    this.formCards.getLayout().setActiveItem(formPanel);
     formPanel.doLayout();
   },
   

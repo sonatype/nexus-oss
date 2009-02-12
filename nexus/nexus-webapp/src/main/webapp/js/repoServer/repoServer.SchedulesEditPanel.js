@@ -1375,6 +1375,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     
     this.loadWeekdayListHelper([], {}, formPanel);
     
+    //add new form
+    this.formCards.add(formPanel);
+    
     //add place holder to grid
     var newRec = new this.scheduleRecordConstructor({
         name : 'New Scheduled Task',
@@ -1383,12 +1386,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       id); //use "new_schedule_" id instead of resourceURI like the reader does
     this.schedulesDataStore.insert(0, [newRec]);
     this.schedulesGridPanel.getSelectionModel().selectRow(0);
-    
-    //add new form
-    this.formCards.add(formPanel);
-    
-    //always set active
-    this.formCards.getLayout().setActiveItem(formPanel);
   },
   
   afterLayoutFormHandler : function(formPanel, fLayout){
