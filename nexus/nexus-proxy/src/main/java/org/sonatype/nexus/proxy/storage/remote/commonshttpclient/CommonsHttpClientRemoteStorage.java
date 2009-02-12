@@ -291,7 +291,7 @@ public class CommonsHttpClientRemoteStorage
 
         HostConfiguration httpConfiguration = null;
 
-        getLogger().debug( "Creating CommonsHttpClient instance" );
+        getLogger().info( "Remote storage settings change detected, updating HttpClient..." );
 
         int timeout = getRemoteConnectionSettings( ctx ).getConnectionTimeout();
 
