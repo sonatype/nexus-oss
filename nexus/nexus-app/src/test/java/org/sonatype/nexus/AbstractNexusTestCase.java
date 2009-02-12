@@ -27,6 +27,7 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase
@@ -126,6 +127,9 @@ public abstract class AbstractNexusTestCase
     protected void tearDown()
         throws Exception
     {
+        // stop the ehCacheManager (this the default imple checks if the cache is running first )
+        this.lookup( PlexusEhCacheWrapper.class ).stop();
+        
         super.tearDown();
     }
 
