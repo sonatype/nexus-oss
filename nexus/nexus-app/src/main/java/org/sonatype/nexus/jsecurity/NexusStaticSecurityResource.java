@@ -21,10 +21,10 @@ import org.sonatype.jsecurity.model.CPrivilege;
 import org.sonatype.jsecurity.model.CProperty;
 import org.sonatype.jsecurity.model.Configuration;
 import org.sonatype.jsecurity.realms.tools.AbstractStaticSecurityResource;
+import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.StaticSecurityResource;
 import org.sonatype.nexus.jsecurity.realms.RepositoryPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.RepositoryViewPrivilegeDescriptor;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -42,6 +42,9 @@ public class NexusStaticSecurityResource
 {    
     @Requirement
     RepositoryRegistry repoRegistry;
+    
+    @Requirement( role = ConfigurationManager.class, hint = "default" )
+    ConfigurationManager configManager;
     
     public void initialize()
         throws InitializationException
@@ -97,10 +100,16 @@ public class NexusStaticSecurityResource
     public void onProximityEvent( AbstractEvent evt )
     {
         if ( RepositoryRegistryEventAdd.class.isAssignableFrom( evt.getClass() ) 
-            || RepositoryRegistryEventUpdate.class.isAssignableFrom( evt.getClass() ) 
-            || RepositoryRegistryEventRemove.class.isAssignableFrom( evt.getClass() ) )
+            || RepositoryRegistryEventUpdate.class.isAssignableFrom( evt.getClass() ) )
         {
             setDirty( true );
+        }
+        else if ( RepositoryRegistryEventRemove.class.isAssignableFrom( evt.getClass() ) )
+        {
+            String repoId = ( ( RepositoryRegistryEventRemove ) evt ).getRepository().getId();
+            setDirty( true );
+            configManager.cleanRemovedPrivilege( RepositoryViewPrivilegeDescriptor.buildPrivilege( repoId ) );
+            configManager.save();
         }
     }
 }

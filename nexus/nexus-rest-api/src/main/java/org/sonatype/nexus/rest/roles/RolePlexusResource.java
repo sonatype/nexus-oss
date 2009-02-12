@@ -100,6 +100,8 @@ public class RolePlexusResource
             try
             {
                 SecurityRole role = restToNexusModel( getNexusSecurity().readRole( resource.getId() ), resource );
+                
+                validateRoleContainment( role );
 
                 getNexusSecurity().updateRole( role );
 

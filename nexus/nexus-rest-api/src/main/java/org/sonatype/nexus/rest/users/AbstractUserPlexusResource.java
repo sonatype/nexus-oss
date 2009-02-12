@@ -104,4 +104,17 @@ public abstract class AbstractUserPlexusResource
         return getNexus().isAnonymousAccessEnabled() && getNexus().getAnonymousUsername().equals( username );
     }
 
+    protected void validateUserContainment( SecurityUser user )
+        throws ResourceException
+    {
+        if ( user.getRoles().size() == 0 )
+        {
+            throw new PlexusResourceException( 
+                Status.CLIENT_ERROR_BAD_REQUEST, 
+                "Configuration error.", 
+                getNexusErrorResponse( 
+                    "roles", 
+                    "User requires one or more roles." ) );
+        }
+    }
 }

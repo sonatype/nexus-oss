@@ -17,10 +17,13 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
+import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RoleResource;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 public abstract class AbstractRolePlexusResource
     extends AbstractNexusPlexusResource
@@ -85,6 +88,21 @@ public abstract class AbstractRolePlexusResource
         }
 
         return role;
+    }
+    
+    public void validateRoleContainment( SecurityRole role )
+        throws ResourceException
+    {
+        if ( role.getRoles().size() == 0 
+            && role.getPrivileges().size() == 0)
+        {
+            throw new PlexusResourceException( 
+                Status.CLIENT_ERROR_BAD_REQUEST, 
+                "Configuration error.", 
+                getNexusErrorResponse( 
+                    "privileges", 
+                    "One or more roles/privilegs are required." ) );
+        }
     }
 
 }

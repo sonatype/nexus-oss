@@ -111,6 +111,8 @@ public class UserPlexusResource
             {
                 SecurityUser user = restToNexusModel( getNexusSecurity().readUser( resource.getUserId() ), resource );
 
+                validateUserContainment( user );
+                
                 getNexusSecurity().updateUser( user );
 
                 result = new UserResourceResponse();

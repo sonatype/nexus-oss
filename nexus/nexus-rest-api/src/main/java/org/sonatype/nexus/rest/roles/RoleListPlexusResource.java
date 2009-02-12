@@ -17,6 +17,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
@@ -27,6 +28,7 @@ import org.sonatype.nexus.rest.model.RoleResourceRequest;
 import org.sonatype.nexus.rest.model.RoleResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * @author tstevens
@@ -93,6 +95,8 @@ public class RoleListPlexusResource
 
             try
             {
+                validateRoleContainment( role );
+                
                 getNexusSecurity().createRole( role );
 
                 result = new RoleResourceResponse();

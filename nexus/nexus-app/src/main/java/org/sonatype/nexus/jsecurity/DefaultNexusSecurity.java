@@ -540,4 +540,14 @@ public class DefaultNexusSecurity
     {
         return this.manager.listPrivilegeDescriptors();
     }
+    
+    public void cleanRemovedPrivilege( String privilegeId )
+    {
+        this.manager.cleanRemovedPrivilege( privilegeId );
+    }
+    
+    public void cleanRemovedRole( String roleId )
+    {
+        this.manager.cleanRemovedRole( roleId );
+    }
 }

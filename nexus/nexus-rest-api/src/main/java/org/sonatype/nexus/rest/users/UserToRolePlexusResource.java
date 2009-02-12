@@ -30,6 +30,7 @@ import org.sonatype.nexus.rest.model.UserToRoleResource;
 import org.sonatype.nexus.rest.model.UserToRoleResourceRequest;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 @Component( role = PlexusResource.class, hint = "UserToRolePlexusResource" )
 public class UserToRolePlexusResource
@@ -108,6 +109,16 @@ public class UserToRolePlexusResource
         UserToRoleResource userToRole = mappingRequest.getData();
 
         SecurityUserRoleMapping roleMapping = this.restToNexusModel( userToRole );
+        
+        if ( roleMapping.getRoles().size() == 0 )
+        {
+            throw new PlexusResourceException( 
+                Status.CLIENT_ERROR_BAD_REQUEST, 
+                "Configuration error.", 
+                getNexusErrorResponse( 
+                    "roles", 
+                    "User requires one or more roles." ) );
+        }
         // this seems a bit odd, but here is why the PUT does both create and update.
         // the users are stored in some LDAP server somewhere, but the role mapping is stored locally
         // this resource is trying to mimic the normal nexus resource, in the future we may add write
