@@ -28,6 +28,8 @@ public interface RemoteStorageContext
 
     public static final String REMOTE_AUTHENTICATION_SETTINGS = "remoteAuthenticationSettings";
 
+    public static final String NOT_INHERITED = "not inherited";
+
     long getLastChanged();
 
     void setLastChanged( long ts );

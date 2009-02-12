@@ -1598,7 +1598,7 @@ public class DefaultNexus
             nexusConfiguration.createInternals();
 
             // notify about start
-            nexusConfiguration.notifyProximityEventListeners( new ConfigurationChangeEvent( nexusConfiguration ) );
+            nexusConfiguration.notifyProximityEventListeners( new ConfigurationChangeEvent( nexusConfiguration, null ) );
 
             feedRecorder.startService();
 

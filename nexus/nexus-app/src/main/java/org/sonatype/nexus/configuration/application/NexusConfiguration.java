@@ -57,23 +57,17 @@ public interface NexusConfiguration
         throws ConfigurationException,
             IOException;
 
-    /**
-     * Applies the config by creating needed objects/reposes/etc.
-     * 
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    void applyConfiguration()
-        throws ConfigurationException,
-            IOException;
+    void applyConfiguration( Object... changeds )
+        throws IOException;
+
+    void saveConfiguration()
+        throws IOException;
 
     ApplicationConfigurationSource getConfigurationSource();
 
     InputStream getConfigurationAsStream()
         throws IOException;
 
-
-    
     boolean isInstanceUpgraded();
 
     boolean isConfigurationUpgraded();
@@ -98,7 +92,7 @@ public interface NexusConfiguration
         throws ConfigurationException;
 
     void dropInternals();
-    
+
     /**
      * List the names of files under Configuration Directory
      * 

@@ -13,6 +13,10 @@
  */
 package org.sonatype.nexus.configuration;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.sonatype.nexus.proxy.events.ConfigurationEvent;
 
 /**
@@ -25,16 +29,30 @@ public class ConfigurationChangeEvent
 {
     private final NotifiableConfiguration configuration;
 
-    public ConfigurationChangeEvent( NotifiableConfiguration configuration )
+    private final List<Object> changes;
+
+    public ConfigurationChangeEvent( NotifiableConfiguration configuration, Collection<Object> changes )
     {
         super();
 
         this.configuration = configuration;
+
+        this.changes = new ArrayList<Object>();
+
+        if ( changes != null )
+        {
+            this.changes.addAll( changes );
+        }
     }
 
     public NotifiableConfiguration getNotifiableConfiguration()
     {
         return configuration;
+    }
+
+    public List<Object> getChanges()
+    {
+        return changes;
     }
 
 }

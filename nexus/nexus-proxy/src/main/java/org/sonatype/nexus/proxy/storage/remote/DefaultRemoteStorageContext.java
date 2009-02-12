@@ -51,7 +51,14 @@ public class DefaultRemoteStorageContext
 
     public long getLastChanged()
     {
-        return lastChanged;
+        if ( defaults != null )
+        {
+            return defaults.getLastChanged() > lastChanged ? defaults.getLastChanged() : lastChanged;
+        }
+        else
+        {
+            return lastChanged;
+        }
     }
 
     public void setLastChanged( long ts )
@@ -68,7 +75,14 @@ public class DefaultRemoteStorageContext
     {
         if ( context.containsKey( key ) )
         {
-            return context.get( key );
+            if ( NOT_INHERITED.equals( context.get( key ) ) )
+            {
+                return null;
+            }
+            else
+            {
+                return context.get( key );
+            }
         }
         else if ( defaults != null )
         {
@@ -83,6 +97,8 @@ public class DefaultRemoteStorageContext
     public void removeRemoteConnectionContextObject( String key )
     {
         context.remove( key );
+
+        lastChanged = System.currentTimeMillis();
     }
 
     public void putRemoteConnectionContextObject( String key, Object value )

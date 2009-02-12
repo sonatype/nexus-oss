@@ -233,7 +233,7 @@ public abstract class AbstractProxyTestEnvironment
         getEnvironmentBuilder().buildEnvironment( this );
 
         applicationConfiguration
-            .notifyProximityEventListeners( new ConfigurationChangeEvent( applicationConfiguration ) );
+            .notifyProximityEventListeners( new ConfigurationChangeEvent( applicationConfiguration, null ) );
 
         applicationConfiguration.notifyProximityEventListeners( new NexusStartedEvent() );
 

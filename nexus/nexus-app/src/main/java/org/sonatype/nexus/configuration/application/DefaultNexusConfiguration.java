@@ -193,11 +193,12 @@ public class DefaultNexusConfiguration
             // and register things
             runtimeConfigurationBuilder.initialize( this );
 
-            notifyProximityEventListeners( new ConfigurationChangeEvent( this ) );
+            applyConfiguration();
         }
     }
 
-    public void applyConfiguration()
+    // XXX: finish this! What changed?
+    public void applyConfiguration( Object... changeds )
         throws IOException
     {
         getLogger().info( "Applying Nexus Configuration..." );
@@ -208,7 +209,7 @@ public class DefaultNexusConfiguration
 
         wastebasketDirectory = null;
 
-        notifyProximityEventListeners( new ConfigurationChangeEvent( this ) );
+        notifyProximityEventListeners( new ConfigurationChangeEvent( this, null ) );
     }
 
     public void saveConfiguration()
@@ -217,10 +218,10 @@ public class DefaultNexusConfiguration
         configurationSource.storeConfiguration();
     }
 
-    protected void applyAndSaveConfiguration()
+    protected void applyAndSaveConfiguration( Object... changes )
         throws IOException
     {
-        applyConfiguration();
+        applyConfiguration( changes );
 
         saveConfiguration();
     }

@@ -67,7 +67,7 @@ public class GroupingBehaviourTest
         // in group (repo1) should provide the file
         getApplicationConfiguration().getConfiguration().getRouting().getGroups().setMergeMetadata( false );
         getApplicationConfiguration().notifyProximityEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
+            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         StorageItem item = getRootRouter()
             .retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );
@@ -88,7 +88,7 @@ public class GroupingBehaviourTest
 
         // get metadata from a gidr router with merging on (default is on), merge should happen
         getApplicationConfiguration().notifyProximityEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
+            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         StorageItem item = getRootRouter()
             .retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );
@@ -129,7 +129,7 @@ public class GroupingBehaviourTest
         // highest ranked repo in group (repo1) should provide the file
         getApplicationConfiguration().getConfiguration().getRouting().getGroups().setMergeMetadata( false );
         getApplicationConfiguration().notifyProximityEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
+            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );
         // it should be a file and unmodified

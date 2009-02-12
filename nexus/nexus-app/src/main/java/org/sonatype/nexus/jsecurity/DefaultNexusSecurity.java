@@ -239,7 +239,8 @@ public class DefaultNexusSecurity
     {
         manager.save();
 
-        notifyProximityEventListeners( new ConfigurationChangeEvent( this ) );
+        // TODO: can we do the same here as with nexus config?
+        notifyProximityEventListeners( new ConfigurationChangeEvent( this, null ) );
         
         for ( Realm realm : realmLocator.getRealms() )
         {

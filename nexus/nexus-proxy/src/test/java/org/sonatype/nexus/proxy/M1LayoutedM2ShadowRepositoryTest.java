@@ -86,7 +86,7 @@ public class M1LayoutedM2ShadowRepositoryTest
         // we will get links as responses, since shadow reposes contains links only
         getApplicationConfiguration().getConfiguration().getRouting().setFollowLinks( false );
         getApplicationConfiguration().notifyProximityEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
+            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         item = getRootRouter().retrieveItem(
             new ResourceStoreRequest( "/repositories/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
@@ -100,7 +100,7 @@ public class M1LayoutedM2ShadowRepositoryTest
         // and will expect the original contents
         getApplicationConfiguration().getConfiguration().getRouting().setFollowLinks( true );
         getApplicationConfiguration().notifyProximityEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
+            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         item = getRootRouter().retrieveItem(
             new ResourceStoreRequest( "/repositories/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
@@ -137,7 +137,7 @@ public class M1LayoutedM2ShadowRepositoryTest
         // we will get links as responses, since shadow reposes contains links only
         getApplicationConfiguration().getConfiguration().getRouting().setFollowLinks( false );
         getApplicationConfiguration().notifyProximityEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
+            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         item = getRootRouter().retrieveItem(
             new ResourceStoreRequest( "/repositories/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
@@ -151,7 +151,7 @@ public class M1LayoutedM2ShadowRepositoryTest
         // and will expect the original contents
         getApplicationConfiguration().getConfiguration().getRouting().setFollowLinks( true );
         getApplicationConfiguration().notifyProximityEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
+            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         item = getRootRouter().retrieveItem(
             new ResourceStoreRequest( "/repositories/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
