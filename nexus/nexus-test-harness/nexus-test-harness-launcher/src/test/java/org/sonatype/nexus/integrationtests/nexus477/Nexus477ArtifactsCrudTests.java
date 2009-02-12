@@ -88,19 +88,21 @@ public class Nexus477ArtifactsCrudTests
         // "service/local/repositories/" + this.getTestRepositoryId() + "/content/" + this.getTestId() + "/";
             "content/repositories/" + this.getTestRepositoryId() + "/" + this.getTestId();
 
-         Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-         Assert.assertEquals( "Artifact should not have been deleted", 401, response.getStatus().getCode() );
+        Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
+        Assert.assertEquals( "Artifact should not have been deleted", 401, response.getStatus().getCode() );
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         this.giveUserPrivilege( "test-user", "T7" );
 
         // delete implies read
         // we need to check read first...
-        response = RequestFacade.sendMessage( "content/repositories/" + this.getTestRepositoryId() + "/" + this.getRelitiveArtifactPath( gav ), Method.GET );
+        response =
+            RequestFacade.sendMessage( "content/repositories/" + this.getTestRepositoryId() + "/"
+                + this.getRelitiveArtifactPath( gav ), Method.GET );
         Assert.assertEquals( "Could not get artifact", 200, response.getStatus().getCode() );
 
-         response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-         Assert.assertEquals( "Artifact should have been deleted", 204, response.getStatus().getCode() );
+        response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
+        Assert.assertEquals( "Artifact should have been deleted", 204, response.getStatus().getCode() );
 
     }
 
@@ -125,13 +127,14 @@ public class Nexus477ArtifactsCrudTests
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         this.giveUserPrivilege( "test-user", "T1" );
-        this.giveUserPrivilege( "test-user", "repository-"+this.getTestRepositoryId() );
+        this.giveUserPrivilege( "test-user", "repository-" + this.getTestRepositoryId() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = RequestFacade.sendMessage( serviceURI, Method.GET );
-        Assert.assertEquals( "Artifact should have been read\nresponse:\n"+ response.getEntity().getText(), 200, response.getStatus().getCode());
+        Assert.assertEquals( "Artifact should have been read\nresponse:\n" + response.getEntity().getText(), 200,
+                             response.getStatus().getCode() );
 
         response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
         Assert.assertEquals( "Artifact should have been deleted", 401, response.getStatus().getCode() );
