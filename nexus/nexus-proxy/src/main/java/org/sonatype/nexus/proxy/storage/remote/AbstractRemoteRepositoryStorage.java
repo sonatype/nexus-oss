@@ -72,7 +72,7 @@ public abstract class AbstractRemoteRepositoryStorage
         return getAbsoluteUrlFromBase( repository.getRemoteUrl(), path );
     }
 
-    protected URL getAbsoluteUrlFromBase( String baseUrl, String path ) 
+    protected URL getAbsoluteUrlFromBase( String baseUrl, String path )
         throws StorageException
     {
         StringBuffer urlStr = new StringBuffer( baseUrl );
@@ -94,9 +94,9 @@ public abstract class AbstractRemoteRepositoryStorage
         {
             throw new StorageException( "The repository has broken URL!", e );
         }
-        
+
     }
-    
+
     /**
      * Remote storage specific, when the remote connection settings are actually applied.
      * 
@@ -111,35 +111,16 @@ public abstract class AbstractRemoteRepositoryStorage
         if ( repository.getRemoteStorageContext() != null )
         {
             // we have repo specific settings
-            if ( repositoryContexts.containsKey( repository.getId() ) )
+            // if contextContains key and is newer, or does not contain yet
+            if ( ( repositoryContexts.containsKey( repository.getId() ) && repository
+                .getRemoteStorageContext().getLastChanged() > repositoryContexts.get( repository.getId() ).longValue() )
+                || !repositoryContexts.containsKey( repository.getId() ) )
             {
-                if ( repository.getRemoteStorageContext().getLastChanged() > repositoryContexts
-                    .get( repository.getId() ).longValue() )
-                {
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug( "Remote storage settings change detected, updating..." );
-                    }
-
-                    updateContext( repository, repository.getRemoteStorageContext() );
-
-                    repositoryContexts.put( repository.getId(), Long.valueOf( repository
-                        .getRemoteStorageContext().getLastChanged() ) );
-                }
-            }
-            else
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Remote storage settings change detected, updating..." );
-                }
-
                 updateContext( repository, repository.getRemoteStorageContext() );
 
                 repositoryContexts.put( repository.getId(), Long.valueOf( repository
                     .getRemoteStorageContext().getLastChanged() ) );
             }
-
         }
 
         return repository.getRemoteStorageContext();
