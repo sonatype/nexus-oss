@@ -354,13 +354,14 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
           item.setHandler( this.addActionHandler.createDelegate( this, [item.handler], 0 ) );
         }
       }, this );
-      
-      this.tbar.push( {
+
+      this.addButton = new Ext.Button( {
         text: 'Add...',
         icon: Sonatype.config.resourcePath + '/images/icons/add.png',
         cls: 'x-btn-text-icon',
         menu: menu
       } );
+      this.tbar.push( this.addButton );
     }
   },
   
@@ -407,13 +408,14 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
   
   createDeleteButton: function() {
     if ( this.deleteButton ) {
-      this.tbar.push( {
+      this.deleteButton = new Ext.Button( {
         text: 'Delete',
         icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
         cls: 'x-btn-text-icon',
         handler: this.deleteActionHandler,
         scope: this
       } );
+      this.tbar.push( this.deleteButton );
     }
   },
   

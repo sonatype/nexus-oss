@@ -1130,7 +1130,7 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
 
   var editor = repoEditors[rec.data.repoType];
   
-  if ( editor && sp.checkPermission( 'nexus:repositories', sp.READ ) &&
+  if ( editor && rec.data.exposed && rec.data.userManaged && sp.checkPermission( 'nexus:repositories', sp.READ ) &&
       ( sp.checkPermission( 'nexus:repositories', sp.CREATE ) ||
         sp.checkPermission( 'nexus:repositories', sp.DELETE ) ||
         sp.checkPermission( 'nexus:repositories', sp.EDIT ) ) ) {

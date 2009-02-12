@@ -566,8 +566,38 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
 
   var sp = Sonatype.lib.Permissions;
 
-  var toolbar = sp.checkPermission( 'nexus:wastebasket', sp.DELETE ) ? 
-    [ {
+  this.browseTypeButton = new Ext.Button( {
+    text: 'User Managed Repositories',
+    icon: Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
+    cls: 'x-btn-text-icon',
+    value: 'user',
+    tooltip: 'Click to browse other types of repositories.',
+    scope: this,
+    menu: {
+      items: [
+        {
+          text: 'User Managed Repositories',
+          value: 'user',
+          checked: true,
+          group: 'repo-view-selector',
+          scope: this,
+          handler: this.switchBrowseType
+        },
+        {
+          text: 'Nexus Managed Repositories',
+          value: 'nexus',
+          checked: false,
+          group: 'repo-view-selector',
+          scope: this,
+          handler: this.switchBrowseType
+        }
+      ]
+    }
+  } );
+  
+  var toolbar = [];
+  if ( sp.checkPermission( 'nexus:wastebasket', sp.DELETE ) ) { 
+    toolbar.push( {
       id: 'repo-trash-btn',
       text: 'Trash...',
       icon: Sonatype.config.resourcePath + '/images/icons/user-trash.png',
@@ -583,7 +613,9 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
           }
         ]
       }
-    } ] : null;
+    } );
+  }
+  toolbar.push( this.browseTypeButton );
   
   Sonatype.repoServer.RepositoryPanel.superclass.constructor.call( this, {
     addMenuInitEvent: 'repositoryAddMenuInit',
@@ -591,12 +623,15 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
     rowClickEvent: 'repositoryViewInit',
     rowContextClickEvent: 'repositoryMenuInit',
     url: Sonatype.config.repos.urls.repositories,
+    dataAutoLoad: false,
     tabbedChildren: true,
     tbar: toolbar,
     columns: [
       { name: 'resourceURI' },
       { name: 'remoteUri' },
       { name: 'id' },
+      { name: 'exposed' },
+      { name: 'userManaged' },
       {
         name: 'name',
         sortType: Ext.data.SortTypes.asUCString,
@@ -637,6 +672,9 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
       }
     ]
   } );
+  
+  this.dataStore.addListener( 'load', this.onRepoStoreLoad, this );
+  this.dataStore.load();
 };
 
 Ext.extend( Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
@@ -665,6 +703,37 @@ Ext.extend( Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
         }
       }
     } );
+  },
+  
+  onRepoStoreLoad: function( store, records, options ) {
+    switch ( this.browseTypeButton.value ) {
+      case 'nexus':
+        for ( var i = 0; i < records.length; i++ ) {
+          if ( records[i].data.userManaged ) {
+            store.remove( records[i] );
+          }
+        }
+        break;
+    }
+  },
+
+  switchBrowseType: function( button, e ) {
+    this.browseTypeButton.setText( button.text );
+    this.browseTypeButton.value = button.value;
+
+    switch ( button.value ) {
+      case 'nexus':
+        this.addButton.disable();
+        this.deleteButton.disable();
+        this.dataStore.proxy.conn.url = Sonatype.config.repos.urls.allRepositories;
+        break;
+      case 'user':
+        this.addButton.enable();
+        this.deleteButton.enable();
+        this.dataStore.proxy.conn.url = Sonatype.config.repos.urls.repositories;
+        break;
+    }
+    this.refreshHandler( button, e );
   }
 } );
 

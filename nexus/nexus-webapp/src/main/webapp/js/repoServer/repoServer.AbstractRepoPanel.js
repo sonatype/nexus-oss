@@ -440,7 +440,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
   },
   
   onRepositoryMenuInit: function( menu, repoRecord ) {
-    if ( repoRecord.id.substring( 0, 4 ) == 'new_' ) return;
+    if ( repoRecord.id.substring( 0, 4 ) == 'new_' || ! repoRecord.data.exposed || ! repoRecord.data.userManaged ) return;
 
     var isVirtual = repoRecord.get( 'repoType' ) == 'virtual';
     var isHosted = repoRecord.get( 'repoType' ) == 'hosted';
@@ -462,13 +462,6 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
           'nexus:metadata', this.sp.DELETE ) && ( isHosted || isGroup ) ){
       menu.add( this.repoActions.rebuildMetadata );
     }
-
-    if ( this.sp.checkPermission(
-          'nexus:artifact', this.sp.CREATE ) &&
-        repoRecord.get('repoType') == 'hosted' &&
-        repoRecord.get('repoPolicy') == 'release' ){
-      menu.add( this.repoActions.uploadArtifact );
-    }
   },
   
   onRepositoryContentMenuInit: function( menu, repoRecord, contentRecord ) {
@@ -481,14 +474,16 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     var isHosted = repoRecord.data.repoType == 'hosted';
     var isGroup = repoRecord.data.repoType == 'group';
 
-    if ( this.sp.checkPermission( 'nexus:cache', this.sp.DELETE ) && ! isVirtual ) {
-      menu.add( this.repoActions.clearCache );
-    }
-    if ( this.sp.checkPermission( 'nexus:index', this.sp.DELETE ) && ! isVirtual ) {
-      menu.add( this.repoActions.reIndex );
-    }
-    if ( this.sp.checkPermission( 'nexus:metadata', this.sp.DELETE ) && ( isHosted || isGroup ) ) {
-      menu.add( this.repoActions.rebuildMetadata );
+    if ( repoRecord.data.userManaged ) {
+      if ( this.sp.checkPermission( 'nexus:cache', this.sp.DELETE ) && ! isVirtual ) {
+        menu.add( this.repoActions.clearCache );
+      }
+      if ( this.sp.checkPermission( 'nexus:index', this.sp.DELETE ) && ! isVirtual ) {
+        menu.add( this.repoActions.reIndex );
+      }
+      if ( this.sp.checkPermission( 'nexus:metadata', this.sp.DELETE ) && ( isHosted || isGroup ) ) {
+        menu.add( this.repoActions.rebuildMetadata );
+      }
     }
 
     if ( contentRecord.isLeaf() ) {
