@@ -1017,7 +1017,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       emptyText: 'Click "Add" to create a scheduled task.'
     }
   });
-  this.schedulesGridPanel.on('rowclick', this.rowClick, this);
+  this.schedulesGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
   this.schedulesGridPanel.on('rowcontextmenu', this.contextClick, this);
 
   Sonatype.repoServer.SchedulesEditPanel.superclass.constructor.call(this, {
@@ -1670,8 +1670,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
   },
 
-  rowClick : function(grid, rowIndex, e){
-    var rec = grid.store.getAt(rowIndex);
+  rowSelect : function( selectionModel, index, rec ) {
     var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
     var formPanel = this.formCards.findById(id);
     var schedulePanel = null;
