@@ -645,7 +645,12 @@ Sonatype.utils = {
             }
           ]
         }
-      ]
+      ],
+      listeners: {
+        show: function( c ) {
+          var field = c.find( 'name', 'currentPassword' )[0].focus( false, 100 );
+        }
+      }
     });
 
     w.show();

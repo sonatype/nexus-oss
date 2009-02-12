@@ -273,7 +273,12 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
             }
           ]
         }
-      ]
+      ],
+      listeners: {
+        show: function( c ) {
+          var field = c.find( 'name', 'newPassword' )[0].focus( false, 100 );
+        }
+      }
     });
 
     w.show();
