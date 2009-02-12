@@ -298,7 +298,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
       emptyText: 'Click "Add" to create a new Repository Target.'
     }
   });
-  this.repoTargetsGridPanel.on('rowclick', this.rowClick, this);
+  this.repoTargetsGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
   this.repoTargetsGridPanel.on('rowcontextmenu', this.contextClick, this);
 
   Sonatype.repoServer.RepoTargetEditPanel.superclass.constructor.call(this, {
@@ -633,8 +633,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
   },
 
-  rowClick : function(grid, rowIndex, e){
-    var rec = grid.store.getAt(rowIndex);
+  rowSelect : function( selectionModel, index, rec ){
     var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
     var formPanel = this.formCards.findById(id);
     
