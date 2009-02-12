@@ -77,12 +77,10 @@ public class Nexus477ArtifactsCrudTests
     public void deleteTest()
         throws IOException
     {
-        Assert.fail( "Delete test should fail, no view privilege?" );
-        
         Gav gav =
             new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
                      null, false, null );
-        
+
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
@@ -95,7 +93,7 @@ public class Nexus477ArtifactsCrudTests
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         this.giveUserPrivilege( "test-user", "T7" );
-        
+
         // delete implies read
         // we need to check read first...
         response = RequestFacade.sendMessage( "content/repositories/" + this.getTestRepositoryId() + "/" + this.getRelitiveArtifactPath( gav ), Method.GET );
@@ -115,7 +113,7 @@ public class Nexus477ArtifactsCrudTests
         Gav gav =
             new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
                      null, false, null );
-        
+
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
@@ -128,7 +126,7 @@ public class Nexus477ArtifactsCrudTests
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         this.giveUserPrivilege( "test-user", "T1" );
         this.giveUserPrivilege( "test-user", "repository-"+this.getTestRepositoryId() );
-        
+
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
@@ -137,7 +135,7 @@ public class Nexus477ArtifactsCrudTests
 
         response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
         Assert.assertEquals( "Artifact should have been deleted", 401, response.getStatus().getCode() );
-        
+
     }
 
 }
