@@ -93,7 +93,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
   this.rolesDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.roles,
     reader: this.rolesReader,
-    sortInfo: {field: 'name', direction: 'ASC'},
+    sortInfo: {field: 'name', direction: 'ASC'}
   });
   
   this.privReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.privRecordConstructor );
