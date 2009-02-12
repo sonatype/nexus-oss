@@ -408,7 +408,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
       emptyText: 'Click "Add" to create a new Role.'
     }
   });
-  this.rolesGridPanel.on('rowclick', this.rowClick, this);
+  this.rolesGridPanel.getSelectionModel().on('rowSelect', this.rowSelect, this);
   this.rolesGridPanel.on('rowcontextmenu', this.contextClick, this);
 
   Sonatype.repoServer.RoleEditPanel.superclass.constructor.call(this, {
@@ -845,64 +845,56 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
   },
 
-  rowClick : function(grid, rowIndex, e){
-    var rec = grid.store.getAt(rowIndex);
-    if (rec) {
-	    if (rec.data.userManaged == true
-	    		&& this.sp.checkPermission('nexus:roles', this.sp.DELETE)) {
-	      grid.getTopToolbar().items.get('role-delete-btn').enable();
-	    } else {
-	      grid.getTopToolbar().items.get('role-delete-btn')
-	        .disable();
-	    }
-	    var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
-	    var formPanel = this.formCards.findById(id);
-	    
-	    //assumption: new route forms already exist in formCards, so they won't get into this case
-	    if(!formPanel){ //create form and populate current data
-	      var config = Ext.apply({}, this.formConfig, {id:id});
-	      
-	      config = this.initializeTreeRoots(id, config);
-	      
-	      formPanel = new Ext.FormPanel(config);
-	      formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
-	      formPanel.form.on('actionfailed', this.actionFailedHandler, this);
-	      formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
-	      
-	      if (rec.data.userManaged == true
-            && this.sp.checkPermission('nexus:roles', this.sp.EDIT)){
-	          formPanel.buttons[0].disabled = false;
-	      }
-	      
-	      var buttonInfoObj = {
-	        formPanel : formPanel,
-	        isNew : false, //not a new route form, see assumption
-	        resourceURI : rec.data.resourceURI
-	      };
-	      
-	      formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
-	      formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
-	      
-	      this.initializeRolesTreeHelper(formPanel);
-	      this.initializePrivilegesTreeHelper(formPanel);
-	  
-	      this.formDataLoader(formPanel, rec.data.resourceURI, this.loadDataModFunc);
-	      
-	      this.formCards.add(formPanel);
-	      
-	      //always set active
-	      this.formCards.getLayout().setActiveItem(formPanel);
-	      
-	      formPanel.doLayout();
-	    }
-	    else{
-	      //always set active
-	      this.formCards.getLayout().setActiveItem(formPanel);
-	    }
+  rowSelect : function( selectionModel, index, rec ) {
+    if (rec.data.userManaged == true
+    		&& this.sp.checkPermission('nexus:roles', this.sp.DELETE)) {
+      this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').enable();
+    } else {
+      this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').disable();
     }
-    else {
-    	grid.getTopToolbar().items.get('role-delete-btn')
-        .disable();
+    var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
+    var formPanel = this.formCards.findById(id);
+    
+    //assumption: new route forms already exist in formCards, so they won't get into this case
+    if(!formPanel){ //create form and populate current data
+      var config = Ext.apply({}, this.formConfig, {id:id});
+      
+      config = this.initializeTreeRoots(id, config);
+      
+      formPanel = new Ext.FormPanel(config);
+      formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
+      formPanel.form.on('actionfailed', this.actionFailedHandler, this);
+      formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
+      
+      if (rec.data.userManaged == true
+          && this.sp.checkPermission('nexus:roles', this.sp.EDIT)){
+          formPanel.buttons[0].disabled = false;
+      }
+      
+      var buttonInfoObj = {
+        formPanel : formPanel,
+        isNew : false, //not a new route form, see assumption
+        resourceURI : rec.data.resourceURI
+      };
+      
+      formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
+      formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
+      
+      this.initializeRolesTreeHelper(formPanel);
+      this.initializePrivilegesTreeHelper(formPanel);
+  
+      this.formDataLoader(formPanel, rec.data.resourceURI, this.loadDataModFunc);
+      
+      this.formCards.add(formPanel);
+      
+      //always set active
+      this.formCards.getLayout().setActiveItem(formPanel);
+      
+      formPanel.doLayout();
+    }
+    else{
+      //always set active
+      this.formCards.getLayout().setActiveItem(formPanel);
     }
   },
   
