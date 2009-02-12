@@ -33,6 +33,7 @@ import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesPermissionTests;
 import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesValidationTests;
+import org.sonatype.nexus.integrationtests.nexus1592.Nexus1592ViewPrivTest;
 import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleTest;
 import org.sonatype.nexus.integrationtests.nexus167.Nexus167ReleaseToSnapshotTest;
 import org.sonatype.nexus.integrationtests.nexus168.Nexus168SnapshotToReleaseTest;
@@ -175,7 +176,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus537RepoTargetsTests.class,
     Nexus1239PlexusUserResourceTest.class,
     Nexus1239UserSearchTest.class,
-    Nexus1240SourceInLoginResourceTest.class
+    Nexus1240SourceInLoginResourceTest.class,
+    Nexus1592ViewPrivTest.class
 } )
 public class IntegrationTestSuiteClassesSecurity
 {
