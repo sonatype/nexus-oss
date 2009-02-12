@@ -443,6 +443,8 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     if ( repoRecord.id.substring( 0, 4 ) == 'new_' ) return;
 
     var isVirtual = repoRecord.get( 'repoType' ) == 'virtual';
+    var isHosted = repoRecord.get( 'repoType' ) == 'hosted';
+    var isGroup = repoRecord.get( 'repoType' ) == 'group';
 
     if ( this.sp.checkPermission(
           'nexus:cache', this.sp.DELETE ) &&
@@ -457,7 +459,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     }
 
     if ( this.sp.checkPermission(
-          'nexus:metadata', this.sp.DELETE ) ){
+          'nexus:metadata', this.sp.DELETE ) && ( isHosted || isGroup ) ){
       menu.add( this.repoActions.rebuildMetadata );
     }
 
@@ -476,6 +478,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
 
     var isVirtual = repoRecord.data.repoType == 'virtual';
     var isProxy = repoRecord.data.repoType == 'proxy';
+    var isHosted = repoRecord.data.repoType == 'hosted';
     var isGroup = repoRecord.data.repoType == 'group';
 
     if ( this.sp.checkPermission( 'nexus:cache', this.sp.DELETE ) && ! isVirtual ) {
@@ -484,7 +487,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     if ( this.sp.checkPermission( 'nexus:index', this.sp.DELETE ) && ! isVirtual ) {
       menu.add( this.repoActions.reIndex );
     }
-    if ( this.sp.checkPermission( 'nexus:metadata', this.sp.DELETE ) ) {
+    if ( this.sp.checkPermission( 'nexus:metadata', this.sp.DELETE ) && ( isHosted || isGroup ) ) {
       menu.add( this.repoActions.rebuildMetadata );
     }
 
