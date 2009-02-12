@@ -44,17 +44,17 @@ public class EventMulticasterComponent
 
     public void notifyProximityEventListeners( AbstractEvent evt )
     {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(
+                "Notifying " + proximityEventListeners.size() + " EventListener about event "
+                    + evt.getClass().getName() + " fired (" + evt.toString() + ")" );
+        }
+
         for ( EventListener l : proximityEventListeners )
         {
             try
             {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                        "Notifying EventListener " + l.getClass().getName() + " about event "
-                            + evt.getClass().getName() + " fired (" + evt.toString() + ")" );
-                }
-
                 l.onProximityEvent( evt );
             }
             catch ( Exception e )
