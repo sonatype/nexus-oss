@@ -117,7 +117,8 @@ Sonatype.panels.GridViewer = function( config ) {
     dataRoot: 'data',
     dataSortInfo: { field: 'name', direction: 'asc' },
     titleColumn: 'name',
-    singleSelect: true
+    singleSelect: true,
+    collapsibleDetails: false
   };
   Ext.apply( this, config, defaultConfig );
   
@@ -180,13 +181,12 @@ Sonatype.panels.GridViewer = function( config ) {
   } );
 
   this.gridPanel = new Ext.grid.GridPanel( {
-    region: 'north',
-    layout: 'fit',
+    region: this.collapsibleDetails ? 'center' : 'north',
     collapsible: true,
     split: true,
-    height: Sonatype.view.mainTabPanel.getInnerHeight() / 3,
-    minHeight: 100,
-    maxHeight: 500,
+    height: this.collapsibleDetails ? null : Sonatype.view.mainTabPanel.getInnerHeight() / 3,
+    minHeight: this.collapsibleDetails ? null : 100,
+    maxHeight: this.collapsibleDetails ? null : 500,
     frame: false,
     autoScroll: true,
     selModel: new Ext.grid.RowSelectionModel( {
@@ -228,11 +228,16 @@ Sonatype.panels.GridViewer = function( config ) {
 
   this.cardPanel = new Ext.Panel( {
     layout: 'card',
-    region: 'center',
+    region: this.collapsibleDetails ? 'south' : 'center',
+    title: this.collapsibleDetails ? ' ' : null,
+    split: true,
+    height: this.collapsibleDetails ? Sonatype.view.mainTabPanel.getInnerHeight() / 4 : null,
     activeItem: 0,
     deferredRender: false,
     autoScroll: false,
     frame: false,
+    collapsed: this.collapsibleDetails,
+    collapsible: this.collapsibleDetails,
     items: [
       {
         xtype: 'panel',
@@ -366,6 +371,10 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
   },
   
   createChildPanel: function( rec, recreateIfExists ) {
+    if ( this.collapsibleDetails ) {
+      this.cardPanel.expand();
+    }
+    
     var id = this.id + rec.id;
 
     var panel = this.cardPanel.findById( id );
