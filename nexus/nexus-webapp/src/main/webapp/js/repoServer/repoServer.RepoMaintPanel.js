@@ -125,7 +125,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     {name:'format'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
     {name:'displayStatus'},
-    {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl }
+    {name:'contentUri', mapping:'resourceURI', convert: Sonatype.config.repos.restToContentUrl }
   ]);
 
   this.groupsReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.groupRecordConstructor );
@@ -160,7 +160,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
 //  {name:'effectiveLocalStorageUrl'},
     {name:'repoPolicy'},
-    {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl },
+    {name:'contentUri', mapping:'resourceURI', convert: Sonatype.config.repos.restToContentUrl },
     {name:'remoteUri'},
     {name:'userManaged'},
     {name:'exposed'}
@@ -413,7 +413,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   downloadHandler : function( item, button, event ){
     event.stopEvent();
     if(this.ctxBrowseNode){
-      window.open(this.restToContentUrl(this.ctxBrowseNode.id));
+      window.open(Sonatype.config.repos.restToContentUrl(this.ctxBrowseNode.id));
     }
   },
   
@@ -572,7 +572,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
       { name: 'displayStatus' },
       { name: 'displayURI', mapping: 'resourceURI',         
         convert: function( s ) {
-          return s.replace( Sonatype.config.repos.urls.groups, Sonatype.config.content.groups );
+          return Sonatype.config.repos.restToContentUrl( s );
         }
       }
     ],
@@ -696,8 +696,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
         },
         mapping: 'resourceURI',
         convert: function( s, parent ) {
-          return s.replace(
-            Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories );
+          return Sonatype.config.repos.restToContentUrl( s );
         }
       }
     ]

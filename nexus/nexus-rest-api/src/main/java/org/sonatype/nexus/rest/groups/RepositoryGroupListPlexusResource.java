@@ -84,7 +84,7 @@ public class RepositoryGroupListPlexusResource
             {
                 RepositoryGroupListResource resource = new RepositoryGroupListResource();
 
-                resource.setResourceURI( createChildReference( request, group.getGroupId() ).toString() );
+                resource.setResourceURI( createRepositoryGroupReference( request, group.getGroupId() ).toString() );
 
                 resource.setId( group.getGroupId() );
 

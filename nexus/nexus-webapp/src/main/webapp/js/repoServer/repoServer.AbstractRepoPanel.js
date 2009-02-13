@@ -411,38 +411,14 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       }
     });
   },
-
-  restToContentUrl: function( r ) {
-    var isGroup = r.indexOf( Sonatype.config.repos.urls.groups ) > -1;
-    var hasHost = r.indexOf( Sonatype.config.host ) > -1;
-
-    var snippet = r.indexOf( Sonatype.config.browseIndexPathSnippet ) == -1 ?
-      Sonatype.config.browsePathSnippet : Sonatype.config.browseIndexPathSnippet;
-    r = r.replace( snippet, '' );
-
-    if ( isGroup ) {
-      r = r.replace( Sonatype.config.repos.urls.groups, Sonatype.config.content.groups );
-    }
-    else {
-      r = r.replace( Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories );
-    }
-
-    return hasHost ? r : ( Sonatype.config.host + r );
-  },
   
   restToRemoteUrl: function( node, repoRecord ) {
-    var r = node.id;
-
-    var snippet = r.indexOf( Sonatype.config.browseIndexPathSnippet ) == -1 ?
-        Sonatype.config.browsePathSnippet : Sonatype.config.browseIndexPathSnippet;
-    r = r.replace( snippet, '' );
-
-    return repoRecord.data.remoteUri + r.replace( repoRecord.data.resourceURI, '' );
+    return repoRecord.data.remoteUri + node.data.relativePath;
   },
   
   downloadHandler: function( node, item, event ) {
     event.stopEvent();
-    window.open( this.restToContentUrl( node.id ) );
+    window.open( Sonatype.config.repos.restToContentUrl( node.id ) );
   },
   
   downloadFromRemoteHandler: function( node, item, event ) {
@@ -569,7 +545,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         text: 'Download',
         scope: this,
         handler: this.downloadHandler,
-        href: this.restToContentUrl( contentRecord.id )
+        href: Sonatype.config.repos.restToContentUrl( contentRecord.id )
       } );
     }
 

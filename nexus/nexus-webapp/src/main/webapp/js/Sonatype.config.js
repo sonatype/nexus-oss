@@ -32,11 +32,16 @@ Sonatype.config = function() {
   var host = window.location.protocol + '//' + window.location.host;
   var contextPath = window.location.pathname;
   contextPath = contextPath.substr(0, contextPath.lastIndexOf('/'));
-  var servicePath = contextPath + '/service/local';
+  var servicePathSnippet = '/service/local';
+  var servicePath = contextPath + servicePathSnippet;
   var resourcePath = contextPath;
-  var contentPath = contextPath + '/content';
   var browsePathSnippet = '/content';
+  var contentPath = contextPath + browsePathSnippet;  
   var browseIndexPathSnippet = '/index_content';
+  var repoBrowsePathSnippet = browsePathSnippet + '/repositories';
+  var groupBrowsePathSnippet = browsePathSnippet + '/groups';
+  var repoServicePathSnippet = servicePathSnippet + '/repositories';
+  var groupServicePathSnippet = servicePathSnippet + '/repo_groups';
   
   return {
     isDebug : false, //set to true to enable Firebug console output (getfirebug.com)
@@ -53,6 +58,22 @@ Sonatype.config = function() {
     installedServers : {repoServer:true},
   
     repos : {
+      restToContentUrl : function ( r ) {
+        if ( r.indexOf( Sonatype.config.repos.snippets.repoServicePathSnippet ) > -1 ){
+          return r.replace( Sonatype.config.repos.snippets.repoServicePathSnippet
+              , Sonatype.config.repos.snippets.repoBrowsePathSnippet );
+        }
+        else if ( r.indexOf( Sonatype.config.repos.snippets.groupServicePathSnippet ) > -1 ){
+          return r.replace( Sonatype.config.repos.snippets.groupServicePathSnippet
+              , Sonatype.config.repos.snippets.groupBrowsePathSnippet );
+        }
+      },
+      snippets : {
+        repoBrowsePathSnippet : repoBrowsePathSnippet,
+        groupBrowsePathSnippet : groupBrowsePathSnippet,
+        repoServicePathSnippet : repoServicePathSnippet,
+        groupServicePathSnippet : groupServicePathSnippet
+      },
       urls : {
         login : servicePath + '/authentication/login',
         logout : servicePath + '/authentication/logout',

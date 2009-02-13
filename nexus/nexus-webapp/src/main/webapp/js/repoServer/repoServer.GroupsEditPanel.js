@@ -280,22 +280,13 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
     return Sonatype.utils.joinArrayObject(val, 'name');
   };
   
-  this.restToContentUrl = function(r){
-    if (r.indexOf(Sonatype.config.host) > -1) {
-      return r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
-    }
-    else {
-      return Sonatype.config.host + r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
-    }
-  };
-
   // START: Repo list ******************************************************
   this.groupRecordConstructor = Ext.data.Record.create([
     {name:'resourceURI'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
     {name:'repositories'},
     {name:'sRepositories', mapping:'repositories', convert: this.nameConcatinator},
-    {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl },
+    {name:'contentUri', mapping:'resourceURI', convert: Sonatype.config.repos.restToContentUrl },
     {name:'format'}
   ]);
 
@@ -710,7 +701,7 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
         //      applies the convert functions in Ext.data.XXXReader.readRecords(), 
         //      not in the constructor yielded from Ext.data.Record.create()
         sentData.sRepositories = this.nameConcatinator(sentData.repositories);
-        sentData.contentUri = this.restToContentUrl(sentData.resourceURI);
+        sentData.contentUri = Sonatype.config.repos.restToContentUrl(sentData.resourceURI);
 
         var newRec = new this.groupRecordConstructor(sentData, action.options.fpanel.id); //form and grid data id match, keep the new id
 
