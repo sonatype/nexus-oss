@@ -41,7 +41,7 @@ public class FileConfigurationSource
     /**
      * The configuration file.
      */
-    @org.codehaus.plexus.component.annotations.Configuration( value = "${nexus-work}/conf/security.xml" )
+    @org.codehaus.plexus.component.annotations.Configuration( value = "${security-xml-file}" )
     private File configurationFile;
 
     /**
