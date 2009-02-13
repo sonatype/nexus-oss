@@ -53,7 +53,7 @@ public class Nexus1592ViewPrivTest
     protected int deploy( Gav gav )
         throws IOException
     {
-        this.giveUserPrivilege( "test-user", "65" );
+        this.giveUserPrivilege( TEST_USER_NAME, "65" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -152,7 +152,7 @@ public class Nexus1592ViewPrivTest
     public void deployView()
         throws Exception
     {
-        this.giveUserPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO );
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
 
         failDeploy( deployGav );
     }
@@ -161,7 +161,7 @@ public class Nexus1592ViewPrivTest
     public void deployViewUpdate()
         throws Exception
     {
-        this.giveUserPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO );
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
         addPriv( TEST_USER_NAME, REPO_TEST_HARNESS_REPO + "-priv", TargetPrivilegeDescriptor.TYPE, "1",
                  REPO_TEST_HARNESS_REPO, null, "update" );
 
@@ -172,7 +172,7 @@ public class Nexus1592ViewPrivTest
     public void deployViewCreate()
         throws Exception
     {
-        this.giveUserPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO );
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
         addPriv( TEST_USER_NAME, REPO_TEST_HARNESS_REPO + "-priv", TargetPrivilegeDescriptor.TYPE, "1",
                  REPO_TEST_HARNESS_REPO, null, "create" );
 
@@ -200,7 +200,7 @@ public class Nexus1592ViewPrivTest
     public void downloadView()
         throws Exception
     {
-        this.giveUserPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO );
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
 
         failDownload();
     }
@@ -209,7 +209,7 @@ public class Nexus1592ViewPrivTest
     public void downloadViewRead()
         throws Exception
     {
-        this.giveUserPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO );
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
         addPriv( TEST_USER_NAME, REPO_TEST_HARNESS_REPO + "-priv", TargetPrivilegeDescriptor.TYPE, "1",
                  REPO_TEST_HARNESS_REPO, null, "read" );
 
@@ -237,7 +237,7 @@ public class Nexus1592ViewPrivTest
     public void redeployView()
         throws Exception
     {
-        this.giveUserPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO );
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
 
         failDeploy( downloadGav );
     }
@@ -246,7 +246,7 @@ public class Nexus1592ViewPrivTest
     public void redeployViewCreate()
         throws Exception
     {
-        this.giveUserPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO );
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
         addPriv( TEST_USER_NAME, REPO_TEST_HARNESS_REPO + "-priv", TargetPrivilegeDescriptor.TYPE, "1",
                  REPO_TEST_HARNESS_REPO, null, "read" );
 
@@ -257,7 +257,7 @@ public class Nexus1592ViewPrivTest
     public void redeployViewUpdate()
         throws Exception
     {
-        this.giveUserPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO );
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
         addPriv( TEST_USER_NAME, REPO_TEST_HARNESS_REPO + "-priv", TargetPrivilegeDescriptor.TYPE, "1",
                  REPO_TEST_HARNESS_REPO, null, "update" );
 
@@ -285,7 +285,7 @@ public class Nexus1592ViewPrivTest
     public void deleteView()
         throws Exception
     {
-        this.giveUserPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO );
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
 
         failDelete();
     }
@@ -294,7 +294,7 @@ public class Nexus1592ViewPrivTest
     public void deleteViewDelete()
         throws Exception
     {
-        this.giveUserPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO );
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
         addPriv( TEST_USER_NAME, REPO_TEST_HARNESS_REPO + "-priv", TargetPrivilegeDescriptor.TYPE, "1",
                  REPO_TEST_HARNESS_REPO, null, "delete" );
 
