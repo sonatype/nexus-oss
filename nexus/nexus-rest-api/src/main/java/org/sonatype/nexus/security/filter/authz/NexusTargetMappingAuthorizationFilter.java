@@ -30,7 +30,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
-import org.sonatype.nexus.proxy.target.TargetSet;
 
 /**
  * A filter that maps the targetId from the Request.
@@ -187,9 +186,9 @@ public class NexusTargetMappingAuthorizationFilter
             }
         }
 
-        TargetSet matcheds = getNexus( request ).getRootRouter().getTargetsForRequest(
-            getResourceStoreRequest( request, false ) );
-
-        return nexusItemAuthorizer.authorizePath( matcheds, null, getActionFromHttpVerb( request ) );
+        return nexusItemAuthorizer.authorizePath(
+            getResourceStoreRequest( request, false ),
+            null,
+            getActionFromHttpVerb( request ) );
     }
 }

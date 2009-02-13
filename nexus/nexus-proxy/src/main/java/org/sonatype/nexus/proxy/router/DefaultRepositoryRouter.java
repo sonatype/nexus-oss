@@ -34,7 +34,6 @@ import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
@@ -65,9 +64,6 @@ public class DefaultRepositoryRouter
 
     @Requirement
     private RepositoryRegistry repositoryRegistry;
-
-    @Requirement
-    private NexusItemAuthorizer nexusItemAuthorizer;
 
     /** Should links be resolved? */
     private boolean followLinks;
@@ -370,11 +366,6 @@ public class DefaultRepositoryRouter
     // Private
     // ===
 
-    protected NexusItemAuthorizer getNexusItemAuthorizer()
-    {
-        return nexusItemAuthorizer;
-    }
-
     protected StorageItem mangle( boolean isList, ResourceStoreRequest request, RequestRoute route, StorageItem item )
         throws AccessDeniedException,
             ItemNotFoundException,
@@ -562,8 +553,6 @@ public class DefaultRepositoryRouter
             for ( Repository repository : repositories )
             {
                 if ( repository.isExposed() && repository.isBrowseable() )
-                // XXX: disabled for now
-                // && getNexusItemAuthorizer().isViewable( repository ) )
                 {
                     DefaultStorageCollectionItem repoItem = new DefaultStorageCollectionItem( this, ItemPathUtils
                         .concatPaths( request.getRequestPath(), repository.getId() ), true, false );

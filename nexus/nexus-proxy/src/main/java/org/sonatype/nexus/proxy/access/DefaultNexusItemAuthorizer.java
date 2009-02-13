@@ -24,9 +24,13 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.subject.Subject;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.proxy.router.RequestRoute;
 import org.sonatype.nexus.proxy.target.TargetMatch;
 import org.sonatype.nexus.proxy.target.TargetSet;
 
@@ -44,8 +48,29 @@ public class DefaultNexusItemAuthorizer
     @Requirement
     private RepositoryRegistry repoRegistry;
 
-    public boolean authorizePath( TargetSet matched, Map<String, Object> context, Action action )
+    @Requirement
+    private RepositoryRouter repositoryRouter;
+
+    public boolean authorizePath( ResourceStoreRequest request, Map<String, Object> context, Action action )
     {
+        TargetSet matched = repositoryRouter.getTargetsForRequest( request );
+
+        try
+        {
+            RequestRoute route = repositoryRouter.getRequestRouteForRequest( request );
+
+            if ( route.getTargetedRepository() != null )
+            {
+                // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
+                matched.addTargetSet( this.getGroupsTargetSet( route.getTargetedRepository(), route
+                    .getOriginalRequestPath(), context ) );
+            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore it, do nothing
+        }
+
         return authorizePath( matched, action );
     }
 
