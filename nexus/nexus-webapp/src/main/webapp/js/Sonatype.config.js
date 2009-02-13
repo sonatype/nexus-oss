@@ -58,11 +58,17 @@ Sonatype.config = function() {
     installedServers : {repoServer:true},
   
     repos : {
-      restToContentUrl : function ( r ) {
+      restToContentUrl : function ( r, id ) {
+        //First dump the /content in the /service url
+        var snippet = r.indexOf( Sonatype.config.browseIndexPathSnippet ) == -1 ?
+          Sonatype.config.browsePathSnippet : Sonatype.config.browseIndexPathSnippet;
+        r = r.replace( snippet, '' );
+        //If repo url, handle accordingly
         if ( r.indexOf( Sonatype.config.repos.snippets.repoServicePathSnippet ) > -1 ){
           return r.replace( Sonatype.config.repos.snippets.repoServicePathSnippet
               , Sonatype.config.repos.snippets.repoBrowsePathSnippet );
         }
+        //otherwise group url
         else if ( r.indexOf( Sonatype.config.repos.snippets.groupServicePathSnippet ) > -1 ){
           return r.replace( Sonatype.config.repos.snippets.groupServicePathSnippet
               , Sonatype.config.repos.snippets.groupBrowsePathSnippet );
