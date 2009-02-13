@@ -176,8 +176,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus537RepoTargetsTests.class,
     Nexus1239PlexusUserResourceTest.class,
     Nexus1239UserSearchTest.class,
-    Nexus1240SourceInLoginResourceTest.class,
-    Nexus1592ViewPrivTest.class
+    Nexus1240SourceInLoginResourceTest.class//,
+    //Nexus1592ViewPrivTest.class
 } )
 public class IntegrationTestSuiteClassesSecurity
 {
