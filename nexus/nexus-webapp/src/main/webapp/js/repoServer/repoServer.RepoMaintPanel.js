@@ -569,7 +569,12 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
       { name: 'format' },
       { name: 'policy' },
       { name: 'status' },
-      { name: 'displayStatus' },
+      { name:'repositories' },
+      { name: 'displayStatus', mapping: 'repositories', 
+        convert: function( v ) {
+          return Sonatype.utils.joinArrayObject( v, 'name' );
+        }
+      },
       { name: 'displayURI', mapping: 'resourceURI',         
         convert: function( s ) {
           return Sonatype.config.repos.restToContentUrl( s );
@@ -681,7 +686,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
       },
       { 
         name: 'displayStatus',
-        header: 'Status',
+        header: 'Repository Status',
         mapping: 'status',
         convert: Sonatype.repoServer.DefaultRepoHandler.statusConverter,
         width: 200
