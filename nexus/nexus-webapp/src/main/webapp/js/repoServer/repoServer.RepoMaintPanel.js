@@ -118,7 +118,9 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
 
   this.groupRecordConstructor = Ext.data.Record.create([
     {name:'id'},
-    {name:'repoType', convert: function(s, parent){return 'group';}},
+    { name: 'repoType', defaultValue: 'group' },
+    { name: 'exposed', type: 'boolean', defaultValue: true },
+    { name: 'userManaged', type: 'boolean', defaultValue: true },
     {name:'resourceURI'},
     {name:'format'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
@@ -385,6 +387,14 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     });
       
     Sonatype.Events.fireEvent( 'repositoryMenuInit', menu, this.ctxRecord );
+
+    var item;
+    while ( ( item = menu.items.first() ) && ! item.text ) {
+      menu.remove( item ); // clean up if the first element is a separator
+    }
+    while ( ( item = menu.items.last() ) && ! item.text ) {
+      menu.remove( item ); // clean up if the last element is a separator
+    }
     
     menu.on('hide', this.onContextHideHandler, this);
     e.stopEvent();
@@ -545,6 +555,36 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
     interval: 5000, // poll every 5 seconds
     scope: this
   };
+
+  this.groupStore = new Ext.data.JsonStore( {
+    root: 'data',
+    id: 'resourceURI',
+    fields: [
+      { name: 'id' },
+      { name: 'name', sortType: Ext.data.SortTypes.asUCString },
+      { name: 'repoType', defaultValue: 'group' },
+      { name: 'exposed', type: 'boolean', defaultValue: true },
+      { name: 'userManaged', type: 'boolean', defaultValue: true },
+      { name: 'resourceURI'},
+      { name: 'format' },
+      { name: 'policy' },
+      { name: 'status' },
+      { name: 'displayStatus' },
+      { name: 'displayURI', mapping: 'resourceURI',         
+        convert: function( s ) {
+          return s.replace( Sonatype.config.repos.urls.groups, Sonatype.config.content.groups );
+        }
+      }
+    ],
+    sortInfo: { field: 'name', direction: 'asc' },
+    url: Sonatype.config.repos.urls.groups,
+    listeners: {
+      load: function( store, records, options ) {
+        this.dataStore.insert( 0, store.data.items );
+      },
+      scope: this
+    }
+  } );
 
   this.browseTypeButton = new Ext.Button( {
     text: 'User Managed Repositories',
@@ -708,6 +748,9 @@ Ext.extend( Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
           }
         }
         break;
+      case 'user':
+        this.groupStore.reload();
+        break;
     }
     this.statusStart();
   },
@@ -760,13 +803,13 @@ Ext.extend( Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
 
     switch ( button.value ) {
       case 'nexus':
-        this.addButton.disable();
-        this.deleteButton.disable();
+        if ( this.toolbarAddButton ) this.toolbarAddButton.disable();
+        if ( this.toolbarDeleteButton ) this.toolbarDeleteButton.disable();
         this.dataStore.proxy.conn.url = Sonatype.config.repos.urls.allRepositories;
         break;
       case 'user':
-        this.addButton.enable();
-        this.deleteButton.enable();
+        if ( this.toolbarAddButton ) this.toolbarAddButton.enable();
+        if ( this.toolbarDeleteButton ) this.toolbarDeleteButton.enable();
         this.dataStore.proxy.conn.url = Sonatype.config.repos.urls.repositories;
         break;
     }
@@ -949,7 +992,7 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
       Sonatype.Events.fireEvent( this.nodeClickEvent, node );
     }
   },
-  
+
   nodeContextMenuHandler: function( node, e ) {
     if ( e.target.nodeName == 'A' ) return; // no menu on links
 
@@ -968,12 +1011,11 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
   
       Sonatype.Events.fireEvent( this.nodeContextMenuEvent, menu, this.payload, node );
 
-      var item = menu.items.first();
-      if ( item && ! item.text ) {
+      var item;
+      while ( ( item = menu.items.first() ) && ! item.text ) {
         menu.remove( item ); // clean up if the first element is a separator
       }
-      item = menu.items.last();
-      if ( item && ! item.text ) {
+      while ( ( item = menu.items.last() ) && ! item.text ) {
         menu.remove( item ); // clean up if the last element is a separator
       }
       if ( ! menu.items.first() ) return;

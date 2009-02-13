@@ -343,12 +343,11 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
       } );
 
       Sonatype.Events.fireEvent( this.addMenuInitEvent, menu );
-      var item = menu.items.first();
-      if ( item && ! item.text ) {
+      var item;
+      while ( ( item = menu.items.first() ) && ! item.text ) {
         menu.remove( item ); // clean up if the first element is a separator
       }
-      item = menu.items.last();
-      if ( item && ! item.text ) {
+      while ( ( item = menu.items.last() ) && ! item.text ) {
         menu.remove( item ); // clean up if the last element is a separator
       }
       if ( ! menu.items.length ) return; // quit if empty
@@ -359,13 +358,13 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
         }
       }, this );
 
-      this.addButton = new Ext.Button( {
+      this.toolbarAddButton = new Ext.Button( {
         text: 'Add...',
         icon: Sonatype.config.resourcePath + '/images/icons/add.png',
         cls: 'x-btn-text-icon',
         menu: menu
       } );
-      this.tbar.push( this.addButton );
+      this.tbar.push( this.toolbarAddButton );
     }
   },
   
@@ -416,14 +415,14 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
   
   createDeleteButton: function() {
     if ( this.deleteButton ) {
-      this.deleteButton = new Ext.Button( {
+      this.toolbarDeleteButton = new Ext.Button( {
         text: 'Delete',
         icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
         cls: 'x-btn-text-icon',
         handler: this.deleteActionHandler,
         scope: this
       } );
-      this.tbar.push( this.deleteButton );
+      this.tbar.push( this.toolbarDeleteButton );
     }
   },
   
@@ -534,12 +533,11 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
   
       Sonatype.Events.fireEvent( this.rowContextClickEvent, menu, rec );
 
-      var item = menu.items.first();
-      if ( item && ! item.text ) {
+      var item;
+      while ( ( item = menu.items.first() ) && ! item.text ) {
         menu.remove( item ); // clean up if the first element is a separator
       }
-      item = menu.items.last();
-      if ( item && ! item.text ) {
+      while ( ( item = menu.items.last() ) && ! item.text ) {
         menu.remove( item ); // clean up if the last element is a separator
       }
       if ( ! menu.items.first() ) return;
