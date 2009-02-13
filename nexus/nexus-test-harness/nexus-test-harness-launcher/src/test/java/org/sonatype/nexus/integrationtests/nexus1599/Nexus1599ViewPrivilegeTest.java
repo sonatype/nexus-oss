@@ -37,13 +37,6 @@ import com.sun.syndication.feed.synd.SyndEntry;
 public class Nexus1599ViewPrivilegeTest
     extends AbstractPrivilegeTest
 {
-    private static final String TEST__REPO_ID = "nexus-test-harness-repo";
-
-    private static final String TEST__REPO_NAME = "nexus-test-harness-repo";
-
-    private static final String USER_ID = "test-user";
-
-    private static final String PASSWORD = "admin123";
 
     protected RepositoryMessageUtil repoMsgUtil;
 
@@ -52,12 +45,10 @@ public class Nexus1599ViewPrivilegeTest
     public Nexus1599ViewPrivilegeTest()
         throws Exception
     {
-        super( TEST__REPO_ID );
+        super( REPO_TEST_HARNESS_REPO );
 
-        this.repoMsgUtil = new RepositoryMessageUtil(
-            this.getJsonXStream(),
-            MediaType.APPLICATION_JSON,
-            getRepositoryTypeRegistry() );
+        this.repoMsgUtil =
+            new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
 
         this.searchMsgUtil = new SearchMessageUtil();
     }
@@ -69,57 +60,74 @@ public class Nexus1599ViewPrivilegeTest
     }
 
     @Test
-    public void testSearch()
+    public void testSearchWithoutView()
         throws Exception
     {
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+        this.giveUserRole( TEST_USER_NAME, "ui-search" ); // search priv
 
-        addPrivilege( USER_ID, RepositoryViewPrivilegeDescriptor.buildPrivilege( TEST__REPO_ID ) );
-        TestContainer.getInstance().getTestContext().setUsername( USER_ID );
-        TestContainer.getInstance().getTestContext().setPassword( PASSWORD );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         List<NexusArtifact> results = searchMsgUtil.searchFor( getTestId() );
-        Assert.assertEquals( "With view perm, there should be 1 results, but was " + results.size() + " !", 1, results
-            .size() );
-
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-        removePrivilege( USER_ID, RepositoryViewPrivilegeDescriptor.buildPrivilege( TEST__REPO_ID ) );
-        TestContainer.getInstance().getTestContext().setUsername( USER_ID );
-        TestContainer.getInstance().getTestContext().setPassword( PASSWORD );
-
-        results = searchMsgUtil.searchFor( getTestId() );
         Assert.assertTrue( "Without perm, the result should be empty! ", results.isEmpty() );
+    }
+
+    @Test
+    public void testSearchWithView()
+        throws Exception
+    {
+        this.giveUserRole( TEST_USER_NAME, "ui-search" ); // search priv
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
+
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+
+        List<NexusArtifact> results = searchMsgUtil.searchFor( "nexus1599" );
+        Assert.assertEquals( "With view perm, there should be 1 results, but was " + results.size() + " !", 1,
+                             results.size() );
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testFeedWithoutView()
+        throws Exception
+    {
+        this.giveUserRole( TEST_USER_NAME, "ui-system-feeds" ); // feeds priv
+
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+
+        List<SyndEntry> entries = FeedUtil.getFeed( "recentlyChangedArtifacts" ).getEntries();
+        for ( SyndEntry entry : entries )
+        {
+            Assert.assertFalse( entryContainsMsg( entry, REPO_TEST_HARNESS_REPO ) );
+        }
     }
 
     @SuppressWarnings( "unchecked" )
     @Test
-    public void testFeed()
+    public void testFeedWithView()
         throws Exception
     {
-        // with view perm, all entries returned
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-        // rss feeds perm
-        // addPrivilege( USER_ID, "44" );
-        addPrivilege( USER_ID, RepositoryViewPrivilegeDescriptor.buildPrivilege( TEST__REPO_ID ) );
-        TestContainer.getInstance().getTestContext().setUsername( USER_ID );
-        TestContainer.getInstance().getTestContext().setPassword( PASSWORD );
+        this.giveUserRole( TEST_USER_NAME, "ui-system-feeds" ); // feeds priv
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
 
-        List<SyndEntry> entriesWithPerm = FeedUtil.getFeed( "recentlyChangedArtifacts" ).getEntries();
-        Assert.assertTrue( "There should be one or more feeds returned!", entriesWithPerm.size() > 0 );
-        Assert.assertTrue( entryContainsMsg( entriesWithPerm.get( 0 ), TEST__REPO_NAME ) );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        // without view perm, entries related with the specific repo are filtered
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-        removePrivilege( USER_ID, RepositoryViewPrivilegeDescriptor.buildPrivilege( TEST__REPO_ID ) );
-        TestContainer.getInstance().getTestContext().setUsername( USER_ID );
-        TestContainer.getInstance().getTestContext().setPassword( PASSWORD );
-
-        List<SyndEntry> entriesWithoutPerm = FeedUtil.getFeed( "recentlyChangedArtifacts" ).getEntries();
-        Assert.assertTrue( entriesWithPerm.size() > entriesWithoutPerm.size() );
-        for ( SyndEntry entry : entriesWithoutPerm )
+        List<SyndEntry> entries = FeedUtil.getFeed( "recentlyChangedArtifacts" ).getEntries();
+        Assert.assertTrue( "There should be one or more feeds returned!", entries.size() > 0 );
+        Assert.assertTrue( entries.size() > entries.size() );
+        boolean containRepo = false;
+        for ( SyndEntry entry : entries )
         {
-            Assert.assertFalse( entryContainsMsg( entry, TEST__REPO_NAME ) );
+            if(entryContainsMsg( entry, REPO_TEST_HARNESS_REPO ) ) {
+                containRepo = true;
+                break;
+            }
         }
+        Assert.assertTrue("Not found repo feed " + entries, containRepo );
+
     }
 
     private boolean entryContainsMsg( SyndEntry entry, String msg )
@@ -132,10 +140,14 @@ public class Nexus1599ViewPrivilegeTest
     }
 
     @Test
-    public void testBrowseRepo()
+    public void testBrowseRepoWithoutView()
         throws Exception
     {
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
+        this.giveUserRole( TEST_USER_NAME, "ui-repo-browser" ); // browser priv
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
+
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         List<RepositoryListResource> repos = repoMsgUtil.getList();
         Assert.assertFalse( repos.isEmpty() );
@@ -151,16 +163,16 @@ public class Nexus1599ViewPrivilegeTest
         throws Exception
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        addPrivilege( USER_ID, RepositoryViewPrivilegeDescriptor.buildPrivilege( repoId ) );
-        TestContainer.getInstance().getTestContext().setUsername( USER_ID );
-        TestContainer.getInstance().getTestContext().setPassword( PASSWORD );
+        addPrivilege( TEST_USER_NAME, RepositoryViewPrivilegeDescriptor.buildPrivilege( repoId ) );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         Assert.assertTrue( containsRepo( repoMsgUtil.getList(), repoId ) );
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        removePrivilege( USER_ID, RepositoryViewPrivilegeDescriptor.buildPrivilege( repoId ) );
-        TestContainer.getInstance().getTestContext().setUsername( USER_ID );
-        TestContainer.getInstance().getTestContext().setPassword( PASSWORD );
+        removePrivilege( TEST_USER_NAME, RepositoryViewPrivilegeDescriptor.buildPrivilege( repoId ) );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         Assert.assertFalse( "Repo '" + repoId + "' should be hidden!", containsRepo( repoMsgUtil.getList(), repoId ) );
     }
