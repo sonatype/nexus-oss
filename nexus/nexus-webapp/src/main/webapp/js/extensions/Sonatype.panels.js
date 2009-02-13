@@ -210,16 +210,15 @@ Sonatype.panels.GridViewer = function( config ) {
   } );
   this.gridPanel.getSelectionModel().on( 'rowselect', this.rowSelectHandler, this );
 
+  this.refreshButton = new Ext.Button( {
+    text: 'Refresh',
+    icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+    cls: 'x-btn-text-icon',
+    scope: this,
+    handler: this.refreshHandler
+  } );
   var toolbar = this.tbar;
-  this.tbar = [
-    {
-      text: 'Refresh',
-      icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
-      cls: 'x-btn-text-icon',
-      scope: this,
-      handler: this.refreshHandler
-    }
-  ]
+  this.tbar = [this.refreshButton];
   this.createAddMenu();
   this.createDeleteButton();
   if ( toolbar ) {
@@ -534,6 +533,15 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
       });
   
       Sonatype.Events.fireEvent( this.rowContextClickEvent, menu, rec );
+
+      var item = menu.items.first();
+      if ( item && ! item.text ) {
+        menu.remove( item ); // clean up if the first element is a separator
+      }
+      item = menu.items.last();
+      if ( item && ! item.text ) {
+        menu.remove( item ); // clean up if the last element is a separator
+      }
       if ( ! menu.items.first() ) return;
 
       e.stopEvent();

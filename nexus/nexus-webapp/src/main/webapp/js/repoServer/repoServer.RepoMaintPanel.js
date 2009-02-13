@@ -122,7 +122,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     {name:'resourceURI'},
     {name:'format'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
-    {name:'sStatus'},
+    {name:'displayStatus'},
     {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl }
   ]);
 
@@ -154,7 +154,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     {name:'localStatus'/*, mapping: 'status'*/, convert: function(s, parent){return parent.status?parent.status.localStatus:null;}},
     {name:'remoteStatus'/*, mapping: 'status'*/, convert: function(s, parent){return parent.status?parent.status.remoteStatus:null;}},
     {name:'proxyMode'/*, mapping: 'status'*/, convert: function(s, parent){return parent.status?parent.status.proxyMode:null;}},
-    {name:'sStatus', /*mapping:'status', */convert: this.statusTextMaker},
+    {name:'displayStatus', /*mapping:'status', */convert: this.statusTextMaker},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
 //  {name:'effectiveLocalStorageUrl'},
     {name:'repoPolicy'},
@@ -211,7 +211,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
               }
               else
               {
-                  item.data.sStatus = 'In Service';
+                  item.data.displayStatus = 'In Service';
               }
             },this);
         },
@@ -252,7 +252,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
         }},
       {header: 'Type', dataIndex: 'repoType', width:50},
       {header: 'Format', dataIndex: 'format', width:50},
-      {header: 'Status', dataIndex: 'sStatus', width:250},
+      {header: 'Status', dataIndex: 'displayStatus', width:250},
       {header: 'Repository Path', dataIndex: 'contentUri', id: 'repo-maint-url-col', width:250,renderer: function(s){return '<a href="' + s + ((s != null && (s.charAt(s.length)) == '/') ? '' : '/') +'" target="_blank">' + s + '</a>';},menuDisabled:true}      
     ],
     autoExpandColumn: 'repo-maint-url-col',
@@ -383,21 +383,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
         this.actions.view
       ]
     });
-
-    if(repoStatusPriv && this.ctxRecord.get('repoType') == 'proxy'){
-      menu.add((this.ctxRecord.get('proxyMode') == 'allow')
-                 ? this.actions.blockProxy
-                 : this.actions.allowProxy
-              );
-    }
-    
-    if (repoStatusPriv && !isGroup ) {
-      menu.add((this.ctxRecord.get('localStatus') == 'inService') 
-               ? this.actions.putOutOfService
-               : this.actions.putInService
-            );
-    }
-
       
     Sonatype.Events.fireEvent( 'repositoryMenuInit', menu, this.ctxRecord );
     
@@ -430,26 +415,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       window.open(this.restToRemoteUrl(this.ctxBrowseNode,rec));
     }
   },  
-  
-  updateRepoStatuses : function(repoStatus){
-    var rec = this.reposDataStore.getById(Sonatype.config.host + Sonatype.config.repos.urls.repositories + '/' + repoStatus.id);
-    rec.beginEdit();
-    rec.set('localStatus', repoStatus.localStatus);
-    rec.set('remoteStatus', (repoStatus.remoteStatus)?repoStatus.remoteStatus:null);
-    rec.set('proxyMode', (repoStatus.proxyMode)?repoStatus.proxyMode:null);
-    rec.set('sStatus', this.statusTextMaker(repoStatus, rec.data));
-    rec.commit();
-    rec.endEdit();
-    
-    if(repoStatus.dependentRepos){
-      Ext.each(repoStatus.dependentRepos, this.updateRepoStatuses, this);
-    }
-    
-    Ext.TaskMgr.start(this.repoStatusTask);
-  },
-  
-  beforeRenderHandler : function(component){
-  },
   
   repoRowSelectHandler : function( selectionModel, index, rec ){
     this.viewRepo(rec);
@@ -488,7 +453,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
             rec.set('localStatus', item.status.localStatus);
             rec.set('remoteStatus', item.status.remoteStatus);
             rec.set('proxyMode', item.status.proxyMode);
-            rec.set('sStatus', this.statusTextMaker(item.status, item));
+            rec.set('displayStatus', this.statusTextMaker(item.status, item));
             rec.commit(true);
             rec.endEdit();
           }
@@ -566,6 +531,21 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
 
   var sp = Sonatype.lib.Permissions;
 
+  this.repoStatusTask = {
+    run: function() {
+      if ( sp.checkPermission( 'nexus:repostatus', sp.READ ) ) {
+        Ext.Ajax.request( {
+          url: Sonatype.config.repos.urls.repositoryStatuses + ( this.forceStatuses ? '?forceCheck' : '' ),
+          callback: this.statusCallback,
+          scope: this
+        } );
+      }
+      this.forceStatuses = false;
+    },
+    interval: 5000, // poll every 5 seconds
+    scope: this
+  };
+
   this.browseTypeButton = new Ext.Button( {
     text: 'User Managed Repositories',
     icon: Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
@@ -616,6 +596,8 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
     } );
   }
   toolbar.push( this.browseTypeButton );
+
+  Sonatype.Events.addListener( 'nexusRepositoryStatus', this.statusStart, this );
   
   Sonatype.repoServer.RepositoryPanel.superclass.constructor.call( this, {
     addMenuInitEvent: 'repositoryAddMenuInit',
@@ -632,6 +614,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
       { name: 'id' },
       { name: 'exposed' },
       { name: 'userManaged' },
+      { name: 'status' },
       {
         name: 'name',
         sortType: Ext.data.SortTypes.asUCString,
@@ -657,6 +640,13 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
         width: 70
       },
       { 
+        name: 'displayStatus',
+        header: 'Status',
+        mapping: 'status',
+        convert: Sonatype.repoServer.DefaultRepoHandler.statusConverter,
+        width: 200
+      },
+      { 
         name: 'displayURI',
         header: 'Repository Path',
         autoExpand: true,
@@ -672,7 +662,11 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
       }
     ]
   } );
-  
+
+  this.addListener( 'beforedestroy', function() { 
+    Ext.TaskMgr.stop( this.repoStatusTask ); 
+    Sonatype.Events.removeListener( 'nexusRepositoryStatus', this.statusStart, this );
+  }, this );
   this.dataStore.addListener( 'load', this.onRepoStoreLoad, this );
   this.dataStore.load();
 };
@@ -715,8 +709,51 @@ Ext.extend( Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
         }
         break;
     }
+    this.statusStart();
   },
 
+  refreshHandler: function( button, e ) {
+    if ( button == this.refreshButton ) {
+      this.forceStatuses = true;
+    }
+    Sonatype.repoServer.RepositoryPanel.superclass.refreshHandler.call( this, button, e );
+  },
+
+  statusCallback : function( options, success, response ) {
+    if ( response.status != 202 ) {
+      Ext.TaskMgr.stop( this.repoStatusTask );
+    }
+
+    if ( success ) {
+      var statusResp = Ext.decode( response.responseText );
+      if ( statusResp.data ) {
+        var data = statusResp.data;
+        for ( var i = data.length - 1; i >= 0; i-- ) {
+          var item = data[i];
+          var rec = this.dataStore.getById( item.resourceURI.replace(
+            Sonatype.config.repos.urls.repositoryStatuses,Sonatype.config.repos.urls.repositories ) );
+          if ( rec ) {
+            rec.beginEdit();
+            rec.set( 'status', item.status );
+            rec.set( 'displayStatus', Sonatype.repoServer.DefaultRepoHandler.statusConverter( item.status, item ) );
+            rec.commit( true );
+            rec.endEdit();
+          }
+        }
+        if ( data.length ) {
+          this.gridPanel.getView().refresh();
+        }
+      }
+    }
+    else {
+      Sonatype.MessageBox.alert( 'Status retrieval failed' );
+    }
+  },
+
+  statusStart: function() {
+    Ext.TaskMgr.start( this.repoStatusTask );
+  },
+  
   switchBrowseType: function( button, e ) {
     this.browseTypeButton.setText( button.text );
     this.browseTypeButton.value = button.value;
@@ -930,6 +967,15 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
       } );
   
       Sonatype.Events.fireEvent( this.nodeContextMenuEvent, menu, this.payload, node );
+
+      var item = menu.items.first();
+      if ( item && ! item.text ) {
+        menu.remove( item ); // clean up if the first element is a separator
+      }
+      item = menu.items.last();
+      if ( item && ! item.text ) {
+        menu.remove( item ); // clean up if the last element is a separator
+      }
       if ( ! menu.items.first() ) return;
 
       e.stopEvent();
@@ -1045,7 +1091,7 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
       }
       node.setText( node.text + ' (Out of Service)' );
     }
-    else if ( response.status == 404 ) {
+    else if ( response.status == 404 || response.status == 400 ) {
       if ( Sonatype.MessageBox.isVisible() ) {
         Sonatype.MessageBox.hide();
       }
