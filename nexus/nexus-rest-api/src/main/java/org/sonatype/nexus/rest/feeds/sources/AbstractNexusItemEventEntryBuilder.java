@@ -15,7 +15,6 @@ package org.sonatype.nexus.rest.feeds.sources;
 
 import java.util.Date;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.restlet.data.MediaType;
@@ -25,7 +24,6 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 import com.sun.syndication.feed.synd.SyndContent;
@@ -118,7 +116,7 @@ abstract public class AbstractNexusItemEventEntryBuilder
 
         return content;
     }
-    
+
     protected String getRepositoryName( NexusArtifactEvent event )
     {
         String repoId = event.getNexusItemInfo().getRepositoryId();
@@ -217,9 +215,7 @@ abstract public class AbstractNexusItemEventEntryBuilder
         {
             Repository repo = nexus.getRepository( event.getNexusItemInfo().getRepositoryId() );
 
-            RepositoryItemUid uid = repo.createUid( event.getNexusItemInfo().getPath() );
-
-            if ( !nexusItemAuthorizer.authorizePath( uid, null, Action.read ) )
+            if ( !nexusItemAuthorizer.authorizePath( repo, event.getNexusItemInfo().getPath(), null, Action.read ) )
             {
                 return false;
             }

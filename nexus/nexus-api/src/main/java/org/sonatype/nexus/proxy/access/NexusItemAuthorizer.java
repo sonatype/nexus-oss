@@ -15,8 +15,8 @@ package org.sonatype.nexus.proxy.access;
 
 import java.util.Map;
 
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.target.TargetSet;
 
 /**
  * Authorizes the Repository requests against permissions.
@@ -26,24 +26,33 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 public interface NexusItemAuthorizer
 {
     /**
-     * Authorizes a repository's path against an action.
+     * Authorizes a TargetSet against an action. Used by authz filter to check the incoming request, that is obviously
+     * addressed to content root.
      * 
      * @param repository
      * @param path
      * @return
      */
-    boolean authorizePath( RepositoryItemUid uid, Map<String, Object> context, Action action );
+    boolean authorizePath( TargetSet matched, Map<String, Object> context, Action action );
 
-//    /**
-//     * Authorizes a root level ResourceStoreRequest against an Action.
-//     * 
-//     * @param request
-//     * @param rsr
-//     * @param action
-//     * @return
-//     */
-//    boolean authorizePath( ResourceStoreRequest rsr, Action action );
-    
+    /**
+     * Authorizes a repository level path against an action. Use when you have a repositoy path, ie. filtering of search
+     * results or feeds.
+     * 
+     * @param repository
+     * @param path
+     * @return
+     */
+    boolean authorizePath( Repository repository, String path, Map<String, Object> context, Action action );
+
+    /**
+     * A shorthand for "view" permission.
+     * 
+     * @param repository
+     * @return
+     */
+    boolean isViewable( Repository repository );
+
     /**
      * Used to authorize a simple permission string
      * 

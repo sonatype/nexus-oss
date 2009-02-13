@@ -21,16 +21,12 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.subject.Subject;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.target.TargetMatch;
 import org.sonatype.nexus.proxy.target.TargetSet;
 
@@ -46,52 +42,26 @@ public class DefaultNexusItemAuthorizer
     private ApplicationConfiguration applicationConfiguration;
 
     @Requirement
-    private RepositoryRouter root;
-
-    @Requirement
     private RepositoryRegistry repoRegistry;
 
-    public boolean authorizePath( RepositoryItemUid uid, Map<String, Object> context, Action action )
+    public boolean authorizePath( TargetSet matched, Map<String, Object> context, Action action )
     {
-        // Get the target(s) that match the path
-        TargetSet matched = uid.getRepository().getTargetsForRequest( uid, context );
+        return authorizePath( matched, action );
+    }
+
+    public boolean authorizePath( Repository repository, String path, Map<String, Object> context, Action action )
+    {
+        TargetSet matched = repository.getTargetsForRequest( path, context );
 
         // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
-        matched.addTargetSet( this.getGroupsTargetSet( uid, context ) );
+        matched.addTargetSet( this.getGroupsTargetSet( repository, path, context ) );
 
         return authorizePath( matched, action );
     }
 
-    private TargetSet getGroupsTargetSet( RepositoryItemUid uid, Map<String, Object> context )
+    public boolean isViewable( Repository repository )
     {
-        TargetSet targetSet = new TargetSet();
-
-        for ( Repository group : this.getListOfGroups( uid.getRepository().getId() ) )
-        {
-            // we need to create a different uid for the group
-            TargetSet groupMatched = group.getTargetsForRequest( group.createUid( uid.getPath() ), context );
-            targetSet.addTargetSet( groupMatched );
-        }
-
-        return targetSet;
-    }
-
-    private List<Repository> getListOfGroups( String repositoryId )
-    {
-        List<Repository> groups = new ArrayList<Repository>();
-        List<String> groupIds = this.repoRegistry.getGroupsOfRepository( repositoryId );
-        for ( String groupId : groupIds )
-        {
-            try
-            {
-                groups.add( this.repoRegistry.getRepository( groupId ) );
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                // ignored
-            }
-        }
-        return groups;
+        return authorizePermission( "nexus:repoview:" + repository.getId() );
     }
 
     public boolean authorizePermission( String permission )
@@ -99,7 +69,49 @@ public class DefaultNexusItemAuthorizer
         return isPermitted( Collections.singletonList( permission ) );
     }
 
-    private boolean authorizePath( TargetSet matched, Action action )
+    // ===
+
+    protected TargetSet getGroupsTargetSet( Repository repository, String path, Map<String, Object> context )
+    {
+        TargetSet targetSet = new TargetSet();
+
+        for ( Repository group : getListOfGroups( repository.getId() ) )
+        {
+            // are the perms transitively inherited from the groups where it is member?
+            // !group.isExposed()
+            if ( true )
+            {
+                TargetSet groupMatched = group.getTargetsForRequest( path, context );
+
+                targetSet.addTargetSet( groupMatched );
+            }
+        }
+
+        return targetSet;
+    }
+
+    protected List<Repository> getListOfGroups( String repositoryId )
+    {
+        List<Repository> groups = new ArrayList<Repository>();
+
+        List<String> groupIds = repoRegistry.getGroupsOfRepository( repositoryId );
+
+        for ( String groupId : groupIds )
+        {
+            try
+            {
+                groups.add( repoRegistry.getRepository( groupId ) );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                // ignored
+            }
+        }
+
+        return groups;
+    }
+
+    protected boolean authorizePath( TargetSet matched, Action action )
     {
         // did we hit repositories at all?
         if ( matched.getMatchedRepositoryIds().size() > 0 )

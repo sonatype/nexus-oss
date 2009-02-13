@@ -27,6 +27,13 @@ public class AccessDeniedException
 
     private final ResourceStoreRequest request;
 
+    public AccessDeniedException( String msg )
+    {
+        super( msg );
+
+        this.request = null;
+    }
+
     public AccessDeniedException( ResourceStoreRequest request, String msg )
     {
         super( msg );

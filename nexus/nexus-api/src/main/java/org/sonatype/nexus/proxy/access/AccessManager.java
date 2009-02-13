@@ -13,8 +13,9 @@
  */
 package org.sonatype.nexus.proxy.access;
 
+import java.util.Map;
+
 import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -47,11 +48,8 @@ public interface AccessManager
     /**
      * The implementation of this method should throw AccessDeniedException or any subclass if it denies access.
      * 
-     * @param request the request
-     * @param repository the repository
-     * @param permission the permission
      * @throws AccessDeniedException the access denied exception
      */
-    void decide( ResourceStoreRequest request, Repository repository, Action action )
+    void decide( Repository repository, String path, Map<String, Object> context, Action action )
         throws AccessDeniedException;
 }

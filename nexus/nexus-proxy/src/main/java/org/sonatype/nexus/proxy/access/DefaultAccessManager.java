@@ -13,11 +13,11 @@
  */
 package org.sonatype.nexus.proxy.access;
 
+import java.util.Map;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -32,17 +32,15 @@ public class DefaultAccessManager
     @Requirement
     private NexusItemAuthorizer nexusItemAuthorizer;
 
-    public void decide( ResourceStoreRequest request, Repository repository, Action action )
+    public void decide( Repository repository, String path, Map<String, Object> context, Action action )
         throws AccessDeniedException
     {
-        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
-
-        if ( !nexusItemAuthorizer.authorizePermission( "nexus:repoview:" + repository.getId() )
-            || !nexusItemAuthorizer.authorizePath( uid, request.getRequestContext(), action ) )
+        if ( !nexusItemAuthorizer.isViewable( repository )
+            || !nexusItemAuthorizer.authorizePath( repository, path, context, action ) )
         {
             // deny the access
-            throw new AccessDeniedException( request, "Access denied on repository ID='" + repository.getId()
-                + "', path='" + request.getRequestPath() + "', action='" + action + "'!" );
+            throw new AccessDeniedException( "Access denied on repository ID='" + repository.getId() + "', path='"
+                + path + "', action='" + action + "'!" );
         }
     }
 }

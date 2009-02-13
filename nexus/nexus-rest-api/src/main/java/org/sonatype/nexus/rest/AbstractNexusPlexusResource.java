@@ -316,7 +316,7 @@ public abstract class AbstractNexusPlexusResource
 
                 String path = mr.getGavCalculator().gavToPath( gav );
 
-                if ( !nexusItemAuthorizer.authorizePath( mr.createUid( path ), null, Action.read ) )
+                if ( !nexusItemAuthorizer.authorizePath( mr, path, null, Action.read ) )
                 {
                     return null;
                 }

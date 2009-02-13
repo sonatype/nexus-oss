@@ -694,9 +694,7 @@ public abstract class AbstractRepository
 
     public TargetSet getTargetsForRequest( ResourceStoreRequest request )
     {
-        RepositoryItemUid uid = createUid( request.getRequestPath() );
-
-        return getTargetsForRequest( uid, request.getRequestContext() );
+        return getTargetsForRequest( request.getRequestPath(), request.getRequestContext() );
     }
 
     public Action getResultingActionOnWrite( ResourceStoreRequest rsr )
@@ -1000,14 +998,14 @@ public abstract class AbstractRepository
         return list( item.getRepositoryItemUid(), item.getItemContext() );
     }
 
-    public TargetSet getTargetsForRequest( RepositoryItemUid uid, Map<String, Object> context )
+    public TargetSet getTargetsForRequest( String path, Map<String, Object> context )
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "getTargetsForRequest() :: " + uid.toString() );
+            getLogger().debug( "getTargetsForRequest() :: " + this.getId() + ":" + path );
         }
 
-        return targetRegistry.getTargetsForRepositoryPath( uid.getRepository(), uid.getPath() );
+        return targetRegistry.getTargetsForRepositoryPath( this, path );
     }
 
     public RepositoryItemUid createUid( String path )
@@ -1122,7 +1120,7 @@ public abstract class AbstractRepository
 
         if ( isExposed() )
         {
-            getAccessManager().decide( request, repository, action );
+            getAccessManager().decide( repository, request.getRequestPath(), request.getRequestContext(), action );
         }
 
         boolean shouldProcess = true;

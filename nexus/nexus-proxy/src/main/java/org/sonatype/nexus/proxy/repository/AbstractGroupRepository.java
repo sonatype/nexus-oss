@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -113,12 +112,8 @@ public abstract class AbstractGroupRepository
                 try
                 {
                     RepositoryItemUid memberUid = repo.createUid( uid.getPath() );
-
-                    ResourceStoreRequest req = new ResourceStoreRequest( memberUid, true );
-
-                    req.setRequestContext( context );
-
-                    addItems( names, result, repo.list( req ) );
+                    
+                    addItems( names, result, repo.list( memberUid, context ) );
 
                     found = true;
                 }
@@ -131,10 +126,6 @@ public abstract class AbstractGroupRepository
                     // ignored
                 }
                 catch ( StorageException e )
-                {
-                    // ignored
-                }
-                catch ( AccessDeniedException e )
                 {
                     // ignored
                 }

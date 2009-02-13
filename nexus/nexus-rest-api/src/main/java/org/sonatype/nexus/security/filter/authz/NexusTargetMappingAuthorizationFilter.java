@@ -28,11 +28,9 @@ import org.jsecurity.web.WebUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
-import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.proxy.router.RequestRoute;
+import org.sonatype.nexus.proxy.target.TargetSet;
 
 /**
  * A filter that maps the targetId from the Request.
@@ -48,9 +46,7 @@ public class NexusTargetMappingAuthorizationFilter
 
     private String pathReplacement;
 
-    private AccessManager accessManager = null;
-
-    private RepositoryRouter repoRouter = null;
+    private NexusItemAuthorizer nexusItemAuthorizer;
 
     public String getPathPrefix()
     {
@@ -177,14 +173,13 @@ public class NexusTargetMappingAuthorizationFilter
             }
         }
 
-        if ( accessManager == null || repoRouter == null )
+        if ( nexusItemAuthorizer == null )
         {
             PlexusContainer plexus = (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
 
             try
             {
-                accessManager = plexus.lookup( AccessManager.class );
-                repoRouter = plexus.lookup( RepositoryRouter.class );
+                nexusItemAuthorizer = plexus.lookup( NexusItemAuthorizer.class );
             }
             catch ( ComponentLookupException e )
             {
@@ -192,22 +187,9 @@ public class NexusTargetMappingAuthorizationFilter
             }
         }
 
-        // try to authorize the request
-        try
-        {
-            ResourceStoreRequest resourceStoreRequest = getResourceStoreRequest( request, true );
-            RequestRoute route = repoRouter.getRequestRouteForRequest( resourceStoreRequest );
-            accessManager.decide( resourceStoreRequest, route.getTargetedRepository(), getActionFromHttpVerb( request ) );
-            return true;
-        }
-        catch ( AccessDeniedException e )
-        {
-            return false;
-        }
-        catch ( ItemNotFoundException e )
-        {
-           return false;
-        }
+        TargetSet matcheds = getNexus( request ).getRootRouter().getTargetsForRequest(
+            getResourceStoreRequest( request, false ) );
 
+        return nexusItemAuthorizer.authorizePath( matcheds, null, getActionFromHttpVerb( request ) );
     }
 }

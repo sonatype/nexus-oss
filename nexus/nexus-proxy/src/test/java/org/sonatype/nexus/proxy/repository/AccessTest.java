@@ -19,8 +19,6 @@ import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
@@ -96,30 +94,34 @@ public class AccessTest
             IllegalOperationException,
             ItemNotFoundException
     {
-        // group access imples repository access
+        // Not true, currently perms are always transitive
+        // group access imples repository access, IF NOT EXPOSED, SO "UN"-EXPOSE IT
+        // getRepositoryRegistry().getRepositoryWithFacet( "test", GroupRepository.class ).setExposed( false );
+
         StorageItem item = this.getItem( "alltest", "repo1", "/spoof/simple.txt" );
         Assert.assertEquals( "repo1", item.getRepositoryId() );
     }
-//
-//    public void testAuthorizerDirectly()
-//        throws Exception
-//    {
-//        String repoId = "repo1";
-//        String path = "/spoof/simple.txt";
-//        String username = "alltest";
-//
-//        Subject subject = SecurityUtils.getSecurityManager().login( new UsernamePasswordToken( username, "" ) );
-//
-//        NexusItemAuthorizer authorizer = this.lookup( NexusItemAuthorizer.class );
-//
-//        ResourceStoreRequest request = new ResourceStoreRequest( "/repositories/" + repoId + "/" + path, true );
-//        Assert.assertTrue( authorizer.authorizePath( request, Action.read ) );
-//
-//        // not sure if we really need to log the user out, we are not using a remember me,
-//        // but what can it hurt?
-//        SecurityUtils.getSecurityManager().logout( subject.getPrincipals() );
-//
-//    }
+
+    //
+    // public void testAuthorizerDirectly()
+    // throws Exception
+    // {
+    // String repoId = "repo1";
+    // String path = "/spoof/simple.txt";
+    // String username = "alltest";
+    //
+    // Subject subject = SecurityUtils.getSecurityManager().login( new UsernamePasswordToken( username, "" ) );
+    //
+    // NexusItemAuthorizer authorizer = this.lookup( NexusItemAuthorizer.class );
+    //
+    // ResourceStoreRequest request = new ResourceStoreRequest( "/repositories/" + repoId + "/" + path, true );
+    // Assert.assertTrue( authorizer.authorizePath( request, Action.read ) );
+    //
+    // // not sure if we really need to log the user out, we are not using a remember me,
+    // // but what can it hurt?
+    // SecurityUtils.getSecurityManager().logout( subject.getPrincipals() );
+    //
+    // }
 
     private StorageItem getItem( String username, String repositoryId, String path )
         throws NoSuchRepositoryException,

@@ -101,7 +101,7 @@ public interface Repository
      * @param uid
      * @return
      */
-    TargetSet getTargetsForRequest( RepositoryItemUid uid, Map<String, Object> context );
+    TargetSet getTargetsForRequest( String path, Map<String, Object> context );
 
     /**
      * Creates an UID within this Repository.
