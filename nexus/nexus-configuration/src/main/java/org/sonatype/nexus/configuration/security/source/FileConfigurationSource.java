@@ -165,7 +165,7 @@ public class FileConfigurationSource
 
         saveConfiguration( file );
     }
-    
+
     /**
      * Load configuration.
      * 

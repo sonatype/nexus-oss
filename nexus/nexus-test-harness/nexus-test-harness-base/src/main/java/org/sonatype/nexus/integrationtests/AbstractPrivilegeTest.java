@@ -148,12 +148,12 @@ public abstract class AbstractPrivilegeTest
             }
         }
 
-//        System.out.println( "User: " + userId );
-//        for ( Iterator iter = privs.iterator(); iter.hasNext(); )
-//        {
-//            String privName = (String) iter.next();
-//            System.out.println( "\t" + privName );
-//        }
+        System.out.println( "User: " + userId );
+        for ( Iterator iter = privs.iterator(); iter.hasNext(); )
+        {
+            String privName = (String) iter.next();
+            System.out.println( "\t" + privName );
+        }
     }
 
     protected void giveUserPrivilege( String userId, String priv )

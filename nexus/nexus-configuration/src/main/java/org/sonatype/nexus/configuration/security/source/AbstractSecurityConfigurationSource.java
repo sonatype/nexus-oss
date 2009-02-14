@@ -118,7 +118,7 @@ public abstract class AbstractSecurityConfigurationSource
         {
             rejectConfiguration( "Security configuration file was loaded but discarded, it has the wrong version number." );
         }
-        
+
         if ( getConfiguration() != null )
         {
             getLogger().debug( "Configuration loaded succesfully." );

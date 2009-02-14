@@ -43,10 +43,7 @@ public class DefaultSecurityConfigurationUpgrader
     implements SecurityConfigurationUpgrader
 {
     @Requirement( role = SecurityUpgrader.class )
-    private Map<String, Upgrader> modelUpgraders;
-
-    @Requirement( role = SecurityContentUpgrader.class )
-    private Map<String, Upgrader> securityContentUpgraders;
+    private Map<String, Upgrader> upgraders;
 
     /**
      * This implementation relies to plexus registered upgraders. It will cycle through them until the configuration is
@@ -83,42 +80,29 @@ public class DefaultSecurityConfigurationUpgrader
 
         msg.setModelVersion( modelVersion );
 
-        // The Model Upgrade would come from the 'security-xml-realm' project because it defines the model
-        Upgrader modelUpgrader = modelUpgraders.get( msg.getModelVersion() );
+        Upgrader upgrader = upgraders.get( msg.getModelVersion() );
 
-        // the Model Content Upgrade would come from the consumers of 'security-xml-realm', which may need to
-        // tweak the way it uses model
-        Upgrader contentUpgrader = securityContentUpgraders.get( msg.getModelVersion() );
-
-        if ( modelUpgrader != null )
+        if ( upgrader != null )
         {
             getLogger().info(
                 "Upgrading old Security configuration file (version " + msg.getModelVersion() + ") from "
                     + file.getAbsolutePath() );
 
-            msg.setConfiguration( modelUpgrader.loadConfiguration( file ) );
+            msg.setConfiguration( upgrader.loadConfiguration( file ) );
 
             while ( !Configuration.MODEL_VERSION.equals( msg.getModelVersion() ) )
             {
-
-                if ( modelUpgrader != null )
+                if ( upgrader != null )
                 {
-                    modelUpgrader.upgrade( msg );
+                    upgrader.upgrade( msg );
                 }
                 else
                 {
-                 // we could parse the XML but have no model version? Is this nexus config at all?
+                    // we could parse the XML but have no model version? Is this nexus config at all?
                     throw new UnsupportedConfigurationVersionException( modelVersion, file );
                 }
-                
-                contentUpgrader = securityContentUpgraders.get( msg.getModelVersion() );
-                if ( contentUpgrader != null )
-                {
-                    contentUpgrader.upgrade( msg );
-                }
-                
-                modelUpgrader = modelUpgraders.get( msg.getModelVersion() );
-                
+
+                upgrader = upgraders.get( msg.getModelVersion() );
             }
 
             getLogger().info(

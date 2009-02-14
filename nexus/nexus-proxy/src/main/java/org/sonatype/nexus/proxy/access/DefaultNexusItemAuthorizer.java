@@ -84,11 +84,6 @@ public class DefaultNexusItemAuthorizer
         return authorizePath( matched, action );
     }
 
-    public boolean isViewable( Repository repository )
-    {
-        return authorizePermission( "nexus:repoview:" + repository.getId() );
-    }
-
     public boolean authorizePermission( String permission )
     {
         return isPermitted( Collections.singletonList( permission ) );

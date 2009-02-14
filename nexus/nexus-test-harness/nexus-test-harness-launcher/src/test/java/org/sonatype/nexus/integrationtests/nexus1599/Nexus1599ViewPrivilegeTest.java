@@ -22,7 +22,6 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.jsecurity.realms.RepositoryViewPrivilegeDescriptor;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.test.utils.FeedUtil;
@@ -163,14 +162,14 @@ public class Nexus1599ViewPrivilegeTest
         throws Exception
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        addPrivilege( TEST_USER_NAME, RepositoryViewPrivilegeDescriptor.buildPrivilege( repoId ) );
+        addPrivilege( TEST_USER_NAME, "repository-" + repoId );
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         Assert.assertTrue( containsRepo( repoMsgUtil.getList(), repoId ) );
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        removePrivilege( TEST_USER_NAME, RepositoryViewPrivilegeDescriptor.buildPrivilege( repoId ) );
+        removePrivilege( TEST_USER_NAME, "repository-" + repoId );
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 

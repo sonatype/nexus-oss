@@ -50,7 +50,7 @@ public abstract class AbstractConfigurationSource
     }
 
     /**
-     * Setter for configuration upgraded.
+     * Setter for configuration pugraded.
      * 
      * @param configurationUpgraded
      */

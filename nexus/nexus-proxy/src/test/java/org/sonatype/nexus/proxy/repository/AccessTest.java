@@ -44,23 +44,6 @@ public class AccessTest
         return this.jettyTestsuiteEnvironmentBuilder;
     }
 
-    public void testFoo()
-    {
-        System.out.println( "ummm" );
-
-        RepositoryRouter router = this.getRootRouter();
-
-        ResourceStoreRequest request = new ResourceStoreRequest( "groups/test/spoof/simple.txt", false );
-
-        TargetSet targets = router.getTargetsForRequest( request );
-
-        for ( TargetMatch targetMatch : targets.getMatches() )
-        {
-            System.out.println( "match: " + this.targetMatchToString( targetMatch ) );
-        }
-
-    }
-
     public void testGroupAccess()
         throws NoSuchRepositoryException,
             StorageException,

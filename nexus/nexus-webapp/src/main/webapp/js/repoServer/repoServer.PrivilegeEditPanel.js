@@ -29,8 +29,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
     data: [['repository',this.convertRepositoryProperty.createDelegate( this )],
            ['repogroup',this.convertRepoGroupProperty.createDelegate( this )],
            ['repotarget',this.convertRepoTargetProperty.createDelegate( this )],
-           ['string',this.convertStringProperty.createDelegate( this )],
-           ['repoOrGroup',this.convertRepoOrGroupProperty.createDelegate( this )]] 
+           ['string',this.convertStringProperty.createDelegate( this )]] 
   });
   
   this.privilegeTypeStore = new Ext.data.JsonStore( {
@@ -110,7 +109,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
         mapping: 'type',
         convert: this.convertType.createDelegate( this ),
         header: 'Type',
-        width: 125
+        width: 100
       },
       { name: 'description' },
       { name: 'properties' },
@@ -154,37 +153,13 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
   convertRepository: function( value, parent ) {
     var targetPriv = false;
     for ( var i = 0; i < parent.properties.length; i++){
-      if ( parent.properties[i].key == 'repositoryOrGroupId'){
-        if ( Ext.isEmpty(parent.properties[i].value)
-            || '*' == parent.properties[i].value){
-          return 'All Repositories';
-        }
-        else {
-          var result = this.convertDataValue( parent.properties[i].value, this.repoStore, 'id', 'name' );
-          
-          if ( Ext.isEmpty( result ) ){
-            result = this.convertDataValue( parent.properties[i].value, this.groupStore, 'id', 'name' );
-          }
-          return result;
-        }
-      }
-      else if ( parent.properties[i].key == 'repositoryId'
+      if ( parent.properties[i].key == 'repositoryId'
         && !Ext.isEmpty(parent.properties[i].value) ){
-        if ( '*' == parent.properties[i].value){
-          return 'All Repositories';
-        }
-        else {
-          return this.convertDataValue( parent.properties[i].value, this.repoStore, 'id', 'name' );
-        }
+        return this.convertDataValue( parent.properties[i].value, this.repoStore, 'id', 'name' );
       }
       else if ( parent.properties[i].key == 'repositoryGroupId'
         && !Ext.isEmpty(parent.properties[i].value) ){
-        if ( '*' == parent.properties[i].value){
-          return 'All Repository Groups';
-        }
-        else {
-          return this.convertDataValue( parent.properties[i].value, this.groupStore, 'id', 'name' );
-        }
+        return this.convertDataValue( parent.properties[i].value, this.groupStore, 'id', 'name' );
       }
       else if ( parent.properties[i].key == 'repositoryTargetId' ){
         targetPriv = true;
@@ -237,35 +212,12 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
       }
       return 'All Repositories';
     }
-    else if ( '*' == value ){
-      return 'All Repositories';
-    }
     return this.convertDataValue( value, this.repoStore, 'id', 'name' );
   },
   
   convertRepoGroupProperty: function( value, parent ) {
-    if ( !Ext.isEmpty( value ) 
-        && '*' == value ) {
-      return 'All Repository Groups';
-    }
-    else if ( !Ext.isEmpty( value ) ){
+    if ( !Ext.isEmpty( value ) ){
       return this.convertDataValue( value, this.groupStore, 'id', 'name' );
-    }
-    return '';
-  },
-  
-  convertRepoOrGroupProperty: function( value, parent ) {
-    if ( Ext.isEmpty( value ) 
-        || '*' == value ) {
-      return 'All Repositories';
-    }
-    else {
-      var result = this.convertDataValue( value, this.repoStore, 'id', 'name' );
-      
-      if ( Ext.isEmpty( result ) ){
-        result = this.convertDataValue( value, this.groupStore, 'id', 'name' );
-      }
-      return result;        
     }
     return '';
   },
