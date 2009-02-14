@@ -1162,6 +1162,7 @@ Sonatype.Events.addListener( 'repositoryAddMenuInit', function( menu ) {
   var sp = Sonatype.lib.Permissions;
 
   if ( sp.checkPermission( 'nexus:repogroups', sp.CREATE ) ) {
+    menu.add( '-' );
     menu.add( {
       text: 'Repository Group',
       autoCreateNewRecord: true,
