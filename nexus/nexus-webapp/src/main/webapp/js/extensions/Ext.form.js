@@ -701,6 +701,9 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
   //(Ext.form.BasicForm, Ext.form.Action)
   actionCompleteHandler : function( form, action ) {
     var receivedData = action.handleResponse( action.response ).data;
+    if ( receivedData == null ) {
+      receivedData = {};
+    }
     if ( action.type == 'sonatypeSubmit' ) {
       this.fireEvent( 'submit', form, action, receivedData );
       
