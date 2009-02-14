@@ -186,13 +186,13 @@ public class NexusApplication
         xstream.omitField( RepositoryGroupListResource.class, "modelEncoding" );
         xstream.alias( "repo-group-list", RepositoryGroupListResourceResponse.class );
         // xstream.alias( "repo-group-list-item", RepositoryGroupListResource.class);
-        // xstream.alias( "repo-group-memeber", RepositoryGroupMemberRepository.class);
+        // xstream.alias( "repo-group-member", RepositoryGroupMemberRepository.class);
         xstream.registerLocalConverter( RepositoryGroupListResource.class, "repositories", new AliasingListConverter(
             RepositoryGroupMemberRepository.class,
-            "repo-group-memeber" ) );
+            "repo-group-member" ) );
         xstream.registerLocalConverter( RepositoryGroupResource.class, "repositories", new AliasingListConverter(
             RepositoryGroupMemberRepository.class,
-            "repo-group-memeber" ) );
+            "repo-group-member" ) );
         xstream.registerLocalConverter( RepositoryGroupListResourceResponse.class, "data", new AliasingListConverter(
             RepositoryGroupListResource.class,
             "repo-group-list-item" ) );
