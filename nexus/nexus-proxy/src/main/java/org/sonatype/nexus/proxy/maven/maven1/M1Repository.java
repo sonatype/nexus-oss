@@ -130,4 +130,10 @@ public class M1Repository
         // it is a release
         return isOld( getReleaseMaxAge(), item );
     }
+    
+    // not available on maven1 repo
+    public boolean recreateMavenMetadata( String path )
+    {
+        return false;
+    }
 }

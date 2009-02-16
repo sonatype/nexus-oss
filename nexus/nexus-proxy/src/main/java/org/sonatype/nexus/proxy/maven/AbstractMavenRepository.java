@@ -45,6 +45,7 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.repository.DefaultRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.MutableProxyRepositoryKind;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
@@ -131,7 +132,17 @@ public abstract class AbstractMavenRepository
 
     public boolean recreateMavenMetadata( String path )
     {
-        getLogger().info( "Recreating Maven medadata on repository " + getId() );
+        if ( !getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
+        {
+            return false;
+        }
+
+        if ( path == null )
+        {
+            path = RepositoryItemUid.PATH_ROOT;
+        }
+
+        getLogger().info( "Recreating maven metadata on repository '" + getId() + "', from path: " + path );
 
         RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
 
@@ -663,15 +674,13 @@ public abstract class AbstractMavenRepository
                 // huh?
             }
         }
-        
+
         return contentValid;
     }
 
     /**
-     * Special implementation of doRetrieveRemoteItem that treats all exceptions
-     * as ItemNotFoundException. 
-     * 
-     * To be used form #doValidateRemoteItemContent only!
+     * Special implementation of doRetrieveRemoteItem that treats all exceptions as ItemNotFoundException. To be used
+     * form #doValidateRemoteItemContent only!
      */
     private DefaultStorageFileItem doRetriveRemoteChecksumItem( Map<String, Object> context, String path )
         throws ItemNotFoundException
