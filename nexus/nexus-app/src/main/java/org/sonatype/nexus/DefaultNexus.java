@@ -1533,6 +1533,20 @@ public class DefaultNexus
     public void initialize()
         throws InitializationException
     {
+
+        StringBuffer sysInfoLog = new StringBuffer();
+
+        sysInfoLog.append( "\n" );
+        sysInfoLog.append( "-------------------------------------------------\n" );
+        sysInfoLog.append( "\n" );
+        sysInfoLog
+            .append( "Starting Nexus (" ).append( applicationStatusSource.getSystemStatus().getEditionShort() ).append(
+                "), Version " ).append( applicationStatusSource.getSystemStatus().getVersion() ).append( "\n" );
+        sysInfoLog.append( "\n" );
+        sysInfoLog.append( "-------------------------------------------------" );
+
+        getLogger().info( sysInfoLog.toString() );
+
         // EventInspectorHost -- BEGIN
         // tying in eventInspectorHost to all event producers
         repositoryRegistry.addProximityEventListener( eventInspectorHost );
@@ -1547,8 +1561,6 @@ public class DefaultNexus
         applicationStatusSource.getSystemStatus().setOperationMode( OperationMode.STANDALONE );
 
         applicationStatusSource.getSystemStatus().setInitializedAt( new Date() );
-
-        getLogger().info( "Initialized Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + ")" );
     }
 
     public void start()
