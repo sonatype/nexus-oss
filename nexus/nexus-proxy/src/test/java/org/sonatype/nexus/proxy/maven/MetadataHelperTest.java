@@ -19,7 +19,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.apache.maven.mercury.repository.metadata.Versioning;
+import org.apache.maven.mercury.repository.metadata.Metadata;
 
 /**
  * @author juven
@@ -29,7 +29,7 @@ public class MetadataHelperTest
 {
     AbstractMetadataHelper mdHelper = new DummyMetadataHelper();
 
-    public void testVersioning()
+    public void testVersioningArtifactDirectory()
         throws Exception
     {
         List<String> orderedVersions = new ArrayList<String>();
@@ -46,7 +46,7 @@ public class MetadataHelperTest
         orderedVersions.add( "1.2.0" );
         orderedVersions.add( "1.2.0.5-SNAPSHOT" );
         orderedVersions.add( "1.3.0-SNAPSHOT" );
-        
+
         List<String> unorderedVersions = new ArrayList<String>();
         unorderedVersions.add( "1.3.0-SNAPSHOT" );
         unorderedVersions.add( "1.2.0-SNAPSHOT" );
@@ -62,10 +62,32 @@ public class MetadataHelperTest
         unorderedVersions.add( "1.0.0-beta-4" );
         unorderedVersions.add( "1.0.0-beta-6-SNAPSHOT" );
 
-        Versioning versioning = mdHelper.versioningForArtifactDir( unorderedVersions );
+        Metadata metadata = new Metadata();
+        mdHelper.versioningForArtifactDir( metadata, unorderedVersions );
 
-        assertEquals( orderedVersions, versioning.getVersions() );
+        assertEquals( orderedVersions, metadata.getVersioning().getVersions() );
 
+    }
+
+    public void testVersioningSnapshotVersionDirectory()
+        throws Exception
+    {
+        List<String> snapshotArtifacts = new ArrayList<String>();
+
+        snapshotArtifacts.add( "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.180215-1.pom" );
+        snapshotArtifacts.add( "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.182430-2.pom" );
+        snapshotArtifacts.add( "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.pom" );
+        snapshotArtifacts.add( "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.pom" );
+        snapshotArtifacts.add( "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-SNAPSHOT.pom" );
+
+        Metadata metadata = new Metadata();
+        metadata.setGroupId( "org.sonatype.nexus" );
+        metadata.setArtifactId( "nexus-api" );
+        metadata.setVersion( "1.2.0-SNAPSHOT" );
+        mdHelper.versioningForSnapshotVersionDir( metadata, snapshotArtifacts );
+
+        assertEquals( "20081025.143218", metadata.getVersioning().getSnapshot().getTimestamp() );
+        assertEquals( 32, metadata.getVersioning().getSnapshot().getBuildNumber() );
     }
 
     private class DummyMetadataHelper

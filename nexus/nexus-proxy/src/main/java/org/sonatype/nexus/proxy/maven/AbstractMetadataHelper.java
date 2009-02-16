@@ -21,22 +21,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.mercury.artifact.version.VersionComparator;
+import org.apache.maven.mercury.repository.metadata.AddVersionOperation;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
+import org.apache.maven.mercury.repository.metadata.MetadataOperation;
 import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.mercury.repository.metadata.SetSnapshotOperation;
-import org.apache.maven.mercury.repository.metadata.Snapshot;
-import org.apache.maven.mercury.repository.metadata.SnapshotOperand;
-import org.apache.maven.mercury.repository.metadata.Versioning;
-import org.apache.maven.mercury.util.TimeUtil;
+import org.apache.maven.mercury.repository.metadata.StringOperand;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * a Maven metadata helper containing all the logic for creating maven-metadata.xml <br/>
@@ -374,7 +370,7 @@ abstract public class AbstractMetadataHelper
 
         md.setArtifactId( currentArtifactId );
 
-        md.setVersioning( versioningForArtifactDir( currentVersions ) );
+        versioningForArtifactDir( md, currentVersions );
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -387,62 +383,17 @@ abstract public class AbstractMetadataHelper
         store( mdString, path + METADATA_SUFFIX );
     }
 
-    protected Versioning versioningForArtifactDir( List<String> versions )
+    protected void versioningForArtifactDir( Metadata metadata, List<String> versions )
+        throws MetadataException
     {
-        Versioning versioning = new Versioning();
-
-        String release = null;
-
-        String latest = null;
-
-        VersionComparator versionComparator = new VersionComparator();
+        List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
 
         for ( String version : versions )
         {
-            if ( !versioning.getVersions().contains( version ) )
-            {
-                versioning.addVersion( version );
-            }
-
-            if ( latest != null && versionComparator.compare( latest, version ) < 0 )
-            {
-                latest = version;
-            }
-
-            if ( release != null && !version.endsWith( "SNAPSHOT" )
-                && versionComparator.compare( release, version ) < 0 )
-            {
-                release = version;
-            }
-
-            if ( latest == null )
-            {
-                latest = version;
-
-            }
-
-            if ( release == null && !version.endsWith( "SNAPSHOT" ) )
-            {
-                release = version;
-
-            }
+            ops.add( new AddVersionOperation( new StringOperand( version ) ) );
         }
 
-        if ( release != null )
-        {
-            versioning.setRelease( release );
-        }
-
-        if ( latest != null )
-        {
-            versioning.setLatest( latest );
-        }
-
-        versioning.setLastUpdated( TimeUtil.getUTCTimestamp() );
-
-        Collections.sort( versioning.getVersions(), versionComparator );
-
-        return versioning;
+        MetadataBuilder.changeMetadata( metadata, ops );
     }
 
     public void createMetadataForSnapshotVersionDir( String path )
@@ -456,7 +407,7 @@ abstract public class AbstractMetadataHelper
 
         md.setVersion( currentVersion );
 
-        versioningForSnapshotVersionDir( md );
+        versioningForSnapshotVersionDir( md, currentArtifacts );
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -469,61 +420,17 @@ abstract public class AbstractMetadataHelper
         store( mdString, path + METADATA_SUFFIX );
     }
 
-    private void versioningForSnapshotVersionDir( Metadata md )
+    protected void versioningForSnapshotVersionDir( Metadata metadata, List<String> artifacts )
         throws MetadataException
     {
-        Versioning versioning = new Versioning();
+        List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
 
-        versioning.setLastUpdated( TimeUtil.getUTCTimestamp() );
-
-        md.setVersioning( versioning );
-
-        Snapshot snapshot = new Snapshot();
-
-        snapshot.setLocalCopy( false );
-
-        snapshot.setBuildNumber( 1 );
-
-        for ( String artifact : currentArtifacts )
+        for ( String artifact : artifacts )
         {
-            String artifactName = getName( artifact );
-
-            // skip files like groupId-artifactId-versionSNAPSHOT.pom
-            if ( artifactName.endsWith( "SNAPSHOT.pom" ) )
-            {
-                continue;
-            }
-
-            int lastHyphenPos = artifactName.lastIndexOf( '-' );
-
-            try
-            {
-                int buildNumber = Integer.parseInt( artifactName.substring(
-                    lastHyphenPos + 1,
-                    artifactName.length() - 4 ) );
-
-                if ( buildNumber >= snapshot.getBuildNumber() )
-                {
-                    snapshot.setBuildNumber( buildNumber );
-
-                    String timeStamp = artifactName.substring( ( md.getArtifactId() + '-' + md.getVersion() + '-' )
-                        .length()
-                        - "-SNAPSHOT".length(), lastHyphenPos );
-
-                    snapshot.setTimestamp( timeStamp );
-
-                }
-            }
-
-            catch ( Exception e )
-            {
-                // skip any exception because of illegal version numbers
-            }
-
+            ops.add( new SetSnapshotOperation( new StringOperand( getName( artifact ) ) ) );
         }
 
-        MetadataBuilder.changeMetadata( md, new SetSnapshotOperation( new SnapshotOperand( snapshot ) ) );
-
+        MetadataBuilder.changeMetadata( metadata, ops );
     }
 
     private void rebuildChecksum( String path )

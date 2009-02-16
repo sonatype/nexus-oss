@@ -13,10 +13,7 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import java.util.Collection;
-
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
@@ -40,8 +37,9 @@ public class RecreateMavenMetadataWalkerProcessor
     {
         isHostedRepo = false;
 
-        repository = context.getRepository() instanceof MavenRepository ? (MavenRepository) context
-            .getRepository() : null;
+        repository = context.getRepository() instanceof MavenRepository
+            ? (MavenRepository) context.getRepository()
+            : null;
 
         if ( repository != null )
         {
@@ -54,28 +52,27 @@ public class RecreateMavenMetadataWalkerProcessor
     }
 
     @Override
+    public void onCollectionEnter( WalkerContext context, StorageCollectionItem coll )
+    {
+        mdHelper.onDirEnter( coll.getPath() );
+    }
+
+    @Override
     public void processItem( WalkerContext context, StorageItem item )
         throws Exception
     {
-        // nothing
+        mdHelper.processFile( item.getPath() );
     }
 
     @Override
     public void onCollectionExit( WalkerContext context, StorageCollectionItem coll )
         throws Exception
     {
-        mdHelper.onDirEnter( coll.getPath() );
-
-        Collection<StorageItem> items = repository.list( coll );
-
-        for ( StorageItem item : items )
-        {
-            if ( item instanceof StorageFileItem )
-            {
-                mdHelper.processFile( item.getPath() );
-            }
-        }
-
         mdHelper.onDirExit( coll.getPath() );
+
+        if ( coll.list().size() == 0 )
+        {
+            repository.deleteItem( coll.getRepositoryItemUid(), coll.getItemContext() );
+        }
     }
 }
