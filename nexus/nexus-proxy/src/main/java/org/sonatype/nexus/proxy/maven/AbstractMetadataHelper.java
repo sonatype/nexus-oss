@@ -51,17 +51,17 @@ abstract public class AbstractMetadataHelper
     /**
      * current groupId based on the current collection, if no groupId, it's null
      */
-    private String currentGroupId;
+    protected String currentGroupId;
 
-    private String currentArtifactId;
+    protected String currentArtifactId;
 
-    private String currentVersion;
+    protected String currentVersion;
 
-    private Map<String, Plugin> currentPlugins = new HashMap<String, Plugin>();
+    protected Map<String, Plugin> currentPlugins = new HashMap<String, Plugin>();
 
-    private List<String> currentVersions = new ArrayList<String>();
+    protected List<String> currentVersions = new ArrayList<String>();
 
-    private List<String> currentArtifacts = new ArrayList<String>();
+    protected List<String> currentArtifacts = new ArrayList<String>();
 
     public void onDirEnter( String path )
     {
@@ -227,7 +227,7 @@ abstract public class AbstractMetadataHelper
         }
     }
 
-    private void updateMavenInfo( String path )
+    protected void updateMavenInfo( String path )
     {
         Model model = null;
         try

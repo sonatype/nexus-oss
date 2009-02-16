@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -27,12 +28,15 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.DefaultMetadataHelper;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -43,11 +47,13 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.DottedStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
+import org.sonatype.nexus.util.ItemPathUtils;
 
 /**
  * The Class SnapshotRemoverJob. After a succesful run, the job guarantees that there will remain at least
@@ -57,7 +63,7 @@ import org.sonatype.nexus.proxy.walker.WalkerContext;
  * 
  * @author cstamas
  */
-@Component(role=SnapshotRemover.class)
+@Component( role = SnapshotRemover.class )
 public class DefaultSnapshotRemover
     extends AbstractLogEnabled
     implements SnapshotRemover
@@ -72,6 +78,11 @@ public class DefaultSnapshotRemover
     private Walker walker;
 
     private ContentClass contentClass = new Maven2ContentClass();
+
+    /**
+     * A set containing all paths where metadata rebuilding is needed, after snapshot removing
+     */
+    private Set<String> metadataRebuildPaths = new HashSet<String>();
 
     public RepositoryRegistry getRepositoryRegistry()
     {
@@ -164,14 +175,14 @@ public class DefaultSnapshotRemover
         RecreateMavenMetadataWalkerProcessor recreateMavenMetadataWalker = new RecreateMavenMetadataWalkerProcessor();
 
         // create a walker to collect deletables and let it loose on collections only
-        SnapshotRemoverWalkerProcessor snapshotRemoverWalker = new SnapshotRemoverWalkerProcessor(
+        SnapshotRemoverWalkerProcessor snapshotRemoveProcessor = new SnapshotRemoverWalkerProcessor(
             repository,
             request,
             recreateMavenMetadataWalker );
 
         DefaultWalkerContext ctx = new DefaultWalkerContext( repository, new DottedStoreWalkerFilter() );
 
-        ctx.getProcessors().add( snapshotRemoverWalker );
+        ctx.getProcessors().add( snapshotRemoveProcessor );
 
         walker.walk( ctx );
 
@@ -179,16 +190,30 @@ public class DefaultSnapshotRemover
         {
             result.setSuccessful( false );
         }
-        
+
         // and collect results
-        result.setDeletedSnapshots( snapshotRemoverWalker.getDeletedSnapshots() );
-        result.setDeletedFiles( snapshotRemoverWalker.getDeletedFiles() );
+        result.setDeletedSnapshots( snapshotRemoveProcessor.getDeletedSnapshots() );
+        result.setDeletedFiles( snapshotRemoveProcessor.getDeletedFiles() );
 
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                "Collected and deleted " + snapshotRemoverWalker.getDeletedSnapshots() + " snapshots with alltogether "
-                    + snapshotRemoverWalker.getDeletedFiles() + " files on repository " + repository.getId() );
+                "Collected and deleted " + snapshotRemoveProcessor.getDeletedSnapshots()
+                    + " snapshots with alltogether " + snapshotRemoveProcessor.getDeletedFiles()
+                    + " files on repository " + repository.getId() );
+        }
+
+        repository.clearCaches( RepositoryItemUid.PATH_ROOT );
+
+        RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor = new RecreateMavenMetadataWalkerProcessor();
+
+        ctx.getProcessors().remove( snapshotRemoveProcessor );
+
+        ctx.getProcessors().add( metadataRebuildProcessor );
+
+        for ( String path : metadataRebuildPaths )
+        {
+            walker.walk( ctx, path );
         }
 
         return result;
@@ -251,16 +276,20 @@ public class DefaultSnapshotRemover
             map.get( key ).add( item );
         }
 
+        @Override
         public void beforeWalk( WalkerContext context )
             throws Exception
         {
-            recreateMavenMetadataWalker.beforeWalk( context );
+            if ( recreateMavenMetadataWalker.isActive() )
+            {
+                recreateMavenMetadataWalker.beforeWalk( context );
+            }
         }
 
         @Override
         public void processItem( WalkerContext context, StorageItem item )
+            throws Exception
         {
-            // nothing here
         }
 
         @Override
@@ -463,36 +492,69 @@ public class DefaultSnapshotRemover
                         }
                     }
                 }
-            }
 
-            // remove empty dirs
-            try
-            {
-                if ( repository.list( coll ).size() == 0 )
+                try
                 {
+                    removeDirectoryIfEmpty( coll );
+
+                    updateMetadataIfNecessary( context, coll );
+                }
+                catch ( Throwable t )
+                {
+                    context.stop( t );
+
                     if ( getLogger().isDebugEnabled() )
                     {
-                        getLogger().debug(
-                            "Removing the empty directory leftover: UID=" + coll.getRepositoryItemUid().toString() );
+                        getLogger().debug( "Snapshot remover aborted abnormally!", t );
                     }
 
-                    repository.deleteItem( coll.getRepositoryItemUid(), coll.getItemContext() );
+                    return;
                 }
-                else
+            }
+
+        }
+
+        private void updateMetadataIfNecessary( WalkerContext context, StorageCollectionItem coll )
+            throws Exception
+        {
+            // all snapshot files are deleted
+            if ( !deletableSnapshotsAndFiles.isEmpty() && remainingSnapshotsAndFiles.isEmpty() )
+            {
+                String parentPath = ItemPathUtils.getParentPath( coll.getPath() );
+
+                metadataRebuildPaths.add( parentPath );
+            }
+            // there are snapshot files, and the metadata is incorrect
+            else if ( !new DefaultMetadataHelper( repository ).isSnapshotVersionMetadataCorrect( coll ) )
+            {
+                metadataRebuildPaths.add( coll.getPath() );
+            }
+
+        }
+
+        private void removeDirectoryIfEmpty( StorageCollectionItem coll )
+            throws StorageException,
+                IllegalOperationException,
+                UnsupportedStorageOperationException
+        {
+            try
+            {
+                if ( repository.list( coll ).size() > 0 )
                 {
-                    // activate next processor
-                    recreateMavenMetadataWalker.onCollectionExit( context, coll );
+                    return;
                 }
+
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug(
+                        "Removing the empty directory leftover: UID=" + coll.getRepositoryItemUid().toString() );
+                }
+
+                repository.deleteItem( coll.getRepositoryItemUid(), coll.getItemContext() );
             }
             catch ( ItemNotFoundException e )
             {
                 // silent, this happens if whole GAV is removed and the dir is removed too
-            }
-            catch ( Throwable t )
-            {
-                context.stop( t );
-
-                return;
             }
         }
 
@@ -528,7 +590,7 @@ public class DefaultSnapshotRemover
                                 null,
                                 null,
                                 null,
-                                false,  // snapshot
+                                false, // snapshot
                                 false,
                                 null,
                                 false,

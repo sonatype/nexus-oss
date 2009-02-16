@@ -14,6 +14,7 @@
 package org.sonatype.nexus;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 
@@ -21,9 +22,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.DirectoryWalkListener;
 import org.codehaus.plexus.util.DirectoryWalker;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.AbstractNexusTestCase;
-import org.sonatype.nexus.DefaultNexus;
-import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
@@ -41,6 +40,8 @@ public class AbstractMavenRepoContentTests
 
     protected MavenRepository releases;
 
+    protected MavenRepository apacheSnapshots;
+
     protected void setUp()
         throws Exception
     {
@@ -55,6 +56,8 @@ public class AbstractMavenRepoContentTests
 
         // get a releases hosted repo
         releases = (MavenRepository) defaultNexus.getRepository( "releases" );
+
+        apacheSnapshots = (MavenRepository) defaultNexus.getRepository( "apache-snapshots" );
     }
 
     protected void tearDown()
@@ -88,12 +91,43 @@ public class AbstractMavenRepoContentTests
 
         copyDirectory( sourceReleasesRoot, releasesRoot );
 
+        final File sourceApacheSnapshotsRoot = new File( getBasedir(), "src/test/resources/reposes/apache-snapshots" );
+
+        final URL apacheSnapshotsRootUrl = new URL( apacheSnapshots.getLocalUrl() );
+
+        final File apacheSnapshotsRoot = new File( apacheSnapshotsRootUrl.toURI() );
+
+        copyDirectory( sourceApacheSnapshotsRoot, apacheSnapshotsRoot );
+
         // This above is possible, since SnapshotRemover is not using index, hence we can manipulate the content
         // "from behind"
 
         // but clear caches
         snapshots.clearCaches( RepositoryItemUid.PATH_ROOT );
         releases.clearCaches( RepositoryItemUid.PATH_ROOT );
+        apacheSnapshots.clearCaches( RepositoryItemUid.PATH_ROOT );
+
+        // make apache-snapshots point to local fake repo
+        CRepository apacheSnapshotsConfig = defaultNexus.readRepository( "apache-snapshots" );
+        apacheSnapshotsConfig.getRemoteStorage().setUrl( "http://localhost:12345/apache-snapshots/" );
+        apacheSnapshotsConfig.setDownloadRemoteIndexes( false );
+        defaultNexus.updateRepository( apacheSnapshotsConfig );
+    }
+    
+    protected File retrieveFile( MavenRepository repo, String path )
+        throws Exception
+    {
+        File root = new File( new URL( repo.getLocalUrl() ).toURI() );
+
+        File result = new File( root, path );
+
+        if ( result.exists() )
+        {
+            return result;
+        }
+
+        throw new FileNotFoundException( "File with path '" + path + "' in repository '" + repo.getId()
+            + "' does not exist!" );
     }
 
     protected void copyDirectory( final File from, final File to )
