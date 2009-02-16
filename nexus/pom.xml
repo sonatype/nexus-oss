@@ -129,7 +129,7 @@
     <!-- Shared with nexus-client, hence it is properties'ed -->
     <plexus.restlet.bridge.version>1.7-SNAPSHOT</plexus.restlet.bridge.version>
     <micromailer.version>1.0.2</micromailer.version>
-    <mercury.version>1.0.0-alpha-2-722647</mercury.version>
+    <mercury.version>1.0-alpha-5</mercury.version>
   </properties>
   <dependencyManagement>
     <dependencies>
