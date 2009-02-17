@@ -257,14 +257,14 @@ Sonatype.repoServer.RepoServer = function(){
       
       //Views Group **************************************************
       nexusPanel.add( {
-        title: 'Views',
+        title: 'Views/Repositories',
         id: 'st-nexus-views',
         items: [
           {
             enabled: sp.checkPermission( 'nexus:repostatus', sp.READ ),
-            title: 'Browse Repositories',
-            tabId: 'repos-maint',
-            tabCode: Sonatype.repoServer.RepoMaintPanel,
+            title: 'Repositories',
+            tabId: 'st-repositories',
+            tabCode: Sonatype.repoServer.RepositoryPanel,
             tabTitle: 'Repositories'
           },
           {
@@ -304,28 +304,6 @@ Sonatype.repoServer.RepoServer = function(){
             tabId: 'nexus-config',
             tabCode: Sonatype.repoServer.ServerEditPanel,
             tabTitle: 'Nexus'
-          },
-          {
-            enabled: sp.checkPermission('nexus:repositories', sp.READ) &&
-              ( sp.checkPermission('nexus:repositories', sp.CREATE) ||
-                sp.checkPermission('nexus:repositories', sp.DELETE) ||
-                sp.checkPermission('nexus:repositories', sp.EDIT)),
-              title: 'Repositories',
-              tabId: 'st-repositories',
-              tabCode: Sonatype.repoServer.RepositoryPanel
-//            title: 'Repositories',
-//            tabId: 'repos-config',
-//            tabCode: Sonatype.repoServer.RepoEditPanel,
-//            tabTitle: 'Repository Config'
-          },
-          {
-            enabled: sp.checkPermission('nexus:repogroups', sp.READ) &&
-              ( sp.checkPermission('nexus:repogroups', sp.CREATE) ||
-                sp.checkPermission('nexus:repogroups', sp.DELETE) ||
-                sp.checkPermission('nexus:repogroups', sp.EDIT)),
-            title: 'Groups',
-            tabId: 'groups-config',
-            tabCode: Sonatype.repoServer.GroupsEditPanel
           },
           {
             enabled: sp.checkPermission('nexus:routes', sp.READ) &&
