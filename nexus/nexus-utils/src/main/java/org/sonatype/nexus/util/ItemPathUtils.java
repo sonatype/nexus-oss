@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.util;
 
+import java.util.Collection;
+
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -20,6 +22,7 @@ import org.codehaus.plexus.util.StringUtils;
  * dependant!
  * 
  * @author cstamas
+ * @author juven
  */
 public class ItemPathUtils
 {
@@ -99,6 +102,80 @@ public class ItemPathUtils
         {
             return path.substring( 0, lastSepratorPos );
         }
+    }
+
+    /**
+     * Calculates the least common parent path
+     * 
+     * @return null if paths is empty, else the least common parent path
+     */
+    public static String getLCPPath( final Collection<String> paths )
+    {
+        String lcp = null;
+
+        for ( String path : paths )
+        {
+            if ( lcp == null )
+            {
+                lcp = path;
+            }
+            else
+            {
+                lcp = getLCPPath( lcp, path );
+            }
+        }
+
+        return lcp;
+    }
+
+    /**
+     * Calculates the least common parent path
+     * 
+     * @return null if any path is empty, else the least common parent path
+     */
+    public static String getLCPPath( final String pathA, final String pathB )
+    {
+        if ( StringUtils.isEmpty( pathA ) || StringUtils.isEmpty( pathB ) )
+        {
+            return null;
+        }
+
+        if ( pathA.equals( pathB ) )
+        {
+            return pathA;
+        }
+
+        if ( pathA.startsWith( pathB ) )
+        {
+            return pathB;
+        }
+
+        if ( pathB.startsWith( pathA ) )
+        {
+            return pathA;
+        }
+
+        StringBuffer lcp = new StringBuffer();
+
+        StringBuffer token = new StringBuffer();
+
+        int index = 0;
+
+        while ( pathA.charAt( index ) == pathB.charAt( index ) && index < pathA.length() && index < pathB.length() )
+        {
+            token.append( pathA.charAt( index ) );
+
+            if ( pathA.charAt( index ) == PATH_SEPARATOR.charAt( 0 ) )
+            {
+                lcp.append( token );
+
+                token.delete( 0, token.length() );
+            }
+
+            index++;
+        }
+
+        return lcp.toString();
     }
 
 }
