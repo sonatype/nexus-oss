@@ -1540,7 +1540,7 @@ public class DefaultNexus
         sysInfoLog.append( "-------------------------------------------------\n" );
         sysInfoLog.append( "\n" );
         sysInfoLog
-            .append( "Starting Nexus (" ).append( applicationStatusSource.getSystemStatus().getEditionShort() ).append(
+            .append( "Initializing Nexus (" ).append( applicationStatusSource.getSystemStatus().getEditionShort() ).append(
                 "), Version " ).append( applicationStatusSource.getSystemStatus().getVersion() ).append( "\n" );
         sysInfoLog.append( "\n" );
         sysInfoLog.append( "-------------------------------------------------" );
