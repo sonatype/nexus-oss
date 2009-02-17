@@ -130,6 +130,12 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
           Sonatype.config.host + Sonatype.config.repos.urls.repositories + '/' + receivedData.id;
         receivedData.displayURI =
           Sonatype.config.host + Sonatype.config.content.repositories + '/' + receivedData.id;
+        if ( receivedData.exposed == null ) {
+          receivedData.exposed = true;
+        }
+        if ( receivedData.userManaged == null ) {
+          receivedData.userManaged = true;
+        }
       }
       return;
     }

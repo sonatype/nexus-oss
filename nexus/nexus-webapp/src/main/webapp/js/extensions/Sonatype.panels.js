@@ -165,18 +165,10 @@ Sonatype.panels.GridViewer = function( config ) {
     autoLoad: this.dataAutoLoad && ( this.dataStores == null || this.dataStores.length == 0 ),
     sortInfo: this.dataSortInfo,
     listeners: {
-      add: {
-        fn: this.recordAddHandler,
-        scope: this
-      },
-      remove: {
-        fn: this.recordRemoveHandler,
-        scope: this
-      }, 
-      update: {
-        fn: this.recordUpdateHandler,
-        scope: this
-      }
+      add: this.recordAddHandler,
+      remove: this.recordRemoveHandler,
+      update: this.recordUpdateHandler,
+      scope: this
     }
   } );
 
@@ -281,6 +273,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
       }
 
       this.dataStore.insert( 0, [rec] );
+      this.gridPanel.getSelectionModel().selectRecords( [rec], false );
     }
     else {
       handler( item, e );
@@ -477,7 +470,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
   },
   
   recordAddHandler: function( store, recs, index ) {
-    if ( recs.length == 1 && recs[0].autoCreateNewRecord ) {
+    if ( recs.length == 1 && recs[0].autoCreateNewRecord && recs[0].id.substring( 0, 4 ) != 'new_' ) {
       this.createChildPanel( recs[0] );
     }
   },
