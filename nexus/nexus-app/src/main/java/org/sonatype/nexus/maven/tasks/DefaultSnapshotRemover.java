@@ -171,14 +171,10 @@ public class DefaultSnapshotRemover
                     + repository.getLocalUrl() );
         }
 
-        // and "sandwich" it with RecreateMavenMetadataWalkerProcessor at once
-        RecreateMavenMetadataWalkerProcessor recreateMavenMetadataWalker = new RecreateMavenMetadataWalkerProcessor();
-
         // create a walker to collect deletables and let it loose on collections only
         SnapshotRemoverWalkerProcessor snapshotRemoveProcessor = new SnapshotRemoverWalkerProcessor(
             repository,
-            request,
-            recreateMavenMetadataWalker );
+            request );
 
         DefaultWalkerContext ctx = new DefaultWalkerContext( repository, new DottedStoreWalkerFilter() );
 
@@ -222,8 +218,6 @@ public class DefaultSnapshotRemover
     private class SnapshotRemoverWalkerProcessor
         extends AbstractWalkerProcessor
     {
-        private final RecreateMavenMetadataWalkerProcessor recreateMavenMetadataWalker;
-
         private final MavenRepository repository;
 
         private final SnapshotRemovalRequest request;
@@ -242,14 +236,11 @@ public class DefaultSnapshotRemover
 
         private int deletedFiles = 0;
 
-        public SnapshotRemoverWalkerProcessor( MavenRepository repository, SnapshotRemovalRequest request,
-            RecreateMavenMetadataWalkerProcessor recreateMavenMetadataWalker )
+        public SnapshotRemoverWalkerProcessor( MavenRepository repository, SnapshotRemovalRequest request )
         {
             this.repository = repository;
 
             this.request = request;
-
-            this.recreateMavenMetadataWalker = recreateMavenMetadataWalker;
 
             int days = request.getRemoveSnapshotsOlderThanDays();
 
@@ -274,16 +265,6 @@ public class DefaultSnapshotRemover
             }
 
             map.get( key ).add( item );
-        }
-
-        @Override
-        public void beforeWalk( WalkerContext context )
-            throws Exception
-        {
-            if ( recreateMavenMetadataWalker.isActive() )
-            {
-                recreateMavenMetadataWalker.beforeWalk( context );
-            }
         }
 
         @Override
