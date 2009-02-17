@@ -137,12 +137,12 @@ public abstract class AbstractMavenRepository
             return false;
         }
 
-        if ( path == null )
+        if ( StringUtils.isEmpty( path ) )
         {
             path = RepositoryItemUid.PATH_ROOT;
         }
 
-        getLogger().info( "Recreating maven metadata on repository '" + getId() + "', from path: " + path );
+        getLogger().info( "Recreating Maven2 metadata in repository ID='" + getId() + "' from path='" + path + "'" );
 
         RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
 

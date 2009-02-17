@@ -807,7 +807,10 @@ public class DefaultNexus
     {
         if ( !logFile.contains( File.pathSeparator ) )
         {
-            getLogger().debug( "Retrieving " + logFile + " log file." );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Retrieving " + logFile + " log file." );
+            }
 
             File log = logManager.getLogFile( logFile );
 
@@ -838,8 +841,6 @@ public class DefaultNexus
 
     public void clearAllCaches( String path )
     {
-        getLogger().info( "Clearing caches in all repositories from path " + path );
-
         for ( Repository repository : repositoryRegistry.getRepositories() )
         {
             repository.clearCaches( path );
@@ -849,16 +850,12 @@ public class DefaultNexus
     public void clearRepositoryCaches( String path, String repositoryId )
         throws NoSuchRepositoryException
     {
-        getLogger().info( "Clearing caches in repository " + repositoryId + " from path " + path );
-
         repositoryRegistry.getRepository( repositoryId ).clearCaches( path );
     }
 
     public void clearRepositoryGroupCaches( String path, String repositoryGroupId )
         throws NoSuchRepositoryException
     {
-        getLogger().info( "Clearing caches in repository group " + repositoryGroupId + " from path " + path );
-
         for ( Repository repository : repositoryRegistry.getRepositoryWithFacet(
             repositoryGroupId,
             GroupRepository.class ).getMemberRepositories() )
@@ -883,8 +880,6 @@ public class DefaultNexus
     public Collection<String> evictAllUnusedProxiedItems( long timestamp )
         throws IOException
     {
-        getLogger().info( "Evicting unused items in all repositories." );
-
         ArrayList<String> result = new ArrayList<String>();
 
         for ( Repository repository : repositoryRegistry.getRepositories() )
@@ -899,8 +894,6 @@ public class DefaultNexus
         throws NoSuchRepositoryException,
             IOException
     {
-        getLogger().info( "Evicting unused items from repository " + repositoryId + "." );
-
         return evictUnusedItems( timestamp, repositoryRegistry.getRepository( repositoryId ), true );
     }
 
@@ -908,8 +901,6 @@ public class DefaultNexus
         throws NoSuchRepositoryException,
             IOException
     {
-        getLogger().info( "Evicting unused items from repositories in group " + repositoryGroupId + "." );
-
         ArrayList<String> result = new ArrayList<String>();
 
         for ( Repository repository : repositoryRegistry.getRepositoryWithFacet(
@@ -1540,8 +1531,8 @@ public class DefaultNexus
         sysInfoLog.append( "-------------------------------------------------\n" );
         sysInfoLog.append( "\n" );
         sysInfoLog
-            .append( "Initializing Nexus (" ).append( applicationStatusSource.getSystemStatus().getEditionShort() ).append(
-                "), Version " ).append( applicationStatusSource.getSystemStatus().getVersion() ).append( "\n" );
+            .append( "Initializing Nexus (" ).append( applicationStatusSource.getSystemStatus().getEditionShort() )
+            .append( "), Version " ).append( applicationStatusSource.getSystemStatus().getVersion() ).append( "\n" );
         sysInfoLog.append( "\n" );
         sysInfoLog.append( "-------------------------------------------------" );
 

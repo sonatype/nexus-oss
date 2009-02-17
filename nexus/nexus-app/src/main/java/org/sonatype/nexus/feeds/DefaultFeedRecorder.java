@@ -355,7 +355,10 @@ public class DefaultFeedRecorder
 
         addToTimeline( prc );
 
-        getLogger().info( prc.getFinishedMessage() );
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( prc.getFinishedMessage() );
+        }
     }
 
     public void systemProcessBroken( SystemProcess prc, Throwable e )

@@ -438,6 +438,8 @@ public abstract class AbstractRepository
             path = RepositoryItemUid.PATH_ROOT;
         }
 
+        getLogger().info( "Expiring cache in repository ID='" + getId() + "' from path='" + path + "'" );
+
         // 1st, expire all the files below path
         DefaultWalkerContext ctx = new DefaultWalkerContext( this );
 
@@ -472,6 +474,8 @@ public abstract class AbstractRepository
 
     public Collection<String> evictUnusedItems( final long timestamp )
     {
+        getLogger().info( "Evicting unused items from repository " + getId() );
+
         EvictUnusedItemsWalkerProcessor walkerProcessor = new EvictUnusedItemsWalkerProcessor( timestamp );
 
         DefaultWalkerContext ctx = new DefaultWalkerContext( this );
@@ -488,7 +492,12 @@ public abstract class AbstractRepository
 
     public boolean recreateAttributes( String path, final Map<String, String> initialData )
     {
-        getLogger().info( "Rebuilding attributes on repository " + getId() );
+        if ( StringUtils.isEmpty( path ) )
+        {
+            path = RepositoryItemUid.PATH_ROOT;
+        }
+
+        getLogger().info( "Rebuilding attributes in repository ID='" + getId() + "' from path='" + path + "'" );
 
         RecreateAttributesWalker walkerProcessor = new RecreateAttributesWalker( this, initialData );
 
