@@ -23,7 +23,7 @@ import org.sonatype.nexus.repository.metadata.validation.RepositoryMetadataValid
 public class DefaultRepositoryMetadataHandler
     implements RepositoryMetadataHandler
 {
-    private static final String REPOSITORY_METADATA_PATH = "/.meta/nexus-repository-metadata.xml";
+    private static final String REPOSITORY_METADATA_PATH = "/.meta/repository-metadata.xml";
 
     protected RepositoryMetadataXpp3Reader repositoryMetadataXpp3Reader = new RepositoryMetadataXpp3Reader();
 

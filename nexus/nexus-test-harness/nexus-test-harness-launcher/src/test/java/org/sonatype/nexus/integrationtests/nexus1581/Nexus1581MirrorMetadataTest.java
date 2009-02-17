@@ -30,7 +30,7 @@ public class Nexus1581MirrorMetadataTest
     public void testMetadata()
         throws Exception
     {
-        File metadata = new File( AbstractNexusIntegrationTest.nexusWorkDir + "/storage/nexus-test-harness-repo/.meta/nexus-repository-metadata.xml" );
+        File metadata = new File( AbstractNexusIntegrationTest.nexusWorkDir + "/storage/nexus-test-harness-repo/.meta/repository-metadata.xml" );
         
         RepositoryMetadataXpp3Reader reader = new RepositoryMetadataXpp3Reader();
         RepositoryMetadataXpp3Writer writer = new RepositoryMetadataXpp3Writer();
