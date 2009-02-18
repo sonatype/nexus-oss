@@ -40,7 +40,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
-import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -61,12 +60,6 @@ public class M2Repository
     @Requirement( hint = "maven2" )
     private GavCalculator gavCalculator;
 
-    /**
-     * The artifact packaging mapper.
-     */
-    @Requirement
-    private ArtifactPackagingMapper artifactPackagingMapper;
-
     @Requirement( hint = "maven2" )
     private ContentClass contentClass;
 
@@ -78,11 +71,6 @@ public class M2Repository
     public GavCalculator getGavCalculator()
     {
         return gavCalculator;
-    }
-
-    public ArtifactPackagingMapper getArtifactPackagingMapper()
-    {
-        return artifactPackagingMapper;
     }
 
     /**

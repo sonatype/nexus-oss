@@ -41,7 +41,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.repository.DefaultRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
@@ -60,7 +59,7 @@ import org.sonatype.nexus.util.ItemPathUtils;
  */
 public abstract class AbstractMavenRepository
     extends DefaultRepository
-    implements MavenRepository
+    implements MavenRepository, MavenHostedRepository, MavenProxyRepository
 {
     /**
      * Metadata manager.
@@ -68,7 +67,15 @@ public abstract class AbstractMavenRepository
     @Requirement
     private MetadataManager metadataManager;
 
+    /**
+     * The artifact packaging mapper.
+     */
+    @Requirement
+    private ArtifactPackagingMapper artifactPackagingMapper;
+
     private MutableProxyRepositoryKind repositoryKind;
+
+    private ArtifactStoreHelper artifactStoreHelper;
 
     /** Maven repository policy */
     private RepositoryPolicy repositoryPolicy = RepositoryPolicy.RELEASE;
@@ -98,6 +105,21 @@ public abstract class AbstractMavenRepository
      * Checksum policy applied in this Maven repository.
      */
     private ChecksumPolicy checksumPolicy;
+
+    public ArtifactStoreHelper getArtifactStoreHelper()
+    {
+        if ( artifactStoreHelper == null )
+        {
+            artifactStoreHelper = new ArtifactStoreHelper( this );
+        }
+
+        return artifactStoreHelper;
+    }
+
+    public ArtifactPackagingMapper getArtifactPackagingMapper()
+    {
+        return artifactPackagingMapper;
+    }
 
     /**
      * Override the "default" kind with Maven specifics.
@@ -240,49 +262,7 @@ public abstract class AbstractMavenRepository
             getLogger().debug( "storeItemWithChecksums() :: " + request.getRequestPath() );
         }
 
-        try
-        {
-            try
-            {
-                storeItem( request, is, userAttributes );
-            }
-            catch ( IOException e )
-            {
-                throw new StorageException( "Could not get the content from the ContentLocator!", e );
-            }
-
-            RepositoryItemUid itemUid = createUid( request.getRequestPath() );
-
-            StorageFileItem storedFile = (StorageFileItem) retrieveItem( itemUid, null );
-
-            String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
-
-            String md5Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
-
-            if ( !StringUtils.isEmpty( sha1Hash ) )
-            {
-                storeItem( new DefaultStorageFileItem(
-                    this,
-                    storedFile.getPath() + ".sha1",
-                    true,
-                    true,
-                    new StringContentLocator( sha1Hash ) ) );
-            }
-
-            if ( !StringUtils.isEmpty( md5Hash ) )
-            {
-                storeItem( new DefaultStorageFileItem(
-                    this,
-                    storedFile.getPath() + ".md5",
-                    true,
-                    true,
-                    new StringContentLocator( md5Hash ) ) );
-            }
-        }
-        catch ( ItemNotFoundException e )
-        {
-            throw new StorageException( "Storage inconsistency!", e );
-        }
+        getArtifactStoreHelper().storeItemWithChecksums( request, is, userAttributes );
     }
 
     public void deleteItemWithChecksums( ResourceStoreRequest request )
@@ -297,54 +277,7 @@ public abstract class AbstractMavenRepository
             getLogger().debug( "deleteItemWithChecksums() :: " + request.getRequestPath() );
         }
 
-        try
-        {
-            deleteItem( request );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            if ( request.getRequestPath().endsWith( ".asc" ) )
-            {
-                // Do nothing no guarantee that the .asc files will exist
-            }
-            else
-            {
-                throw e;
-            }
-        }
-
-        String originalPath = request.getRequestPath();
-
-        request.setRequestPath( originalPath + ".sha1" );
-
-        try
-        {
-            deleteItem( request );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore not found
-        }
-
-        request.setRequestPath( originalPath + ".md5" );
-
-        try
-        {
-            deleteItem( request );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore not found
-        }
-
-        // Now remove the .asc files, and the checksums stored with them as well
-        // Note this is a recursive call, hence the check for .asc
-        if ( !originalPath.endsWith( ".asc" ) )
-        {
-            request.setRequestPath( originalPath + ".asc" );
-
-            deleteItemWithChecksums( request );
-        }
+        getArtifactStoreHelper().deleteItemWithChecksums( request );
     }
 
     public void storeItemWithChecksums( AbstractStorageItem item )
@@ -357,48 +290,7 @@ public abstract class AbstractMavenRepository
             getLogger().debug( "storeItemWithChecksums() :: " + item.getRepositoryItemUid().toString() );
         }
 
-        try
-        {
-            try
-            {
-                storeItem( item );
-            }
-            catch ( IOException e )
-            {
-                throw new StorageException( "Could not get the content from the ContentLocator!", e );
-            }
-
-            StorageFileItem storedFile = (StorageFileItem) retrieveItem( item.getRepositoryItemUid(), item
-                .getItemContext() );
-
-            String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
-
-            String md5Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
-
-            if ( !StringUtils.isEmpty( sha1Hash ) )
-            {
-                storeItem( new DefaultStorageFileItem(
-                    this,
-                    item.getPath() + ".sha1",
-                    true,
-                    true,
-                    new StringContentLocator( sha1Hash ) ) );
-            }
-
-            if ( !StringUtils.isEmpty( md5Hash ) )
-            {
-                storeItem( new DefaultStorageFileItem(
-                    this,
-                    item.getPath() + ".md5",
-                    true,
-                    true,
-                    new StringContentLocator( md5Hash ) ) );
-            }
-        }
-        catch ( ItemNotFoundException e )
-        {
-            throw new StorageException( "Storage inconsistency!", e );
-        }
+        getArtifactStoreHelper().storeItemWithChecksums( item );
     }
 
     public void deleteItemWithChecksums( RepositoryItemUid uid, Map<String, Object> context )
@@ -411,51 +303,8 @@ public abstract class AbstractMavenRepository
         {
             getLogger().debug( "deleteItemWithChecksums() :: " + uid.toString() );
         }
-
-        try
-        {
-            deleteItem( uid, context );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            if ( uid.getPath().endsWith( ".asc" ) )
-            {
-                // Do nothing no guarantee that the .asc files will exist
-            }
-            else
-            {
-                throw e;
-            }
-        }
-
-        RepositoryItemUid sha1Uid = createUid( uid.getPath() + ".sha1" );
-
-        try
-        {
-            deleteItem( sha1Uid, context );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore not found
-        }
-
-        RepositoryItemUid md5Uid = createUid( uid.getPath() + ".md5" );
-
-        try
-        {
-            deleteItem( md5Uid, context );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore not found
-        }
-
-        // Now remove the .asc files, and the checksums stored with them as well
-        // Note this is a recursive call, hence the check for .asc
-        if ( !uid.getPath().endsWith( ".asc" ) )
-        {
-            deleteItemWithChecksums( createUid( uid.getPath() + ".asc" ), context );
-        }
+        
+        getArtifactStoreHelper().deleteItemWithChecksums( uid, context );
     }
 
     public MetadataManager getMetadataManager()

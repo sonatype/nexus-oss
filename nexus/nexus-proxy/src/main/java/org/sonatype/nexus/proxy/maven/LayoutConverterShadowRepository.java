@@ -65,20 +65,28 @@ public abstract class LayoutConverterShadowRepository
     private MetadataManager metadataManager;
 
     /**
+     * The artifact packaging mapper.
+     */
+    @Requirement
+    private ArtifactPackagingMapper artifactPackagingMapper;
+
+    /**
      * ArtifactStoreHelper.
      */
     private ArtifactStoreHelper artifactStoreHelper;
 
+    @Override
     public MavenRepository getMasterRepository()
     {
-        return (MavenRepository) super.getMasterRepository();
+        return super.getMasterRepository().adaptToFacet( MavenRepository.class );
     }
 
+    @Override
     public void setMasterRepository( Repository masterRepository )
         throws IncompatibleMasterRepositoryException
     {
         // we allow only MavenRepository instances as masters
-        if ( !MavenRepository.class.isAssignableFrom( masterRepository.getClass() ) )
+        if ( !masterRepository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
         {
             throw new IncompatibleMasterRepositoryException(
                 "This shadow repository needs master repository which implements MavenRepository interface!",
@@ -99,9 +107,19 @@ public abstract class LayoutConverterShadowRepository
         return m2GavCalculator;
     }
 
+    public ArtifactPackagingMapper getArtifactPackagingMapper()
+    {
+        return artifactPackagingMapper;
+    }
+
     public RepositoryPolicy getRepositoryPolicy()
     {
         return getMasterRepository().getRepositoryPolicy();
+    }
+
+    public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
+    {
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public MetadataManager getMetadataManager()
@@ -322,81 +340,14 @@ public abstract class LayoutConverterShadowRepository
         }
     }
 
-    protected ArtifactStoreHelper getArtifactStoreHelper()
+    public ArtifactStoreHelper getArtifactStoreHelper()
     {
         if ( artifactStoreHelper == null )
         {
             artifactStoreHelper = new ArtifactStoreHelper( this );
         }
+
         return artifactStoreHelper;
-    }
-
-    // =======================================================================================
-    // MavenRepository iface, delegates to master simply
-
-    public ChecksumPolicy getChecksumPolicy()
-    {
-        return getMasterRepository().getChecksumPolicy();
-    }
-
-    public int getMetadataMaxAge()
-    {
-        return getMasterRepository().getMetadataMaxAge();
-    }
-
-    public int getReleaseMaxAge()
-    {
-        return getMasterRepository().getReleaseMaxAge();
-    }
-
-    public int getSnapshotMaxAge()
-    {
-        return getMasterRepository().getSnapshotMaxAge();
-    }
-
-    public boolean isCleanseRepositoryMetadata()
-    {
-        return getMasterRepository().isCleanseRepositoryMetadata();
-    }
-
-    public boolean isFixRepositoryChecksums()
-    {
-        return getMasterRepository().isFixRepositoryChecksums();
-    }
-
-    public void setChecksumPolicy( ChecksumPolicy checksumPolicy )
-    {
-        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
-    }
-
-    public void setCleanseRepositoryMetadata( boolean cleanseRepositoryMetadata )
-    {
-        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
-    }
-
-    public void setFixRepositoryChecksums( boolean fixRepositoryChecksums )
-    {
-        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
-    }
-
-    public void setMetadataMaxAge( int metadataMaxAge )
-    {
-        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
-    }
-
-    public void setReleaseMaxAge( int releaseMaxAge )
-    {
-        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
-    }
-
-    public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
-    {
-        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
-    }
-
-    public void setSnapshotMaxAge( int snapshotMaxAge )
-    {
-        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     // =================================================================================

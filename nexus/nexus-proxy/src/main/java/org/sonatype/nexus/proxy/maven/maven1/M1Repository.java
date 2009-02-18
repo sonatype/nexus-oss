@@ -21,7 +21,6 @@ import org.sonatype.nexus.artifact.M1ArtifactRecognizer;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
-import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -45,12 +44,6 @@ public class M1Repository
     @Requirement( hint = "maven1" )
     private ContentClass contentClass;
 
-    /**
-     * The artifact packaging mapper.
-     */
-    @Requirement
-    private ArtifactPackagingMapper artifactPackagingMapper;
-
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
@@ -59,11 +52,6 @@ public class M1Repository
     public GavCalculator getGavCalculator()
     {
         return gavCalculator;
-    }
-
-    public ArtifactPackagingMapper getArtifactPackagingMapper()
-    {
-        return artifactPackagingMapper;
     }
 
     /**

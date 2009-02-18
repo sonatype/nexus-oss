@@ -22,8 +22,6 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 public interface MetadataManager
 {
-    String ROLE = MetadataManager.class.getName();
-
     /**
      * Calling this method updates the GAV and GA metadatas accordingly. It senses whether it is a snapshot or not.
      * 

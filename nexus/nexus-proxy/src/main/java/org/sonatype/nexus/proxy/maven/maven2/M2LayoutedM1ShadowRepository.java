@@ -16,7 +16,6 @@ package org.sonatype.nexus.proxy.maven.maven2;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.GavCalculator;
-import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -30,12 +29,6 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 public class M2LayoutedM1ShadowRepository
     extends LayoutConverterShadowRepository
 {
-    /**
-     * The artifact packaging mapper.
-     */
-    @Requirement
-    private ArtifactPackagingMapper artifactPackagingMapper;
-
     @Requirement( hint = "maven2" )
     private ContentClass contentClass;
 
@@ -55,11 +48,6 @@ public class M2LayoutedM1ShadowRepository
     public ContentClass getMasterRepositoryContentClass()
     {
         return masterContentClass;
-    }
-
-    public ArtifactPackagingMapper getArtifactPackagingMapper()
-    {
-        return artifactPackagingMapper;
     }
 
     protected String transformMaster2Shadow( String path )

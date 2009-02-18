@@ -30,13 +30,13 @@ public class AbstractMavenRepositoryConfigurator
         CRepository repo, RemoteStorageContext rsc, LocalRepositoryStorage ls, RemoteRepositoryStorage rs )
         throws InvalidConfigurationException
     {
-        MavenRepository repository =  (MavenRepository) super.updateRepositoryFromModel( old, configuration, repo, rsc, ls, rs );
-
-        repository.setReleaseMaxAge( repo.getArtifactMaxAge() );
-        repository.setSnapshotMaxAge( repo.getArtifactMaxAge() );
-        repository.setMetadataMaxAge( repo.getMetadataMaxAge() );
-        repository.setCleanseRepositoryMetadata( repo.isMaintainProxiedRepositoryMetadata() );
-        repository.setChecksumPolicy( ChecksumPolicy.fromModel( repo.getChecksumPolicy() ) );
+        MavenRepository repository = (MavenRepository) super.updateRepositoryFromModel(
+            old,
+            configuration,
+            repo,
+            rsc,
+            ls,
+            rs );
 
         if ( CRepository.REPOSITORY_POLICY_RELEASE.equals( repo.getRepositoryPolicy() ) )
         {
@@ -46,7 +46,18 @@ public class AbstractMavenRepositoryConfigurator
         {
             repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
         }
-        
+
+        if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
+        {
+            MavenProxyRepository mpr = repository.adaptToFacet( MavenProxyRepository.class );
+
+            mpr.setReleaseMaxAge( repo.getArtifactMaxAge() );
+            mpr.setSnapshotMaxAge( repo.getArtifactMaxAge() );
+            mpr.setMetadataMaxAge( repo.getMetadataMaxAge() );
+            mpr.setCleanseRepositoryMetadata( repo.isMaintainProxiedRepositoryMetadata() );
+            mpr.setChecksumPolicy( ChecksumPolicy.fromModel( repo.getChecksumPolicy() ) );
+        }
+
         return repository;
     }
 }

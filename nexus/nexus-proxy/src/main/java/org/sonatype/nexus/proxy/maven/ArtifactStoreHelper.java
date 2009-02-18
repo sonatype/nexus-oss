@@ -33,11 +33,16 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -45,8 +50,6 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  * Repository interface of it's "owner" repository for storing/retrieval.
  * 
  * @author cstamas
- * @deprecated Please try to avoid using this class until we decide how should we properly add
- *             "high level maven awareness" to reposes.
  */
 public class ArtifactStoreHelper
 {
@@ -57,6 +60,225 @@ public class ArtifactStoreHelper
         super();
 
         this.repository = repo;
+    }
+
+    public MavenRepository getMavenRepository()
+    {
+        return repository;
+    }
+
+    public void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
+        throws UnsupportedStorageOperationException,
+            IllegalOperationException,
+            StorageException,
+            AccessDeniedException
+    {
+        try
+        {
+            try
+            {
+                getMavenRepository().storeItem( request, is, userAttributes );
+            }
+            catch ( IOException e )
+            {
+                throw new StorageException( "Could not get the content from the ContentLocator!", e );
+            }
+
+            RepositoryItemUid itemUid = getMavenRepository().createUid( request.getRequestPath() );
+
+            StorageFileItem storedFile = (StorageFileItem) getMavenRepository().retrieveItem( itemUid, null );
+
+            String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+
+            String md5Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+
+            if ( !StringUtils.isEmpty( sha1Hash ) )
+            {
+                getMavenRepository().storeItem(
+                    new DefaultStorageFileItem(
+                        getMavenRepository(),
+                        storedFile.getPath() + ".sha1",
+                        true,
+                        true,
+                        new StringContentLocator( sha1Hash ) ) );
+            }
+
+            if ( !StringUtils.isEmpty( md5Hash ) )
+            {
+                getMavenRepository().storeItem(
+                    new DefaultStorageFileItem(
+                        getMavenRepository(),
+                        storedFile.getPath() + ".md5",
+                        true,
+                        true,
+                        new StringContentLocator( md5Hash ) ) );
+            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            throw new StorageException( "Storage inconsistency!", e );
+        }
+    }
+
+    public void deleteItemWithChecksums( ResourceStoreRequest request )
+        throws UnsupportedStorageOperationException,
+            IllegalOperationException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException
+    {
+        try
+        {
+            getMavenRepository().deleteItem( request );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            if ( request.getRequestPath().endsWith( ".asc" ) )
+            {
+                // Do nothing no guarantee that the .asc files will exist
+            }
+            else
+            {
+                throw e;
+            }
+        }
+
+        String originalPath = request.getRequestPath();
+
+        request.setRequestPath( originalPath + ".sha1" );
+
+        try
+        {
+            getMavenRepository().deleteItem( request );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
+        }
+
+        request.setRequestPath( originalPath + ".md5" );
+
+        try
+        {
+            getMavenRepository().deleteItem( request );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
+        }
+
+        // Now remove the .asc files, and the checksums stored with them as well
+        // Note this is a recursive call, hence the check for .asc
+        if ( !originalPath.endsWith( ".asc" ) )
+        {
+            request.setRequestPath( originalPath + ".asc" );
+
+            deleteItemWithChecksums( request );
+        }
+    }
+
+    public void storeItemWithChecksums( AbstractStorageItem item )
+        throws UnsupportedStorageOperationException,
+            IllegalOperationException,
+            StorageException
+    {
+        try
+        {
+            try
+            {
+                getMavenRepository().storeItem( item );
+            }
+            catch ( IOException e )
+            {
+                throw new StorageException( "Could not get the content from the ContentLocator!", e );
+            }
+
+            StorageFileItem storedFile = (StorageFileItem) getMavenRepository().retrieveItem(
+                item.getRepositoryItemUid(),
+                item.getItemContext() );
+
+            String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+
+            String md5Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+
+            if ( !StringUtils.isEmpty( sha1Hash ) )
+            {
+                getMavenRepository().storeItem(
+                    new DefaultStorageFileItem(
+                        getMavenRepository(),
+                        item.getPath() + ".sha1",
+                        true,
+                        true,
+                        new StringContentLocator( sha1Hash ) ) );
+            }
+
+            if ( !StringUtils.isEmpty( md5Hash ) )
+            {
+                getMavenRepository().storeItem(
+                    new DefaultStorageFileItem(
+                        getMavenRepository(),
+                        item.getPath() + ".md5",
+                        true,
+                        true,
+                        new StringContentLocator( md5Hash ) ) );
+            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            throw new StorageException( "Storage inconsistency!", e );
+        }
+    }
+
+    public void deleteItemWithChecksums( RepositoryItemUid uid, Map<String, Object> context )
+        throws UnsupportedStorageOperationException,
+            IllegalOperationException,
+            ItemNotFoundException,
+            StorageException
+    {
+        try
+        {
+            getMavenRepository().deleteItem( uid, context );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            if ( uid.getPath().endsWith( ".asc" ) )
+            {
+                // Do nothing no guarantee that the .asc files will exist
+            }
+            else
+            {
+                throw e;
+            }
+        }
+
+        RepositoryItemUid sha1Uid = getMavenRepository().createUid( uid.getPath() + ".sha1" );
+
+        try
+        {
+            getMavenRepository().deleteItem( sha1Uid, context );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
+        }
+
+        RepositoryItemUid md5Uid = getMavenRepository().createUid( uid.getPath() + ".md5" );
+
+        try
+        {
+            getMavenRepository().deleteItem( md5Uid, context );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
+        }
+
+        // Now remove the .asc files, and the checksums stored with them as well
+        // Note this is a recursive call, hence the check for .asc
+        if ( !uid.getPath().endsWith( ".asc" ) )
+        {
+            deleteItemWithChecksums( getMavenRepository().createUid( uid.getPath() + ".asc" ), context );
+        }
     }
 
     public StorageFileItem retrieveArtifactPom( ArtifactStoreRequest gavRequest )
@@ -505,8 +727,8 @@ public class ArtifactStoreHelper
         try
         {
             repository.retrieveItem( uid, null );
-            
-            //reader = ReaderFactory.newXmlReader( repository.retrieveItemContent( uid ) );
+
+            // reader = ReaderFactory.newXmlReader( repository.retrieveItemContent( uid ) );
 
             XmlPullParser parser = new MXParser();
 

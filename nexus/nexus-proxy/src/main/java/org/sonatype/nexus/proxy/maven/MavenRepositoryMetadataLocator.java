@@ -26,6 +26,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
@@ -75,7 +76,7 @@ public class MavenRepositoryMetadataLocator
     {
         Gav gav = null;
 
-        if ( ArtifactStoreRequest.DUMMY_PATH.equals( request.getRequestPath() ) )
+        if ( StringUtils.isEmpty( request.getRequestPath() ) )
         {
             // we have no path info
             gav = new Gav(

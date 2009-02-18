@@ -18,6 +18,14 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 public interface MavenProxyRepository
     extends MavenRepository, ProxyRepository
 {
+    boolean isCleanseRepositoryMetadata();
+
+    void setCleanseRepositoryMetadata( boolean cleanseRepositoryMetadata );
+
+    boolean isFixRepositoryChecksums();
+
+    void setFixRepositoryChecksums( boolean fixRepositoryChecksums );
+
     ChecksumPolicy getChecksumPolicy();
 
     void setChecksumPolicy( ChecksumPolicy checksumPolicy );

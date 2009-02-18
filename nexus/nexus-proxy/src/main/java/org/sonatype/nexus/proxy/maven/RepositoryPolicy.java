@@ -21,49 +21,63 @@ import org.sonatype.nexus.index.creator.AbstractIndexCreator;
 
 public enum RepositoryPolicy
 {
-    RELEASE 
+    RELEASE
     {
-        public DocumentFilter getFilter() 
+        public DocumentFilter getFilter()
         {
             return new DocumentFilter()
             {
                 public boolean accept( Document doc )
                 {
                     String uinfo = doc.get( ArtifactInfo.UINFO );
-    
-                    if ( uinfo == null ) 
+
+                    if ( uinfo == null )
                     {
                         return true;
-                    } 
-    
+                    }
+
                     String[] r = AbstractIndexCreator.FS_PATTERN.split( uinfo );
-    
+
                     return !VersionUtils.isSnapshot( r[2] );
                 }
-            };         
+            };
         }
     },
 
-    SNAPSHOT 
+    SNAPSHOT
     {
-        public DocumentFilter getFilter() 
+        public DocumentFilter getFilter()
         {
             return new DocumentFilter()
             {
                 public boolean accept( Document doc )
                 {
                     String uinfo = doc.get( ArtifactInfo.UINFO );
-    
-                    if ( uinfo == null ) 
+
+                    if ( uinfo == null )
                     {
                         return true;
-                    } 
-    
+                    }
+
                     String[] r = AbstractIndexCreator.FS_PATTERN.split( uinfo );
-    
+
                     return VersionUtils.isSnapshot( r[2] );
                 }
-            };         
+            };
+        }
+    },
+
+    MIXED
+    {
+        public DocumentFilter getFilter()
+        {
+            return new DocumentFilter()
+            {
+                public boolean accept( Document doc )
+                {
+                    return true;
+                }
+            };
         }
     };
 

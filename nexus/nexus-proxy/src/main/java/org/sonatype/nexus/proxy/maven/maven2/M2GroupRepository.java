@@ -31,6 +31,7 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -42,15 +43,24 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.repository.DefaultGroupRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 @Component( role = GroupRepository.class, hint = "maven2", instantiationStrategy = "per-lookup", description = "Maven2 Repository Group" )
 public class M2GroupRepository
-    extends DefaultGroupRepository
+    extends AbstractMavenGroupRepository
 {
+    /**
+     * The GAV Calculator.
+     */
+    @Requirement( hint = "maven2" )
+    private GavCalculator gavCalculator;
+
+    /**
+     * Content class.
+     */
     @Requirement( hint = "maven2" )
     private ContentClass contentClass;
 
@@ -59,6 +69,11 @@ public class M2GroupRepository
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
+    }
+
+    public GavCalculator getGavCalculator()
+    {
+        return gavCalculator;
     }
 
     @Override
@@ -246,4 +261,5 @@ public class M2GroupRepository
             mergeMetadata = cfg.getConfiguration().getRouting().getGroups().isMergeMetadata();
         }
     }
+
 }

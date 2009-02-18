@@ -19,8 +19,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 public class ArtifactStoreRequest
     extends ResourceStoreRequest
 {
-    public static final String DUMMY_PATH = "GAV";
-
     private String groupId;
 
     private String artifactId;
@@ -36,7 +34,7 @@ public class ArtifactStoreRequest
     public ArtifactStoreRequest( boolean localOnly, String repositoryId, String g, String a, String v, String p,
         String c, String e )
     {
-        super( DUMMY_PATH, localOnly, repositoryId );
+        super( null, localOnly, repositoryId );
 
         if ( StringUtils.isEmpty( g ) || StringUtils.isEmpty( a ) || StringUtils.isEmpty( v ) )
         {

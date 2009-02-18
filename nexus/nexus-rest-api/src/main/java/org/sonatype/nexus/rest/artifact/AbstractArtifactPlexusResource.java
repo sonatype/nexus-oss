@@ -41,8 +41,10 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -79,24 +81,34 @@ public abstract class AbstractArtifactPlexusResource
             getLogger().debug( "Created ResourceStore request for " + result.getRequestPath() );
         }
 
+        // stuff in the originating remote address
         result.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, request.getClientInfo().getAddress() );
 
+        // stuff in the user id if we have it in request
         if ( request.getChallengeResponse() != null && request.getChallengeResponse().getIdentifier() != null )
         {
             result.getRequestContext().put( AccessManager.REQUEST_USER, request.getChallengeResponse().getIdentifier() );
         }
 
+        // this is HTTPS, get the cert and stuff it too for later
         if ( request.isConfidential() )
         {
             result.getRequestContext().put( AccessManager.REQUEST_CONFIDENTIAL, Boolean.TRUE );
 
-            // X509Certificate[] certs = (X509Certificate[]) context.getHttpServletRequest().getAttribute(
-            // "javax.servlet.request.X509Certificate" );
-            // if ( false ) // certs != null )
-            // {
-            // result.getRequestContext().put( CertificateBasedAccessDecisionVoter.REQUEST_CERTIFICATES, certs );
-            // }
+            List<?> certs = (List<?>) request.getAttributes().get( "org.restlet.https.clientCertificates" );
+
+            if ( certs != null )
+            {
+                result.getRequestContext().put( AccessManager.REQUEST_CERTIFICATES, certs );
+            }
         }
+
+        // put the incoming URLs
+        result.getRequestContext().put(
+            ResourceStoreRequest.CTX_REQUEST_APP_ROOT_URL,
+            getContextRoot( request ).toString() );
+        result.getRequestContext().put( ResourceStoreRequest.CTX_REQUEST_URL, request.getOriginalRef().toString() );
+
         return result;
     }
 
@@ -133,12 +145,9 @@ public abstract class AbstractArtifactPlexusResource
 
         try
         {
-            Repository repository = getNexus().getRepository( repositoryId );
+            MavenRepository mavenRepository = getMavenRepository( repositoryId );
 
-            if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
-            {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "This is not a Maven repository!" );
-            }
+            ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
 
             InputStream pomContent = null;
 
@@ -148,8 +157,6 @@ public abstract class AbstractArtifactPlexusResource
 
             try
             {
-                ArtifactStoreHelper helper = new ArtifactStoreHelper( (MavenRepository) repository );
-
                 StorageFileItem file = helper.retrieveArtifactPom( gavRequest );
 
                 pomContent = file.getInputStream();
@@ -220,14 +227,9 @@ public abstract class AbstractArtifactPlexusResource
 
         try
         {
-            Repository repository = getNexus().getRepository( repositoryId );
+            MavenRepository mavenRepository = getMavenRepository( repositoryId );
 
-            if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
-            {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "This is not a Maven repository!" );
-            }
-
-            ArtifactStoreHelper helper = new ArtifactStoreHelper( (MavenRepository) repository );
+            ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
 
             StorageFileItem file = helper.retrieveArtifact( gavRequest );
 
@@ -415,35 +417,22 @@ public abstract class AbstractArtifactPlexusResource
 
                     try
                     {
-                        Repository repository = getNexus().getRepository( repositoryId );
+                        MavenRepository mr = getMavenRepository( repositoryId );
 
-                        ArtifactStoreHelper helper = new ArtifactStoreHelper( (MavenRepository) repository );
+                        ArtifactStoreHelper helper = mr.getArtifactStoreHelper();
 
-                        if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                        // temporarily we disable SNAPSHOT upload
+                        // check is it a Snapshot repo
+                        if ( RepositoryPolicy.SNAPSHOT.equals( mr.getRepositoryPolicy() ) )
                         {
-                            getLogger().warn( "Upload to non maven repository attempted" );
+                            getLogger().info( "Upload to SNAPSHOT maven repository attempted" );
+
                             throw new ResourceException(
                                 Status.CLIENT_ERROR_BAD_REQUEST,
-                                "This is not a Maven repository!" );
-                        }
-                        else
-                        {
-                            // temporarily we disable SNAPSHOT upload
-                            // check is it a Snapshot repo
-                            MavenRepository mr = (MavenRepository) repository;
-
-                            if ( RepositoryPolicy.SNAPSHOT.equals( mr.getRepositoryPolicy() ) )
-                            {
-                                getLogger().info( "Upload to SNAPSHOT maven repository attempted" );
-
-                                throw new ResourceException(
-                                    Status.CLIENT_ERROR_BAD_REQUEST,
-                                    "This is a Maven SNAPSHOT repository, and manual upload against it is forbidden!" );
-                            }
+                                "This is a Maven SNAPSHOT repository, and manual upload against it is forbidden!" );
                         }
 
-                        if ( !versionMatchesPolicy( gavRequest.getVersion(), ( (MavenRepository) repository )
-                            .getRepositoryPolicy() ) )
+                        if ( !versionMatchesPolicy( gavRequest.getVersion(), mr.getRepositoryPolicy() ) )
                         {
                             getLogger().warn(
                                 "Version (" + gavRequest.getVersion() + ") and Repository Policy mismatch" );
@@ -583,7 +572,27 @@ public abstract class AbstractArtifactPlexusResource
         }
     }
 
-    private boolean versionMatchesPolicy( String version, RepositoryPolicy policy )
+    protected MavenRepository getMavenRepository( String id )
+        throws ResourceException
+    {
+        try
+        {
+            Repository repository = getNexus().getRepository( id );
+
+            if ( !repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "This is not a Maven repository!" );
+            }
+
+            return repository.adaptToFacet( MavenRepository.class );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+        }
+    }
+
+    protected boolean versionMatchesPolicy( String version, RepositoryPolicy policy )
     {
         boolean result = false;
 
