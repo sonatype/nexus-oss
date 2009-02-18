@@ -18,7 +18,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.integrationtests.proxy.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ClearCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;

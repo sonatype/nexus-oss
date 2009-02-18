@@ -117,7 +117,12 @@ public class RestletRawTransport
 
     protected Request createRequest( Method method, String path )
     {
-        Request request = new Request( method, new Reference( repositoryRoot, path ) );
+        // TODO: in restlet 1.1.1 the Reference is broken, (it works great in 1.1.2, but that has other problems)
+        // so we need to a working solution
+        String uri = repositoryRoot + ( repositoryRoot.endsWith( "/" ) ? "" : "/" ) + path;
+        Reference reference = new Reference( uri );
+                
+        Request request = new Request( method, reference );
 
         ClientInfo ci = new ClientInfo();
 

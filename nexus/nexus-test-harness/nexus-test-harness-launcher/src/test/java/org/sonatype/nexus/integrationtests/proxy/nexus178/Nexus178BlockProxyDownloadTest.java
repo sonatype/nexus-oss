@@ -24,7 +24,7 @@ import junit.framework.Assert;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.integrationtests.proxy.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
 /**

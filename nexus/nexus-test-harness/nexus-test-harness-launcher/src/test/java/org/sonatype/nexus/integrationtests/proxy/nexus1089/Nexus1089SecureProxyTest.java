@@ -19,7 +19,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.integrationtests.proxy.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
 public class Nexus1089SecureProxyTest
