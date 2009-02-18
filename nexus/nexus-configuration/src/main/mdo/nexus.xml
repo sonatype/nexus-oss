@@ -954,6 +954,18 @@
           </association>
           <required>false</required>
         </field>
+        <field>
+          <name>mirrors</name>
+          <version>1.0.8+</version>
+          <description>
+            Repository mirrors configuration.
+          </description>
+          <association>
+            <type>CMirror</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

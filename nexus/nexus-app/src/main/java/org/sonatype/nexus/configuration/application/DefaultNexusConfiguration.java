@@ -1678,7 +1678,23 @@ public class DefaultNexusConfiguration
             {
                 if ( repository.getId().equals( repositoryId ) )
                 {
-                    repository.getRemoteStorage().setMirrors( mirrors );
+                    //Proxy mirrors
+                    if ( repository.getRemoteStorage() != null )
+                    {
+                        repository.getRemoteStorage().setMirrors( mirrors );
+                    }
+                    //Hosted mirrors
+                    else
+                    {
+                        int i = 1;
+                        for ( CMirror mirror : mirrors )
+                        {
+                            mirror.setId( String.valueOf( i++ ) );
+                        }
+                        
+                        repository.setMirrors( mirrors );
+                    }
+                    
                     applyAndSaveConfiguration();
                     try
                     {
@@ -1712,7 +1728,16 @@ public class DefaultNexusConfiguration
         {
             if ( repository.getId().equals( repositoryId ) )
             {
-                return repository.getRemoteStorage().getMirrors();
+                //Proxy mirrors
+                if ( repository.getRemoteStorage() != null )
+                {
+                    return repository.getRemoteStorage().getMirrors();
+                }
+                //Hosted mirrors
+                else
+                {
+                    return repository.getMirrors();
+                }
             }
         }
 

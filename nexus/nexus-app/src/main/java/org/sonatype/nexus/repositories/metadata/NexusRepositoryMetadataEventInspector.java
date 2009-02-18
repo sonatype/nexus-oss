@@ -1,4 +1,4 @@
-package org.sonatype.nexus.proxy.repository.metadata;
+package org.sonatype.nexus.repositories.metadata;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,6 +8,10 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.model.CMirror;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -18,12 +22,14 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
 import org.sonatype.nexus.repository.metadata.RepositoryMetadataHandler;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMemberMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
+import org.sonatype.nexus.repository.metadata.model.RepositoryMirrorMetadata;
 
 @Component( role = EventInspector.class, hint = "NexusRepositoryMetadataEventInspector" )
 public class NexusRepositoryMetadataEventInspector
@@ -38,6 +44,9 @@ public class NexusRepositoryMetadataEventInspector
 
     @Requirement
     private RepositoryMetadataHandler repositoryMetadataHandler;
+    
+    @Requirement
+    private NexusConfiguration configuration;
 
     public boolean accepts( AbstractEvent evt )
     {
@@ -56,6 +65,8 @@ public class NexusRepositoryMetadataEventInspector
             String repositoryUrl = null;
 
             String repositoryLocalUrl = null;
+            
+            List<RepositoryMirrorMetadata> mirrors = null;
 
             if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
             {
@@ -86,6 +97,11 @@ public class NexusRepositoryMetadataEventInspector
                 // huh? unknown stuff, better to not tamper with it
                 return;
             }
+            
+            if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
+            {
+                mirrors = getMirrors( repository.getId() );
+            }
 
             RepositoryMetadata rm = new RepositoryMetadata();
             rm.setUrl( repositoryUrl );
@@ -93,6 +109,7 @@ public class NexusRepositoryMetadataEventInspector
             rm.setName( repository.getName() );
             rm.setLayout( repository.getRepositoryContentClass().getId() );
             rm.setPolicy( getRepositoryPolicy( repository ) );
+            rm.setMirrors( mirrors );
 
             if ( repositoryLocalUrl != null )
             {
@@ -198,4 +215,30 @@ public class NexusRepositoryMetadataEventInspector
         }
     }
 
+    protected List<RepositoryMirrorMetadata> getMirrors( String repositoryId )
+    {
+        try
+        {
+            List<RepositoryMirrorMetadata> mirrors = new ArrayList<RepositoryMirrorMetadata>();
+            
+            CRepository repo = configuration.readRepository( repositoryId );
+            
+            for ( CMirror mirror : ( List<CMirror> ) repo.getMirrors() )
+            {
+                RepositoryMirrorMetadata md = new RepositoryMirrorMetadata();
+                md.setId( mirror.getId() );
+                md.setUrl( mirror.getUrl() );
+                
+                mirrors.add( md );
+            }
+            
+            return mirrors;
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            getLogger().debug( "Repository not found, returning no mirrors" );
+        }
+        
+        return null;
+    }
 }

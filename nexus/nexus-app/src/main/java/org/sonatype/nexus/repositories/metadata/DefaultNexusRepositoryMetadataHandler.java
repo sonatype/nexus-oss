@@ -1,4 +1,4 @@
-package org.sonatype.nexus.proxy.repository.metadata;
+package org.sonatype.nexus.repositories.metadata;
 
 import java.io.IOException;
 

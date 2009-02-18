@@ -12,7 +12,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.repository.metadata.NexusRepositoryMetadataHandler;
+import org.sonatype.nexus.repositories.metadata.NexusRepositoryMetadataHandler;
 import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMirrorMetadata;
