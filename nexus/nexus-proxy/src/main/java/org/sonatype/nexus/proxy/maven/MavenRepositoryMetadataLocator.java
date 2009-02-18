@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.Map;
 
 import org.apache.maven.mercury.repository.metadata.Metadata;
@@ -25,12 +26,14 @@ import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.pull.MXParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.GavCalculator;
-import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -45,59 +48,23 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  * 
  * @author cstamas
  */
+@Component( role = MetadataLocator.class )
 public class MavenRepositoryMetadataLocator
     implements MetadataLocator
 {
-    private final MavenRepository mavenRepository;
-
-    public MavenRepositoryMetadataLocator( MavenRepository repository )
-    {
-        super();
-
-        this.mavenRepository = repository;
-    }
-
-    public MavenRepository getMavenRepository()
-    {
-        return mavenRepository;
-    }
-
-    public GavCalculator getGavCalculator()
-    {
-        return getMavenRepository().getGavCalculator();
-    }
-
-    public ArtifactPackagingMapper getArtifactPackagingMapper()
-    {
-        return getMavenRepository().getArtifactPackagingMapper();
-    }
-
     public Gav getGavForRequest( ArtifactStoreRequest request )
     {
         Gav gav = null;
 
-        if ( StringUtils.isEmpty( request.getRequestPath() ) )
+        if ( request.getGav() != null )
         {
-            // we have no path info
-            gav = new Gav(
-                request.getGroupId(),
-                request.getArtifactId(),
-                request.getVersion(),
-                request.getClassifier(),
-                getArtifactPackagingMapper().getExtensionForPackaging( request.getPackaging() ),
-                null,
-                null,
-                null,
-                VersionUtils.isSnapshot( request.getVersion() ),
-                false,
-                null,
-                false,
-                null );
+            // we have gav
+            gav = request.getGav();
         }
         else
         {
             // we have path info, the best way is to calc GAV
-            gav = getGavCalculator().pathToGav( request.getRequestPath() );
+            gav = request.getMavenRepository().getGavCalculator().pathToGav( request.getRequestPath() );
         }
 
         return gav;
@@ -124,17 +91,82 @@ public class MavenRepositoryMetadataLocator
         return plugin;
     }
 
+    public String retrievePackagingFromPom( ArtifactStoreRequest request )
+        throws IOException
+    {
+        String packaging = "jar";
+
+        Reader reader = null;
+
+        try
+        {
+            StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem(
+                request.getMavenRepository().createUid( request.getRequestPath() ),
+                request.getRequestContext() );
+
+            reader = ReaderFactory.newXmlReader( pomFile.getInputStream() );
+
+            XmlPullParser parser = new MXParser();
+
+            parser.setInput( reader );
+
+            boolean foundRoot = false;
+
+            int eventType = parser.getEventType();
+
+            while ( eventType != XmlPullParser.END_DOCUMENT )
+            {
+                if ( eventType == XmlPullParser.START_TAG )
+                {
+                    if ( parser.getName().equals( "project" ) )
+                    {
+                        foundRoot = true;
+                    }
+                    else if ( parser.getName().equals( "packaging" ) )
+                    {
+                        // 1st: if found project/packaging -> overwrite
+                        if ( parser.getDepth() == 2 )
+                        {
+                            packaging = StringUtils.trim( parser.nextText() );
+                            break;
+                        }
+                    }
+                    else if ( !foundRoot )
+                    {
+                        throw new XmlPullParserException( "Unrecognised tag: '" + parser.getName() + "'", parser, null );
+                    }
+                }
+
+                eventType = parser.next();
+            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            return null;
+        }
+        catch ( Exception e )
+        {
+            throw createIOExceptionWithCause( e.getMessage(), e );
+        }
+        finally
+        {
+            IOUtil.close( reader );
+        }
+
+        return packaging;
+    }
+
     public Model retrievePom( ArtifactStoreRequest request )
         throws IOException
     {
         try
         {
-            Gav gav = getMavenRepository().getMetadataManager().resolveArtifact( getMavenRepository(), request );
+            Gav gav = request.getGav();
 
-            String pomPath = getMavenRepository().getGavCalculator().gavToPath( gav );
+            String pomPath = request.getMavenRepository().getGavCalculator().gavToPath( gav );
 
-            StorageFileItem pomFile = (StorageFileItem) getMavenRepository().retrieveItem(
-                getMavenRepository().createUid( pomPath ),
+            StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem(
+                request.getMavenRepository().createUid( pomPath ),
                 request.getRequestContext() );
 
             Model model = null;
@@ -171,7 +203,7 @@ public class MavenRepositoryMetadataLocator
         {
             Gav gav = getGavForRequest( request );
 
-            return readOrCreateGAVMetadata( getMavenRepository(), gav, request.getRequestContext() );
+            return readOrCreateGAVMetadata( request, gav );
         }
         catch ( Exception e )
         {
@@ -186,7 +218,7 @@ public class MavenRepositoryMetadataLocator
         {
             Gav gav = getGavForRequest( request );
 
-            return readOrCreateGAMetadata( getMavenRepository(), gav, request.getRequestContext() );
+            return readOrCreateGAMetadata( request, gav );
         }
         catch ( Exception e )
         {
@@ -201,7 +233,7 @@ public class MavenRepositoryMetadataLocator
         {
             Gav gav = getGavForRequest( request );
 
-            return readOrCreateGMetadata( getMavenRepository(), gav, request.getRequestContext() );
+            return readOrCreateGMetadata( request, gav );
         }
         catch ( Exception e )
         {
@@ -216,7 +248,7 @@ public class MavenRepositoryMetadataLocator
         {
             Gav gav = getGavForRequest( request );
 
-            writeGAVMetadata( getMavenRepository(), gav, metadata, request.getRequestContext() );
+            writeGAVMetadata( request, gav, metadata );
         }
         catch ( Exception e )
         {
@@ -231,7 +263,7 @@ public class MavenRepositoryMetadataLocator
         {
             Gav gav = getGavForRequest( request );
 
-            writeGAMetadata( getMavenRepository(), gav, metadata, request.getRequestContext() );
+            writeGAMetadata( request, gav, metadata );
         }
         catch ( Exception e )
         {
@@ -246,7 +278,7 @@ public class MavenRepositoryMetadataLocator
         {
             Gav gav = getGavForRequest( request );
 
-            writeGMetadata( getMavenRepository(), gav, metadata, request.getRequestContext() );
+            writeGMetadata( request, gav, metadata );
         }
         catch ( Exception e )
         {
@@ -332,19 +364,19 @@ public class MavenRepositoryMetadataLocator
         ( (MavenRepository) uid.getRepository() ).storeItemWithChecksums( file );
     }
 
-    protected Metadata readOrCreateGAVMetadata( MavenRepository repository, Gav gav, Map<String, Object> ctx )
+    protected Metadata readOrCreateGAVMetadata( ArtifactStoreRequest request, Gav gav )
         throws IllegalOperationException,
             IOException,
             MetadataException
     {
-        String mdPath = getGavCalculator().gavToPath( gav );
+        String mdPath = request.getRequestPath();
 
         // GAV
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
 
-        RepositoryItemUid uid = repository.createUid( mdPath );
+        RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
 
-        Metadata result = readOrCreateMetadata( uid, ctx );
+        Metadata result = readOrCreateMetadata( uid, request.getRequestContext() );
 
         result.setGroupId( gav.getGroupId() );
 
@@ -355,12 +387,12 @@ public class MavenRepositoryMetadataLocator
         return result;
     }
 
-    protected Metadata readOrCreateGAMetadata( MavenRepository repository, Gav gav, Map<String, Object> ctx )
+    protected Metadata readOrCreateGAMetadata( ArtifactStoreRequest request, Gav gav )
         throws IllegalOperationException,
             IOException,
             MetadataException
     {
-        String mdPath = getGavCalculator().gavToPath( gav );
+        String mdPath = request.getRequestPath();
 
         // GAV
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
@@ -368,9 +400,9 @@ public class MavenRepositoryMetadataLocator
         // GA
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
 
-        RepositoryItemUid uid = repository.createUid( mdPath );
+        RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
 
-        Metadata result = readOrCreateMetadata( uid, ctx );
+        Metadata result = readOrCreateMetadata( uid, request.getRequestContext() );
 
         result.setGroupId( gav.getGroupId() );
 
@@ -381,12 +413,12 @@ public class MavenRepositoryMetadataLocator
         return result;
     }
 
-    protected Metadata readOrCreateGMetadata( MavenRepository repository, Gav gav, Map<String, Object> ctx )
+    protected Metadata readOrCreateGMetadata( ArtifactStoreRequest request, Gav gav )
         throws IllegalOperationException,
             IOException,
             MetadataException
     {
-        String mdPath = getGavCalculator().gavToPath( gav );
+        String mdPath = request.getRequestPath();
 
         // GAV
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
@@ -397,9 +429,9 @@ public class MavenRepositoryMetadataLocator
         // G
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
 
-        RepositoryItemUid uid = repository.createUid( mdPath );
+        RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
 
-        Metadata result = readOrCreateMetadata( uid, ctx );
+        Metadata result = readOrCreateMetadata( uid, request.getRequestContext() );
 
         result.setGroupId( null );
 
@@ -410,29 +442,29 @@ public class MavenRepositoryMetadataLocator
         return result;
     }
 
-    protected void writeGAVMetadata( MavenRepository repository, Gav gav, Metadata md, Map<String, Object> ctx )
+    protected void writeGAVMetadata( ArtifactStoreRequest request, Gav gav, Metadata md )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             MetadataException,
             IOException
     {
-        String mdPath = getGavCalculator().gavToPath( gav );
+        String mdPath = request.getRequestPath();
 
         // GAV
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
 
-        RepositoryItemUid uid = repository.createUid( mdPath );
+        RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
 
-        writeMetadata( uid, ctx, md );
+        writeMetadata( uid, request.getRequestContext(), md );
     }
 
-    protected void writeGAMetadata( MavenRepository repository, Gav gav, Metadata md, Map<String, Object> ctx )
+    protected void writeGAMetadata( ArtifactStoreRequest request, Gav gav, Metadata md )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             MetadataException,
             IOException
     {
-        String mdPath = getGavCalculator().gavToPath( gav );
+        String mdPath = request.getRequestPath();
 
         // GAV
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
@@ -440,18 +472,18 @@ public class MavenRepositoryMetadataLocator
         // GA
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
 
-        RepositoryItemUid uid = repository.createUid( mdPath );
+        RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
 
-        writeMetadata( uid, ctx, md );
+        writeMetadata( uid, request.getRequestContext(), md );
     }
 
-    protected void writeGMetadata( MavenRepository repository, Gav gav, Metadata md, Map<String, Object> ctx )
+    protected void writeGMetadata( ArtifactStoreRequest request, Gav gav, Metadata md )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             MetadataException,
             IOException
     {
-        String mdPath = getGavCalculator().gavToPath( gav );
+        String mdPath = request.getRequestPath();
 
         // GAV
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
@@ -462,9 +494,9 @@ public class MavenRepositoryMetadataLocator
         // G
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
 
-        RepositoryItemUid uid = repository.createUid( mdPath );
+        RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
 
-        writeMetadata( uid, ctx, md );
+        writeMetadata( uid, request.getRequestContext(), md );
     }
 
 }

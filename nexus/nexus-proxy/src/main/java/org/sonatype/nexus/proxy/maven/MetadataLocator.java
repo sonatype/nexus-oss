@@ -19,7 +19,6 @@ import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.GavCalculator;
 
 /**
  * An adapter in charge for doing the IO against the storage, hiding the fact where it runs.
@@ -28,20 +27,6 @@ import org.sonatype.nexus.artifact.GavCalculator;
  */
 public interface MetadataLocator
 {
-    /**
-     * Returns the GavCalculator that suits the layout of the underlying storage.
-     * 
-     * @return
-     */
-    GavCalculator getGavCalculator();
-
-    /**
-     * Returns the ArtifactPackagingMapper that suits the underlying storage.
-     * 
-     * @return
-     */
-    ArtifactPackagingMapper getArtifactPackagingMapper();
-
     /**
      * Calculates the GAV for the request.
      * 
@@ -69,6 +54,16 @@ public interface MetadataLocator
      * @throws IOException
      */
     Model retrievePom( ArtifactStoreRequest request )
+        throws IOException;
+
+    /**
+     * Gets the packaging from POM for given request.
+     * 
+     * @param request
+     * @return packaging, or null if not found on the request path
+     * @throws IOException
+     */
+    String retrievePackagingFromPom( ArtifactStoreRequest request )
         throws IOException;
 
     /**

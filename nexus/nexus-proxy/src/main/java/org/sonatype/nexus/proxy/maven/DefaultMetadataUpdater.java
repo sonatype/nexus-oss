@@ -29,17 +29,22 @@ import org.apache.maven.mercury.repository.metadata.PluginOperand;
 import org.apache.maven.mercury.repository.metadata.SetSnapshotOperation;
 import org.apache.maven.mercury.repository.metadata.SnapshotOperand;
 import org.apache.maven.mercury.repository.metadata.StringOperand;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 
+@Component( role = MetadataUpdater.class )
 public class DefaultMetadataUpdater
     extends AbstractLogEnabled
     implements MetadataUpdater
 {
+    @Requirement
+    private MetadataLocator locator;
 
-    public void deployArtifact( ArtifactStoreRequest request, MetadataLocator locator )
+    public void deployArtifact( ArtifactStoreRequest request )
         throws IOException
     {
         if ( !StringUtils.isEmpty( request.getClassifier() ) )
@@ -93,7 +98,7 @@ public class DefaultMetadataUpdater
 
             operations = new ArrayList<MetadataOperation>();
 
-            if ( "maven-plugin".equals( request.getPackaging() ) )
+            if ( StringUtils.equals( "maven-plugin", locator.retrievePackagingFromPom( request ) ) )
             {
                 Metadata gMd = locator.retrieveGMetadata( request );
 
@@ -116,7 +121,7 @@ public class DefaultMetadataUpdater
         }
     }
 
-    public void undeployArtifact( ArtifactStoreRequest request, MetadataLocator locator )
+    public void undeployArtifact( ArtifactStoreRequest request )
         throws IOException
     {
         if ( !StringUtils.isEmpty( request.getClassifier() ) )
@@ -170,7 +175,7 @@ public class DefaultMetadataUpdater
 
             operations = new ArrayList<MetadataOperation>();
 
-            if ( "maven-plugin".equals( request.getPackaging() ) )
+            if ( StringUtils.equals( "maven-plugin", locator.retrievePackagingFromPom( request ) ) )
             {
                 Metadata gMd = locator.retrieveGMetadata( request );
 
@@ -190,20 +195,23 @@ public class DefaultMetadataUpdater
         catch ( MetadataException e )
         {
             // ?
-        }    }
+        }
+    }
 
-    public void deployArtifacts( Collection<ArtifactStoreRequest> requests, MetadataLocator locator )
+    // ==
+
+    public void deployArtifacts( Collection<ArtifactStoreRequest> requests )
         throws IOException
     {
         // TODO Auto-generated method stub
 
     }
 
-    public void recreateMetadata( StorageCollectionItem coll, MetadataLocator locator )
+    public void recreateMetadata( StorageCollectionItem coll )
         throws IOException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

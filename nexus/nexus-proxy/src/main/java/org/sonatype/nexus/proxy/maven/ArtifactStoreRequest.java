@@ -13,136 +13,72 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 
 public class ArtifactStoreRequest
     extends ResourceStoreRequest
 {
-    private String groupId;
+    private final MavenRepository mavenRepository;
 
-    private String artifactId;
+    private final Gav gav;
 
-    private String version;
-
-    private String packaging;
-
-    private String classifier;
-
-    private String extension;
-
-    public ArtifactStoreRequest( boolean localOnly, String repositoryId, String g, String a, String v, String p,
-        String c, String e )
+    public ArtifactStoreRequest( MavenRepository repository, String path, boolean localOnly )
     {
-        super( null, localOnly, repositoryId );
+        super( path, localOnly, repository.getId() );
 
-        if ( StringUtils.isEmpty( g ) || StringUtils.isEmpty( a ) || StringUtils.isEmpty( v ) )
-        {
-            throw new IllegalArgumentException( "None of the GAV dimensions can be null or empty!" );
-        }
+        this.mavenRepository = repository;
 
-        setGroupId( g );
+        this.gav = mavenRepository.getGavCalculator().pathToGav( path );
 
-        setArtifactId( a );
-
-        setVersion( v );
-
-        if ( !StringUtils.isEmpty( p ) )
+        if ( gav == null )
         {
-            setPackaging( p );
-        }
-        else
-        {
-            setPackaging( "jar" );
-        }
-
-        if ( !StringUtils.isEmpty( c ) )
-        {
-            setClassifier( c );
-        }
-        else
-        {
-            setClassifier( null );
-        }
-
-        if ( !StringUtils.isEmpty( e ) )
-        {
-            setExtension( e );
-        }
-        else
-        {
-            setExtension( null );
+            throw new IllegalArgumentException( "The path does not represent an artifact!" );
         }
     }
 
-    public ArtifactStoreRequest( String g, String a, String v, String p, String c )
+    public ArtifactStoreRequest( MavenRepository repository, Gav gav, boolean localOnly )
     {
-        this( false, null, g, a, v, p, c, null );
+        super( repository.getGavCalculator().gavToPath( gav ), localOnly, repository.getId() );
+
+        this.mavenRepository = repository;
+
+        this.gav = gav;
     }
 
-    public ArtifactStoreRequest( String g, String a, String v )
+    public MavenRepository getMavenRepository()
     {
-        this( false, null, g, a, v, null, null, null );
+        return mavenRepository;
+    }
+
+    public Gav getGav()
+    {
+        return gav;
     }
 
     public String getGroupId()
     {
-        return groupId;
-    }
-
-    public void setGroupId( String groupId )
-    {
-        this.groupId = groupId;
+        return gav.getGroupId();
     }
 
     public String getArtifactId()
     {
-        return artifactId;
-    }
-
-    public void setArtifactId( String artifactId )
-    {
-        this.artifactId = artifactId;
+        return gav.getArtifactId();
     }
 
     public String getVersion()
     {
-        return version;
-    }
-
-    public void setVersion( String version )
-    {
-        this.version = version;
-    }
-
-    public String getPackaging()
-    {
-        return packaging;
-    }
-
-    public void setPackaging( String packaging )
-    {
-        this.packaging = packaging;
+        return gav.getVersion();
     }
 
     public String getClassifier()
     {
-        return classifier;
-    }
-
-    public void setClassifier( String classifier )
-    {
-        this.classifier = classifier;
+        return gav.getClassifier();
     }
 
     public String getExtension()
     {
-        return extension;
-    }
-
-    public void setExtension( String extension )
-    {
-        this.extension = extension;
+        return gav.getExtension();
     }
 
     public String toString()
@@ -151,12 +87,10 @@ public class ArtifactStoreRequest
         sb.append( ":" );
         sb.append( getArtifactId() );
         sb.append( ":" );
-        sb.append( getPackaging() );
-        sb.append( ":" );
-        sb.append( getClassifier() );
-        sb.append( ":" );
         sb.append( getVersion() );
-        sb.append( ":" );
+        sb.append( ":c=" );
+        sb.append( getClassifier() );
+        sb.append( ":e=" );
         sb.append( getExtension() );
 
         return sb.toString();

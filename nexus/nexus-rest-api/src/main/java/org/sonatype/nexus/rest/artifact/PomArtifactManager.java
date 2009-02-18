@@ -102,22 +102,16 @@ public class PomArtifactManager
 
         return new FileInputStream( tmpPomFile );
     }
-    
+
     private ArtifactStoreRequest generateGavRequestClone( ArtifactStoreRequest request )
     {
         if ( request == null )
         {
             return null;
         }
-        
-        return new ArtifactStoreRequest( request.isRequestLocalOnly(), 
-                                         request.getRequestRepositoryId(), 
-                                         request.getGroupId(),
-                                         request.getArtifactId(),
-                                         request.getVersion(),
-                                         request.getPackaging(),
-                                         request.getClassifier(),
-                                         request.getExtension() );
+
+        return new ArtifactStoreRequest( request.getMavenRepository(), request.getRequestPath(), request
+            .isRequestLocalOnly() );
     }
 
     public ArtifactStoreRequest getGAVRequestFromTempPomFile( ArtifactStoreRequest request )
@@ -255,15 +249,15 @@ public class PomArtifactManager
             eventType = parser.next();
         }
 
-        gavRequest.setGroupId( groupId );
+        //gavRequest.setGroupId( groupId );
 
-        gavRequest.setArtifactId( artifactId );
+        //gavRequest.setArtifactId( artifactId );
 
-        gavRequest.setVersion( version );
+        //gavRequest.setVersion( version );
 
-        gavRequest.setPackaging( packaging );
+        //gavRequest.setPackaging( packaging );
 
         // POMs have no classifiers, so reset it
-        gavRequest.setClassifier( null );
+        //gavRequest.setClassifier( null );
     }
 }

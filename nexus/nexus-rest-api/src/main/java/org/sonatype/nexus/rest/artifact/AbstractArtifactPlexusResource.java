@@ -36,6 +36,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -73,8 +74,13 @@ public abstract class AbstractArtifactPlexusResource
      */
     protected ArtifactStoreRequest getResourceStoreRequest( Request request, boolean localOnly, String repositoryId,
         String g, String a, String v, String p, String c, String e )
+        throws ResourceException
     {
-        ArtifactStoreRequest result = new ArtifactStoreRequest( localOnly, repositoryId, g, a, v, p, c, e );
+        MavenRepository mavenRepository = getMavenRepository( repositoryId );
+
+        Gav gav = new Gav( g, a, v, c, e, null, null, null, VersionUtils.isSnapshot( v ), false, null, false, null );
+
+        ArtifactStoreRequest result = new ArtifactStoreRequest( mavenRepository, gav, localOnly );
 
         if ( getLogger().isDebugEnabled() )
         {
@@ -390,12 +396,12 @@ public abstract class AbstractArtifactPlexusResource
                             // the packaging type in the pom (or the packaging type provided
                             if ( !StringUtils.isEmpty( extension ) )
                             {
-                                gavRequest.setExtension( extension );
+                                // gavRequest.setExtension( extension );
                             }
 
                             if ( !StringUtils.isEmpty( classifier ) )
                             {
-                                gavRequest.setClassifier( classifier );
+                                // gavRequest.setClassifier( classifier );
                             }
                         }
                     }
@@ -454,7 +460,7 @@ public abstract class AbstractArtifactPlexusResource
                             }
                             else
                             {
-                                helper.storeArtifactWithGeneratedPom( gavRequest, is, null );
+                                helper.storeArtifactWithGeneratedPom( gavRequest, packaging, is, null );
                             }
                         }
                     }

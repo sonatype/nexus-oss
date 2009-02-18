@@ -16,73 +16,41 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.IOException;
 
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.proxy.IllegalOperationException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
-import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 public interface MetadataManager
 {
     /**
-     * Calling this method updates the GAV and GA metadatas accordingly. It senses whether it is a snapshot or not.
+     * Calling this method updates the GAV, GA and G metadatas accordingly. It senses whether it is a snapshot or not.
      * 
      * @param req
      */
-    void deployArtifact( ArtifactStoreRequest req, MavenRepository repository )
-        throws IllegalOperationException,
-            IOException,
-            UnsupportedStorageOperationException;
+    void deployArtifact( ArtifactStoreRequest request )
+        throws IOException;
 
     /**
-     * Calling this method updates the GAV and GA metadatas accordingly. It senses whether it is a snapshot or not.
+     * Calling this method updates the GAV, GA and G metadatas accordingly. It senses whether it is a snapshot or not.
      * 
      * @param req
      */
-    void undeployArtifact( ArtifactStoreRequest req, MavenRepository repository )
-        throws IllegalOperationException,
-            IOException,
-            UnsupportedStorageOperationException;
-
-    /**
-     * Calling this method updates the plugin metadata.
-     * 
-     * @param req
-     */
-    void deployPlugin( ArtifactStoreRequest req, MavenRepository repository )
-        throws IllegalOperationException,
-            IOException,
-            UnsupportedStorageOperationException;
-
-    /**
-     * Calling this method updates the plugin metadata.
-     * 
-     * @param req
-     */
-    void undeployPlugin( ArtifactStoreRequest req, MavenRepository repository )
-        throws IllegalOperationException,
-            IOException,
-            UnsupportedStorageOperationException;
+    void undeployArtifact( ArtifactStoreRequest request )
+        throws IOException;
 
     /**
      * Resolves the artifact, honoring LATEST and RELEASE as version. In case of snapshots, it will try to resolve the
      * timestamped version too, if needed.
      * 
      * @return
-     * @throws RepositoryNotAvailableException
      * @throws IOException
      */
-    Gav resolveArtifact( MavenRepository repository, ArtifactStoreRequest gavRequest )
-        throws IllegalOperationException,
-            IOException;
+    Gav resolveArtifact( ArtifactStoreRequest gavRequest )
+        throws IOException;
 
     /**
-     * Resolves the snapshot base version to a timestamped version if possible. So, when a repo is snapshot, and we have
-     * GAV.
+     * Resolves the snapshot base version to a timestamped version if possible. Only when a repo is snapshot.
      * 
      * @return
-     * @throws RepositoryNotAvailableException
      * @throws IOException
      */
-    Gav resolveSnapshot( MavenRepository repository, ArtifactStoreRequest gavRequest, Gav gav )
-        throws IllegalOperationException,
-            IOException;
+    Gav resolveSnapshot( ArtifactStoreRequest gavRequest, Gav gav )
+        throws IOException;
 }

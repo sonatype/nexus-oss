@@ -16,7 +16,6 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,11 +23,7 @@ import java.util.Map;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.pull.MXParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -55,7 +50,7 @@ public class ArtifactStoreHelper
 {
     private final MavenRepository repository;
 
-    public ArtifactStoreHelper( MavenRepository repo )
+    protected ArtifactStoreHelper( MavenRepository repo )
     {
         super();
 
@@ -287,11 +282,22 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
-        gavRequest.setClassifier( null );
+        Gav pomGav = new Gav( gavRequest.getGav().getGroupId(), gavRequest.getGav().getArtifactId(), gavRequest
+            .getGav().getVersion(), null, // gavRequest.getGav().getClassifier(),
+            "pom", // gavRequest.getGav().getExtension(),
+            gavRequest.getGav().getSnapshotBuildNumber(),
+            gavRequest.getGav().getSnapshotTimeStamp(),
+            gavRequest.getGav().getName(),
+            gavRequest.getGav().isSnapshot(),
+            gavRequest.getGav().isHash(),
+            gavRequest.getGav().getHashType(),
+            gavRequest.getGav().isSignature(),
+            gavRequest.getGav().getSignatureType() );
 
-        gavRequest.setPackaging( "pom" );
+        ArtifactStoreRequest pomRequest = new ArtifactStoreRequest( gavRequest.getMavenRepository(), pomGav, gavRequest
+            .isRequestLocalOnly() );
 
-        return retrieveArtifact( gavRequest );
+        return retrieveArtifact( pomRequest );
     }
 
     public StorageFileItem retrieveArtifact( ArtifactStoreRequest gavRequest )
@@ -304,7 +310,7 @@ public class ArtifactStoreHelper
 
         try
         {
-            Gav gav = repository.getMetadataManager().resolveArtifact( repository, gavRequest );
+            Gav gav = repository.getMetadataManager().resolveArtifact( gavRequest );
 
             if ( gav == null )
             {
@@ -350,7 +356,7 @@ public class ArtifactStoreHelper
 
         try
         {
-            repository.getMetadataManager().deployArtifact( gavRequest, repository );
+            repository.getMetadataManager().deployArtifact( gavRequest );
         }
         catch ( IOException e )
         {
@@ -367,33 +373,16 @@ public class ArtifactStoreHelper
     {
         checkRequest( gavRequest );
 
-        if ( gavRequest.getPackaging() == null )
-        {
-            throw new IllegalArgumentException( "Cannot generate POM without valid 'packaging'!" );
-        }
-
-        Gav gav = new Gav(
-            gavRequest.getGroupId(),
-            gavRequest.getArtifactId(),
-            gavRequest.getVersion(),
-            gavRequest.getClassifier(),
-            gavRequest.getExtension() != null ? gavRequest.getExtension() : repository
-                .getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
-            null,
-            null,
-            null,
-            RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
-            false,
-            null,
-            false,
-            null );
+        Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
+            .getClassifier(), gavRequest.getExtension(), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
+            .getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
         repository.storeItemWithChecksums( gavRequest, is, attributes );
     }
 
-    public void storeArtifactWithGeneratedPom( ArtifactStoreRequest gavRequest, InputStream is,
+    public void storeArtifactWithGeneratedPom( ArtifactStoreRequest gavRequest, String packaging, InputStream is,
         Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
@@ -428,7 +417,7 @@ public class ArtifactStoreHelper
         }
         catch ( ItemNotFoundException e )
         {
-            if ( gavRequest.getPackaging() == null )
+            if ( StringUtils.isBlank( packaging ) )
             {
                 throw new IllegalArgumentException( "Cannot generate POM without valid 'packaging'!" );
             }
@@ -441,7 +430,7 @@ public class ArtifactStoreHelper
             model.setGroupId( gavRequest.getGroupId() );
             model.setArtifactId( gavRequest.getArtifactId() );
             model.setVersion( gavRequest.getVersion() );
-            model.setPackaging( gavRequest.getPackaging() );
+            model.setPackaging( packaging );
             model.setDescription( "POM was created by Sonatype Nexus" );
 
             StringWriter sw = new StringWriter();
@@ -466,7 +455,7 @@ public class ArtifactStoreHelper
 
             try
             {
-                repository.getMetadataManager().deployArtifact( gavRequest, repository );
+                repository.getMetadataManager().deployArtifact( gavRequest );
             }
             catch ( IOException ex )
             {
@@ -480,8 +469,7 @@ public class ArtifactStoreHelper
             gavRequest.getArtifactId(),
             gavRequest.getVersion(),
             gavRequest.getClassifier(),
-            gavRequest.getExtension() != null ? gavRequest.getExtension() : repository
-                .getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
+            gavRequest.getExtension(),
             null,
             null,
             null,
@@ -537,8 +525,7 @@ public class ArtifactStoreHelper
     {
         // delete the artifact
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
-            gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
+            .getClassifier(), gavRequest.getExtension(), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
@@ -556,7 +543,7 @@ public class ArtifactStoreHelper
     {
         try
         {
-            repository.getMetadataManager().undeployArtifact( gavRequest, repository );
+            repository.getMetadataManager().undeployArtifact( gavRequest );
         }
         catch ( IOException e )
         {
@@ -712,63 +699,4 @@ public class ArtifactStoreHelper
         }
     }
 
-    protected String getPackagingFromPom( String requestPath )
-        throws IOException,
-            XmlPullParserException,
-            IllegalOperationException,
-            ItemNotFoundException
-    {
-        String packaging = "jar";
-
-        RepositoryItemUid uid = repository.createUid( requestPath );
-
-        Reader reader = null;
-
-        try
-        {
-            repository.retrieveItem( uid, null );
-
-            // reader = ReaderFactory.newXmlReader( repository.retrieveItemContent( uid ) );
-
-            XmlPullParser parser = new MXParser();
-
-            parser.setInput( reader );
-
-            boolean foundRoot = false;
-
-            int eventType = parser.getEventType();
-
-            while ( eventType != XmlPullParser.END_DOCUMENT )
-            {
-                if ( eventType == XmlPullParser.START_TAG )
-                {
-                    if ( parser.getName().equals( "project" ) )
-                    {
-                        foundRoot = true;
-                    }
-                    else if ( parser.getName().equals( "packaging" ) )
-                    {
-                        // 1st: if found project/packaging -> overwrite
-                        if ( parser.getDepth() == 2 )
-                        {
-                            packaging = StringUtils.trim( parser.nextText() );
-                            break;
-                        }
-                    }
-                    else if ( !foundRoot )
-                    {
-                        throw new XmlPullParserException( "Unrecognised tag: '" + parser.getName() + "'", parser, null );
-                    }
-                }
-
-                eventType = parser.next();
-            }
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
-        return packaging;
-    }
 }

@@ -34,7 +34,7 @@ public interface MetadataUpdater
      * 
      * @param req
      */
-    void deployArtifact( ArtifactStoreRequest request, MetadataLocator locator )
+    void deployArtifact( ArtifactStoreRequest request )
         throws IOException;
 
     /**
@@ -42,7 +42,7 @@ public interface MetadataUpdater
      * 
      * @param req
      */
-    void undeployArtifact( ArtifactStoreRequest request, MetadataLocator locator )
+    void undeployArtifact( ArtifactStoreRequest request )
         throws IOException;
 
     //
@@ -54,7 +54,7 @@ public interface MetadataUpdater
      * 
      * @param req
      */
-    void deployArtifacts( Collection<ArtifactStoreRequest> requests, MetadataLocator locator )
+    void deployArtifacts( Collection<ArtifactStoreRequest> requests )
         throws IOException;
 
     /**
@@ -64,6 +64,6 @@ public interface MetadataUpdater
      * @param locator
      * @throws IOException
      */
-    void recreateMetadata( StorageCollectionItem coll, MetadataLocator locator )
+    void recreateMetadata( StorageCollectionItem coll )
         throws IOException;
 }
