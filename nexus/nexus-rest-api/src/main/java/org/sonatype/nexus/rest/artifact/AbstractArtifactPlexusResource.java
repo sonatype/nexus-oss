@@ -76,7 +76,27 @@ public abstract class AbstractArtifactPlexusResource
         String g, String a, String v, String p, String c, String e )
         throws ResourceException
     {
+        if ( StringUtils.isBlank( p ) && StringUtils.isBlank( e ) )
+        {
+            // if packaging and extension is both blank, it is a bad request
+            throw new ResourceException(
+                Status.CLIENT_ERROR_BAD_REQUEST,
+                "Deployment tried with both 'packaging' and/or 'extension' being empty! One of these values is mandatory!" );
+        }
+
         MavenRepository mavenRepository = getMavenRepository( repositoryId );
+
+        // if extension is not given, fall-back to packaging and apply mapper
+        if ( StringUtils.isBlank( e ) )
+        {
+            e = mavenRepository.getArtifactPackagingMapper().getExtensionForPackaging( p );
+        }
+
+        // clean up the classifier
+        if ( StringUtils.isBlank( c ) )
+        {
+            c = null;
+        }
 
         Gav gav = new Gav( g, a, v, c, e, null, null, null, VersionUtils.isSnapshot( v ), false, null, false, null );
 
@@ -84,7 +104,7 @@ public abstract class AbstractArtifactPlexusResource
 
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "Created ResourceStore request for " + result.getRequestPath() );
+            getLogger().debug( "Created ArtifactStoreRequest request for " + result.getRequestPath() );
         }
 
         // stuff in the originating remote address
@@ -147,7 +167,7 @@ public abstract class AbstractArtifactPlexusResource
             version,
             null,
             null,
-            null );
+            "pom" );
 
         try
         {
@@ -218,6 +238,12 @@ public abstract class AbstractArtifactPlexusResource
         if ( groupId == null || artifactId == null || version == null || repositoryId == null )
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST );
+        }
+
+        // default the packaging
+        if ( StringUtils.isBlank( packaging ) )
+        {
+            packaging = "jar";
         }
 
         ArtifactStoreRequest gavRequest = getResourceStoreRequest(
@@ -304,179 +330,186 @@ public abstract class AbstractArtifactPlexusResource
             PomArtifactManager pomManager = new PomArtifactManager( getNexus()
                 .getNexusConfiguration().getTemporaryDirectory() );
 
-            for ( FileItem fi : files )
+            try
             {
-                if ( fi.isFormField() )
+                for ( FileItem fi : files )
                 {
-                    // a parameter
-                    if ( "r".equals( fi.getFieldName() ) )
+                    if ( fi.isFormField() )
                     {
-                        repositoryId = fi.getString();
-                    }
-                    else if ( "g".equals( fi.getFieldName() ) )
-                    {
-                        groupId = fi.getString();
-                    }
-                    else if ( "a".equals( fi.getFieldName() ) )
-                    {
-                        artifactId = fi.getString();
-                    }
-                    else if ( "v".equals( fi.getFieldName() ) )
-                    {
-                        version = fi.getString();
-                    }
-                    else if ( "p".equals( fi.getFieldName() ) )
-                    {
-                        packaging = fi.getString();
-                    }
-                    else if ( "c".equals( fi.getFieldName() ) )
-                    {
-                        classifier = fi.getString();
-                    }
-                    else if ( "e".equals( fi.getFieldName() ) )
-                    {
-                        extension = fi.getString();
-                    }
-                    else if ( "hasPom".equals( fi.getFieldName() ) )
-                    {
-                        hasPom = Boolean.parseBoolean( fi.getString() );
-                    }
-                }
-                else
-                {
-                    // a file
-                    isPom = fi.getName().endsWith( ".pom" ) || fi.getName().endsWith( "pom.xml" );
-
-                    ArtifactStoreRequest gavRequest;
-
-                    if ( hasPom )
-                    {
-                        if ( isPom )
+                        // a parameter
+                        if ( "r".equals( fi.getFieldName() ) )
                         {
-                            pomManager.storeTempPomFile( fi.getInputStream() );
-
-                            is = pomManager.getTempPomFileInputStream();
-
+                            repositoryId = fi.getString();
                         }
-                        else
+                        else if ( "g".equals( fi.getFieldName() ) )
                         {
-                            is = fi.getInputStream();
+                            groupId = fi.getString();
                         }
-
-                        // this is ugly: since GAVRequest does not allow contructing
-                        // without GAV, i am filling it with dummy values, and pomManager
-                        // will set those to proper values
-                        try
+                        else if ( "a".equals( fi.getFieldName() ) )
                         {
-                            gavRequest = pomManager.getGAVRequestFromTempPomFile( getResourceStoreRequest(
-                                request,
-                                true,
-                                repositoryId,
-                                "G",
-                                "A",
-                                "V",
-                                "P",
-                                null,
-                                null ) );
+                            artifactId = fi.getString();
                         }
-                        catch ( IOException e )
+                        else if ( "v".equals( fi.getFieldName() ) )
                         {
-                            getLogger().info( e.getMessage() );
-
-                            throw new ResourceException(
-                                Status.CLIENT_ERROR_BAD_REQUEST,
-                                "Error occurred while reading the POM file. Malformed POM?" );
+                            version = fi.getString();
                         }
-
-                        if ( !isPom )
+                        else if ( "p".equals( fi.getFieldName() ) )
                         {
-
-                            // Can't retrieve these details from the pom, so we must expect the user to provide them
-                            // If now, the classifier will not be appended, and we will use the extension mapped from
-                            // the packaging type in the pom (or the packaging type provided
-                            if ( !StringUtils.isEmpty( extension ) )
-                            {
-                                // gavRequest.setExtension( extension );
-                            }
-
-                            if ( !StringUtils.isEmpty( classifier ) )
-                            {
-                                // gavRequest.setClassifier( classifier );
-                            }
+                            packaging = fi.getString();
+                        }
+                        else if ( "c".equals( fi.getFieldName() ) )
+                        {
+                            classifier = fi.getString();
+                        }
+                        else if ( "e".equals( fi.getFieldName() ) )
+                        {
+                            extension = fi.getString();
+                        }
+                        else if ( "hasPom".equals( fi.getFieldName() ) )
+                        {
+                            hasPom = Boolean.parseBoolean( fi.getString() );
                         }
                     }
                     else
                     {
-                        is = fi.getInputStream();
+                        // a file
+                        isPom = fi.getName().endsWith( ".pom" ) || fi.getName().endsWith( "pom.xml" );
 
-                        gavRequest = getResourceStoreRequest(
-                            request,
-                            true,
-                            repositoryId,
-                            groupId,
-                            artifactId,
-                            version,
-                            packaging,
-                            classifier,
-                            extension );
-                    }
+                        PomArtifactManager.ArtifactCoordinate coords = null;
 
-                    try
-                    {
-                        MavenRepository mr = getMavenRepository( repositoryId );
+                        ArtifactStoreRequest gavRequest = null;
 
-                        ArtifactStoreHelper helper = mr.getArtifactStoreHelper();
-
-                        // temporarily we disable SNAPSHOT upload
-                        // check is it a Snapshot repo
-                        if ( RepositoryPolicy.SNAPSHOT.equals( mr.getRepositoryPolicy() ) )
+                        if ( hasPom )
                         {
-                            getLogger().info( "Upload to SNAPSHOT maven repository attempted" );
-
-                            throw new ResourceException(
-                                Status.CLIENT_ERROR_BAD_REQUEST,
-                                "This is a Maven SNAPSHOT repository, and manual upload against it is forbidden!" );
-                        }
-
-                        if ( !versionMatchesPolicy( gavRequest.getVersion(), mr.getRepositoryPolicy() ) )
-                        {
-                            getLogger().warn(
-                                "Version (" + gavRequest.getVersion() + ") and Repository Policy mismatch" );
-                            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "The version "
-                                + gavRequest.getVersion() + " does not match the repository policy!" );
-                        }
-
-                        if ( isPom )
-                        {
-                            helper.storeArtifactPom( gavRequest, is, null );
-
-                            isPom = false;
-                        }
-                        else
-                        {
-                            if ( hasPom )
+                            if ( isPom )
                             {
-                                helper.storeArtifact( gavRequest, is, null );
+                                // let it "thru" the pomManager to be able to get GAV from it on later pass
+                                pomManager.storeTempPomFile( fi.getInputStream() );
+
+                                is = pomManager.getTempPomFileInputStream();
                             }
                             else
                             {
-                                helper.storeArtifactWithGeneratedPom( gavRequest, packaging, is, null );
+                                is = fi.getInputStream();
+                            }
+
+                            try
+                            {
+                                coords = pomManager.getArtifactCoordinateFromTempPomFile();
+                            }
+                            catch ( IOException e )
+                            {
+                                getLogger().info( e.getMessage() );
+
+                                throw new ResourceException(
+                                    Status.CLIENT_ERROR_BAD_REQUEST,
+                                    "Error occurred while reading the POM file. Malformed POM?" );
+                            }
+
+                            if ( isPom )
+                            {
+                                gavRequest = getResourceStoreRequest(
+                                    request,
+                                    true,
+                                    repositoryId,
+                                    coords.getGroupId(),
+                                    coords.getArtifactId(),
+                                    coords.getVersion(),
+                                    coords.getPackaging(),
+                                    null,
+                                    null );
+                            }
+                            else
+                            {
+                                gavRequest = getResourceStoreRequest(
+                                    request,
+                                    true,
+                                    repositoryId,
+                                    coords.getGroupId(),
+                                    coords.getArtifactId(),
+                                    coords.getVersion(),
+                                    coords.getPackaging(),
+                                    classifier,
+                                    extension );
                             }
                         }
-                    }
-                    catch ( IllegalArgumentException e )
-                    {
-                        getLogger().info( "Cannot upload!", e );
+                        else
+                        {
+                            is = fi.getInputStream();
 
-                        throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
+                            gavRequest = getResourceStoreRequest(
+                                request,
+                                true,
+                                repositoryId,
+                                groupId,
+                                artifactId,
+                                version,
+                                packaging,
+                                classifier,
+                                extension );
+                        }
+
+                        try
+                        {
+                            MavenRepository mr = getMavenRepository( repositoryId );
+
+                            ArtifactStoreHelper helper = mr.getArtifactStoreHelper();
+
+                            // temporarily we disable SNAPSHOT upload
+                            // check is it a Snapshot repo
+                            if ( RepositoryPolicy.SNAPSHOT.equals( mr.getRepositoryPolicy() ) )
+                            {
+                                getLogger().info(
+                                    "Upload to SNAPSHOT maven repository attempted, returning Bad Request." );
+
+                                throw new ResourceException(
+                                    Status.CLIENT_ERROR_BAD_REQUEST,
+                                    "This is a Maven SNAPSHOT repository, and manual upload against it is forbidden!" );
+                            }
+
+                            if ( !versionMatchesPolicy( gavRequest.getVersion(), mr.getRepositoryPolicy() ) )
+                            {
+                                getLogger().warn(
+                                    "Version (" + gavRequest.getVersion() + ") and Repository Policy mismatch" );
+                                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "The version "
+                                    + gavRequest.getVersion() + " does not match the repository policy!" );
+                            }
+
+                            if ( isPom )
+                            {
+                                helper.storeArtifactPom( gavRequest, is, null );
+
+                                isPom = false;
+                            }
+                            else
+                            {
+                                if ( hasPom )
+                                {
+                                    helper.storeArtifact( gavRequest, is, null );
+                                }
+                                else
+                                {
+                                    helper.storeArtifactWithGeneratedPom( gavRequest, packaging, is, null );
+                                }
+                            }
+                        }
+                        catch ( IllegalArgumentException e )
+                        {
+                            getLogger().info( "Cannot upload!", e );
+
+                            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
+                        }
                     }
                 }
             }
-
-            if ( hasPom )
+            finally
             {
-                pomManager.removeTempPomFile();
+                if ( hasPom )
+                {
+                    pomManager.removeTempPomFile();
+                }
             }
+
         }
         catch ( Exception e )
         {

@@ -27,17 +27,21 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 
+/**
+ * This component simply preserves "state" and gets the needed GAVP values from the POM that it stores temporarily.
+ * 
+ * @author cstamas
+ */
 public class PomArtifactManager
 {
     private File tmpStorage = null;
 
     private File tmpPomFile = null;
 
-    private ArtifactStoreRequest gavRequest = null;
-
     private int state = 0;
+
+    private ArtifactCoordinate artifactCoordinate;
 
     private static final int STATE_NONE = 0;
 
@@ -52,14 +56,6 @@ public class PomArtifactManager
         super();
 
         this.tmpStorage = tmpStorage;
-    }
-
-    private long getNextIdentifier()
-    {
-        synchronized ( identifierGenerator )
-        {
-            return identifierGenerator.nextLong();
-        }
     }
 
     public void storeTempPomFile( InputStream is )
@@ -103,29 +99,18 @@ public class PomArtifactManager
         return new FileInputStream( tmpPomFile );
     }
 
-    private ArtifactStoreRequest generateGavRequestClone( ArtifactStoreRequest request )
-    {
-        if ( request == null )
-        {
-            return null;
-        }
-
-        return new ArtifactStoreRequest( request.getMavenRepository(), request.getRequestPath(), request
-            .isRequestLocalOnly() );
-    }
-
-    public ArtifactStoreRequest getGAVRequestFromTempPomFile( ArtifactStoreRequest request )
+    public ArtifactCoordinate getArtifactCoordinateFromTempPomFile()
         throws IOException,
             XmlPullParserException
     {
         if ( STATE_FILE_STORED > state )
         {
-            throw new IllegalStateException( "The temporary pom file has not yet been stored" );
+            throw new IllegalStateException( "The temporary POM file has not yet been stored" );
         }
 
         if ( STATE_GAV_GENERATED == state )
         {
-            return generateGavRequestClone( gavRequest );
+            return artifactCoordinate;
         }
 
         Reader reader = null;
@@ -134,9 +119,7 @@ public class PomArtifactManager
         {
             reader = ReaderFactory.newXmlReader( tmpPomFile );
 
-            gavRequest = generateGavRequestClone( request );
-
-            parsePom( reader );
+            artifactCoordinate = parsePom( reader );
 
             state = STATE_GAV_GENERATED;
         }
@@ -145,9 +128,12 @@ public class PomArtifactManager
             IOUtil.close( reader );
         }
 
-        return generateGavRequestClone( gavRequest );
+        return artifactCoordinate;
     }
 
+    /**
+     * Clean up.
+     */
     public void removeTempPomFile()
     {
         if ( STATE_FILE_STORED > state )
@@ -157,12 +143,31 @@ public class PomArtifactManager
 
         tmpPomFile.delete();
 
-        gavRequest = null;
+        artifactCoordinate = null;
 
         state = STATE_NONE;
     }
 
-    private void parsePom( Reader reader )
+    // ==
+    // Private
+
+    private long getNextIdentifier()
+    {
+        synchronized ( identifierGenerator )
+        {
+            return identifierGenerator.nextLong();
+        }
+    }
+
+    /**
+     * Pulls out the GAVP by parsing the temporarily stored POM.
+     * 
+     * @param reader
+     * @return
+     * @throws IOException
+     * @throws XmlPullParserException
+     */
+    private ArtifactCoordinate parsePom( Reader reader )
         throws IOException,
             XmlPullParserException
     {
@@ -249,15 +254,67 @@ public class PomArtifactManager
             eventType = parser.next();
         }
 
-        //gavRequest.setGroupId( groupId );
+        ArtifactCoordinate artifactCoordinates = new ArtifactCoordinate();
 
-        //gavRequest.setArtifactId( artifactId );
+        artifactCoordinates.setGroupId( groupId );
 
-        //gavRequest.setVersion( version );
+        artifactCoordinates.setArtifactId( artifactId );
 
-        //gavRequest.setPackaging( packaging );
+        artifactCoordinates.setVersion( version );
 
-        // POMs have no classifiers, so reset it
-        //gavRequest.setClassifier( null );
+        artifactCoordinates.setPackaging( packaging );
+
+        return artifactCoordinates;
+    }
+
+    public class ArtifactCoordinate
+    {
+        private String groupId;
+
+        private String artifactId;
+
+        private String version;
+
+        private String packaging;
+
+        public String getGroupId()
+        {
+            return groupId;
+        }
+
+        public void setGroupId( String groupId )
+        {
+            this.groupId = groupId;
+        }
+
+        public String getArtifactId()
+        {
+            return artifactId;
+        }
+
+        public void setArtifactId( String artifactId )
+        {
+            this.artifactId = artifactId;
+        }
+
+        public String getVersion()
+        {
+            return version;
+        }
+
+        public void setVersion( String version )
+        {
+            this.version = version;
+        }
+
+        public String getPackaging()
+        {
+            return packaging;
+        }
+
+        public void setPackaging( String packaging )
+        {
+            this.packaging = packaging;
+        }
     }
 }
