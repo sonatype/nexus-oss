@@ -334,8 +334,10 @@ Sonatype.repoServer.ServerEditPanel = function(config){
               }
 
               var forceCheckbox = this.ownerCt.find( 'name', 'forceBaseUrl' )[0];
-              if ( this.allowBlank == false && forceCheckbox.checked &&
-                  v != window.location.href.substring( 0, v.length ) ) {
+              if ( this.allowBlank == false 
+                  && forceCheckbox.checked 
+                  && !Ext.isEmpty( v )
+                  && v.toLowerCase() != window.location.href.substring( 0, v.length ).toLowerCase() ) {
                 if ( ! this.warningEl ) {
                   var elp = this.getErrorCt();
                   if ( ! elp ) {                         

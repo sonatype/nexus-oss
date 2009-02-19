@@ -292,7 +292,7 @@ public class GlobalConfigurationPlexusResource
                         else
                         {
                             // setting it
-                            getNexus().setBaseUrl( resource.getBaseUrl() );
+                            getNexus().setBaseUrl( resource.getBaseUrl().toLowerCase() );
                         }
 
                         getNexus().setForceBaseUrl( resource.isForceBaseUrl() );

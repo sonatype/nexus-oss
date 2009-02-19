@@ -736,7 +736,7 @@ Sonatype.utils = {
             }
   
             var baseUrl = respObj.data.baseUrl;
-            baseUrlMismatch = ( baseUrl != window.location.href.substring( 0, baseUrl.length ) );
+            baseUrlMismatch = ( baseUrl.toLowerCase() != window.location.href.substring( 0, baseUrl.length ).toLowerCase() );
           }
         }
         else {
