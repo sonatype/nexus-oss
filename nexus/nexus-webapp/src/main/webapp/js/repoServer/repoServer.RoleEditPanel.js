@@ -387,11 +387,6 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     loadMask: true,
     deferredRender: false,
     columns: [
-      { header: 'Role Id', dataIndex: 'id', width:120, id: 'role-config-id-col', 
-        renderer: function( value, meta, rec, index ) { 
-          return rec.data.mapping ? ( '<b>' + value + '</b' ) : value; 
-        }
-      },
       { header: 'Name', dataIndex: 'name', width:200, id: 'role-config-name-col',
         renderer: function( value, meta, rec, index ) { 
           return rec.data.mapping ? ( '<b>' + value + '</b' ) : value;
