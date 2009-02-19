@@ -581,7 +581,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
         }
       }
     ],
-    sortInfo: { field: 'name', direction: 'asc' },
+    sortInfo: { field: 'name', direction: 'desc' },
     url: Sonatype.config.repos.urls.groups,
     listeners: {
       load: function( store, records, options ) {
