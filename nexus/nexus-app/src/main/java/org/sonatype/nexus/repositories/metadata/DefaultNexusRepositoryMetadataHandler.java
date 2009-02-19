@@ -41,7 +41,7 @@ public class DefaultNexusRepositoryMetadataHandler
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        NexusRawTransport nrt = new NexusRawTransport( repository, false, false );
+        NexusRawTransport nrt = new NexusRawTransport( repository, false, true );
 
         return repositoryMetadataHandler.readRepositoryMetadata( nrt );
     }
