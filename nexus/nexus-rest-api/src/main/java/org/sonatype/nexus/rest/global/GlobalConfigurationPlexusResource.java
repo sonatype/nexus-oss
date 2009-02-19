@@ -22,6 +22,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.restlet.Context;
+import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -291,8 +292,8 @@ public class GlobalConfigurationPlexusResource
                         }
                         else
                         {
-                            // setting it
-                            getNexus().setBaseUrl( resource.getBaseUrl().toLowerCase() );
+                            // setting it using reference object to normalize the hostname (all lowercase)
+                            getNexus().setBaseUrl( new Reference( resource.getBaseUrl() ).getTargetRef().toString() );
                         }
 
                         getNexus().setForceBaseUrl( resource.isForceBaseUrl() );
