@@ -65,50 +65,29 @@ public class RepositoryPredefinedMirrorListPlexusResource
         String repositoryId = this.getRepositoryId( request );
 
         // get remote metadata
-        RepositoryMetadata metadata = this.getMetadata( repositoryId, true );
-        // if its missing get local metadata
-        if ( metadata == null )
-        {
-            metadata = this.getMetadata( repositoryId, false );
-        }
+        RepositoryMetadata metadata = this.getMetadata( repositoryId );
 
-        for ( RepositoryMirrorMetadata mirror : (List<RepositoryMirrorMetadata>) metadata.getMirrors() )
+        if( metadata != null )
         {
-            MirrorResource resource = new MirrorResource();
-            resource.setId( mirror.getId() );
-            resource.setUrl( mirror.getUrl() );
-            dto.addData( resource );
+            for ( RepositoryMirrorMetadata mirror : (List<RepositoryMirrorMetadata>) metadata.getMirrors() )
+            {
+                MirrorResource resource = new MirrorResource();
+                resource.setId( mirror.getId() );
+                resource.setUrl( mirror.getUrl() );
+                dto.addData( resource );
+            }
         }
 
         return dto;
     }
 
-    private RepositoryMetadata getMetadata( String repositoryId, boolean fromRemote )
+    private RepositoryMetadata getMetadata( String repositoryId )
         throws ResourceException
     {
         RepositoryMetadata metadata = null;
         try
         {
-            if ( fromRemote )
-            {
-                // we need to figure out the remote URL for this,
-                // TODO: this needs to be refactored out of this
-                // i should be able to pass in just the repo Id for this
-                try
-                {
-                    ProxyRepository repo = this.repoRegistry.getRepositoryWithFacet( repositoryId, ProxyRepository.class );
-                    metadata = repoMetadata.readRemoteRepositoryMetadata( repo.getRemoteUrl() );
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    getLogger().debug( "ProxyRepository with id: "+ repositoryId +" does not exists, will check local repositories.", e );
-                }
-            }
-            else
-            {
                 metadata = repoMetadata.readRepositoryMetadata( repositoryId );
-            }
-
         }
         catch ( NoSuchRepositoryException e )
         {
