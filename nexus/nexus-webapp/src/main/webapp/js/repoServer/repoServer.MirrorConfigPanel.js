@@ -53,21 +53,11 @@ Sonatype.repoServer.AbstractMirrorPanel = function(config) {
     autoLoad :false
   });
 
-  this.predefinedMirrorDataStore = new Ext.data.Store( {
-    url :Sonatype.config.repos.urls.repoPredefinedMirrors + '/' + this.payload.data.id,
-    reader :this.mirrorReader,
-    sortInfo : {
-      field :'url',
-      direction :'ASC'
-    },
-    autoLoad :false
-  });
-
   var defaultConfig = {
     uri :Sonatype.config.repos.urls.repoMirrors + '/' + this.payload.data.id,
     referenceData :Sonatype.repoServer.referenceData.repoMirrors,
     dataStores : [
-        this.mirrorDataStore, this.predefinedMirrorDataStore
+        this.mirrorDataStore
     ],
     dataModifiers : {
       load : {
@@ -280,6 +270,30 @@ Sonatype.repoServer.ProxyMirrorEditor = function (config) {
   var config = config || {};
   Ext.apply( this, config, {} );
   var ht = Sonatype.repoServer.resources.help.repoMirrors;
+  
+  this.mirrorRecordConstructor = Ext.data.Record.create( [
+    {
+      name :'id'
+    }, {
+      name :'url',
+      sortType :Ext.data.SortTypes.asUCString
+    }
+  ]);
+  
+  this.mirrorReader = new Ext.data.JsonReader( {
+    root :'data',
+    id :'id'
+  }, this.mirrorRecordConstructor);
+  
+  this.predefinedMirrorDataStore = new Ext.data.Store( {
+    url :Sonatype.config.repos.urls.repoPredefinedMirrors + '/' + this.payload.data.id,
+    reader :this.mirrorReader,
+    sortInfo : {
+      field :'url',
+      direction :'ASC'
+    },
+    autoLoad :true
+  });
   
   Sonatype.repoServer.ProxyMirrorEditor.superclass.constructor.call( this, {
   items : [
