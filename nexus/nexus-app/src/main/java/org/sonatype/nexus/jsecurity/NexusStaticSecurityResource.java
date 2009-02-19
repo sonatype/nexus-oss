@@ -14,37 +14,15 @@
 package org.sonatype.nexus.jsecurity;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.jsecurity.model.Configuration;
 import org.sonatype.jsecurity.realms.tools.AbstractStaticSecurityResource;
-import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.StaticSecurityResource;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 @Component( role = StaticSecurityResource.class, hint = "NexusStaticSecurityResource" )
 public class NexusStaticSecurityResource
     extends AbstractStaticSecurityResource
-    implements StaticSecurityResource, EventListener, Initializable
+    implements StaticSecurityResource
 {
-    @Requirement
-    RepositoryRegistry repoRegistry;
-
-    @Requirement( role = ConfigurationManager.class, hint = "default" )
-    ConfigurationManager configManager;
-
-    public void initialize()
-        throws InitializationException
-    {
-        repoRegistry.addProximityEventListener( this );
-    }
-
     public String getResourcePath()
     {
         return "/META-INF/nexus/static-security.xml";
@@ -52,20 +30,6 @@ public class NexusStaticSecurityResource
 
     public Configuration getConfiguration()
     {
-        return new Configuration();
-    }
-
-    public void onProximityEvent( AbstractEvent evt )
-    {
-        if ( RepositoryRegistryEventAdd.class.isAssignableFrom( evt.getClass() )
-            || RepositoryRegistryEventUpdate.class.isAssignableFrom( evt.getClass() ) )
-        {
-            setDirty( true );
-        }
-        else if ( RepositoryRegistryEventRemove.class.isAssignableFrom( evt.getClass() ) )
-        {
-            setDirty( true );
-            configManager.save();
-        }
+        return null;
     }
 }
