@@ -19,6 +19,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -36,7 +37,7 @@ import com.thoughtworks.xstream.XStream;
 public class TaskScheduleUtil
 {
     private static final Logger LOG = Logger.getLogger( TaskScheduleUtil.class );
-    
+
     private static XStream xstream;
 
     static
@@ -80,11 +81,13 @@ public class TaskScheduleUtil
     {
         String serviceURI = "service/local/schedules";
         Response response = RequestFacade.doGetRequest( serviceURI );
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            response.getEntity().getText(),
+            MediaType.APPLICATION_XML );
 
-        ScheduledServiceListResourceResponse scheduleResponse =
-            (ScheduledServiceListResourceResponse) representation.getPayload( new ScheduledServiceListResourceResponse() );
+        ScheduledServiceListResourceResponse scheduleResponse = (ScheduledServiceListResourceResponse) representation
+            .getPayload( new ScheduledServiceListResourceResponse() );
 
         return scheduleResponse.getData();
     }
@@ -95,13 +98,13 @@ public class TaskScheduleUtil
         ScheduledServiceListResource task = getTask( name );
         return task.getLastRunResult();
     }
-    
+
     public static void waitForTasks()
         throws Exception
     {
         waitForTasks( 300 );
     }
-    
+
     public static void waitForTasks( int maxAttempts )
         throws Exception
     {
@@ -114,12 +117,12 @@ public class TaskScheduleUtil
             Thread.sleep( sleep );
 
             List<ScheduledServiceListResource> tasks = getTasks();
-            
+
             int brokenCount = 0;
-            
+
             for ( ScheduledServiceListResource task : tasks )
             {
-                if("BROKEN".equals( task.getStatus()))
+                if ( "BROKEN".equals( task.getStatus() ) )
                 {
                     brokenCount++;
                 }
@@ -134,7 +137,7 @@ public class TaskScheduleUtil
 
     /**
      * Blocks while waiting for a task to finish.
-     *
+     * 
      * @param name
      * @return
      * @throws Exception
@@ -153,8 +156,9 @@ public class TaskScheduleUtil
 
             ScheduledServiceListResource task = getTask( name );
 
-            LOG.info( "Task: " + task.getName() + ", Attempt: " + attempt + ", LastRunResult: " + task.getLastRunResult() + ", Status: " + task.getStatus() );
-            if ( task.getLastRunResult() != "n/a"
+            LOG.info( "Task: " + task.getName() + ", Attempt: " + attempt + ", LastRunResult: "
+                + task.getLastRunResult() + ", Status: " + task.getStatus() );
+            if ( !StringUtils.equals( task.getLastRunResult(), "n/a" )
                 && ( task.getStatus().equals( "SUBMITTED" ) || task.getStatus().equals( "WAITING" ) ) )
             {
                 return task;
@@ -203,7 +207,7 @@ public class TaskScheduleUtil
     }
 
     public static ScheduledServiceListResource runTask( String taskName, String typeId, int maxAttempts,
-                                                        ScheduledServicePropertyResource... properties )
+        ScheduledServicePropertyResource... properties )
         throws Exception
     {
         ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
@@ -229,7 +233,7 @@ public class TaskScheduleUtil
     }
 
     public static ScheduledServiceListResource runTask( String taskName, String typeId,
-                                                        ScheduledServicePropertyResource... properties )
+        ScheduledServicePropertyResource... properties )
         throws Exception
     {
         return runTask( taskName, typeId, 300, properties );
