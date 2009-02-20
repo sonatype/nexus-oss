@@ -299,8 +299,11 @@ public class DefaultScheduledTask<T>
             // check for execution
             if ( !( (SchedulerTask<?>) getCallable() ).allowConcurrentExecution( getScheduler().getActiveTasks() ) )
             {
-                // simply reschedule itself for 10sec
-                nextRun = new Date( nextRun.getTime() + 10000 );
+                if ( nextRun != null )
+                {
+                    // simply reschedule itself for 10sec
+                    nextRun = new Date( nextRun.getTime() + 10000 );
+                }
                 
                 setFuture( getScheduler().getScheduledExecutorService().schedule( this, 10000, TimeUnit.MILLISECONDS ) );
                 
