@@ -57,7 +57,7 @@ public class Nexus930AutoDiscoverComponent
             role,
             this.getXMLXStream(),
             MediaType.APPLICATION_XML );
-        Assert.assertTrue( "Expected list size equal 2.", result1.size() == 2 );
+        Assert.assertTrue( "Expected list size equal 3.", result1.size() == 3 );
 
         // 401 test
         this.overwriteUserRole( TEST_USER_NAME, "login-only" + role, "2" );
