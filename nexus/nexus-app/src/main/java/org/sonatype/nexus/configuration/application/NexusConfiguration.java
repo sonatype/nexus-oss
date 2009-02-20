@@ -22,11 +22,13 @@ import org.sonatype.nexus.configuration.application.source.ApplicationConfigurat
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.CRepositoryWebSite;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 /**
@@ -83,6 +85,9 @@ public interface NexusConfiguration
         throws InvalidConfigurationException;
 
     GroupRepository createRepositoryFromModel( Configuration configuration, CRepositoryGroup repositoryGroup )
+        throws InvalidConfigurationException;
+
+    WebSiteRepository createRepositoryFromModel( Configuration configuration, CRepositoryWebSite repositorySite )
         throws InvalidConfigurationException;
 
     // ------------------------------------------------------------------

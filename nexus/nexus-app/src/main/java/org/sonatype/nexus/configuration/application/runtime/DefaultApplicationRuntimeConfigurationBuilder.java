@@ -26,6 +26,7 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.CRepositoryWebSite;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -36,6 +37,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.repository.ShadowRepositoryConfigurator;
+import org.sonatype.nexus.proxy.repository.WebSiteRepository;
+import org.sonatype.nexus.proxy.repository.WebSiteRepositoryConfigurator;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 
@@ -115,9 +118,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
             }
 
             // Setting contentClass specific things on a repository
-            RepositoryConfigurator configurator = plexusContainer.lookup(
-                RepositoryConfigurator.class,
-                type );
+            RepositoryConfigurator configurator = plexusContainer.lookup( RepositoryConfigurator.class, type );
 
             repository = configurator.updateRepositoryFromModel( old, nexusConfiguration, repo, nexusConfiguration
                 .getRemoteStorageContext(), ls, rs );
@@ -217,11 +218,57 @@ public class DefaultApplicationRuntimeConfigurationBuilder
             }
 
             // Setting contentClass specific things on a repository
-            GroupRepositoryConfigurator configurator = plexusContainer.lookup(
-                GroupRepositoryConfigurator.class,
-                type );
+            GroupRepositoryConfigurator configurator = plexusContainer.lookup( GroupRepositoryConfigurator.class, type );
 
             repository = configurator.updateRepositoryFromModel( old, nexusConfiguration, group, ls );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new InvalidConfigurationException( "Repository of type='" + type
+                + "' does not have a valid configurator!", e );
+        }
+
+        return repository;
+    }
+
+    public WebSiteRepository createRepositoryFromModel( Configuration configuration, CRepositoryWebSite site )
+        throws InvalidConfigurationException
+    {
+        if ( site.getType() == null )
+        {
+            site.setType( "maven-site" );
+        }
+
+        WebSiteRepository siteRepository = createRepository( WebSiteRepository.class, site.getType() );
+
+        return updateRepositoryFromModel( siteRepository, configuration, site );
+    }
+
+    public WebSiteRepository updateRepositoryFromModel( WebSiteRepository old, Configuration configuration,
+        CRepositoryWebSite site )
+        throws InvalidConfigurationException
+    {
+        WebSiteRepository repository = null;
+
+        String type = site.getType();
+
+        try
+        {
+            LocalRepositoryStorage ls = null;
+
+            if ( site.getLocalStorage() != null )
+            {
+                ls = getLocalRepositoryStorage( site.getId(), site.getLocalStorage().getProvider() );
+            }
+            else
+            {
+                ls = getLocalRepositoryStorage( site.getId(), DEFAULT_LS_PROVIDER );
+            }
+
+            // Setting contentClass specific things on a repository
+            WebSiteRepositoryConfigurator configurator = plexusContainer.lookup( WebSiteRepositoryConfigurator.class, type );
+
+            repository = configurator.updateRepositoryFromModel( old, nexusConfiguration, site, ls );
         }
         catch ( ComponentLookupException e )
         {

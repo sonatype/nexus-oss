@@ -17,11 +17,13 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.CRepositoryWebSite;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 
 /**
  * A component to be slimmed! Actually, it is a "factory" (backed by Plexus) that creates repo and other instances. It
@@ -51,5 +53,12 @@ public interface ApplicationRuntimeConfigurationBuilder
 
     GroupRepository updateRepositoryFromModel( GroupRepository old, Configuration configuration,
         CRepositoryGroup repositoryGroup )
+        throws InvalidConfigurationException;
+
+    WebSiteRepository createRepositoryFromModel( Configuration configuration, CRepositoryWebSite repositorySite )
+        throws InvalidConfigurationException;
+
+    WebSiteRepository updateRepositoryFromModel( WebSiteRepository old, Configuration configuration,
+        CRepositoryWebSite repositorySite )
         throws InvalidConfigurationException;
 }
