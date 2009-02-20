@@ -47,6 +47,7 @@ public class HttpVerbMappingAuthorizationFilter
         mapping.put( "get", "read" );
         mapping.put( "put", "update" );
         mapping.put( "post", "create" );
+        mapping.put( "mkcol", "create" );
     }
 
     protected Log getLogger()
