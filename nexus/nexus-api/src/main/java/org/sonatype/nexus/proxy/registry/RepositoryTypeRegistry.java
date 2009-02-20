@@ -25,9 +25,17 @@ import java.util.Set;
 public interface RepositoryTypeRegistry
 {
     /**
-     * Returns the set of classes that are known that provides Repository components.
+     * Returns the set of repo type descriptors that are known that provides Repository components. To register new
+     * provider, add it to the set returned here.
      * 
-     * @return a set of repository roles or empty set.
+     * @return a modifiable set of repository type descriptors or empty set.
+     */
+    Set<RepositoryTypeDescriptor> getRepositoryTypeDescriptors();
+
+    /**
+     * Returns an unmodifiable set of FQN of classes that are known that provides Repository components.
+     * 
+     * @return a set of repository type descriptors or empty set.
      */
     Set<String> getRepositoryRoles();
 

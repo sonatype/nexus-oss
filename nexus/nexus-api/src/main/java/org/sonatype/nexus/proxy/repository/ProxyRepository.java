@@ -13,6 +13,9 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import java.util.List;
+
+import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
@@ -113,4 +116,8 @@ public interface ProxyRepository
      * @param storage the storage
      */
     void setRemoteStorage( RemoteRepositoryStorage storage );
+
+    DownloadMirrors getDownloadMirrors();
+
+    void setMirrors( List<Mirror> mirrors );
 }
