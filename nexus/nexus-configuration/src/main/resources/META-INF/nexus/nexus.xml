@@ -93,7 +93,7 @@
 			<repositoryPolicy>snapshot</repositoryPolicy>
 			<remoteStorage>
 				<provider>apacheHttpClient3x</provider>
-				<url>http://people.apache.org/repo/m2-snapshot-repository</url>
+				<url>http://repository.apache.org/snapshots</url>
 			</remoteStorage>
 		</repository>
 
