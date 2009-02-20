@@ -11,25 +11,29 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.mirror;
+package org.sonatype.nexus.proxy.maven.site;
 
-import java.util.List;
+import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 
-import org.sonatype.nexus.proxy.repository.Mirror;
-
-
-public interface DownloadMirrors
+/**
+ * The Maven Site content class. It is not compatible with anything, hence it is not groupable.
+ * 
+ * @author cstamas
+ */
+@Component( role = ContentClass.class, hint = "maven-site" )
+public class MavenSiteContentClass
+    implements ContentClass
 {
+    private static final String ID = "maven-site";
 
-    void setMirrors( List<Mirror> mirrors );
+    public String getId()
+    {
+        return ID;
+    }
 
-    /**
-     * Returns list of all configured mirror urls, including urls of mirrors
-     * added to the blacklist.
-     */
-    List<Mirror> getMirrors();
-
-    boolean isBlacklisted( Mirror mirror );
-
-    DownloadMirrorSelector openSelector();
+    public boolean isCompatible( ContentClass contentClass )
+    {
+        return false;
+    }
 }

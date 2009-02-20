@@ -43,7 +43,8 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.target.TargetSet;
@@ -64,6 +65,9 @@ public class DefaultRepositoryRouter
 
     @Requirement
     private RepositoryRegistry repositoryRegistry;
+
+    @Requirement
+    private RepositoryTypeRegistry repositoryTypeRegistry;
 
     /** Should links be resolved? */
     private boolean followLinks;
@@ -424,16 +428,28 @@ public class DefaultRepositoryRouter
 
         if ( explodedPath.length >= 1 )
         {
-            // we have kind information ("repositories" vs "groups")
-            if ( explodedPath[0].equals( "repositories" ) )
+            // we have kind information ("repositories" vs "groups" etc)
+            for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRepositoryTypeDescriptors() )
             {
-                kind = Repository.class;
+                try
+                {
+                    if ( rtd.getPrefix().equals( explodedPath[0] ) )
+                    {
+                        kind = (Class<Repository>) Class.forName( rtd.getRole() );
+
+                        break;
+                    }
+                }
+                catch ( ClassNotFoundException e )
+                {
+                    getLogger().info(
+                        "RepositoryType with role='" + rtd.getRole()
+                            + "' is registered, but not found on classpath, skipping it.",
+                        e );
+                }
             }
-            else if ( explodedPath[0].equals( "groups" ) )
-            {
-                kind = GroupRepository.class;
-            }
-            else
+
+            if ( kind == null )
             {
                 // unknown explodedPath[0]
                 throw new ItemNotFoundException( request.getRequestPath() );
@@ -502,28 +518,37 @@ public class DefaultRepositoryRouter
     protected Collection<StorageItem> listVirtualPath( ResourceStoreRequest request, RequestRoute route )
         throws ItemNotFoundException
     {
-        // XXX: A crude implementation with wired-in items like collections "repositories" and "groups".
-        // We will need to make it smarter, for example sort out dirs based on their Roles, and extend RepoTypeRegistry
-        // for role 2 path mapping or so.
         if ( route.getRequestDepth() == 0 )
         {
             // 1st level
             ArrayList<StorageItem> result = new ArrayList<StorageItem>();
 
-            DefaultStorageCollectionItem repositories = new DefaultStorageCollectionItem( this, ItemPathUtils
-                .concatPaths( request.getRequestPath(), "repositories" ), true, false );
+            for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRepositoryTypeDescriptors() )
+            {
+                try
+                {
+                    // check is there any repo registered
+                    if ( !repositoryRegistry.getRepositoriesWithFacet( Class.forName( rtd.getRole() ) ).isEmpty() )
+                    {
+                        DefaultStorageCollectionItem repositories = new DefaultStorageCollectionItem(
+                            this,
+                            ItemPathUtils.concatPaths( request.getRequestPath(), rtd.getPrefix() ),
+                            true,
+                            false );
 
-            repositories.getItemContext().putAll( request.getRequestContext() );
+                        repositories.getItemContext().putAll( request.getRequestContext() );
 
-            result.add( repositories );
-
-            DefaultStorageCollectionItem groups = new DefaultStorageCollectionItem( this, ItemPathUtils.concatPaths(
-                request.getRequestPath(),
-                "groups" ), true, false );
-
-            groups.getItemContext().putAll( request.getRequestContext() );
-
-            result.add( groups );
+                        result.add( repositories );
+                    }
+                }
+                catch ( ClassNotFoundException e )
+                {
+                    getLogger().info(
+                        "RepositoryType with role='" + rtd.getRole()
+                            + "' is registered, but not found on classpath, skipping it.",
+                        e );
+                }
+            }
 
             return result;
         }
@@ -532,18 +557,29 @@ public class DefaultRepositoryRouter
             // 2nd level
             List<? extends Repository> repositories = null;
 
-            if ( route.getStrippedPrefix().startsWith( "/repositories" ) )
+            for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRepositoryTypeDescriptors() )
             {
-                // repositories (all, even groups from now on!)
+                try
+                {
+                    if ( route.getStrippedPrefix().startsWith( "/" + rtd.getPrefix() ) )
+                    {
+                        repositories = repositoryRegistry.getRepositoriesWithFacet( (Class<Repository>) Class
+                            .forName( rtd.getRole() ) );
 
-                repositories = repositoryRegistry.getRepositoriesWithFacet( Repository.class );
+                        break;
+                    }
+                }
+                catch ( ClassNotFoundException e )
+                {
+                    getLogger().info(
+                        "RepositoryType with role='" + rtd.getRole()
+                            + "' is registered, but not found on classpath, skipping it.",
+                        e );
+                }
             }
-            else if ( route.getStrippedPrefix().startsWith( "/groups" ) )
-            {
-                // groups only
-                repositories = repositoryRegistry.getRepositoriesWithFacet( GroupRepository.class );
-            }
-            else
+
+            // if no prefix matched, Item not found
+            if ( repositories == null )
             {
                 throw new ItemNotFoundException( request.getRequestPath() );
             }

@@ -56,7 +56,7 @@ public class DefaultRepositoryConfigurator
         CRepository repo, RemoteStorageContext rsc, LocalRepositoryStorage ls, RemoteRepositoryStorage rs )
         throws InvalidConfigurationException
     {
-        DefaultRepository repository = (DefaultRepository) old;
+        Repository repository = (Repository) old;
 
         repository.setId( repo.getId() );
         repository.setName( repo.getName() );
@@ -122,76 +122,81 @@ public class DefaultRepositoryConfigurator
 
         // proxy stuff
 
-        repository.setProxyMode( repositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
-
-        repository.setItemMaxAge( repo.getArtifactMaxAge() );
-
-        try
+        if ( repository instanceof ProxyRepository )
         {
-            if ( repo.getRemoteStorage() != null )
-            {
-                rs.validateStorageUrl( repo.getRemoteStorage().getUrl() );
+            ProxyRepository prepository = (ProxyRepository) repository;
 
-                repository.setRemoteUrl( repo.getRemoteStorage().getUrl() );
-                repository.setRemoteStorage( rs );
-                
-                List<CMirror> mirrors = ( List<CMirror> )repo.getRemoteStorage().getMirrors();
-                if ( mirrors != null && mirrors.size() > 0 )
+            prepository.setProxyMode( repositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
+
+            prepository.setItemMaxAge( repo.getArtifactMaxAge() );
+
+            try
+            {
+                if ( repo.getRemoteStorage() != null )
                 {
-                    List<Mirror> runtimeMirrors = new ArrayList<Mirror>();
-                    
-                    for ( CMirror mirror : mirrors )
+                    rs.validateStorageUrl( repo.getRemoteStorage().getUrl() );
+
+                    prepository.setRemoteUrl( repo.getRemoteStorage().getUrl() );
+                    prepository.setRemoteStorage( rs );
+
+                    List<CMirror> mirrors = (List<CMirror>) repo.getRemoteStorage().getMirrors();
+                    if ( mirrors != null && mirrors.size() > 0 )
                     {
-                        runtimeMirrors.add( new Mirror( mirror.getId(), mirror.getUrl() ) );  
+                        List<Mirror> runtimeMirrors = new ArrayList<Mirror>();
+
+                        for ( CMirror mirror : mirrors )
+                        {
+                            runtimeMirrors.add( new Mirror( mirror.getId(), mirror.getUrl() ) );
+                        }
+
+                        prepository.setMirrors( runtimeMirrors );
                     }
-                    
-                    repository.setMirrors( runtimeMirrors );
+                    else
+                    {
+                        prepository.setMirrors( null );
+                    }
+
+                    DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( rsc );
+
+                    if ( repo.getRemoteStorage().getConnectionSettings() != null )
+                    {
+                        ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS, repo
+                            .getRemoteStorage().getConnectionSettings() );
+                    }
+
+                    if ( repo.getRemoteStorage().getHttpProxySettings() != null )
+                    {
+                        ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS, repo
+                            .getRemoteStorage().getHttpProxySettings() );
+                    }
+
+                    if ( repo.getRemoteStorage().getAuthentication() != null )
+                    {
+                        ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS, repo
+                            .getRemoteStorage().getAuthentication() );
+                    }
+
+                    prepository.setRemoteStorageContext( ctx );
                 }
                 else
                 {
-                    repository.setMirrors( null );
+                    prepository.setRemoteUrl( null );
+
+                    prepository.setRemoteStorage( null );
+
+                    prepository.setRemoteStorageContext( null );
                 }
-
-                DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( rsc );
-
-                if ( repo.getRemoteStorage().getConnectionSettings() != null )
-                {
-                    ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS, repo
-                        .getRemoteStorage().getConnectionSettings() );
-                }
-
-                if ( repo.getRemoteStorage().getHttpProxySettings() != null )
-                {
-                    ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS, repo
-                        .getRemoteStorage().getHttpProxySettings() );
-                }
-
-                if ( repo.getRemoteStorage().getAuthentication() != null )
-                {
-                    ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS, repo
-                        .getRemoteStorage().getAuthentication() );
-                }
-
-                repository.setRemoteStorageContext( ctx );
             }
-            else
+            catch ( StorageException e )
             {
-                repository.setRemoteUrl( null );
+                ValidationResponse response = new ApplicationValidationResponse();
 
-                repository.setRemoteStorage( null );
+                ValidationMessage error = new ValidationMessage( "remoteStorageUrl", e.getMessage(), e.getMessage() );
 
-                repository.setRemoteStorageContext( null );
+                response.addValidationError( error );
+
+                throw new InvalidConfigurationException( response );
             }
-        }
-        catch ( StorageException e )
-        {
-            ValidationResponse response = new ApplicationValidationResponse();
-
-            ValidationMessage error = new ValidationMessage( "remoteStorageUrl", e.getMessage(), e.getMessage() );
-
-            response.addValidationError( error );
-
-            throw new InvalidConfigurationException( response );
         }
 
         for ( PluginRepositoryConfigurator configurator : pluginRepositoryConfigurators.values() )

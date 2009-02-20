@@ -28,6 +28,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 
 @Component( role = RepositoryTypeRegistry.class )
 public class DefaultRepositoryTypeRegistry
@@ -37,21 +38,36 @@ public class DefaultRepositoryTypeRegistry
     @Requirement
     private PlexusContainer container;
 
-    private Set<String> repositoryRoles;
+    private Set<RepositoryTypeDescriptor> repositoryRoles;
 
-    public Set<String> getRepositoryRoles()
+    public Set<RepositoryTypeDescriptor> getRepositoryTypeDescriptors()
     {
         if ( repositoryRoles == null )
         {
-            repositoryRoles = new HashSet<String>();
+            repositoryRoles = new HashSet<RepositoryTypeDescriptor>();
 
             // fill in the defaults
-            repositoryRoles.add( Repository.class.getName() );
-            repositoryRoles.add( ShadowRepository.class.getName() );
-            repositoryRoles.add( GroupRepository.class.getName() );
+            repositoryRoles.add( new RepositoryTypeDescriptor( Repository.class.getName(), "repositories" ) );
+            repositoryRoles.add( new RepositoryTypeDescriptor( ShadowRepository.class.getName(), "shadows" ) );
+            repositoryRoles.add( new RepositoryTypeDescriptor( GroupRepository.class.getName(), "groups" ) );
+            repositoryRoles.add( new RepositoryTypeDescriptor( WebSiteRepository.class.getName(), "sites" ) );
         }
 
         return repositoryRoles;
+    }
+
+    public Set<String> getRepositoryRoles()
+    {
+        Set<RepositoryTypeDescriptor> rtds = getRepositoryTypeDescriptors();
+
+        HashSet<String> result = new HashSet<String>( rtds.size() );
+
+        for ( RepositoryTypeDescriptor rtd : rtds )
+        {
+            result.add( rtd.getRole() );
+        }
+
+        return Collections.unmodifiableSet( result );
     }
 
     public Set<String> getExistingRepositoryHints( String role )
