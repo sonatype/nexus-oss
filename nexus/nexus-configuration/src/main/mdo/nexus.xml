@@ -1,14 +1,12 @@
 
   <!--
 
-    Nexus: Maven Repository Manager Copyright (C) 2008 Sonatype, Inc. This file is part of Nexus. This program is free
-    software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as
-    published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-    details. You should have received a copy of the GNU Lesser General Public License along with this program; if not,
-    write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+    Nexus: Maven Repository Manager Copyright (C) 2008 Sonatype, Inc. This file is part of Nexus. This program is free software; you can
+    redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+    either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+    General Public License for more details. You should have received a copy of the GNU Lesser General Public License along with this
+    program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
   -->
 
 <model xsd.namespace="http://www.sonatype.com/xsd/nexus-configuration-1.0.1" xsd.target-namespace="http://www.sonatype.com/xsd/nexus-configuration-1.0.1">
@@ -44,7 +42,7 @@
           <description>
             The version of the persisted model. Should be equal to the version in Nexus that consumes this
             configuration.
-					</description>
+          </description>
           <type>String</type>
           <required>true</required>
         </field>
@@ -54,7 +52,8 @@
           <description>
             The Nexus workingDirectory contains files needed for Nexus to function properly. Data like
             Lucene
-            index, file attributes, shared local storage, etc. are here.
+            index, file
+            attributes, shared local storage, etc. are here.
 					</description>
           <type>String</type>
           <required>true</required>
@@ -84,7 +83,8 @@
           <version>1.0.0</version>
           <description>
             The global connection settings are settings applied across Nexus. These can be overridden by
-            per-repository connection settings.
+            per-repository connection
+            settings.
 					</description>
           <association>
             <type>CRemoteConnectionSettings</type>
@@ -96,7 +96,8 @@
           <version>1.0.1+</version>
           <description>
             The global connection settings are settings applied across Nexus. These can be overridden by
-            per-repository connection settings.
+            per-repository connection
+            settings.
 					</description>
           <association>
             <type>CRemoteConnectionSettings</type>
@@ -108,7 +109,8 @@
           <version>1.0.0+</version>
           <description>
             The global HTTP Proxy settings are settings applied across Nexus. These can be overridden by
-            per-repository HTTP Proxy settings.
+            per-repository HTTP Proxy
+            settings.
 					</description>
           <association>
             <type>CRemoteHttpProxySettings</type>
@@ -167,6 +169,16 @@
           <description>The list of defined repository shadows within Nexus.</description>
           <association>
             <type>CRepositoryShadow</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+        <field>
+          <name>repositorySites</name>
+          <version>1.0.8+</version>
+          <description>The list of defined site repositories within Nexus.</description>
+          <association>
+            <type>CRepositoryWebSite</type>
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
@@ -419,7 +431,7 @@
       <description>
         Remote authentication tokens used in remote authentications against HTTP Proxies and/or protected remote
         repositories.
-			</description>
+      </description>
       <fields>
         <field>
           <name>username</name>
@@ -612,10 +624,11 @@
           <description>
             Path mapping, that directs routers where to search and/or avoid full-group search. You can also
             use
-            path mappings to create ranking exceptions, since if mapping is found for path, the request
+            path mappings to
+            create ranking exceptions, since if mapping is found for path, the request
             will be executed by
             ordering supplied in mapping.
-					</description>
+          </description>
         </field>
       </fields>
     </class>
@@ -635,7 +648,8 @@
           <description>
             The map of inclusions. Keys are regexps for paths (like /some/path/.*) and values are comma
             separated
-            list of repository ID's.
+            list of
+            repository ID's.
 					</description>
         </field>
         <field>
@@ -649,7 +663,8 @@
           <description>
             The map of exclusions. Keys are regexps for paths (like /some/path/.*) and values are comma
             separated
-            list of repository ID's.
+            list of
+            repository ID's.
 					</description>
         </field>
       </fields>
@@ -784,7 +799,7 @@
             If true, repository is browseable on UI/DAV. With any value repository will still properly serve
             Maven
             clients.
-					</description>
+          </description>
           <defaultValue>true</defaultValue>
         </field>
         <field>
@@ -795,7 +810,7 @@
           <description>
             If true, repository will never try to reach it's remote peer. Will offer the content it has in
             cache/local store.
-					</description>
+          </description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -805,10 +820,11 @@
           <required>true</required>
           <description>
             If true, repository will get indexed. If false, the files and artifacts from repository will NOT
-            appear on Nexus index, thus will be not searcheable (and browseable on views that relies on
+            appear on Nexus
+            index, thus will be not searcheable (and browseable on views that relies on
             index), altough it will
             serve Maven clients properly.
-					</description>
+          </description>
           <defaultValue>true</defaultValue>
         </field>
         <field>
@@ -829,7 +845,7 @@
           <description>
             Max. minutes that have to pass before Nexus will look to remote peer for possibly new version of
             artifact.
-					</description>
+          </description>
           <defaultValue>1440</defaultValue>
         </field>
         <field>
@@ -840,7 +856,7 @@
           <description>
             Max. minutes that have to pass before Nexus will look to remote peer for possibly new version of
             repository metadata.
-					</description>
+          </description>
           <defaultValue>1440</defaultValue>
         </field>
         <field>
@@ -851,7 +867,7 @@
           <description>
             Max. minutes that have to pass before Nexus will look to remote peer for possibly new version of
             cached file.
-					</description>
+          </description>
           <defaultValue>1440</defaultValue>
         </field>
         <field>
@@ -878,7 +894,8 @@
           <description>
             If true, repository will fix/maintain repository metadata (according to it's repositoryType)
             that is
-            coming from it's remote store (this setting does not affect hosted reposes). Beware,
+            coming from it's
+            remote store (this setting does not affect hosted reposes). Beware,
             this setting is modifying the
             repo metadata!
 					</description>
@@ -892,7 +909,8 @@
           <description>
             The type of repository, it may have "release" or "snapshot" values allowing it to
             host/proxy/server
-            release or snapshot artifacts only.
+            release or snapshot
+            artifacts only.
 					</description>
           <defaultValue>release</defaultValue>
         </field>
@@ -904,9 +922,11 @@
           <description>
             The checksum policy of this repository (used on proxies only). Valid values are: 'ignore'
             (simply
-            ignore checksums), 'warn' (warn in logs on wrong checksums but serve it), 'strict'
+            ignore checksums),
+            'warn' (warn in logs on wrong checksums but serve it), 'strict'
             (strict checksumming, on bad or
-            missing remote checksum the artifact is not served) and
+            missing remote checksum the
+            artifact is not served) and
             'strictIfExists' (like 'strict' if hash exists remotely or
             warn if not exists).
 					</description>
@@ -934,7 +954,8 @@
           <description>
             The local storage definition of repository. It is optional element. If not defined, the
             repository will
-            use the shared local storage.
+            use the shared
+            local storage.
 					</description>
           <association>
             <type>CLocalStorage</type>
@@ -947,7 +968,8 @@
           <description>
             The remote storage definition of repository. It not defined, the repository will be
             Nexus-hosted. If
-            defined at least the remote URL, the repository will be proxy-repository.
+            defined at least
+            the remote URL, the repository will be proxy-repository.
 					</description>
           <association>
             <type>CRemoteStorage</type>
@@ -1039,7 +1061,8 @@
       <version>1.0.0+</version>
       <description>
         The local storage definition. If defined, the repository will have own instance of local storage instead
-        to use shared one.
+        to use shared
+        one.
 			</description>
       <fields>
         <field>
@@ -1065,7 +1088,8 @@
           <description>
             If true, the base of URL will be repoIds. Set to false if this local storage points to an
             existing repo
-            contens on FS not in default location.
+            contens on FS
+            not in default location.
 					</description>
           <defaultValue>false</defaultValue>
         </field>
@@ -1076,7 +1100,8 @@
       <version>1.0.0+</version>
       <description>
         The remote storage definition. If URL is only defined, the repository will share one shared remote
-        storage instance. If any other properties are defined, the repository will own a private repository
+        storage instance. If
+        any other properties are defined, the repository will own a private repository
         store instance.
 			</description>
       <fields>
@@ -1165,6 +1190,98 @@
       </fields>
     </class>
 
+    <!-- SITE REPOSES -->
+    <class>
+      <name>CRepositoryWebSite</name>
+      <version>1.0.8+</version>
+      <description>Site repository definition.</description>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>Repository ID. It should uniquely identify this repository across Nexus.</description>
+        </field>
+        <field>
+          <name>name</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>Human readable Repository name.</description>
+        </field>
+        <field>
+          <name>localStatus</name>
+          <version>1.0.8+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The local status of repository.</description>
+          <defaultValue>inService</defaultValue>
+        </field>
+        <field>
+          <name>available</name>
+          <version>1.0.8+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>If false, repository will deny any kind of request.</description>
+          <defaultValue>true</defaultValue>
+        </field>
+        <field>
+          <name>type</name>
+          <version>1.0.8+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>Site type.</description>
+        </field>
+        <field>
+          <name>userManaged</name>
+          <version>1.0.8+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>
+            If true, repository is user managed, and it is allowed to be edited/dropped by users.
+          </description>
+          <defaultValue>true</defaultValue>
+        </field>
+        <field>
+          <name>exposed</name>
+          <version>1.0.8+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>
+            If true, repository is exposed at content.
+          </description>
+          <defaultValue>true</defaultValue>
+        </field>
+        <field>
+          <name>localStorage</name>
+          <version>1.0.8+</version>
+          <description>
+            The local storage definition of repository. It is optional element. If not defined, the
+            repository will
+            use the shared
+            local storage.
+          </description>
+          <association>
+            <type>CLocalStorage</type>
+          </association>
+          <required>false</required>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.8+</version>
+          <code><![CDATA[
+  /* A field that "carries" the Configuration modelVersion with object */
+    public final String modelVersion = Configuration.MODEL_VERSION;
+    
+    /* A field to store the default local storage URL */
+    public transient String defaultLocalStorageUrl;
+]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+
     <!-- SHADOW REPOSES -->
     <class>
       <name>CRepositoryShadow</name>
@@ -1209,7 +1326,8 @@
           <description>
             Repository ID of existing Nexus repository to be master of this shadow. It should point to an
             existing
-            Nexus Repository.
+            Nexus
+            Repository.
 					</description>
         </field>
         <field>
@@ -1345,9 +1463,11 @@
           <description>
             Path mapping, that directs grouping router where to search and/or avoid full-group search. You
             can also
-            use path mappings to create ranking exceptions, since if mapping is found for path, the
+            use path
+            mappings to create ranking exceptions, since if mapping is found for path, the
             request will be executed by
-            ordering supplied in mapping.
+            ordering supplied in
+            mapping.
 					</description>
         </field>
         <field>
@@ -1361,7 +1481,7 @@
           <description>
             The list of repositories that are members of this group. The order in this list defines the repo
             ordering in group.
-					</description>
+          </description>
         </field>
       </fields>
     </class>
@@ -1459,7 +1579,8 @@
           <description>
             The local storage definition of repository. It is optional element. If not defined, the
             repository will
-            use the shared local storage.
+            use the shared
+            local storage.
           </description>
           <association>
             <type>CLocalStorage</type>
@@ -1477,7 +1598,7 @@
           <description>
             The list of repositories that are members of this group. The order in this list defines the repo
             ordering in group.
-					</description>
+          </description>
         </field>
       </fields>
     </class>
@@ -1504,7 +1625,8 @@
           <description>
             If enabled, the users will be able to access DAV resources unauthenticated, if Realm allows. To
             set
-            rights for unauthenticated users, use "anonymous" username.
+            rights for
+            unauthenticated users, use "anonymous" username.
 					</description>
           <defaultValue>false</defaultValue>
         </field>
@@ -1516,7 +1638,8 @@
           <description>
             The username used to log in as anonymous user. The account should be enabled and existing according to
             the
-            used JSecurity realm!
+            used
+            JSecurity realm!
 					</description>
           <defaultValue>anonymous</defaultValue>
         </field>
@@ -1528,7 +1651,8 @@
           <description>
             The username used to log in as anonymous user. The account should be enabled and existing according to
             the
-            used JSecurity realm!
+            used
+            JSecurity realm!
 					</description>
           <defaultValue>anonymous</defaultValue>
         </field>
