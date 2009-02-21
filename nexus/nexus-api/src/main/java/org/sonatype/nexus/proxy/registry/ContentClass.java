@@ -18,4 +18,6 @@ public interface ContentClass
     String getId();
 
     boolean isCompatible( ContentClass contentClass );
+    
+    boolean isGroupable();
 }

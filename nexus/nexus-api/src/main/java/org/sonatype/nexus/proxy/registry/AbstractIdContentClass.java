@@ -20,4 +20,9 @@ public abstract class AbstractIdContentClass
     {
         return getId().equals( contentClass.getId() );
     }
+    
+    public boolean isGroupable()
+    {
+        return true;
+    }
 }

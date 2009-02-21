@@ -36,4 +36,9 @@ public class MavenSiteContentClass
     {
         return false;
     }
+    
+    public boolean isGroupable()
+    {
+        return false;
+    }
 }
