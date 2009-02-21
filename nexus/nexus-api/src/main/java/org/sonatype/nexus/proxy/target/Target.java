@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
@@ -69,7 +70,9 @@ public class Target
 
     public boolean isPathContained( ContentClass contentClass, String path )
     {
-        if ( getContentClass().isCompatible( contentClass ) )
+        // if is the same or is compatible
+        if ( StringUtils.equals( getContentClass().getId(), contentClass.getId() )
+            || getContentClass().isCompatible( contentClass ) )
         {
             // look for pattern matching
             for ( Pattern pattern : patterns )
