@@ -23,11 +23,9 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
@@ -108,30 +106,13 @@ public abstract class AbstractShadowRepository
             {
                 try
                 {
-                    String shadowPath = transformMaster2Shadow( ievt.getItemUid().getPath() );
-
-                    if ( shadowPath != null )
+                    if ( ievt instanceof RepositoryItemEventStore || ievt instanceof RepositoryItemEventCache )
                     {
-                        if ( ievt instanceof RepositoryItemEventStore || ievt instanceof RepositoryItemEventCache )
-                        {
-                            DefaultStorageLinkItem link = new DefaultStorageLinkItem(
-                                this,
-                                shadowPath,
-                                true,
-                                true,
-                                ievt.getItemUid() );
-
-                            if ( ievt.getContext() != null )
-                            {
-                                link.getItemContext().putAll( ievt.getContext() );
-                            }
-
-                            storeItem( link );
-                        }
-                        else if ( ievt instanceof RepositoryItemEventDelete )
-                        {
-                            deleteItem( createUid( shadowPath ), ievt.getContext() );
-                        }
+                        createLink( ievt.getItem(), ievt.getContext() );
+                    }
+                    else if ( ievt instanceof RepositoryItemEventDelete )
+                    {
+                        deleteLink( ievt.getItem(), ievt.getContext() );
                     }
                 }
                 catch ( Exception e )
@@ -142,51 +123,24 @@ public abstract class AbstractShadowRepository
         }
     }
 
-    @Override
-    protected StorageItem doRetrieveItem( RepositoryItemUid uid, Map<String, Object> context )
-        throws IllegalOperationException,
+    protected abstract void deleteLink( StorageItem item, Map<String, Object> context )
+        throws UnsupportedStorageOperationException,
+            IllegalOperationException,
             ItemNotFoundException,
-            StorageException
-    {
-        StorageItem result = null;
+            StorageException;
 
-        try
-        {
-            result = super.doRetrieveItem( uid, context );
+    protected abstract void createLink( StorageItem item, Map<String, Object> context )
+        throws UnsupportedStorageOperationException,
+            IllegalOperationException,
+            StorageException;
 
-            return result;
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // if it is thrown by super.doRetrieveItem()
-            String transformedPath = transformShadow2Master( uid.getPath() );
 
-            if ( transformedPath == null )
-            {
-                throw new ItemNotFoundException( uid.getPath() );
-            }
-
-            // delegate the call to the master
-            RepositoryItemUid tuid = getMasterRepository().createUid( transformedPath );
-
-            return ( (AbstractRepository) getMasterRepository() ).doRetrieveItem( tuid, context );
-        }
-    }
-
-    @Override
-    public void storeItem( StorageItem item )
+    protected void synchronizeLink( StorageItem item, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException
     {
-        if ( StorageLinkItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            super.storeItem( item );
-        }
-        else
-        {
-            throw new UnsupportedOperationException( "Shadow repository may contain only links!" );
-        }
+        createLink( item, context );
     }
 
     /**
@@ -198,7 +152,15 @@ public abstract class AbstractShadowRepository
 
         clearCaches( RepositoryItemUid.PATH_ROOT );
 
-        SyncWalker sw = new SyncWalker( this );
+        AbstractFileWalkerProcessor sw = new AbstractFileWalkerProcessor()
+        {
+            @Override
+            protected void processFileItem( WalkerContext context, StorageFileItem item )
+                throws Exception
+            {
+                synchronizeLink( item, context.getContext() );
+            }
+        };
 
         DefaultWalkerContext ctx = new DefaultWalkerContext( getMasterRepository() );
 
@@ -207,46 +169,12 @@ public abstract class AbstractShadowRepository
         getWalker().walk( ctx );
     }
 
-    /**
-     * Gets the shadow path from master path. If path is not transformable, return null.
-     * 
-     * @param path the path
-     * @return the shadow path
-     */
-    protected abstract String transformMaster2Shadow( String path );
-
-    /**
-     * Gets the master path from shadow path. If path is not transformable, return null.
-     * 
-     * @param path the path
-     * @return the master path
-     */
-    protected abstract String transformShadow2Master( String path );
-
-    protected class SyncWalker
-        extends AbstractFileWalkerProcessor
+    protected StorageItem doRetrieveItemFromMaster( RepositoryItemUid tuid, Map<String, Object> context )
+        throws IllegalOperationException,
+            ItemNotFoundException,
+            StorageException
     {
-        private Repository repository;
-
-        public SyncWalker( Repository repository )
-        {
-            this.repository = repository;
-        }
-
-        @Override
-        protected void processFileItem( WalkerContext ctx, StorageFileItem item )
-            throws Exception
-        {
-            String tuid = transformMaster2Shadow( item.getRepositoryItemUid().getPath() );
-
-            if ( tuid != null )
-            {
-                DefaultStorageLinkItem link = new DefaultStorageLinkItem( repository, tuid, true, true, item
-                    .getRepositoryItemUid() );
-
-                storeItem( link );
-            }
-        }
-    };
+        return ( (AbstractRepository) getMasterRepository() ).doRetrieveItem( tuid, context );
+    }
 
 }

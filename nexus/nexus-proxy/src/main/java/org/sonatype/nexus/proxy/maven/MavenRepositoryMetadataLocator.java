@@ -34,6 +34,7 @@ import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -94,51 +95,46 @@ public class MavenRepositoryMetadataLocator
     public String retrievePackagingFromPom( ArtifactStoreRequest request )
         throws IOException
     {
-        String packaging = "jar";
+        String packaging;
 
+        GavCalculator gavCalculator = request.getMavenRepository().getGavCalculator();
+
+        Gav gav = gavCalculator.pathToGav( request.getRequestPath() );
+
+        if ( gav == null )
+        {
+            return null;
+        }
+        
         Reader reader = null;
 
         try
         {
+            Gav pomGav = new Gav( 
+                gav.getGroupId(), // groupId
+                gav.getArtifactId(), // artifactId
+                gav.getVersion(), // version
+                null, // classifier
+                "pom", // extension 
+                gav.getSnapshotBuildNumber(), // snapshotBuildNumber
+                gav.getSnapshotTimeStamp(), // snapshotTimeStamp
+                gav.getName(), // name
+                gav.isSnapshot(), // snapshot
+                false, // hash
+                null,  // hashType
+                false, // signature
+                null // signatureType 
+            );
+
+            String pomPath = gavCalculator.gavToPath( pomGav );
+
             StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem(
-                request.getMavenRepository().createUid( request.getRequestPath() ),
+                request.getMavenRepository().createUid( pomPath ),
                 request.getRequestContext() );
 
             reader = ReaderFactory.newXmlReader( pomFile.getInputStream() );
 
-            XmlPullParser parser = new MXParser();
-
-            parser.setInput( reader );
-
-            boolean foundRoot = false;
-
-            int eventType = parser.getEventType();
-
-            while ( eventType != XmlPullParser.END_DOCUMENT )
-            {
-                if ( eventType == XmlPullParser.START_TAG )
-                {
-                    if ( parser.getName().equals( "project" ) )
-                    {
-                        foundRoot = true;
-                    }
-                    else if ( parser.getName().equals( "packaging" ) )
-                    {
-                        // 1st: if found project/packaging -> overwrite
-                        if ( parser.getDepth() == 2 )
-                        {
-                            packaging = StringUtils.trim( parser.nextText() );
-                            break;
-                        }
-                    }
-                    else if ( !foundRoot )
-                    {
-                        throw new XmlPullParserException( "Unrecognised tag: '" + parser.getName() + "'", parser, null );
-                    }
-                }
-
-                eventType = parser.next();
-            }
+            packaging = getPackaging( reader );
         }
         catch ( ItemNotFoundException e )
         {
@@ -151,6 +147,49 @@ public class MavenRepositoryMetadataLocator
         finally
         {
             IOUtil.close( reader );
+        }
+
+        return packaging;
+    }
+
+    private String getPackaging( Reader reader )
+        throws XmlPullParserException,
+            IOException
+    {
+        String packaging = "jar";
+
+        XmlPullParser parser = new MXParser();
+
+        parser.setInput( reader );
+
+        boolean foundRoot = false;
+
+        int eventType = parser.getEventType();
+
+        while ( eventType != XmlPullParser.END_DOCUMENT )
+        {
+            if ( eventType == XmlPullParser.START_TAG )
+            {
+                if ( parser.getName().equals( "project" ) )
+                {
+                    foundRoot = true;
+                }
+                else if ( parser.getName().equals( "packaging" ) )
+                {
+                    // 1st: if found project/packaging -> overwrite
+                    if ( parser.getDepth() == 2 )
+                    {
+                        packaging = StringUtils.trim( parser.nextText() );
+                        break;
+                    }
+                }
+                else if ( !foundRoot )
+                {
+                    throw new XmlPullParserException( "Unrecognised tag: '" + parser.getName() + "'", parser, null );
+                }
+            }
+
+            eventType = parser.next();
         }
 
         return packaging;

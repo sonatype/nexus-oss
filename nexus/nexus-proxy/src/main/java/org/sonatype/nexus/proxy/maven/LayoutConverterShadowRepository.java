@@ -29,8 +29,10 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.AbstractShadowRepository;
 import org.sonatype.nexus.proxy.repository.IncompatibleMasterRepositoryException;
@@ -412,5 +414,84 @@ public abstract class LayoutConverterShadowRepository
         sb.append( gav.getName() );
         return sb.toString();
     }
+
+    @Override
+    protected void deleteLink( StorageItem item, Map<String, Object> context )
+        throws UnsupportedStorageOperationException,
+            IllegalOperationException,
+            ItemNotFoundException,
+            StorageException
+    {
+        String shadowPath = transformMaster2Shadow( item.getPath() );
+
+        if ( shadowPath != null )
+        {
+            deleteItem( createUid( shadowPath ), context );
+        }
+    }
+
+    @Override
+    protected void createLink( StorageItem item, Map<String, Object> context )
+        throws UnsupportedStorageOperationException,
+            IllegalOperationException,
+            StorageException
+    {
+        String shadowPath = transformMaster2Shadow( item.getPath() );
+
+        if ( shadowPath != null )
+        {
+            DefaultStorageLinkItem link = new DefaultStorageLinkItem( this, shadowPath, true, true, item
+                .getRepositoryItemUid() );
+
+            storeItem( link );
+        }
+    }
+
+    /**
+     * Gets the shadow path from master path. If path is not transformable, return null.
+     * 
+     * @param path the path
+     * @return the shadow path
+     */
+    protected abstract String transformMaster2Shadow( String path );
+
+    @Override
+    protected StorageItem doRetrieveItem( RepositoryItemUid uid, Map<String, Object> context )
+        throws IllegalOperationException,
+            ItemNotFoundException,
+            StorageException
+    {
+        StorageItem result = null;
+
+        try
+        {
+            result = super.doRetrieveItem( uid, context );
+
+            return result;
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // if it is thrown by super.doRetrieveItem()
+            String transformedPath = transformShadow2Master( uid.getPath() );
+
+            if ( transformedPath == null )
+            {
+                throw new ItemNotFoundException( uid.getPath() );
+            }
+
+            // delegate the call to the master
+            RepositoryItemUid tuid = getMasterRepository().createUid( transformedPath );
+
+            return doRetrieveItemFromMaster( tuid, context );
+        }
+    }
+
+    /**
+     * Gets the master path from shadow path. If path is not transformable, return null.
+     * 
+     * @param path the path
+     * @return the master path
+     */
+    protected abstract String transformShadow2Master( String path );
 
 }
