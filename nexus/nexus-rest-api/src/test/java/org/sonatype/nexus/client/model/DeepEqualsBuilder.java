@@ -103,7 +103,7 @@ public class DeepEqualsBuilder
                         Class testClass = getTestClass( lhsChild, rhsChild );
                         boolean hasEqualsMethod = classHasEqualsMethod( testClass );
 
-                        if ( testClass != null && testClass.getDeclaredFields().length > 0 && !hasEqualsMethod )
+                        if ( testClass != null && !hasEqualsMethod )
                         {
                             reflectionAppend( lhsChild, rhsChild, testClass, builder, useTransients, excludeFields );
                         }
