@@ -1225,11 +1225,10 @@ Sonatype.repoServer.ExternapRoleMappingPopup = function( config ) {
             editable: false,
             forceSelection: true,
             mode: 'local',
-            lastQuery: '',
+            triggerAction: 'all',
             emptyText: 'Select...',
             selectOnFocus: true,
-            allowBlank: false,
-            lazyInit: false
+            allowBlank: false
           }
         ],
         buttons: [
