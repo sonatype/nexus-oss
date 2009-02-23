@@ -354,11 +354,23 @@ Sonatype.repoServer.RoleEditPanel = function(config){
       },
       {
         id: 'role-add-btn',
-        text:'Add',
+        text:'Add...',
         icon: Sonatype.config.resourcePath + '/images/icons/add.png',
         cls: 'x-btn-text-icon',
         scope: this,
-        handler: this.addResourceHandler,
+        menu: new Sonatype.menu.Menu({
+          payload: this,
+          scope: this,
+          items: [{
+            text: 'Nexus Role',
+            handler: this.addResourceHandler
+          },
+          {
+            id: 'role-map-menu-item',
+            text: 'External Role Mapping',
+            handler: this.mapExternalRoles,
+            disabled: true
+          }]}),
         disabled: !this.sp.checkPermission('nexus:roles', this.sp.CREATE)
       },
       {
@@ -369,15 +381,6 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         scope:this,
         handler: this.deleteHandler,
         disabled: !this.sp.checkPermission('nexus:roles', this.sp.DELETE)
-      },
-      {
-        id: 'role-map-btn',
-        text: 'Map External Role',
-        icon: Sonatype.config.resourcePath + '/images/icons/page_white_put.png',
-        cls: 'x-btn-text-icon',
-        scope: this,
-        handler: this.mapExternalRoles,
-        disabled: true
       }
     ],
 
@@ -539,7 +542,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     }
   },
   
-  addResourceHandler : function( button, event, valueRec ) {
+  addResourceHandler : function( button, menuItem, event, valueRec ) {
 	
     var id = 'new_role_' + new Date().getTime();
 
@@ -1134,7 +1137,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
 
     // if there are any realms left, enable the mapping button
     if ( store.getCount() > 0 ) { //&& this.sp.checkPermission( 'nexus:roles', this.sp.CREATE ) ) {
-      Ext.getCmp( 'role-map-btn' ).enable();
+      Ext.getCmp( 'role-map-menu-item' ).enable();
     }
   },
   
@@ -1270,7 +1273,7 @@ Ext.extend( Sonatype.repoServer.ExternapRoleMappingPopup, Ext.Window, {
     if ( this.hostPanel ) {
       var roleId = this.find( 'name', 'roleId' )[0].getValue();
       var roleRec = this.roleStore.getById( roleId );
-      this.hostPanel.addResourceHandler( button, e, roleRec );
+      this.hostPanel.addResourceHandler( button, null, e, roleRec );
       this.close();
     }
   }
