@@ -47,7 +47,9 @@ public class Nexus1375LogConfigTest
     {
         LogConfigResource resource = messageUtil.getLogConfig();
 
-        Assert.assertEquals( "DEBUG, logfile", resource.getRootLogger() );
+        Assert.assertEquals( "DEBUG", resource.getRootLoggerLevel() );
+        
+        Assert.assertEquals( "logfile", resource.getRootLoggerAppenders() );
 
         Assert.assertEquals( "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n", resource.getFileAppenderPattern() );
 
@@ -64,18 +66,19 @@ public class Nexus1375LogConfigTest
     {
         LogConfigResource resource = messageUtil.getLogConfig();
 
-        Assert.assertEquals( "DEBUG, logfile", resource.getRootLogger() );
+        Assert.assertEquals( "DEBUG", resource.getRootLoggerLevel() );
+        Assert.assertEquals( "logfile", resource.getRootLoggerAppenders() );
 
-        resource.setRootLogger( "INFO, logfile" );
-
-        messageUtil.updateLogConfig( resource );
-
-        Assert.assertEquals( "INFO, logfile", messageUtil.getLogConfig().getRootLogger() );
-
-        resource.setRootLogger( "DEBUG, logfile" );
+        resource.setRootLoggerLevel( "ERROR" );
 
         messageUtil.updateLogConfig( resource );
 
-        Assert.assertEquals( "DEBUG, logfile", messageUtil.getLogConfig().getRootLogger() );
+        Assert.assertEquals( "ERROR", resource.getRootLoggerLevel() );
+
+        resource.setRootLoggerLevel( "DEBUG");
+
+        messageUtil.updateLogConfig( resource );
+
+        Assert.assertEquals( "DEBUG", resource.getRootLoggerLevel() );
     }
 }
