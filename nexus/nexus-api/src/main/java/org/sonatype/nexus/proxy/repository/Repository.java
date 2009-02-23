@@ -332,6 +332,13 @@ public interface Repository
     void clearCaches( String path );
 
     /**
+     * Purges the NFC caches from path and below.
+     * 
+     * @param path
+     */
+    void clearNotFoundCaches( String path );
+
+    /**
      * Evicts items that were last used before timestamp.
      * 
      * @param timestamp

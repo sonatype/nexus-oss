@@ -438,7 +438,7 @@ public abstract class AbstractRepository
             path = RepositoryItemUid.PATH_ROOT;
         }
 
-        getLogger().info( "Expiring cache in repository ID='" + getId() + "' from path='" + path + "'" );
+        getLogger().info( "Expiring local cache in repository ID='" + getId() + "' from path='" + path + "'" );
 
         // 1st, expire all the files below path
         DefaultWalkerContext ctx = new DefaultWalkerContext( this );
@@ -448,6 +448,19 @@ public abstract class AbstractRepository
         walker.walk( ctx, path );
 
         // 2nd, remove the items from NFC
+        clearNotFoundCaches( path );
+    }
+
+    public void clearNotFoundCaches( String path )
+    {
+        if ( StringUtils.isBlank( path ) )
+        {
+            path = RepositoryItemUid.PATH_ROOT;
+        }
+
+        getLogger().info( "Clearing NFC cache in repository ID='" + getId() + "' from path='" + path + "'" );
+
+        // remove the items from NFC
         if ( RepositoryItemUid.PATH_ROOT.equals( path ) )
         {
             // purge all
