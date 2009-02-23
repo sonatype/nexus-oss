@@ -112,7 +112,7 @@ Sonatype.utils = {
       }
     }
 
-    if ( response.status == 403 || response.status == 401 ) {
+    if ( !options.dontForceLogout && (response.status == 403 || response.status == 401 )) {
       if ( options && options.options && options.options.ignore401 ) {
         return;
       }
