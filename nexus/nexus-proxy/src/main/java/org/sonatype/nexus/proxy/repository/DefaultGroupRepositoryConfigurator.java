@@ -37,7 +37,7 @@ public class DefaultGroupRepositoryConfigurator
 {
     @Requirement
     private RepositoryRegistry repositoryRegistry;
-    
+
     @SuppressWarnings( "unchecked" )
     public GroupRepository updateRepositoryFromModel( GroupRepository old, ApplicationConfiguration configuration,
         CRepositoryGroup group, LocalRepositoryStorage ls )
@@ -46,7 +46,9 @@ public class DefaultGroupRepositoryConfigurator
         AbstractGroupRepository repository = (AbstractGroupRepository) old;
 
         repository.setId( group.getGroupId() );
-        repository.setName( group.getName() );        
+        repository.setName( group.getName() );
+        
+        repository.setNotFoundCacheActive( false );
 
         File defaultStorageFile = new File( new File( configuration.getWorkingDirectory(), "storage" ), repository
             .getId() );
@@ -94,12 +96,12 @@ public class DefaultGroupRepositoryConfigurator
             throw new InvalidConfigurationException( response );
         }
 
-        for ( String repoId : (List<String>)group.getRepositories() )
+        for ( String repoId : (List<String>) group.getRepositories() )
         {
             try
             {
                 Repository repo = repositoryRegistry.getRepository( repoId );
-                
+
                 if ( !repository.getRepositoryContentClass().isCompatible( repo.getRepositoryContentClass() ) )
                 {
                     ValidationResponse response = new ApplicationValidationResponse();
@@ -128,7 +130,7 @@ public class DefaultGroupRepositoryConfigurator
                 throw new InvalidConfigurationException( response );
             }
         }
-        
+
         repository.setMemberRepositories( new ArrayList<String>( group.getRepositories() ) );
 
         return repository;
