@@ -580,6 +580,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         description: 'External mapping for ' + valueRec.data.name + ' (' + valueRec.data.source + ')', 
         sessionTimeout: 60
       };
+      
+      formPanel.find('name', 'id')[0].disable();
     }
     
     //add place holder to grid
