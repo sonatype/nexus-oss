@@ -3253,11 +3253,17 @@
       <version>1.0.0+</version>
       <fields>
         <field>
-          <name>rootLogger</name>
+          <name>rootLoggerLevel</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
         </field>
+        <field>
+          <name>rootLoggerAppenders</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>        
         <field>
           <name>fileAppenderLocation</name>
           <version>1.0.0+</version>

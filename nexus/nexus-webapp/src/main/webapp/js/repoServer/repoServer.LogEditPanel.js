@@ -18,8 +18,15 @@ Sonatype.repoServer.LogEditPanel = function(config){
 
   // help text alias
   var ht = Sonatype.repoServer.resources.help.log;
+  
   var formId = Ext.id();
 
+  var rootLoggerLevelStore = new Ext.data.SimpleStore({
+	  fields: ['value','display'], 
+	  data: [['DEBUG','DEBUG'],['INFO','INFO'],['ERROR','ERROR']]
+	  
+  });
+  
   this.formPanel = new Ext.FormPanel({  
     region: 'center',
     id: formId,
@@ -49,13 +56,30 @@ Sonatype.repoServer.LogEditPanel = function(config){
       },
       items: [
         {
-          xtype: 'textfield',
-          fieldLabel: 'Root Logger',
+          xtype: 'combo',
+          fieldLabel: 'Root Logger Level',
           itemCls: 'required-field',
           allowBlank: false,
-          helpText: ht.rootLogger,
-          name: 'rootLogger',
-          anchor: Sonatype.view.FIELD_OFFSET
+          width: 100,
+          helpText: ht.rootLoggerLevel,
+          name: 'rootLoggerLevel',
+          store: rootLoggerLevelStore,
+          valueField: 'value',
+          displayField: 'display',
+          mode: 'local',
+          triggerAction: 'all',
+          forceSelection: true,
+          selectOnFocus:true
+        },
+        {
+          xtype: 'textfield',
+          fieldLabel: 'Root Logger Appenders',
+          itemCls: 'required-field',
+          allowBlank: false,
+          helpText: ht.rootLoggerAppenders,
+          name: 'rootLoggerAppenders',
+          anchor: Sonatype.view.FIELD_OFFSET,
+          disabled: true
         },
         {
             xtype: 'textfield',
