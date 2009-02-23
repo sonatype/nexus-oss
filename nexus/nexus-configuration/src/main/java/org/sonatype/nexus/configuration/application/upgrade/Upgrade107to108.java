@@ -48,6 +48,7 @@ public class Upgrade107to108
             org.sonatype.nexus.configuration.model.CSecurity newSecurity = super.upgradeCSecurity( security, value );
             newSecurity.removeRealm( "NexusMethodAuthorizingRealm" );
             newSecurity.removeRealm( "NexusTargetAuthorizingRealm" );
+            newSecurity.removeRealm( "XmlMethodAuthorizingRealm" );
             newSecurity.addRealm( "XmlAuthorizingRealm" );
             
             return newSecurity;
