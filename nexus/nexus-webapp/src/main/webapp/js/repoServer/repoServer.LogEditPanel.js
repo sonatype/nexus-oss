@@ -77,30 +77,6 @@ Sonatype.repoServer.LogEditPanel = function(config){
           disabled: true
         }
       ]
-      },
-
-      {
-        xtype: 'fieldset',
-        checkboxToggle:true,
-        collapsed: true,
-        id: formId + '_' + 'logCustomize',
-        title: 'Log4j Customization (not yet implemented)',
-        anchor: Sonatype.view.FIELDSET_OFFSET,
-        autoHeight:true,
-        layoutConfig: {
-          labelSeparator: ''
-        },
-        listeners: {
-          'expand' : {
-            fn: this.logCustomizeExpandHandler,
-            scope: this
-          },
-          'collapse' : {
-            fn: this.logCustomizeCollapseHandler,
-            scope: this,
-            delay: 100
-          }
-        }
       }
     ],
 
@@ -179,19 +155,6 @@ Ext.extend(Sonatype.repoServer.LogEditPanel, Ext.Panel, {
       serviceDataObj : Sonatype.repoServer.referenceData.logConfig
       }
     );
-  },
-  
-  logCustomizeExpandHandler: function(){
-    var logConfigPanel = this.formPanel.findById(this.formPanel.getId() + '_logConfig' );
-    logConfigPanel.collapse();
-    logConfigPanel.disable();
-
-  },
-
-  logCustomizeCollapseHandler: function(){
-    var logConfigPanel = this.formPanel.findById(this.formPanel.getId() + '_logConfig' );
-    logConfigPanel.expand();
-    logConfigPanel.enable();
   }
 
 });
