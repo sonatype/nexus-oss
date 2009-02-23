@@ -47,6 +47,7 @@ public abstract class AbstractWebSiteRepository
 
             // add defaults
             welcomeFiles.add( "index.html" );
+            welcomeFiles.add( "index.htm" );
         }
 
         return welcomeFiles;
@@ -59,7 +60,7 @@ public abstract class AbstractWebSiteRepository
     {
         StorageItem result = super.doRetrieveItem( uid, context );
 
-        if ( result instanceof StorageCollectionItem )
+        if ( result instanceof StorageCollectionItem && getWelcomeFiles().size() > 0 )
         {
             // it is a collection, check for one of the "welcome" files
             Collection<StorageItem> collItems = list( (StorageCollectionItem) result );

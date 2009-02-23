@@ -174,16 +174,6 @@
           <required>false</required>
         </field>
         <field>
-          <name>repositorySites</name>
-          <version>1.0.8+</version>
-          <description>The list of defined site repositories within Nexus.</description>
-          <association>
-            <type>CRepositoryWebSite</type>
-            <multiplicity>*</multiplicity>
-          </association>
-          <required>false</required>
-        </field>
-        <field>
           <!-- In 1.0.0 only, later changed to repositoryGrouping -->
           <name>repositoryGroups</name>
           <version>1.0.0</version>
@@ -1188,98 +1178,6 @@
           <description>mirror url</description>
         </field>
       </fields>
-    </class>
-
-    <!-- SITE REPOSES -->
-    <class>
-      <name>CRepositoryWebSite</name>
-      <version>1.0.8+</version>
-      <description>Site repository definition.</description>
-      <fields>
-        <field>
-          <name>id</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-          <description>Repository ID. It should uniquely identify this repository across Nexus.</description>
-        </field>
-        <field>
-          <name>name</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-          <description>Human readable Repository name.</description>
-        </field>
-        <field>
-          <name>localStatus</name>
-          <version>1.0.8+</version>
-          <type>String</type>
-          <required>true</required>
-          <description>The local status of repository.</description>
-          <defaultValue>inService</defaultValue>
-        </field>
-        <field>
-          <name>available</name>
-          <version>1.0.8+</version>
-          <type>boolean</type>
-          <required>true</required>
-          <description>If false, repository will deny any kind of request.</description>
-          <defaultValue>true</defaultValue>
-        </field>
-        <field>
-          <name>type</name>
-          <version>1.0.8+</version>
-          <type>String</type>
-          <required>true</required>
-          <description>Site type.</description>
-        </field>
-        <field>
-          <name>userManaged</name>
-          <version>1.0.8+</version>
-          <type>boolean</type>
-          <required>true</required>
-          <description>
-            If true, repository is user managed, and it is allowed to be edited/dropped by users.
-          </description>
-          <defaultValue>true</defaultValue>
-        </field>
-        <field>
-          <name>exposed</name>
-          <version>1.0.8+</version>
-          <type>boolean</type>
-          <required>true</required>
-          <description>
-            If true, repository is exposed at content.
-          </description>
-          <defaultValue>true</defaultValue>
-        </field>
-        <field>
-          <name>localStorage</name>
-          <version>1.0.8+</version>
-          <description>
-            The local storage definition of repository. It is optional element. If not defined, the
-            repository will
-            use the shared
-            local storage.
-          </description>
-          <association>
-            <type>CLocalStorage</type>
-          </association>
-          <required>false</required>
-        </field>
-      </fields>
-      <codeSegments>
-        <codeSegment>
-          <version>1.0.8+</version>
-          <code><![CDATA[
-  /* A field that "carries" the Configuration modelVersion with object */
-    public final String modelVersion = Configuration.MODEL_VERSION;
-    
-    /* A field to store the default local storage URL */
-    public transient String defaultLocalStorageUrl;
-]]></code>
-        </codeSegment>
-      </codeSegments>
     </class>
 
     <!-- SHADOW REPOSES -->

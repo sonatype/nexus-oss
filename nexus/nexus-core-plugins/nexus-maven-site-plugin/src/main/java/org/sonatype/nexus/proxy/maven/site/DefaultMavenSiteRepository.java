@@ -29,7 +29,7 @@ import org.sonatype.nexus.proxy.repository.WebSiteRepository;
  * 
  * @author cstamas
  */
-@Component( role = WebSiteRepository.class, hint = "maven-site", instantiationStrategy = "per-lookup", description = "Maven Generated Site Repository" )
+@Component( role = WebSiteRepository.class, hint = "maven-site", instantiationStrategy = "per-lookup", description = "Maven Site Repository" )
 public class DefaultMavenSiteRepository
     extends AbstractWebSiteRepository
     implements MavenSiteRepository

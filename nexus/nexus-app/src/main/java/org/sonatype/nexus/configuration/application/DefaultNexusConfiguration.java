@@ -44,7 +44,6 @@ import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
-import org.sonatype.nexus.configuration.model.CRepositoryWebSite;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
@@ -61,7 +60,6 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.Target;
@@ -340,12 +338,6 @@ public class DefaultNexusConfiguration
         return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repositoryGroup );
     }
 
-    public WebSiteRepository createRepositoryFromModel( Configuration configuration, CRepositoryWebSite repositorySite )
-        throws InvalidConfigurationException
-    {
-        return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repositorySite );
-    }
-
     public Collection<ContentClass> listRepositoryContentClasses()
     {
         return Collections.unmodifiableList( contentClasses );
@@ -474,19 +466,6 @@ public class DefaultNexusConfiguration
             for ( CRepositoryShadow shadow : shadows )
             {
                 Repository repository = createRepositoryFromModel( getConfiguration(), shadow );
-
-                // shadows has no index
-                repositoryRegistry.addRepository( repository );
-            }
-        }
-
-        if ( getConfiguration().getRepositorySites() != null )
-        {
-            List<CRepositoryWebSite> sites = getConfiguration().getRepositorySites();
-
-            for ( CRepositoryWebSite site : sites )
-            {
-                Repository repository = createRepositoryFromModel( getConfiguration(), site );
 
                 // shadows has no index
                 repositoryRegistry.addRepository( repository );
