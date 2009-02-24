@@ -163,6 +163,7 @@ public class M2Repository
         return super.doCacheItem( item );
     }
 
+    @Override
     protected boolean isOld( StorageItem item )
     {
         if ( M2ArtifactRecognizer.isMetadata( item.getPath() ) )

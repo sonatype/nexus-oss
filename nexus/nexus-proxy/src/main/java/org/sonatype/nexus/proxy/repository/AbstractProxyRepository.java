@@ -475,7 +475,7 @@ public abstract class AbstractProxyRepository
                                 if ( getLogger().isDebugEnabled() )
                                 {
                                     getLogger().debug(
-                                        "Newer version of item " + uid.toString() + " is found on remote storage." );
+                                        "No newer version of item " + uid.toString() + " found on remote storage." );
                                 }
                             }
                             else
@@ -483,7 +483,7 @@ public abstract class AbstractProxyRepository
                                 if ( getLogger().isDebugEnabled() )
                                 {
                                     getLogger().debug(
-                                        "No newer version of item " + uid.toString() + " found on remote storage." );
+                                        "Newer version of item " + uid.toString() + " is found on remote storage." );
                                 }
                             }
 
@@ -854,7 +854,7 @@ public abstract class AbstractProxyRepository
         }
 
         // if repo is non-expirable, false
-        if ( maxAge < 1 )
+        if ( maxAge < 0 )
         {
             return false;
         }

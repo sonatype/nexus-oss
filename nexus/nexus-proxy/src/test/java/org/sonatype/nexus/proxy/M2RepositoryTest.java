@@ -13,10 +13,14 @@
  */
 package org.sonatype.nexus.proxy;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.nexus.artifact.VersionUtils;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -244,5 +248,114 @@ public class M2RepositoryTest
         assertEquals( true, VersionUtils.isSnapshot( "1.0.0-SNAPSHOT" ) );
         assertEquals( false, VersionUtils.isSnapshot( "1.0-alpha-25" ) );
         assertEquals( true, VersionUtils.isSnapshot( "1.0-alpha-25-20070518.002146-2" ) );
+    }
+
+    public void testExpiration_NEXUS1675()
+        throws Exception
+    {
+        CounterListener ch = new CounterListener();
+
+        M2Repository repository = (M2Repository) getResourceStore();
+
+        repository.addProximityEventListener( ch );
+
+        File mdFile = new File( new File( getBasedir() ), "target/test-classes/repo1/spoof/maven-metadata.xml" );
+
+        assertTrue( mdFile.exists() );
+
+        // ==
+
+        try
+        {
+            repository.deleteItem( new ResourceStoreRequest( "/spoof", true ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore
+        }
+
+        repository.setMetadataMaxAge( 0 );
+
+        mdFile.setLastModified( System.currentTimeMillis() - ( 3L * 24L * 60L * 60L * 1000L ) );
+
+        Thread.sleep( 200 ); // wait for FS
+
+        repository.retrieveItem( new ResourceStoreRequest( "/spoof/maven-metadata.xml", false ) );
+
+        mdFile.setLastModified( System.currentTimeMillis() - ( 2L * 24L * 60L * 60L * 1000L ) );
+
+        Thread.sleep( 200 ); // wait for FS
+
+        repository.retrieveItem( new ResourceStoreRequest( "/spoof/maven-metadata.xml", false ) );
+
+        mdFile.setLastModified( System.currentTimeMillis() - ( 1L * 24L * 60L * 60L * 1000L ) );
+
+        Thread.sleep( 200 ); // wait for FS
+
+        repository.retrieveItem( new ResourceStoreRequest( "/spoof/maven-metadata.xml", false ) );
+
+        assertEquals( "Every request should end up in server.", 3, ch.getRequestCount() );
+
+        // ==
+
+        ch.reset();
+
+        try
+        {
+            repository.deleteItem( new ResourceStoreRequest( "/spoof", true ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore
+        }
+
+        repository.setMetadataMaxAge( 5 );
+
+        mdFile.setLastModified( System.currentTimeMillis() );
+
+        Thread.sleep( 200 ); // wait for FS
+
+        repository.retrieveItem( new ResourceStoreRequest( "/spoof/maven-metadata.xml", false ) );
+
+        mdFile.setLastModified( System.currentTimeMillis() );
+
+        Thread.sleep( 200 ); // wait for FS
+
+        repository.retrieveItem( new ResourceStoreRequest( "/spoof/maven-metadata.xml", false ) );
+
+        mdFile.setLastModified( System.currentTimeMillis() );
+
+        Thread.sleep( 200 ); // wait for FS
+
+        repository.retrieveItem( new ResourceStoreRequest( "/spoof/maven-metadata.xml", false ) );
+
+        assertEquals( "Only one (1st) of the request should end up in server.", 1, ch.getRequestCount() );
+    }
+
+    // ==
+
+    protected class CounterListener
+        implements EventListener
+    {
+        private int requestCount = 0;
+
+        public int getRequestCount()
+        {
+            return this.requestCount;
+        }
+
+        public void reset()
+        {
+            this.requestCount = 0;
+        }
+
+        public void onProximityEvent( AbstractEvent evt )
+        {
+            if ( evt instanceof RepositoryItemEventCache
+                && ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith( "maven-metadata.xml" ) )
+            {
+                requestCount = requestCount + 1;
+            }
+        }
     }
 }
