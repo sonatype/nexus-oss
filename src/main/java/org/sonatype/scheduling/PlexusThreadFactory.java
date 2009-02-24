@@ -56,7 +56,8 @@ public class PlexusThreadFactory
     {
         Thread result = new Thread( schedulerThreadGroup, r, namePrefix + threadNumber.getAndIncrement() );
 
-        result.setContextClassLoader( plexusContainer.getLookupRealm() );
+        // using plexusContainer.getLookupRealm() is NOT Thread pool friendly, it uses a ThreadLocal
+        // result.setContextClassLoader( plexusContainer.getLookupRealm() );
 
         result.setDaemon( false );
         
