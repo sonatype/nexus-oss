@@ -831,7 +831,12 @@ public abstract class AbstractRepository
                 getLogger().debug( getId() + " retrieveItem() :: NOT FOUND " + uid.toString() );
             }
 
-            addToNotFoundCache( uid.getPath() );
+            // if not local/remote only, add it to NFC
+            if ( !ContextUtils.isFlagTrue( context, ResourceStoreRequest.CTX_LOCAL_ONLY_FLAG )
+                && !ContextUtils.isFlagTrue( context, ResourceStoreRequest.CTX_REMOTE_ONLY_FLAG ) )
+            {
+                addToNotFoundCache( uid.getPath() );
+            }
 
             throw ex;
         }
