@@ -77,7 +77,7 @@ Sonatype.repoServer.resources.help = {
   // Groups Config help text
   groups : {
     id : 'The unique id for the group. This id will become part of the url so it should not contain spaces.',
-    name : 'The human readable group name used in the UI and logs.'
+    name : 'The Group Name which is referenced in the UI and Logs.'
   },
 
   // Routes Config help text
@@ -132,7 +132,7 @@ Sonatype.repoServer.resources.help = {
   repos : {
     // shared across types of repositories
     id : 'The unique id for the repository. This id will become part of the url so it should not contain spaces.',
-    name : 'This is the human readable repository name used in the UI and logs.',
+    name : 'The Repository Name which is referenced in the UI and Logs.',
     repoType : 'Nexus supports 3 repository types: Hosted = Normal repository owned by this Nexus instance, Proxy = Retrieve artifacts from the remote repository and store them locally, Virtual = A logical view of another repository configured in Nexus (For example, to provide a Maven 1 view of an existing Maven 2 repository)',
     repoPolicy : 'Repositories can store either all Release artifacts or all Snapshot artifacts.',
     defaultLocalStorageUrl : 'This is the location on the file system used to host the artifacts. It is contained by the Working Directory set in the Server configuration.',
