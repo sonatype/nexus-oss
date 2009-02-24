@@ -512,10 +512,10 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
         this.el.unmask();
 
         if ( success ) {
-          this.formPanel.buttons[1].setText( 'Close' );
+          this.formPanel.buttons[2].setText( 'Close' );
           Sonatype.MessageBox.show( {
-            title: 'Import Successful',
-            msg: 'Artifactory backup import completed successfully',
+            title: 'Import Scheduled',
+            msg: 'Artifactory backup import scheduled',
             buttons: Sonatype.MessageBox.OK,
             icon: Sonatype.MessageBox.INFO
           } );

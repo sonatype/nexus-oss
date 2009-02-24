@@ -84,7 +84,7 @@ public class SecurityConfigConvertor
 
     public MigrationResult convert()
     {
-        this.logger.info( "Starging Artifactory Security Migration." );
+        this.logger.info( "Starting Artifactory Security Migration." );
         try
         {
             this.buildTargetSuites();

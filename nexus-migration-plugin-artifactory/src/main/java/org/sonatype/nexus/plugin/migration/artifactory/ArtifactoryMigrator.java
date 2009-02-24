@@ -730,7 +730,6 @@ public class ArtifactoryMigrator
             if ( logDir != null )
             {
                 this.logFile = new File( logDir, LOGFILE_NAME ).getAbsolutePath();
-                ;
             }
         }
         catch ( IOException e )
