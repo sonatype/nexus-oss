@@ -373,10 +373,22 @@ public class SecurityConfigConvertor
                 }
                 catch ( ArtifactoryMigrationException e )
                 {
-                    this.migrationResult.addErrorMessage( "Failed to add user: '" + user.getId() + "'." );
+                    this.migrationResult.addErrorMessage( "Failed to import user: '" + user.getId() + "'." );
+
+                    logger.info( "Failed to import user '" + user.getId() + "'." );
+
+                    if ( logger.isDebugEnabled() )
+                    {
+                        logger.debug( "The cause is: ", e );
+                    }
                 }
 
                 users.add( user );
+
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "User '" + user.getId() + "' was imported successfully" );
+                }
             }
         }
     }

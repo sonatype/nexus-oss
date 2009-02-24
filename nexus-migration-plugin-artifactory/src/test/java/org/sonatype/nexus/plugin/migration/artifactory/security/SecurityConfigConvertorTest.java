@@ -24,6 +24,7 @@ import org.sonatype.jsecurity.realms.tools.dao.SecurityProperty;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
+import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
 import org.sonatype.nexus.plugin.migration.artifactory.MigrationResult;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
@@ -66,6 +67,9 @@ public class SecurityConfigConvertorTest
         config.addUser( admin );
         config.addUser( user );
         config.addUser( user1 );
+        
+        ArtifactoryUser wrongUser = new ArtifactoryUser( "wrong-user", "5f4dcc3b5aa765d61d8327deb882cf99" );
+        config.addUser( wrongUser );
 
         // repoPaths
         ArtifactoryPermissionTarget apache = new ArtifactoryPermissionTarget( "apachePermTarget", "apache" );
@@ -273,7 +277,14 @@ public class SecurityConfigConvertorTest
         }
 
         public void receiveSecurityUser( SecurityUser user )
+            throws ArtifactoryMigrationException
         {
+            // simulate an exception while receiving user
+            if ( user.getId().equals( "wrong-user" ) )
+            {
+                throw new ArtifactoryMigrationException( "User 'wrong-user' could not be imported" );
+            }
+
             userList.add( user );
         }
     }
