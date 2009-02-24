@@ -204,7 +204,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                   },
                   {
                     xtype: 'button',
-                    text: 'Load',
+                    text: 'Upload',
                     id: 'artifactory-import-browse-button',
                     columnWidth: .1,
                     handler: this.loadBackup,
