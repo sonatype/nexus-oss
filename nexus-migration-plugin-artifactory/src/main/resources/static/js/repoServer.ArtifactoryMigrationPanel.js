@@ -221,7 +221,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
           {
             xtype: 'fieldset',
             checkboxToggle: false,
-            title: '2. Customize Import',
+            title: '2. Customize Import on Artifactory Import',
             anchor: Sonatype.view.FIELDSET_OFFSET_WITH_SCROLL,
             autoHeight: true,
             collapsed: true,
