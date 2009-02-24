@@ -14,6 +14,8 @@
 package org.sonatype.nexus.tools.repository;
 
 import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -25,111 +27,99 @@ public class RepositoryConvertorTest
 {
     private RepositoryConvertor convertor;
 
-    private File repository = new File( "src/test/resources/local-test-repo" );
-
-    private File moveTargetPath = new File( "target/convert-output-move" );
-
-    private File copyTargetPath = new File( "target/convert-output-copy" );
-
-    public void setUp() throws Exception
-    {
-        convertor = (RepositoryConvertor) this.lookup( RepositoryConvertor.class );
-
-        if ( copyTargetPath.exists() )
-        {
-            deleteFile( copyTargetPath );
-        }
-
-        copyTargetPath.mkdir();
-
-        if ( moveTargetPath.exists() )
-        {
-            deleteFile( moveTargetPath );
-        }
-
-        moveTargetPath.mkdir();
-    }
-
-    public void testConvert()
+    public void setUp()
         throws Exception
     {
-
-        convertor.convertRepositoryWithCopy( repository, copyTargetPath );
-
-        assertTargetRepositoryContent( copyTargetPath );
-
+        convertor = (RepositoryConvertor) this.lookup( RepositoryConvertor.class );
     }
-
-    private void deleteFile( File file )
+    
+    public void testConvertWithCopy()
+        throws Exception
     {
-        if ( file.isDirectory() )
-        {
-            for ( File subFile : file.listFiles() )
-            {
-                deleteFile( subFile );
-            }
-        }
-        file.delete();
-    }
+        File srcRepo = new File( getBasedir(), "target/test-classes/local-test-repo" );
+        File target = new File( getBasedir(), "target" );
 
-    private void assertTargetRepositoryContent( File targetPath )
-    {
-        assertTrue( new File( targetPath, "local-test-repo-releases/org/apache/maven/plugins/maven-javadoc-plugin/2.5/" )
-            .isDirectory() );
-        assertTrue( new File( targetPath, "local-test-repo-releases/org/apache/maven/plugins/maven-javadoc-plugin/2.5/" )
-            .exists() );
-
-        assertTrue( new File(
-            targetPath,
-            "local-test-repo-releases/org/apache/maven/plugins/maven-javadoc-plugin/2.5/maven-javadoc-plugin-2.5.jar" )
-            .isFile() );
-        assertTrue( new File(
-            targetPath,
-            "local-test-repo-releases/org/apache/maven/plugins/maven-javadoc-plugin/2.5/maven-javadoc-plugin-2.5.jar" )
-            .exists() );
-
-        assertTrue( new File(
-            targetPath,
-            "local-test-repo-releases/org/apache/maven/plugins/maven-javadoc-plugin/2.5/maven-javadoc-plugin-2.5.pom" )
-            .isFile() );
-        assertTrue( new File(
-            targetPath,
-            "local-test-repo-releases/org/apache/maven/plugins/maven-javadoc-plugin/2.5/maven-javadoc-plugin-2.5.pom" )
-            .exists() );
-
-        assertTrue( new File(
-            targetPath,
-            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/" ).isDirectory() );
-        assertTrue( new File(
-            targetPath,
-            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/" ).exists() );
-
-        assertTrue( new File(
-            targetPath,
-            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-javadoc-plugin-2.5.1-20081013.050423-737.jar" )
-            .isFile() );
-        assertTrue( new File(
-            targetPath,
-            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-javadoc-plugin-2.5.1-20081013.050423-737.jar" )
-            .exists() );
-
-        assertTrue( new File(
-            targetPath,
-            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-javadoc-plugin-2.5.1-20081013.050423-737.pom" )
-            .isFile() );
-        assertTrue( new File(
-            targetPath,
-            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-javadoc-plugin-2.5.1-20081013.050423-737.pom" )
-            .exists() );
+        File targetReleasesRepo = new File( getBasedir(), "target/local-test-repo-releases" );
+        File targetSnapshotsRepo = new File( getBasedir(), "target/local-test-repo-snapshots" );
         
-        // maven-metadata files should be filtered
-        assertFalse( new File(
-            targetPath,
-            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-metadata-central.xml" )
-            .exists() );
-        assertFalse( new File(
-            targetPath,
-            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-metadata-central.xml.sha1" )
-            .exists() );
+        convertor.convertRepositoryWithCopy( srcRepo, target );
+        
+        Map<File, Boolean> expected = new LinkedHashMap<File, Boolean>();
+        
+        expected.put( new File( targetReleasesRepo, "org/apache/maven/plugins/maven-javadoc-plugin/2.5/"), Boolean.TRUE );
+        expected.put( new File( targetReleasesRepo, "org/apache/maven/plugins/maven-javadoc-plugin/2.5/maven-javadoc-plugin-2.5.jar"), Boolean.TRUE );
+        expected.put( new File( targetReleasesRepo, "org/apache/maven/plugins/maven-javadoc-plugin/2.5/maven-javadoc-plugin-2.5.pom"), Boolean.TRUE );
+        expected.put( new File( targetSnapshotsRepo, "org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/"), Boolean.TRUE );
+        expected.put( new File( targetSnapshotsRepo, "org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-javadoc-plugin-2.5.1-20081013.050423-737.jar"), Boolean.TRUE );
+        expected.put( new File( targetSnapshotsRepo, "org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-javadoc-plugin-2.5.1-20081013.050423-737.pom"), Boolean.TRUE );
+        expected.put( new File( targetSnapshotsRepo,"org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-metadata-central.xml"), Boolean.FALSE);
+        expected.put( new File( targetSnapshotsRepo,"org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-metadata-central.xml.sha1"), Boolean.FALSE);
+        
+        validateResult( expected );
+    }
+    
+    public void testConvertWithMove()
+        throws Exception
+    {
+        File srcRepo = new File( getBasedir(), "target/test-classes/local-test-repo" );
+        File target = new File( getBasedir(), "target" );
+
+        convertor.convertRepositoryWithMove( srcRepo, target );
+
+        Map<File, Boolean> expected = new LinkedHashMap<File, Boolean>();
+
+        expected.put( srcRepo, Boolean.FALSE );
+
+        validateResult( expected );
+    }
+
+    public void testNexus1667()
+        throws Exception
+    {
+        File srcRepo = new File( getBasedir(), "target/test-classes/nexus-1667-repo" );
+        File target = new File( getBasedir(), "target" );
+
+        File targetReleasesRepo = new File( getBasedir(), "target/nexus-1667-repo-releases" );
+        File targetSnapshotsRepo = new File( getBasedir(), "target/nexus-1667-repo-snapshots" );
+
+        convertor.convertRepositoryWithCopy( srcRepo, target );
+
+        Map<File, Boolean> expected = new LinkedHashMap<File, Boolean>();
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/eclipse/emf/ecore/2.3.0-v200706262000/ecore-2.3.0-v200706262000.jar" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/eclipse/emf/ecore/2.3.0-v200706262000/ecore-2.3.0-v200706262000.pom" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/eclipse/emf/ecore/change/2.3.0-v200706262000/change-2.3.0-v200706262000.jar" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/eclipse/emf/ecore/change/2.3.0-v200706262000/change-2.3.0-v200706262000.pom" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/eclipse/emf/ecore/edit/2.3.0-v200706262000/edit-2.3.0-v200706262000.jar" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/eclipse/emf/ecore/edit/2.3.0-v200706262000/edit-2.3.0-v200706262000.pom" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/eclipse/emf/ecore/xml/2.3.0-v200706262000/xml-2.3.0-v200706262000.jar" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/eclipse/emf/ecore/xml/2.3.0-v200706262000/xml-2.3.0-v200706262000.pom" ), Boolean.TRUE );
+
+        validateResult( expected );
+    }
+
+    private void validateResult( Map<File, Boolean> expected )
+    {
+        for ( File file : expected.keySet() )
+        {
+            Boolean actual = new Boolean( file.exists() );
+
+            assertEquals( "For file: " + file.getAbsolutePath(), expected.get( file ), actual );
+        }
     }
 }

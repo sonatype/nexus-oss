@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -44,14 +45,14 @@ public class DefaultRepositoryConvertor
     private List<ConvertorCommand> convertorCommands = new ArrayList<ConvertorCommand>();
 
     public void convertRepositoryWithCopy( File repository, File releasedTargetPath, File snapshotTargetPath,
-                                           FileFilter filter )
+        FileFilter filter )
         throws IOException
     {
         setUp( repository, releasedTargetPath, snapshotTargetPath, false, filter );
     }
 
     public void convertRepositoryWithMove( File repository, File releasedTargetPath, File snapshotTargetPath,
-                                           FileFilter filter )
+        FileFilter filter )
         throws IOException
     {
         setUp( repository, releasedTargetPath, snapshotTargetPath, true, filter );
@@ -60,7 +61,7 @@ public class DefaultRepositoryConvertor
     }
 
     private void setUp( File repository, File releasedTargetPath, File snapshotTargetPath, boolean move,
-                        FileFilter filter )
+        FileFilter filter )
         throws IOException
     {
         currentRepository = repository;
@@ -83,55 +84,41 @@ public class DefaultRepositoryConvertor
 
         convertorCommands.add( repositorySeperationConvertorCommand );
 
-        iterate( currentRepository, move );
+        List<File> operatableFiles = new LinkedList<File>();
+
+        iterate( currentRepository, operatableFiles );
+
+        executeCommands( operatableFiles );
 
     }
 
-    private void iterate( File file, boolean isMove )
+    private void executeCommands( List<File> operatableFiles )
         throws IOException
     {
-        List<File> artifactVersions = getArtifactVersions( file );
-
-        if ( !artifactVersions.isEmpty() )
+        for ( ConvertorCommand convertorCommand : convertorCommands )
         {
-            for ( ConvertorCommand convertorCommand : convertorCommands )
-            {
-                convertorCommand.execute( artifactVersions );
-            }
-        }
-        else if ( file.isDirectory() )
-        {
-            for ( File subFile : file.listFiles() )
-            {
-                iterate( subFile, isMove );
-            }
+            convertorCommand.execute( operatableFiles );
         }
     }
 
-    /**
-     * Check if the file is the artifact directory, which contains sub-directory named by version
-     *
-     * @param file
-     * @return
-     */
-    private List<File> getArtifactVersions( File file )
+    private void iterate( File file, List<File> operatableFiles )
+        throws IOException
     {
-        List<File> artifactVersions = new ArrayList<File>();
-
-        if ( !file.exists() || !file.isDirectory() )
+        if ( !file.isDirectory() )
         {
-            return artifactVersions;
+            return;
         }
-        else
+
+        if ( file.getName().matches( VERSION_REGEX ) )
         {
-            for ( File subFile : file.listFiles() )
-            {
-                if ( subFile.getName().matches( VERSION_REGEX ) )
-                {
-                    artifactVersions.add( subFile );
-                }
-            }
-            return artifactVersions;
+            operatableFiles.add( file );
+
+            return;
+        }
+
+        for ( File subFile : file.listFiles() )
+        {
+            iterate( subFile, operatableFiles );
         }
     }
 
