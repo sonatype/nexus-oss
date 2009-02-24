@@ -163,11 +163,9 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
       {
         style: 'padding: 10px;',
         cls: 'x-form-item',
-        html: 'Import an existing Artifactory configuration into Nexus.<br/><br/>' +
-          'In order to proceed, you first need to upload a .zip file with a configuration backup to ' +
-          'the server where Nexus is running. Once the file upload is complete you can specify its ' +
-          'location in the form below, and then you will be presented with a list of available ' +
-          'repositories and import options.'
+        html: 'The Artifactory Import is used to import an existing Artifactory configuration into Nexus.<br/><br/>' +
+          'In order to proceed, you will first place a .zip file with an Artifactory configuration backup to the server where Nexus is running.<br>' +
+          'Once the file is on the Nexus server, you will specify its location in Step 1. Load Artifactory Configuration, and then you will be presented with a list of available repositories and import options, which is customizable in Step 2. Customize Import on Artifactory Import.'
       },
       { 
         xtype: 'panel',
