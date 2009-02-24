@@ -138,9 +138,6 @@ Sonatype.utils = {
         }
       }
       else {
-        Sonatype.utils.clearCookie('JSESSIONID');
-        Sonatype.utils.clearCookie('nxRememberMe');
-
         Sonatype.MessageBox.show( {
           title: 'Authentication Error',
           msg: 'Your login is incorrect or your session has expired.<br />' +
