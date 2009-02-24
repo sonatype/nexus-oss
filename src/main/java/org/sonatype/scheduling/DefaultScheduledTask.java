@@ -371,7 +371,7 @@ public class DefaultScheduledTask<T>
             }
         }
 
-        // If manually running or having future, park this task to waiting        
+        // If manually running or having future, park this task to submitted
         if ( isManualRunScheduled() )
         {
             setTaskState( TaskState.SUBMITTED );
@@ -380,6 +380,18 @@ public class DefaultScheduledTask<T>
         {
             setTaskState( TaskState.WAITING );
 
+            setFuture( nextFuture );
+        }
+        // If disabled (and not manually run), 
+        // put to waiting and reschedule for next time
+        // user may want to enable at some point, 
+        // so still seeing the next run time may be handy
+        else if ( !isEnabled() )
+        {
+            setTaskState( TaskState.WAITING );
+            
+            nextFuture = reschedule();
+            
             setFuture( nextFuture );
         }
         else

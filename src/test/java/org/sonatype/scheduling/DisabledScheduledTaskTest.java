@@ -35,7 +35,7 @@ public class DisabledScheduledTaskTest
     public void testRunDisabledTaske()
         throws Exception
     {
-         ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this.getTestSchedule(), null );
+         ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this.getTestSchedule( 0 ), null );
        task.setEnabled( false );
          
         // manually run the task
@@ -47,9 +47,7 @@ public class DisabledScheduledTaskTest
             Thread.sleep( 300 );
         }
 
-//        // TODO what should the state be?
-//        System.out.println( "TaskState: "+ task.getTaskState() );
-         assertEquals( TaskState.WAITING, task.getTaskState() ); // if task is enabled
+         assertEquals( TaskState.WAITING, task.getTaskState() ); // if task is disabled
 
         assertEquals( 1, task.getResults().get( 0 ).intValue() );
 
@@ -61,9 +59,26 @@ public class DisabledScheduledTaskTest
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
     }
     
-    private Schedule getTestSchedule()
+    public void testDisabledTaskOnSchedule()
+        throws Exception
     {
-        Date startDate = new Date();
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this.getTestSchedule( 200 ), null );
+        task.setEnabled( false );
+        
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+        
+        Thread.sleep( 300 );
+        
+        assertNull( task.getLastRun() );
+        
+        assertNotNull( task.getNextRun() );
+        
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+    }
+    
+    private Schedule getTestSchedule( long waitTime )
+    {
+        Date startDate = new Date( System.currentTimeMillis() + waitTime );
         Calendar tempCalendar = Calendar.getInstance();
         tempCalendar.setTime( startDate );
         tempCalendar.add( Calendar.DATE, 7 );
