@@ -1,11 +1,7 @@
 package org.sonatype.nexus.plugin.migration.artifactory;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -16,7 +12,6 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.log4j.Appender;
@@ -78,6 +73,7 @@ public class ArtifactoryMigrator
         new NotFileFilter( new SuffixFileFilter( ".artifactory-metadata" ) );
 
     private static final String LOGFILE_NAME = "migration.log";
+
     /**
      * If the log directory cannot be figured out from the LogFileManager, this path is used.
      */
@@ -694,23 +690,10 @@ public class ArtifactoryMigrator
     {
         File tempDir = this.nexus.getNexusConfiguration().getTemporaryDirectory();
 
-        File artifactoryBackupZip =
-            File.createTempFile( FilenameUtils.getBaseName( fileItem.getName() ), ".zip", tempDir );
-
-        InputStream in = new FileInputStream( fileItem );
-        OutputStream out = new FileOutputStream( artifactoryBackupZip );
-
-        IOUtils.copy( in, out );
-
-        in.close();
-        out.close();
-
-        File artifactoryBackup =
-            new File( artifactoryBackupZip.getParentFile(),
-                      FilenameUtils.getBaseName( artifactoryBackupZip.getAbsolutePath() ) + "content" );
+        File artifactoryBackup = new File( tempDir, FilenameUtils.getBaseName( fileItem.getName() ) + "content" );
         artifactoryBackup.mkdirs();
 
-        zipUnArchiver.setSourceFile( artifactoryBackupZip );
+        zipUnArchiver.setSourceFile( fileItem );
         zipUnArchiver.setDestDirectory( artifactoryBackup );
         zipUnArchiver.extract();
 

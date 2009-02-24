@@ -13,6 +13,9 @@
 package org.sonatype.nexus.plugin.migration.artifactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -62,7 +65,7 @@ public abstract class AbstractArtifactoryMigrationPlexusResource
 
         xstream.registerLocalConverter( MigrationSummaryDTO.class, "groupsResolution", new AliasingListConverter(
             GroupResolutionDTO.class,
-            "groupResolution" ) );        
+            "groupResolution" ) );
     }
 
     protected File validateBackupFileLocation( String fileLocation )
@@ -70,12 +73,28 @@ public abstract class AbstractArtifactoryMigrationPlexusResource
     {
         File file = new File( fileLocation );
 
-        if ( file.exists() && file.isFile() )
+        if ( !file.exists() || !file.isFile() )
         {
-            return file;
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid File Location: " + file.getAbsolutePath() );
         }
 
-        throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid File Location." );
+        ZipFile zip;
+        try
+        {
+            zip = new ZipFile(file);
+            zip.close();
+        }
+        catch ( ZipException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid file format. Is not a Zip. " + e.getMessage() );
+        }
+        catch ( IOException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Unable to read file. " + e.getMessage() );
+        }
+
+        return file;
+
     }
 
 }
