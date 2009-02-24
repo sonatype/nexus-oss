@@ -457,6 +457,10 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
   },
   
   startImport: function() {
+    Ext.MessageBox.confirm('Warning', 'Loading the Artifactory Configuration could take a long period of time depending on the amount of information you are attempting to import. Your Nexus instance will be unusable during this time. Continue?' , this.proceedImport, this);	
+  },
+
+  proceedImport: function() {
     this.el.mask( 'Importing...' );
     this.formPanel.buttons[0].disable();
 
