@@ -727,7 +727,7 @@ public class ArtifactoryMigrator
             loggers.add( Logger.getLogger( SecurityConfigConvertor.class ) );
             loggers.add( this.logger );
 
-            Layout layout = new PatternLayout( "%d{mm/dd/yyyy HH:mm:ss zzz}: [%-5p] %m%n" );
+            Layout layout = new PatternLayout( "%d{MM/dd/yyyy HH:mm:ss zzz}: [%-5p] %m%n" );
             Appender appender = new DailyRollingFileAppender( layout, this.logFile, "yyyy-mm-dd" );
 
             for ( Logger tmpLogger : loggers )
