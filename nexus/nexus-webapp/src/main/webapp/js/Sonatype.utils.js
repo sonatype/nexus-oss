@@ -111,6 +111,10 @@ Sonatype.utils = {
         serverMessage = r.substring( n1, n2 );
       }
     }
+    
+    if ( options.options == undefined) {
+      options.options = { dontForceLogout : false };
+    }
 
     if ( !options.options.dontForceLogout && (response.status == 403 || response.status == 401 )) {
       if ( options && options.options && options.options.ignore401 ) {
