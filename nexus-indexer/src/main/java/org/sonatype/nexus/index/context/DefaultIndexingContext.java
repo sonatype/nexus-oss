@@ -90,7 +90,7 @@ public class DefaultIndexingContext
 
     private List<? extends IndexCreator> indexCreators;
 
-    /** 
+    /**
      * Currently nexus-indexer knows only M2 reposes
      * <p>
      * XXX move this into a concrete Scanner implementation
@@ -234,8 +234,8 @@ public class DefaultIndexingContext
         // // compare version
         // if ( !VERSION.equals( version ) )
         // {
-        //     throw new UnsupportedExistingLuceneIndexException( 
-        //         "The existing index has version [" + version + "] and not [" + VERSION + "] version!" );
+        // throw new UnsupportedExistingLuceneIndexException(
+        // "The existing index has version [" + version + "] and not [" + VERSION + "] version!" );
         // }
 
         if ( getRepositoryId() == null )
@@ -263,7 +263,7 @@ public class DefaultIndexingContext
             Field.Index.NO ) );
 
         IndexWriter w = getIndexWriter();
-        
+
         w.updateDocument( DESCRIPTOR_TERM, hdr );
 
         w.flush();
@@ -357,7 +357,7 @@ public class DefaultIndexingContext
         return analyzer;
     }
 
-    public IndexWriter getIndexWriter()
+    public synchronized IndexWriter getIndexWriter()
         throws IOException
     {
         if ( indexWriter == null || indexWriter.isClosed() )
@@ -369,7 +369,7 @@ public class DefaultIndexingContext
         return indexWriter;
     }
 
-    public IndexReader getIndexReader()
+    public synchronized IndexReader getIndexReader()
         throws IOException
     {
         if ( indexReader == null || !indexReader.isCurrent() )
@@ -383,7 +383,7 @@ public class DefaultIndexingContext
         return indexReader;
     }
 
-    public IndexSearcher getIndexSearcher()
+    public synchronized IndexSearcher getIndexSearcher()
         throws IOException
     {
         if ( indexSearcher == null || getIndexReader() != indexSearcher.getIndexReader() )
