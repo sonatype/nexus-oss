@@ -22,6 +22,7 @@
             <sessionTimeout>60</sessionTimeout>
             <roles>
                 <role>anonymous</role>
+                <role>ui-basic</role>
             </roles>
         </role>
         <role>
