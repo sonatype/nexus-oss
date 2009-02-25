@@ -1049,6 +1049,7 @@ Sonatype.repoServer.RepositoryGroupEditor = function( config ) {
         emptyText:'Select...',
         selectOnFocus:true,
         allowBlank: false,
+        disabled: ! this.isNew,
         listeners: {
           select: this.providerSelectHandler,
           scope: this
