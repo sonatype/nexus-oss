@@ -51,16 +51,8 @@ public class NexusHttpAuthenticationFilter
 
     private boolean fakeAuthScheme;
     
-    private long lastLoginFailureTime = 0L;
+    private AuthcAuthzEvent currentAuthcEvt;
     
-    private Map<String, String> lastLoginFailureContext = new HashMap<String, String>();
-    
-    private static final String C_PRINCIPAL_KEY = "k_principal";
-
-    private static final String C_ADDRESS_KEY = "k_address";
-
-    private static final String C_HOST_KEY = "k_host";
-
     protected Log getLogger()
     {
         return logger;
@@ -95,6 +87,7 @@ public class NexusHttpAuthenticationFilter
     {
         return (Nexus) request.getAttribute( Nexus.class.getName() );
     }
+    
 
     @Override
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
@@ -226,52 +219,64 @@ public class NexusHttpAuthenticationFilter
         // means the authentication attempt either never occured, or wasn't successful:
         return false;
     }
+    
+    @Override
+    protected boolean onLoginSuccess( AuthenticationToken token, Subject subject, ServletRequest request,
+        ServletResponse response )
+    {
+        String msg = "Successfully authenticated user [" + token.getPrincipal() + "] from address/host ["
+            + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
+
+        recordAuthcEvent( request, msg );
+
+        return true;
+    }
+    
+    private void recordAuthcEvent( ServletRequest request, String msg )
+    {
+        // to make feeds entries be more concise, ignore similar events which occurs in a small period of time
+        if ( isSimilarEvent( msg ) )
+        {
+            return;
+        }
+
+        AuthcAuthzEvent evt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHC, msg );
+
+        getNexus( request ).addAuthcAuthzEvent( evt );
+
+        currentAuthcEvt = evt;
+    }
+    
+    private boolean isSimilarEvent( String msg )
+    {
+        if ( currentAuthcEvt == null )
+        {
+            return false;
+        }
+
+        if ( currentAuthcEvt.getMessage().equals( msg )
+            && ( System.currentTimeMillis() - currentAuthcEvt.getEventDate().getTime() < 2000L ) )
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     @Override
     protected boolean onLoginFailure( AuthenticationToken token, AuthenticationException ae, ServletRequest request,
         ServletResponse response )
     {
-        // to make feeds entries be more concise, ignore similar events which occurs in a small period of time
-        if ( !isSimilarLoginFailure( token, request ) )
-        {
-            String msg = "Unable to authenticate user [" + token.getPrincipal() + "] from address/host ["
-                + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
+        String msg = "Unable to authenticate user [" + token.getPrincipal() + "] from address/host ["
+            + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
 
-            AuthcAuthzEvent aaEvt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHC, msg );
-
-            getNexus( request ).addAuthcAuthzEvent( aaEvt );
-
-            lastLoginFailureTime = System.currentTimeMillis();
-            
-            lastLoginFailureContext.put( C_PRINCIPAL_KEY, token.getPrincipal().toString() );
-
-            lastLoginFailureContext.put( C_ADDRESS_KEY, request.getRemoteAddr() );
-
-            lastLoginFailureContext.put( C_HOST_KEY, request.getRemoteHost() );
-        }
+        recordAuthcEvent( request, msg );
 
         HttpServletResponse httpResponse = WebUtils.toHttp( response );
 
         if ( ExpiredCredentialsException.class.isAssignableFrom( ae.getClass() ) )
         {
             httpResponse.addHeader( "X-Nexus-Reason", "expired" );
-        }
-
-        return false;
-    }
-
-    private boolean isSimilarLoginFailure( AuthenticationToken token, ServletRequest request )
-    {
-        if ( System.currentTimeMillis() - lastLoginFailureTime > 1000L )
-        {
-            return false;
-        }
-
-        if ( lastLoginFailureContext.get( C_PRINCIPAL_KEY ).equals( token.getPrincipal() )
-            && lastLoginFailureContext.get( C_ADDRESS_KEY ).equals( request.getRemoteAddr() )
-            && lastLoginFailureContext.get( C_HOST_KEY ).equals( request.getRemoteHost() ) )
-        {
-            return true;
         }
 
         return false;
