@@ -45,7 +45,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
         mapping: 'isMixed',
         convert: function( v, rec ) { return v ? rec.repositoryTypeResolution.toLowerCase().replace( /_/g, ' ' ) : ''; }
       },
-      { name: 'import', type: 'bool', defaultValue: true }
+      { name: 'isImport', type: 'bool', defaultValue: true }
     ]
   } );
 
@@ -73,7 +73,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
         mapping: 'isMixed',
         convert: function( v, rec ) { return v ? rec.mixResolution.toLowerCase().replace( /_/g, ' ' ) : ''; }
       },
-      { name: 'import', type: 'bool', defaultValue: true }
+      { name: 'isImport', type: 'bool', defaultValue: true }
     ]
   } );
 
@@ -87,19 +87,19 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
       { name: 'email' },
       { name: 'isAdmin', type: 'bool' },
       { name: 'password' },
-      { name: 'import', type: 'bool', defaultValue: true }
+      { name: 'isImport', type: 'bool', defaultValue: true }
     ]
   } );
 
   var groupImportColumn = new Ext.grid.CheckColumn( {
     header: 'Import',
-    dataIndex: 'import',
+    dataIndex: 'isImport',
     width: 45
   } );
 
   var repoImportColumn = new Ext.grid.CheckColumn( {
     header: 'Import',
-    dataIndex: 'import',
+    dataIndex: 'isImport',
     width: 45
   } );
 
@@ -135,7 +135,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
 
   var userImportColumn = new Ext.grid.CheckColumn( {
     header: 'Import',
-    dataIndex: 'import',
+    dataIndex: 'isImport',
     width: 45
   } );
 
@@ -469,39 +469,39 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
       repositoriesResolution: [],
       usersResolution: []
     };
-    
-    this.groupStore.each( function( rec ) {
-      if ( rec.data.import ) {
-        data.groupsResolution.push( {
-          groupId: rec.data.groupId,
-          isMixed: rec.data.isMixed,
-          repositoryTypeResolution: rec.data.displayType.toUpperCase().replace( /\ /g, '_' )
-        } );
-      }
-    }, this );
-    
-    this.repoStore.each( function( rec ) {
-      if ( rec.data.import ) {
-        data.repositoriesResolution.push( {
-          repositoryId: rec.data.repositoryId,
-          type: rec.data.type,
-          mapUrls: rec.data.mapUrls,
-          copyCachedArtifacts: rec.data.copyCachedArtifacts,
-          isMixed: rec.data.isMixed,
-          mixResolution: rec.data.displayMixedResolution.toUpperCase().replace( /\ /g, '_' ),
-          similarRepositoryId: rec.data.similarRepositoryId, 
-          mergeSimilarRepository: rec.data.mergeSimilarRepository
-        } );
-      }
-    }, this );
 
-    this.userStore.each( function( rec ) {
-      if ( rec.data.import ) {
+    this.groupStore.each( function( item ) {
+      if ( item.data.isImport ) {
+        data.groupsResolution.push( {
+          groupId: item.data.groupId,
+          isMixed: item.data.isMixed,
+          repositoryTypeResolution: item.data.displayType.toUpperCase().replace( /\ /g, '_' )
+        } );
+      }
+    }, this );
+    
+    this.repoStore.each( function( item ) {
+      if ( item.data.isImport ) {
+        data.repositoriesResolution.push( {
+          repositoryId: item.data.repositoryId,
+          type: item.data.type,
+          mapUrls: item.data.mapUrls,
+          copyCachedArtifacts: item.data.copyCachedArtifacts,
+          isMixed: item.data.isMixed,
+          mixResolution: item.data.displayMixedResolution.toUpperCase().replace( /\ /g, '_' ),
+          similarRepositoryId: item.data.similarRepositoryId, 
+          mergeSimilarRepository: item.data.mergeSimilarRepository
+        } );
+      }
+    }, this );
+    
+    this.userStore.each( function( item ) {
+      if ( item.data.isImport ) {
         data.usersResolution.push( {
-          userId: rec.data.userId,
-          email: rec.data.email,
-          password: rec.data.password,
-          isAdmin: rec.data.isAdmin
+          userId: item.data.userId,
+          email: item.data.email,
+          password: item.data.password,
+          isAdmin: item.data.isAdmin
         } );
       }
     }, this );
