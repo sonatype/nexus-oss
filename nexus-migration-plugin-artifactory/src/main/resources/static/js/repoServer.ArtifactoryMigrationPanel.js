@@ -386,7 +386,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
         columnWidth: .1,
         handler: this.showMigrationLog,
         scope: this,
-        disabled: false,
+        disabled: true,
         setSize: function() {}
       },
       {
@@ -525,6 +525,7 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
 
         if ( success ) {
           this.formPanel.buttons[2].setText( 'Close' );
+          this.formPanel.buttons[1].setDisabled( false );
           Sonatype.MessageBox.show( {
             title: 'Import Scheduled',
             msg: 'Artifactory backup import scheduled',
