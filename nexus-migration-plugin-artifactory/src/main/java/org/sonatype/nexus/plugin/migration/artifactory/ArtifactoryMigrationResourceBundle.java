@@ -34,6 +34,9 @@ public class ArtifactoryMigrationResourceBundle
         result.add( new DefaultStaticResource(
             getClass().getResource( "/static/js/repoServer.ArtifactoryMigrationPanel.js" ),
             "/js/repoServer/repoServer.ArtifactoryMigrationPanel.js" ) );
+        result.add( new DefaultStaticResource(
+            getClass().getResource( "/static/style/ArtifactoryMigration.css" ),
+            "/style/ArtifactoryMigration.css" ) );
 
         return result;
     }
@@ -41,6 +44,7 @@ public class ArtifactoryMigrationResourceBundle
     @Override
     public String getPostHeadContribution( Map<String, Object> ctx )
     {
-        return "<script src=\"js/repoServer/repoServer.ArtifactoryMigrationPanel.js\" type=\"text/javascript\" charset=\"utf-8\"></script>";
+        return "<script src=\"js/repoServer/repoServer.ArtifactoryMigrationPanel.js\" type=\"text/javascript\" charset=\"utf-8\"></script> \n" +
+        "<link rel=\"stylesheet\" href=\"style/ArtifactoryMigration.css\" type=\"text/css\" media=\"screen\" title=\"no title\" charset=\"utf-8\">";
     }
 }
