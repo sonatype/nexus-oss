@@ -112,6 +112,10 @@ Sonatype.utils = {
       }
     }
     
+    if ( options == undefined ) {
+      options = { options : { dontForceLogout : false }};
+    }
+    
     if ( options.options == undefined) {
       options.options = { dontForceLogout : false };
     }
