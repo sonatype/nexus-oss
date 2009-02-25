@@ -24,7 +24,9 @@
     </realms>
   </security>
   <globalConnectionSettings />
-  <restApi />
+   <restApi>
+    <baseUrl>http://localhost:${nexus-application-port}/nexus</baseUrl>
+  </restApi>
   <httpProxy />
   <routing>
     <groups />
