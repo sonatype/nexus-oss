@@ -346,8 +346,8 @@ Sonatype.repoServer.ServerEditPanel = function(config){
                   this.warningEl = elp.createChild( { cls:'x-form-invalid-msg' } );
                   this.warningEl.setWidth( elp.getWidth( true ) );
                 }
-                this.warningEl.update( '<span style="color:black"><b>WARNING:</b> ' +
-                  'this Base URL setting does not match your actual URL!</span>' );
+                this.warningEl.update( '<b>WARNING:</b> ' +
+                  'this Base URL setting does not match your actual URL!' );
                 Ext.form.Field.msgFx[this.msgFx].show(this.warningEl, this);
               }
               else {
