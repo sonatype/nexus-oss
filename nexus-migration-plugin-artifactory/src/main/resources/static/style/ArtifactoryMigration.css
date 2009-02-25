@@ -6,3 +6,11 @@
     background-image: url(../images/icons/help.png);
     background-position:0 0;
 }
+
+.x-grid-dirty-cell {
+     background-image:none;
+}
+
+.x-grid3-dirty-cell {
+     background-image:none;
+}
