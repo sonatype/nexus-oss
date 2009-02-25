@@ -210,6 +210,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                     handler: this.loadBackup,
                     scope: this,
                     disabled: true,
+                    helpText: 'Specify the path to the Artifactory configuration zip file which has been stored on the server where Nexus is currently running.',
                     setSize: function() {}
                   }
                 ] 
@@ -271,6 +272,9 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                           listClass: 'x-combo-list-small'
                         } )
                       }
+                    ],
+                    tools: [
+                      { id: 'help', qtip: 'Groups to be imported.', handler: function(){ } }
                     ]
                   }
                 ]
@@ -322,7 +326,10 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                         return e.value != '';
                       },
                       scope: this
-                    }
+                    },
+                    tools: [
+                      { id: 'help', qtip: 'Repositories to be imported.', handler: function(){ } }
+                    ]
                   }
                 ]
               },
@@ -347,6 +354,9 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                       { header: 'User ID', dataIndex: 'userId', width: 200 },
                       { header: 'Email', dataIndex: 'email', width: 200 },
                       adminColumn
+                    ],
+                    tools: [
+                      { id: 'help', qtip: 'Users to be imported.', handler: function(){ } }
                     ]
                   }
                 ]
