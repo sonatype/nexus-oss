@@ -40,6 +40,8 @@ public class HttpVerbMappingAuthorizationFilter
     extends PermissionsAuthorizationFilter
 {
     private final Log logger = LogFactory.getLog( this.getClass() );
+    
+    private AuthcAuthzEvent currentAuthzEvt;
 
     private Map<String, String> mapping = new HashMap<String, String>();
     {
@@ -134,18 +136,53 @@ public class HttpVerbMappingAuthorizationFilter
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
         throws IOException
     {
+        recordAuthzFailureEvent( request, response );
+
+        request.setAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE );
+
+        return false;
+    }
+
+    private void recordAuthzFailureEvent( ServletRequest request, ServletResponse response )
+    {
+        Nexus nexus = getNexus( request );
+
         Subject subject = getSubject( request, response );
+
+        if ( nexus.getAnonymousUsername().equals( subject.getPrincipal() ) )
+        {
+            return;
+        }
 
         String msg = "Unable to authorize user [" + subject.getPrincipal() + "] for " + getActionFromHttpVerb( request )
             + " to " + ( (HttpServletRequest) request ).getRequestURI() + " from address/host ["
             + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
 
-        AuthcAuthzEvent aaEvt = new AuthcAuthzEvent(FeedRecorder.SYSTEM_AUTHZ, msg);
-        
-        getNexus( request ).addAuthcAuthzEvent( aaEvt );
-        
-        request.setAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE );
-        
+        if ( isSimilarEvent( msg ) )
+        {
+            return;
+        }
+
+        AuthcAuthzEvent authzEvt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHZ, msg );
+
+        nexus.addAuthcAuthzEvent( authzEvt );
+
+        currentAuthzEvt = authzEvt;
+    }
+
+    private boolean isSimilarEvent( String msg )
+    {
+        if ( currentAuthzEvt == null )
+        {
+            return false;
+        }
+
+        if ( currentAuthzEvt.getMessage().equals( msg )
+            && ( System.currentTimeMillis() - currentAuthzEvt.getEventDate().getTime() < 2000L ) )
+        {
+            return true;
+        }
+
         return false;
     }
 
