@@ -276,7 +276,7 @@ public class ArtifactoryFileLocationPlexusResource
 
             if ( repoArtifactory.getUrl() != null )
             {
-                type = ERepositoryType.PROXIED;
+                type = ERepositoryType.PROXY;
                 similarId = findSimilarRepository( repoArtifactory.getUrl() );
             }
 
