@@ -39,7 +39,7 @@ public class SecurityConfigConvertor
     private boolean resolvePermission = true;
 
     private List<SecurityUser> users = new ArrayList<SecurityUser>();
-    
+
     // TODO: fix logger
     private Logger logger = Logger.getLogger( this.getClass() );
 
@@ -54,7 +54,7 @@ public class SecurityConfigConvertor
     private MappingConfiguration mappingConfiguration;
 
     private MigrationResult migrationResult;
-    
+
     public SecurityConfigConvertor( ArtifactorySecurityConfig config, SecurityConfigReceiver persistor,
         MappingConfiguration mappingConfiguration, MigrationResult migrationResult )
     {
@@ -63,7 +63,7 @@ public class SecurityConfigConvertor
         this.receiver = persistor;
 
         this.mappingConfiguration = mappingConfiguration;
-        
+
         this.migrationResult = migrationResult;
     }
 
@@ -336,10 +336,14 @@ public class SecurityConfigConvertor
     {
         for ( ArtifactoryUser artifactoryUser : config.getUsers() )
         {
+            logger.info( "Importing user: " + artifactoryUser.getUsername() );
+
             if ( StringUtils.isEmpty( artifactoryUser.getPassword() ) )
             {
                 // assuming that the user is from a external realm (LDAP)
-                this.migrationResult.addWarningMessage( "Failed to add user: '" + artifactoryUser.getUsername() + "'.  User was missing a password. Usually this means the user is from an external Realm, e.g., LDAP." );
+                String warn = "Failed to add user: '" + artifactoryUser.getUsername() + "'.  User was missing a password. Usually this means the user is from an external Realm, e.g., LDAP.";
+                this.migrationResult.addWarningMessage( warn );
+                logger.warn( warn );
             }
             else
             {
@@ -373,14 +377,8 @@ public class SecurityConfigConvertor
                 }
                 catch ( ArtifactoryMigrationException e )
                 {
-                    this.migrationResult.addErrorMessage( "Failed to import user: '" + user.getId() + "'." );
-
-                    logger.info( "Failed to import user '" + user.getId() + "'." );
-
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logger.debug( "The cause is: ", e );
-                    }
+                    this.migrationResult.addErrorMessage( "Failed to import user: '" + user.getId() + "'.", e );
+                    logger.error( "Failed to import user '" + user.getId() + "'." , e);
                 }
 
                 users.add( user );
@@ -454,7 +452,7 @@ public class SecurityConfigConvertor
 
     /**
      * One permission target will be converted a one TargetSuite
-     * 
+     *
      * @author Juven Xu
      */
     class TargetSuite

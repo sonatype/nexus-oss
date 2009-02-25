@@ -35,7 +35,6 @@ import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
-import org.sonatype.nexus.log.SimpleLog4jConfig;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryProxy;
@@ -72,12 +71,10 @@ public class ArtifactoryMigrator
     private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER =
         new NotFileFilter( new SuffixFileFilter( ".artifactory-metadata" ) );
 
-    private static final String LOGFILE_NAME = "migration.log";
-
     /**
      * If the log directory cannot be figured out from the LogFileManager, this path is used.
      */
-    @Configuration( value = "${application-conf}/../logs/migration.log" )
+    @Configuration( value = "${nexus-work}/logs/migration.log" )
     private String logFile;
 
     @Requirement( role = org.codehaus.plexus.archiver.UnArchiver.class, hint = "zip" )
@@ -98,10 +95,10 @@ public class ArtifactoryMigrator
     @Requirement
     private Nexus nexus;
 
-    @Requirement
-    private MigrationResult migrationResult;
+    protected Logger logger = Logger.getLogger( this.getClass() );
 
-    private Logger logger = Logger.getLogger( this.getClass() );
+    @Requirement
+    protected MigrationResult migrationResult;
 
     private static final List<String> migrated = new ArrayList<String>();
 
@@ -112,8 +109,7 @@ public class ArtifactoryMigrator
 
         if ( migrated.contains( migrationSummary.getId() ) )
         {
-            this.logger.info( "Trying to import the same package twice: '" + migrationSummary.getId() + "'." );
-            migrationResult.addWarningMessage( "Trying to import the same package twice: '" + migrationSummary.getId()
+            addWarnMessage( "Trying to import the same package twice: '" + migrationSummary.getId()
                 + "'." );
             return migrationResult;
         }
@@ -122,7 +118,7 @@ public class ArtifactoryMigrator
             migrated.add( migrationSummary.getId() );
         }
 
-        this.logger.info( "Importing Artifactory Backup from file: '" + migrationSummary.getBackupLocation() + "'." );
+        addInfoMessage( "Importing Artifactory Backup from file: '" + migrationSummary.getBackupLocation() + "'." );
 
         // need to resolve that on posts
         File artifactoryBackupZip = new File( migrationSummary.getBackupLocation() );
@@ -150,6 +146,7 @@ public class ArtifactoryMigrator
         // parse artifactory.config.xml
         try
         {
+            addInfoMessage( "Parsing artifactory.config.xml" );
             cfg = ArtifactoryConfig.read( new File( artifactoryBackupDir, "artifactory.config.xml" ) );
         }
         catch ( Exception e )
@@ -160,6 +157,7 @@ public class ArtifactoryMigrator
         // parse security.xml
         try
         {
+            addInfoMessage( "Parsing security.xml" );
             securityCfg = ArtifactorySecurityConfigBuilder.read( new File( artifactoryBackupDir, "security.xml" ) );
         }
         catch ( Exception e )
@@ -182,28 +180,83 @@ public class ArtifactoryMigrator
             return migrationResult;
         }
 
-        importRepositories( migrationSummary, cfg, artifactoryBackupDir );
+        try
+        {
+            importRepositories( migrationSummary, cfg, artifactoryBackupDir );
+        }
+        catch ( Exception e )
+        {
+            addErrorMessage( "Error importing repositories.", e );
+        }
 
-        importGroups( migrationSummary, cfg );
+        try
+        {
+            importGroups( migrationSummary, cfg );
+        }
+        catch ( Exception e )
+        {
+            addErrorMessage( "Error importing groups.", e );
+        }
 
-        importSecurity( migrationSummary, securityCfg );
+        try
+        {
+            importSecurity( migrationSummary, securityCfg );
+        }
+        catch ( Exception e )
+        {
+            addErrorMessage( "Error importing security.", e );
+        }
+
+        cleanBackupDir( artifactoryBackupDir );
+
+        // if we have errors already, just return
+        if ( !migrationResult.getErrorMessages().isEmpty() )
+        {
+            addWarnMessage( "Migration finished with some errors." );
+        }
+        else
+        {
+            addInfoMessage( "Migration finished without any error." );
+        }
 
         return migrationResult;
 
     }
 
-    private void addErrorMessage( String msg, Exception e )
+    private void cleanBackupDir( File artifactoryBackupDir )
     {
-        this.migrationResult.addErrorMessage( msg, e );
-        getLogger().error( msg, e );
+        File[] files = artifactoryBackupDir.listFiles();
+        for ( File file : files )
+        {
+            try
+            {
+                org.codehaus.plexus.util.FileUtils.forceDelete( file );
+            }
+            catch ( IOException e )
+            {
+                // ignore
+            }
+        }
+
+        try
+        {
+            org.codehaus.plexus.util.FileUtils.forceDelete( artifactoryBackupDir );
+        }
+        catch ( IOException e )
+        {
+            // ignore
+        }
     }
 
     private void importSecurity( MigrationSummaryDTO migrationSummary, ArtifactorySecurityConfig cfg )
     {
+        addInfoMessage( "Importing security" );
         List<ArtifactoryUser> userList = new ArrayList<ArtifactoryUser>();
 
         for ( UserResolutionDTO userResolution : migrationSummary.getUsersResolution() )
         {
+            addInfoMessage( "Importing user: " + userResolution.getUserId() );
+
             ArtifactoryUser user =
                 new ArtifactoryUser( userResolution.getUserId(), userResolution.getPassword(),
                                      userResolution.getEmail() );
@@ -225,12 +278,16 @@ public class ArtifactoryMigrator
         convertor.setResolvePermission( migrationSummary.isResolvePermission() );
 
         // returns a result of the migration, which may contain errors and warnings.
-        convertor.convert();
+        MigrationResult result = convertor.convert();
+
+        this.migrationResult.mergeResult( result );
     }
 
     private void importRepositories( MigrationSummaryDTO migrationSummary, ArtifactoryConfig cfg,
                                      File artifactoryBackupDir )
     {
+        addInfoMessage( "Importing repositories" );
+
         final File repositoriesBackup = new File( artifactoryBackupDir, "repositories" );
 
         final Map<String, ArtifactoryRepository> artifactoryRepositories = cfg.getRepositories();
@@ -239,6 +296,8 @@ public class ArtifactoryMigrator
 
         for ( RepositoryResolutionDTO resolution : repositories )
         {
+            addInfoMessage( "Importing repository: " + resolution.getRepositoryId() );
+
             final ArtifactoryRepository repo = artifactoryRepositories.get( resolution.getRepositoryId() );
 
             try
@@ -282,8 +341,7 @@ public class ArtifactoryMigrator
                 }
                 else
                 {
-                    if ( ERepositoryType.PROXIED.equals( resolution.getType() )
-                        && resolution.isMergeSimilarRepository() )
+                    if ( ERepositoryType.PROXY.equals( resolution.getType() ) && resolution.isMergeSimilarRepository() )
                     {
                         if ( resolution.isMapUrls() )
                         {
@@ -444,6 +502,8 @@ public class ArtifactoryMigrator
 
     private void importGroups( MigrationSummaryDTO migrationSummary, ArtifactoryConfig cfg )
     {
+        addInfoMessage( "Importing groups" );
+
         final Map<String, ArtifactoryVirtualRepository> virtualRepositories = cfg.getVirtualRepositories();
         VirtualRepositoryUtil.resolveRepositories( virtualRepositories );
         final Map<String, ArtifactoryRepository> repositories = cfg.getRepositories();
@@ -451,6 +511,8 @@ public class ArtifactoryMigrator
 
         for ( GroupResolutionDTO resolution : groups )
         {
+            addInfoMessage( "Importing group: " + resolution.getGroupId() );
+
             ArtifactoryVirtualRepository virtualRepo = virtualRepositories.get( resolution.getGroupId() );
             CRepositoryGroup group = new CRepositoryGroup();
             group.setGroupId( virtualRepo.getKey() );
@@ -465,7 +527,7 @@ public class ArtifactoryMigrator
             {
                 RepositoryResolutionDTO repoResolution = migrationSummary.getRepositoryResolution( repoId );
 
-                if ( ERepositoryType.PROXIED.equals( repoResolution.getType() )
+                if ( ERepositoryType.PROXY.equals( repoResolution.getType() )
                     && repoResolution.isMergeSimilarRepository() )
                 {
                     group.addRepository( repoResolution.getSimilarRepositoryId() );
@@ -610,6 +672,8 @@ public class ArtifactoryMigrator
     private void copyArtifacts( Repository nexusRepoSnapshots, Repository nexusRepoReleases, File repositoryBackup )
         throws MigrationException
     {
+        addInfoMessage( "Copying cached artifacts to: " + nexusRepoReleases.getId() + ", " + nexusRepoSnapshots.getId() );
+
         try
         {
             repositoryConvertor.convertRepositoryWithCopy( repositoryBackup, getStorage( nexusRepoReleases ),
@@ -621,11 +685,15 @@ public class ArtifactoryMigrator
             throw new MigrationException( "Unable to copy cached artifacts", e );
         }
 
+        createMetadatas( nexusRepoSnapshots.getId() );
+        createMetadatas( nexusRepoReleases.getId() );
     }
 
     private void copyArtifacts( String repoId, File sourceRepositoryBackup, File destinationStorage )
         throws MigrationException
     {
+        addInfoMessage( "Copying cached artifacts to: " + repoId );
+
         if ( sourceRepositoryBackup.isDirectory() && sourceRepositoryBackup.list().length > 0 )
         {
             // filter artifactory metadata
@@ -645,6 +713,8 @@ public class ArtifactoryMigrator
 
     private void createMetadatas( String repoId )
     {
+        addInfoMessage( "Recreating repository metadatas " + repoId );
+
         ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
         rt.setRepositoryId( repoId );
         nexusScheduler.submit( "reindex-" + repoId, rt );
@@ -688,6 +758,8 @@ public class ArtifactoryMigrator
     private File unzipArtifactoryBackup( File fileItem )
         throws IOException, ArchiverException
     {
+        addInfoMessage( "Unpacking backup file" );
+
         File tempDir = this.nexus.getNexusConfiguration().getTemporaryDirectory();
 
         File artifactoryBackup = new File( tempDir, FilenameUtils.getBaseName( fileItem.getName() ) + "content" );
@@ -703,26 +775,8 @@ public class ArtifactoryMigrator
     public void initialize()
         throws InitializationException
     {
-        // try to figure out the log directory
         try
         {
-            SimpleLog4jConfig log4jConf = this.nexus.getLogConfig();
-            String nexusLogFilePath = log4jConf.getFileAppenderLocation();
-            File logDir = new File( nexusLogFilePath ).getParentFile();
-
-            if ( logDir != null )
-            {
-                this.logFile = new File( logDir, LOGFILE_NAME ).getAbsolutePath();
-            }
-        }
-        catch ( IOException e )
-        {
-            this.logger.warn( "Failed to locate log directory defaulting to logfile: " + this.logFile );
-        }
-
-        try
-        {
-
             Set<Logger> loggers = new HashSet<Logger>();
             loggers.add( Logger.getLogger( SecurityConfigConvertor.class ) );
             loggers.add( this.logger );
@@ -745,6 +799,32 @@ public class ArtifactoryMigrator
         {
             this.logger.error( "Failed to add Migration log appender for file: '" + logFile + "'." );
         }
-
     }
+
+    protected void addInfoMessage( String msg )
+    {
+        logger.info( msg );
+        getLogger().info( msg );
+    }
+    protected void addWarnMessage( String msg )
+    {
+        this.migrationResult.addWarningMessage( msg );
+        logger.warn( msg );
+        getLogger().warn( msg );
+    }
+
+    protected void addErrorMessage( String msg )
+    {
+        this.migrationResult.addErrorMessage( msg );
+        logger.error( msg );
+        getLogger().error( msg );
+    }
+
+    protected void addErrorMessage( String msg, Exception e )
+    {
+        this.migrationResult.addErrorMessage( msg, e );
+        logger.error( msg, e );
+        getLogger().error( msg, e );
+    }
+
 }

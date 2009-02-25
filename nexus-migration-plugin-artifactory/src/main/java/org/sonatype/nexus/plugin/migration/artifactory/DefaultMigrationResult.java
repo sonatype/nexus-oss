@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 
-@Component(role=MigrationResult.class)
+@Component(role=MigrationResult.class, instantiationStrategy = "singleton")
 public class DefaultMigrationResult
     implements MigrationResult
 {
