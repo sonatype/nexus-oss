@@ -67,7 +67,7 @@ public class ConfigurationListPlexusResource
         {
             ConfigurationsListResource resource = new ConfigurationsListResource();
             
-            resource.setResourceURI( createChildReference( request, entry.getKey() ).toString() );
+            resource.setResourceURI( createChildReference( request, this, entry.getKey() ).toString() );
             
             resource.setName( entry.getValue() );
             

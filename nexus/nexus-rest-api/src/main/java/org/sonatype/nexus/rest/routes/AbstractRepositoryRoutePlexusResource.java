@@ -74,7 +74,7 @@ public abstract class AbstractRepositoryRoutePlexusResource
 
                 member.setName( getNexus().getRepository( repoId ).getName() );
 
-                member.setResourceURI( createChildReference( request, repoId ).toString() );
+                member.setResourceURI( createChildReference( request, this, repoId ).toString() );
             }
 
             members.add( member );

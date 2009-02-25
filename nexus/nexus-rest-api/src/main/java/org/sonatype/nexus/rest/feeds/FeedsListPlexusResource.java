@@ -73,7 +73,7 @@ public class FeedsListPlexusResource
         {
             FeedListResource resource = new FeedListResource();
 
-            resource.setResourceURI( createChildReference( req, source.getFeedKey() ).toString() );
+            resource.setResourceURI( createChildReference( req, this, source.getFeedKey() ).toString() );
 
             resource.setName( source.getFeedName() );
 

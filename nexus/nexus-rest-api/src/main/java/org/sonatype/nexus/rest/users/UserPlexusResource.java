@@ -121,7 +121,7 @@ public class UserPlexusResource
                 
                 result.getData().setUserManaged( !user.isReadOnly() );
 
-                result.getData().setResourceURI( createChildReference( request, resource.getUserId() ).toString() );
+                result.getData().setResourceURI( createChildReference( request, this, resource.getUserId() ).toString() );
 
             }
             catch ( NoSuchUserException e )

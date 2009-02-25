@@ -83,7 +83,7 @@ public class RepositoryTargetListPlexusResource
 
             res.setContentClass( target.getContentClass() );
 
-            res.setResourceURI( this.createChildReference( request, target.getId() ).toString() );
+            res.setResourceURI( this.createChildReference( request, this, target.getId() ).toString() );
 
             result.addData( res );
         }

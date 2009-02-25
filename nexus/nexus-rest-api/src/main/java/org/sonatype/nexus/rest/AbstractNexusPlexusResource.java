@@ -120,9 +120,11 @@ public abstract class AbstractNexusPlexusResource
         return ref.getTargetRef();
     }
 
-    protected Reference createChildReference( Request request, String childPath )
+    protected Reference createChildReference( Request request, PlexusResource resource, String childPath )
     {
-        Reference result = new Reference( request.getResourceRef() ).addSegment( childPath ).getTargetRef();
+        Reference result = new Reference( getContextRoot( request ), request
+            .getResourceRef().getTargetRef().toString().substring(
+                request.getRootRef().getTargetRef().toString().length() ) ).addSegment( childPath ).getTargetRef();
 
         if ( result.hasQuery() )
         {

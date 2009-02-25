@@ -90,7 +90,7 @@ public class RepositoryRouteListPlexusResource
 
                 resource.setGroupId( item.getGroupId() );
 
-                resource.setResourceURI( createChildReference( request, item.getId() ).toString() );
+                resource.setResourceURI( createChildReference( request, this, item.getId() ).toString() );
 
                 resource.setRuleType( config2resourceType( item.getRouteType() ) );
 

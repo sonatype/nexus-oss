@@ -55,7 +55,7 @@ public abstract class AbstractPrivilegePlexusResource
         resource.setId( privilege.getId() );
         resource.setName( privilege.getName() );
         resource.setDescription( privilege.getDescription() );
-        resource.setResourceURI( this.createChildReference( request, resource.getId() ).toString() );
+        resource.setResourceURI( createChildReference( request, this, resource.getId() ).toString() );
         resource.setUserManaged( !privilege.isReadOnly() );
 
         return resource;

@@ -105,7 +105,7 @@ public class UserListPlexusResource
                 // Update the status, as that may have changed
                 resource.setStatus( user.getStatus() );
 
-                resource.setResourceURI( createChildReference( request, resource.getUserId() ).toString() );
+                resource.setResourceURI( createChildReference( request, this, resource.getUserId() ).toString() );
                 
                 resource.setUserManaged( true );
 

@@ -371,7 +371,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
                     resource.setLeaf( !StorageCollectionItem.class.isAssignableFrom( child.getClass() ) );
 
-                    resource.setResourceURI( createChildReference( req, child.getName() ).toString()
+                    resource.setResourceURI( createChildReference( req, this, child.getName() ).toString()
                         + ( resource.isLeaf() ? "" : "/" ) );
 
                     resource.setRelativePath( child.getPath() + ( resource.isLeaf() ? "" : "/" ) );

@@ -72,7 +72,7 @@ public class LogsListPlexusResource
             {
                 LogsListResource resource = new LogsListResource();
 
-                resource.setResourceURI( createChildReference( request, logFile.getName() ).toString() );
+                resource.setResourceURI( createChildReference( request, this, logFile.getName() ).toString() );
 
                 resource.setName( logFile.getName() );
 

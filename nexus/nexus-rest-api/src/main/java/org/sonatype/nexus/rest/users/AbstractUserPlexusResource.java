@@ -66,7 +66,7 @@ public abstract class AbstractUserPlexusResource
         resource.setName( user.getName() );
         resource.setStatus( user.getStatus() );
         resource.setUserId( user.getId() );
-        resource.setResourceURI( this.createChildReference( request, resource.getUserId() ).toString() );
+        resource.setResourceURI( this.createChildReference( request, this, resource.getUserId() ).toString() );
         resource.setUserManaged( !user.isReadOnly() );
 
         for ( String roleId : user.getRoles() )

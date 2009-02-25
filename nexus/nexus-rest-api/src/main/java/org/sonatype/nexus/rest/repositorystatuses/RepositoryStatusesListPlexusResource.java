@@ -69,7 +69,7 @@ public class RepositoryStatusesListPlexusResource
         {
             repoRes = new RepositoryStatusListResource();
 
-            repoRes.setResourceURI( createChildReference( request, repository.getId() ).toString() );
+            repoRes.setResourceURI( createChildReference( request, this, repository.getId() ).toString() );
 
             repoRes.setId( repository.getId() );
 
@@ -101,7 +101,7 @@ public class RepositoryStatusesListPlexusResource
         {
             repoRes = new RepositoryStatusListResource();
 
-            repoRes.setResourceURI( createChildReference( request, shadow.getId() ).toString() );
+            repoRes.setResourceURI( createChildReference( request, this, shadow.getId() ).toString() );
 
             repoRes.setId( shadow.getId() );
 

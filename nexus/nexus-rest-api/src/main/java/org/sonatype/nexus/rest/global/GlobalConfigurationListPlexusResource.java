@@ -63,7 +63,7 @@ public class GlobalConfigurationListPlexusResource
 
         data.setName( GlobalConfigurationPlexusResource.DEFAULT_CONFIG_NAME );
 
-        data.setResourceURI( createChildReference( request, data.getName() ).toString() );
+        data.setResourceURI( createChildReference( request, this, data.getName() ).toString() );
 
         result.addData( data );
 
@@ -71,7 +71,7 @@ public class GlobalConfigurationListPlexusResource
 
         data.setName( GlobalConfigurationPlexusResource.CURRENT_CONFIG_NAME );
 
-        data.setResourceURI( createChildReference( request, data.getName() ).toString() );
+        data.setResourceURI( createChildReference( request, this, data.getName() ).toString() );
 
         result.addData( data );
 

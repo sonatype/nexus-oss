@@ -78,7 +78,7 @@ public class RepositoryTemplateListPlexusResource
 
                 repoRes.setId( repository.getId() );
 
-                repoRes.setResourceURI( createChildReference( request, repository.getId() ).toString() );
+                repoRes.setResourceURI( createChildReference( request, this, repository.getId() ).toString() );
 
                 if ( repository.getRemoteStorage() != null && repository.getRemoteStorage().getUrl() != null )
                 {
@@ -107,7 +107,7 @@ public class RepositoryTemplateListPlexusResource
             {
                 repoRes = new RepositoryListResource();
 
-                repoRes.setResourceURI( createChildReference( request, shadow.getId() ).toString() );
+                repoRes.setResourceURI( createChildReference( request, this, shadow.getId() ).toString() );
 
                 repoRes.setRepoType( "virtual" );
 
