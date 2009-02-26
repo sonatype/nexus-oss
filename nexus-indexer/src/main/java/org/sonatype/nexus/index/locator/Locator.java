@@ -9,8 +9,7 @@ package org.sonatype.nexus.index.locator;
 import java.io.File;
 
 /**
- * Locate an repository "elements" relative to some file. Always is the file that makes "relative to". So, if you are
- * looking for file SHA1 checksum, than pass the file to Sha1Locator.
+ * An artifact locator used to locate repository "elements" relative to some file. 
  * 
  * @author Jason van Zyl
  */

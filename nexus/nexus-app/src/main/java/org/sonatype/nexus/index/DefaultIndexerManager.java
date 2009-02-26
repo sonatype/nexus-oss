@@ -781,7 +781,7 @@ public class DefaultIndexerManager
                 }
 
                 // rebuild group info
-                nexusIndexer.rebuildGroups( context );
+                context.rebuildGroups();
 
                 // committing changes
                 context.getIndexWriter().flush();

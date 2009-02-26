@@ -9,9 +9,10 @@ package org.sonatype.nexus.artifact;
 import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
-import org.sonatype.nexus.DefaultNexusEnforcer;
-import org.sonatype.nexus.NexusEnforcer;
 
+/**
+ * Utility methods for working with artifact version strings
+ */
 public class VersionUtils
 {
     private static NexusEnforcer enforcer = new DefaultNexusEnforcer();

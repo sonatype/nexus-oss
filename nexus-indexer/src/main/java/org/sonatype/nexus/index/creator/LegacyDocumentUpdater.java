@@ -11,7 +11,7 @@ import org.apache.lucene.document.Document;
 import org.sonatype.nexus.index.ArtifactInfo;
 
 /**
- * A legacy document updater is used to produce legacy Lucene index documents. 
+ * A legacy document updater used to produce legacy Lucene index documents. 
  * 
  * @author Eugene Kuleshov
  */

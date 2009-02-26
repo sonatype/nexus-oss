@@ -16,8 +16,7 @@ package org.sonatype.nexus.proxy.maven;
 import org.apache.lucene.document.Document;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.DocumentFilter;
-import org.sonatype.nexus.index.creator.AbstractIndexCreator;
+import org.sonatype.nexus.index.context.DocumentFilter;
 
 public enum RepositoryPolicy
 {
@@ -36,7 +35,7 @@ public enum RepositoryPolicy
                         return true;
                     }
 
-                    String[] r = AbstractIndexCreator.FS_PATTERN.split( uinfo );
+                    String[] r = ArtifactInfo.FS_PATTERN.split( uinfo );
 
                     return !VersionUtils.isSnapshot( r[2] );
                 }
@@ -59,7 +58,7 @@ public enum RepositoryPolicy
                         return true;
                     }
 
-                    String[] r = AbstractIndexCreator.FS_PATTERN.split( uinfo );
+                    String[] r = ArtifactInfo.FS_PATTERN.split( uinfo );
 
                     return VersionUtils.isSnapshot( r[2] );
                 }

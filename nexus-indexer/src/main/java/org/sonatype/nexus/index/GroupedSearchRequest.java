@@ -11,6 +11,11 @@ import java.util.Comparator;
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexingContext;
 
+/**
+ * A grouped search request.
+ * 
+ * @see NexusIndexer#searchGrouped(GroupedSearchRequest)
+ */
 public class GroupedSearchRequest
 {
     private final Query query;

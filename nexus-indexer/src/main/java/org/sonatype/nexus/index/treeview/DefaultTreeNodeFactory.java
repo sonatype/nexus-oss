@@ -11,9 +11,9 @@ import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.treeview.TreeNode.Type;
 
 /**
- * A default implementation of TreeNodeFactory, that is failry simple to extend.
+ * A default implementation of TreeNodeFactory, that is fairly simple to extend.
  * 
- * @author cstamas
+ * @author Tamas Cservenak
  */
 public class DefaultTreeNodeFactory
     implements TreeNodeFactory

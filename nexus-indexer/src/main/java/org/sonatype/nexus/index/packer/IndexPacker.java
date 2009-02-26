@@ -8,8 +8,10 @@ package org.sonatype.nexus.index.packer;
 
 import java.io.IOException;
 
+import org.sonatype.nexus.index.updater.IndexUpdater;
+
 /**
- * A component that creates defined ZIP and Properties file where the index will get packed.
+ * An index packer used to create transfer index format that can be used by the {@link IndexUpdater}.
  * 
  * @author Tamas Cservenak
  */

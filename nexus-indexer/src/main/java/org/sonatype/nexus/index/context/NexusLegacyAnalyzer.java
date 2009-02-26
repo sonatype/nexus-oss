@@ -15,7 +15,12 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.sonatype.nexus.index.ArtifactInfo;
 
-/** @author Jason van Zyl */
+/** 
+ * A Nexus specific <a href="http://lucene.apache.org/java/2_4_0/api/core/org/apache/lucene/analysis/Analyzer.html">Lucene Analyzer</a>
+ * used to produce legacy index transfer format
+ * 
+ * @author Jason van Zyl 
+ */
 public class NexusLegacyAnalyzer
     extends Analyzer
 {

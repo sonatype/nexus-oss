@@ -13,7 +13,8 @@ import org.apache.lucene.analysis.TokenStream;
 import org.sonatype.nexus.index.ArtifactInfo;
 
 /**
- * Nexus analyzer used to parse indexed fields
+ * A Nexus specific <a href="http://lucene.apache.org/java/2_4_0/api/core/org/apache/lucene/analysis/Analyzer.html">Lucene Analyzer</a>
+ * used to parse indexed fields
  * 
  * @author Eugene Kuleshov
  */

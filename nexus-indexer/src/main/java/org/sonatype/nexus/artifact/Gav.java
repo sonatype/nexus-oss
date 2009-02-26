@@ -6,18 +6,23 @@
  */
 package org.sonatype.nexus.artifact;
 
-import org.sonatype.nexus.DefaultNexusEnforcer;
 
 /**
  * A value class representing unique artifact coordinates
  */
 public class Gav
 {
+    /**
+     * Enumeration representing Maven artifact hash types
+     */
     public enum HashType
     {
         sha1, md5
     }
 
+    /**
+     * Enumeration representing Maven artifact signature types
+     */
     public enum SignatureType
     {
         gpg;

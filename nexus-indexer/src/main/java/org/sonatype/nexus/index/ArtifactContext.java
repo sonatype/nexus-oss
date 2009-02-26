@@ -7,13 +7,25 @@
 package org.sonatype.nexus.index;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Index;
+import org.apache.lucene.document.Field.Store;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.index.context.IndexCreator;
+import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
- * The context of an artifact.
+ * An artifact context used to provide information about artifact during
+ * scanning. It is passed to the {@link IndexCreator}, which can populate
+ * {@link ArtifactInfo} for the given artifact.
+ * 
+ * @see IndexCreator#populateArtifactInfo(ArtifactContext)
+ * @see NexusIndexer#scan(IndexingContext)
  * 
  * @author Jason van Zyl
  * @author Tamas Cservenak
@@ -79,5 +91,40 @@ public class ArtifactContext
     public void addError(Exception e) 
     {
         errors.add( e );
+    }
+
+    /**
+     * Creates Lucene Document using {@link IndexCreator}s from the given {@link IndexingContext}.
+     */
+    public Document createDocument( IndexingContext context )
+    {
+        Document doc = new Document();
+    
+        // unique key
+        doc.add( new Field( ArtifactInfo.UINFO, getArtifactInfo().getUinfo(),
+            Store.YES, Index.UN_TOKENIZED ) );
+    
+        doc.add( new Field( ArtifactInfo.LAST_MODIFIED, //
+            Long.toString( System.currentTimeMillis() ), Store.YES, Index.NO ) );
+        
+        for ( IndexCreator indexCreator : context.getIndexCreators() )
+        {
+            try 
+            {
+                indexCreator.populateArtifactInfo( this );
+            } 
+            catch ( IOException ex ) 
+            {
+                addError( ex );
+            }
+        }
+    
+        // need a second pass in case index creators updated document attributes
+        for ( IndexCreator indexCreator : context.getIndexCreators() )
+        {
+            indexCreator.updateDocument( getArtifactInfo(), doc );
+        }
+    
+        return doc;
     }
 }

@@ -19,25 +19,22 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.TermQuery;
 import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.index.creator.AbstractIndexCreator;
-import org.sonatype.nexus.index.creator.IndexerEngine;
-import org.sonatype.nexus.index.scan.ScanningResult;
 
 /**
- * Indexing scanner listener
+ * A default scanning listener
  * 
  * @author Eugene Kuleshov
  */
-class DefaultNexusIndexerListener implements
+class DefaultScannerListener implements
     ArtifactScanningListener 
 {
     private final IndexingContext context;
-    private final NexusIndexer indexer;
     private final IndexerEngine indexerEngine;
     private final boolean update;
     private final ArtifactScanningListener listener;
 
     private final Set<String> uinfos = new HashSet<String>();
+    private final Set<String> processedUinfos = new HashSet<String>();
     private final Set<String> allGroups = new HashSet<String>();
     private final Set<String> groups = new HashSet<String>();
     
@@ -45,12 +42,11 @@ class DefaultNexusIndexerListener implements
     
     private int count = 0;
     
-    DefaultNexusIndexerListener( IndexingContext context, //
-        NexusIndexer indexer, IndexerEngine indexerEngine, boolean update, // 
+    DefaultScannerListener( IndexingContext context, //
+        IndexerEngine indexerEngine, boolean update, // 
         ArtifactScanningListener listener ) 
     {
         this.context = context;
-        this.indexer = indexer;
         this.indexerEngine = indexerEngine;
         this.update = update;
         this.listener = listener;
@@ -80,6 +76,13 @@ class DefaultNexusIndexerListener implements
     {
         String uinfo = ac.getArtifactInfo().getUinfo();
         
+        if ( processedUinfos.contains( uinfo ) )
+        {
+            return;  // skip individual snapshots
+        }
+        
+        processedUinfos.add( uinfo );
+        
         if ( uinfos.contains( uinfo ) )
         {
             // already indexed
@@ -94,14 +97,14 @@ class DefaultNexusIndexerListener implements
                 listener.artifactDiscovered( ac );
             }
 
-            indexer.artifactDiscovered( ac, context );
+            indexerEngine.index( context, ac );
             
             for ( Exception e : ac.getErrors() )
             {
                 artifactError( ac, e );
             }
             
-            groups.add( AbstractIndexCreator.getRootGroup( ac.getArtifactInfo().groupId ) );
+            groups.add( ac.getArtifactInfo().getRootGroup() );
             allGroups.add( ac.getArtifactInfo().groupId );
             
             count++;
@@ -123,11 +126,11 @@ class DefaultNexusIndexerListener implements
         
         try 
         {
-            indexerEngine.optimize( context );
+            context.optimize();
             
-            indexer.setRootGroups( context, groups );
+            context.setRootGroups( groups );
             
-            indexer.setAllGroups( context, allGroups );
+            context.setAllGroups( allGroups );
             
             if ( update )
             {
@@ -169,8 +172,9 @@ class DefaultNexusIndexerListener implements
         }
     }
 
-    private void initialize(IndexingContext ctx) throws IOException,
-        CorruptIndexException
+    private void initialize( IndexingContext ctx )
+        throws IOException,
+            CorruptIndexException
     {
         IndexReader r = ctx.getIndexReader();
         
@@ -210,7 +214,7 @@ class DefaultNexusIndexerListener implements
 
             if( hits.length() > 0 )
             {
-                String[] ra = AbstractIndexCreator.FS_PATTERN.split( uinfo );
+                String[] ra = ArtifactInfo.FS_PATTERN.split( uinfo );
 
                 ArtifactInfo ai = new ArtifactInfo();
                 
@@ -224,12 +228,12 @@ class DefaultNexusIndexerListener implements
        
                 if ( ra.length > 3 )
                 {
-                    ai.classifier = AbstractIndexCreator.renvl( ra[3] );
+                    ai.classifier = ArtifactInfo.renvl( ra[3] );
                 }
       
                 if ( ra.length > 4 )
                 {
-                    ai.packaging = AbstractIndexCreator.renvl( ra[4] );
+                    ai.packaging = ArtifactInfo.renvl( ra[4] );
                 }
             
                 // minimal ArtifactContext for removal
@@ -237,7 +241,7 @@ class DefaultNexusIndexerListener implements
                 
                 for ( int i = 0; i < hits.length(); i++ )
                 {
-                    indexer.deleteArtifactFromIndex( ac, context );
+                    indexerEngine.remove( context, ac );
                     
                     deleted++;
                 }

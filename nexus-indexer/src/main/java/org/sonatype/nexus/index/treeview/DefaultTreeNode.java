@@ -9,7 +9,7 @@ package org.sonatype.nexus.index.treeview;
 /**
  * The simplest treenode, that does not adds any "decoration" to the nodes.
  * 
- * @author cstamas
+ * @author Tamas Cservenak
  */
 public class DefaultTreeNode
     extends AbstractTreeNode

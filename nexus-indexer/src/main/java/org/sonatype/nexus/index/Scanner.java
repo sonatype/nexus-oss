@@ -6,9 +6,15 @@
  */
 package org.sonatype.nexus.index;
 
-import org.apache.lucene.document.Document;
-
-public interface DocumentFilter
+/**
+ * An abstraction for scanning content of the artifact repositories
+ *  
+ * @author Jason van Zyl
+ */
+public interface Scanner
 {
-    boolean accept( Document doc );
+    /**
+     * Scan repository artifacts and populate {@link ScanningResult} 
+     */
+    ScanningResult scan( ScanningRequest request );
 }

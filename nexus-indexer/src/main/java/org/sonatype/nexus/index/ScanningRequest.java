@@ -4,20 +4,22 @@
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
  * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
  */
-package org.sonatype.nexus.index.scan;
+package org.sonatype.nexus.index;
 
-import org.sonatype.nexus.index.ArtifactScanningListener;
 import org.sonatype.nexus.index.context.IndexingContext;
 
-/** @author Jason van Zyl */
-public class DefaultScanningRequest
-    implements ScanningRequest
+/**
+ * A scanning request provides various input parameters for repository scan
+ *  
+ * @author Jason van Zyl 
+ */
+public class ScanningRequest
 {
     private IndexingContext context;
 
     private ArtifactScanningListener artifactScanningListener;
 
-    public DefaultScanningRequest( IndexingContext context, 
+    public ScanningRequest( IndexingContext context, 
         ArtifactScanningListener artifactScanningListener )
     {
         this.context = context;

@@ -7,14 +7,17 @@
 package org.sonatype.nexus.index;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.VersionUtils;
-import org.sonatype.nexus.index.creator.AbstractIndexCreator;
 
 /**
  * ArtifactInfo holds the values known about an repository artifact. This is a simple Value Object kind of stuff.
@@ -26,6 +29,14 @@ public class ArtifactInfo
     implements Serializable
 {
     private static final long serialVersionUID = 6028843453477511104L;
+
+    /** Field separator */
+    public static final String FS = "|";
+
+    public static final Pattern FS_PATTERN = Pattern.compile( Pattern.quote( FS ) );
+
+    /** Non available value */
+    public static final String NA = "NA";
 
     public static final String ROOT_GROUPS = "rootGroups";
 
@@ -128,9 +139,9 @@ public class ArtifactInfo
      */
     public static final String DELETED = "del";
 
-    public static final VersionComparator VERSION_COMPARATOR = new VersionComparator();
+    public static final Comparator<ArtifactInfo> VERSION_COMPARATOR = new VersionComparator();
 
-    public static final VersionComparator REPOSITORY_VERSION_COMPARATOR = new RepositoryVersionComparator();
+    public static final Comparator<ArtifactInfo> REPOSITORY_VERSION_COMPARATOR = new RepositoryVersionComparator();
 
     public String fname;
 
@@ -243,15 +254,26 @@ public class ArtifactInfo
     {
         if( uinfo == null )
         {
-            uinfo = AbstractIndexCreator.getGAV( //
-              groupId, //
-              artifactId, //
-              version, //
-              classifier, //
-              packaging );  // extension is stored in the packaging field when classifier is not used
+            uinfo = new StringBuilder() //
+            .append( groupId ).append( FS ) //
+            .append( artifactId ).append( FS ) //
+            .append( version ).append( FS ) //
+            .append( nvl( classifier ) ) //
+            .append( StringUtils.isEmpty( classifier ) || StringUtils.isEmpty( packaging ) ? "" : FS + packaging ) //
+            .toString();  // extension is stored in the packaging field when classifier is not used
         }
         
         return uinfo;    
+    }
+    
+    public String getRootGroup()
+    {
+        int n = groupId.indexOf( '.' );
+        if ( n > -1 )
+        {
+            return groupId.substring( 0, n );
+        }
+        return groupId;
     }
     
     public Gav calculateGav() 
@@ -286,7 +308,35 @@ public class ArtifactInfo
     // Utils
     // ----------------------------------------------------------------------------
 
-    public static class VersionComparator
+    public static String nvl( String v )
+    {
+        return v == null ? NA : v;
+    }
+
+    public static String renvl( String v )
+    {
+        return NA.equals( v ) ? null : v;
+    }
+
+    public static String lst2str( Collection<String> list )
+    {
+        StringBuilder sb = new StringBuilder();
+        for ( String s : list )
+        {
+            sb.append( s ).append( ArtifactInfo.FS );
+        }
+        return sb.length()==0 ? sb.toString() : sb.substring( 0, sb.length() - 1 );
+    }
+    
+    public static List<String> str2lst( String str )
+    {
+        return Arrays.asList( ArtifactInfo.FS_PATTERN.split( str ) );
+    }
+
+    /**
+     * A version comparator
+     */
+    static class VersionComparator
         implements Comparator<ArtifactInfo>
     {
         @SuppressWarnings( "unchecked" )
@@ -350,7 +400,10 @@ public class ArtifactInfo
         }
     }
 
-    public static class RepositoryVersionComparator
+    /**
+     * A repository and version comparator
+     */
+    static class RepositoryVersionComparator
         extends VersionComparator
     {
         @Override

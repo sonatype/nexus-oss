@@ -10,10 +10,16 @@ import java.util.Comparator;
 
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.index.search.SearchEngine;
 
+/**
+ * A flat search request.
+ * 
+ * @see NexusIndexer#searchFlat(FlatSearchRequest)
+ */
 public class FlatSearchRequest
 {
+    public static int UNDEFINED = -1;
+
     private Query query;
 
     private Comparator<ArtifactInfo> artifactInfoComparator;
@@ -34,9 +40,9 @@ public class FlatSearchRequest
 
         this.context = null;
 
-        this.start = SearchEngine.UNDEFINED;
+        this.start = UNDEFINED;
 
-        this.aiCount = SearchEngine.UNDEFINED;
+        this.aiCount = UNDEFINED;
     }
 
     public FlatSearchRequest( Query query, Comparator<ArtifactInfo> artifactInfoComparator )

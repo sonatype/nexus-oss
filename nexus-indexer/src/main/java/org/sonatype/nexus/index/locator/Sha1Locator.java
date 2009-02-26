@@ -8,7 +8,10 @@ package org.sonatype.nexus.index.locator;
 
 import java.io.File;
 
-/** @author Jason van Zyl */
+/** 
+ * An sha1 locator to locate the sha1 file relative to POM.
+ * 
+ * @author Jason van Zyl */
 public class Sha1Locator
     implements Locator
 {

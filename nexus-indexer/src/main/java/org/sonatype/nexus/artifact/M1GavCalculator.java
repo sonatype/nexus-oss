@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
- * The M1 GAV Calculator.
+ * An M1 <code>GavCalculator</code>.
  * 
  * @author Jason van Zyl
  * @author Tamas Cservenak

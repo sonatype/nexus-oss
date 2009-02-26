@@ -15,13 +15,12 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
- * The default query creator.
- * <p>
- * Constructs Lucene query for provided query text. 
+ * A default {@link QueryCreator} constructs Lucene query for provided query text. 
  * 
- * By default it creates wildcard such as query text matches beginning of the field 
+ * <p>
+ * By default wildcards are created such as query text matches beginning of the field 
  * value or beginning of the class/package name segment for {@link ArtifactInfo#NAMES NAMES} field.  
- * But it can be controlled by using the following wildcards:
+ * But it can be controlled by using special markers:
  * 
  * <ul>
  * <li>* - any character</li>
@@ -37,10 +36,9 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  * <li>^junit$ - matches junit, but not junit-foo, nor foo-junit</li>
  * </ul>
  * 
- * @author Tamas Cservenak
  * @author Eugene Kuleshov
  */
-@Component(role=QueryCreator.class)
+@Component(role = QueryCreator.class)
 public class DefaultQueryCreator
     extends AbstractLogEnabled
     implements QueryCreator

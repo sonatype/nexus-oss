@@ -25,9 +25,12 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.store.RAMDirectory;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
-import org.sonatype.nexus.index.creator.IndexCreator;
+import org.sonatype.nexus.index.packer.DefaultIndexPacker;
+import org.sonatype.nexus.index.search.grouping.GAGrouping;
+import org.sonatype.nexus.index.updater.DefaultIndexUpdater;
 
 /** @author Jason van Zyl */
 public class NexusIndexerTest
@@ -204,10 +207,10 @@ public class NexusIndexerTest
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-        IndexUtils.packIndexArchive( context, bos );
+        DefaultIndexPacker.packIndexArchive( context, bos );
 
-        IndexUtils.unpackIndexArchive( new ByteArrayInputStream( bos.toByteArray() ), newDirectory, //
-            context.getIndexCreators() );
+        DefaultIndexUpdater.unpackIndexArchive( new ByteArrayInputStream( bos.toByteArray() ), newDirectory, //
+            context );
 
         indexer.removeIndexingContext( context, false );
 

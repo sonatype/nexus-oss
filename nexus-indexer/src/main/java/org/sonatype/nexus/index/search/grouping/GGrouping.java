@@ -4,25 +4,28 @@
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
  * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
  */
-package org.sonatype.nexus.index;
+package org.sonatype.nexus.index.search.grouping;
 
 import java.util.Comparator;
 
+import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.Grouping;
+
 /**
- * This is the GroupId : ArtifactId : Version grouping.
+ * A GroupId {@link Grouping} implementation.
  * 
- * @author cstamas
+ * @author Tamas Cservenak
  */
-public class RGAVGrouping
+public class GGrouping
     extends AbstractGrouping
 {
 
-    public RGAVGrouping()
+    public GGrouping()
     {
         super();
     }
 
-    public RGAVGrouping( Comparator<ArtifactInfo> comparator )
+    public GGrouping( Comparator<ArtifactInfo> comparator )
     {
         super( comparator );
     }
@@ -30,8 +33,7 @@ public class RGAVGrouping
     @Override
     protected String getGroupKey( ArtifactInfo artifactInfo )
     {
-        return artifactInfo.repository + ":" + artifactInfo.groupId + ":" + artifactInfo.artifactId + ":"
-            + artifactInfo.version + ":" + artifactInfo.classifier;
+        return artifactInfo.groupId;
     }
 
 }

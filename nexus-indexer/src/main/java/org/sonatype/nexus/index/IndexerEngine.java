@@ -1,18 +1,16 @@
 /**
- * Copyright (c) 2007-2008 Sonatype, Inc. All rights reserved.
- *
- * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
- * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ * Copyright (c) 2007-2008 Sonatype, Inc. All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License Version 1.0, which accompanies this distribution and is
+ * available at http://www.eclipse.org/legal/epl-v10.html.
  */
-package org.sonatype.nexus.index.creator;
+package org.sonatype.nexus.index;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
- * An indexer engine 
+ * An indexer engine used to index, update and remote artifacts to the indexing context.
  */
 public interface IndexerEngine
 {
@@ -27,17 +25,11 @@ public interface IndexerEngine
      */
     void update( IndexingContext context, ArtifactContext ac )
         throws IOException;
-    
+
     /**
      * Remove artifact to the index
      */
     void remove( IndexingContext context, ArtifactContext ac )
         throws IOException;
 
-    /**
-     * Optimize index store after multiple operations
-     */
-    void optimize( IndexingContext context )
-        throws IOException;
-    
 }

@@ -13,7 +13,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UTFDataFormatException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
@@ -22,8 +21,8 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.IndexWriter;
-import org.sonatype.nexus.index.IndexUtils;
-import org.sonatype.nexus.index.creator.IndexCreator;
+import org.sonatype.nexus.index.context.IndexUtils;
+import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
  * An index data reader used to parse transfer index format.
@@ -42,7 +41,7 @@ public class IndexDataReader
         this.dis = new DataInputStream( gis );
     }
 
-    public IndexDataReadResult readIndex( IndexWriter w, Collection<? extends IndexCreator> ics )
+    public IndexDataReadResult readIndex( IndexWriter w, IndexingContext context )
         throws IOException
     {
         dis.readByte(); // data format version
@@ -58,7 +57,7 @@ public class IndexDataReader
         Document doc;
         while ( ( doc = readDocument() ) != null )
         {
-            w.addDocument( IndexUtils.updateDocument( doc, ics ) );
+            w.addDocument( IndexUtils.updateDocument( doc, context ) );
             
             n++;
         }

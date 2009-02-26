@@ -13,6 +13,10 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 
+/**
+ * An extension of <a href="http://lucene.apache.org/java/2_4_0/api/core/org/apache/lucene/index/IndexWriter.html">Lucene IndexWriter</a>
+ * to allow to track if writer is closed 
+ */
 public class NexusIndexWriter
     extends IndexWriter
 {

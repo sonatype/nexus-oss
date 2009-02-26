@@ -6,7 +6,7 @@
  */
 package org.sonatype.nexus.index.updater;
 
-import org.sonatype.nexus.index.DocumentFilter;
+import org.sonatype.nexus.index.context.DocumentFilter;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**

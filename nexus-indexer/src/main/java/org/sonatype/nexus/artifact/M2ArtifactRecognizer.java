@@ -7,7 +7,7 @@
 package org.sonatype.nexus.artifact;
 
 /**
- * A simple class for some very basic "detection" of the kind of path.
+ * Utility methods for basic "detection" of artifact kind in M2 repository.
  */
 public class M2ArtifactRecognizer
 {

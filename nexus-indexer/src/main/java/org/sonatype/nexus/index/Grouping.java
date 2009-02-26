@@ -8,10 +8,13 @@ package org.sonatype.nexus.index;
 
 import java.util.Map;
 
+
 /**
- * Grouping drives the search Map filling, if groupes search requested.
+ * A grouping criteria for grouped searches.
  * 
- * @author cstamas
+ * @see NexusIndexer#searchGrouped(GroupedSearchRequest)
+ * 
+ * @author Tamas Cservenak
  */
 public interface Grouping
 {

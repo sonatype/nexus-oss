@@ -11,6 +11,9 @@ import java.io.File;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 
+/**
+ * A POM locator to locate POM artifact. 
+ */
 public class PomLocator
     implements GavHelpedLocator
 {

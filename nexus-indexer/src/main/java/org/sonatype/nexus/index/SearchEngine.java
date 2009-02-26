@@ -4,7 +4,7 @@
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
  * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
  */
-package org.sonatype.nexus.index.search;
+package org.sonatype.nexus.index;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -12,26 +12,17 @@ import java.util.Comparator;
 import java.util.Set;
 
 import org.apache.lucene.search.Query;
-import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.FlatSearchRequest;
-import org.sonatype.nexus.index.FlatSearchResponse;
-import org.sonatype.nexus.index.GroupedSearchRequest;
-import org.sonatype.nexus.index.GroupedSearchResponse;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
+ * A search engine used to perform searches trough repository indexes.
+ *  
  * @author Eugene Kuleshov
  * @author Jason van Zyl
  * @author Tamas Cservenak
  */
 public interface SearchEngine
 {
-    int UNDEFINED = -1;
-
-    // ----------------------------------------------------------------------------
-    // Searching
-    // ----------------------------------------------------------------------------
-
     @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
         IndexingContext indexingContext, Query query )

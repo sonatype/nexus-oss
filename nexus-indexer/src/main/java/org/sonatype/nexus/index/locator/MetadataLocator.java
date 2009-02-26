@@ -8,7 +8,11 @@ package org.sonatype.nexus.index.locator;
 
 import java.io.File;
 
-/** @author Jason van Zyl */
+/**
+ * A metadata locator to locate the Maven 2 artifact metadata relative to its POM.
+ * 
+ * @author Jason van Zyl 
+ */
 public class MetadataLocator
     implements Locator
 {

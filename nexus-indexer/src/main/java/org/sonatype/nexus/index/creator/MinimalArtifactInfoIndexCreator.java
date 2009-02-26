@@ -33,6 +33,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.ArtifactAvailablility;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.locator.JavadocLocator;
 import org.sonatype.nexus.index.locator.Locator;
 import org.sonatype.nexus.index.locator.Sha1Locator;
@@ -225,11 +226,11 @@ public class MinimalArtifactInfoIndexCreator
     public void updateDocument( ArtifactInfo ai, Document doc )
     {
         String info = new StringBuilder()
-            .append( ai.packaging ).append( AbstractIndexCreator.FS ).append( Long.toString( ai.lastModified ) )
-            .append( AbstractIndexCreator.FS ).append( Long.toString( ai.size ) ).append( AbstractIndexCreator.FS )
-            .append( ai.sourcesExists.toString() ).append( AbstractIndexCreator.FS ).append(
-                ai.javadocExists.toString() ).append( AbstractIndexCreator.FS ).append( ai.signatureExists.toString() )
-            .append( AbstractIndexCreator.FS ).append( ai.fextension ).toString();
+            .append( ai.packaging ).append( ArtifactInfo.FS ).append( Long.toString( ai.lastModified ) )
+            .append( ArtifactInfo.FS ).append( Long.toString( ai.size ) ).append( ArtifactInfo.FS )
+            .append( ai.sourcesExists.toString() ).append( ArtifactInfo.FS ).append(
+                ai.javadocExists.toString() ).append( ArtifactInfo.FS ).append( ai.signatureExists.toString() )
+            .append( ArtifactInfo.FS ).append( ai.fextension ).toString();
 
         doc.add( new Field( ArtifactInfo.INFO, info, Field.Store.YES, Field.Index.NO ) );
 
@@ -266,7 +267,7 @@ public class MinimalArtifactInfoIndexCreator
 
         if ( ai.goals != null )
         {
-            doc.add( new Field( ArtifactInfo.PLUGIN_GOALS, lst2str( ai.goals ), Field.Store.YES, Field.Index.NO ) );
+            doc.add( new Field( ArtifactInfo.PLUGIN_GOALS, ArtifactInfo.lst2str( ai.goals ), Field.Store.YES, Field.Index.NO ) );
         }
 
         if ( ai.sha1 != null )
@@ -291,7 +292,7 @@ public class MinimalArtifactInfoIndexCreator
 
         if ( uinfo != null )
         {
-            String[] r = FS_PATTERN.split( uinfo );
+            String[] r = ArtifactInfo.FS_PATTERN.split( uinfo );
 
             ai.groupId = r[0];
 
@@ -301,7 +302,7 @@ public class MinimalArtifactInfoIndexCreator
 
             if ( r.length > 3 )
             {
-                ai.classifier = renvl( r[3] );
+                ai.classifier = ArtifactInfo.renvl( r[3] );
             }
 
             res = true;
@@ -311,7 +312,7 @@ public class MinimalArtifactInfoIndexCreator
 
         if ( info != null )
         {
-            String[] r = FS_PATTERN.split( info );
+            String[] r = ArtifactInfo.FS_PATTERN.split( info );
 
             ai.packaging = r[0];
 
@@ -352,7 +353,7 @@ public class MinimalArtifactInfoIndexCreator
 
                 if ( goals != null )
                 {
-                    ai.goals = str2lst( goals );
+                    ai.goals = ArtifactInfo.str2lst( goals );
                 }
             }
 

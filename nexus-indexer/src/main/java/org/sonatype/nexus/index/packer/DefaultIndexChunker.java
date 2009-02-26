@@ -15,12 +15,12 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.index.ArtifactInfo;
 
 /**
- * Default chunker converts timestamp (e.g. {@link ArtifactInfo#LAST_MODIFIED}) to corresponding index chunk name using
- * day as a base.
+ * A default {@link IndexChunker} implementation. Converts timestamp (e.g. {@link ArtifactInfo#LAST_MODIFIED}) to
+ * the corresponding index chunk name using day as a base.
  * 
  * @author Tamas Cservenak
  */
-@Component(role=IndexChunker.class, hint="day")
+@Component( role = IndexChunker.class, hint = "day" )
 public class DefaultIndexChunker
     implements IndexChunker
 {

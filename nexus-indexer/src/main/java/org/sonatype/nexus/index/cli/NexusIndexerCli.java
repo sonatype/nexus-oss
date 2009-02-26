@@ -22,13 +22,38 @@ import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactScanningListener;
 import org.sonatype.nexus.index.NexusIndexer;
+import org.sonatype.nexus.index.ScanningResult;
+import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
-import org.sonatype.nexus.index.creator.IndexCreator;
+import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
+import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.packer.IndexPackingRequest;
-import org.sonatype.nexus.index.scan.ScanningResult;
 
+/**
+ * A command line tool that can be used to index local Maven repository.
+ * <p>
+ * The following command line options are supported:
+ * 
+ * 
+ * <ul>
+ * <li>-repository <path> : required path to repository to be indexed</li>
+ * <li>-index <path> : required index folder used to store created index or
+ * where previously created index is stored</li>
+ * <li>-name <path> : required repository name/id</li>
+ * <li>-target <path> : optional folder name where to save produced index files</li>
+ * <li>-type <path> : optional indexer types</li>
+ * </ul>
+ * 
+ * When index folder contains previously created index, the tool will use it as
+ * a base line and will generate chunks for the incremental updates.
+ * <p>
+ * The indexer types could be one of default, min or full. You can also specify
+ * list of coma-separated custom index creators. An index creator should be a
+ * regular Plexus component, see {@link MinimalArtifactInfoIndexCreator} and
+ * {@link JarFileContentsIndexCreator}.
+ */
 public class NexusIndexerCli
     extends AbstractCli
 {
@@ -82,13 +107,6 @@ public class NexusIndexerCli
 
         options.addOption( OptionBuilder.withLongOpt( "type" ).hasArg() //
         .withDescription( "Indexer type (default, min, full or coma separated list of custom types)." ).create( TYPE ) );
-
-//        options.addOption( OptionBuilder
-//            .withLongOpt( "resolution" ).hasArg()
-//            //
-//            .withDescription(
-//                "Incremental index chunk resolution: 'day' (default), 'week', 'month' and 'none'." ).create(
-//                CHUNK_RESOLUTION ) );
 
         return options;
     }

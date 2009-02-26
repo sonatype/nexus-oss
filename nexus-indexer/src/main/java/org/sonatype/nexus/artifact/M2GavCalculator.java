@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
- * The M2 GAV Calculator.
+ * An M2 <code>GavCalculator</code>.
  * 
  * @author Jason van Zyl
  * @author Tamas Cservenak

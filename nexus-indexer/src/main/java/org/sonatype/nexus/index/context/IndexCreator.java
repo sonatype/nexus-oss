@@ -3,13 +3,15 @@
  * available under the terms of the Eclipse Public License Version 1.0, which accompanies this distribution and is
  * available at http://www.eclipse.org/legal/epl-v10.html.
  */
-package org.sonatype.nexus.index.creator;
+package org.sonatype.nexus.index.context;
 
 import java.io.IOException;
 
 import org.apache.lucene.document.Document;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
+import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 
 /**
  * An index creator is responsible for storing and reading data to and from Lucene index.

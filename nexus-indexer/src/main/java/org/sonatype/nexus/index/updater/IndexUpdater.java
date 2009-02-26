@@ -14,8 +14,32 @@ import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
+import org.sonatype.nexus.index.packer.IndexPacker;
 
 /**
+ * An index updater provides functionality to update index for remote
+ * repositories using transfer format produced by the {@link IndexPacker}.
+ * <p>
+ * The following snippet shows how to update/download remote index:
+ * 
+ * <pre>
+ *   IndexingContext context = indexer.getIndexingContexts().get(indexId);
+ *   Settings settings = embedder.getSettings();
+ *   Proxy proxy = settings.getActiveProxy();
+ *   ProxyInfo proxyInfo = null;
+ *   if(proxy != null) {
+ *     proxyInfo = new ProxyInfo();
+ *     proxyInfo.setHost(proxy.getHost());
+ *     proxyInfo.setPort(proxy.getPort());
+ *     proxyInfo.setNonProxyHosts(proxy.getNonProxyHosts());
+ *     proxyInfo.setUserName(proxy.getUsername());
+ *     proxyInfo.setPassword(proxy.getPassword());
+ *   }
+ *   
+ *   Date indexTime = updater.fetchAndUpdateIndex(context, transferListener, proxyInfo);
+ *   ...
+ * </pre>
+ * 
  * @author Jason van Zyl
  * @author Eugene Kuleshov
  */

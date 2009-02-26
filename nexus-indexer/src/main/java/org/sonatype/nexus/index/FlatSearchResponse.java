@@ -10,6 +10,11 @@ import java.util.Set;
 
 import org.apache.lucene.search.Query;
 
+/**
+ * A flat search response.
+ * 
+ * @see NexusIndexer#searchFlat(FlatSearchRequest)
+ */
 public class FlatSearchResponse
 {
     private final Query query;

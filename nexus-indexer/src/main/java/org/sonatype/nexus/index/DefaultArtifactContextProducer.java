@@ -12,20 +12,18 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.index.creator.AbstractIndexCreator;
 import org.sonatype.nexus.index.locator.GavHelpedLocator;
 import org.sonatype.nexus.index.locator.Locator;
 import org.sonatype.nexus.index.locator.MetadataLocator;
 import org.sonatype.nexus.index.locator.PomLocator;
 
 /**
- * The default implementation of the ArtifactContextProducer.
+ * A default implementation of the {@link ArtifactContextProducer}.
  * 
  * @author Tamas Cservenak
  * @author Eugene Kuleshov
- * 
  */
-@Component(role=ArtifactContextProducer.class)
+@Component(role = ArtifactContextProducer.class)
 public class DefaultArtifactContextProducer
     implements ArtifactContextProducer
 {
@@ -49,7 +47,7 @@ public class DefaultArtifactContextProducer
             return null;  // not an artifact
         }
         
-        if ( !AbstractIndexCreator.isIndexable( file ) )
+        if ( !isIndexable( file ) )
         {
             return null;  // skipped
         }
@@ -102,6 +100,32 @@ public class DefaultArtifactContextProducer
         File metadata = ml.locate( pom );
 
         return new ArtifactContext( pom, artifact, metadata, ai, gav );
+    }
+
+    private boolean isIndexable( File file )
+    {
+        if ( file == null )
+        {
+            return false;
+        }
+        
+        String filename = file.getName();
+        
+        if (   filename.startsWith( "maven-metadata" )
+            // || filename.endsWith( "-javadoc.jar" )
+            // || filename.endsWith( "-javadocs.jar" )
+            // || filename.endsWith( "-sources.jar" )
+            || filename.endsWith( ".properties" )
+            || filename.endsWith( ".xml" )
+            || filename.endsWith( ".asc" ) 
+            || filename.endsWith( ".md5" )
+            || filename.endsWith( ".sha1" )
+            || ( filename.endsWith( ".pom" ) && new File( file.getParent(), filename.replaceAll( "\\.pom$", ".jar" ) ).exists() ) )
+        {
+            return false;
+        }
+        
+        return true;
     }
 
 }

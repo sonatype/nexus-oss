@@ -6,9 +6,10 @@
  */
 package org.sonatype.nexus.artifact;
 
-import org.sonatype.nexus.DefaultNexusEnforcer;
-import org.sonatype.nexus.NexusEnforcer;
 
+/**
+ * An abstract <code>GavCalculator</code> base class.
+ */
 public abstract class AbstractGavCalculator
     implements GavCalculator
 {

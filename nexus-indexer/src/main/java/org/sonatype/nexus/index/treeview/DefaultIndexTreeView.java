@@ -77,7 +77,7 @@ public class DefaultIndexTreeView
         if ( "/".equals( path ) )
         {
             // get root groups and finish
-            Set<String> rootGroups = getNexusIndexer().getRootGroups( factory.getIndexingContext() );
+            Set<String> rootGroups = factory.getIndexingContext().getRootGroups();
 
             for ( String group : rootGroups )
             {
@@ -89,7 +89,7 @@ public class DefaultIndexTreeView
         }
         else
         {
-            Set<String> allGroups = getNexusIndexer().getAllGroups( factory.getIndexingContext() );
+            Set<String> allGroups = factory.getIndexingContext().getAllGroups();
 
             listChildren( result, factory, allGroups );
         }

@@ -6,6 +6,9 @@
  */
 package org.sonatype.nexus.artifact;
 
+/**
+ * Utility methods for basic "detection" of artifact kind in M1 repository.
+ */
 public class M1ArtifactRecognizer {
 	/**
 	 * Is this item M1 Checksum?

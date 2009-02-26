@@ -30,8 +30,8 @@ import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchRequest;
 import org.sonatype.nexus.index.FlatSearchResponse;
-import org.sonatype.nexus.index.IndexUtils;
 import org.sonatype.nexus.index.NexusIndexer;
+import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**

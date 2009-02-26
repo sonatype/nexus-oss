@@ -8,7 +8,10 @@ package org.sonatype.nexus.index.locator;
 
 import java.io.File;
 
-/** @author Jason van Zyl */
+/** 
+ * A signature locator to locate the signature file relative to POM.
+ * 
+ * @author Jason van Zyl */
 public class SignatureLocator
     implements Locator
 {

@@ -133,7 +133,7 @@
           <forkMode>never</forkMode>
         </configuration>
       </plugin>
-
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -203,6 +203,14 @@
           <!-- this is important for muti-module project
           <aggregate>true</aggregate>
           -->
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <overview>/src/main/java/overview-summary.html</overview>
         </configuration>
       </plugin>
     </plugins>

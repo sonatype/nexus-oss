@@ -18,6 +18,10 @@ import java.util.Set;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
+import org.sonatype.nexus.index.search.grouping.GAGrouping;
+import org.sonatype.nexus.index.updater.DefaultIndexUpdater;
 
 /** 
  * @author Eugene Kuleshov
@@ -29,13 +33,6 @@ public class Index20081108RegressionTest
     protected void prepareNexusIndexer( NexusIndexer nexusIndexer )
         throws Exception
     {
-        InputStream is = new FileInputStream( getBasedir() +  //
-            File.separator + "src" +  // 
-            File.separator + "test" + //
-            File.separator  + "nexus-maven-repository-index.20081108.zip" );
-        
-        IndexUtils.unpackIndexArchive( is, indexDir, NexusIndexer.DEFAULT_INDEX );
-        
         context = nexusIndexer.addIndexingContextForced(
             "test",
             "test",
@@ -44,6 +41,15 @@ public class Index20081108RegressionTest
             null,
             null,
             NexusIndexer.DEFAULT_INDEX );
+        
+        InputStream is = new FileInputStream( getBasedir() +  //
+            File.separator + "src" +  // 
+            File.separator + "test" + //
+            File.separator  + "nexus-maven-repository-index.20081108.zip" );
+        
+        Directory tempDir = new RAMDirectory();
+        DefaultIndexUpdater.unpackIndexArchive( is, tempDir, context );
+        context.replace( tempDir );
     }
     
     public void testExtension() throws Exception 
@@ -95,7 +101,7 @@ public class Index20081108RegressionTest
     public void testRootGroups()
         throws Exception
     {
-        Set<String> rootGroups = nexusIndexer.getRootGroups( context );
+        Set<String> rootGroups = context.getRootGroups();
         assertEquals( rootGroups.toString(), 8, rootGroups.size() );
       
         assertGroup( 2, "qdox", context );

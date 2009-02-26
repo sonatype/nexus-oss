@@ -57,7 +57,7 @@ public abstract class AbstractIndexContentPlexusResource
     {
         return null;
     }
-    
+
     protected abstract IndexingContext getIndexingContext( Request request )
         throws ResourceException;
 
@@ -72,10 +72,10 @@ public abstract class AbstractIndexContentPlexusResource
             return null;
         }
 
-        ContentListResourceResponse resourceResponse =
-            createResponse( request, getIndexingContext( request ) );
-        
-        if ( resourceResponse.getData().size() == 0 ) {
+        ContentListResourceResponse resourceResponse = createResponse( request, getIndexingContext( request ) );
+
+        if ( resourceResponse.getData().size() == 0 )
+        {
             response.setStatus( Status.CLIENT_ERROR_NOT_FOUND );
         }
 
@@ -95,17 +95,18 @@ public abstract class AbstractIndexContentPlexusResource
             if ( "/".equals( path ) )
             {
                 // get root groups and finish
-                Set<String> rootGroups = indexer.getRootGroups( indexingContext );
+                Set<String> rootGroups = indexingContext.getRootGroups();
                 for ( String group : rootGroups )
                 {
-                    if ( group.length() > 0 ) {
+                    if ( group.length() > 0 )
+                    {
                         response.addData( createGroupResource( request, path, group ) );
                     }
                 }
             }
             else
             {
-                Set<String> allGroups = indexer.getAllGroups( indexingContext );
+                Set<String> allGroups = indexingContext.getAllGroups();
 
                 ContentListResource rootResource = new ContentListResource();
                 rootResource.setRelativePath( path );
@@ -246,7 +247,7 @@ public abstract class AbstractIndexContentPlexusResource
                 {
                     group = group.substring( 0, nextDot );
                 }
-                if ( group.length() > 0 && ! result.contains( group ) )
+                if ( group.length() > 0 && !result.contains( group ) )
                 {
                     result.add( group );
                 }

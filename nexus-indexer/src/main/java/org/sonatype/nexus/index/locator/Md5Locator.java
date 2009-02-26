@@ -8,7 +8,10 @@ package org.sonatype.nexus.index.locator;
 
 import java.io.File;
 
-/** @author Jason van Zyl */
+/**
+ * An md5 locator to locate the md5 file relative to POM.
+ *  
+ * @author Jason van Zyl */
 public class Md5Locator
     implements Locator
 {

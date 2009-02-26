@@ -19,6 +19,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.sonatype.nexus.index.search.grouping.GAGrouping;
 
 public abstract class AbstractRepoNexusIndexerTest
     extends AbstractNexusIndexerTest
@@ -29,7 +30,7 @@ public abstract class AbstractRepoNexusIndexerTest
     public void testRootGroups()
         throws Exception
     {
-        Set<String> rootGroups = nexusIndexer.getRootGroups( context );
+        Set<String> rootGroups = context.getRootGroups();
         assertEquals( rootGroups.toString(), 11, rootGroups.size() );
 
         assertGroup( 2, "qdox", context );

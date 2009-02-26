@@ -10,6 +10,11 @@ import java.util.Map;
 
 import org.apache.lucene.search.Query;
 
+/**
+ * A grouped search response.
+ * 
+ * @see NexusIndexer#searchGrouped(GroupedSearchRequest)
+ */
 public class GroupedSearchResponse
 {
     private final Query query;

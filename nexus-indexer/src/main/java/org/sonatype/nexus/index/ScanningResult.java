@@ -4,14 +4,17 @@
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
  * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
  */
-package org.sonatype.nexus.index.scan;
+package org.sonatype.nexus.index;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/** @author Jason van Zyl */
-public class DefaultScanningResult
-    implements ScanningResult
+/**
+ * A scanning result holds result of repository scan
+ *  
+ * @author Jason van Zyl 
+ */
+public class ScanningResult
 {
     private int totalFiles = 0;
     

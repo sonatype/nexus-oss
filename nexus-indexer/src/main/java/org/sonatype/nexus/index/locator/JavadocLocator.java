@@ -8,12 +8,16 @@ package org.sonatype.nexus.index.locator;
 
 import java.io.File;
 
-/** @author Jason van Zyl */
+/**
+ * A JavaDoc locator to locate the JavaDoc bundle relative to POM.
+ *  
+ * @author Jason van Zyl 
+ */
 public class JavadocLocator
     implements Locator
 {
     /**
-     * Locates the sources bundle relative to POM.
+     * Locates the JavaDoc bundle relative to POM.
      */
     public File locate( File source )
     {

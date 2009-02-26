@@ -11,8 +11,6 @@ import java.text.SimpleDateFormat;
 
 import junit.framework.TestCase;
 
-import org.sonatype.nexus.DefaultNexusEnforcer;
-import org.sonatype.nexus.NexusEnforcer;
 
 public class M2GavCalculatorTest
     extends TestCase

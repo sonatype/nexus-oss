@@ -12,6 +12,9 @@ import java.util.Collection;
 
 import org.sonatype.nexus.index.context.IndexingContext;
 
+/**
+ * An index packing request.
+ */
 public class IndexPackingRequest
 {
     private static final int MAX_CHUNKS = 30;

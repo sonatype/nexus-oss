@@ -19,8 +19,11 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.RAMDirectory;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.packer.DefaultIndexPacker;
+import org.sonatype.nexus.index.search.grouping.GAGrouping;
+import org.sonatype.nexus.index.updater.DefaultIndexUpdater;
 
 /** http://issues.sonatype.org/browse/NEXUS-13 */
 public class Nexus13NexusIndexerTest
@@ -98,25 +101,28 @@ public class Nexus13NexusIndexerTest
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-        IndexUtils.packIndexArchive( context, os );
+        DefaultIndexPacker.packIndexArchive( context, os );
 
         Thread.sleep( 1000L );
 
-        Directory newIndexDir = FSDirectory.getDirectory( new File( getBasedir(), "target/test-new" ) );
-
-        IndexUtils.unpackIndexArchive(
-            new ByteArrayInputStream( os.toByteArray() ),
-            newIndexDir,
-            NexusIndexer.DEFAULT_INDEX );
-
+        Directory indexDir = new RAMDirectory();
+        
         IndexingContext newContext = nexusIndexer.addIndexingContext(
             "test-new",
             "nexus-13",
             null,
-            newIndexDir,
+            indexDir,
             null,
             null,
             NexusIndexer.DEFAULT_INDEX );
+        
+        Directory newIndexDir = new RAMDirectory();
+        
+        DefaultIndexUpdater.unpackIndexArchive(
+            new ByteArrayInputStream( os.toByteArray() ),
+            newIndexDir,
+            newContext );
+        newContext.replace( newIndexDir );
 
         assertEquals( 0, newContext.getTimestamp().getTime() - context.getTimestamp().getTime() );
 
@@ -151,7 +157,7 @@ public class Nexus13NexusIndexerTest
     public void testRootGroups()
         throws Exception
     {
-        Set<String> rootGroups = nexusIndexer.getRootGroups( context );
+        Set<String> rootGroups = context.getRootGroups();
         assertEquals( rootGroups.toString(), 1, rootGroups.size() );
 
         assertGroup( 8, "cisco", context );

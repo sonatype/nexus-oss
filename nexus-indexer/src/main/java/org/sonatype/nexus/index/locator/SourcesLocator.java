@@ -8,7 +8,10 @@ package org.sonatype.nexus.index.locator;
 
 import java.io.File;
 
-/** @author Jason van Zyl */
+/** 
+ * A sources locator to locate the sources bundle relative to POM.
+ * 
+ * @author Jason van Zyl */
 public class SourcesLocator
     implements Locator
 {

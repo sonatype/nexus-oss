@@ -16,6 +16,7 @@ import org.apache.lucene.document.Field;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.context.IndexCreator;
 
 /**
  * An index creator used to index Java class names from a Maven artifact.

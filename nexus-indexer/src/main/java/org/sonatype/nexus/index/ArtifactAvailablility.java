@@ -6,6 +6,9 @@
  */
 package org.sonatype.nexus.index;
 
+/**
+ * Enumeration provides values indicating artifact availability
+ */
 public enum ArtifactAvailablility
 {
     /**

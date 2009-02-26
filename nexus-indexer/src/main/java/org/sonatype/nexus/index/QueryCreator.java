@@ -9,7 +9,10 @@ package org.sonatype.nexus.index;
 import org.apache.lucene.search.Query;
 
 /**
- * A component that creates Query objects from Strings, that can be later combined into one Query.
+ * A component that creates Lucene 
+ * <a href="http://lucene.apache.org/java/2_4_0/api/core/org/apache/lucene/search/Query.html">Query</a>
+ * instances for provided query text. Created queries can be also combined using
+ * <a href="http://lucene.apache.org/java/2_4_0/api/core/org/apache/lucene/search/BooleanQuery.html">BooleanQuery</a>.
  * 
  * @author Tamas Cservenak
  */

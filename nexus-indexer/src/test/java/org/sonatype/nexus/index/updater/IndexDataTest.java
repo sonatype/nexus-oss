@@ -17,11 +17,11 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.sonatype.nexus.index.AbstractRepoNexusIndexerTest;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.NexusIndexer;
+import org.sonatype.nexus.index.context.IndexUtils;
 
 /**
  * @author Eugene Kuleshov
@@ -65,7 +65,7 @@ public class IndexDataTest
 
         newDir = new RAMDirectory();
 
-        Date newTimestamp = DefaultIndexUpdater.unpackIndexData( is, newDir, context.getIndexCreators() );
+        Date newTimestamp = DefaultIndexUpdater.unpackIndexData( is, newDir, context );
 
         assertEquals( timestamp, newTimestamp );
         
@@ -102,7 +102,7 @@ public class IndexDataTest
         {
             Document document = r1.document( i );
             
-            ArtifactInfo ai = context.constructArtifactInfo( document );
+            ArtifactInfo ai = IndexUtils.constructArtifactInfo( document, context );
             
             if( ai != null)
             {

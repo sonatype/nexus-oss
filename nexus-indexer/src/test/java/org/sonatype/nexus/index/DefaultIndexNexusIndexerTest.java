@@ -26,6 +26,10 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.packer.DefaultIndexPacker;
+import org.sonatype.nexus.index.search.grouping.GAGrouping;
+import org.sonatype.nexus.index.search.grouping.GGrouping;
+import org.sonatype.nexus.index.updater.DefaultIndexUpdater;
 
 /** @author Jason van Zyl */
 public class DefaultIndexNexusIndexerTest
@@ -301,7 +305,7 @@ public class DefaultIndexNexusIndexerTest
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-        IndexUtils.packIndexArchive( context, os );
+        DefaultIndexPacker.packIndexArchive( context, os );
 
         Thread.sleep( 1000L );
 
@@ -309,10 +313,10 @@ public class DefaultIndexNexusIndexerTest
 
         Directory newIndexDir = FSDirectory.getDirectory( newIndex );
 
-        IndexUtils.unpackIndexArchive(
+        DefaultIndexUpdater.unpackIndexArchive(
             new ByteArrayInputStream( os.toByteArray() ),
             newIndexDir,
-            NexusIndexer.DEFAULT_INDEX );
+            context );
 
         IndexingContext newContext = nexusIndexer.addIndexingContext(
             "test-new",
