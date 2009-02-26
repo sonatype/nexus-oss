@@ -34,6 +34,8 @@ public abstract class AbstractMetadataProcessor
         {
             if ( isMetadataCorrect( path ) )
             {
+                postProcessMetadata();
+                
                 return true;
             }
             else

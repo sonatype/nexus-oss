@@ -100,8 +100,6 @@ public class ArtifactDirMetadataProcessor
     @Override
     public void postProcessMetadata()
     {
-        metadataHelper.currentArtifacts.clear();
-        
         metadataHelper.currentVersions.clear();
     }
 
