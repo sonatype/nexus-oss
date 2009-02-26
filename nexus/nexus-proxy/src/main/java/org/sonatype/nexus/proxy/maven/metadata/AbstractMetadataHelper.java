@@ -11,24 +11,15 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.maven;
+package org.sonatype.nexus.proxy.maven.metadata;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.maven.mercury.repository.metadata.AddVersionOperation;
-import org.apache.maven.mercury.repository.metadata.Metadata;
-import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
-import org.apache.maven.mercury.repository.metadata.MetadataException;
-import org.apache.maven.mercury.repository.metadata.MetadataOperation;
 import org.apache.maven.mercury.repository.metadata.Plugin;
-import org.apache.maven.mercury.repository.metadata.SetSnapshotOperation;
-import org.apache.maven.mercury.repository.metadata.StringOperand;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -42,26 +33,42 @@ import org.codehaus.plexus.util.StringUtils;
  */
 abstract public class AbstractMetadataHelper
 {
-    private static final String MD5_SUFFIX = ".md5";
+    static final String MD5_SUFFIX = ".md5";
 
-    private static final String SHA1_SUFFIX = ".sha1";
+    static final String SHA1_SUFFIX = ".sha1";
 
-    private static final String METADATA_SUFFIX = "/maven-metadata.xml";
+    static final String METADATA_SUFFIX = "/maven-metadata.xml";
 
     /**
      * current groupId based on the current collection, if no groupId, it's null
      */
-    protected String currentGroupId;
+    String currentGroupId;
 
-    protected String currentArtifactId;
+    String currentArtifactId;
 
-    protected String currentVersion;
+    String currentVersion;
 
-    protected Map<String, Plugin> currentPlugins = new HashMap<String, Plugin>();
+    List<Plugin> currentPlugins = new ArrayList<Plugin>();
 
-    protected List<String> currentVersions = new ArrayList<String>();
+    List<String> currentVersions = new ArrayList<String>();
 
-    protected List<String> currentArtifacts = new ArrayList<String>();
+    List<String> currentArtifacts = new ArrayList<String>();
+
+    private Collection<AbstractMetadataProcessor> metadataProcessors;
+
+    public AbstractMetadataHelper()
+    {
+        // here the order matters
+        metadataProcessors = new ArrayList<AbstractMetadataProcessor>( 3 );
+
+        metadataProcessors.add( new VersionDirMetadataProcessor( this ) );
+
+        metadataProcessors.add( new ArtifactDirMetadataProcessor( this ) );
+
+        metadataProcessors.add( new GroupDirMetadataProcessor( this ) );
+
+        metadataProcessors.add( new ObsoleteMetadataProcessor( this ) );
+    }
 
     public void onDirEnter( String path )
     {
@@ -72,29 +79,12 @@ abstract public class AbstractMetadataHelper
     {
         try
         {
-            if ( shouldCreateMetadataForSnapshotVersionDir( path ) )
+            for ( AbstractMetadataProcessor metadataProcessor : metadataProcessors )
             {
-                createMetadataForSnapshotVersionDir( path );
-
-                rebuildChecksum( path + METADATA_SUFFIX );
-
-                currentArtifacts.clear();
-            }
-            else if ( shouldCreateMetadataForArtifactDir( path ) )
-            {
-                createMetadataForArtifactDir( path );
-
-                rebuildChecksum( path + METADATA_SUFFIX );
-
-                currentVersions.clear();
-            }
-            else if ( shouldCreateMetadataForPluginGroupDir( path ) )
-            {
-                createMetadataForPluginGroupDir( path );
-
-                rebuildChecksum( path + METADATA_SUFFIX );
-
-                currentPlugins.clear();
+                if ( metadataProcessor.process( path ) )
+                {
+                    break;
+                }
             }
 
             cleanGAV( path );
@@ -109,15 +99,8 @@ abstract public class AbstractMetadataHelper
     {
         try
         {
-            // remove old metadata files
-            if ( isMavenMetadataFile( path ) )
-            {
-                remove( path );
-
-                return;
-            }
             // remove rotten checksum
-            if ( isRottenChecksum( path ) )
+            if ( isObsoleteChecksum( path ) )
             {
                 remove( path );
 
@@ -137,7 +120,7 @@ abstract public class AbstractMetadataHelper
         }
     }
 
-    private boolean isRottenChecksum( String path )
+    private boolean isObsoleteChecksum( String path )
         throws Exception
     {
         if ( !isChecksumFile( path ) )
@@ -174,32 +157,6 @@ abstract public class AbstractMetadataHelper
             return false;
         }
         if ( path.substring( 1 ).replace( '/', '.' ).equals( currentGroupId ) )
-        {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean inVersionPath( String path )
-    {
-        if ( StringUtils.isEmpty( currentVersion ) )
-        {
-            return false;
-        }
-        if ( getName( path ).equals( currentVersion ) )
-        {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean inArtifactIdPath( String path )
-    {
-        if ( StringUtils.isEmpty( currentArtifactId ) )
-        {
-            return false;
-        }
-        if ( getName( path ).equals( currentArtifactId ) )
         {
             return true;
         }
@@ -296,36 +253,8 @@ abstract public class AbstractMetadataHelper
                 plugin.setName( model.getName() );
             }
 
-            currentPlugins.put( model.getArtifactId(), plugin );
+            currentPlugins.add( plugin );
         }
-    }
-
-    private boolean shouldCreateMetadataForArtifactDir( String path )
-    {
-        if ( !currentVersions.isEmpty() && inArtifactIdPath( path ) )
-        {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean shouldCreateMetadataForSnapshotVersionDir( String path )
-    {
-        if ( !currentArtifacts.isEmpty() && inVersionPath( path ) && currentVersion.endsWith( "SNAPSHOT" ) )
-        {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean shouldCreateMetadataForPluginGroupDir( String path )
-    {
-        if ( !currentPlugins.isEmpty() && inGroupIdPath( path ) )
-        {
-            return true;
-        }
-
-        return false;
     }
 
     private String getPluginPrefix( String artifactId )
@@ -340,102 +269,23 @@ abstract public class AbstractMetadataHelper
         }
     }
 
-    public void createMetadataForPluginGroupDir( String path )
+    void rebuildChecksum( String path )
         throws Exception
     {
-        Metadata md = new Metadata();
-
-        for ( Plugin plugin : currentPlugins.values() )
+        if ( !exists( path ) )
         {
-            md.addPlugin( plugin );
+            if ( exists( path + MD5_SUFFIX ) )
+            {
+                remove( path + MD5_SUFFIX );
+            }
+            if ( exists( path + SHA1_SUFFIX ) )
+            {
+                remove( path + SHA1_SUFFIX );
+            }
+
+            return;
         }
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        MetadataBuilder.write( md, outputStream );
-
-        String mdString = outputStream.toString();
-
-        outputStream.close();
-
-        store( mdString, path + METADATA_SUFFIX );
-    }
-
-    public void createMetadataForArtifactDir( String path )
-        throws Exception
-    {
-        Metadata md = new Metadata();
-
-        md.setGroupId( currentGroupId );
-
-        md.setArtifactId( currentArtifactId );
-
-        versioningForArtifactDir( md, currentVersions );
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        MetadataBuilder.write( md, outputStream );
-
-        String mdString = outputStream.toString();
-
-        outputStream.close();
-
-        store( mdString, path + METADATA_SUFFIX );
-    }
-
-    protected void versioningForArtifactDir( Metadata metadata, List<String> versions )
-        throws MetadataException
-    {
-        List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
-
-        for ( String version : versions )
-        {
-            ops.add( new AddVersionOperation( new StringOperand( version ) ) );
-        }
-
-        MetadataBuilder.changeMetadata( metadata, ops );
-    }
-
-    public void createMetadataForSnapshotVersionDir( String path )
-        throws Exception
-    {
-        Metadata md = new Metadata();
-
-        md.setGroupId( currentGroupId );
-
-        md.setArtifactId( currentArtifactId );
-
-        md.setVersion( currentVersion );
-
-        versioningForSnapshotVersionDir( md, currentArtifacts );
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        MetadataBuilder.write( md, outputStream );
-
-        String mdString = outputStream.toString();
-
-        outputStream.close();
-
-        store( mdString, path + METADATA_SUFFIX );
-    }
-
-    protected void versioningForSnapshotVersionDir( Metadata metadata, List<String> artifacts )
-        throws MetadataException
-    {
-        List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
-
-        for ( String artifact : artifacts )
-        {
-            ops.add( new SetSnapshotOperation( new StringOperand( getName( artifact ) ) ) );
-        }
-
-        MetadataBuilder.changeMetadata( metadata, ops );
-    }
-
-    private void rebuildChecksum( String path )
-        throws Exception
-    {
         if ( !shouldBuildChecksum( path ) )
         {
             return;
@@ -459,15 +309,6 @@ abstract public class AbstractMetadataHelper
     protected boolean isChecksumFile( String path )
     {
         if ( getName( path ).endsWith( MD5_SUFFIX ) || getName( path ).endsWith( SHA1_SUFFIX ) )
-        {
-            return true;
-        }
-        return false;
-    }
-
-    protected boolean isMavenMetadataFile( String path )
-    {
-        if ( getName( path ).endsWith( METADATA_SUFFIX.substring( 1 ) ) )
         {
             return true;
         }

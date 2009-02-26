@@ -11,7 +11,7 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.maven;
+package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.maven.mercury.repository.metadata.Metadata;
+import org.sonatype.nexus.proxy.maven.metadata.AbstractMetadataHelper;
 
 /**
  * @author juven
@@ -27,7 +28,6 @@ import org.apache.maven.mercury.repository.metadata.Metadata;
 public class MetadataHelperTest
     extends TestCase
 {
-    AbstractMetadataHelper mdHelper = new DummyMetadataHelper();
 
     public void testVersioningArtifactDirectory()
         throws Exception
@@ -63,7 +63,7 @@ public class MetadataHelperTest
         unorderedVersions.add( "1.0.0-beta-6-SNAPSHOT" );
 
         Metadata metadata = new Metadata();
-        mdHelper.versioningForArtifactDir( metadata, unorderedVersions );
+        new ArtifactDirMetadataProcessor( null ).versioning( metadata, unorderedVersions );
 
         assertEquals( orderedVersions, metadata.getVersioning().getVersions() );
 
@@ -84,63 +84,10 @@ public class MetadataHelperTest
         metadata.setGroupId( "org.sonatype.nexus" );
         metadata.setArtifactId( "nexus-api" );
         metadata.setVersion( "1.2.0-SNAPSHOT" );
-        mdHelper.versioningForSnapshotVersionDir( metadata, snapshotArtifacts );
+        new VersionDirMetadataProcessor( null ).versioning( metadata, snapshotArtifacts );
 
         assertEquals( "20081025.143218", metadata.getVersioning().getSnapshot().getTimestamp() );
         assertEquals( 32, metadata.getVersioning().getSnapshot().getBuildNumber() );
     }
 
-    private class DummyMetadataHelper
-        extends AbstractMetadataHelper
-    {
-
-        @Override
-        public String buildMd5( String path )
-            throws Exception
-        {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public String buildSh1( String path )
-            throws Exception
-        {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public boolean exists( String path )
-            throws Exception
-        {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        @Override
-        public void remove( String path )
-            throws Exception
-        {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public InputStream retrieveContent( String path )
-            throws Exception
-        {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public void store( String content, String path )
-            throws Exception
-        {
-            // TODO Auto-generated method stub
-
-        }
-
-    }
 }

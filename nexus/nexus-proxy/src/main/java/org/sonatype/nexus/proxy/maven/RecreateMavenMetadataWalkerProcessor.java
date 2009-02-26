@@ -16,6 +16,8 @@ package org.sonatype.nexus.proxy.maven;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.metadata.AbstractMetadataHelper;
+import org.sonatype.nexus.proxy.maven.metadata.DefaultMetadataHelper;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;

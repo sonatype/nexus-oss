@@ -36,13 +36,13 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.maven.DefaultMetadataHelper;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RecreateMavenMetadataWalkerProcessor;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.maven.metadata.DefaultMetadataHelper;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -505,8 +505,7 @@ public class DefaultSnapshotRemover
 
                 metadataRebuildPaths.add( parentPath );
             }
-            // there are snapshot files, and the metadata is incorrect
-            else if ( !new DefaultMetadataHelper( repository ).isSnapshotVersionMetadataCorrect( coll ) )
+            else 
             {
                 metadataRebuildPaths.add( coll.getPath() );
             }

@@ -11,13 +11,10 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.maven;
+package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.InputStream;
 
-import org.apache.maven.mercury.repository.metadata.Metadata;
-import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
-import org.apache.maven.mercury.repository.metadata.MetadataException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.StorageException;
@@ -26,7 +23,6 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
@@ -46,72 +42,6 @@ public class DefaultMetadataHelper
     public DefaultMetadataHelper( Repository repository )
     {
         this.repository = repository;
-    }
-
-    public boolean isSnapshotVersionMetadataCorrect( StorageCollectionItem coll )
-        throws MetadataException,
-            Exception
-    {
-        String mdPath = coll.getPath() + "/maven-metadata.xml";
-
-        if ( !exists( mdPath ) )
-        {
-            return false;
-        }
-
-        Metadata existingMd = MetadataBuilder.read( retrieveContent( mdPath ) );
-
-        for ( StorageItem item : coll.list() )
-        {
-            if ( !( item instanceof StorageFileItem ) )
-            {
-                continue;
-            }
-
-            StorageFileItem fileItem = (StorageFileItem) item;
-
-            if ( !fileItem.getPath().endsWith( "pom" ) )
-            {
-                continue;
-            }
-
-            updateMavenInfo( fileItem.getPath() );
-        }
-
-        if ( currentGroupId == null || currentArtifactId == null || currentVersion == null
-            || currentArtifacts.isEmpty() )
-        {
-            return false;
-        }
-
-        Metadata md = new Metadata();
-
-        md.setGroupId( currentGroupId );
-
-        md.setArtifactId( currentArtifactId );
-
-        md.setVersion( currentVersion );
-
-        versioningForSnapshotVersionDir( md, currentArtifacts );
-
-        if ( md.getVersioning() == null || md.getVersioning().getSnapshot() == null
-            || md.getVersioning().getSnapshot().getTimestamp() == null )
-        {
-            return false;
-        }
-
-        if ( existingMd.getArtifactId().equals( md.getArtifactId() )
-            && existingMd.getGroupId().equals( md.getGroupId() )
-            && existingMd.getVersion().equals( md.getVersion() )
-            && existingMd.getVersioning().getSnapshot().getTimestamp().equals(
-                md.getVersioning().getSnapshot().getTimestamp() )
-            && existingMd.getVersioning().getSnapshot().getBuildNumber() == md
-                .getVersioning().getSnapshot().getBuildNumber() )
-        {
-            return true;
-        }
-
-        return false;
     }
 
     @Override
