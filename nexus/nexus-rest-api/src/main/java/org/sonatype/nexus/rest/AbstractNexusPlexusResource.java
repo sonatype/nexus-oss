@@ -103,21 +103,26 @@ public abstract class AbstractNexusPlexusResource
 
         return result;
     }
+    
+    private Reference updateBaseRefPath( Reference reference )
+    {
+        if ( reference.getBaseRef().getPath() == null )
+        {
+            reference.getBaseRef().setPath( "/" );
+        }
+        else if ( !reference.getBaseRef().getPath().endsWith( "/" ) )
+        {
+            reference.getBaseRef().setPath( reference.getBaseRef().getPath() + "/" );
+        }
+        
+        return reference;
+    }
 
-    private Reference createReference( Reference base, String relPart )
+    protected Reference createReference( Reference base, String relPart )
     {
         Reference ref = new Reference( base, relPart );
 
-        if ( ref.getBaseRef().getPath() == null )
-        {
-            ref.getBaseRef().setPath( "/" );
-        }
-        else if ( !ref.getBaseRef().getPath().endsWith( "/" ) )
-        {
-            ref.getBaseRef().setPath( ref.getBaseRef().getPath() + "/" );
-        }
-
-        return ref.getTargetRef();
+        return updateBaseRefPath( ref ).getTargetRef();
     }
 
     protected Reference createChildReference( Request request, PlexusResource resource, String childPath )
@@ -126,21 +131,19 @@ public abstract class AbstractNexusPlexusResource
             request.getRootRef().getTargetRef().toString().length() );
         
         // trim leading slash
-        /*if ( uriPart.startsWith( "/" ) )
+        if ( uriPart.startsWith( "/" ) )
         {
             uriPart = uriPart.substring( 1 );
-        }*/
+        }
         
-        // Just using the string constructor, as the (Reference, String) constructor is persistently chopping
-        // off the contextPath I have set, i.e. /nexusmax is always removed.
-        Reference result = new Reference( getContextRoot( request ).getTargetRef() + uriPart ).addSegment( childPath ).getTargetRef();
+        Reference result = updateBaseRefPath( new Reference( getContextRoot( request ),  uriPart ) ).addSegment( childPath );
 
         if ( result.hasQuery() )
         {
             result.setQuery( null );
         }
 
-        return result;
+        return result.getTargetRef();
     }
 
     protected Reference createRootReference( Request request, String relPart )
