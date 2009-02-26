@@ -519,7 +519,9 @@ Ext.extend( Sonatype.repoServer.HostedMirrorEditor, Sonatype.repoServer.Abstract
 
 Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
   var sp = Sonatype.lib.Permissions;
-  if (rec.data.resourceURI && sp.checkPermission('nexus:repositorymirrors', sp.READ) 
+  if (rec.data.resourceURI 
+      && sp.checkPermission('nexus:repositorymirrors', sp.READ) 
+      && rec.data.userManaged == true
       && ( rec.data.repoType == 'proxy' || rec.data.repoType == 'hosted' ) ) {
     if ( rec.data.repoType == 'proxy' ){
       cardPanel.add(new Sonatype.repoServer.ProxyMirrorEditor( {
