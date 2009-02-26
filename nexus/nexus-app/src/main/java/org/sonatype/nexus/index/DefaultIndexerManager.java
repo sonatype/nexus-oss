@@ -754,37 +754,40 @@ public class DefaultIndexerManager
 
             IndexingContext context = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryGroupId ) );
 
-            // local index include all repositories
-            try
+            synchronized ( context )
             {
-                IndexingContext bestContext = getRepositoryBestIndexContext( repository.getId() );
+                // local index include all repositories
+                try
+                {
+                    IndexingContext bestContext = getRepositoryBestIndexContext( repository.getId() );
+
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                            " ...found best context " + bestContext.getId() + " for repository "
+                                + bestContext.getRepositoryId() + ", merging it..." );
+                    }
+
+                    context.merge( bestContext.getIndexDirectory() );
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    // not to happen, we are iterating over them
+                }
 
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug(
-                        " ...found best context " + bestContext.getId() + " for repository "
-                            + bestContext.getRepositoryId() + ", merging it..." );
+                    getLogger().debug( "Rebuilding groups in merged index for repository group " + repositoryGroupId );
                 }
 
-                context.merge( bestContext.getIndexDirectory() );
+                // rebuild group info
+                nexusIndexer.rebuildGroups( context );
+
+                // committing changes
+                context.getIndexWriter().flush();
+
+                context.updateTimestamp();
             }
-            catch ( NoSuchRepositoryException e )
-            {
-                // not to happen, we are iterating over them
-            }
-
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "Rebuilding groups in merged index for repository group " + repositoryGroupId );
-            }
-
-            // rebuild group info
-            nexusIndexer.rebuildGroups( context );
-
-            // committing changes
-            context.getIndexWriter().flush();
-
-            context.updateTimestamp();
         }
     }
 
