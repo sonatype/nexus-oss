@@ -122,9 +122,18 @@ public abstract class AbstractNexusPlexusResource
 
     protected Reference createChildReference( Request request, PlexusResource resource, String childPath )
     {
-        Reference result = new Reference( getContextRoot( request ).toString() + request
-            .getResourceRef().getTargetRef().toString().substring(
-                request.getRootRef().getTargetRef().toString().length() ) ).addSegment( childPath ).getTargetRef();
+        String uriPart = request.getResourceRef().getTargetRef().toString().substring(
+            request.getRootRef().getTargetRef().toString().length() );
+        
+        // trim leading slash
+        /*if ( uriPart.startsWith( "/" ) )
+        {
+            uriPart = uriPart.substring( 1 );
+        }*/
+        
+        // Just using the string constructor, as the (Reference, String) constructor is persistently chopping
+        // off the contextPath I have set, i.e. /nexusmax is always removed.
+        Reference result = new Reference( getContextRoot( request ).getTargetRef() + uriPart ).addSegment( childPath ).getTargetRef();
 
         if ( result.hasQuery() )
         {
@@ -144,6 +153,11 @@ public abstract class AbstractNexusPlexusResource
         }
 
         return ref.getTargetRef();
+    }
+    
+    protected Reference createRepositoryContentReference( Request request, String repoId )
+    {
+        return createReference( getContextRoot( request ), "content/repositories/" + repoId ).getTargetRef();
     }
 
     protected Reference createRepositoryReference( Request request, String repoId )
