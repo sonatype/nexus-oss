@@ -22,7 +22,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class ArtifactoryVirtualRepository
 {
-
     private Xpp3Dom dom;
 
     private List<String> resolvedRepositories;

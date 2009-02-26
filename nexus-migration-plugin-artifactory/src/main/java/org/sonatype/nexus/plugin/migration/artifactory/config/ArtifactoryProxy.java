@@ -18,7 +18,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class ArtifactoryProxy
 {
-
     private Xpp3Dom dom;
 
     public ArtifactoryProxy( Xpp3Dom dom )

@@ -17,7 +17,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias( "repositoryResolution" )
 public class RepositoryResolutionDTO
 {
-
     private String repositoryId;
 
     private String type;
@@ -121,7 +120,7 @@ public class RepositoryResolutionDTO
         this.mergeSimilarRepository = mergeSimilarRepository;
     }
 
-    public void setAlreadyExists(boolean alreadyExists)
+    public void setAlreadyExists( boolean alreadyExists )
     {
         this.alreadyExists = alreadyExists;
     }

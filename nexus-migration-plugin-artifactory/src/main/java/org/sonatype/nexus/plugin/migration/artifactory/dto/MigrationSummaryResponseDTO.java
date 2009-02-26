@@ -17,7 +17,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias( "migrationSummaryResponse" )
 public class MigrationSummaryResponseDTO
 {
-
     private MigrationSummaryDTO data;
 
     public MigrationSummaryDTO getData()

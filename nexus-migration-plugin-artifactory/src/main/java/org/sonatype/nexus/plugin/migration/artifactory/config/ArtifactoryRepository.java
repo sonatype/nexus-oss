@@ -26,7 +26,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class ArtifactoryRepository
 {
-
     private final Xpp3Dom dom;
 
     public ArtifactoryRepository( Xpp3Dom dom )
@@ -36,7 +35,8 @@ public class ArtifactoryRepository
 
     @SuppressWarnings( "deprecation" )
     public static ArtifactoryRepository read( File file )
-        throws IOException, XmlPullParserException
+        throws IOException,
+            XmlPullParserException
     {
         XmlStreamReader reader = ReaderFactory.newXmlReader( file );
         try
@@ -51,7 +51,8 @@ public class ArtifactoryRepository
 
     @SuppressWarnings( "deprecation" )
     public static ArtifactoryRepository read( InputStream input )
-        throws IOException, XmlPullParserException
+        throws IOException,
+            XmlPullParserException
     {
         XmlStreamReader reader = ReaderFactory.newXmlReader( input );
         try

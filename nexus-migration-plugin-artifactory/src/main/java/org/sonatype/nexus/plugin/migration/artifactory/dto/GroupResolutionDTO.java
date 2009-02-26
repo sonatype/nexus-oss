@@ -17,7 +17,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias( "groupResolution" )
 public class GroupResolutionDTO
 {
-
     private String groupId;
 
     private boolean isMixed = false;

@@ -17,7 +17,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias( "userResolution" )
 public class UserResolutionDTO
 {
-
     private String userId;
     
     private String password;

@@ -22,7 +22,6 @@ public class ArtifactoryMigrationSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
-
     public String getResourcePath()
     {
         return "/META-INF/nexus-artifactory-migration-plugin-security.xml";
@@ -32,5 +31,4 @@ public class ArtifactoryMigrationSecurityResource
     {
         return null;
     }
-
 }

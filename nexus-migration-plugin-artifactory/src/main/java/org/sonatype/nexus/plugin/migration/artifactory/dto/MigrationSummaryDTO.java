@@ -20,7 +20,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias( "migrationSummaryDTO" )
 public class MigrationSummaryDTO
 {
-
     private String id;
 
     private String backupLocation;

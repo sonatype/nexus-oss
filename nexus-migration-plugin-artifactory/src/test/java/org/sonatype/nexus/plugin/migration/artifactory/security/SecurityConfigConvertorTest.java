@@ -17,6 +17,8 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
@@ -26,6 +28,7 @@ import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
 import org.sonatype.nexus.plugin.migration.artifactory.MigrationResult;
+import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
 
@@ -42,12 +45,14 @@ public class SecurityConfigConvertorTest
 
     protected List<SecurityUser> userList;
 
+    protected ArtifactorySecurityConfig config;
+
     @Before
     public void prepare()
         throws Exception
     {
         // initialize security config
-        ArtifactorySecurityConfig config = new ArtifactorySecurityConfig();
+        config = new ArtifactorySecurityConfig();
 
         repoTargetList = new ArrayList<CRepositoryTarget>();
         privList = new ArrayList<SecurityPrivilege>();
@@ -67,7 +72,7 @@ public class SecurityConfigConvertorTest
         config.addUser( admin );
         config.addUser( user );
         config.addUser( user1 );
-        
+
         ArtifactoryUser wrongUser = new ArtifactoryUser( "wrong-user", "5f4dcc3b5aa765d61d8327deb882cf99" );
         config.addUser( wrongUser );
 
@@ -99,14 +104,20 @@ public class SecurityConfigConvertorTest
         groupAcl.addPermission( ArtifactoryPermission.READER );
         config.addAcl( groupAcl );
 
-        configConvertor = new SecurityConfigConvertor( config, new FakeReceiver(), new FakeMappingConfiguration(), new MockMigrationResults() );
+        configConvertor = new DefaultSecurityConfigConvertor();
     }
 
     @Test
     public void assertRepositoryTarget()
         throws Exception
     {
-        configConvertor.convert();
+        SecurityConfigConvertorRequest request = new SecurityConfigConvertorRequest(
+            config,
+            new FakeReceiver(),
+            new FakeMappingConfiguration(),
+            new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
+
+        configConvertor.convert( request );
 
         CRepositoryTarget targetApache = repoTargetList.get( 0 );
         Assert.assertEquals( "apachePermTarget", targetApache.getId() );
@@ -127,7 +138,13 @@ public class SecurityConfigConvertorTest
     public void assertPrivilege()
         throws Exception
     {
-        configConvertor.convert();
+        SecurityConfigConvertorRequest request = new SecurityConfigConvertorRequest(
+            config,
+            new FakeReceiver(),
+            new FakeMappingConfiguration(),
+            new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
+
+        configConvertor.convert( request );
 
         // assert the privileges
         Assert.assertNotNull( privList.get( 0 ).getId() );
@@ -164,7 +181,13 @@ public class SecurityConfigConvertorTest
     public void assertRole()
         throws Exception
     {
-        configConvertor.convert();
+        SecurityConfigConvertorRequest request = new SecurityConfigConvertorRequest(
+            config,
+            new FakeReceiver(),
+            new FakeMappingConfiguration(),
+            new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
+
+        configConvertor.convert( request );
 
         Assert.assertEquals( 9, roleList.size() );
 
@@ -195,7 +218,13 @@ public class SecurityConfigConvertorTest
     public void assertAdmin()
         throws Exception
     {
-        configConvertor.convert();
+        SecurityConfigConvertorRequest request = new SecurityConfigConvertorRequest(
+            config,
+            new FakeReceiver(),
+            new FakeMappingConfiguration(),
+            new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
+
+        configConvertor.convert( request );
 
         SecurityUser admin = userList.get( 0 );
 
@@ -212,13 +241,19 @@ public class SecurityConfigConvertorTest
     public void assertUser()
         throws Exception
     {
-        configConvertor.convert();
+        SecurityConfigConvertorRequest request = new SecurityConfigConvertorRequest(
+            config,
+            new FakeReceiver(),
+            new FakeMappingConfiguration(),
+            new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
+
+        configConvertor.convert( request );
 
         SecurityUser user = userList.get( 1 );
 
         Assert.assertEquals( "arti-user", user.getId() );
         Assert.assertEquals( "arti-user", user.getName() );
-        Assert.assertEquals("5f4dcc3b5aa765d61d8327deb882cf99", user.getPassword());
+        Assert.assertEquals( "5f4dcc3b5aa765d61d8327deb882cf99", user.getPassword() );
         Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
         Assert.assertEquals( "active", user.getStatus() );
 
@@ -237,8 +272,13 @@ public class SecurityConfigConvertorTest
     public void disableResolvePermission()
         throws Exception
     {
-        configConvertor.setResolvePermission( false );
-        configConvertor.convert();
+        SecurityConfigConvertorRequest request = new SecurityConfigConvertorRequest(
+            config,
+            new FakeReceiver(),
+            new FakeMappingConfiguration(),
+            new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
+        request.setResolvePermission( false );
+        configConvertor.convert( request );
 
         Assert.assertEquals( 3, userList.size() );
         Assert.assertEquals( 1, roleList.size() );
@@ -324,53 +364,6 @@ public class SecurityConfigConvertorTest
         }
 
         public void setNexusContext( String nexusContext )
-        {
-            // TODO Auto-generated method stub
-
-        }
-
-    }
-
-    class MockMigrationResults implements MigrationResult
-    {
-
-        public void addErrorMessage( String errorMessage )
-        {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void addWarningMessage( String warningMessage )
-        {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void clear()
-        {
-            // TODO Auto-generated method stub
-
-        }
-
-        public List<String> getErrorMessages()
-        {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public List<String> getWarningMessages()
-        {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public void mergeResult( MigrationResult migrationResult )
-        {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void addErrorMessage( String errorMessage, Exception e )
         {
             // TODO Auto-generated method stub
 

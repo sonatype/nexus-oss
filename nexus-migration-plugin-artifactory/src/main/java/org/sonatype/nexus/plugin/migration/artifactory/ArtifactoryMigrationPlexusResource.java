@@ -26,9 +26,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 @Component( role = PlexusResource.class, hint = "artifactoryMigration" )
 public class ArtifactoryMigrationPlexusResource
     extends AbstractArtifactoryMigrationPlexusResource
-
 {
-
     public ArtifactoryMigrationPlexusResource()
     {
         this.setReadable( false );
@@ -71,7 +69,6 @@ public class ArtifactoryMigrationPlexusResource
         this.getNexus().submit( "Importing Artifactory Backup.", migrationTask );
 
         return null;
-
     }
 
 }

@@ -27,10 +27,6 @@ import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationExcep
 public class DefaultSecurityConfigReceiver
     implements SecurityConfigReceiver
 {
-
-/*    @Requirement
-    private NexusSecurity nexusSecurity;*/
-
     @Requirement
     private Nexus nexus;
     

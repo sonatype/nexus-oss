@@ -35,7 +35,6 @@ import com.thoughtworks.xstream.XStream;
 public abstract class AbstractArtifactoryMigrationPlexusResource
     extends AbstractNexusPlexusResource
 {
-
     public AbstractArtifactoryMigrationPlexusResource()
     {
         super();
@@ -75,18 +74,20 @@ public abstract class AbstractArtifactoryMigrationPlexusResource
 
         if ( !file.exists() || !file.isFile() )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid File Location: " + file.getAbsolutePath() );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid File Location: "
+                + file.getAbsolutePath() );
         }
 
         ZipFile zip;
         try
         {
-            zip = new ZipFile(file);
+            zip = new ZipFile( file );
             zip.close();
         }
         catch ( ZipException e )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid file format. Is not a Zip. " + e.getMessage() );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid file format. Is not a Zip. "
+                + e.getMessage() );
         }
         catch ( IOException e )
         {
@@ -94,7 +95,5 @@ public abstract class AbstractArtifactoryMigrationPlexusResource
         }
 
         return file;
-
     }
-
 }

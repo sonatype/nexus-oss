@@ -30,7 +30,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class ArtifactoryConfig
 {
-
     private final Xpp3Dom dom;
 
     public ArtifactoryConfig( Xpp3Dom dom )

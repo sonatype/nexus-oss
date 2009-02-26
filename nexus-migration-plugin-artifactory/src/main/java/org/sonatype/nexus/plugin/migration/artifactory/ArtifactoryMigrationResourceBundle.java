@@ -44,7 +44,7 @@ public class ArtifactoryMigrationResourceBundle
     @Override
     public String getPostHeadContribution( Map<String, Object> ctx )
     {
-        return "<script src=\"js/repoServer/repoServer.ArtifactoryMigrationPanel.js\" type=\"text/javascript\" charset=\"utf-8\"></script> \n" +
-        "<link rel=\"stylesheet\" href=\"style/ArtifactoryMigration.css\" type=\"text/css\" media=\"screen\" title=\"no title\" charset=\"utf-8\">";
+        return "<script src=\"js/repoServer/repoServer.ArtifactoryMigrationPanel.js\" type=\"text/javascript\" charset=\"utf-8\"></script> \n"
+            + "<link rel=\"stylesheet\" href=\"style/ArtifactoryMigration.css\" type=\"text/css\" media=\"screen\" title=\"no title\" charset=\"utf-8\">";
     }
 }
