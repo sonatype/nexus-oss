@@ -2,7 +2,9 @@ package org.sonatype.nexus.plugin.migration.artifactory;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
@@ -13,9 +15,11 @@ public class MigrationResult
 
     private final MigrationSummaryDTO migrationSummary;
 
-    private final List<String> errorMessages = new ArrayList<String>();
+    private final ArrayList<String> errorMessages = new ArrayList<String>();
 
-    private final List<String> warningMessages = new ArrayList<String>();
+    private final ArrayList<String> warningMessages = new ArrayList<String>();
+
+    private final HashSet<String> migratedRepositoryIds = new HashSet<String>();
 
     private boolean successful = false;
 
@@ -116,6 +120,11 @@ public class MigrationResult
     public void setSuccessful( boolean successful )
     {
         this.successful = successful;
+    }
+
+    public Set<String> getMigratedRepositoryIds()
+    {
+        return migratedRepositoryIds;
     }
 
     @Override

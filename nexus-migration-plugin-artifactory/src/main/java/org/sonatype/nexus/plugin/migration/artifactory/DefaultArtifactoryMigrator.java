@@ -208,6 +208,9 @@ public class DefaultArtifactoryMigrator
             result.addErrorMessage( "Error importing security.", e );
         }
 
+        // finally, recreate metadata for all migrated reposes
+        spawnAllMetadatas( result );
+
         cleanBackupDir( artifactoryBackupDir );
 
         // if we have errors already, just return
@@ -732,19 +735,30 @@ public class DefaultArtifactoryMigrator
 
     private void createMetadatas( MigrationResult result, String repoId )
     {
-        result.addInfoMessage( "Recreating repository metadatas " + repoId );
+        if ( result.getMigratedRepositoryIds().add( repoId ) )
+        {
+            result.addInfoMessage( "Spooling the creation of repository metadatas for repository " + repoId );
+        }
+    }
 
-        ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-        rt.setRepositoryId( repoId );
-        nexusScheduler.submit( "reindex-" + repoId, rt );
+    private void spawnAllMetadatas( MigrationResult result )
+    {
+        for ( String repoId : result.getMigratedRepositoryIds() )
+        {
+            result.addInfoMessage( "Recreating repository metadatas " + repoId );
 
-        RebuildMavenMetadataTask mt = nexusScheduler.createTaskInstance( RebuildMavenMetadataTask.class );
-        mt.setRepositoryId( repoId );
-        nexusScheduler.submit( "rebuild-maven-metadata-" + repoId, mt );
+            ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+            rt.setRepositoryId( repoId );
+            nexusScheduler.submit( "reindex-" + repoId, rt );
 
-        RebuildAttributesTask at = nexusScheduler.createTaskInstance( RebuildAttributesTask.class );
-        at.setRepositoryId( repoId );
-        nexusScheduler.submit( "rebuild-attributes-" + repoId, at );
+            RebuildMavenMetadataTask mt = nexusScheduler.createTaskInstance( RebuildMavenMetadataTask.class );
+            mt.setRepositoryId( repoId );
+            nexusScheduler.submit( "rebuild-maven-metadata-" + repoId, mt );
+
+            RebuildAttributesTask at = nexusScheduler.createTaskInstance( RebuildAttributesTask.class );
+            at.setRepositoryId( repoId );
+            nexusScheduler.submit( "rebuild-attributes-" + repoId, at );
+        }
     }
 
     private File getStorage( Repository nexusRepo )
