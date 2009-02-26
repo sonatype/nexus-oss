@@ -41,6 +41,7 @@ Ext.extend(Ext.tree.SonatypeTreeLoader, Ext.tree.TreeLoader, {
               url: node.id + '?isLocal',                                                     //diff
               success: this.handleResponse,
               failure: this.handleFailure,
+              options: { dontForceLogout: true },
               scope: this,
               argument: {callback: callback, node: node},
               //disableCaching: false,                                          //diff

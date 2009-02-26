@@ -123,6 +123,11 @@ Ext.override(Ext.data.Connection, {
           o.headers = hs;
         }
       }
+      
+      if ( Sonatype.utils.authToken ) {
+        // Add auth header to each request
+        o.headers.Authorization = 'Basic ' + Sonatype.utils.authToken
+      }
 
       var cb = {
         success: this.handleResponse,

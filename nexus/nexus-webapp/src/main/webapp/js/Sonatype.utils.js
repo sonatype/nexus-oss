@@ -19,6 +19,7 @@ Sonatype.utils = {
   versionShort: '',
   edition : '',
   editionShort : '',
+  authToken : '',
   lowercase : function(str){
     if (Ext.isEmpty(str)) {return str;}
     str = str.toString();
@@ -111,20 +112,9 @@ Sonatype.utils = {
         serverMessage = r.substring( n1, n2 );
       }
     }
-    
-    if ( options == undefined ) {
-      options = { options : { dontForceLogout : false }};
-    }
-    
-    if ( options.options == undefined) {
-      options.options = { dontForceLogout : false };
-    }
 
-    if ( !options.options.dontForceLogout && (response.status == 403 || response.status == 401 )) {
-      if ( options && options.options && options.options.ignore401 ) {
-        return;
-      }
-
+    if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() && (response.status == 403 || response.status == 401 )) {
+      
       if ( serverMessage ) {
         serverMessage = '<br /><br />' + serverMessage;
       }
@@ -144,22 +134,6 @@ Sonatype.utils = {
             animEl: 'mb3'
           } );
         }
-      }
-      else {
-        Sonatype.utils.clearCookie('JSESSIONID');
-        Sonatype.utils.clearCookie('nxRememberMe');
-
-        Sonatype.MessageBox.show( {
-          title: 'Authentication Error',
-          msg: 'Your login is incorrect or your session has expired.<br />' +
-            'Please login again.' + serverMessage,
-          buttons: Sonatype.MessageBox.OK,
-          icon: Sonatype.MessageBox.ERROR,
-          animEl: 'mb3',
-          fn: function(button) {
-            window.location.reload();
-          }
-        } );
       }
     }
     else {
@@ -350,7 +324,7 @@ Sonatype.utils = {
     var matches;
     while((matches = re.exec(c)) != null){
       if ( matches[1] == cookieName ) {
-    	return matches[2];
+      return matches[2];
       }
     }
     return null;
@@ -358,7 +332,7 @@ Sonatype.utils = {
   
   setCookie: function(cookieName, value) {
     document.cookie = cookieName + "=" + value +
-	    "; path=" + Sonatype.config.resourcePath
+      "; path=" + Sonatype.config.resourcePath
   },
 
   clearCookie : function(cookieName){
@@ -430,7 +404,7 @@ Sonatype.utils = {
                   failure: function(response, options){
                     var errorOptions = {
                           hideErrorStatus : true
-                    };                	  
+                    };                    
                     Sonatype.utils.connectionError( response, 'There is a problem retrieving your username.', false, errorOptions )
                   }
                 });
@@ -667,13 +641,13 @@ Sonatype.utils = {
   doLogin: function( activeWindow, username, password ) {
     activeWindow.getEl().mask("Logging you in...");
 
-    var token = Sonatype.utils.base64.encode(username + ':' + password); 
+    Sonatype.utils.authToken = Sonatype.utils.base64.encode(username + ':' + password); 
     Ext.Ajax.request({
       method: 'GET',
       cbPassThru : {
         username : username
       },
-      headers: {'Authorization' : 'Basic ' + token}, //@todo: send HTTP basic auth data
+      headers: {'Authorization' : 'Basic ' + Sonatype.utils.authToken}, //@todo: send HTTP basic auth data
       url: Sonatype.config.repos.urls.login,
       success: function(response, options){
         activeWindow.getEl().unmask();
@@ -686,6 +660,7 @@ Sonatype.utils = {
         Sonatype.utils.loadNexusStatus( respObj.data.clientPermissions.loggedInUserSource );
       },
       failure: function(response, options){
+      Sonatype.utils.authToken = null;
         activeWindow.getEl().unmask();
         if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
           Sonatype.repoServer.RepoServer.loginForm.find('name', 'password')[0].focus(true);

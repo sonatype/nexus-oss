@@ -420,8 +420,7 @@ Sonatype.repoServer.RepoServer = function(){
           method: 'GET',
           url: Sonatype.config.repos.urls.logout,
           callback: function(options, success, response){
-            Sonatype.utils.clearCookie('JSESSIONID');
-            Sonatype.utils.clearCookie('nxRememberMe');
+            Sonatype.utils.authToken = null;
             Sonatype.utils.loadNexusStatus();
           }
         });
