@@ -51,7 +51,7 @@ public class PrivilegesMessageUtil
         this.xstream = xstream;
         this.mediaType = mediaType;
     }
-    
+
     public List<PrivilegeStatusResource> createPrivileges( PrivilegeResource resource ) throws IOException
     {
         Response response = this.sendMessage( Method.POST, resource );
@@ -64,7 +64,7 @@ public class PrivilegesMessageUtil
         // get the Resource object
         List<PrivilegeStatusResource> statusResources = this.getResourceListFromResponse( response );
         SecurityConfigUtil.verifyPrivileges( statusResources );
-        
+
         return statusResources;
     }
 
@@ -77,7 +77,17 @@ public class PrivilegesMessageUtil
         }
         return this.getResourceFromResponse( response );
     }
-    
+
+    public List<PrivilegeStatusResource> getList(  ) throws IOException
+    {
+        Response response = this.sendMessage( Method.GET, null );
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Could not get Privilege: " + response.getStatus() +"\n" + response.getEntity().getText());
+        }
+        return this.getResourceListFromResponse( response );
+    }
+
     public Response sendMessage( Method method, PrivilegeResource resource ) throws IOException
     {
         return this.sendMessage( method, resource, "" );
@@ -113,7 +123,7 @@ public class PrivilegesMessageUtil
         PrivilegeStatusResourceResponse resourceResponse =
             (PrivilegeStatusResourceResponse) representation.getPayload( new PrivilegeStatusResourceResponse() );
 
-        return (PrivilegeStatusResource) resourceResponse.getData();
+        return resourceResponse.getData();
 
     }
 
@@ -144,7 +154,7 @@ public class PrivilegesMessageUtil
 
         for ( Iterator<NexusError> iter = errorResponse.getErrors().iterator(); iter.hasNext(); )
         {
-            NexusError error = (NexusError) iter.next();
+            NexusError error = iter.next();
             Assert.assertFalse( "Response Error message is empty.", StringUtils.isEmpty( error.getMsg() ) );
 
         }
