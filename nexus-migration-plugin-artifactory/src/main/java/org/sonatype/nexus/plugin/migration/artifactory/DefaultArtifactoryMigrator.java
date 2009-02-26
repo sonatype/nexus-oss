@@ -747,17 +747,17 @@ public class DefaultArtifactoryMigrator
         {
             result.addInfoMessage( "Recreating repository metadatas " + repoId );
 
-            ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-            rt.setRepositoryId( repoId );
-            nexusScheduler.submit( "reindex-" + repoId, rt );
+            RebuildAttributesTask at = nexusScheduler.createTaskInstance( RebuildAttributesTask.class );
+            at.setRepositoryId( repoId );
+            nexusScheduler.submit( "rebuild-attributes-" + repoId, at );
 
             RebuildMavenMetadataTask mt = nexusScheduler.createTaskInstance( RebuildMavenMetadataTask.class );
             mt.setRepositoryId( repoId );
             nexusScheduler.submit( "rebuild-maven-metadata-" + repoId, mt );
 
-            RebuildAttributesTask at = nexusScheduler.createTaskInstance( RebuildAttributesTask.class );
-            at.setRepositoryId( repoId );
-            nexusScheduler.submit( "rebuild-attributes-" + repoId, at );
+            ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+            rt.setRepositoryId( repoId );
+            nexusScheduler.submit( "reindex-" + repoId, rt );
         }
     }
 
