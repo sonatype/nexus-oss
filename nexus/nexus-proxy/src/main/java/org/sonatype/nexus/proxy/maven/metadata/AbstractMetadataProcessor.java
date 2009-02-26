@@ -1,7 +1,10 @@
 package org.sonatype.nexus.proxy.maven.metadata;
 
+import java.io.InputStream;
+
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
+import org.codehaus.plexus.util.IOUtil;
 
 /**
  * @author juven
@@ -35,7 +38,7 @@ public abstract class AbstractMetadataProcessor
             if ( isMetadataCorrect( path ) )
             {
                 postProcessMetadata();
-                
+
                 return true;
             }
             else
@@ -63,7 +66,29 @@ public abstract class AbstractMetadataProcessor
     protected Metadata readMetadata( String path )
         throws Exception
     {
-        return MetadataBuilder.read( metadataHelper.retrieveContent( path + METADATA_SUFFIX ) );
+        InputStream mdStream = null;
+
+        try
+        {
+            mdStream = metadataHelper.retrieveContent( path + METADATA_SUFFIX );
+
+            Metadata md = MetadataBuilder.read( mdStream );
+
+            return md;
+        }
+        finally
+        {
+            try
+            {
+                if ( mdStream != null )
+                {
+                    mdStream.close();
+                }
+            }
+            catch ( Exception e )
+            {
+            }
+        }
     }
 
     protected void removedMetadata( String path )
