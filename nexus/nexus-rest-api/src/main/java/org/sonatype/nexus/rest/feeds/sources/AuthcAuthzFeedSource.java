@@ -83,7 +83,7 @@ public class AuthcAuthzFeedSource
 
             if ( FeedRecorder.SYSTEM_AUTHC.equals( item.getAction() ) )
             {
-                entry.setTitle( "Authencation" );
+                entry.setTitle( "Authentication" );
             }
             else if ( FeedRecorder.SYSTEM_AUTHZ.equals( item.getAction() ) )
             {
