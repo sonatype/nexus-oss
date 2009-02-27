@@ -131,7 +131,7 @@
 				<!-- TODO remove when upgrade generator is marged into modello -->
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>modello-plugin-upgrade</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
+				<version>0.0.1</version>
 				<executions>
 					<execution>
 						<id>nexus-upgrade</id>
