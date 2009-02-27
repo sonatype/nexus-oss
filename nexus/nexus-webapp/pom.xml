@@ -1,12 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <!-- the version of maven's project object model -->
   <modelVersion>4.0.0</modelVersion>
   <!-- Parent POM -->
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>1.3.0</version>
   </parent>
   <!-- a unique name for this project -->
   <artifactId>nexus-webapp</artifactId>
@@ -39,7 +38,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
-      <version>${nexus-lvo-plugin.version}</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
@@ -197,8 +196,7 @@
           <includeTestClasspath>true</includeTestClasspath>
           <!--
             prependClasspaths> <prependClasspath>${project.build.directory}/plexus-home/conf</prependClasspath>
-            </prependClasspaths
-          -->
+            </prependClasspaths -->
           <systemProperties>
             <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
           </systemProperties>
