@@ -80,7 +80,6 @@ public class RepositoryConvertorTest
         File target = new File( getBasedir(), "target" );
 
         File targetReleasesRepo = new File( getBasedir(), "target/nexus-1667-repo-releases" );
-        File targetSnapshotsRepo = new File( getBasedir(), "target/nexus-1667-repo-snapshots" );
 
         convertor.convertRepositoryWithCopy( srcRepo, target );
 
@@ -110,6 +109,58 @@ public class RepositoryConvertorTest
             targetReleasesRepo,
             "org/eclipse/emf/ecore/xml/2.3.0-v200706262000/xml-2.3.0-v200706262000.pom" ), Boolean.TRUE );
 
+        validateResult( expected );
+    }
+    
+    public void testNonstandardVersionDirectory()
+        throws Exception
+    {
+        File srcRepo = new File( getBasedir(), "target/test-classes/non-standard-repo" );
+        File target = new File( getBasedir(), "target" );
+        
+        File targetReleasesRepo = new File( getBasedir(), "target/non-standard-repo-releases" );
+        
+        convertor.convertRepositoryWithCopy( srcRepo, target );
+        
+        Map<File, Boolean> expected = new LinkedHashMap<File, Boolean>();
+        
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/jvnet/hudson/trilead-ssh2/build212-hudson-1-1/trilead-ssh2-build212-hudson-1-1-sources.jar" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/jvnet/hudson/trilead-ssh2/build212-hudson-1-1/trilead-ssh2-build212-hudson-1-1-sources.jar.md5" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/jvnet/hudson/trilead-ssh2/build212-hudson-1-1/trilead-ssh2-build212-hudson-1-1-sources.jar.sha1" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/jvnet/hudson/trilead-ssh2/build212-hudson-1-1/trilead-ssh2-build212-hudson-1-1.jar" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/jvnet/hudson/trilead-ssh2/build212-hudson-1-1/trilead-ssh2-build212-hudson-1-1.jar.md5" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/jvnet/hudson/trilead-ssh2/build212-hudson-1-1/trilead-ssh2-build212-hudson-1-1.jar.sha1" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/jvnet/hudson/trilead-ssh2/build212-hudson-1-1/trilead-ssh2-build212-hudson-1-1.pom" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/jvnet/hudson/trilead-ssh2/build212-hudson-1-1/trilead-ssh2-build212-hudson-1-1.pom.md5" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/jvnet/hudson/trilead-ssh2/build212-hudson-1-1/trilead-ssh2-build212-hudson-1-1.pom.sha1" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/jvnet/hudson/trilead-ssh2/maven-metadata.xml" ), Boolean.FALSE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/jvnet/hudson/trilead-ssh2/maven-metadata.xml.md5" ), Boolean.FALSE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/jvnet/hudson/trilead-ssh2/maven-metadata.xml.sha1" ), Boolean.FALSE );
+   
         validateResult( expected );
     }
 

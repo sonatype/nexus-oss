@@ -84,11 +84,11 @@ public class DefaultRepositoryConvertor
 
         convertorCommands.add( repositorySeperationConvertorCommand );
 
-        List<File> operatableFiles = new LinkedList<File>();
+        List<File> operand = new LinkedList<File>();
 
-        iterate( currentRepository, operatableFiles );
+        collectOperandRecursive( currentRepository, operand );
 
-        executeCommands( operatableFiles );
+        executeCommands( operand );
 
     }
 
@@ -101,7 +101,7 @@ public class DefaultRepositoryConvertor
         }
     }
 
-    private void iterate( File file, List<File> operatableFiles )
+    private void collectOperandRecursive( File file, List<File> operatableFiles )
         throws IOException
     {
         if ( !file.isDirectory() )
@@ -109,7 +109,7 @@ public class DefaultRepositoryConvertor
             return;
         }
 
-        if ( file.getName().matches( VERSION_REGEX ) )
+        if ( hasArtifacts( file ) )
         {
             operatableFiles.add( file );
 
@@ -118,8 +118,21 @@ public class DefaultRepositoryConvertor
 
         for ( File subFile : file.listFiles() )
         {
-            iterate( subFile, operatableFiles );
+            collectOperandRecursive( subFile, operatableFiles );
         }
+    }
+
+    private boolean hasArtifacts( File dir )
+    {
+        for ( File file : dir.listFiles() )
+        {
+            if ( file.isFile() && file.getName().endsWith( "pom" ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void deleteCurrentRepository()
