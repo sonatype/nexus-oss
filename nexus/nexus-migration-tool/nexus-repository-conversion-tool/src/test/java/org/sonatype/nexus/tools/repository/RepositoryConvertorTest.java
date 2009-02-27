@@ -108,6 +108,33 @@ public class RepositoryConvertorTest
         expected.put( new File(
             targetReleasesRepo,
             "org/eclipse/emf/ecore/xml/2.3.0-v200706262000/xml-2.3.0-v200706262000.pom" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/apache/myfaces/tobago/maven-apt-plugin/1.0.13/maven-apt-plugin-1.0.13.jar" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/apache/myfaces/tobago/maven-apt-plugin/1.0.13/maven-apt-plugin-1.0.13.jar.md5" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/apache/myfaces/tobago/maven-apt-plugin/1.0.13/maven-apt-plugin-1.0.13.jar.sha1" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/apache/myfaces/tobago/tobago/1.0.13/tobago-1.0.13.pom" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/apache/myfaces/tobago/tobago/1.0.13/tobago-1.0.13.pom.md5" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/apache/myfaces/tobago/tobago/1.0.13/tobago-1.0.13.pom.sha1" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/apache/myfaces/tobago/tobago-tool/1.0.13/tobago-tool-1.0.13.pom" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/apache/myfaces/tobago/tobago-tool/1.0.13/tobago-tool-1.0.13.pom.sha1" ), Boolean.TRUE );
+        expected.put( new File(
+            targetReleasesRepo,
+            "org/apache/myfaces/tobago/tobago-tool/1.0.13/tobago-tool-1.0.13.pom.md5" ), Boolean.TRUE );
 
         validateResult( expected );
     }

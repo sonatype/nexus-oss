@@ -109,7 +109,7 @@ public class DefaultRepositoryConvertor
             return;
         }
 
-        if ( hasArtifacts( file ) )
+        if ( file.getName().matches( VERSION_REGEX ) || hasArtifacts( file ) )
         {
             operatableFiles.add( file );
 
@@ -126,7 +126,7 @@ public class DefaultRepositoryConvertor
     {
         for ( File file : dir.listFiles() )
         {
-            if ( file.isFile() && file.getName().endsWith( "pom" ) )
+            if ( file.isFile() && ( file.getName().endsWith( "pom" ) || file.getName().endsWith( "jar" ) ) )
             {
                 return true;
             }
