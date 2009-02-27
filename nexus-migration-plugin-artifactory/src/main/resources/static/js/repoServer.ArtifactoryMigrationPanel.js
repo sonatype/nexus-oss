@@ -145,18 +145,6 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
     width: 45
   } );
   
-  var helpMark = {
-    id: 'img-id',
-    tag: 'img',
-    src: Sonatype.config.resourcePath + '/images/icons/help.png',
-    width: 16,
-    height: 16,
-    cls: 'migration-help-icon',
-    handler: function() {
-      Ext.fly('img-id').set({qtip:'Specify the path to the Artifactory configuration zip file which has been stored on the server where Nexus is currently running.'}); 
-    }
-  };
-
   this.formPanel = new Ext.form.FormPanel( {
     region: 'center',
     trackResetOnLoad: true,
@@ -224,7 +212,18 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                     disabled: true,
                     setSize: function() {}
                   },
-                  helpMark
+                  {
+                    xtype:'box',
+                    anchor:'',
+                    width: 16,
+                    height: 16,
+                    autoEl:{
+                      tag:'img',
+                      qtip:'Specify the path to the Artifactory configuration zip file which has been stored on the server where Nexus is currently running.',
+                      cls: 'migration-help-icon',
+                      src: Sonatype.config.resourcePath + '/images/icons/help.png'
+                    }
+                  }
                 ] 
               }
             ]
@@ -453,12 +452,12 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
 
   showMigrationLog: function() {
 
-//	  FIXME, tabe title is duplicated here
-	  var panel = Sonatype.view.mainTabPanel.addOrShowTab(
+//    FIXME, tabe title is duplicated here
+    var panel = Sonatype.view.mainTabPanel.addOrShowTab(
               'st-nexus-search-panel', Sonatype.repoServer.LogsViewPanel, { title: 'Logs and Config Files' } );
-	  
-	  // FIXME: Add check to see if log exists
-	  panel.showLog('migration.log');
+    
+    // FIXME: Add check to see if log exists
+    panel.showLog('migration.log');
 
   },
   
@@ -478,81 +477,83 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
   },
   
   startImport: function() {
-    Ext.MessageBox.confirm('Warning', 'Loading the Artifactory Configuration could take a long period of time depending on the amount of information you are attempting to import. Your Nexus instance will be unusable during this time. Continue?' , this.proceedImport, this);	
+    Ext.MessageBox.confirm('Warning', 'Loading the Artifactory Configuration could take a long period of time depending on the amount of information you are attempting to import. Your Nexus instance will be unusable during this time. Continue?' , this.proceedImport, this);  
   },
 
-  proceedImport: function() {
-    this.el.mask( 'Importing...' );
-    this.formPanel.buttons[0].disable();
-
-    var data = {
-      backupLocation: this.importData.backupLocation,
-      resolvePermission: this.formPanel.form.findField( 'resolvePermission' ).checked,
-      groupsResolution: [],
-      repositoriesResolution: [],
-      usersResolution: []
-    };
-
-    this.groupStore.each( function( item ) {
-      if ( item.data.isImport ) {
-        data.groupsResolution.push( {
-          groupId: item.data.groupId,
-          isMixed: item.data.isMixed,
-          repositoryTypeResolution: item.data.displayType.toUpperCase().replace( /\ /g, '_' )
-        } );
-      }
-    }, this );
-    
-    this.repoStore.each( function( item ) {
-      if ( item.data.isImport ) {
-        data.repositoriesResolution.push( {
-          repositoryId: item.data.repositoryId,
-          type: item.data.type,
-          mapUrls: item.data.mapUrls,
-          copyCachedArtifacts: item.data.copyCachedArtifacts,
-          isMixed: item.data.isMixed,
-          mixResolution: item.data.displayMixedResolution.toUpperCase().replace( /\ /g, '_' ),
-          similarRepositoryId: item.data.similarRepositoryId, 
-          mergeSimilarRepository: item.data.mergeSimilarRepository
-        } );
-      }
-    }, this );
-    
-    this.userStore.each( function( item ) {
-      if ( item.data.isImport ) {
-        data.usersResolution.push( {
-          userId: item.data.userId,
-          email: item.data.email,
-          password: item.data.password,
-          isAdmin: item.data.isAdmin
-        } );
-      }
-    }, this );
-
-    Ext.Ajax.request( {
-      method: 'POST',
-      url: Sonatype.config.servicePath + '/migration/artifactory/content',
-      jsonData: { data: data },
-      callback: function( options, success, response ) {
-        this.el.unmask();
-
-        if ( success ) {
-          this.formPanel.buttons[2].setText( 'Close' );
-          this.formPanel.buttons[1].setDisabled( false );
-          Sonatype.MessageBox.show( {
-            title: 'Import Scheduled',
-            msg: 'Artifactory backup import scheduled',
-            buttons: Sonatype.MessageBox.OK,
-            icon: Sonatype.MessageBox.INFO
+  proceedImport: function(action) {
+    if(action == 'yes') {
+      this.el.mask( 'Importing...' );
+      this.formPanel.buttons[0].disable();
+  
+      var data = {
+        backupLocation: this.importData.backupLocation,
+        resolvePermission: this.formPanel.form.findField( 'resolvePermission' ).checked,
+        groupsResolution: [],
+        repositoriesResolution: [],
+        usersResolution: []
+      };
+  
+      this.groupStore.each( function( item ) {
+        if ( item.data.isImport ) {
+          data.groupsResolution.push( {
+            groupId: item.data.groupId,
+            isMixed: item.data.isMixed,
+            repositoryTypeResolution: item.data.displayType.toUpperCase().replace( /\ /g, '_' )
           } );
         }
-        else {
-          this.formPanel.buttons[0].enable();
-          Sonatype.utils.connectionError( response, 'Artifactory import failed!' );
+      }, this );
+      
+      this.repoStore.each( function( item ) {
+        if ( item.data.isImport ) {
+          data.repositoriesResolution.push( {
+            repositoryId: item.data.repositoryId,
+            type: item.data.type,
+            mapUrls: item.data.mapUrls,
+            copyCachedArtifacts: item.data.copyCachedArtifacts,
+            isMixed: item.data.isMixed,
+            mixResolution: item.data.displayMixedResolution.toUpperCase().replace( /\ /g, '_' ),
+            similarRepositoryId: item.data.similarRepositoryId, 
+            mergeSimilarRepository: item.data.mergeSimilarRepository
+          } );
         }
-      },
-      scope : this
-    } );
+      }, this );
+      
+      this.userStore.each( function( item ) {
+        if ( item.data.isImport ) {
+          data.usersResolution.push( {
+            userId: item.data.userId,
+            email: item.data.email,
+            password: item.data.password,
+            isAdmin: item.data.isAdmin
+          } );
+        }
+      }, this );
+  
+      Ext.Ajax.request( {
+        method: 'POST',
+        url: Sonatype.config.servicePath + '/migration/artifactory/content',
+        jsonData: { data: data },
+        callback: function( options, success, response ) {
+          this.el.unmask();
+  
+          if ( success ) {
+            this.formPanel.buttons[2].setText( 'Close' );
+            this.formPanel.buttons[1].setDisabled( false );
+            Sonatype.MessageBox.show( {
+              title: 'Import Scheduled',
+              msg: 'Artifactory backup import scheduled',
+              buttons: Sonatype.MessageBox.OK,
+              icon: Sonatype.MessageBox.INFO
+            } );
+          }
+          else {
+            this.formPanel.buttons[0].enable();
+            Sonatype.utils.connectionError( response, 'Artifactory import failed!' );
+          }
+        },
+        scope : this
+      } );
+    }
   }
 } );
 
