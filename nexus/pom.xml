@@ -124,8 +124,8 @@
     <plexus-jsecurity-realms.version>1.0.6</plexus-jsecurity-realms.version>
     <slf4j.version>1.5.6</slf4j.version>
     <maven.version>2.1-SONATYPE-653485</maven.version>
-    <nexus.indexer.version>1.2.1-SNAPSHOT</nexus.indexer.version>
-    <nexus.repository.metadata.version>1.0.0-SNAPSHOT</nexus.repository.metadata.version>
+    <nexus.indexer.version>1.2.1</nexus.indexer.version>
+    <nexus.repository.metadata.version>1.0.0</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
     <plexus.restlet.bridge.version>1.7</plexus.restlet.bridge.version>
     <micromailer.version>1.0.2</micromailer.version>
