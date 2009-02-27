@@ -18,6 +18,8 @@ import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
@@ -26,6 +28,8 @@ import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.log.SimpleLog4jConfig;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryProxy;
@@ -46,6 +50,7 @@ import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigCo
 import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigConvertorRequest;
 import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigReceiver;
 import org.sonatype.nexus.plugin.migration.artifactory.security.builder.ArtifactorySecurityConfigBuilder;
+import org.sonatype.nexus.plugin.migration.artifactory.util.MigrationLog4jConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.util.VirtualRepositoryUtil;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -58,8 +63,10 @@ import org.sonatype.scheduling.ScheduledTask;
 @Component( role = ArtifactoryMigrator.class )
 public class DefaultArtifactoryMigrator
     extends AbstractLogEnabled
-    implements ArtifactoryMigrator
+    implements ArtifactoryMigrator, Initializable
 {
+    private static final String MIGRATION_LOG = "migration.log";
+
     private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER =
         new NotFileFilter( new SuffixFileFilter( ".artifactory-metadata" ) );
 
@@ -77,12 +84,15 @@ public class DefaultArtifactoryMigrator
 
     @Requirement
     private SecurityConfigReceiver securityConfigAdaptorPersistor;
- 
+
     @Requirement
     private SecurityConfigConvertor securityConfigConvertor;
 
     @Requirement
     private Nexus nexus;
+
+    @Requirement
+    private LogManager logManager;
 
     /**
      * Map of processed migrations.
@@ -104,7 +114,7 @@ public class DefaultArtifactoryMigrator
     public MigrationResult migrate( MigrationSummaryDTO migrationSummary )
     {
         MigrationResult result =
-            new MigrationResult( getLogger().getChildLogger( migrationSummary.getId() ), migrationSummary );
+            new MigrationResult( getLogger()/* .getChildLogger( migrationSummary.getId() ) */, migrationSummary );
 
         if ( migrationResults.containsKey( result.getId() ) )
         {
@@ -822,6 +832,28 @@ public class DefaultArtifactoryMigrator
         zipUnArchiver.extract();
 
         return artifactoryBackup;
+    }
+
+    public void initialize()
+        throws InitializationException
+    {
+        if ( this.logManager.getLogFile( MIGRATION_LOG ) != null )
+        {
+            return;
+        }
+
+        File nexusLog = this.logManager.getLogFile( "nexus.log" );
+        File migrationLog = new File( nexusLog.getParentFile(), MIGRATION_LOG );
+
+        try
+        {
+            SimpleLog4jConfig logConfig = new MigrationLog4jConfig( nexus.getLogConfig(), migrationLog );
+            logManager.setLogConfig( logConfig );
+        }
+        catch ( IOException e )
+        {
+            throw new InitializationException( "Unable to configure migration log", e );
+        }
     }
 
 }

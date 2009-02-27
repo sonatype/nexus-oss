@@ -146,21 +146,16 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
   } );
   
   var helpMark = {
+    id: 'img-id',
     tag: 'img',
     src: Sonatype.config.resourcePath + '/images/icons/help.png',
     width: 16,
     height: 16,
-    cls: 'migration-help-icon'
-  }
-
-  Ext.QuickTips.init();
-  
-  Ext.QuickTips.register({
-    target:  helpMark,
-    title: '',
-    text: 'Specify the path to the Artifactory configuration zip file which has been stored on the server where Nexus is currently running.',
-    enabled: true
-  });
+    cls: 'migration-help-icon',
+    handler: function() {
+      Ext.fly('img-id').set({qtip:'Specify the path to the Artifactory configuration zip file which has been stored on the server where Nexus is currently running.'}); 
+    }
+  };
 
   this.formPanel = new Ext.form.FormPanel( {
     region: 'center',
@@ -421,6 +416,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
       this.formPanel
     ]
   } );
+
 };
 
 Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {

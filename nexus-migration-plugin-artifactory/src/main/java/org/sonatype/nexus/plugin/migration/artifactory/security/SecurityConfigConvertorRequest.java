@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.logging.Logger;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.plugin.migration.artifactory.MigrationResult;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
