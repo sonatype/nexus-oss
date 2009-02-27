@@ -53,14 +53,15 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.tools.repository.RepositoryConvertor;
+import org.sonatype.scheduling.ScheduledTask;
 
 @Component( role = ArtifactoryMigrator.class )
 public class DefaultArtifactoryMigrator
     extends AbstractLogEnabled
     implements ArtifactoryMigrator
 {
-    private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER = new NotFileFilter( new SuffixFileFilter(
-        ".artifactory-metadata" ) );
+    private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER =
+        new NotFileFilter( new SuffixFileFilter( ".artifactory-metadata" ) );
 
     @Requirement( role = org.codehaus.plexus.archiver.UnArchiver.class, hint = "zip" )
     private ZipUnArchiver zipUnArchiver;
@@ -76,7 +77,7 @@ public class DefaultArtifactoryMigrator
 
     @Requirement
     private SecurityConfigReceiver securityConfigAdaptorPersistor;
-
+ 
     @Requirement
     private SecurityConfigConvertor securityConfigConvertor;
 
@@ -102,9 +103,8 @@ public class DefaultArtifactoryMigrator
 
     public MigrationResult migrate( MigrationSummaryDTO migrationSummary )
     {
-        MigrationResult result = new MigrationResult(
-            getLogger().getChildLogger( migrationSummary.getId() ),
-            migrationSummary );
+        MigrationResult result =
+            new MigrationResult( getLogger().getChildLogger( migrationSummary.getId() ), migrationSummary );
 
         if ( migrationResults.containsKey( result.getId() ) )
         {
@@ -263,10 +263,9 @@ public class DefaultArtifactoryMigrator
         {
             result.addInfoMessage( "Importing user: " + userResolution.getUserId() );
 
-            ArtifactoryUser user = new ArtifactoryUser(
-                userResolution.getUserId(),
-                userResolution.getPassword(),
-                userResolution.getEmail() );
+            ArtifactoryUser user =
+                new ArtifactoryUser( userResolution.getUserId(), userResolution.getPassword(),
+                                     userResolution.getEmail() );
 
             user.setAdmin( userResolution.isAdmin() );
 
@@ -278,11 +277,8 @@ public class DefaultArtifactoryMigrator
 
         cfg.getUsers().addAll( userList );
 
-        SecurityConfigConvertorRequest convertorRequest = new SecurityConfigConvertorRequest(
-            cfg,
-            securityConfigAdaptorPersistor,
-            mappingConfiguration,
-            result );
+        SecurityConfigConvertorRequest convertorRequest =
+            new SecurityConfigConvertorRequest( cfg, securityConfigAdaptorPersistor, mappingConfiguration, result );
 
         convertorRequest.setResolvePermission( result.getMigrationSummary().isResolvePermission() );
 
@@ -325,8 +321,9 @@ public class DefaultArtifactoryMigrator
                         Repository nexusRepoReleases = createRepository( repo, artifactoryProxies, false, "releases" );
                         Repository nexusRepoSnapshots = createRepository( repo, artifactoryProxies, true, "snapshots" );
 
-                        CRepositoryGroup nexusGroup = createGroup( repo.getKey(), repo.getType(), nexusRepoReleases
-                            .getId(), nexusRepoSnapshots.getId() );
+                        CRepositoryGroup nexusGroup =
+                            createGroup( repo.getKey(), repo.getType(), nexusRepoReleases.getId(),
+                                         nexusRepoSnapshots.getId() );
 
                         if ( resolution.isCopyCachedArtifacts() )
                         {
@@ -336,11 +333,9 @@ public class DefaultArtifactoryMigrator
 
                         if ( resolution.isMapUrls() )
                         {
-                            CMapping map = new CMapping(
-                                resolution.getRepositoryId(),
-                                nexusGroup.getGroupId(),
-                                nexusRepoReleases.getId(),
-                                nexusRepoSnapshots.getId() );
+                            CMapping map =
+                                new CMapping( resolution.getRepositoryId(), nexusGroup.getGroupId(),
+                                              nexusRepoReleases.getId(), nexusRepoSnapshots.getId() );
                             addMapping( map );
                         }
 
@@ -352,15 +347,15 @@ public class DefaultArtifactoryMigrator
                     {
                         if ( resolution.isMapUrls() )
                         {
-                            CMapping map = new CMapping( resolution.getRepositoryId(), resolution
-                                .getSimilarRepositoryId() );
+                            CMapping map =
+                                new CMapping( resolution.getRepositoryId(), resolution.getSimilarRepositoryId() );
                             addMapping( map );
                         }
                     }
                     else
                     {
-                        importRepository( result, repositoriesBackup, artifactoryProxies, resolution, repo, repo
-                            .getHandleSnapshots(), null );
+                        importRepository( result, repositoriesBackup, artifactoryProxies, resolution, repo,
+                                          repo.getHandleSnapshots(), null );
                     }
                 }
 
@@ -399,8 +394,9 @@ public class DefaultArtifactoryMigrator
     }
 
     private void importRepository( MigrationResult result, File repositoriesBackup,
-        Map<String, ArtifactoryProxy> artifactoryProxies, RepositoryResolutionDTO resolution,
-        ArtifactoryRepository repo, boolean isSnapshot, String suffix )
+                                   Map<String, ArtifactoryProxy> artifactoryProxies,
+                                   RepositoryResolutionDTO resolution, ArtifactoryRepository repo, boolean isSnapshot,
+                                   String suffix )
         throws MigrationException
     {
         File repositoryBackup = new File( repositoriesBackup, repo.getKey() );
@@ -437,7 +433,7 @@ public class DefaultArtifactoryMigrator
     }
 
     private Repository createRepository( ArtifactoryRepository repo, Map<String, ArtifactoryProxy> artifactoryProxies,
-        boolean isSnapshot, String suffix )
+                                         boolean isSnapshot, String suffix )
         throws MigrationException
 
     {
@@ -687,7 +683,7 @@ public class DefaultArtifactoryMigrator
     }
 
     private void copyArtifacts( MigrationResult result, Repository nexusRepoSnapshots, Repository nexusRepoReleases,
-        File repositoryBackup )
+                                File repositoryBackup )
         throws MigrationException
     {
         result.addInfoMessage( "Copying cached artifacts to: " + nexusRepoReleases.getId() + ", "
@@ -695,11 +691,9 @@ public class DefaultArtifactoryMigrator
 
         try
         {
-            repositoryConvertor.convertRepositoryWithCopy(
-                repositoryBackup,
-                getStorage( nexusRepoReleases ),
-                getStorage( nexusRepoSnapshots ),
-                ARTIFACTORY_METADATA_FILE_FILTER );
+            repositoryConvertor.convertRepositoryWithCopy( repositoryBackup, getStorage( nexusRepoReleases ),
+                                                           getStorage( nexusRepoSnapshots ),
+                                                           ARTIFACTORY_METADATA_FILE_FILTER );
         }
         catch ( IOException e )
         {
@@ -711,7 +705,7 @@ public class DefaultArtifactoryMigrator
     }
 
     private void copyArtifacts( MigrationResult result, String repoId, File sourceRepositoryBackup,
-        File destinationStorage )
+                                File destinationStorage )
         throws MigrationException
     {
         result.addInfoMessage( "Copying cached artifacts to: " + repoId );
@@ -749,16 +743,41 @@ public class DefaultArtifactoryMigrator
 
             RebuildAttributesTask at = nexusScheduler.createTaskInstance( RebuildAttributesTask.class );
             at.setRepositoryId( repoId );
-            nexusScheduler.submit( "rebuild-attributes-" + repoId, at );
+            ScheduledTask<Object> schedule = nexusScheduler.submit( "rebuild-attributes-" + repoId, at );
+            try
+            {
+                schedule.get();
+            }
+            catch ( Exception e )
+            {
+                result.addWarningMessage( "Error building attributes " + repoId, e );
+            }
 
             RebuildMavenMetadataTask mt = nexusScheduler.createTaskInstance( RebuildMavenMetadataTask.class );
             mt.setRepositoryId( repoId );
-            nexusScheduler.submit( "rebuild-maven-metadata-" + repoId, mt );
+            schedule = nexusScheduler.submit( "rebuild-maven-metadata-" + repoId, mt );
+            try
+            {
+                schedule.get();
+            }
+            catch ( Exception e )
+            {
+                result.addWarningMessage( "Error creating maven metadata " + repoId, e );
+            }
 
             ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
             rt.setRepositoryId( repoId );
-            nexusScheduler.submit( "reindex-" + repoId, rt );
+            schedule = nexusScheduler.submit( "reindex-" + repoId, rt );
+            try
+            {
+                schedule.get();
+            }
+            catch ( Exception e )
+            {
+                result.addWarningMessage( "Error creating nexus index " + repoId, e );
+            }
         }
+
     }
 
     private File getStorage( Repository nexusRepo )
@@ -789,8 +808,7 @@ public class DefaultArtifactoryMigrator
     }
 
     private File unzipArtifactoryBackup( MigrationResult result, File fileItem )
-        throws IOException,
-            ArchiverException
+        throws IOException, ArchiverException
     {
         result.addInfoMessage( "Unpacking backup file" );
 
