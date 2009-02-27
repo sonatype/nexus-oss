@@ -267,9 +267,12 @@ public class DefaultIndexingContext
     {
         String[] names = indexDirectory.list();
 
-        for ( int i = 0; i < names.length; i++ )
+        if ( names != null )
         {
-            indexDirectory.deleteFile( names[i] );
+            for ( int i = 0; i < names.length; i++ )
+            {
+                indexDirectory.deleteFile( names[i] );
+            }
         }
 
         IndexUtils.deleteTimestamp( indexDirectory );
