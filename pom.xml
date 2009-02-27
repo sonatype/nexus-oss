@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>spice-parent</artifactId>
 		<groupId>org.sonatype.spice</groupId>
-		<version>10</version>
+		<version>11</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.sonatype.spice</groupId>
