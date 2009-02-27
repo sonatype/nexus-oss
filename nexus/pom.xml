@@ -119,9 +119,9 @@
   </modules>
   <!-- Shortcuts for outnumbered deps :) -->
   <properties>
-    <plexus.appbooter.version>1.6.5-SNAPSHOT</plexus.appbooter.version>
+    <plexus.appbooter.version>1.6.6</plexus.appbooter.version>
     <jsw.binaries.version>3.2.3.4</jsw.binaries.version>
-    <plexus-jsecurity-realms.version>1.0.6-SNAPSHOT</plexus-jsecurity-realms.version>
+    <plexus-jsecurity-realms.version>1.0.6</plexus-jsecurity-realms.version>
     <slf4j.version>1.5.6</slf4j.version>
     <maven.version>2.1-SONATYPE-653485</maven.version>
     <nexus.indexer.version>1.2.1-SNAPSHOT</nexus.indexer.version>
@@ -131,6 +131,20 @@
     <micromailer.version>1.0.2</micromailer.version>
     <mercury.version>1.0-alpha-5</mercury.version>
     <restlet.version>1.1.1-b6</restlet.version>
+    <plexus-jetty6.version>1.6</plexus-jetty6.version>
+    <plexus-task-scheduler.version>1.1</plexus-task-scheduler.version>
+    <plexus-digest.version>1.1</plexus-digest.version>
+    <plexus-cli.version>1.2</plexus-cli.version>
+    <plexus-classworlds.version>1.4</plexus-classworlds.version>
+    <plexus-utils.version>1.5.5</plexus-utils.version>
+    <plexus-interpolation.version>1.6</plexus-interpolation.version>
+    <plexus-slf4j-logging.version>1.1-alpha-1</plexus-slf4j-logging.version>
+    <plexus-velocity.version>1.1.7</plexus-velocity.version>
+    <jsecurity.version>0.9.0-RC2-SONATYPE</jsecurity.version>
+    <commons-beanutils.version>1.7.0</commons-beanutils.version>
+    <log4j.version>1.2.14</log4j.version>
+    <plexus-ehcache.version>1.0.0</plexus-ehcache.version>
+    <plexus-jetty-testsuite.version>1.3</plexus-jetty-testsuite.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -166,12 +180,12 @@
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-jetty6</artifactId>
-        <version>1.5</version>
+        <version>${plexus-jetty6.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-task-scheduler</artifactId>
-        <version>1.1</version>
+        <version>${plexus-task-scheduler.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
@@ -181,7 +195,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-digest</artifactId>
-        <version>1.1</version>
+        <version>${plexus-digest.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -192,7 +206,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-cli</artifactId>
-        <version>1.2</version>
+        <version>${plexus-cli.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -210,23 +224,23 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-classworlds</artifactId>
-        <version>1.4</version>
+        <version>${plexus-classworlds.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>1.5.5</version>
+        <version>${plexus-utils.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-interpolation</artifactId>
-        <version>1.6</version>
+        <version>${plexus-interpolation.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-slf4j-logging</artifactId>
-        <version>1.1-alpha-1</version>
+        <version>${plexus-slf4j-logging.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -246,7 +260,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-velocity</artifactId>
-        <version>1.1.7</version>
+        <version>${plexus-velocity.version}</version>
         <type>jar</type>
         <scope>compile</scope>
         <exclusions>
@@ -274,7 +288,7 @@
       <dependency>
         <groupId>org.jsecurity</groupId>
         <artifactId>jsecurity</artifactId>
-        <version>0.9.0-RC2-SONATYPE</version>
+        <version>${jsecurity.version}</version>
         <scope>compile</scope>
         <exclusions>
           <exclusion>
@@ -286,7 +300,7 @@
       <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils</artifactId>
-        <version>1.7.0</version>
+        <version>${commons-beanutils.version}</version>
         <scope>runtime</scope>
         <exclusions>
           <exclusion>
@@ -328,7 +342,7 @@
       <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
-        <version>1.2.14</version>
+        <version>${log4j.version}</version>
       </dependency>
 
       <!-- Maven -->
@@ -442,7 +456,7 @@
       <dependency>
 	    <groupId>org.sonatype.spice</groupId>
 		<artifactId>plexus-ehcache</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>${plexus-ehcache.version}</version>
      </dependency>
      <dependency>
         <groupId>org.restlet</groupId>
@@ -537,7 +551,7 @@
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-jetty-testsuite</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <version>${plexus-jetty-testsuite.version}</version>
         <type>jar</type>
         <scope>test</scope>
       </dependency>
