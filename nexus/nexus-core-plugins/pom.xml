@@ -20,7 +20,7 @@ under the License.
 
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-core-plugins</artifactId>
-    <version>1</version>
+    <version>2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Nexus Core Plugins Aggregator</name>
 
