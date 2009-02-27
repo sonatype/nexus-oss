@@ -7,14 +7,14 @@
   </parent>
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-parent</artifactId>
-  <version>8-SNAPSHOT</version>
+  <version>8</version>
   <packaging>pom</packaging>
   <name>Sonatype Nexus Parent</name>
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-parent</connection>
-    <url>http://svn.sonatype.org/nexus/trunk/nexus-parent</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-parent</developerConnection>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/tags/nexus-parent-8</connection>
+    <url>http://svn.sonatype.org/nexus/tags/nexus-parent-8</url>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/tags/nexus-parent-8</developerConnection>
   </scm>
 
   <properties>
