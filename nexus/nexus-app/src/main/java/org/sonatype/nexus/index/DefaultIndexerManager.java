@@ -87,9 +87,6 @@ public class DefaultIndexerManager
     /** Context id remote suffix */
     public static final String CTX_REMOTE_SUFIX = "-remote";
 
-    /** Virgin date :) */
-    private static final Date VIRGIN_CONTEXT_DATE = new Date( 1 );
-
     @Requirement
     private NexusIndexer nexusIndexer;
 
@@ -499,27 +496,11 @@ public class DefaultIndexerManager
                 }
                 else
                 {
-                    // XXX: a hack follows, remove it when fixed!
-                    boolean hacked = context.getTimestamp() == null;
-
-                    if ( hacked )
-                    {
-                        context.updateTimestamp( false, VIRGIN_CONTEXT_DATE );
-                    }
-                    // XXX: end of the hack
-
                     IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
 
                     packReq.setCreateIncrementalChunks( false );
 
                     indexPacker.packIndex( packReq );
-
-                    // XXX: a hack follows, remove it when fixed!
-                    if ( hacked )
-                    {
-                        context.updateTimestamp( false, null );
-                    }
-                    // XXX: end of the hack
 
                     File[] files = targetDir.listFiles();
 
@@ -563,8 +544,18 @@ public class DefaultIndexerManager
                 true,
                 new PreparedContentLocator( fis ) );
 
-            fItem.setModified( context.getTimestamp().getTime() );
-            fItem.setCreated( context.getTimestamp().getTime() );
+            if ( context.getTimestamp() == null )
+            {
+                fItem.setModified( 0 );
+
+                fItem.setCreated( 0 );
+            }
+            else
+            {
+                fItem.setModified( context.getTimestamp().getTime() );
+
+                fItem.setCreated( context.getTimestamp().getTime() );
+            }
 
             if ( repository instanceof MavenRepository )
             {
@@ -611,27 +602,11 @@ public class DefaultIndexerManager
                     getLogger().debug( "Packing the merged index context." );
                 }
 
-                // XXX: a hack follows, remove it when fixed!
-                boolean hacked = context.getTimestamp() == null;
-
-                if ( hacked )
-                {
-                    context.updateTimestamp( false, VIRGIN_CONTEXT_DATE );
-                }
-                // XXX: end of the hack
-
                 IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
 
                 packReq.setCreateIncrementalChunks( false );
 
                 indexPacker.packIndex( packReq );
-
-                // XXX: a hack follows, remove it when fixed!
-                if ( hacked )
-                {
-                    context.updateTimestamp( false, null );
-                }
-                // XXX: end of the hack
 
                 File[] files = targetDir.listFiles();
 
