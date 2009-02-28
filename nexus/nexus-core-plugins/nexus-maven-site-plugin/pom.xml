@@ -14,7 +14,7 @@
 
 
   <properties>
-    <nexus.version>1.3.0-SNAPSHOT</nexus.version>
+    <nexus.version>1.4.0-SNAPSHOT</nexus.version>
   </properties>
 
   <scm>
