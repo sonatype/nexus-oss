@@ -86,4 +86,5 @@ class UserCRUDTest
         def result = msgUtil.doDelete("velo");
         assertEquals result.code, 204
      }
+
 }
