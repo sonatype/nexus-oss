@@ -337,27 +337,16 @@ public class RecreateMavenMetadataWalkerTest
         throws Exception
     {
         rebuildMavenMetadata( inhouseRelease );
-
-        try
-        {
-            inhouseRelease
-                .retrieveItem( new ResourceStoreRequest( "/junit/junit/4.4/junit-4.4.sources.jar.md5", false ) );
-
-            fail( "Should throw exception telling that can't find this item" );
-        }
-        catch ( Exception e )
-        {
-        }
-
-        try
-        {
-            inhouseRelease.retrieveItem( new ResourceStoreRequest( "/junit/junit-mock/maven-metadata.xml", false ) );
-
-            fail( "Should throw exception telling that can't find this item" );
-        }
-        catch ( Exception e )
-        {
-        }
+        
+        Map<String, Boolean> expected = new LinkedHashMap<String, Boolean>();
+        
+        expected.put("/junit/junit/4.4/junit-4.4.sources.jar.md5", Boolean.FALSE);
+        expected.put("/junit/junit-mock/maven-metadata.xml", Boolean.FALSE);
+        expected.put("/junit/junit/3.8.1/maven-metadata.xml", Boolean.FALSE);
+        expected.put("/junit/junit/3.8.1/maven-metadata.xml.md5", Boolean.FALSE);
+        expected.put("/junit/junit/3.8.1/maven-metadata.xml.sha1", Boolean.FALSE);
+        
+        validateResults( inhouseRelease, expected );;
     }
 
     public void testArtifactDirMdCorrect()

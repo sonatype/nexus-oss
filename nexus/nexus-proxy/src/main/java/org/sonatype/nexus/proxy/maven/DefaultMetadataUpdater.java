@@ -72,15 +72,16 @@ public class DefaultMetadataUpdater
 
             gavMd.setVersion( gav.getBaseVersion() );
 
+            // GAV metadata is only meaningful to snapshot artifacts
             if ( gav.isSnapshot() )
             {
                 operations.add( new SetSnapshotOperation( new SnapshotOperand( MetadataBuilder.createSnapshot( request
                     .getVersion() ) ) ) );
+                
+                MetadataBuilder.changeMetadata( gavMd, operations );
+
+                locator.storeGAVMetadata( request, gavMd );
             }
-
-            MetadataBuilder.changeMetadata( gavMd, operations );
-
-            locator.storeGAVMetadata( request, gavMd );
 
             // GA
 
