@@ -142,6 +142,9 @@ public abstract class AbstractRepository
     /** The name. */
     private String name;
 
+    /** The path prefix */
+    private String pathPrefix;
+
     /** The local status */
     private volatile LocalStatus localStatus = LocalStatus.IN_SERVICE;
 
@@ -364,6 +367,26 @@ public abstract class AbstractRepository
     public void setName( String name )
     {
         this.name = name;
+    }
+
+    public String getPathPrefix()
+    {
+        // a "fallback" mechanism: id's must be unique now across nexus,
+        // but some older systems may have groups/reposes with same ID. To clear out the ID-clash, we will need to
+        // change IDs, but we must _not_ change the published URLs on those systems.
+        if ( !StringUtils.isBlank( pathPrefix ) )
+        {
+            return pathPrefix;
+        }
+        else
+        {
+            return getId();
+        }
+    }
+
+    public void setPathPrefix( String prefix )
+    {
+        this.pathPrefix = prefix;
     }
 
     public boolean isIndexable()

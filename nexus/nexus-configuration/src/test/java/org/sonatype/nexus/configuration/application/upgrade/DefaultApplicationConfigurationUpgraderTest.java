@@ -159,10 +159,10 @@ public class DefaultApplicationConfigurationUpgraderTest
         throws Exception
     {
         TimeZone defaultTZ = TimeZone.getDefault();
-        
+
         // use UTC for this test
         TimeZone.setDefault( TimeZone.getTimeZone( "UTC" ) );
-        
+
         copyFromClasspathToFile(
             "/org/sonatype/nexus/configuration/upgrade/103-1/nexus-103.xml",
             getNexusConfiguration() );
@@ -175,7 +175,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         // set back to the default timezone
         TimeZone.setDefault( defaultTZ );
-        
+
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
         assertEquals( 6, configuration.getRepositories().size() );
@@ -234,5 +234,17 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-105.xml", configuration );
+    }
+
+    public void testNEXUS1710()
+        throws Exception
+    {
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus1710/nexus.xml", getNexusConfiguration() );
+
+        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
+
+        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
+
+        resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus1710/nexus.xml", configuration );
     }
 }

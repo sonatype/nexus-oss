@@ -47,6 +47,7 @@ public class DefaultGroupRepositoryConfigurator
 
         repository.setId( group.getGroupId() );
         repository.setName( group.getName() );
+        repository.setPathPrefix( group.getPathPrefix() );
         
         repository.setNotFoundCacheActive( false );
 

@@ -380,6 +380,15 @@ public class DefaultApplicationConfigurationValidator
             }
         }
 
+        if ( context.getExistingRepositoryGroupIds() != null )
+        {
+            if ( context.getExistingRepositoryGroupIds().contains( repo.getId() ) )
+            {
+                response.addValidationError( "Repository " + repo.getId()
+                    + " conflicts woth existing Group with same ID='" + repo.getId() + "'!" );
+            }
+        }
+
         return response;
     }
 
@@ -427,8 +436,8 @@ public class DefaultApplicationConfigurationValidator
 
         if ( !validateShadowRepositoryType( shadow.getType() ) )
         {
-            response.addValidationError( "TYPE='" + shadow.getType() + "' of shadow repository with ID='" + shadow.getId()
-                + "' is wrong!" );
+            response.addValidationError( "TYPE='" + shadow.getType() + "' of shadow repository with ID='"
+                + shadow.getId() + "' is wrong!" );
         }
 
         if ( context.getExistingRepositoryShadowIds() != null )
@@ -447,6 +456,15 @@ public class DefaultApplicationConfigurationValidator
             {
                 response.addValidationError( "Repository shadow " + shadow.getId()
                     + " conflicts with existing Repository with same ID='" + shadow.getId() + "'!" );
+            }
+        }
+
+        if ( context.getExistingRepositoryGroupIds() != null )
+        {
+            if ( context.getExistingRepositoryGroupIds().contains( shadow.getId() ) )
+            {
+                response.addValidationError( "Repository shadow " + shadow.getId()
+                    + " conflicts woth existing Group with same ID='" + shadow.getId() + "'!" );
             }
         }
 
@@ -615,6 +633,24 @@ public class DefaultApplicationConfigurationValidator
             }
         }
 
+        if ( context.getExistingRepositoryIds() != null )
+        {
+            if ( context.getExistingRepositoryIds().contains( group.getGroupId() ) )
+            {
+                response.addValidationError( "The group with GroupID " + group.getGroupId()
+                    + " conflicts with Repository having same ID!" );
+            }
+        }
+
+        if ( context.getExistingRepositoryShadowIds() != null )
+        {
+            if ( context.getExistingRepositoryShadowIds().contains( group.getGroupId() ) )
+            {
+                response.addValidationError( "The group with GroupID " + group.getGroupId()
+                    + " conflicts with Shadow repository having same ID!" );
+            }
+        }
+
         if ( context.getExistingRepositoryIds() != null && context.getExistingRepositoryShadowIds() != null )
         {
             List<String> existingReposes = context.getExistingRepositoryIds();
@@ -712,7 +748,7 @@ public class DefaultApplicationConfigurationValidator
 
         return response;
     }
-    
+
     public ValidationResponse validateRepositoryMirrors( ApplicationValidationContext ctx, List<CMirror> mirrors )
     {
         ValidationResponse response = new ApplicationValidationResponse();
@@ -721,31 +757,32 @@ public class DefaultApplicationConfigurationValidator
         {
             response.setContext( ctx );
         }
-        
+
         for ( CMirror mirror : mirrors )
-        {        
+        {
             if ( StringUtils.isEmpty( mirror.getId() ) )
             {
                 String newId = idGenerator.generateId();
-    
+
                 mirror.setId( newId );
-    
-                response.addValidationWarning( "Fixed wrong mirror ID from '" + mirror.getId() + "' to '" + newId + "'" );
-    
+
+                response
+                    .addValidationWarning( "Fixed wrong mirror ID from '" + mirror.getId() + "' to '" + newId + "'" );
+
                 response.setModified( true );
             }
-            
+
             if ( StringUtils.isEmpty( mirror.getId() ) )
             {
                 response.addValidationError( "The Mirror may have no empty/null ID!" );
             }
-            
+
             if ( StringUtils.isEmpty( mirror.getUrl() ) )
             {
                 response.addValidationError( "The Mirror may have no empty/null URL!" );
             }
         }
-        
+
         return response;
     }
 

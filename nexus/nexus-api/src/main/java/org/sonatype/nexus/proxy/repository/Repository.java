@@ -74,6 +74,20 @@ public interface Repository
     void setName( String name );
 
     /**
+     * Used by router only, to specify a valid path prefix to a repository (previously was used getId() for this).
+     * 
+     * @return
+     */
+    String getPathPrefix();
+
+    /**
+     * Used by router only, to specify a valid path prefix to a repository (previously was used getId() for this).
+     * 
+     * @param prefix
+     */
+    void setPathPrefix( String prefix );
+
+    /**
      * This is the "type"/kind of the repository. It tells some minimal info about the repo working (not content,
      * neither implementation).
      * 

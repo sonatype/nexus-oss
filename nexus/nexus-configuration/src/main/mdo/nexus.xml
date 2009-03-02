@@ -681,6 +681,13 @@
           <description>Human readable Repository name.</description>
         </field>
         <field>
+          <name>pathPrefix</name>
+          <version>1.0.8+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>Path prefix, used by router, to form the URL where this repository will be published.</description>
+        </field>
+        <field>
           <name>localStatus</name>
           <version>1.0.2+</version>
           <type>String</type>
@@ -1201,6 +1208,13 @@
           <description>Human readable Repository name.</description>
         </field>
         <field>
+          <name>pathPrefix</name>
+          <version>1.0.8+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>Path prefix, used by router, to form the URL where this repository will be published.</description>
+        </field>
+        <field>
           <name>localStatus</name>
           <version>1.0.2+</version>
           <type>String</type>
@@ -1463,6 +1477,13 @@
           <type>String</type>
           <required>true</required>
           <description>Human readable Repository Group name.</description>
+        </field>
+        <field>
+          <name>pathPrefix</name>
+          <version>1.0.8+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>Path prefix, used by router, to form the URL where this repository will be published.</description>
         </field>
         <field>
           <name>type</name>
@@ -1811,14 +1832,14 @@
           <required>true</required>
           <description>The current status of the task</description>
         </field>
-        <field xml.format="long">
+        <field>
           <name>lastRun</name>
           <type>Date</type>
           <version>1.0.3+</version>
           <required>true</required>
           <description>The date the task last ran</description>
         </field>
-        <field xml.format="long">
+        <field>
           <name>nextRun</name>
           <type>Date</type>
           <version>1.0.3+</version>
@@ -1868,14 +1889,14 @@
           <required>true</required>
           <description>The type of the schedule</description>
         </field>
-        <field xml.format="long">
+        <field>
           <name>startDate</name>
           <type>Date</type>
           <version>1.0.4+</version>
           <required>true</required>
           <description>The schedule that controls the time this task is run</description>
         </field>
-        <field xml.format="long">
+        <field>
           <name>endDate</name>
           <type>Date</type>
           <version>1.0.4+</version>
@@ -1972,7 +1993,7 @@
       <version>1.0.3</version>
       <description>A schedule, which will run a task once.</description>
       <fields>
-        <field xml.format="long">
+        <field>
           <name>startDate</name>
           <type>Date</type>
           <version>1.0.3</version>
@@ -1988,7 +2009,7 @@
       <version>1.0.3</version>
       <description>A schedule, which will run a task daily.</description>
       <fields>
-        <field xml.format="long">
+        <field>
           <name>endDate</name>
           <type>Date</type>
           <version>1.0.3</version>

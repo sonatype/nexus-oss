@@ -60,6 +60,7 @@ public class DefaultRepositoryConfigurator
 
         repository.setId( repo.getId() );
         repository.setName( repo.getName() );
+        repository.setPathPrefix( repo.getPathPrefix() );
         repository.setLocalStatus( repositoryStatusConverter.localStatusFromModel( repo.getLocalStatus() ) );
         repository.setAllowWrite( repo.isAllowWrite() );
         repository.setBrowseable( repo.isBrowseable() );

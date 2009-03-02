@@ -465,11 +465,13 @@ public class DefaultRepositoryRouter
 
             try
             {
-                repository = repositoryRegistry.getRepositoryWithFacet( explodedPath[1], kind );
+                repository = getRepositoryForPathPrefixOrId( explodedPath[1], kind );
+                // explodedPath[1] is not _always_ ID anymore! It is PathPrefix _or_ ID! NEXUS-1710
+                // repository = repositoryRegistry.getRepositoryWithFacet( explodedPath[1], kind );
 
                 if ( !repository.isExposed() )
                 {
-                    // the repo is not exposed
+                    // this is not the main facet or the repo is not exposed
                     throw new ItemNotFoundException( request.getRequestPath() );
                 }
             }
@@ -499,6 +501,44 @@ public class DefaultRepositoryRouter
         }
 
         return result;
+    }
+
+    protected Repository getRepositoryForPathPrefixOrId( String pathPrefixOrId, Class<? extends Repository> kind )
+        throws NoSuchRepositoryException
+    {
+        List<? extends Repository> repositories = repositoryRegistry.getRepositoriesWithFacet( kind );
+
+        Repository idMatched = null;
+
+        Repository pathPrefixMatched = null;
+
+        for ( Repository repository : repositories )
+        {
+            if ( StringUtils.equals( repository.getId(), pathPrefixOrId ) )
+            {
+                idMatched = repository;
+            }
+
+            if ( StringUtils.equals( repository.getPathPrefix(), pathPrefixOrId ) )
+            {
+                pathPrefixMatched = repository;
+            }
+        }
+
+        if ( idMatched != null )
+        {
+            // id wins
+            return idMatched;
+        }
+
+        if ( pathPrefixMatched != null )
+        {
+            // if no id found, prefix wins
+            return pathPrefixMatched;
+        }
+
+        // nothing found
+        throw new NoSuchRepositoryException( "pathPrefixOrId: '" + pathPrefixOrId + "'" );
     }
 
     protected StorageItem retrieveVirtualPath( ResourceStoreRequest request, RequestRoute route )
@@ -555,7 +595,9 @@ public class DefaultRepositoryRouter
         else if ( route.getRequestDepth() == 1 )
         {
             // 2nd level
-            List<? extends Repository> repositories = null;
+            List<Repository> repositories = null;
+
+            Class<Repository> kind = null;
 
             for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRepositoryTypeDescriptors() )
             {
@@ -563,8 +605,9 @@ public class DefaultRepositoryRouter
                 {
                     if ( route.getStrippedPrefix().startsWith( "/" + rtd.getPrefix() ) )
                     {
-                        repositories = repositoryRegistry.getRepositoriesWithFacet( (Class<Repository>) Class
-                            .forName( rtd.getRole() ) );
+                        kind = (Class<Repository>) Class.forName( rtd.getRole() );
+
+                        repositories = repositoryRegistry.getRepositoriesWithFacet( kind );
 
                         break;
                     }
@@ -579,7 +622,7 @@ public class DefaultRepositoryRouter
             }
 
             // if no prefix matched, Item not found
-            if ( repositories == null )
+            if ( repositories == null || repositories.isEmpty() )
             {
                 throw new ItemNotFoundException( request.getRequestPath() );
             }
@@ -590,8 +633,18 @@ public class DefaultRepositoryRouter
             {
                 if ( repository.isExposed() && repository.isBrowseable() )
                 {
-                    DefaultStorageCollectionItem repoItem = new DefaultStorageCollectionItem( this, ItemPathUtils
-                        .concatPaths( request.getRequestPath(), repository.getId() ), true, false );
+                    DefaultStorageCollectionItem repoItem = null;
+
+                    if ( Repository.class.equals( kind ) )
+                    {
+                        repoItem = new DefaultStorageCollectionItem( this, ItemPathUtils.concatPaths( request
+                            .getRequestPath(), repository.getId() ), true, false );
+                    }
+                    else
+                    {
+                        repoItem = new DefaultStorageCollectionItem( this, ItemPathUtils.concatPaths( request
+                            .getRequestPath(), repository.getPathPrefix() ), true, false );
+                    }
 
                     repoItem.getItemContext().putAll( request.getRequestContext() );
 
@@ -606,5 +659,4 @@ public class DefaultRepositoryRouter
             throw new ItemNotFoundException( request.getRequestPath() );
         }
     }
-
 }

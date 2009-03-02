@@ -16,10 +16,15 @@ package org.sonatype.nexus.configuration.application.upgrade;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryGroup;
+import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_8.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
@@ -32,15 +37,20 @@ public class Upgrade107to108
     implements Upgrader
 {
 
-    private BasicVersionUpgrade converter = new BasicVersionUpgrade() {
+    private BasicVersionUpgrade converter = new BasicVersionUpgrade()
+    {
         @Override
-        public org.sonatype.nexus.configuration.model.CRepositoryGroup upgradeCRepositoryGroup(org.sonatype.nexus.configuration.model.v1_0_7.CRepositoryGroup repositoryGroup, org.sonatype.nexus.configuration.model.CRepositoryGroup value )
+        public org.sonatype.nexus.configuration.model.CRepositoryGroup upgradeCRepositoryGroup(
+            org.sonatype.nexus.configuration.model.v1_0_7.CRepositoryGroup repositoryGroup,
+            org.sonatype.nexus.configuration.model.CRepositoryGroup value )
         {
-            org.sonatype.nexus.configuration.model.CRepositoryGroup group = super.upgradeCRepositoryGroup( repositoryGroup, value );
+            org.sonatype.nexus.configuration.model.CRepositoryGroup group = super.upgradeCRepositoryGroup(
+                repositoryGroup,
+                value );
             group.setType( "maven2" );
             return group;
         }
-        
+
         @Override
         public CSecurity upgradeCSecurity( org.sonatype.nexus.configuration.model.v1_0_7.CSecurity security,
             CSecurity value )
@@ -50,7 +60,7 @@ public class Upgrade107to108
             newSecurity.removeRealm( "NexusTargetAuthorizingRealm" );
             newSecurity.removeRealm( "XmlMethodAuthorizingRealm" );
             newSecurity.addRealm( "XmlAuthorizingRealm" );
-            
+
             return newSecurity;
         }
     };
@@ -89,13 +99,48 @@ public class Upgrade107to108
 
     public void upgrade( UpgradeMessage message )
     {
-        org.sonatype.nexus.configuration.model.v1_0_7.Configuration oldc = (org.sonatype.nexus.configuration.model.v1_0_7.Configuration) message.getConfiguration();
+        org.sonatype.nexus.configuration.model.v1_0_7.Configuration oldc = (org.sonatype.nexus.configuration.model.v1_0_7.Configuration) message
+            .getConfiguration();
 
         org.sonatype.nexus.configuration.model.Configuration newc = converter.upgradeConfiguration( oldc );
+
+        // NEXUS-1710: enforce ID uniqueness, but also /content URL must remain unchanged for existing systems.
+        // sadly, as part of upgrade, we must ensure the repoId uniqueness, which was not case in pre-1.3 nexuses
+        List<String> repoIds = new ArrayList<String>();
+
+        // repoIds are _unchanged_
+        if ( newc.getRepositories() != null )
+        {
+            for ( CRepository repository : (List<CRepository>) newc.getRepositories() )
+            {
+                repoIds.add( repository.getId() );
+            }
+        }
+
+        // shadowIds are _unchanged_ (the repo:shadow ID uniqueness was enforced in pre-1.3!)
+        if ( newc.getRepositoryShadows() != null )
+        {
+            for ( CRepositoryShadow repository : (List<CRepositoryShadow>) newc.getRepositoryShadows() )
+            {
+                repoIds.add( repository.getId() );
+            }
+        }
+
+        if ( newc.getRepositoryGrouping() != null && newc.getRepositoryGrouping().getRepositoryGroups() != null )
+        {
+            for ( CRepositoryGroup group : (List<CRepositoryGroup>) newc.getRepositoryGrouping().getRepositoryGroups() )
+            {
+                if ( repoIds.contains( group.getGroupId() ) )
+                {
+                    // if duped only
+                    group.setPathPrefix( group.getGroupId() );
+                    group.setGroupId( group.getGroupId() + "-group" );
+                }
+            }
+        }
 
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
-
 }

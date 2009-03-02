@@ -61,7 +61,7 @@ public class DefaultApplicationConfigurationValidatorTest
         assertTrue( response.isModified() );
 
         assertEquals( 1, response.getValidationErrors().size() );
-        
+
         assertEquals( 3, response.getValidationWarnings().size() );
     }
 
@@ -79,5 +79,35 @@ public class DefaultApplicationConfigurationValidatorTest
         assertEquals( 6, response.getValidationErrors().size() );
 
         assertEquals( 0, response.getValidationWarnings().size() );
+    }
+
+    public void testNexus1710Bad()
+        throws Exception
+    {
+        // this was before fix: groupId/repoId name clash
+        ValidationResponse response = configurationValidator.validateModel( new ValidationRequest(
+            getConfigurationFromStream( getClass().getResourceAsStream(
+                "/org/sonatype/nexus/configuration/upgrade/nexus1710/nexus.xml.result-bad" ) ) ) );
+
+        assertFalse( response.isValid() );
+
+        assertFalse( response.isModified() );
+
+        assertEquals( 1, response.getValidationErrors().size() );
+
+        assertEquals( 0, response.getValidationWarnings().size() );
+    }
+
+    public void testNexus1710Good()
+        throws Exception
+    {
+        // this is after fix: groupId is appended by "-group" to resolve clash
+        ValidationResponse response = configurationValidator.validateModel( new ValidationRequest(
+            getConfigurationFromStream( getClass().getResourceAsStream(
+                "/org/sonatype/nexus/configuration/upgrade/nexus1710/nexus.xml.result" ) ) ) );
+
+        assertTrue( response.isValid() );
+
+        assertFalse( response.isModified() );
     }
 }

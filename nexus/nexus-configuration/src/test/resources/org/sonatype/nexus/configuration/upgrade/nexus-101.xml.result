@@ -237,7 +237,8 @@
         </repositories>
       </repositoryGroup>
       <repositoryGroup>
-        <groupId>inhouse-snapshots</groupId>
+        <groupId>inhouse-snapshots-group</groupId>
+        <pathPrefix>inhouse-snapshots</pathPrefix>
         <type>maven2</type>
         <repositories>
           <repository>inhouse-snapshots</repository>

@@ -64,6 +64,7 @@ public abstract class AbstractShadowRepositoryConfigurator
 
         shadowRepository.setId( repo.getId() );
         shadowRepository.setName( repo.getName() );
+        shadowRepository.setPathPrefix( repo.getPathPrefix() );
 
         shadowRepository.setLocalStatus( repositoryStatusConverter.localStatusFromModel( repo.getLocalStatus() ) );
         shadowRepository.setAllowWrite( false );
