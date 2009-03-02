@@ -1229,6 +1229,7 @@ Sonatype.repoServer.ExternapRoleMappingPopup = function( config ) {
             forceSelection: true,
             mode: 'local',
             triggerAction: 'all',
+            lastQuery:'',
             emptyText: 'Select...',
             selectOnFocus: true,
             allowBlank: false
@@ -1258,18 +1259,12 @@ Sonatype.repoServer.ExternapRoleMappingPopup = function( config ) {
 
 Ext.extend( Sonatype.repoServer.ExternapRoleMappingPopup, Ext.Window, {
   onSourceSelect: function( combo, rec, index ) {
-    this.filterRoleList( rec.data.roleHint );
-  },
-  
-  filterRoleList: function( source ) {
-    this.roleStore.clearFilter();
-    this.roleStore.filterBy( function( rec, id ) {
-      return rec.data.source == source;
-    } );
-    this.find( 'name', 'roleId' )[0].reset();
+  	var roleCombo = this.find( 'name', 'roleId' )[0];        
+    roleCombo.clearValue();
+    roleCombo.store.filter('source', rec.data.roleHint);
   },
 
-  createRoleMapping: function( button, e ) {
+ createRoleMapping: function( button, e ) {
     if ( this.hostPanel ) {
       var roleId = this.find( 'name', 'roleId' )[0].getValue();
       var roleRec = this.roleStore.getById( roleId );
