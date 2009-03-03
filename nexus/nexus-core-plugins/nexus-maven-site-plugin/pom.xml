@@ -4,7 +4,7 @@
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-plugins-parent</artifactId>
+    <artifactId>nexus-core-plugins</artifactId>
     <version>1.4.0-SNAPSHOT</version>
   </parent>
 
