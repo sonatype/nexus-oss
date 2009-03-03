@@ -112,7 +112,7 @@ public abstract class AbstractGroupRepository
                 try
                 {
                     RepositoryItemUid memberUid = repo.createUid( uid.getPath() );
-                    
+
                     addItems( names, result, repo.list( memberUid, context ) );
 
                     found = true;
@@ -278,25 +278,43 @@ public abstract class AbstractGroupRepository
 
         for ( Repository repository : getRequestRepositories( uid ) )
         {
-            RepositoryItemUid muid = repository.createUid( uid.getPath() );
+            if ( !ContextUtils.collContains( context, ResourceStoreRequest.CTX_PROCESSED_REPOSITORIES, repository
+                .getId() ) )
+            {
+                RepositoryItemUid muid = repository.createUid( uid.getPath() );
 
-            try
-            {
-                StorageItem item = repository.retrieveItem( muid, context );
+                try
+                {
+                    StorageItem item = repository.retrieveItem( muid, context );
 
-                items.add( item );
+                    items.add( item );
+                }
+                catch ( StorageException e )
+                {
+                    throw e;
+                }
+                catch ( IllegalOperationException e )
+                {
+                    getLogger().warn( "Member repository request failed", e );
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    // that's okay
+                }
             }
-            catch ( StorageException e )
+            else
             {
-                throw e;
-            }
-            catch ( IllegalOperationException e )
-            {
-                getLogger().warn( "Member repository request failed", e );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // that's okay
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger()
+                        .debug(
+                            "A repository CYCLE detected (doRetrieveItem()), while processing group ID='"
+                                + this.getId()
+                                + "'. The repository with ID='"
+                                + repository.getId()
+                                + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                + uid.toString() );
+                }
             }
         }
 
