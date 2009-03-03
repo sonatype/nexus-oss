@@ -23,6 +23,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
+import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
@@ -363,5 +364,37 @@ public abstract class AbstractNexusPlexusResource
         a.setContextId( ai.context );
 
         return a;
+    }
+    
+    protected String getValidRemoteIPAddress( Request request )
+    {
+        Form form = (Form) request.getAttributes().get("org.restlet.http.headers");
+        String forwardedIP = getFirstForwardedIp( form.getFirstValue( "X-Forwarded-For" ) );
+        
+        if ( forwardedIP != null )
+        {
+            return forwardedIP;
+        }
+        
+        List<String> ipAddresses = request.getClientInfo().getAddresses();
+        
+        if ( ipAddresses.size() > 0 )
+        {
+            return ipAddresses.get( 0 );
+        }
+        
+        return null;
+    }
+    
+    protected String getFirstForwardedIp( String forwardedFor )
+    {
+        if ( !StringUtils.isEmpty( forwardedFor ) )
+        {
+            String [] forwardedIps = forwardedFor.split( "," );
+            
+            return forwardedIps[0].trim();
+        }
+        
+        return null;
     }
 }

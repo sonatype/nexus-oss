@@ -108,7 +108,7 @@ public abstract class AbstractArtifactPlexusResource
         }
 
         // stuff in the originating remote address
-        result.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, request.getClientInfo().getAddress() );
+        result.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, getValidRemoteIPAddress( request ) );
 
         // stuff in the user id if we have it in request
         if ( request.getChallengeResponse() != null && request.getChallengeResponse().getIdentifier() != null )
