@@ -132,14 +132,17 @@ public abstract class AbstractGroupRepository
             }
             else
             {
-                getLogger()
-                    .info(
-                        "A repository CYCLE detected (doListItems()), while processing group ID='"
-                            + this.getId()
-                            + "'. The repository with ID='"
-                            + repo.getId()
-                            + "' was already processed during this request! This repository is skipped from processing. Request: "
-                            + uid.toString() );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger()
+                        .debug(
+                            "A repository CYCLE detected (doListItems()), while processing group ID='"
+                                + this.getId()
+                                + "'. The repository with ID='"
+                                + repo.getId()
+                                + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                + uid.toString() );
+                }
             }
         }
 
@@ -308,7 +311,7 @@ public abstract class AbstractGroupRepository
                 {
                     getLogger()
                         .debug(
-                            "A repository CYCLE detected (doRetrieveItem()), while processing group ID='"
+                            "A repository CYCLE detected (doRetrieveItems()), while processing group ID='"
                                 + this.getId()
                                 + "'. The repository with ID='"
                                 + repository.getId()
