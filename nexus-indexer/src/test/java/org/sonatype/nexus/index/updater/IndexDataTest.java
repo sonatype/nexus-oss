@@ -36,7 +36,7 @@ public class IndexDataTest
         throws Exception
     {
         indexDir = new RAMDirectory();
-        
+
         context = nexusIndexer.addIndexingContext(
             "test-default",
             "test",
@@ -51,10 +51,10 @@ public class IndexDataTest
         nexusIndexer.scan( context );
 
         Date timestamp = context.getTimestamp();
-        
+
         assertNotNull( timestamp );
 
-        // save and restore index to be used by common tests 
+        // save and restore index to be used by common tests
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
@@ -68,27 +68,63 @@ public class IndexDataTest
         Date newTimestamp = DefaultIndexUpdater.unpackIndexData( is, newDir, context );
 
         assertEquals( timestamp, newTimestamp );
-        
+
         context.replace( newDir );
     }
-    
+
+    public void testEmptyContext()
+        throws Exception
+    {
+        indexDir = new RAMDirectory();
+
+        context = nexusIndexer.addIndexingContext(
+            "test-default",
+            "test",
+            repo,
+            indexDir,
+            null,
+            null,
+            NexusIndexer.DEFAULT_INDEX );
+
+        assertNull( context.getTimestamp() ); // unknown upon creation
+
+        // save and restore index to be used by common tests
+        // the point is that this is virgin context, and timestamp is null,
+        // and it should remain null
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        IndexDataWriter dw = new IndexDataWriter( bos );
+        dw.write( context, null );
+
+        ByteArrayInputStream is = new ByteArrayInputStream( bos.toByteArray() );
+
+        newDir = new RAMDirectory();
+
+        Date newTimestamp = DefaultIndexUpdater.unpackIndexData( is, newDir, context );
+
+        assertEquals( null, newTimestamp );
+
+        context.replace( newDir );
+    }
+
     public void testData()
         throws Exception
     {
         IndexReader r1 = context.getIndexReader();
-        
+
         Map<String, ArtifactInfo> r1map = readIndex( r1 );
-        
+
         IndexReader r2 = IndexReader.open( newDir );
 
         Map<String, ArtifactInfo> r2map = readIndex( r2 );
-        
+
         for ( Entry<String, ArtifactInfo> e : r1map.entrySet() )
         {
             String key = e.getKey();
             assertTrue( "Expected for find " + key, r2map.containsKey( key ) );
         }
-        
+
         assertEquals( r1map.size(), r2map.size() );
     }
 
@@ -96,20 +132,20 @@ public class IndexDataTest
         throws CorruptIndexException,
             IOException
     {
-        Map<String,ArtifactInfo> map = new HashMap<String, ArtifactInfo>(); 
+        Map<String, ArtifactInfo> map = new HashMap<String, ArtifactInfo>();
 
         for ( int i = 0; i < r1.maxDoc(); i++ )
         {
             Document document = r1.document( i );
-            
+
             ArtifactInfo ai = IndexUtils.constructArtifactInfo( document, context );
-            
-            if( ai != null)
+
+            if ( ai != null )
             {
                 map.put( ai.getUinfo(), ai );
             }
         }
-        
+
         return map;
     }
 
