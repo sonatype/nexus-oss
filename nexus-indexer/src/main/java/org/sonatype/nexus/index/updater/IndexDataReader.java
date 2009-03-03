@@ -48,9 +48,14 @@ public class IndexDataReader
 
         long timestamp = dis.readLong();
 
-        Date date = new Date( timestamp );
+        Date date = null;
 
-        IndexUtils.updateTimestamp( w.getDirectory(), date );
+        if ( timestamp != -1 )
+        {
+            date = new Date( timestamp );
+
+            IndexUtils.updateTimestamp( w.getDirectory(), date );
+        }
 
         int n = 0;
 
@@ -58,7 +63,7 @@ public class IndexDataReader
         while ( ( doc = readDocument() ) != null )
         {
             w.addDocument( IndexUtils.updateDocument( doc, context ) );
-            
+
             n++;
         }
 
@@ -157,14 +162,14 @@ public class IndexDataReader
                 case 5:
                 case 6:
                 case 7:
-                    /* 0xxxxxxx*/
+                    /* 0xxxxxxx */
                     count++;
                     chararr[chararr_count++] = (char) c;
                     break;
 
                 case 12:
                 case 13:
-                    /* 110x xxxx   10xx xxxx*/
+                    /* 110x xxxx 10xx xxxx */
                     count += 2;
                     if ( count > utflen )
                     {
@@ -179,7 +184,7 @@ public class IndexDataReader
                     break;
 
                 case 14:
-                    /* 1110 xxxx  10xx xxxx  10xx xxxx */
+                    /* 1110 xxxx 10xx xxxx 10xx xxxx */
                     count += 3;
                     if ( count > utflen )
                     {
@@ -195,7 +200,7 @@ public class IndexDataReader
                     break;
 
                 default:
-                    /* 10xx xxxx,  1111 xxxx */
+                    /* 10xx xxxx, 1111 xxxx */
                     throw new UTFDataFormatException( "malformed input around byte " + count );
             }
         }

@@ -11,6 +11,7 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
@@ -77,7 +78,9 @@ public class IndexDataWriter
         throws IOException
     {
         dos.writeByte( VERSION );
-        dos.writeLong( context.getTimestamp().getTime() );
+        
+        Date timestamp = context.getTimestamp();
+        dos.writeLong( timestamp == null ? -1 : timestamp.getTime() );
     }
 
     public int writeDocuments( IndexReader r, List<Integer> docIndexes )
