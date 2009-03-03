@@ -5,18 +5,12 @@
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-plugins-parent</artifactId>
-    <version>2</version>
+    <version>1.4.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-maven-site-plugin</artifactId>
   <name>Nexus Maven Site Plugin (Extras)</name>
-  <version>1.0.1-SNAPSHOT</version>
   <description>Nexus Maven Site Plugin (Extras).</description>
-
-
-  <properties>
-    <nexus.version>1.4.0-SNAPSHOT</nexus.version>
-  </properties>
 
   <scm>
     <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-maven-site-plugin</url>
@@ -39,7 +33,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

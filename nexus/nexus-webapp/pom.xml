@@ -20,7 +20,6 @@
     <jsw-input>target/jsw-template</jsw-input>
     <jsw-output>jsw-filtered</jsw-output>
     <nexus-tools-input>target/nexus-tools</nexus-tools-input>
-    <nexus-lvo-plugin.version>1.0.1-SNAPSHOT</nexus-lvo-plugin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -38,7 +37,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
-      <version>1.0.2-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
