@@ -32,7 +32,7 @@ under the License.
       <module>nexus-repository-metadata</module>
       <module>nexus</module>
     </modules>
-    
+    <!--don't deploy the aggregator-->
     <distributionManagement>
       <repository>
         <id>localhost</id>
