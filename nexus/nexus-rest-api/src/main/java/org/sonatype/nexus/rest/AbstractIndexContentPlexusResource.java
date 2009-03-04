@@ -26,6 +26,7 @@ import org.apache.lucene.search.TermQuery;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
+import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -177,6 +178,21 @@ public abstract class AbstractIndexContentPlexusResource
             }
         }
     }
+    
+    protected Reference createIndexReference( Request request )
+    {
+        String wholeUrl = request.getResourceRef().getBaseRef().toString();
+        String baseUrl = request.getRootRef().toString();
+        String relPart = wholeUrl.substring( baseUrl.length() );
+        
+        // trim leading slash
+        if ( relPart.startsWith( "/" ) )
+        {
+            relPart = relPart.substring( 1 );
+        }
+        
+        return createRootReference( request, relPart );
+    }
 
     protected ContentListResource createGroupResource( Request request, String path, String group )
     {
@@ -184,7 +200,7 @@ public abstract class AbstractIndexContentPlexusResource
         path += group + "/";
         groupResource.setText( group );
         groupResource.setLeaf( false );
-        groupResource.setResourceURI( request.getResourceRef().getBaseRef() + path );
+        groupResource.setResourceURI( createIndexReference( request ) + path );
         groupResource.setRelativePath( path );
         groupResource.setLastModified( new Date() );
         groupResource.setSizeOnDisk( -1 );
@@ -197,7 +213,7 @@ public abstract class AbstractIndexContentPlexusResource
         path += ai.artifactId + "/";
         artifactResource.setText( ai.artifactId );
         artifactResource.setLeaf( false );
-        artifactResource.setResourceURI( request.getResourceRef().getBaseRef() + path );
+        artifactResource.setResourceURI( createIndexReference( request ) + path );
         artifactResource.setRelativePath( path );
         artifactResource.setLastModified( new Date( ai.lastModified ) );
         artifactResource.setSizeOnDisk( -1 );
@@ -210,7 +226,7 @@ public abstract class AbstractIndexContentPlexusResource
         ContentListResource versionResource = new ContentListResource();
         versionResource.setText( ai.version );
         versionResource.setLeaf( false );
-        versionResource.setResourceURI( request.getResourceRef().getBaseRef() + path );
+        versionResource.setResourceURI( createIndexReference( request ) + path );
         versionResource.setRelativePath( path );
         versionResource.setLastModified( new Date( ai.lastModified ) );
         versionResource.setSizeOnDisk( -1 );
