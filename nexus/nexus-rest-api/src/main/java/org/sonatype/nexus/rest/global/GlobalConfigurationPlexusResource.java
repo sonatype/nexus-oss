@@ -371,7 +371,7 @@ public class GlobalConfigurationPlexusResource
 
         resource.setGlobalHttpProxySettings( convert( getNexus().readGlobalRemoteHttpProxySettings() ) );
 
-        resource.setBaseUrl( getContextRoot( request ).getTargetRef().toString() );
+        resource.setBaseUrl( StringUtils.isEmpty( getNexus().getBaseUrl() ) ? getContextRoot( request ).getTargetRef().toString() : getNexus().getBaseUrl() );
 
         resource.setForceBaseUrl( getNexus().isForceBaseUrl() );
 
