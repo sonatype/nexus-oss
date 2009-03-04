@@ -6,11 +6,9 @@ package org.sonatype.nexus
 import org.testng.annotations.Test
 import static org.testng.Assert.*
 import org.sonatype.nexus.groovytest.NexusCompatibility
+import org.codehaus.plexus.component.annotations.Component;
 
-/**
- * @author velo
- *
- */
+@Component(role = SkipTest.class)
 public class SkipTest{
 
     @Test

@@ -8,6 +8,10 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
+  <properties>
+    <plexus.version>1.0-beta-3.0.5</plexus.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.codehaus.groovy.maven</groupId>
@@ -29,15 +33,27 @@
     </dependency>
 
     <dependency>
-    	<groupId>org.aspectj</groupId>
-    	<artifactId>aspectjtools</artifactId>
-    	<version>1.6.2</version>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjtools</artifactId>
+      <version>1.6.2</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.maven.mercury</groupId>
       <artifactId>mercury-artifact</artifactId>
       <version>1.0-alpha-5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>${plexus.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-component-annotations</artifactId>
+      <version>${plexus.version}</version>
     </dependency>
   </dependencies>
 
@@ -90,6 +106,41 @@
             <argument>${project.build.testOutputDirectory}</argument>
           </arguments>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/RunFirst.*</include>
+            <include>**/*Test.*</include>
+          </includes>
+          <properties>
+            <property><!-- just ignored by surefire -->
+              <name>object-factory</name>
+              <value>org.sonatype.nexus.groovytest.plexus.PlexusObjectFactory</value>
+            </property>
+          </properties>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+        <version>${plexus.version}</version>
+        <executions>
+          <execution>
+            <id>process-classes</id>
+            <goals>
+              <goal>generate-metadata</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>process-test-classes</id>
+            <goals>
+              <goal>generate-test-metadata</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
