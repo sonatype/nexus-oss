@@ -201,6 +201,22 @@ public abstract class AbstractNexusPlexusResource
 
         return createReference( groupRootRef, repoPath );
     }
+    
+    protected Reference createRedirectReference( Request request )
+    {
+        String uriPart = request.getResourceRef().getTargetRef().toString().substring(
+            request.getRootRef().getTargetRef().toString().length() );
+        
+        // trim leading slash
+        if ( uriPart.startsWith( "/" ) )
+        {
+            uriPart = uriPart.substring( 1 );
+        }
+        
+        Reference result = updateBaseRefPath( new Reference( getContextRoot( request ),  uriPart ) ).getTargetRef();
+        
+        return result;
+    }
 
     // ===
 

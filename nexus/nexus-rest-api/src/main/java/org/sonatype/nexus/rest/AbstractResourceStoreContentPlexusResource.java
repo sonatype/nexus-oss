@@ -345,7 +345,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             if ( !resPath.endsWith( "/" ) )
             {
-                res.redirectPermanent( resPath + "/" );
+                res.redirectPermanent( createRedirectReference( req ).getTargetRef().toString() + "/" );
 
                 return null;
             }
