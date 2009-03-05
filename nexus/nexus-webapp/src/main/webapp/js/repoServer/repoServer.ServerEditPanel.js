@@ -222,7 +222,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             titleRight: 'Available Realms',
             name: 'securityRealms',
             valueField: 'roleHint',
-            displayField: 'roleHint',
+            displayField: 'description',
             store: this.realmTypeDataStore,
             required: true,
             halfSize: true
