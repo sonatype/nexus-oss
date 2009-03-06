@@ -21,7 +21,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.NexusStateUtil;
+import org.sonatype.nexus.test.utils.NexusStatusUtil;
 
 /**
  * This test-harness uses the start/stop internally. This test will just poke at the state after the methods are called.
@@ -36,13 +36,13 @@ public class Nexus292SoftRestartTest
     {
 
         // make sure Nexus is running
-        Assert.assertTrue( NexusStateUtil.isNexusRunning() );
+        Assert.assertTrue( NexusStatusUtil.isNexusRunning() );
 
         // restart
-        NexusStateUtil.doSoftRestart();
+        NexusStatusUtil.doSoftRestart();
 
         // make sure Nexus is running
-        Assert.assertTrue( NexusStateUtil.isNexusRunning() );
+        Assert.assertTrue( NexusStatusUtil.isNexusRunning() );
 
         // now that we know the status comes back as STARTED, now we need to see if the rest of nexus will work at
         // all...
@@ -62,13 +62,13 @@ public class Nexus292SoftRestartTest
     {
 
         // make sure Nexus is running
-        Assert.assertTrue( NexusStateUtil.isNexusRunning() );
+        Assert.assertTrue( NexusStatusUtil.isNexusRunning() );
 
         // restart
-        NexusStateUtil.doSoftStop();
+        NexusStatusUtil.doSoftStop();
 
         // make sure Nexus is not running
-        Assert.assertFalse( NexusStateUtil.isNexusRunning() );
+        Assert.assertFalse( NexusStatusUtil.isNexusRunning() );
 
         // now that we know the status comes back as STARTED, now we need to see if the rest of nexus will work at
         // all...
@@ -88,10 +88,10 @@ public class Nexus292SoftRestartTest
         }
 
         // restart
-        NexusStateUtil.doSoftStart();
+        NexusStatusUtil.doSoftStart();
 
         // make sure Nexus is running
-        Assert.assertTrue( NexusStateUtil.isNexusRunning() );
+        Assert.assertTrue( NexusStatusUtil.isNexusRunning() );
 
         // this will hurl if something bad happens
         this.downloadArtifact( gav, "target/downloads" );

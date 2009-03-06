@@ -22,6 +22,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.client.NexusConnectionException;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
@@ -29,7 +30,6 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.test.utils.TestProperties;
 
 /**
  * Tests the Nexus java/REST client.
@@ -44,7 +44,7 @@ public class Nexus725InitialRestClient
 
         NexusClient client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
         TestContext context = TestContainer.getInstance().getTestContext();
-        client.connect( TestProperties.getString( "nexus.base.url" ), context.getAdminUsername(),
+        client.connect( AbstractNexusIntegrationTest.baseNexusUrl, context.getAdminUsername(),
                         context.getAdminPassword() );
 
         return client;
@@ -264,7 +264,7 @@ public class Nexus725InitialRestClient
         
         try
         {
-            client.connect( TestProperties.getString( "nexus.base.url" ), "admin", "wrong-password" );
+            client.connect( AbstractNexusIntegrationTest.baseNexusUrl, "admin", "wrong-password" );
             // the REST instance doesn't actually connect until you send a message
             client.getRepository( "nexus-test-harness-repo" );
             Assert.fail( "Expected NexusConnectionException" );

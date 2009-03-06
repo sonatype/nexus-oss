@@ -13,20 +13,19 @@
  */
 package org.sonatype.nexus.integrationtests.client.nexus758;
 
-import static org.sonatype.nexus.test.utils.NexusStateUtil.doClientStart;
-import static org.sonatype.nexus.test.utils.NexusStateUtil.doClientStop;
-import static org.sonatype.nexus.test.utils.NexusStateUtil.doHardStart;
-import static org.sonatype.nexus.test.utils.NexusStateUtil.doHardStop;
-import static org.sonatype.nexus.test.utils.NexusStateUtil.doSoftStart;
-import static org.sonatype.nexus.test.utils.NexusStateUtil.doSoftStop;
+import static org.sonatype.nexus.test.utils.NexusStatusUtil.doClientStart;
+import static org.sonatype.nexus.test.utils.NexusStatusUtil.doClientStop;
+import static org.sonatype.nexus.test.utils.NexusStatusUtil.doHardStart;
+import static org.sonatype.nexus.test.utils.NexusStatusUtil.doHardStop;
+import static org.sonatype.nexus.test.utils.NexusStatusUtil.doSoftStart;
+import static org.sonatype.nexus.test.utils.NexusStatusUtil.doSoftStop;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.nexus.client.NexusClient;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
-import org.sonatype.nexus.test.utils.TestProperties;
 
 /**
  * Tests the Soft Start, Stop, Restart, and isNexusStarted methods in the rest-client.
@@ -41,7 +40,7 @@ public class Nexus758ServiceStabilityTest
     {
         client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
         TestContext context = TestContainer.getInstance().getTestContext();
-        client.connect( TestProperties.getString( "nexus.base.url" ), context.getAdminUsername(),
+        client.connect( AbstractNexusIntegrationTest.baseNexusUrl, context.getAdminUsername(),
                         context.getAdminPassword() );
     }
 
@@ -50,47 +49,45 @@ public class Nexus758ServiceStabilityTest
         throws Exception
     {
 
-        ForkedAppBooter app;
-
         // this could be done using a for, but I wanna to know how may times it run just looking to stack trace
         // 1
-        app = doHardStart();
+        doHardStart();
         doHardStop();
 
         // 2
-        app = doHardStart();
+        doHardStart();
         doHardStop();
 
         // 3
-        app = doHardStart();
+        doHardStart();
         doHardStop();
 
         // 4
-        app = doHardStart();
+        doHardStart();
         doHardStop();
 
         // 5
-        app = doHardStart();
+        doHardStart();
         doHardStop();
 
         // 6
-        app = doHardStart();
+        doHardStart();
         doHardStop();
 
         // 7
-        app = doHardStart();
+        doHardStart();
         doHardStop();
 
         // 8
-        app = doHardStart();
+        doHardStart();
         doHardStop();
 
         // 9
-        app = doHardStart();
+        doHardStart();
         doHardStop();
 
         // 10
-        app = doHardStart();
+        doHardStart();
         doHardStop();
 
     }
@@ -99,7 +96,7 @@ public class Nexus758ServiceStabilityTest
     public void softRestarts()
         throws Exception
     {
-        ForkedAppBooter app = doHardStart();
+        doHardStart();
 
         doSoftStop();
 
@@ -151,7 +148,7 @@ public class Nexus758ServiceStabilityTest
     public void clientRestarts()
         throws Exception
     {
-        ForkedAppBooter app = doHardStart();
+        doHardStart();
 
         doClientStop();
 

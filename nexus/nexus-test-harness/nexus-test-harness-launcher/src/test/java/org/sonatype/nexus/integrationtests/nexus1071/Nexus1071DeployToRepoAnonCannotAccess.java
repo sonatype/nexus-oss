@@ -20,14 +20,15 @@ import junit.framework.Assert;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.junit.Test;
+import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 
 /**
- * 
+ *
  * @author Juven Xu
  *
  */
 public class Nexus1071DeployToRepoAnonCannotAccess
-    extends AbstractAnonAccessTest
+    extends AbstractMavenNexusIT
 {
 
     @Test
@@ -117,7 +118,7 @@ public class Nexus1071DeployToRepoAnonCannotAccess
             failTest( verifier2 );
         }
     }
-    
+
     @Test
     public void anonDeploy()
         throws Exception

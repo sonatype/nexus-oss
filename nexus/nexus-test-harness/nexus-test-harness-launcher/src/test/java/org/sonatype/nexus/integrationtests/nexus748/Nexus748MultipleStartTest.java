@@ -20,13 +20,12 @@ import junit.framework.Assert;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.junit.Test;
-import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.nexus.client.NexusClient;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
-import org.sonatype.nexus.test.utils.NexusStateUtil;
-import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.nexus.test.utils.NexusStatusUtil;
 
 public class Nexus748MultipleStartTest
 {
@@ -40,7 +39,7 @@ public class Nexus748MultipleStartTest
 
         NexusClient client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
         TestContext context = TestContainer.getInstance().getTestContext();
-        client.connect( TestProperties.getString( "nexus.base.url" ), context.getAdminUsername(),
+        client.connect( AbstractNexusIntegrationTest.baseNexusUrl, context.getAdminUsername(),
                         context.getAdminPassword() );
 
         // enable security
@@ -55,7 +54,7 @@ public class Nexus748MultipleStartTest
             stopWatch.start();
 
             // start
-            ForkedAppBooter appBooter = NexusStateUtil.doHardStart();
+            NexusStatusUtil.doHardStart();
 
             Assert.assertTrue( client.isNexusStarted( true ) );
 
@@ -63,7 +62,7 @@ public class Nexus748MultipleStartTest
             stopWatch.stop();
 
             // stop
-            NexusStateUtil.doHardStop();
+            NexusStatusUtil.doHardStop();
 
             startTimes.add( stopWatch.getTime() );
         }

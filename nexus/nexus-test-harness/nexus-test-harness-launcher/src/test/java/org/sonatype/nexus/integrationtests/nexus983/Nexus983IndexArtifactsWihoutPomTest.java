@@ -58,7 +58,7 @@ public class Nexus983IndexArtifactsWihoutPomTest
         throws Exception
     {
         File artifactFile = getTestFile( "artifact.jar" );
-        FileUtils.copyFile( artifactFile, new File( nexusBaseDir, "runtime/work/storage/" + REPO_TEST_HARNESS_REPO
+        FileUtils.copyFile( artifactFile, new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_REPO
             + "/nexus983/nexus983-artifact2/1.0.0/nexus983-artifact2-1.0.0.jar" ) );
         RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
 

@@ -21,7 +21,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
-import org.sonatype.nexus.test.utils.TestProperties;
 
 /**
  * Tests the Soft Start, Stop, Restart, and isNexusStarted methods in the rest-client.
@@ -36,7 +35,7 @@ public class Nexus758StatusService
 
         NexusClient client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
         TestContext context = TestContainer.getInstance().getTestContext();
-        client.connect( TestProperties.getString( "nexus.base.url" ), context.getAdminUsername(),
+        client.connect( AbstractNexusIntegrationTest.baseNexusUrl, context.getAdminUsername(),
                         context.getAdminPassword() );
 
         return client;

@@ -83,6 +83,16 @@ public class CommandPlexusResource
                 // and start it
                 result = getNexus().setState( SystemState.STARTED );
             }
+            else if ( "KILL".equalsIgnoreCase( cmd ) )
+            {
+                // if running stop it
+                if ( SystemState.STARTED.equals( getNexus().getSystemStatus().getState() ) )
+                {
+                    getNexus().setState( SystemState.STOPPED );
+                }
+
+                System.exit( 0 );
+            }
             else
             {
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Unknown COMMAND!" );

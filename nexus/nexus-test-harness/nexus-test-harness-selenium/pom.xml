@@ -14,14 +14,14 @@
 		<config-expanded-dir>target/test-nexus-config</config-expanded-dir>
 
 		<nexus-relative-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-relative-basedir>
-		<nexus-abs-basedir>${project.build.directory}/bundle/nexus-webapp-${project.version}</nexus-abs-basedir>
+		<nexus-base-dir>${project.build.directory}/bundle/nexus-webapp-${project.version}</nexus-base-dir>
 		<emma-sources-base>target/emma/sources</emma-sources-base>
 
-		<config-target-dir>${nexus-abs-basedir}/runtime/apps/nexus/conf</config-target-dir>
-		<work-target-dir>${nexus-abs-basedir}/runtime/work</work-target-dir>
+		<config-target-dir>${nexus-base-dir}/runtime/apps/nexus/conf</config-target-dir>
+		<work-target-dir>${nexus-base-dir}/runtime/work</work-target-dir>
 		<proxy-repo-target-dir-name>proxyRepo</proxy-repo-target-dir-name>
 		<proxy-repo-target-dir>${project.build.directory}/test-classes/${proxy-repo-target-dir-name}</proxy-repo-target-dir>
-		<nexus-plexus-config-file>${nexus-abs-basedir}/conf/plexus.xml</nexus-plexus-config-file>
+		<nexus-plexus-config-file>${nexus-base-dir}/conf/plexus.xml</nexus-plexus-config-file>
 		<proxy-repo-plexus-config-file>${project.build.directory}/test-classes/proxyRepo/conf/ProxyRepoPlexus.xml</proxy-repo-plexus-config-file>
 		<proxy-repo-port>8092</proxy-repo-port>
 		<proxy-repo-base-url>http://localhost:${proxy-repo-port}/remote/</proxy-repo-base-url>

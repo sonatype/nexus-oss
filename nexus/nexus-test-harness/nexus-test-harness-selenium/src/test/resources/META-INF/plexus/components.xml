@@ -16,19 +16,19 @@
         <debug-java-cmd>java -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=@DEBUG_SUSPEND@,address=@DEBUG_PORT@ -Djava.compiler=NONE</debug-java-cmd>
         <launcher-class>org.sonatype.appbooter.PlexusContainerHost</launcher-class>
         <configuration>${nexus-plexus-config-file}</configuration>
-        <basedir>${nexus-abs-basedir}</basedir>
+        <basedir>${nexus-base-dir}</basedir>
         <temp-dir>${project.build.directory}/appbooter.tmp/</temp-dir>
         <control-port>${nexus-control-port}</control-port>
-        <platform-file>${nexus-abs-basedir}/lib/plexus-platform-jsw-*.jar</platform-file>
-        <class-path-elements>${nexus-abs-basedir}/runtime/apps/nexus/conf, ${nexus-abs-basedir}/runtime/apps/nexus/lib/*.jar</class-path-elements>
+        <platform-file>${nexus-base-dir}/lib/plexus-platform-jsw-*.jar</platform-file>
+        <class-path-elements>${nexus-base-dir}/runtime/apps/nexus/conf, ${nexus-base-dir}/runtime/apps/nexus/lib/*.jar</class-path-elements>
         <sleep-after-start>6000</sleep-after-start>
         <systemProperties>
         		<plexus.application-port>${nexus-application-port}</plexus.application-port>
         		<plexus.application-host>${jetty-application-host}</plexus.application-host>
-        		<plexus.runtime>${nexus-abs-basedir}/runtime</plexus.runtime>
-        		<plexus.apps>${nexus-abs-basedir}/runtime/apps</plexus.apps>
-        		<plexus.nexus-work>${nexus-abs-basedir}/runtime/work</plexus.nexus-work>
-        		<plexus.webapp>${nexus-abs-basedir}/runtime/apps/nexus/webapp</plexus.webapp>
+        		<plexus.runtime>${nexus-base-dir}/runtime</plexus.runtime>
+        		<plexus.apps>${nexus-base-dir}/runtime/apps</plexus.apps>
+        		<plexus.nexus-work>${nexus-base-dir}/runtime/work</plexus.nexus-work>
+        		<plexus.webapp>${nexus-base-dir}/runtime/apps/nexus/webapp</plexus.webapp>
         		<plexus.webapp-context-path>/nexus</plexus.webapp-context-path>
         </systemProperties>
       </configuration>

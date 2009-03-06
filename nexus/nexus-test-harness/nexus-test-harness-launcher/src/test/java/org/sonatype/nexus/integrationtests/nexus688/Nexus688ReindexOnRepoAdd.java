@@ -16,13 +16,11 @@ package org.sonatype.nexus.integrationtests.nexus688;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Test;
 import org.restlet.data.MediaType;

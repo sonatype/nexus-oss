@@ -36,7 +36,7 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskTest
             printKnownErrorButDoNotFail( getClass(), "rebuildMavenMetadata" );
             return;
         }*/
-        String releaseRepoPath = "runtime/work/storage/nexus-test-harness-repo/";
+        String releaseRepoPath = "storage/nexus-test-harness-repo/";
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
 
@@ -47,10 +47,10 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskTest
         ScheduledServiceListResource task = TaskScheduleUtil.runTask("RebuildMavenMetadata-Nexus1022", RebuildMavenMetadataTaskDescriptor.ID, repo );
         Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
 
-        File artifactDirMd = new File( nexusBaseDir, releaseRepoPath + "nexus1022/foo/bar/artifact/maven-metadata.xml" );
+        File artifactDirMd = new File( nexusWorkDir, releaseRepoPath + "nexus1022/foo/bar/artifact/maven-metadata.xml" );
         Assert.assertTrue( "Maven metadata file should be generated after rebuild", artifactDirMd.exists() );
 
-        File groupPluginMd = new File( nexusBaseDir, releaseRepoPath + "nexus1022/foo/bar/plugins/maven-metadata.xml" );
+        File groupPluginMd = new File( nexusWorkDir, releaseRepoPath + "nexus1022/foo/bar/plugins/maven-metadata.xml" );
         Assert.assertTrue( "Maven metadata file should be generated after rebuild", groupPluginMd.exists() );
 
     }

@@ -20,7 +20,7 @@ import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.test.utils.ChangePasswordUtils;
-import org.sonatype.nexus.test.utils.NexusStateUtil;
+import org.sonatype.nexus.test.utils.NexusStatusUtil;
 
 /**
  * Changes users password, restarts nexus, and verify password is correct.
@@ -48,10 +48,10 @@ public class Nexus650ChangePasswordAndRebootTest
         context.setPassword( newPassword );
 
         // reboot
-        NexusStateUtil.doSoftRestart();
+        NexusStatusUtil.doSoftRestart();
 
         // now we can verify everything worked out
-        Assert.assertTrue( "Nexus is not running", NexusStateUtil.isNexusRunning() );
+        Assert.assertTrue( "Nexus is not running", NexusStatusUtil.isNexusRunning() );
 
     }
 

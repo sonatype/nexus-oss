@@ -73,7 +73,7 @@ public class AbstractSnapshotRemoverTest
     public void initFolders()
         throws Exception
     {
-        repositoryPath = new File( nexusBaseDir, "runtime/work/storage/nexus-test-harness-snapshot-repo" );
+        repositoryPath = new File( nexusWorkDir, "storage/nexus-test-harness-snapshot-repo" );
         artifactFolder = new File( repositoryPath, "nexus634/artifact/1.0-SNAPSHOT" );
     }
 
@@ -97,9 +97,9 @@ public class AbstractSnapshotRemoverTest
         removeReleasedProp.setId( "removeIfReleaseExists" );
         removeReleasedProp.setValue( String.valueOf( removeIfReleaseExists ) );
 
-        ScheduledServiceListResource task =TaskScheduleUtil.runTask( SnapshotRemovalTaskDescriptor.ID, 
+        ScheduledServiceListResource task =TaskScheduleUtil.runTask( SnapshotRemovalTaskDescriptor.ID,
                                   repositoryProp, keepSnapshotsProp, ageProp, removeReleasedProp );
-        
+
         Assert.assertNotNull( task );
         Assert.assertEquals( "SUBMITTED", task.getStatus() );
     }

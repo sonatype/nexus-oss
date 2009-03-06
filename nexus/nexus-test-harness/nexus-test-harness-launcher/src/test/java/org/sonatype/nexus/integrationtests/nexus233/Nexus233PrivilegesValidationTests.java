@@ -30,8 +30,6 @@ import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 
-import com.thoughtworks.xstream.converters.ConversionException;
-
 /**
  * Extra CRUD validation tests.
  */

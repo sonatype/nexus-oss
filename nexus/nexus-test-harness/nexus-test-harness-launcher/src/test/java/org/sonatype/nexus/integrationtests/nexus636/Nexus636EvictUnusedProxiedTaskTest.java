@@ -59,8 +59,8 @@ public class Nexus636EvictUnusedProxiedTaskTest
         throws Exception
     {
 
-        repositoryPath = new File( nexusBaseDir, "runtime/work/storage/" + REPO_RELEASE_PROXY_REPO1 );
-        attributesPath = new File( nexusBaseDir, "runtime/work/proxy/attributes/" + REPO_RELEASE_PROXY_REPO1 );
+        repositoryPath = new File( nexusWorkDir, "storage/" + REPO_RELEASE_PROXY_REPO1 );
+        attributesPath = new File( nexusWorkDir, "proxy/attributes/" + REPO_RELEASE_PROXY_REPO1 );
 
         File repo = getTestFile( "repo" );
 

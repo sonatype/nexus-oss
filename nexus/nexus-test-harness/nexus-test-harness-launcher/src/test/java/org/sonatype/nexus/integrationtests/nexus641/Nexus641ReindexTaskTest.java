@@ -36,24 +36,24 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public class Nexus641ReindexTaskTest
     extends AbstractNexusIntegrationTest
 {
-    
-    private SearchMessageUtil messageUtil = new SearchMessageUtil();
-    
-    private File repositoryPath = new File( nexusBaseDir, "runtime/work/storage/"+ this.getTestRepositoryId() );
 
-    
+    private SearchMessageUtil messageUtil = new SearchMessageUtil();
+
+    private File repositoryPath = new File( nexusWorkDir, "storage/"+ this.getTestRepositoryId() );
+
+
     public Nexus641ReindexTaskTest() throws IOException
     {
         super( "nexus641" );
-        
+
     }
-    
+
     @Test
     public void testReindex()
         throws Exception
     {
 
-        this.repositoryPath = new File( nexusBaseDir, "runtime/work/storage/"+ this.getTestRepositoryId() );
+        this.repositoryPath = new File( nexusWorkDir, "storage/"+ this.getTestRepositoryId() );
         System.out.println( "path: "+ repositoryPath );
         File oldSnapshot = getTestFile( "repo" );
 
@@ -73,7 +73,7 @@ public class Nexus641ReindexTaskTest
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( ReindexTaskDescriptor.ID, prop );
         Assert.assertNotNull( task );
         Assert.assertEquals( "SUBMITTED", task.getStatus() );
-        
+
         // try to download again and success
         search = messageUtil.searchFor( "nexus641" );
         Assert.assertEquals( "The artifact should be indexed", 2, search.size() );

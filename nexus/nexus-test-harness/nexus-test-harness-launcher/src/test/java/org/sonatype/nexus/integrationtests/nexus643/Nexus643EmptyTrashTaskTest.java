@@ -41,16 +41,16 @@ public class Nexus643EmptyTrashTaskTest
 
         delete( "nexus643" );
 
-        File trashContent = new File( nexusBaseDir, "runtime/work/trash/nexus-test-harness-repo/nexus643" );
+        File trashContent = new File( nexusWorkDir, "trash/nexus-test-harness-repo/nexus643" );
         Assert.assertTrue( "Something should be at trash!", trashContent.exists() );
 
         // Empty trash content older than 1 days
         File oldTrashFile = new File(
-            nexusBaseDir,
-            "runtime/work/trash/nexus-test-harness-repo/nexus643/artifact-1-1.0.0.pom" );
+            nexusWorkDir,
+            "trash/nexus-test-harness-repo/nexus643/artifact-1-1.0.0.pom" );
         File newTrashFile = new File(
-            nexusBaseDir,
-            "runtime/work/trash/nexus-test-harness-repo/nexus643/artifact-1-1.0.0.jar" );
+            nexusWorkDir,
+            "trash/nexus-test-harness-repo/nexus643/artifact-1-1.0.0.jar" );
         oldTrashFile.setLastModified( System.currentTimeMillis() - 24L * 60L * 60L * 1000L * 2 );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();

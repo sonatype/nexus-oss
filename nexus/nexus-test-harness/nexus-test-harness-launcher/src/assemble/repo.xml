@@ -10,7 +10,7 @@
   <fileSets>
     <fileSet>
       <outputDirectory>/</outputDirectory>
-      <directory>${basedir}/target/test-classes/fake-central</directory>
+      <directory>${basedir}/target/maven/fake-repo</directory>
     </fileSet>
   </fileSets>
 </assembly>

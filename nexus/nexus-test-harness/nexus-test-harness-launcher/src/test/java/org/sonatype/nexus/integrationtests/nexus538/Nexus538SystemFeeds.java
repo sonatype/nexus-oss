@@ -25,7 +25,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.FeedUtil;
-import org.sonatype.nexus.test.utils.NexusStateUtil;
+import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -46,7 +46,7 @@ public class Nexus538SystemFeeds
 
         // restart and look for event in feed
 
-        NexusStateUtil.doSoftRestart();
+        NexusStatusUtil.doSoftRestart();
 
         SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
         List<SyndEntry> entries = feed.getEntries();

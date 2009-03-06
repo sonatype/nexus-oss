@@ -34,16 +34,16 @@ public class Nexus640RebuildRepositoryAttributesTaskTest
     public void rebuildAttributes()
         throws Exception
     {
-        String attributePath = "runtime/work/proxy/attributes/nexus-test-harness-repo/nexus640/artifact/1.0.0/";
+        String attributePath = "proxy/attributes/nexus-test-harness-repo/nexus640/artifact/1.0.0/";
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setId( "repositoryOrGroupId" );
         repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
         TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, repo );
 
-        File jar = new File( nexusBaseDir, attributePath + "artifact-1.0.0.jar" );
+        File jar = new File( nexusWorkDir, attributePath + "artifact-1.0.0.jar" );
         Assert.assertTrue( "Attribute files should be generated after rebuild", jar.exists() );
-        File pom = new File( nexusBaseDir, attributePath + "artifact-1.0.0.pom" );
+        File pom = new File( nexusWorkDir, attributePath + "artifact-1.0.0.pom" );
         Assert.assertTrue( "Attribute files should be generated after rebuild", pom.exists() );
 
     }

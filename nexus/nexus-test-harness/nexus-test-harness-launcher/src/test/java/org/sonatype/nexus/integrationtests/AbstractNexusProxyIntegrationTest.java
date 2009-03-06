@@ -26,8 +26,7 @@ import org.restlet.data.Response;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 public abstract class AbstractNexusProxyIntegrationTest
@@ -132,5 +131,21 @@ public abstract class AbstractNexusProxyIntegrationTest
         {
             Assert.fail( "Could not set proxy out of service status (Status: "+response.getStatus()+ ": " + repoId + "\n" + response.getEntity().getText());
         }
+    }
+
+    @Override
+    protected void copyTestResources()
+        throws IOException
+    {
+        super.copyTestResources();
+
+        File source = new File( TestProperties.getString( "test.resources.source.folder" ), "proxyRepo" );
+        if ( !source.exists() )
+        {
+            return;
+        }
+
+        FileTestingUtils.interpolationDirectoryCopy( source, new File(localStorageDir), TestProperties.getAll() );
+
     }
 }

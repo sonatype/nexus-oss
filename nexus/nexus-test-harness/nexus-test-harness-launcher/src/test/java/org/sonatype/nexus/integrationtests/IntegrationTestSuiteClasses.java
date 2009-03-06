@@ -18,8 +18,6 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.sonatype.nexus.integrationtests.client.nexus758.Nexus758StatusService;
 import org.sonatype.nexus.integrationtests.nexus1022.Nexus1022RebuildRepositoryMavenMetadataTaskTest;
-import org.sonatype.nexus.integrationtests.nexus1071.Nexus1071AnonAccessTest;
-import org.sonatype.nexus.integrationtests.nexus1071.Nexus1071DeployToRepoAnonCannotAccess;
 import org.sonatype.nexus.integrationtests.nexus1197.Nexus1197CheckUserAgentTest;
 import org.sonatype.nexus.integrationtests.nexus1239.Nexus1239PlexusUserResourceTest;
 import org.sonatype.nexus.integrationtests.nexus1239.Nexus1239UserSearchTest;
@@ -197,8 +195,6 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1116.Nexus1116InvalidPr
     Nexus779DeployRssTest.class,
     Nexus639PurgeTaskTest.class,
     Nexus1022RebuildRepositoryMavenMetadataTaskTest.class,
-    Nexus1071DeployToRepoAnonCannotAccess.class,
-    Nexus1071AnonAccessTest.class,
     Nexus1101NexusOverWebproxyTest.class,
     Nexus1113WebProxyWithAuthenticationTest.class,
     Nexus1116InvalidProxyTest.class,
