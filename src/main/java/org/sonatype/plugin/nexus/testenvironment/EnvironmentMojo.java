@@ -25,9 +25,13 @@ import org.apache.maven.shared.artifact.filter.collection.GroupIdFilter;
 import org.apache.maven.shared.artifact.filter.collection.TypeFilter;
 import org.apache.maven.shared.filtering.MavenFileFilter;
 import org.apache.maven.shared.filtering.MavenFilteringException;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.archiver.manager.ArchiverManager;
-import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -40,6 +44,7 @@ import org.codehaus.plexus.util.IOUtil;
  */
 public class EnvironmentMojo
     extends AbstractMojo
+    implements Contextualizable
 {
 
     /** @component */
@@ -64,12 +69,7 @@ public class EnvironmentMojo
      */
     protected MavenSession session;
 
-    /**
-     * To look up Archiver/UnArchiver implementations
-     *
-     * @component
-     */
-    protected ArchiverManager archiverManager;
+    private PlexusContainer plexus;
 
     /**
      * The maven project.
@@ -441,11 +441,11 @@ public class EnvironmentMojo
         UnArchiver unarchiver;
         try
         {
-            unarchiver = archiverManager.getUnArchiver( type );
+            unarchiver = (UnArchiver) plexus.lookup( UnArchiver.ROLE, type );
         }
-        catch ( NoSuchArchiverException e )
+        catch ( ComponentLookupException e )
         {
-            throw new MojoExecutionException( "Invalid file format ", e );
+            throw new MojoExecutionException( "Unable to lookup for unarchiver", e );
         }
 
         unarchiver.setSourceFile( sourceFile );
@@ -530,6 +530,12 @@ public class EnvironmentMojo
         }
 
         return artifact;
+    }
+
+    public void contextualize( Context context )
+        throws ContextException
+    {
+        plexus = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
 }
