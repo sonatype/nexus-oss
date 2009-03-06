@@ -441,7 +441,7 @@ public class EnvironmentMojo
         UnArchiver unarchiver;
         try
         {
-            unarchiver = archiverManager.getUnArchiver( sourceFile );
+            unarchiver = archiverManager.getUnArchiver( type );
         }
         catch ( NoSuchArchiverException e )
         {
