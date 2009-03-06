@@ -283,6 +283,8 @@ public class EnvironmentMojo
     private void copyUrl( String sourceUrl, File destinationFile )
         throws MojoExecutionException
     {
+        getLog().info( "Copying url '" + sourceUrl + "'");
+
         String name = FileUtils.removeExtension( FileUtils.removePath( sourceUrl, '/' ) );
         String extension = FileUtils.getExtension( sourceUrl );
 
@@ -305,6 +307,7 @@ public class EnvironmentMojo
     private void copyDirectory( File sourceDir, File destinationDir )
         throws MojoExecutionException
     {
+        getLog().info( "Copying dir '" + sourceDir + "'" );
         try
         {
             FileUtils.copyDirectoryStructure( sourceDir, destinationDir );
@@ -318,6 +321,7 @@ public class EnvironmentMojo
     private void copyAndInterpolate( File sourceDir, File destinationDir )
         throws MojoExecutionException
     {
+        getLog().info( "Copying and interpolating dir '" + sourceDir + "'" );
         try
         {
             FileUtils.copyDirectoryStructure( sourceDir, destinationDir );
@@ -407,6 +411,8 @@ public class EnvironmentMojo
     private void copy( File sourceFile, File destinationDir )
         throws MojoExecutionException
     {
+        getLog().info( "Copying file '" + sourceFile + "'" );
+
         try
         {
             FileUtils.copyFileToDirectory( sourceFile, destinationDir );
