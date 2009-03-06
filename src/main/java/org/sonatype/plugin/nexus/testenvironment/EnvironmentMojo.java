@@ -206,6 +206,7 @@ public class EnvironmentMojo
             copyUrl( "/default-config/nexus.xml", new File( defaultConfig, "nexus.xml" ) );
             copyUrl( "/default-config/security.xml", new File( defaultConfig, "security.xml" ) );
             copyUrl( "/default-config/settings.xml", new File( defaultConfig, "settings.xml" ) );
+            copyUrl( "/default-config/log4j.properties", new File( defaultConfig, "log4j.properties" ) );
 
             File sourceDefaultConfig = new File( resourcesSourceLocation, "default-config" );
             if ( sourceDefaultConfig.isDirectory() )
