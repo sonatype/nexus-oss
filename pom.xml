@@ -13,6 +13,8 @@
 
   <packaging>maven-plugin</packaging>
 
+  <name>Nexus Test Environment maven-plugin</name>
+
   <prerequisites>
     <maven>2.0.9</maven>
   </prerequisites>

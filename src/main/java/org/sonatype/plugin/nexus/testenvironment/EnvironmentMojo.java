@@ -1,11 +1,11 @@
 package org.sonatype.plugin.nexus.testenvironment;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -229,9 +229,9 @@ public class EnvironmentMojo
     private void merge( File originalFile, File extraContentFile, String type )
         throws MojoFailureException, MojoExecutionException
     {
-        Reader originalReader = null;
-        Reader extraContentReader = null;
-        Writer originalWriter = null;
+        InputStream originalReader = null;
+        InputStream extraContentReader = null;
+        OutputStream originalWriter = null;
         try
         {
             String name = FileUtils.removeExtension( extraContentFile.getName() );
@@ -242,14 +242,14 @@ public class EnvironmentMojo
                 File tempFile = File.createTempFile( name, extension );
                 mavenFileFilter.copyFile( extraContentFile, tempFile, true, project, null, true, "UTF-8", session );
 
-                originalReader = new FileReader( originalFile );
-                extraContentReader = new FileReader( tempFile );
+                originalReader = new FileInputStream( originalFile );
+                extraContentReader = new FileInputStream( tempFile );
 
                 Properties original = new Properties();
                 original.load( originalReader );
                 IOUtil.close( originalReader );
 
-                originalWriter = new FileWriter( originalFile );
+                originalWriter = new FileOutputStream( originalFile );
 
                 Properties extra = new Properties();
                 extra.load( extraContentReader );
