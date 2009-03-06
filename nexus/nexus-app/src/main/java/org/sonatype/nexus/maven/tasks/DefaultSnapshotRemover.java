@@ -504,7 +504,7 @@ public class DefaultSnapshotRemover
 
                 metadataRebuildPaths.add( parentPath );
             }
-            else 
+            else
             {
                 metadataRebuildPaths.add( coll.getPath() );
             }
@@ -552,7 +552,8 @@ public class DefaultSnapshotRemover
                     MavenRepository mrepository = repository.adaptToFacet( MavenRepository.class );
 
                     // look in release reposes only
-                    if ( RepositoryPolicy.RELEASE.equals( mrepository.getRepositoryPolicy() ) )
+                    if ( mrepository.isUserManaged()
+                        && RepositoryPolicy.RELEASE.equals( mrepository.getRepositoryPolicy() ) )
                     {
                         try
                         {
