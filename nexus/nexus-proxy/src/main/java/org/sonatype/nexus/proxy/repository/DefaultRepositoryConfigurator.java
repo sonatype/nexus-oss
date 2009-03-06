@@ -130,7 +130,7 @@ public class DefaultRepositoryConfigurator
             prepository.setProxyMode( repositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
 
             prepository.setItemMaxAge( repo.getArtifactMaxAge() );
-
+            
             try
             {
                 if ( repo.getRemoteStorage() != null )
@@ -208,6 +208,12 @@ public class DefaultRepositoryConfigurator
             }
         }
 
+        // clear the NotFoundCache
+        if( repository.getNotFoundCache() != null )
+        {
+            repository.getNotFoundCache().purge();
+        }
+        
         return repository;
     }
 }
