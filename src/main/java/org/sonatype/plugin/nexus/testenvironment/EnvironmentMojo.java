@@ -163,7 +163,7 @@ public class EnvironmentMojo
 
         unpack( bundle.getFile(), destination, bundle.getType() );
 
-        File nexusBaseDir = new File( destination, "nexus-webapp-" + bundle.getVersion() );
+        File nexusBaseDir = new File( destination, "nexus-webapp-" + bundle.getBaseVersion() );
         project.getProperties().put( "nexus-base-dir", getPath( nexusBaseDir ) );
         project.getProperties().put( "nexus-work-dir", getPath( new File( destination, "nexus-work-dir" ) ) );
 
@@ -181,7 +181,7 @@ public class EnvironmentMojo
 
         if ( setupMaven )
         {
-            String mavenVersion = setupMaven().getVersion();
+            String mavenVersion = setupMaven().getBaseVersion();
             project.getProperties().put( "maven-version", mavenVersion );
             project.getProperties().put( "maven-basedir",
                                          getPath( new File( mavenLocation, "apache-maven-" + mavenVersion ) ) );
