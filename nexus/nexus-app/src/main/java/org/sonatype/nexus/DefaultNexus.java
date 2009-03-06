@@ -1378,6 +1378,26 @@ public class DefaultNexus
         indexerManager.reindexRepositoryGroup( path, repositoryGroupId );
     }
 
+    public void downloadAllIndex()
+        throws IOException
+    {
+        indexerManager.downloadAllIndex();
+    }
+
+    public void downloadRepositoryIndex( String repositoryId )
+        throws IOException,
+            NoSuchRepositoryException
+    {
+        indexerManager.downloadRepositoryIndex( repositoryId );
+    }
+
+    public void downloadRepositoryGroupIndex( String repositoryGroupId )
+        throws IOException,
+            NoSuchRepositoryException
+    {
+        indexerManager.downloadRepositoryGroupIndex( repositoryGroupId );
+    }
+
     public void publishAllIndex()
         throws IOException
     {

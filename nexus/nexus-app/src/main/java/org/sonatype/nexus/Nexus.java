@@ -146,6 +146,17 @@ public interface Nexus
         throws IOException,
             NoSuchRepositoryException;
 
+    void downloadAllIndex()
+        throws IOException;
+
+    void downloadRepositoryIndex( String repositoryId )
+        throws IOException,
+            NoSuchRepositoryException;
+
+    void downloadRepositoryGroupIndex( String repositoryGroupId )
+        throws IOException,
+            NoSuchRepositoryException;
+
     void rebuildAttributesAllRepositories( String path )
         throws IOException;
 

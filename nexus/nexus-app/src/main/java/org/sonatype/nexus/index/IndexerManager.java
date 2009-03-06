@@ -93,22 +93,7 @@ public interface IndexerManager
     NexusIndexer getNexusIndexer();
 
     // ----------------------------------------------------------------------------
-    // Publishing index
-    // ----------------------------------------------------------------------------
-
-    void publishAllIndex()
-        throws IOException;
-
-    void publishRepositoryIndex( String repositoryId )
-        throws IOException,
-            NoSuchRepositoryException;
-
-    void publishRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException,
-            NoSuchRepositoryException;
-
-    // ----------------------------------------------------------------------------
-    // Reindexing related
+    // Reindexing related (will do local-scan, remote-download, merge, publish)
     // ----------------------------------------------------------------------------
 
     void reindexAllRepositories( String path )
@@ -121,6 +106,36 @@ public interface IndexerManager
     void reindexRepositoryGroup( String path, String repositoryGroupId )
         throws NoSuchRepositoryException,
             IOException;
+
+    // ----------------------------------------------------------------------------
+    // Downloading remote indexes (will do remote-download, merge only)
+    // ----------------------------------------------------------------------------
+
+    void downloadAllIndex()
+        throws IOException;
+
+    void downloadRepositoryIndex( String repositoryId )
+        throws IOException,
+            NoSuchRepositoryException;
+
+    void downloadRepositoryGroupIndex( String repositoryGroupId )
+        throws IOException,
+            NoSuchRepositoryException;
+
+    // ----------------------------------------------------------------------------
+    // Publishing index (will do publish only)
+    // ----------------------------------------------------------------------------
+
+    void publishAllIndex()
+        throws IOException;
+
+    void publishRepositoryIndex( String repositoryId )
+        throws IOException,
+            NoSuchRepositoryException;
+
+    void publishRepositoryGroupIndex( String repositoryGroupId )
+        throws IOException,
+            NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------
     // Identify

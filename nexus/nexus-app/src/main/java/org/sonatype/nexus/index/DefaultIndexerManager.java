@@ -411,232 +411,6 @@ public class DefaultIndexerManager
     }
 
     // ----------------------------------------------------------------------------
-    // Publishing index
-    // ----------------------------------------------------------------------------
-
-    public void publishAllIndex()
-        throws IOException
-    {
-        List<Repository> reposes = repositoryRegistry.getRepositories();
-
-        for ( Repository repository : reposes )
-        {
-            publishRepositoryIndex( repository );
-        }
-
-        List<GroupRepository> groups = repositoryRegistry.getRepositoriesWithFacet( GroupRepository.class );
-
-        for ( GroupRepository group : groups )
-        {
-            publishRepositoryGroupIndex( group );
-        }
-    }
-
-    public void publishRepositoryIndex( String repositoryId )
-        throws IOException,
-            NoSuchRepositoryException
-    {
-        publishRepositoryIndex( repositoryRegistry.getRepository( repositoryId ) );
-    }
-
-    public void publishRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException,
-            NoSuchRepositoryException
-    {
-        GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
-
-        for ( Repository repository : group.getMemberRepositories() )
-        {
-            publishRepositoryIndex( repository );
-        }
-
-        publishRepositoryGroupIndex( group );
-    }
-
-    protected void publishRepositoryIndex( Repository repository )
-        throws IOException
-    {
-        // shadows are not capable to publish indexes
-        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
-        {
-            return;
-        }
-
-        boolean repositoryIndexable = repository.isIndexable();
-
-        try
-        {
-            repository.setIndexable( false );
-
-            getLogger().info( "Publishing best index for repository " + repository.getId() );
-
-            // publish index update, publish the best context we have downstream
-            IndexingContext context = null;
-
-            try
-            {
-                context = getRepositoryBestIndexContext( repository.getId() );
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                // will not happen, but...
-            }
-
-            File targetDir = null;
-
-            try
-            {
-                targetDir = new File( getTempDirectory(), "nx-index" + System.currentTimeMillis() );
-
-                if ( !targetDir.mkdirs() )
-                {
-                    getLogger().error( "Could not create temp dir for packing indexes: " + targetDir );
-
-                    throw new IOException( "Could not create temp dir for packing indexes: " + targetDir );
-                }
-                else
-                {
-                    IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
-
-                    packReq.setCreateIncrementalChunks( false );
-
-                    indexPacker.packIndex( packReq );
-
-                    File[] files = targetDir.listFiles();
-
-                    if ( files != null )
-                    {
-                        for ( File file : files )
-                        {
-                            storeItem( repository, file, context );
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                if ( targetDir != null )
-                {
-                    FileUtils.deleteDirectory( targetDir );
-                }
-            }
-        }
-        finally
-        {
-            repository.setIndexable( repositoryIndexable );
-        }
-    }
-
-    private void storeItem( Repository repository, File file, IndexingContext context )
-    {
-        String path = "/.index/" + file.getName();
-
-        FileInputStream fis = null;
-
-        try
-        {
-            fis = new FileInputStream( file );
-
-            DefaultStorageFileItem fItem = new DefaultStorageFileItem(
-                repository,
-                path,
-                true,
-                true,
-                new PreparedContentLocator( fis ) );
-
-            if ( context.getTimestamp() == null )
-            {
-                fItem.setModified( 0 );
-
-                fItem.setCreated( 0 );
-            }
-            else
-            {
-                fItem.setModified( context.getTimestamp().getTime() );
-
-                fItem.setCreated( context.getTimestamp().getTime() );
-            }
-
-            if ( repository instanceof MavenRepository )
-            {
-                // this is maven repo, so use the checksumming facility
-                ( (MavenRepository) repository ).storeItemWithChecksums( fItem );
-            }
-            else
-            {
-                // simply store it
-                repository.storeItem( fItem );
-            }
-        }
-        catch ( Exception e )
-        {
-            getLogger().error( "Cannot store index file " + path, e );
-        }
-        finally
-        {
-            IOUtil.close( fis );
-        }
-    }
-
-    protected void publishRepositoryGroupIndex( GroupRepository groupRepository )
-        throws IOException
-    {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Publishing merged index for repository group " + groupRepository.getId() );
-        }
-
-        IndexingContext context = nexusIndexer
-            .getIndexingContexts().get( getRemoteContextId( groupRepository.getId() ) );
-
-        File targetDir = null;
-
-        try
-        {
-            targetDir = new File( getTempDirectory(), "nx-index" + System.currentTimeMillis() );
-
-            if ( targetDir.mkdirs() )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Packing the merged index context." );
-                }
-
-                IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
-
-                packReq.setCreateIncrementalChunks( false );
-
-                indexPacker.packIndex( packReq );
-
-                File[] files = targetDir.listFiles();
-
-                if ( files != null )
-                {
-                    for ( File file : files )
-                    {
-                        storeItem( groupRepository, file, context );
-                    }
-                }
-            }
-            else
-            {
-                getLogger().warn( "Could not create temp dir for packing indexes: " + targetDir );
-            }
-        }
-        finally
-        {
-            if ( targetDir != null )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Cleanup of temp files..." );
-                }
-                FileUtils.deleteDirectory( targetDir );
-            }
-        }
-    }
-
-    // ----------------------------------------------------------------------------
     // Reindexing related
     // ----------------------------------------------------------------------------
 
@@ -704,65 +478,21 @@ public class DefaultIndexerManager
 
             IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
 
-            nexusIndexer.scan( context );
+            synchronized ( context )
+            {
+                nexusIndexer.scan( context );
 
-            updateIndexForRemoteRepository( repository );
+                if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                {
+                    downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ) );
+                }
 
-            mergeRepositoryGroupIndexWithMember( repository );
+                mergeRepositoryGroupIndexWithMember( repository );
+            }
         }
         finally
         {
             repository.setIndexable( repositoryIndexable );
-        }
-    }
-
-    protected void mergeRepositoryGroupIndexWithMember( Repository repository )
-        throws IOException
-    {
-        List<String> groupsOfRepository = repositoryRegistry.getGroupsOfRepository( repository.getId() );
-
-        for ( String repositoryGroupId : groupsOfRepository )
-        {
-            getLogger().info(
-                "Cascading merge of group indexes for group '" + repositoryGroupId + "', where repository '"
-                    + repository.getId() + "' is member." );
-
-            IndexingContext context = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryGroupId ) );
-
-            synchronized ( context )
-            {
-                // local index include all repositories
-                try
-                {
-                    IndexingContext bestContext = getRepositoryBestIndexContext( repository.getId() );
-
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug(
-                            " ...found best context " + bestContext.getId() + " for repository "
-                                + bestContext.getRepositoryId() + ", merging it..." );
-                    }
-
-                    context.merge( bestContext.getIndexDirectory() );
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    // not to happen, we are iterating over them
-                }
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Rebuilding groups in merged index for repository group " + repositoryGroupId );
-                }
-
-                // rebuild group info
-                context.rebuildGroups();
-
-                // committing changes
-                context.getIndexWriter().flush();
-
-                context.updateTimestamp();
-            }
         }
     }
 
@@ -773,76 +503,141 @@ public class DefaultIndexerManager
 
         if ( context != null )
         {
-            context.purge();
+            synchronized ( context )
+            {
+                context.purge();
+            }
         }
     }
 
-    private boolean updateIndexForRemoteRepository( Repository repository )
+    // ----------------------------------------------------------------------------
+    // Downloading remote indexes (will do remote-download, merge only)
+    // ----------------------------------------------------------------------------
+
+    public void downloadAllIndex()
         throws IOException
     {
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        List<ProxyRepository> reposes = repositoryRegistry.getRepositoriesWithFacet( ProxyRepository.class );
+
+        for ( ProxyRepository repository : reposes )
         {
-            boolean shouldDownloadRemoteIndex = false;
+            if ( downloadRepositoryIndex( repository ) )
+            {
+                mergeRepositoryGroupIndexWithMember( repository );
+            }
+        }
+    }
 
-            ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
+    public void downloadRepositoryIndex( String repositoryId )
+        throws IOException,
+            NoSuchRepositoryException
+    {
+        ProxyRepository repository = repositoryRegistry.getRepositoryWithFacet( repositoryId, ProxyRepository.class );
 
+        if ( downloadRepositoryIndex( repository ) )
+        {
+            mergeRepositoryGroupIndexWithMember( repository );
+        }
+    }
+
+    public void downloadRepositoryGroupIndex( String repositoryGroupId )
+        throws IOException,
+            NoSuchRepositoryException
+    {
+        List<Repository> group = repositoryRegistry
+            .getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
+
+        for ( Repository repository : group )
+        {
+            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+            {
+                if ( downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ) ) )
+                {
+                    mergeRepositoryGroupIndexWithMember( repository );
+                }
+            }
+        }
+    }
+
+    protected boolean downloadRepositoryIndex( ProxyRepository repository )
+        throws IOException
+    {
+        boolean repositoryIndexable = repository.isIndexable();
+
+        try
+        {
+            repository.setIndexable( false );
+
+            IndexingContext context = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repository.getId() ) );
+
+            synchronized ( context )
+            {
+                return updateIndexForRemoteRepository( repository );
+            }
+        }
+        finally
+        {
+            repository.setIndexable( repositoryIndexable );
+        }
+    }
+
+    protected boolean updateIndexForRemoteRepository( ProxyRepository repository )
+        throws IOException
+    {
+        boolean shouldDownloadRemoteIndex = false;
+
+        try
+        {
+            CRepository repoModel = nexusConfiguration.readRepository( repository.getId() );
+
+            shouldDownloadRemoteIndex = repoModel.isDownloadRemoteIndexes();
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // TODO: heee?
+        }
+
+        boolean hasRemoteIndex = false;
+
+        if ( shouldDownloadRemoteIndex )
+        {
             try
             {
-                CRepository repoModel = nexusConfiguration.readRepository( proxy.getId() );
+                getLogger().info( "Trying to get remote index for repository " + repository.getId() );
 
-                shouldDownloadRemoteIndex = repoModel.isDownloadRemoteIndexes();
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                // TODO: heee?
-            }
+                hasRemoteIndex = updateRemoteIndex( repository );
 
-            boolean hasRemoteIndex = false;
-
-            if ( shouldDownloadRemoteIndex )
-            {
-                try
+                if ( hasRemoteIndex )
                 {
-                    getLogger().info( "Trying to get remote index for repository " + proxy.getId() );
-
-                    hasRemoteIndex = updateRemoteIndex( proxy );
-
-                    if ( hasRemoteIndex )
-                    {
-                        getLogger().info( "Remote indexes updated successfully for repository " + proxy.getId() );
-                    }
-                    else
-                    {
-                        getLogger()
-                            .info( "Remote indexes unchanged (no update needed) for repository " + proxy.getId() );
-                    }
+                    getLogger().info( "Remote indexes updated successfully for repository " + repository.getId() );
                 }
-                catch ( Exception e )
+                else
                 {
-                    getLogger().warn( "Cannot fetch remote index:", e );
+                    getLogger().info(
+                        "Remote indexes unchanged (no update needed) for repository " + repository.getId() );
                 }
             }
-            else
+            catch ( Exception e )
             {
-                // make empty the remote context
-                IndexingContext context = nexusIndexer.getIndexingContexts().get( getRemoteContextId( proxy.getId() ) );
-
-                context.purge();
-
-                // XXX remove obsolete files, should remove all index fragments
-                // deleteItem( repository, ctx, zipUid );
-                // deleteItem( repository, ctx, chunkUid ) ;
+                getLogger().warn( "Cannot fetch remote index:", e );
             }
-
-            return hasRemoteIndex;
         }
         else
         {
-            return false;
+            // make empty the remote context
+            IndexingContext context = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repository.getId() ) );
+
+            context.purge();
+
+            // XXX remove obsolete files, should remove all index fragments
+            // deleteItem( repository, ctx, zipUid );
+            // deleteItem( repository, ctx, chunkUid ) ;
         }
+
+        return hasRemoteIndex;
     }
 
-    private boolean updateRemoteIndex( final ProxyRepository repository )
+    protected boolean updateRemoteIndex( final ProxyRepository repository )
         throws IOException,
             IllegalOperationException,
             ItemNotFoundException
@@ -944,6 +739,297 @@ public class DefaultIndexerManager
         Date contextTimestamp = indexUpdater.fetchAndUpdateIndex( updateRequest );
 
         return contextTimestamp != null;
+    }
+
+    protected void mergeRepositoryGroupIndexWithMember( Repository repository )
+        throws IOException
+    {
+        List<String> groupsOfRepository = repositoryRegistry.getGroupsOfRepository( repository.getId() );
+
+        for ( String repositoryGroupId : groupsOfRepository )
+        {
+            getLogger().info(
+                "Cascading merge of group indexes for group '" + repositoryGroupId + "', where repository '"
+                    + repository.getId() + "' is member." );
+
+            // get the groups target ctx
+            IndexingContext context = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryGroupId ) );
+
+            synchronized ( context )
+            {
+                // local index include all repositories
+                try
+                {
+                    IndexingContext bestContext = getRepositoryBestIndexContext( repository.getId() );
+
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                            " ...found best context " + bestContext.getId() + " for repository "
+                                + bestContext.getRepositoryId() + ", merging it..." );
+                    }
+
+                    synchronized ( bestContext )
+                    {
+                        context.merge( bestContext.getIndexDirectory() );
+                    }
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    // not to happen, we are iterating over them
+                }
+
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Rebuilding groups in merged index for repository group " + repositoryGroupId );
+                }
+
+                // rebuild group info
+                context.rebuildGroups();
+
+                // committing changes
+                context.getIndexWriter().flush();
+
+                context.updateTimestamp();
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------------
+    // Publishing index (will do publish only)
+    // ----------------------------------------------------------------------------
+
+    public void publishAllIndex()
+        throws IOException
+    {
+        List<Repository> reposes = repositoryRegistry.getRepositories();
+
+        for ( Repository repository : reposes )
+        {
+            publishRepositoryIndex( repository );
+        }
+
+        List<GroupRepository> groups = repositoryRegistry.getRepositoriesWithFacet( GroupRepository.class );
+
+        for ( GroupRepository group : groups )
+        {
+            publishRepositoryGroupIndex( group );
+        }
+    }
+
+    public void publishRepositoryIndex( String repositoryId )
+        throws IOException,
+            NoSuchRepositoryException
+    {
+        publishRepositoryIndex( repositoryRegistry.getRepository( repositoryId ) );
+    }
+
+    public void publishRepositoryGroupIndex( String repositoryGroupId )
+        throws IOException,
+            NoSuchRepositoryException
+    {
+        GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
+
+        for ( Repository repository : group.getMemberRepositories() )
+        {
+            publishRepositoryIndex( repository );
+        }
+
+        publishRepositoryGroupIndex( group );
+    }
+
+    protected void publishRepositoryIndex( Repository repository )
+        throws IOException
+    {
+        // shadows are not capable to publish indexes
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+        {
+            return;
+        }
+
+        boolean repositoryIndexable = repository.isIndexable();
+
+        try
+        {
+            repository.setIndexable( false );
+
+            getLogger().info( "Publishing best index for repository " + repository.getId() );
+
+            // publish index update, publish the best context we have downstream
+            IndexingContext context = null;
+
+            try
+            {
+                context = getRepositoryBestIndexContext( repository.getId() );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                // will not happen, but...
+            }
+
+            File targetDir = null;
+
+            synchronized ( context )
+            {
+                try
+                {
+                    targetDir = new File( getTempDirectory(), "nx-index" + System.currentTimeMillis() );
+
+                    if ( !targetDir.mkdirs() )
+                    {
+                        throw new IOException( "Could not create temp dir for packing indexes: " + targetDir );
+                    }
+                    else
+                    {
+                        IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
+
+                        packReq.setCreateIncrementalChunks( false );
+
+                        indexPacker.packIndex( packReq );
+
+                        File[] files = targetDir.listFiles();
+
+                        if ( files != null )
+                        {
+                            for ( File file : files )
+                            {
+                                storeItem( repository, file, context );
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    if ( targetDir != null )
+                    {
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            getLogger().debug( "Cleanup of temp files..." );
+                        }
+
+                        FileUtils.deleteDirectory( targetDir );
+                    }
+                }
+            }
+        }
+        finally
+        {
+            repository.setIndexable( repositoryIndexable );
+        }
+    }
+
+    protected void publishRepositoryGroupIndex( GroupRepository groupRepository )
+        throws IOException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Publishing merged index for repository group " + groupRepository.getId() );
+        }
+
+        // groups contains the merged context in -remote idx context
+        IndexingContext context = nexusIndexer
+            .getIndexingContexts().get( getRemoteContextId( groupRepository.getId() ) );
+
+        File targetDir = null;
+
+        synchronized ( context )
+        {
+            try
+            {
+                targetDir = new File( getTempDirectory(), "nx-index" + System.currentTimeMillis() );
+
+                if ( !targetDir.mkdirs() )
+                {
+                    throw new IOException( "Could not create temp dir for packing indexes: " + targetDir );
+                }
+                else
+                {
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug( "Packing the merged index context." );
+                    }
+
+                    IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
+
+                    packReq.setCreateIncrementalChunks( false );
+
+                    indexPacker.packIndex( packReq );
+
+                    File[] files = targetDir.listFiles();
+
+                    if ( files != null )
+                    {
+                        for ( File file : files )
+                        {
+                            storeItem( groupRepository, file, context );
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if ( targetDir != null )
+                {
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug( "Cleanup of temp files..." );
+                    }
+
+                    FileUtils.deleteDirectory( targetDir );
+                }
+            }
+        }
+    }
+
+    private void storeItem( Repository repository, File file, IndexingContext context )
+    {
+        String path = "/.index/" + file.getName();
+
+        FileInputStream fis = null;
+
+        try
+        {
+            fis = new FileInputStream( file );
+
+            DefaultStorageFileItem fItem = new DefaultStorageFileItem(
+                repository,
+                path,
+                true,
+                true,
+                new PreparedContentLocator( fis ) );
+
+            if ( context.getTimestamp() == null )
+            {
+                fItem.setModified( 0 );
+
+                fItem.setCreated( 0 );
+            }
+            else
+            {
+                fItem.setModified( context.getTimestamp().getTime() );
+
+                fItem.setCreated( context.getTimestamp().getTime() );
+            }
+
+            if ( repository instanceof MavenRepository )
+            {
+                // this is maven repo, so use the checksumming facility
+                ( (MavenRepository) repository ).storeItemWithChecksums( fItem );
+            }
+            else
+            {
+                // simply store it
+                repository.storeItem( fItem );
+            }
+        }
+        catch ( Exception e )
+        {
+            getLogger().error( "Cannot store index file " + path, e );
+        }
+        finally
+        {
+            IOUtil.close( fis );
+        }
     }
 
     // ----------------------------------------------------------------------------

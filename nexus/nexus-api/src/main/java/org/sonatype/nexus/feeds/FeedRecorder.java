@@ -55,6 +55,11 @@ public interface FeedRecorder
     public static final String SYSTEM_PUBLISHINDEX_ACTION = "PUBLISHINDEX";
 
     /**
+     * System event action: download indexes
+     */
+    public static final String SYSTEM_DOWNLOADINDEX_ACTION = "DOWNLOADINDEX";
+
+    /**
      * System event action: rebuildAttributes
      */
     public static final String SYSTEM_REBUILDATTRIBUTES_ACTION = "REBUILDATTRIBUTES";
