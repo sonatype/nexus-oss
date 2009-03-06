@@ -283,7 +283,7 @@ public class EnvironmentMojo
     private void copyUrl( String sourceUrl, File destinationFile )
         throws MojoExecutionException
     {
-        getLog().info( "Copying url '" + sourceUrl + "'");
+        getLog().info( "Copying url '" + sourceUrl + "'" );
 
         String name = FileUtils.removeExtension( FileUtils.removePath( sourceUrl, '/' ) );
         String extension = FileUtils.getExtension( sourceUrl );
@@ -517,13 +517,16 @@ public class EnvironmentMojo
 
         Artifact artifact = projectArtifacts.iterator().next();
 
-        try
+        if ( !artifact.isResolved() )
         {
-            resolver.resolve( artifact, remoteRepositories, localRepository );
-        }
-        catch ( AbstractArtifactResolutionException e )
-        {
-            throw new MojoExecutionException( "Unable to resolve artifact: " + artifact, e );
+            try
+            {
+                resolver.resolve( artifact, remoteRepositories, localRepository );
+            }
+            catch ( AbstractArtifactResolutionException e )
+            {
+                throw new MojoExecutionException( "Unable to resolve artifact: " + artifact, e );
+            }
         }
 
         return artifact;
