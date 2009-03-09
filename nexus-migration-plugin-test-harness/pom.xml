@@ -7,6 +7,7 @@
     <version>1.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>nexus-migration-plugin-test-harness</artifactId>
+  <version>1.3.0-SNAPSHOT</version>
 
   <name>Nexus Migration Plugin - Test harness</name>
 
@@ -102,24 +103,24 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-migration-plugin-artifactory</artifactId>
-      <version>${migration-plugin-version}</version>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-migration-plugin-artifactory-bridge</artifactId>
-      <version>${migration-plugin-version}</version>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-migration-plugin-packaging</artifactId>
-      <version>${migration-plugin-version}</version>
+      <version>1.0-SNAPSHOT</version>
       <type>zip</type>
       <classifier>webapp</classifier>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-migration-plugin-packaging</artifactId>
-      <version>${migration-plugin-version}</version>
+      <version>1.0-SNAPSHOT</version>
       <type>zip</type>
       <classifier>plugins</classifier>
     </dependency>
@@ -154,4 +155,10 @@
     </plugins>
   </reporting>
 
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/branches/nexus-migration-plugin-1.0.x</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/branches/nexus-migration-plugin-1.0.x</developerConnection>
+    <url>http://svn.sonatype.org/nexus/branches/nexus-migration-plugin-1.0.x</url>
+  </scm>
 </project>

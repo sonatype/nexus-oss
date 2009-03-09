@@ -150,4 +150,10 @@
     </plugins>
   </build>
 
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/branches/nexus-migration-plugin-1.0.x</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/branches/nexus-migration-plugin-1.0.x</developerConnection>
+    <url>http://svn.sonatype.org/nexus-plugins/branches/nexus-migration-plugin-1.0.x</url>
+  </scm>
 </project>
