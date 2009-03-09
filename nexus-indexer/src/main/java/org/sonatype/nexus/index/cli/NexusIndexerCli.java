@@ -35,23 +35,18 @@ import org.sonatype.nexus.index.packer.IndexPackingRequest;
  * A command line tool that can be used to index local Maven repository.
  * <p>
  * The following command line options are supported:
- * 
- * 
  * <ul>
  * <li>-repository <path> : required path to repository to be indexed</li>
- * <li>-index <path> : required index folder used to store created index or
- * where previously created index is stored</li>
+ * <li>-index <path> : required index folder used to store created index or where previously created index is stored</li>
  * <li>-name <path> : required repository name/id</li>
  * <li>-target <path> : optional folder name where to save produced index files</li>
  * <li>-type <path> : optional indexer types</li>
  * </ul>
- * 
- * When index folder contains previously created index, the tool will use it as
- * a base line and will generate chunks for the incremental updates.
+ * When index folder contains previously created index, the tool will use it as a base line and will generate chunks for
+ * the incremental updates.
  * <p>
- * The indexer types could be one of default, min or full. You can also specify
- * list of coma-separated custom index creators. An index creator should be a
- * regular Plexus component, see {@link MinimalArtifactInfoIndexCreator} and
+ * The indexer types could be one of default, min or full. You can also specify list of coma-separated custom index
+ * creators. An index creator should be a regular Plexus component, see {@link MinimalArtifactInfoIndexCreator} and
  * {@link JarFileContentsIndexCreator}.
  */
 public class NexusIndexerCli
@@ -92,11 +87,11 @@ public class NexusIndexerCli
     public Options buildCliOptions( Options options )
     {
         this.options = options;
-        
+
         options.addOption( OptionBuilder.withLongOpt( "index" ).hasArg() //
         .withDescription( "Path to the index folder." ).create( INDEX ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "target" ) //
+        options.addOption( OptionBuilder.withLongOpt( "destination" ).hasArg() //
         .withDescription( "Target folder." ).create( TARGET_DIR ) );
 
         options.addOption( OptionBuilder.withLongOpt( "repository" ).hasArg() //
@@ -112,12 +107,13 @@ public class NexusIndexerCli
     }
 
     @Override
-    public void displayHelp() {
+    public void displayHelp()
+    {
         System.out.println();
 
         HelpFormatter formatter = new HelpFormatter();
 
-        formatter.printHelp("nexus-indexer [options]", "\nOptions:", options, "\n");
+        formatter.printHelp( "nexus-indexer [options]", "\nOptions:", options, "\n" );
     }
 
     @Override
@@ -143,11 +139,13 @@ public class NexusIndexerCli
 
         File indexFolder = new File( indexDirectoryName );
 
-        File outputFolder = new File( cli.hasOption( TARGET_DIR ) ? cli.getOptionValue( TARGET_DIR ) : "." );
+        String outputDirectoryName = cli.getOptionValue( TARGET_DIR, "." );
+
+        File outputFolder = new File( outputDirectoryName );
 
         File repositoryFolder = new File( cli.getOptionValue( REPO ) );
 
-        String repositoryName = cli.hasOption( NAME ) ? cli.getOptionValue( NAME ) : indexFolder.getName();
+        String repositoryName = cli.getOptionValue( NAME, indexFolder.getName() );
 
         List<IndexCreator> indexers = getIndexers( cli, plexus );
 
@@ -179,22 +177,6 @@ public class NexusIndexerCli
         indexer.scan( context, listener, true );
 
         IndexPackingRequest request = new IndexPackingRequest( context, outputFolder );
-
-//        if ( cli.hasOption( CHUNK_RESOLUTION ) )
-//        {
-//            String resolution = cli.getOptionValue( CHUNK_RESOLUTION );
-//
-//            if ( CHUNK_RESOLUTION_NONE.equalsIgnoreCase( resolution ) )
-//            {
-//                request.setCreateIncrementalChunks( false );
-//            }
-//            else
-//            {
-//                IndexChunker indexChunker = plexus.lookup( IndexChunker.class, "day" );
-//
-//                request.setIndexChunker( indexChunker );
-//            }
-//        }
 
         packIndex( packer, request, debug );
 

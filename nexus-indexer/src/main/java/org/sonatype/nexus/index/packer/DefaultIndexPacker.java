@@ -34,6 +34,7 @@ import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.IndexCreator;
@@ -49,7 +50,7 @@ import org.sonatype.nexus.index.updater.IndexDataWriter;
  * @author Tamas Cservenak
  * @author Eugene Kuleshov
  */
-@Component(role = IndexPacker.class)
+@Component( role = IndexPacker.class )
 public class DefaultIndexPacker
     extends AbstractLogEnabled
     implements IndexPacker
@@ -96,18 +97,44 @@ public class DefaultIndexPacker
 
         if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_LEGACY ) )
         {
-            writeIndexArchive( request.getContext(), new File( request.getTargetDir(), //
-                IndexingContext.INDEX_FILE + ".zip" ) );
+            File file = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".zip" );
+
+            writeIndexArchive( request.getContext(), file );
+
+            FileUtils.fileWrite(
+                new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
+                DigesterUtils.getSha1Digest( file ) );
+
+            FileUtils.fileWrite(
+                new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
+                DigesterUtils.getMd5Digest( file ) );
         }
 
         if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_V1 ) )
         {
-            writeIndexData( request.getContext(), null, new File( request.getTargetDir(), //
-                IndexingContext.INDEX_FILE + ".gz" ) );
+            File file = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".gz" );
+
+            writeIndexData( request.getContext(), null, file );
+
+            FileUtils.fileWrite(
+                new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
+                DigesterUtils.getSha1Digest( file ) );
+
+            FileUtils.fileWrite(
+                new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
+                DigesterUtils.getMd5Digest( file ) );
         }
 
-        writeIndexProperties( request, info, new File( request.getTargetDir(), //
-            IndexingContext.INDEX_FILE + ".properties" ) );
+        File file = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".properties" );
+
+        writeIndexProperties( request, info, file );
+
+        FileUtils.fileWrite(
+            new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
+            DigesterUtils.getSha1Digest( file ) );
+
+        FileUtils.fileWrite( new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(), DigesterUtils
+            .getMd5Digest( file ) );
     }
 
     private Map<String, List<Integer>> getIndexChunks( IndexPackingRequest request )
@@ -163,17 +190,28 @@ public class DefaultIndexPacker
             info.put( IndexingContext.INDEX_CHUNK_PREFIX + n, format( request.getIndexChunker().getChunkDate( key ) ) );
 
             List<Integer> indexes = e.getValue();
-            
+
             if ( currentIndexes != null )
             {
-                indexes.addAll(currentIndexes);
+                indexes.addAll( currentIndexes );
             }
-            
+
             currentIndexes = indexes;
 
+            File file = new File( request.getTargetDir(), //
+                IndexingContext.INDEX_FILE + "." + key + ".gz" );
+
             writeIndexData( context, //
-                indexes, new File( request.getTargetDir(), //
-                    IndexingContext.INDEX_FILE + "." + key + ".gz" ) );
+                indexes,
+                file );
+
+            FileUtils.fileWrite(
+                new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
+                DigesterUtils.getSha1Digest( file ) );
+
+            FileUtils.fileWrite(
+                new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
+                DigesterUtils.getMd5Digest( file ) );
 
             n++;
 
@@ -205,7 +243,7 @@ public class DefaultIndexPacker
             IOUtil.close( os );
         }
     }
-    
+
     /**
      * Pack legacy index archive into a specified output stream
      */
@@ -236,7 +274,7 @@ public class DefaultIndexPacker
             IndexUtils.delete( indexDir );
         }
     }
-    
+
     static void copyLegacyDocuments( IndexReader r, Directory targetdir, IndexingContext context )
         throws CorruptIndexException,
             LockObtainFailedException,
@@ -246,7 +284,7 @@ public class DefaultIndexPacker
         try
         {
             w = new IndexWriter( targetdir, false, new NexusLegacyAnalyzer(), true );
-    
+
             for ( int i = 0; i < r.maxDoc(); i++ )
             {
                 if ( !r.isDeleted( i ) )
@@ -254,7 +292,7 @@ public class DefaultIndexPacker
                     w.addDocument( updateLegacyDocument( r.document( i ), context ) );
                 }
             }
-    
+
             w.optimize();
             w.flush();
         }
@@ -263,7 +301,7 @@ public class DefaultIndexPacker
             IndexUtils.close( w );
         }
     }
-    
+
     static Document updateLegacyDocument( Document doc, IndexingContext context )
     {
         ArtifactInfo ai = IndexUtils.constructArtifactInfo( doc, context );
@@ -285,7 +323,7 @@ public class DefaultIndexPacker
 
         return document;
     }
-    
+
     static void packDirectory( Directory directory, OutputStream os )
         throws IOException
     {
@@ -294,25 +332,25 @@ public class DefaultIndexPacker
         {
             zos = new ZipOutputStream( os );
             zos.setLevel( 9 );
-    
+
             String[] names = directory.list();
-    
+
             boolean savedTimestamp = false;
-    
+
             byte[] buf = new byte[8192];
-    
+
             for ( int i = 0; i < names.length; i++ )
             {
                 String name = names[i];
-    
+
                 writeFile( name, zos, directory, buf );
-    
+
                 if ( name.equals( IndexUtils.TIMESTAMP_FILE ) )
                 {
                     savedTimestamp = true;
                 }
             }
-    
+
             // FSDirectory filter out the foreign files
             if ( !savedTimestamp && directory.fileExists( IndexUtils.TIMESTAMP_FILE ) )
             {
@@ -321,7 +359,7 @@ public class DefaultIndexPacker
         }
         finally
         {
-          IndexUtils.close( zos );
+            IndexUtils.close( zos );
         }
     }
 
@@ -329,24 +367,24 @@ public class DefaultIndexPacker
         throws IOException
     {
         ZipEntry e = new ZipEntry( name );
-    
+
         zos.putNextEntry( e );
-    
+
         IndexInput in = directory.openInput( name );
-    
+
         try
         {
             int toRead = 0;
-    
+
             int bytesLeft = (int) in.length();
-    
+
             while ( bytesLeft > 0 )
             {
                 toRead = ( bytesLeft >= buf.length ) ? buf.length : bytesLeft;
                 bytesLeft -= toRead;
-    
+
                 in.readBytes( buf, 0, toRead, false );
-    
+
                 zos.write( buf, 0, toRead );
             }
         }
@@ -354,12 +392,12 @@ public class DefaultIndexPacker
         {
             IndexUtils.close( in );
         }
-    
+
         zos.flush();
-    
+
         zos.closeEntry();
     }
-    
+
     void writeIndexData( IndexingContext context, List<Integer> docIndexes, File targetArchive )
         throws IOException
     {
@@ -373,10 +411,10 @@ public class DefaultIndexPacker
         try
         {
             os = new FileOutputStream( targetArchive );
-            
+
             IndexDataWriter dw = new IndexDataWriter( os );
             dw.write( context, docIndexes );
-            
+
             os.flush();
         }
         finally
@@ -398,11 +436,6 @@ public class DefaultIndexPacker
         }
 
         info.setProperty( IndexingContext.INDEX_TIMESTAMP, format( timestamp ) );
-
-//        if ( request.isCreateIncrementalChunks() )
-//        {
-//            info.setProperty( IndexingContext.INDEX_CHUNKS_RESOLUTION, request.getIndexChunker().getId() );
-//        }
 
         OutputStream os = null;
 
