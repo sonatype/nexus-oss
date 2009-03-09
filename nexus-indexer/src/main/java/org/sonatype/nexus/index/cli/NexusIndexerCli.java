@@ -177,6 +177,8 @@ public class NexusIndexerCli
         indexer.scan( context, listener, true );
 
         IndexPackingRequest request = new IndexPackingRequest( context, outputFolder );
+        
+        request.setCreateChecksumFiles( true );
 
         packIndex( packer, request, debug );
 

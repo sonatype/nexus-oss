@@ -25,6 +25,8 @@ public class IndexPackingRequest
 
     private boolean createIncrementalChunks;
 
+    private boolean createChecksumFiles;
+
     private IndexChunker indexChunker;
 
     private int maxIndexChunks;
@@ -39,10 +41,12 @@ public class IndexPackingRequest
 
         this.createIncrementalChunks = true;
 
+        this.createChecksumFiles = false;
+
         this.indexChunker = new DefaultIndexChunker();
 
         this.maxIndexChunks = MAX_CHUNKS;
-        
+
         this.formats = Arrays.asList( IndexFormat.FORMAT_LEGACY, IndexFormat.FORMAT_V1 );
     }
 
@@ -63,9 +67,9 @@ public class IndexPackingRequest
     {
         this.formats = formats;
     }
-    
+
     /**
-     * Returns index formats to be created. 
+     * Returns index formats to be created.
      */
     public Collection<IndexFormat> getFormats()
     {
@@ -92,6 +96,16 @@ public class IndexPackingRequest
         this.createIncrementalChunks = createIncrementalChunks;
     }
 
+    public boolean isCreateChecksumFiles()
+    {
+        return createChecksumFiles;
+    }
+
+    public void setCreateChecksumFiles( boolean createChecksumFiles )
+    {
+        this.createChecksumFiles = createChecksumFiles;
+    }
+
     public IndexChunker getIndexChunker()
     {
         return indexChunker;
@@ -112,11 +126,10 @@ public class IndexPackingRequest
         this.maxIndexChunks = maxIndexChunks;
     }
 
-
     /**
      * Index format enumeration.
      */
-    public static enum IndexFormat 
+    public static enum IndexFormat
     {
         FORMAT_LEGACY, FORMAT_V1;
 

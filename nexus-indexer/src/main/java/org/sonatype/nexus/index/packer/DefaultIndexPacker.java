@@ -101,13 +101,16 @@ public class DefaultIndexPacker
 
             writeIndexArchive( request.getContext(), file );
 
-            FileUtils.fileWrite(
-                new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
-                DigesterUtils.getSha1Digest( file ) );
+            if ( request.isCreateChecksumFiles() )
+            {
+                FileUtils.fileWrite(
+                    new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
+                    DigesterUtils.getSha1Digest( file ) );
 
-            FileUtils.fileWrite(
-                new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
-                DigesterUtils.getMd5Digest( file ) );
+                FileUtils.fileWrite(
+                    new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
+                    DigesterUtils.getMd5Digest( file ) );
+            }
         }
 
         if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_V1 ) )
@@ -116,6 +119,24 @@ public class DefaultIndexPacker
 
             writeIndexData( request.getContext(), null, file );
 
+            if ( request.isCreateChecksumFiles() )
+            {
+                FileUtils.fileWrite(
+                    new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
+                    DigesterUtils.getSha1Digest( file ) );
+
+                FileUtils.fileWrite(
+                    new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
+                    DigesterUtils.getMd5Digest( file ) );
+            }
+        }
+
+        File file = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".properties" );
+
+        writeIndexProperties( request, info, file );
+
+        if ( request.isCreateChecksumFiles() )
+        {
             FileUtils.fileWrite(
                 new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
                 DigesterUtils.getSha1Digest( file ) );
@@ -124,17 +145,6 @@ public class DefaultIndexPacker
                 new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
                 DigesterUtils.getMd5Digest( file ) );
         }
-
-        File file = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".properties" );
-
-        writeIndexProperties( request, info, file );
-
-        FileUtils.fileWrite(
-            new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
-            DigesterUtils.getSha1Digest( file ) );
-
-        FileUtils.fileWrite( new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(), DigesterUtils
-            .getMd5Digest( file ) );
     }
 
     private Map<String, List<Integer>> getIndexChunks( IndexPackingRequest request )
@@ -205,13 +215,16 @@ public class DefaultIndexPacker
                 indexes,
                 file );
 
-            FileUtils.fileWrite(
-                new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
-                DigesterUtils.getSha1Digest( file ) );
+            if ( request.isCreateChecksumFiles() )
+            {
+                FileUtils.fileWrite(
+                    new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
+                    DigesterUtils.getSha1Digest( file ) );
 
-            FileUtils.fileWrite(
-                new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
-                DigesterUtils.getMd5Digest( file ) );
+                FileUtils.fileWrite(
+                    new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
+                    DigesterUtils.getMd5Digest( file ) );
+            }
 
             n++;
 
