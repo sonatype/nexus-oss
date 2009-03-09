@@ -1,5 +1,7 @@
 package org.sonatype.plugin.nexus.testenvironment;
 
+import java.io.File;
+
 public class MavenArtifact
 {
 
@@ -8,6 +10,20 @@ public class MavenArtifact
     private String classifier;
 
     private String groupId;
+
+    private File outputDirectory;
+
+    private String outputProperty;
+
+    public String getOutputProperty()
+    {
+        return outputProperty;
+    }
+
+    public void setOutputProperty( String outputProperty )
+    {
+        this.outputProperty = outputProperty;
+    }
 
     private String type;
 
@@ -45,6 +61,11 @@ public class MavenArtifact
         return groupId;
     }
 
+    public File getOutputDirectory()
+    {
+        return outputDirectory;
+    }
+
     public String getType()
     {
         return type;
@@ -63,6 +84,11 @@ public class MavenArtifact
     public void setGroupId( String groupId )
     {
         this.groupId = groupId;
+    }
+
+    public void setOutputDirectory( File outputDirectory )
+    {
+        this.outputDirectory = outputDirectory;
     }
 
     public void setType( String type )

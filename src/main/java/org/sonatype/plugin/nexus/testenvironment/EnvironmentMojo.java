@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.Set;
 
@@ -110,6 +109,13 @@ public class EnvironmentMojo
     private MavenArtifact[] nexusPluginsArtifacts;
 
     /**
+     * Artifact file containing nexus bundle
+     *
+     * @parameter
+     */
+    private MavenArtifact[] extraResourcesArtifacts;
+
+    /**
      * When true setup a maven instance
      *
      * @parameter default-value="true"
@@ -173,10 +179,9 @@ public class EnvironmentMojo
         File pluginFolder = new File( nexusBaseDir, "runtime/apps/nexus/lib" );
         copyEmma( pluginFolder );
 
-        Set<Artifact> plugins = getMavenArtifacts( nexusPluginsArtifacts );
-        if ( plugins != null )
+        if ( nexusPluginsArtifacts != null )
         {
-            setupPlugins( nexusBaseDir, plugins, pluginFolder );
+            setupPlugins( nexusBaseDir, nexusPluginsArtifacts, pluginFolder );
         }
 
         if ( setupMaven )
@@ -193,11 +198,11 @@ public class EnvironmentMojo
             project.getProperties().put( "test-resources-folder", getPath( resourcesDestinationLocation ) );
 
             File fakeRepository = new File( resourcesSourceLocation, "fake-central" );
+            File fakeRepoDest = new File( mavenLocation, "fake-repo" );
+            project.getProperties().put( "maven-repository", getPath( fakeRepoDest ) );
             if ( fakeRepository.isDirectory() )
             {
-                File fakeRepoDest = new File( mavenLocation, "fake-repo" );
                 copyDirectory( fakeRepository, fakeRepoDest );
-                project.getProperties().put( "maven-repository", getPath( fakeRepoDest ) );
             }
 
             File defaultConfig = new File( resourcesDestinationLocation, "default-configs" );
@@ -223,6 +228,42 @@ public class EnvironmentMojo
                 merge( baseTestProperties, testSuiteProperties, "properties" );
             }
 
+        }
+
+        if ( extraResourcesArtifacts != null )
+        {
+            copyExtraResources();
+        }
+
+        File componentsXml = new File( project.getBasedir(), "src/test/resources/components.xml" );
+        if ( componentsXml.exists() )
+        {
+            copyAndInterpolate( componentsXml.getParentFile(), new File( project.getBuild().getTestOutputDirectory(),
+                                                                         "META-INF/plexus" ) );
+        }
+    }
+
+    private void copyExtraResources()
+        throws MojoExecutionException, MojoFailureException
+    {
+        for ( MavenArtifact extraResource : extraResourcesArtifacts )
+        {
+            Artifact artifact = getMavenArtifact( extraResource );
+
+            File destination;
+            if ( extraResource.getOutputDirectory() != null )
+            {
+                destination = extraResource.getOutputDirectory();
+            }
+            else if ( extraResource.getOutputProperty() != null )
+            {
+                destination = new File( project.getProperties().getProperty( extraResource.getOutputProperty() ) );
+            }
+            else
+            {
+                destination = resourcesDestinationLocation;
+            }
+            unpack( artifact.getFile(), destination, artifact.getType() );
         }
     }
 
@@ -307,6 +348,8 @@ public class EnvironmentMojo
     private void copyDirectory( File sourceDir, File destinationDir )
         throws MojoExecutionException
     {
+        destinationDir.mkdirs();
+
         getLog().info( "Copying dir '" + sourceDir + "'" );
         try
         {
@@ -321,11 +364,11 @@ public class EnvironmentMojo
     private void copyAndInterpolate( File sourceDir, File destinationDir )
         throws MojoExecutionException
     {
+        destinationDir.mkdirs();
+
         getLog().info( "Copying and interpolating dir '" + sourceDir + "'" );
         try
         {
-            FileUtils.copyDirectoryStructure( sourceDir, destinationDir );
-
             DirectoryScanner scanner = new DirectoryScanner();
 
             scanner.setBasedir( sourceDir );
@@ -335,13 +378,14 @@ public class EnvironmentMojo
             String[] files = scanner.getIncludedFiles();
             for ( String file : files )
             {
-                mavenFileFilter.copyFile( new File( sourceDir, file ), new File( destinationDir, file ), true, project,
-                                          null, false, "UTF-8", session );
+                File source = new File( sourceDir, file );
+                source.getParentFile().mkdirs();
+
+                File destination = new File( destinationDir, file );
+                destination.getParentFile().mkdirs();
+
+                mavenFileFilter.copyFile( source, destination, true, project, null, false, "UTF-8", session );
             }
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Failed to copy : " + sourceDir, e );
         }
         catch ( MavenFilteringException e )
         {
@@ -387,23 +431,40 @@ public class EnvironmentMojo
         copy( artifact.getFile(), pluginFolder );
     }
 
-    private void setupPlugins( File nexusBaseDir, Set<Artifact> plugins, File pluginFolder )
+    private void setupPlugins( File nexusBaseDir, MavenArtifact[] nexusPluginsArtifacts, File pluginsFolder )
         throws MojoFailureException, MojoExecutionException
     {
 
-        for ( Artifact plugin : plugins )
+        for ( MavenArtifact plugin : nexusPluginsArtifacts )
         {
-            if ( "jar".equals( plugin.getType() ) )
+            Artifact pluginArtifact = getMavenArtifact( plugin );
+
+            File destination;
+            if ( plugin.getOutputDirectory() != null )
             {
-                copy( plugin.getFile(), pluginFolder );
+                destination = plugin.getOutputDirectory();
             }
-            else if ( "zip".equals( plugin.getType() ) || "tar.gz".equals( plugin.getType() ) )
+            else if ( plugin.getOutputProperty() != null )
             {
-                unpack( plugin.getFile(), pluginFolder, plugin.getType() );
+                destination = new File( project.getProperties().getProperty( plugin.getOutputProperty() ) );
             }
             else
             {
-                throw new MojoFailureException( "Invalid plugin type: " + plugin.getType() );
+                destination = pluginsFolder;
+            }
+
+            String type = pluginArtifact.getType();
+            if ( "jar".equals( type ) )
+            {
+                copy( pluginArtifact.getFile(), destination );
+            }
+            else if ( "zip".equals( type ) || "tar.gz".equals( type ) )
+            {
+                unpack( pluginArtifact.getFile(), destination, plugin.getType() );
+            }
+            else
+            {
+                throw new MojoFailureException( "Invalid plugin type: " + type );
             }
         }
     }
@@ -438,6 +499,8 @@ public class EnvironmentMojo
     private void unpack( File sourceFile, File destDirectory, String type )
         throws MojoExecutionException
     {
+        destDirectory.mkdirs();
+
         UnArchiver unarchiver;
         try
         {
@@ -458,26 +521,6 @@ public class EnvironmentMojo
         {
             throw new MojoExecutionException( "Unable to unpack " + sourceFile, e );
         }
-    }
-
-    private Set<Artifact> getMavenArtifacts( MavenArtifact... mavenArtifacts )
-        throws MojoExecutionException, MojoFailureException
-    {
-        if ( mavenArtifacts == null )
-        {
-            return null;
-        }
-
-        Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
-
-        for ( MavenArtifact mavenArtifact : mavenArtifacts )
-        {
-            Artifact bundle = getMavenArtifact( mavenArtifact );
-
-            artifacts.add( bundle );
-        }
-
-        return artifacts;
     }
 
     @SuppressWarnings( "unchecked" )
