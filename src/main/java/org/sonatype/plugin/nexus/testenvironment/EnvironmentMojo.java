@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -34,6 +37,8 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.plugins.portallocator.Port;
+import org.sonatype.plugins.portallocator.PortAllocatorMojo;
 
 /**
  * @author velo
@@ -153,6 +158,8 @@ public class EnvironmentMojo
     {
         init();
 
+        allocatePorts();
+
         project.getProperties().put( "jetty-application-host", "0.0.0.0" );
         project.getProperties().put(
                                      "nexus-base-url",
@@ -241,6 +248,23 @@ public class EnvironmentMojo
             copyAndInterpolate( componentsXml.getParentFile(), new File( project.getBuild().getTestOutputDirectory(),
                                                                          "META-INF/plexus" ) );
         }
+    }
+
+    private void allocatePorts()
+        throws MojoExecutionException, MojoFailureException
+    {
+        List<Port> portsList = new ArrayList<Port>();
+        portsList.add( new Port( "proxy-repo-port" ) );
+        portsList.add( new Port( "proxy-repo-control-port" ) );
+        portsList.add( new Port( "nexus-application-port" ) );
+        portsList.add( new Port( "nexus-control-port" ) );
+        portsList.add( new Port( "email-server-port" ) );
+        portsList.add( new Port( "webproxy-server-port" ) );
+
+        PortAllocatorMojo portAllocator = new PortAllocatorMojo();
+        portAllocator.setProject( project );
+        portAllocator.setPorts( portsList.toArray( new Port[0] ) );
+        portAllocator.execute();
     }
 
     private void copyExtraResources()
@@ -378,16 +402,29 @@ public class EnvironmentMojo
             String[] files = scanner.getIncludedFiles();
             for ( String file : files )
             {
+                String extension = FileUtils.getExtension( file );
+
                 File source = new File( sourceDir, file );
-                source.getParentFile().mkdirs();
 
                 File destination = new File( destinationDir, file );
                 destination.getParentFile().mkdirs();
 
-                mavenFileFilter.copyFile( source, destination, true, project, null, false, "UTF-8", session );
+                if ( Arrays.asList( "zip", "jar", "tar.gz" ).contains( extension ) )
+                {
+                    // just copy know binaries
+                    FileUtils.copyFile( source, destination );
+                }
+                else
+                {
+                    mavenFileFilter.copyFile( source, destination, true, project, null, false, "UTF-8", session );
+                }
             }
         }
         catch ( MavenFilteringException e )
+        {
+            throw new MojoExecutionException( "Failed to copy : " + sourceDir, e );
+        }
+        catch ( IOException e )
         {
             throw new MojoExecutionException( "Failed to copy : " + sourceDir, e );
         }
