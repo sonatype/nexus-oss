@@ -111,7 +111,7 @@ public class PlexusServerServlet
 
         if ( result == null && defaultValue != null )
         {
-            result = getServletConfig().getServletName() + "." + defaultValue;
+            result = defaultValue;
         }
 
         return result;
