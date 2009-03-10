@@ -64,7 +64,9 @@ public class NexusIndexerCli
 
     public static final char TARGET_DIR = 'd';
 
-    public static final String CHUNK_RESOLUTION_NONE = "none";
+    public static final char CREATE_INCREMENTAL_CHUNKS = 'c';
+
+    public static final char CREATE_FILE_CHECKSUMS = 's';
 
     private static final long MB = 1024 * 1024;
 
@@ -99,6 +101,12 @@ public class NexusIndexerCli
 
         options.addOption( OptionBuilder.withLongOpt( "name" ).hasArg() //
         .withDescription( "Repository name." ).create( NAME ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "chunks" ) //
+        .withDescription( "Create incremental chunks." ).create( CREATE_INCREMENTAL_CHUNKS ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "checksums" ) //
+        .withDescription( "Create checksums for all files (sha1, md5)." ).create( CREATE_FILE_CHECKSUMS ) );
 
         options.addOption( OptionBuilder.withLongOpt( "type" ).hasArg() //
         .withDescription( "Indexer type (default, min, full or coma separated list of custom types)." ).create( TYPE ) );
@@ -149,11 +157,33 @@ public class NexusIndexerCli
 
         List<IndexCreator> indexers = getIndexers( cli, plexus );
 
+        boolean createChecksums = cli.hasOption( CREATE_FILE_CHECKSUMS );
+
+        boolean createIncrementalChunks = cli.hasOption( CREATE_INCREMENTAL_CHUNKS );
+
         System.err.printf( "Repository Folder: %s\n", repositoryFolder.getAbsolutePath() );
         System.err.printf( "Index Folder:      %s\n", indexFolder.getAbsolutePath() );
         System.err.printf( "Output Folder:     %s\n", outputFolder.getAbsolutePath() );
         System.err.printf( "Repository name:   %s\n", repositoryName );
         System.err.printf( "Indexers: %s\n", indexers.toString() );
+        
+        if ( createChecksums )
+        {
+            System.err.printf( "Will create checksum files for all published files (sha1, md5).\n" );
+        }
+        else
+        {
+            System.err.printf( "Will not create checksum files.\n" );
+        }
+        
+        if ( createIncrementalChunks )
+        {
+            System.err.printf( "Will create incremental chunks for changes, along with baseline file.\n" );
+        }
+        else
+        {
+            System.err.printf( "Will create incremental chunks.\n" );
+        }
 
         NexusIndexer indexer = plexus.lookup( NexusIndexer.class );
 
@@ -177,8 +207,10 @@ public class NexusIndexerCli
         indexer.scan( context, listener, true );
 
         IndexPackingRequest request = new IndexPackingRequest( context, outputFolder );
-        
-        request.setCreateChecksumFiles( true );
+
+        request.setCreateChecksumFiles( createChecksums );
+
+        request.setCreateIncrementalChunks( createIncrementalChunks );
 
         packIndex( packer, request, debug );
 
