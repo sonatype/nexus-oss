@@ -33,10 +33,12 @@ public class ArtifactoryMigrationResourceBundle
 
         result.add( new DefaultStaticResource(
             getClass().getResource( "/static/js/repoServer.ArtifactoryMigrationPanel.js" ),
-            "/js/repoServer/repoServer.ArtifactoryMigrationPanel.js" ) );
+            "/js/repoServer/repoServer.ArtifactoryMigrationPanel.js",
+            "application/x-javascript" ) );
         result.add( new DefaultStaticResource(
             getClass().getResource( "/static/style/ArtifactoryMigration.css" ),
-            "/style/ArtifactoryMigration.css" ) );
+            "/style/ArtifactoryMigration.css",
+            "text/css" ) );
 
         return result;
     }
@@ -44,7 +46,13 @@ public class ArtifactoryMigrationResourceBundle
     @Override
     public String getPostHeadContribution( Map<String, Object> ctx )
     {
-        return "<script src=\"js/repoServer/repoServer.ArtifactoryMigrationPanel.js\" type=\"text/javascript\" charset=\"utf-8\"></script> \n"
-            + "<link rel=\"stylesheet\" href=\"style/ArtifactoryMigration.css\" type=\"text/css\" media=\"screen\" title=\"no title\" charset=\"utf-8\">";
+        String version = getVersionFromJarFile( "/META-INF/maven/org.sonatype.nexus.plugins/nexus-migration-plugin-artifactory/pom.properties" );
+        
+        return "<script src=\"js/repoServer/repoServer.ArtifactoryMigrationPanel.js" 
+            + ( version == null ? "" : "?" + version ) 
+            + "\" type=\"text/javascript\" charset=\"utf-8\"></script>"
+            + "<link rel=\"stylesheet\" href=\"style/ArtifactoryMigration.css" 
+            + ( version == null ? "" : "?" + version ) 
+            + "\" type=\"text/css\" media=\"screen\" title=\"no title\" charset=\"utf-8\">";
     }
 }
