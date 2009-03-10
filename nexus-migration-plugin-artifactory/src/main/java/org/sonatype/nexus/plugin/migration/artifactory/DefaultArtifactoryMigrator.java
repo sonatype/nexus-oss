@@ -230,7 +230,7 @@ public class DefaultArtifactoryMigrator
         }
         else
         {
-            result.addInfoMessage( "Migration finished without any error." );
+            result.addInfoMessage( "Migration finished." );
         }
 
         result.setSuccessful( true );

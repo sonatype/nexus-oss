@@ -70,6 +70,31 @@ public class Nexus1435MapRepositoriesTest
     }
 
     @Test
+    public void downloadMixedRepoSnapshot()
+    throws Exception
+    {
+
+        File artifact = getTestFile( "artifact.jar" );
+        URL url =
+            new URL( "http://localhost:" + nexusApplicationPort
+                     + "/artifactory/main-local/nxcm255/snapshot/1.0-SNAPSHOT/snapshot-1.0.jar" );
+        File downloaded;
+        try
+        {
+            downloaded = this.downloadFile( url, "target/downloads/nxcm255" );
+        }
+        catch ( IOException e )
+        {
+            Assert.fail( "Unable to download artifact " + url + " got:\n" + e.getMessage() );
+            throw e; // never happen
+        }
+
+        Assert.assertTrue( "Downloaded artifact was not right, checksum comparation fail " + url,
+                           FileTestingUtils.compareFileSHA1s( artifact, downloaded ) );
+
+    }
+
+    @Test
     public void resolveMixedRepo() throws Exception {
         File mavenProject = getTestFile( "maven-project" );
 

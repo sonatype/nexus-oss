@@ -63,7 +63,10 @@ public class ImportMessageUtil
 
         Response response = RequestFacade.sendMessage( serviceURI, Method.POST, requestRepresentation );
 
-        Assert.assertEquals( 201, response.getStatus().getCode() );
+        if ( 201 != response.getStatus().getCode() )
+        {
+            Assert.fail( "Invalid response for server " + response.getEntity().getText() );
+        }
 
         String responseString = response.getEntity().getText();
 
@@ -71,8 +74,8 @@ public class ImportMessageUtil
 
         XStreamRepresentation responseRepresentation = new XStreamRepresentation( xstream, responseString, mediaType );
 
-        MigrationSummaryResponseDTO migrationSummaryResponse = (MigrationSummaryResponseDTO) responseRepresentation
-            .getPayload( new MigrationSummaryResponseDTO() );
+        MigrationSummaryResponseDTO migrationSummaryResponse =
+            (MigrationSummaryResponseDTO) responseRepresentation.getPayload( new MigrationSummaryResponseDTO() );
 
         return migrationSummaryResponse.getData();
 
@@ -84,16 +87,12 @@ public class ImportMessageUtil
         MigrationSummaryRequestDTO request = new MigrationSummaryRequestDTO();
         request.setData( migrationSummary );
 
-        XStreamRepresentation representation = new XStreamRepresentation(
-            XStreamFactory.getXmlXStream(),
-            "",
-            MediaType.APPLICATION_XML );
+        XStreamRepresentation representation =
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), "", MediaType.APPLICATION_XML );
         representation.setPayload( request );
 
-        Response response = RequestFacade.sendMessage(
-            "service/local/migration/artifactory/content",
-            Method.POST,
-            representation );
+        Response response =
+            RequestFacade.sendMessage( "service/local/migration/artifactory/content", Method.POST, representation );
 
         return response;
     }

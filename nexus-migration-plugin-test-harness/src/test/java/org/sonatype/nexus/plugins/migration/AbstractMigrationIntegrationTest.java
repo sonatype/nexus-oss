@@ -38,7 +38,7 @@ import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-public class AbstractMigrationIntegrationTest
+public abstract class AbstractMigrationIntegrationTest
     extends AbstractNexusIntegrationTest
 {
 

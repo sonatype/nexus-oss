@@ -20,7 +20,7 @@ public class Nexus1450LoadMappingTest
     {
         super.copyConfigFiles();
 
-        this.copyConfigFile( "mapping.xml", RELATIVE_WORK_CONF_DIR );
+        this.copyConfigFile( "mapping.xml", WORK_CONF_DIR );
     }
 
     @Test
