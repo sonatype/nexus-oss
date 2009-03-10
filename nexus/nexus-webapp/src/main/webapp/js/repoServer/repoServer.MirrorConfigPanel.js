@@ -138,7 +138,7 @@ Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
         url :url
       },
       allowChildren :false,
-      draggable :false,
+      draggable :true,
       leaf :true,
       icon : icon
     }));
@@ -372,9 +372,11 @@ Sonatype.repoServer.ProxyMirrorEditor = function (config) {
               autoScroll :true,
               containerScroll :true,
               rootVisible :false,
-              enableDD :false,
+              ddScroll: true,
+              enableDD: true,
               root :new Ext.tree.TreeNode( {
-                text :'root'
+                text :'root',
+                draggable: false
               })
             }, {
               xtype :'panel',
