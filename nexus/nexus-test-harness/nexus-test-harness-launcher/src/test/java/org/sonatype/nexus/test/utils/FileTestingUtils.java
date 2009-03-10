@@ -23,10 +23,13 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 
@@ -259,24 +262,35 @@ public class FileTestingUtils
         String[] files = scan.getIncludedFiles();
         for ( String fileName : files )
         {
-            FileReader reader = null;
-            FileWriter writer = null;
-            try
+            String extension = FilenameUtils.getExtension( fileName );
+            File sourceFile = new File( from, fileName );
+            File destFile = new File( dest, fileName );
+            destFile.getParentFile().mkdirs();
+
+            if ( Arrays.asList( "zip", "jar", "tar.gz" ).contains( extension ) )
             {
-                reader = new FileReader( new File( from, fileName ) );
-                InterpolationFilterReader filterReader = new InterpolationFilterReader( reader, variables );
-
-                File destFile = new File( dest, fileName );
-                destFile.getParentFile().mkdirs();
-
-                writer = new FileWriter( destFile );
-
-                IOUtil.copy( filterReader, writer );
+                //just copy know binaries
+                FileUtils.copyFile( sourceFile, destFile );
             }
-            finally
+            else
             {
-                IOUtil.close(reader);
-                IOUtil.close(writer);
+                FileReader reader = null;
+                FileWriter writer = null;
+                try
+                {
+                    reader = new FileReader( sourceFile );
+                    InterpolationFilterReader filterReader = new InterpolationFilterReader( reader, variables );
+
+                    writer = new FileWriter( destFile );
+
+                    IOUtil.copy( filterReader, writer );
+                }
+                finally
+                {
+                    IOUtil.close( reader );
+                    IOUtil.close( writer );
+                }
+
             }
         }
 
