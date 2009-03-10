@@ -117,7 +117,7 @@ public class NexusTargetMappingAuthorizationFilter
     }
 
     @Override
-    protected Action getActionFromHttpVerb( ServletRequest request )
+    protected String getActionFromHttpVerb( ServletRequest request )
     {
         String action = ( (HttpServletRequest) request ).getMethod().toLowerCase();
 
@@ -185,10 +185,10 @@ public class NexusTargetMappingAuthorizationFilter
                 throw new IllegalStateException( "Cannot lookup NexusArtifactAuthorizer!", e );
             }
         }
-
+        
         return nexusItemAuthorizer.authorizePath(
             getResourceStoreRequest( request, false ),
             null,
-            getActionFromHttpVerb( request ) );
+            Action.valueOf( getActionFromHttpVerb( request ) ) );
     }
 }

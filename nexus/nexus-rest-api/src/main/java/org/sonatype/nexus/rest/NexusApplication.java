@@ -48,6 +48,11 @@ import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 
 import com.thoughtworks.xstream.XStream;
 
+
+//TODO: extend from PlexusSecureApplication
+
+
+
 /**
  * Nexus REST Application. This will ultimately replace the two applications we have now, and provide us plugin UI
  * extension capability.
@@ -59,6 +64,7 @@ public class NexusApplication
     extends PlexusRestletApplicationBridge
     implements EventListener
 {
+    
     @Requirement
     private Nexus nexus;
 

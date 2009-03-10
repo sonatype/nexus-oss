@@ -37,99 +37,14 @@ import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
  * @author cstamas
  */
 public class HttpVerbMappingAuthorizationFilter
-    extends PermissionsAuthorizationFilter
+    extends org.sonatype.jsecurity.web.filter.authz.HttpVerbMappingAuthorizationFilter
 {
-    private final Log logger = LogFactory.getLog( this.getClass() );
     
     private AuthcAuthzEvent currentAuthzEvt;
-
-    private Map<String, String> mapping = new HashMap<String, String>();
-    {
-        mapping.put( "head", "read" );
-        mapping.put( "get", "read" );
-        mapping.put( "put", "update" );
-        mapping.put( "post", "create" );
-        mapping.put( "mkcol", "create" );
-    }
-
-    protected Log getLogger()
-    {
-        return logger;
-    }
-
+    
     protected Nexus getNexus( ServletRequest request )
     {
         return (Nexus) request.getAttribute( Nexus.class.getName() );
-    }
-
-    protected Action getActionFromHttpVerb( String method )
-    {
-        method = method.toLowerCase();
-
-        if ( mapping.containsKey( method ) )
-        {
-            method = mapping.get( method );
-        }
-
-        return Action.valueOf( method );
-    }
-
-    protected Action getActionFromHttpVerb( ServletRequest request )
-    {
-        String action = ( (HttpServletRequest) request ).getMethod();
-
-        return getActionFromHttpVerb( action );
-    }
-
-    protected String[] mapPerms( String[] perms, Action action )
-    {
-        if ( perms != null && perms.length > 0 && action != null )
-        {
-            String[] mappedPerms = new String[perms.length];
-
-            for ( int i = 0; i < perms.length; i++ )
-            {
-                mappedPerms[i] = perms[i] + ":" + action;
-            }
-
-            if ( getLogger().isDebugEnabled() )
-            {
-                StringBuffer sb = new StringBuffer();
-
-                for ( int i = 0; i < mappedPerms.length; i++ )
-                {
-                    sb.append( mappedPerms[i] );
-
-                    sb.append( ", " );
-                }
-
-                getLogger().debug(
-                    "MAPPED '" + action + "' action to permission: " + sb.toString().substring( 0, sb.length() - 2 ) );
-            }
-
-            return mappedPerms;
-        }
-        else
-        {
-            return perms;
-        }
-    }
-
-    @Override
-    public boolean isAccessAllowed( ServletRequest request, ServletResponse response, Object mappedValue )
-        throws IOException
-    {
-        String[] perms = (String[]) mappedValue;
-
-        if ( super.isAccessAllowed( request, response, mapPerms( perms, getActionFromHttpVerb( request ) ) ) )
-        {
-            // I wanted to record all successful authz events here, but found that, if we do record here, there would be
-            // too many feed entries, that's a pollution
-
-            return true;
-        }
-
-        return false;
     }
 
     @Override
