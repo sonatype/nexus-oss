@@ -13,8 +13,11 @@
  */
 package org.sonatype.nexus.plugins.rest;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class AbstractNexusResourceBundle
     implements NexusResourceBundle
@@ -42,6 +45,28 @@ public class AbstractNexusResourceBundle
     public String getPostBodyContribution( Map<String, Object> context )
     {
         return null;
+    }
+    
+    protected String getVersionFromJarFile( String path )
+    {
+        Properties props = new Properties();
+
+        InputStream is = getClass().getResourceAsStream( path );
+
+        if ( is != null )
+        {
+            try
+            {
+                props.load( is );
+            }
+            catch ( IOException e )
+            {
+                //no prop file ?? back out
+                return null;
+            }
+        }
+
+        return props.getProperty( "version" );
     }
 
 }

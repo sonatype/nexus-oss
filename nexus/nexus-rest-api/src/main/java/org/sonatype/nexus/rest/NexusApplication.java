@@ -588,7 +588,7 @@ public class NexusApplication
                 {
                     for ( StaticResource resource : resources )
                     {
-                        attach( root, true, resource.getPath(), new StaticResourceFinder( getContext(), resource ) );
+                        attach( root, false, resource.getPath(), new StaticResourceFinder( getContext(), resource ) );
                     }
                 }
             }

@@ -20,8 +20,9 @@ public class LvoResourceBundle
         List<StaticResource> result = new ArrayList<StaticResource>();
 
         result.add( new DefaultStaticResource(
-            getClass().getResource( "/static/js/repoServer.NexusUpgradeChecker.js" ),
-            "/js/repoServer/repoServer.NexusUpgradeChecker.js" ) );
+            getClass().getResource( "/static/js/nexus-lvo-plugin-all.js" ),
+            "/js/repoServer/nexus-lvo-plugin-all.js",
+            "application/x-javascript" ) );
 
         return result;
     }
@@ -29,7 +30,11 @@ public class LvoResourceBundle
     @Override
     public String getPostHeadContribution( Map<String, Object> ctx )
     {
-        return "<script src=\"js/repoServer/repoServer.NexusUpgradeChecker.js\" type=\"text/javascript\" charset=\"utf-8\"></script>";
+        String version = getVersionFromJarFile( "/META-INF/maven/org.sonatype.nexus.plugins/nexus-lvo-plugin/pom.properties" );
+        
+        return "<script src=\"js/repoServer/nexus-lvo-plugin-all.js" 
+        + ( version == null ? "" : "?" + version ) 
+        + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
     }
 
 }

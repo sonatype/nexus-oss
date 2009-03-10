@@ -16,6 +16,7 @@ package org.sonatype.nexus.rest;
 import org.restlet.Context;
 import org.restlet.Finder;
 import org.restlet.Handler;
+import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.plugins.rest.StaticResource;
@@ -36,6 +37,8 @@ public class StaticResourceFinder
 
     public Handler createTarget( Request request, Response response )
     {
+        StaticHeaderUtil.addResponseHeaders( response );
+        
         StaticResourceResource resourceResource = new StaticResourceResource( context, request, response, resource );
 
         return resourceResource;

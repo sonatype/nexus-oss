@@ -26,17 +26,16 @@ public class DefaultStaticResource
     private final String path;
 
     private volatile URLConnection urlConnection;
+    
+    private String contentType;
 
-    public DefaultStaticResource( URL url )
-    {
-        this( url, null );
-    }
-
-    public DefaultStaticResource( URL url, String path )
+    public DefaultStaticResource( URL url, String path, String contentType )
     {
         this.resourceURL = url;
 
         this.path = path;
+        
+        this.contentType = contentType;
     }
 
     protected synchronized boolean checkConnection()
@@ -83,7 +82,11 @@ public class DefaultStaticResource
 
     public String getContentType()
     {
-        if ( checkConnection() )
+        if ( contentType != null )
+        {
+            return contentType;
+        }
+        else if ( checkConnection() )
         {
             return urlConnection.getContentType();
         }
