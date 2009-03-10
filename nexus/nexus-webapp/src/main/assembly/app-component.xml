@@ -35,16 +35,30 @@
         <include>ext-2.2/resources/css/ext-all.css</include>
         <include>ext-2.2/resources/css/xtheme-gray.css</include>
         <include>ext-2.2/resources/images/**</include>
-        <include>images/**</include>
         <include>js/*</include>
         <include>js/extensions/*</include>
         <include>js/filetree/js/Ext.ux.form.BrowseButton.js</include>
         <include>js/repoServer/*</include>
         <include>style/Sonatype.css</include>
         <include>style/Sonatype-content.css</include>
+        <include>images/**</include>
         <include>WEB-INF/*</include>
       </includes>
     </fileSet>
+	<fileSet>
+	  <directory>target/ui-compressed/js</directory>
+	  <outputDirectory>/${pom.build.finalName}/runtime/apps/nexus/webapp/js</outputDirectory>
+	  <includes>
+	    <include>sonatype-all.js</include>
+	  </includes>
+	</fileSet>
+	<fileSet>
+	  <directory>target/ui-compressed/style</directory>
+	  <outputDirectory>/${pom.build.finalName}/runtime/apps/nexus/webapp/style</outputDirectory>
+	  <includes>
+	    <include>sonatype-all.css</include>
+	  </includes>
+	</fileSet>
     <fileSet>
       <directory>target/nexus-tools</directory>
       <outputDirectory>/${pom.build.finalName}/runtime/apps/nexus/tools</outputDirectory>

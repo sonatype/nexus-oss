@@ -564,7 +564,7 @@ public class NexusApplication
         attach( root, true, indexTemplateResource );
 
         // publish the WAR contents
-        Directory rootDir = new Directory( getContext(), "war:///" );
+        Directory rootDir = new NexusDirectory( getContext(), "war:///" );
         rootDir.setListingAllowed( false );
         rootDir.setNegotiateContent( false );
         attach( root, false, "/", rootDir );

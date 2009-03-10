@@ -20,13 +20,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.index.IndexFileNameFilter;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -46,13 +50,17 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 @Component( role = ManagedPlexusResource.class, hint = "indexTemplate" )
 public class IndexTemplatePlexusResource
     extends AbstractPlexusResource
-    implements ManagedPlexusResource
+    implements ManagedPlexusResource,
+        Initializable
 {
     @Requirement
     private Nexus nexus;
 
     @Requirement( role = NexusResourceBundle.class )
     private Map<String, NexusResourceBundle> bundles;
+    
+    @Configuration( value = "${index.template.file}" )
+    String templateFilename;
 
     public IndexTemplatePlexusResource()
     {
@@ -115,7 +123,7 @@ public class IndexTemplatePlexusResource
 
         VelocityRepresentation templateRepresentation = new VelocityRepresentation(
             context,
-            "/templates/index.vm",
+            templateFilename,
             MediaType.TEXT_HTML );
 
         // gather plugin stuff
@@ -242,6 +250,16 @@ public class IndexTemplatePlexusResource
                     "Got ResourceNotFoundException exception during Velocity invocation!",
                     e );
             }
+        }
+    }
+    
+    public void initialize()
+        throws InitializationException
+    {
+        //Hasn't been interpolated
+        if ( "${index.template.file}".equals( templateFilename ) )
+        {
+            templateFilename = "templates/index.vm";
         }
     }
 }
