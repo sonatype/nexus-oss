@@ -227,7 +227,7 @@ public class EnvironmentMojo
             }
 
             File baseTestProperties = new File( project.getBuild().getTestOutputDirectory(), "baseTest.properties" );
-            copyUrl( "/baseTest.properties", baseTestProperties );
+            copyUrl( "/default-config/baseTest.properties", baseTestProperties );
 
             File testSuiteProperties = new File( resourcesSourceLocation, "baseTest.properties" );
             if ( testSuiteProperties.isFile() )
@@ -242,11 +242,14 @@ public class EnvironmentMojo
             copyExtraResources();
         }
 
+        File destinationComponents =
+            new File( project.getBuild().getTestOutputDirectory(), "META-INF/plexus/components.xml" );
+        copyUrl( "/default-config/components.xml", destinationComponents );
+
         File componentsXml = new File( project.getBasedir(), "src/test/resources/components.xml" );
         if ( componentsXml.exists() )
         {
-            copyAndInterpolate( componentsXml.getParentFile(), new File( project.getBuild().getTestOutputDirectory(),
-                                                                         "META-INF/plexus" ) );
+            copyAndInterpolate( componentsXml.getParentFile(), destinationComponents.getParentFile() );
         }
     }
 
