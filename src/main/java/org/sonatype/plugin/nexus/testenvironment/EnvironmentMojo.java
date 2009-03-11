@@ -180,7 +180,7 @@ public class EnvironmentMojo
         project.getProperties().put( "nexus-base-dir", getPath( nexusBaseDir ) );
         project.getProperties().put( "nexus-work-dir", getPath( new File( destination, "nexus-work-dir" ) ) );
 
-        copyUrl( "/plexus.properties", new File( nexusBaseDir, "conf/plexus.properties" ) );
+        copyUrl( "/default-config/plexus.properties", new File( nexusBaseDir, "conf/plexus.properties" ) );
         project.getProperties().put( "nexus-plexus-config-file", getPath( new File( nexusBaseDir, "conf/plexus.xml" ) ) );
 
         File pluginFolder = new File( nexusBaseDir, "runtime/apps/nexus/lib" );
