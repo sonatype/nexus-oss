@@ -34,16 +34,6 @@ public class DefaultSchedulerTest
         super.setUp();
 
         defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
-
-        defaultScheduler.startService();
-    }
-
-    public void tearDown()
-        throws Exception
-    {
-        defaultScheduler.stopService();
-
-        super.tearDown();
     }
 
     public void testSimpleRunnable()

@@ -27,16 +27,6 @@ public class RunNowSchedulerTest
         super.setUp();
 
         defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
-
-        defaultScheduler.startService();
-    }
-
-    public void tearDown()
-        throws Exception
-    {
-        defaultScheduler.stopService();
-
-        super.tearDown();
     }
 
     public void testRunNowRunnable()
@@ -56,7 +46,7 @@ public class RunNowSchedulerTest
         assertEquals( 1, tr.getRunCount() );
 
         assertEquals( TaskState.FINISHED, st.getTaskState() );
-        
+
         assertNull( st.getNextRun() );
 
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
@@ -83,7 +73,7 @@ public class RunNowSchedulerTest
         assertEquals( Integer.valueOf( 0 ), st.getResults().get( 0 ) );
 
         assertEquals( TaskState.FINISHED, st.getTaskState() );
-        
+
         assertNull( st.getNextRun() );
 
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );

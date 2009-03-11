@@ -30,6 +30,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
@@ -44,7 +45,7 @@ import org.sonatype.scheduling.schedules.Schedule;
 @Component( role = Scheduler.class )
 public class DefaultScheduler
     extends AbstractLogEnabled
-    implements Scheduler
+    implements Scheduler, Startable
 {
     @Requirement
     private PlexusContainer plexusContainer;
@@ -62,7 +63,7 @@ public class DefaultScheduler
 
     private int threadPriority = Thread.MIN_PRIORITY;
 
-    public void startService()
+    public void start()
         throws StartingException
     {
         tasksMap = new HashMap<String, List<ScheduledTask<?>>>();
@@ -76,7 +77,7 @@ public class DefaultScheduler
         taskConfig.initializeTasks( this );
     }
 
-    public void stopService()
+    public void stop()
         throws StoppingException
     {
         getScheduledExecutorService().shutdown();

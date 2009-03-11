@@ -7,7 +7,6 @@ import java.util.concurrent.Callable;
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.Schedule;
-import org.sonatype.scheduling.schedules.WeeklySchedule;
 
 public class DisabledScheduledTaskTest
     extends PlexusTestCase
@@ -20,16 +19,6 @@ public class DisabledScheduledTaskTest
         super.setUp();
 
         defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
-
-        defaultScheduler.startService();
-    }
-
-    public void tearDown()
-        throws Exception
-    {
-        defaultScheduler.stopService();
-
-        super.tearDown();
     }
 
     public void testRunDisabledTaske()

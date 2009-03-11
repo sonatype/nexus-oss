@@ -21,12 +21,6 @@ import org.sonatype.scheduling.schedules.Schedule;
 
 public interface Scheduler
 {
-    void startService()
-        throws Exception;
-
-    void stopService()
-        throws Exception;
-
     /**
      * Initialize a task on bootup.
      * 
