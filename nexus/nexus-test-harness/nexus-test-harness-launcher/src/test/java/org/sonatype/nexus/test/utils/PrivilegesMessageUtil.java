@@ -25,14 +25,14 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.rest.model.NexusError;
-import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.plexus.rest.resource.error.ErrorMessage;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -148,13 +148,13 @@ public class PrivilegesMessageUtil
         // has to do 1->n mapping (it knows what _will_ 'data' field contain)
         xstream.alias( "data", org.sonatype.nexus.rest.model.PrivilegeListResourceResponse.class );
 
-        NexusErrorResponse errorResponse = (NexusErrorResponse) xstream.fromXML( xml, new NexusErrorResponse() );
+        ErrorResponse errorResponse = (ErrorResponse) xstream.fromXML( xml, new ErrorResponse() );
 
         Assert.assertTrue( "Error response is empty.", errorResponse.getErrors().size() > 0 );
 
-        for ( Iterator<NexusError> iter = errorResponse.getErrors().iterator(); iter.hasNext(); )
+        for ( Iterator<ErrorMessage> iter = errorResponse.getErrors().iterator(); iter.hasNext(); )
         {
-            NexusError error = iter.next();
+            ErrorMessage error = iter.next();
             Assert.assertFalse( "Response Error message is empty.", StringUtils.isEmpty( error.getMsg() ) );
 
         }

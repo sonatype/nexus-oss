@@ -44,6 +44,8 @@ import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.plexus.rest.resource.error.ErrorMessage;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 
 import com.thoughtworks.xstream.XStream;
@@ -138,14 +140,14 @@ public class NexusApplication
         xstream.alias( "project", Model.class );
 
         // omitting modelEncoding
-        xstream.omitField( NexusErrorResponse.class, "modelEncoding" );
+        xstream.omitField( ErrorResponse.class, "modelEncoding" );
         // xstream.addImplicitCollection( NexusErrorResponse.class, "errors", "error", NexusError.class ); // FIXME:
         // this might break the JSON parser, test it before checking in
-        xstream.omitField( NexusError.class, "modelEncoding" );
-        xstream.alias( "nexus-error", NexusErrorResponse.class );
-        xstream.alias( "error", NexusError.class );
-        xstream.registerLocalConverter( NexusErrorResponse.class, "errors", new AliasingListConverter(
-            NexusError.class,
+        xstream.omitField( ErrorMessage.class, "modelEncoding" );
+        xstream.alias( "nexus-error", ErrorResponse.class );
+        xstream.alias( "error", ErrorMessage.class );
+        xstream.registerLocalConverter( ErrorResponse.class, "errors", new AliasingListConverter(
+            ErrorMessage.class,
             "error" ) );
 
         xstream.omitField( ContentListResourceResponse.class, "modelEncoding" );

@@ -39,7 +39,7 @@
     </class>
 
     <!-- Error response -->
-    <class>
+    <!--<class>
       <name>NexusErrorResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
@@ -74,7 +74,7 @@
           <required>true</required>
         </field>
       </fields>
-    </class>
+    </class>-->
 
     <!-- Reused stuff on many resources -->
     <class>

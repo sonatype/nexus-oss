@@ -26,12 +26,12 @@ import org.restlet.resource.ResourceException;
 import org.sonatype.jsecurity.model.CUserRoleMapping;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.NoSuchRoleMappingException;
-import org.sonatype.nexus.rest.model.NexusError;
-import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.nexus.rest.model.UserToRoleResource;
 import org.sonatype.nexus.rest.model.UserToRoleResourceRequest;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.plexus.rest.resource.error.ErrorMessage;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 public class UserToRolePRTest
     extends PlexusTestCase
@@ -101,7 +101,7 @@ public class UserToRolePRTest
             // expected
             Assert.assertEquals( 400, e.getStatus().getCode() );
             Assert.assertTrue( this
-                .getErrorString( (NexusErrorResponse) e.getResultObject(), 0 ).toLowerCase().contains( "role" ) );
+                .getErrorString( (ErrorResponse) e.getResultObject(), 0 ).toLowerCase().contains( "role" ) );
         }
     }
 
@@ -151,14 +151,14 @@ public class UserToRolePRTest
         }
         catch ( PlexusResourceException e )
         {
-            String error = this.getErrorString( (NexusErrorResponse) e.getResultObject(), 0 );
+            String error = this.getErrorString( (ErrorResponse) e.getResultObject(), 0 );
             Assert.assertTrue( error.contains( "repomaintainer" ) );
         }
     }
 
-    protected String getErrorString( NexusErrorResponse errorResponse, int index )
+    protected String getErrorString( ErrorResponse errorResponse, int index )
     {
-        return ( (NexusError) errorResponse.getErrors().get( index ) ).getMsg();
+        return ( (ErrorMessage) errorResponse.getErrors().get( index ) ).getMsg();
     }
 
     public void testPutWithRolesAndDelete()

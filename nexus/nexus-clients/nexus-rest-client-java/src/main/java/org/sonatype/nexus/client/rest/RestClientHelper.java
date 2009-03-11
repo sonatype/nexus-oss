@@ -38,10 +38,10 @@ import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
 import org.sonatype.nexus.rest.NexusApplication;
-import org.sonatype.nexus.rest.model.NexusError;
-import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.nexus.rest.model.NexusResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.plexus.rest.resource.error.ErrorMessage;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
@@ -219,7 +219,7 @@ public class RestClientHelper
         if ( !response.getStatus().isSuccess() )
         {
             String errorMessage = "Error in response from server: " + response.getStatus() + ".";
-            List<NexusError> errors = new ArrayList<NexusError>();
+            List<ErrorMessage> errors = new ArrayList<ErrorMessage>();
             try
             {
                 if ( response.getEntity() != null )
@@ -231,9 +231,9 @@ public class RestClientHelper
                     if ( responseText.contains( "<error" ) ) // quick check before we parse the string
                     {
                         // try to parse the response
-                        NexusErrorResponse errorResponse = (NexusErrorResponse) this.xstream.fromXML(
+                        ErrorResponse errorResponse = (ErrorResponse) this.xstream.fromXML(
                             responseText,
-                            new NexusErrorResponse() );
+                            new ErrorResponse() );
                         // if we made it this far we can stick the NexusErrors in the Exception
                         errors = errorResponse.getErrors();
                     }
