@@ -21,17 +21,19 @@ import java.util.LinkedHashSet;
 import junit.framework.TestCase;
 
 /**
- * 
  * @author juven
- *
  */
 public class EnhancedPropertiesTest
     extends TestCase
 {
+
+    private static String LINE_SEPARATOR = System.getProperty( "line.separator" );
+
     public void testRead()
         throws Exception
     {
-        String source = "author=juven\n" + "\n" + "#Juven Xu\n" + "date=Mar 11\n";
+        String source = "author=juven" + LINE_SEPARATOR + LINE_SEPARATOR + "#Juven Xu" + LINE_SEPARATOR + "date=Mar 11"
+            + LINE_SEPARATOR;
 
         EnhancedProperties properties = new EnhancedProperties();
         InputStream inStream = new ByteArrayInputStream( source.getBytes() );
@@ -52,27 +54,29 @@ public class EnhancedPropertiesTest
 
         assertEquals( expected, actual );
     }
-    
+
     public void testStore()
         throws Exception
     {
-        String source = "author=juven\n" + "\n" + "#Juven Xu\n" + "date=Mar 11";
-        
+        String source = "author=juven" + LINE_SEPARATOR + LINE_SEPARATOR + "#Juven Xu" + LINE_SEPARATOR + "date=Mar 11"
+            + LINE_SEPARATOR;
+
         EnhancedProperties properties = new EnhancedProperties();
         InputStream inStream = new ByteArrayInputStream( source.getBytes() );
         properties.load( inStream );
         inStream.close();
-        
+
         properties.put( "author", "juv-away" );
         properties.put( "date", "Mar 11, 2009" );
-        
+
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         properties.store( outStream );
-        
-        String expected = "author=juv-away\n" + "\n" + "#Juven Xu\n" + "date=Mar 11, 2009\n";
+
+        String expected = "author=juv-away" + LINE_SEPARATOR + LINE_SEPARATOR + "#Juven Xu" + LINE_SEPARATOR
+            + "date=Mar 11, 2009" + LINE_SEPARATOR;
         assertEquals( expected, outStream.toString() );
-        
+
         outStream.close();
-        
+
     }
 }
