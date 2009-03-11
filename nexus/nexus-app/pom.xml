@@ -26,6 +26,12 @@
 			<groupId>org.sonatype.nexus</groupId>
 			<artifactId>nexus-configuration</artifactId>
 		</dependency>
+		
+	<dependency>
+		<groupId>org.sonatype.security</groupId>
+		<artifactId>security-configuration</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-edition</artifactId>
