@@ -29,7 +29,7 @@
 		
 	<dependency>
 		<groupId>org.sonatype.security</groupId>
-		<artifactId>security-configuration</artifactId>
+		<artifactId>security-manager</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</dependency>
     <dependency>

@@ -20,7 +20,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
-import org.sonatype.nexus.jsecurity.InvalidCredentialsException;
+import org.sonatype.security.InvalidCredentialsException;
 import org.sonatype.nexus.rest.model.UserChangePasswordRequest;
 import org.sonatype.nexus.rest.model.UserChangePasswordResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;

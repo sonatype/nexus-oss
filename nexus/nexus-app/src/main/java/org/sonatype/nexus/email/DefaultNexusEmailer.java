@@ -30,15 +30,16 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.security.email.SecurityEmailer;
 
 /**
  * The default emailer.
  * 
  * @author cstamas
  */
-@Component( role = NexusEmailer.class )
+@Component( role = SecurityEmailer.class )
 public class DefaultNexusEmailer
-    implements NexusEmailer, EventListener, Initializable
+    implements SecurityEmailer, EventListener, Initializable
 {
     @Requirement
     private EMailer emailer;
