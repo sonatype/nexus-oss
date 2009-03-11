@@ -13,10 +13,10 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 public class TestProperties
 {
@@ -43,9 +43,10 @@ public class TestProperties
     public static Map<String, String> getAll()
     {
         Map<String, String> properties = new LinkedHashMap<String, String>();
-        Set<String> keys = bundle.keySet();
-        for ( String key : keys )
+        Enumeration<String> keys = bundle.getKeys();
+        while ( keys.hasMoreElements() )
         {
+            String key = keys.nextElement();
             properties.put( key, bundle.getString( key ) );
         }
         return properties;
