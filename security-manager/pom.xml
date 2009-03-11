@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<artifactId>security-parent</artifactId>
+		<groupId>org.sonatype.security</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.sonatype.security</groupId>
+	<artifactId>security-manager</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<dependencies>
+		<dependency>
+			<groupId>org.sonatype.jsecurity</groupId>
+			<artifactId>security-xml-realm</artifactId>
+			<version>1.0.7-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.sonatype.security</groupId>
+			<artifactId>security-configuration</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-metadata</artifactId>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>

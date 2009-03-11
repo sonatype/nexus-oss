@@ -8,7 +8,7 @@
   <modules>
   	<module>security-parent</module>
   	<module>security-configuration</module>
-  	<!--<module>security-manager</module>-->
+  	<module>security-manager</module>
   </modules>
   
   <distributionManagement>
