@@ -15,6 +15,7 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 
@@ -24,7 +25,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 @Component( role = PlexusEhCacheWrapper.class )
 public class DefaultEhCacheWrapper
     extends AbstractLogEnabled
-    implements PlexusEhCacheWrapper, Contextualizable
+    implements PlexusEhCacheWrapper, Contextualizable, Startable
 {
 
     /**
