@@ -22,31 +22,47 @@ import java.util.Properties;
 import org.apache.log4j.PropertyConfigurator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.util.EnhancedProperties;
 
 /**
  * @author juven
  */
-@Component( role = LogConfiguration.class )
+@Component( role = LogConfiguration.class, hint = "default" )
 public class Log4jLogConfiguration
-    implements LogConfiguration<Properties>
+    implements LogConfiguration<EnhancedProperties>
 {
 
     @Requirement
     private LogConfigurationSource<File> logConfigurationSource;
 
-    private Properties config = new Properties();
+    private EnhancedProperties config = new EnhancedProperties();
 
     public void apply()
     {
-        PropertyConfigurator.configure( config );
+        Properties properties = new Properties();
+
+        for ( String key : config.keySet() )
+        {
+            if ( key.startsWith( EnhancedProperties.BLANK_LINE_KEY_PREFIX ) )
+            {
+                continue;
+            }
+            if ( key.startsWith( EnhancedProperties.COMMENT_KEY_PREFIX ) )
+            {
+                continue;
+            }
+            properties.put( key, config.get( key ) );
+        }
+
+        PropertyConfigurator.configure( properties );
     }
 
-    public Properties getConfig()
+    public EnhancedProperties getConfig()
     {
         return config;
     }
 
-    public void setConfig( Properties config )
+    public void setConfig( EnhancedProperties config )
     {
         this.config = config;
     }
@@ -73,7 +89,7 @@ public class Log4jLogConfiguration
 
         try
         {
-            config.store( outputStream, null );
+            config.store( outputStream );
         }
         finally
         {

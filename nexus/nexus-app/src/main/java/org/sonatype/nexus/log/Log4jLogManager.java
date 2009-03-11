@@ -17,7 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Appender;
@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.util.EnhancedProperties;
 
 /**
  * Log4J log manager.
@@ -40,7 +41,7 @@ public class Log4jLogManager
     implements LogManager
 {
     @Requirement
-    private LogConfiguration<Properties> logConfiguration;
+    private LogConfiguration<EnhancedProperties> logConfiguration;
 
     public Log4jLogManager()
     {
@@ -125,7 +126,7 @@ public class Log4jLogManager
     public void setLogConfig( SimpleLog4jConfig simpleLog4jConfig )
         throws IOException
     {
-        Properties config = logConfiguration.getConfig();
+        Map<String, String> config = logConfiguration.getConfig();
 
         config.putAll( simpleLog4jConfig.toMap() );
 

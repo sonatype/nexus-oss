@@ -45,13 +45,13 @@ public class SimpleLog4jConfig
         this.fileAppenderPattern = fileAppenderPattern;
     }
 
-    public SimpleLog4jConfig( Properties prop )
+    public SimpleLog4jConfig( Map<String, String> prop )
     {
-        this.rootLogger = prop.getProperty( KEY_ROOT_LOGGER );
+        this.rootLogger = prop.get( KEY_ROOT_LOGGER );
 
-        this.fileAppenderLocation = prop.getProperty( KEY_FILE_APPENDER_LOCAION );
+        this.fileAppenderLocation = prop.get( KEY_FILE_APPENDER_LOCAION );
 
-        this.fileAppenderPattern = prop.getProperty( KEY_FILE_APPENDER_PATTERN );
+        this.fileAppenderPattern = prop.get( KEY_FILE_APPENDER_PATTERN );
     }
 
     public Map<String, String> toMap()

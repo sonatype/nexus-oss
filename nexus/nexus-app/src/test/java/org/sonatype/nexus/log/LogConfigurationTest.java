@@ -14,10 +14,10 @@
 package org.sonatype.nexus.log;
 
 import java.io.File;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.util.EnhancedProperties;
 
 /**
  * @author juven
@@ -25,27 +25,23 @@ import org.sonatype.nexus.AbstractNexusTestCase;
 public class LogConfigurationTest
     extends AbstractNexusTestCase
 {
-    protected LogConfiguration<Properties> logConfiguration;
+    protected LogConfiguration<EnhancedProperties> logConfiguration;
 
-    public LogConfigurationTest()
-        throws Exception
-    {
-        super.setUp();
-
-    }
 
     @SuppressWarnings( "unchecked" )
     @Override
     protected void setUp()
         throws Exception
     {
+        super.setUp();
+        
         File logFile = new File( getBasedir(), "target/test-classes/log4j.properties" );
 
         assertTrue( logFile.exists() );
 
         System.getProperties().put( "plexus.log4j-prop-file", logFile.getAbsolutePath() );
 
-        logConfiguration = (LogConfiguration<Properties>) lookup( LogConfiguration.class );
+        logConfiguration = lookup( LogConfiguration.class );
 
         logConfiguration.load();
 
@@ -55,7 +51,7 @@ public class LogConfigurationTest
     protected void tearDown()
         throws Exception
     {
-        Properties config = logConfiguration.getConfig();
+        EnhancedProperties config = logConfiguration.getConfig();
 
         config.put( "log4j.rootLogger", "DEBUG, console" );
 
@@ -67,7 +63,7 @@ public class LogConfigurationTest
     public void testLoad()
         throws Exception
     {
-        Properties config = logConfiguration.getConfig();
+        EnhancedProperties config = logConfiguration.getConfig();
 
         assertTrue( config.containsKey( "log4j.rootLogger" ) );
     }
@@ -77,7 +73,7 @@ public class LogConfigurationTest
     {
         assertTrue( Logger.getRootLogger().isDebugEnabled() );
 
-        Properties config = logConfiguration.getConfig();
+        EnhancedProperties config = logConfiguration.getConfig();
 
         config.put( "log4j.rootLogger", "INFO, console" );
 
@@ -93,7 +89,7 @@ public class LogConfigurationTest
         assertTrue( Logger.getRootLogger().isDebugEnabled() );
 
         // change to info level and save
-        Properties config = logConfiguration.getConfig();
+        EnhancedProperties config = logConfiguration.getConfig();
 
         config.put( "log4j.rootLogger", "INFO, console" );
 

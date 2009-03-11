@@ -34,9 +34,9 @@ public class EnhancedProperties
 {
     private static final long serialVersionUID = -3245270814468070815L;
 
-    private static final String COMMENT_KEY_PREFIX = "#COMMENT";
+    public static final String COMMENT_KEY_PREFIX = "#COMMENT";
 
-    private static final String BLANK_LINE_KEY_PREFIX = "#BLANK_LINE";
+    public static final String BLANK_LINE_KEY_PREFIX = "#BLANK_LINE";
 
     public void load( InputStream inStream )
         throws IOException
