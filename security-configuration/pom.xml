@@ -9,6 +9,28 @@
   <artifactId>security-configuration</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.sonatype.jsecurity</groupId>
+			<artifactId>security-xml-realm</artifactId>
+			<version>1.0.7-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-component-annotations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>1.5.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-container-default</artifactId>
+		</dependency>
+		
+	</dependencies>
 
 <build>
 		<plugins>
