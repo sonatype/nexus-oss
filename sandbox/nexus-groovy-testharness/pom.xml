@@ -114,12 +114,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5-SNAPSHOT</version>
         <configuration>
-          <includes>
-            <include>**/RunFirst.*</include>
-            <include>**/*Test.*</include>
-          </includes>
-          <parallel>true</parallel>
+          <objectFactory>org.sonatype.nexus.groovytest.plexus.PlexusObjectFactory</objectFactory>
         </configuration>
       </plugin>
 

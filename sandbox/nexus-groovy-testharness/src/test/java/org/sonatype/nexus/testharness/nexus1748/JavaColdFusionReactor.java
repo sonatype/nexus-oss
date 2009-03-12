@@ -1,4 +1,4 @@
-package org.sonatype.nexus.groovytest.plexus;
+package org.sonatype.nexus.testharness.nexus1748;
 
 import org.codehaus.plexus.component.annotations.Component;
 
