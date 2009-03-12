@@ -148,6 +148,8 @@
                 <privilege>10</privilege>
                 <privilege>78</privilege>
                 <privilege>79</privilege>
+                <privilege>81</privilege>
+                <privilege>82</privilege>
             </privileges>
         </role>
         <role>
@@ -1657,6 +1659,38 @@
                     <value>nexus:privilegetypes</value>
                 </property>
             </properties>
+        </privilege>
+        <privilege>
+          <id>81</id>
+          <type>method</type>
+          <name>Repository Mirrors, Retrieve Predefined List - (read)</name>
+          <description>Give permission to retrieve predefined list of mirrors from the server</description>
+          <properties>
+            <property>
+              <key>method</key>
+              <value>read</value>
+            </property>
+            <property>
+              <key>permission</key>
+              <value>nexus:repositorypredefinedmirrors</value>
+            </property>
+          </properties>
+        </privilege>
+        <privilege>
+          <id>82</id>
+          <type>method</type>
+          <name>Repository Mirrors, Retrieve Mirror Status - (read)</name>
+          <description>Give permission to retrieve mirror status from the server</description>
+          <properties>
+            <property>
+              <key>method</key>
+              <value>read</value>
+            </property>
+            <property>
+              <key>permission</key>
+              <value>nexus:repositorymirrorsstatus</value>
+            </property>
+          </properties>
         </privilege>
     </privileges>
 </security>
