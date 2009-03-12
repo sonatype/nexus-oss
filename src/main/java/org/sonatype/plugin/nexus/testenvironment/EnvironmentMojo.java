@@ -176,7 +176,7 @@ public class EnvironmentMojo
 
         unpack( bundle.getFile(), destination, bundle.getType() );
 
-        File nexusBaseDir = new File( destination, "nexus-webapp-" + bundle.getBaseVersion() );
+        File nexusBaseDir = new File( destination, bundle.getArtifactId() + "-" + bundle.getBaseVersion() );
         project.getProperties().put( "nexus-base-dir", getPath( nexusBaseDir ) );
         project.getProperties().put( "nexus-work-dir", getPath( new File( destination, "nexus-work-dir" ) ) );
 
