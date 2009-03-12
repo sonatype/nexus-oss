@@ -118,9 +118,6 @@
       <type>zip</type>
       <classifier>repo</classifier>
     </dependency>
-    <!--
-      <dependency> <groupId>org.sonatype.nexus</groupId> <artifactId>nexus-test-harness-launcher</artifactId> <version>${nexus.version}</version> <type>zip</type> <classifier>resources</classifier> </dependency>
-    -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
