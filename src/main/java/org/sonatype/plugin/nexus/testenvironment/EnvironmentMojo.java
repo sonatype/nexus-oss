@@ -235,6 +235,8 @@ public class EnvironmentMojo
                 merge( baseTestProperties, testSuiteProperties, "properties" );
             }
 
+            addProjectProperties( baseTestProperties );
+
         }
 
         if ( extraResourcesArtifacts != null )
@@ -253,6 +255,38 @@ public class EnvironmentMojo
         }
     }
 
+    private void addProjectProperties( File baseTestProperties )
+        throws MojoExecutionException
+    {
+        InputStream input = null;
+        OutputStream output = null;
+        try
+        {
+            input = new FileInputStream( baseTestProperties );
+
+            Properties original = new Properties();
+            original.load( input );
+            IOUtil.close( input );
+
+            original.putAll( this.project.getProperties() );
+
+            output = new FileOutputStream( baseTestProperties );
+
+            original.store( output, "Updated by EnvironmentMojo" );
+        }
+        catch ( Exception e )
+        {
+            throw new MojoExecutionException(
+                                              "Error adding properties '" + baseTestProperties.getAbsolutePath() + "'.",
+                                              e );
+        }
+        finally
+        {
+            IOUtil.close( input );
+            IOUtil.close( output );
+        }
+    }
+
     private void allocatePorts()
         throws MojoExecutionException, MojoFailureException
     {
@@ -266,6 +300,7 @@ public class EnvironmentMojo
 
         PortAllocatorMojo portAllocator = new PortAllocatorMojo();
         portAllocator.setProject( project );
+        portAllocator.setLog( getLog() );
         portAllocator.setPorts( portsList.toArray( new Port[0] ) );
         portAllocator.execute();
     }
@@ -351,7 +386,7 @@ public class EnvironmentMojo
     private void copyUrl( String sourceUrl, File destinationFile )
         throws MojoExecutionException
     {
-        getLog().info( "Copying url '" + sourceUrl + "'" );
+        getLog().debug( "Copying url '" + sourceUrl + "'" );
 
         String name = FileUtils.removeExtension( FileUtils.removePath( sourceUrl, '/' ) );
         String extension = FileUtils.getExtension( sourceUrl );
@@ -377,7 +412,7 @@ public class EnvironmentMojo
     {
         destinationDir.mkdirs();
 
-        getLog().info( "Copying dir '" + sourceDir + "'" );
+        getLog().debug( "Copying dir '" + sourceDir + "'" );
         try
         {
             FileUtils.copyDirectoryStructure( sourceDir, destinationDir );
@@ -393,7 +428,7 @@ public class EnvironmentMojo
     {
         destinationDir.mkdirs();
 
-        getLog().info( "Copying and interpolating dir '" + sourceDir + "'" );
+        getLog().debug( "Copying and interpolating dir '" + sourceDir + "'" );
         try
         {
             DirectoryScanner scanner = new DirectoryScanner();
@@ -512,7 +547,7 @@ public class EnvironmentMojo
     private void copy( File sourceFile, File destinationDir )
         throws MojoExecutionException
     {
-        getLog().info( "Copying file '" + sourceFile + "'" );
+        getLog().debug( "Copying file '" + sourceFile + "'" );
 
         try
         {
