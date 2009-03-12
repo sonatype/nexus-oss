@@ -110,7 +110,7 @@ public class NexusStatusUtil
 
         if ( !response.getStatus().isSuccess() )
         {
-            throw new NexusIllegalStateException( response.getStatus().toString() );
+            throw new NexusIllegalStateException( "Error retrieving current status " + response.getStatus().toString() );
         }
 
         XStream xstream = XStreamFactory.getXmlXStream();
