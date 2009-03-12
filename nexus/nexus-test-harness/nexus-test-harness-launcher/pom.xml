@@ -13,8 +13,16 @@
 
   <build>
 
-    <plugins>
+    <testResources>
+      <testResource>
+        <targetPath>${project.build.testOutputDirectory}</targetPath>
+        <filtering>true</filtering>
+        <directory>${basedir}/src/test/resources</directory>
+      </testResource>
+    </testResources>
 
+    <plugins>
+    
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
@@ -197,12 +205,24 @@
       <scope>compile</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-      <scope>compile</scope>
-    </dependency>
 
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+	</dependency>
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+	</dependency>
+	<dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-slf4j-logging</artifactId>
+	</dependency>
+	<dependency>
+	    <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+	</dependency>
+	
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-verifier</artifactId>

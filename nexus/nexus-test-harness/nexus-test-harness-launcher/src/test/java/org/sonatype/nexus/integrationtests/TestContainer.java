@@ -71,6 +71,9 @@ public class TestContainer
         ContainerConfiguration containerConfiguration = new DefaultContainerConfiguration()
             .setName( "test" ).setContext( context );
 
+        containerConfiguration.setContainerConfigurationURL( this.getClass().getClassLoader().getResource(
+            "PlexusTestContainerConfig.xml" ) );
+        
         try
         {
             this.container = new DefaultPlexusContainer( containerConfiguration );
