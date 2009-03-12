@@ -1,8 +1,4 @@
-/**
- * 
- */
-package org.sonatype.nexus.util
-
+package org.sonatype.nexus.testharness.util
 
 
 /**

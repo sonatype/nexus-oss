@@ -1,9 +1,9 @@
-package org.sonatype.nexus.testharness.nexus481
+package org.sonatype.nexus.testharness.nexus1747
 
 import static org.testng.Assert.*
 import org.testng.annotations.Test
 import org.testng.annotations.BeforeClass
-import org.sonatype.nexus.util.MessageUtil
+import org.sonatype.nexus.testharness.util.MessageUtil
 import org.sonatype.nexus.groovytest.NexusCompatibilityimport groovy.util.XmlSlurperimport groovy.xml.StreamingMarkupBuilderimport org.codehaus.plexus.component.annotations.Component;
 
 @Component(role = UserCRUDTest.class)

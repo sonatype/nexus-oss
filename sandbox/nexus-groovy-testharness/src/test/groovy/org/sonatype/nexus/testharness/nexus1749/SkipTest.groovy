@@ -1,7 +1,4 @@
-/**
- * 
- */
-package org.sonatype.nexus
+package org.sonatype.nexus.testharness.nexus1749
 
 import org.testng.annotations.Test
 import static org.testng.Assert.*

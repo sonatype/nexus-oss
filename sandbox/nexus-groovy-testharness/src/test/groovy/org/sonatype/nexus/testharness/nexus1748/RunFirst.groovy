@@ -1,4 +1,4 @@
-package org.sonatype.nexus
+package org.sonatype.nexus.testharness.nexus1748
 
 import org.testng.*
 import org.testng.annotations.*
