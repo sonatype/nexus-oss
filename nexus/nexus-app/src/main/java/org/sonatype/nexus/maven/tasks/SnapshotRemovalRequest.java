@@ -13,6 +13,9 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class SnapshotRemovalRequest
 {
     private final String repositoryId, repositoryGroupId;
@@ -22,6 +25,8 @@ public class SnapshotRemovalRequest
     private final int removeSnapshotsOlderThanDays;
 
     private final boolean removeIfReleaseExists;
+
+    private final Set<String> metadataRebuildPaths;
 
     public SnapshotRemovalRequest( String repositoryId, String repositoryGroupId, int minCountOfSnapshotsToKeep,
         int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists )
@@ -37,6 +42,8 @@ public class SnapshotRemovalRequest
         this.removeSnapshotsOlderThanDays = removeSnapshotsOlderThanDays;
 
         this.removeIfReleaseExists = removeIfReleaseExists;
+
+        this.metadataRebuildPaths = new HashSet<String>();
     }
 
     public String getRepositoryId()
@@ -62,5 +69,10 @@ public class SnapshotRemovalRequest
     public boolean isRemoveIfReleaseExists()
     {
         return removeIfReleaseExists;
+    }
+
+    public Set<String> getMetadataRebuildPaths()
+    {
+        return metadataRebuildPaths;
     }
 }

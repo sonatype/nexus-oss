@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -41,7 +40,6 @@ import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RecreateMavenMetadataWalkerProcessor;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -67,23 +65,16 @@ public class DefaultSnapshotRemover
     extends AbstractLogEnabled
     implements SnapshotRemover
 {
-    /**
-     * The registry.
-     */
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
     @Requirement
     private Walker walker;
 
-    private ContentClass contentClass = new Maven2ContentClass();
+    @Requirement( hint = "maven2" )
+    private ContentClass contentClass;
 
-    /**
-     * A set containing all paths where metadata rebuilding is needed, after snapshot removing
-     */
-    private Set<String> metadataRebuildPaths = new HashSet<String>();
-
-    public RepositoryRegistry getRepositoryRegistry()
+    protected RepositoryRegistry getRepositoryRegistry()
     {
         return repositoryRegistry;
     }
@@ -170,6 +161,8 @@ public class DefaultSnapshotRemover
                     + repository.getLocalUrl() );
         }
 
+        request.getMetadataRebuildPaths().clear();
+
         // create a walker to collect deletables and let it loose on collections only
         SnapshotRemoverWalkerProcessor snapshotRemoveProcessor = new SnapshotRemoverWalkerProcessor(
             repository,
@@ -206,7 +199,7 @@ public class DefaultSnapshotRemover
 
         ctx.getProcessors().add( metadataRebuildProcessor );
 
-        for ( String path : metadataRebuildPaths )
+        for ( String path : request.getMetadataRebuildPaths() )
         {
             walker.walk( ctx, path );
         }
@@ -502,11 +495,11 @@ public class DefaultSnapshotRemover
             {
                 String parentPath = ItemPathUtils.getParentPath( coll.getPath() );
 
-                metadataRebuildPaths.add( parentPath );
+                request.getMetadataRebuildPaths().add( parentPath );
             }
             else
             {
-                metadataRebuildPaths.add( coll.getPath() );
+                request.getMetadataRebuildPaths().add( coll.getPath() );
             }
 
         }
