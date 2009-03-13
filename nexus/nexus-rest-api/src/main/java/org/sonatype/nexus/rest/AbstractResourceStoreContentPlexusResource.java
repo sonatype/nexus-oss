@@ -266,10 +266,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
 
         // put the incoming URLs
-        result.getRequestContext().put(
-            ResourceStoreRequest.CTX_REQUEST_APP_ROOT_URL,
-            getContextRoot( request ).toString() );
-        result.getRequestContext().put( ResourceStoreRequest.CTX_REQUEST_URL, request.getOriginalRef().toString() );
+        result.setRequestAppRootUrl( getContextRoot( request ).toString() );
+        result.setRequestUrl( request.getOriginalRef().toString() );
 
         return result;
     }

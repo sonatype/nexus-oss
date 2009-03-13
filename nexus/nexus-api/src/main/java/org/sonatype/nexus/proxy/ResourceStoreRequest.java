@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
@@ -30,19 +31,25 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 public class ResourceStoreRequest
 {
     /** Context URL of the app root on the incoming connector. */
-    public static final String CTX_REQUEST_APP_ROOT_URL = "request.appRootUrl";
+    private static final String CTX_REQUEST_APP_ROOT_URL = "request.appRootUrl";
 
     /** Context URL of the original resource requested on the incoming connector. */
-    public static final String CTX_REQUEST_URL = "request.url";
+    private static final String CTX_REQUEST_URL = "request.url";
 
     /** Context flag to mark a request local only. */
-    public static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
+    private static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
 
     /** Context flag to mark a request local only. */
-    public static final String CTX_REMOTE_ONLY_FLAG = "request.remoteOnly";
+    private static final String CTX_REMOTE_ONLY_FLAG = "request.remoteOnly";
 
     /** Context key for set of processed repositories. */
-    public static final String CTX_PROCESSED_REPOSITORIES = "request.processedRepositories";
+    private static final String CTX_PROCESSED_REPOSITORIES = "request.processedRepositories";
+
+    /** Context key for condition "if-modified-since" */
+    private static final String CTX_CONDITION_IF_MODIFIED_SINCE = "request.condition.ifModifiedSince";
+
+    /** Context key for condition "if-none-match" */
+    private static final String CTX_CONDITION_IF_NONE_MATCH = "request.condition.ifNoneMatch";
 
     /** The path we want to retrieve. */
     private String requestPath;
@@ -247,7 +254,8 @@ public class ResourceStoreRequest
      */
     public boolean isConditional()
     {
-        return ItemContextUtils.isConditional( getRequestContext() );
+        return getRequestContext().containsKey( CTX_CONDITION_IF_MODIFIED_SINCE )
+            || getRequestContext().containsKey( CTX_CONDITION_IF_NONE_MATCH );
     }
 
     /**
@@ -257,7 +265,7 @@ public class ResourceStoreRequest
      */
     public long getIfModifiedSince()
     {
-        return ItemContextUtils.getIfModifiedSince( getRequestContext() );
+        return ( (Long) getRequestContext().get( CTX_CONDITION_IF_MODIFIED_SINCE ) ).longValue();
     }
 
     /**
@@ -267,7 +275,14 @@ public class ResourceStoreRequest
      */
     public void setIfModifiedSince( long ifModifiedSince )
     {
-        ItemContextUtils.setIfModifiedSince( getRequestContext(), ifModifiedSince );
+        if ( ifModifiedSince != 0 )
+        {
+            getRequestContext().put( CTX_CONDITION_IF_MODIFIED_SINCE, Long.valueOf( ifModifiedSince ) );
+        }
+        else
+        {
+            getRequestContext().remove( CTX_CONDITION_IF_MODIFIED_SINCE );
+        }
     }
 
     /**
@@ -277,7 +292,7 @@ public class ResourceStoreRequest
      */
     public String getIfNoneMatch()
     {
-        return ItemContextUtils.getIfNoneMatch( getRequestContext() );
+        return (String) getRequestContext().get( CTX_CONDITION_IF_NONE_MATCH );
     }
 
     /**
@@ -287,6 +302,67 @@ public class ResourceStoreRequest
      */
     public void setIfNoneMatch( String tag )
     {
-        ItemContextUtils.setIfNoneMatch( getRequestContext(), tag );
+        if ( !StringUtils.isEmpty( tag ) )
+        {
+            getRequestContext().put( CTX_CONDITION_IF_NONE_MATCH, tag );
+        }
+        else
+        {
+            getRequestContext().remove( CTX_CONDITION_IF_NONE_MATCH );
+        }
+    }
+
+    /**
+     * Returns the URL of the original request.
+     * 
+     * @return
+     */
+    public String getRequestUrl()
+    {
+        return (String) getRequestContext().get( CTX_REQUEST_URL );
+    }
+
+    /**
+     * Sets the URL of the original request.
+     * 
+     * @param url
+     */
+    public void setRequestUrl( String url )
+    {
+        if ( !StringUtils.isEmpty( url ) )
+        {
+            getRequestContext().put( CTX_REQUEST_URL, url );
+        }
+        else
+        {
+            getRequestContext().remove( CTX_REQUEST_URL );
+        }
+    }
+
+    /**
+     * Returns the URL of the AppRoot of the incoming request.
+     * 
+     * @return
+     */
+    public String getRequestAppRootUrl()
+    {
+        return (String) getRequestContext().get( CTX_REQUEST_APP_ROOT_URL );
+    }
+
+    /**
+     * Sets the URL of the AppRoot of the incoming request.
+     * 
+     * @param url
+     */
+    public void setRequestAppRootUrl( String url )
+    {
+        if ( !StringUtils.isEmpty( url ) )
+        {
+            getRequestContext().put( CTX_REQUEST_APP_ROOT_URL, url );
+        }
+        else
+        {
+            getRequestContext().remove( CTX_REQUEST_APP_ROOT_URL );
+        }
     }
 }
