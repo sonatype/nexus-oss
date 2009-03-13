@@ -23,7 +23,7 @@ import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-public class AbstractDeployBridgeTest
+public abstract class AbstractDeployBridgeTest
     extends AbstractMigrationIntegrationTest
 {
 

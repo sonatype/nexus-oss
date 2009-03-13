@@ -118,6 +118,7 @@ public class DefaultArtifactoryMigrator
 
         if ( migrationResults.containsKey( result.getId() ) )
         {
+            result.addWarningMessage( "Trying to import the same package twice. Skiping and returning previous result." );
             return getMigrationResultForId( result.getId() );
         }
         else
@@ -230,7 +231,7 @@ public class DefaultArtifactoryMigrator
         }
         else
         {
-            result.addInfoMessage( "Migration finished." );
+            result.addInfoMessage( "Migration finished successfully." );
         }
 
         result.setSuccessful( true );

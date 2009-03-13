@@ -20,12 +20,14 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
+import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "artifactoryRedirector" )
 public class ArtifactoryRedirectorPlexusResource
     extends AbstractPlexusResource
+    implements ManagedPlexusResource
 {
 
     @Requirement

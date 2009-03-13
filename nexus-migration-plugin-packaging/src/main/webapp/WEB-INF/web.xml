@@ -35,6 +35,11 @@
         </init-param>
         <init-param>
             <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter -->
+            <param-name>artifactory.roleHint</param-name>
+            <param-value>artifactoryBridge</param-value>
+        </init-param>
+        <init-param>
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter -->
             <param-name>artifactory.org.restlet.clients</param-name>
             <param-value>FILE CLAP</param-value>
         </init-param>

@@ -26,9 +26,16 @@
         <include>org.sonatype.nexus.plugins:nexus-migration-plugin-artifactory</include>
         <include>org.sonatype.nexus.plugins:nexus-migration-plugin-configuration</include>
 
-        <include>org.sonatype.nexus.tools:nexus-repository-conversion-tool</include>
         <include>org.codehaus.plexus:plexus-archiver</include>
         <include>org.codehaus.plexus:plexus-io</include>
+        <include>org.sonatype.nexus.tools:nexus-repository-conversion-tool</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <unpack>false</unpack>
+      <outputDirectory>runtime/apps/nexus/lib</outputDirectory>
+      <includes>
+        <include>org.sonatype.nexus.plugins:nexus-migration-plugin-artifactory-bridge</include>
       </includes>
     </dependencySet>
     <dependencySet>
