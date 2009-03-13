@@ -15,11 +15,20 @@ package org.sonatype.nexus.proxy.item;
 
 import java.util.Map;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+
 /**
  * The Interface StorageItem, a top of the item abstraction.
  */
 public interface StorageItem
 {
+    /**
+     * Returns the resource store request that made this item to appear.
+     * 
+     * @return
+     */
+    ResourceStoreRequest getResourceStoreRequest();
+
     /**
      * Gets the repository item uid from where originates item.
      * 

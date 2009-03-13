@@ -254,6 +254,9 @@ public class DefaultFSLocalRepositoryStorage
         {
             throw new ItemNotFoundException( uid );
         }
+        
+        // set the request
+        result.setResourceStoreRequest( request );
 
         // pass over the context
         result.getItemContext().putAll( request.getRequestContext() );

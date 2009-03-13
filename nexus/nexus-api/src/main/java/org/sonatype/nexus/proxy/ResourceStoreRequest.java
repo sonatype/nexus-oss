@@ -91,6 +91,16 @@ public class ResourceStoreRequest
     }
 
     /**
+     * Creates a request aimed at given path. You are free to set some other attributes of this created default request.
+     * 
+     * @param requestPath the path.
+     */
+    public ResourceStoreRequest( String requestPath, boolean localOnly, boolean remoteOnly )
+    {
+        this( requestPath, localOnly, remoteOnly, null );
+    }
+
+    /**
      * Creates a request aimed at given path denoted by RepositoryItemUid.
      * 
      * @param uid the uid

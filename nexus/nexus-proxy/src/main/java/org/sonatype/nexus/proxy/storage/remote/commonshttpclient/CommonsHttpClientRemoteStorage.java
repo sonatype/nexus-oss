@@ -178,8 +178,6 @@ public class CommonsHttpClientRemoteStorage
                     true,
                     new PreparedContentLocator( new HttpClientInputStream( get, is ) ) );
 
-                httpItem.setRemoteUrl( remoteURL.toString() );
-
                 if ( get.getResponseContentLength() != -1 )
                 {
                     // FILE
@@ -191,9 +189,15 @@ public class CommonsHttpClientRemoteStorage
                     httpItem.setMimeType( method.getResponseHeader( "content-type" ).getValue() );
                 }
 
+                httpItem.setRemoteUrl( remoteURL.toString() );
+
                 httpItem.setModified( makeDateFromHeader( method.getResponseHeader( "last-modified" ) ) );
 
                 httpItem.setCreated( httpItem.getModified() );
+                
+                httpItem.getItemContext().putAll( request.getRequestContext() );
+                
+                httpItem.setResourceStoreRequest( request );
 
                 return httpItem;
             }
