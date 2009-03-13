@@ -25,7 +25,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.modello.Configuration;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.configuration.upgrade.UnsupportedConfigurationVersionException;
 import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;

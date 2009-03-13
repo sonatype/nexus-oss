@@ -30,7 +30,7 @@ import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
  * 
  * @author cstamas
  */
-@Component(role = CacheManager.class )
+@Component( role = CacheManager.class )
 public class EhCacheCacheManager
     extends AbstractLogEnabled
     implements CacheManager
@@ -38,30 +38,15 @@ public class EhCacheCacheManager
     @Requirement
     private PlexusEhCacheWrapper cacheManager;
 
-   
     public PathCache getPathCache( String cache )
     {
         net.sf.ehcache.CacheManager ehCacheManager = this.cacheManager.getEhCacheManager();
+
         if ( !ehCacheManager.cacheExists( cache ) )
         {
             ehCacheManager.addCache( cache );
         }
 
         return new EhCachePathCache( ehCacheManager.getEhcache( cache ) );
-    }
-
-
-    public void startService()
-        throws Exception
-    {
-        cacheManager.start();
-    }
-
-
-    public void stopService()
-        throws Exception
-    {
-       cacheManager.stop();
-        
     }
 }

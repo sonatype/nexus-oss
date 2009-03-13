@@ -16,7 +16,6 @@ package org.sonatype.nexus.proxy.access;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -51,7 +50,7 @@ public class DefaultNexusItemAuthorizer
     @Requirement
     private RepositoryRouter repositoryRouter;
 
-    public boolean authorizePath( ResourceStoreRequest request, Map<String, Object> context, Action action )
+    public boolean authorizePath( ResourceStoreRequest request, Action action )
     {
         TargetSet matched = repositoryRouter.getTargetsForRequest( request );
 
@@ -62,8 +61,11 @@ public class DefaultNexusItemAuthorizer
             if ( route.getTargetedRepository() != null )
             {
                 // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
-                matched.addTargetSet( this.getGroupsTargetSet( route.getTargetedRepository(), route
-                    .getOriginalRequestPath(), context ) );
+                request.pushRequestPath( route.getOriginalRequestPath() );
+
+                matched.addTargetSet( getGroupsTargetSet( route.getTargetedRepository(), request ) );
+
+                request.popRequestPath();
             }
         }
         catch ( ItemNotFoundException e )
@@ -74,12 +76,12 @@ public class DefaultNexusItemAuthorizer
         return authorizePath( matched, action );
     }
 
-    public boolean authorizePath( Repository repository, String path, Map<String, Object> context, Action action )
+    public boolean authorizePath( Repository repository, ResourceStoreRequest request, Action action )
     {
-        TargetSet matched = repository.getTargetsForRequest( path, context );
+        TargetSet matched = repository.getTargetsForRequest( request );
 
         // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
-        matched.addTargetSet( this.getGroupsTargetSet( repository, path, context ) );
+        matched.addTargetSet( this.getGroupsTargetSet( repository, request ) );
 
         return authorizePath( matched, action );
     }
@@ -91,7 +93,7 @@ public class DefaultNexusItemAuthorizer
 
     // ===
 
-    protected TargetSet getGroupsTargetSet( Repository repository, String path, Map<String, Object> context )
+    protected TargetSet getGroupsTargetSet( Repository repository, ResourceStoreRequest request )
     {
         TargetSet targetSet = new TargetSet();
 
@@ -101,7 +103,7 @@ public class DefaultNexusItemAuthorizer
             // !group.isExposed()
             if ( true )
             {
-                TargetSet groupMatched = group.getTargetsForRequest( path, context );
+                TargetSet groupMatched = group.getTargetsForRequest( request );
 
                 targetSet.addTargetSet( groupMatched );
             }

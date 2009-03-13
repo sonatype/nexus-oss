@@ -16,12 +16,10 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -53,12 +51,13 @@ public abstract class AbstractWebSiteRepository
         return welcomeFiles;
     }
 
-    protected StorageItem doRetrieveItem( RepositoryItemUid uid, Map<String, Object> context )
+    @Override
+    protected StorageItem doRetrieveItem( RepositoryRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
-        StorageItem result = super.doRetrieveItem( uid, context );
+        StorageItem result = super.doRetrieveItem( request );
 
         if ( result instanceof StorageCollectionItem && getWelcomeFiles().size() > 0 )
         {

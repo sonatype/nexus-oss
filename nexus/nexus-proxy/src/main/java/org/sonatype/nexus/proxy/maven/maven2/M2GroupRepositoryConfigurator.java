@@ -14,23 +14,31 @@
 package org.sonatype.nexus.proxy.maven.maven2;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.proxy.repository.DefaultGroupRepositoryConfigurator;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepositoryConfigurator;
-import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
+import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepositoryConfigurator;
+import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 
-@Component( role = GroupRepositoryConfigurator.class, hint = "maven2" )
+@Component( role = M2GroupRepositoryConfigurator.class )
 public class M2GroupRepositoryConfigurator
-    extends DefaultGroupRepositoryConfigurator
+    extends AbstractMavenGroupRepositoryConfigurator
 {
-    public GroupRepository updateRepositoryFromModel( GroupRepository old, ApplicationConfiguration configuration,
-        CRepositoryGroup group, LocalRepositoryStorage ls )
-        throws InvalidConfigurationException
+    public static final String MERGE_METADATA = "mergeMetadata";
+
+    @Override
+    public void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
+        PlexusConfiguration externalConfiguration )
+        throws ConfigurationException
     {
-        return super.updateRepositoryFromModel( old, configuration, group, ls );
+        super.doConfigure( repository, configuration, repo, externalConfiguration );
+
+        MavenGroupRepository mgr = repository.adaptToFacet( MavenGroupRepository.class );
+
+        mgr.setMergeMetadata( Boolean.parseBoolean( externalConfiguration.getChild( MERGE_METADATA ).getValue(
+            String.valueOf( true ) ) ) );
     }
 
 }

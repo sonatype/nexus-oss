@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.nexus.configuration.model.CProps;
+import org.sonatype.nexus.configuration.modello.CProps;
 
 /**
  * A simple CProps to Map converter, to ease handling of CProps.

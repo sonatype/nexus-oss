@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class DefaultWalkerContext
@@ -27,9 +28,9 @@ public class DefaultWalkerContext
 
     private final WalkerFilter walkerFilter;
 
-    private final boolean localOnly;
-
     private final boolean collectionsOnly;
+
+    private final ResourceStoreRequest request;
 
     private Map<String, Object> context;
 
@@ -39,25 +40,26 @@ public class DefaultWalkerContext
 
     private volatile boolean running;
 
-    public DefaultWalkerContext( Repository store )
+    public DefaultWalkerContext( Repository store, ResourceStoreRequest request )
     {
-        this( store, null );
+        this( store, request, null );
     }
 
-    public DefaultWalkerContext( Repository store, WalkerFilter filter )
+    public DefaultWalkerContext( Repository store, ResourceStoreRequest request, WalkerFilter filter )
     {
-        this( store, filter, true, false );
+        this( store, request, filter, true, false );
     }
 
-    public DefaultWalkerContext( Repository store, WalkerFilter filter, boolean localOnly, boolean collectionsOnly )
+    public DefaultWalkerContext( Repository store, ResourceStoreRequest request, WalkerFilter filter,
+        boolean localOnly, boolean collectionsOnly )
     {
         super();
 
         this.resourceStore = store;
 
-        this.walkerFilter = filter;
+        this.request = request;
 
-        this.localOnly = localOnly;
+        this.walkerFilter = filter;
 
         this.collectionsOnly = collectionsOnly;
 
@@ -66,7 +68,7 @@ public class DefaultWalkerContext
 
     public boolean isLocalOnly()
     {
-        return localOnly;
+        return request.isRequestLocalOnly();
     }
 
     public boolean isCollectionsOnly()
@@ -106,6 +108,11 @@ public class DefaultWalkerContext
     public Repository getRepository()
     {
         return resourceStore;
+    }
+
+    public ResourceStoreRequest getResourceStoreRequest()
+    {
+        return request;
     }
 
     public boolean isStopped()

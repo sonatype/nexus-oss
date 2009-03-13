@@ -34,6 +34,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.attributes.DefaultAttributeStorage;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -62,6 +63,9 @@ public abstract class AbstractProxyTestEnvironment
     /** The config */
     private ApplicationConfiguration applicationConfiguration;
 
+    /** The app event hub */
+    private ApplicationEventMulticaster applicationEventMulticaster;
+
     /** The repository registry. */
     private RepositoryRegistry repositoryRegistry;
 
@@ -88,19 +92,14 @@ public abstract class AbstractProxyTestEnvironment
         return applicationConfiguration;
     }
 
-    public void setApplicationConfiguration( ApplicationConfiguration applicationConfiguration )
+    public ApplicationEventMulticaster getApplicationEventMulticaster()
     {
-        this.applicationConfiguration = applicationConfiguration;
+        return applicationEventMulticaster;
     }
 
     public RemoteStorageContext getRemoteStorageContext()
     {
         return remoteStorageContext;
-    }
-
-    public void setRemoteStorageContext( RemoteStorageContext remoteStorageContext )
-    {
-        this.remoteStorageContext = remoteStorageContext;
     }
 
     /**
@@ -208,6 +207,8 @@ public abstract class AbstractProxyTestEnvironment
 
         applicationConfiguration = lookup( ApplicationConfiguration.class );
 
+        applicationEventMulticaster = lookup( ApplicationEventMulticaster.class );
+
         // deleting files
         FileUtils.forceDelete( getApplicationConfiguration().getWorkingDirectory() );
 
@@ -215,7 +216,7 @@ public abstract class AbstractProxyTestEnvironment
 
         testEventListener = new TestItemEventListener();
 
-        repositoryRegistry.addProximityEventListener( testEventListener );
+        applicationEventMulticaster.addProximityEventListener( testEventListener );
 
         attributesHandler = lookup( AttributesHandler.class );
 
@@ -232,10 +233,11 @@ public abstract class AbstractProxyTestEnvironment
 
         getEnvironmentBuilder().buildEnvironment( this );
 
-        applicationConfiguration
-            .notifyProximityEventListeners( new ConfigurationChangeEvent( applicationConfiguration, null ) );
+        applicationEventMulticaster.notifyProximityEventListeners( new ConfigurationChangeEvent(
+            applicationConfiguration,
+            null ) );
 
-        applicationConfiguration.notifyProximityEventListeners( new NexusStartedEvent() );
+        applicationEventMulticaster.notifyProximityEventListeners( new NexusStartedEvent() );
 
         getEnvironmentBuilder().startService();
     }

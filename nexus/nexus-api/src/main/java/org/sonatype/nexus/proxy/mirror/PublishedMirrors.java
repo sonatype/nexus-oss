@@ -11,18 +11,21 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.repository;
+package org.sonatype.nexus.proxy.mirror;
+
+import java.util.List;
+
+import org.sonatype.nexus.proxy.repository.Mirror;
 
 /**
- * Default group repository implementation.
+ * Published mirrors of a repository. Set of mirrors used by all repository types to publish downstream (using
+ * metadata).
+ * 
+ * @author cstamas
  */
-public abstract class DefaultGroupRepository
-    extends AbstractGroupRepository
+public interface PublishedMirrors
 {
-    private RepositoryKind repositoryKind = new DefaultRepositoryKind( GroupRepository.class, null );
+    void setMirrors( List<Mirror> mirrors );
 
-    public RepositoryKind getRepositoryKind()
-    {
-        return repositoryKind;
-    }
+    List<Mirror> getMirrors();
 }

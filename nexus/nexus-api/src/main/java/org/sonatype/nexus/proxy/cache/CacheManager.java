@@ -13,10 +13,7 @@
  */
 package org.sonatype.nexus.proxy.cache;
 
-import org.sonatype.nexus.NexusService;
-
 public interface CacheManager
-    extends NexusService
 {
     PathCache getPathCache( String cache );
 }

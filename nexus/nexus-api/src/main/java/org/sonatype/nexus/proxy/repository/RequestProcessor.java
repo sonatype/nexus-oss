@@ -13,12 +13,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import java.util.Map;
-
-import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
 /**
  * A Processor that is able to process/modify the request before Nexus will serve it.
@@ -34,9 +29,8 @@ public interface RequestProcessor
      * 
      * @param request
      * @param action
-     * @throws AccessDeniedException
      */
-    boolean process( Repository repository, ResourceStoreRequest request, Action action );
+    boolean process( RepositoryRequest request, Action action );
 
     /**
      * Request processor is able to override generic behaviour of Repositories in aspect of proxying.
@@ -46,5 +40,5 @@ public interface RequestProcessor
      * @param context
      * @return
      */
-    boolean shouldProxy( Repository repository, RepositoryItemUid uid, Map<String, Object> context );
+    boolean shouldProxy( RepositoryRequest request );
 }

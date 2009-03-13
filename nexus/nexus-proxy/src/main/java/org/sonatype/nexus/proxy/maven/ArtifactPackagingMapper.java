@@ -21,7 +21,5 @@ package org.sonatype.nexus.proxy.maven;
  */
 public interface ArtifactPackagingMapper
 {
-    String ROLE = ArtifactPackagingMapper.class.getName();
-
     String getExtensionForPackaging( String packaging );
 }

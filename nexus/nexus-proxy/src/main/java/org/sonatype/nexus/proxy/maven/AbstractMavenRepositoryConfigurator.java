@@ -13,51 +13,67 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.modello.CRepository;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.proxy.repository.DefaultRepositoryConfigurator;
+import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 public class AbstractMavenRepositoryConfigurator
-    extends DefaultRepositoryConfigurator
+    extends AbstractProxyRepositoryConfigurator
 {
-    @Override
-    public Repository updateRepositoryFromModel( Repository old, ApplicationConfiguration configuration,
-        CRepository repo, RemoteStorageContext rsc, LocalRepositoryStorage ls, RemoteRepositoryStorage rs )
-        throws InvalidConfigurationException
-    {
-        MavenRepository repository = (MavenRepository) super.updateRepositoryFromModel(
-            old,
-            configuration,
-            repo,
-            rsc,
-            ls,
-            rs );
+    public static final String REPOSITORY_POLICY = "repositoryPolicy";
 
-        if ( CRepository.REPOSITORY_POLICY_RELEASE.equals( repo.getRepositoryPolicy() ) )
+    public static final String CHECKSUM_POLICY = "checksumPolicy";
+
+    public static final String ARTIFACT_MAX_AGE = "artifactMaxAge";
+
+    public static final String METADATA_MAX_AGE = "metadataMaxAge";
+
+    public static final String MAINTAIN_PROXIED_REPOSITORY_METADATA = "maintainProxiedRepositoryMetadata";
+
+    @Override
+    public void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
+        PlexusConfiguration externalConfiguration )
+        throws ConfigurationException
+    {
+        super.doConfigure( repository, configuration, repo, externalConfiguration );
+
+        MavenRepository mrepository = repository.adaptToFacet( MavenRepository.class );
+
+        try
         {
-            repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+            mrepository.setRepositoryPolicy( RepositoryPolicy.valueOf( externalConfiguration.getChild(
+                REPOSITORY_POLICY ).getValue() ) );
         }
-        else
+        catch ( PlexusConfigurationException e )
         {
-            repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
+            throw new InvalidConfigurationException( "Cannot read the repository policy for repository ID='"
+                + repository.getId() + "'" );
         }
 
         if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
         {
             MavenProxyRepository mpr = repository.adaptToFacet( MavenProxyRepository.class );
 
-            mpr.setReleaseMaxAge( repo.getArtifactMaxAge() );
-            mpr.setSnapshotMaxAge( repo.getArtifactMaxAge() );
-            mpr.setMetadataMaxAge( repo.getMetadataMaxAge() );
-            mpr.setCleanseRepositoryMetadata( repo.isMaintainProxiedRepositoryMetadata() );
-            mpr.setChecksumPolicy( ChecksumPolicy.fromModel( repo.getChecksumPolicy() ) );
-        }
+            mpr.setChecksumPolicy( ChecksumPolicy.valueOf( externalConfiguration
+                .getChild( CHECKSUM_POLICY ).getValue( ChecksumPolicy.WARN.toString() ) ) );
 
-        return repository;
+            mpr.setReleaseMaxAge( Integer.parseInt( externalConfiguration.getChild( ARTIFACT_MAX_AGE ).getValue(
+                String.valueOf( 1440 ) ) ) );
+
+            mpr.setSnapshotMaxAge( Integer.parseInt( externalConfiguration.getChild( ARTIFACT_MAX_AGE ).getValue(
+                String.valueOf( 1440 ) ) ) );
+
+            mpr.setMetadataMaxAge( Integer.parseInt( externalConfiguration.getChild( METADATA_MAX_AGE ).getValue(
+                String.valueOf( 1440 ) ) ) );
+
+            mpr.setCleanseRepositoryMetadata( Boolean.parseBoolean( externalConfiguration.getChild(
+                MAINTAIN_PROXIED_REPOSITORY_METADATA ).getValue( String.valueOf( false ) ) ) );
+
+        }
     }
 }

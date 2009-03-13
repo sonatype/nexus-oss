@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -76,7 +77,7 @@ public class DefaultAttributesHandlerTest
         assertFalse( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .getFileFromBase( uid ).exists() );
 
-        repository.recreateAttributes( null, null );
+        repository.recreateAttributes( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ), null );
 
         assertTrue( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .getFileFromBase( uid ).exists() );
@@ -96,7 +97,7 @@ public class DefaultAttributesHandlerTest
         customAttrs.put( "one", "1" );
         customAttrs.put( "two", "2" );
 
-        repository.recreateAttributes( null, customAttrs );
+        repository.recreateAttributes( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ), customAttrs );
 
         assertTrue( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .getFileFromBase( uid ).exists() );

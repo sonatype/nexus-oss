@@ -13,24 +13,47 @@
  */
 package org.sonatype.nexus.configuration;
 
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyMode;
-import org.sonatype.nexus.proxy.repository.RemoteStatus;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.events.ConfigurationEvent;
 
 /**
- * A component to convert various repository status enumerations to configuration values.
+ * An event fired on configuration change.
  * 
  * @author cstamas
  */
-public interface RepositoryStatusConverter
+public class ConfigurationChangeEvent
+    extends ConfigurationEvent
 {
-    LocalStatus localStatusFromModel( String string );
+    private final ApplicationConfiguration configuration;
 
-    String localStatusToModel( LocalStatus localStatus );
+    private final List<Object> changes;
 
-    ProxyMode proxyModeFromModel( String string );
+    public ConfigurationChangeEvent( ApplicationConfiguration configuration, Collection<Object> changes )
+    {
+        super();
 
-    String proxyModeToModel( ProxyMode proxyMode );
+        this.configuration = configuration;
 
-    String remoteStatusToModel( RemoteStatus remoteStatus );
+        this.changes = new ArrayList<Object>();
+
+        if ( changes != null )
+        {
+            this.changes.addAll( changes );
+        }
+    }
+
+    public ApplicationConfiguration getApplicationConfiguration()
+    {
+        return configuration;
+    }
+
+    public List<Object> getChanges()
+    {
+        return changes;
+    }
+
 }

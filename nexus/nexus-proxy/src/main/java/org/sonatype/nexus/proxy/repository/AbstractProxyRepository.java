@@ -16,13 +16,12 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -44,7 +43,6 @@ import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.util.ContextUtils;
 
 /**
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
@@ -67,6 +65,9 @@ public abstract class AbstractProxyRepository
      */
     @Requirement
     private FeedRecorder feedRecorder;
+
+    @Requirement
+    private DownloadMirrors dMirrors;
 
     /** The proxy mode */
     private volatile ProxyMode proxyMode = ProxyMode.ALLOW;
@@ -93,9 +94,6 @@ public abstract class AbstractProxyRepository
      * The item max age.
      */
     private int itemMaxAge = 24 * 60;
-
-    @Requirement
-    private DownloadMirrors dMirrors;
 
     protected void resetRemoteStatus()
     {
@@ -241,7 +239,8 @@ public abstract class AbstractProxyRepository
 
         if ( sendNotification && !proxyMode.equals( oldProxyMode ) )
         {
-            notifyProximityEventListeners( new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );
+            getApplicationEventMulticaster().notifyProximityEventListeners(
+                new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );
         }
     }
 
@@ -344,11 +343,6 @@ public abstract class AbstractProxyRepository
         return dMirrors;
     }
 
-    public void setMirrors( List<Mirror> mirrors )
-    {
-        dMirrors.setMirrors( mirrors );
-    }
-
     protected AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws StorageException
     {
@@ -367,14 +361,14 @@ public abstract class AbstractProxyRepository
                     "Caching item " + item.getRepositoryItemUid().toString() + " in local storage of repository." );
             }
 
-            getLocalStorage().storeItem( this, item.getItemContext(), item );
+            getLocalStorage().storeItem( this, item );
 
             removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
 
-            result = getLocalStorage()
-                .retrieveItem( this, item.getItemContext(), item.getRepositoryItemUid().getPath() );
+            result = getLocalStorage().retrieveItem( this, new ResourceStoreRequest( item ) );
 
-            notifyProximityEventListeners( new RepositoryItemEventCache( this, result ) );
+            getApplicationEventMulticaster()
+                .notifyProximityEventListeners( new RepositoryItemEventCache( this, result ) );
 
             result.getItemContext().putAll( item.getItemContext() );
         }
@@ -393,7 +387,8 @@ public abstract class AbstractProxyRepository
         return result;
     }
 
-    protected StorageItem doRetrieveItem( RepositoryItemUid uid, Map<String, Object> context )
+    @Override
+    protected StorageItem doRetrieveItem( RepositoryRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
@@ -402,15 +397,12 @@ public abstract class AbstractProxyRepository
         AbstractStorageItem remoteItem = null;
         AbstractStorageItem localItem = null;
 
-        boolean localOnly = ContextUtils.isFlagTrue( context, ResourceStoreRequest.CTX_LOCAL_ONLY_FLAG );
-        boolean remoteOnly = ContextUtils.isFlagTrue( context, ResourceStoreRequest.CTX_REMOTE_ONLY_FLAG );
-
         if ( getLogger().isDebugEnabled() )
         {
-            StringBuffer db = new StringBuffer( uid.toString() );
+            StringBuffer db = new StringBuffer( request.toString() );
 
-            db.append( " :: localOnly=" ).append( localOnly );
-            db.append( ", remoteOnly=" ).append( remoteOnly );
+            db.append( " :: localOnly=" ).append( request.getResourceStoreRequest().isRequestLocalOnly() );
+            db.append( ", remoteOnly=" ).append( request.getResourceStoreRequest().isRequestRemoteOnly() );
 
             if ( getProxyMode() != null )
             {
@@ -420,11 +412,11 @@ public abstract class AbstractProxyRepository
             getLogger().debug( db.toString() );
         }
 
-        if ( !remoteOnly )
+        if ( !request.getResourceStoreRequest().isRequestRemoteOnly() )
         {
             try
             {
-                localItem = (AbstractStorageItem) super.doRetrieveItem( uid, context );
+                localItem = (AbstractStorageItem) super.doRetrieveItem( request );
             }
             catch ( ItemNotFoundException e )
             {
@@ -436,10 +428,11 @@ public abstract class AbstractProxyRepository
 
         for ( RequestProcessor processor : getRequestProcessors() )
         {
-            shouldProxy = shouldProxy && processor.shouldProxy( this, uid, context );
+            shouldProxy = shouldProxy && processor.shouldProxy( request );
         }
 
-        if ( getProxyMode() != null && getProxyMode().shouldProxy() && !localOnly && shouldProxy )
+        if ( getProxyMode() != null && getProxyMode().shouldProxy()
+            && !request.getResourceStoreRequest().isRequestLocalOnly() && shouldProxy )
         {
 
             // we are able to go remote
@@ -455,7 +448,8 @@ public abstract class AbstractProxyRepository
                         if ( getLogger().isDebugEnabled() )
                         {
                             getLogger().debug(
-                                "Item " + uid.toString() + " is old, checking for newer file on remote then local: "
+                                "Item " + request.toString()
+                                    + " is old, checking for newer file on remote then local: "
                                     + new Date( localItem.getModified() ) );
                         }
 
@@ -465,17 +459,16 @@ public abstract class AbstractProxyRepository
                             shouldGetRemote = getRemoteStorage().containsItem(
                                 localItem.getModified(),
                                 this,
-                                context,
-                                uid.getPath() );
+                                request.getResourceStoreRequest() );
 
                             if ( !shouldGetRemote )
                             {
-                                markItemRemotelyChecked( uid, context );
+                                markItemRemotelyChecked( request );
 
                                 if ( getLogger().isDebugEnabled() )
                                 {
                                     getLogger().debug(
-                                        "No newer version of item " + uid.toString() + " found on remote storage." );
+                                        "No newer version of item " + request.toString() + " found on remote storage." );
                                 }
                             }
                             else
@@ -483,7 +476,7 @@ public abstract class AbstractProxyRepository
                                 if ( getLogger().isDebugEnabled() )
                                 {
                                     getLogger().debug(
-                                        "Newer version of item " + uid.toString() + " is found on remote storage." );
+                                        "Newer version of item " + request.toString() + " is found on remote storage." );
                                 }
                             }
 
@@ -534,11 +527,11 @@ public abstract class AbstractProxyRepository
                         // this will GET it unconditionally
                         try
                         {
-                            remoteItem = doRetrieveRemoteItem( uid, context );
+                            remoteItem = doRetrieveRemoteItem( request );
 
                             if ( getLogger().isDebugEnabled() )
                             {
-                                getLogger().debug( "Item " + uid.toString() + " found in remote storage." );
+                                getLogger().debug( "Item " + request.toString() + " found in remote storage." );
                             }
                         }
                         catch ( StorageException e )
@@ -550,7 +543,7 @@ public abstract class AbstractProxyRepository
                             {
                                 if ( localItem == null )
                                 {
-                                    deleteItem( uid, context );
+                                    deleteItem( request );
                                 }
                             }
                             catch ( ItemNotFoundException ex1 )
@@ -572,7 +565,7 @@ public abstract class AbstractProxyRepository
                 {
                     if ( getLogger().isDebugEnabled() )
                     {
-                        getLogger().debug( "Item " + uid.toString() + " not found in remote storage." );
+                        getLogger().debug( "Item " + request.toString() + " not found in remote storage." );
                     }
 
                     remoteItem = null;
@@ -587,11 +580,11 @@ public abstract class AbstractProxyRepository
                     getLogger()
                         .debug(
                             "Item "
-                                + uid.toString()
+                                + request.toString()
                                 + " does not exist in local storage neither in remote storage, throwing ItemNotFoundException." );
                 }
 
-                throw new ItemNotFoundException( uid );
+                throw new ItemNotFoundException( request.getResourceStoreRequest().getRequestPath(), getId() );
             }
             else if ( localItem != null && remoteItem == null )
             {
@@ -599,7 +592,8 @@ public abstract class AbstractProxyRepository
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug(
-                        "Item " + uid.toString() + " does exist in local storage and is fresh, returning local one." );
+                        "Item " + request.toString()
+                            + " does exist in local storage and is fresh, returning local one." );
                 }
 
                 item = localItem;
@@ -620,8 +614,10 @@ public abstract class AbstractProxyRepository
             {
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug(
-                        "Item " + uid.toString() + " does exist locally and cannot go remote, returning local one." );
+                    getLogger()
+                        .debug(
+                            "Item " + request.toString()
+                                + " does exist locally and cannot go remote, returning local one." );
                 }
 
                 item = localItem;
@@ -631,23 +627,23 @@ public abstract class AbstractProxyRepository
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug(
-                        "Item " + uid.toString()
+                        "Item " + request.toString()
                             + " does not exist locally and cannot go remote, throwing ItemNotFoundException." );
                 }
 
-                throw new ItemNotFoundException( uid );
+                throw new ItemNotFoundException( request.getResourceStoreRequest().getRequestPath(), getId() );
             }
         }
 
         return item;
     }
 
-    private void sendContentValidationEvents( RepositoryItemUid uid, List<NexusArtifactEvent> events,
+    private void sendContentValidationEvents( RepositoryRequest request, List<NexusArtifactEvent> events,
         boolean isContentValid )
     {
         if ( getLogger().isDebugEnabled() && !isContentValid )
         {
-            getLogger().debug( "Item " + uid.toString() + " failed content integrity validation." );
+            getLogger().debug( "Item " + request.toString() + " failed content integrity validation." );
         }
 
         for ( NexusArtifactEvent event : events )
@@ -656,12 +652,12 @@ public abstract class AbstractProxyRepository
         }
     }
 
-    protected void markItemRemotelyChecked( RepositoryItemUid uid, Map<String, Object> context )
+    protected void markItemRemotelyChecked( RepositoryRequest request )
         throws StorageException,
             ItemNotFoundException
     {
         // remote file unchanged, touch the local one to renew it's Age
-        getLocalStorage().touchItemRemoteChecked( this, context, uid.getPath() );
+        getLocalStorage().touchItemRemoteChecked( request.getRepository(), request.getResourceStoreRequest() );
     }
 
     /**
@@ -672,7 +668,7 @@ public abstract class AbstractProxyRepository
      * </code>
      */
     protected boolean doValidateRemoteItemContent( String baseUrl, AbstractStorageItem item,
-        Map<String, Object> context, List<NexusArtifactEvent> events )
+        List<NexusArtifactEvent> events )
         throws StorageException
     {
         return true;
@@ -701,7 +697,7 @@ public abstract class AbstractProxyRepository
      * Other                yes           yes
      * </pre>
      */
-    protected AbstractStorageItem doRetrieveRemoteItem( RepositoryItemUid uid, Map<String, Object> context )
+    protected AbstractStorageItem doRetrieveRemoteItem( RepositoryRequest request )
         throws ItemNotFoundException,
             RemoteAccessException,
             StorageException
@@ -709,6 +705,7 @@ public abstract class AbstractProxyRepository
         DownloadMirrorSelector selector = getDownloadMirrors().openSelector();
 
         ArrayList<Mirror> mirrors = new ArrayList<Mirror>( selector.getMirrors() );
+
         mirrors.add( new Mirror( "default", getRemoteUrl() ) );
 
         ArrayList<NexusArtifactEvent> events = new ArrayList<NexusArtifactEvent>();
@@ -737,17 +734,16 @@ public abstract class AbstractProxyRepository
 
                         AbstractStorageItem remoteItem = getRemoteStorage().retrieveItem(
                             this,
-                            context,
-                            mirror.getUrl(),
-                            uid.getPath() );
+                            request.getResourceStoreRequest(),
+                            mirror.getUrl() );
 
-                        remoteItem.getItemContext().putAll( context );
+                        remoteItem.getItemContext().putAll( request.getResourceStoreRequest().getRequestContext() );
 
                         remoteItem = doCacheItem( remoteItem );
 
-                        if ( doValidateRemoteItemContent( mirror.getUrl(), remoteItem, context, events ) )
+                        if ( doValidateRemoteItemContent( mirror.getUrl(), remoteItem, events ) )
                         {
-                            sendContentValidationEvents( uid, events, true );
+                            sendContentValidationEvents( request, events, true );
 
                             selector.feedbackSuccess( mirror );
 
@@ -757,7 +753,7 @@ public abstract class AbstractProxyRepository
                         {
                             selector.feedbackFailure( mirror );
 
-                            lastException = new InvalidItemContentException( uid );
+                            lastException = new InvalidItemContentException( request, mirror );
                         }
                     }
                     catch ( ItemNotFoundException e )
@@ -792,11 +788,11 @@ public abstract class AbstractProxyRepository
 
         // if we got here, requested item was not retrieved for some reason
 
-        sendContentValidationEvents( uid, events, false );
+        sendContentValidationEvents( request, events, false );
 
         try
         {
-            getLocalStorage().deleteItem( this, context, uid.getPath() );
+            getLocalStorage().deleteItem( this, request.getResourceStoreRequest() );
         }
         catch ( ItemNotFoundException e )
         {
@@ -817,7 +813,7 @@ public abstract class AbstractProxyRepository
         }
 
         // validation failed, I guess.
-        throw new ItemNotFoundException( uid );
+        throw new ItemNotFoundException( request.getResourceStoreRequest().getRequestPath(), getId() );
 
     }
 

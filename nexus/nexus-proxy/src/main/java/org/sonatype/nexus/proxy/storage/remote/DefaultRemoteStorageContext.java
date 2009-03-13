@@ -16,7 +16,7 @@ package org.sonatype.nexus.proxy.storage.remote;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
 
 /**
  * The default remote storage context.
@@ -45,7 +45,13 @@ public class DefaultRemoteStorageContext
             // HttpProxy).
             // Also, when we have no "parent" (defaults, to delegate lookup to), that means that we have to create a
             // default one.
-            this.putRemoteConnectionContextObject( REMOTE_CONNECTIONS_SETTINGS, new CRemoteConnectionSettings() );
+            CRemoteConnectionSettings connSettings = new CRemoteConnectionSettings();
+            
+            connSettings.setConnectionTimeout( 10000 );
+            
+            connSettings.setRetrievalRetryCount( 3 );
+            
+            this.putRemoteConnectionContextObject( REMOTE_CONNECTIONS_SETTINGS, connSettings );
         }
     }
 
@@ -108,4 +114,8 @@ public class DefaultRemoteStorageContext
         lastChanged = System.currentTimeMillis();
     }
 
+    public RemoteStorageContext getParentRemoteStorageContext()
+    {
+        return defaults;
+    }
 }

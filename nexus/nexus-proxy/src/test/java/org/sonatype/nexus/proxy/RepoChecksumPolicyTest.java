@@ -64,8 +64,7 @@ public class RepoChecksumPolicyTest
         // IGNORE: the req ignores checksum
         assertFalse( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-all/activemq-core/1.2/activemq-core-1.2.jar.sha1" ) );
+            new ResourceStoreRequest( "/activemq-with-all/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
 
         file = requestWithPolicy( policy, new ResourceStoreRequest(
             "/activemq-with-md5/activemq-core/1.2/activemq-core-1.2.jar",
@@ -74,8 +73,7 @@ public class RepoChecksumPolicyTest
         // IGNORE: the req ignores checksum
         assertFalse( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-md5/activemq-core/1.2/activemq-core-1.2.jar.md5" ) );
+            new ResourceStoreRequest( "/activemq-with-md5/activemq-core/1.2/activemq-core-1.2.jar.md5", true ) ) );
 
         file = requestWithPolicy( policy, new ResourceStoreRequest(
             "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar",
@@ -84,8 +82,7 @@ public class RepoChecksumPolicyTest
         // IGNORE: the req ignores checksum
         assertFalse( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.sha1" ) );
+            new ResourceStoreRequest( "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
 
         file = requestWithPolicy( policy, new ResourceStoreRequest(
             "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar",
@@ -94,8 +91,7 @@ public class RepoChecksumPolicyTest
         // IGNORE: the req ignores checksum
         assertFalse( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar.sha1" ) );
+            new ResourceStoreRequest( "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
     }
 
     public void testPolicyWarn()
@@ -111,8 +107,7 @@ public class RepoChecksumPolicyTest
         // WARN: the req implicitly gets the "best" checksum available implicitly
         assertTrue( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-all/activemq-core/1.2/activemq-core-1.2.jar.sha1" ) );
+            new ResourceStoreRequest( "/activemq-with-all/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
 
         file = requestWithPolicy( policy, new ResourceStoreRequest(
             "/activemq-with-md5/activemq-core/1.2/activemq-core-1.2.jar",
@@ -121,8 +116,7 @@ public class RepoChecksumPolicyTest
         // WARN: the req implicitly gets the "best" checksum available implicitly
         assertTrue( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-md5/activemq-core/1.2/activemq-core-1.2.jar.md5" ) );
+            new ResourceStoreRequest( "/activemq-with-md5/activemq-core/1.2/activemq-core-1.2.jar.md5", true ) ) );
 
         file = requestWithPolicy( policy, new ResourceStoreRequest(
             "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar",
@@ -131,12 +125,10 @@ public class RepoChecksumPolicyTest
         // WARN: the req implicitly gets the "best" checksum available implicitly
         assertFalse( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.sha1" ) );
+            new ResourceStoreRequest( "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
         assertFalse( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.md5" ) );
+            new ResourceStoreRequest( "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.md5", true ) ) );
 
         file = requestWithPolicy( policy, new ResourceStoreRequest(
             "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar",
@@ -145,8 +137,7 @@ public class RepoChecksumPolicyTest
         // WARN: the req implicitly gets the "best" checksum available implicitly
         assertTrue( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar.sha1" ) );
+            new ResourceStoreRequest( "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
     }
 
     public void testPolicyStrictIfExists()
@@ -162,8 +153,7 @@ public class RepoChecksumPolicyTest
         // STRICT_IF_EXISTS: the req implicitly gets the "best" checksum available implicitly
         assertTrue( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-all/activemq-core/1.2/activemq-core-1.2.jar.sha1" ) );
+            new ResourceStoreRequest( "/activemq-with-all/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
 
         file = requestWithPolicy( policy, new ResourceStoreRequest(
             "/activemq-with-md5/activemq-core/1.2/activemq-core-1.2.jar",
@@ -172,8 +162,7 @@ public class RepoChecksumPolicyTest
         // STRICT_IF_EXISTS: the req implicitly gets the "best" checksum available implicitly
         assertTrue( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-md5/activemq-core/1.2/activemq-core-1.2.jar.md5" ) );
+            new ResourceStoreRequest( "/activemq-with-md5/activemq-core/1.2/activemq-core-1.2.jar.md5", true ) ) );
 
         file = requestWithPolicy( policy, new ResourceStoreRequest(
             "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar",
@@ -182,12 +171,10 @@ public class RepoChecksumPolicyTest
         // STRICT_IF_EXISTS: the req implicitly gets the "best" checksum available implicitly
         assertFalse( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.sha1" ) );
+            new ResourceStoreRequest( "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
         assertFalse( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.md5" ) );
+            new ResourceStoreRequest( "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.md5", true ) ) );
 
         try
         {
@@ -205,8 +192,7 @@ public class RepoChecksumPolicyTest
         }
         assertFalse( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar.sha1" ) );
+            new ResourceStoreRequest( "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
     }
 
     public void testPolicyStrict()
@@ -222,8 +208,7 @@ public class RepoChecksumPolicyTest
         // STRICT: the req implicitly gets the "best" checksum available implicitly
         assertTrue( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-all/activemq-core/1.2/activemq-core-1.2.jar.sha1" ) );
+            new ResourceStoreRequest( "/activemq-with-all/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
 
         file = requestWithPolicy( policy, new ResourceStoreRequest(
             "/activemq-with-md5/activemq-core/1.2/activemq-core-1.2.jar",
@@ -232,8 +217,7 @@ public class RepoChecksumPolicyTest
         // STRICT: the req implicitly gets the "best" checksum available implicitly
         assertTrue( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-md5/activemq-core/1.2/activemq-core-1.2.jar.md5" ) );
+            new ResourceStoreRequest( "/activemq-with-md5/activemq-core/1.2/activemq-core-1.2.jar.md5", true ) ) );
 
         try
         {
@@ -251,12 +235,10 @@ public class RepoChecksumPolicyTest
         }
         assertFalse( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.sha1" ) );
+            new ResourceStoreRequest( "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
         assertFalse( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.md5" ) );
+            new ResourceStoreRequest( "/activemq-with-none/activemq-core/1.2/activemq-core-1.2.jar.md5", true ) ) );
 
         try
         {
@@ -274,7 +256,6 @@ public class RepoChecksumPolicyTest
         }
         assertFalse( getRepository().getLocalStorage().containsItem(
             getRepository(),
-            null,
-            "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar.sha1" ) );
+            new ResourceStoreRequest( "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
     }
 }

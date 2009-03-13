@@ -23,8 +23,6 @@ import java.util.List;
 import org.easymock.EasyMock;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
@@ -82,21 +80,6 @@ public class DefaultRepositoryRegistryTest
         expect( repoA.adaptToFacet( HostedRepository.class ) ).andReturn( repoA ).anyTimes();
         expect( repoB.adaptToFacet( HostedRepository.class ) ).andReturn( repoB ).anyTimes();
         expect( repoC.adaptToFacet( HostedRepository.class ) ).andReturn( repoC ).anyTimes();
-
-        repoA.addProximityEventListener( (EventListener) repositoryRegistry );
-        repoB.addProximityEventListener( (EventListener) repositoryRegistry );
-        repoC.addProximityEventListener( (EventListener) repositoryRegistry );
-
-        repoA.removeProximityEventListener( (EventListener) repositoryRegistry );
-        repoB.removeProximityEventListener( (EventListener) repositoryRegistry );
-        repoC.removeProximityEventListener( (EventListener) repositoryRegistry );
-        
-        repoA.onProximityEvent( EasyMock.isA( AbstractEvent.class ) );
-        EasyMock.expectLastCall().anyTimes();
-        repoB.onProximityEvent( EasyMock.isA( AbstractEvent.class ) );
-        EasyMock.expectLastCall().anyTimes();
-        repoC.onProximityEvent( EasyMock.isA( AbstractEvent.class ) );
-        EasyMock.expectLastCall().anyTimes();
 
         replay( repoA, repoB, repoC );
 

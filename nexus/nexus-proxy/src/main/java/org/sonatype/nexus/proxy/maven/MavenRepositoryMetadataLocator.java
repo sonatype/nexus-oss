@@ -42,6 +42,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -105,32 +106,32 @@ public class MavenRepositoryMetadataLocator
         {
             return null;
         }
-        
+
         Reader reader = null;
 
         try
         {
-            Gav pomGav = new Gav( 
-                gav.getGroupId(), // groupId
+            Gav pomGav = new Gav( gav.getGroupId(), // groupId
                 gav.getArtifactId(), // artifactId
                 gav.getVersion(), // version
                 null, // classifier
-                "pom", // extension 
+                "pom", // extension
                 gav.getSnapshotBuildNumber(), // snapshotBuildNumber
                 gav.getSnapshotTimeStamp(), // snapshotTimeStamp
                 gav.getName(), // name
                 gav.isSnapshot(), // snapshot
                 false, // hash
-                null,  // hashType
+                null, // hashType
                 false, // signature
-                null // signatureType 
+                null // signatureType
             );
 
             String pomPath = gavCalculator.gavToPath( pomGav );
 
+            request.setRequestPath( pomPath );
+
             StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem(
-                request.getMavenRepository().createUid( pomPath ),
-                request.getRequestContext() );
+                new RepositoryRequest( request.getMavenRepository(), request ) );
 
             reader = ReaderFactory.newXmlReader( pomFile.getInputStream() );
 
@@ -204,9 +205,10 @@ public class MavenRepositoryMetadataLocator
 
             String pomPath = request.getMavenRepository().getGavCalculator().gavToPath( gav );
 
+            request.setRequestPath( pomPath );
+
             StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem(
-                request.getMavenRepository().createUid( pomPath ),
-                request.getRequestContext() );
+                new RepositoryRequest( request.getMavenRepository(), request ) );
 
             Model model = null;
 
@@ -338,7 +340,7 @@ public class MavenRepositoryMetadataLocator
         return result;
     }
 
-    protected Metadata readOrCreateMetadata( RepositoryItemUid uid, Map<String, Object> ctx )
+    protected Metadata readOrCreateMetadata( RepositoryItemUid uid, ArtifactStoreRequest request )
         throws IllegalOperationException,
             IOException,
             MetadataException
@@ -347,7 +349,9 @@ public class MavenRepositoryMetadataLocator
 
         try
         {
-            StorageItem item = uid.getRepository().retrieveItem( uid, ctx );
+            request.setRequestPath( uid.getPath() );
+
+            StorageItem item = uid.getRepository().retrieveItem( new RepositoryRequest( uid.getRepository(), request ) );
 
             if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
             {
@@ -415,7 +419,7 @@ public class MavenRepositoryMetadataLocator
 
         RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
 
-        Metadata result = readOrCreateMetadata( uid, request.getRequestContext() );
+        Metadata result = readOrCreateMetadata( uid, request );
 
         result.setGroupId( gav.getGroupId() );
 
@@ -441,7 +445,7 @@ public class MavenRepositoryMetadataLocator
 
         RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
 
-        Metadata result = readOrCreateMetadata( uid, request.getRequestContext() );
+        Metadata result = readOrCreateMetadata( uid, request );
 
         result.setGroupId( gav.getGroupId() );
 
@@ -470,7 +474,7 @@ public class MavenRepositoryMetadataLocator
 
         RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
 
-        Metadata result = readOrCreateMetadata( uid, request.getRequestContext() );
+        Metadata result = readOrCreateMetadata( uid, request );
 
         result.setGroupId( null );
 

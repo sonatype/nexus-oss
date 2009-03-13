@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.sonatype.nexus.configuration.ValidatingConfigurable;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStore;
@@ -25,11 +26,10 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.cache.PathCache;
-import org.sonatype.nexus.proxy.events.EventListener;
-import org.sonatype.nexus.proxy.events.EventMulticaster;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.mirror.PublishedMirrors;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
@@ -43,7 +43,7 @@ import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
  * @author cstamas
  */
 public interface Repository
-    extends ResourceStore, EventMulticaster, EventListener
+    extends ResourceStore, ValidatingConfigurable<Object>
 {
     /**
      * Returns the ID of the resourceStore.
@@ -110,12 +110,20 @@ public interface Repository
     RepositoryTaskFilter getRepositoryTaskFilter();
 
     /**
-     * Gets the target set for UID.
+     * Gets the target set for request.
      * 
      * @param uid
      * @return
      */
-    TargetSet getTargetsForRequest( String path, Map<String, Object> context );
+    TargetSet getTargetsForRequest( ResourceStoreRequest request );
+
+    /**
+     * Checks is there at all any target for the given request.
+     * 
+     * @param uid
+     * @return
+     */
+    boolean hasAnyTargetsForRequest( ResourceStoreRequest request );
 
     /**
      * Creates an UID within this Repository.
@@ -146,7 +154,7 @@ public interface Repository
      * @param t
      * @return the facet requested, otherwise null.
      */
-    <T> T adaptToFacet( Class<T> t );
+    <F> F adaptToFacet( Class<F> t );
 
     // ==================================================
     // NFC et al
@@ -251,6 +259,13 @@ public interface Repository
      */
     void setLocalStorage( LocalRepositoryStorage storage );
 
+    /**
+     * Gets the published mirrors.
+     * 
+     * @return
+     */
+    PublishedMirrors getPublishedMirrors();
+
     // ==================================================
     // Behaviour
 
@@ -343,21 +358,21 @@ public interface Repository
      * 
      * @param path a path from to start descending. If null, it is taken as "root".
      */
-    void clearCaches( String path );
+    void clearCaches( ResourceStoreRequest request );
 
     /**
      * Purges the NFC caches from path and below.
      * 
      * @param path
      */
-    void clearNotFoundCaches( String path );
+    void clearNotFoundCaches( ResourceStoreRequest request );
 
     /**
      * Evicts items that were last used before timestamp.
      * 
      * @param timestamp
      */
-    Collection<String> evictUnusedItems( long timestamp );
+    Collection<String> evictUnusedItems( ResourceStoreRequest request, long timestamp );
 
     /**
      * Forces the recreation of attributes on this repository.
@@ -365,7 +380,7 @@ public interface Repository
      * @param initialData the initial data
      * @return true, if recreate attributes
      */
-    boolean recreateAttributes( String fromPath, Map<String, String> initialData );
+    boolean recreateAttributes( ResourceStoreRequest request, Map<String, String> initialData );
 
     /**
      * Returns the repository level AccessManager. Per repository instance may exists.
@@ -384,24 +399,24 @@ public interface Repository
     // ==================================================
     // Alternative (and unprotected) Content access
 
-    StorageItem retrieveItem( RepositoryItemUid uid, Map<String, Object> context )
+    StorageItem retrieveItem( RepositoryRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
-    void copyItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
+    void copyItem( RepositoryRequest from, RepositoryRequest to )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
-    void moveItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
+    void moveItem( RepositoryRequest from, RepositoryRequest to )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
-    void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
+    void deleteItem( RepositoryRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
@@ -412,7 +427,7 @@ public interface Repository
             IllegalOperationException,
             StorageException;
 
-    Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
+    Collection<StorageItem> list( RepositoryRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
@@ -421,5 +436,4 @@ public interface Repository
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
-
 }

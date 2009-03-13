@@ -23,7 +23,7 @@ public abstract class AbstractNexusTestEnvironment
 {
     /** The cache manager. */
     private CacheManager cacheManager;
-    
+
     private Scheduler scheduler;
 
     private RepositoryItemUidFactory repositoryItemUidFactory;
@@ -32,32 +32,18 @@ public abstract class AbstractNexusTestEnvironment
         throws Exception
     {
         super.setUp();
-        
+
         FileUtils.deleteDirectory( PLEXUS_HOME );
-        
+
         PLEXUS_HOME.mkdirs();
         WORK_HOME.mkdirs();
         CONF_HOME.mkdirs();
 
         scheduler = lookup( Scheduler.class );
-        
-        scheduler.startService();
-        
+
         cacheManager = lookup( CacheManager.class );
 
-        cacheManager.startService();
-
         repositoryItemUidFactory = lookup( RepositoryItemUidFactory.class );
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        cacheManager.stopService();
-        
-        scheduler.stopService();
-
-        super.tearDown();
     }
 
     /**
@@ -68,6 +54,11 @@ public abstract class AbstractNexusTestEnvironment
     protected CacheManager getCacheManager()
     {
         return cacheManager;
+    }
+    
+    protected Scheduler getScheduler()
+    {
+        return scheduler;
     }
 
     protected RepositoryItemUidFactory getRepositoryItemUidFactory()

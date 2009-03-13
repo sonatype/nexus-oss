@@ -39,7 +39,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.packer.IndexPackingRequest;
@@ -54,6 +53,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -584,57 +584,56 @@ public class DefaultIndexerManager
     protected boolean updateIndexForRemoteRepository( ProxyRepository repository )
         throws IOException
     {
-        boolean shouldDownloadRemoteIndex = false;
-
-        try
+        if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
         {
-            CRepository repoModel = nexusConfiguration.readRepository( repository.getId() );
+            MavenProxyRepository mpr = repository.adaptToFacet( MavenProxyRepository.class );
 
-            shouldDownloadRemoteIndex = repoModel.isDownloadRemoteIndexes();
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // TODO: heee?
-        }
+            boolean shouldDownloadRemoteIndex = mpr.isDownloadRemoteIndexes();
 
-        boolean hasRemoteIndex = false;
+            boolean hasRemoteIndex = false;
 
-        if ( shouldDownloadRemoteIndex )
-        {
-            try
+            if ( shouldDownloadRemoteIndex )
             {
-                getLogger().info( "Trying to get remote index for repository " + repository.getId() );
-
-                hasRemoteIndex = updateRemoteIndex( repository );
-
-                if ( hasRemoteIndex )
+                try
                 {
-                    getLogger().info( "Remote indexes updated successfully for repository " + repository.getId() );
+                    getLogger().info( "Trying to get remote index for repository " + repository.getId() );
+
+                    hasRemoteIndex = updateRemoteIndex( repository );
+
+                    if ( hasRemoteIndex )
+                    {
+                        getLogger().info( "Remote indexes updated successfully for repository " + repository.getId() );
+                    }
+                    else
+                    {
+                        getLogger().info(
+                            "Remote indexes unchanged (no update needed) for repository " + repository.getId() );
+                    }
                 }
-                else
+                catch ( Exception e )
                 {
-                    getLogger().info(
-                        "Remote indexes unchanged (no update needed) for repository " + repository.getId() );
+                    getLogger().warn( "Cannot fetch remote index:", e );
                 }
             }
-            catch ( Exception e )
+            else
             {
-                getLogger().warn( "Cannot fetch remote index:", e );
+                // make empty the remote context
+                IndexingContext context = nexusIndexer.getIndexingContexts().get(
+                    getRemoteContextId( repository.getId() ) );
+
+                context.purge();
+
+                // XXX remove obsolete files, should remove all index fragments
+                // deleteItem( repository, ctx, zipUid );
+                // deleteItem( repository, ctx, chunkUid ) ;
             }
+
+            return hasRemoteIndex;
         }
         else
         {
-            // make empty the remote context
-            IndexingContext context = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repository.getId() ) );
-
-            context.purge();
-
-            // XXX remove obsolete files, should remove all index fragments
-            // deleteItem( repository, ctx, zipUid );
-            // deleteItem( repository, ctx, chunkUid ) ;
+            return false;
         }
-
-        return hasRemoteIndex;
     }
 
     protected boolean updateRemoteIndex( final ProxyRepository repository )

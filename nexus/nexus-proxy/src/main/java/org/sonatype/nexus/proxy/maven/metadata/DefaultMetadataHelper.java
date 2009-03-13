@@ -17,6 +17,7 @@ import java.io.InputStream;
 
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -27,6 +28,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -63,21 +65,23 @@ public class DefaultMetadataHelper
             IllegalOperationException,
             ItemNotFoundException
     {
-        repository.deleteItem( repository.createUid( path ), null );
+        repository.deleteItem( new RepositoryRequest( repository, new ResourceStoreRequest( path, true ) ) );
     }
 
     @Override
     public boolean exists( String path )
         throws StorageException
     {
-        return repository.getLocalStorage().containsItem( repository, null, path );
+        return repository.getLocalStorage().containsItem( repository, new ResourceStoreRequest( path, true ) );
     }
 
     @Override
     public InputStream retrieveContent( String path )
         throws Exception
     {
-        StorageItem item = repository.retrieveItem( repository.createUid( path ), null );
+        StorageItem item = repository.retrieveItem( new RepositoryRequest( repository, new ResourceStoreRequest(
+            path,
+            false ) ) );
 
         if ( item instanceof StorageFileItem )
         {
@@ -132,7 +136,7 @@ public class DefaultMetadataHelper
         throws StorageException,
             ItemNotFoundException
     {
-        return repository.getLocalStorage().retrieveItem( repository, null, path );
+        return repository.getLocalStorage().retrieveItem( repository, new ResourceStoreRequest( path, true ) );
     }
 
     private void storeItem( RepositoryItemUid uid, ContentLocator contentLocator )

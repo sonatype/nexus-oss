@@ -11,29 +11,35 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.repository;
+package org.sonatype.nexus.proxy.mirror;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 
-/**
- * This is default implementation of a repository. It supports age calculation, a repeated retrieval if item is found
- * locally but it's age is more then allowed.
- * 
- * @author cstamas
- */
-public abstract class DefaultRepository
-    extends AbstractProxyRepository
+import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.proxy.repository.Mirror;
+
+@Component( role = PublishedMirrors.class, instantiationStrategy = "per-lookup" )
+public class DefaultPublishedMirrors
+    implements PublishedMirrors
 {
-    private MutableProxyRepositoryKind repositoryKind;
+    private LinkedHashSet<Mirror> mirrors = new LinkedHashSet<Mirror>();
 
-    public RepositoryKind getRepositoryKind()
+    public void setMirrors( List<Mirror> mirrors )
     {
-        if ( repositoryKind == null )
+        if ( mirrors == null || mirrors.isEmpty() )
         {
-            repositoryKind = new MutableProxyRepositoryKind( this, null, new DefaultRepositoryKind(
-                HostedRepository.class,
-                null ), new DefaultRepositoryKind( ProxyRepository.class, null ) );
+            this.mirrors.clear();
         }
+        else
+        {
+            this.mirrors = new LinkedHashSet<Mirror>( mirrors );
+        }
+    }
 
-        return repositoryKind;
+    public List<Mirror> getMirrors()
+    {
+        return new ArrayList<Mirror>( mirrors );
     }
 }

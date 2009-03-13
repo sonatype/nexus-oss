@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.walker;
 import java.util.List;
 import java.util.Map;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -25,6 +26,13 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public interface WalkerContext
 {
+    /**
+     * Gets the resource store request that initiated this walk.
+     * 
+     * @return
+     */
+    ResourceStoreRequest getResourceStoreRequest();
+
     /**
      * Will not try to reach remote storage.
      * 

@@ -20,8 +20,8 @@ import java.util.TimeZone;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
-import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
+import org.sonatype.nexus.configuration.modello.Configuration;
+import org.sonatype.nexus.configuration.modello.io.xpp3.NexusConfigurationXpp3Writer;
 
 public class DefaultApplicationConfigurationUpgraderTest
     extends AbstractNexusTestCase
@@ -66,10 +66,6 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( 7, configuration.getRepositories().size() );
 
-        assertEquals( 0, configuration.getRepositoryShadows().size() );
-
-        assertEquals( 2, configuration.getRepositoryGrouping().getRepositoryGroups().size() );
-
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-001-1.xml", configuration );
@@ -85,10 +81,6 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
         assertEquals( 11, configuration.getRepositories().size() );
-
-        assertEquals( 0, configuration.getRepositoryShadows().size() );
-
-        assertEquals( 2, configuration.getRepositoryGrouping().getRepositoryGroups().size() );
 
         assertEquals( 3, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -106,10 +98,6 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( 7, configuration.getRepositories().size() );
 
-        assertEquals( 0, configuration.getRepositoryShadows().size() );
-
-        assertEquals( 2, configuration.getRepositoryGrouping().getRepositoryGroups().size() );
-
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-001-3.xml", configuration );
@@ -126,10 +114,6 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( 7, configuration.getRepositories().size() );
 
-        assertEquals( 0, configuration.getRepositoryShadows().size() );
-
-        assertEquals( 2, configuration.getRepositoryGrouping().getRepositoryGroups().size() );
-
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-100.xml", configuration );
@@ -145,10 +129,6 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
         assertEquals( 15, configuration.getRepositories().size() );
-
-        assertEquals( 2, configuration.getRepositoryShadows().size() );
-
-        assertEquals( 5, configuration.getRepositoryGrouping().getRepositoryGroups().size() );
 
         assertEquals( 4, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -180,10 +160,6 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( 6, configuration.getRepositories().size() );
 
-        assertEquals( 1, configuration.getRepositoryShadows().size() );
-
-        assertEquals( 2, configuration.getRepositoryGrouping().getRepositoryGroups().size() );
-
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/103-1/nexus-103.xml", configuration );
@@ -202,10 +178,6 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
         assertEquals( 6, configuration.getRepositories().size() );
-
-        assertEquals( 1, configuration.getRepositoryShadows().size() );
-
-        assertEquals( 2, configuration.getRepositoryGrouping().getRepositoryGroups().size() );
 
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 

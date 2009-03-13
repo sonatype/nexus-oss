@@ -182,8 +182,8 @@ public class Upgrade101to102
                 newshadow.setId( oldshadow.getId() );
                 newshadow.setName( oldshadow.getName() );
                 newshadow.setLocalStatus( oldshadow.isAvailable()
-                    ? org.sonatype.nexus.configuration.model.Configuration.LOCAL_STATUS_IN_SERVICE
-                    : org.sonatype.nexus.configuration.model.Configuration.LOCAL_STATUS_OUT_OF_SERVICE );
+                    ? org.sonatype.nexus.configuration.model.v1_0_2.Configuration.LOCAL_STATUS_IN_SERVICE
+                    : org.sonatype.nexus.configuration.model.v1_0_2.Configuration.LOCAL_STATUS_OUT_OF_SERVICE );
                 newshadow.setShadowOf( oldshadow.getShadowOf() );
                 newshadow.setType( oldshadow.getType() );
                 newshadow.setSyncAtStartup( oldshadow.isSyncAtStartup() );

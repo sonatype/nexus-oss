@@ -37,4 +37,12 @@ public interface TargetRegistry
      * @return
      */
     TargetSet getTargetsForRepositoryPath( Repository repository, String path );
+
+    /**
+     * This method will return true if the repository has any applicable target at all.
+     * 
+     * @param repository
+     * @return
+     */
+    boolean hasAnyApplicableTarget( Repository repository );
 }

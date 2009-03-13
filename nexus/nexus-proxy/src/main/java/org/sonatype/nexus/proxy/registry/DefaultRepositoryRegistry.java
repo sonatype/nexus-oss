@@ -20,11 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.proxy.EventMulticasterComponent;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
-import org.sonatype.nexus.proxy.events.EventMulticaster;
+import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
@@ -49,9 +48,12 @@ import org.sonatype.nexus.proxy.repository.RepositoryStatusCheckerThread;
  */
 @Component( role = RepositoryRegistry.class )
 public class DefaultRepositoryRegistry
-    extends EventMulticasterComponent
-    implements RepositoryRegistry, EventListener
+    extends AbstractLogEnabled
+    implements RepositoryRegistry
 {
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
+
     /** The repo register, [Repository.getId, Repository] */
     private Map<String, Repository> repositories = new HashMap<String, Repository>();
 
@@ -186,14 +188,6 @@ public class DefaultRepositoryRegistry
         return result;
     }
 
-    /**
-     * Simply "aggregating" repo events, and passing them over.
-     */
-    public void onProximityEvent( AbstractEvent evt )
-    {
-        this.notifyProximityEventListeners( evt );
-    }
-
     //
     // priv
     //
@@ -224,16 +218,14 @@ public class DefaultRepositoryRegistry
 
         if ( isAddOperation )
         {
-            if ( repository instanceof EventMulticaster )
-            {
-                ( (EventMulticaster) repository ).addProximityEventListener( this );
-            }
-
-            notifyProximityEventListeners( new RepositoryRegistryEventAdd( this, repository ) );
+            applicationEventMulticaster
+                .notifyProximityEventListeners( new RepositoryRegistryEventAdd( this, repository ) );
         }
         else
         {
-            notifyProximityEventListeners( new RepositoryRegistryEventUpdate( this, repository ) );
+            applicationEventMulticaster.notifyProximityEventListeners( new RepositoryRegistryEventUpdate(
+                this,
+                repository ) );
         }
     }
 
@@ -241,7 +233,9 @@ public class DefaultRepositoryRegistry
     {
         if ( !silently )
         {
-            notifyProximityEventListeners( new RepositoryRegistryEventRemove( this, repository ) );
+            applicationEventMulticaster.notifyProximityEventListeners( new RepositoryRegistryEventRemove(
+                this,
+                repository ) );
         }
 
         repositories.remove( repository.getId() );
@@ -251,11 +245,6 @@ public class DefaultRepositoryRegistry
             RepositoryStatusCheckerThread thread = repositoryStatusCheckers.remove( repository.getId() );
 
             thread.interrupt();
-        }
-
-        if ( repository instanceof EventMulticaster )
-        {
-            ( (EventMulticaster) repository ).removeProximityEventListener( this );
         }
     }
 

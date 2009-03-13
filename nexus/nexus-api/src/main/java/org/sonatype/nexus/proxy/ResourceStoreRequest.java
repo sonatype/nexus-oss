@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * Request for a resource. It drives many aspects of the request itself.
@@ -93,6 +94,20 @@ public class ResourceStoreRequest
     }
 
     /**
+     * Creates a request for a given item.
+     * 
+     * @param item
+     */
+    public ResourceStoreRequest( StorageItem item )
+    {
+        this( item.getRepositoryItemUid().getPath(), true, item.getRepositoryId() );
+
+        getRequestContext().putAll( item.getItemContext() );
+
+        getProcessedRepositories().clear();
+    }
+
+    /**
      * Gets the request path.
      * 
      * @return the request path
@@ -145,6 +160,16 @@ public class ResourceStoreRequest
     }
 
     /**
+     * Checks if is request remote only.
+     * 
+     * @return true, if is request remote only
+     */
+    public boolean isRequestRemoteOnly()
+    {
+        return (Boolean) getRequestContext().get( CTX_REMOTE_ONLY_FLAG );
+    }
+
+    /**
      * Sets the request local only.
      * 
      * @param requestLocalOnly the new request local only
@@ -152,6 +177,16 @@ public class ResourceStoreRequest
     public void setRequestLocalOnly( boolean requestLocalOnly )
     {
         getRequestContext().put( CTX_LOCAL_ONLY_FLAG, requestLocalOnly );
+    }
+
+    /**
+     * Sets the request remote only.
+     * 
+     * @param requestremoteOnly the new request remote only
+     */
+    public void setRequestRemoteOnly( boolean requestRemoteOnly )
+    {
+        getRequestContext().put( CTX_REMOTE_ONLY_FLAG, requestRemoteOnly );
     }
 
     /**

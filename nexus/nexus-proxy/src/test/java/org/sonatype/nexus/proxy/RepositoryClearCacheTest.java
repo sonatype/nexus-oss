@@ -83,16 +83,16 @@ public class RepositoryClearCacheTest
 
         // we have now two items in NFC
         assertEquals( 2, getRepository().getNotFoundCache().getStatistics().getSize() );
-        
+
         // remove one
-        getRepository().clearCaches( "/activemq1/activemq-core" );
+        getRepository().clearCaches( new ResourceStoreRequest( "/activemq1/activemq-core", true ) );
 
         assertEquals( 1, getRepository().getNotFoundCache().getStatistics().getSize() );
 
-        getRepository().clearCaches( "/" );
+        getRepository().clearCaches( new ResourceStoreRequest( "/", true ) );
 
         assertEquals( 0, getRepository().getNotFoundCache().getStatistics().getSize() );
-        
+
         retrieveItem();
     }
 

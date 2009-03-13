@@ -13,7 +13,7 @@
  */
 package org.sonatype.nexus.proxy.http;
 
-import org.sonatype.nexus.configuration.model.CHttpProxySettings;
+import org.sonatype.nexus.configuration.modello.CHttpProxySettings;
 
 /**
  * HTTP Proxy policy, that defines how proxy work/behave in case of non-resolvable URLs.

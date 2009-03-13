@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -79,9 +80,8 @@ public class ArtifactStoreHelper
                 throw new StorageException( "Could not get the content from the ContentLocator!", e );
             }
 
-            RepositoryItemUid itemUid = getMavenRepository().createUid( request.getRequestPath() );
-
-            StorageFileItem storedFile = (StorageFileItem) getMavenRepository().retrieveItem( itemUid, null );
+            StorageFileItem storedFile = (StorageFileItem) getMavenRepository().retrieveItem(
+                new RepositoryRequest( getMavenRepository(), request ) );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -189,8 +189,7 @@ public class ArtifactStoreHelper
             }
 
             StorageFileItem storedFile = (StorageFileItem) getMavenRepository().retrieveItem(
-                item.getRepositoryItemUid(),
-                item.getItemContext() );
+                new RepositoryRequest( getMavenRepository(), new ResourceStoreRequest( item ) ) );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -224,7 +223,7 @@ public class ArtifactStoreHelper
         }
     }
 
-    public void deleteItemWithChecksums( RepositoryItemUid uid, Map<String, Object> context )
+    public void deleteItemWithChecksums( RepositoryRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
@@ -232,11 +231,11 @@ public class ArtifactStoreHelper
     {
         try
         {
-            getMavenRepository().deleteItem( uid, context );
+            getMavenRepository().deleteItem( request );
         }
         catch ( ItemNotFoundException e )
         {
-            if ( uid.getPath().endsWith( ".asc" ) )
+            if ( request.getResourceStoreRequest().getRequestPath().endsWith( ".asc" ) )
             {
                 // Do nothing no guarantee that the .asc files will exist
             }
@@ -246,33 +245,43 @@ public class ArtifactStoreHelper
             }
         }
 
-        RepositoryItemUid sha1Uid = getMavenRepository().createUid( uid.getPath() + ".sha1" );
+        request
+            .getResourceStoreRequest().pushRequestPath( request.getResourceStoreRequest().getRequestPath() + ".sha1" );
 
         try
         {
-            getMavenRepository().deleteItem( sha1Uid, context );
+            getMavenRepository().deleteItem( request );
         }
         catch ( ItemNotFoundException e )
         {
             // ignore not found
         }
 
-        RepositoryItemUid md5Uid = getMavenRepository().createUid( uid.getPath() + ".md5" );
+        request.getResourceStoreRequest().popRequestPath();
+
+        request.getResourceStoreRequest().pushRequestPath( request.getResourceStoreRequest().getRequestPath() + ".md5" );
 
         try
         {
-            getMavenRepository().deleteItem( md5Uid, context );
+            getMavenRepository().deleteItem( request );
         }
         catch ( ItemNotFoundException e )
         {
             // ignore not found
         }
+
+        request.getResourceStoreRequest().popRequestPath();
 
         // Now remove the .asc files, and the checksums stored with them as well
         // Note this is a recursive call, hence the check for .asc
-        if ( !uid.getPath().endsWith( ".asc" ) )
+        if ( !request.getResourceStoreRequest().getRequestPath().endsWith( ".asc" ) )
         {
-            deleteItemWithChecksums( getMavenRepository().createUid( uid.getPath() + ".asc" ), context );
+            request.getResourceStoreRequest().pushRequestPath(
+                request.getResourceStoreRequest().getRequestPath() + ".asc" );
+
+            deleteItemWithChecksums( request );
+
+            request.getResourceStoreRequest().popRequestPath();
         }
     }
 
@@ -410,10 +419,10 @@ public class ArtifactStoreHelper
 
         try
         {
+            gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( pomGav ) );
+
             // check for POM existence
-            repository.retrieveItem(
-                repository.createUid( repository.getGavCalculator().gavToPath( pomGav ) ),
-                gavRequest.getRequestContext() );
+            repository.retrieveItem( new RepositoryRequest( getMavenRepository(), gavRequest ) );
         }
         catch ( ItemNotFoundException e )
         {
@@ -595,10 +604,12 @@ public class ArtifactStoreHelper
 
         try
         {
+            gavRequest.setRequestPath( parentCollUid.getPath() );
+
             // get the parent collection
-            StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem(
-                parentCollUid,
-                gavRequest.getRequestContext() );
+            StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem( new RepositoryRequest(
+                getMavenRepository(),
+                gavRequest ) );
 
             // list it
             Collection<StorageItem> items = repository.list( parentColl );
@@ -616,7 +627,16 @@ public class ArtifactStoreHelper
                         && gavRequest.getArtifactId().equals( gav.getArtifactId() )
                         && gavRequest.getVersion().equals( gav.getVersion() ) && gav.getClassifier() != null )
                     {
-                        repository.deleteItem( item.getRepositoryItemUid(), gavRequest.getRequestContext() );
+                        try
+                        {
+                            gavRequest.pushRequestPath( item.getPath() );
+
+                            repository.deleteItem( new RepositoryRequest( getMavenRepository(), gavRequest ) );
+                        }
+                        finally
+                        {
+                            gavRequest.popRequestPath();
+                        }
                     }
                     else if ( !item.getPath().endsWith( "maven-metadata.xml" ) )
                     {
@@ -631,7 +651,7 @@ public class ArtifactStoreHelper
 
             if ( !hadSubdirectoryOrOtherFiles )
             {
-                repository.deleteItem( parentCollUid, gavRequest.getRequestContext() );
+                repository.deleteItem( new RepositoryRequest( getMavenRepository(), gavRequest ) );
             }
         }
         catch ( ItemNotFoundException e )
@@ -655,10 +675,12 @@ public class ArtifactStoreHelper
 
         try
         {
+            gavRequest.setRequestPath( parentCollUid.getPath() );
+
             // get the parent collection
-            StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem(
-                parentCollUid,
-                gavRequest.getRequestContext() );
+            StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem( new RepositoryRequest(
+                getMavenRepository(),
+                gavRequest ) );
 
             // list it
             Collection<StorageItem> items = repository.list( parentColl );
@@ -670,7 +692,16 @@ public class ArtifactStoreHelper
             {
                 if ( !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
                 {
-                    repository.deleteItem( item.getRepositoryItemUid(), gavRequest.getRequestContext() );
+                    try
+                    {
+                        gavRequest.pushRequestPath( item.getPath() );
+
+                        repository.deleteItem( new RepositoryRequest( getMavenRepository(), gavRequest ) );
+                    }
+                    finally
+                    {
+                        gavRequest.popRequestPath();
+                    }
                 }
                 else if ( !item.getPath().endsWith( "maven-metadata.xml" ) )
                 {
@@ -680,7 +711,7 @@ public class ArtifactStoreHelper
 
             if ( !hadSubdirectory )
             {
-                repository.deleteItem( parentCollUid, gavRequest.getRequestContext() );
+                repository.deleteItem( new RepositoryRequest( getMavenRepository(), gavRequest ) );
             }
         }
         catch ( ItemNotFoundException e )

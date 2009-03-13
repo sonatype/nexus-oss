@@ -21,12 +21,14 @@ import java.io.IOException;
 import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
+import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -46,9 +48,12 @@ import com.thoughtworks.xstream.XStreamException;
  */
 @Component( role = AttributeStorage.class )
 public class DefaultAttributeStorage
-    extends LoggingComponent
-    implements AttributeStorage, Initializable
+    extends AbstractLogEnabled
+    implements AttributeStorage, EventListener, Initializable
 {
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
+
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
@@ -77,7 +82,7 @@ public class DefaultAttributeStorage
 
     public void initialize()
     {
-        applicationConfiguration.addProximityEventListener( this );
+        applicationEventMulticaster.addProximityEventListener( this );
     }
 
     public void onProximityEvent( AbstractEvent evt )

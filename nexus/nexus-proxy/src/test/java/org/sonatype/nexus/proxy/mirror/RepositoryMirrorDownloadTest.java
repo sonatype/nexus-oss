@@ -22,9 +22,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.same;
 
-import java.util.Map;
-
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.InvalidItemContentException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -132,12 +130,8 @@ public class RepositoryMirrorDownloadTest
         RepositoryItemUid uid = repo.createUid( ITEM_PATH );
 
         RemoteRepositoryStorage rs = createMock( RemoteRepositoryStorage.class );
-        expect(
-            rs.retrieveItem(
-                same( repo ),
-                (Map<String, Object>) anyObject(),
-                eq( MIRROR1.getUrl() ),
-                eq( uid.getPath() ) ) ).andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
+        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( MIRROR1.getUrl() ) ) )
+            .andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
 
         repo.setRemoteStorage( rs );
 
@@ -279,71 +273,57 @@ public class RepositoryMirrorDownloadTest
             if ( exception instanceof InvalidItemContentException )
             {
                 expect(
-                    rs.retrieveItem(
-                        same( repo ),
-                        (Map<String, Object>) anyObject(),
-                        eq( request.mirrors[0].getUrl() ),
-                        eq( uid.getPath() ) ) ).andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
+                    rs
+                        .retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
+                            .getUrl() ) ) ).andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
 
-                expect(
-                    rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( CANONICAL_URL ), eq( hashUid
-                        .getPath() ) ) ).andReturn( newRemoteStorageFileItem( hashUid, ITEM_BAD_SHA1_HASH.getBytes() ) );
+                expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
+                    .andReturn( newRemoteStorageFileItem( hashUid, ITEM_BAD_SHA1_HASH.getBytes() ) );
             }
             else
             {
                 expect(
-                    rs.retrieveItem(
-                        same( repo ),
-                        (Map<String, Object>) anyObject(),
-                        eq( request.mirrors[0].getUrl() ),
-                        eq( uid.getPath() ) ) ).andThrow( exception );
+                    rs
+                        .retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
+                            .getUrl() ) ) ).andThrow( exception );
             }
         }
 
         if ( request.mirrorSuccess )
         {
             expect(
-                rs.retrieveItem(
-                    same( repo ),
-                    (Map<String, Object>) anyObject(),
-                    eq( request.mirrors[0].getUrl() ),
-                    eq( uid.getPath() ) ) ).andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
+                rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0].getUrl() ) ) )
+                .andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
 
-            expect(
-                rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( CANONICAL_URL ), eq( hashUid
-                    .getPath() ) ) ).andReturn( newRemoteStorageFileItem( hashUid, ITEM_SHA1_HASH.getBytes() ) );
+            expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
+                .andReturn( newRemoteStorageFileItem( hashUid, ITEM_SHA1_HASH.getBytes() ) );
         }
 
         for ( Exception exception : request.canonicalFailures )
         {
             if ( exception instanceof InvalidItemContentException )
             {
-                expect(
-                    rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( CANONICAL_URL ), eq( uid
-                        .getPath() ) ) ).andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
+                expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
+                    .andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
 
-                expect(
-                    rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( CANONICAL_URL ), eq( hashUid
-                        .getPath() ) ) ).andReturn( newRemoteStorageFileItem( hashUid, ITEM_BAD_SHA1_HASH.getBytes() ) );
+                expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
+                    .andReturn( newRemoteStorageFileItem( hashUid, ITEM_BAD_SHA1_HASH.getBytes() ) );
 
             }
             else
             {
-                expect(
-                    rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( CANONICAL_URL ), eq( uid
-                        .getPath() ) ) ).andThrow( exception );
+                expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
+                    .andThrow( exception );
             }
         }
 
         if ( request.canonicalSuccess )
         {
-            expect(
-                rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( CANONICAL_URL ), eq( uid
-                    .getPath() ) ) ).andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
+            expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
+                .andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
 
-            expect(
-                rs.retrieveItem( same( repo ), (Map<String, Object>) anyObject(), eq( CANONICAL_URL ), eq( hashUid
-                    .getPath() ) ) ).andReturn( newRemoteStorageFileItem( hashUid, ITEM_SHA1_HASH.getBytes() ) );
+            expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
+                .andReturn( newRemoteStorageFileItem( hashUid, ITEM_SHA1_HASH.getBytes() ) );
         }
 
         repo.setRemoteStorage( rs );
@@ -391,7 +371,7 @@ public class RepositoryMirrorDownloadTest
 
         LocalRepositoryStorage ls = createMockEmptyLocalStorage();
         repo.setLocalStorage( ls );
-        
+
         repo.setRemoteStorageContext( new DefaultRemoteStorageContext( null ) );
         CRemoteConnectionSettings remoteConnectionSettings = (CRemoteConnectionSettings) repo
             .getRemoteStorageContext().getRemoteConnectionContextObject(
@@ -400,7 +380,7 @@ public class RepositoryMirrorDownloadTest
 
         repo.setRemoteUrl( CANONICAL_URL );
 
-        repo.setMirrors( Arrays.asList( mirrors ) );
+        repo.getDownloadMirrors().setMirrors( Arrays.asList( mirrors ) );
         return repo;
     }
 
@@ -427,13 +407,13 @@ public class RepositoryMirrorDownloadTest
     {
         LocalRepositoryStorage ls = createMock( LocalRepositoryStorage.class );
 
-        expect( ls.retrieveItem( (Repository) anyObject(), (Map<String, Object>) anyObject(), (String) anyObject() ) )
-            .andThrow( itemNotFount ).anyTimes();
+        expect( ls.retrieveItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() ) ).andThrow(
+            itemNotFount ).anyTimes();
 
-        ls.deleteItem( (Repository) anyObject(), (Map<String, Object>) anyObject(), (String) anyObject() );
+        ls.deleteItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() );
         expectLastCall().andThrow( itemNotFount ).anyTimes();
 
-        ls.storeItem( (Repository) anyObject(), (Map<String, Object>) anyObject(), (StorageItem) anyObject() );
+        ls.storeItem( (Repository) anyObject(), (StorageItem) anyObject() );
         expectLastCall().anyTimes();
 
         replay( ls );

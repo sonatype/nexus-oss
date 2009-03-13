@@ -17,6 +17,7 @@ import java.util.Collection;
 
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class RepositoryEvictUnusedItemsTest
@@ -52,8 +53,7 @@ public class RepositoryEvictUnusedItemsTest
         // now mangle the attributes of one of them
         AbstractStorageItem mangledItem = repo1.getLocalStorage().retrieveItem(
             repo1,
-            null,
-            "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
+            new ResourceStoreRequest( "/activemq/activemq-core/1.2/activemq-core-1.2.jar", true ) );
 
         // make it last requested before 3 days
         mangledItem.setLastRequested( System.currentTimeMillis() - ( 3 * DAY ) );
@@ -62,7 +62,9 @@ public class RepositoryEvictUnusedItemsTest
         repo1.getLocalStorage().updateItemAttributes( repo1, null, mangledItem );
 
         // and evict all that are not "used" for 2 days
-        Collection<String> evicted = repo1.evictUnusedItems( System.currentTimeMillis() - ( 2 * DAY ) );
+        Collection<String> evicted = repo1.evictUnusedItems( new ResourceStoreRequest(
+            RepositoryItemUid.PATH_ROOT,
+            true ), System.currentTimeMillis() - ( 2 * DAY ) );
 
         // checks
         assertNotNull( evicted );

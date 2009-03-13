@@ -217,7 +217,7 @@ public class SimplePullTest
         }
         catch ( ItemNotFoundException e )
         {
-            fail();
+            fail("Should get the file!");
         }
 
         try

@@ -20,7 +20,10 @@ import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDesc
 public interface ScheduledTaskDescriptor
 {
     String getId();
+
     String getName();
+
     List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors();
+
     boolean isExposed();
 }

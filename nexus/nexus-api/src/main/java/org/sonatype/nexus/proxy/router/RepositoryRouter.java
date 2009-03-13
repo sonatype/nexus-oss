@@ -20,7 +20,6 @@ import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -35,7 +34,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @author cstamas
  */
 public interface RepositoryRouter
-    extends ResourceStore, EventListener
+    extends ResourceStore
 {
     boolean isFollowLinks();
 
@@ -56,7 +55,14 @@ public interface RepositoryRouter
             ItemNotFoundException,
             IllegalOperationException,
             StorageException;
-    
+
+    /**
+     * Calculates the RequestRoute for the given request.
+     * 
+     * @param request
+     * @return
+     * @throws ItemNotFoundException
+     */
     RequestRoute getRequestRouteForRequest( ResourceStoreRequest request )
         throws ItemNotFoundException;
 }

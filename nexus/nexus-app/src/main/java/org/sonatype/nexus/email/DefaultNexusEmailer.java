@@ -27,8 +27,9 @@ import org.sonatype.micromailer.imp.DefaultMailType;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.modello.CSmtpConfiguration;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.security.email.SecurityEmailer;
 
@@ -43,6 +44,9 @@ public class DefaultNexusEmailer
 {
     @Requirement
     private EMailer emailer;
+
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
 
     @Requirement
     private NexusConfiguration configuration;
@@ -122,7 +126,7 @@ public class DefaultNexusEmailer
     public void initialize()
         throws InitializationException
     {
-        configuration.addProximityEventListener( this );
+        applicationEventMulticaster.addProximityEventListener( this );
     }
 
     public void onProximityEvent( AbstractEvent evt )
@@ -130,10 +134,10 @@ public class DefaultNexusEmailer
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {
             if ( ApplicationConfiguration.class.isAssignableFrom( ( (ConfigurationChangeEvent) evt )
-                .getNotifiableConfiguration().getClass() ) )
+                .getApplicationConfiguration().getClass() ) )
             {
                 ApplicationConfiguration config = (ApplicationConfiguration) ( (ConfigurationChangeEvent) evt )
-                    .getNotifiableConfiguration();
+                    .getApplicationConfiguration();
 
                 CSmtpConfiguration newSmtp = config.getConfiguration().getSmtpConfiguration();
 
@@ -149,7 +153,7 @@ public class DefaultNexusEmailer
     {
         EmailerConfiguration config = new EmailerConfiguration();
         config.setDebug( smtp.isDebugMode() );
-        config.setMailHost( smtp.getHost() );
+        config.setMailHost( smtp.getHostname() );
         config.setMailPort( smtp.getPort() );
         config.setPassword( smtp.getPassword() );
         config.setSsl( smtp.isSslEnabled() );
@@ -161,19 +165,18 @@ public class DefaultNexusEmailer
 
     protected boolean configChanged( CSmtpConfiguration newSmtp )
     {
-        if ( smtp == null 
-            || ( smtp.getHost() == null && newSmtp.getHost() != null )
-            || ( smtp.getHost() != null && !smtp.getHost().equals( newSmtp.getHost() ) )
+        if ( smtp == null
+            || ( smtp.getHostname() == null && newSmtp.getHostname() != null )
+            || ( smtp.getHostname() != null && !smtp.getHostname().equals( newSmtp.getHostname() ) )
             || ( smtp.getUsername() == null && newSmtp.getUsername() != null )
             || ( smtp.getUsername() != null && !smtp.getUsername().equals( newSmtp.getUsername() ) )
             || ( smtp.getPassword() == null && newSmtp.getPassword() != null )
-            || ( smtp.getPassword() != null && !smtp.getPassword().equals( newSmtp.getPassword() ) ) 
+            || ( smtp.getPassword() != null && !smtp.getPassword().equals( newSmtp.getPassword() ) )
             || !( smtp.getPort() == newSmtp.getPort() )
             || ( smtp.getSystemEmailAddress() == null && newSmtp.getSystemEmailAddress() != null )
-            || ( smtp.getSystemEmailAddress() != null && !smtp.getSystemEmailAddress().equals( newSmtp.getSystemEmailAddress() ) )
-            || !( smtp.isSslEnabled() == newSmtp.isSslEnabled() ) 
-            || !( smtp.isTlsEnabled() == newSmtp.isTlsEnabled() )
-            || !( smtp.isDebugMode() == newSmtp.isDebugMode() ) )
+            || ( smtp.getSystemEmailAddress() != null && !smtp.getSystemEmailAddress().equals(
+                newSmtp.getSystemEmailAddress() ) ) || !( smtp.isSslEnabled() == newSmtp.isSslEnabled() )
+            || !( smtp.isTlsEnabled() == newSmtp.isTlsEnabled() ) || !( smtp.isDebugMode() == newSmtp.isDebugMode() ) )
         {
             smtp = newSmtp;
             return true;

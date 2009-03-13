@@ -10,9 +10,11 @@ import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 
 /**
  * This is a "local" strategy, uses Nexus content for information fetch.
@@ -63,9 +65,9 @@ public class ContentGetDiscoveryStrategy
             Repository repository = getNexus().getRepository( request.getLvoKey().getRepositoryId() );
 
             // ItemNotFound if the path does not exists
-            StorageItem item = repository.retrieveItem(
-                repository.createUid( request.getLvoKey().getLocalPath() ),
-                null );
+            StorageItem item = repository.retrieveItem( new RepositoryRequest( repository, new ResourceStoreRequest(
+                request.getLvoKey().getLocalPath(),
+                false ) ) );
 
             // return only if item is a file, nuke it otherwise
             if ( item instanceof StorageFileItem )

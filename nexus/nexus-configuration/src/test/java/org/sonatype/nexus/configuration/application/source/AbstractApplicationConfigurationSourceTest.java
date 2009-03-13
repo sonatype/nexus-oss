@@ -18,6 +18,7 @@ import java.io.InputStream;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
+import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 
 public abstract class AbstractApplicationConfigurationSourceTest
     extends AbstractNexusTestCase

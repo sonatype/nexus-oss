@@ -13,39 +13,31 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.Map;
-
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.configuration.RepositoryStatusConverter;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.validator.ApplicationValidationResponse;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
-import org.sonatype.nexus.plugins.PluginShadowRepositoryConfigurator;
-import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 public abstract class AbstractShadowRepositoryConfigurator
-    implements ShadowRepositoryConfigurator
+    extends AbstractProxyRepositoryConfigurator
 {
-    @Requirement
-    private RepositoryStatusConverter repositoryStatusConverter;
-
-    @Requirement( role = PluginShadowRepositoryConfigurator.class )
-    private Map<String, PluginShadowRepositoryConfigurator> pluginShadowRepositoryConfigurators;
-
-    public ShadowRepository updateRepositoryFromModel( ShadowRepository old, ApplicationConfiguration configuration,
-        CRepositoryShadow repo, RemoteStorageContext rsc, LocalRepositoryStorage ls, Repository masterRepository )
+    @Override
+    public void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
+        PlexusConfiguration externalConfiguration )
         throws InvalidConfigurationException
     {
-        ShadowRepository shadowRepository = old;
+        ShadowRepository shadowRepository = repository.adaptToFacet( ShadowRepository.class );
 
         try
         {
+            Repository masterRepository = getRepositoryRegistry().getRepository(
+                externalConfiguration.getChild( "masterRepository" ).getValue() );
+
             shadowRepository.setMasterRepository( masterRepository );
         }
         catch ( IncompatibleMasterRepositoryException e )
@@ -61,48 +53,23 @@ public abstract class AbstractShadowRepositoryConfigurator
 
             throw new InvalidConfigurationException( response );
         }
-
-        shadowRepository.setId( repo.getId() );
-        shadowRepository.setName( repo.getName() );
-        shadowRepository.setPathPrefix( repo.getPathPrefix() );
-
-        shadowRepository.setLocalStatus( repositoryStatusConverter.localStatusFromModel( repo.getLocalStatus() ) );
-        shadowRepository.setAllowWrite( false );
-        shadowRepository.setBrowseable( true );
-        shadowRepository.setIndexable( false );
-        shadowRepository.setNotFoundCacheTimeToLive( masterRepository.getNotFoundCacheTimeToLive() );
-        shadowRepository.setUserManaged( repo.isUserManaged() );
-
-        // NX-198: filling up the default variable to store the "default" local URL
-        File defaultStorageFile = new File(
-            new File( configuration.getWorkingDirectory(), "storage" ),
-            shadowRepository.getId() );
-
-        defaultStorageFile.mkdirs();
-
-        try
+        catch ( NoSuchRepositoryException e )
         {
-            repo.defaultLocalStorageUrl = defaultStorageFile.toURL().toString();
+            ValidationMessage message = new ValidationMessage(
+                "shadowOf",
+                e.getMessage(),
+                "The source nexus repository is not existing." );
+
+            ValidationResponse response = new ApplicationValidationResponse();
+
+            response.addValidationError( message );
+
+            throw new InvalidConfigurationException( response );
         }
-        catch ( MalformedURLException e )
+        catch ( PlexusConfigurationException e )
         {
-            // will not happen, not user settable
-            throw new InvalidConfigurationException( "Malformed URL for LocalRepositoryStorage!", e );
+            throw new InvalidConfigurationException( "Could not read the configuration!", e );
         }
-
-        shadowRepository.setLocalUrl( repo.defaultLocalStorageUrl );
-
-        shadowRepository.setLocalStorage( ls );
-
-        for ( PluginShadowRepositoryConfigurator configurator : pluginShadowRepositoryConfigurators.values() )
-        {
-            if ( configurator.isHandledRepository( shadowRepository ) )
-            {
-                configurator.configureRepository( shadowRepository );
-            }
-        }
-
-        return shadowRepository;
     }
 
 }

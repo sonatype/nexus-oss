@@ -84,8 +84,8 @@ public class M1LayoutedM2ShadowRepositoryTest
 
         // we will check stuff on M1 places but,
         // we will get links as responses, since shadow reposes contains links only
-        getApplicationConfiguration().getConfiguration().getRouting().setFollowLinks( false );
-        getApplicationConfiguration().notifyProximityEventListeners(
+        getApplicationConfiguration().getConfiguration().getRouting().setResolveLinks( false );
+        getApplicationEventMulticaster().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         item = getRootRouter().retrieveItem(
@@ -98,8 +98,8 @@ public class M1LayoutedM2ShadowRepositoryTest
 
         // and now we will force the router itself to resolve links
         // and will expect the original contents
-        getApplicationConfiguration().getConfiguration().getRouting().setFollowLinks( true );
-        getApplicationConfiguration().notifyProximityEventListeners(
+        getApplicationConfiguration().getConfiguration().getRouting().setResolveLinks( true );
+        getApplicationEventMulticaster().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         item = getRootRouter().retrieveItem(
@@ -135,8 +135,8 @@ public class M1LayoutedM2ShadowRepositoryTest
 
         // and after sync, we will check stuff on M1 places but,
         // we will get links as responses, since shadow reposes contains links only
-        getApplicationConfiguration().getConfiguration().getRouting().setFollowLinks( false );
-        getApplicationConfiguration().notifyProximityEventListeners(
+        getApplicationConfiguration().getConfiguration().getRouting().setResolveLinks( false );
+        getApplicationEventMulticaster().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         item = getRootRouter().retrieveItem(
@@ -149,8 +149,8 @@ public class M1LayoutedM2ShadowRepositoryTest
 
         // and now we will force the router itself to resolve links
         // and will expect the original contents
-        getApplicationConfiguration().getConfiguration().getRouting().setFollowLinks( true );
-        getApplicationConfiguration().notifyProximityEventListeners(
+        getApplicationConfiguration().getConfiguration().getRouting().setResolveLinks( true );
+        getApplicationEventMulticaster().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         item = getRootRouter().retrieveItem(

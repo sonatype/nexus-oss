@@ -18,12 +18,12 @@ import java.io.ByteArrayInputStream;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 
 public class LinkTest
     extends AbstractProxyTestEnvironment
@@ -58,16 +58,15 @@ public class LinkTest
 
         DefaultStorageLinkItem link = new DefaultStorageLinkItem( repo1, "/b.txt", true, true, file
             .getRepositoryItemUid() );
-        repo1.getLocalStorage().storeItem( repo1, null, link );
+        repo1.getLocalStorage().storeItem( repo1, link );
 
         StorageItem item = repo1.retrieveItem( new ResourceStoreRequest( "/b.txt", true ) );
         assertEquals( DefaultStorageLinkItem.class, item.getClass() );
 
-        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid(
-            ( (StorageLinkItem) item ).getTarget().getRepository(),
-            ( (StorageLinkItem) item ).getTarget().getPath() );
-
-        StorageFileItem item1 = (StorageFileItem) repo1.retrieveItem( uid, null );
+        StorageFileItem item1 = (StorageFileItem) repo1.retrieveItem( new RepositoryRequest( ( (StorageLinkItem) item )
+            .getTarget().getRepository(), new ResourceStoreRequest(
+            ( (StorageLinkItem) item ).getTarget().getPath(),
+            false ) ) );
 
         assertStorageFileItem( item1 );
         assertTrue( contentEquals( item1.getInputStream(), new ByteArrayInputStream( contentString.getBytes() ) ) );

@@ -13,12 +13,13 @@
  */
 package org.sonatype.nexus.proxy.mapping;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 
 /**
  * The mapping.
@@ -31,11 +32,12 @@ public class RepositoryPathMapping
 
     private boolean allGroups;
 
-    private Pattern pattern;
+    private List<Pattern> patterns;
 
     private List<Repository> resourceStores;
 
-    public RepositoryPathMapping( boolean allGroups, String groupId, String regexp, List<Repository> resourceStores )
+    public RepositoryPathMapping( boolean allGroups, String groupId, List<String> regexps,
+        List<Repository> resourceStores )
         throws PatternSyntaxException
     {
         if ( allGroups )
@@ -51,16 +53,29 @@ public class RepositoryPathMapping
             this.allGroups = false;
         }
 
-        this.pattern = Pattern.compile( regexp );
+        patterns = new ArrayList<Pattern>( regexps.size() );
+
+        for ( String regexp : regexps )
+        {
+            patterns.add( Pattern.compile( regexp ) );
+        }
 
         this.resourceStores = resourceStores;
     }
 
-    public boolean matches( RepositoryItemUid uid )
+    public boolean matches( RepositoryRequest request )
     {
-        if ( allGroups || groupId.equals( uid.getRepository().getId() ) )
+        if ( allGroups || groupId.equals( request.getRepository().getId() ) )
         {
-            return pattern.matcher( uid.getPath() ).matches();
+            for ( Pattern pattern : patterns )
+            {
+                if ( pattern.matcher( request.getResourceStoreRequest().getRequestPath() ).matches() )
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         else
         {
@@ -73,9 +88,9 @@ public class RepositoryPathMapping
         return groupId;
     }
 
-    public Pattern getPattern()
+    public List<Pattern> getPatterns()
     {
-        return pattern;
+        return patterns;
     }
 
     public List<Repository> getResourceStores()

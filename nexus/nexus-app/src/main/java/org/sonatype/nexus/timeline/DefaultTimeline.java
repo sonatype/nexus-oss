@@ -46,12 +46,15 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.index.context.NexusIndexWriter;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
+import org.sonatype.nexus.proxy.events.EventListener;
 
 /**
  * The default implementation of timeline based on Lucene.
@@ -61,13 +64,16 @@ import org.sonatype.nexus.proxy.events.AbstractEvent;
 @Component( role = Timeline.class )
 public class DefaultTimeline
     extends AbstractLogEnabled
-    implements Timeline, Initializable
+    implements Timeline, EventListener, Initializable, Startable
 {
     private static final String TIMESTAMP = "_t";
 
     private static final String TYPE = "_1";
 
     private static final String SUBTYPE = "_2";
+
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -86,7 +92,7 @@ public class DefaultTimeline
 
     public void initialize()
     {
-        applicationConfiguration.addProximityEventListener( this );
+        applicationEventMulticaster.addProximityEventListener( this );
     }
 
     public void onProximityEvent( AbstractEvent evt )
@@ -102,9 +108,9 @@ public class DefaultTimeline
                     // restart to apply port change but not affect the component state "running"
                     try
                     {
-                        stopService();
+                        stop();
 
-                        startService();
+                        start();
                     }
                     catch ( Exception e )
                     {
@@ -115,7 +121,7 @@ public class DefaultTimeline
         }
     }
 
-    public void startService()
+    public void start()
         throws StartingException
     {
         if ( running )
@@ -167,7 +173,7 @@ public class DefaultTimeline
         }
     }
 
-    public void stopService()
+    public void stop()
         throws StoppingException
     {
         // cleanup
@@ -338,7 +344,7 @@ public class DefaultTimeline
                     query,
                     new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
 
-                @SuppressWarnings("unchecked")
+                @SuppressWarnings( "unchecked" )
                 Iterator<Hit> i = hits.iterator();
 
                 // step over the unneeded stuff

@@ -15,9 +15,9 @@ package org.sonatype.nexus.proxy.storage.local;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.Map;
 
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -48,7 +48,7 @@ public interface LocalRepositoryStorage
      * @return true, if available (reachable)
      * @throws StorageException the storage exception
      */
-    boolean isReachable( Repository repository, Map<String, Object> context, String path )
+    boolean isReachable( Repository repository, ResourceStoreRequest request )
         throws StorageException;
 
     /**
@@ -57,7 +57,7 @@ public interface LocalRepositoryStorage
      * @param uid the uid
      * @return the absolute url from base
      */
-    URL getAbsoluteUrlFromBase( Repository repository, Map<String, Object> context, String path )
+    URL getAbsoluteUrlFromBase( Repository repository, ResourceStoreRequest request )
         throws StorageException;
 
     /**
@@ -80,7 +80,7 @@ public interface LocalRepositoryStorage
      * @param uid the uid
      * @throws StorageException the storage exception
      */
-    void touchItemRemoteChecked( Repository repository, Map<String, Object> context, String path )
+    void touchItemRemoteChecked( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             StorageException;
 
@@ -91,7 +91,7 @@ public interface LocalRepositoryStorage
      * @param timestamp the ts to set on file, 0 to "expire" it
      * @throws StorageException the storage exception
      */
-    void touchItemRemoteChecked( long timestamp, Repository repository, Map<String, Object> context, String path )
+    void touchItemRemoteChecked( long timestamp, Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             StorageException;
 
@@ -101,7 +101,7 @@ public interface LocalRepositoryStorage
      * @param uid the uid
      * @throws StorageException the storage exception
      */
-    void touchItemLastRequested( Repository repository, Map<String, Object> context, String path )
+    void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             StorageException;
 
@@ -112,7 +112,7 @@ public interface LocalRepositoryStorage
      * @param timestamp the ts to set on file, 0 to "expire" it
      * @throws StorageException the storage exception
      */
-    void touchItemLastRequested( long timestamp, Repository repository, Map<String, Object> context, String path )
+    void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             StorageException;
 
@@ -123,7 +123,7 @@ public interface LocalRepositoryStorage
      * @return true, if successful
      * @throws StorageException the storage exception
      */
-    boolean containsItem( Repository repository, Map<String, Object> context, String path )
+    boolean containsItem( Repository repository, ResourceStoreRequest request )
         throws StorageException;
 
     /**
@@ -134,7 +134,7 @@ public interface LocalRepositoryStorage
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
      */
-    AbstractStorageItem retrieveItem( Repository repository, Map<String, Object> context, String path )
+    AbstractStorageItem retrieveItem( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             StorageException;
 
@@ -145,7 +145,7 @@ public interface LocalRepositoryStorage
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
      * @throws StorageException the storage exception
      */
-    void storeItem( Repository repository, Map<String, Object> context, StorageItem item )
+    void storeItem( Repository repository, StorageItem item )
         throws UnsupportedStorageOperationException,
             StorageException;
 
@@ -155,7 +155,7 @@ public interface LocalRepositoryStorage
      * @param item the item
      * @throws StorageException the storage exception
      */
-    void updateItemAttributes( Repository repository, Map<String, Object> context, StorageItem item )
+    void updateItemAttributes( Repository repository, ResourceStoreRequest request, StorageItem item )
         throws ItemNotFoundException,
             StorageException;
 
@@ -167,7 +167,7 @@ public interface LocalRepositoryStorage
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
      * @throws StorageException the storage exception
      */
-    void deleteItem( Repository repository, Map<String, Object> context, String path )
+    void deleteItem( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             StorageException;
@@ -180,7 +180,7 @@ public interface LocalRepositoryStorage
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
      * @throws StorageException the storage exception
      */
-    void shredItem( Repository repository, Map<String, Object> context, String path )
+    void shredItem( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             StorageException;
@@ -194,7 +194,7 @@ public interface LocalRepositoryStorage
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
      * @throws StorageException the storage exception
      */
-    Collection<StorageItem> listItems( Repository repository, Map<String, Object> context, String path )
+    Collection<StorageItem> listItems( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             StorageException;
 

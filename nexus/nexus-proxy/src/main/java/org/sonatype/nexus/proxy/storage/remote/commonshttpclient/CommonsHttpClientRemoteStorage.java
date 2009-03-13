@@ -19,7 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.httpclient.Header;
@@ -49,6 +48,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -104,33 +104,45 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
-    public boolean isReachable( ProxyRepository repository, Map<String, Object> context )
+    public boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
         throws RemoteAccessException,
             StorageException
     {
-        return checkRemoteAvailability( 0, repository, context, RepositoryItemUid.PATH_ROOT, isReachableCheckRelaxed() );
+        boolean result = false;
+
+        try
+        {
+            request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
+
+            result = checkRemoteAvailability( 0, repository, request, isReachableCheckRelaxed() );
+        }
+        finally
+        {
+            request.popRequestPath();
+        }
+
+        return result;
     }
 
-    public boolean containsItem( long newerThen, ProxyRepository repository, Map<String, Object> context, String path )
+    public boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
         throws RemoteAccessException,
             StorageException
     {
-        return checkRemoteAvailability( newerThen, repository, context, path, false );
+        return checkRemoteAvailability( newerThen, repository, request, false );
     }
 
-    public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String baseUrl,
-        String path )
+    public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
         throws ItemNotFoundException,
             RemoteAccessException,
             StorageException
     {
-        URL remoteURL = getAbsoluteUrlFromBase( baseUrl, path );
+        URL remoteURL = getAbsoluteUrlFromBase( baseUrl, request.getRequestPath() );
 
         HttpMethod method = null;
 
         method = new GetMethod( remoteURL.toString() );
 
-        int response = executeMethod( repository, context, path, method, remoteURL );
+        int response = executeMethod( repository, request, method, remoteURL );
 
         if ( response == HttpStatus.SC_OK )
         {
@@ -161,7 +173,7 @@ public class CommonsHttpClientRemoteStorage
 
                 DefaultStorageFileItem httpItem = new DefaultStorageFileItem(
                     repository,
-                    path,
+                    request.getRequestPath(),
                     true,
                     true,
                     new PreparedContentLocator( new HttpClientInputStream( get, is ) ) );
@@ -213,7 +225,7 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
-    public void storeItem( ProxyRepository repository, Map<String, Object> context, StorageItem item )
+    public void storeItem( ProxyRepository repository, StorageItem item )
         throws UnsupportedStorageOperationException,
             RemoteAccessException,
             StorageException
@@ -225,7 +237,9 @@ public class CommonsHttpClientRemoteStorage
 
         StorageFileItem fItem = (StorageFileItem) item;
 
-        URL remoteURL = getAbsoluteUrlFromBase( repository, context, item.getPath() );
+        ResourceStoreRequest request = new ResourceStoreRequest( item );
+
+        URL remoteURL = getAbsoluteUrlFromBase( repository, request );
 
         PutMethod method = new PutMethod( remoteURL.toString() );
 
@@ -234,7 +248,7 @@ public class CommonsHttpClientRemoteStorage
             method.setRequestEntity( new InputStreamRequestEntity( fItem.getInputStream(), fItem.getLength(), fItem
                 .getMimeType() ) );
 
-            int response = executeMethod( repository, context, item.getPath(), method, remoteURL );
+            int response = executeMethod( repository, request, method, remoteURL );
 
             if ( response != HttpStatus.SC_OK && response != HttpStatus.SC_CREATED
                 && response != HttpStatus.SC_NO_CONTENT && response != HttpStatus.SC_ACCEPTED )
@@ -253,19 +267,19 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
-    public void deleteItem( ProxyRepository repository, Map<String, Object> context, String path )
+    public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             RemoteAccessException,
             StorageException
     {
-        URL remoteURL = getAbsoluteUrlFromBase( repository, context, path );
+        URL remoteURL = getAbsoluteUrlFromBase( repository, request );
 
         DeleteMethod method = new DeleteMethod( remoteURL.toString() );
 
         try
         {
-            int response = executeMethod( repository, context, path, method, remoteURL );
+            int response = executeMethod( repository, request, method, remoteURL );
 
             if ( response != HttpStatus.SC_OK && response != HttpStatus.SC_NO_CONTENT
                 && response != HttpStatus.SC_ACCEPTED )
@@ -431,8 +445,8 @@ public class CommonsHttpClientRemoteStorage
      * @param method the method
      * @return the int
      */
-    protected int executeMethod( ProxyRepository repository, Map<String, Object> context, String path,
-        HttpMethod method, URL remoteUrl )
+    protected int executeMethod( ProxyRepository repository, ResourceStoreRequest request, HttpMethod method,
+        URL remoteUrl )
         throws RemoteAccessException,
             StorageException
     {
@@ -571,13 +585,13 @@ public class CommonsHttpClientRemoteStorage
      * @throws RemoteAccessException
      * @throws StorageException
      */
-    protected boolean checkRemoteAvailability( long newerThen, ProxyRepository repository, Map<String, Object> context,
-        String path, boolean relaxedCheck )
+    protected boolean checkRemoteAvailability( long newerThen, ProxyRepository repository,
+        ResourceStoreRequest request, boolean relaxedCheck )
         throws RemoteAuthenticationNeededException,
             RemoteAccessException,
             StorageException
     {
-        URL remoteURL = getAbsoluteUrlFromBase( repository, context, path );
+        URL remoteURL = getAbsoluteUrlFromBase( repository, request );
 
         HttpMethodBase method = new HeadMethod( remoteURL.toString() );
 
@@ -588,7 +602,7 @@ public class CommonsHttpClientRemoteStorage
 
         try
         {
-            response = executeMethod( repository, context, path, method, remoteURL );
+            response = executeMethod( repository, request, method, remoteURL );
         }
         catch ( StorageException e )
         {
@@ -617,7 +631,7 @@ public class CommonsHttpClientRemoteStorage
             try
             {
                 // execute it
-                response = executeMethod( repository, context, path, method, remoteURL );
+                response = executeMethod( repository, request, method, remoteURL );
             }
             finally
             {

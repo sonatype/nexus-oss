@@ -18,8 +18,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
-import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
+import org.sonatype.nexus.configuration.modello.Configuration;
+import org.sonatype.nexus.configuration.modello.io.xpp3.NexusConfigurationXpp3Reader;
+import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ValidationRequest;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 

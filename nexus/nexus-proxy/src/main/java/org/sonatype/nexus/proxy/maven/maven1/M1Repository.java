@@ -18,12 +18,14 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M1ArtifactRecognizer;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryConfigurationValidator;
+import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 
 /**
  * The default M1Repository. This class adds snapshot/release sensing and differentiated expiration handling and repo
@@ -44,6 +46,9 @@ public class M1Repository
     @Requirement( hint = "maven1" )
     private ContentClass contentClass;
 
+    @Requirement
+    private M1RepositoryConfigurator m1RepositoryConfigurator;
+
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
@@ -54,17 +59,30 @@ public class M1Repository
         return gavCalculator;
     }
 
+    @Override
+    public RepositoryConfigurationValidator getRepositoryConfigurationValidator()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public RepositoryConfigurator getRepositoryConfigurator()
+    {
+        return m1RepositoryConfigurator;
+    }
+
     /**
      * Should serve by policies.
      * 
      * @param uid the uid
      * @return true, if successful
      */
-    public boolean shouldServeByPolicies( RepositoryItemUid uid )
+    public boolean shouldServeByPolicies( RepositoryRequest request )
     {
-        if ( M1ArtifactRecognizer.isMetadata( uid.getPath() ) )
+        if ( M1ArtifactRecognizer.isMetadata( request.getResourceStoreRequest().getRequestPath() ) )
         {
-            if ( M1ArtifactRecognizer.isSnapshot( uid.getPath() ) )
+            if ( M1ArtifactRecognizer.isSnapshot( request.getResourceStoreRequest().getRequestPath() ) )
             {
                 return RepositoryPolicy.SNAPSHOT.equals( getRepositoryPolicy() );
             }
@@ -76,7 +94,7 @@ public class M1Repository
         }
 
         // we are using Gav to test the path
-        Gav gav = getGavCalculator().pathToGav( uid.getPath() );
+        Gav gav = getGavCalculator().pathToGav( request.getResourceStoreRequest().getRequestPath() );
 
         if ( gav == null )
         {
@@ -118,7 +136,7 @@ public class M1Repository
         // it is a release
         return isOld( getReleaseMaxAge(), item );
     }
-    
+
     // not available on maven1 repo
     public boolean recreateMavenMetadata( String path )
     {

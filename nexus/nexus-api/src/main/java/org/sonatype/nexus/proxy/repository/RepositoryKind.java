@@ -13,6 +13,11 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+/**
+ * Main interface for detecting the repository kind.
+ * 
+ * @author cstamas
+ */
 public interface RepositoryKind
 {
     Class<?> getMainFacet();

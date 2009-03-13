@@ -14,10 +14,10 @@
 package org.sonatype.nexus.proxy.storage.remote;
 
 import java.net.URL;
-import java.util.Map;
 
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -52,7 +52,7 @@ public interface RemoteRepositoryStorage
      * @return true, if available (reachable)
      * @throws StorageException the storage exception
      */
-    boolean isReachable( ProxyRepository repository, Map<String, Object> context )
+    boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
         throws RemoteAccessException,
             StorageException;
 
@@ -63,7 +63,7 @@ public interface RemoteRepositoryStorage
      * @return the absolute url from base
      * @throws StorageException when the repository in question has wrong/malformed URL set
      */
-    URL getAbsoluteUrlFromBase( ProxyRepository repository, Map<String, Object> context, String path )
+    URL getAbsoluteUrlFromBase( ProxyRepository repository, ResourceStoreRequest request )
         throws StorageException;
 
     /**
@@ -82,7 +82,7 @@ public interface RemoteRepositoryStorage
      * @return true, if successful
      * @throws StorageException the storage exception
      */
-    boolean containsItem( ProxyRepository repository, Map<String, Object> context, String path )
+    boolean containsItem( ProxyRepository repository, ResourceStoreRequest request )
         throws RemoteAccessException,
             StorageException;
 
@@ -93,7 +93,7 @@ public interface RemoteRepositoryStorage
      * @return true, if successful
      * @throws StorageException the storage exception
      */
-    boolean containsItem( long newerThen, ProxyRepository repository, Map<String, Object> context, String path )
+    boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
         throws RemoteAccessException,
             StorageException;
 
@@ -104,8 +104,7 @@ public interface RemoteRepositoryStorage
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
      */
-    AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String baseUrl,
-        String path )
+    AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
         throws ItemNotFoundException,
             RemoteAccessException,
             StorageException;
@@ -117,7 +116,7 @@ public interface RemoteRepositoryStorage
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
      * @throws StorageException the storage exception
      */
-    void storeItem( ProxyRepository repository, Map<String, Object> context, StorageItem item )
+    void storeItem( ProxyRepository repository, StorageItem item )
         throws UnsupportedStorageOperationException,
             RemoteAccessException,
             StorageException;
@@ -130,7 +129,7 @@ public interface RemoteRepositoryStorage
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
      * @throws StorageException the storage exception
      */
-    void deleteItem( ProxyRepository repository, Map<String, Object> context, String path )
+    void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             RemoteAccessException,

@@ -18,6 +18,7 @@ import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -63,11 +64,25 @@ public class WalkerTest
         WalkerContext wc = null;
 
         wp = new TestWalkerProcessor();
+
         // this is a group
-        wc = new DefaultWalkerContext( getRepositoryRegistry().getRepository( "test" ) );
+        wc = new DefaultWalkerContext( getRepositoryRegistry().getRepository( "test" ), new ResourceStoreRequest(
+            RepositoryItemUid.PATH_ROOT,
+            true ) );
+
         wc.getProcessors().add( wp );
 
         walker.walk( wc );
+
+        assertFalse( "Should not be stopped!", wc.isStopped() );
+
+        if ( wc.getStopCause() != null )
+        {
+            wc.getStopCause().printStackTrace();
+
+            fail( "Should be no exception!" );
+        }
+
         assertEquals( 10, wp.collEnters );
         assertEquals( 10, wp.collExits );
         assertEquals( 10, wp.colls );

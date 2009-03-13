@@ -14,19 +14,17 @@
 package org.sonatype.nexus.proxy.walker;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 
 /**
  * The Class Walker.
@@ -44,11 +42,8 @@ public class DefaultWalker
 
     public void walk( WalkerContext context )
     {
-        walk( context, null );
-    }
+        String fromPath = context.getResourceStoreRequest().getRequestPath();
 
-    public void walk( WalkerContext context, String fromPath )
-    {
         if ( fromPath == null )
         {
             fromPath = RepositoryItemUid.PATH_ROOT;
@@ -76,18 +71,10 @@ public class DefaultWalker
 
         try
         {
-            // this way we avoid security context processing!!!
-            // TODO: enable somehow ability to pass-over the req context!
-            RepositoryItemUid uid = context.getRepository().createUid( fromPath );
+            RepositoryRequest request = new RepositoryRequest( context.getRepository(), context
+                .getResourceStoreRequest() );
 
-            Map<String, Object> rctx = new HashMap<String, Object>();
-
-            if ( context.isLocalOnly() )
-            {
-                rctx.put( ResourceStoreRequest.CTX_LOCAL_ONLY_FLAG, Boolean.TRUE );
-            }
-
-            item = context.getRepository().retrieveItem( uid, rctx );
+            item = context.getRepository().retrieveItem( request );
         }
         catch ( ItemNotFoundException ex )
         {

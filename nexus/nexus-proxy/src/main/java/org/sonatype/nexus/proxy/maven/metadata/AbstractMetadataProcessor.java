@@ -4,7 +4,6 @@ import java.io.InputStream;
 
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
-import org.codehaus.plexus.util.IOUtil;
 
 /**
  * @author juven

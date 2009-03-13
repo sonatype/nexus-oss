@@ -18,6 +18,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.repository.RepositoryConfigurationValidator;
+import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 /**
@@ -35,6 +37,9 @@ public class M2LayoutedM1ShadowRepository
     @Requirement( hint = "maven1" )
     private ContentClass masterContentClass;
 
+    @Requirement
+    private M2LayoutedM1ShadowRepositoryConfigurator m2LayoutedM1ShadowRepositoryConfigurator;
+
     public GavCalculator getGavCalculator()
     {
         return getM2GavCalculator();
@@ -50,6 +55,19 @@ public class M2LayoutedM1ShadowRepository
         return masterContentClass;
     }
 
+    @Override
+    public RepositoryConfigurationValidator getRepositoryConfigurationValidator()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public RepositoryConfigurator getRepositoryConfigurator()
+    {
+        return m2LayoutedM1ShadowRepositoryConfigurator;
+    }
+
     protected String transformMaster2Shadow( String path )
     {
         return transformM1toM2( path );
@@ -59,4 +77,5 @@ public class M2LayoutedM1ShadowRepository
     {
         return transformM2toM1( path );
     }
+
 }

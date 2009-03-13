@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 public class M2RepositoryTest
@@ -78,7 +79,7 @@ public class M2RepositoryTest
         }
 
         // reset NFC
-        repository.clearCaches( "/" );
+        repository.clearCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ) );
 
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
@@ -130,7 +131,7 @@ public class M2RepositoryTest
         }
 
         // reset NFC
-        repository.clearCaches( "/" );
+        repository.clearCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ) );
 
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
@@ -160,55 +161,59 @@ public class M2RepositoryTest
     {
         M2Repository repository = (M2Repository) getResourceStore();
 
-        RepositoryItemUid releasePom = getRepositoryItemUidFactory().createUid(
-            repository,
-            "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/plexus-container-default-1.0-alpha-40.pom" );
-        RepositoryItemUid releaseArtifact = getRepositoryItemUidFactory().createUid(
-            repository,
-            "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/plexus-container-default-1.0-alpha-40.jar" );
-        RepositoryItemUid snapshotPom = getRepositoryItemUidFactory()
-            .createUid(
-                repository,
-                "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/plexus-container-default-1.0-alpha-41-20071205.190351-1.pom" );
-        RepositoryItemUid snapshotArtifact = getRepositoryItemUidFactory()
-            .createUid(
-                repository,
-                "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/plexus-container-default-1.0-alpha-41-20071205.190351-1.jar" );
-        RepositoryItemUid metadata1 = getRepositoryItemUidFactory().createUid(
-            repository,
-            "/org/codehaus/plexus/plexus-container-default/maven-metadata.xml" );
-        RepositoryItemUid metadataR = getRepositoryItemUidFactory().createUid(
-            repository,
-            "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/maven-metadata.xml" );
-        RepositoryItemUid metadataS = getRepositoryItemUidFactory().createUid(
-            repository,
-            "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/maven-metadata.xml" );
-        RepositoryItemUid someDirectory = getRepositoryItemUidFactory().createUid( repository, "/classworlds/" );
-        RepositoryItemUid anyNonArtifactFile = getRepositoryItemUidFactory().createUid( repository, "/any/file.txt" );
+        String releasePom = "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/plexus-container-default-1.0-alpha-40.pom";
+        String releaseArtifact = "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/plexus-container-default-1.0-alpha-40.jar";
+        String snapshotPom = "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/plexus-container-default-1.0-alpha-41-20071205.190351-1.pom";
+        String snapshotArtifact = "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/plexus-container-default-1.0-alpha-41-20071205.190351-1.jar";
+        String metadata1 = "/org/codehaus/plexus/plexus-container-default/maven-metadata.xml";
+        String metadataR = "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/maven-metadata.xml";
+        String metadataS = "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/maven-metadata.xml";
+        String someDirectory = "/classworlds/";
+        String anyNonArtifactFile = "/any/file.txt";
+
+        RepositoryRequest request = new RepositoryRequest( repository, new ResourceStoreRequest( "", true ) );
 
         // it is equiv of repo type: RELEASE
         repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-        assertEquals( true, repository.shouldServeByPolicies( releasePom ) );
-        assertEquals( true, repository.shouldServeByPolicies( releaseArtifact ) );
-        assertEquals( false, repository.shouldServeByPolicies( snapshotPom ) );
-        assertEquals( false, repository.shouldServeByPolicies( snapshotArtifact ) );
-        assertEquals( true, repository.shouldServeByPolicies( metadata1 ) );
-        assertEquals( true, repository.shouldServeByPolicies( metadataR ) );
-        assertEquals( false, repository.shouldServeByPolicies( metadataS ) );
-        assertEquals( true, repository.shouldServeByPolicies( someDirectory ) );
-        assertEquals( true, repository.shouldServeByPolicies( anyNonArtifactFile ) );
+        request.getResourceStoreRequest().setRequestPath( releasePom );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( releaseArtifact );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( snapshotPom );
+        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( snapshotArtifact );
+        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( metadata1 );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( metadataR );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( metadataS );
+        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( someDirectory );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( anyNonArtifactFile );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
 
         // it is equiv of repo type: SNAPSHOT
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
-        assertEquals( false, repository.shouldServeByPolicies( releasePom ) );
-        assertEquals( false, repository.shouldServeByPolicies( releaseArtifact ) );
-        assertEquals( true, repository.shouldServeByPolicies( snapshotPom ) );
-        assertEquals( true, repository.shouldServeByPolicies( snapshotArtifact ) );
-        assertEquals( true, repository.shouldServeByPolicies( metadata1 ) );
-        assertEquals( true, repository.shouldServeByPolicies( metadataR ) );
-        assertEquals( true, repository.shouldServeByPolicies( metadataS ) );
-        assertEquals( true, repository.shouldServeByPolicies( someDirectory ) );
-        assertEquals( true, repository.shouldServeByPolicies( anyNonArtifactFile ) );
+        request.getResourceStoreRequest().setRequestPath( releasePom );
+        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( releaseArtifact );
+        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( snapshotPom );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( snapshotArtifact );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( metadata1 );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( metadataR );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( metadataS );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( someDirectory );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        request.getResourceStoreRequest().setRequestPath( anyNonArtifactFile );
+        assertEquals( true, repository.shouldServeByPolicies( request ) );
     }
 
     public void testGetLatestVersionSimple()
@@ -257,7 +262,7 @@ public class M2RepositoryTest
 
         M2Repository repository = (M2Repository) getResourceStore();
 
-        repository.addProximityEventListener( ch );
+        getApplicationEventMulticaster().addProximityEventListener( ch );
 
         File mdFile = new File( new File( getBasedir() ), "target/test-classes/repo1/spoof/maven-metadata.xml" );
 

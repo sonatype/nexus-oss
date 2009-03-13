@@ -13,10 +13,9 @@
  */
 package org.sonatype.nexus.proxy.access;
 
-import java.util.Map;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -29,7 +28,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class OpenAccessManager
     implements AccessManager
 {
-    public void decide( Repository repository, String path, Map<String, Object> context, Action action )
+    public void decide( Repository repository, ResourceStoreRequest request, Action action )
         throws AccessDeniedException
     {
         // this access manager is open, everybody has access to everything since

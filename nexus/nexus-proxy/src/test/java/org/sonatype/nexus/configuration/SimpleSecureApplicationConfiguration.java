@@ -18,12 +18,11 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CGroupsSetting;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CSecurity;
-import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.modello.CRepositoryGrouping;
+import org.sonatype.nexus.configuration.modello.CRouting;
+import org.sonatype.nexus.configuration.modello.CSecurity;
+import org.sonatype.nexus.configuration.modello.Configuration;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
@@ -51,7 +50,6 @@ public class SimpleSecureApplicationConfiguration
         configuration.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
         // configuration.setGlobalHttpProxySettings( new CRemoteHttpProxySettings() );
         configuration.setRouting( new CRouting() );
-        configuration.getRouting().setGroups( new CGroupsSetting() );
         configuration.setRepositoryGrouping( new CRepositoryGrouping() );
         
         

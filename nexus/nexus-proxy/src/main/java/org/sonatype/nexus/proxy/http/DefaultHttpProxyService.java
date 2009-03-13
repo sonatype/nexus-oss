@@ -26,9 +26,11 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.events.EventListener;
 
 /**
@@ -36,12 +38,15 @@ import org.sonatype.nexus.proxy.events.EventListener;
  * 
  * @author cstamas
  */
-@Component(role=HttpProxyService.class)
+@Component( role = HttpProxyService.class )
 public class DefaultHttpProxyService
     extends AbstractLogEnabled
-    implements HttpProxyService, Initializable, EventListener
+    implements HttpProxyService, EventListener, Initializable, Startable
 {
     public static final int DEFAULT_TIMEOUT = 20 * 1000;
+
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -49,7 +54,7 @@ public class DefaultHttpProxyService
     @Requirement
     private NexusURLResolver nexusURLResolver;
 
-    @Configuration(value="10")
+    @Configuration( value = "10" )
     private int poolSize;
 
     private int port;
@@ -67,7 +72,7 @@ public class DefaultHttpProxyService
     public void initialize()
         throws InitializationException
     {
-        applicationConfiguration.addProximityEventListener( this );
+        applicationEventMulticaster.addProximityEventListener( this );
     }
 
     public void onProximityEvent( AbstractEvent evt )
@@ -83,15 +88,15 @@ public class DefaultHttpProxyService
 
                 if ( running )
                 {
-                    stopService();
+                    stop();
 
-                    startService();
+                    start();
                 }
             }
         }
     }
 
-    public void startService()
+    public void start()
     {
         if ( running )
         {
@@ -116,11 +121,11 @@ public class DefaultHttpProxyService
         {
             getLogger().error( "Cannot start HttpProxy service:", e );
 
-            stopService();
+            stop();
         }
     }
 
-    public void stopService()
+    public void stop()
     {
         getLogger().info( "HttpProxy service stopped." );
 

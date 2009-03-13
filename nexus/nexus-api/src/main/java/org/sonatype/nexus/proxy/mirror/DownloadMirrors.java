@@ -17,8 +17,18 @@ import java.util.List;
 
 import org.sonatype.nexus.proxy.repository.Mirror;
 
+/**
+ * Download mirrors of a Proxy repository. Set of mirrors used by Proxy repositories to download stuff from.
+ * 
+ * @author damian
+ */
 public interface DownloadMirrors
 {
+    /**
+     * Sets the mirrors.
+     * 
+     * @param mirrors
+     */
     void setMirrors( List<Mirror> mirrors );
 
     /**

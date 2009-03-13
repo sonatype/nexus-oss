@@ -16,7 +16,6 @@ package org.sonatype.nexus.proxy.registry;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.events.EventMulticaster;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -25,7 +24,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @author cstamas
  */
 public interface RepositoryRegistry
-    extends EventMulticaster
 {
     /**
      * Adds single repository.

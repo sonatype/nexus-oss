@@ -16,6 +16,11 @@ package org.sonatype.nexus.proxy.router;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+/**
+ * Request route holds the information how will be an incoming request processed.
+ * 
+ * @author cstamas
+ */
 public class RequestRoute
 {
     private Repository targetedRepository;
@@ -25,7 +30,7 @@ public class RequestRoute
     private String strippedPrefix;
 
     private String originalRequestPath;
-    
+
     private int requestDepth;
 
     private ResourceStoreRequest resourceStoreRequest;

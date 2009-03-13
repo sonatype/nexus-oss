@@ -14,15 +14,14 @@
 package org.sonatype.nexus.configuration.application;
 
 import java.io.File;
+import java.io.IOException;
 
-import org.sonatype.nexus.configuration.NotifiableConfiguration;
-import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.modello.Configuration;
 
 /**
  * ApplicationConfiguration is the main component to have and maintain configuration.
  */
 public interface ApplicationConfiguration
-    extends NotifiableConfiguration
 {
     /**
      * Gets the working directory as file. The directory is created if needed and is guaranteed to exists.
@@ -73,4 +72,12 @@ public interface ApplicationConfiguration
      * @return
      */
     Configuration getConfiguration();
+
+    /**
+     * Saves the configuration.
+     * 
+     * @throws IOException
+     */
+    void saveConfiguration()
+        throws IOException;
 }

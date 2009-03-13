@@ -35,8 +35,10 @@ import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.RecreateMavenMetadataWalkerProcessor;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
 
@@ -186,7 +188,9 @@ public class RecreateMavenMetadataWalkerTest
     {
         RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
 
-        DefaultWalkerContext ctx = new DefaultWalkerContext( repo );
+        DefaultWalkerContext ctx = new DefaultWalkerContext( repo, new ResourceStoreRequest(
+            RepositoryItemUid.PATH_ROOT,
+            true ) );
 
         ctx.getProcessors().add( wp );
 
@@ -200,7 +204,11 @@ public class RecreateMavenMetadataWalkerTest
         {
             try
             {
-                repository.retrieveItem( repository.createUid( entry.getKey() ), null );
+                RepositoryRequest req = new RepositoryRequest( repository, new ResourceStoreRequest(
+                    entry.getKey(),
+                    true ) );
+
+                repository.retrieveItem( req );
 
                 // we succeeded, the value must be true
                 assertTrue(
@@ -337,15 +345,15 @@ public class RecreateMavenMetadataWalkerTest
         throws Exception
     {
         rebuildMavenMetadata( inhouseRelease );
-        
+
         Map<String, Boolean> expected = new LinkedHashMap<String, Boolean>();
-        
-        expected.put("/junit/junit/4.4/junit-4.4.sources.jar.md5", Boolean.FALSE);
-        expected.put("/junit/junit-mock/maven-metadata.xml", Boolean.FALSE);
-        expected.put("/junit/junit/3.8.1/maven-metadata.xml", Boolean.FALSE);
-        expected.put("/junit/junit/3.8.1/maven-metadata.xml.md5", Boolean.FALSE);
-        expected.put("/junit/junit/3.8.1/maven-metadata.xml.sha1", Boolean.FALSE);
-        
+
+        expected.put( "/junit/junit/4.4/junit-4.4.sources.jar.md5", Boolean.FALSE );
+        expected.put( "/junit/junit-mock/maven-metadata.xml", Boolean.FALSE );
+        expected.put( "/junit/junit/3.8.1/maven-metadata.xml", Boolean.FALSE );
+        expected.put( "/junit/junit/3.8.1/maven-metadata.xml.md5", Boolean.FALSE );
+        expected.put( "/junit/junit/3.8.1/maven-metadata.xml.sha1", Boolean.FALSE );
+
         validateResults( inhouseRelease, expected );;
     }
 

@@ -13,7 +13,7 @@
  */
 package org.sonatype.nexus.plugins;
 
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -27,5 +27,5 @@ public interface PluginRepositoryConfigurator
     boolean isHandledRepository( Repository repository );
 
     void configureRepository( Repository repository )
-        throws InvalidConfigurationException;
+        throws ConfigurationException;
 }

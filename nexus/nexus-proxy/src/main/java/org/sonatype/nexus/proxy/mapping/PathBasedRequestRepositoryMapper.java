@@ -19,17 +19,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
-import org.sonatype.nexus.proxy.LoggingComponent;
+import org.sonatype.nexus.configuration.modello.CPathMappingItem;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 
 /**
  * The Class PathBasedRequestRepositoryMapper filters repositories to search using supplied list of filter expressions.
@@ -50,9 +50,12 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 @Component( role = RequestRepositoryMapper.class )
 public class PathBasedRequestRepositoryMapper
-    extends LoggingComponent
+    extends AbstractLogEnabled
     implements RequestRepositoryMapper, Initializable
 {
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
+
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
@@ -67,7 +70,7 @@ public class PathBasedRequestRepositoryMapper
 
     public void initialize()
     {
-        applicationConfiguration.addProximityEventListener( this );
+        applicationEventMulticaster.addProximityEventListener( this );
     }
 
     public void onProximityEvent( AbstractEvent evt )
@@ -83,7 +86,7 @@ public class PathBasedRequestRepositoryMapper
         return applicationConfiguration;
     }
 
-    public List<Repository> getMappedRepositories( RepositoryRegistry registry, RepositoryItemUid uid,
+    public List<Repository> getMappedRepositories( RepositoryRegistry registry, RepositoryRequest request,
         List<Repository> resolvedRepositories )
         throws NoSuchRepositoryException
     {
@@ -101,13 +104,13 @@ public class PathBasedRequestRepositoryMapper
 
         for ( RepositoryPathMapping mapping : blockings )
         {
-            if ( mapping.matches( uid ) )
+            if ( mapping.matches( request ) )
             {
                 reposList.clear();
 
                 getLogger().info(
-                    "The request path [" + uid.getPath() + "] is blocked by rule " + mapping.getPattern().toString()
-                        + " defined for group='" + mapping.getGroupId() + "'" );
+                    "The request path [" + request.toString() + "] is blocked by rule "
+                        + mapping.getPatterns().toString() + " defined for group='" + mapping.getGroupId() + "'" );
 
                 return reposList;
             }
@@ -116,7 +119,7 @@ public class PathBasedRequestRepositoryMapper
         // include, if found a match
         for ( RepositoryPathMapping mapping : inclusions )
         {
-            if ( mapping.matches( uid ) )
+            if ( mapping.matches( request ) )
             {
                 if ( firstAdd )
                 {
@@ -142,7 +145,7 @@ public class PathBasedRequestRepositoryMapper
         // then, if exlude found, remove those
         for ( RepositoryPathMapping mapping : exclusions )
         {
-            if ( mapping.matches( uid ) )
+            if ( mapping.matches( request ) )
             {
                 mapped = true;
 
@@ -162,7 +165,7 @@ public class PathBasedRequestRepositoryMapper
         {
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug( "No mapping exists for request path [" + uid.getPath() + "]" );
+                getLogger().debug( "No mapping exists for request path [" + request.toString() + "]" );
             }
         }
         else
@@ -172,11 +175,12 @@ public class PathBasedRequestRepositoryMapper
                 if ( reposList.size() == 0 )
                 {
                     getLogger().debug(
-                        "Mapping for path [" + uid.getPath() + "] excluded all storages from servicing the request." );
+                        "Mapping for path [" + request.toString()
+                            + "] excluded all storages from servicing the request." );
                 }
                 else
                 {
-                    getLogger().debug( "Request path for [" + uid.getPath() + "] is MAPPED!" );
+                    getLogger().debug( "Request path for [" + request.toString() + "] is MAPPED!" );
                 }
             }
         }
@@ -212,14 +216,14 @@ public class PathBasedRequestRepositoryMapper
             return;
         }
 
-        List<CGroupsSettingPathMappingItem> pathMappings = getApplicationConfiguration()
+        List<CPathMappingItem> pathMappings = getApplicationConfiguration()
             .getConfiguration().getRepositoryGrouping().getPathMappings();
 
-        for ( CGroupsSettingPathMappingItem item : pathMappings )
+        for ( CPathMappingItem item : pathMappings )
         {
             List<Repository> reposes = null;
 
-            if ( !CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
+            if ( !CPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
             {
                 List<String> repoIds = item.getRepositories();
 
@@ -238,18 +242,18 @@ public class PathBasedRequestRepositoryMapper
                 }
             }
 
-            RepositoryPathMapping mapping = new RepositoryPathMapping( CGroupsSettingPathMappingItem.ALL_GROUPS
-                .equals( item.getGroupId() ), item.getGroupId(), item.getRoutePattern(), reposes );
+            RepositoryPathMapping mapping = new RepositoryPathMapping( CPathMappingItem.ALL_GROUPS.equals( item
+                .getGroupId() ), item.getGroupId(), item.getRoutePatterns(), reposes );
 
-            if ( CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
+            if ( CPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
             {
                 blockings.add( mapping );
             }
-            else if ( CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE.equals( item.getRouteType() ) )
+            else if ( CPathMappingItem.INCLUSION_RULE_TYPE.equals( item.getRouteType() ) )
             {
                 inclusions.add( mapping );
             }
-            else if ( CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE.equals( item.getRouteType() ) )
+            else if ( CPathMappingItem.EXCLUSION_RULE_TYPE.equals( item.getRouteType() ) )
             {
                 exclusions.add( mapping );
             }

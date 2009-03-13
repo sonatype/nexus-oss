@@ -14,10 +14,8 @@
 package org.sonatype.nexus.proxy.repository;
 
 import java.util.List;
-import java.util.Map;
 
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
@@ -64,6 +62,6 @@ public interface GroupRepository
      * @return
      * @throws StorageException
      */
-    List<StorageItem> doRetrieveItems( RepositoryItemUid uid, Map<String, Object> context )
+    List<StorageItem> doRetrieveItems( RepositoryRequest request )
         throws StorageException;
 }

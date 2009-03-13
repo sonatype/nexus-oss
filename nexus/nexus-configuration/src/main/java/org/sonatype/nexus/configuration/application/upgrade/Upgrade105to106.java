@@ -98,7 +98,7 @@ public class Upgrade105to106
         Configuration oldc = (Configuration) message.getConfiguration();
         org.sonatype.nexus.configuration.model.v1_0_6.Configuration newc = new org.sonatype.nexus.configuration.model.v1_0_6.Configuration();
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.v1_0_6.Configuration.MODEL_VERSION );
         // Working & log directories removed in this revision
         // newc.setWorkingDirectory( oldc.getWorkingDirectory() );
         // newc.setApplicationLogDirectory( oldc.getApplicationLogDirectory() );

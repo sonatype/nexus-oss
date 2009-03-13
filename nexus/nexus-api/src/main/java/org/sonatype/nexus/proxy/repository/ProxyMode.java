@@ -13,6 +13,11 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+/**
+ * Proxy mode.
+ * 
+ * @author cstamas
+ */
 public enum ProxyMode
 {
     ALLOW,

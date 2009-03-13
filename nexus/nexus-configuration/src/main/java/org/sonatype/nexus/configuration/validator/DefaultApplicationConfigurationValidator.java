@@ -11,7 +11,7 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.configuration.application.validator;
+package org.sonatype.nexus.configuration.validator;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -27,29 +27,24 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
-import org.sonatype.nexus.configuration.model.CGroupsSetting;
-import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
-import org.sonatype.nexus.configuration.model.CHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CMirror;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
-import org.sonatype.nexus.configuration.model.CRepositoryTarget;
-import org.sonatype.nexus.configuration.model.CRestApiSettings;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CScheduleConfig;
-import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.configuration.model.CSecurity;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
-import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.validator.ValidationMessage;
-import org.sonatype.nexus.configuration.validator.ValidationRequest;
-import org.sonatype.nexus.configuration.validator.ValidationResponse;
+import org.sonatype.nexus.configuration.modello.CHttpProxySettings;
+import org.sonatype.nexus.configuration.modello.CMirror;
+import org.sonatype.nexus.configuration.modello.CPathMappingItem;
+import org.sonatype.nexus.configuration.modello.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.modello.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.modello.CRemoteNexusInstance;
+import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.configuration.modello.CRepositoryGrouping;
+import org.sonatype.nexus.configuration.modello.CRepositoryTarget;
+import org.sonatype.nexus.configuration.modello.CRestApiSettings;
+import org.sonatype.nexus.configuration.modello.CRouting;
+import org.sonatype.nexus.configuration.modello.CScheduleConfig;
+import org.sonatype.nexus.configuration.modello.CScheduledTask;
+import org.sonatype.nexus.configuration.modello.CSecurity;
+import org.sonatype.nexus.configuration.modello.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.modello.Configuration;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
@@ -150,8 +145,6 @@ public class DefaultApplicationConfigurationValidator
         {
             model.setRouting( new CRouting() );
 
-            model.getRouting().setGroups( new CGroupsSetting() );
-
             response.addValidationWarning( "The routing section was missing from configuration, defaulted it." );
 
             response.setModified( true );
@@ -165,19 +158,6 @@ public class DefaultApplicationConfigurationValidator
         for ( CRepository repo : reposes )
         {
             response.append( validateRepository( context, repo ) );
-        }
-
-        // check shadow reposes and check their realms (optional section)
-        if ( model.getRepositoryShadows() != null )
-        {
-            context.addExistingRepositoryShadowIds();
-
-            List<CRepositoryShadow> shadows = model.getRepositoryShadows();
-
-            for ( CRepositoryShadow shadow : shadows )
-            {
-                response.append( validateRepository( context, shadow ) );
-            }
         }
 
         // check groups (optional section)
@@ -318,11 +298,10 @@ public class DefaultApplicationConfigurationValidator
 
         if ( !validateLocalStatus( repo.getLocalStatus() ) )
         {
-            response.addValidationError( "LocalStatus of repository with ID='" + repo.getId() + "' is wrong:'"
-                + repo.getType() + "'! (Allowed values are: '" + Configuration.LOCAL_STATUS_IN_SERVICE + "' and '"
-                + Configuration.LOCAL_STATUS_OUT_OF_SERVICE + "')" );
+            response.addValidationError( "LocalStatus of repository with ID='" + repo.getId() + "' is wrong! (Allowed values are: '" + LocalStatus.IN_SERVICE + "' and '"
+                + LocalStatus.OUT_OF_SERVICE + "')" );
         }
-
+/*
         if ( !validateRepositoryType( repo.getType() ) )
         {
             response.addValidationError( "TYPE='" + repo.getType() + "' of repository with ID='" + repo.getId()
@@ -360,7 +339,7 @@ public class DefaultApplicationConfigurationValidator
                 + CRepository.CHECKSUM_POLICY_STRICT_IF_EXISTS + "\" or \"" + CRepository.CHECKSUM_POLICY_STRICT
                 + "\" only." );
         }
-
+*/
         if ( context.getExistingRepositoryIds() != null )
         {
             if ( context.getExistingRepositoryIds().contains( repo.getId() ) )
@@ -392,85 +371,6 @@ public class DefaultApplicationConfigurationValidator
         return response;
     }
 
-    public ValidationResponse validateRepository( ApplicationValidationContext ctx, CRepositoryShadow shadow )
-    {
-        ValidationResponse response = new ApplicationValidationResponse();
-
-        if ( ctx != null )
-        {
-            response.setContext( ctx );
-        }
-
-        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
-
-        if ( StringUtils.isEmpty( shadow.getId() ) )
-        {
-            response.addValidationError( "Repository shadow ID's may not be empty!" );
-        }
-
-        if ( StringUtils.isEmpty( shadow.getName() ) )
-        {
-            shadow.setName( shadow.getId() );
-
-            response.addValidationWarning( "Repository shadow with ID='" + shadow.getId()
-                + "' has no name, defaulted to it's ID." );
-
-            response.setModified( true );
-        }
-
-        if ( context.getExistingRepositoryIds() != null )
-        {
-            if ( !context.getExistingRepositoryIds().contains( shadow.getShadowOf() ) )
-            {
-                response.addValidationError( "The shadow with ID='" + shadow.getId() + "' of repository "
-                    + shadow.getShadowOf() + " of type " + shadow.getType() + " points to a nonexistent repository!" );
-            }
-        }
-
-        if ( !validateLocalStatus( shadow.getLocalStatus() ) )
-        {
-            response.addValidationError( "LocalStatus of repository with ID='" + shadow.getId()
-                + "' is wrong! (Allowed values are: " + Configuration.LOCAL_STATUS_IN_SERVICE + " and "
-                + Configuration.LOCAL_STATUS_OUT_OF_SERVICE + ")" );
-        }
-
-        if ( !validateShadowRepositoryType( shadow.getType() ) )
-        {
-            response.addValidationError( "TYPE='" + shadow.getType() + "' of shadow repository with ID='"
-                + shadow.getId() + "' is wrong!" );
-        }
-
-        if ( context.getExistingRepositoryShadowIds() != null )
-        {
-            if ( context.getExistingRepositoryShadowIds().contains( shadow.getId() ) )
-            {
-                response.addValidationError( "Repository shadow " + shadow.getId() + " declared more than once!" );
-            }
-
-            context.getExistingRepositoryShadowIds().add( shadow.getId() );
-        }
-
-        if ( context.getExistingRepositoryIds() != null )
-        {
-            if ( context.getExistingRepositoryIds().contains( shadow.getId() ) )
-            {
-                response.addValidationError( "Repository shadow " + shadow.getId()
-                    + " conflicts with existing Repository with same ID='" + shadow.getId() + "'!" );
-            }
-        }
-
-        if ( context.getExistingRepositoryGroupIds() != null )
-        {
-            if ( context.getExistingRepositoryGroupIds().contains( shadow.getId() ) )
-            {
-                response.addValidationError( "Repository shadow " + shadow.getId()
-                    + " conflicts woth existing Group with same ID='" + shadow.getId() + "'!" );
-            }
-        }
-
-        return response;
-    }
-
     public ValidationResponse validateRepositoryGrouping( ApplicationValidationContext ctx, CRepositoryGrouping settings )
     {
         ValidationResponse response = new ApplicationValidationResponse();
@@ -482,21 +382,11 @@ public class DefaultApplicationConfigurationValidator
 
         ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
 
-        context.addExistingRepositoryGroupIds();
-
-        if ( settings.getRepositoryGroups() != null )
-        {
-            for ( CRepositoryGroup group : (List<CRepositoryGroup>) settings.getRepositoryGroups() )
-            {
-                response.append( validateRepositoryGroup( context, group ) );
-            }
-        }
-
         context.addExistingPathMappingIds();
 
         if ( settings.getPathMappings() != null )
         {
-            for ( CGroupsSettingPathMappingItem item : (List<CGroupsSettingPathMappingItem>) settings.getPathMappings() )
+            for ( CPathMappingItem item : (List<CPathMappingItem>) settings.getPathMappings() )
             {
                 response.append( validateGroupsSettingPathMappingItem( context, item ) );
             }
@@ -506,7 +396,7 @@ public class DefaultApplicationConfigurationValidator
     }
 
     public ValidationResponse validateGroupsSettingPathMappingItem( ApplicationValidationContext ctx,
-        CGroupsSettingPathMappingItem item )
+        CPathMappingItem item )
     {
         ValidationResponse response = new ApplicationValidationResponse();
 
@@ -533,7 +423,7 @@ public class DefaultApplicationConfigurationValidator
 
         if ( StringUtils.isEmpty( item.getGroupId() ) )
         {
-            item.setGroupId( CGroupsSettingPathMappingItem.ALL_GROUPS );
+            item.setGroupId( CPathMappingItem.ALL_GROUPS );
 
             response
                 .addValidationWarning( "Fixed route without groupId set, set to ALL_GROUPS to keep backward comp, ID='"
@@ -542,10 +432,13 @@ public class DefaultApplicationConfigurationValidator
             response.setModified( true );
         }
 
-        if ( !isValidRegexp( item.getRoutePattern() ) )
+        for ( String regexp : (List<String>) item.getRoutePatterns() )
         {
-            response.addValidationError( "The regexp in Route with ID='" + item.getId() + "' is not valid: "
-                + item.getRoutePattern() );
+            if ( !isValidRegexp( regexp ) )
+            {
+                response.addValidationError( "The regexp in Route with ID='" + item.getId() + "' is not valid: "
+                    + regexp );
+            }
         }
 
         if ( context.getExistingPathMappingIds() != null )
@@ -553,18 +446,17 @@ public class DefaultApplicationConfigurationValidator
             context.getExistingPathMappingIds().add( item.getId() );
         }
 
-        if ( !CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE.equals( item.getRouteType() )
-            && !CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE.equals( item.getRouteType() )
-            && !CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
+        if ( !CPathMappingItem.INCLUSION_RULE_TYPE.equals( item.getRouteType() )
+            && !CPathMappingItem.EXCLUSION_RULE_TYPE.equals( item.getRouteType() )
+            && !CPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
         {
             response.addValidationError( "The groupMapping pattern with ID=" + item.getId()
                 + " have invalid routeType='" + item.getRouteType() + "'. Valid route types are '"
-                + CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE + "', '"
-                + CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE + "' and '"
-                + CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE + "'." );
+                + CPathMappingItem.INCLUSION_RULE_TYPE + "', '" + CPathMappingItem.EXCLUSION_RULE_TYPE + "' and '"
+                + CPathMappingItem.BLOCKING_RULE_TYPE + "'." );
         }
 
-        if ( !CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
+        if ( !CPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
         {
             // NOT TRUE ANYMORE:
             // if you delete a repo(ses) that were belonging to a route, we insist on
@@ -591,80 +483,6 @@ public class DefaultApplicationConfigurationValidator
                 {
                     response.addValidationError( "The groupMapping pattern with ID=" + item.getId()
                         + " refers to a nonexistent repository with repoID = " + repoId );
-                }
-            }
-        }
-
-        return response;
-    }
-
-    public ValidationResponse validateRepositoryGroup( ApplicationValidationContext ctx, CRepositoryGroup group )
-    {
-        ValidationResponse response = new ApplicationValidationResponse();
-
-        if ( ctx != null )
-        {
-            response.setContext( ctx );
-        }
-
-        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
-
-        if ( StringUtils.isEmpty( group.getGroupId() ) )
-        {
-            response.addValidationError( "RepositoryGroup ID's may not be empty!" );
-        }
-
-        if ( StringUtils.isEmpty( group.getName() ) )
-        {
-            group.setName( group.getGroupId() );
-
-            response.addValidationWarning( "RepositoryGroup with ID='" + group.getGroupId()
-                + "' has no name, defaulted to it's ID." );
-
-            response.setModified( true );
-        }
-
-        if ( context.getExistingRepositoryGroupIds() != null )
-        {
-            if ( context.getExistingRepositoryGroupIds().contains( group.getGroupId() ) )
-            {
-                response.addValidationError( "The group with GroupID " + group.getGroupId()
-                    + " is defined more than once!" );
-            }
-        }
-
-        if ( context.getExistingRepositoryIds() != null )
-        {
-            if ( context.getExistingRepositoryIds().contains( group.getGroupId() ) )
-            {
-                response.addValidationError( "The group with GroupID " + group.getGroupId()
-                    + " conflicts with Repository having same ID!" );
-            }
-        }
-
-        if ( context.getExistingRepositoryShadowIds() != null )
-        {
-            if ( context.getExistingRepositoryShadowIds().contains( group.getGroupId() ) )
-            {
-                response.addValidationError( "The group with GroupID " + group.getGroupId()
-                    + " conflicts with Shadow repository having same ID!" );
-            }
-        }
-
-        if ( context.getExistingRepositoryIds() != null && context.getExistingRepositoryShadowIds() != null )
-        {
-            List<String> existingReposes = context.getExistingRepositoryIds();
-
-            List<String> existingShadows = context.getExistingRepositoryShadowIds();
-
-            List<String> members = group.getRepositories();
-
-            for ( String repoId : members )
-            {
-                if ( !existingReposes.contains( repoId ) && !existingShadows.contains( repoId ) )
-                {
-                    response.addValidationError( "The group with GroupID " + group.getGroupId()
-                        + " refers to a nonexistent repository with ID = " + repoId );
                 }
             }
         }
@@ -921,7 +739,7 @@ public class DefaultApplicationConfigurationValidator
             response.setContext( ctx );
         }
 
-        if ( StringUtils.isEmpty( settings.getHost() ) )
+        if ( StringUtils.isEmpty( settings.getHostname() ) )
         {
             ValidationMessage msg = new ValidationMessage( "host", "SMTP Host is empty." );
             response.addValidationError( msg );
@@ -949,8 +767,7 @@ public class DefaultApplicationConfigurationValidator
 
     protected boolean validateLocalStatus( String ls )
     {
-        return Configuration.LOCAL_STATUS_IN_SERVICE.equals( ls )
-            || Configuration.LOCAL_STATUS_OUT_OF_SERVICE.equals( ls );
+        return LocalStatus.IN_SERVICE.toString().equals( ls ) || LocalStatus.OUT_OF_SERVICE.equals( ls );
     }
 
     protected boolean validateRepositoryType( String type )

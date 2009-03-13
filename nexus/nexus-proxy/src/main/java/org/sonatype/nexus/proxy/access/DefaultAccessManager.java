@@ -13,11 +13,10 @@
  */
 package org.sonatype.nexus.proxy.access;
 
-import java.util.Map;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -32,14 +31,14 @@ public class DefaultAccessManager
     @Requirement
     private NexusItemAuthorizer nexusItemAuthorizer;
 
-    public void decide( Repository repository, String path, Map<String, Object> context, Action action )
+    public void decide( Repository repository, ResourceStoreRequest request, Action action )
         throws AccessDeniedException
     {
-        if ( !nexusItemAuthorizer.authorizePath( repository, path, context, action ) )
+        if ( !nexusItemAuthorizer.authorizePath( repository, request, action ) )
         {
             // deny the access
             throw new AccessDeniedException( "Access denied on repository ID='" + repository.getId() + "', path='"
-                + path + "', action='" + action + "'!" );
+                + request.getRequestPath() + "', action='" + action + "'!" );
         }
     }
 }

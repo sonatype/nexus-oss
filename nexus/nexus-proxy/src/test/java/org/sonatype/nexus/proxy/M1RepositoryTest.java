@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy;
 
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -79,7 +80,7 @@ public class M1RepositoryTest
         }
 
         // reset NFC
-        repository.clearCaches( "/" );
+        repository.clearCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ) );
 
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
@@ -131,7 +132,7 @@ public class M1RepositoryTest
         }
 
         // reset NFC
-        repository.clearCaches( "/" );
+        repository.clearCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ) );
 
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );

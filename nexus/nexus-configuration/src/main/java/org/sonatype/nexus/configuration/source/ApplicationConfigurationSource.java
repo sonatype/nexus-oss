@@ -11,13 +11,12 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.configuration.application.source;
+package org.sonatype.nexus.configuration.source;
 
 import java.io.IOException;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.source.ConfigurationSource;
+import org.sonatype.nexus.configuration.modello.Configuration;
 
 /**
  * The Interface ApplicationConfigurationSource, responsible to fetch Nexus user configuration by some means. It also

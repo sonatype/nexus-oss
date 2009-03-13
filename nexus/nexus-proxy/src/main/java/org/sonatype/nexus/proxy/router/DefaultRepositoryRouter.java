@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
@@ -30,11 +31,12 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
+import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -57,9 +59,12 @@ import org.sonatype.nexus.util.ItemPathUtils;
  */
 @Component( role = RepositoryRouter.class )
 public class DefaultRepositoryRouter
-    extends LoggingComponent
-    implements RepositoryRouter, Initializable
+    extends AbstractLogEnabled
+    implements RepositoryRouter, EventListener, Initializable
 {
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
+
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
@@ -355,14 +360,14 @@ public class DefaultRepositoryRouter
 
     public void initialize()
     {
-        applicationConfiguration.addProximityEventListener( this );
+        applicationEventMulticaster.addProximityEventListener( this );
     }
 
     public void onProximityEvent( AbstractEvent evt )
     {
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {
-            followLinks = applicationConfiguration.getConfiguration().getRouting().isFollowLinks();
+            followLinks = applicationConfiguration.getConfiguration().getRouting().isResolveLinks();
         }
     }
 

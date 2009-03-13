@@ -19,15 +19,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.proxy.LoggingComponent;
+import org.sonatype.nexus.configuration.modello.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.modello.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -39,7 +40,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @author cstamas
  */
 public abstract class AbstractRemoteRepositoryStorage
-    extends LoggingComponent
+    extends AbstractLogEnabled
     implements RemoteRepositoryStorage
 {
     @Requirement
@@ -66,10 +67,10 @@ public abstract class AbstractRemoteRepositoryStorage
      * @param uid the uid
      * @return the absolute url from base
      */
-    public URL getAbsoluteUrlFromBase( ProxyRepository repository, Map<String, Object> context, String path )
+    public URL getAbsoluteUrlFromBase( ProxyRepository repository, ResourceStoreRequest request )
         throws StorageException
     {
-        return getAbsoluteUrlFromBase( repository.getRemoteUrl(), path );
+        return getAbsoluteUrlFromBase( repository.getRemoteUrl(), request.getRequestPath() );
     }
 
     protected URL getAbsoluteUrlFromBase( String baseUrl, String path )
@@ -126,12 +127,12 @@ public abstract class AbstractRemoteRepositoryStorage
         return repository.getRemoteStorageContext();
     }
 
-    public boolean containsItem( ProxyRepository repository, Map<String, Object> context, String path )
+    public boolean containsItem( ProxyRepository repository, ResourceStoreRequest request )
         throws RemoteAuthenticationNeededException,
             RemoteAccessException,
             StorageException
     {
-        return containsItem( 0, repository, context, path );
+        return containsItem( 0, repository, request );
     }
 
     public String getVersion()

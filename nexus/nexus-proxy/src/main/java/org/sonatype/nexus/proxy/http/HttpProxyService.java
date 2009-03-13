@@ -13,16 +13,12 @@
  */
 package org.sonatype.nexus.proxy.http;
 
-import org.sonatype.nexus.NexusService;
-
 /**
  * The HTTP Proxy service component interface.
  * 
  * @author cstamas
  */
-public interface HttpProxyService extends NexusService
+public interface HttpProxyService
 {
-    String ROLE = HttpProxyService.class.getName();
-
     NexusURLResolver getNexusURLResolver();
 }

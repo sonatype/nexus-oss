@@ -42,12 +42,13 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
-import org.sonatype.nexus.proxy.repository.DefaultRepository;
+import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.MutableProxyRepositoryKind;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.util.ItemPathUtils;
@@ -58,7 +59,7 @@ import org.sonatype.nexus.util.ItemPathUtils;
  * @author cstamas
  */
 public abstract class AbstractMavenRepository
-    extends DefaultRepository
+    extends AbstractProxyRepository
     implements MavenRepository, MavenHostedRepository, MavenProxyRepository
 {
     /**
@@ -85,6 +86,8 @@ public abstract class AbstractMavenRepository
 
     /** Should repository provide correct checksums even if wrong ones are in repo? */
     private boolean fixRepositoryChecksums = false;
+
+    private boolean downloadRemoteIndexes;
 
     /**
      * The release max age (in minutes).
@@ -137,46 +140,60 @@ public abstract class AbstractMavenRepository
         return repositoryKind;
     }
 
-    public Collection<String> evictUnusedItems( final long timestamp )
+    @Override
+    public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
     {
         EvictUnusedMavenItemsWalkerProcessor walkerProcessor = new EvictUnusedMavenItemsWalkerProcessor( timestamp );
 
-        DefaultWalkerContext ctx = new DefaultWalkerContext( this, new EvictUnusedMavenItemsWalkerFilter() );
+        DefaultWalkerContext ctx = new DefaultWalkerContext( this, request, new EvictUnusedMavenItemsWalkerFilter() );
 
         ctx.getProcessors().add( walkerProcessor );
 
         getWalker().walk( ctx );
 
-        notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
+        getApplicationEventMulticaster().notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
         return walkerProcessor.getFiles();
     }
 
-    public boolean recreateMavenMetadata( String path )
+    public boolean recreateMavenMetadata( ResourceStoreRequest request )
     {
         if ( !getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
         {
             return false;
         }
 
-        if ( StringUtils.isEmpty( path ) )
+        if ( StringUtils.isEmpty( request.getRequestPath() ) )
         {
-            path = RepositoryItemUid.PATH_ROOT;
+            request.setRequestPath( RepositoryItemUid.PATH_ROOT );
         }
 
-        getLogger().info( "Recreating Maven2 metadata in repository ID='" + getId() + "' from path='" + path + "'" );
+        getLogger().info(
+            "Recreating Maven2 metadata in repository ID='" + getId() + "' from path='" + request.getRequestPath()
+                + "'" );
 
         RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
 
-        DefaultWalkerContext ctx = new DefaultWalkerContext( this );
+        DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
 
         ctx.getProcessors().add( wp );
 
-        getWalker().walk( ctx, path );
+        getWalker().walk( ctx );
 
-        notifyProximityEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
+        getApplicationEventMulticaster()
+            .notifyProximityEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
 
         return !ctx.isStopped();
+    }
+
+    public boolean isDownloadRemoteIndexes()
+    {
+        return downloadRemoteIndexes;
+    }
+
+    public void setDownloadRemoteIndexes( boolean downloadRemoteIndexes )
+    {
+        this.downloadRemoteIndexes = downloadRemoteIndexes;
     }
 
     public RepositoryPolicy getRepositoryPolicy()
@@ -249,7 +266,7 @@ public abstract class AbstractMavenRepository
         this.metadataMaxAge = metadataMaxAge;
     }
 
-    public abstract boolean shouldServeByPolicies( RepositoryItemUid uid );
+    public abstract boolean shouldServeByPolicies( RepositoryRequest request );
 
     public void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException,
@@ -293,7 +310,7 @@ public abstract class AbstractMavenRepository
         getArtifactStoreHelper().storeItemWithChecksums( item );
     }
 
-    public void deleteItemWithChecksums( RepositoryItemUid uid, Map<String, Object> context )
+    public void deleteItemWithChecksums( RepositoryRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
@@ -301,10 +318,10 @@ public abstract class AbstractMavenRepository
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "deleteItemWithChecksums() :: " + uid.toString() );
+            getLogger().debug( "deleteItemWithChecksums() :: " + request.toString() );
         }
-        
-        getArtifactStoreHelper().deleteItemWithChecksums( uid, context );
+
+        getArtifactStoreHelper().deleteItemWithChecksums( request );
     }
 
     public MetadataManager getMetadataManager()
@@ -316,22 +333,23 @@ public abstract class AbstractMavenRepository
     // DefaultRepository customizations
 
     @Override
-    protected StorageItem doRetrieveItem( RepositoryItemUid uid, Map<String, Object> context )
+    protected StorageItem doRetrieveItem( RepositoryRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
-        if ( !shouldServeByPolicies( uid ) )
+        if ( !shouldServeByPolicies( request ) )
         {
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "The serving of item " + uid.toString() + " is forbidden by Maven repository policy." );
+                    "The serving of item " + request.toString() + " is forbidden by Maven repository policy." );
             }
-            throw new ItemNotFoundException( uid );
+
+            throw new ItemNotFoundException( request );
         }
 
-        return super.doRetrieveItem( uid, context );
+        return super.doRetrieveItem( request );
     }
 
     @Override
@@ -340,7 +358,7 @@ public abstract class AbstractMavenRepository
             IllegalOperationException,
             StorageException
     {
-        if ( shouldServeByPolicies( item.getRepositoryItemUid() ) )
+        if ( shouldServeByPolicies( new RepositoryRequest( this, new ResourceStoreRequest( item ) ) ) )
         {
             super.storeItem( item );
         }
@@ -372,27 +390,27 @@ public abstract class AbstractMavenRepository
     // DefaultRepository customizations
 
     @Override
-    protected AbstractStorageItem doRetrieveRemoteItem( RepositoryItemUid uid, Map<String, Object> context )
+    protected AbstractStorageItem doRetrieveRemoteItem( RepositoryRequest request )
         throws ItemNotFoundException,
             RemoteAccessException,
             StorageException
     {
-        if ( !isChecksum( uid ) )
+        if ( !isChecksum( request.getResourceStoreRequest().getRequestPath() ) )
         {
             // we are about to download an artifact from remote repository
             // lets clean any existing (stale) checksum files
-            removeLocalChecksum( uid, context );
+            removeLocalChecksum( request.getResourceStoreRequest() );
         }
 
-        return super.doRetrieveRemoteItem( uid, context );
+        return super.doRetrieveRemoteItem( request );
     }
 
     @Override
     protected boolean doValidateRemoteItemContent( String baseUrl, AbstractStorageItem item,
-        Map<String, Object> context, List<NexusArtifactEvent> events )
+        List<NexusArtifactEvent> events )
         throws StorageException
     {
-        if ( isChecksum( item.getRepositoryItemUid() ) )
+        if ( isChecksum( item.getRepositoryItemUid().getPath() ) )
         {
             // do not validate checksum files
             return true;
@@ -407,23 +425,27 @@ public abstract class AbstractMavenRepository
 
         RepositoryItemUid uid = item.getRepositoryItemUid();
 
+        ResourceStoreRequest request = new ResourceStoreRequest( item );
+
         DefaultStorageFileItem hashItem = null;
 
         // we prefer SHA1 ...
         try
         {
-            String path = uid.getRepository().createUid( uid.getPath() + ".sha1" ).getPath();
+            request.pushRequestPath( uid.getPath() + ".sha1" );
 
-            hashItem = doRetriveRemoteChecksumItem( context, path );
+            hashItem = doRetriveRemoteChecksumItem( request );
         }
         catch ( ItemNotFoundException sha1e )
         {
             // ... but MD5 will do too
             try
             {
-                String path = uid.getRepository().createUid( uid.getPath() + ".md5" ).getPath();
+                request.popRequestPath();
 
-                hashItem = doRetriveRemoteChecksumItem( context, path );
+                request.pushRequestPath( uid.getPath() + ".md5" );
+
+                hashItem = doRetriveRemoteChecksumItem( request );
             }
             catch ( ItemNotFoundException md5e )
             {
@@ -512,7 +534,9 @@ public abstract class AbstractMavenRepository
             // TODO should we remove bad checksum if policy==WARN?
             try
             {
-                getLocalStorage().deleteItem( this, context, hashItem.getRepositoryItemUid().getPath() );
+                getLocalStorage().deleteItem(
+                    this,
+                    new ResourceStoreRequest( hashItem.getRepositoryItemUid().getPath(), true ) );
             }
             catch ( ItemNotFoundException e )
             {
@@ -531,20 +555,20 @@ public abstract class AbstractMavenRepository
      * Special implementation of doRetrieveRemoteItem that treats all exceptions as ItemNotFoundException. To be used
      * form #doValidateRemoteItemContent only!
      */
-    private DefaultStorageFileItem doRetriveRemoteChecksumItem( Map<String, Object> context, String path )
+    private DefaultStorageFileItem doRetriveRemoteChecksumItem( ResourceStoreRequest request )
         throws ItemNotFoundException
     {
         try
         {
-            return (DefaultStorageFileItem) getRemoteStorage().retrieveItem( this, context, getRemoteUrl(), path );
+            return (DefaultStorageFileItem) getRemoteStorage().retrieveItem( this, request, getRemoteUrl() );
         }
         catch ( RemoteAccessException e )
         {
-            throw new ItemNotFoundException( path, e );
+            throw new ItemNotFoundException( request.getRequestPath(), e );
         }
         catch ( StorageException e )
         {
-            throw new ItemNotFoundException( path, e );
+            throw new ItemNotFoundException( request.getRequestPath(), e );
         }
     }
 
@@ -573,33 +597,41 @@ public abstract class AbstractMavenRepository
         return nae;
     }
 
-    private boolean isChecksum( RepositoryItemUid uid )
+    private boolean isChecksum( String path )
     {
-        return uid.getPath().endsWith( ".sha1" ) || uid.getPath().endsWith( ".md5" );
+        return path.endsWith( ".sha1" ) || path.endsWith( ".md5" );
     }
 
-    private void removeLocalChecksum( RepositoryItemUid uid, Map<String, Object> context )
+    private void removeLocalChecksum( ResourceStoreRequest request )
         throws StorageException
     {
         try
         {
+            request.pushRequestPath( request.getRequestPath() + ".sha1" );
+
             try
             {
-                getLocalStorage().deleteItem( this, context, uid.getPath() + ".sha1" );
+                getLocalStorage().deleteItem( this, request );
             }
             catch ( ItemNotFoundException e )
             {
                 // this is exactly what we're trying to achieve
             }
 
+            request.popRequestPath();
+
+            request.pushRequestPath( request.getRequestPath() + ".md5" );
+
             try
             {
-                getLocalStorage().deleteItem( this, context, uid.getPath() + ".md5" );
+                getLocalStorage().deleteItem( this, request );
             }
             catch ( ItemNotFoundException e )
             {
                 // this is exactly what we're trying to achieve
             }
+
+            request.popRequestPath();
         }
         catch ( UnsupportedStorageOperationException e )
         {
@@ -608,42 +640,44 @@ public abstract class AbstractMavenRepository
 
     }
 
-    protected void markItemRemotelyChecked( RepositoryItemUid uid, Map<String, Object> context )
+    @Override
+    protected void markItemRemotelyChecked( RepositoryRequest request )
         throws StorageException,
             ItemNotFoundException
     {
-        super.markItemRemotelyChecked( uid, context );
+        super.markItemRemotelyChecked( request );
 
-        RepositoryItemUid sha1Uid = uid.getRepository().createUid( uid.getPath() + ".sha1" );
+        request
+            .getResourceStoreRequest().pushRequestPath( request.getResourceStoreRequest().getRequestPath() + ".sha1" );
 
-        if ( getLocalStorage().containsItem( this, context, sha1Uid.getPath() ) )
+        if ( getLocalStorage().containsItem( this, request.getResourceStoreRequest() ) )
         {
-            super.markItemRemotelyChecked( sha1Uid, context );
+            super.markItemRemotelyChecked( request );
         }
 
-        RepositoryItemUid md5Uid = uid.getRepository().createUid( uid.getPath() + ".md5" );
+        request.getResourceStoreRequest().popRequestPath();
 
-        if ( getLocalStorage().containsItem( this, context, md5Uid.getPath() ) )
+        request.getResourceStoreRequest().pushRequestPath( request.getResourceStoreRequest().getRequestPath() + ".md5" );
+
+        if ( getLocalStorage().containsItem( this, request.getResourceStoreRequest() ) )
         {
-            super.markItemRemotelyChecked( md5Uid, context );
+            super.markItemRemotelyChecked( request );
         }
+
+        request.getResourceStoreRequest().popRequestPath();
     }
 
-    public void deleteItem( ResourceStoreRequest request )
+    @Override
+    public void deleteItem( RepositoryRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
-        RepositoryItemUid uid = createUid( request.getRequestPath() );
-
-        Map<String, Object> context = request.getRequestContext();
-
         // first determine from where to rebuild metadata
         String path = RepositoryItemUid.PATH_ROOT;
 
-        StorageItem item = this.retrieveItem( uid, context );
+        StorageItem item = getLocalStorage().retrieveItem( this, request.getResourceStoreRequest() );
 
         if ( item instanceof StorageCollectionItem )
         {
@@ -658,6 +692,6 @@ public abstract class AbstractMavenRepository
         super.deleteItem( request );
 
         // finally rebuild metadata
-        recreateMavenMetadata( path );
+        recreateMavenMetadata( new ResourceStoreRequest( path, true ) );
     }
 }

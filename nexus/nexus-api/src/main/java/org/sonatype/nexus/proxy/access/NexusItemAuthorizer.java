@@ -13,8 +13,6 @@
  */
 package org.sonatype.nexus.proxy.access;
 
-import java.util.Map;
-
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -33,7 +31,7 @@ public interface NexusItemAuthorizer
      * @param path
      * @return
      */
-    boolean authorizePath( ResourceStoreRequest request, Map<String, Object> context, Action action );
+    boolean authorizePath( ResourceStoreRequest request, Action action );
 
     /**
      * Authorizes a repository level path against an action. Use when you have a repositoy path, ie. filtering of search
@@ -43,7 +41,7 @@ public interface NexusItemAuthorizer
      * @param path
      * @return
      */
-    boolean authorizePath( Repository repository, String path, Map<String, Object> context, Action action );
+    boolean authorizePath( Repository repository, ResourceStoreRequest request, Action action );
 
     /**
      * Used to authorize a simple permission string

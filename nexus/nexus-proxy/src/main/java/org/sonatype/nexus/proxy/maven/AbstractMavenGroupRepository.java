@@ -1,6 +1,7 @@
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -10,13 +11,16 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.repository.DefaultGroupRepository;
+import org.sonatype.nexus.proxy.repository.AbstractGroupRepository;
+import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 public abstract class AbstractMavenGroupRepository
-    extends DefaultGroupRepository
-    implements MavenRepository
+    extends AbstractGroupRepository
+    implements MavenGroupRepository
 {
     /**
      * Metadata manager.
@@ -31,6 +35,18 @@ public abstract class AbstractMavenGroupRepository
     private ArtifactPackagingMapper artifactPackagingMapper;
 
     private ArtifactStoreHelper artifactStoreHelper;
+
+    private RepositoryKind repositoryKind;
+
+    public RepositoryKind getRepositoryKind()
+    {
+        if ( repositoryKind == null )
+        {
+            repositoryKind = new DefaultRepositoryKind( GroupRepository.class, Arrays
+                .asList( new Class<?>[] { MavenGroupRepository.class } ) );
+        }
+        return repositoryKind;
+    }
 
     public ArtifactPackagingMapper getArtifactPackagingMapper()
     {
@@ -52,7 +68,7 @@ public abstract class AbstractMavenGroupRepository
         return metadataManager;
     }
 
-    public boolean recreateMavenMetadata( String path )
+    public boolean recreateMavenMetadata( ResourceStoreRequest request )
     {
         return false;
     }
@@ -96,13 +112,13 @@ public abstract class AbstractMavenGroupRepository
         getArtifactStoreHelper().deleteItemWithChecksums( request );
     }
 
-    public void deleteItemWithChecksums( RepositoryItemUid uid, Map<String, Object> context )
+    public void deleteItemWithChecksums( RepositoryRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
-        getArtifactStoreHelper().deleteItemWithChecksums( uid, context );
+        getArtifactStoreHelper().deleteItemWithChecksums( request );
     }
 
 }

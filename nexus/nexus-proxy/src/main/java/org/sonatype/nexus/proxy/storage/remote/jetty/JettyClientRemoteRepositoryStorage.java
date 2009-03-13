@@ -16,7 +16,6 @@ package org.sonatype.nexus.proxy.storage.remote.jetty;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.mortbay.jetty.HttpHeaders;
@@ -26,12 +25,13 @@ import org.mortbay.jetty.client.HttpDestination;
 import org.mortbay.jetty.client.security.ProxyAuthorization;
 import org.mortbay.jetty.client.security.Realm;
 import org.mortbay.jetty.client.security.RealmResolver;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.modello.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.modello.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -134,22 +134,35 @@ public class JettyClientRemoteRepositoryStorage
         }
     }
 
-    public boolean isReachable( ProxyRepository repository, Map<String, Object> context )
+    public boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
         throws RemoteAuthenticationNeededException,
             RemoteAccessException,
             StorageException
     {
-        return containsItem( repository, context, RepositoryItemUid.PATH_ROOT );
+        boolean result = false;
+
+        try
+        {
+            request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
+
+            result = containsItem( repository, request );
+        }
+        finally
+        {
+            request.popRequestPath();
+        }
+
+        return result;
     }
 
-    public boolean containsItem( long newerThen, ProxyRepository repository, Map<String, Object> context, String path )
+    public boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
         throws StorageException
     {
         RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
-        ContainsHttpExchange contains = new ContainsHttpExchange( repository, path, newerThen );
+        ContainsHttpExchange contains = new ContainsHttpExchange( repository, request.getRequestPath(), newerThen );
 
-        setUpExchange( contains, rsc, repository, context, path );
+        setUpExchange( contains, rsc, repository, request );
 
         executeRequest( rsc, contains );
 
@@ -163,22 +176,22 @@ public class JettyClientRemoteRepositoryStorage
         }
     }
 
-    public AbstractStorageItem retrieveItem( ProxyRepository repository, Map<String, Object> context, String baseUrl, String path )
+    public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
         throws ItemNotFoundException,
             StorageException
     {
         RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
-        RetrieveHttpExchange retrieve = new RetrieveHttpExchange( repository, path );
+        RetrieveHttpExchange retrieve = new RetrieveHttpExchange( repository, request.getRequestPath() );
 
-        setUpExchange( retrieve, rsc, repository, context, path );
+        setUpExchange( retrieve, rsc, repository, request );
 
         executeRequest( rsc, retrieve );
 
         return retrieve.getStorageItem();
     }
 
-    public void storeItem( ProxyRepository repository, Map<String, Object> context, StorageItem item )
+    public void storeItem( ProxyRepository repository, StorageItem item )
         throws UnsupportedStorageOperationException,
             StorageException
     {
@@ -186,7 +199,7 @@ public class JettyClientRemoteRepositoryStorage
 
         StoreHttpExchange store = new StoreHttpExchange( repository, item.getPath(), item );
 
-        setUpExchange( store, rsc, repository, context, item.getPath() );
+        setUpExchange( store, rsc, repository, new ResourceStoreRequest( item ) );
 
         executeRequest( rsc, store );
 
@@ -200,16 +213,16 @@ public class JettyClientRemoteRepositoryStorage
         }
     }
 
-    public void deleteItem( ProxyRepository repository, Map<String, Object> context, String path )
+    public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             StorageException
     {
         RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
-        DeleteHttpExchange delete = new DeleteHttpExchange( repository, path );
+        DeleteHttpExchange delete = new DeleteHttpExchange( repository, request.getRequestPath() );
 
-        setUpExchange( delete, rsc, repository, context, path );
+        setUpExchange( delete, rsc, repository, request );
 
         executeRequest( rsc, delete );
 
@@ -237,10 +250,10 @@ public class JettyClientRemoteRepositoryStorage
     // ----
 
     protected void setUpExchange( AbstractNexusExchange exchange, RemoteStorageContext rsc, ProxyRepository repository,
-        Map<String, Object> context, String path )
+        ResourceStoreRequest request )
         throws StorageException
     {
-        URL requestURL = getAbsoluteUrlFromBase( repository, context, path );
+        URL requestURL = getAbsoluteUrlFromBase( repository, request );
 
         StringBuffer requestStringBuffer = new StringBuffer( requestURL.toString() );
 

@@ -26,6 +26,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.store.DefaultEntry;
 import org.sonatype.nexus.store.Entry;
@@ -45,6 +46,9 @@ public class FileStore
     implements Store, EventListener, Initializable
 {
     @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
+
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
     private File baseDir;
@@ -60,7 +64,7 @@ public class FileStore
 
     public void initialize()
     {
-        applicationConfiguration.addProximityEventListener( this );
+        applicationEventMulticaster.addProximityEventListener( this );
     }
 
     public void onProximityEvent( AbstractEvent evt )

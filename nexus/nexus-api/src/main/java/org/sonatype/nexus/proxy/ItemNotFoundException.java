@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 
 /**
  * Thrown if the requested item is not found.
@@ -43,6 +44,11 @@ public class ItemNotFoundException
     public ItemNotFoundException( RepositoryItemUid uid )
     {
         super( "Item not found on UID " + uid.toString() + " in repository " + uid.getRepository().getId() );
+    }
+
+    public ItemNotFoundException( RepositoryRequest request )
+    {
+        super( "Item not found on path " + request.toString() + " in repository " + request.getRepository().getId() );
     }
 
 }

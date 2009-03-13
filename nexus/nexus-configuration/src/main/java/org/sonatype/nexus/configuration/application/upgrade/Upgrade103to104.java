@@ -326,9 +326,9 @@ public class Upgrade103to104
 
                 task.setType( oldTask.getType() );
 
-                List<org.sonatype.nexus.configuration.model.CProps> oldProps = oldTask.getProperties();
+                List<org.sonatype.nexus.configuration.model.v1_0_3.CProps> oldProps = oldTask.getProperties();
 
-                for ( org.sonatype.nexus.configuration.model.CProps oldProp : oldProps )
+                for ( org.sonatype.nexus.configuration.model.v1_0_3.CProps oldProp : oldProps )
                 {
                     CProps prop = new CProps();
 

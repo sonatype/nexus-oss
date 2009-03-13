@@ -41,4 +41,8 @@ public interface MavenProxyRepository
     int getMetadataMaxAge();
 
     void setMetadataMaxAge( int metadataMaxAge );
+
+    boolean isDownloadRemoteIndexes();
+
+    void setDownloadRemoteIndexes( boolean download );
 }

@@ -18,11 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.nexus.NexusService;
-import org.sonatype.nexus.proxy.events.EventListener;
-
 public interface Timeline
-    extends NexusService, EventListener
 {
     void add( String type, String subType, Map<String, String> data );
 

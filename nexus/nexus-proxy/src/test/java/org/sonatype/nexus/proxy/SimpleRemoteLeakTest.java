@@ -19,6 +19,7 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 
@@ -68,12 +69,15 @@ public class SimpleRemoteLeakTest
             checkForFileAndMatchContents( item2 );
 
             // to force refetch
-            getRepositoryRegistry().getRepository( item1.getRepositoryId() ).deleteItem(
-                item1.getRepositoryItemUid(),
-                item1.getItemContext() );
-            getRepositoryRegistry().getRepository( item2.getRepositoryId() ).deleteItem(
-                item2.getRepositoryItemUid(),
-                item2.getItemContext() );
+            getRepositoryRegistry()
+                .getRepository( item1.getRepositoryId() ).deleteItem(
+                    new RepositoryRequest( item1.getRepositoryItemUid().getRepository(), new ResourceStoreRequest(
+                        item1 ) ) );
+
+            getRepositoryRegistry()
+                .getRepository( item2.getRepositoryId() ).deleteItem(
+                    new RepositoryRequest( item2.getRepositoryItemUid().getRepository(), new ResourceStoreRequest(
+                        item2 ) ) );
         }
 
         // get the default context, since they used it

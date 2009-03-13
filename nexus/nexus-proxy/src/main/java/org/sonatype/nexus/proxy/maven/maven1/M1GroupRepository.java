@@ -19,6 +19,8 @@ import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.RepositoryConfigurationValidator;
+import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 
 @Component( role = GroupRepository.class, hint = "maven1", instantiationStrategy = "per-lookup", description = "Maven1 Repository Group" )
 public class M1GroupRepository
@@ -30,6 +32,21 @@ public class M1GroupRepository
     @Requirement( hint = "maven1" )
     private GavCalculator gavCalculator;
 
+    @Requirement
+    private M1GroupRepositoryConfigurator m1GroupRepositoryConfigurator;
+
+    private boolean mergeMetadata = true;
+
+    public boolean isMergeMetadata()
+    {
+        return mergeMetadata;
+    }
+
+    public void setMergeMetadata( boolean mergeMetadata )
+    {
+        this.mergeMetadata = mergeMetadata;
+    }
+
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
@@ -38,5 +55,17 @@ public class M1GroupRepository
     public GavCalculator getGavCalculator()
     {
         return gavCalculator;
+    }
+
+    @Override
+    public RepositoryConfigurationValidator getRepositoryConfigurationValidator()
+    {
+        return null;
+    }
+
+    @Override
+    public RepositoryConfigurator getRepositoryConfigurator()
+    {
+        return m1GroupRepositoryConfigurator;
     }
 }

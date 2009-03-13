@@ -94,4 +94,22 @@ public class DefaultTargetRegistry
         return result;
     }
 
+    public boolean hasAnyApplicableTarget( Repository repository )
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Looking for any targets for repository='" + repository.getId() + "'" );
+        }
+
+        for ( Target t : targets.values() )
+        {
+            if ( t.getContentClass().isCompatible( repository.getRepositoryContentClass() ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

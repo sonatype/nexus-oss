@@ -11,23 +11,23 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy;
+package org.sonatype.nexus.proxy.events;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
-import org.sonatype.nexus.proxy.events.EventMulticaster;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
  * The Class ProximityEventMulticasterComponent implements multicasting. Used by Repository and Registry
- * implementations.
+ * implementations. Note: this class methods are dedicated to Proximity :)
  * 
  * @author cstamas
  */
-public class EventMulticasterComponent
-    extends LoggingComponent
-    implements EventMulticaster
+@Component( role = ApplicationEventMulticaster.class )
+public class DefaultApplicationEventMulticaster
+    extends AbstractLogEnabled
+    implements ApplicationEventMulticaster
 {
     /** The proximity event listeners. */
     private CopyOnWriteArrayList<EventListener> proximityEventListeners = new CopyOnWriteArrayList<EventListener>();
@@ -59,7 +59,7 @@ public class EventMulticasterComponent
             }
             catch ( Exception e )
             {
-                getLogger().info( "Unexpected exception in listener", e );
+                getLogger().info( "Unexpected exception in listener, continuing listener notification.", e );
             }
         }
     }

@@ -37,6 +37,7 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.AbstractShadowRepository;
 import org.sonatype.nexus.proxy.repository.IncompatibleMasterRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -129,7 +130,7 @@ public abstract class LayoutConverterShadowRepository
         return metadataManager;
     }
 
-    public boolean recreateMavenMetadata( String path )
+    public boolean recreateMavenMetadata( ResourceStoreRequest request )
     {
         return false;
     }
@@ -156,9 +157,7 @@ public abstract class LayoutConverterShadowRepository
                 throw new StorageException( "Could not get the content from the ContentLocator!", e );
             }
 
-            RepositoryItemUid itemUid = createUid( request.getRequestPath() );
-
-            StorageFileItem storedFile = (StorageFileItem) retrieveItem( itemUid, null );
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( new RepositoryRequest( this, request ) );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -273,8 +272,9 @@ public abstract class LayoutConverterShadowRepository
                 throw new StorageException( "Could not get the content from the ContentLocator!", e );
             }
 
-            StorageFileItem storedFile = (StorageFileItem) retrieveItem( item.getRepositoryItemUid(), item
-                .getItemContext() );
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( new RepositoryRequest(
+                this,
+                new ResourceStoreRequest( item ) ) );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -306,7 +306,7 @@ public abstract class LayoutConverterShadowRepository
         }
     }
 
-    public void deleteItemWithChecksums( RepositoryItemUid uid, Map<String, Object> ctx )
+    public void deleteItemWithChecksums( RepositoryRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
@@ -314,31 +314,41 @@ public abstract class LayoutConverterShadowRepository
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "deleteItemWithChecksums() :: " + uid.toString() );
+            getLogger().debug( "deleteItemWithChecksums() :: " + request.toString() );
         }
 
-        deleteItem( uid, ctx );
-
-        RepositoryItemUid sha1Uid = createUid( uid.getPath() + ".sha1" );
+        deleteItem( request );
 
         try
         {
-            deleteItem( sha1Uid, ctx );
+            request.getResourceStoreRequest().pushRequestPath(
+                request.getResourceStoreRequest().getRequestPath() + ".sha1" );
+
+            deleteItem( request );
         }
         catch ( ItemNotFoundException e )
         {
             // ignore not found
         }
-
-        RepositoryItemUid md5Uid = createUid( uid.getPath() + ".md5" );
+        finally
+        {
+            request.getResourceStoreRequest().popRequestPath();
+        }
 
         try
         {
-            deleteItem( md5Uid, ctx );
+            request.getResourceStoreRequest().pushRequestPath(
+                request.getResourceStoreRequest().getRequestPath() + ".md5" );
+
+            deleteItem( request );
         }
         catch ( ItemNotFoundException e )
         {
             // ignore not found
+        }
+        finally
+        {
+            request.getResourceStoreRequest().popRequestPath();
         }
     }
 
@@ -426,7 +436,11 @@ public abstract class LayoutConverterShadowRepository
 
         if ( shadowPath != null )
         {
-            deleteItem( createUid( shadowPath ), context );
+            ResourceStoreRequest request = new ResourceStoreRequest( item );
+
+            request.getRequestContext().putAll( context );
+
+            deleteItem( new RepositoryRequest( this, request ) );
         }
     }
 
@@ -456,7 +470,7 @@ public abstract class LayoutConverterShadowRepository
     protected abstract String transformMaster2Shadow( String path );
 
     @Override
-    protected StorageItem doRetrieveItem( RepositoryItemUid uid, Map<String, Object> context )
+    protected StorageItem doRetrieveItem( RepositoryRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
@@ -465,24 +479,33 @@ public abstract class LayoutConverterShadowRepository
 
         try
         {
-            result = super.doRetrieveItem( uid, context );
+            result = super.doRetrieveItem( request );
 
             return result;
         }
         catch ( ItemNotFoundException e )
         {
             // if it is thrown by super.doRetrieveItem()
-            String transformedPath = transformShadow2Master( uid.getPath() );
+            String transformedPath = transformShadow2Master( request.getResourceStoreRequest().getRequestPath() );
 
             if ( transformedPath == null )
             {
-                throw new ItemNotFoundException( uid.getPath() );
+                throw new ItemNotFoundException( request );
             }
 
             // delegate the call to the master
-            RepositoryItemUid tuid = getMasterRepository().createUid( transformedPath );
+            request.getResourceStoreRequest().pushRequestPath( transformedPath );
 
-            return doRetrieveItemFromMaster( tuid, context );
+            try
+            {
+                result = doRetrieveItemFromMaster( request );
+            }
+            finally
+            {
+                request.getResourceStoreRequest().popRequestPath();
+            }
+
+            return result;
         }
     }
 

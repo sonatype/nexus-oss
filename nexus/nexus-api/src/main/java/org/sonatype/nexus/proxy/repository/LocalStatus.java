@@ -13,6 +13,11 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+/**
+ * Local status of a Repository.
+ * 
+ * @author cstamas
+ */
 public enum LocalStatus
 {
 

@@ -24,19 +24,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CProps;
-import org.sonatype.nexus.configuration.model.CScheduleConfig;
-import org.sonatype.nexus.configuration.model.CScheduledTask;
+import org.sonatype.nexus.configuration.modello.CProps;
+import org.sonatype.nexus.configuration.modello.CScheduleConfig;
+import org.sonatype.nexus.configuration.modello.CScheduledTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.HourlySchedule;
@@ -54,7 +50,7 @@ import org.sonatype.scheduling.schedules.WeeklySchedule;
 @Component( role = TaskConfigManager.class )
 public class DefaultTaskConfigManager
     extends AbstractLogEnabled
-    implements TaskConfigManager, Contextualizable
+    implements TaskConfigManager
 {
     /**
      * The app config holding tasks.
@@ -65,13 +61,8 @@ public class DefaultTaskConfigManager
     /**
      * Plexus.
      */
+    @Requirement
     private PlexusContainer plexusContainer;
-
-    public void contextualize( Context ctx )
-        throws ContextException
-    {
-        this.plexusContainer = (PlexusContainer) ctx.get( PlexusConstants.PLEXUS_KEY );
-    }
 
     protected PlexusContainer getPlexusContainer()
     {
@@ -108,7 +99,7 @@ public class DefaultTaskConfigManager
                         task.getName(),
                         task.getType(),
                         nexusTask,
-                        translateFrom( task.getSchedule(), task.getNextRun() ),
+                        translateFrom( task.getSchedule(), new Date( task.getNextRun() ) ),
                         translateFrom( task.getProperties() ) ).setEnabled( task.isEnabled() );
                 }
                 catch ( IllegalArgumentException e )
@@ -118,7 +109,8 @@ public class DefaultTaskConfigManager
                     getLogger()
                         .warn(
                             "Unable to initialize task " + task.getName() + ", couldn't load service class "
-                                + task.getId(), e );
+                                + task.getId(),
+                            e );
                 }
             }
         }
@@ -274,7 +266,8 @@ public class DefaultTaskConfigManager
                 }
             }
 
-            schedule = new MonthlySchedule( modelSchedule.getStartDate(), modelSchedule.getEndDate(), daysToRun );
+            schedule = new MonthlySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule
+                .getEndDate() ), daysToRun );
         }
         else if ( CScheduleConfig.TYPE_WEEKLY.equals( modelSchedule.getType() ) )
         {
@@ -294,19 +287,22 @@ public class DefaultTaskConfigManager
                 }
             }
 
-            schedule = new WeeklySchedule( modelSchedule.getStartDate(), modelSchedule.getEndDate(), daysToRun );
+            schedule = new WeeklySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule
+                .getEndDate() ), daysToRun );
         }
         else if ( CScheduleConfig.TYPE_DAILY.equals( modelSchedule.getType() ) )
         {
-            schedule = new DailySchedule( modelSchedule.getStartDate(), modelSchedule.getEndDate() );
+            schedule = new DailySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule
+                .getEndDate() ) );
         }
         else if ( CScheduleConfig.TYPE_HOURLY.equals( modelSchedule.getType() ) )
         {
-            schedule = new HourlySchedule( modelSchedule.getStartDate(), modelSchedule.getEndDate() );
+            schedule = new HourlySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule
+                .getEndDate() ) );
         }
         else if ( CScheduleConfig.TYPE_ONCE.equals( modelSchedule.getType() ) )
         {
-            schedule = new OnceSchedule( modelSchedule.getStartDate() );
+            schedule = new OnceSchedule( new Date( modelSchedule.getStartDate() ) );
         }
         else if ( CScheduleConfig.TYPE_RUN_NOW.equals( modelSchedule.getType() ) )
         {
@@ -338,8 +334,8 @@ public class DefaultTaskConfigManager
         storeableTask.setName( task.getName() );
         storeableTask.setType( task.getType() );
         storeableTask.setStatus( task.getTaskState().name() );
-        storeableTask.setLastRun( task.getLastRun() );
-        storeableTask.setNextRun( task.getNextRun() );
+        storeableTask.setLastRun( task.getLastRun().getTime() );
+        storeableTask.setNextRun( task.getNextRun().getTime() );
 
         for ( String key : task.getTaskParams().keySet() )
         {
@@ -365,9 +361,9 @@ public class DefaultTaskConfigManager
             {
                 storeableSchedule.setType( CScheduleConfig.TYPE_MONTHLY );
 
-                storeableSchedule.setStartDate( ( (MonthlySchedule) schedule ).getStartDate() );
+                storeableSchedule.setStartDate( ( (MonthlySchedule) schedule ).getStartDate().getTime() );
 
-                storeableSchedule.setEndDate( ( (MonthlySchedule) schedule ).getEndDate() );
+                storeableSchedule.setEndDate( ( (MonthlySchedule) schedule ).getEndDate().getTime() );
 
                 for ( Iterator iter = ( (MonthlySchedule) schedule ).getDaysToRun().iterator(); iter.hasNext(); )
                 {
@@ -381,9 +377,9 @@ public class DefaultTaskConfigManager
             {
                 storeableSchedule.setType( CScheduleConfig.TYPE_WEEKLY );
 
-                storeableSchedule.setStartDate( ( (WeeklySchedule) schedule ).getStartDate() );
+                storeableSchedule.setStartDate( ( (WeeklySchedule) schedule ).getStartDate().getTime() );
 
-                storeableSchedule.setEndDate( ( (WeeklySchedule) schedule ).getEndDate() );
+                storeableSchedule.setEndDate( ( (WeeklySchedule) schedule ).getEndDate().getTime() );
 
                 for ( Iterator iter = ( (WeeklySchedule) schedule ).getDaysToRun().iterator(); iter.hasNext(); )
                 {
@@ -397,23 +393,23 @@ public class DefaultTaskConfigManager
             {
                 storeableSchedule.setType( CScheduleConfig.TYPE_DAILY );
 
-                storeableSchedule.setStartDate( ( (DailySchedule) schedule ).getStartDate() );
+                storeableSchedule.setStartDate( ( (DailySchedule) schedule ).getStartDate().getTime() );
 
-                storeableSchedule.setEndDate( ( (DailySchedule) schedule ).getEndDate() );
+                storeableSchedule.setEndDate( ( (DailySchedule) schedule ).getEndDate().getTime() );
             }
             else if ( HourlySchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
                 storeableSchedule.setType( CScheduleConfig.TYPE_HOURLY );
 
-                storeableSchedule.setStartDate( ( (HourlySchedule) schedule ).getStartDate() );
+                storeableSchedule.setStartDate( ( (HourlySchedule) schedule ).getStartDate().getTime() );
 
-                storeableSchedule.setEndDate( ( (HourlySchedule) schedule ).getEndDate() );
+                storeableSchedule.setEndDate( ( (HourlySchedule) schedule ).getEndDate().getTime() );
             }
             else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
                 storeableSchedule.setType( CScheduleConfig.TYPE_ONCE );
 
-                storeableSchedule.setStartDate( ( (OnceSchedule) schedule ).getStartDate() );
+                storeableSchedule.setStartDate( ( (OnceSchedule) schedule ).getStartDate().getTime() );
             }
             else if ( RunNowSchedule.class.isAssignableFrom( schedule.getClass() ) )
             {

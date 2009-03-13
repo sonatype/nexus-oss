@@ -14,23 +14,10 @@
 package org.sonatype.nexus.proxy.maven.maven1;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.proxy.repository.DefaultGroupRepositoryConfigurator;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepositoryConfigurator;
-import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
+import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepositoryConfigurator;
 
-@Component( role = GroupRepositoryConfigurator.class, hint = "maven1" )
+@Component( role = M1GroupRepositoryConfigurator.class )
 public class M1GroupRepositoryConfigurator
-    extends DefaultGroupRepositoryConfigurator
+    extends AbstractMavenGroupRepositoryConfigurator
 {
-    public GroupRepository updateRepositoryFromModel( GroupRepository old, ApplicationConfiguration configuration,
-        CRepositoryGroup group, LocalRepositoryStorage ls )
-        throws InvalidConfigurationException
-    {
-        return super.updateRepositoryFromModel( old, configuration, group, ls );
-    }
-
 }

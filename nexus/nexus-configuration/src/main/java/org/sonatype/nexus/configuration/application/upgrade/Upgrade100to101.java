@@ -87,7 +87,7 @@ public class Upgrade100to101
 
         org.sonatype.nexus.configuration.model.v1_0_1.Configuration newc = new org.sonatype.nexus.configuration.model.v1_0_1.Configuration();
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.v1_0_1.Configuration.MODEL_VERSION );
         newc.setWorkingDirectory( oldc.getWorkingDirectory() );
         newc.setApplicationLogDirectory( oldc.getApplicationLogDirectory() );
 

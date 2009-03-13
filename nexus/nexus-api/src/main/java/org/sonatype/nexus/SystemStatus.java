@@ -15,19 +15,11 @@ package org.sonatype.nexus;
 
 import java.util.Date;
 
-import org.sonatype.nexus.configuration.validator.ValidationResponse;
-
 /**
  * Nexus system state object. It gives small amount of important infos about Nexus Application.
  * 
  * @author cstamas
- */
-/**
- * @author Damian
- *
- */
-/**
- * @author Damian
+ * @author damian
  */
 public class SystemStatus
 {
@@ -100,11 +92,6 @@ public class SystemStatus
      * If instanceUpgraded, was there also a configuration upgrade?
      */
     private boolean configurationUpgraded;
-
-    /**
-     * The validation response of the configuration.
-     */
-    private ValidationResponse configurationValidationResponse;
 
     /**
      * Other error cause that blocked startup.
@@ -219,16 +206,6 @@ public class SystemStatus
     public void setLastConfigChange( Date lastConfigChange )
     {
         this.lastConfigChange = lastConfigChange;
-    }
-
-    public ValidationResponse getConfigurationValidationResponse()
-    {
-        return configurationValidationResponse;
-    }
-
-    public void setConfigurationValidationResponse( ValidationResponse configurationValidationResponse )
-    {
-        this.configurationValidationResponse = configurationValidationResponse;
     }
 
     public Throwable getErrorCause()

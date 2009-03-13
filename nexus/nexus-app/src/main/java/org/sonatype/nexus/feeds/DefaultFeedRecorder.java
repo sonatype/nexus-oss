@@ -98,18 +98,6 @@ public class DefaultFeedRecorder
     @Requirement
     private Timeline timeline;
 
-    public void startService()
-        throws Exception
-    {
-        timeline.startService();
-    }
-
-    public void stopService()
-        throws Exception
-    {
-        timeline.stopService();
-    }
-
     protected DateFormat getDateFormat()
     {
         return new SimpleDateFormat( EVENT_DATE_FORMAT );

@@ -41,4 +41,6 @@ public interface RemoteStorageContext
     void removeRemoteConnectionContextObject( String key );
 
     Map<String, Object> getRemoteConnectionContext();
+
+    RemoteStorageContext getParentRemoteStorageContext();
 }

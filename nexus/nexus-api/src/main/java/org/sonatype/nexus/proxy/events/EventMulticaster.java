@@ -18,7 +18,6 @@ package org.sonatype.nexus.proxy.events;
  */
 public interface EventMulticaster
 {
-
     /**
      * Adds the proximity event listener.
      * 
@@ -39,5 +38,4 @@ public interface EventMulticaster
      * @param evt the evt
      */
     public void notifyProximityEventListeners( AbstractEvent evt );
-
 }

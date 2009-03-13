@@ -11,30 +11,26 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.configuration.application.validator;
+package org.sonatype.nexus.configuration.validator;
 
 import java.util.List;
 
-import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
-import org.sonatype.nexus.configuration.model.CHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CMirror;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
-import org.sonatype.nexus.configuration.model.CRepositoryTarget;
-import org.sonatype.nexus.configuration.model.CRestApiSettings;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CScheduleConfig;
-import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.configuration.model.CSecurity;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
-import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
-import org.sonatype.nexus.configuration.validator.ValidationResponse;
+import org.sonatype.nexus.configuration.modello.CHttpProxySettings;
+import org.sonatype.nexus.configuration.modello.CMirror;
+import org.sonatype.nexus.configuration.modello.CPathMappingItem;
+import org.sonatype.nexus.configuration.modello.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.modello.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.modello.CRemoteNexusInstance;
+import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.configuration.modello.CRepositoryGrouping;
+import org.sonatype.nexus.configuration.modello.CRepositoryTarget;
+import org.sonatype.nexus.configuration.modello.CRestApiSettings;
+import org.sonatype.nexus.configuration.modello.CRouting;
+import org.sonatype.nexus.configuration.modello.CScheduleConfig;
+import org.sonatype.nexus.configuration.modello.CScheduledTask;
+import org.sonatype.nexus.configuration.modello.CSecurity;
+import org.sonatype.nexus.configuration.modello.CSmtpConfiguration;
 
 /**
  * The validator used to validate current configuration in boot-up sequence.
@@ -51,14 +47,6 @@ public interface ApplicationConfigurationValidator
      * @return
      */
     ValidationResponse validateRepository( ApplicationValidationContext ctx, CRepository repository );
-
-    /**
-     * Validates a repository configuration.
-     * 
-     * @param repository
-     * @return
-     */
-    ValidationResponse validateRepository( ApplicationValidationContext ctx, CRepositoryShadow repository );
 
     /**
      * Validates remote connection settings.
@@ -140,16 +128,7 @@ public interface ApplicationConfigurationValidator
      * @param settings
      * @return
      */
-    ValidationResponse validateGroupsSettingPathMappingItem( ApplicationValidationContext ctx,
-        CGroupsSettingPathMappingItem settings );
-
-    /**
-     * Validates repository group item.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateRepositoryGroup( ApplicationValidationContext ctx, CRepositoryGroup settings );
+    ValidationResponse validateGroupsSettingPathMappingItem( ApplicationValidationContext ctx, CPathMappingItem settings );
 
     /**
      * Validates repository target item.
@@ -183,7 +162,7 @@ public interface ApplicationConfigurationValidator
      * @return
      */
     ValidationResponse validateSmtpConfiguration( ApplicationValidationContext ctx, CSmtpConfiguration settings );
-    
+
     /**
      * Validate mirror config
      * 

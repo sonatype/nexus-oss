@@ -23,9 +23,9 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -37,7 +37,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  */
 @Component( role = AttributesHandler.class )
 public class DefaultAttributesHandler
-    extends LoggingComponent
+    extends AbstractLogEnabled
     implements AttributesHandler
 {
 

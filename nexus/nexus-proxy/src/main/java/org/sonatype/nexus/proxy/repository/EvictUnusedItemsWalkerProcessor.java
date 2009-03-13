@@ -91,7 +91,7 @@ public class EvictUnusedItemsWalkerProcessor
             IllegalOperationException,
             ItemNotFoundException
     {
-        getRepository( ctx ).deleteItem( item.getRepositoryItemUid(), item.getItemContext() );
+        getRepository( ctx ).deleteItem( new RepositoryRequest( item, ctx.getResourceStoreRequest() ) );
     }
 
     @Override
@@ -103,7 +103,7 @@ public class EvictUnusedItemsWalkerProcessor
         {
             if ( getRepository( ctx ).list( coll ).size() == 0 )
             {
-                getRepository( ctx ).deleteItem( coll.getRepositoryItemUid(), coll.getItemContext() );
+                getRepository( ctx ).deleteItem( new RepositoryRequest( coll, ctx.getResourceStoreRequest() ) );
             }
         }
         catch ( RepositoryNotAvailableException e )

@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.nexus.NexusService;
 import org.sonatype.nexus.timeline.TimelineFilter;
 
 /**
@@ -27,7 +26,6 @@ import org.sonatype.nexus.timeline.TimelineFilter;
  * @author cstamas
  */
 public interface FeedRecorder
-    extends NexusService
 {
     /**
      * System event action: boot

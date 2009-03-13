@@ -16,11 +16,11 @@ package org.sonatype.nexus.proxy.storage.local;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.LoggingComponent;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -37,7 +37,7 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
  * @author cstamas
  */
 public abstract class AbstractLocalRepositoryStorage
-    extends LoggingComponent
+    extends AbstractLogEnabled
     implements LocalRepositoryStorage
 {
 
@@ -59,18 +59,18 @@ public abstract class AbstractLocalRepositoryStorage
      * @param uid the uid
      * @return the absolute url from base
      */
-    public URL getAbsoluteUrlFromBase( Repository repository, Map<String, Object> context, String path )
+    public URL getAbsoluteUrlFromBase( Repository repository, ResourceStoreRequest request )
         throws StorageException
     {
         StringBuffer urlStr = new StringBuffer( repository.getLocalUrl() );
 
-        if ( path.startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        if ( request.getRequestPath().startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
-            urlStr.append( path );
+            urlStr.append( request.getRequestPath() );
         }
         else
         {
-            urlStr.append( RepositoryItemUid.PATH_SEPARATOR ).append( path );
+            urlStr.append( RepositoryItemUid.PATH_SEPARATOR ).append( request.getRequestPath() );
         }
         try
         {
@@ -99,18 +99,18 @@ public abstract class AbstractLocalRepositoryStorage
         this.attributesHandler = attributesHandler;
     }
 
-    public void touchItemRemoteChecked( Repository repository, Map<String, Object> context, String path )
+    public void touchItemRemoteChecked( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             StorageException
     {
-        touchItemRemoteChecked( System.currentTimeMillis(), repository, context, path );
+        touchItemRemoteChecked( System.currentTimeMillis(), repository, request );
     }
 
-    public void touchItemRemoteChecked( long timestamp, Repository repository, Map<String, Object> context, String path )
+    public void touchItemRemoteChecked( long timestamp, Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             StorageException
     {
-        RepositoryItemUid uid = repository.createUid( path );
+        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
         AbstractStorageItem item = getAttributesHandler().getAttributeStorage().getAttributes( uid );
 
@@ -126,18 +126,18 @@ public abstract class AbstractLocalRepositoryStorage
         }
     }
 
-    public void touchItemLastRequested( Repository repository, Map<String, Object> context, String path )
+    public void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             StorageException
     {
-        touchItemLastRequested( System.currentTimeMillis(), repository, context, path );
+        touchItemLastRequested( System.currentTimeMillis(), repository, request );
     }
 
-    public void touchItemLastRequested( long timestamp, Repository repository, Map<String, Object> context, String path )
+    public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             StorageException
     {
-        RepositoryItemUid uid = repository.createUid( path );
+        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
         AbstractStorageItem item = getAttributesHandler().getAttributeStorage().getAttributes( uid );
 
@@ -151,19 +151,19 @@ public abstract class AbstractLocalRepositoryStorage
         }
     }
 
-    public void updateItemAttributes( Repository repository, Map<String, Object> context, StorageItem item )
+    public void updateItemAttributes( Repository repository, ResourceStoreRequest request, StorageItem item )
         throws ItemNotFoundException,
             StorageException
     {
         getAttributesHandler().getAttributeStorage().putAttribute( item );
     }
 
-    public final void deleteItem( Repository repository, Map<String, Object> context, String path )
+    public final void deleteItem( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             StorageException
     {
-        wastebasket.delete( this, repository, context, path );
+        wastebasket.delete( this, repository, request );
     }
 
 }

@@ -69,7 +69,9 @@ public abstract class AbstractNexusRepositoriesTask<T>
     {
         try
         {
-            return getNexus().readRepositoryGroup( getRepositoryGroupId() ).getName();
+            GroupRepository repo = getNexus().getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class );
+            
+            return repo.getName();
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -83,7 +85,9 @@ public abstract class AbstractNexusRepositoriesTask<T>
     {
         try
         {
-            return getNexus().readRepository( getRepositoryId() ).getName();
+            Repository repo = getNexus().getRepositoryWithFacet( getRepositoryGroupId(), Repository.class );
+            
+            return repo.getName();
         }
         catch ( NoSuchRepositoryException e )
         {

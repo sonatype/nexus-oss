@@ -11,7 +11,7 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.configuration.application.source;
+package org.sonatype.nexus.configuration.source;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,10 +24,9 @@ import java.io.Writer;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.InterpolatorFilterReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
-import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
-import org.sonatype.nexus.configuration.source.AbstractConfigurationSource;
+import org.sonatype.nexus.configuration.modello.Configuration;
+import org.sonatype.nexus.configuration.modello.io.xpp3.NexusConfigurationXpp3Reader;
+import org.sonatype.nexus.configuration.modello.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
 
 /**

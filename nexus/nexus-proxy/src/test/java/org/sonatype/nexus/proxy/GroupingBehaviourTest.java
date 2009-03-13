@@ -22,6 +22,7 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 
 public class GroupingBehaviourTest
     extends AbstractProxyTestEnvironment
@@ -65,8 +66,8 @@ public class GroupingBehaviourTest
         // get metadata from a gidr router but switch merging off (default is on), spoofing should happen, and the
         // highest ranked repo
         // in group (repo1) should provide the file
-        getApplicationConfiguration().getConfiguration().getRouting().getGroups().setMergeMetadata( false );
-        getApplicationConfiguration().notifyProximityEventListeners(
+        getRepositoryRegistry().getRepositoryWithFacet( "test", MavenGroupRepository.class ).setMergeMetadata( false );
+        getApplicationEventMulticaster().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         StorageItem item = getRootRouter()
@@ -87,7 +88,7 @@ public class GroupingBehaviourTest
         Metadata md1, md2;
 
         // get metadata from a gidr router with merging on (default is on), merge should happen
-        getApplicationConfiguration().notifyProximityEventListeners(
+        getApplicationEventMulticaster().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         StorageItem item = getRootRouter()
@@ -127,8 +128,8 @@ public class GroupingBehaviourTest
 
         // get metadata from a gidr router but switch merging off (default is on), spoofing should happen, and the
         // highest ranked repo in group (repo1) should provide the file
-        getApplicationConfiguration().getConfiguration().getRouting().getGroups().setMergeMetadata( false );
-        getApplicationConfiguration().notifyProximityEventListeners(
+        getRepositoryRegistry().getRepositoryWithFacet( "test", MavenGroupRepository.class ).setMergeMetadata( false );
+        getApplicationEventMulticaster().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );

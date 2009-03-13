@@ -36,13 +36,15 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryConfigurationValidator;
+import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.util.AlphanumComparator;
 
 /**
@@ -63,6 +65,9 @@ public class M2Repository
     @Requirement( hint = "maven2" )
     private ContentClass contentClass;
 
+    @Requirement
+    private M2RepositoryConfigurator m2RepositoryConfigurator;
+
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
@@ -73,17 +78,30 @@ public class M2Repository
         return gavCalculator;
     }
 
+    @Override
+    public RepositoryConfigurationValidator getRepositoryConfigurationValidator()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public RepositoryConfigurator getRepositoryConfigurator()
+    {
+        return m2RepositoryConfigurator;
+    }
+
     /**
      * Should serve by policies.
      * 
      * @param uid the uid
      * @return true, if successful
      */
-    public boolean shouldServeByPolicies( RepositoryItemUid uid )
+    public boolean shouldServeByPolicies( RepositoryRequest request )
     {
-        if ( M2ArtifactRecognizer.isMetadata( uid.getPath() ) )
+        if ( M2ArtifactRecognizer.isMetadata( request.getResourceStoreRequest().getRequestPath() ) )
         {
-            if ( M2ArtifactRecognizer.isSnapshot( uid.getPath() ) )
+            if ( M2ArtifactRecognizer.isSnapshot( request.getResourceStoreRequest().getRequestPath() ) )
             {
                 return RepositoryPolicy.SNAPSHOT.equals( getRepositoryPolicy() );
             }
@@ -94,7 +112,8 @@ public class M2Repository
             }
         }
         // we are using Gav to test the path
-        Gav gav = gavCalculator.pathToGav( uid.getPath() );
+        Gav gav = gavCalculator.pathToGav( request.getResourceStoreRequest().getRequestPath() );
+
         if ( gav == null )
         {
             return true;
@@ -221,5 +240,4 @@ public class M2Repository
 
         return versions.get( versions.size() - 1 );
     }
-
 }
