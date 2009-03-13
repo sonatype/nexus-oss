@@ -28,10 +28,14 @@ public class ConciseClassNamePatternConverterTest
         assertConciseClassName( "org.sonatype.nexus.Nexus", "o.s.n.Nexus" );
         assertConciseClassName( "org.sonatype.nexus.DefaultNexus", "o.s.n.DefaultNexus" );
         assertConciseClassName( "org.sonatype.nexus.MyDefaultWonderfulNexus", "o.s.n.MyDefaultWond~" );
+        assertConciseClassName( "a.b.c.d.e.f.g.h.i.j.Hello", "a.b.c.d.e.f.g.h.i.j~");
+        assertConciseClassName( "a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.", "a.b.c.d.e.f.g.h.i.j~");
+        
     }
 
     protected void assertConciseClassName( String className, String conciseClassName )
     {
         assertEquals( conciseClassName, AbstractConcisePatternConverter.simplify( className, 20 ) );
     }
+    
 }

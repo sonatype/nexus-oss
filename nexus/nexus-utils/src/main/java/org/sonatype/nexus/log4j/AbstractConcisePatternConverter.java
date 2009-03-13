@@ -66,49 +66,52 @@ public abstract class AbstractConcisePatternConverter
     }
 
     /**
-     * @See Able Source <a href='http://code.google.com/p/able/source/browse/trunk/able-lib/src/main/java/able/util/StandardFormatter.java'>StandardFormatte
-     *      r < / a >
+     * @See <a href='http://code.google.com/p/able/source/browse/trunk/able-lib/src/main/java/able/util/StandardFormatter.java'>StandardFormatter</a
+     *      >
      */
     public static String simplify( String className, int maxLength )
     {
+        if ( className.length() <= maxLength )
+        {
+            return className;
+        }
+
         StringBuffer result = new StringBuffer();
 
-        int classNameLength = className.length();
-        int before = result.length();
-
-        if ( classNameLength > maxLength )
+        int index = -1;
+        
+        while ( true )
         {
-            int index = -1;
-            while ( true )
+            if ( className.indexOf( ".", index + 1 ) == -1 )
+            {
+                String remainingStr = className.substring( index + 1 );
+                
+                int availableLength = maxLength - result.length();
+
+                if ( remainingStr.length() > availableLength )
+                {
+                    remainingStr = remainingStr.substring( 0, availableLength - 1 ) + '~';
+                }
+
+                result.append( remainingStr );
+
+                break;
+            }
+            else
             {
                 result.append( className.charAt( index + 1 ) );
-
-                int oldIndex = index;
-                index = className.indexOf( ".", index + 1 );
-
-                if ( index == -1 )
+                
+                if ( result.length() + 1 == maxLength )
                 {
-                    String str = className.substring( oldIndex + 2 );
-                    int rem = maxLength - ( result.length() - before );
-
-                    if ( str.length() > rem )
-                    {
-                        str = str.substring( 0, rem - 1 ) + '~';
-                    }
-
-                    result.append( str );
-
+                    result.append( '~' );
+                    
                     break;
                 }
-                else
-                {
-                    result.append( '.' );
-                }
+
+                result.append( '.' );
+                
+                index = className.indexOf( ".", index + 1 );
             }
-        }
-        else
-        {
-            result.append( className );
         }
 
         return result.toString();
