@@ -28,6 +28,14 @@ public class DefaultStaticResource
     private volatile URLConnection urlConnection;
     
     private String contentType;
+    
+    @Deprecated
+    public DefaultStaticResource( URL url, String path )
+    {
+        this.resourceURL = url;
+
+        this.path = path;
+    }
 
     public DefaultStaticResource( URL url, String path, String contentType )
     {
