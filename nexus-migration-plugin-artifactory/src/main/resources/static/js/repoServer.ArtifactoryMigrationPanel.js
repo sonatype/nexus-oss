@@ -186,7 +186,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
               {
                 style: 'padding-bottom: 10px',
                 cls: 'x-form-item',
-                html: 'Enter the path on the server to the location of your .zip file containing the Artifactory configuration backup and select "Upload".'
+                html: 'Enter the path on the server to the location of your .zip file containing the Artifactory configuration backup and select "Load".'
               },
               {
                 xtype: 'panel',
@@ -204,7 +204,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                   },
                   {
                     xtype: 'button',
-                    text: 'Upload',
+                    text: 'Load',
                     id: 'artifactory-import-browse-button',
                     columnWidth: .1,
                     handler: this.loadBackup,
