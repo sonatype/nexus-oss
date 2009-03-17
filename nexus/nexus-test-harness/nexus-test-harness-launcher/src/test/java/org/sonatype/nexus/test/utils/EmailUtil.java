@@ -20,14 +20,19 @@ import com.icegreen.greenmail.util.ServerSetup;
 
 public class EmailUtil
 {
-    private static final int emailServerPort;
+    public static final String USER_EMAIL = "system@nexus.org";
+
+    public static final String USER_PASSWORD = "smtp-password";
+
+    public static final String USER_USERNAME = "smtp-username";
+
+    public static final int EMAIL_SERVER_PORT;
 
     private static final Logger log = Logger.getLogger( EmailUtil.class );
 
     static
     {
-        String port = TestProperties.getString( "email.server.port" );
-        emailServerPort = new Integer( port );
+        EMAIL_SERVER_PORT = TestProperties.getInteger( "email.server.port" );
     }
 
     private static GreenMail server;
@@ -37,10 +42,10 @@ public class EmailUtil
         if ( server == null )
         {
             // ServerSetup smtp = new ServerSetup( 1234, null, ServerSetup.PROTOCOL_SMTP );
-            ServerSetup smtp = new ServerSetup( emailServerPort, null, ServerSetup.PROTOCOL_SMTP );
+            ServerSetup smtp = new ServerSetup( EMAIL_SERVER_PORT, null, ServerSetup.PROTOCOL_SMTP );
 
             server = new GreenMail( smtp );
-            server.setUser( "system@nexus.org", "smtp-username", "smtp-password" );
+            server.setUser( USER_EMAIL, USER_USERNAME, USER_PASSWORD );
             log.debug( "Starting e-mail server" );
             server.start();
         }

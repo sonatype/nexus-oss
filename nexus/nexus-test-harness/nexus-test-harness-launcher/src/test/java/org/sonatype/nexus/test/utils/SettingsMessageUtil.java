@@ -22,6 +22,8 @@ import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
+import org.sonatype.nexus.rest.model.SmtpSettingsResource;
+import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -66,4 +68,19 @@ public class SettingsMessageUtil
         return response.getStatus();
     }
 
+    public static Status validateSmtp( SmtpSettingsResource smtpSettings )
+        throws IOException
+    {
+        String serviceURI = "service/local/check_smtp_settings/";
+
+        SmtpSettingsResourceRequest configResponse = new SmtpSettingsResourceRequest();
+        configResponse.setData( smtpSettings );
+
+        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
+        representation.setPayload( configResponse );
+
+        Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
+
+        return response.getStatus();
+    }
 }

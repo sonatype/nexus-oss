@@ -239,6 +239,12 @@ public class UserMessageUtil
         return result.getData();
     }
 
+    public List<PlexusUserResource> searchPlexusUsers( String source )
+        throws IOException
+    {
+        return searchPlexusUsers( source, "" );
+    }
+
     @SuppressWarnings( "unchecked" )
     public List<PlexusUserResource> searchPlexusUsers( String source, String userId )
         throws IOException
