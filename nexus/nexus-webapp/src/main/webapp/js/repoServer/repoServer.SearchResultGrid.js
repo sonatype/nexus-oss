@@ -127,13 +127,6 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       dataIndex: 'classifier',
       width: 40,
       sortable:true
-    },{
-      id: 'jar',
-      header: "Download",
-      dataIndex: 'resourceURI',
-      width: 65,
-      sortable:false,
-      renderer: this.formatJarLink.createDelegate( this )
     }
 //@note: NX-444 remove POM link functionality until it can work across browsers (firefix issue presently)
 //  ,{
@@ -270,46 +263,6 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     return 'x-grid3-row-collapsed';
   },
 
-  formatJarLink: function(value, parent, record, rowIndex, colIndex, store) {
-    var r = record.get( 'repoId' );
-    var g = record.get( 'groupId' );
-    var a = record.get( 'artifactId' );
-    var v = record.get( 'version' );
-    var c = record.get( 'classifier' );
-    var p = record.get( 'packaging' );
-
-    if ( c ) {
-      return this.makeArtifactLink( r, g, a, v, c, p, 'artifact' );
-    }
-    // no packaging, only shows a pom link
-    else if ( !p ){
-      return this.makeArtifactLink( r, g, a, v, null, 'pom', 'pom')
-    }
-    else if ( p == 'pom') {
-      return this.makeArtifactLink( r, g, a, v, c, p, 'pom' );
-    }
-    else {
-      return this.makeArtifactLink( r, g, a, v, c, p, 'artifact' ) + ', ' +
-      this.makeArtifactLink( r, g, a, v, null, 'pom', 'pom' );
-    }
-  },
-
-  makeArtifactLink: function( r, g, a, v, c, p, title ) {
-    var url = Sonatype.config.repos.urls.redirect +
-      '?r=' + r + '&g=' + g + '&a=' + a + '&v=' + v;
-    if ( c ) {
-      url += '&c=' + c;
-    }
-    if ( p ) {
-      url += '&p=' + p;
-    }
-    return String.format( '<a target="_blank" href="{0}">{1}</a>', url, title );
-  },
-  
-  formatPomLink: function(value, p, record, rowIndex, colIndex, store) {
-      return '<a class="pom-link" index="'+rowIndex+'" href="#">View & Copy</a>';
-  },
-
   fetchMoreRows: function( button, event ) {
     if ( button.value != this.fetchMoreButton.value ) {
       this.fetchMoreButton.value = button.value;
@@ -361,6 +314,34 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     this.clearWarningLabel();
   },
   
+  makeArtifactUrl: function(r, g, a, v, c, p) {
+    var url = Sonatype.config.repos.urls.redirect +
+      '?r=' + r + '&g=' + g + '&a=' + a + '&v=' + v;	
+    if ( c ) {
+        url += '&c=' + c;
+    }
+    if ( p ) {
+        url += '&p=' + p;
+    }
+    return url;
+  },
+  
+  makeDownloadItem: function(text, url, event){
+	var item = {   
+      text: text,
+      href: url,
+      scope: this,
+      handler: this.downloadHandler
+	};
+	item.targetUrl = url;
+	return item;
+  },
+  
+  downloadHandler: function( node, item, event) {
+	  event.stopEvent();
+	  window.open( item.targetUrl );
+  },  
+  
   rowContextMenuHandler: function( grid, rowIndex, e ) {
     var rec = this.store.getAt( rowIndex );
     
@@ -372,16 +353,45 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     if ( this.sp.checkPermission( 'nexus:cache', this.sp.DELETE ) ){
       menu.add( Sonatype.repoServer.DefaultRepoHandler.repoActions.clearCache );
     }
-//    if ( this.sp.checkPermission( 'nexus:index', this.sp.DELETE ) ) {
-//      menu.add( Sonatype.repoServer.DefaultRepoHandler.repoActions.reIndex );
-//    }
+
     if ( this.sp.checkPermission( 'nexus:metadata', this.sp.DELETE ) ) {
       menu.add( Sonatype.repoServer.DefaultRepoHandler.repoActions.rebuildMetadata );
     }
-
-    if ( ! menu.items.first() ) return;
+    
+    if ( menu.items.first() ){
+    	menu.add( '-' );
+    }
+    
+    var r = rec.get( 'repoId' );
+    var g = rec.get( 'groupId' );
+    var a = rec.get( 'artifactId' );
+    var v = rec.get( 'version' );
+    var c = rec.get( 'classifier' );
+    var p = rec.get( 'packaging' );
+    
+    if ( c ) {
+      var url = this.makeArtifactUrl( r, g, a, v, c, p);
+      menu.add( this.makeDownloadItem('Download Artifact', url, e) );
+    }
+    // no packaging, only shows a pom link
+    else if ( !p ){
+      var url = this.makeArtifactUrl( r, g, a, v, null, 'pom');
+      menu.add( this.makeDownloadItem('Open POM', url, e) );
+    }
+    else if ( p == 'pom') {
+      var url = this.makeArtifactUrl( r, g, a, v, c, p);
+      menu.add( this.makeDownloadItem('Open POM', url, e) );
+    }
+    else {
+      var url = this.makeArtifactUrl( r, g, a, v, c, p);
+      menu.add( this.makeDownloadItem('Download Artifact', url, e) );
+      url = this.makeArtifactUrl( r, g, a, v, null, 'pom');
+      menu.add( this.makeDownloadItem('Open POM', url, e) );
+    }
 
     e.stopEvent();
     menu.showAt( e.getXY() );
   }
+  
+  
 });
