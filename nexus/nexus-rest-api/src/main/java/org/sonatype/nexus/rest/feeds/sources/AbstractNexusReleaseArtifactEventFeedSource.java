@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.modello.CRepository;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 
 public abstract class AbstractNexusReleaseArtifactEventFeedSource

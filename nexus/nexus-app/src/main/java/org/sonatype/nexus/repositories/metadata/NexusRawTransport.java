@@ -11,7 +11,6 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.repository.metadata.RawTransport;
 
 public class NexusRawTransport
@@ -45,11 +44,9 @@ public class NexusRawTransport
 
         try
         {
-            ResourceStoreRequest rsr = new ResourceStoreRequest( path, localOnly, remoteOnly );
+            ResourceStoreRequest request = new ResourceStoreRequest( path, localOnly, remoteOnly );
 
-            RepositoryRequest request = new RepositoryRequest( repository, rsr );
-
-            StorageItem item = repository.retrieveItem( request );
+            StorageItem item = repository.retrieveItem( false, request );
 
             if ( item instanceof StorageFileItem )
             {
@@ -89,12 +86,12 @@ public class NexusRawTransport
     {
         DefaultStorageFileItem file = new DefaultStorageFileItem(
             repository,
-            path,
+            new ResourceStoreRequest( path ),
             true,
             true,
             new ByteArrayContentLocator( data ) );
 
-        repository.storeItem( file );
+        repository.storeItem( false, file );
 
         lastWriteFile = file;
     }

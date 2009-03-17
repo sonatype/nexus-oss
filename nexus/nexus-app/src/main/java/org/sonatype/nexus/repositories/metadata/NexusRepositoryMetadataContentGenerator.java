@@ -8,7 +8,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.ContentGenerator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
@@ -37,18 +36,18 @@ public class NexusRepositoryMetadataContentGenerator
 
             String body = new String( bos.toByteArray(), "UTF-8" );
 
-            StringContentLocator result = null; 
+            StringContentLocator result = null;
 
-            if ( item.getItemContext().containsKey( ResourceStoreRequest.CTX_REQUEST_APP_ROOT_URL ) )
+            if ( item.getItemContext().getRequestAppRootUrl() != null )
             {
-                String appRootUrl = (String) item.getItemContext().get( ResourceStoreRequest.CTX_REQUEST_APP_ROOT_URL );
-                
-                //trim last slash NEXUS-1736
+                String appRootUrl = item.getItemContext().getRequestAppRootUrl();
+
+                // trim last slash NEXUS-1736
                 if ( appRootUrl.endsWith( "/" ) )
                 {
                     appRootUrl = appRootUrl.substring( 0, appRootUrl.length() - 1 );
                 }
-                
+
                 result = new StringContentLocator( body.replace( "@rootUrl@", appRootUrl ) );
             }
             else

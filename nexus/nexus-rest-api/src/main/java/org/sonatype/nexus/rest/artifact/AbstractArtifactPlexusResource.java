@@ -45,7 +45,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -130,10 +129,8 @@ public abstract class AbstractArtifactPlexusResource
         }
 
         // put the incoming URLs
-        result.getRequestContext().put(
-            ResourceStoreRequest.CTX_REQUEST_APP_ROOT_URL,
-            getContextRoot( request ).toString() );
-        result.getRequestContext().put( ResourceStoreRequest.CTX_REQUEST_URL, request.getOriginalRef().toString() );
+        result.setRequestAppRootUrl( getContextRoot( request ).toString() );
+        result.setRequestUrl( request.getOriginalRef().toString() );
 
         return result;
     }

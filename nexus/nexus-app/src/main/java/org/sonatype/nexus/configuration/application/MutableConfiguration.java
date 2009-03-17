@@ -18,20 +18,17 @@ import java.util.Collection;
 import java.util.List;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
-import org.sonatype.nexus.configuration.model.CMirror;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
-import org.sonatype.nexus.configuration.model.CRepositoryTarget;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.modello.CMirror;
+import org.sonatype.nexus.configuration.modello.CPathMappingItem;
+import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.modello.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.modello.CRemoteNexusInstance;
+import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.configuration.modello.CRepositoryTarget;
+import org.sonatype.nexus.configuration.modello.CRouting;
+import org.sonatype.nexus.configuration.modello.CSmtpConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
 public interface MutableConfiguration
@@ -150,69 +147,25 @@ public interface MutableConfiguration
             IOException,
             ConfigurationException;
 
-    // CRepositoryShadow: CRUD
-
-    Collection<CRepositoryShadow> listRepositoryShadows();
-
-    void createRepositoryShadow( CRepositoryShadow settings )
-        throws ConfigurationException,
-            IOException;
-
-    CRepositoryShadow readRepositoryShadow( String id )
-        throws NoSuchRepositoryException;
-
-    void updateRepositoryShadow( CRepositoryShadow settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException;
-
-    void deleteRepositoryShadow( String id )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException;
-
     // CGroupsSettingPathMapping: CRUD
 
-    Collection<CGroupsSettingPathMappingItem> listGroupsSettingPathMapping();
+    Collection<CPathMappingItem> listGroupsSettingPathMapping();
 
-    void createGroupsSettingPathMapping( CGroupsSettingPathMappingItem settings )
+    void createGroupsSettingPathMapping( CPathMappingItem settings )
         throws NoSuchRepositoryException,
             ConfigurationException,
             IOException;
 
-    CGroupsSettingPathMappingItem readGroupsSettingPathMapping( String id )
+    CPathMappingItem readGroupsSettingPathMapping( String id )
         throws IOException;
 
-    void updateGroupsSettingPathMapping( CGroupsSettingPathMappingItem settings )
+    void updateGroupsSettingPathMapping( CPathMappingItem settings )
         throws NoSuchRepositoryException,
             ConfigurationException,
             IOException;
 
     void deleteGroupsSettingPathMapping( String id )
         throws IOException;
-
-    // CRepositoryGroup: CRUD
-
-    Collection<CRepositoryGroup> listRepositoryGroups();
-
-    void createRepositoryGroup( CRepositoryGroup settings )
-        throws NoSuchRepositoryException,
-            InvalidGroupingException,
-            IOException,
-            ConfigurationException;
-
-    CRepositoryGroup readRepositoryGroup( String id )
-        throws NoSuchRepositoryException;
-
-    void updateRepositoryGroup( CRepositoryGroup settings )
-        throws NoSuchRepositoryException,
-            InvalidGroupingException,
-            IOException,
-            ConfigurationException;
-
-    void deleteRepositoryGroup( String id )
-        throws NoSuchRepositoryException,
-            IOException;
 
     // CRepositoryTarget: CRUD
 

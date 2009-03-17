@@ -49,9 +49,9 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -642,7 +642,7 @@ public class DefaultIndexerManager
             ItemNotFoundException
     {
         // this will force remote check for newer files
-        repository.clearCaches( "/.index" );
+        repository.clearCaches( new ResourceStoreRequest( "/.index" ) );
 
         IndexingContext context = null;
 
@@ -682,8 +682,7 @@ public class DefaultIndexerManager
             public void retrieve( String name, File targetFile )
                 throws IOException
             {
-                RepositoryItemUid uid = repository.createUid( //
-                    "/.index/" + name );
+                ResourceStoreRequest req = new ResourceStoreRequest( "/.index/" + name );
 
                 OutputStream fos = null;
                 InputStream is = null;
@@ -703,13 +702,12 @@ public class DefaultIndexerManager
 
                         item = (StorageFileItem) proxy.getRemoteStorage().retrieveItem(
                             proxy,
-                            ctx,
-                            proxy.getRemoteUrl(),
-                            uid.getPath() );
+                            req,
+                            proxy.getRemoteUrl() );
                     }
                     else
                     {
-                        throw new ItemNotFoundException( uid );
+                        throw new ItemNotFoundException( req, repository );
                     }
 
                     is = item.getInputStream();
@@ -1013,12 +1011,12 @@ public class DefaultIndexerManager
             if ( repository instanceof MavenRepository )
             {
                 // this is maven repo, so use the checksumming facility
-                ( (MavenRepository) repository ).storeItemWithChecksums( fItem );
+                ( (MavenRepository) repository ).storeItemWithChecksums( false, fItem );
             }
             else
             {
                 // simply store it
-                repository.storeItem( fItem );
+                repository.storeItem( false, fItem );
             }
         }
         catch ( Exception e )

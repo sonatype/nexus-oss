@@ -18,9 +18,7 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.configuration.modello.Configuration;
 
 /**
  * Adapter for NexusConfiguration.
@@ -68,21 +66,6 @@ public class ApplicationConfigurationAdapter
         throws IOException
     {
         nexusConfiguration.saveConfiguration();
-    }
-
-    public void addProximityEventListener( EventListener listener )
-    {
-        nexusConfiguration.addProximityEventListener( listener );
-    }
-
-    public void removeProximityEventListener( EventListener listener )
-    {
-        nexusConfiguration.removeProximityEventListener( listener );
-    }
-
-    public void notifyProximityEventListeners( AbstractEvent evt )
-    {
-        nexusConfiguration.notifyProximityEventListeners( evt );
     }
 
     public boolean isSecurityEnabled()

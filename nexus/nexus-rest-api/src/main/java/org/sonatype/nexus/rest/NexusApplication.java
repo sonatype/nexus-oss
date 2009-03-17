@@ -30,6 +30,7 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
@@ -69,6 +70,9 @@ public class NexusApplication
     
     @Requirement
     private Nexus nexus;
+    
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
 
     @Requirement
     private PlexusWebConfiguration plexusWebConfiguration;
@@ -113,7 +117,7 @@ public class NexusApplication
     protected void doConfigure()
     {
         // adding ourselves as listener
-        nexus.getNexusConfiguration().addProximityEventListener( this );
+        applicationEventMulticaster.addProximityEventListener( this );
     }
 
     /**

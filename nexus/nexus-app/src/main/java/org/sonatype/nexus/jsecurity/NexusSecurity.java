@@ -14,13 +14,10 @@
 package org.sonatype.nexus.jsecurity;
 
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
-import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
-import org.sonatype.nexus.NexusService;
-import org.sonatype.nexus.configuration.NotifiableConfiguration;
 import org.sonatype.security.PlexusSecurity;
 
 public interface NexusSecurity
-    extends PlexusSecurity, ConfigurationManager, NexusService, NotifiableConfiguration
+    extends PlexusSecurity, ConfigurationManager
 {
-    
+
 }

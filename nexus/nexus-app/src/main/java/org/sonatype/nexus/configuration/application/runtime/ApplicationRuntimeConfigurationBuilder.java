@@ -14,14 +14,10 @@
 package org.sonatype.nexus.configuration.application.runtime;
 
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
-import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.configuration.modello.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 /**
  * A component to be slimmed! Actually, it is a "factory" (backed by Plexus) that creates repo and other instances. It
@@ -37,19 +33,5 @@ public interface ApplicationRuntimeConfigurationBuilder
         throws InvalidConfigurationException;
 
     Repository updateRepositoryFromModel( Repository old, Configuration configuration, CRepository repository )
-        throws InvalidConfigurationException;
-
-    ShadowRepository createRepositoryFromModel( Configuration configuration, CRepositoryShadow repositoryShadow )
-        throws InvalidConfigurationException;
-
-    ShadowRepository updateRepositoryFromModel( ShadowRepository old, Configuration configuration,
-        CRepositoryShadow repositoryShadow )
-        throws InvalidConfigurationException;
-
-    GroupRepository createRepositoryFromModel( Configuration configuration, CRepositoryGroup repositoryGroup )
-        throws InvalidConfigurationException;
-
-    GroupRepository updateRepositoryFromModel( GroupRepository old, Configuration configuration,
-        CRepositoryGroup repositoryGroup )
         throws InvalidConfigurationException;
 }

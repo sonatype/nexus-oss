@@ -36,6 +36,7 @@ import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -104,7 +105,7 @@ public abstract class AbstractNexusPlexusResource
 
         return result;
     }
-    
+
     private Reference updateBaseRefPath( Reference reference )
     {
         if ( reference.getBaseRef().getPath() == null )
@@ -115,7 +116,7 @@ public abstract class AbstractNexusPlexusResource
         {
             reference.getBaseRef().setPath( reference.getBaseRef().getPath() + "/" );
         }
-        
+
         return reference;
     }
 
@@ -130,14 +131,15 @@ public abstract class AbstractNexusPlexusResource
     {
         String uriPart = request.getResourceRef().getTargetRef().toString().substring(
             request.getRootRef().getTargetRef().toString().length() );
-        
+
         // trim leading slash
         if ( uriPart.startsWith( "/" ) )
         {
             uriPart = uriPart.substring( 1 );
         }
-        
-        Reference result = updateBaseRefPath( new Reference( getContextRoot( request ),  uriPart ) ).addSegment( childPath );
+
+        Reference result = updateBaseRefPath( new Reference( getContextRoot( request ), uriPart ) ).addSegment(
+            childPath );
 
         if ( result.hasQuery() )
         {
@@ -158,7 +160,7 @@ public abstract class AbstractNexusPlexusResource
 
         return ref.getTargetRef();
     }
-    
+
     protected Reference createRepositoryContentReference( Request request, String repoId )
     {
         return createReference( getContextRoot( request ), "content/repositories/" + repoId ).getTargetRef();
@@ -201,20 +203,20 @@ public abstract class AbstractNexusPlexusResource
 
         return createReference( groupRootRef, repoPath );
     }
-    
+
     protected Reference createRedirectReference( Request request )
     {
         String uriPart = request.getResourceRef().getTargetRef().toString().substring(
             request.getRootRef().getTargetRef().toString().length() );
-        
+
         // trim leading slash
         if ( uriPart.startsWith( "/" ) )
         {
             uriPart = uriPart.substring( 1 );
         }
-        
-        Reference result = updateBaseRefPath( new Reference( getContextRoot( request ),  uriPart ) ).getTargetRef();
-        
+
+        Reference result = updateBaseRefPath( new Reference( getContextRoot( request ), uriPart ) ).getTargetRef();
+
         return result;
     }
 
@@ -350,14 +352,14 @@ public abstract class AbstractNexusPlexusResource
                     false,
                     null );
 
-                String path = mr.getGavCalculator().gavToPath( gav );
+                ResourceStoreRequest req = new ResourceStoreRequest( mr.getGavCalculator().gavToPath( gav ) );
 
-                if ( !nexusItemAuthorizer.authorizePath( mr, path, null, Action.read ) )
+                if ( !nexusItemAuthorizer.authorizePath( mr, req, Action.read ) )
                 {
                     return null;
                 }
 
-                a.setResourceURI( createRepositoryReference( request, ai.repository, path ).toString() );
+                a.setResourceURI( createRepositoryReference( request, ai.repository, req.getRequestPath() ).toString() );
             }
         }
         catch ( NoSuchRepositoryException e )
@@ -381,36 +383,36 @@ public abstract class AbstractNexusPlexusResource
 
         return a;
     }
-    
+
     protected String getValidRemoteIPAddress( Request request )
     {
-        Form form = (Form) request.getAttributes().get("org.restlet.http.headers");
+        Form form = (Form) request.getAttributes().get( "org.restlet.http.headers" );
         String forwardedIP = getFirstForwardedIp( form.getFirstValue( "X-Forwarded-For" ) );
-        
+
         if ( forwardedIP != null )
         {
             return forwardedIP;
         }
-        
+
         List<String> ipAddresses = request.getClientInfo().getAddresses();
-        
+
         if ( ipAddresses.size() > 0 )
         {
             return ipAddresses.get( 0 );
         }
-        
+
         return null;
     }
-    
+
     protected String getFirstForwardedIp( String forwardedFor )
     {
         if ( !StringUtils.isEmpty( forwardedFor ) )
         {
-            String [] forwardedIps = forwardedFor.split( "," );
-            
+            String[] forwardedIps = forwardedFor.split( "," );
+
             return forwardedIps[0].trim();
         }
-        
+
         return null;
     }
 }

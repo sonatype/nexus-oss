@@ -18,15 +18,11 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.source.ApplicationConfigurationSource;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
-import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.configuration.modello.Configuration;
+import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 /**
@@ -77,12 +73,6 @@ public interface NexusConfiguration
     RemoteStorageContext getRemoteStorageContext();
 
     Repository createRepositoryFromModel( Configuration configuration, CRepository repository )
-        throws InvalidConfigurationException;
-
-    ShadowRepository createRepositoryFromModel( Configuration configuration, CRepositoryShadow repositoryShadow )
-        throws InvalidConfigurationException;
-
-    GroupRepository createRepositoryFromModel( Configuration configuration, CRepositoryGroup repositoryGroup )
         throws InvalidConfigurationException;
 
     // ------------------------------------------------------------------

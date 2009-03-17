@@ -9,9 +9,10 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CMirror;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.modello.CMirror;
+import org.sonatype.nexus.configuration.modello.CRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -44,7 +45,7 @@ public class NexusRepositoryMetadataEventInspector
 
     @Requirement
     private RepositoryMetadataHandler repositoryMetadataHandler;
-    
+
     @Requirement
     private NexusConfiguration configuration;
 
@@ -65,7 +66,7 @@ public class NexusRepositoryMetadataEventInspector
             String repositoryUrl = null;
 
             String repositoryLocalUrl = null;
-            
+
             List<RepositoryMirrorMetadata> mirrors = null;
 
             if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
@@ -97,7 +98,7 @@ public class NexusRepositoryMetadataEventInspector
                 // huh? unknown stuff, better to not tamper with it
                 return;
             }
-            
+
             if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
             {
                 mirrors = getMirrors( repository.getId() );
@@ -154,7 +155,7 @@ public class NexusRepositoryMetadataEventInspector
                     ContentGenerator.CONTENT_GENERATOR_ID,
                     "NexusRepositoryMetadataContentGenerator" );
 
-                repository.getLocalStorage().updateItemAttributes( repository, file.getItemContext(), file );
+                repository.getLocalStorage().updateItemAttributes( repository, new ResourceStoreRequest( file ), file );
             }
             catch ( MetadataHandlerException e )
             {
@@ -220,25 +221,25 @@ public class NexusRepositoryMetadataEventInspector
         try
         {
             List<RepositoryMirrorMetadata> mirrors = new ArrayList<RepositoryMirrorMetadata>();
-            
+
             CRepository repo = configuration.readRepository( repositoryId );
-            
-            for ( CMirror mirror : ( List<CMirror> ) repo.getMirrors() )
+
+            for ( CMirror mirror : (List<CMirror>) repo.getMirrors() )
             {
                 RepositoryMirrorMetadata md = new RepositoryMirrorMetadata();
                 md.setId( mirror.getId() );
                 md.setUrl( mirror.getUrl() );
-                
+
                 mirrors.add( md );
             }
-            
+
             return mirrors;
         }
         catch ( NoSuchRepositoryException e )
         {
             getLogger().debug( "Repository not found, returning no mirrors" );
         }
-        
+
         return null;
     }
 }

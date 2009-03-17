@@ -22,12 +22,11 @@ import java.util.concurrent.RejectedExecutionException;
 
 import org.sonatype.nexus.configuration.application.MutableConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.modello.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.configuration.modello.CRouting;
+import org.sonatype.nexus.configuration.modello.CSmtpConfiguration;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
@@ -320,21 +319,6 @@ public interface Nexus
         throws IOException;
 
     void deleteRepositoryTemplate( String id )
-        throws IOException;
-
-    Collection<CRepositoryShadow> listRepositoryShadowTemplates()
-        throws IOException;
-
-    void createRepositoryShadowTemplate( CRepositoryShadow settings )
-        throws IOException;
-
-    CRepositoryShadow readRepositoryShadowTemplate( String id )
-        throws IOException;
-
-    void updateRepositoryShadowTemplate( CRepositoryShadow settings )
-        throws IOException;
-
-    void deleteRepositoryShadowTemplate( String id )
         throws IOException;
 
     // ----------------------------------------------------------------------------

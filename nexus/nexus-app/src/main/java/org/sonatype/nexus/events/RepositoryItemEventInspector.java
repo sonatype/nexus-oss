@@ -26,6 +26,7 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -162,8 +163,7 @@ public class RepositoryItemEventInspector
                         .getItemUid().getRepository().getLocalStorage().getClass() ) )
                     {
                         File file = ( (DefaultFSLocalRepositoryStorage) ievt.getRepository().getLocalStorage() )
-                            .getFileFromBase( ievt.getRepository(), ievt.getItem().getItemContext(), ievt
-                                .getItemUid().getPath() );
+                            .getFileFromBase( ievt.getRepository(), new ResourceStoreRequest( ievt.getItem() ) );
 
                         if ( file.exists() )
                         {
