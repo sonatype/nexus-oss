@@ -3373,5 +3373,77 @@
       </fields>
     </class>
 
+
+    <class>
+      <name>SmtpSettingsResourceRequest</name>
+      <version>1.0.0+</version>
+      <superClass>NexusResponse</superClass>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>SmtpSettingsResource</type>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>SmtpSettingsResource</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>testEmail</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>host</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>port</name>
+          <version>1.0.0+</version>
+          <type>int</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>username</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
+          <name>password</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
+          <name>systemEmailAddress</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>sslEnabled</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>false</required>
+        </field>
+        <field>
+          <name>tlsEnabled</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>false</required>
+        </field>
+      </fields>
+    </class>
+
   </classes>
 </model>

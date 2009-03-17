@@ -58,7 +58,7 @@ import com.thoughtworks.xstream.XStream;
 /**
  * Nexus REST Application. This will ultimately replace the two applications we have now, and provide us plugin UI
  * extension capability.
- * 
+ *
  * @author cstamas
  */
 @Component( role = Application.class, hint = "nexus" )
@@ -246,6 +246,9 @@ public class NexusApplication
         xstream.omitField( AuthenticationSettings.class, "modelEncoding" );
         xstream.omitField( SmtpSettings.class, "modelEncoding" );
         xstream.alias( "global-settings", GlobalConfigurationResourceResponse.class );
+        xstream.omitField( SmtpSettingsResourceRequest.class, "modelEncoding" );
+        xstream.omitField( SmtpSettingsResource.class, "modelEncoding" );
+        xstream.alias( "smtp-settings", SmtpSettingsResourceRequest.class );
 
         xstream.omitField( WastebasketResource.class, "modelEncoding" );
         xstream.omitField( WastebasketResourceResponse.class, "modelEncoding" );
@@ -494,21 +497,21 @@ public class NexusApplication
             PlexusRoleResource.class,
             "plexus-role" ) );
 
-        
+
         xstream.omitField( PlexusUserSearchCriteriaResourceRequest.class, "modelEncoding" );
         xstream.alias( "user-search", PlexusUserSearchCriteriaResourceRequest.class );
         xstream.omitField( PlexusUserSearchCriteriaResource.class, "modelEncoding" );
-        
+
         xstream.omitField( MirrorResourceListRequest.class, "modelEncoding" );
         xstream.omitField( MirrorResourceListResponse.class, "modelEncoding" );
         xstream.omitField( MirrorStatusResourceListResponse.class, "modelEncoding" );
         xstream.omitField( MirrorResource.class, "modelEncoding" );
         xstream.omitField( MirrorStatusResource.class, "modelEncoding" );
-        
+
         xstream.alias( "mirror-list-request", MirrorResourceListRequest.class );
         xstream.alias( "mirror-list-response", MirrorResourceListResponse.class );
         xstream.alias( "mirror-status-list-response", MirrorStatusResourceListResponse.class );
-        
+
         xstream.registerLocalConverter( MirrorResourceListRequest.class, "data", new AliasingListConverter(
             MirrorResource.class,
             "mirrorResource" ) );
@@ -518,7 +521,7 @@ public class NexusApplication
         xstream.registerLocalConverter( MirrorStatusResourceListResponse.class, "data", new AliasingListConverter(
             MirrorStatusResource.class,
             "mirrorResource" ) );
-        
+
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );
         xstream.omitField( ModelBase.class, "modelEncoding" );
@@ -545,7 +548,7 @@ public class NexusApplication
 
     /**
      * "Decorating" the root with our resources.
-     * 
+     *
      * @TODO Move this to PlexusResources, except Status (see isStarted usage below!)
      */
     @Override

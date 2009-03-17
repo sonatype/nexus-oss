@@ -147,7 +147,8 @@ Sonatype.config = function() {
         repoMirrors: servicePath + '/repository_mirrors',
         repoPredefinedMirrors: servicePath + '/repository_predefined_mirrors',
         repoMirrorStatus: servicePath + '/repository_mirrors_status',
-        privilegeTypes: servicePath + '/privilege_types'
+        privilegeTypes: servicePath + '/privilege_types',
+        smtpSettingsState : servicePath + '/check_smtp_settings'
       }
     },
     
