@@ -160,7 +160,7 @@ public class JettyClientRemoteRepositoryStorage
     {
         RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
-        ContainsHttpExchange contains = new ContainsHttpExchange( repository, request.getRequestPath(), newerThen );
+        ContainsHttpExchange contains = new ContainsHttpExchange( repository, request, newerThen );
 
         setUpExchange( contains, rsc, repository, request );
 
@@ -182,7 +182,7 @@ public class JettyClientRemoteRepositoryStorage
     {
         RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
-        RetrieveHttpExchange retrieve = new RetrieveHttpExchange( repository, request.getRequestPath() );
+        RetrieveHttpExchange retrieve = new RetrieveHttpExchange( repository, request );
 
         setUpExchange( retrieve, rsc, repository, request );
 
@@ -197,7 +197,7 @@ public class JettyClientRemoteRepositoryStorage
     {
         RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
-        StoreHttpExchange store = new StoreHttpExchange( repository, item.getPath(), item );
+        StoreHttpExchange store = new StoreHttpExchange( repository, item );
 
         setUpExchange( store, rsc, repository, new ResourceStoreRequest( item ) );
 
@@ -220,7 +220,7 @@ public class JettyClientRemoteRepositoryStorage
     {
         RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
-        DeleteHttpExchange delete = new DeleteHttpExchange( repository, request.getRequestPath() );
+        DeleteHttpExchange delete = new DeleteHttpExchange( repository, request );
 
         setUpExchange( delete, rsc, repository, request );
 

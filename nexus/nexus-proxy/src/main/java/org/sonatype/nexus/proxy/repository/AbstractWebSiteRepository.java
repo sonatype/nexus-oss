@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -52,7 +53,7 @@ public abstract class AbstractWebSiteRepository
     }
 
     @Override
-    protected StorageItem doRetrieveItem( RepositoryRequest request )
+    protected StorageItem doRetrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
@@ -62,7 +63,7 @@ public abstract class AbstractWebSiteRepository
         if ( result instanceof StorageCollectionItem && getWelcomeFiles().size() > 0 )
         {
             // it is a collection, check for one of the "welcome" files
-            Collection<StorageItem> collItems = list( (StorageCollectionItem) result );
+            Collection<StorageItem> collItems = list( false, (StorageCollectionItem) result );
 
             for ( StorageItem item : collItems )
             {

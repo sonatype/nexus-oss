@@ -16,17 +16,12 @@ package org.sonatype.nexus.configuration.application.upgrade;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-//import org.sonatype.nexus.configuration.model.CRepository;
-//import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-//import org.sonatype.nexus.configuration.model.CRepositoryShadow;
-//import org.sonatype.nexus.configuration.model.CSecurity;
-//import org.sonatype.nexus.configuration.model.v1_0_8.upgrade.BasicVersionUpgrade;
+import org.sonatype.nexus.configuration.model.v1_0_8.upgrade.BasicVersionUpgrade;
+import org.sonatype.nexus.configuration.modello.CSecurity;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.upgrade.Upgrader;
@@ -35,14 +30,13 @@ import org.sonatype.nexus.configuration.upgrade.Upgrader;
 public class Upgrade107to108
     extends AbstractLogEnabled
     implements Upgrader
-{
-/*
+{/*
     private BasicVersionUpgrade converter = new BasicVersionUpgrade()
     {
         @Override
-        public org.sonatype.nexus.configuration.model.CRepositoryGroup upgradeCRepositoryGroup(
+        public org.sonatype.nexus.configuration.modello.CRepositoryGroup upgradeCRepositoryGroup(
             org.sonatype.nexus.configuration.model.v1_0_7.CRepositoryGroup repositoryGroup,
-            org.sonatype.nexus.configuration.model.CRepositoryGroup value )
+            org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup value )
         {
             org.sonatype.nexus.configuration.model.CRepositoryGroup group = super.upgradeCRepositoryGroup(
                 repositoryGroup,

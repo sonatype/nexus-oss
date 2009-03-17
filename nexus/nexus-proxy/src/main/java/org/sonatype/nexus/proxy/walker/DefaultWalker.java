@@ -24,7 +24,6 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 
 /**
  * The Class Walker.
@@ -71,10 +70,7 @@ public class DefaultWalker
 
         try
         {
-            RepositoryRequest request = new RepositoryRequest( context.getRepository(), context
-                .getResourceStoreRequest() );
-
-            item = context.getRepository().retrieveItem( request );
+            item = context.getRepository().retrieveItem( context.getResourceStoreRequest() );
         }
         catch ( ItemNotFoundException ex )
         {
@@ -224,7 +220,7 @@ public class DefaultWalker
 
         if ( shouldProcessRecursively )
         {
-            ls = context.getRepository().list( coll );
+            ls = context.getRepository().list( false, coll );
 
             for ( StorageItem i : ls )
             {

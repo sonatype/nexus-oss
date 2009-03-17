@@ -98,7 +98,7 @@ public class DefaultRepositoryRouter
             getLogger().debug( "Dereferencing link " + link.getTarget() );
         }
 
-        ResourceStoreRequest req = new ResourceStoreRequest( link.getTarget(), false );
+        ResourceStoreRequest req = new ResourceStoreRequest( link.getTarget().getPath() );
 
         req.getRequestContext().putAll( link.getItemContext() );
 
@@ -549,11 +549,9 @@ public class DefaultRepositoryRouter
     protected StorageItem retrieveVirtualPath( ResourceStoreRequest request, RequestRoute route )
         throws ItemNotFoundException
     {
-        DefaultStorageCollectionItem result = new DefaultStorageCollectionItem(
-            this,
-            route.getOriginalRequestPath(),
-            true,
-            false );
+        ResourceStoreRequest req = new ResourceStoreRequest( route.getOriginalRequestPath() );
+
+        DefaultStorageCollectionItem result = new DefaultStorageCollectionItem( this, req, true, false );
 
         result.getItemContext().putAll( request.getRequestContext() );
 
@@ -575,9 +573,12 @@ public class DefaultRepositoryRouter
                     // check is there any repo registered
                     if ( !repositoryRegistry.getRepositoriesWithFacet( Class.forName( rtd.getRole() ) ).isEmpty() )
                     {
+                        ResourceStoreRequest req = new ResourceStoreRequest( ItemPathUtils.concatPaths( request
+                            .getRequestPath(), rtd.getPrefix() ) );
+
                         DefaultStorageCollectionItem repositories = new DefaultStorageCollectionItem(
                             this,
-                            ItemPathUtils.concatPaths( request.getRequestPath(), rtd.getPrefix() ),
+                            req,
                             true,
                             false );
 
@@ -640,16 +641,20 @@ public class DefaultRepositoryRouter
                 {
                     DefaultStorageCollectionItem repoItem = null;
 
+                    ResourceStoreRequest req = null;
+
                     if ( Repository.class.equals( kind ) )
                     {
-                        repoItem = new DefaultStorageCollectionItem( this, ItemPathUtils.concatPaths( request
-                            .getRequestPath(), repository.getId() ), true, false );
+                        req = new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(), repository
+                            .getId() ) );
                     }
                     else
                     {
-                        repoItem = new DefaultStorageCollectionItem( this, ItemPathUtils.concatPaths( request
-                            .getRequestPath(), repository.getPathPrefix() ), true, false );
+                        req = new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(), repository
+                            .getPathPrefix() ) );
                     }
+
+                    repoItem = new DefaultStorageCollectionItem( this, req, true, false );
 
                     repoItem.getItemContext().putAll( request.getRequestContext() );
 

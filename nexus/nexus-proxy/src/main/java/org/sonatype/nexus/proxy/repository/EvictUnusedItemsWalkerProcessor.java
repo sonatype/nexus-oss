@@ -19,6 +19,7 @@ import java.util.List;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -91,7 +92,7 @@ public class EvictUnusedItemsWalkerProcessor
             IllegalOperationException,
             ItemNotFoundException
     {
-        getRepository( ctx ).deleteItem( new RepositoryRequest( item, ctx.getResourceStoreRequest() ) );
+        getRepository( ctx ).deleteItem( false, new ResourceStoreRequest( item ) );
     }
 
     @Override
@@ -101,9 +102,9 @@ public class EvictUnusedItemsWalkerProcessor
         // expiring now empty directories
         try
         {
-            if ( getRepository( ctx ).list( coll ).size() == 0 )
+            if ( getRepository( ctx ).list( false, coll ).size() == 0 )
             {
-                getRepository( ctx ).deleteItem( new RepositoryRequest( coll, ctx.getResourceStoreRequest() ) );
+                getRepository( ctx ).deleteItem( false, new ResourceStoreRequest( coll ) );
             }
         }
         catch ( RepositoryNotAvailableException e )

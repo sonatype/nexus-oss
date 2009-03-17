@@ -16,15 +16,16 @@ package org.sonatype.nexus.proxy.storage.remote.jetty;
 import org.mortbay.jetty.HttpMethods;
 import org.mortbay.jetty.HttpStatus;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 public class DeleteHttpExchange
     extends AbstractNexusExchange
 {
-    public DeleteHttpExchange( ProxyRepository repository, String path )
+    public DeleteHttpExchange( ProxyRepository repository, ResourceStoreRequest request )
     {
-        super( repository, path );
+        super( repository, request );
 
         setMethod( HttpMethods.DELETE );
     }

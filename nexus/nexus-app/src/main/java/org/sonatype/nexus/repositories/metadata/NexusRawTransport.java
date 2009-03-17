@@ -2,7 +2,6 @@ package org.sonatype.nexus.repositories.metadata;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.HashMap;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -12,8 +11,8 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.repository.metadata.RawTransport;
-import org.sonatype.nexus.util.ContextUtils;
 
 public class NexusRawTransport
     implements RawTransport
@@ -46,12 +45,11 @@ public class NexusRawTransport
 
         try
         {
-            HashMap<String, Object> ctx = new HashMap<String, Object>();
+            ResourceStoreRequest rsr = new ResourceStoreRequest( path, localOnly, remoteOnly );
 
-            ContextUtils.setFlag( ctx, ResourceStoreRequest.CTX_LOCAL_ONLY_FLAG, localOnly );
-            ContextUtils.setFlag( ctx, ResourceStoreRequest.CTX_REMOTE_ONLY_FLAG, remoteOnly );
+            RepositoryRequest request = new RepositoryRequest( repository, rsr );
 
-            StorageItem item = repository.retrieveItem( repository.createUid( path ), ctx );
+            StorageItem item = repository.retrieveItem( request );
 
             if ( item instanceof StorageFileItem )
             {
@@ -62,7 +60,7 @@ public class NexusRawTransport
                 os = new ByteArrayOutputStream();
 
                 IOUtil.copy( is, os );
-                
+
                 lastReadFile = file;
 
                 return os.toByteArray();
@@ -97,7 +95,7 @@ public class NexusRawTransport
             new ByteArrayContentLocator( data ) );
 
         repository.storeItem( file );
-        
+
         lastWriteFile = file;
     }
 

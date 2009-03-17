@@ -37,12 +37,12 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -130,8 +130,7 @@ public class MavenRepositoryMetadataLocator
 
             request.setRequestPath( pomPath );
 
-            StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem(
-                new RepositoryRequest( request.getMavenRepository(), request ) );
+            StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem( false, request );
 
             reader = ReaderFactory.newXmlReader( pomFile.getInputStream() );
 
@@ -207,8 +206,7 @@ public class MavenRepositoryMetadataLocator
 
             request.setRequestPath( pomPath );
 
-            StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem(
-                new RepositoryRequest( request.getMavenRepository(), request ) );
+            StorageFileItem pomFile = (StorageFileItem) request.getMavenRepository().retrieveItem( false, request );
 
             Model model = null;
 
@@ -351,7 +349,7 @@ public class MavenRepositoryMetadataLocator
         {
             request.setRequestPath( uid.getPath() );
 
-            StorageItem item = uid.getRepository().retrieveItem( new RepositoryRequest( uid.getRepository(), request ) );
+            StorageItem item = uid.getRepository().retrieveItem( false, request );
 
             if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
             {
@@ -397,14 +395,10 @@ public class MavenRepositoryMetadataLocator
 
         outputStream.close();
 
-        DefaultStorageFileItem file = new DefaultStorageFileItem(
-            uid.getRepository(),
-            uid.getPath(),
-            true,
-            true,
-            new StringContentLocator( mdString ) );
+        DefaultStorageFileItem file = new DefaultStorageFileItem( uid.getRepository(), new ResourceStoreRequest( uid
+            .getPath() ), true, true, new StringContentLocator( mdString ) );
 
-        ( (MavenRepository) uid.getRepository() ).storeItemWithChecksums( file );
+        ( (MavenRepository) uid.getRepository() ).storeItemWithChecksums( false, file );
     }
 
     protected Metadata readOrCreateGAVMetadata( ArtifactStoreRequest request, Gav gav )

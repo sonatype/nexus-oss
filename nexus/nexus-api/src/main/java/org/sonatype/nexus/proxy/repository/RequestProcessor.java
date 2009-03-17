@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 
 /**
@@ -30,7 +31,7 @@ public interface RequestProcessor
      * @param request
      * @param action
      */
-    boolean process( RepositoryRequest request, Action action );
+    boolean process( Repository repository, ResourceStoreRequest request, Action action );
 
     /**
      * Request processor is able to override generic behaviour of Repositories in aspect of proxying.
@@ -40,5 +41,5 @@ public interface RequestProcessor
      * @param context
      * @return
      */
-    boolean shouldProxy( RepositoryRequest request );
+    boolean shouldProxy( ProxyRepository repository, ResourceStoreRequest request );
 }

@@ -38,7 +38,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.RecreateMavenMetadataWalkerProcessor;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
 
@@ -204,9 +203,7 @@ public class RecreateMavenMetadataWalkerTest
         {
             try
             {
-                RepositoryRequest req = new RepositoryRequest( repository, new ResourceStoreRequest(
-                    entry.getKey(),
-                    true ) );
+                ResourceStoreRequest req = new ResourceStoreRequest( entry.getKey(), true );
 
                 repository.retrieveItem( req );
 

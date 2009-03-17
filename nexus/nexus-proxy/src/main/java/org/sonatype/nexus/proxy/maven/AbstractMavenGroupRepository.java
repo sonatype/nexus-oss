@@ -15,7 +15,6 @@ import org.sonatype.nexus.proxy.repository.AbstractGroupRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 public abstract class AbstractMavenGroupRepository
@@ -94,12 +93,12 @@ public abstract class AbstractMavenGroupRepository
         getArtifactStoreHelper().storeItemWithChecksums( request, is, userAttributes );
     }
 
-    public void storeItemWithChecksums( AbstractStorageItem item )
+    public void storeItemWithChecksums( boolean fromTask, AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException
     {
-        getArtifactStoreHelper().storeItemWithChecksums( item );
+        getArtifactStoreHelper().storeItemWithChecksums( fromTask, item );
     }
 
     public void deleteItemWithChecksums( ResourceStoreRequest request )
@@ -112,13 +111,13 @@ public abstract class AbstractMavenGroupRepository
         getArtifactStoreHelper().deleteItemWithChecksums( request );
     }
 
-    public void deleteItemWithChecksums( RepositoryRequest request )
+    public void deleteItemWithChecksums( boolean fromTask, ResourceStoreRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
-        getArtifactStoreHelper().deleteItemWithChecksums( request );
+        getArtifactStoreHelper().deleteItemWithChecksums( fromTask, request );
     }
 
 }

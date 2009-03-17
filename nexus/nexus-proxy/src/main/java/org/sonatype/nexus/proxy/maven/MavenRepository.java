@@ -24,7 +24,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 public interface MavenRepository
@@ -62,12 +61,12 @@ public interface MavenRepository
 
     // == "Insider API" (unprotected)
 
-    void storeItemWithChecksums( AbstractStorageItem item )
+    void storeItemWithChecksums( boolean fromTask, AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException;
 
-    void deleteItemWithChecksums( RepositoryRequest request )
+    void deleteItemWithChecksums( boolean fromTask, ResourceStoreRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,

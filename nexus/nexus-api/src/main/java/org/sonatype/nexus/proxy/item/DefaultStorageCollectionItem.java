@@ -43,9 +43,24 @@ public class DefaultStorageCollectionItem
      * @param canRead the can read
      * @param canWrite the can write
      */
+    public DefaultStorageCollectionItem( Repository repository, ResourceStoreRequest request, boolean canRead,
+        boolean canWrite )
+    {
+        super( repository, request, canRead, canWrite );
+    }
+
+    /**
+     * Shotuct method.
+     * 
+     * @param repository
+     * @param path
+     * @param canRead
+     * @param canWrite
+     * @deprecated supply resourceStoreRequest always
+     */
     public DefaultStorageCollectionItem( Repository repository, String path, boolean canRead, boolean canWrite )
     {
-        super( repository, path, canRead, canWrite );
+        this( repository, new ResourceStoreRequest( path, true, false ), canRead, canWrite );
     }
 
     /**
@@ -57,9 +72,24 @@ public class DefaultStorageCollectionItem
      * @param canRead the can read
      * @param canWrite the can write
      */
+    public DefaultStorageCollectionItem( RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
+        boolean canWrite )
+    {
+        super( router, request, canRead, canWrite );
+    }
+
+    /**
+     * Shortcut method.
+     * 
+     * @param router
+     * @param path
+     * @param canRead
+     * @param canWrite
+     * @deprecated supply resourceStoreRequest always
+     */
     public DefaultStorageCollectionItem( RepositoryRouter router, String path, boolean canRead, boolean canWrite )
     {
-        super( router, path, canRead, canWrite );
+        this( router, new ResourceStoreRequest( path, true, false ), canRead, canWrite );
     }
 
     /*
@@ -73,32 +103,15 @@ public class DefaultStorageCollectionItem
             ItemNotFoundException,
             StorageException
     {
-        // create request
-        ResourceStoreRequest req = new ResourceStoreRequest( getPath(), true );
-
-        // let the call inherit the context, ie. auth info, etc.
-        req.getRequestContext().putAll( getItemContext() );
-
-        if ( isVirtual() || !Repository.class.isAssignableFrom( getStore().getClass() ) )
+        if ( isVirtual() )
         {
-            return getStore().list( req );
-        }
-        else if ( getStore() instanceof Repository )
-        {
-            Repository repo = (Repository) getStore();
-
-            Collection<StorageItem> result = repo.list( this );
-
-            correctPaths( result );
-
-            return result;
+            return getStore().list( getResourceStoreRequest() );
         }
         else
         {
-            // path correction here
-            req.setRequestPath( getRepositoryItemUid().getPath() );
+            Repository repo = getRepositoryItemUid().getRepository();
 
-            Collection<StorageItem> result = getStore().list( req );
+            Collection<StorageItem> result = repo.list( false, this );
 
             correctPaths( result );
 

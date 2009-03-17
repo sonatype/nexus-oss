@@ -23,6 +23,7 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -65,7 +66,7 @@ public abstract class AbstractGroupRepository
     }
 
     @Override
-    protected Collection<StorageItem> doListItems( RepositoryRequest request )
+    protected Collection<StorageItem> doListItems( ResourceStoreRequest request )
         throws ItemNotFoundException,
             StorageException
     {
@@ -74,7 +75,7 @@ public abstract class AbstractGroupRepository
         boolean found = false;
         try
         {
-            addItems( names, result, getLocalStorage().listItems( this, request.getResourceStoreRequest() ) );
+            addItems( names, result, getLocalStorage().listItems( this, request ) );
 
             found = true;
         }
@@ -85,11 +86,11 @@ public abstract class AbstractGroupRepository
 
         for ( Repository repo : getMemberRepositories() )
         {
-            if ( !request.getResourceStoreRequest().getProcessedRepositories().contains( repo.getId() ) )
+            if ( !request.getProcessedRepositories().contains( repo.getId() ) )
             {
                 try
                 {
-                    addItems( names, result, repo.list( request ) );
+                    addItems( names, result, repo.list( false, request ) );
 
                     found = true;
                 }
@@ -124,7 +125,7 @@ public abstract class AbstractGroupRepository
 
         if ( !found )
         {
-            throw new ItemNotFoundException( request.getResourceStoreRequest().getRequestPath(), getId() );
+            throw new ItemNotFoundException( request, this );
         }
 
         return result;
@@ -143,7 +144,7 @@ public abstract class AbstractGroupRepository
     }
 
     @Override
-    protected StorageItem doRetrieveItem( RepositoryRequest request )
+    protected StorageItem doRetrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
@@ -160,16 +161,15 @@ public abstract class AbstractGroupRepository
 
         for ( Repository repo : getRequestRepositories( request ) )
         {
-            if ( !request.getResourceStoreRequest().getProcessedRepositories().contains( repo.getId() ) )
+            if ( !request.getProcessedRepositories().contains( repo.getId() ) )
             {
                 try
                 {
-                    StorageItem item = repo.retrieveItem( request );
+                    StorageItem item = repo.retrieveItem( false, request );
 
                     if ( item instanceof StorageCollectionItem )
                     {
-                        item = new DefaultStorageCollectionItem( this, request
-                            .getResourceStoreRequest().getRequestPath(), true, false );
+                        item = new DefaultStorageCollectionItem( this, request, true, false );
                     }
 
                     return item;
@@ -200,7 +200,7 @@ public abstract class AbstractGroupRepository
             }
         }
 
-        throw new ItemNotFoundException( request.getResourceStoreRequest().getRequestPath(), getId() );
+        throw new ItemNotFoundException( request, this );
     }
 
     public List<Repository> getMemberRepositories()
@@ -224,14 +224,14 @@ public abstract class AbstractGroupRepository
         return result;
     }
 
-    protected List<Repository> getRequestRepositories( RepositoryRequest request )
+    protected List<Repository> getRequestRepositories( ResourceStoreRequest request )
         throws StorageException
     {
         List<Repository> members = getMemberRepositories();
 
         try
         {
-            return requestRepositoryMapper.getMappedRepositories( repoRegistry, request, members );
+            return requestRepositoryMapper.getMappedRepositories( this, request, members );
         }
         catch ( NoSuchResourceStoreException e )
         {
@@ -249,18 +249,18 @@ public abstract class AbstractGroupRepository
         memberRepoIds.remove( repositoryId );
     }
 
-    public List<StorageItem> doRetrieveItems( RepositoryRequest request )
+    public List<StorageItem> doRetrieveItems( ResourceStoreRequest request )
         throws StorageException
     {
         ArrayList<StorageItem> items = new ArrayList<StorageItem>();
 
         for ( Repository repository : getRequestRepositories( request ) )
         {
-            if ( !request.getResourceStoreRequest().getProcessedRepositories().contains( repository.getId() ) )
+            if ( !request.getProcessedRepositories().contains( repository.getId() ) )
             {
                 try
                 {
-                    StorageItem item = repository.retrieveItem( request );
+                    StorageItem item = repository.retrieveItem( false, request );
 
                     items.add( item );
                 }

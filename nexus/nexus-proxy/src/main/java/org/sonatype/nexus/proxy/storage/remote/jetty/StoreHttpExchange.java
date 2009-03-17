@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.storage.remote.jetty;
 import org.mortbay.jetty.HttpMethods;
 import org.mortbay.jetty.HttpStatus;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -23,10 +24,9 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 public class StoreHttpExchange
     extends AbstractNexusExchange
 {
-
-    public StoreHttpExchange( ProxyRepository repository, String path, StorageItem item )
+    public StoreHttpExchange( ProxyRepository repository, StorageItem item )
     {
-        super( repository, path );
+        super( repository, new ResourceStoreRequest( item ) );
 
         setMethod( HttpMethods.PUT );
     }

@@ -34,17 +34,16 @@ import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurationValidator;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 @Component( role = GroupRepository.class, hint = "maven2", instantiationStrategy = "per-lookup", description = "Maven2 Repository Group" )
@@ -102,13 +101,13 @@ public class M2GroupRepository
     }
 
     @Override
-    protected StorageItem doRetrieveItem( RepositoryRequest request )
+    protected StorageItem doRetrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
-        if ( M2ArtifactRecognizer.isMetadata( request.getResourceStoreRequest().getRequestPath() )
-            && !M2ArtifactRecognizer.isChecksum( request.getResourceStoreRequest().getRequestPath() ) )
+        if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() )
+            && !M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
         {
             // metadata checksum files are calculated and cached as side-effect
             // of doRetrieveMetadata.
@@ -129,7 +128,7 @@ public class M2GroupRepository
     /**
      * Aggregates metadata from all member repositories
      */
-    private StorageItem doRetrieveMetadata( RepositoryRequest request )
+    private StorageItem doRetrieveMetadata( ResourceStoreRequest request )
         throws StorageException,
             IllegalOperationException,
             UnsupportedStorageOperationException,
@@ -140,7 +139,7 @@ public class M2GroupRepository
         if ( listOfStorageItems.isEmpty() )
         {
             // empty: not found
-            throw new ItemNotFoundException( request );
+            throw new ItemNotFoundException( request, this );
         }
 
         if ( !mergeMetadata )
@@ -206,7 +205,7 @@ public class M2GroupRepository
         if ( mergedMetadata == null )
         {
             // may happen if only one or all metadatas are unparseable
-            throw new ItemNotFoundException( request );
+            throw new ItemNotFoundException( request, this );
         }
 
         try
@@ -234,10 +233,7 @@ public class M2GroupRepository
                         + Integer.toString( listOfStorageItems.size() ) + " found items." );
             }
 
-            AbstractStorageItem item = createStorageItem(
-                createUid( request.getResourceStoreRequest().getRequestPath() ),
-                bos.toByteArray(),
-                request.getResourceStoreRequest().getRequestContext() );
+            AbstractStorageItem item = createStorageItem( request, bos.toByteArray() );
 
             item.getItemContext().put( CTX_TRANSITIVE_ITEM, Boolean.TRUE );
 
@@ -253,19 +249,20 @@ public class M2GroupRepository
         }
     }
 
-    protected void storeDigest( RepositoryRequest request, MessageDigest digest )
+    protected void storeDigest( ResourceStoreRequest request, MessageDigest digest )
         throws IOException,
             UnsupportedStorageOperationException,
             IllegalOperationException
     {
         byte[] bytes = ( new String( Hex.encodeHex( digest.digest() ) ) + "\n" ).getBytes();
 
-        RepositoryItemUid csuid = createUid( request.getResourceStoreRequest().getRequestPath() + "."
+        ResourceStoreRequest req = new ResourceStoreRequest( request.getRequestPath() + "."
             + digest.getAlgorithm().toLowerCase() );
 
-        AbstractStorageItem item = createStorageItem( csuid, bytes, request
-            .getResourceStoreRequest().getRequestContext() );
+        req.getRequestContext().setParentContext( request.getRequestContext() );
 
-        storeItem( item );
+        AbstractStorageItem item = createStorageItem( req, bytes );
+
+        storeItem( false, item );
     }
 }

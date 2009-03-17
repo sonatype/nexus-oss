@@ -23,12 +23,10 @@ import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -50,12 +48,9 @@ public class DefaultMetadataHelper
     public void store( String content, String path )
         throws Exception
     {
-        // UIDs are like URIs! The separator is _always_ "/"!!!
-        RepositoryItemUid mdUid = repository.createUid( path );
-
         ContentLocator contentLocator = new StringContentLocator( content );
 
-        storeItem( mdUid, contentLocator );
+        storeItem( path, contentLocator );
     }
 
     @Override
@@ -65,7 +60,7 @@ public class DefaultMetadataHelper
             IllegalOperationException,
             ItemNotFoundException
     {
-        repository.deleteItem( new RepositoryRequest( repository, new ResourceStoreRequest( path, true ) ) );
+        repository.deleteItem( false, new ResourceStoreRequest( path, true ) );
     }
 
     @Override
@@ -79,9 +74,7 @@ public class DefaultMetadataHelper
     public InputStream retrieveContent( String path )
         throws Exception
     {
-        StorageItem item = repository.retrieveItem( new RepositoryRequest( repository, new ResourceStoreRequest(
-            path,
-            false ) ) );
+        StorageItem item = repository.retrieveItem( false, new ResourceStoreRequest( path, false ) );
 
         if ( item instanceof StorageFileItem )
         {
@@ -139,21 +132,18 @@ public class DefaultMetadataHelper
         return repository.getLocalStorage().retrieveItem( repository, new ResourceStoreRequest( path, true ) );
     }
 
-    private void storeItem( RepositoryItemUid uid, ContentLocator contentLocator )
+    private void storeItem( String path, ContentLocator contentLocator )
         throws StorageException,
             UnsupportedStorageOperationException,
             IllegalOperationException
     {
-        DefaultStorageFileItem mdFile = new DefaultStorageFileItem(
-            repository,
-            uid.getPath(),
-            true,
-            true,
-            contentLocator );
+        ResourceStoreRequest req = new ResourceStoreRequest( path );
 
-        repository.storeItem( mdFile );
+        DefaultStorageFileItem mdFile = new DefaultStorageFileItem( repository, req, true, true, contentLocator );
 
-        repository.removeFromNotFoundCache( uid.getPath() );
+        repository.storeItem( false, mdFile );
+
+        repository.removeFromNotFoundCache( path );
     }
 
 }

@@ -19,6 +19,7 @@ import static org.easymock.EasyMock.replay;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultRepositoryItemUid;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -72,7 +73,7 @@ public class DefaultAttributeStorageTest
     {
         DefaultStorageFileItem file = new DefaultStorageFileItem(
             repository,
-            "/a.txt",
+            new ResourceStoreRequest( "/a.txt" ),
             true,
             true,
             new StringContentLocator( "CONTENT" ) );
@@ -93,7 +94,7 @@ public class DefaultAttributeStorageTest
     {
         DefaultStorageFileItem file = new DefaultStorageFileItem(
             repository,
-            "/b.txt",
+            new ResourceStoreRequest( "/b.txt" ),
             true,
             true,
             new StringContentLocator( "CONTENT" ) );

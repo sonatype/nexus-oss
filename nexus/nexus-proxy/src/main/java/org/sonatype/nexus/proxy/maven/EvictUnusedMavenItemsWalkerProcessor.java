@@ -21,7 +21,6 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.EvictUnusedItemsWalkerProcessor;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
@@ -62,8 +61,7 @@ public class EvictUnusedMavenItemsWalkerProcessor
     {
         MavenRepository repository = (MavenRepository) getRepository( ctx );
 
-        repository
-            .deleteItemWithChecksums( new RepositoryRequest( ctx.getRepository(), new ResourceStoreRequest( item ) ) );
+        repository.deleteItemWithChecksums( false, new ResourceStoreRequest( item ) );
     }
 
     // on maven repositories, we must use another delete method
@@ -73,10 +71,10 @@ public class EvictUnusedMavenItemsWalkerProcessor
         // expiring now empty directories
         try
         {
-            if ( getRepository( ctx ).list( coll ).size() == 0 )
+            if ( getRepository( ctx ).list( false, coll ).size() == 0 )
             {
-                ( (MavenRepository) getRepository( ctx ) ).deleteItemWithChecksums( new RepositoryRequest( ctx
-                    .getRepository(), new ResourceStoreRequest( coll ) ) );
+                ( (MavenRepository) getRepository( ctx ) ).deleteItemWithChecksums( false, new ResourceStoreRequest(
+                    coll ) );
             }
         }
         catch ( UnsupportedStorageOperationException e )

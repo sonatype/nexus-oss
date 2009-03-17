@@ -218,10 +218,12 @@ public class DefaultAttributeStorage
             try
             {
                 AbstractStorageItem onDisk = doGetAttributes( item.getRepositoryItemUid() );
-
+                
                 if ( onDisk != null && ( onDisk.getGeneration() > item.getGeneration() ) )
                 {
                     // change detected, overlay the to be saved onto the newer one and swap
+                    onDisk.setResourceStoreRequest( item.getResourceStoreRequest() );
+                    
                     onDisk.overlay( item );
 
                     // and overlay other things too

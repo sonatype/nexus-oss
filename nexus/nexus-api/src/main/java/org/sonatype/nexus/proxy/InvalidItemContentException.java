@@ -14,7 +14,6 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.proxy.repository.Mirror;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 
 public class InvalidItemContentException
     extends StorageException
@@ -26,7 +25,7 @@ public class InvalidItemContentException
         super( msg, cause );
     }
 
-    public InvalidItemContentException( RepositoryRequest req, Mirror mirror )
+    public InvalidItemContentException( ResourceStoreRequest req, Mirror mirror )
     {
         super( "Item content is invalid on path '" + req.toString() + "' on mirror '" + mirror.getUrl() + "'" );
     }

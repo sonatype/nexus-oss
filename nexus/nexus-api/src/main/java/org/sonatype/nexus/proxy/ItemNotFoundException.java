@@ -13,8 +13,7 @@
  */
 package org.sonatype.nexus.proxy;
 
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * Thrown if the requested item is not found.
@@ -26,29 +25,45 @@ public class ItemNotFoundException
 {
     private static final long serialVersionUID = -4964273361722823796L;
 
+    private final Repository repository;
+
+    private final ResourceStoreRequest request;
+
     public ItemNotFoundException( String path )
     {
-        super( "Item not found on path " + path );
+        this( path, null );
     }
 
     public ItemNotFoundException( String path, Throwable cause )
     {
         super( "Item not found on path " + path, cause );
+
+        this.repository = null;
+
+        this.request = null;
     }
 
-    public ItemNotFoundException( String path, String repo )
+    public ItemNotFoundException( ResourceStoreRequest request, Repository repository )
     {
-        super( "Item not found on path " + path + " in repository " + repo );
+        this( request, repository, null );
     }
 
-    public ItemNotFoundException( RepositoryItemUid uid )
+    public ItemNotFoundException( ResourceStoreRequest request, Repository repository, Throwable cause )
     {
-        super( "Item not found on UID " + uid.toString() + " in repository " + uid.getRepository().getId() );
+        super( "Item not found on path " + request.toString() + " in repository " + repository.getId(), cause );
+
+        this.repository = repository;
+
+        this.request = request;
     }
 
-    public ItemNotFoundException( RepositoryRequest request )
+    public Repository getRepository()
     {
-        super( "Item not found on path " + request.toString() + " in repository " + request.getRepository().getId() );
+        return repository;
     }
 
+    public ResourceStoreRequest getRequest()
+    {
+        return request;
+    }
 }

@@ -60,7 +60,7 @@ import org.sonatype.scheduling.schedules.Schedule;
  * @author cstamas
  */
 public interface Nexus
-    extends ApplicationStatusSource, MutableConfiguration, NexusService
+    extends ApplicationStatusSource, MutableConfiguration
 {
     // ------------------------------------------------------------------
     // Configuration

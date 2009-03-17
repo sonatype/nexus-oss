@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.item;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.replay;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class DefaultStorageCollectionItemTest
             new DefaultRepositoryItemUid( repository, "/a/some/dir/coll/B" ) );
         expect( repository.createUid( "/a/some/dir/coll/C" ) ).andReturn(
             new DefaultRepositoryItemUid( repository, "/a/some/dir/coll/C" ) );
-        expect( repository.list( isA( StorageCollectionItem.class ) ) ).andReturn( result );
+        expect( repository.list( anyBoolean(), isA( StorageCollectionItem.class ) ) ).andReturn( result );
 
         replay( repository );
 

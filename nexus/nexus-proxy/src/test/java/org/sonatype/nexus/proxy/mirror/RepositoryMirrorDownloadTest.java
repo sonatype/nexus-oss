@@ -387,12 +387,8 @@ public class RepositoryMirrorDownloadTest
     private AbstractStorageItem newRemoteStorageFileItem( RepositoryItemUid uid, byte[] bytes )
     {
         ContentLocator content = new ByteArrayContentLocator( bytes );
-        DefaultStorageFileItem item = new DefaultStorageFileItem(
-            uid.getRepository(),
-            uid.getPath(),
-            true,
-            false,
-            content );
+        DefaultStorageFileItem item = new DefaultStorageFileItem( uid.getRepository(), new ResourceStoreRequest( uid
+            .getPath() ), true, false, content );
         if ( bytes.length == 0 )
         {
             item.getAttributes().put( "digest.sha1", ITEM_SHA1_HASH );

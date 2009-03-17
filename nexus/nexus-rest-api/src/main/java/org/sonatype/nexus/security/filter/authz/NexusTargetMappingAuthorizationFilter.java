@@ -185,10 +185,8 @@ public class NexusTargetMappingAuthorizationFilter
                 throw new IllegalStateException( "Cannot lookup NexusArtifactAuthorizer!", e );
             }
         }
-        
-        return nexusItemAuthorizer.authorizePath(
-            getResourceStoreRequest( request, false ),
-            null,
-            Action.valueOf( getActionFromHttpVerb( request ) ) );
+
+        return nexusItemAuthorizer.authorizePath( getResourceStoreRequest( request, false ), Action
+            .valueOf( getActionFromHttpVerb( request ) ) );
     }
 }

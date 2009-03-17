@@ -17,15 +17,16 @@ import org.mortbay.jetty.HttpHeaders;
 import org.mortbay.jetty.HttpMethods;
 import org.mortbay.jetty.HttpStatus;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 public class ContainsHttpExchange
     extends AbstractNexusExchange
 {
-    public ContainsHttpExchange( ProxyRepository repository, String path, long newerThen )
+    public ContainsHttpExchange( ProxyRepository repository, ResourceStoreRequest request, long newerThen )
     {
-        super( repository, path );
+        super( repository, request );
 
         setMethod( HttpMethods.HEAD );
 

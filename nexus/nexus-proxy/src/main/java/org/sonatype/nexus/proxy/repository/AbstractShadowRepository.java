@@ -13,8 +13,6 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import java.util.Map;
-
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -107,11 +105,11 @@ public abstract class AbstractShadowRepository
                 {
                     if ( ievt instanceof RepositoryItemEventStore || ievt instanceof RepositoryItemEventCache )
                     {
-                        createLink( ievt.getItem(), ievt.getContext() );
+                        createLink( ievt.getItem() );
                     }
                     else if ( ievt instanceof RepositoryItemEventDelete )
                     {
-                        deleteLink( ievt.getItem(), ievt.getContext() );
+                        deleteLink( ievt.getItem() );
                     }
                 }
                 catch ( Exception e )
@@ -122,23 +120,23 @@ public abstract class AbstractShadowRepository
         }
     }
 
-    protected abstract void deleteLink( StorageItem item, Map<String, Object> context )
+    protected abstract void deleteLink( StorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
-    protected abstract void createLink( StorageItem item, Map<String, Object> context )
+    protected abstract void createLink( StorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException;
 
-    protected void synchronizeLink( StorageItem item, Map<String, Object> context )
+    protected void synchronizeLink( StorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException
     {
-        createLink( item, context );
+        createLink( item );
     }
 
     /**
@@ -158,7 +156,7 @@ public abstract class AbstractShadowRepository
             protected void processFileItem( WalkerContext context, StorageFileItem item )
                 throws Exception
             {
-                synchronizeLink( item, context.getContext() );
+                synchronizeLink( item );
             }
         };
 
@@ -169,7 +167,7 @@ public abstract class AbstractShadowRepository
         getWalker().walk( ctx );
     }
 
-    protected StorageItem doRetrieveItemFromMaster( RepositoryRequest request )
+    protected StorageItem doRetrieveItemFromMaster( ResourceStoreRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException

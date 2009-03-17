@@ -173,7 +173,7 @@ public class CommonsHttpClientRemoteStorage
 
                 DefaultStorageFileItem httpItem = new DefaultStorageFileItem(
                     repository,
-                    request.getRequestPath(),
+                    request,
                     true,
                     true,
                     new PreparedContentLocator( new HttpClientInputStream( get, is ) ) );
@@ -194,10 +194,8 @@ public class CommonsHttpClientRemoteStorage
                 httpItem.setModified( makeDateFromHeader( method.getResponseHeader( "last-modified" ) ) );
 
                 httpItem.setCreated( httpItem.getModified() );
-                
+
                 httpItem.getItemContext().putAll( request.getRequestContext() );
-                
-                httpItem.setResourceStoreRequest( request );
 
                 return httpItem;
             }

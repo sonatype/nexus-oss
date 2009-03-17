@@ -21,6 +21,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
+import org.sonatype.nexus.proxy.repository.RepositoryConfigurationValidator;
+import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 
@@ -36,6 +38,9 @@ public class DefaultMavenSiteRepository
 {
     @Requirement( hint = "maven-site" )
     private ContentClass contentClass;
+
+    @Requirement( hint = "maven-site" )
+    private RepositoryConfigurator repositoryConfigurator;
 
     private RepositoryKind repositoryKind;
 
@@ -59,6 +64,18 @@ public class DefaultMavenSiteRepository
     {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public RepositoryConfigurationValidator getRepositoryConfigurationValidator()
+    {
+        return null;
+    }
+
+    @Override
+    public RepositoryConfigurator getRepositoryConfigurator()
+    {
+        return repositoryConfigurator;
     }
 
 }

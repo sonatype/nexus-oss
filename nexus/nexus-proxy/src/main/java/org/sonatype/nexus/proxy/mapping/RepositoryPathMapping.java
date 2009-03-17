@@ -18,8 +18,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 
 /**
  * The mapping.
@@ -63,13 +64,15 @@ public class RepositoryPathMapping
         this.resourceStores = resourceStores;
     }
 
-    public boolean matches( RepositoryRequest request )
+    public boolean matches( Repository repository, ResourceStoreRequest request )
     {
-        if ( allGroups || groupId.equals( request.getRepository().getId() ) )
+        if ( allGroups
+            || ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) && groupId.equals( repository
+                .getId() ) ) )
         {
             for ( Pattern pattern : patterns )
             {
-                if ( pattern.matcher( request.getResourceStoreRequest().getRequestPath() ).matches() )
+                if ( pattern.matcher( request.getRequestPath() ).matches() )
                 {
                     return true;
                 }

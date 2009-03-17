@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 
 /**
@@ -25,12 +26,12 @@ public class AbstractRequestProcessor
     implements RequestProcessor
 {
 
-    public boolean process( RepositoryRequest request, Action action )
+    public boolean process( Repository repository, ResourceStoreRequest request, Action action )
     {
         return true;
     }
 
-    public boolean shouldProxy( RepositoryRequest request )
+    public boolean shouldProxy( ProxyRepository proxy, ResourceStoreRequest request )
     {
         return true;
     }

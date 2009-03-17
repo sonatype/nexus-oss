@@ -48,7 +48,6 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.MutableProxyRepositoryKind;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.util.ItemPathUtils;
@@ -266,7 +265,7 @@ public abstract class AbstractMavenRepository
         this.metadataMaxAge = metadataMaxAge;
     }
 
-    public abstract boolean shouldServeByPolicies( RepositoryRequest request );
+    public abstract boolean shouldServeByPolicies( ResourceStoreRequest request );
 
     public void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException,
@@ -297,7 +296,7 @@ public abstract class AbstractMavenRepository
         getArtifactStoreHelper().deleteItemWithChecksums( request );
     }
 
-    public void storeItemWithChecksums( AbstractStorageItem item )
+    public void storeItemWithChecksums( boolean fromTask, AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException
@@ -307,10 +306,10 @@ public abstract class AbstractMavenRepository
             getLogger().debug( "storeItemWithChecksums() :: " + item.getRepositoryItemUid().toString() );
         }
 
-        getArtifactStoreHelper().storeItemWithChecksums( item );
+        getArtifactStoreHelper().storeItemWithChecksums( fromTask, item );
     }
 
-    public void deleteItemWithChecksums( RepositoryRequest request )
+    public void deleteItemWithChecksums( boolean fromTask, ResourceStoreRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
@@ -321,7 +320,7 @@ public abstract class AbstractMavenRepository
             getLogger().debug( "deleteItemWithChecksums() :: " + request.toString() );
         }
 
-        getArtifactStoreHelper().deleteItemWithChecksums( request );
+        getArtifactStoreHelper().deleteItemWithChecksums( fromTask, request );
     }
 
     public MetadataManager getMetadataManager()
@@ -333,7 +332,7 @@ public abstract class AbstractMavenRepository
     // DefaultRepository customizations
 
     @Override
-    protected StorageItem doRetrieveItem( RepositoryRequest request )
+    protected StorageItem doRetrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
@@ -346,21 +345,21 @@ public abstract class AbstractMavenRepository
                     "The serving of item " + request.toString() + " is forbidden by Maven repository policy." );
             }
 
-            throw new ItemNotFoundException( request );
+            throw new ItemNotFoundException( request, this );
         }
 
         return super.doRetrieveItem( request );
     }
 
     @Override
-    public void storeItem( StorageItem item )
+    public void storeItem( boolean fromTask, StorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException
     {
-        if ( shouldServeByPolicies( new RepositoryRequest( this, new ResourceStoreRequest( item ) ) ) )
+        if ( shouldServeByPolicies( new ResourceStoreRequest( item ) ) )
         {
-            super.storeItem( item );
+            super.storeItem( fromTask, item );
         }
         else
         {
@@ -390,16 +389,16 @@ public abstract class AbstractMavenRepository
     // DefaultRepository customizations
 
     @Override
-    protected AbstractStorageItem doRetrieveRemoteItem( RepositoryRequest request )
+    protected AbstractStorageItem doRetrieveRemoteItem( ResourceStoreRequest request )
         throws ItemNotFoundException,
             RemoteAccessException,
             StorageException
     {
-        if ( !isChecksum( request.getResourceStoreRequest().getRequestPath() ) )
+        if ( !isChecksum( request.getRequestPath() ) )
         {
             // we are about to download an artifact from remote repository
             // lets clean any existing (stale) checksum files
-            removeLocalChecksum( request.getResourceStoreRequest() );
+            removeLocalChecksum( request );
         }
 
         return super.doRetrieveRemoteItem( request );
@@ -641,34 +640,33 @@ public abstract class AbstractMavenRepository
     }
 
     @Override
-    protected void markItemRemotelyChecked( RepositoryRequest request )
+    protected void markItemRemotelyChecked( ResourceStoreRequest request )
         throws StorageException,
             ItemNotFoundException
     {
         super.markItemRemotelyChecked( request );
 
-        request
-            .getResourceStoreRequest().pushRequestPath( request.getResourceStoreRequest().getRequestPath() + ".sha1" );
+        request.pushRequestPath( request.getRequestPath() + ".sha1" );
 
-        if ( getLocalStorage().containsItem( this, request.getResourceStoreRequest() ) )
+        if ( getLocalStorage().containsItem( this, request ) )
         {
             super.markItemRemotelyChecked( request );
         }
 
-        request.getResourceStoreRequest().popRequestPath();
+        request.popRequestPath();
 
-        request.getResourceStoreRequest().pushRequestPath( request.getResourceStoreRequest().getRequestPath() + ".md5" );
+        request.pushRequestPath( request.getRequestPath() + ".md5" );
 
-        if ( getLocalStorage().containsItem( this, request.getResourceStoreRequest() ) )
+        if ( getLocalStorage().containsItem( this, request ) )
         {
             super.markItemRemotelyChecked( request );
         }
 
-        request.getResourceStoreRequest().popRequestPath();
+        request.popRequestPath();
     }
 
     @Override
-    public void deleteItem( RepositoryRequest request )
+    public void deleteItem( boolean fromTask, ResourceStoreRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
@@ -677,7 +675,7 @@ public abstract class AbstractMavenRepository
         // first determine from where to rebuild metadata
         String path = RepositoryItemUid.PATH_ROOT;
 
-        StorageItem item = getLocalStorage().retrieveItem( this, request.getResourceStoreRequest() );
+        StorageItem item = getLocalStorage().retrieveItem( this, request );
 
         if ( item instanceof StorageCollectionItem )
         {
@@ -689,7 +687,7 @@ public abstract class AbstractMavenRepository
         }
 
         // then delete the item
-        super.deleteItem( request );
+        super.deleteItem( fromTask, request );
 
         // finally rebuild metadata
         recreateMavenMetadata( new ResourceStoreRequest( path, true ) );

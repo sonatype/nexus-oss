@@ -32,6 +32,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.artifact.VersionUtils;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
@@ -44,7 +45,6 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurationValidator;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.util.AlphanumComparator;
 
 /**
@@ -97,11 +97,11 @@ public class M2Repository
      * @param uid the uid
      * @return true, if successful
      */
-    public boolean shouldServeByPolicies( RepositoryRequest request )
+    public boolean shouldServeByPolicies( ResourceStoreRequest request )
     {
-        if ( M2ArtifactRecognizer.isMetadata( request.getResourceStoreRequest().getRequestPath() ) )
+        if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() ) )
         {
-            if ( M2ArtifactRecognizer.isSnapshot( request.getResourceStoreRequest().getRequestPath() ) )
+            if ( M2ArtifactRecognizer.isSnapshot( request.getRequestPath() ) )
             {
                 return RepositoryPolicy.SNAPSHOT.equals( getRepositoryPolicy() );
             }
@@ -112,7 +112,7 @@ public class M2Repository
             }
         }
         // we are using Gav to test the path
-        Gav gav = gavCalculator.pathToGav( request.getResourceStoreRequest().getRequestPath() );
+        Gav gav = gavCalculator.pathToGav( request.getRequestPath() );
 
         if ( gav == null )
         {

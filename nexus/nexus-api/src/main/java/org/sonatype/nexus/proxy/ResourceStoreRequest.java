@@ -13,13 +13,9 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 import java.util.Stack;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
@@ -30,84 +26,44 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  */
 public class ResourceStoreRequest
 {
-    /** Context URL of the app root on the incoming connector. */
-    private static final String CTX_REQUEST_APP_ROOT_URL = "request.appRootUrl";
-
-    /** Context URL of the original resource requested on the incoming connector. */
-    private static final String CTX_REQUEST_URL = "request.url";
-
-    /** Context flag to mark a request local only. */
-    private static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
-
-    /** Context flag to mark a request local only. */
-    private static final String CTX_REMOTE_ONLY_FLAG = "request.remoteOnly";
-
-    /** Context key for set of processed repositories. */
-    private static final String CTX_PROCESSED_REPOSITORIES = "request.processedRepositories";
-
-    /** Context key for condition "if-modified-since" */
-    private static final String CTX_CONDITION_IF_MODIFIED_SINCE = "request.condition.ifModifiedSince";
-
-    /** Context key for condition "if-none-match" */
-    private static final String CTX_CONDITION_IF_NONE_MATCH = "request.condition.ifNoneMatch";
-
     /** The path we want to retrieve. */
     private String requestPath;
 
     /** Extra data associated with this request. */
-    private Map<String, Object> requestContext;
-
-    /** Explicitly targets a repository (only if accessed over Routers!). */
-    private String requestRepositoryId;
+    private RequestContext requestContext;
 
     /** Used internally by Routers. */
     private Stack<String> pathStack;
 
-    public ResourceStoreRequest( String requestPath, boolean localOnly, boolean remoteOnly, String repositoryId )
+    public ResourceStoreRequest( String requestPath, boolean localOnly, boolean remoteOnly )
     {
         super();
         this.requestPath = requestPath;
-        this.requestRepositoryId = repositoryId;
         this.pathStack = new Stack<String>();
-        this.requestContext = new HashMap<String, Object>();
-        this.requestContext.put( CTX_LOCAL_ONLY_FLAG, localOnly );
-        this.requestContext.put( CTX_REMOTE_ONLY_FLAG, remoteOnly );
-        this.requestContext.put( CTX_PROCESSED_REPOSITORIES, new HashSet<String>() );
+        this.requestContext = new RequestContext();
+        this.requestContext.setRequestLocalOnly( localOnly );
+        this.requestContext.setRequestRemoteOnly( remoteOnly );
     }
 
-    public ResourceStoreRequest( String requestPath, boolean localOnly, String repositoryId )
-    {
-        this( requestPath, localOnly, false, repositoryId );
-    }
-
-    /**
-     * Creates a request aimed at given path. You are free to set some other attributes of this created default request.
-     * 
-     * @param requestPath the path.
-     */
     public ResourceStoreRequest( String requestPath, boolean localOnly )
     {
-        this( requestPath, localOnly, null );
+        this( requestPath, localOnly, false );
     }
 
-    /**
-     * Creates a request aimed at given path. You are free to set some other attributes of this created default request.
-     * 
-     * @param requestPath the path.
-     */
-    public ResourceStoreRequest( String requestPath, boolean localOnly, boolean remoteOnly )
+    public ResourceStoreRequest( String requestPath )
     {
-        this( requestPath, localOnly, remoteOnly, null );
+        this( requestPath, false, false );
     }
 
     /**
      * Creates a request aimed at given path denoted by RepositoryItemUid.
      * 
      * @param uid the uid
+     * @deprecated use ResourceStoreRequest(String path)
      */
     public ResourceStoreRequest( RepositoryItemUid uid, boolean localOnly )
     {
-        this( uid.getPath(), localOnly, uid.getRepository().getId() );
+        this( uid.getPath(), localOnly, false );
     }
 
     /**
@@ -117,11 +73,22 @@ public class ResourceStoreRequest
      */
     public ResourceStoreRequest( StorageItem item )
     {
-        this( item.getRepositoryItemUid().getPath(), true, item.getRepositoryId() );
+        this( item.getRepositoryItemUid().getPath(), true, false );
 
-        getRequestContext().putAll( item.getItemContext() );
+        this.requestContext = item.getItemContext();
 
-        getProcessedRepositories().clear();
+        // but clear up the list of processed repositories
+        this.requestContext.getProcessedRepositories().clear();
+    }
+
+    /**
+     * Gets the request context.
+     * 
+     * @return the request context
+     */
+    public RequestContext getRequestContext()
+    {
+        return requestContext;
     }
 
     /**
@@ -152,6 +119,7 @@ public class ResourceStoreRequest
     public void pushRequestPath( String requestPath )
     {
         pathStack.push( this.requestPath );
+
         this.requestPath = requestPath;
     }
 
@@ -163,6 +131,7 @@ public class ResourceStoreRequest
     public String popRequestPath()
     {
         this.requestPath = pathStack.pop();
+
         return getRequestPath();
     }
 
@@ -173,17 +142,7 @@ public class ResourceStoreRequest
      */
     public boolean isRequestLocalOnly()
     {
-        return (Boolean) getRequestContext().get( CTX_LOCAL_ONLY_FLAG );
-    }
-
-    /**
-     * Checks if is request remote only.
-     * 
-     * @return true, if is request remote only
-     */
-    public boolean isRequestRemoteOnly()
-    {
-        return (Boolean) getRequestContext().get( CTX_REMOTE_ONLY_FLAG );
+        return getRequestContext().isRequestLocalOnly();
     }
 
     /**
@@ -193,7 +152,17 @@ public class ResourceStoreRequest
      */
     public void setRequestLocalOnly( boolean requestLocalOnly )
     {
-        getRequestContext().put( CTX_LOCAL_ONLY_FLAG, requestLocalOnly );
+        getRequestContext().setRequestLocalOnly( requestLocalOnly );
+    }
+
+    /**
+     * Checks if is request remote only.
+     * 
+     * @return true, if is request remote only
+     */
+    public boolean isRequestRemoteOnly()
+    {
+        return getRequestContext().isRequestRemoteOnly();
     }
 
     /**
@@ -203,47 +172,7 @@ public class ResourceStoreRequest
      */
     public void setRequestRemoteOnly( boolean requestRemoteOnly )
     {
-        getRequestContext().put( CTX_REMOTE_ONLY_FLAG, requestRemoteOnly );
-    }
-
-    /**
-     * Gets the request context.
-     * 
-     * @return the request context
-     */
-    public Map<String, Object> getRequestContext()
-    {
-        return requestContext;
-    }
-
-    /**
-     * Sets the request context.
-     * 
-     * @param requestContext the request context
-     */
-    public void setRequestContext( Map<String, Object> requestContext )
-    {
-        this.requestContext = requestContext;
-    }
-
-    /**
-     * Gets the request repository id.
-     * 
-     * @return the request repository id
-     */
-    public String getRequestRepositoryId()
-    {
-        return requestRepositoryId;
-    }
-
-    /**
-     * Sets the request repository id.
-     * 
-     * @param requestRepositoryId the new request repository id
-     */
-    public void setRequestRepositoryId( String requestRepositoryId )
-    {
-        this.requestRepositoryId = requestRepositoryId;
+        getRequestContext().setRequestRemoteOnly( requestRemoteOnly );
     }
 
     /**
@@ -251,10 +180,9 @@ public class ResourceStoreRequest
      * 
      * @return
      */
-    @SuppressWarnings( "unchecked" )
-    public Set<String> getProcessedRepositories()
+    public List<String> getProcessedRepositories()
     {
-        return (Set<String>) getRequestContext().get( CTX_PROCESSED_REPOSITORIES );
+        return getRequestContext().getProcessedRepositories();
     }
 
     /**
@@ -264,8 +192,7 @@ public class ResourceStoreRequest
      */
     public boolean isConditional()
     {
-        return getRequestContext().containsKey( CTX_CONDITION_IF_MODIFIED_SINCE )
-            || getRequestContext().containsKey( CTX_CONDITION_IF_NONE_MATCH );
+        return getRequestContext().isConditional();
     }
 
     /**
@@ -275,7 +202,7 @@ public class ResourceStoreRequest
      */
     public long getIfModifiedSince()
     {
-        return ( (Long) getRequestContext().get( CTX_CONDITION_IF_MODIFIED_SINCE ) ).longValue();
+        return getRequestContext().getIfModifiedSince();
     }
 
     /**
@@ -285,14 +212,7 @@ public class ResourceStoreRequest
      */
     public void setIfModifiedSince( long ifModifiedSince )
     {
-        if ( ifModifiedSince != 0 )
-        {
-            getRequestContext().put( CTX_CONDITION_IF_MODIFIED_SINCE, Long.valueOf( ifModifiedSince ) );
-        }
-        else
-        {
-            getRequestContext().remove( CTX_CONDITION_IF_MODIFIED_SINCE );
-        }
+        getRequestContext().setIfModifiedSince( ifModifiedSince );
     }
 
     /**
@@ -302,7 +222,7 @@ public class ResourceStoreRequest
      */
     public String getIfNoneMatch()
     {
-        return (String) getRequestContext().get( CTX_CONDITION_IF_NONE_MATCH );
+        return getRequestContext().getIfNoneMatch();
     }
 
     /**
@@ -312,14 +232,7 @@ public class ResourceStoreRequest
      */
     public void setIfNoneMatch( String tag )
     {
-        if ( !StringUtils.isEmpty( tag ) )
-        {
-            getRequestContext().put( CTX_CONDITION_IF_NONE_MATCH, tag );
-        }
-        else
-        {
-            getRequestContext().remove( CTX_CONDITION_IF_NONE_MATCH );
-        }
+        getRequestContext().setIfNoneMatch( tag );
     }
 
     /**
@@ -329,7 +242,7 @@ public class ResourceStoreRequest
      */
     public String getRequestUrl()
     {
-        return (String) getRequestContext().get( CTX_REQUEST_URL );
+        return getRequestContext().getRequestUrl();
     }
 
     /**
@@ -339,14 +252,7 @@ public class ResourceStoreRequest
      */
     public void setRequestUrl( String url )
     {
-        if ( !StringUtils.isEmpty( url ) )
-        {
-            getRequestContext().put( CTX_REQUEST_URL, url );
-        }
-        else
-        {
-            getRequestContext().remove( CTX_REQUEST_URL );
-        }
+        getRequestContext().setRequestUrl( url );
     }
 
     /**
@@ -356,7 +262,7 @@ public class ResourceStoreRequest
      */
     public String getRequestAppRootUrl()
     {
-        return (String) getRequestContext().get( CTX_REQUEST_APP_ROOT_URL );
+        return getRequestContext().getRequestAppRootUrl();
     }
 
     /**
@@ -366,13 +272,11 @@ public class ResourceStoreRequest
      */
     public void setRequestAppRootUrl( String url )
     {
-        if ( !StringUtils.isEmpty( url ) )
-        {
-            getRequestContext().put( CTX_REQUEST_APP_ROOT_URL, url );
-        }
-        else
-        {
-            getRequestContext().remove( CTX_REQUEST_APP_ROOT_URL );
-        }
+        getRequestContext().setRequestAppRootUrl( url );
+    }
+
+    public String toString()
+    {
+        return getRequestPath();
     }
 }

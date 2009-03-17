@@ -37,7 +37,6 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.AbstractShadowRepository;
 import org.sonatype.nexus.proxy.repository.IncompatibleMasterRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -141,6 +140,8 @@ public abstract class LayoutConverterShadowRepository
             StorageException,
             AccessDeniedException
     {
+        String originalPath = request.getRequestPath();
+
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "storeItemWithChecksums() :: " + request.getRequestPath() );
@@ -157,7 +158,7 @@ public abstract class LayoutConverterShadowRepository
                 throw new StorageException( "Could not get the content from the ContentLocator!", e );
             }
 
-            StorageFileItem storedFile = (StorageFileItem) retrieveItem( new RepositoryRequest( this, request ) );
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( false, request );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -165,27 +166,27 @@ public abstract class LayoutConverterShadowRepository
 
             if ( !StringUtils.isEmpty( sha1Hash ) )
             {
-                storeItem( new DefaultStorageFileItem(
-                    this,
-                    storedFile.getPath() + ".sha1",
-                    true,
-                    true,
-                    new StringContentLocator( sha1Hash ) ) );
+                request.setRequestPath( storedFile.getPath() + ".sha1" );
+
+                storeItem( false, new DefaultStorageFileItem( this, request, true, true, new StringContentLocator(
+                    sha1Hash ) ) );
             }
 
             if ( !StringUtils.isEmpty( md5Hash ) )
             {
-                storeItem( new DefaultStorageFileItem(
-                    this,
-                    storedFile.getPath() + ".md5",
-                    true,
-                    true,
-                    new StringContentLocator( md5Hash ) ) );
+                request.setRequestPath( storedFile.getPath() + ".md5" );
+
+                storeItem( false, new DefaultStorageFileItem( this, request, true, true, new StringContentLocator(
+                    md5Hash ) ) );
             }
         }
         catch ( ItemNotFoundException e )
         {
             throw new StorageException( "Storage inconsistency!", e );
+        }
+        finally
+        {
+            request.setRequestPath( originalPath );
         }
     }
 
@@ -251,7 +252,7 @@ public abstract class LayoutConverterShadowRepository
         }
     }
 
-    public void storeItemWithChecksums( AbstractStorageItem item )
+    public void storeItemWithChecksums( boolean fromTask, AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException
@@ -265,16 +266,16 @@ public abstract class LayoutConverterShadowRepository
         {
             try
             {
-                storeItem( item );
+                storeItem( fromTask, item );
             }
             catch ( IOException e )
             {
                 throw new StorageException( "Could not get the content from the ContentLocator!", e );
             }
 
-            StorageFileItem storedFile = (StorageFileItem) retrieveItem( new RepositoryRequest(
-                this,
-                new ResourceStoreRequest( item ) ) );
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( fromTask, new ResourceStoreRequest( item ) );
+
+            ResourceStoreRequest req = new ResourceStoreRequest( storedFile );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -282,22 +283,18 @@ public abstract class LayoutConverterShadowRepository
 
             if ( !StringUtils.isEmpty( sha1Hash ) )
             {
-                storeItem( new DefaultStorageFileItem(
-                    this,
-                    item.getPath() + ".sha1",
-                    true,
-                    true,
-                    new StringContentLocator( sha1Hash ) ) );
+                req.setRequestPath( item.getPath() + ".sha1" );
+
+                storeItem( fromTask, new DefaultStorageFileItem( this, req, true, true, new StringContentLocator(
+                    sha1Hash ) ) );
             }
 
             if ( !StringUtils.isEmpty( md5Hash ) )
             {
-                storeItem( new DefaultStorageFileItem(
-                    this,
-                    item.getPath() + ".sha1",
-                    true,
-                    true,
-                    new StringContentLocator( md5Hash ) ) );
+                req.setRequestPath( item.getPath() + ".md5" );
+
+                storeItem( fromTask, new DefaultStorageFileItem( this, req, true, true, new StringContentLocator(
+                    md5Hash ) ) );
             }
         }
         catch ( ItemNotFoundException e )
@@ -306,7 +303,7 @@ public abstract class LayoutConverterShadowRepository
         }
     }
 
-    public void deleteItemWithChecksums( RepositoryRequest request )
+    public void deleteItemWithChecksums( boolean fromTask, ResourceStoreRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
@@ -317,14 +314,13 @@ public abstract class LayoutConverterShadowRepository
             getLogger().debug( "deleteItemWithChecksums() :: " + request.toString() );
         }
 
-        deleteItem( request );
+        deleteItem( fromTask, request );
 
         try
         {
-            request.getResourceStoreRequest().pushRequestPath(
-                request.getResourceStoreRequest().getRequestPath() + ".sha1" );
+            request.pushRequestPath( request.getRequestPath() + ".sha1" );
 
-            deleteItem( request );
+            deleteItem( fromTask, request );
         }
         catch ( ItemNotFoundException e )
         {
@@ -332,15 +328,14 @@ public abstract class LayoutConverterShadowRepository
         }
         finally
         {
-            request.getResourceStoreRequest().popRequestPath();
+            request.popRequestPath();
         }
 
         try
         {
-            request.getResourceStoreRequest().pushRequestPath(
-                request.getResourceStoreRequest().getRequestPath() + ".md5" );
+            request.pushRequestPath( request.getRequestPath() + ".md5" );
 
-            deleteItem( request );
+            deleteItem( fromTask, request );
         }
         catch ( ItemNotFoundException e )
         {
@@ -348,7 +343,7 @@ public abstract class LayoutConverterShadowRepository
         }
         finally
         {
-            request.getResourceStoreRequest().popRequestPath();
+            request.popRequestPath();
         }
     }
 
@@ -426,7 +421,7 @@ public abstract class LayoutConverterShadowRepository
     }
 
     @Override
-    protected void deleteLink( StorageItem item, Map<String, Object> context )
+    protected void deleteLink( StorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
@@ -438,14 +433,12 @@ public abstract class LayoutConverterShadowRepository
         {
             ResourceStoreRequest request = new ResourceStoreRequest( item );
 
-            request.getRequestContext().putAll( context );
-
-            deleteItem( new RepositoryRequest( this, request ) );
+            deleteItem( false, request );
         }
     }
 
     @Override
-    protected void createLink( StorageItem item, Map<String, Object> context )
+    protected void createLink( StorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException
@@ -454,10 +447,14 @@ public abstract class LayoutConverterShadowRepository
 
         if ( shadowPath != null )
         {
-            DefaultStorageLinkItem link = new DefaultStorageLinkItem( this, shadowPath, true, true, item
+            ResourceStoreRequest req = new ResourceStoreRequest( shadowPath );
+
+            req.getRequestContext().putAll( item.getItemContext() );
+
+            DefaultStorageLinkItem link = new DefaultStorageLinkItem( this, req, true, true, item
                 .getRepositoryItemUid() );
 
-            storeItem( link );
+            storeItem( false, link );
         }
     }
 
@@ -470,7 +467,7 @@ public abstract class LayoutConverterShadowRepository
     protected abstract String transformMaster2Shadow( String path );
 
     @Override
-    protected StorageItem doRetrieveItem( RepositoryRequest request )
+    protected StorageItem doRetrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
@@ -486,15 +483,15 @@ public abstract class LayoutConverterShadowRepository
         catch ( ItemNotFoundException e )
         {
             // if it is thrown by super.doRetrieveItem()
-            String transformedPath = transformShadow2Master( request.getResourceStoreRequest().getRequestPath() );
+            String transformedPath = transformShadow2Master( request.getRequestPath() );
 
             if ( transformedPath == null )
             {
-                throw new ItemNotFoundException( request );
+                throw new ItemNotFoundException( request, this );
             }
 
             // delegate the call to the master
-            request.getResourceStoreRequest().pushRequestPath( transformedPath );
+            request.pushRequestPath( transformedPath );
 
             try
             {
@@ -502,7 +499,7 @@ public abstract class LayoutConverterShadowRepository
             }
             finally
             {
-                request.getResourceStoreRequest().popRequestPath();
+                request.popRequestPath();
             }
 
             return result;

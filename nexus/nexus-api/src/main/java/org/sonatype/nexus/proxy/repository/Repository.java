@@ -399,40 +399,40 @@ public interface Repository
     // ==================================================
     // Alternative (and unprotected) Content access
 
-    StorageItem retrieveItem( RepositoryRequest request )
+    StorageItem retrieveItem( boolean fromTask, ResourceStoreRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
-    void copyItem( RepositoryRequest from, RepositoryRequest to )
+    void copyItem( boolean fromTask, ResourceStoreRequest from, ResourceStoreRequest to )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
-    void moveItem( RepositoryRequest from, RepositoryRequest to )
+    void moveItem( boolean fromTask, ResourceStoreRequest from, ResourceStoreRequest to )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
-    void deleteItem( RepositoryRequest request )
+    void deleteItem( boolean fromTask, ResourceStoreRequest request )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
-    void storeItem( StorageItem item )
+    void storeItem( boolean fromTask, StorageItem item )
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException;
 
-    Collection<StorageItem> list( RepositoryRequest request )
+    Collection<StorageItem> list( boolean fromTask, ResourceStoreRequest request )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
-    Collection<StorageItem> list( StorageCollectionItem item )
+    Collection<StorageItem> list( boolean fromTask, StorageCollectionItem item )
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;

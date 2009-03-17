@@ -21,11 +21,9 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.proxy.target.TargetMatch;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
-import org.sonatype.nexus.proxy.target.TargetSet;
 
 public class AccessTest
     extends AbstractProxyTestEnvironment
@@ -118,7 +116,6 @@ public class AccessTest
         Repository repo = this.getRepositoryRegistry().getRepository( repositoryId );
 
         ResourceStoreRequest request = new ResourceStoreRequest( path, false );
-        request.setRequestRepositoryId( repositoryId );
 
         StorageItem item = repo.retrieveItem( request );
 

@@ -23,7 +23,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 
 public class LinkTest
     extends AbstractProxyTestEnvironment
@@ -54,7 +53,7 @@ public class LinkTest
             new StringContentLocator( contentString ) );
         file.setMimeType( "plain/text" );
         file.getAttributes().put( "attr1", "ATTR1" );
-        repo1.storeItem( file );
+        repo1.storeItem( false, file );
 
         DefaultStorageLinkItem link = new DefaultStorageLinkItem( repo1, "/b.txt", true, true, file
             .getRepositoryItemUid() );
@@ -63,10 +62,9 @@ public class LinkTest
         StorageItem item = repo1.retrieveItem( new ResourceStoreRequest( "/b.txt", true ) );
         assertEquals( DefaultStorageLinkItem.class, item.getClass() );
 
-        StorageFileItem item1 = (StorageFileItem) repo1.retrieveItem( new RepositoryRequest( ( (StorageLinkItem) item )
-            .getTarget().getRepository(), new ResourceStoreRequest(
+        StorageFileItem item1 = (StorageFileItem) repo1.retrieveItem( false, new ResourceStoreRequest(
             ( (StorageLinkItem) item ).getTarget().getPath(),
-            false ) ) );
+            false ) );
 
         assertStorageFileItem( item1 );
         assertTrue( contentEquals( item1.getInputStream(), new ByteArrayInputStream( contentString.getBytes() ) ) );

@@ -28,7 +28,6 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 public class M2RepositoryTest
@@ -114,14 +113,14 @@ public class M2RepositoryTest
             true,
             new StringContentLocator( SPOOF_RELEASE ) );
 
-        repository.storeItem( item );
+        repository.storeItem( false, item );
 
         try
         {
             item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
                 SPOOF_SNAPSHOT ) );
 
-            repository.storeItem( item );
+            repository.storeItem( false, item );
 
             fail( "Should not be able to store snapshot to release repo" );
         }
@@ -139,14 +138,14 @@ public class M2RepositoryTest
         item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
             SPOOF_SNAPSHOT ) );
 
-        repository.storeItem( item );
+        repository.storeItem( false, item );
 
         try
         {
             item = new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true, new StringContentLocator(
                 SPOOF_RELEASE ) );
 
-            repository.storeItem( item );
+            repository.storeItem( false, item );
 
             fail( "Should not be able to store release to snapshot repo" );
         }
@@ -171,48 +170,48 @@ public class M2RepositoryTest
         String someDirectory = "/classworlds/";
         String anyNonArtifactFile = "/any/file.txt";
 
-        RepositoryRequest request = new RepositoryRequest( repository, new ResourceStoreRequest( "", true ) );
+        ResourceStoreRequest request = new ResourceStoreRequest( "" );
 
         // it is equiv of repo type: RELEASE
         repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-        request.getResourceStoreRequest().setRequestPath( releasePom );
+        request.setRequestPath( releasePom );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( releaseArtifact );
+        request.setRequestPath( releaseArtifact );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( snapshotPom );
+        request.setRequestPath( snapshotPom );
         assertEquals( false, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( snapshotArtifact );
+        request.setRequestPath( snapshotArtifact );
         assertEquals( false, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( metadata1 );
+        request.setRequestPath( metadata1 );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( metadataR );
+        request.setRequestPath( metadataR );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( metadataS );
+        request.setRequestPath( metadataS );
         assertEquals( false, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( someDirectory );
+        request.setRequestPath( someDirectory );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( anyNonArtifactFile );
+        request.setRequestPath( anyNonArtifactFile );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
 
         // it is equiv of repo type: SNAPSHOT
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
-        request.getResourceStoreRequest().setRequestPath( releasePom );
+        request.setRequestPath( releasePom );
         assertEquals( false, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( releaseArtifact );
+        request.setRequestPath( releaseArtifact );
         assertEquals( false, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( snapshotPom );
+        request.setRequestPath( snapshotPom );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( snapshotArtifact );
+        request.setRequestPath( snapshotArtifact );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( metadata1 );
+        request.setRequestPath( metadata1 );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( metadataR );
+        request.setRequestPath( metadataR );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( metadataS );
+        request.setRequestPath( metadataS );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( someDirectory );
+        request.setRequestPath( someDirectory );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
-        request.getResourceStoreRequest().setRequestPath( anyNonArtifactFile );
+        request.setRequestPath( anyNonArtifactFile );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
     }
 

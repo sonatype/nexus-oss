@@ -13,8 +13,7 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import java.util.Map;
-
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -52,7 +51,7 @@ public abstract class RepositoryItemEvent
      * 
      * @return the item context
      */
-    public Map<String, Object> getContext()
+    public RequestContext getContext()
     {
         return item.getItemContext();
     }

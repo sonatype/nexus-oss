@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
@@ -39,12 +40,28 @@ public class DefaultStorageLinkItem
      * @param canWrite the can write
      * @param targetUid the target uid
      */
+    public DefaultStorageLinkItem( Repository repository, ResourceStoreRequest request, boolean canRead,
+        boolean canWrite, RepositoryItemUid targetUid )
+    {
+        super( repository, request, canRead, canWrite );
+
+        setTarget( targetUid );
+    }
+
+    /**
+     * Shortcut method.
+     * 
+     * @param repository
+     * @param path
+     * @param canRead
+     * @param canWrite
+     * @param targetUid
+     * @deprecated supply resourceStoreRequest always
+     */
     public DefaultStorageLinkItem( Repository repository, String path, boolean canRead, boolean canWrite,
         RepositoryItemUid targetUid )
     {
-        super( repository, path, canRead, canWrite );
-
-        setTarget( targetUid );
+        this( repository, new ResourceStoreRequest( path, true, false ), canRead, canWrite, targetUid );
     }
 
     /**
@@ -56,10 +73,10 @@ public class DefaultStorageLinkItem
      * @param canWrite the can write
      * @param targetUid the target uid
      */
-    public DefaultStorageLinkItem( RepositoryRouter router, String path, boolean canRead, boolean canWrite,
-        RepositoryItemUid targetUid )
+    public DefaultStorageLinkItem( RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
+        boolean canWrite, RepositoryItemUid targetUid )
     {
-        super( router, path, canRead, canWrite );
+        super( router, request, canRead, canWrite );
 
         setTarget( targetUid );
     }

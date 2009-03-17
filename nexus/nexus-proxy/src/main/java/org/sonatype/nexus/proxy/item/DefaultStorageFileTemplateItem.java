@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
@@ -32,10 +33,10 @@ public class DefaultStorageFileTemplateItem
      * @param canWrite the can write
      * @param contentLocator the content locator
      */
-    public DefaultStorageFileTemplateItem( Repository repository, String path, boolean canRead, boolean canWrite,
-        ContentLocator contentLocator )
+    public DefaultStorageFileTemplateItem( Repository repository, ResourceStoreRequest request, boolean canRead,
+        boolean canWrite, ContentLocator contentLocator )
     {
-        super( repository, path, canRead, canWrite, contentLocator );
+        super( repository, request, canRead, canWrite, contentLocator );
 
         getItemContext().put( ContentGenerator.CONTENT_GENERATOR_ID, "velocity" );
     }
@@ -49,10 +50,10 @@ public class DefaultStorageFileTemplateItem
      * @param canWrite the can write
      * @param contentLocator the content locator
      */
-    public DefaultStorageFileTemplateItem( RepositoryRouter router, String path, boolean canRead, boolean canWrite,
-        ContentLocator contentLocator )
+    public DefaultStorageFileTemplateItem( RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
+        boolean canWrite, ContentLocator contentLocator )
     {
-        super( router, path, canRead, canWrite, contentLocator );
+        super( router, request, canRead, canWrite, contentLocator );
 
         getItemContext().put( ContentGenerator.CONTENT_GENERATOR_ID, VelocityContentGenerator.class.getSimpleName() );
     }

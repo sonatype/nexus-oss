@@ -115,14 +115,14 @@ public class M1RepositoryTest
             true,
             new StringContentLocator( SPOOF_RELEASE ) );
 
-        repository.storeItem( item );
+        repository.storeItem( false, item );
 
         try
         {
             item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
                 SPOOF_SNAPSHOT ) );
 
-            repository.storeItem( item );
+            repository.storeItem( false, item );
 
             fail( "Should not be able to store snapshot to release repo" );
         }
@@ -140,14 +140,14 @@ public class M1RepositoryTest
         item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
             SPOOF_SNAPSHOT ) );
 
-        repository.storeItem( item );
+        repository.storeItem( false, item );
 
         try
         {
             item = new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true, new StringContentLocator(
                 SPOOF_RELEASE ) );
 
-            repository.storeItem( item );
+            repository.storeItem( false, item );
 
             fail( "Should not be able to store release to snapshot repo" );
         }

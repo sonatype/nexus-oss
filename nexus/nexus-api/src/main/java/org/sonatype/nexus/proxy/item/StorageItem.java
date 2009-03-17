@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.item;
 
 import java.util.Map;
 
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 
 /**
@@ -23,7 +24,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 public interface StorageItem
 {
     /**
-     * Returns the resource store request that made this item to appear.
+     * The request.
      * 
      * @return
      */
@@ -177,7 +178,7 @@ public interface StorageItem
      * 
      * @return the attributes
      */
-    Map<String, Object> getItemContext();
+    RequestContext getItemContext();
 
     /**
      * Overlay.

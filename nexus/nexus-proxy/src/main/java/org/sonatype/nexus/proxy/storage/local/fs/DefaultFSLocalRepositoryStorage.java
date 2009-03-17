@@ -201,10 +201,11 @@ public class DefaultFSLocalRepositoryStorage
         AbstractStorageItem result = null;
         if ( target.exists() && target.isDirectory() )
         {
+            request.setRequestPath( path );
 
             DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
                 repository,
-                path,
+                request,
                 target.canRead(),
                 target.canWrite() );
             coll.setModified( target.lastModified() );
@@ -215,13 +216,15 @@ public class DefaultFSLocalRepositoryStorage
         }
         else if ( target.exists() && target.isFile() && !mustBeACollection )
         {
+            request.setRequestPath( path );
+            
             if ( checkBeginOfFile( LINK_PREFIX, target ) )
             {
                 try
                 {
                     DefaultStorageLinkItem link = new DefaultStorageLinkItem(
                         repository,
-                        path,
+                        request,
                         target.canRead(),
                         target.canWrite(),
                         getLinkTarget( target ) );
@@ -236,12 +239,12 @@ public class DefaultFSLocalRepositoryStorage
 
                     target.delete();
 
-                    throw new ItemNotFoundException( uid );
+                    throw new ItemNotFoundException( request, repository );
                 }
             }
             else
             {
-                DefaultStorageFileItem file = new DefaultStorageFileItem( repository, path, target.canRead(), target
+                DefaultStorageFileItem file = new DefaultStorageFileItem( repository, request, target.canRead(), target
                     .canWrite(), new FileContentLocator( target ) );
                 getAttributesHandler().fetchAttributes( file );
                 file.setModified( target.lastModified() );
@@ -252,14 +255,8 @@ public class DefaultFSLocalRepositoryStorage
         }
         else
         {
-            throw new ItemNotFoundException( uid );
+            throw new ItemNotFoundException( request, repository );
         }
-        
-        // set the request
-        result.setResourceStoreRequest( request );
-
-        // pass over the context
-        result.getItemContext().putAll( request.getRequestContext() );
 
         return result;
     }
@@ -437,7 +434,7 @@ public class DefaultFSLocalRepositoryStorage
         }
         else
         {
-            throw new ItemNotFoundException( request.getRequestPath(), repository.getId() );
+            throw new ItemNotFoundException( request, repository );
         }
     }
 
@@ -482,12 +479,12 @@ public class DefaultFSLocalRepositoryStorage
             }
             else
             {
-                throw new ItemNotFoundException( request.getRequestPath(), repository.getId() );
+                throw new ItemNotFoundException( request, repository );
             }
         }
         else
         {
-            throw new ItemNotFoundException( request.getRequestPath(), repository.getId() );
+            throw new ItemNotFoundException( request, repository );
         }
 
         return result;

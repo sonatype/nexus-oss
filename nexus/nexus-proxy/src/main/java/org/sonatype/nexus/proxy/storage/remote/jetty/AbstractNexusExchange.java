@@ -17,6 +17,7 @@ import org.mortbay.jetty.HttpStatus;
 import org.mortbay.jetty.client.CachedExchange;
 import org.mortbay.util.DateCache;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
@@ -25,17 +26,17 @@ public abstract class AbstractNexusExchange
 {
     private final ProxyRepository repository;
 
-    private final String path;
+    private final ResourceStoreRequest request;
 
     private final DateCache dateCache;
 
-    public AbstractNexusExchange( ProxyRepository repository, String path )
+    public AbstractNexusExchange( ProxyRepository repository, ResourceStoreRequest request )
     {
         super( true );
 
         this.repository = repository;
 
-        this.path = path;
+        this.request = request;
 
         this.dateCache = new DateCache();
     }
@@ -45,9 +46,9 @@ public abstract class AbstractNexusExchange
         return repository;
     }
 
-    public String getPath()
+    public ResourceStoreRequest getResourceStoreRequest()
     {
-        return path;
+        return request;
     }
 
     protected DateCache getDateCache()
@@ -79,7 +80,7 @@ public abstract class AbstractNexusExchange
 
         if ( getResponseStatus() == HttpStatus.ORDINAL_404_Not_Found )
         {
-            throw new ItemNotFoundException( getPath(), getRepository().getId() );
+            throw new ItemNotFoundException( getResourceStoreRequest(), getRepository() );
         }
 
         if ( !doValidate() )

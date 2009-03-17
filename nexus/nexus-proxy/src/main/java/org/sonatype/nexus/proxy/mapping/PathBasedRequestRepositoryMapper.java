@@ -25,11 +25,11 @@ import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.modello.CPathMappingItem;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryRequest;
 
 /**
  * The Class PathBasedRequestRepositoryMapper filters repositories to search using supplied list of filter expressions.
@@ -59,6 +59,9 @@ public class PathBasedRequestRepositoryMapper
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
+    @Requirement
+    private RepositoryRegistry repositoryRegistry;
+
     /** The compiled flag. */
     private volatile boolean compiled = false;
 
@@ -86,13 +89,13 @@ public class PathBasedRequestRepositoryMapper
         return applicationConfiguration;
     }
 
-    public List<Repository> getMappedRepositories( RepositoryRegistry registry, RepositoryRequest request,
+    public List<Repository> getMappedRepositories( Repository repository, ResourceStoreRequest request,
         List<Repository> resolvedRepositories )
         throws NoSuchRepositoryException
     {
         if ( !compiled )
         {
-            compile( registry );
+            compile( repositoryRegistry );
         }
 
         boolean mapped = false;
@@ -104,7 +107,7 @@ public class PathBasedRequestRepositoryMapper
 
         for ( RepositoryPathMapping mapping : blockings )
         {
-            if ( mapping.matches( request ) )
+            if ( mapping.matches( repository, request ) )
             {
                 reposList.clear();
 
@@ -119,7 +122,7 @@ public class PathBasedRequestRepositoryMapper
         // include, if found a match
         for ( RepositoryPathMapping mapping : inclusions )
         {
-            if ( mapping.matches( request ) )
+            if ( mapping.matches( repository, request ) )
             {
                 if ( firstAdd )
                 {
@@ -145,7 +148,7 @@ public class PathBasedRequestRepositoryMapper
         // then, if exlude found, remove those
         for ( RepositoryPathMapping mapping : exclusions )
         {
-            if ( mapping.matches( request ) )
+            if ( mapping.matches( repository, request ) )
             {
                 mapped = true;
 

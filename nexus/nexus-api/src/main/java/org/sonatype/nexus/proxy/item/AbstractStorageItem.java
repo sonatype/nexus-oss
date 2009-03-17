@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -32,7 +33,7 @@ public abstract class AbstractStorageItem
     implements StorageItem
 {
     /** The request */
-    private ResourceStoreRequest request;
+    private transient ResourceStoreRequest request;
 
     /** The repository item uid. */
     private transient RepositoryItemUid repositoryItemUid;
@@ -40,8 +41,8 @@ public abstract class AbstractStorageItem
     /** The store. */
     private transient ResourceStore store;
 
-    /** The trasient context. */
-    private transient Map<String, Object> context;
+    /** The item context */
+    private transient RequestContext context;
 
     /** Used for versioning of attribute */
     private int generation = 0;
@@ -90,10 +91,12 @@ public abstract class AbstractStorageItem
      * @param readable the readable
      * @param writable the writable
      */
-    public AbstractStorageItem( String path, boolean readable, boolean writable )
+    public AbstractStorageItem( ResourceStoreRequest request, boolean readable, boolean writable )
     {
         super();
-        setPath( path );
+        setPath( request.getRequestPath() );
+        this.request = request;
+        this.context = new RequestContext( request.getRequestContext() );
         this.readable = readable;
         this.writable = writable;
         this.expired = false;
@@ -109,9 +112,9 @@ public abstract class AbstractStorageItem
      * @param readable the readable
      * @param writable the writable
      */
-    public AbstractStorageItem( Repository repository, String path, boolean readable, boolean writable )
+    public AbstractStorageItem( Repository repository, ResourceStoreRequest request, boolean readable, boolean writable )
     {
-        this( path, readable, writable );
+        this( request, readable, writable );
         this.store = repository;
         this.repositoryItemUid = repository.createUid( path );
         this.repositoryId = repository.getId();
@@ -126,9 +129,10 @@ public abstract class AbstractStorageItem
      * @param readable the readable
      * @param writable the writable
      */
-    public AbstractStorageItem( RepositoryRouter router, String path, boolean readable, boolean writable )
+    public AbstractStorageItem( RepositoryRouter router, ResourceStoreRequest request, boolean readable,
+        boolean writable )
     {
-        this( path, readable, writable );
+        this( request, readable, writable );
         this.store = router;
         this.repositoryItemUid = null;
         this.repositoryId = null;
@@ -158,19 +162,21 @@ public abstract class AbstractStorageItem
         }
     }
 
-    public RepositoryItemUid getRepositoryItemUid()
-    {
-        return repositoryItemUid;
-    }
-
     public ResourceStoreRequest getResourceStoreRequest()
     {
         return request;
     }
-
-    public void setResourceStoreRequest( ResourceStoreRequest request )
+    
+    public void setResourceStoreRequest(ResourceStoreRequest request)
     {
         this.request = request;
+        
+        this.context = new RequestContext( request.getRequestContext() );
+    }
+
+    public RepositoryItemUid getRepositoryItemUid()
+    {
+        return repositoryItemUid;
     }
 
     /**
@@ -314,13 +320,8 @@ public abstract class AbstractStorageItem
         return attributes;
     }
 
-    public Map<String, Object> getItemContext()
+    public RequestContext getItemContext()
     {
-        if ( context == null )
-        {
-            context = new HashMap<String, Object>();
-        }
-
         return context;
     }
 
@@ -422,7 +423,10 @@ public abstract class AbstractStorageItem
             setExpired( item.isExpired() );
             setRemoteUrl( item.getRemoteUrl() );
             getAttributes().putAll( item.getAttributes() );
-            getItemContext().putAll( item.getItemContext() );
+            if ( item.getItemContext() != null )
+            {
+                getItemContext().putAll( item.getItemContext() );
+            }
         }
         else
         {
