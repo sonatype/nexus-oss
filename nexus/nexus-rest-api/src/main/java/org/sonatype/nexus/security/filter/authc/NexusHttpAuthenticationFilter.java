@@ -13,9 +13,6 @@
  */
 package org.sonatype.nexus.security.filter.authc;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -239,6 +236,8 @@ public class NexusHttpAuthenticationFilter
         {
             return;
         }
+        
+        getLogger().info( msg );
 
         AuthcAuthzEvent evt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHC, msg );
 
