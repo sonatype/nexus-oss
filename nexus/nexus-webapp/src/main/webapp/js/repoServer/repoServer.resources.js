@@ -187,7 +187,9 @@ Sonatype.repoServer.resources.help = {
     packaging: 'Packaging type',
     classifier: 'Classifier of the uploaded artifact.  If not supplied, no classifier will be appended to the artifact.',
     extension: 'Extension of the uploaded artifact.  If not supplied, the default extension (derived from the packaging type) will be used.',
-    autoguess: 'Automatically guess the attributes by parsing the artifact file name.'
+    autoguess: 'Automatically guess the attributes by parsing the artifact file name.',
+    description: 'A description of the artifact(s) that will be uploaded, be as descriptive as necessary.',
+    gavDefinition: 'How the GAV parameters will be retrieved, either from a POM file or manually entered'
   },
 
   cronBriefHelp: {

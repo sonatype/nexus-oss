@@ -106,6 +106,8 @@
 <!-- Plugin pre BODY contributions ends here -->
 
 <div id="header">
+  <div id="branding">
+  </div>
   <div id="logo">
     <span>
       $formattedAppName

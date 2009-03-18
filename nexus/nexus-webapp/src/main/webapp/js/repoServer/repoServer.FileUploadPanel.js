@@ -11,7 +11,7 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-Sonatype.repoServer.FileUploadPanel = function(config){
+Sonatype.repoServer.ArtifactUploadPanel = function(config){
   var config = config || {};
   var defaultConfig = {
     autoScroll:true
@@ -19,204 +19,18 @@ Sonatype.repoServer.FileUploadPanel = function(config){
   Ext.apply(this, config, defaultConfig);
 
   var ht = Sonatype.repoServer.resources.help.artifact;
-
+  
+  this.fileInput = null;
+  this.pomInput = null;
+  
+  this.gavDefinitionStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['pom','From POM'],['gav','GAV Parameters']]});
+  
   var packagingStore = new Ext.data.SimpleStore( {
     fields: ['value'], 
     data: [['pom'], ['jar'], ['ejb'], ['war'], ['ear'], ['rar'], ['par'], ['maven-archetype'], ['maven-plugin']]
   } );
 
-  this.pomMode = true;
-
-  this.filenameField = new Ext.form.TextField({
-    xtype: 'textfield',
-    name: 'filenameField',
-    readOnly: true,
-    columnWidth: .9
-  });
-  this.fileInput = null;
-
-  this.pomnameField = new Ext.form.TextField({
-    xtype: 'textfield',
-    name: 'pomnameField',
-    readOnly: true,
-    columnWidth: .8
-  });
-  this.pomInput = null;
-
-  this.pomCard = 'pomCard';
-  this.attributeCard = 'attributeCard';
-  this.cardPanel = new Ext.Panel( {
-    xtype: 'panel',
-    columnWidth: .8,
-    layout: 'card',
-    activeItem: this.pomCard, 
-    items: [
-      {
-        xtype: 'fieldset',
-        id: this.pomCard,
-        labelWidth: 80,
-        checkboxToggle:false,
-        collapsed: false,
-        collapsible: false,
-        autoHeight:true,
-        layoutConfig: {
-          labelSeparator: ''
-        },
-        items: [
-          {
-            xtype: 'panel',
-            layout: 'column',
-            style: 'padding-bottom:4px',
-            hideLabel: true,
-            items: [
-              {
-                xtype: 'label',
-                text: 'POM',
-                width: 84
-              },
-              this.pomnameField,
-              {
-                xtype: 'browsebutton',
-                text: 'Browse...',
-                columnWidth: .2,
-                uploadPanel: this,
-                handler: function( b ) {
-                  b.uploadPanel.pomInput = b.detachInputFile(); 
-                  var filename = b.uploadPanel.pomInput.getValue();
-                  b.uploadPanel.pomnameField.setRawValue( filename );
-                  b.uploadPanel.updateUploadButton( b.uploadPanel );
-                }
-              }
-            ]
-          },
-          {
-            xtype: 'textfield',
-            fieldLabel: 'Classifier',
-            helpText: ht.classifier,
-            anchor: Sonatype.view.FIELD_OFFSET,
-            name: 'pomc',
-            allowBlank:true
-          },
-          {
-            xtype: 'textfield',
-            fieldLabel: 'Extension',
-            helpText: ht.extension,
-            anchor: Sonatype.view.FIELD_OFFSET,
-            name: 'pome',
-            allowBlank:true
-          }
-        ] 
-      },
-      {
-        xtype: 'fieldset',
-        labelWidth: 80,
-        checkboxToggle:false,
-        collapsed: false,
-        collapsible: false,
-        autoHeight:true,
-        id: this.attributeCard,
-        layoutConfig: {
-          labelSeparator: ''
-        },
-        items: [
-          {
-            xtype: 'checkbox',
-            fieldLabel: 'Auto Guess',
-            checked: true,
-            name: 'autoguess',
-            helpText: ht.autoguess,
-            listeners: {
-              'check': {
-                fn: function( checkbox, value ) {
-                  this.updateFilename( this );
-                },
-                scope: this
-              }
-            }
-          },
-          {
-            xtype: 'textfield',
-            fieldLabel: 'Group',
-            itemCls: 'required-field',
-            helpText: ht.groupId,
-            anchor: Sonatype.view.FIELD_OFFSET,
-            name: 'g',
-            allowBlank: false
-          },
-          {
-            xtype: 'textfield',
-            fieldLabel: 'Artifact',
-            itemCls: 'required-field',
-            helpText: ht.artifactId,
-            anchor: Sonatype.view.FIELD_OFFSET,
-            name: 'a',
-            allowBlank:false
-          },
-          {
-            xtype: 'textfield',
-            fieldLabel: 'Version',
-            itemCls: 'required-field',
-            helpText: ht.version,
-            anchor: Sonatype.view.FIELD_OFFSET,
-            name: 'v',
-            allowBlank: false,
-            uploadPanel: this,
-            validator: function( v ){
-              var isSnapshotVersion = /-SNAPSHOT$/.test( v ) || /LATEST$/.test( v ) || /^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$/.test( v );
-              var isSnapshotRepo = this.uploadPanel.payload.data.repoPolicy == 'snapshot';
-              if ( isSnapshotRepo ) {
-                if ( ! isSnapshotVersion ) {
-                  return 'You cannot upload a release version into a snapshot repository';
-                }
-              }
-              else {
-                if ( isSnapshotVersion ) {
-                  return 'You cannot upload a snapshot version into a release repository';
-                }
-              }
-              return true;
-            }
-          },
-          {
-            xtype: 'combo',
-            fieldLabel: 'Packaging',
-            itemCls: 'required-field',
-            helpText: ht.packaging,
-            store: packagingStore,
-            displayField: 'value',
-            editable: true,
-            forceSelection: false,
-            mode: 'local',
-            triggerAction: 'all',
-            emptyText: 'Select...',
-            selectOnFocus: true,
-            allowBlank: false,
-            name: 'p',
-            width: 150,
-            listWidth: 150
-          },
-          {
-            xtype: 'textfield',
-            fieldLabel: 'Classifier',
-            helpText: ht.classifier,
-            anchor: Sonatype.view.FIELD_OFFSET,
-            name: 'c',
-            allowBlank:true
-          },
-          {
-            xtype: 'textfield',
-            fieldLabel: 'Extension',
-            helpText: ht.extension,
-            anchor: Sonatype.view.FIELD_OFFSET,
-            name: 'e',
-            allowBlank:true
-          }
-        ]
-      }
-    ]
-  } );
-
-  Sonatype.repoServer.FileUploadPanel.superclass.constructor.call(this, {
+  Sonatype.repoServer.ArtifactUploadPanel.superclass.constructor.call(this, {
     autoScroll: true,
     border: true,
     bodyBorder: true,
@@ -229,7 +43,6 @@ Sonatype.repoServer.FileUploadPanel = function(config){
     layoutConfig: {
       labelSeparator: ''
     },
-        
     items: [
       {
         xtype: 'hidden',
@@ -239,279 +52,251 @@ Sonatype.repoServer.FileUploadPanel = function(config){
       {
         xtype: 'fieldset',
         checkboxToggle:false,
-        title: 'Select a File For Upload',
+        title: 'Select Artifact(s) for Upload',
         collapsible: false,
         autoHeight:true,
         items: [
           {
-            xtype: 'panel',
-            layout: 'column',
             hideLabel: true,
-            items: [
-              this.filenameField,
-              {
-                xtype: 'browsebutton',
-                text: 'Browse...',
-                columnWidth: .1,
-                uploadPanel: this,
-                handler: function( b ) {
-                  b.uploadPanel.fileInput = b.detachInputFile(); 
-                  var filename = b.uploadPanel.fileInput.getValue();
-                  b.uploadPanel.updateFilename( b.uploadPanel, filename );
-                }
-              }
-            ] 
-          }
-        ]
-      },
-      {
-        xtype: 'fieldset',
-        checkboxToggle:false,
-        title: 'Specify Artifact Information',
-        collapsible: false,
-        autoHeight:true,
-        layout: 'column',
-        items: [
+            xtype: 'browsebutton',
+            text: 'Select Artifact to Upload...',
+            style :'margin-bottom: 5px;',
+            uploadPanel: this,
+            handler: function( b ) {
+              b.uploadPanel.fileInput = b.detachInputFile(); 
+              var filename = b.uploadPanel.fileInput.getValue();
+              b.uploadPanel.updateFilename( b.uploadPanel, filename );
+            }
+          },
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Filename',
+            name: 'filenameField',
+            anchor: Sonatype.view.FIELD_OFFSET,
+            readOnly: true,
+            allowBlank:true
+          },
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Classifier',
+            helpText: ht.classifier,
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'classifier',
+            allowBlank:true
+          },
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Extension',
+            helpText: ht.extension,
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'extension',
+            allowBlank:true
+          },
+          {
+            xtype: 'combo',
+            lazyInit: false,
+            fieldLabel: 'GAV Definition',
+            itemCls: 'required-field',
+            helpText: ht.gavDefinition,
+            name: 'gavDefinition',
+            store: this.gavDefinitionStore,
+            valueField:'value',
+            displayField:'display',
+            editable: false,
+            forceSelection: true,
+            mode: 'local',
+            triggerAction: 'all',
+            selectOnFocus:true,
+            emptyText: 'Select...',
+            allowBlank: false,
+            value: 'pom'
+          },
           {
             xtype: 'panel',
-            columnWidth: .15,
+            id: 'gav-definition-card-panel',
+            header: false,
+            layout: 'card',
+            region: 'center',
+            activeItem: 0,
+            bodyStyle: 'padding:15px',
+            deferredRender: false,
+            autoScroll: false,
+            frame: false,
             items: [
-              {xtype: 'panel',
-               items: [
               {
-                xtype: 'radio',
-                boxLabel: 'POM File',
-                name: 'hasPom',
-                value: 'true',
-                checked: true,
-                listeners: {
-                  'check': {
-                    fn: function( checkbox, checked ) {
-                      if ( checked ) {
-                        this.cardPanel.layout.setActiveItem( this.pomCard );
-                        this.pomMode = true;
-                      }
-                      this.updateUploadButton( this );
-                    },
-                    scope: this
+                  xtype: 'fieldset',
+                  checkboxToggle:false,
+                  title: 'GAV Details',
+                  anchor: Sonatype.view.FIELDSET_OFFSET,
+                  collapsible: false,
+                  autoHeight:true,
+                  layoutConfig: {
+                    labelSeparator: ''
+                  },
+                  items: [
+                  {
+                    xtype: 'label',
+                    text: 'Select a GAV Definition to enter details.'
                   }
-                }
+                ]
               },
               {
-                xtype: 'radio',
-                boxLabel: 'Attributes',
-                name: 'hasPom',
-                value: 'false',
-                listeners: {
-                  'check': {
-                    fn: function( checkbox, checked ) {
-                      if ( checked ) {
-                        this.cardPanel.layout.setActiveItem( this.attributeCard );
-//                        this.cardPanel.findById( this.attributeCard ).find( 'name', 'p' )[0].setWidth( 150 );
-                        this.pomMode = false;
-                      }
-                      this.updateUploadButton( this );
-                    },
-                    scope: this
+                xtype: 'fieldset',
+                checkboxToggle:false,
+                title: 'GAV details',
+                collapsible: false,
+                autoHeight:true,
+                items: [
+                  {
+                    hideLabel: true,
+                    xtype: 'browsebutton',
+                    text: 'Select POM to Upload...',
+                    style :'margin-bottom: 5px;',
+                    uploadPanel: this,
+                    handler: function( b ) {
+                      b.uploadPanel.pomInput = b.detachInputFile(); 
+                      var filename = b.uploadPanel.pomInput.getValue();
+                      b.uploadPanel.updatePomFilename( b.uploadPanel, filename );
+                    }
+                  },
+                  {
+                    xtype: 'textfield',
+                    fieldLabel: 'POM Filename',
+                    name: 'pomnameField',
+                    anchor: Sonatype.view.FIELD_OFFSET,
+                    readOnly: true,
+                    allowBlank:false,
+                    itemCls: 'required-field',
+                    disabled: true
                   }
-                }
+                ]
+              },
+              {
+                xtype: 'fieldset',
+                checkboxToggle:false,
+                title: 'GAV details',
+                collapsible: false,
+                autoHeight:true,
+                items: [
+                  {
+                    xtype: 'checkbox',
+                    fieldLabel: 'Auto Guess',
+                    checked: true,
+                    name: 'autoguess',
+                    helpText: ht.autoguess,
+                    listeners: {
+                      'check': {
+                        fn: function( checkbox, value ) {
+                          this.updateFilename( this );
+                        },
+                        scope: this
+                      }
+                    },
+                    disabled: true
+                  },
+                  {
+                    xtype: 'textfield',
+                    fieldLabel: 'Group',
+                    itemCls: 'required-field',
+                    helpText: ht.groupId,
+                    anchor: Sonatype.view.FIELD_OFFSET,
+                    name: 'g',
+                    allowBlank: false,
+                    disabled: true
+                  },
+                  {
+                    xtype: 'textfield',
+                    fieldLabel: 'Artifact',
+                    itemCls: 'required-field',
+                    helpText: ht.artifactId,
+                    anchor: Sonatype.view.FIELD_OFFSET,
+                    name: 'a',
+                    allowBlank:false,
+                    disabled: true
+                  },
+                  {
+                    xtype: 'textfield',
+                    fieldLabel: 'Version',
+                    itemCls: 'required-field',
+                    helpText: ht.version,
+                    anchor: Sonatype.view.FIELD_OFFSET,
+                    name: 'v',
+                    allowBlank: false,
+                    uploadPanel: this,
+                    validator: function( v ){
+                      var isSnapshotVersion = /-SNAPSHOT$/.test( v ) || /LATEST$/.test( v ) || /^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$/.test( v );
+                      var isSnapshotRepo = this.uploadPanel.payload.data.repoPolicy == 'snapshot';
+                      if ( isSnapshotRepo ) {
+                        if ( ! isSnapshotVersion ) {
+                          return 'You cannot upload a release version into a snapshot repository';
+                        }
+                      }
+                      else {
+                        if ( isSnapshotVersion ) {
+                          return 'You cannot upload a snapshot version into a release repository';
+                        }
+                      }
+                      return true;
+                    },
+                    disabled: true
+                  },
+                  {
+                    xtype: 'combo',
+                    fieldLabel: 'Packaging',
+                    itemCls: 'required-field',
+                    helpText: ht.packaging,
+                    store: packagingStore,
+                    displayField: 'value',
+                    editable: true,
+                    forceSelection: false,
+                    mode: 'local',
+                    triggerAction: 'all',
+                    emptyText: 'Select...',
+                    selectOnFocus: true,
+                    allowBlank: false,
+                    name: 'p',
+                    width: 150,
+                    listWidth: 150,
+                    disabled: true
+                  }
+                ]
               }
-              ]}
             ]
           },
-          this.cardPanel
-        ]
-      }
-    ],
-
-    buttons: [
-      {
-        text: 'Upload',
-        id: 'upload-button',
-        handler: function() {
-          if ( this.pomMode || this.form.isValid() ) {
-            this.doUpload();
+          {
+            xtype: 'button',
+            id: 'upload-button',
+            text: 'Upload Artifact',
+            handler: this.uploadArtifacts,
+            scope: this
           }
-        },
-        disabled: true,
-        scope: this
-      },
-      {
-        text: 'Reset',
-        handler: function() {
-          this.form.reset();
-          this.pomMode = true;
-        },
-        scope: this
+        ]
       }
     ]
   });
-
-  if ( Ext.isIE ) this.filenameField.on(
-    'render',
-    function( c ) {
-      this.filenameField.ownerCt.doLayout();
-    },
-    this
-  );
 };
 
-Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
-
-  updateUploadButton: function( p ) {
-    var filesSelected = p.filenameField.getValue().length > 0 &&
-      ( ! p.pomMode || p.pomnameField.getValue().length > 0 );
-    p.buttons[0].setDisabled( ! filesSelected );
-  },
-  
-  doUpload: function() {
-    Sonatype.MessageBox.wait( 'Uploading...' );
-    this.createUploadForm();
-  },
-
-  createUploadForm: function() {
-    var repoId = this.payload.id;
-    repoId = repoId.substring( repoId.lastIndexOf( '/' ) + 1 );
-
-    var repoTag = {
-      tag: 'input',
-      type: 'hidden',
-      name: 'r',
-      value: repoId
-    }
-
-    var tmpForm = Ext.getBody().createChild({
-      tag: 'form',
-      cls: 'x-hidden',
-      id: Ext.id(),
-      children:
-        this.pomMode ?
-          [
-            repoTag,
-            {
-              tag: 'input',
-              type: 'hidden',
-              name: 'hasPom',
-              value: 'true'
-            },
-            {
-                tag: 'input',
-                type: 'hidden',
-                name: 'c',
-                value: this.form.findField( 'pomc' ).getValue()
-              },
-              {
-                tag: 'input',
-                type: 'hidden',
-                name: 'e',
-                value: this.form.findField( 'pome' ).getValue()
-              }
-          ]
-        :
-          [
-            repoTag,
-            {
-              tag: 'input',
-              type: 'hidden',
-              name: 'g',
-              value: this.form.findField( 'g' ).getValue()
-            },
-            {
-              tag: 'input',
-              type: 'hidden',
-              name: 'a',
-              value: this.form.findField( 'a' ).getValue()
-            },
-            {
-              tag: 'input',
-              type: 'hidden',
-              name: 'v',
-              value: this.form.findField( 'v' ).getValue()
-            },
-            {
-              tag: 'input',
-              type: 'hidden',
-              name: 'p',
-              value: this.form.findField( 'p' ).getValue()
-            },
-            {
-              tag: 'input',
-              type: 'hidden',
-              name: 'c',
-              value: this.form.findField( 'c' ).getValue()
-            },
-            {
-              tag: 'input',
-              type: 'hidden',
-              name: 'e',
-              value: this.form.findField( 'e' ).getValue()
-            }
-          ]
-    });
-
-    if ( this.pomMode ) {
-      this.pomInput.appendTo( tmpForm );
-    }
-    this.fileInput.appendTo( tmpForm );
-    
-    Ext.Ajax.request({
-      url: Sonatype.config.repos.urls.upload,
-      form : tmpForm,
-      isUpload : true,
-      callback: function( options, success, response ) {
-        tmpForm.remove();
-
-        //This is a hack to get around the fact that upload submit always returns
-        //success = true
-        if ( response.responseXML.title == '' ) {
-          Sonatype.MessageBox.show({
-            title: 'Upload Complete',
-            msg: 'Artifact upload finished successfully',
-            buttons: Sonatype.MessageBox.OK,
-            icon: Sonatype.MessageBox.INFO
-          });
-        }
-        else {
-          var s = 'Artifact upload failed.<br />';
-          var r = response.responseText;
-          var n1 = r.toLowerCase().indexOf( '<h3>' ) + 4;
-          var n2 = r.toLowerCase().indexOf( '</h3>' );
-          if ( n2 > n1 ) {
-            s += r.substring( n1, n2 );
-          }
-          else {
-            s += 'Check Nexus logs for more information.';
-          }
-          Sonatype.MessageBox.show({
-            title: 'Upload Failed',
-            msg: s,
-            buttons: Sonatype.MessageBox.OK,
-            icon: Sonatype.MessageBox.ERROR
-          });
-        }
-      },
-      scope : this
-    });
-  },
-  
+Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
   updateFilename: function( uploadPanel, filename ) {
+    var filenameField = uploadPanel.find('name', 'filenameField')[0];
     if ( filename ) {
-      uploadPanel.filenameField.setValue( filename );
+      filenameField.setValue( filename );
     }
     else {
-      if ( ! ( filename = uploadPanel.filenameField.getValue() ) ) {
+      if ( ! ( filename = filenameField.getValue() ) ) {
         return;
       }
     }
-
     var g = '';
     var a = '';
     var v = '';
     var c = '';
     var p = '';
     var e = '';
+    
+    var cardPanel = uploadPanel.find( 'id', 'gav-definition-card-panel')[0];
 
-    if ( uploadPanel.cardPanel.find( 'name', 'autoguess' )[0].checked ) {
+    if ( cardPanel.find( 'name', 'autoguess' )[0].checked ) {
     
       // match extension to guess the packaging
       var extensionIndex = filename.lastIndexOf( '.' );
@@ -585,14 +370,188 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
       }
     }
 
-    uploadPanel.cardPanel.find( 'name', 'g' )[0].setRawValue( g );
-    uploadPanel.cardPanel.find( 'name', 'a' )[0].setRawValue( a );
-    uploadPanel.cardPanel.find( 'name', 'v' )[0].setRawValue( v );
-    uploadPanel.cardPanel.find( 'name', 'c' )[0].setRawValue( c );
-    uploadPanel.cardPanel.find( 'name', 'p' )[0].setRawValue( p );
-    uploadPanel.cardPanel.find( 'name', 'e' )[0].setRawValue( e );
+    cardPanel.find( 'name', 'g' )[0].setRawValue( g );
+    cardPanel.find( 'name', 'a' )[0].setRawValue( a );
+    cardPanel.find( 'name', 'v' )[0].setRawValue( v );
+    cardPanel.find( 'name', 'p' )[0].setRawValue( p );
     if ( ! a ) uploadPanel.form.clearInvalid();
-    uploadPanel.updateUploadButton( uploadPanel );
+  },
+  updatePomFilename: function( uploadPanel, filename ) {
+    var filenameField = uploadPanel.find('name', 'pomnameField')[0];
+    if ( filename ) {
+      filenameField.setValue( filename );
+    }
+    else {
+      if ( ! ( filename = filenameField.getValue() ) ) {
+        return;
+      }
+    }
+  },
+  gavDefinitionSelectHandler : function(combo, record, index){
+    var gavDefinitionPanel = this.findById('gav-definition-card-panel');
+    //First disable all the items currently on screen, so they wont be validated/submitted etc
+    gavDefinitionPanel.getLayout().activeItem.items.each(function(item){
+      if ( item.xtype != 'browsebutton' ){
+        item.disable();
+      }
+    });
+    //Then find the proper card to activate (based upon the selected schedule type)
+    if (record.data.value == 'pom'){
+      gavDefinitionPanel.getLayout().setActiveItem(gavDefinitionPanel.items.itemAt(1));
+    }
+    else if (record.data.value == 'gav'){
+      gavDefinitionPanel.getLayout().setActiveItem(gavDefinitionPanel.items.itemAt(2));
+    }
+    else {
+      gavDefinitionPanel.getLayout().setActiveItem(gavDefinitionPanel.items.itemAt(0));
+    }
+    //Then enable the fields in that card
+    gavDefinitionPanel.getLayout().activeItem.items.each(function(item){
+      if ( item.xtype != 'browsebutton' ){
+        item.enable();
+        if ( item.readOnly ){
+          item.getEl().dom.readOnly = true;
+        }
+      }
+      else {
+        item.setClipSize();
+      }
+    });
+    this.doLayout();
+  },
+  uploadArtifacts : function(){
+    if ( this.form.isValid() ) {
+      this.doUpload();
+    }
+  },
+  doUpload: function() {
+    Sonatype.MessageBox.wait( 'Uploading...' );
+    this.createUploadForm();
+  },
+  createUploadForm: function() {
+    var repoId = this.payload.id;
+    repoId = repoId.substring( repoId.lastIndexOf( '/' ) + 1 );
+    var pomMode = this.find( 'name', 'gavDefinition' )[0].getValue() == 'pom';
+    
+    var repoTag = {
+      tag: 'input',
+      type: 'hidden',
+      name: 'r',
+      value: repoId
+    };
+
+    var tmpForm = Ext.getBody().createChild({
+      tag: 'form',
+      cls: 'x-hidden',
+      id: Ext.id(),
+      children:
+        pomMode ?
+          [
+            repoTag,
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'hasPom',
+              value: 'true'
+            },
+            {
+                tag: 'input',
+                type: 'hidden',
+                name: 'c',
+                value: this.form.findField( 'classifier' ).getValue()
+              },
+              {
+                tag: 'input',
+                type: 'hidden',
+                name: 'e',
+                value: this.form.findField( 'extension' ).getValue()
+              }
+          ]
+        :
+          [
+            repoTag,
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'g',
+              value: this.form.findField( 'g' ).getValue()
+            },
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'a',
+              value: this.form.findField( 'a' ).getValue()
+            },
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'v',
+              value: this.form.findField( 'v' ).getValue()
+            },
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'p',
+              value: this.form.findField( 'p' ).getValue()
+            },
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'c',
+              value: this.form.findField( 'classifier' ).getValue()
+            },
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'e',
+              value: this.form.findField( 'extension' ).getValue()
+            }
+          ]
+    });
+
+    if ( pomMode ) {
+      this.pomInput.appendTo( tmpForm );
+    }
+    this.fileInput.appendTo( tmpForm );
+    
+    Ext.Ajax.request({
+      url: Sonatype.config.repos.urls.upload,
+      form : tmpForm,
+      isUpload : true,
+      callback: function( options, success, response ) {
+        tmpForm.remove();
+
+        //This is a hack to get around the fact that upload submit always returns
+        //success = true
+        if ( response.responseXML.title == '' ) {
+          Sonatype.MessageBox.show({
+            title: 'Upload Complete',
+            msg: 'Artifact upload finished successfully',
+            buttons: Sonatype.MessageBox.OK,
+            icon: Sonatype.MessageBox.INFO
+          });
+        }
+        else {
+          var s = 'Artifact upload failed.<br />';
+          var r = response.responseText;
+          var n1 = r.toLowerCase().indexOf( '<h3>' ) + 4;
+          var n2 = r.toLowerCase().indexOf( '</h3>' );
+          if ( n2 > n1 ) {
+            s += r.substring( n1, n2 );
+          }
+          else {
+            s += 'Check Nexus logs for more information.';
+          }
+          Sonatype.MessageBox.show({
+            title: 'Upload Failed',
+            msg: s,
+            buttons: Sonatype.MessageBox.OK,
+            icon: Sonatype.MessageBox.ERROR
+          });
+        }
+      },
+      scope : this
+    });
   }
 });
 
@@ -611,15 +570,21 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
           var statusResp = Ext.decode( response.responseText );
           if ( statusResp.data ) {
             if ( statusResp.data.allowWrite ) {
-              var uploadPanel = cardPanel.add( {
+              var uploadPanel = new Sonatype.repoServer.ArtifactUploadPanel( { payload: rec } ); 
+              var card = cardPanel.add( {
                 xtype: 'panel',
                 layout: 'fit',
-                tabTitle: 'Upload',
-                items: [ new Sonatype.repoServer.FileUploadPanel( { payload: rec } ) ]
+                tabTitle: 'Artifact Upload',
+                items: [ uploadPanel ]
               } );
               
-              uploadPanel.on( 'show', function( p ) {
+              card.on( 'show', function( p ) {
+                // This is a hack to fix the width of the edit box in IE
                 p.doLayout();
+                p.find('name', 'filenameField')[0].setValue('.');
+                p.find('name', 'filenameField')[0].setValue('');
+                
+                // another hack to make the whole browse button clickable
                 if ( ! p.browseButtonsUpdated ) {
                   var b = p.find( 'xtype', 'browsebutton' );
                   for ( var i = 0; i < b.length; i++ ) {
@@ -627,12 +592,17 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
                   }
                   p.browseButtonsUpdated = true;
                 }
+                
+                var gavDefComboField = p.find( 'name', 'gavDefinition' )[0];
+                //another hack to fix the combo box lists
+                gavDefComboField.syncSize();
+                gavDefComboField.on('select', p.items.items[0].gavDefinitionSelectHandler, p.items.items[0]);
               } );
             }
             else {
               cardPanel.add( {
                 xtype: 'panel',
-                tabTitle: 'Upload',
+                tabTitle: 'Artifact Upload',
                 items: [
                   {
                     border: false,
