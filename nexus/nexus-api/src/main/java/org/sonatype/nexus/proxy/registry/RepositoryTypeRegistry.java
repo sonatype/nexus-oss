@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.registry;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -31,6 +32,13 @@ public interface RepositoryTypeRegistry
      * @return a modifiable set of repository type descriptors or empty set.
      */
     Set<RepositoryTypeDescriptor> getRepositoryTypeDescriptors();
+
+    /**
+     * List existing ContentClasses that exists in system.
+     * 
+     * @return
+     */
+    Collection<ContentClass> listRepositoryContentClasses();
 
     /**
      * Returns an unmodifiable set of FQN of classes that are known that provides Repository components.

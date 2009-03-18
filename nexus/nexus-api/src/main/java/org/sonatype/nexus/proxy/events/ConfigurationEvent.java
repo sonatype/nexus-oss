@@ -21,10 +21,8 @@ package org.sonatype.nexus.proxy.events;
 public abstract class ConfigurationEvent
     extends AbstractEvent
 {
-
     public ConfigurationEvent()
     {
         super();
     }
-
 }

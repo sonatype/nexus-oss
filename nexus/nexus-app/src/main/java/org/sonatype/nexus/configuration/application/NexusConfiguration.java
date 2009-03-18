@@ -18,10 +18,9 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.modello.CRepository;
-import org.sonatype.nexus.configuration.modello.Configuration;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
@@ -73,7 +72,7 @@ public interface NexusConfiguration
     RemoteStorageContext getRemoteStorageContext();
 
     Repository createRepositoryFromModel( Configuration configuration, CRepository repository )
-        throws InvalidConfigurationException;
+        throws ConfigurationException;
 
     // ------------------------------------------------------------------
     // Booting
@@ -90,6 +89,13 @@ public interface NexusConfiguration
      */
     Map<String, String> getConfigurationFiles();
 
+    /**
+     * Loads the config file.
+     * 
+     * @param key
+     * @return
+     * @throws IOException
+     */
     InputStream getConfigurationAsStreamByKey( String key )
         throws IOException;
 }

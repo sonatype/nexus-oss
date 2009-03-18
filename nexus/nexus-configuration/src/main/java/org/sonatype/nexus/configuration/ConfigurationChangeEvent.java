@@ -55,5 +55,4 @@ public class ConfigurationChangeEvent
     {
         return changes;
     }
-
 }

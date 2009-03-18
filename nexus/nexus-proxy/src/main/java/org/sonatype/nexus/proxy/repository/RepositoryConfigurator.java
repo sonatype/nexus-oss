@@ -15,10 +15,34 @@ package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.configuration.model.CRepository;
 
+/**
+ * A component responsible for "apply" (config -> repo) and "prepare" (repo -> config) steps.
+ * 
+ * @author cstamas
+ */
 public interface RepositoryConfigurator
 {
-    public void configure( Repository old, ApplicationConfiguration configuration, CRepository repo )
+    /**
+     * Will apply the configuration is parameter repo to the repository.
+     * 
+     * @param repository
+     * @param configuration
+     * @param repoConfig
+     * @throws ConfigurationException
+     */
+    void applyConfiguration( Repository repository, ApplicationConfiguration configuration, CRepository repoConfig )
+        throws ConfigurationException;
+
+    /**
+     * Will prepare repoConfig for save, by syncing it with repository state.
+     * 
+     * @param repository
+     * @param configuration
+     * @param repoConfig
+     * @throws ConfigurationException
+     */
+    void prepareForSave( Repository repository, ApplicationConfiguration configuration, CRepository repoConfig )
         throws ConfigurationException;
 }

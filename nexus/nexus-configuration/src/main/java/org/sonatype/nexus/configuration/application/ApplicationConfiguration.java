@@ -16,7 +16,7 @@ package org.sonatype.nexus.configuration.application;
 import java.io.File;
 import java.io.IOException;
 
-import org.sonatype.nexus.configuration.modello.Configuration;
+import org.sonatype.nexus.configuration.model.Configuration;
 
 /**
  * ApplicationConfiguration is the main component to have and maintain configuration.

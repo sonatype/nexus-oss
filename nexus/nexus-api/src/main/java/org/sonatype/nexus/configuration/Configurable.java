@@ -16,7 +16,8 @@ public interface Configurable<T>
     T getCurrentConfiguration();
 
     /**
-     * Sets the configuration object and calls configure().
+     * Sets the configuration object and calls configure(). A shortcut for setCurrentConfiguration(config) and then
+     * configure() calls.
      * 
      * @param config
      * @throws ConfigurationException

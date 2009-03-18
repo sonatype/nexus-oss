@@ -16,7 +16,7 @@ package org.sonatype.nexus.configuration.source;
 import java.io.IOException;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.modello.Configuration;
+import org.sonatype.nexus.configuration.model.Configuration;
 
 /**
  * The Interface ApplicationConfigurationSource, responsible to fetch Nexus user configuration by some means. It also

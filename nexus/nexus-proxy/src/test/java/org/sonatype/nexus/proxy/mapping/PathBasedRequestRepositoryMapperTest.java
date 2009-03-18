@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.modello.CPathMappingItem;
+import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;

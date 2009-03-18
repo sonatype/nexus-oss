@@ -1,6 +1,6 @@
 package org.sonatype.nexus.email;
 
-import org.sonatype.nexus.configuration.modello.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 
 public interface SmtpSettingsValidator
 {

@@ -37,15 +37,13 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CMirror;
+import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
@@ -70,8 +68,10 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.cache.CacheManager;
+import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.http.HttpProxyService;
@@ -113,6 +113,9 @@ public class DefaultNexus
     extends AbstractLogEnabled
     implements Nexus, Initializable, Startable
 {
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
+
     /**
      * The nexus configuration.
      */
@@ -573,50 +576,14 @@ public class DefaultNexus
         nexusConfiguration.deleteRepository( id );
     }
 
-    // CRepositoryShadow: CRUD
-
-    public Collection<CRepositoryShadow> listRepositoryShadows()
-    {
-        return nexusConfiguration.listRepositoryShadows();
-    }
-
-    public void createRepositoryShadow( CRepositoryShadow settings )
-        throws ConfigurationException,
-            IOException
-    {
-        nexusConfiguration.createRepositoryShadow( settings );
-    }
-
-    public CRepositoryShadow readRepositoryShadow( String id )
-        throws NoSuchRepositoryException
-    {
-        return nexusConfiguration.readRepositoryShadow( id );
-    }
-
-    public void updateRepositoryShadow( CRepositoryShadow settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {
-        nexusConfiguration.updateRepositoryShadow( settings );
-    }
-
-    public void deleteRepositoryShadow( String id )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {
-        nexusConfiguration.deleteRepositoryShadow( id );
-    }
-
     // CGroupsSettingPathMapping: CRUD
 
-    public Collection<CGroupsSettingPathMappingItem> listGroupsSettingPathMapping()
+    public Collection<CPathMappingItem> listGroupsSettingPathMapping()
     {
         return nexusConfiguration.listGroupsSettingPathMapping();
     }
 
-    public void createGroupsSettingPathMapping( CGroupsSettingPathMappingItem settings )
+    public void createGroupsSettingPathMapping( CPathMappingItem settings )
         throws NoSuchRepositoryException,
             ConfigurationException,
             IOException
@@ -624,13 +591,13 @@ public class DefaultNexus
         nexusConfiguration.createGroupsSettingPathMapping( settings );
     }
 
-    public CGroupsSettingPathMappingItem readGroupsSettingPathMapping( String id )
+    public CPathMappingItem readGroupsSettingPathMapping( String id )
         throws IOException
     {
         return nexusConfiguration.readGroupsSettingPathMapping( id );
     }
 
-    public void updateGroupsSettingPathMapping( CGroupsSettingPathMappingItem settings )
+    public void updateGroupsSettingPathMapping( CPathMappingItem settings )
         throws NoSuchRepositoryException,
             ConfigurationException,
             IOException
@@ -642,44 +609,6 @@ public class DefaultNexus
         throws IOException
     {
         nexusConfiguration.deleteGroupsSettingPathMapping( id );
-    }
-
-    // CRepositoryGroup: CRUD
-
-    public Collection<CRepositoryGroup> listRepositoryGroups()
-    {
-        return nexusConfiguration.listRepositoryGroups();
-    }
-
-    public void createRepositoryGroup( CRepositoryGroup settings )
-        throws NoSuchRepositoryException,
-            InvalidGroupingException,
-            IOException,
-            ConfigurationException
-    {
-        nexusConfiguration.createRepositoryGroup( settings );
-    }
-
-    public CRepositoryGroup readRepositoryGroup( String id )
-        throws NoSuchRepositoryException
-    {
-        return nexusConfiguration.readRepositoryGroup( id );
-    }
-
-    public void updateRepositoryGroup( CRepositoryGroup settings )
-        throws NoSuchRepositoryException,
-            InvalidGroupingException,
-            IOException,
-            ConfigurationException
-    {
-        nexusConfiguration.updateRepositoryGroup( settings );
-    }
-
-    public void deleteRepositoryGroup( String id )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        nexusConfiguration.deleteRepositoryGroup( id );
     }
 
     public Collection<CRepositoryTarget> listRepositoryTargets()
@@ -839,15 +768,15 @@ public class DefaultNexus
         return null;
     }
 
-    public void clearAllCaches( String path )
+    public void clearAllCaches( ResourceStoreRequest request )
     {
         for ( Repository repository : repositoryRegistry.getRepositories() )
         {
-            repository.clearCaches( path );
+            repository.clearCaches( request );
         }
     }
 
-    public void clearRepositoryCaches( String path, String repositoryId )
+    public void clearRepositoryCaches( ResourceStoreRequest request, String repositoryId )
         throws NoSuchRepositoryException
     {
         repositoryRegistry.getRepository( repositoryId ).clearCaches( path );
@@ -1558,14 +1487,8 @@ public class DefaultNexus
 
         getLogger().info( sysInfoLog.toString() );
 
-        // EventInspectorHost -- BEGIN
-        // tying in eventInspectorHost to all event producers
-        repositoryRegistry.addProximityEventListener( eventInspectorHost );
-
-        nexusConfiguration.addProximityEventListener( eventInspectorHost );
-
-        security.addProximityEventListener( eventInspectorHost );
-        // EventInspectorHost -- END
+        // EventInspectorHost
+        applicationEventMulticaster.addProximityEventListener( eventInspectorHost );
 
         applicationStatusSource.setState( SystemState.STOPPED );
 
@@ -1611,21 +1534,13 @@ public class DefaultNexus
             // applies configuration and notifies listeners
             nexusConfiguration.loadConfiguration( true );
 
-            // essential service
-            security.startService();
-
-            // essential service
-            cacheManager.startService();
-
             // create internals
             nexusConfiguration.createInternals();
 
             // notify about start
-            nexusConfiguration.notifyProximityEventListeners( new ConfigurationChangeEvent( nexusConfiguration, null ) );
-
-            feedRecorder.startService();
-
-            nexusScheduler.startService();
+            applicationEventMulticaster.notifyProximityEventListeners( new ConfigurationChangeEvent(
+                nexusConfiguration,
+                null ) );
 
             addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Starting Nexus (version "
                 + getSystemStatus().getVersion() + " " + getSystemStatus().getEditionShort() + ")" );
@@ -1686,7 +1601,7 @@ public class DefaultNexus
                 "Started Nexus (version " + getSystemStatus().getVersion() + " " + getSystemStatus().getEditionShort()
                     + ")" );
 
-            nexusConfiguration.notifyProximityEventListeners( new NexusStartedEvent() );
+            applicationEventMulticaster.notifyProximityEventListeners( new NexusStartedEvent() );
         }
         catch ( IOException e )
         {
@@ -1724,13 +1639,9 @@ public class DefaultNexus
         addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version " + getSystemStatus().getVersion()
             + " " + getSystemStatus().getEditionShort() + ")" );
 
-        nexusConfiguration.notifyProximityEventListeners( new NexusStoppedEvent() );
+        applicationEventMulticaster.notifyProximityEventListeners( new NexusStoppedEvent() );
 
-        httpProxyService.stopService();
-
-        nexusScheduler.stopService();
-
-        security.stopService();
+        nexusConfiguration.dropInternals();
 
         try
         {
@@ -1740,19 +1651,6 @@ public class DefaultNexus
         {
             getLogger().error( "Error while stopping IndexerManager:", e );
         }
-
-        feedRecorder.stopService();
-
-        try
-        {
-            cacheManager.stopService();
-        }
-        catch ( IllegalStateException e )
-        {
-            getLogger().error( "Error while stopping CacheManager:", e );
-        }
-
-        nexusConfiguration.dropInternals();
 
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPED );
 

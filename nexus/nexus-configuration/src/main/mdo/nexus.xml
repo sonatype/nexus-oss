@@ -17,7 +17,7 @@
   <defaults>
     <default>
       <key>package</key>
-      <value>org.sonatype.nexus.configuration.modello</value>
+      <value>org.sonatype.nexus.configuration.model</value>
     </default>
   </defaults>
 

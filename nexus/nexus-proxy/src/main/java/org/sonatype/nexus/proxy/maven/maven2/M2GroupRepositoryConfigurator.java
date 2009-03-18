@@ -17,7 +17,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepositoryConfigurator;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;

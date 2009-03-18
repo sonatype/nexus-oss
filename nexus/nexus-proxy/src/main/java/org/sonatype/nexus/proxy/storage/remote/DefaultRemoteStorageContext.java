@@ -16,7 +16,7 @@ package org.sonatype.nexus.proxy.storage.remote;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 
 /**
  * The default remote storage context.

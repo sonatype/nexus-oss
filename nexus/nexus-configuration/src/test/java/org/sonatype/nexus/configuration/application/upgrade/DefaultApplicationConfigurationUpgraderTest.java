@@ -20,8 +20,8 @@ import java.util.TimeZone;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
-import org.sonatype.nexus.configuration.modello.Configuration;
-import org.sonatype.nexus.configuration.modello.io.xpp3.NexusConfigurationXpp3Writer;
+import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 
 public class DefaultApplicationConfigurationUpgraderTest
     extends AbstractNexusTestCase

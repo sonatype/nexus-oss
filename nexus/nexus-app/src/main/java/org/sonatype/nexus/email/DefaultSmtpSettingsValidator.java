@@ -13,7 +13,7 @@ import org.sonatype.micromailer.EmailerConfiguration;
 import org.sonatype.micromailer.MailRequest;
 import org.sonatype.micromailer.MailRequestStatus;
 import org.sonatype.micromailer.imp.DefaultMailType;
-import org.sonatype.nexus.configuration.modello.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 
 /**
  * @author velo

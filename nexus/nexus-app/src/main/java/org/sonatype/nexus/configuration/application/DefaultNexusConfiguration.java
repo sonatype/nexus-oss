@@ -27,31 +27,30 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
-import org.sonatype.nexus.configuration.application.source.ApplicationConfigurationSource;
-import org.sonatype.nexus.configuration.application.validator.ApplicationConfigurationValidator;
-import org.sonatype.nexus.configuration.application.validator.ApplicationValidationContext;
-import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CMirror;
+import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
+import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
+import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
-import org.sonatype.nexus.proxy.EventMulticasterComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -75,9 +74,11 @@ import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
  */
 @Component( role = NexusConfiguration.class )
 public class DefaultNexusConfiguration
-    extends EventMulticasterComponent
+    extends AbstractLogEnabled
     implements NexusConfiguration
 {
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
 
     /**
      * The configuration source.
@@ -190,9 +191,6 @@ public class DefaultNexusConfiguration
                     getConfiguration().getGlobalHttpProxySettings() );
             }
 
-            // and register things
-            runtimeConfigurationBuilder.initialize( this );
-
             applyConfiguration();
         }
     }
@@ -209,7 +207,7 @@ public class DefaultNexusConfiguration
 
         wastebasketDirectory = null;
 
-        notifyProximityEventListeners( new ConfigurationChangeEvent( this, null ) );
+        applicationEventMulticaster.notifyProximityEventListeners( new ConfigurationChangeEvent( this, null ) );
     }
 
     public void saveConfiguration()
@@ -321,21 +319,9 @@ public class DefaultNexusConfiguration
     }
 
     public Repository createRepositoryFromModel( Configuration configuration, CRepository repository )
-        throws InvalidConfigurationException
+        throws ConfigurationException
     {
         return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repository );
-    }
-
-    public ShadowRepository createRepositoryFromModel( Configuration configuration, CRepositoryShadow repositoryShadow )
-        throws InvalidConfigurationException
-    {
-        return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repositoryShadow );
-    }
-
-    public GroupRepository createRepositoryFromModel( Configuration configuration, CRepositoryGroup repositoryGroup )
-        throws InvalidConfigurationException
-    {
-        return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repositoryGroup );
     }
 
     public Collection<ContentClass> listRepositoryContentClasses()
@@ -459,36 +445,6 @@ public class DefaultNexusConfiguration
 
             repositoryRegistry.addRepository( repository );
         }
-
-        if ( getConfiguration().getRepositoryShadows() != null )
-        {
-            List<CRepositoryShadow> shadows = getConfiguration().getRepositoryShadows();
-            for ( CRepositoryShadow shadow : shadows )
-            {
-                Repository repository = createRepositoryFromModel( getConfiguration(), shadow );
-
-                // shadows has no index
-                repositoryRegistry.addRepository( repository );
-            }
-        }
-
-        if ( getConfiguration().getRepositoryGrouping() != null
-            && getConfiguration().getRepositoryGrouping().getRepositoryGroups() != null )
-        {
-            List<CRepositoryGroup> groups = getConfiguration().getRepositoryGrouping().getRepositoryGroups();
-
-            for ( CRepositoryGroup group : groups )
-            {
-                if ( group.getName() == null )
-                {
-                    group.setName( group.getGroupId() );
-                }
-
-                GroupRepository repository = createRepositoryFromModel( getConfiguration(), group );
-
-                repositoryRegistry.addRepository( repository );
-            }
-        }
     }
 
     protected void dropRepositories()
@@ -503,9 +459,6 @@ public class DefaultNexusConfiguration
             {
                 // will not happen
             }
-
-            // unregister it as config listener if needed
-            removeProximityEventListener( repository );
         }
     }
 
@@ -691,21 +644,6 @@ public class DefaultNexusConfiguration
 
         fillValidationContextRepositoryIds( result );
 
-        fillValidationContextRepositoryShadowIds( result );
-
-        return result;
-    }
-
-    protected ApplicationValidationContext getRepositoryGroupValidationContext()
-    {
-        ApplicationValidationContext result = new ApplicationValidationContext();
-
-        fillValidationContextRepositoryIds( result );
-
-        fillValidationContextRepositoryShadowIds( result );
-
-        fillValidationContextRepositoryGroupIds( result );
-
         return result;
     }
 
@@ -720,36 +658,6 @@ public class DefaultNexusConfiguration
             for ( CRepository repo : repositories )
             {
                 context.getExistingRepositoryIds().add( repo.getId() );
-            }
-        }
-    }
-
-    private void fillValidationContextRepositoryShadowIds( ApplicationValidationContext context )
-    {
-        context.addExistingRepositoryShadowIds();
-
-        List<CRepositoryShadow> repositoryShadows = getConfiguration().getRepositoryShadows();
-
-        if ( repositoryShadows != null )
-        {
-            for ( CRepositoryShadow repo : repositoryShadows )
-            {
-                context.getExistingRepositoryShadowIds().add( repo.getId() );
-            }
-        }
-    }
-
-    private void fillValidationContextRepositoryGroupIds( ApplicationValidationContext context )
-    {
-        context.addExistingRepositoryGroupIds();
-
-        List<CRepositoryGroup> repositoryGroups = getConfiguration().getRepositoryGrouping().getRepositoryGroups();
-
-        if ( repositoryGroups != null )
-        {
-            for ( CRepositoryGroup repoGroup : repositoryGroups )
-            {
-                context.getExistingRepositoryGroupIds().add( repoGroup.getGroupId() );
             }
         }
     }
@@ -831,13 +739,10 @@ public class DefaultNexusConfiguration
             throw new NoSuchRepositoryException( settings.getId() );
         }
 
-        Repository newRepository = runtimeConfigurationBuilder.updateRepositoryFromModel(
-            repository,
-            getConfiguration(),
-            settings );
+        runtimeConfigurationBuilder.updateRepositoryFromModel( repository, getConfiguration(), settings );
 
         // replace it with new one
-        repositoryRegistry.updateRepository( newRepository );
+        repositoryRegistry.updateRepository( repository );
 
         List<CRepository> reposes = getConfiguration().getRepositories();
 
@@ -917,11 +822,11 @@ public class DefaultNexusConfiguration
         // pahMappings
         // (correction, since registry is completely unaware of this component)
 
-        List<CGroupsSettingPathMappingItem> pathMappings = getConfiguration().getRepositoryGrouping().getPathMappings();
+        List<CPathMappingItem> pathMappings = getConfiguration().getRepositoryGrouping().getPathMappings();
 
-        for ( Iterator<CGroupsSettingPathMappingItem> i = pathMappings.iterator(); i.hasNext(); )
+        for ( Iterator<CPathMappingItem> i = pathMappings.iterator(); i.hasNext(); )
         {
-            CGroupsSettingPathMappingItem item = i.next();
+            CPathMappingItem item = i.next();
 
             item.removeRepository( id );
         }
@@ -950,194 +855,9 @@ public class DefaultNexusConfiguration
         throw new NoSuchRepositoryException( id );
     }
 
-    // CRepositoryShadow: CRUD
-
-    protected void validateRepositoryShadow( CRepositoryShadow settings, boolean create )
-        throws ConfigurationException
-    {
-        ApplicationValidationContext ctx = getRepositoryValidationContext();
-
-        if ( !create && !StringUtils.isEmpty( settings.getId() ) )
-        {
-            // remove "itself" from the list to avoid hitting "duplicate repo" problem
-            ctx.getExistingRepositoryShadowIds().remove( settings.getId() );
-        }
-
-        ValidationResponse vr = configurationValidator.validateRepository( ctx, settings );
-
-        if ( !vr.isValid() )
-        {
-            throw new InvalidConfigurationException( vr );
-        }
-    }
-
-    public Collection<CRepositoryShadow> listRepositoryShadows()
-    {
-        return new ArrayList<CRepositoryShadow>( getConfiguration().getRepositoryShadows() );
-    }
-
-    public void createRepositoryShadow( CRepositoryShadow settings )
-        throws ConfigurationException,
-            IOException
-    {
-        validateRepositoryShadow( settings, true );
-
-        Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfiguration(), settings );
-
-        repositoryRegistry.addRepository( repository );
-
-        getConfiguration().getRepositoryShadows().add( settings );
-
-        applyAndSaveConfiguration();
-    }
-
-    public CRepositoryShadow readRepositoryShadow( String id )
-        throws NoSuchRepositoryException
-    {
-        repositoryRegistry.getRepositoryWithFacet( id, ShadowRepository.class );
-
-        List<CRepositoryShadow> shadows = getConfiguration().getRepositoryShadows();
-
-        for ( Iterator<CRepositoryShadow> i = shadows.iterator(); i.hasNext(); )
-        {
-            CRepositoryShadow shadow = i.next();
-            if ( shadow.getId().equals( id ) )
-            {
-                return shadow;
-            }
-        }
-
-        throw new NoSuchRepositoryException( id );
-    }
-
-    public void updateRepositoryShadow( CRepositoryShadow settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {
-        validateRepositoryShadow( settings, false );
-
-        ShadowRepository repository = repositoryRegistry.getRepositoryWithFacet(
-            settings.getId(),
-            ShadowRepository.class );;
-
-        Repository newRepository = runtimeConfigurationBuilder.updateRepositoryFromModel(
-            repository,
-            getConfiguration(),
-            settings );
-
-        // replace it with new one
-        repositoryRegistry.updateRepository( newRepository );
-
-        List<CRepositoryShadow> reposes = getConfiguration().getRepositoryShadows();
-
-        for ( int i = 0; i < reposes.size(); i++ )
-        {
-            CRepositoryShadow repo = reposes.get( i );
-
-            if ( repo.getId().equals( settings.getId() ) )
-            {
-                reposes.remove( i );
-
-                reposes.add( i, settings );
-
-                applyAndSaveConfiguration();
-
-                return;
-            }
-        }
-    }
-
-    public void deleteRepositoryShadow( String id )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {
-        ShadowRepository repository = repositoryRegistry.getRepositoryWithFacet( id, ShadowRepository.class );
-
-        repository.setLocalStatus( LocalStatus.OUT_OF_SERVICE );
-
-        // remove dependants too
-
-        // =======
-        // shadows
-        // (fail if any repo references the currently processing one)
-        if ( getConfiguration().getRepositoryShadows() != null && getConfiguration().getRepositoryShadows().size() > 0 )
-        {
-            List<CRepositoryShadow> shadows = getConfiguration().getRepositoryShadows();
-
-            for ( Iterator<CRepositoryShadow> i = shadows.iterator(); i.hasNext(); )
-            {
-                CRepositoryShadow shadow = i.next();
-
-                if ( repository.getId().equals( shadow.getShadowOf() ) )
-                {
-                    throw new ConfigurationException( "The repository with ID='" + id
-                        + "' is not deletable, it has dependant repositories!" );
-                }
-            }
-        }
-
-        // ======
-        // groups
-        // (correction in config only, registry DOES handle it)
-
-        // do we have groups at all?
-        if ( getConfiguration().getRepositoryGrouping() != null
-            && getConfiguration().getRepositoryGrouping().getRepositoryGroups() != null )
-        {
-            // all existing groups
-            List<CRepositoryGroup> groups = getConfiguration().getRepositoryGrouping().getRepositoryGroups();
-
-            // if any group reference this repository, remove that reference
-            for ( CRepositoryGroup group : groups )
-            {
-                if ( group.getRepositories().contains( id ) )
-                {
-                    group.getRepositories().remove( id );
-                }
-            }
-        }
-
-        // ===========
-        // pahMappings
-        // (correction, since registry is completely unaware of this component)
-
-        List<CGroupsSettingPathMappingItem> pathMappings = getConfiguration().getRepositoryGrouping().getPathMappings();
-
-        for ( Iterator<CGroupsSettingPathMappingItem> i = pathMappings.iterator(); i.hasNext(); )
-        {
-            CGroupsSettingPathMappingItem item = i.next();
-
-            item.removeRepository( id );
-        }
-
-        // ===========
-        // and finally
-        // this cleans it properly from the registry (from reposes and repo groups)
-        repositoryRegistry.removeRepository( id );
-
-        List<CRepositoryShadow> shadows = getConfiguration().getRepositoryShadows();
-
-        for ( Iterator<CRepositoryShadow> i = shadows.iterator(); i.hasNext(); )
-        {
-            CRepositoryShadow shadow = i.next();
-            if ( shadow.getId().equals( id ) )
-            {
-                i.remove();
-
-                applyAndSaveConfiguration();
-
-                return;
-            }
-        }
-
-        throw new NoSuchRepositoryException( id );
-    }
-
     // CGroupsSettingPathMapping: CRUD
 
-    protected void validateRoutePattern( CGroupsSettingPathMappingItem settings )
+    protected void validateRoutePattern( CPathMappingItem settings )
         throws ConfigurationException
     {
         ValidationResponse res = configurationValidator.validateGroupsSettingPathMappingItem( null, settings );
@@ -1148,13 +868,12 @@ public class DefaultNexusConfiguration
         }
     }
 
-    public Collection<CGroupsSettingPathMappingItem> listGroupsSettingPathMapping()
+    public Collection<CPathMappingItem> listGroupsSettingPathMapping()
     {
         if ( getConfiguration().getRepositoryGrouping() != null
             && getConfiguration().getRepositoryGrouping().getPathMappings() != null )
         {
-            return new ArrayList<CGroupsSettingPathMappingItem>( getConfiguration()
-                .getRepositoryGrouping().getPathMappings() );
+            return new ArrayList<CPathMappingItem>( getConfiguration().getRepositoryGrouping().getPathMappings() );
         }
         else
         {
@@ -1162,7 +881,7 @@ public class DefaultNexusConfiguration
         }
     }
 
-    public void createGroupsSettingPathMapping( CGroupsSettingPathMappingItem settings )
+    public void createGroupsSettingPathMapping( CPathMappingItem settings )
         throws NoSuchRepositoryException,
             ConfigurationException,
             IOException
@@ -1179,14 +898,14 @@ public class DefaultNexusConfiguration
         applyAndSaveConfiguration();
     }
 
-    public CGroupsSettingPathMappingItem readGroupsSettingPathMapping( String id )
+    public CPathMappingItem readGroupsSettingPathMapping( String id )
         throws IOException
     {
-        List<CGroupsSettingPathMappingItem> items = getConfiguration().getRepositoryGrouping().getPathMappings();
+        List<CPathMappingItem> items = getConfiguration().getRepositoryGrouping().getPathMappings();
 
-        for ( Iterator<CGroupsSettingPathMappingItem> i = items.iterator(); i.hasNext(); )
+        for ( Iterator<CPathMappingItem> i = items.iterator(); i.hasNext(); )
         {
-            CGroupsSettingPathMappingItem mapping = i.next();
+            CPathMappingItem mapping = i.next();
 
             if ( mapping.getId().equals( id ) )
             {
@@ -1197,24 +916,24 @@ public class DefaultNexusConfiguration
         return null;
     }
 
-    public void updateGroupsSettingPathMapping( CGroupsSettingPathMappingItem settings )
+    public void updateGroupsSettingPathMapping( CPathMappingItem settings )
         throws NoSuchRepositoryException,
             ConfigurationException,
             IOException
     {
         validateRoutePattern( settings );
 
-        List<CGroupsSettingPathMappingItem> items = getConfiguration().getRepositoryGrouping().getPathMappings();
+        List<CPathMappingItem> items = getConfiguration().getRepositoryGrouping().getPathMappings();
 
-        for ( Iterator<CGroupsSettingPathMappingItem> i = items.iterator(); i.hasNext(); )
+        for ( Iterator<CPathMappingItem> i = items.iterator(); i.hasNext(); )
         {
-            CGroupsSettingPathMappingItem mapping = i.next();
+            CPathMappingItem mapping = i.next();
 
             if ( mapping.getId().equals( settings.getId() ) )
             {
                 mapping.setRouteType( settings.getRouteType() );
 
-                mapping.setRoutePattern( settings.getRoutePattern() );
+                mapping.setRoutePatterns( settings.getRoutePatterns() );
 
                 mapping.setRepositories( settings.getRepositories() );
 
@@ -1234,11 +953,11 @@ public class DefaultNexusConfiguration
             return;
         }
 
-        List<CGroupsSettingPathMappingItem> items = getConfiguration().getRepositoryGrouping().getPathMappings();
+        List<CPathMappingItem> items = getConfiguration().getRepositoryGrouping().getPathMappings();
 
-        for ( Iterator<CGroupsSettingPathMappingItem> i = items.iterator(); i.hasNext(); )
+        for ( Iterator<CPathMappingItem> i = items.iterator(); i.hasNext(); )
         {
-            CGroupsSettingPathMappingItem mapping = i.next();
+            CPathMappingItem mapping = i.next();
 
             if ( mapping.getId().equals( id ) )
             {
@@ -1246,129 +965,6 @@ public class DefaultNexusConfiguration
             }
         }
 
-        applyAndSaveConfiguration();
-    }
-
-    // CRepositoryGroup: CRUD
-
-    protected void validateRepositoryGroup( CRepositoryGroup settings, boolean create )
-        throws ConfigurationException
-    {
-        ApplicationValidationContext ctx = getRepositoryGroupValidationContext();
-
-        if ( !create && !StringUtils.isEmpty( settings.getGroupId() ) )
-        {
-            ctx.getExistingRepositoryGroupIds().remove( settings.getGroupId() );
-        }
-
-        ValidationResponse vr = configurationValidator.validateRepositoryGroup( ctx, settings );
-
-        if ( !vr.isValid() )
-        {
-            throw new InvalidConfigurationException( vr );
-        }
-
-    }
-
-    public Collection<CRepositoryGroup> listRepositoryGroups()
-    {
-        return new ArrayList<CRepositoryGroup>( getConfiguration().getRepositoryGrouping().getRepositoryGroups() );
-    }
-
-    public void createRepositoryGroup( CRepositoryGroup settings )
-        throws ConfigurationException,
-            IOException
-    {
-        validateRepositoryGroup( settings, true );
-
-        GroupRepository repository = runtimeConfigurationBuilder.createRepositoryFromModel(
-            getConfiguration(),
-            settings );
-
-        repositoryRegistry.addRepository( repository );
-
-        getConfiguration().getRepositoryGrouping().addRepositoryGroup( settings );
-
-        applyAndSaveConfiguration();
-    }
-
-    public CRepositoryGroup readRepositoryGroup( String id )
-        throws NoSuchRepositoryException
-    {
-        repositoryRegistry.getRepositoryWithFacet( id, GroupRepository.class );
-
-        List<CRepositoryGroup> groups = getConfiguration().getRepositoryGrouping().getRepositoryGroups();
-
-        for ( Iterator<CRepositoryGroup> i = groups.iterator(); i.hasNext(); )
-        {
-            CRepositoryGroup group = i.next();
-
-            if ( group.getGroupId().equals( id ) )
-            {
-                return group;
-            }
-        }
-
-        throw new NoSuchRepositoryException( id );
-    }
-
-    public void updateRepositoryGroup( CRepositoryGroup settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {
-        validateRepositoryGroup( settings, false );
-
-        GroupRepository repository = repositoryRegistry.getRepositoryWithFacet(
-            settings.getGroupId(),
-            GroupRepository.class );
-
-        GroupRepository newRepository = runtimeConfigurationBuilder.updateRepositoryFromModel(
-            repository,
-            getConfiguration(),
-            settings );
-
-        // replace it with new one
-        repositoryRegistry.updateRepository( newRepository );
-
-        List<CRepositoryGroup> groups = getConfiguration().getRepositoryGrouping().getRepositoryGroups();
-
-        for ( int i = 0; i < groups.size(); i++ )
-        {
-            CRepositoryGroup repo = groups.get( i );
-
-            if ( repo.getGroupId().equals( settings.getGroupId() ) )
-            {
-                groups.remove( i );
-
-                groups.add( i, settings );
-
-                applyAndSaveConfiguration();
-
-                return;
-            }
-        }
-    }
-
-    public void deleteRepositoryGroup( String id )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        repositoryRegistry.getRepositoryWithFacet( id, GroupRepository.class );
-
-        repositoryRegistry.removeRepository( id );
-
-        List<CRepositoryGroup> groups = getConfiguration().getRepositoryGrouping().getRepositoryGroups();
-
-        for ( Iterator<CRepositoryGroup> i = groups.iterator(); i.hasNext(); )
-        {
-            CRepositoryGroup group = i.next();
-
-            if ( group.getGroupId().equals( id ) )
-            {
-                i.remove();
-            }
-        }
         applyAndSaveConfiguration();
     }
 

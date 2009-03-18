@@ -27,7 +27,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -256,7 +256,7 @@ public abstract class AbstractRepository
             doValidateConfiguration( getCurrentConfiguration() );
         }
 
-        getRepositoryConfigurator().configure( this, applicationConfiguration, getCurrentConfiguration() );
+        getRepositoryConfigurator().applyConfiguration( this, applicationConfiguration, getCurrentConfiguration() );
     }
 
     public abstract RepositoryConfigurationValidator getRepositoryConfigurationValidator();

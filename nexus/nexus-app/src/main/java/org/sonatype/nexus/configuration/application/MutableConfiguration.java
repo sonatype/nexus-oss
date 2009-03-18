@@ -18,17 +18,16 @@ import java.util.Collection;
 import java.util.List;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.modello.CMirror;
-import org.sonatype.nexus.configuration.modello.CPathMappingItem;
-import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.modello.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.modello.CRemoteNexusInstance;
-import org.sonatype.nexus.configuration.modello.CRepository;
-import org.sonatype.nexus.configuration.modello.CRepositoryTarget;
-import org.sonatype.nexus.configuration.modello.CRouting;
-import org.sonatype.nexus.configuration.modello.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.CMirror;
+import org.sonatype.nexus.configuration.model.CPathMappingItem;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryTarget;
+import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
 public interface MutableConfiguration
@@ -63,12 +62,6 @@ public interface MutableConfiguration
         throws IOException;
 
     // ----------------------------------------------------------------------------
-    // ContentClasses
-    // ----------------------------------------------------------------------------
-
-    Collection<ContentClass> listRepositoryContentClasses();
-
-    // ----------------------------------------------------------------------------
     // Scheduled Tasks
     // ----------------------------------------------------------------------------
 
@@ -89,6 +82,10 @@ public interface MutableConfiguration
 
     void setForceBaseUrl( boolean force )
         throws IOException;
+
+    int getSessionExpiration();
+
+    void setSessionExpiration( int value );
 
     // ------------------------------------------------------------------
     // CRUD-like ops on config sections

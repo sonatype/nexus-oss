@@ -14,7 +14,7 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.configuration.modello.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;

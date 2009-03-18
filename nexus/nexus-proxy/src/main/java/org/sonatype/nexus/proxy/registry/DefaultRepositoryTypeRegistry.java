@@ -13,9 +13,11 @@
  */
 package org.sonatype.nexus.proxy.registry;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.PlexusContainer;
@@ -37,6 +39,9 @@ public class DefaultRepositoryTypeRegistry
 {
     @Requirement
     private PlexusContainer container;
+
+    @Requirement( role = ContentClass.class )
+    private Map<String, ContentClass> contentClasses;
 
     private Set<RepositoryTypeDescriptor> repositoryRoles;
 
@@ -68,6 +73,11 @@ public class DefaultRepositoryTypeRegistry
         }
 
         return Collections.unmodifiableSet( result );
+    }
+
+    public Collection<ContentClass> listRepositoryContentClasses()
+    {
+        return Collections.unmodifiableCollection( contentClasses.values() );
     }
 
     public Set<String> getExistingRepositoryHints( String role )

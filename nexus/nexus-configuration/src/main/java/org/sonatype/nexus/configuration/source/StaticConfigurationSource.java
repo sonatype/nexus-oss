@@ -18,7 +18,7 @@ import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.modello.Configuration;
+import org.sonatype.nexus.configuration.model.Configuration;
 
 /**
  * A special "static" configuration source, that always return a factory provided defaults for Nexus configuration. It

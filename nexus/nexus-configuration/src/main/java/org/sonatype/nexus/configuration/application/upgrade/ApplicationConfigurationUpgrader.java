@@ -16,7 +16,7 @@ package org.sonatype.nexus.configuration.application.upgrade;
 import java.io.File;
 import java.io.IOException;
 
-import org.sonatype.nexus.configuration.modello.Configuration;
+import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.configuration.upgrade.UnsupportedConfigurationVersionException;
 

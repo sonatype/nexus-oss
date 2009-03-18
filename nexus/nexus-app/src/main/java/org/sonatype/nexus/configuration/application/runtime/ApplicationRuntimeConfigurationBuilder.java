@@ -13,10 +13,9 @@
  */
 package org.sonatype.nexus.configuration.application.runtime;
 
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.modello.CRepository;
-import org.sonatype.nexus.configuration.modello.Configuration;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -27,11 +26,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public interface ApplicationRuntimeConfigurationBuilder
 {
-    void initialize( NexusConfiguration configuration );
+    Repository createRepositoryFromModel( Configuration configuration, CRepository repoConf )
+        throws ConfigurationException;
 
-    Repository createRepositoryFromModel( Configuration configuration, CRepository repository )
-        throws InvalidConfigurationException;
-
-    Repository updateRepositoryFromModel( Repository old, Configuration configuration, CRepository repository )
-        throws InvalidConfigurationException;
+    void updateRepositoryFromModel( Repository repository, Configuration configuration, CRepository repoConf )
+        throws ConfigurationException;
 }

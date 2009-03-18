@@ -26,8 +26,7 @@ import org.sonatype.micromailer.MailRequest;
 import org.sonatype.micromailer.imp.DefaultMailType;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.modello.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.events.EventListener;
@@ -47,9 +46,6 @@ public class DefaultNexusEmailer
 
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
-
-    @Requirement
-    private NexusConfiguration configuration;
 
     private CSmtpConfiguration smtp;
 

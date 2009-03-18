@@ -15,22 +15,22 @@ package org.sonatype.nexus.configuration.validator;
 
 import java.util.List;
 
-import org.sonatype.nexus.configuration.modello.CHttpProxySettings;
-import org.sonatype.nexus.configuration.modello.CMirror;
-import org.sonatype.nexus.configuration.modello.CPathMappingItem;
-import org.sonatype.nexus.configuration.modello.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.modello.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.modello.CRemoteNexusInstance;
-import org.sonatype.nexus.configuration.modello.CRepository;
-import org.sonatype.nexus.configuration.modello.CRepositoryGrouping;
-import org.sonatype.nexus.configuration.modello.CRepositoryTarget;
-import org.sonatype.nexus.configuration.modello.CRestApiSettings;
-import org.sonatype.nexus.configuration.modello.CRouting;
-import org.sonatype.nexus.configuration.modello.CScheduleConfig;
-import org.sonatype.nexus.configuration.modello.CScheduledTask;
-import org.sonatype.nexus.configuration.modello.CSecurity;
-import org.sonatype.nexus.configuration.modello.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.CHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CMirror;
+import org.sonatype.nexus.configuration.model.CPathMappingItem;
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
+import org.sonatype.nexus.configuration.model.CRepositoryTarget;
+import org.sonatype.nexus.configuration.model.CRestApiSettings;
+import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CScheduleConfig;
+import org.sonatype.nexus.configuration.model.CScheduledTask;
+import org.sonatype.nexus.configuration.model.CSecurity;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 
 /**
  * The validator used to validate current configuration in boot-up sequence.

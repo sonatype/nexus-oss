@@ -15,8 +15,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.modello.CMirror;
-import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.configuration.model.CMirror;
+import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
@@ -39,23 +39,26 @@ public class AbstractRepositoryConfigurator
     @Requirement( role = PluginRepositoryConfigurator.class )
     private Map<String, PluginRepositoryConfigurator> pluginRepositoryConfigurators;
 
-    public final void configure( Repository repository, ApplicationConfiguration configuration, CRepository repo )
+    public final void applyConfiguration( Repository repository, ApplicationConfiguration configuration,
+        CRepository repoConfig )
         throws ConfigurationException
     {
-        // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
-        // later we will see about it
-        PlexusConfiguration externalConfiguration = null;
-
-        if ( repo.getExternalConfiguration() != null )
+        if ( repoConfig.getExternalConfiguration() == null )
         {
-            externalConfiguration = new XmlPlexusConfiguration( (Xpp3Dom) repo.getExternalConfiguration() );
+            // just put an elephant in South Africa to find it for sure ;)
+            repoConfig.setExternalConfiguration( new Xpp3Dom( "externalConfiguration" ) );
         }
 
-        preConfigure( repository, configuration, repo, externalConfiguration );
+        // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
+        // later we will see about it
+        PlexusConfiguration externalConfiguration = new XmlPlexusConfiguration( (Xpp3Dom) repoConfig
+            .getExternalConfiguration() );
 
-        doConfigure( repository, configuration, repo, externalConfiguration );
+        preConfigure( repository, configuration, repoConfig, externalConfiguration );
 
-        postConfigure( repository, configuration, repo, externalConfiguration );
+        doConfigure( repository, configuration, repoConfig, externalConfiguration );
+
+        postConfigure( repository, configuration, repoConfig, externalConfiguration );
     }
 
     protected void preConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
@@ -75,7 +78,7 @@ public class AbstractRepositoryConfigurator
         repository.setNotFoundCacheActive( repo.isNotFoundCacheActive() );
 
         List<CMirror> mirrors = (List<CMirror>) repo.getMirrors();
-        
+
         if ( mirrors != null && mirrors.size() > 0 )
         {
             List<Mirror> runtimeMirrors = new ArrayList<Mirror>();
@@ -91,7 +94,7 @@ public class AbstractRepositoryConfigurator
         {
             repository.getPublishedMirrors().setMirrors( null );
         }
-        
+
         // Setting common things on a repository
 
         // NX-198: filling up the default variable to store the "default" local URL
@@ -170,6 +173,130 @@ public class AbstractRepositoryConfigurator
         {
             repository.getNotFoundCache().purge();
         }
+    }
+
+    public final void prepareForSave( Repository repository, ApplicationConfiguration configuration,
+        CRepository repoConfig )
+        throws ConfigurationException
+    {
+        if ( repoConfig.getExternalConfiguration() == null )
+        {
+            // just put an elephant in South Africa to find it for sure ;)
+            repoConfig.setExternalConfiguration( new Xpp3Dom( "externalConfiguration" ) );
+        }
+
+        // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
+        // later we will see about it
+        PlexusConfiguration externalConfiguration = new XmlPlexusConfiguration( (Xpp3Dom) repoConfig
+            .getExternalConfiguration() );
+
+        prePrepare( repository, configuration, repoConfig, externalConfiguration );
+
+        doPrepare( repository, configuration, repoConfig, externalConfiguration );
+
+        postPrepare( repository, configuration, repoConfig, externalConfiguration );
+    }
+
+    protected void prePrepare( Repository repository, ApplicationConfiguration configuration, CRepository repo,
+        PlexusConfiguration externalConfiguration )
+        throws ConfigurationException
+    {
+        repo.setId( repository.getId() );
+        repo.setName( repository.getName() );
+        repo.setPathPrefix( repository.getPathPrefix() );
+        repo.setLocalStatus( repository.getLocalStatus().toString() );
+        repo.setAllowWrite( repository.isAllowWrite() );
+        repo.setBrowseable( repository.isBrowseable() );
+        repo.setIndexable( repository.isIndexable() );
+        repo.setNotFoundCacheTTL( repository.getNotFoundCacheTimeToLive() );
+        repo.setUserManaged( repository.isUserManaged() );
+        repo.setExposed( repository.isExposed() );
+        repo.setNotFoundCacheActive( repository.isNotFoundCacheActive() );
+
+        List<CMirror> mirrors = (List<CMirror>) repo.getMirrors();
+
+        if ( mirrors != null && mirrors.size() > 0 )
+        {
+            List<Mirror> runtimeMirrors = new ArrayList<Mirror>();
+
+            for ( CMirror mirror : mirrors )
+            {
+                runtimeMirrors.add( new Mirror( mirror.getId(), mirror.getUrl() ) );
+            }
+
+            repository.getPublishedMirrors().setMirrors( runtimeMirrors );
+        }
+        else
+        {
+            repository.getPublishedMirrors().setMirrors( null );
+        }
+
+        // Setting common things on a repository
+
+        // NX-198: filling up the default variable to store the "default" local URL
+        File defaultStorageFile = new File( new File( configuration.getWorkingDirectory(), "storage" ), repository
+            .getId() );
+
+        try
+        {
+            repo.defaultLocalStorageUrl = defaultStorageFile.toURL().toString();
+        }
+        catch ( MalformedURLException e )
+        {
+            // will not happen, not user settable
+            throw new InvalidConfigurationException( "Malformed URL for LocalRepositoryStorage!", e );
+        }
+
+        String localUrl = null;
+
+        if ( repo.getLocalStorage() != null && !StringUtils.isEmpty( repo.getLocalStorage().getUrl() ) )
+        {
+            localUrl = repo.getLocalStorage().getUrl();
+        }
+        else
+        {
+            localUrl = repo.defaultLocalStorageUrl;
+
+            // Default dir is going to be valid
+            defaultStorageFile.mkdirs();
+        }
+
+        LocalRepositoryStorage ls = getLocalRepositoryStorage( repo.getId(), repo.getLocalStorage().getProvider() );
+
+        try
+        {
+            ls.validateStorageUrl( localUrl );
+
+            repository.setLocalUrl( localUrl );
+            repository.setLocalStorage( ls );
+        }
+        catch ( StorageException e )
+        {
+            ValidationResponse response = new ApplicationValidationResponse();
+
+            ValidationMessage error = new ValidationMessage(
+                "overrideLocalStorageUrl",
+                "Repository has an invalid local storage URL '" + localUrl,
+                "Invalid file location" );
+
+            response.addValidationError( error );
+
+            throw new InvalidConfigurationException( response );
+        }
+    }
+
+    protected void doPrepare( Repository repository, ApplicationConfiguration configuration, CRepository repo,
+        PlexusConfiguration externalConfiguration )
+        throws ConfigurationException
+    {
+        // nothing
+    }
+
+    protected void postPrepare( Repository repository, ApplicationConfiguration configuration, CRepository repo,
+        PlexusConfiguration externalConfiguration )
+        throws ConfigurationException
+    {
+        // nothing
     }
 
     // ==

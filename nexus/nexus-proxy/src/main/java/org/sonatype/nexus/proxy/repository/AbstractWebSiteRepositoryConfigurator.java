@@ -20,7 +20,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.modello.CRepository;
+import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 
 public abstract class AbstractWebSiteRepositoryConfigurator

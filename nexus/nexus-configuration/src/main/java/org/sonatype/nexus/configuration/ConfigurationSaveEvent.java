@@ -11,14 +11,20 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.repository;
+package org.sonatype.nexus.configuration;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
 
-public interface RepositoryConfigurationValidator
+/**
+ * An event fired on configuration save.
+ * 
+ * @author cstamas
+ */
+public class ConfigurationSaveEvent
+    extends ConfigurationIOEvent
 {
-    public void validate( ApplicationConfiguration configuration, CRepository repo )
-        throws ConfigurationException;
+    public ConfigurationSaveEvent( ApplicationConfiguration configuration )
+    {
+        super( configuration );
+    }
 }

@@ -26,8 +26,8 @@ import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedExceptio
 import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.upgrade.Upgrader;
 
-@Component( role = Upgrader.class, hint = "1.0.7" )
-public class Upgrade107to108
+@Component( role = Upgrader.class, hint = "1.0.8" )
+public class Upgrade108to140
     extends AbstractLogEnabled
     implements Upgrader
 {/*

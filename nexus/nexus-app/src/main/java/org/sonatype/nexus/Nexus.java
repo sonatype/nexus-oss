@@ -22,11 +22,11 @@ import java.util.concurrent.RejectedExecutionException;
 
 import org.sonatype.nexus.configuration.application.MutableConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.modello.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.modello.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.modello.CRepository;
-import org.sonatype.nexus.configuration.modello.CRouting;
-import org.sonatype.nexus.configuration.modello.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
@@ -42,6 +42,7 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
@@ -115,22 +116,15 @@ public interface Nexus
     NexusStreamResponse getApplicationLogAsStream( String logFile, long fromByte, long bytesCount )
         throws IOException;
 
-    void clearAllCaches( String path );
+    void clearAllCaches( ResourceStoreRequest request );
 
-    void clearRepositoryCaches( String path, String repositoryId )
+    void clearRepositoryCaches( ResourceStoreRequest request, String repositoryId )
         throws NoSuchRepositoryException;
 
-    void clearRepositoryGroupCaches( String path, String repositoryGroupId )
-        throws NoSuchRepositoryException;
-
-    void reindexAllRepositories( String path )
+    void reindexAllRepositories( ResourceStoreRequest request )
         throws IOException;
 
-    void reindexRepository( String path, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException;
-
-    void reindexRepositoryGroup( String path, String repositoryGroupId )
+    void reindexRepository( ResourceStoreRequest request, String repositoryId )
         throws NoSuchRepositoryException,
             IOException;
 
@@ -141,10 +135,6 @@ public interface Nexus
         throws IOException,
             NoSuchRepositoryException;
 
-    void publishRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException,
-            NoSuchRepositoryException;
-
     void downloadAllIndex()
         throws IOException;
 
@@ -152,29 +142,17 @@ public interface Nexus
         throws IOException,
             NoSuchRepositoryException;
 
-    void downloadRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException,
-            NoSuchRepositoryException;
-
-    void rebuildAttributesAllRepositories( String path )
+    void rebuildAttributesAllRepositories( ResourceStoreRequest request )
         throws IOException;
 
-    void rebuildAttributesRepository( String path, String repositoryId )
+    void rebuildAttributesRepository( ResourceStoreRequest request, String repositoryId )
         throws NoSuchRepositoryException,
             IOException;
 
-    void rebuildAttributesRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryException,
-            IOException;
-
-    void rebuildMavenMetadataAllRepositories( String path )
+    void rebuildMavenMetadataAllRepositories( ResourceStoreRequest request )
         throws IOException;
 
-    void rebuildMavenMetadataRepository( String path, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException;
-
-    void rebuildMavenMetadataRepositoryGroup( String path, String repositoryGroupId )
+    void rebuildMavenMetadataRepository( ResourceStoreRequest request, String repositoryId )
         throws NoSuchRepositoryException,
             IOException;
 
@@ -182,10 +160,6 @@ public interface Nexus
         throws IOException;
 
     Collection<String> evictRepositoryUnusedProxiedItems( long timestamp, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException;
-
-    Collection<String> evictRepositoryGroupUnusedProxiedItems( long timestamp, String repositoryGroupId )
         throws NoSuchRepositoryException,
             IOException;
 

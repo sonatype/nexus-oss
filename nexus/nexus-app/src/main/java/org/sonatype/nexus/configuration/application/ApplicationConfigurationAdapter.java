@@ -18,7 +18,7 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.configuration.modello.Configuration;
+import org.sonatype.nexus.configuration.model.Configuration;
 
 /**
  * Adapter for NexusConfiguration.
