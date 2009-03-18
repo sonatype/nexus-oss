@@ -38,6 +38,7 @@ import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesValidationTests
 import org.sonatype.nexus.integrationtests.nexus1560.Nexus1560LegacyAllowGroupRulesTest;
 import org.sonatype.nexus.integrationtests.nexus1560.Nexus1560LegacyAllowRulesTest;
 import org.sonatype.nexus.integrationtests.nexus1560.Nexus1560LegacyDenyRulesTest;
+import org.sonatype.nexus.integrationtests.nexus1563.Nexus1563ExternalRealmsLoginTest;
 import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleTest;
 import org.sonatype.nexus.integrationtests.nexus167.Nexus167ReleaseToSnapshotTest;
 import org.sonatype.nexus.integrationtests.nexus168.Nexus168SnapshotToReleaseTest;
@@ -186,7 +187,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     //Nexus1592ViewPrivTest.class
     Nexus1560LegacyAllowRulesTest.class,
     Nexus1560LegacyAllowGroupRulesTest.class,
-    Nexus1560LegacyDenyRulesTest.class
+    Nexus1560LegacyDenyRulesTest.class,
+    Nexus1563ExternalRealmsLoginTest    
 } )
 public class IntegrationTestSuiteClassesSecurity
 {

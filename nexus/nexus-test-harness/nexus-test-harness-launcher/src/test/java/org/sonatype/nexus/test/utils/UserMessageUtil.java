@@ -297,4 +297,10 @@ public class UserMessageUtil
         return user;
     }
 
+    public List<PlexusUserResource> searchPlexusUsers( String source )
+    throws IOException
+    {
+        return searchPlexusUsers( source, "" );
+    }
+
 }

@@ -19,6 +19,7 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.jsecurity.locators.users.PlexusRole;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
 import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
 import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
@@ -150,6 +151,11 @@ public class SimpleUserLocator
         user.setEmailAddress( simpleUser.getEmail() );
         user.setName( simpleUser.getName() );
         user.setUserId( simpleUser.getUserId() );
+        for ( String role : simpleUser.getRoles() )
+        {
+            PlexusRole plexusRole = new PlexusRole( role, role, role );
+            user.addRole( plexusRole );
+        }
         // set the source of this user to this
         user.setSource( this.getSource() );
 

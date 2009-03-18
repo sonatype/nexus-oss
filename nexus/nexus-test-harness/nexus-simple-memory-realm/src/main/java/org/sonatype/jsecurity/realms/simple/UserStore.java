@@ -31,25 +31,28 @@ public class UserStore
         // 100% correct)
         // If you have 2 'jcoder' users, (if the 'jcoder' defined in the primary realm does not have any privileges the
         // user will not be able to login to Nexus.
-        // to work around this, just assign the user the correct privileges. 
+        // to work around this, just assign the user the correct privileges.
 
         SimpleUser admin = new SimpleUser();
         admin.setEmail( "admin-simple@sample.com" );
         admin.setName( "Simple Administrator" );
         admin.setUserId( "admin-simple" );
         admin.setPassword( "admin123" );
+        admin.addRole( "role-123" );
 
         SimpleUser deployment = new SimpleUser();
         deployment.setEmail( "deployment-simple@sample.com" );
         deployment.setName( "Simple Developer" );
         deployment.setUserId( "deployment-simple" );
         deployment.setPassword( "deployment123" );
+        deployment.addRole( "role-abc" );
 
         SimpleUser anonymous = new SimpleUser();
         anonymous.setEmail( "anonymous-simple@sample.com" );
         anonymous.setName( "Simple Anonymous" );
         anonymous.setUserId( "anonymous-simple" );
         anonymous.setPassword( "anonymous" );
+        anonymous.addRole( "role-xyz" );
 
         // put the users in a map
         this.userMap.put( admin.getUserId(), admin );

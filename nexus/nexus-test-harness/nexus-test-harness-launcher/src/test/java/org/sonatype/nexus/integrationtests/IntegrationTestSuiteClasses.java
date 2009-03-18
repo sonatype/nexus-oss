@@ -38,6 +38,7 @@ import org.sonatype.nexus.integrationtests.nexus142.Nexus142UserValidationTests;
 import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesValidationTests;
+import org.sonatype.nexus.integrationtests.nexus1563.Nexus1563ExternalRealmsTest;
 import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleTest;
 import org.sonatype.nexus.integrationtests.nexus167.Nexus167ReleaseToSnapshotTest;
 import org.sonatype.nexus.integrationtests.nexus168.Nexus168SnapshotToReleaseTest;
@@ -210,7 +211,8 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1116.Nexus1116InvalidPr
     Nexus1329MirrorOnlyTest.class,
     Nexus1329RetryMirrorTest.class,
     Nexus1329UnavailableTest.class,
-    Nexus1696ValidateBaseUrl.class
+    Nexus1696ValidateBaseUrl.class,
+    Nexus1563ExternalRealmsTest.class
 } )
 public class IntegrationTestSuiteClasses
 {
