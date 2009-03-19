@@ -17,15 +17,19 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
+import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CProps;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
@@ -46,6 +50,9 @@ import org.sonatype.nexus.configuration.model.v1_0_8.io.xpp3.NexusConfigurationX
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.upgrade.Upgrader;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 /**
  * Upgrades configuration model from version 1.0.8 to 1.4.0.
@@ -57,6 +64,13 @@ public class Upgrade108to140
     extends AbstractLogEnabled
     implements Upgrader
 {
+
+    private static final String EXTERNAL_CONFIG = "externalConfiguration";
+
+    private static final String GROUP_MEMBERS_NODE = "memberRepositories";
+
+    private static final String GROUP_CHILD_NODE = "memberRepositorie";
+
     public Object loadConfiguration( File file )
         throws IOException,
             ConfigurationIsCorruptedException
@@ -128,18 +142,15 @@ public class Upgrade108to140
         }
         newc.setTasks( tasks );
 
-        
-        
-        
         // FIXME: Repositories are NOT the same
-        List<CRepository> repositories = new ArrayList<CRepository>( oldc.getRepositories().size() );
+        List<CRepository> repositories = new ArrayList<CRepository>();
         for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepository oldrepos : (List<org.sonatype.nexus.configuration.model.v1_0_8.CRepository>) oldc
             .getRepositories() )
         {
             CRepository newrepos = copyCRepository1_0_8( oldrepos );
             repositories.add( newrepos );
         }
-        // shadows are repos       
+        // shadows are repos
         if ( oldc.getRepositoryShadows() != null )
         {
             for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow oldshadow : (List<org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow>) oldc
@@ -148,7 +159,6 @@ public class Upgrade108to140
                 repositories.add( copyCRepositoryShadow1_0_8( oldshadow ) );
             }
         }
-        newc.setRepositories( repositories );
 
         if ( oldc.getRepositoryGrouping() != null )
         {
@@ -161,16 +171,22 @@ public class Upgrade108to140
                     repositoryGrouping.addPathMapping( copyCGroupsSettingPathMappingItem1_0_8( oldItem ) );
                 }
             }
-            // FIXME
-//            List<CRepositoryGroup> repositoryGroups = new ArrayList<CRepositoryGroup>( oldc
-//                .getRepositoryGrouping().getRepositoryGroups().size() );
-//            for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup oldgroup : (List<org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup>) oldc
-//                .getRepositoryGrouping().getRepositoryGroups() )
-//            {
-//                repositoryGroups.add( copyCRepositoryGroup1_0_8( oldgroup ) );
-//            }
-//            repositoryGrouping.setRepositoryGroups( repositoryGroups );
-            newc.setRepositoryGrouping( repositoryGrouping );
+
+            // mergeMetadata
+            boolean mergeMetadata = true;
+
+            if ( oldc.getRouting() != null && oldc.getRouting().getGroups() != null )
+            {
+                mergeMetadata = oldc.getRouting().getGroups().isMergeMetadata();
+            }
+
+            for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup oldgroup : (List<org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup>) oldc
+                .getRepositoryGrouping().getRepositoryGroups() )
+            {
+                repositories.add( copyCRepositoryGroup1_0_8( oldgroup, mergeMetadata ) );
+            }
+
+            newc.setRepositories( repositories );
         }
 
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
@@ -242,27 +258,39 @@ public class Upgrade108to140
 
     protected CRepository copyCRepository1_0_8( org.sonatype.nexus.configuration.model.v1_0_8.CRepository oldrepos )
     {
-        CRepository newrepos = new CRepository();
-        newrepos.setId( oldrepos.getId() );
-        newrepos.setName( oldrepos.getName() );
-// TODO        newrepos.setType( oldrepos.getType() );
-        newrepos.setLocalStatus( oldrepos.getLocalStatus() );
-     // TODO        newrepos.setProxyMode( oldrepos.getProxyMode() );
-        newrepos.setAllowWrite( oldrepos.isAllowWrite() );
-        newrepos.setBrowseable( oldrepos.isBrowseable() );
-        newrepos.setIndexable( oldrepos.isIndexable() );
-        newrepos.setNotFoundCacheTTL( oldrepos.getNotFoundCacheTTL() );
-     // TODO        newrepos.setArtifactMaxAge( oldrepos.getArtifactMaxAge() );
-     // TODO        newrepos.setMetadataMaxAge( oldrepos.getMetadataMaxAge() );
-     // TODO        newrepos.setMaintainProxiedRepositoryMetadata( oldrepos.isMaintainProxiedRepositoryMetadata() );
-     // TODO        newrepos.setDownloadRemoteIndexes( oldrepos.isDownloadRemoteIndexes() );
-     // TODO        newrepos.setChecksumPolicy( oldrepos.getChecksumPolicy() );
+        CRepository newrepo = new CRepository();
+        newrepo.setId( oldrepos.getId() );
+        newrepo.setName( oldrepos.getName() );
+        newrepo.setLocalStatus( oldrepos.getLocalStatus() );
+        newrepo.setAllowWrite( oldrepos.isAllowWrite() );
+        newrepo.setBrowseable( oldrepos.isBrowseable() );
+        newrepo.setIndexable( oldrepos.isIndexable() );
+        newrepo.setNotFoundCacheTTL( oldrepos.getNotFoundCacheTTL() );
+        newrepo.setExposed( oldrepos.isExposed() );
+        newrepo.setMirrors( copyCMirrors1_0_8( oldrepos.getMirrors() ) );
+        newrepo.setNotFoundCacheActive( oldrepos.isNotFoundCacheActive() );
+        newrepo.setPathPrefix( oldrepos.getPathPrefix() );
+        newrepo.setProviderHint( oldrepos.getType() );
+        newrepo.setProviderRole( Repository.class.toString() );
+        newrepo.setUserManaged( oldrepos.isUserManaged() );
+
+        // Manipulate the dom
+        Xpp3Dom externalConfig = new Xpp3Dom( EXTERNAL_CONFIG );
+        newrepo.setExternalConfiguration( externalConfig );
+        this.setNodeValue( externalConfig, "proxyMode", oldrepos.getProxyMode() );
+        this.setNodeValue( externalConfig, "artifactMaxAge", Integer.toString( oldrepos.getArtifactMaxAge() ) );
+        this.setNodeValue( externalConfig, "itemMaxAge", Integer.toString( oldrepos.getMetadataMaxAge() ) );
+        this.setNodeValue( externalConfig, "cleanseRepositoryMetadata", Boolean.toString( oldrepos
+            .isMaintainProxiedRepositoryMetadata() ) ); // TODO
+        this
+            .setNodeValue( externalConfig, "downloadRemoteIndex", Boolean.toString( oldrepos.isDownloadRemoteIndexes() ) );
+        this.setNodeValue( externalConfig, "checksumPolicy", oldrepos.getChecksumPolicy() );
 
         if ( oldrepos.getLocalStorage() != null )
         {
             CLocalStorage localStorage = new CLocalStorage();
             localStorage.setUrl( oldrepos.getLocalStorage().getUrl() );
-            newrepos.setLocalStorage( localStorage );
+            newrepo.setLocalStorage( localStorage );
         }
 
         if ( oldrepos.getRemoteStorage() != null )
@@ -284,9 +312,24 @@ public class Upgrade108to140
                 remoteStorage.setHttpProxySettings( copyCRemoteHttpProxySettings1_0_8( oldrepos
                     .getRemoteStorage().getHttpProxySettings() ) );
             }
-            newrepos.setRemoteStorage( remoteStorage );
+            newrepo.setRemoteStorage( remoteStorage );
         }
-        return newrepos;
+        return newrepo;
+    }
+
+    private List<CMirror> copyCMirrors1_0_8( List<org.sonatype.nexus.configuration.model.v1_0_8.CMirror> oldMirrors )
+    {
+        List<CMirror> newMirrors = new ArrayList<CMirror>();
+
+        for ( org.sonatype.nexus.configuration.model.v1_0_8.CMirror oldMirror : oldMirrors )
+        {
+            CMirror newMirror = new CMirror();
+            newMirror.setId( oldMirror.getId() );
+            newMirror.setUrl( oldMirror.getUrl() );
+            newMirrors.add( newMirror );
+        }
+
+        return newMirrors;
     }
 
     protected CSmtpConfiguration copyCSmtpConfiguration1_0_8(
@@ -332,14 +375,6 @@ public class Upgrade108to140
         if ( oldrouting != null )
         {
             routing.setResolveLinks( oldrouting.isFollowLinks() );
-//            routing.setNotFoundCacheTTL( oldrouting.getNotFoundCacheTTL() ); // TODO
-//            if ( oldrouting.getGroups() != null ) // TODO
-//            {
-//                CGroupsSetting groups = new CGroupsSetting();
-//                groups.setStopItemSearchOnFirstFoundFile( oldrouting.getGroups().isStopItemSearchOnFirstFoundFile() );
-//                groups.setMergeMetadata( oldrouting.getGroups().isMergeMetadata() );
-//                routing.setGroups( groups );
-//            }
         }
 
         return routing;
@@ -354,8 +389,8 @@ public class Upgrade108to140
         {
             restapi.setBaseUrl( oldrestapi.getBaseUrl() );
             restapi.setForceBaseUrl( oldrestapi.isForceBaseUrl() );
-//            restapi.setSessionExpiration( TODO );
-//            restapi.setAccessAllowedFrom( oldrestapi.getAccessAllowedFrom() ); //TODO
+            // restapi.setSessionExpiration( TODO );
+            // restapi.setAccessAllowedFrom( oldrestapi.getAccessAllowedFrom() ); //TODO
         }
 
         return restapi;
@@ -391,7 +426,6 @@ public class Upgrade108to140
 
         return target;
     }
-
 
     protected CScheduledTask copyCScheduledTask1_0_8(
         org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask oldtask )
@@ -437,44 +471,41 @@ public class Upgrade108to140
         org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow oldshadow )
         throws ConfigurationIsCorruptedException
     {
-//        CRepositoryShadow shadow = new CRepositoryShadow();
-//
-//        if ( oldshadow != null )
-//        {
-//            shadow.setId( oldshadow.getId() );
-//            shadow.setName( oldshadow.getName() );
-//            shadow.setLocalStatus( oldshadow.getLocalStatus() );
-//            shadow.setShadowOf( oldshadow.getShadowOf() );
-//
-//            // TYPE: we had a discrepancy between role hints and type, fixing it in 1.0.7 version
-//            String type = null;
-//
-//            if ( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow.TYPE_MAVEN1.equals( oldshadow
-//                .getType() ) )
-//            {
-//                type = "m2-m1-shadow";
-//            }
-//            else if ( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow.TYPE_MAVEN2.equals( oldshadow
-//                .getType() ) )
-//            {
-//                type = "m1-m2-shadow";
-//            }
-//            else if ( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow.TYPE_MAVEN2_CONSTRAINED
-//                .equals( oldshadow.getType() ) )
-//            {
-//                type = "m2-constrained";
-//            }
-//            else
-//            {
-//                throw new ConfigurationIsCorruptedException( "Repository shadow type '" + oldshadow.getType()
-//                    + "' creation is not supported!" );
-//            }
-//            shadow.setType( type );
-//
-//            shadow.setSyncAtStartup( oldshadow.isSyncAtStartup() );
-//        }
+        CRepository newShadow = new CRepository();
 
-        return new CRepository(); // TODO
+        if ( oldshadow != null )
+        {
+            newShadow.setId( oldshadow.getId() );
+            newShadow.setName( oldshadow.getName() );
+            newShadow.setLocalStatus( oldshadow.getLocalStatus() );
+            newShadow.setProviderHint( oldshadow.getType() );
+            newShadow.setProviderRole( ShadowRepository.class.toString() );
+            newShadow.setExposed( oldshadow.isExposed() );
+            newShadow.setUserManaged( oldshadow.isUserManaged() );
+            newShadow.setAllowWrite( false );
+            newShadow.setBrowseable( true );
+            newShadow.setIndexable( false );
+            newShadow.setLocalStorage( null );
+            newShadow.setMirrors( null );
+            newShadow.setNotFoundCacheActive( false );
+            newShadow.setNotFoundCacheTTL( 15 );
+            newShadow.setPathPrefix( null );
+            newShadow.setRemoteStorage( null );
+
+            // shadow ShadowRepository.class
+            // Manipulate the dom
+            Xpp3Dom externalConfig = new Xpp3Dom( EXTERNAL_CONFIG );
+            newShadow.setExternalConfiguration( externalConfig );
+            this.setNodeValue( externalConfig, "masterRepositoryId", oldshadow.getShadowOf() );
+            this.setNodeValue( externalConfig, "syncAtStartup", Boolean.toString( oldshadow.isSyncAtStartup() ) ); // TODO,
+            // this
+            // is
+            // not
+            // added
+            // yet
+        }
+
+        return newShadow;
     }
 
     protected CPathMappingItem copyCGroupsSettingPathMappingItem1_0_8(
@@ -487,7 +518,7 @@ public class Upgrade108to140
             pathMappingItem.setGroupId( oldpathmapping.getGroupId() );
             pathMappingItem.setId( oldpathmapping.getId() );
             pathMappingItem.setRepositories( oldpathmapping.getRepositories() );
-            
+
             List<String> patterns = new ArrayList<String>();
             patterns.add( oldpathmapping.getRoutePattern() );
             pathMappingItem.setRoutePatterns( patterns );
@@ -497,18 +528,93 @@ public class Upgrade108to140
         return pathMappingItem;
     }
 
-//    protected CRepositoryGroup copyCRepositoryGroup1_0_8(
-//        org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup oldgroup )
-//    {
-//        CRepositoryGroup group = new CRepositoryGroup();
-//
-//        if ( oldgroup != null )
-//        {
-//            group.setGroupId( oldgroup.getGroupId() );
-//            group.setName( oldgroup.getName() );
-//            group.setRepositories( oldgroup.getRepositories() );
-//        }
-//
-//        return group;
-//    }
+    protected CRepository copyCRepositoryGroup1_0_8(
+        org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup oldgroup, boolean mergeMetadata )
+    {
+        CRepository groupRepo = new CRepository();
+
+        if ( oldgroup != null )
+        {
+            groupRepo.setId( oldgroup.getGroupId() );
+            groupRepo.setName( oldgroup.getName() );
+            groupRepo.setProviderHint( oldgroup.getType() );
+            groupRepo.setProviderRole( GroupRepository.class.toString() );
+            groupRepo.setAllowWrite( false );
+            groupRepo.setBrowseable( true );
+            groupRepo.setExposed( true );
+            groupRepo.setIndexable( false );
+
+            if ( oldgroup.getLocalStorage() != null )
+            {
+                CLocalStorage localStorage = new CLocalStorage();
+                localStorage.setUrl( oldgroup.getLocalStorage().getUrl() );
+                groupRepo.setLocalStorage( localStorage );
+            }
+
+            groupRepo.setMirrors( null );
+            groupRepo.setNotFoundCacheActive( true );
+            groupRepo.setNotFoundCacheTTL( 15 );
+            groupRepo.setPathPrefix( oldgroup.getPathPrefix() );
+            groupRepo.setRemoteStorage( null );
+            groupRepo.setUserManaged( true );
+
+            // Manipulate the dom
+            Xpp3Dom externalConfig = new Xpp3Dom( EXTERNAL_CONFIG );
+            this.setNodeValue( externalConfig, "mergeMetadata", Boolean.toString( mergeMetadata ) );
+            this.setCollectionValues( externalConfig, GROUP_MEMBERS_NODE, GROUP_CHILD_NODE, oldgroup.getRepositories() );
+        }
+
+        return groupRepo;
+    }
+
+    protected void setNodeValue( Xpp3Dom parent, String name, String value )
+    {
+        // if we do not have a current value, then just return without setting the node;
+        if ( value == null )
+        {
+            return;
+        }
+
+        Xpp3Dom node = parent.getChild( name );
+
+        if ( node == null )
+        {
+            node = new Xpp3Dom( name );
+
+            parent.addChild( node );
+        }
+
+        node.setValue( value );
+    }
+
+    protected void setCollectionValues( Xpp3Dom parent, String nodeName, String childName, Collection<String> values )
+    {
+        Xpp3Dom node = parent.getChild( nodeName );
+
+        if ( node != null )
+        {
+            for ( int i = 0; i < parent.getChildCount(); i++ )
+            {
+                Xpp3Dom existing = parent.getChild( i );
+
+                if ( StringUtils.equals( nodeName, existing.getName() ) )
+                {
+                    parent.removeChild( i );
+
+                    break;
+                }
+            }
+
+            node = null;
+        }
+
+        node = new Xpp3Dom( nodeName );
+
+        parent.addChild( node );
+
+        for ( String childVal : values )
+        {
+            this.setNodeValue( node, childName, childVal );
+        }
+    }
 }

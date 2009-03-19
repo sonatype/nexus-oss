@@ -138,8 +138,8 @@ public class Upgrade107to108
             }
         }
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
-        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.v1_0_8.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.v1_0_8.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
         
     }
