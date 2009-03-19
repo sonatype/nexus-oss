@@ -16,12 +16,17 @@ package org.sonatype.nexus.configuration.application.upgrade;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.configuration.model.v1_0_8.upgrade.BasicVersionUpgrade;
-import org.sonatype.nexus.configuration.model.CSecurity;
+import org.sonatype.nexus.configuration.model.v1_0_8.CRepository;
+import org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup;
+import org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.v1_0_8.CSecurity;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.upgrade.Upgrader;
@@ -30,15 +35,15 @@ import org.sonatype.nexus.configuration.upgrade.Upgrader;
 public class Upgrade107to108
     extends AbstractLogEnabled
     implements Upgrader
-{/*
+{
     private BasicVersionUpgrade converter = new BasicVersionUpgrade()
     {
         @Override
-        public org.sonatype.nexus.configuration.modello.CRepositoryGroup upgradeCRepositoryGroup(
+        public org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup upgradeCRepositoryGroup(
             org.sonatype.nexus.configuration.model.v1_0_7.CRepositoryGroup repositoryGroup,
             org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup value )
         {
-            org.sonatype.nexus.configuration.model.CRepositoryGroup group = super.upgradeCRepositoryGroup(
+            org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup group = super.upgradeCRepositoryGroup(
                 repositoryGroup,
                 value );
             group.setType( "maven2" );
@@ -49,7 +54,7 @@ public class Upgrade107to108
         public CSecurity upgradeCSecurity( org.sonatype.nexus.configuration.model.v1_0_7.CSecurity security,
             CSecurity value )
         {
-            org.sonatype.nexus.configuration.model.CSecurity newSecurity = super.upgradeCSecurity( security, value );
+            org.sonatype.nexus.configuration.model.v1_0_8.CSecurity newSecurity = super.upgradeCSecurity( security, value );
             newSecurity.removeRealm( "NexusMethodAuthorizingRealm" );
             newSecurity.removeRealm( "NexusTargetAuthorizingRealm" );
             newSecurity.removeRealm( "XmlMethodAuthorizingRealm" );
@@ -58,7 +63,7 @@ public class Upgrade107to108
             return newSecurity;
         }
     };
-*/
+
     public Object loadConfiguration( File file )
         throws IOException,
             ConfigurationIsCorruptedException
@@ -93,10 +98,10 @@ public class Upgrade107to108
 
     public void upgrade( UpgradeMessage message )
     {
-/*        org.sonatype.nexus.configuration.model.v1_0_7.Configuration oldc = (org.sonatype.nexus.configuration.model.v1_0_7.Configuration) message
+       org.sonatype.nexus.configuration.model.v1_0_7.Configuration oldc = (org.sonatype.nexus.configuration.model.v1_0_7.Configuration) message
             .getConfiguration();
 
-        org.sonatype.nexus.configuration.model.Configuration newc = converter.upgradeConfiguration( oldc );
+        org.sonatype.nexus.configuration.model.v1_0_8.Configuration newc = converter.upgradeConfiguration( oldc );
 
         // NEXUS-1710: enforce ID uniqueness, but also /content URL must remain unchanged for existing systems.
         // sadly, as part of upgrade, we must ensure the repoId uniqueness, which was not case in pre-1.3 nexuses
@@ -136,6 +141,6 @@ public class Upgrade107to108
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
-        */
+        
     }
 }
