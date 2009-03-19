@@ -69,14 +69,8 @@ public abstract class AbstractProxyRepository
     @Requirement
     private DownloadMirrors dMirrors;
 
-    /** The proxy mode */
-    private volatile ProxyMode proxyMode = ProxyMode.ALLOW;
-
     /** The proxy remote status */
     private volatile RemoteStatus remoteStatus = RemoteStatus.UNKNOWN;
-
-    /** The repo status check mode */
-    private volatile RepositoryStatusCheckMode repositoryStatusCheckMode = RepositoryStatusCheckMode.NEVER;
 
     /** Last time remote status was updated */
     private volatile long remoteStatusUpdated = 0;
@@ -84,16 +78,130 @@ public abstract class AbstractProxyRepository
     /** The remote storage. */
     private RemoteRepositoryStorage remoteStorage;
 
-    /** The remote url. */
-    private String remoteUrl;
-
     /** Remote storage context to store connection configs. */
     private RemoteStorageContext remoteStorageContext;
 
+    protected AbstractProxyRepositoryConfiguration getExternalConfiguration()
+    {
+        return (AbstractProxyRepositoryConfiguration) super.getExternalConfiguration();
+    }
+
+    public ProxyMode getProxyMode()
+    {
+        if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        {
+            return getExternalConfiguration().getProxyMode();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    protected void setProxyMode( ProxyMode proxyMode, boolean sendNotification, Throwable cause )
+    {
+        if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        {
+            ProxyMode oldProxyMode = getProxyMode();
+
+            getExternalConfiguration().setProxyMode( proxyMode );
+
+            markDirty();
+
+            // if this is proxy
+            // and was !shouldProxy() and the new is shouldProxy()
+            if ( proxyMode != null && proxyMode.shouldProxy() && !oldProxyMode.shouldProxy() )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "We have a !shouldProxy() -> shouldProxy() transition, purging NFC" );
+                }
+
+                getNotFoundCache().purge();
+
+                resetRemoteStatus();
+            }
+
+            if ( sendNotification && !proxyMode.equals( oldProxyMode ) )
+            {
+                getApplicationEventMulticaster().notifyProximityEventListeners(
+                    new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );
+            }
+        }
+    }
+
+    public void setProxyMode( ProxyMode proxyMode )
+    {
+        setProxyMode( proxyMode, true, null );
+    }
+
+    protected void autoBlockProxying( Throwable cause )
+    {
+        setRemoteStatus( RemoteStatus.UNAVAILABLE, cause );
+    }
+
+    public RepositoryStatusCheckMode getRepositoryStatusCheckMode()
+    {
+        return getExternalConfiguration().getRepositoryStatusCheckMode();
+    }
+
+    public void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode )
+    {
+        getExternalConfiguration().setRepositoryStatusCheckMode( mode );
+
+        markDirty();
+    }
+
+    public String getRemoteUrl()
+    {
+        if ( getRemoteStorage() != null )
+        {
+            return getCurrentConfiguration().getRemoteStorage().getUrl();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public void setRemoteUrl( String remoteUrl )
+    {
+        if ( getRemoteStorage() != null )
+        {
+            String trstr = remoteUrl.trim();
+
+            if ( trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+            {
+                trstr = trstr.substring( 0, trstr.length() - 1 );
+            }
+
+            getCurrentConfiguration().getRemoteStorage().setUrl( trstr );
+
+            markDirty();
+        }
+    }
+
     /**
-     * The item max age.
+     * Gets the item max age in (in minutes).
+     * 
+     * @return the item max age in (in minutes)
      */
-    private int itemMaxAge = 24 * 60;
+    public int getItemMaxAge()
+    {
+        return getExternalConfiguration().getItemMaxAge();
+    }
+
+    /**
+     * Sets the item max age in (in minutes).
+     * 
+     * @param itemMaxAgeInSeconds the new item max age in (in minutes).
+     */
+    public void setItemMaxAge( int itemMaxAge )
+    {
+        getExternalConfiguration().setItemMaxAge( itemMaxAge );
+
+        markDirty();
+    }
 
     protected void resetRemoteStatus()
     {
@@ -205,91 +313,6 @@ public abstract class AbstractProxyRepository
          */
     }
 
-    public ProxyMode getProxyMode()
-    {
-        if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            return proxyMode;
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    protected void setProxyMode( ProxyMode proxyMode, boolean sendNotification, Throwable cause )
-    {
-        ProxyMode oldProxyMode = this.proxyMode;
-
-        this.proxyMode = proxyMode;
-
-        // if this is proxy
-        // and was !shouldProxy() and the new is shouldProxy()
-        if ( this.proxyMode != null && this.proxyMode.shouldProxy() && !oldProxyMode.shouldProxy() )
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "We have a !shouldProxy() -> shouldProxy() transition, purging NFC" );
-            }
-
-            getNotFoundCache().purge();
-
-            resetRemoteStatus();
-        }
-
-        if ( sendNotification && !proxyMode.equals( oldProxyMode ) )
-        {
-            getApplicationEventMulticaster().notifyProximityEventListeners(
-                new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );
-        }
-    }
-
-    public void setProxyMode( ProxyMode proxyMode )
-    {
-        setProxyMode( proxyMode, true, null );
-    }
-
-    protected void autoBlockProxying( Throwable cause )
-    {
-        setRemoteStatus( RemoteStatus.UNAVAILABLE, cause );
-    }
-
-    public RepositoryStatusCheckMode getRepositoryStatusCheckMode()
-    {
-        return repositoryStatusCheckMode;
-    }
-
-    public void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode )
-    {
-        this.repositoryStatusCheckMode = mode;
-    }
-
-    public String getRemoteUrl()
-    {
-        return remoteUrl;
-    }
-
-    public void setRemoteUrl( String remoteUrl )
-    {
-        if ( remoteUrl == null )
-        {
-            this.remoteUrl = null;
-        }
-        else
-        {
-            String trstr = remoteUrl.trim();
-
-            if ( !trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
-            {
-                this.remoteUrl = trstr;
-            }
-            else
-            {
-                this.remoteUrl = trstr.substring( 0, trstr.length() - 1 );
-            }
-        }
-    }
-
     public RemoteStorageContext getRemoteStorageContext()
     {
         return remoteStorageContext;
@@ -304,26 +327,6 @@ public abstract class AbstractProxyRepository
             // perm changes? retry if autoBlocked
             setProxyMode( ProxyMode.ALLOW );
         }
-    }
-
-    /**
-     * Gets the item max age in (in minutes).
-     * 
-     * @return the item max age in (in minutes)
-     */
-    public int getItemMaxAge()
-    {
-        return itemMaxAge;
-    }
-
-    /**
-     * Sets the item max age in (in minutes).
-     * 
-     * @param itemMaxAgeInSeconds the new item max age in (in minutes).
-     */
-    public void setItemMaxAge( int itemMaxAge )
-    {
-        this.itemMaxAge = itemMaxAge;
     }
 
     public RemoteRepositoryStorage getRemoteStorage()

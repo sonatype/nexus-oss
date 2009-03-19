@@ -48,7 +48,10 @@ public abstract class AbstractGroupRepository
     @Requirement
     private RequestRepositoryMapper requestRepositoryMapper;
 
-    private List<String> memberRepoIds = new ArrayList<String>();
+    protected AbstractGroupRepositoryConfiguration getExternalConfiguration()
+    {
+        return (AbstractGroupRepositoryConfiguration) super.getExternalConfiguration();
+    }
 
     @Override
     public void onProximityEvent( AbstractEvent evt )
@@ -61,7 +64,7 @@ public abstract class AbstractGroupRepository
             RepositoryRegistryEventRemove revt = (RepositoryRegistryEventRemove) evt;
 
             // remove it from members (will nothing happen if not amongs them)
-            removeMemberRepository( revt.getRepository().getId() );
+            removeMemberRepositoryId( revt.getRepository().getId() );
         }
     }
 
@@ -203,13 +206,28 @@ public abstract class AbstractGroupRepository
         throw new ItemNotFoundException( request, this );
     }
 
+    public List<String> getMemberRepositoryIds()
+    {
+        return getExternalConfiguration().getMemberRepositoryIds();
+    }
+
+    public void setMemberRepositoryIds( List<String> repositories )
+    {
+        getExternalConfiguration().setMemberRepositoryIds( repositories );
+    }
+
+    public void removeMemberRepositoryId( String repositoryId )
+    {
+        getExternalConfiguration().removeMemberRepositoryId( repositoryId );
+    }
+
     public List<Repository> getMemberRepositories()
     {
         ArrayList<Repository> result = new ArrayList<Repository>();
 
         try
         {
-            for ( String repoId : memberRepoIds )
+            for ( String repoId : getMemberRepositoryIds() )
             {
                 Repository repo = repoRegistry.getRepository( repoId );
 
@@ -237,16 +255,6 @@ public abstract class AbstractGroupRepository
         {
             throw new StorageException( e );
         }
-    }
-
-    public void setMemberRepositories( List<String> repositories )
-    {
-        memberRepoIds = new ArrayList<String>( repositories );
-    }
-
-    public void removeMemberRepository( String repositoryId )
-    {
-        memberRepoIds.remove( repositoryId );
     }
 
     public List<StorageItem> doRetrieveItems( ResourceStoreRequest request )

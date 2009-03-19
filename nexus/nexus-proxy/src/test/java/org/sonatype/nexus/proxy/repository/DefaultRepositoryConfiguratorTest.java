@@ -8,8 +8,8 @@ import org.sonatype.nexus.configuration.SimpleApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfigurator;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -41,8 +41,8 @@ public class DefaultRepositoryConfiguratorTest
         cRepo.setLocalStorage( new CLocalStorage() );
         cRepo.getLocalStorage().setProvider( "file" );
         Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
-        ex.addChild( getNode( AbstractMavenRepositoryConfigurator.REPOSITORY_POLICY, RepositoryPolicy.RELEASE
-            .toString() ) );
+        M2RepositoryConfiguration extConf = new M2RepositoryConfiguration( ex );
+        extConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
         cRepo.setExternalConfiguration( ex );
 
         RemoteStorageContext rsc = new DefaultRemoteStorageContext( null );
@@ -78,8 +78,8 @@ public class DefaultRepositoryConfiguratorTest
         cRepo.setLocalStorage( new CLocalStorage() );
         cRepo.getLocalStorage().setProvider( "file" );
         Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
-        ex.addChild( getNode( AbstractMavenRepositoryConfigurator.REPOSITORY_POLICY, RepositoryPolicy.RELEASE
-            .toString() ) );
+        M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
+        exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
         cRepo.setExternalConfiguration( ex );
 
         RemoteStorageContext rsc = new DefaultRemoteStorageContext( null );

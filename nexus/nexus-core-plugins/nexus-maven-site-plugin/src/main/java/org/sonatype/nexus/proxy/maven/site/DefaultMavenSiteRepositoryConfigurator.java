@@ -14,6 +14,8 @@
 package org.sonatype.nexus.proxy.maven.site;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.configuration.application.ExternalConfiguration;
 import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 
@@ -21,5 +23,11 @@ import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 public class DefaultMavenSiteRepositoryConfigurator
     extends AbstractWebSiteRepositoryConfigurator
 {
+
+    @Override
+    protected ExternalConfiguration createExternalConfiguration( Xpp3Dom dom )
+    {
+        return new DefaultMavenSiteRepositoryConfiguration( dom );
+    }
 
 }

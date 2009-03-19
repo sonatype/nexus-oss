@@ -26,7 +26,9 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.ConfigurationSaveEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.ExternalConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -108,74 +110,26 @@ public abstract class AbstractRepository
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
-    /**
-     * The cache manager.
-     */
     @Requirement
     private CacheManager cacheManager;
 
-    /**
-     * The target registry.
-     */
     @Requirement
     private TargetRegistry targetRegistry;
 
-    /**
-     * Factory for UIDs.
-     */
     @Requirement
     private RepositoryItemUidFactory repositoryItemUidFactory;
 
-    /**
-     * The access manager.
-     */
     @Requirement
     private AccessManager accessManager;
 
-    /**
-     * The Walker service.
-     */
     @Requirement
     private Walker walker;
 
-    /**
-     * The published mirrros.
-     */
     @Requirement
     private PublishedMirrors pMirrors;
 
-    /**
-     * The known ContentGenerators.
-     */
     @Requirement( role = ContentGenerator.class )
     private Map<String, ContentGenerator> contentGenerators;
-
-    /** The id. */
-    private String id;
-
-    /** The name. */
-    private String name;
-
-    /** The path prefix */
-    private String pathPrefix;
-
-    /** The local status */
-    private volatile LocalStatus localStatus = LocalStatus.IN_SERVICE;
-
-    /** The read only. */
-    private boolean allowWrite = true;
-
-    /** The listable. */
-    private boolean browseable = true;
-
-    /** The indexable. */
-    private boolean indexable = true;
-
-    /** User managed */
-    private boolean userManaged = true;
-
-    /** Exposed */
-    private boolean exposed = true;
 
     /** The local storage. */
     private LocalRepositoryStorage localStorage;
@@ -183,26 +137,30 @@ public abstract class AbstractRepository
     /** The not found cache. */
     private PathCache notFoundCache;
 
-    /** Flag: is NFC active */
-    private boolean notFoundCacheActive = true;
-
-    /** The not found cache time to live (in minutes). */
-    private int notFoundCacheTimeToLive = 24 * 60;
-
-    /** The local url. */
-    private String localUrl;
-
     /** Request processors list */
     private List<RequestProcessor> requestProcessors;
 
     /** The configuration */
-    private CRepository crepository;
+    private CRepository repositoryConfiguration;
+
+    /** dirty flag */
+    private boolean dirty;
+
+    protected void markDirty()
+    {
+        dirty = true;
+    }
+
+    protected void unmarkDirty()
+    {
+        dirty = false;
+    }
 
     // Configurable iface
 
     public final CRepository getCurrentConfiguration()
     {
-        return crepository;
+        return repositoryConfiguration;
     }
 
     public final void validateConfiguration( Object config )
@@ -228,7 +186,7 @@ public abstract class AbstractRepository
     {
         validateConfiguration( config );
 
-        this.crepository = (CRepository) config;
+        this.repositoryConfiguration = (CRepository) config;
 
         doConfigure( false );
     }
@@ -239,12 +197,17 @@ public abstract class AbstractRepository
         doConfigure( true );
     }
 
+    public boolean isDirty()
+    {
+        return dirty || getExternalConfiguration().isDirty();
+    }
+
     protected void doValidateConfiguration( CRepository config )
         throws ConfigurationException
     {
-        if ( getRepositoryConfigurationValidator() != null )
+        if ( getRepositoryConfigurator() != null )
         {
-            getRepositoryConfigurationValidator().validate( applicationConfiguration, config );
+            getRepositoryConfigurator().validate( applicationConfiguration, config );
         }
     }
 
@@ -257,9 +220,14 @@ public abstract class AbstractRepository
         }
 
         getRepositoryConfigurator().applyConfiguration( this, applicationConfiguration, getCurrentConfiguration() );
+
+        dirty = false;
     }
 
-    public abstract RepositoryConfigurationValidator getRepositoryConfigurationValidator();
+    protected ExternalConfiguration getExternalConfiguration()
+    {
+        return getCurrentConfiguration().externalConfigurationImple;
+    }
 
     public abstract RepositoryConfigurator getRepositoryConfigurator();
 
@@ -284,6 +252,17 @@ public abstract class AbstractRepository
                 applicationEventMulticaster.removeProximityEventListener( this );
             }
         }
+        else if ( evt instanceof ConfigurationSaveEvent )
+        {
+            if ( isDirty() )
+            {
+                getRepositoryConfigurator().prepareForSave( this, applicationConfiguration, getCurrentConfiguration() );
+
+                unmarkDirty();
+
+                getExternalConfiguration().unmarkDirty();
+            }
+        }
     }
 
     protected ApplicationEventMulticaster getApplicationEventMulticaster()
@@ -305,64 +284,6 @@ public abstract class AbstractRepository
             .setAttributeOperators( DefaultRepositoryTaskActivityDescriptor.ALL_ATTRIBUTES_OPERATIONS );
     }
 
-    public LocalStatus getLocalStatus()
-    {
-        return localStatus;
-    }
-
-    public void setLocalStatus( LocalStatus localStatus )
-    {
-        LocalStatus oldStatus = this.localStatus;
-
-        this.localStatus = localStatus;
-
-        if ( !oldStatus.equals( localStatus ) )
-        {
-            getApplicationEventMulticaster().notifyProximityEventListeners(
-                new RepositoryEventLocalStatusChanged( this, oldStatus, localStatus ) );
-        }
-    }
-
-    public boolean isAllowWrite()
-    {
-        return allowWrite;
-    }
-
-    public void setAllowWrite( boolean allowWrite )
-    {
-        this.allowWrite = allowWrite;
-    }
-
-    public boolean isBrowseable()
-    {
-        return browseable;
-    }
-
-    public void setBrowseable( boolean browseable )
-    {
-        this.browseable = browseable;
-    }
-
-    public boolean isUserManaged()
-    {
-        return userManaged;
-    }
-
-    public void setUserManaged( boolean userManaged )
-    {
-        this.userManaged = userManaged;
-    }
-
-    public boolean isExposed()
-    {
-        return exposed;
-    }
-
-    public void setExposed( boolean exposed )
-    {
-        this.exposed = exposed;
-    }
-
     public List<RequestProcessor> getRequestProcessors()
     {
         if ( requestProcessors == null )
@@ -371,16 +292,6 @@ public abstract class AbstractRepository
         }
 
         return requestProcessors;
-    }
-
-    public int getNotFoundCacheTimeToLive()
-    {
-        return notFoundCacheTimeToLive;
-    }
-
-    public void setNotFoundCacheTimeToLive( int notFoundCacheTimeToLive )
-    {
-        this.notFoundCacheTimeToLive = notFoundCacheTimeToLive;
     }
 
     /**
@@ -429,34 +340,28 @@ public abstract class AbstractRepository
         this.notFoundCache = notFoundcache;
     }
 
-    public boolean isNotFoundCacheActive()
-    {
-        return notFoundCacheActive;
-    }
-
-    public void setNotFoundCacheActive( boolean notFoundCacheActive )
-    {
-        this.notFoundCacheActive = notFoundCacheActive;
-    }
-
     public String getId()
     {
-        return id;
+        return repositoryConfiguration.getId();
     }
 
     public void setId( String id )
     {
-        this.id = id;
+        getCurrentConfiguration().setId( id );
+
+        markDirty();
     }
 
     public String getName()
     {
-        return name;
+        return getCurrentConfiguration().getName();
     }
 
     public void setName( String name )
     {
-        this.name = name;
+        getCurrentConfiguration().setName( name );
+
+        markDirty();
     }
 
     public String getPathPrefix()
@@ -464,9 +369,9 @@ public abstract class AbstractRepository
         // a "fallback" mechanism: id's must be unique now across nexus,
         // but some older systems may have groups/reposes with same ID. To clear out the ID-clash, we will need to
         // change IDs, but we must _not_ change the published URLs on those systems.
-        if ( !StringUtils.isBlank( pathPrefix ) )
+        if ( !StringUtils.isBlank( getCurrentConfiguration().getPathPrefix() ) )
         {
-            return pathPrefix;
+            return getCurrentConfiguration().getPathPrefix();
         }
         else
         {
@@ -476,36 +381,132 @@ public abstract class AbstractRepository
 
     public void setPathPrefix( String prefix )
     {
-        this.pathPrefix = prefix;
+        getCurrentConfiguration().setPathPrefix( prefix );
+
+        markDirty();
     }
 
     public boolean isIndexable()
     {
-        return indexable;
+        return getCurrentConfiguration().isIndexable();
     }
 
     public void setIndexable( boolean indexable )
     {
-        this.indexable = indexable;
+        getCurrentConfiguration().setIndexable( indexable );
+
+        markDirty();
     }
 
     public String getLocalUrl()
     {
-        return localUrl;
+        return getCurrentConfiguration().getLocalStorage().getUrl();
     }
 
     public void setLocalUrl( String localUrl )
     {
         String trstr = localUrl.trim();
 
-        if ( !trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        if ( trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
-            this.localUrl = trstr;
+            trstr = trstr.substring( 0, trstr.length() - 1 );
         }
-        else
+
+        getCurrentConfiguration().getLocalStorage().setUrl( trstr );
+
+        markDirty();
+    }
+
+    public LocalStatus getLocalStatus()
+    {
+        return LocalStatus.valueOf( getCurrentConfiguration().getLocalStatus() );
+    }
+
+    public void setLocalStatus( LocalStatus localStatus )
+    {
+        if ( !localStatus.equals( getLocalStatus() ) )
         {
-            this.localUrl = trstr.substring( 0, trstr.length() - 1 );
+            LocalStatus oldLocalStatus = getLocalStatus();
+
+            getCurrentConfiguration().setLocalStatus( localStatus.toString() );
+
+            markDirty();
+
+            getApplicationEventMulticaster().notifyProximityEventListeners(
+                new RepositoryEventLocalStatusChanged( this, oldLocalStatus, localStatus ) );
         }
+    }
+
+    public boolean isAllowWrite()
+    {
+        return getCurrentConfiguration().isAllowWrite();
+    }
+
+    public void setAllowWrite( boolean allowWrite )
+    {
+        getCurrentConfiguration().setAllowWrite( allowWrite );
+
+        markDirty();
+    }
+
+    public boolean isBrowseable()
+    {
+        return getCurrentConfiguration().isBrowseable();
+    }
+
+    public void setBrowseable( boolean browseable )
+    {
+        getCurrentConfiguration().setBrowseable( browseable );
+
+        markDirty();
+    }
+
+    public boolean isUserManaged()
+    {
+        return getCurrentConfiguration().isUserManaged();
+    }
+
+    public void setUserManaged( boolean userManaged )
+    {
+        getCurrentConfiguration().setUserManaged( userManaged );
+
+        markDirty();
+    }
+
+    public boolean isExposed()
+    {
+        return getCurrentConfiguration().isExposed();
+    }
+
+    public void setExposed( boolean exposed )
+    {
+        getCurrentConfiguration().setExposed( exposed );
+
+        markDirty();
+    }
+
+    public int getNotFoundCacheTimeToLive()
+    {
+        return getCurrentConfiguration().getNotFoundCacheTTL();
+    }
+
+    public void setNotFoundCacheTimeToLive( int notFoundCacheTimeToLive )
+    {
+        getCurrentConfiguration().setNotFoundCacheTTL( notFoundCacheTimeToLive );
+
+        markDirty();
+    }
+
+    public boolean isNotFoundCacheActive()
+    {
+        return getCurrentConfiguration().isNotFoundCacheActive();
+    }
+
+    public void setNotFoundCacheActive( boolean notFoundCacheActive )
+    {
+        getCurrentConfiguration().setNotFoundCacheActive( notFoundCacheActive );
+
+        markDirty();
     }
 
     public PublishedMirrors getPublishedMirrors()
@@ -670,14 +671,12 @@ public abstract class AbstractRepository
             throw new ItemNotFoundException( request, this );
         }
 
-        RepositoryItemUid uid = createUid( request.getRequestPath() );
-
         StorageItem item = retrieveItem( false, request );
 
         if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) && !isBrowseable() )
         {
             getLogger().debug(
-                getId() + " retrieveItem() :: FOUND a collection on " + uid.toString()
+                getId() + " retrieveItem() :: FOUND a collection on " + request.toString()
                     + " but repository is not Browseable." );
 
             throw new ItemNotFoundException( request, this );

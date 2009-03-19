@@ -18,7 +18,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.repository.RepositoryConfigurationValidator;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
@@ -53,13 +52,6 @@ public class M2LayoutedM1ShadowRepository
     public ContentClass getMasterRepositoryContentClass()
     {
         return masterContentClass;
-    }
-
-    @Override
-    public RepositoryConfigurationValidator getRepositoryConfigurationValidator()
-    {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

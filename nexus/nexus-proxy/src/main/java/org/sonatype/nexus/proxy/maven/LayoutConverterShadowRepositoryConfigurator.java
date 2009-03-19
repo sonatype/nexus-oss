@@ -11,22 +11,16 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.maven.maven1;
+package org.sonatype.nexus.proxy.maven;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.configuration.application.ExternalConfiguration;
-import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfigurator;
+import org.sonatype.nexus.proxy.repository.AbstractShadowRepositoryConfigurator;
 
-@Component( role = M1RepositoryConfigurator.class )
-public class M1RepositoryConfigurator
-    extends AbstractMavenRepositoryConfigurator
+/**
+ * Base class for shadows that make "gateways" from M1 to M2 lauouts and vice versa.
+ * 
+ * @author cstamas
+ */
+public abstract class LayoutConverterShadowRepositoryConfigurator
+    extends AbstractShadowRepositoryConfigurator
 {
-
-    @Override
-    protected ExternalConfiguration createExternalConfiguration( Xpp3Dom dom )
-    {
-        return new M1RepositoryConfiguration( dom );
-    }
-
 }

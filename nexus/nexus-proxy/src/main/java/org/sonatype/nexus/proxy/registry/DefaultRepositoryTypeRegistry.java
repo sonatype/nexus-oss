@@ -24,7 +24,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -109,18 +109,26 @@ public class DefaultRepositoryTypeRegistry
 
         if ( container.hasComponent( Repository.class, role, hint ) )
         {
-            try
-            {
-                // Note: this is very heavy to do on every call, we need some better solution.
-                // but if we think about plugins, and having runtime changes about available repository
-                // implementations...
-                Repository repository = container.lookup( Repository.class, role, hint );
+            ComponentDescriptor<Repository> descriptor = container
+                .getComponentDescriptor( Repository.class, role, hint );
 
-                return repository.getRepositoryContentClass();
-            }
-            catch ( ComponentLookupException e )
+            String contentClassHint = null;
+
+            for ( ComponentRequirement req : descriptor.getRequirements() )
             {
-                // should not happen, we checked for it
+                if ( StringUtils.equals( ContentClass.class.getName(), req.getRole() ) )
+                {
+                    // XXX: shadow has two of these!
+                    contentClassHint = req.getRoleHint();
+                }
+            }
+
+            if ( contentClassHint != null )
+            {
+                return contentClasses.get( contentClassHint );
+            }
+            else
+            {
                 return null;
             }
         }

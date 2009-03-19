@@ -24,11 +24,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
@@ -138,8 +143,24 @@ public class PathBasedRequestRepositoryMapperTest
         testgroup.add( repoF.getId() );
 
         groupRepo = (M2GroupRepository) getContainer().lookup( GroupRepository.class, "maven2" );
-        groupRepo.setId( "test" );
-        groupRepo.setMemberRepositories( testgroup );
+
+        CRepository repoGroupConf = new DefaultCRepository();
+
+        repoGroupConf.setProviderRole( GroupRepository.class.getName() );
+        repoGroupConf.setProviderHint( "maven2" );
+        repoGroupConf.setId( "test" );
+
+        repoGroupConf.setLocalStorage( new CLocalStorage() );
+        repoGroupConf.getLocalStorage().setProvider( "file" );
+
+        Xpp3Dom exGroupRepo = new Xpp3Dom( "externalConfiguration" );
+        repoGroupConf.setExternalConfiguration( exGroupRepo );
+        M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
+        exGroupRepoConf.setMemberRepositoryIds( testgroup );
+        exGroupRepoConf.setMergeMetadata( true );
+
+        groupRepo.configure( repoGroupConf );
+
         registry.addRepository( groupRepo );
 
         if ( inclusions != null )

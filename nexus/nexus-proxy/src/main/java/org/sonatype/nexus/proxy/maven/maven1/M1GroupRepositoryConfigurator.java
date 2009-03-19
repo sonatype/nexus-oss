@@ -14,10 +14,18 @@
 package org.sonatype.nexus.proxy.maven.maven1;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.configuration.application.ExternalConfiguration;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepositoryConfigurator;
 
 @Component( role = M1GroupRepositoryConfigurator.class )
 public class M1GroupRepositoryConfigurator
     extends AbstractMavenGroupRepositoryConfigurator
 {
+
+    @Override
+    protected ExternalConfiguration createExternalConfiguration( Xpp3Dom dom )
+    {
+        return new M1GroupRepositoryConfiguration( dom );
+    }
 }

@@ -11,22 +11,16 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.maven.maven1;
+package org.sonatype.nexus.proxy.maven.maven2;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.configuration.application.ExternalConfiguration;
-import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfigurator;
+import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfiguration;
 
-@Component( role = M1RepositoryConfigurator.class )
-public class M1RepositoryConfigurator
-    extends AbstractMavenRepositoryConfigurator
+public class M2RepositoryConfiguration
+    extends AbstractMavenRepositoryConfiguration
 {
-
-    @Override
-    protected ExternalConfiguration createExternalConfiguration( Xpp3Dom dom )
+    public M2RepositoryConfiguration( Xpp3Dom configuration )
     {
-        return new M1RepositoryConfiguration( dom );
+        super( configuration );
     }
-
 }

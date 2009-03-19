@@ -14,31 +14,17 @@
 package org.sonatype.nexus.proxy.maven.maven2;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.configuration.application.ExternalConfiguration;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepositoryConfigurator;
-import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 @Component( role = M2GroupRepositoryConfigurator.class )
 public class M2GroupRepositoryConfigurator
     extends AbstractMavenGroupRepositoryConfigurator
 {
-    public static final String MERGE_METADATA = "mergeMetadata";
-
     @Override
-    public void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
-        PlexusConfiguration externalConfiguration )
-        throws ConfigurationException
+    protected ExternalConfiguration createExternalConfiguration( Xpp3Dom dom )
     {
-        super.doConfigure( repository, configuration, repo, externalConfiguration );
-
-        MavenGroupRepository mgr = repository.adaptToFacet( MavenGroupRepository.class );
-
-        mgr.setMergeMetadata( Boolean.parseBoolean( externalConfiguration.getChild( MERGE_METADATA ).getValue(
-            String.valueOf( true ) ) ) );
+        return new M2GroupRepositoryConfiguration( dom );
     }
-
 }

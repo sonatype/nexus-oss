@@ -25,21 +25,21 @@ public class IncompatibleMasterRepositoryException
 
     private final ShadowRepository shadow;
 
-    private final Repository master;
+    private final String masterId;
 
-    public IncompatibleMasterRepositoryException( ShadowRepository shadow, Repository master )
+    public IncompatibleMasterRepositoryException( ShadowRepository shadow, String masterId )
     {
-        this( "Master repository ID='" + master.getId() + "' is incompatible with shadow repository ID='"
-            + shadow.getId() + "' because of it's ContentClass", shadow, master );
+        this( "Master repository ID='" + masterId + "' is incompatible with shadow repository ID='" + shadow.getId()
+            + "' because of it's ContentClass", shadow, masterId );
     }
 
-    public IncompatibleMasterRepositoryException( String message, ShadowRepository shadow, Repository master )
+    public IncompatibleMasterRepositoryException( String message, ShadowRepository shadow, String masterId )
     {
         super( message );
 
         this.shadow = shadow;
 
-        this.master = master;
+        this.masterId = masterId;
     }
 
     public ShadowRepository getShadow()
@@ -47,8 +47,8 @@ public class IncompatibleMasterRepositoryException
         return shadow;
     }
 
-    public Repository getMaster()
+    public String getMasterId()
     {
-        return master;
+        return masterId;
     }
 }

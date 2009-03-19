@@ -13,7 +13,6 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -36,20 +35,19 @@ public abstract class AbstractWebSiteRepository
     extends AbstractRepository
     implements WebSiteRepository
 {
-    private List<String> welcomeFiles;
+    protected AbstractWebSiteRepositoryConfiguration getExternalConfiguration()
+    {
+        return (AbstractWebSiteRepositoryConfiguration) super.getExternalConfiguration();
+    }
 
     public List<String> getWelcomeFiles()
     {
-        if ( welcomeFiles == null )
-        {
-            welcomeFiles = new ArrayList<String>();
+        return getExternalConfiguration().getWelcomeFiles();
+    }
 
-            // add defaults
-            welcomeFiles.add( "index.html" );
-            welcomeFiles.add( "index.htm" );
-        }
-
-        return welcomeFiles;
+    public void setWelcomeFiles( List<String> vals )
+    {
+        getExternalConfiguration().setWelcomeFiles( vals );
     }
 
     @Override
@@ -60,14 +58,16 @@ public abstract class AbstractWebSiteRepository
     {
         StorageItem result = super.doRetrieveItem( request );
 
-        if ( result instanceof StorageCollectionItem && getWelcomeFiles().size() > 0 )
+        List<String> wf = getWelcomeFiles();
+
+        if ( result instanceof StorageCollectionItem && wf.size() > 0 )
         {
             // it is a collection, check for one of the "welcome" files
             Collection<StorageItem> collItems = list( false, (StorageCollectionItem) result );
 
             for ( StorageItem item : collItems )
             {
-                if ( item instanceof StorageFileItem && getWelcomeFiles().contains( item.getName() ) )
+                if ( item instanceof StorageFileItem && wf.contains( item.getName() ) )
                 {
                     // it is a file, it's name is in welcomeFiles list, so return it instead parent collection
                     return item;

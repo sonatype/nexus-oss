@@ -19,17 +19,22 @@ import java.util.List;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.jettytestsuite.WebappContext;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.model.CLocalStorage;
+import org.sonatype.nexus.configuration.model.CRemoteStorage;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
+import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
-import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 
 /**
  * The Class JettyTestsuiteEnvironment.
@@ -46,7 +51,8 @@ public class M2TestsuiteEnvironmentBuilder
     }
 
     public void buildEnvironment( AbstractProxyTestEnvironment env )
-        throws IOException,
+        throws ConfigurationException,
+            IOException,
             ComponentLookupException
     {
         PlexusContainer container = env.getPlexusContainer();
@@ -56,32 +62,31 @@ public class M2TestsuiteEnvironmentBuilder
         {
             M2Repository repo = (M2Repository) container.lookup( Repository.class, "maven2" );
 
-            // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
-            repo.setId( remoteRepo.getName() );
-            repo.setRemoteUrl( getServletServer().getUrl( remoteRepo.getName() ) );
-            repo.setLocalUrl( env
-                .getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + repo.getId() ).toURI().toURL()
-                .toString() );
-            repo.setLocalStorage( env.getLocalRepositoryStorage() );
-            repo.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-            repo.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-            // repo.setFeedRecorder( new SimpleFeedRecorder() );
-            if ( remoteRepo.getAuthenticationInfo() != null )
-            {
-                // we have a protected repo, cannot share remote peer
-                // auth should be set somewhere else
-                CommonsHttpClientRemoteStorage rs = (CommonsHttpClientRemoteStorage) env.getPlexusContainer().lookup(
-                    RemoteRepositoryStorage.class,
-                    "apacheHttpClient3x" );
-                repo.setRemoteStorage( rs );
-                repo.setRemoteStorageContext( new DefaultRemoteStorageContext( env.getRemoteStorageContext() ) );
-            }
-            else
-            {
-                repo.setRemoteStorage( env.getRemoteRepositoryStorage() );
+            CRepository repoConf = new DefaultCRepository();
 
-                repo.setRemoteStorageContext( env.getRemoteStorageContext() );
-            }
+            repoConf.setProviderRole( Repository.class.getName() );
+            repoConf.setProviderHint( "maven2" );
+            repoConf.setId( remoteRepo.getName() );
+
+            repoConf.setLocalStorage( new CLocalStorage() );
+            repoConf.getLocalStorage().setProvider( "file" );
+            repoConf.getLocalStorage().setUrl(
+                env
+                    .getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + remoteRepo.getName() ).toURI()
+                    .toURL().toString() );
+
+            Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
+            repoConf.setExternalConfiguration( ex );
+            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
+            exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+            exConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
+
+            repoConf.setRemoteStorage( new CRemoteStorage() );
+            repoConf.getRemoteStorage().setProvider( "apacheHttpClient3x" );
+            repoConf.getRemoteStorage().setUrl( getServletServer().getUrl( remoteRepo.getName() ) );
+
+            repo.configure( repoConf );
+
             // repo.setCacheManager( env.getCacheManager() );
             reposes.add( repo.getId() );
 
@@ -91,41 +96,79 @@ public class M2TestsuiteEnvironmentBuilder
         // ading one hosted only
         M2Repository repo = (M2Repository) container.lookup( Repository.class, "maven2" );
 
-        // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
-        repo.setId( "inhouse" );
-        repo.setLocalUrl( env
-            .getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + repo.getId() ).toURI().toURL()
-            .toString() );
-        repo.setLocalStorage( env.getLocalRepositoryStorage() );
-        // repo.setCacheManager( env.getCacheManager() );
+        CRepository repoConf = new DefaultCRepository();
+
+        repoConf.setProviderRole( Repository.class.getName() );
+        repoConf.setProviderHint( "maven2" );
+        repoConf.setId( "inhouse" );
+
+        repoConf.setLocalStorage( new CLocalStorage() );
+        repoConf.getLocalStorage().setProvider( "file" );
+        repoConf.getLocalStorage().setUrl(
+            env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/inhouse" ).toURI().toURL().toString() );
+
+        Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
+        repoConf.setExternalConfiguration( exRepo );
+        M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration( exRepo );
+        exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
+
+        repo.configure( repoConf );
+
         reposes.add( repo.getId() );
+
         env.getRepositoryRegistry().addRepository( repo );
 
         // add a hosted snapshot repo
         M2Repository repoSnapshot = (M2Repository) container.lookup( Repository.class, "maven2" );
 
-        repoSnapshot.setId( "inhouse-snapshot" );
-        repoSnapshot.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
-        repoSnapshot.setLocalUrl( env.getApplicationConfiguration().getWorkingDirectory(
-            "proxy/store/" + repoSnapshot.getId() ).toURI().toURL().toString() );
-        repoSnapshot.setLocalStorage( env.getLocalRepositoryStorage() );
+        CRepository repoSnapshotConf = new DefaultCRepository();
+
+        repoSnapshotConf.setProviderRole( Repository.class.getName() );
+        repoSnapshotConf.setProviderHint( "maven2" );
+        repoSnapshotConf.setId( "inhouse-snapshot" );
+
+        repoSnapshotConf.setLocalStorage( new CLocalStorage() );
+        repoSnapshotConf.getLocalStorage().setProvider( "file" );
+        repoSnapshotConf.getLocalStorage().setUrl(
+            env
+                .getApplicationConfiguration().getWorkingDirectory( "proxy/store/inhouse-snapshot" ).toURI().toURL()
+                .toString() );
+
+        Xpp3Dom exSnapRepo = new Xpp3Dom( "externalConfiguration" );
+        repoSnapshotConf.setExternalConfiguration( exSnapRepo );
+        M2RepositoryConfiguration exSnapRepoConf = new M2RepositoryConfiguration( exSnapRepo );
+        exSnapRepoConf.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
+        exSnapRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
+
+        repoSnapshot.configure( repoSnapshotConf );
+
         reposes.add( repoSnapshot.getId() );
+
         env.getRepositoryRegistry().addRepository( repoSnapshot );
 
+        // add a group
         M2GroupRepository group = (M2GroupRepository) container.lookup( GroupRepository.class, "maven2" );
 
-        group.setId( "test" );
+        CRepository repoGroupConf = new DefaultCRepository();
 
-        group.setLocalUrl( env
-            .getApplicationConfiguration().getWorkingDirectory( "proxy/groupstore/" + repo.getId() ).toURI().toURL()
-            .toString() );
+        repoGroupConf.setProviderRole( GroupRepository.class.getName() );
+        repoGroupConf.setProviderHint( "maven2" );
+        repoGroupConf.setId( "test" );
 
-        group.setLocalStorage( env.getLocalRepositoryStorage() );
+        repoGroupConf.setLocalStorage( new CLocalStorage() );
+        repoGroupConf.getLocalStorage().setProvider( "file" );
+        repoGroupConf.getLocalStorage().setUrl(
+            env.getApplicationConfiguration().getWorkingDirectory( "proxy/store/test" ).toURI().toURL().toString() );
 
-        group.setMemberRepositories( reposes );
+        Xpp3Dom exGroupRepo = new Xpp3Dom( "externalConfiguration" );
+        repoGroupConf.setExternalConfiguration( exGroupRepo );
+        M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
+        exGroupRepoConf.setMemberRepositoryIds( reposes );
+        exGroupRepoConf.setMergeMetadata( true );
+
+        group.configure( repoGroupConf );
 
         env.getRepositoryRegistry().addRepository( group );
-
-        // adding routers
     }
 }

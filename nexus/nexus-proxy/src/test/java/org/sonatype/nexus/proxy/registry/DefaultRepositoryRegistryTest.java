@@ -94,7 +94,7 @@ public class DefaultRepositoryRegistryTest
 
         M2GroupRepository groupRepository = (M2GroupRepository) getContainer().lookup( GroupRepository.class, "maven2" );
         groupRepository.setId( "ALL" );
-        groupRepository.setMemberRepositories( gl );
+        groupRepository.setMemberRepositoryIds( gl );
         repositoryRegistry.addRepository( groupRepository );
 
         List<Repository> repoMembers = repositoryRegistry

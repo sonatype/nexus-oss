@@ -32,4 +32,11 @@ public interface Configurable<T>
      */
     void configure()
         throws ConfigurationException;
+
+    /**
+     * Returns true if the config is changed but is not persisted.
+     * 
+     * @return
+     */
+    boolean isDirty();
 }

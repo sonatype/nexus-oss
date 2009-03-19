@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.configuration.ConfigurationException;
 
 /**
  * The Class JettyTestsuiteEnvironment.
@@ -26,7 +27,6 @@ import org.sonatype.jettytestsuite.ServletServer;
 public abstract class AbstractJettyEnvironmentBuilder
     implements EnvironmentBuilder
 {
-
     private ServletServer servletServer;
 
     public AbstractJettyEnvironmentBuilder( ServletServer servletServer )
@@ -53,7 +53,8 @@ public abstract class AbstractJettyEnvironmentBuilder
     }
 
     public abstract void buildEnvironment( AbstractProxyTestEnvironment env )
-        throws IOException,
+        throws ConfigurationException,
+            IOException,
             ComponentLookupException;
 
 }

@@ -21,7 +21,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
-import org.sonatype.nexus.proxy.repository.RepositoryConfigurationValidator;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.repository.WebSiteRepository;
@@ -62,14 +61,7 @@ public class DefaultMavenSiteRepository
     public void deploySiteBundle( String prefix, InputStream bundle )
         throws IOException
     {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public RepositoryConfigurationValidator getRepositoryConfigurationValidator()
-    {
-        return null;
+        throw new UnsupportedOperationException( "Deploy of the bundle is not yet implemented!" );
     }
 
     @Override

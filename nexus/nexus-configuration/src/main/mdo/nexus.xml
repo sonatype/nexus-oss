@@ -605,6 +605,9 @@
     
     /* A field to store the default local storage URL */
     public transient String defaultLocalStorageUrl;
+
+    /* A field to store actual external configuration implementation */
+    public transient org.sonatype.nexus.configuration.application.ExternalConfiguration externalConfigurationImple;
 ]]></code>
         </codeSegment>
       </codeSegments>
@@ -1125,23 +1128,52 @@
           <version>1.4.0+</version>
           <type>String</type>
           <required>true</required>
-          <description>The plugin Type</description>
+          <description>The plugin Role</description>
         </field>
         <field>
-          <name>active</name>
+          <name>id</name>
           <version>1.4.0+</version>
-          <type>boolean</type>
+          <type>String</type>
           <required>true</required>
-          <description>Is plugin active</description>
+          <description>The plugin Hint</description>
         </field>
         <field>
-          <name>configuration</name>
+          <name>name</name>
+          <version>1.4.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The plugin Hint</description>
+        </field>
+        <field>
+          <name>status</name>
+          <version>1.4.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>Plugin status</description>
+        </field>
+        <field>
+          <name>externalConfiguration</name>
           <version>1.4.0+</version>
           <type>DOM</type>
           <required>false</required>
           <description>Plugin configuration</description>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.4.0+</version>
+          <code><![CDATA[
+    public static final String STATUS_ACTIVE = "active";
+
+    public static final String STATUS_INACTIVE = "inactive";
+
+    public static final String STATUS_BROKEN = "broken";
+
+    /* A field to store actual external configuration implementation */
+    public transient org.sonatype.nexus.configuration.application.ExternalConfiguration externalConfigurationImple;
+]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
 
   </classes>

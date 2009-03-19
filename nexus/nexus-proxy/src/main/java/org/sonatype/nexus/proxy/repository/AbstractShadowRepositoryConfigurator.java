@@ -13,9 +13,9 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.ExternalConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
@@ -27,18 +27,49 @@ public abstract class AbstractShadowRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {
     @Override
-    public void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
-        PlexusConfiguration externalConfiguration )
-        throws InvalidConfigurationException
+    public void doValidate( ApplicationConfiguration configuration, CRepository repo,
+        ExternalConfiguration externalConfiguration )
+        throws ConfigurationException
     {
+        super.doValidate( configuration, repo, externalConfiguration );
+
+        // validate master
+        AbstractShadowRepositoryConfiguration extConf = (AbstractShadowRepositoryConfiguration) externalConfiguration;
+
+        // we can validate existence only
+        try
+        {
+            getRepositoryRegistry().getRepository( extConf.getMasterRepositoryId() );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            ValidationMessage message = new ValidationMessage(
+                "shadowOf",
+                e.getMessage(),
+                "The source nexus repository is not existing." );
+
+            ValidationResponse response = new ApplicationValidationResponse();
+
+            response.addValidationError( message );
+
+            throw new InvalidConfigurationException( response );
+        }
+    }
+
+    @Override
+    public void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
+        ExternalConfiguration externalConfiguration )
+        throws ConfigurationException
+    {
+        super.doConfigure( repository, configuration, repo, externalConfiguration );
+
         ShadowRepository shadowRepository = repository.adaptToFacet( ShadowRepository.class );
+
+        AbstractShadowRepositoryConfiguration extConf = (AbstractShadowRepositoryConfiguration) externalConfiguration;
 
         try
         {
-            Repository masterRepository = getRepositoryRegistry().getRepository(
-                externalConfiguration.getChild( "masterRepository" ).getValue() );
-
-            shadowRepository.setMasterRepository( masterRepository );
+            shadowRepository.setMasterRepositoryId( extConf.getMasterRepositoryId() );
         }
         catch ( IncompatibleMasterRepositoryException e )
         {
@@ -65,10 +96,6 @@ public abstract class AbstractShadowRepositoryConfigurator
             response.addValidationError( message );
 
             throw new InvalidConfigurationException( response );
-        }
-        catch ( PlexusConfigurationException e )
-        {
-            throw new InvalidConfigurationException( "Could not read the configuration!", e );
         }
     }
 

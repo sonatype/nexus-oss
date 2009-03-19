@@ -1,53 +1,37 @@
 package org.sonatype.nexus.proxy.repository;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.ExternalConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 
-public class AbstractGroupRepositoryConfigurator
+public abstract class AbstractGroupRepositoryConfigurator
     extends AbstractRepositoryConfigurator
 {
-    public static final String MEMBER_REPOSITORIES = "memberRepositories";
-
     @Override
-    public void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
-        PlexusConfiguration externalConfiguration )
+    public void doValidate( ApplicationConfiguration configuration, CRepository repo,
+        ExternalConfiguration externalConfiguration )
         throws ConfigurationException
     {
-        super.doConfigure( repository, configuration, repo, externalConfiguration );
+        super.doValidate( configuration, repo, externalConfiguration );
 
-        List<String> members = new ArrayList<String>( externalConfiguration
-            .getChild( MEMBER_REPOSITORIES ).getChildCount() );
+        AbstractGroupRepositoryConfiguration extConf = (AbstractGroupRepositoryConfiguration) externalConfiguration;
 
-        try
-        {
-            for ( PlexusConfiguration config : externalConfiguration.getChild( MEMBER_REPOSITORIES ).getChildren() )
-            {
-                members.add( config.getValue() );
-            }
-        }
-        catch ( PlexusConfigurationException e )
-        {
-            throw new InvalidConfigurationException( "Cannot read configuration!" );
-        }
-
-        for ( String repoId : members )
+        for ( String repoId : extConf.getMemberRepositoryIds() )
         {
             try
             {
+                ContentClass myContentClass = getRepositoryTypeRegistry().getRepositoryContentClass( repo.getProviderRole(),repo.getProviderHint() );
+
                 Repository member = getRepositoryRegistry().getRepository( repoId );
 
-                if ( !repository.getRepositoryContentClass().isCompatible( member.getRepositoryContentClass() ) )
+                if ( !myContentClass.isCompatible( member.getRepositoryContentClass() ) )
                 {
                     ValidationResponse response = new ApplicationValidationResponse();
 
@@ -75,7 +59,5 @@ public class AbstractGroupRepositoryConfigurator
                 throw new InvalidConfigurationException( response );
             }
         }
-
-        repository.adaptToFacet( GroupRepository.class ).setMemberRepositories( members );
     }
 }

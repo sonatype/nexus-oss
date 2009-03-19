@@ -77,36 +77,10 @@ public abstract class AbstractMavenRepository
 
     private ArtifactStoreHelper artifactStoreHelper;
 
-    /** Maven repository policy */
-    private RepositoryPolicy repositoryPolicy = RepositoryPolicy.RELEASE;
-
-    /** Should repository metadata be cleaned? */
-    private boolean cleanseRepositoryMetadata = false;
-
-    /** Should repository provide correct checksums even if wrong ones are in repo? */
-    private boolean fixRepositoryChecksums = false;
-
-    private boolean downloadRemoteIndexes;
-
-    /**
-     * The release max age (in minutes).
-     */
-    private int releaseMaxAge = 24 * 60;
-
-    /**
-     * The snapshot max age (in minutes).
-     */
-    private int snapshotMaxAge = 24 * 60;
-
-    /**
-     * The metadata max age (in minutes).
-     */
-    private int metadataMaxAge = 24 * 60;
-
-    /**
-     * Checksum policy applied in this Maven repository.
-     */
-    private ChecksumPolicy checksumPolicy;
+    protected AbstractMavenRepositoryConfiguration getExternalConfiguration()
+    {
+        return (AbstractMavenRepositoryConfiguration) super.getExternalConfiguration();
+    }
 
     public ArtifactStoreHelper getArtifactStoreHelper()
     {
@@ -187,82 +161,62 @@ public abstract class AbstractMavenRepository
 
     public boolean isDownloadRemoteIndexes()
     {
-        return downloadRemoteIndexes;
+        return getExternalConfiguration().isDownloadRemoteIndex();
     }
 
     public void setDownloadRemoteIndexes( boolean downloadRemoteIndexes )
     {
-        this.downloadRemoteIndexes = downloadRemoteIndexes;
+        getExternalConfiguration().setDownloadRemoteIndex( downloadRemoteIndexes );
     }
 
     public RepositoryPolicy getRepositoryPolicy()
     {
-        return repositoryPolicy;
+        return getExternalConfiguration().getRepositoryPolicy();
     }
 
     public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
     {
-        this.repositoryPolicy = repositoryPolicy;
+        getExternalConfiguration().setRepositoryPolicy( repositoryPolicy );
     }
 
     public boolean isCleanseRepositoryMetadata()
     {
-        return cleanseRepositoryMetadata;
+        return getExternalConfiguration().isCleanseRepositoryMetadata();
     }
 
     public void setCleanseRepositoryMetadata( boolean cleanseRepositoryMetadata )
     {
-        this.cleanseRepositoryMetadata = cleanseRepositoryMetadata;
-    }
-
-    public boolean isFixRepositoryChecksums()
-    {
-        return fixRepositoryChecksums;
-    }
-
-    public void setFixRepositoryChecksums( boolean fixRepositoryChecksums )
-    {
-        this.fixRepositoryChecksums = fixRepositoryChecksums;
+        getExternalConfiguration().setCleanseRepositoryMetadata( cleanseRepositoryMetadata );
     }
 
     public ChecksumPolicy getChecksumPolicy()
     {
-        return checksumPolicy;
+        return getExternalConfiguration().getChecksumPolicy();
     }
 
     public void setChecksumPolicy( ChecksumPolicy checksumPolicy )
     {
-        this.checksumPolicy = checksumPolicy;
+        getExternalConfiguration().setChecksumPolicy( checksumPolicy );
     }
 
-    public int getReleaseMaxAge()
+    public int getArtifactMaxAge()
     {
-        return releaseMaxAge;
+        return getExternalConfiguration().getArtifactMaxAge();
     }
 
-    public void setReleaseMaxAge( int releaseMaxAge )
+    public void setArtifactMaxAge( int maxAge )
     {
-        this.releaseMaxAge = releaseMaxAge;
-    }
-
-    public int getSnapshotMaxAge()
-    {
-        return snapshotMaxAge;
-    }
-
-    public void setSnapshotMaxAge( int snapshotMaxAge )
-    {
-        this.snapshotMaxAge = snapshotMaxAge;
+        getExternalConfiguration().setArtifactMaxAge( maxAge );
     }
 
     public int getMetadataMaxAge()
     {
-        return metadataMaxAge;
+        return getExternalConfiguration().getMetadataMaxAge();
     }
 
     public void setMetadataMaxAge( int metadataMaxAge )
     {
-        this.metadataMaxAge = metadataMaxAge;
+        getExternalConfiguration().setMetadataMaxAge( metadataMaxAge );
     }
 
     public abstract boolean shouldServeByPolicies( ResourceStoreRequest request );

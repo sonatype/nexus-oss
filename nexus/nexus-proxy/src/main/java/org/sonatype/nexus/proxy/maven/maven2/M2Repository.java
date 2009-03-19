@@ -43,7 +43,6 @@ import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryConfigurationValidator;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.util.AlphanumComparator;
 
@@ -76,13 +75,6 @@ public class M2Repository
     public GavCalculator getGavCalculator()
     {
         return gavCalculator;
-    }
-
-    @Override
-    public RepositoryConfigurationValidator getRepositoryConfigurationValidator()
-    {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -191,7 +183,7 @@ public class M2Repository
         }
         if ( M2ArtifactRecognizer.isSnapshot( item.getPath() ) )
         {
-            return isOld( getSnapshotMaxAge(), item );
+            return isOld( getArtifactMaxAge(), item );
         }
 
         // we are using Gav to test the path
@@ -203,7 +195,7 @@ public class M2Repository
             return super.isOld( item );
         }
         // it is a release
-        return isOld( getReleaseMaxAge(), item );
+        return isOld( getArtifactMaxAge(), item );
     }
 
     @SuppressWarnings( "unchecked" )

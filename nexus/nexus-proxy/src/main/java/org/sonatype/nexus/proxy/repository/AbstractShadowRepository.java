@@ -13,8 +13,10 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
@@ -25,6 +27,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
@@ -39,41 +42,55 @@ public abstract class AbstractShadowRepository
     extends AbstractRepository
     implements ShadowRepository
 {
-    /** The master repository. */
-    private Repository masterRepository;
+    @Requirement
+    private RepositoryRegistry repositoryRegistry;
 
-    private RepositoryKind repositoryKind = new DefaultRepositoryKind( ShadowRepository.class, null );
+    protected AbstractShadowRepositoryConfiguration getExternalConfiguration()
+    {
+        return (AbstractShadowRepositoryConfiguration) super.getExternalConfiguration();
+    }
 
-    /**
-     * Gets the master repository.
-     * 
-     * @return the master repository
-     */
+    public String getMasterRepositoryId()
+    {
+        return getExternalConfiguration().getMasterRepositoryId();
+    }
+
+    public void setMasterRepositoryId( String id )
+        throws NoSuchRepositoryException,
+            IncompatibleMasterRepositoryException
+    {
+        setMasterRepository( repositoryRegistry.getRepository( id ) );
+    }
+
     public Repository getMasterRepository()
     {
-        return masterRepository;
+        try
+        {
+            return repositoryRegistry.getRepository( getExternalConfiguration().getMasterRepositoryId() );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // erm?
+
+            getLogger().warn(
+                "ShadowRepository ID='" + getId() + "' cannot fetch it's master repository with ID='"
+                    + getMasterRepositoryId() + "'!",
+                e );
+
+            return null;
+        }
     }
 
-    public RepositoryKind getRepositoryKind()
-    {
-        return repositoryKind;
-    }
-
-    /**
-     * Sets the master repository.
-     * 
-     * @param masterRepository the new master repository
-     */
     public void setMasterRepository( Repository masterRepository )
         throws IncompatibleMasterRepositoryException
     {
         if ( getMasterRepositoryContentClass().getId().equals( masterRepository.getRepositoryContentClass().getId() ) )
         {
-            this.masterRepository = masterRepository;
+            getExternalConfiguration().setMasterRepositoryId( masterRepository.getId() );
         }
         else
         {
-            throw new IncompatibleMasterRepositoryException( this, masterRepository );
+            throw new IncompatibleMasterRepositoryException( this, masterRepository.getId() );
         }
     }
 

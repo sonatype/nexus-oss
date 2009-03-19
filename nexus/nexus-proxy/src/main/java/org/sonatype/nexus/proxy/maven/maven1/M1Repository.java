@@ -24,7 +24,6 @@ import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryConfigurationValidator;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 
 /**
@@ -57,13 +56,6 @@ public class M1Repository
     public GavCalculator getGavCalculator()
     {
         return gavCalculator;
-    }
-
-    @Override
-    public RepositoryConfigurationValidator getRepositoryConfigurationValidator()
-    {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -114,6 +106,7 @@ public class M1Repository
         }
     }
 
+    @Override
     protected boolean isOld( StorageItem item )
     {
         if ( M1ArtifactRecognizer.isMetadata( item.getPath() ) )
@@ -122,7 +115,7 @@ public class M1Repository
         }
         if ( M1ArtifactRecognizer.isSnapshot( item.getPath() ) )
         {
-            return isOld( getSnapshotMaxAge(), item );
+            return isOld( getArtifactMaxAge(), item );
         }
 
         // we are using Gav to test the path
@@ -133,8 +126,9 @@ public class M1Repository
             // this is not an artifact, it is just any "file"
             return super.isOld( item );
         }
+        
         // it is a release
-        return isOld( getReleaseMaxAge(), item );
+        return isOld( getArtifactMaxAge(), item );
     }
 
     // not available on maven1 repo

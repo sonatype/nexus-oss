@@ -42,7 +42,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.RepositoryConfigurationValidator;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -65,16 +64,20 @@ public class M2GroupRepository
     @Requirement
     private M2GroupRepositoryConfigurator m2GroupRepositoryConfigurator;
 
-    private boolean mergeMetadata = true;
+    @Override
+    protected M2GroupRepositoryConfiguration getExternalConfiguration()
+    {
+        return (M2GroupRepositoryConfiguration) super.getExternalConfiguration();
+    }
 
     public boolean isMergeMetadata()
     {
-        return mergeMetadata;
+        return getExternalConfiguration().isMergeMetadata();
     }
 
     public void setMergeMetadata( boolean mergeMetadata )
     {
-        this.mergeMetadata = mergeMetadata;
+        getExternalConfiguration().setMergeMetadata( mergeMetadata );
     }
 
     public ContentClass getRepositoryContentClass()
@@ -85,13 +88,6 @@ public class M2GroupRepository
     public GavCalculator getGavCalculator()
     {
         return gavCalculator;
-    }
-
-    @Override
-    public RepositoryConfigurationValidator getRepositoryConfigurationValidator()
-    {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -142,7 +138,7 @@ public class M2GroupRepository
             throw new ItemNotFoundException( request, this );
         }
 
-        if ( !mergeMetadata )
+        if ( !isMergeMetadata() )
         {
             // not merging: return the 1st and ciao
             return listOfStorageItems.get( 0 );

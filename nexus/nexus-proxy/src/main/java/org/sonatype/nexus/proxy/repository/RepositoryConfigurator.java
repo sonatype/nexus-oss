@@ -25,6 +25,16 @@ import org.sonatype.nexus.configuration.model.CRepository;
 public interface RepositoryConfigurator
 {
     /**
+     * Validates the repoConfig.
+     * 
+     * @param configuration
+     * @param repoConfig
+     * @throws ConfigurationException on validation problem.
+     */
+    public void validate( ApplicationConfiguration configuration, CRepository repoConfig )
+        throws ConfigurationException;
+
+    /**
      * Will apply the configuration is parameter repo to the repository.
      * 
      * @param repository
@@ -43,6 +53,12 @@ public interface RepositoryConfigurator
      * @param repoConfig
      * @throws ConfigurationException
      */
-    void prepareForSave( Repository repository, ApplicationConfiguration configuration, CRepository repoConfig )
-        throws ConfigurationException;
+    void prepareForSave( Repository repository, ApplicationConfiguration configuration, CRepository repoConfig );
+
+    /**
+     * Returns the external configuration object, if any. Null otherwise.
+     * 
+     * @return
+     */
+    Object getExternalConfiguration( Repository repository );
 }

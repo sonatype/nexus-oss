@@ -11,14 +11,28 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.repository;
+package org.sonatype.nexus.proxy.maven;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryConfiguration;
 
-public interface RepositoryConfigurationValidator
+public abstract class AbstractMavenGroupRepositoryConfiguration
+    extends AbstractGroupRepositoryConfiguration
 {
-    public void validate( ApplicationConfiguration configuration, CRepository repo )
-        throws ConfigurationException;
+    private static final String MERGE_METADATA = "mergeMetadata";
+
+    public AbstractMavenGroupRepositoryConfiguration( Xpp3Dom configuration )
+    {
+        super( configuration );
+    }
+
+    public boolean isMergeMetadata()
+    {
+        return Boolean.parseBoolean( getNodeValue( getConfiguration(), MERGE_METADATA, Boolean.TRUE.toString() ) );
+    }
+
+    public void setMergeMetadata( boolean val )
+    {
+        setNodeValue( getConfiguration(), MERGE_METADATA, Boolean.toString( val ) );
+    }
 }

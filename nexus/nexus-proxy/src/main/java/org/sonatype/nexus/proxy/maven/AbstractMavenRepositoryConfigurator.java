@@ -13,67 +13,10 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfigurator;
-import org.sonatype.nexus.proxy.repository.Repository;
 
-public class AbstractMavenRepositoryConfigurator
+public abstract class AbstractMavenRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {
-    public static final String REPOSITORY_POLICY = "repositoryPolicy";
 
-    public static final String CHECKSUM_POLICY = "checksumPolicy";
-
-    public static final String ARTIFACT_MAX_AGE = "artifactMaxAge";
-
-    public static final String METADATA_MAX_AGE = "metadataMaxAge";
-
-    public static final String MAINTAIN_PROXIED_REPOSITORY_METADATA = "maintainProxiedRepositoryMetadata";
-
-    @Override
-    public void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
-        PlexusConfiguration externalConfiguration )
-        throws ConfigurationException
-    {
-        super.doConfigure( repository, configuration, repo, externalConfiguration );
-
-        MavenRepository mrepository = repository.adaptToFacet( MavenRepository.class );
-
-        try
-        {
-            mrepository.setRepositoryPolicy( RepositoryPolicy.valueOf( externalConfiguration.getChild(
-                REPOSITORY_POLICY ).getValue() ) );
-        }
-        catch ( PlexusConfigurationException e )
-        {
-            throw new InvalidConfigurationException( "Cannot read the repository policy for repository ID='"
-                + repository.getId() + "'" );
-        }
-
-        if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
-        {
-            MavenProxyRepository mpr = repository.adaptToFacet( MavenProxyRepository.class );
-
-            mpr.setChecksumPolicy( ChecksumPolicy.valueOf( externalConfiguration
-                .getChild( CHECKSUM_POLICY ).getValue( ChecksumPolicy.WARN.toString() ) ) );
-
-            mpr.setReleaseMaxAge( Integer.parseInt( externalConfiguration.getChild( ARTIFACT_MAX_AGE ).getValue(
-                String.valueOf( 1440 ) ) ) );
-
-            mpr.setSnapshotMaxAge( Integer.parseInt( externalConfiguration.getChild( ARTIFACT_MAX_AGE ).getValue(
-                String.valueOf( 1440 ) ) ) );
-
-            mpr.setMetadataMaxAge( Integer.parseInt( externalConfiguration.getChild( METADATA_MAX_AGE ).getValue(
-                String.valueOf( 1440 ) ) ) );
-
-            mpr.setCleanseRepositoryMetadata( Boolean.parseBoolean( externalConfiguration.getChild(
-                MAINTAIN_PROXIED_REPOSITORY_METADATA ).getValue( String.valueOf( false ) ) ) );
-
-        }
-    }
 }

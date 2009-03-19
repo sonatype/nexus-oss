@@ -13,48 +13,8 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-
 public abstract class AbstractWebSiteRepositoryConfigurator
     extends AbstractRepositoryConfigurator
 {
-    public static final String WELCOME_FILES = "welcomeFiles";
 
-    @Override
-    protected void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
-        PlexusConfiguration externalConfiguration )
-        throws ConfigurationException
-    {
-        if ( externalConfiguration.getChild( WELCOME_FILES, false ) != null )
-        {
-            List<String> welcomeFiles = new ArrayList<String>( externalConfiguration
-                .getChild( WELCOME_FILES ).getChildCount() );
-
-            try
-            {
-                for ( PlexusConfiguration config : externalConfiguration.getChild( WELCOME_FILES ).getChildren() )
-                {
-                    welcomeFiles.add( config.getValue() );
-                }
-            }
-            catch ( PlexusConfigurationException e )
-            {
-                throw new InvalidConfigurationException( "Cannot read configuration!" );
-            }
-
-            WebSiteRepository webSite = repository.adaptToFacet( WebSiteRepository.class );
-
-            webSite.getWelcomeFiles().clear();
-
-            webSite.getWelcomeFiles().addAll( welcomeFiles );
-        }
-    }
 }

@@ -31,18 +31,25 @@ public interface GroupRepository
     extends Repository
 {
     /**
+     * Returns the ID list of the members of this group.
+     * 
+     * @return
+     */
+    List<String> getMemberRepositoryIds();
+
+    /**
      * Sets the members of this group.
      * 
      * @param repositories
      */
-    void setMemberRepositories( List<String> repositories );
+    void setMemberRepositoryIds( List<String> repositories );
 
     /**
      * Removes a member from this group.
      * 
      * @param repositoryId
      */
-    void removeMemberRepository( String repositoryId );
+    void removeMemberRepositoryId( String repositoryId );
 
     /**
      * Returns the unmodifiable list of Repositories that are group members in this GroupRepository. The repo order

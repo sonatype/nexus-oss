@@ -15,7 +15,7 @@ package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryConfigurator;
 
-public class AbstractMavenGroupRepositoryConfigurator
+public abstract class AbstractMavenGroupRepositoryConfigurator
     extends AbstractGroupRepositoryConfigurator
 {
 }

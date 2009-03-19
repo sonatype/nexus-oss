@@ -3,10 +3,14 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.ExternalConfiguration;
 import org.sonatype.nexus.configuration.model.CMirror;
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
@@ -17,34 +21,26 @@ import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
-public class AbstractProxyRepositoryConfigurator
+public abstract class AbstractProxyRepositoryConfigurator
     extends AbstractRepositoryConfigurator
 {
-    public static final String PROXY_MODE = "proxyMode";
-
-    public static final String ITEM_MAX_AGE = "itemMaxAge";
-
     /** The global remote storage context, without any parent. */
     private RemoteStorageContext globalRemoteStorageContext = new DefaultRemoteStorageContext( null );
 
     @Override
     public void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
-        PlexusConfiguration externalConfiguration )
+        ExternalConfiguration externalConfiguration )
         throws ConfigurationException
     {
         super.doConfigure( repository, configuration, repo, externalConfiguration );
 
-        // proxy stuff
+        // proxy stuff, but is optional!
 
         if ( repo.getRemoteStorage() != null )
         {
-            ProxyRepository prepository = repository.adaptToFacet( ProxyRepository.class );
-
-            prepository.setProxyMode( ProxyMode.valueOf( externalConfiguration.getChild( PROXY_MODE ).getValue(
-                ProxyMode.ALLOW.toString() ) ) );
-
-            prepository.setItemMaxAge( Integer.parseInt( externalConfiguration.getChild( ITEM_MAX_AGE ).getValue(
-                String.valueOf( 1440 ) ) ) );
+            // NOTE: we are intentionally _casting_ it, not calling adaptToFacet(), since repo implementation
+            // still does not know that is should be a proxy repo!
+            ProxyRepository prepository = (ProxyRepository) repository;
 
             try
             {
@@ -55,10 +51,10 @@ public class AbstractProxyRepositoryConfigurator
 
                     rs.validateStorageUrl( repo.getRemoteStorage().getUrl() );
 
-                    prepository.setRemoteUrl( repo.getRemoteStorage().getUrl() );
                     prepository.setRemoteStorage( rs );
 
                     List<CMirror> mirrors = (List<CMirror>) repo.getRemoteStorage().getMirrors();
+
                     if ( mirrors != null && mirrors.size() > 0 )
                     {
                         List<Mirror> runtimeMirrors = new ArrayList<Mirror>();
@@ -116,6 +112,80 @@ public class AbstractProxyRepositoryConfigurator
 
                 throw new InvalidConfigurationException( response );
             }
+        }
+    }
+
+    @Override
+    protected void doPrepareForSave( Repository repository, ApplicationConfiguration configuration,
+        CRepository repoConfig, ExternalConfiguration externalConfiguration )
+    {
+        super.doPrepareForSave( repository, configuration, repoConfig, externalConfiguration );
+
+        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        {
+            ProxyRepository prepository = repository.adaptToFacet( ProxyRepository.class );
+
+            List<Mirror> mirrors = (List<Mirror>) prepository.getDownloadMirrors().getMirrors();
+
+            if ( mirrors != null && mirrors.size() > 0 )
+            {
+                List<CMirror> runtimeMirrors = new ArrayList<CMirror>();
+
+                for ( Mirror mirror : mirrors )
+                {
+                    CMirror cmirror = new CMirror();
+
+                    cmirror.setId( mirror.getId() );
+                    cmirror.setUrl( mirror.getUrl() );
+                    runtimeMirrors.add( cmirror );
+                }
+
+                repoConfig.getRemoteStorage().setMirrors( runtimeMirrors );
+            }
+            else
+            {
+                repoConfig.getRemoteStorage().getMirrors().clear();
+            }
+
+            RemoteStorageContext rsc = prepository.getRemoteStorageContext();
+
+            CRemoteConnectionSettings conn = (CRemoteConnectionSettings) rsc
+                .getRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS );
+
+            if ( conn != null )
+            {
+                repoConfig.getRemoteStorage().setConnectionSettings( conn );
+            }
+
+            CRemoteHttpProxySettings proxy = (CRemoteHttpProxySettings) rsc
+                .getRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS );
+
+            if ( proxy != null )
+            {
+                repoConfig.getRemoteStorage().setHttpProxySettings( proxy );
+            }
+
+            CRemoteAuthentication auth = (CRemoteAuthentication) rsc
+                .getRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS );
+
+            if ( auth != null )
+            {
+                repoConfig.getRemoteStorage().setAuthentication( auth );
+            }
+        }
+    }
+
+    protected RemoteRepositoryStorage getRemoteRepositoryStorage( String repoId, String provider )
+        throws InvalidConfigurationException
+    {
+        try
+        {
+            return getPlexusContainer().lookup( RemoteRepositoryStorage.class, provider );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new InvalidConfigurationException( "Repository " + repoId
+                + " have remote storage with unsupported provider: " + provider, e );
         }
     }
 }

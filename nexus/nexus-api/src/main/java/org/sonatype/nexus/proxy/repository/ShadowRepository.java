@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
@@ -36,7 +37,7 @@ public interface ShadowRepository
      * 
      * @return
      */
-    Repository getMasterRepository();
+    String getMasterRepositoryId();
 
     /**
      * Sets the master repository of this ShadowRepository.
@@ -44,7 +45,23 @@ public interface ShadowRepository
      * @param masterRepository
      * @throws IncompatibleMasterRepositoryException
      */
-    public void setMasterRepository( Repository masterRepository )
+    public void setMasterRepositoryId( String masterRepositoryId )
+        throws NoSuchRepositoryException,
+            IncompatibleMasterRepositoryException;
+
+    /**
+     * Returns the master.
+     * 
+     * @return
+     */
+    Repository getMasterRepository();
+
+    /**
+     * Sets the master.
+     * 
+     * @return
+     */
+    void setMasterRepository( Repository repository )
         throws IncompatibleMasterRepositoryException;
 
     /**

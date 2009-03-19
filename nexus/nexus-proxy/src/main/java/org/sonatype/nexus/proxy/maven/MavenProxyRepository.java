@@ -22,21 +22,13 @@ public interface MavenProxyRepository
 
     void setCleanseRepositoryMetadata( boolean cleanseRepositoryMetadata );
 
-    boolean isFixRepositoryChecksums();
-
-    void setFixRepositoryChecksums( boolean fixRepositoryChecksums );
-
     ChecksumPolicy getChecksumPolicy();
 
     void setChecksumPolicy( ChecksumPolicy checksumPolicy );
 
-    int getReleaseMaxAge();
+    int getArtifactMaxAge();
 
-    void setReleaseMaxAge( int releaseMaxAge );
-
-    int getSnapshotMaxAge();
-
-    void setSnapshotMaxAge( int snapshotMaxAge );
+    void setArtifactMaxAge( int maxAge );
 
     int getMetadataMaxAge();
 

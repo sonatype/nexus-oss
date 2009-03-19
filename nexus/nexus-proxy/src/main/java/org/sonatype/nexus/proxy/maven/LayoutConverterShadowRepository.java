@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -35,8 +36,11 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.AbstractShadowRepository;
+import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.IncompatibleMasterRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -73,9 +77,20 @@ public abstract class LayoutConverterShadowRepository
     private ArtifactPackagingMapper artifactPackagingMapper;
 
     /**
+     * Repository kind.
+     */
+    private RepositoryKind repositoryKind = new DefaultRepositoryKind( ShadowRepository.class, Arrays
+        .asList( new Class<?>[] { MavenRepository.class } ) );
+
+    /**
      * ArtifactStoreHelper.
      */
     private ArtifactStoreHelper artifactStoreHelper;
+
+    public RepositoryKind getRepositoryKind()
+    {
+        return repositoryKind;
+    }
 
     @Override
     public MavenRepository getMasterRepository()
@@ -93,7 +108,7 @@ public abstract class LayoutConverterShadowRepository
             throw new IncompatibleMasterRepositoryException(
                 "This shadow repository needs master repository which implements MavenRepository interface!",
                 this,
-                masterRepository );
+                masterRepository.getId() );
         }
 
         super.setMasterRepository( masterRepository );

@@ -13,9 +13,16 @@ public interface WebSiteRepository
     extends HostedRepository
 {
     /**
-     * Gets the list of modifiable "welcome" file names. Example: "index.html", "index.htm".
+     * Gets the list of unmodifiable "welcome" file names. Example: "index.html", "index.htm".
      * 
      * @return
      */
     List<String> getWelcomeFiles();
+
+    /**
+     * Sets the list of welcome files.
+     * 
+     * @param files
+     */
+    void setWelcomeFiles( List<String> files );
 }
