@@ -298,16 +298,35 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       var resp = Ext.decode(response.responseText);
       var myMenu = Ext.menu.MenuMgr.get('log-menu');
       
-      for ( var i=0; i<resp.data.length; i++){
-      	var name = resp.data[i].name;
-      	var uri = resp.data[i].resourceURI;
+      if ( resp.data.length > 0 ){
+    	  myMenu.add('-');
+      }
+      
+      var list = resp.data;
+      // bubble sort the list
+      for ( var i=1; i<list.length; i++){
+    	  for ( var j=i; j>0; j--){
+    		  if ( list[j].name.toLowerCase() < list[j-1].name.toLowerCase() ){
+    			  var temp = list[j];
+    			  list[j] = list[j-1];
+    			  list[j-1] = temp;
+    		  }
+    		  else{
+    			  break;
+    		  }
+    	  }
+      }
+      
+      for ( var i=0; i<list.length; i++){
+      	var name = list[i].name;
+      	var uri = list[i].resourceURI;
       	
       	var existingItem = myMenu.items.find( function( o ) {
           return o.logUri == uri;
         } );
         
         if ( !existingItem ){
-        	  myMenu.addMenuItem({
+          myMenu.addMenuItem({
             id: name,
             logUri: uri, 
             text: name,
