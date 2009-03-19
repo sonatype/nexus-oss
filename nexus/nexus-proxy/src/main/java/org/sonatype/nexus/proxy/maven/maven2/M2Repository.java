@@ -67,6 +67,12 @@ public class M2Repository
     @Requirement
     private M2RepositoryConfigurator m2RepositoryConfigurator;
 
+    @Override
+    protected M2RepositoryConfiguration getExternalConfiguration()
+    {
+        return (M2RepositoryConfiguration) super.getExternalConfiguration();
+    }
+    
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;

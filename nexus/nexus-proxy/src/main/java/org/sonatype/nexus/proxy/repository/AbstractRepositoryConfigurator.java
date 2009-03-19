@@ -12,8 +12,9 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.ExternalConfiguration;
 import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
@@ -51,22 +52,24 @@ public abstract class AbstractRepositoryConfigurator
     }
 
     public final void applyConfiguration( Repository repository, ApplicationConfiguration configuration,
-        CRepository repoConfig )
+        CoreConfiguration config )
         throws ConfigurationException
     {
-        prepareExternalConfiguration( repoConfig );
+        prepareExternalConfiguration( (CRepository) config.getConfiguration( false ) );
 
-        doConfigure( repository, configuration, repoConfig, repoConfig.externalConfigurationImple );
+        doConfigure( repository, configuration, (CRepository) config.getConfiguration( false ), config
+            .getExternalConfiguration() );
     }
 
     public final void prepareForSave( Repository repository, ApplicationConfiguration configuration,
-        CRepository repoConfig )
+        CoreConfiguration config )
     {
-        prepareExternalConfiguration( repoConfig );
+        prepareExternalConfiguration( (CRepository) config.getConfiguration( false ) );
 
         // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
         // later we will see about it
-        doPrepareForSave( repository, configuration, repoConfig, repoConfig.externalConfigurationImple );
+        doPrepareForSave( repository, configuration, (CRepository) config.getConfiguration( false ), config
+            .getExternalConfiguration() );
     }
 
     protected void prepareExternalConfiguration( CRepository repoConfig )
@@ -90,7 +93,7 @@ public abstract class AbstractRepositoryConfigurator
 
     public ExternalConfiguration getExternalConfiguration( Repository repository )
     {
-        return ( (AbstractRepository) repository ).getCurrentConfiguration().externalConfigurationImple;
+        return repository.getCurrentCoreConfiguration().getExternalConfiguration();
     }
 
     protected void doValidate( ApplicationConfiguration configuration, CRepository repo,

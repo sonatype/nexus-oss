@@ -18,34 +18,34 @@ public class AbstractProxyRepositoryConfiguration
 
     public ProxyMode getProxyMode()
     {
-        return ProxyMode.valueOf( getNodeValue( getConfiguration(), PROXY_MODE, ProxyMode.ALLOW.toString() ) );
+        return ProxyMode.valueOf( getNodeValue( getConfiguration( false ), PROXY_MODE, ProxyMode.ALLOW.toString() ) );
     }
 
     public void setProxyMode( ProxyMode mode )
     {
-        setNodeValue( getConfiguration(), PROXY_MODE, mode.toString() );
+        setNodeValue( getConfiguration( true ), PROXY_MODE, mode.toString() );
     }
 
     public RepositoryStatusCheckMode getRepositoryStatusCheckMode()
     {
         return RepositoryStatusCheckMode.valueOf( getNodeValue(
-            getConfiguration(),
+            getConfiguration( false ),
             REMOTE_STATUS_CHECK_MODE,
             RepositoryStatusCheckMode.AUTO_BLOCKED_ONLY.toString() ) );
     }
 
     public void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode )
     {
-        setNodeValue( getConfiguration(), REMOTE_STATUS_CHECK_MODE, mode.toString() );
+        setNodeValue( getConfiguration( true ), REMOTE_STATUS_CHECK_MODE, mode.toString() );
     }
 
     public int getItemMaxAge()
     {
-        return Integer.parseInt( getNodeValue( getConfiguration(), ITEM_MAX_AGE, "1440" ) );
+        return Integer.parseInt( getNodeValue( getConfiguration( false ), ITEM_MAX_AGE, "1440" ) );
     }
 
     public void setItemMaxAge( int age )
     {
-        setNodeValue( getConfiguration(), ITEM_MAX_AGE, String.valueOf( age ) );
+        setNodeValue( getConfiguration( true ), ITEM_MAX_AGE, String.valueOf( age ) );
     }
 }

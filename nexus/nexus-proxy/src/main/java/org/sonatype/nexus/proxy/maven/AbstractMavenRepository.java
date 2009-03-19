@@ -77,6 +77,7 @@ public abstract class AbstractMavenRepository
 
     private ArtifactStoreHelper artifactStoreHelper;
 
+    @Override
     protected AbstractMavenRepositoryConfiguration getExternalConfiguration()
     {
         return (AbstractMavenRepositoryConfiguration) super.getExternalConfiguration();

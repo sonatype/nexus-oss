@@ -27,9 +27,11 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationSaveEvent;
+import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.ExternalConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CoreCRepositoryConfiguration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -141,26 +143,31 @@ public abstract class AbstractRepository
     private List<RequestProcessor> requestProcessors;
 
     /** The configuration */
-    private CRepository repositoryConfiguration;
-
-    /** dirty flag */
-    private boolean dirty;
+    private CoreConfiguration repositoryConfiguration;
 
     protected void markDirty()
     {
-        dirty = true;
     }
 
     protected void unmarkDirty()
     {
-        dirty = false;
     }
 
     // Configurable iface
 
-    public final CRepository getCurrentConfiguration()
+    public final CoreConfiguration getCurrentCoreConfiguration()
     {
         return repositoryConfiguration;
+    }
+
+    protected CRepository getCurrentConfiguration( boolean forWrite )
+    {
+        return (CRepository) repositoryConfiguration.getConfiguration( forWrite );
+    }
+
+    protected ExternalConfiguration getExternalConfiguration()
+    {
+        return getCurrentCoreConfiguration().getExternalConfiguration();
     }
 
     public final void validateConfiguration( Object config )
@@ -186,7 +193,7 @@ public abstract class AbstractRepository
     {
         validateConfiguration( config );
 
-        this.repositoryConfiguration = (CRepository) config;
+        this.repositoryConfiguration = new CoreCRepositoryConfiguration( (CRepository) config );
 
         doConfigure( false );
     }
@@ -199,7 +206,8 @@ public abstract class AbstractRepository
 
     public boolean isDirty()
     {
-        return dirty || getExternalConfiguration().isDirty();
+        return getCurrentCoreConfiguration().isDirty()
+            || getCurrentCoreConfiguration().getExternalConfiguration().isDirty();
     }
 
     protected void doValidateConfiguration( CRepository config )
@@ -216,17 +224,18 @@ public abstract class AbstractRepository
     {
         if ( validate )
         {
-            doValidateConfiguration( getCurrentConfiguration() );
+            doValidateConfiguration( getCurrentConfiguration( false ) );
         }
 
-        getRepositoryConfigurator().applyConfiguration( this, applicationConfiguration, getCurrentConfiguration() );
+        getCurrentCoreConfiguration().applyChanges();
 
-        dirty = false;
-    }
-
-    protected ExternalConfiguration getExternalConfiguration()
-    {
-        return getCurrentConfiguration().externalConfigurationImple;
+        if ( getCurrentCoreConfiguration().getExternalConfiguration() != null )
+        {
+            getCurrentCoreConfiguration().getExternalConfiguration().applyChanges();
+        }
+        
+        getRepositoryConfigurator()
+            .applyConfiguration( this, applicationConfiguration, getCurrentCoreConfiguration() );
     }
 
     public abstract RepositoryConfigurator getRepositoryConfigurator();
@@ -256,11 +265,16 @@ public abstract class AbstractRepository
         {
             if ( isDirty() )
             {
-                getRepositoryConfigurator().prepareForSave( this, applicationConfiguration, getCurrentConfiguration() );
+                getCurrentCoreConfiguration().applyChanges();
+
+                getCurrentCoreConfiguration().getExternalConfiguration().applyChanges();
+
+                getRepositoryConfigurator().prepareForSave(
+                    this,
+                    applicationConfiguration,
+                    getCurrentCoreConfiguration() );
 
                 unmarkDirty();
-
-                getExternalConfiguration().unmarkDirty();
             }
         }
     }
@@ -342,24 +356,24 @@ public abstract class AbstractRepository
 
     public String getId()
     {
-        return repositoryConfiguration.getId();
+        return getCurrentConfiguration( false ).getId();
     }
 
     public void setId( String id )
     {
-        getCurrentConfiguration().setId( id );
+        getCurrentConfiguration( true ).setId( id );
 
         markDirty();
     }
 
     public String getName()
     {
-        return getCurrentConfiguration().getName();
+        return getCurrentConfiguration( false ).getName();
     }
 
     public void setName( String name )
     {
-        getCurrentConfiguration().setName( name );
+        getCurrentConfiguration( true ).setName( name );
 
         markDirty();
     }
@@ -369,9 +383,11 @@ public abstract class AbstractRepository
         // a "fallback" mechanism: id's must be unique now across nexus,
         // but some older systems may have groups/reposes with same ID. To clear out the ID-clash, we will need to
         // change IDs, but we must _not_ change the published URLs on those systems.
-        if ( !StringUtils.isBlank( getCurrentConfiguration().getPathPrefix() ) )
+        String pathPrefix = getCurrentConfiguration( false ).getPathPrefix();
+
+        if ( !StringUtils.isBlank( pathPrefix ) )
         {
-            return getCurrentConfiguration().getPathPrefix();
+            return pathPrefix;
         }
         else
         {
@@ -381,26 +397,26 @@ public abstract class AbstractRepository
 
     public void setPathPrefix( String prefix )
     {
-        getCurrentConfiguration().setPathPrefix( prefix );
+        getCurrentConfiguration( true ).setPathPrefix( prefix );
 
         markDirty();
     }
 
     public boolean isIndexable()
     {
-        return getCurrentConfiguration().isIndexable();
+        return getCurrentConfiguration( false ).isIndexable();
     }
 
     public void setIndexable( boolean indexable )
     {
-        getCurrentConfiguration().setIndexable( indexable );
+        getCurrentConfiguration( true ).setIndexable( indexable );
 
         markDirty();
     }
 
     public String getLocalUrl()
     {
-        return getCurrentConfiguration().getLocalStorage().getUrl();
+        return getCurrentConfiguration( false ).getLocalStorage().getUrl();
     }
 
     public void setLocalUrl( String localUrl )
@@ -412,14 +428,14 @@ public abstract class AbstractRepository
             trstr = trstr.substring( 0, trstr.length() - 1 );
         }
 
-        getCurrentConfiguration().getLocalStorage().setUrl( trstr );
+        getCurrentConfiguration( true ).getLocalStorage().setUrl( trstr );
 
         markDirty();
     }
 
     public LocalStatus getLocalStatus()
     {
-        return LocalStatus.valueOf( getCurrentConfiguration().getLocalStatus() );
+        return LocalStatus.valueOf( getCurrentConfiguration( false ).getLocalStatus() );
     }
 
     public void setLocalStatus( LocalStatus localStatus )
@@ -428,7 +444,7 @@ public abstract class AbstractRepository
         {
             LocalStatus oldLocalStatus = getLocalStatus();
 
-            getCurrentConfiguration().setLocalStatus( localStatus.toString() );
+            getCurrentConfiguration( true ).setLocalStatus( localStatus.toString() );
 
             markDirty();
 
@@ -439,72 +455,72 @@ public abstract class AbstractRepository
 
     public boolean isAllowWrite()
     {
-        return getCurrentConfiguration().isAllowWrite();
+        return getCurrentConfiguration( false ).isAllowWrite();
     }
 
     public void setAllowWrite( boolean allowWrite )
     {
-        getCurrentConfiguration().setAllowWrite( allowWrite );
+        getCurrentConfiguration( true ).setAllowWrite( allowWrite );
 
         markDirty();
     }
 
     public boolean isBrowseable()
     {
-        return getCurrentConfiguration().isBrowseable();
+        return getCurrentConfiguration( false ).isBrowseable();
     }
 
     public void setBrowseable( boolean browseable )
     {
-        getCurrentConfiguration().setBrowseable( browseable );
+        getCurrentConfiguration( true ).setBrowseable( browseable );
 
         markDirty();
     }
 
     public boolean isUserManaged()
     {
-        return getCurrentConfiguration().isUserManaged();
+        return getCurrentConfiguration( false ).isUserManaged();
     }
 
     public void setUserManaged( boolean userManaged )
     {
-        getCurrentConfiguration().setUserManaged( userManaged );
+        getCurrentConfiguration( true ).setUserManaged( userManaged );
 
         markDirty();
     }
 
     public boolean isExposed()
     {
-        return getCurrentConfiguration().isExposed();
+        return getCurrentConfiguration( false ).isExposed();
     }
 
     public void setExposed( boolean exposed )
     {
-        getCurrentConfiguration().setExposed( exposed );
+        getCurrentConfiguration( true ).setExposed( exposed );
 
         markDirty();
     }
 
     public int getNotFoundCacheTimeToLive()
     {
-        return getCurrentConfiguration().getNotFoundCacheTTL();
+        return getCurrentConfiguration( false ).getNotFoundCacheTTL();
     }
 
     public void setNotFoundCacheTimeToLive( int notFoundCacheTimeToLive )
     {
-        getCurrentConfiguration().setNotFoundCacheTTL( notFoundCacheTimeToLive );
+        getCurrentConfiguration( true ).setNotFoundCacheTTL( notFoundCacheTimeToLive );
 
         markDirty();
     }
 
     public boolean isNotFoundCacheActive()
     {
-        return getCurrentConfiguration().isNotFoundCacheActive();
+        return getCurrentConfiguration( false ).isNotFoundCacheActive();
     }
 
     public void setNotFoundCacheActive( boolean notFoundCacheActive )
     {
-        getCurrentConfiguration().setNotFoundCacheActive( notFoundCacheActive );
+        getCurrentConfiguration( true ).setNotFoundCacheActive( notFoundCacheActive );
 
         markDirty();
     }

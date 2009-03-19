@@ -17,13 +17,14 @@ public abstract class AbstractWebSiteRepositoryConfiguration
 
     public List<String> getWelcomeFiles()
     {
-        List<String> result = getCollection( getConfiguration(), WELCOME_FILES );
+        List<String> result = getCollection( getConfiguration( false ), WELCOME_FILES );
 
         if ( result.isEmpty() )
         {
             // default it
-            setCollection( getConfiguration(), WELCOME_FILES, Arrays
-                .asList( new String[] { "index.html", "index.htm" } ) );
+            setCollection( getConfiguration( true ), WELCOME_FILES, Arrays.asList( new String[] {
+                "index.html",
+                "index.htm" } ) );
 
             return getWelcomeFiles();
         }
@@ -35,6 +36,6 @@ public abstract class AbstractWebSiteRepositoryConfiguration
 
     public void setWelcomeFiles( List<String> vals )
     {
-        setCollection( getConfiguration(), WELCOME_FILES, vals );
+        setCollection( getConfiguration( true ), WELCOME_FILES, vals );
     }
 }

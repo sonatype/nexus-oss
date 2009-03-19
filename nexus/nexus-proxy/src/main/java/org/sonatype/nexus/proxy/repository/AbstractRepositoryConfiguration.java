@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.configuration.application.ExternalConfiguration;
+import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.util.Inflector;
 
 /**
@@ -15,38 +15,83 @@ import org.sonatype.nexus.util.Inflector;
  * 
  * @author cstamas
  */
-public abstract class AbstractRepositoryConfiguration
+public class AbstractRepositoryConfiguration
     implements ExternalConfiguration
 {
     private Xpp3Dom configuration;
 
-    private boolean dirty;
+    private Xpp3Dom changedConfiguration;
 
     public AbstractRepositoryConfiguration( Xpp3Dom configuration )
     {
         this.configuration = configuration;
-
-        this.dirty = false;
     }
 
     public boolean isDirty()
     {
-        return this.dirty;
+        return this.changedConfiguration != null;
     }
 
-    public void unmarkDirty()
+    public void applyChanges()
     {
-        this.dirty = false;
+        if ( changedConfiguration != null )
+        {
+            configuration = Xpp3Dom.mergeXpp3Dom( changedConfiguration, configuration );
+
+            changedConfiguration = null;
+        }
     }
 
-    protected Xpp3Dom getConfiguration()
+    public void rollbackChanges()
+    {
+        changedConfiguration = null;
+    }
+
+    public Object getConfiguration()
     {
         return configuration;
     }
 
-    protected void markDirty()
+    public Xpp3Dom getConfiguration( boolean forModification )
     {
-        this.dirty = true;
+        if ( forModification )
+        {
+            // copy configuration if needed
+            if ( changedConfiguration == null )
+            {
+                changedConfiguration = copyTree( configuration );
+            }
+
+            return changedConfiguration;
+        }
+        else
+        {
+            return configuration;
+        }
+    }
+
+    protected Xpp3Dom copyTree( Xpp3Dom root )
+    {
+        Xpp3Dom clone = new Xpp3Dom( root.getName() );
+
+        // copy attributes
+        for ( String attrName : root.getAttributeNames() )
+        {
+            clone.setAttribute( attrName, root.getAttribute( attrName ) );
+        }
+
+        // copy value
+        clone.setValue( root.getValue() );
+
+        // copy children
+        for ( Xpp3Dom rootChild : root.getChildren() )
+        {
+            Xpp3Dom cloneChild = copyTree( rootChild );
+
+            clone.addChild( cloneChild );
+        }
+
+        return clone;
     }
 
     /**
@@ -68,8 +113,6 @@ public abstract class AbstractRepositoryConfiguration
             node.setValue( defaultValue );
 
             parent.addChild( node );
-
-            markDirty();
         }
 
         return node.getValue();
@@ -94,8 +137,6 @@ public abstract class AbstractRepositoryConfiguration
         }
 
         node.setValue( value );
-
-        markDirty();
     }
 
     /**
@@ -114,8 +155,6 @@ public abstract class AbstractRepositoryConfiguration
             node = new Xpp3Dom( name );
 
             parent.addChild( node );
-
-            markDirty();
         }
 
         ArrayList<String> result = new ArrayList<String>( node.getChildCount() );
@@ -163,8 +202,6 @@ public abstract class AbstractRepositoryConfiguration
 
             node.addChild( child );
         }
-
-        markDirty();
     }
 
     /**
@@ -206,8 +243,6 @@ public abstract class AbstractRepositoryConfiguration
 
         node.addChild( child );
 
-        markDirty();
-
         return true;
     }
 
@@ -236,8 +271,6 @@ public abstract class AbstractRepositoryConfiguration
             if ( StringUtils.equals( value, child.getValue() ) )
             {
                 node.removeChild( i );
-
-                markDirty();
 
                 return true;
             }

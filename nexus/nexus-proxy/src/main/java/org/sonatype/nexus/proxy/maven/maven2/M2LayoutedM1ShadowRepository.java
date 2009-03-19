@@ -39,6 +39,12 @@ public class M2LayoutedM1ShadowRepository
     @Requirement
     private M2LayoutedM1ShadowRepositoryConfigurator m2LayoutedM1ShadowRepositoryConfigurator;
 
+    @Override
+    protected M2LayoutedM1ShadowRepositoryConfiguration getExternalConfiguration()
+    {
+        return (M2LayoutedM1ShadowRepositoryConfiguration) super.getExternalConfiguration();
+    }
+
     public GavCalculator getGavCalculator()
     {
         return getM2GavCalculator();

@@ -48,6 +48,12 @@ public class M1Repository
     @Requirement
     private M1RepositoryConfigurator m1RepositoryConfigurator;
 
+    @Override
+    public M1RepositoryConfiguration getExternalConfiguration()
+    {
+        return (M1RepositoryConfiguration) super.getExternalConfiguration();
+    }
+
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
@@ -126,7 +132,7 @@ public class M1Repository
             // this is not an artifact, it is just any "file"
             return super.isOld( item );
         }
-        
+
         // it is a release
         return isOld( getArtifactMaxAge(), item );
     }

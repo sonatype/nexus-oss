@@ -45,6 +45,7 @@ public abstract class AbstractShadowRepository
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
+    @Override
     protected AbstractShadowRepositoryConfiguration getExternalConfiguration()
     {
         return (AbstractShadowRepositoryConfiguration) super.getExternalConfiguration();

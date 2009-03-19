@@ -4,16 +4,15 @@ package org.sonatype.nexus.configuration;
  * A Configurable component.
  * 
  * @author cstamas
- * @param <T>
  */
-public interface Configurable<T>
+public interface Configurable
 {
     /**
-     * Returns the current configuration of the component. May return null if there is not config object set.
+     * Returns the current core configuration of the component.May return null if there is not config object set.
      * 
      * @return
      */
-    T getCurrentConfiguration();
+    CoreConfiguration getCurrentCoreConfiguration();
 
     /**
      * Sets the configuration object and calls configure(). A shortcut for setCurrentConfiguration(config) and then
@@ -22,7 +21,7 @@ public interface Configurable<T>
      * @param config
      * @throws ConfigurationException
      */
-    void configure( T config )
+    void configure( Object config )
         throws ConfigurationException;
 
     /**
@@ -34,7 +33,7 @@ public interface Configurable<T>
         throws ConfigurationException;
 
     /**
-     * Returns true if the config is changed but is not persisted.
+     * Returns true if there are some unsaved changes.
      * 
      * @return
      */

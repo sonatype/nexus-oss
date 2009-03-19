@@ -14,11 +14,11 @@ public abstract class AbstractShadowRepositoryConfiguration
 
     public String getMasterRepositoryId()
     {
-        return getNodeValue( getConfiguration(), MASTER_REPOSITORY_ID, null );
+        return getNodeValue( getConfiguration( false ), MASTER_REPOSITORY_ID, null );
     }
 
     public void setMasterRepositoryId( String id )
     {
-        setNodeValue( getConfiguration(), MASTER_REPOSITORY_ID, id );
+        setNodeValue( getConfiguration( true ), MASTER_REPOSITORY_ID, id );
     }
 }

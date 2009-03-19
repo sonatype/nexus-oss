@@ -81,6 +81,7 @@ public abstract class AbstractProxyRepository
     /** Remote storage context to store connection configs. */
     private RemoteStorageContext remoteStorageContext;
 
+    @Override
     protected AbstractProxyRepositoryConfiguration getExternalConfiguration()
     {
         return (AbstractProxyRepositoryConfiguration) super.getExternalConfiguration();
@@ -156,7 +157,7 @@ public abstract class AbstractProxyRepository
     {
         if ( getRemoteStorage() != null )
         {
-            return getCurrentConfiguration().getRemoteStorage().getUrl();
+            return getCurrentConfiguration( false ).getRemoteStorage().getUrl();
         }
         else
         {
@@ -175,7 +176,7 @@ public abstract class AbstractProxyRepository
                 trstr = trstr.substring( 0, trstr.length() - 1 );
             }
 
-            getCurrentConfiguration().getRemoteStorage().setUrl( trstr );
+            getCurrentConfiguration( true ).getRemoteStorage().setUrl( trstr );
 
             markDirty();
         }

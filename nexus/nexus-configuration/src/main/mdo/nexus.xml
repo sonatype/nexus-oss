@@ -607,7 +607,7 @@
     public transient String defaultLocalStorageUrl;
 
     /* A field to store actual external configuration implementation */
-    public transient org.sonatype.nexus.configuration.application.ExternalConfiguration externalConfigurationImple;
+    public transient org.sonatype.nexus.configuration.ExternalConfiguration externalConfigurationImple;
 ]]></code>
         </codeSegment>
       </codeSegments>
@@ -1170,7 +1170,7 @@
     public static final String STATUS_BROKEN = "broken";
 
     /* A field to store actual external configuration implementation */
-    public transient org.sonatype.nexus.configuration.application.ExternalConfiguration externalConfigurationImple;
+    public transient org.sonatype.nexus.configuration.ExternalConfiguration externalConfigurationImple;
 ]]></code>
         </codeSegment>
       </codeSegments>

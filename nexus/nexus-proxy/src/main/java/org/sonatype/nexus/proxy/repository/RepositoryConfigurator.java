@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 
@@ -42,7 +43,8 @@ public interface RepositoryConfigurator
      * @param repoConfig
      * @throws ConfigurationException
      */
-    void applyConfiguration( Repository repository, ApplicationConfiguration configuration, CRepository repoConfig )
+    void applyConfiguration( Repository repository, ApplicationConfiguration configuration,
+        CoreConfiguration coreConfiguration )
         throws ConfigurationException;
 
     /**
@@ -53,12 +55,6 @@ public interface RepositoryConfigurator
      * @param repoConfig
      * @throws ConfigurationException
      */
-    void prepareForSave( Repository repository, ApplicationConfiguration configuration, CRepository repoConfig );
-
-    /**
-     * Returns the external configuration object, if any. Null otherwise.
-     * 
-     * @return
-     */
-    Object getExternalConfiguration( Repository repository );
+    void prepareForSave( Repository repository, ApplicationConfiguration configuration,
+        CoreConfiguration coreConfiguration );
 }

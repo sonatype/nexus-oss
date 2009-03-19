@@ -16,16 +16,16 @@ public abstract class AbstractGroupRepositoryConfiguration
 
     public List<String> getMemberRepositoryIds()
     {
-        return getCollection( getConfiguration(), MEMBER_REPOSITORIES );
+        return getCollection( getConfiguration( false ), MEMBER_REPOSITORIES );
     }
 
     public void setMemberRepositoryIds( List<String> vals )
     {
-        setCollection( getConfiguration(), MEMBER_REPOSITORIES, vals );
+        setCollection( getConfiguration( true ), MEMBER_REPOSITORIES, vals );
     }
 
     public void removeMemberRepositoryId( String repositoryId )
     {
-        removeFromCollection( getConfiguration(), MEMBER_REPOSITORIES, repositoryId );
+        removeFromCollection( getConfiguration( true ), MEMBER_REPOSITORIES, repositoryId );
     }
 }

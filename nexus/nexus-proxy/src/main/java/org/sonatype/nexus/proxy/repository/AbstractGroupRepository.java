@@ -48,6 +48,7 @@ public abstract class AbstractGroupRepository
     @Requirement
     private RequestRepositoryMapper requestRepositoryMapper;
 
+    @Override
     protected AbstractGroupRepositoryConfiguration getExternalConfiguration()
     {
         return (AbstractGroupRepositoryConfiguration) super.getExternalConfiguration();

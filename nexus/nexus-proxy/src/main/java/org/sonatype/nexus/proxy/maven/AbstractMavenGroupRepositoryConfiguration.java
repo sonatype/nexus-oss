@@ -28,11 +28,12 @@ public abstract class AbstractMavenGroupRepositoryConfiguration
 
     public boolean isMergeMetadata()
     {
-        return Boolean.parseBoolean( getNodeValue( getConfiguration(), MERGE_METADATA, Boolean.TRUE.toString() ) );
+        return Boolean
+            .parseBoolean( getNodeValue( getConfiguration( false ), MERGE_METADATA, Boolean.TRUE.toString() ) );
     }
 
     public void setMergeMetadata( boolean val )
     {
-        setNodeValue( getConfiguration(), MERGE_METADATA, Boolean.toString( val ) );
+        setNodeValue( getConfiguration( true ), MERGE_METADATA, Boolean.toString( val ) );
     }
 }

@@ -62,6 +62,7 @@ public class M2RepositoryTest
 
         // a "release"
         repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        repository.getCurrentCoreConfiguration().applyChanges();
 
         StorageItem item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_RELEASE, false ) );
         checkForFileAndMatchContents( item );
@@ -82,6 +83,7 @@ public class M2RepositoryTest
 
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
+        repository.getCurrentCoreConfiguration().applyChanges();
 
         item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_SNAPSHOT, false ) );
         checkForFileAndMatchContents( item );
@@ -105,6 +107,7 @@ public class M2RepositoryTest
 
         // a "release"
         repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        repository.getCurrentCoreConfiguration().applyChanges();
 
         DefaultStorageFileItem item = new DefaultStorageFileItem(
             repository,
@@ -134,6 +137,7 @@ public class M2RepositoryTest
 
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
+        repository.getCurrentCoreConfiguration().applyChanges();
 
         item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
             SPOOF_SNAPSHOT ) );
@@ -174,6 +178,8 @@ public class M2RepositoryTest
 
         // it is equiv of repo type: RELEASE
         repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        repository.getCurrentCoreConfiguration().applyChanges();
+
         request.setRequestPath( releasePom );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
         request.setRequestPath( releaseArtifact );
@@ -195,6 +201,8 @@ public class M2RepositoryTest
 
         // it is equiv of repo type: SNAPSHOT
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
+        repository.getCurrentCoreConfiguration().applyChanges();
+
         request.setRequestPath( releasePom );
         assertEquals( false, repository.shouldServeByPolicies( request ) );
         request.setRequestPath( releaseArtifact );
@@ -279,6 +287,7 @@ public class M2RepositoryTest
         }
 
         repository.setMetadataMaxAge( 0 );
+        repository.getCurrentCoreConfiguration().applyChanges();
 
         mdFile.setLastModified( System.currentTimeMillis() - ( 3L * 24L * 60L * 60L * 1000L ) );
 
@@ -314,6 +323,7 @@ public class M2RepositoryTest
         }
 
         repository.setMetadataMaxAge( 5 );
+        repository.getCurrentCoreConfiguration().applyChanges();
 
         mdFile.setLastModified( System.currentTimeMillis() );
 

@@ -6,8 +6,8 @@ package org.sonatype.nexus.configuration;
  * @author cstamas
  * @param <T>
  */
-public interface ValidatingConfigurable<T>
-    extends Configurable<T>
+public interface ValidatingConfigurable
+    extends Configurable
 {
     /**
      * Validates the passed in configuration object.
@@ -15,6 +15,6 @@ public interface ValidatingConfigurable<T>
      * @param config
      * @throws ConfigurationException
      */
-    void validateConfiguration( T config )
+    void validateConfiguration( Object config )
         throws ConfigurationException;
 }

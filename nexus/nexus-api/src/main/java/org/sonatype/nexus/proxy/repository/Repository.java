@@ -43,7 +43,7 @@ import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
  * @author cstamas
  */
 public interface Repository
-    extends ResourceStore, ValidatingConfigurable<Object>
+    extends ResourceStore, ValidatingConfigurable
 {
     /**
      * Returns the ID of the resourceStore.

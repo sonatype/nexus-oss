@@ -35,6 +35,7 @@ public abstract class AbstractWebSiteRepository
     extends AbstractRepository
     implements WebSiteRepository
 {
+    @Override
     protected AbstractWebSiteRepositoryConfiguration getExternalConfiguration()
     {
         return (AbstractWebSiteRepositoryConfiguration) super.getExternalConfiguration();
