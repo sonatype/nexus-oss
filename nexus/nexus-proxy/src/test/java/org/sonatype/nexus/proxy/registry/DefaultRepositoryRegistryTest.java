@@ -20,10 +20,15 @@ import static org.easymock.EasyMock.replay;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.easymock.EasyMock;
+import org.sonatype.nexus.configuration.model.CLocalStorage;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -93,8 +98,24 @@ public class DefaultRepositoryRegistryTest
         gl.add( "C" );
 
         M2GroupRepository groupRepository = (M2GroupRepository) getContainer().lookup( GroupRepository.class, "maven2" );
-        groupRepository.setId( "ALL" );
-        groupRepository.setMemberRepositoryIds( gl );
+
+        CRepository repoGroupConf = new DefaultCRepository();
+
+        repoGroupConf.setProviderRole( GroupRepository.class.getName() );
+        repoGroupConf.setProviderHint( "maven2" );
+        repoGroupConf.setId( "ALL" );
+
+        repoGroupConf.setLocalStorage( new CLocalStorage() );
+        repoGroupConf.getLocalStorage().setProvider( "file" );
+
+        Xpp3Dom exGroupRepo = new Xpp3Dom( "externalConfiguration" );
+        repoGroupConf.setExternalConfiguration( exGroupRepo );
+        M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
+        exGroupRepoConf.setMemberRepositoryIds( gl );
+        exGroupRepoConf.setMergeMetadata( true );
+
+        groupRepository.configure( repoGroupConf );
+
         repositoryRegistry.addRepository( groupRepository );
 
         List<Repository> repoMembers = repositoryRegistry

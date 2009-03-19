@@ -16,12 +16,17 @@ package org.sonatype.nexus.proxy;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.model.CLocalStorage;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
-import org.sonatype.nexus.proxy.repository.IncompatibleMasterRepositoryException;
+import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
@@ -41,9 +46,9 @@ public class M1LayoutedM2ShadowRepositoryTest
     }
 
     protected void addShadowReposes()
-        throws IOException,
-            ComponentLookupException,
-            IncompatibleMasterRepositoryException
+        throws ConfigurationException,
+            IOException,
+            ComponentLookupException
     {
         for ( ProxyRepository master : getRepositoryRegistry().getRepositoriesWithFacet( ProxyRepository.class ) )
         {
@@ -51,14 +56,23 @@ public class M1LayoutedM2ShadowRepositoryTest
                 ShadowRepository.class,
                 "m2-m1-shadow" );
 
-            // shadow.enableLogging( getLogger().getChildLogger( "SHADOW " + master.getId() ) );
-            shadow.setMasterRepository( master );
-            shadow.setId( master.getId() + "-m1" );
-            shadow.setLocalUrl( getApplicationConfiguration()
-                .getWorkingDirectory( shadow.getId() ).toURI().toURL().toString() );
+            CRepository repoConf = new DefaultCRepository();
 
-            shadow.setLocalStorage( getLocalRepositoryStorage() );
-            // shadow.setCacheManager( getCacheManager() );
+            repoConf.setProviderRole( ShadowRepository.class.getName() );
+            repoConf.setProviderHint( "m2-m1-shadow" );
+            repoConf.setId( master.getId() + "-m1" );
+
+            repoConf.setLocalStorage( new CLocalStorage() );
+            repoConf.getLocalStorage().setProvider( "file" );
+
+            Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
+            repoConf.setExternalConfiguration( exRepo );
+            M1LayoutedM2ShadowRepositoryConfiguration exRepoConf = new M1LayoutedM2ShadowRepositoryConfiguration(
+                exRepo );
+            exRepoConf.setMasterRepositoryId( master.getId() );
+
+            shadow.configure( repoConf );
+
             shadow.synchronizeWithMaster();
 
             getRepositoryRegistry().addRepository( shadow );

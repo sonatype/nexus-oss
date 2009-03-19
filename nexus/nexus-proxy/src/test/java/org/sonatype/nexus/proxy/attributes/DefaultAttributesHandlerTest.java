@@ -18,14 +18,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.configuration.model.CLocalStorage;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 
 /**
  * AttributeStorage implementation driven by XStream.
@@ -56,15 +61,24 @@ public class DefaultAttributesHandlerTest
 
         repository = lookup( Repository.class, "maven2" );
 
-        repository.setId( "dummy" );
+        CRepository repoConf = new DefaultCRepository();
 
-        repository.setLocalUrl( new File( getBasedir(), "target/test-reposes/repo1" ).toURI().toURL().toString() );
+        repoConf.setProviderRole( Repository.class.getName() );
+        repoConf.setProviderHint( "maven2" );
+        repoConf.setId( "dummy" );
 
-        DefaultFSLocalRepositoryStorage ls = (DefaultFSLocalRepositoryStorage) lookup(
-            LocalRepositoryStorage.class,
-            "file" );
+        repoConf.setLocalStorage( new CLocalStorage() );
+        repoConf.getLocalStorage().setProvider( "file" );
+        repoConf.getLocalStorage().setUrl(
+            new File( getBasedir(), "target/test-reposes/repo1" ).toURI().toURL().toString() );
 
-        repository.setLocalStorage( ls );
+        Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
+        repoConf.setExternalConfiguration( exRepo );
+        M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration( exRepo );
+        exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
+
+        repository.configure( repoConf );
     }
 
     public void testRecreateAttrs()

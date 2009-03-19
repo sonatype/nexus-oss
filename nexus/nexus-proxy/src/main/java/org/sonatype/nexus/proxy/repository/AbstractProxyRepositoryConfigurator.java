@@ -24,9 +24,6 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 public abstract class AbstractProxyRepositoryConfigurator
     extends AbstractRepositoryConfigurator
 {
-    /** The global remote storage context, without any parent. */
-    private RemoteStorageContext globalRemoteStorageContext = new DefaultRemoteStorageContext( null );
-
     @Override
     public void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
         ExternalConfiguration externalConfiguration )
@@ -71,7 +68,8 @@ public abstract class AbstractProxyRepositoryConfigurator
                         prepository.getDownloadMirrors().setMirrors( null );
                     }
 
-                    DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( globalRemoteStorageContext );
+                    DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( configuration
+                        .getGlobalRemoteStorageContext() );
 
                     if ( repo.getRemoteStorage().getConnectionSettings() != null )
                     {

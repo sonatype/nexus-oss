@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 /**
  * ApplicationConfiguration is the main component to have and maintain configuration.
@@ -72,6 +73,13 @@ public interface ApplicationConfiguration
      * @return
      */
     Configuration getConfiguration();
+
+    /**
+     * Gets the top level remote storage context.
+     * 
+     * @return
+     */
+    RemoteStorageContext getGlobalRemoteStorageContext();
 
     /**
      * Saves the configuration.

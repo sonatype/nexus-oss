@@ -44,9 +44,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 /**
  * The Class AbstractProxyTestEnvironment.
@@ -78,9 +76,6 @@ public abstract class AbstractProxyTestEnvironment
     /** The remote repository storage. */
     private RemoteRepositoryStorage remoteRepositoryStorage;
 
-    /** The shared remote storage context */
-    private RemoteStorageContext remoteStorageContext;
-
     /** The root router */
     private RepositoryRouter rootRouter;
 
@@ -95,11 +90,6 @@ public abstract class AbstractProxyTestEnvironment
     public ApplicationEventMulticaster getApplicationEventMulticaster()
     {
         return applicationEventMulticaster;
-    }
-
-    public RemoteStorageContext getRemoteStorageContext()
-    {
-        return remoteStorageContext;
     }
 
     /**
@@ -224,8 +214,6 @@ public abstract class AbstractProxyTestEnvironment
             .setWorkingDirectory( getApplicationConfiguration().getWorkingDirectory( "proxy/attributes" ) );
 
         localRepositoryStorage = lookup( LocalRepositoryStorage.class, "file" );
-
-        remoteStorageContext = new DefaultRemoteStorageContext( null );
 
         remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, "apacheHttpClient3x" );
 

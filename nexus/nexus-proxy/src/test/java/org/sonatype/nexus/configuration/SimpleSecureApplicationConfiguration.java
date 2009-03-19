@@ -26,6 +26,8 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
+import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 public class SimpleSecureApplicationConfiguration
     implements ApplicationConfiguration
@@ -35,6 +37,8 @@ public class SimpleSecureApplicationConfiguration
     private CSecurity security;
 
     private Vector<EventListener> listeners = new Vector<EventListener>();
+    
+    private RemoteStorageContext remoteStorageContext = new DefaultRemoteStorageContext( null );
 
     public SimpleSecureApplicationConfiguration()
     {
@@ -51,9 +55,11 @@ public class SimpleSecureApplicationConfiguration
         // configuration.setGlobalHttpProxySettings( new CRemoteHttpProxySettings() );
         configuration.setRouting( new CRouting() );
         configuration.setRepositoryGrouping( new CRepositoryGrouping() );
-        
-        
-        
+    }
+    
+    public RemoteStorageContext getGlobalRemoteStorageContext()
+    {
+        return remoteStorageContext;
     }
 
     public Configuration getConfiguration()

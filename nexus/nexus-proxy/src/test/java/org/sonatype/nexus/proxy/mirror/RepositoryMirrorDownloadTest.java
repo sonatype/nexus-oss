@@ -22,7 +22,16 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.same;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.configuration.model.CLocalStorage;
+import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.CRemoteStorage;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.InvalidItemContentException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -36,14 +45,14 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
+import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.Mirror;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -57,7 +66,7 @@ public class RepositoryMirrorDownloadTest
 
     private static final Mirror MIRROR2 = new Mirror( "2", "mirror2-url" );
 
-    private static final String CANONICAL_URL = "canonical-url";
+    private static final String CANONICAL_URL = "http://canonical-url";
 
     private static final ItemNotFoundException itemNotFount = new ItemNotFoundException( ITEM_PATH );
 
@@ -130,8 +139,18 @@ public class RepositoryMirrorDownloadTest
         RepositoryItemUid uid = repo.createUid( ITEM_PATH );
 
         RemoteRepositoryStorage rs = createMock( RemoteRepositoryStorage.class );
+        
+        // have to ask the mirror
         expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( MIRROR1.getUrl() ) ) )
             .andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
+        
+        // checksums are from canonical
+        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andThrow(
+            itemNotFount );
+        
+        // checksums are from canonical
+        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andThrow(
+            itemNotFount );
 
         repo.setRemoteStorage( rs );
 
@@ -365,22 +384,49 @@ public class RepositoryMirrorDownloadTest
     {
         M2Repository repo = (M2Repository) getContainer().lookup( Repository.class, "maven2" );
 
-        repo.setId( "repo" );
+        CRepository repoConf = new DefaultCRepository();
+
+        repoConf.setProviderRole( Repository.class.getName() );
+        repoConf.setProviderHint( "maven2" );
+        repoConf.setId( "repo" );
+
+        repoConf.setLocalStorage( new CLocalStorage() );
+        repoConf.getLocalStorage().setProvider( "file" );
+
+        repoConf.setRemoteStorage( new CRemoteStorage() );
+        repoConf.getRemoteStorage().setProvider( "apacheHttpClient3x" );
+        repoConf.getRemoteStorage().setUrl( CANONICAL_URL );
+        repoConf.getRemoteStorage().setConnectionSettings( new CRemoteConnectionSettings() );
+        repoConf.getRemoteStorage().getConnectionSettings().setRetrievalRetryCount( 2 );
+
+        if ( mirrors != null )
+        {
+            List<CMirror> cmirrors = new ArrayList<CMirror>( mirrors.length );
+
+            for ( Mirror mirror : mirrors )
+            {
+                CMirror cmirror = new CMirror();
+                cmirror.setId( mirror.getId() );
+                cmirror.setUrl( mirror.getUrl() );
+                cmirrors.add( cmirror );
+            }
+
+            repoConf.getRemoteStorage().setMirrors( cmirrors );
+        }
+
+        Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
+        repoConf.setExternalConfiguration( exRepo );
+        M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration( exRepo );
+        exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
+
+        repo.configure( repoConf );
 
         repo.getNotFoundCache().purge();
 
         LocalRepositoryStorage ls = createMockEmptyLocalStorage();
         repo.setLocalStorage( ls );
 
-        repo.setRemoteStorageContext( new DefaultRemoteStorageContext( null ) );
-        CRemoteConnectionSettings remoteConnectionSettings = (CRemoteConnectionSettings) repo
-            .getRemoteStorageContext().getRemoteConnectionContextObject(
-                RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS );
-        remoteConnectionSettings.setRetrievalRetryCount( 2 );
-
-        repo.setRemoteUrl( CANONICAL_URL );
-
-        repo.getDownloadMirrors().setMirrors( Arrays.asList( mirrors ) );
         return repo;
     }
 

@@ -52,6 +52,9 @@ public class SimpleRemoteLeakTest
                 "localhost",
                 "127.0.0.1" ) );
 
+        ProxyRepository repo1 = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
+        ProxyRepository repo2 = getRepositoryRegistry().getRepositoryWithFacet( "repo2", ProxyRepository.class );
+
         ResourceStoreRequest req1 = new ResourceStoreRequest(
             "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar",
             false );
@@ -78,13 +81,21 @@ public class SimpleRemoteLeakTest
         }
 
         // get the default context, since they used it
-        RemoteStorageContext ctx = getRemoteStorageContext();
+        RemoteStorageContext ctx1 = repo1.getRemoteStorageContext();
 
-        MultiThreadedHttpConnectionManager cm = (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx
+        MultiThreadedHttpConnectionManager cm1 = (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx1
             .getRemoteConnectionContext().get( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
             .getHttpConnectionManager();
-        assertEquals( 2, cm.getConnectionsInPool() );
+        
+        assertEquals( 1, cm1.getConnectionsInPool() );
 
+        RemoteStorageContext ctx2 = repo2.getRemoteStorageContext();
+
+        MultiThreadedHttpConnectionManager cm2 = (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx2
+            .getRemoteConnectionContext().get( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+            .getHttpConnectionManager();
+        
+        assertEquals( 1, cm2.getConnectionsInPool() );
     }
 
     // DISABLED: move to IT, it takes too long (no route to host + java)
@@ -115,13 +126,21 @@ public class SimpleRemoteLeakTest
         }
 
         // get the default context, since they used it
-        RemoteStorageContext ctx = getRemoteStorageContext();
+        RemoteStorageContext ctx1 = repo1.getRemoteStorageContext();
 
-        MultiThreadedHttpConnectionManager cm = (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx
+        MultiThreadedHttpConnectionManager cm1 = (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx1
             .getRemoteConnectionContext().get( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
             .getHttpConnectionManager();
-        assertEquals( 2, cm.getConnectionsInPool() );
+        
+        assertEquals( 1, cm1.getConnectionsInPool() );
 
+        RemoteStorageContext ctx2 = repo2.getRemoteStorageContext();
+
+        MultiThreadedHttpConnectionManager cm2 = (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx2
+            .getRemoteConnectionContext().get( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+            .getHttpConnectionManager();
+        
+        assertEquals( 1, cm2.getConnectionsInPool() );
     }
 
 }
