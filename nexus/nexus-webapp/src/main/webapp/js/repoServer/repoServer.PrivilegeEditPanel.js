@@ -441,7 +441,6 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
       triggerAction: 'all',
       emptyText:'Select...',
       selectOnFocus:true,
-      allowBlank: false,
       width: this.COMBO_WIDTH
     } );
   }
