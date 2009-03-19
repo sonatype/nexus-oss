@@ -14,11 +14,14 @@
 package org.sonatype.nexus.configuration.application.upgrade;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.StringWriter;
 import java.util.TimeZone;
 
+import org.apache.log4j.lf5.util.StreamUtils;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
@@ -52,7 +55,27 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path + ".result" ) );
 
-        assertEquals( shouldBe, sw.toString() );
+        if ( !StringUtils.equals( shouldBe, sw.toString() ) )
+        {
+            // write the file out so we can have something to compare
+
+            File expected = FileUtils.toFile( getClass().getResource( path + ".result" ) );
+            File actual = new File( "target", expected.getName().replaceFirst( "result", "actual" ) );
+            FileOutputStream out = new FileOutputStream( actual );
+            try
+            {
+                IOUtil.copy( sw.toString(), out );
+            }
+            finally
+            {
+                IOUtil.close( out );
+            }
+            String diffMessage = "diff "+ expected.getAbsolutePath() + " "+ actual.getAbsolutePath();
+            String message = "Files differ, you can manually diff them:\n" +diffMessage;
+
+            // the method makes the error pretty, so we can keep it.
+            assertEquals( message, shouldBe, sw.toString() );
+        }
     }
 
     public void testFromDEC()
@@ -64,7 +87,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 7+2, configuration.getRepositories().size() );
+        assertEquals( 7 + 2, configuration.getRepositories().size() );
 
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -80,7 +103,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 11+4, configuration.getRepositories().size() );
+        assertEquals( 11 + 4, configuration.getRepositories().size() );
 
         assertEquals( 3, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -96,7 +119,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 7+2, configuration.getRepositories().size() );
+        assertEquals( 7 + 2, configuration.getRepositories().size() );
 
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -113,7 +136,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
         // 7 repos and 2 groups
-        assertEquals( 7+2, configuration.getRepositories().size() );
+        assertEquals( 7 + 2, configuration.getRepositories().size() );
 
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -129,7 +152,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 15+4, configuration.getRepositories().size() );
+        assertEquals( 15 + 4, configuration.getRepositories().size() );
 
         assertEquals( 4, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -159,7 +182,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 6+2, configuration.getRepositories().size() );
+        assertEquals( 6 + 2, configuration.getRepositories().size() );
 
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -178,7 +201,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 6+2, configuration.getRepositories().size() );
+        assertEquals( 6 + 2, configuration.getRepositories().size() );
 
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -212,7 +235,9 @@ public class DefaultApplicationConfigurationUpgraderTest
     public void testNEXUS1710()
         throws Exception
     {
-        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus1710/nexus.xml", getNexusConfiguration() );
+        copyFromClasspathToFile(
+            "/org/sonatype/nexus/configuration/upgrade/nexus1710/nexus.xml",
+            getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 

@@ -69,7 +69,7 @@ public class Upgrade108to140
 
     private static final String GROUP_MEMBERS_NODE = "memberRepositories";
 
-    private static final String GROUP_CHILD_NODE = "memberRepositorie";
+    private static final String GROUP_CHILD_NODE = "memberRepository";
 
     public Object loadConfiguration( File file )
         throws IOException,
@@ -272,7 +272,7 @@ public class Upgrade108to140
         newrepo.setNotFoundCacheActive( oldrepos.isNotFoundCacheActive() );
         newrepo.setPathPrefix( oldrepos.getPathPrefix() );
         newrepo.setProviderHint( oldrepos.getType() );
-        newrepo.setProviderRole( Repository.class.toString() );
+        newrepo.setProviderRole( Repository.class.getName() );
         newrepo.setUserManaged( oldrepos.isUserManaged() );
 
         // Manipulate the dom
@@ -286,6 +286,7 @@ public class Upgrade108to140
         this
             .setNodeValue( externalConfig, "downloadRemoteIndex", Boolean.toString( oldrepos.isDownloadRemoteIndexes() ) );
         this.setNodeValue( externalConfig, "checksumPolicy", oldrepos.getChecksumPolicy() );
+        this.setNodeValue( externalConfig, "repositoryPolicy", oldrepos.getRepositoryPolicy() );
 
         if ( oldrepos.getLocalStorage() != null )
         {
@@ -360,8 +361,8 @@ public class Upgrade108to140
         if ( oldsecurity != null )
         {
             security.setAnonymousAccessEnabled( oldsecurity.isAnonymousAccessEnabled() );
-            security.setAnonymousPassword( oldsecurity.getAnonymousPassword() );
             security.setAnonymousUsername( oldsecurity.getAnonymousUsername() );
+            security.setAnonymousPassword( oldsecurity.getAnonymousPassword() );
             security.setEnabled( oldsecurity.isEnabled() );
             security.getRealms().addAll( oldsecurity.getRealms() );
         }
@@ -480,7 +481,7 @@ public class Upgrade108to140
             newShadow.setName( oldshadow.getName() );
             newShadow.setLocalStatus( oldshadow.getLocalStatus() );
             newShadow.setProviderHint( oldshadow.getType() );
-            newShadow.setProviderRole( ShadowRepository.class.toString() );
+            newShadow.setProviderRole( ShadowRepository.class.getName() );
             newShadow.setExposed( oldshadow.isExposed() );
             newShadow.setUserManaged( oldshadow.isUserManaged() );
             newShadow.setAllowWrite( false );
@@ -539,7 +540,7 @@ public class Upgrade108to140
             groupRepo.setId( oldgroup.getGroupId() );
             groupRepo.setName( oldgroup.getName() );
             groupRepo.setProviderHint( oldgroup.getType() );
-            groupRepo.setProviderRole( GroupRepository.class.toString() );
+            groupRepo.setProviderRole( GroupRepository.class.getName() );
             groupRepo.setAllowWrite( false );
             groupRepo.setBrowseable( true );
             groupRepo.setExposed( true );
@@ -561,6 +562,7 @@ public class Upgrade108to140
 
             // Manipulate the dom
             Xpp3Dom externalConfig = new Xpp3Dom( EXTERNAL_CONFIG );
+            groupRepo.setExternalConfiguration( externalConfig );
             this.setNodeValue( externalConfig, "mergeMetadata", Boolean.toString( mergeMetadata ) );
             this.setCollectionValues( externalConfig, GROUP_MEMBERS_NODE, GROUP_CHILD_NODE, oldgroup.getRepositories() );
         }
@@ -615,7 +617,9 @@ public class Upgrade108to140
 
         for ( String childVal : values )
         {
-            this.setNodeValue( node, childName, childVal );
+            Xpp3Dom childNode = new Xpp3Dom( childName );
+            node.addChild( childNode );
+            childNode.setValue( childVal );
         }
     }
 }
