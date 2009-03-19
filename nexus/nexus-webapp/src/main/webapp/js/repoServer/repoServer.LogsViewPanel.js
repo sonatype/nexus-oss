@@ -225,7 +225,8 @@ Sonatype.repoServer.LogsViewPanel = function(config){
         readOnly: true,
         hideLabel: true,
         anchor: '100% 100%',
-        emptyText: 'Select a document to view'
+        emptyText: 'Select a document to view',
+        style: 'font-family: monospace'
       }
     ]
   });
