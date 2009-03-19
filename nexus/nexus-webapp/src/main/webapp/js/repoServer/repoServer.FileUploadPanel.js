@@ -14,7 +14,6 @@
 Sonatype.repoServer.ArtifactUploadPanel = function(config){
   var config = config || {};
   var defaultConfig = {
-    autoScroll:true
   };
   Ext.apply(this, config, defaultConfig);
 
@@ -31,15 +30,14 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
   } );
 
   Sonatype.repoServer.ArtifactUploadPanel.superclass.constructor.call(this, {
-    autoScroll: true,
-    border: true,
-    bodyBorder: true,
+    border: false,
     frame: true,
     collapsible: false,
     collapsed: false,
     fileUpload: true,
     width: '100%',
     height: '100%',
+    autoScroll: true,
     layoutConfig: {
       labelSeparator: ''
     },
@@ -109,7 +107,13 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
             selectOnFocus:true,
             emptyText: 'Select...',
             allowBlank: false,
-            value: 'pom'
+            value: 'pom',
+            listeners: {
+              select: {
+                fn: this.gavDefinitionSelectHandler,
+                scope: this
+              }
+            }
           },
           {
             xtype: 'panel',
@@ -596,7 +600,6 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
                 var gavDefComboField = p.find( 'name', 'gavDefinition' )[0];
                 //another hack to fix the combo box lists
                 gavDefComboField.syncSize();
-                gavDefComboField.on('select', p.items.items[0].gavDefinitionSelectHandler, p.items.items[0]);
               } );
             }
             else {
