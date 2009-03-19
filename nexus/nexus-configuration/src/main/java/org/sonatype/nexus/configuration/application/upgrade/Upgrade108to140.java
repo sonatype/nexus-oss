@@ -170,8 +170,9 @@ public class Upgrade108to140
                 {
                     repositoryGrouping.addPathMapping( copyCGroupsSettingPathMappingItem1_0_8( oldItem ) );
                 }
+                newc.setRepositoryGrouping( repositoryGrouping );
             }
-
+            
             // mergeMetadata
             boolean mergeMetadata = true;
 

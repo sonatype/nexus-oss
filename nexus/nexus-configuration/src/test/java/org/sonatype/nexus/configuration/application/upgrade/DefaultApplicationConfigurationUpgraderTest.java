@@ -64,7 +64,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 7, configuration.getRepositories().size() );
+        assertEquals( 7+2, configuration.getRepositories().size() );
 
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -80,7 +80,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 11, configuration.getRepositories().size() );
+        assertEquals( 11+4, configuration.getRepositories().size() );
 
         assertEquals( 3, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -96,7 +96,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 7, configuration.getRepositories().size() );
+        assertEquals( 7+2, configuration.getRepositories().size() );
 
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -112,7 +112,8 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 7, configuration.getRepositories().size() );
+        // 7 repos and 2 groups
+        assertEquals( 7+2, configuration.getRepositories().size() );
 
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -128,7 +129,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 15, configuration.getRepositories().size() );
+        assertEquals( 15+4, configuration.getRepositories().size() );
 
         assertEquals( 4, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -158,7 +159,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 6, configuration.getRepositories().size() );
+        assertEquals( 6+2, configuration.getRepositories().size() );
 
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
@@ -177,7 +178,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 6, configuration.getRepositories().size() );
+        assertEquals( 6+2, configuration.getRepositories().size() );
 
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
