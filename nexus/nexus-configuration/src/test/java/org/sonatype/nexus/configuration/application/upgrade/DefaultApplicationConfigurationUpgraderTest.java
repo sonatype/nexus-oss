@@ -18,9 +18,6 @@ import java.io.FileOutputStream;
 import java.io.StringWriter;
 import java.util.TimeZone;
 
-import junit.framework.Assert;
-
-import org.apache.log4j.lf5.util.StreamUtils;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
