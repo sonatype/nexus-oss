@@ -152,7 +152,8 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        assertEquals( 15 + 4, configuration.getRepositories().size() );
+        // 15 repos, 5 groups, 2 shadows
+        assertEquals( 15 + 5 + 2, configuration.getRepositories().size() );
 
         assertEquals( 4, configuration.getRepositoryGrouping().getPathMappings().size() );
 
