@@ -18,6 +18,8 @@ import java.io.FileOutputStream;
 import java.io.StringWriter;
 import java.util.TimeZone;
 
+import junit.framework.Assert;
+
 import org.apache.log4j.lf5.util.StreamUtils;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -249,4 +251,32 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus1710/nexus.xml", configuration );
     }
+    
+//    public void testUpgradeStaticConfig()
+//    throws Exception
+//    {
+//        copyFromClasspathToFile( "/META-INF/nexus/nexus.xml", getNexusConfiguration() );
+//        
+//        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
+//
+//        Assert.assertNotNull( configuration );
+//        
+//        NexusConfigurationXpp3Writer w = new NexusConfigurationXpp3Writer();
+//
+//        StringWriter sw = new StringWriter();
+//
+//        w.write( sw, configuration );
+//        
+//        File actual = new File( "target", "upgraded-nexus.xml" );
+//        FileOutputStream out = new FileOutputStream( actual );
+//        try
+//        {
+//            IOUtil.copy( sw.toString(), out );
+//        }
+//        finally
+//        {
+//            IOUtil.close( out );
+//        }
+//        
+//    }
 }

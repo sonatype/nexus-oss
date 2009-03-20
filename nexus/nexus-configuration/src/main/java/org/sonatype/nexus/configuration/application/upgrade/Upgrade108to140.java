@@ -18,8 +18,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -51,6 +53,8 @@ import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedExceptio
 import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.upgrade.Upgrader;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
@@ -70,6 +74,26 @@ public class Upgrade108to140
     private static final String GROUP_MEMBERS_NODE = "memberRepositories";
 
     private static final String GROUP_CHILD_NODE = "memberRepository";
+    
+    private final Map<String, String> localStatus = new HashMap<String, String>();
+    private final Map<String, String> checksumPolicy = new HashMap<String, String>();
+    private final Map<String, String> proxyMode = new HashMap<String, String>();
+    
+    public Upgrade108to140()
+    {
+        // migrate to ENUMS
+        this.localStatus.put( "inService", "IN_SERVICE" );
+        this.localStatus.put( "outOfService", "OUT_OF_SERVICE" );
+
+        this.checksumPolicy.put( "ignore", "IGNORE" );
+        this.checksumPolicy.put( "warn", "WARN" );
+        this.checksumPolicy.put( "strictIfExists", "STRICT_IF_EXISTS" );
+        this.checksumPolicy.put( "strict", "STRICT" );
+
+        this.proxyMode.put( "allow", "ALLOW" );
+        this.proxyMode.put( "blockedAuto", "BLOCKED_AUTO" );
+        this.proxyMode.put( "blockedManual", "BLOKED_MANUAL" );
+    }
 
     public Object loadConfiguration( File file )
         throws IOException,
@@ -262,7 +286,7 @@ public class Upgrade108to140
         CRepository newrepo = new CRepository();
         newrepo.setId( oldrepos.getId() );
         newrepo.setName( oldrepos.getName() );
-        newrepo.setLocalStatus( oldrepos.getLocalStatus() );
+        newrepo.setLocalStatus( this.localStatus.get( oldrepos.getLocalStatus()) );
         newrepo.setAllowWrite( oldrepos.isAllowWrite() );
         newrepo.setBrowseable( oldrepos.isBrowseable() );
         newrepo.setIndexable( oldrepos.isIndexable() );
@@ -278,14 +302,14 @@ public class Upgrade108to140
         // Manipulate the dom
         Xpp3Dom externalConfig = new Xpp3Dom( EXTERNAL_CONFIG );
         newrepo.setExternalConfiguration( externalConfig );
-        this.setNodeValue( externalConfig, "proxyMode", oldrepos.getProxyMode() );
+        this.setNodeValue( externalConfig, "proxyMode", this.proxyMode.get( oldrepos.getProxyMode() ));
         this.setNodeValue( externalConfig, "artifactMaxAge", Integer.toString( oldrepos.getArtifactMaxAge() ) );
         this.setNodeValue( externalConfig, "itemMaxAge", Integer.toString( oldrepos.getMetadataMaxAge() ) );
         this.setNodeValue( externalConfig, "cleanseRepositoryMetadata", Boolean.toString( oldrepos
             .isMaintainProxiedRepositoryMetadata() ) ); // TODO
         this
             .setNodeValue( externalConfig, "downloadRemoteIndex", Boolean.toString( oldrepos.isDownloadRemoteIndexes() ) );
-        this.setNodeValue( externalConfig, "checksumPolicy", oldrepos.getChecksumPolicy() );
+        this.setNodeValue( externalConfig, "checksumPolicy", this.checksumPolicy.get( oldrepos.getChecksumPolicy() ));
         this.setNodeValue( externalConfig, "repositoryPolicy", oldrepos.getRepositoryPolicy() );
 
         if ( oldrepos.getLocalStorage() != null )
@@ -492,7 +516,7 @@ public class Upgrade108to140
         {
             newShadow.setId( oldshadow.getId() );
             newShadow.setName( oldshadow.getName() );
-            newShadow.setLocalStatus( oldshadow.getLocalStatus() );
+            newShadow.setLocalStatus( this.localStatus.get( oldshadow.getLocalStatus() ));
             newShadow.setProviderHint( oldshadow.getType() );
             newShadow.setProviderRole( ShadowRepository.class.getName() );
             newShadow.setExposed( oldshadow.isExposed() );
@@ -558,7 +582,8 @@ public class Upgrade108to140
             groupRepo.setBrowseable( true );
             groupRepo.setExposed( true );
             groupRepo.setIndexable( false );
-
+            groupRepo.setLocalStatus( LocalStatus.IN_SERVICE.toString());
+            
             if ( oldgroup.getLocalStorage() != null )
             {
                 CLocalStorage localStorage = new CLocalStorage();
