@@ -57,19 +57,22 @@ public abstract class AbstractRepositoryConfigurator
     {
         prepareExternalConfiguration( (CRepository) config.getConfiguration( false ) );
 
-        doConfigure( repository, configuration, (CRepository) config.getConfiguration( false ), config
+        doApplyConfiguration( repository, configuration, (CRepository) config.getConfiguration( false ), config
             .getExternalConfiguration() );
     }
 
     public final void prepareForSave( Repository repository, ApplicationConfiguration configuration,
         CoreConfiguration config )
     {
-        prepareExternalConfiguration( (CRepository) config.getConfiguration( false ) );
+        prepareExternalConfiguration( (CRepository) config.getConfiguration( true ) );
 
         // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
         // later we will see about it
-        doPrepareForSave( repository, configuration, (CRepository) config.getConfiguration( false ), config
+        doPrepareForSave( repository, configuration, (CRepository) config.getConfiguration( true ), config
             .getExternalConfiguration() );
+
+        // commit, since doPrepareForSave() potentially modifies coreConfig or externalConfig
+        config.applyChanges();
     }
 
     protected void prepareExternalConfiguration( CRepository repoConfig )
@@ -82,7 +85,7 @@ public abstract class AbstractRepositoryConfigurator
 
         if ( repoConfig.externalConfigurationImple == null )
         {
-            // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
+            // in 1st round, i intentionally choosed to make our lives bitter, and handle config manually
             // later we will see about it
             repoConfig.externalConfigurationImple = createExternalConfiguration( (Xpp3Dom) repoConfig
                 .getExternalConfiguration() );
@@ -105,7 +108,7 @@ public abstract class AbstractRepositoryConfigurator
     }
 
     @SuppressWarnings( "unchecked" )
-    protected void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
+    protected void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration, CRepository repo,
         ExternalConfiguration externalConfiguration )
         throws ConfigurationException
     {
@@ -163,7 +166,6 @@ public abstract class AbstractRepositoryConfigurator
         {
             ls.validateStorageUrl( localUrl );
 
-            repository.setLocalUrl( localUrl );
             repository.setLocalStorage( ls );
         }
         catch ( StorageException e )

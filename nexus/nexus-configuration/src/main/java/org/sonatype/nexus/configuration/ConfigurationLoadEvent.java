@@ -25,7 +25,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 public class ConfigurationLoadEvent
     extends ConfigurationIOEvent
 {
-    public ConfigurationLoadEvent( ApplicationConfiguration configuration, Collection<Object> changes )
+    public ConfigurationLoadEvent( ApplicationConfiguration configuration )
     {
         super( configuration );
     }

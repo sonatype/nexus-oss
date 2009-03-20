@@ -230,7 +230,8 @@ public interface Repository
      * 
      * @param url the new local url
      */
-    void setLocalUrl( String url );
+    void setLocalUrl( String url )
+        throws StorageException;
 
     /**
      * Gets local status.

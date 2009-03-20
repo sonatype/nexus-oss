@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -84,7 +85,8 @@ public interface ProxyRepository
      * 
      * @param url the new remote url
      */
-    void setRemoteUrl( String url );
+    void setRemoteUrl( String url )
+        throws StorageException;
 
     /**
      * Returns repository specific remote connection context.

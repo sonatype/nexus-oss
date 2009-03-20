@@ -107,8 +107,6 @@ public abstract class AbstractProxyRepository
 
             getExternalConfiguration().setProxyMode( proxyMode );
 
-            markDirty();
-
             // if this is proxy
             // and was !shouldProxy() and the new is shouldProxy()
             if ( proxyMode != null && proxyMode.shouldProxy() && !oldProxyMode.shouldProxy() )
@@ -149,8 +147,6 @@ public abstract class AbstractProxyRepository
     public void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode )
     {
         getExternalConfiguration().setRepositoryStatusCheckMode( mode );
-
-        markDirty();
     }
 
     public String getRemoteUrl()
@@ -166,6 +162,7 @@ public abstract class AbstractProxyRepository
     }
 
     public void setRemoteUrl( String remoteUrl )
+        throws StorageException
     {
         if ( getRemoteStorage() != null )
         {
@@ -176,9 +173,9 @@ public abstract class AbstractProxyRepository
                 trstr = trstr.substring( 0, trstr.length() - 1 );
             }
 
-            getCurrentConfiguration( true ).getRemoteStorage().setUrl( trstr );
+            getRemoteStorage().validateStorageUrl( trstr );
 
-            markDirty();
+            getCurrentConfiguration( true ).getRemoteStorage().setUrl( trstr );
         }
     }
 
@@ -200,8 +197,6 @@ public abstract class AbstractProxyRepository
     public void setItemMaxAge( int itemMaxAge )
     {
         getExternalConfiguration().setItemMaxAge( itemMaxAge );
-
-        markDirty();
     }
 
     protected void resetRemoteStatus()
@@ -338,6 +333,11 @@ public abstract class AbstractProxyRepository
     public void setRemoteStorage( RemoteRepositoryStorage remoteStorage )
     {
         this.remoteStorage = remoteStorage;
+
+        if ( remoteStorage == null )
+        {
+            getCurrentConfiguration( true ).setRemoteStorage( null );
+        }
 
         setAllowWrite( remoteStorage == null );
     }

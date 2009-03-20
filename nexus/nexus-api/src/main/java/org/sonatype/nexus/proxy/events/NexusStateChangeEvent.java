@@ -19,25 +19,10 @@ package org.sonatype.nexus.proxy.events;
  * @author cstamas
  */
 public abstract class NexusStateChangeEvent
-    extends AbstractEvent
+    extends AbstractVetoableEvent
 {
-    private boolean vetoed;
-
     public NexusStateChangeEvent()
     {
         super();
-
-        this.vetoed = false;
     }
-
-    public boolean isVetoed()
-    {
-        return vetoed;
-    }
-
-    public void setVetoed( boolean vetoed )
-    {
-        this.vetoed = vetoed;
-    }
-
 }

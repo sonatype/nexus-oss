@@ -14,7 +14,6 @@
 package org.sonatype.nexus.configuration;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.proxy.events.ConfigurationEvent;
 
 /**
  * An event fired on configuration IO (load, save).
@@ -24,17 +23,8 @@ import org.sonatype.nexus.proxy.events.ConfigurationEvent;
 public abstract class ConfigurationIOEvent
     extends ConfigurationEvent
 {
-    private final ApplicationConfiguration configuration;
-
     public ConfigurationIOEvent( ApplicationConfiguration configuration )
     {
-        super();
-
-        this.configuration = configuration;
-    }
-
-    public ApplicationConfiguration getApplicationConfiguration()
-    {
-        return configuration;
+        super( configuration );
     }
 }

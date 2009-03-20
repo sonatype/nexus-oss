@@ -57,11 +57,11 @@ public abstract class AbstractShadowRepositoryConfigurator
     }
 
     @Override
-    public void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
+    public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration, CRepository repo,
         ExternalConfiguration externalConfiguration )
         throws ConfigurationException
     {
-        super.doConfigure( repository, configuration, repo, externalConfiguration );
+        super.doApplyConfiguration( repository, configuration, repo, externalConfiguration );
 
         ShadowRepository shadowRepository = repository.adaptToFacet( ShadowRepository.class );
 

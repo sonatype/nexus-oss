@@ -26,7 +26,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.ConfigurationSaveEvent;
+import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -145,14 +145,6 @@ public abstract class AbstractRepository
     /** The configuration */
     private CoreConfiguration repositoryConfiguration;
 
-    protected void markDirty()
-    {
-    }
-
-    protected void unmarkDirty()
-    {
-    }
-
     // Configurable iface
 
     public final CoreConfiguration getCurrentCoreConfiguration()
@@ -233,9 +225,8 @@ public abstract class AbstractRepository
         {
             getCurrentCoreConfiguration().getExternalConfiguration().applyChanges();
         }
-        
-        getRepositoryConfigurator()
-            .applyConfiguration( this, applicationConfiguration, getCurrentCoreConfiguration() );
+
+        getRepositoryConfigurator().applyConfiguration( this, applicationConfiguration, getCurrentCoreConfiguration() );
     }
 
     public abstract RepositoryConfigurator getRepositoryConfigurator();
@@ -261,20 +252,18 @@ public abstract class AbstractRepository
                 applicationEventMulticaster.removeProximityEventListener( this );
             }
         }
-        else if ( evt instanceof ConfigurationSaveEvent )
+        else if ( evt instanceof ConfigurationPrepareForSaveEvent )
         {
             if ( isDirty() )
             {
-                getCurrentCoreConfiguration().applyChanges();
-
-                getCurrentCoreConfiguration().getExternalConfiguration().applyChanges();
+                ConfigurationPrepareForSaveEvent psevt = (ConfigurationPrepareForSaveEvent) evt;
 
                 getRepositoryConfigurator().prepareForSave(
                     this,
                     applicationConfiguration,
                     getCurrentCoreConfiguration() );
 
-                unmarkDirty();
+                psevt.getChanges().add( this );
             }
         }
     }
@@ -362,8 +351,6 @@ public abstract class AbstractRepository
     public void setId( String id )
     {
         getCurrentConfiguration( true ).setId( id );
-
-        markDirty();
     }
 
     public String getName()
@@ -374,8 +361,6 @@ public abstract class AbstractRepository
     public void setName( String name )
     {
         getCurrentConfiguration( true ).setName( name );
-
-        markDirty();
     }
 
     public String getPathPrefix()
@@ -398,8 +383,6 @@ public abstract class AbstractRepository
     public void setPathPrefix( String prefix )
     {
         getCurrentConfiguration( true ).setPathPrefix( prefix );
-
-        markDirty();
     }
 
     public boolean isIndexable()
@@ -410,8 +393,6 @@ public abstract class AbstractRepository
     public void setIndexable( boolean indexable )
     {
         getCurrentConfiguration( true ).setIndexable( indexable );
-
-        markDirty();
     }
 
     public String getLocalUrl()
@@ -420,6 +401,7 @@ public abstract class AbstractRepository
     }
 
     public void setLocalUrl( String localUrl )
+        throws StorageException
     {
         String trstr = localUrl.trim();
 
@@ -428,9 +410,9 @@ public abstract class AbstractRepository
             trstr = trstr.substring( 0, trstr.length() - 1 );
         }
 
-        getCurrentConfiguration( true ).getLocalStorage().setUrl( trstr );
+        getLocalStorage().validateStorageUrl( trstr );
 
-        markDirty();
+        getCurrentConfiguration( true ).getLocalStorage().setUrl( trstr );
     }
 
     public LocalStatus getLocalStatus()
@@ -446,8 +428,6 @@ public abstract class AbstractRepository
 
             getCurrentConfiguration( true ).setLocalStatus( localStatus.toString() );
 
-            markDirty();
-
             getApplicationEventMulticaster().notifyProximityEventListeners(
                 new RepositoryEventLocalStatusChanged( this, oldLocalStatus, localStatus ) );
         }
@@ -461,8 +441,6 @@ public abstract class AbstractRepository
     public void setAllowWrite( boolean allowWrite )
     {
         getCurrentConfiguration( true ).setAllowWrite( allowWrite );
-
-        markDirty();
     }
 
     public boolean isBrowseable()
@@ -473,8 +451,6 @@ public abstract class AbstractRepository
     public void setBrowseable( boolean browseable )
     {
         getCurrentConfiguration( true ).setBrowseable( browseable );
-
-        markDirty();
     }
 
     public boolean isUserManaged()
@@ -485,8 +461,6 @@ public abstract class AbstractRepository
     public void setUserManaged( boolean userManaged )
     {
         getCurrentConfiguration( true ).setUserManaged( userManaged );
-
-        markDirty();
     }
 
     public boolean isExposed()
@@ -497,8 +471,6 @@ public abstract class AbstractRepository
     public void setExposed( boolean exposed )
     {
         getCurrentConfiguration( true ).setExposed( exposed );
-
-        markDirty();
     }
 
     public int getNotFoundCacheTimeToLive()
@@ -509,8 +481,6 @@ public abstract class AbstractRepository
     public void setNotFoundCacheTimeToLive( int notFoundCacheTimeToLive )
     {
         getCurrentConfiguration( true ).setNotFoundCacheTTL( notFoundCacheTimeToLive );
-
-        markDirty();
     }
 
     public boolean isNotFoundCacheActive()
@@ -521,8 +491,6 @@ public abstract class AbstractRepository
     public void setNotFoundCacheActive( boolean notFoundCacheActive )
     {
         getCurrentConfiguration( true ).setNotFoundCacheActive( notFoundCacheActive );
-
-        markDirty();
     }
 
     public PublishedMirrors getPublishedMirrors()

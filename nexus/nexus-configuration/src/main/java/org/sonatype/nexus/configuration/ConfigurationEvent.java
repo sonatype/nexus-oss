@@ -11,7 +11,10 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.events;
+package org.sonatype.nexus.configuration;
+
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
 
 /**
  * The event that is occured when configuration related change had occured.
@@ -21,8 +24,17 @@ package org.sonatype.nexus.proxy.events;
 public abstract class ConfigurationEvent
     extends AbstractEvent
 {
-    public ConfigurationEvent()
+    private final ApplicationConfiguration configuration;
+
+    public ConfigurationEvent( ApplicationConfiguration configuration )
     {
         super();
+
+        this.configuration = configuration;
+    }
+
+    public ApplicationConfiguration getConfiguration()
+    {
+        return configuration;
     }
 }

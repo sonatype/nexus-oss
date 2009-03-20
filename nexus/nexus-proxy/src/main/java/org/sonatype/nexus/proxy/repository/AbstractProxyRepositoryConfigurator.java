@@ -25,11 +25,11 @@ public abstract class AbstractProxyRepositoryConfigurator
     extends AbstractRepositoryConfigurator
 {
     @Override
-    public void doConfigure( Repository repository, ApplicationConfiguration configuration, CRepository repo,
+    public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration, CRepository repo,
         ExternalConfiguration externalConfiguration )
         throws ConfigurationException
     {
-        super.doConfigure( repository, configuration, repo, externalConfiguration );
+        super.doApplyConfiguration( repository, configuration, repo, externalConfiguration );
 
         // proxy stuff, but is optional!
 
@@ -93,8 +93,6 @@ public abstract class AbstractProxyRepositoryConfigurator
                 }
                 else
                 {
-                    prepository.setRemoteUrl( null );
-
                     prepository.setRemoteStorage( null );
 
                     prepository.setRemoteStorageContext( null );

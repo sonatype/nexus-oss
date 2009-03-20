@@ -13,31 +13,37 @@
  */
 package org.sonatype.nexus.configuration;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.events.AbstractVetoableEvent;
 
 /**
- * An event fired on configuration change.
+ * An event fired on configuration prepare save, when configurable components should prepare configs for save. This is a
+ * VetoableEvent, so, save may be vetoed.
  * 
  * @author cstamas
  */
-public class ConfigurationChangeEvent
-    extends ConfigurationEvent
+public class ConfigurationPrepareForSaveEvent
+    extends AbstractVetoableEvent
 {
+    private final ApplicationConfiguration configuration;
+
     private final Collection<Configurable> changes;
 
-    public ConfigurationChangeEvent( ApplicationConfiguration configuration, Collection<Configurable> changes )
+    public ConfigurationPrepareForSaveEvent( ApplicationConfiguration configuration )
     {
-        super( configuration );
+        super();
 
-        if ( changes == null )
-        {
-            changes = Collections.emptyList();
-        }
+        this.configuration = configuration;
 
-        this.changes = Collections.unmodifiableCollection( changes );
+        this.changes = new ArrayList<Configurable>();
+    }
+
+    public ApplicationConfiguration getConfiguration()
+    {
+        return configuration;
     }
 
     public Collection<Configurable> getChanges()

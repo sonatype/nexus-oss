@@ -20,7 +20,6 @@ package org.sonatype.nexus.proxy.repository;
  */
 public enum LocalStatus
 {
-
     IN_SERVICE,
 
     OUT_OF_SERVICE;
@@ -29,5 +28,4 @@ public enum LocalStatus
     {
         return IN_SERVICE.equals( this );
     }
-
 }
