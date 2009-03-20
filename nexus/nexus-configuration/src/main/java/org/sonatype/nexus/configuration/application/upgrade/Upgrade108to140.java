@@ -439,8 +439,14 @@ public class Upgrade108to140
             task.setType( oldtask.getType() );
             task.setEnabled( oldtask.isEnabled() );
             task.setId( oldtask.getId() );
-            task.setLastRun( oldtask.getLastRun().getTime() );
-            task.setNextRun( oldtask.getNextRun().getTime() );
+            if( oldtask.getLastRun() != null )
+            {
+                task.setLastRun( oldtask.getLastRun().getTime() );
+            }
+            if( oldtask.getNextRun() != null )
+            {
+                task.setNextRun( oldtask.getNextRun().getTime() );
+            }
             task.setName( oldtask.getName() );
             task.setStatus( oldtask.getStatus() );
             task.setProperties( copyCProps1_0_8( (List<org.sonatype.nexus.configuration.model.v1_0_8.CProps>) oldtask
