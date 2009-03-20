@@ -15,7 +15,8 @@ package org.sonatype.nexus.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.scheduling.AbstractNexusTask;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ShadowPropertyDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
@@ -27,7 +28,7 @@ import org.sonatype.scheduling.SchedulerTask;
  */
 @Component( role = SchedulerTask.class, hint = SynchronizeShadowTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class SynchronizeShadowsTask
-    extends AbstractNexusTask<Object>
+    extends AbstractNexusRepositoriesTask<Object>
 {
     public String getShadowRepositoryId()
     {
@@ -43,7 +44,11 @@ public class SynchronizeShadowsTask
     protected Object doRun()
         throws Exception
     {
-        getNexus().synchronizeShadow( getShadowRepositoryId() );
+        ShadowRepository shadow = getRepositoryRegistry().getRepositoryWithFacet(
+            getShadowRepositoryId(),
+            ShadowRepository.class );
+
+        shadow.synchronizeWithMaster();
 
         return null;
     }

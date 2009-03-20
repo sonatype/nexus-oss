@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
@@ -13,6 +14,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -24,6 +26,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class ContentGetDiscoveryStrategy
     extends AbstractDiscoveryStrategy
 {
+    @Requirement
+    private RepositoryRegistry repositoryRegistry;
+
     public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
         throws NoSuchRepositoryException,
             IOException
@@ -61,7 +66,7 @@ public class ContentGetDiscoveryStrategy
         try
         {
             // NoSuchRepository if the repoId is not known
-            Repository repository = getNexus().getRepository( request.getLvoKey().getRepositoryId() );
+            Repository repository = repositoryRegistry.getRepository( request.getLvoKey().getRepositoryId() );
 
             // ItemNotFound if the path does not exists
             StorageItem item = repository.retrieveItem( false, new ResourceStoreRequest( request

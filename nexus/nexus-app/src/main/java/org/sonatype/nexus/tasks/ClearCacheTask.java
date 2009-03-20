@@ -15,6 +15,9 @@ package org.sonatype.nexus.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.ClearCacheTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
@@ -27,21 +30,24 @@ import org.sonatype.scheduling.SchedulerTask;
 @Component( role = SchedulerTask.class, hint = ClearCacheTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class ClearCacheTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
-{    
+{
     public Object doRun()
         throws Exception
     {
+        ResourceStoreRequest req = new ResourceStoreRequest( getResourceStorePath() );
+
         if ( getRepositoryGroupId() != null )
         {
-            getNexus().clearRepositoryGroupCaches( getResourceStorePath(), getRepositoryGroupId() );
+            getRepositoryRegistry()
+                .getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).clearCaches( req );
         }
         else if ( getRepositoryId() != null )
         {
-            getNexus().clearRepositoryCaches( getResourceStorePath(), getRepositoryId() );
+            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class ).clearCaches( req );
         }
         else
         {
-            getNexus().clearAllCaches( getResourceStorePath() );
+            getNexus().clearAllCaches( new ResourceStoreRequest( getResourceStorePath() ) );
         }
 
         return null;
@@ -66,7 +72,7 @@ public class ClearCacheTask
         }
         else
         {
-            return "Clearing caches for all registered repositories" + " from path " + getResourceStorePath()
+            return "Clearing caches for all registered repositories from path " + getResourceStorePath()
                 + " and below.";
         }
     }

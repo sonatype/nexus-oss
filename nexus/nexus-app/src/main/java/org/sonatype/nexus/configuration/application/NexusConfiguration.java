@@ -14,15 +14,14 @@
 package org.sonatype.nexus.configuration.application;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 
+import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 /**
  * A component responsible for configuration management.
@@ -52,24 +51,13 @@ public interface NexusConfiguration
         throws ConfigurationException,
             IOException;
 
-    void applyConfiguration( Object... changeds )
-        throws IOException;
-
-    void saveConfiguration()
-        throws IOException;
-
     ApplicationConfigurationSource getConfigurationSource();
-
-    InputStream getConfigurationAsStream()
-        throws IOException;
 
     boolean isInstanceUpgraded();
 
     boolean isConfigurationUpgraded();
 
     boolean isConfigurationDefaulted();
-
-    RemoteStorageContext getRemoteStorageContext();
 
     Repository createRepositoryFromModel( Configuration configuration, CRepository repository )
         throws ConfigurationException;
@@ -96,6 +84,6 @@ public interface NexusConfiguration
      * @return
      * @throws IOException
      */
-    InputStream getConfigurationAsStreamByKey( String key )
+    NexusStreamResponse getConfigurationAsStreamByKey( String key )
         throws IOException;
 }

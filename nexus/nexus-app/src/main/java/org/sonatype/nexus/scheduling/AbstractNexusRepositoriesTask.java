@@ -18,10 +18,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.tasks.descriptors.properties.RepositoryOrGroupPropertyDescriptor;
@@ -37,6 +39,9 @@ public abstract class AbstractNexusRepositoriesTask<T>
 
     private static final String GROUP_PREFIX = "group_";
 
+    @Requirement
+    private RepositoryRegistry repositoryRegistry;
+
     public static String getIdFromPrefixedString( String prefix, String prefixedString )
     {
         if ( prefixedString != null && prefixedString.startsWith( prefix ) )
@@ -45,6 +50,11 @@ public abstract class AbstractNexusRepositoriesTask<T>
         }
 
         return null;
+    }
+
+    protected RepositoryRegistry getRepositoryRegistry()
+    {
+        return repositoryRegistry;
     }
 
     public String getRepositoryId()
@@ -65,13 +75,23 @@ public abstract class AbstractNexusRepositoriesTask<T>
         return getIdFromPrefixedString( GROUP_PREFIX, getParameters().get( RepositoryOrGroupPropertyDescriptor.ID ) );
     }
 
+    public void setRepositoryGroupId( String repositoryGroupId )
+    {
+        if ( !StringUtils.isEmpty( repositoryGroupId ) )
+        {
+            getParameters().put( RepositoryOrGroupPropertyDescriptor.ID, GROUP_PREFIX + repositoryGroupId );
+        }
+    }
+
     public String getRepositoryGroupName()
     {
         try
         {
-            GroupRepository repo = getNexus().getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class );
-            
-            return repo.getName();
+            GroupRepository repo = getRepositoryRegistry().getRepositoryWithFacet(
+                getRepositoryGroupId(),
+                GroupRepository.class );
+
+            return repo.getName() + " (group)";
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -85,8 +105,8 @@ public abstract class AbstractNexusRepositoriesTask<T>
     {
         try
         {
-            Repository repo = getNexus().getRepositoryWithFacet( getRepositoryGroupId(), Repository.class );
-            
+            Repository repo = getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(), Repository.class );
+
             return repo.getName();
         }
         catch ( NoSuchRepositoryException e )
@@ -94,14 +114,6 @@ public abstract class AbstractNexusRepositoriesTask<T>
             this.getLogger().warn( "Could not read repository!", e );
 
             return getRepositoryId();
-        }
-    }
-
-    public void setRepositoryGroupId( String repositoryGroupId )
-    {
-        if ( !StringUtils.isEmpty( repositoryGroupId ) )
-        {
-            getParameters().put( RepositoryOrGroupPropertyDescriptor.ID, GROUP_PREFIX + repositoryGroupId );
         }
     }
 
@@ -195,24 +207,26 @@ public abstract class AbstractNexusRepositoriesTask<T>
 
             if ( getRepositoryId() != null )
             {
-                thisReposes.add( getNexus().getRepository( getRepositoryId() ) );
+                thisReposes.add( getRepositoryRegistry().getRepository( getRepositoryId() ) );
             }
             else
             {
-                thisReposes.addAll( getNexus()
-                    .getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).getMemberRepositories() );
+                thisReposes.addAll( getRepositoryRegistry().getRepositoryWithFacet(
+                    getRepositoryGroupId(),
+                    GroupRepository.class ).getMemberRepositories() );
             }
 
             List<Repository> otherReposes = new ArrayList<Repository>();
 
             if ( otherRepositoryId != null )
             {
-                otherReposes.add( getNexus().getRepository( otherRepositoryId ) );
+                otherReposes.add( getRepositoryRegistry().getRepository( otherRepositoryId ) );
             }
             else
             {
-                otherReposes.addAll( getNexus()
-                    .getRepositoryWithFacet( otherRepositoryGroupId, GroupRepository.class ).getMemberRepositories() );
+                otherReposes.addAll( getRepositoryRegistry().getRepositoryWithFacet(
+                    otherRepositoryGroupId,
+                    GroupRepository.class ).getMemberRepositories() );
             }
 
             HashSet<Repository> testSet = new HashSet<Repository>();

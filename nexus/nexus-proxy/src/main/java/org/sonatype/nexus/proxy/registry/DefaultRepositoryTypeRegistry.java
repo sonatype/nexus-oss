@@ -75,7 +75,7 @@ public class DefaultRepositoryTypeRegistry
         return Collections.unmodifiableSet( result );
     }
 
-    public Collection<ContentClass> listRepositoryContentClasses()
+    public Collection<ContentClass> getContentClasses()
     {
         return Collections.unmodifiableCollection( contentClasses.values() );
     }

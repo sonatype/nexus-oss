@@ -45,9 +45,23 @@ public interface ShadowRepository
      * @param masterRepository
      * @throws IncompatibleMasterRepositoryException
      */
-    public void setMasterRepositoryId( String masterRepositoryId )
+    void setMasterRepositoryId( String masterRepositoryId )
         throws NoSuchRepositoryException,
             IncompatibleMasterRepositoryException;
+
+    /**
+     * Gets sync at startup.
+     * 
+     * @return
+     */
+    boolean isSynchronizeAtStartup();
+
+    /**
+     * Sets sync at start.
+     * 
+     * @param value
+     */
+    void setSynchronizeAtStartup( boolean value );
 
     /**
      * Returns the master.
@@ -67,5 +81,5 @@ public interface ShadowRepository
     /**
      * Triggers syncing with master repository.
      */
-    public void synchronizeWithMaster();
+    void synchronizeWithMaster();
 }

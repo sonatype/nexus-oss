@@ -16,7 +16,9 @@ package org.sonatype.nexus.tasks;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.PublishIndexesTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
@@ -30,6 +32,9 @@ import org.sonatype.scheduling.SchedulerTask;
 public class PublishIndexesTask
     extends AbstractNexusRepositoriesTask<Object>
 {
+    @Requirement
+    private IndexerManager indexerManager;
+
     @Override
     protected Object doRun()
         throws Exception
@@ -38,15 +43,15 @@ public class PublishIndexesTask
         {
             if ( getRepositoryId() != null )
             {
-                getNexus().publishRepositoryIndex( getRepositoryId() );
+                indexerManager.publishRepositoryIndex( getRepositoryId() );
             }
             else if ( getRepositoryGroupId() != null )
             {
-                getNexus().publishRepositoryGroupIndex( getRepositoryGroupId() );
+                indexerManager.publishRepositoryGroupIndex( getRepositoryGroupId() );
             }
             else
             {
-                getNexus().publishAllIndex();
+                indexerManager.publishAllIndex();
             }
         }
         catch ( IOException e )

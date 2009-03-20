@@ -11,21 +11,21 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.configuration.application.runtime;
+package org.sonatype.nexus.configuration;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 /**
- * A component to be slimmed! Actually, it is a "factory" (backed by Plexus) that creates repo and other instances. It
- * should realy onto plexus as much can.
+ * An event fired on configuration prepare save, when configurable components should prepare configs for save. This is a
+ * VetoableEvent, so, save may be vetoed.
  * 
  * @author cstamas
  */
-public interface ApplicationRuntimeConfigurationBuilder
+public class ConfigurationRollbackEvent
+    extends ConfigurationIOEvent
 {
-    Repository createRepositoryFromModel( Configuration configuration, CRepository repoConf )
-        throws ConfigurationException;
+    public ConfigurationRollbackEvent( ApplicationConfiguration configuration )
+    {
+        super( configuration );
+    }
 }

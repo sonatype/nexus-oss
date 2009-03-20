@@ -14,7 +14,9 @@
 package org.sonatype.nexus.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
@@ -27,21 +29,24 @@ import org.sonatype.scheduling.SchedulerTask;
 @Component( role = SchedulerTask.class, hint = ReindexTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class ReindexTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
-{    
+{
+    @Requirement
+    private IndexerManager indexerManager;
+
     public Object doRun()
         throws Exception
     {
-        if ( getRepositoryGroupId() != null )
+        if ( getRepositoryId() != null )
         {
-            getNexus().reindexRepositoryGroup( getResourceStorePath(), getRepositoryGroupId() );
+            indexerManager.reindexRepository( getResourceStorePath(), getRepositoryId() );
         }
-        else if ( getRepositoryId() != null )
+        else if ( getRepositoryGroupId() != null )
         {
-            getNexus().reindexRepository( getResourceStorePath(), getRepositoryId() );
+            indexerManager.reindexRepositoryGroup( getResourceStorePath(), getRepositoryGroupId() );
         }
         else
         {
-            getNexus().reindexAllRepositories( getResourceStorePath() );
+            indexerManager.reindexAllRepositories( getResourceStorePath() );
         }
 
         return null;

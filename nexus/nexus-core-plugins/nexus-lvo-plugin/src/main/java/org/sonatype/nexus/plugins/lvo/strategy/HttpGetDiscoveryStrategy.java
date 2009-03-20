@@ -72,7 +72,7 @@ public class HttpGetDiscoveryStrategy
     {
         Request rr = new Request( Method.GET, url );
 
-        rr.setReferrerRef( getNexus().getBaseUrl() );
+        rr.setReferrerRef( getNexus().getNexusConfiguration().getBaseUrl() );
 
         ClientInfo ci = new ClientInfo();
 

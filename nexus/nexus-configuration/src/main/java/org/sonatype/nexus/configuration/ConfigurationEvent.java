@@ -33,7 +33,7 @@ public abstract class ConfigurationEvent
         this.configuration = configuration;
     }
 
-    public ApplicationConfiguration getConfiguration()
+    public ApplicationConfiguration getApplicationConfiguration()
     {
         return configuration;
     }

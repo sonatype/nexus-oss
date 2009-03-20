@@ -16,7 +16,6 @@ package org.sonatype.nexus.configuration.application;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,10 +28,11 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
-import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -53,7 +53,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -104,17 +104,14 @@ public class DefaultNexusConfiguration
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
+    @Requirement
+    private RepositoryTypeRegistry repositoryTypeRegistry;
+
     /**
      * The target registry.
      */
     @Requirement
     private TargetRegistry targetRegistry;
-
-    /**
-     * The available content classes.
-     */
-    @Requirement( role = ContentClass.class )
-    private List<ContentClass> contentClasses;
 
     /**
      * The available scheduled task descriptors
@@ -139,16 +136,6 @@ public class DefaultNexusConfiguration
 
     /** Names of the conf files */
     private Map<String, String> configurationFiles;
-
-    public RemoteStorageContext getRemoteStorageContext()
-    {
-        return remoteStorageContext;
-    }
-
-    public void setRemoteStorageContext( RemoteStorageContext remoteStorageContext )
-    {
-        this.remoteStorageContext = remoteStorageContext;
-    }
 
     public void loadConfiguration()
         throws ConfigurationException,
@@ -195,19 +182,30 @@ public class DefaultNexusConfiguration
         }
     }
 
-    // XXX: finish this! What changed?
-    public void applyConfiguration( Object... changeds )
+    public void applyConfiguration()
         throws IOException
     {
         getLogger().info( "Applying Nexus Configuration..." );
 
-        configurationDirectory = null;
+        ConfigurationPrepareForSaveEvent prepare = new ConfigurationPrepareForSaveEvent( this );
 
-        temporaryDirectory = null;
+        applicationEventMulticaster.notifyProximityEventListeners( prepare );
 
-        wastebasketDirectory = null;
+        if ( !prepare.isVetoed() )
+        {
+            configurationDirectory = null;
 
-        applicationEventMulticaster.notifyProximityEventListeners( new ConfigurationChangeEvent( this, null ) );
+            temporaryDirectory = null;
+
+            wastebasketDirectory = null;
+
+            applicationEventMulticaster.notifyProximityEventListeners( new ConfigurationChangeEvent( this, prepare
+                .getChanges() ) );
+        }
+        else
+        {
+            getLogger().info( "... applying was vetoed by: " + prepare.getVetos() );
+        }
     }
 
     public void saveConfiguration()
@@ -216,10 +214,10 @@ public class DefaultNexusConfiguration
         configurationSource.storeConfiguration();
     }
 
-    protected void applyAndSaveConfiguration( Object... changes )
+    protected void applyAndSaveConfiguration()
         throws IOException
     {
-        applyConfiguration( changes );
+        applyConfiguration();
 
         saveConfiguration();
     }
@@ -232,12 +230,6 @@ public class DefaultNexusConfiguration
     public ApplicationConfigurationSource getConfigurationSource()
     {
         return configurationSource;
-    }
-
-    public InputStream getConfigurationAsStream()
-        throws IOException
-    {
-        return configurationSource.getConfigurationAsStream();
     }
 
     public boolean isInstanceUpgraded()
@@ -256,6 +248,11 @@ public class DefaultNexusConfiguration
     public boolean isConfigurationDefaulted()
     {
         return configurationSource.isConfigurationDefaulted();
+    }
+
+    public RemoteStorageContext getGlobalRemoteStorageContext()
+    {
+        return remoteStorageContext;
     }
 
     public File getWorkingDirectory()
@@ -322,11 +319,6 @@ public class DefaultNexusConfiguration
         throws ConfigurationException
     {
         return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repository );
-    }
-
-    public Collection<ContentClass> listRepositoryContentClasses()
-    {
-        return Collections.unmodifiableList( contentClasses );
     }
 
     public List<ScheduledTaskDescriptor> listScheduledTaskDescriptors()
@@ -477,7 +469,7 @@ public class DefaultNexusConfiguration
         {
             ContentClass contentClass = null;
 
-            for ( ContentClass cl : contentClasses )
+            for ( ContentClass cl : repositoryTypeRegistry.getContentClasses() )
             {
                 if ( settings.getContentClass().equals( cl.getId() ) )
                 {
@@ -555,6 +547,31 @@ public class DefaultNexusConfiguration
         }
 
         getConfiguration().getRestApi().setForceBaseUrl( force );
+
+        applyAndSaveConfiguration();
+    }
+
+    public int getSessionExpiration()
+    {
+        if ( getConfiguration().getRestApi() != null )
+        {
+            return getConfiguration().getRestApi().getSessionExpiration();
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    public void setSessionExpiration( int value )
+        throws IOException
+    {
+        if ( getConfiguration().getRestApi() == null )
+        {
+            getConfiguration().setRestApi( new CRestApiSettings() );
+        }
+
+        getConfiguration().getRestApi().setSessionExpiration( value );
 
         applyAndSaveConfiguration();
     }
@@ -638,7 +655,7 @@ public class DefaultNexusConfiguration
 
     // CRepository and CreposioryShadow helper
 
-    protected ApplicationValidationContext getRepositoryValidationContext()
+    private ApplicationValidationContext getRepositoryValidationContext()
     {
         ApplicationValidationContext result = new ApplicationValidationContext();
 
@@ -683,84 +700,19 @@ public class DefaultNexusConfiguration
         }
     }
 
-    public Collection<CRepository> listRepositories()
-    {
-        return new ArrayList<CRepository>( getConfiguration().getRepositories() );
-    }
-
-    public void createRepository( CRepository settings )
+    public Repository createRepository( CRepository settings )
         throws ConfigurationException,
             IOException
     {
         validateRepository( settings, true );
 
+        getConfiguration().addRepository( settings );
+
         Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfiguration(), settings );
 
         repositoryRegistry.addRepository( repository );
 
-        getConfiguration().getRepositories().add( settings );
-
-        applyAndSaveConfiguration();
-    }
-
-    public CRepository readRepository( String id )
-        throws NoSuchRepositoryException
-    {
-        repositoryRegistry.getRepository( id );
-
-        List<CRepository> shadows = getConfiguration().getRepositories();
-
-        for ( Iterator<CRepository> i = shadows.iterator(); i.hasNext(); )
-        {
-            CRepository repo = i.next();
-
-            if ( repo.getId().equals( id ) )
-            {
-                return repo;
-            }
-        }
-
-        throw new NoSuchRepositoryException( id );
-    }
-
-    public void updateRepository( CRepository settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {
-        validateRepository( settings, false );
-
-        Repository repository = repositoryRegistry.getRepository( settings.getId() );
-
-        if ( !repository.getRepositoryKind().isFacetAvailable( HostedRepository.class )
-            && !repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            // this is something else
-            throw new NoSuchRepositoryException( settings.getId() );
-        }
-
-        runtimeConfigurationBuilder.updateRepositoryFromModel( repository, getConfiguration(), settings );
-
-        // replace it with new one
-        repositoryRegistry.updateRepository( repository );
-
-        List<CRepository> reposes = getConfiguration().getRepositories();
-
-        for ( int i = 0; i < reposes.size(); i++ )
-        {
-            CRepository repo = reposes.get( i );
-
-            if ( repo.getId().equals( settings.getId() ) )
-            {
-                reposes.remove( i );
-
-                reposes.add( i, settings );
-
-                applyAndSaveConfiguration();
-
-                return;
-            }
-        }
+        return repository;
     }
 
     public void deleteRepository( String id )
@@ -784,13 +736,13 @@ public class DefaultNexusConfiguration
         // =======
         // shadows
         // (fail if any repo references the currently processing one)
-        List<CRepositoryShadow> shadows = getConfiguration().getRepositoryShadows();
+        List<ShadowRepository> shadows = repositoryRegistry.getRepositoriesWithFacet( ShadowRepository.class );
 
-        for ( Iterator<CRepositoryShadow> i = shadows.iterator(); i.hasNext(); )
+        for ( Iterator<ShadowRepository> i = shadows.iterator(); i.hasNext(); )
         {
-            CRepositoryShadow shadow = i.next();
+            ShadowRepository shadow = i.next();
 
-            if ( repository.getId().equals( shadow.getShadowOf() ) )
+            if ( repository.getId().equals( shadow.getMasterRepository() ) )
             {
                 throw new ConfigurationException( "The repository with ID " + id
                     + " is not deletable, it has dependant repositories!" );
@@ -800,23 +752,7 @@ public class DefaultNexusConfiguration
         // ======
         // groups
         // (correction in config only, registry DOES handle it)
-
-        // do we have groups at all?
-        if ( getConfiguration().getRepositoryGrouping() != null
-            && getConfiguration().getRepositoryGrouping().getRepositoryGroups() != null )
-        {
-            // all existing groups
-            List<CRepositoryGroup> groups = getConfiguration().getRepositoryGrouping().getRepositoryGroups();
-
-            // if any group reference this repository, remove that reference
-            for ( CRepositoryGroup group : groups )
-            {
-                if ( group.getRepositories().contains( id ) )
-                {
-                    group.getRepositories().remove( id );
-                }
-            }
-        }
+        // since NEXUS-1770, groups are "self maintaining"
 
         // ===========
         // pahMappings
@@ -1054,7 +990,7 @@ public class DefaultNexusConfiguration
         {
             boolean contentClassExists = false;
 
-            for ( ContentClass cc : contentClasses )
+            for ( ContentClass cc : repositoryTypeRegistry.getContentClasses() )
             {
                 if ( cc.getId().equals( settings.getContentClass() ) )
                 {
@@ -1096,7 +1032,7 @@ public class DefaultNexusConfiguration
 
         ContentClass contentClass = null;
 
-        for ( ContentClass cl : contentClasses )
+        for ( ContentClass cl : repositoryTypeRegistry.getContentClasses() )
         {
             if ( settings.getContentClass().equals( cl.getId() ) )
             {
@@ -1157,7 +1093,7 @@ public class DefaultNexusConfiguration
 
             ContentClass contentClass = null;
 
-            for ( ContentClass cl : contentClasses )
+            for ( ContentClass cl : repositoryTypeRegistry.getContentClasses() )
             {
                 if ( oldTarget.getContentClass().equals( cl.getId() ) )
                 {
@@ -1251,92 +1187,36 @@ public class DefaultNexusConfiguration
         return configurationFiles;
     }
 
-    public InputStream getConfigurationAsStreamByKey( String key )
+    public NexusStreamResponse getConfigurationAsStreamByKey( String key )
         throws IOException
     {
-        String fileName = configurationFiles.get( key );
+        String fileName = getConfigurationFiles().get( key );
 
-        return new FileInputStream( new File( getConfigurationDirectory(), fileName ) );
-    }
-
-    public void setMirrors( String repositoryId, List<CMirror> mirrors )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {
-        ValidationResponse res = configurationValidator.validateRepositoryMirrors( null, mirrors );
-
-        if ( res.isValid() )
+        if ( fileName != null )
         {
-            boolean found = false;
+            File configFile = new File( getConfigurationDirectory(), fileName );
 
-            for ( CRepository repository : (List<CRepository>) getConfiguration().getRepositories() )
+            if ( configFile.canRead() && configFile.isFile() )
             {
-                if ( repository.getId().equals( repositoryId ) )
-                {
-                    // Proxy mirrors
-                    if ( repository.getRemoteStorage() != null )
-                    {
-                        repository.getRemoteStorage().setMirrors( mirrors );
-                    }
-                    // Hosted mirrors
-                    else
-                    {
-                        int i = 1;
-                        for ( CMirror mirror : mirrors )
-                        {
-                            mirror.setId( String.valueOf( i++ ) );
-                        }
+                NexusStreamResponse response = new NexusStreamResponse();
 
-                        repository.setMirrors( mirrors );
-                    }
+                response.setName( fileName );
+                response.setMimeType( "text/xml" );
+                response.setSize( configFile.length() );
+                response.setFromByte( 0 );
+                response.setBytesCount( configFile.length() );
+                response.setInputStream( new FileInputStream( configFile ) );
 
-                    applyAndSaveConfiguration();
-                    try
-                    {
-                        updateRepository( repository );
-                    }
-                    catch ( ConfigurationException e )
-                    {
-                        // Shouldn't be able to get to this case
-                        getLogger().error( "Invalid configuration applied when updating mirrors", e );
-                    }
-                    found = true;
-                    break;
-                }
+                return response;
             }
-
-            if ( !found )
+            else
             {
-                throw new NoSuchRepositoryException( repositoryId );
+                return null;
             }
         }
         else
         {
-            throw new InvalidConfigurationException( res );
+            return null;
         }
-    }
-
-    public Collection<CMirror> listMirrors( String repositoryId )
-        throws NoSuchRepositoryException
-    {
-        for ( CRepository repository : (List<CRepository>) getConfiguration().getRepositories() )
-        {
-            if ( repository.getId().equals( repositoryId ) )
-            {
-                // Proxy mirrors
-                if ( repository.getRemoteStorage() != null )
-                {
-                    return repository.getRemoteStorage().getMirrors();
-                }
-                // Hosted mirrors
-                else
-                {
-                    return repository.getMirrors();
-                }
-            }
-        }
-
-        throw new NoSuchRepositoryException( repositoryId );
     }
 }

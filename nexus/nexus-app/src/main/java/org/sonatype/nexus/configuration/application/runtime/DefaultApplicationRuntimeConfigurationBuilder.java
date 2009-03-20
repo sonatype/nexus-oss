@@ -43,15 +43,9 @@ public class DefaultApplicationRuntimeConfigurationBuilder
     {
         Repository repository = createRepository( repoConf.getProviderRole(), repoConf.getProviderHint() );
 
-        updateRepositoryFromModel( repository, configuration, repoConf );
+        repository.configure( repoConf );
 
         return repository;
-    }
-
-    public void updateRepositoryFromModel( Repository repository, Configuration configuration, CRepository repoConf )
-        throws ConfigurationException
-    {
-        repository.configure( repoConf );
     }
 
     // ----------------------------------------

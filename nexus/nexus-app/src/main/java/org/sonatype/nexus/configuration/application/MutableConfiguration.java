@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -28,6 +27,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
 public interface MutableConfiguration
@@ -85,7 +85,8 @@ public interface MutableConfiguration
 
     int getSessionExpiration();
 
-    void setSessionExpiration( int value );
+    void setSessionExpiration( int value )
+        throws IOException;
 
     // ------------------------------------------------------------------
     // CRUD-like ops on config sections
@@ -125,18 +126,8 @@ public interface MutableConfiguration
 
     // CRepository: CRUD
 
-    Collection<CRepository> listRepositories();
-
-    void createRepository( CRepository settings )
+    Repository createRepository( CRepository settings )
         throws ConfigurationException,
-            IOException;
-
-    CRepository readRepository( String id )
-        throws NoSuchRepositoryException;
-
-    void updateRepository( CRepository settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
             IOException;
 
     void deleteRepository( String id )
@@ -194,19 +185,11 @@ public interface MutableConfiguration
     void deleteRemoteNexusInstance( String alias )
         throws IOException;
 
+    // CSmtpConfiguration are mandatory: RU
     // Smtp settings
     CSmtpConfiguration readSmtpConfiguration();
 
     void updateSmtpConfiguration( CSmtpConfiguration settings )
         throws ConfigurationException,
             IOException;
-
-    // Mirrors
-    void setMirrors( String repositoryId, List<CMirror> mirrors )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException;
-
-    Collection<CMirror> listMirrors( String repositoryId )
-        throws NoSuchRepositoryException;
 }

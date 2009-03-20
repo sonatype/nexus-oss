@@ -82,6 +82,16 @@ public abstract class AbstractShadowRepository
         }
     }
 
+    public boolean isSynchronizeAtStartup()
+    {
+        return getExternalConfiguration().isSynchronizeAtStartup();
+    }
+
+    public void setSynchronizeAtStartup( boolean val )
+    {
+        getExternalConfiguration().setSynchronizeAtStartup( val );
+    }
+
     public void setMasterRepository( Repository masterRepository )
         throws IncompatibleMasterRepositoryException
     {

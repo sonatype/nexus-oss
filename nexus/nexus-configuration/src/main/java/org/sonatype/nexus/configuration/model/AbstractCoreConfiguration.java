@@ -87,9 +87,9 @@ public abstract class AbstractCoreConfiguration
             setOriginalConfiguration( getXStream().fromXML(
                 getXStream().toXML( getChangedConfiguration() ),
                 getOriginalConfiguration() ) );
-        }
 
-        setChangedConfiguration( null );
+            setChangedConfiguration( null );
+        }
 
         if ( getExternalConfiguration() != null && getExternalConfiguration().isDirty() )
         {
@@ -99,6 +99,14 @@ public abstract class AbstractCoreConfiguration
 
     public void rollbackChanges()
     {
-        setChangedConfiguration( null );
+        if ( isDirty() )
+        {
+            setChangedConfiguration( null );
+        }
+        
+        if ( getExternalConfiguration() != null && getExternalConfiguration().isDirty() )
+        {
+            getExternalConfiguration().rollbackChanges();
+        }
     }
 }

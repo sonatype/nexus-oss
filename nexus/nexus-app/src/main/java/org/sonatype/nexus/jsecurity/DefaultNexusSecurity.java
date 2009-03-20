@@ -29,7 +29,8 @@ import org.sonatype.security.DefaultPlexusSecurity;
 
 @Component( role = NexusSecurity.class )
 public class DefaultNexusSecurity
-    extends DefaultPlexusSecurity implements NexusSecurity
+    extends DefaultPlexusSecurity
+    implements NexusSecurity
 {
     @Requirement
     private PrivilegeInheritanceManager privInheritance;
@@ -49,7 +50,7 @@ public class DefaultNexusSecurity
     public void createPrivilege( SecurityPrivilege privilege, ValidationContext context )
         throws InvalidConfigurationException
     {
-         addInheritedPrivileges( privilege );
+        addInheritedPrivileges( privilege );
         super.createPrivilege( privilege, context );
     }
 

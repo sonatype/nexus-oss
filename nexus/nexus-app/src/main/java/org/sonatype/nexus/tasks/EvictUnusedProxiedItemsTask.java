@@ -17,6 +17,9 @@ import java.util.Collection;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.EvictOlderThanDaysPropertyDescriptor;
@@ -30,7 +33,7 @@ import org.sonatype.scheduling.SchedulerTask;
 @Component( role = SchedulerTask.class, hint = EvictUnusedItemsTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class EvictUnusedProxiedItemsTask
     extends AbstractNexusRepositoriesTask<Collection<String>>
-{ 
+{
     public int getEvictOlderCacheItemsThen()
     {
         return Integer.parseInt( getParameters().get( EvictOlderThanDaysPropertyDescriptor.ID ) );
@@ -45,22 +48,25 @@ public class EvictUnusedProxiedItemsTask
     protected Collection<String> doRun()
         throws Exception
     {
+        ResourceStoreRequest req = new ResourceStoreRequest( "/" );
+
+        long olderThan = System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * A_DAY );
+
         if ( getRepositoryGroupId() != null )
         {
-            return getNexus().evictRepositoryGroupUnusedProxiedItems(
-                System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * A_DAY ),
-                getRepositoryGroupId() );
+            return getRepositoryRegistry()
+                .getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).evictUnusedItems(
+                    req,
+                    olderThan );
         }
         else if ( getRepositoryId() != null )
         {
-            return getNexus().evictRepositoryUnusedProxiedItems(
-                System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * A_DAY ),
-                getRepositoryId() );
+            return getRepositoryRegistry()
+                .getRepositoryWithFacet( getRepositoryId(), Repository.class ).evictUnusedItems( req, olderThan );
         }
         else
         {
-            return getNexus().evictAllUnusedProxiedItems(
-                System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * A_DAY ) );
+            return getNexus().evictAllUnusedProxiedItems( req, olderThan );
         }
     }
 

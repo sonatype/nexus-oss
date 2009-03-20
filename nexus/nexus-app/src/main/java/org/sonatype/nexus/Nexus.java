@@ -18,9 +18,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.RejectedExecutionException;
 
-import org.sonatype.nexus.configuration.application.MutableConfiguration;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -31,9 +30,6 @@ import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
-import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.FlatSearchResponse;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.log.SimpleLog4jConfig;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
@@ -48,10 +44,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.scheduling.NexusTask;
-import org.sonatype.scheduling.NoSuchTaskException;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.schedules.Schedule;
 
 /**
  * The main Nexus application interface.
@@ -60,7 +52,7 @@ import org.sonatype.scheduling.schedules.Schedule;
  * @author cstamas
  */
 public interface Nexus
-    extends ApplicationStatusSource, MutableConfiguration
+    extends ApplicationStatusSource
 {
     // ------------------------------------------------------------------
     // Configuration
@@ -70,16 +62,6 @@ public interface Nexus
     // ----------------------------------------------------------------------------
     // Reposes
     // ----------------------------------------------------------------------------
-
-    Repository getRepository( String repoId )
-        throws NoSuchRepositoryException;
-
-    <T> T getRepositoryWithFacet( String repoId, Class<T> f )
-        throws NoSuchRepositoryException;
-
-    Collection<Repository> getRepositories();
-
-    <T> Collection<T> getRepositoriesWithFacet( Class<T> f );
 
     StorageItem dereferenceLinkItem( StorageLinkItem item )
         throws NoSuchResourceStoreException,
@@ -91,17 +73,17 @@ public interface Nexus
     RepositoryRouter getRootRouter();
 
     // ----------------------------------------------------------------------------
-    // Wastebasket
+    // Repo maintenance
     // ----------------------------------------------------------------------------
 
-    long getWastebasketItemCount()
-        throws IOException;
+    public Repository createRepository( CRepository settings )
+        throws ConfigurationException,
+            IOException;
 
-    long getWastebasketSize()
-        throws IOException;
-
-    void wastebasketPurge()
-        throws IOException;
+    public void deleteRepository( String id )
+        throws NoSuchRepositoryException,
+            IOException,
+            ConfigurationException;
 
     // ----------------------------------------------------------------------------
     // Maintenance
@@ -118,57 +100,47 @@ public interface Nexus
 
     void clearAllCaches( ResourceStoreRequest request );
 
-    void clearRepositoryCaches( ResourceStoreRequest request, String repositoryId )
-        throws NoSuchRepositoryException;
-
     void reindexAllRepositories( ResourceStoreRequest request )
         throws IOException;
-
-    void reindexRepository( ResourceStoreRequest request, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException;
-
-    void publishAllIndex()
-        throws IOException;
-
-    void publishRepositoryIndex( String repositoryId )
-        throws IOException,
-            NoSuchRepositoryException;
-
-    void downloadAllIndex()
-        throws IOException;
-
-    void downloadRepositoryIndex( String repositoryId )
-        throws IOException,
-            NoSuchRepositoryException;
 
     void rebuildAttributesAllRepositories( ResourceStoreRequest request )
         throws IOException;
 
-    void rebuildAttributesRepository( ResourceStoreRequest request, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException;
-
     void rebuildMavenMetadataAllRepositories( ResourceStoreRequest request )
         throws IOException;
 
-    void rebuildMavenMetadataRepository( ResourceStoreRequest request, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException;
-
-    Collection<String> evictAllUnusedProxiedItems( long timestamp )
+    Collection<String> evictAllUnusedProxiedItems( ResourceStoreRequest request, long timestamp )
         throws IOException;
-
-    Collection<String> evictRepositoryUnusedProxiedItems( long timestamp, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException;
 
     SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
         throws NoSuchRepositoryException,
             IllegalArgumentException;
 
-    void synchronizeShadow( String shadowRepositoryId )
-        throws NoSuchRepositoryException;
+    /**
+     * Remove the repository's storage folder
+     */
+    void removeRepositoryFolder( Repository repository );
+
+    /**
+     * List the names of files in nexus-work/conf
+     */
+    Map<String, String> getConfigurationFiles();
+
+    /**
+     * Get the content of configuration file based on the key
+     * 
+     * @param key index in configuration file name list
+     * @return
+     * @throws IOException
+     */
+    NexusStreamResponse getConfigurationAsStreamByKey( String key )
+        throws IOException;
+
+    SimpleLog4jConfig getLogConfig()
+        throws IOException;
+
+    void setLogConfig( SimpleLog4jConfig config )
+        throws IOException;
 
     // ----------------------------------------------------------------------------
     // Feeds
@@ -206,50 +178,6 @@ public interface Nexus
     List<SystemEvent> getSystemEvents( Integer from, Integer count );
 
     List<AuthcAuthzEvent> getAuthcAuthzEvents( Integer from, Integer count );
-
-    // ----------------------------------------------------------------------------
-    // Scheduler
-    // ----------------------------------------------------------------------------
-
-    <T> ScheduledTask<T> submit( String name, NexusTask<T> task )
-        throws RejectedExecutionException,
-            NullPointerException;
-
-    <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
-        throws RejectedExecutionException,
-            NullPointerException;
-
-    <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
-        throws RejectedExecutionException,
-            NullPointerException;
-
-    Map<String, List<ScheduledTask<?>>> getAllTasks();
-
-    Map<String, List<ScheduledTask<?>>> getActiveTasks();
-
-    ScheduledTask<?> getTaskById( String id )
-        throws NoSuchTaskException;
-
-    /**
-     * A factory for tasks.
-     * 
-     * @param taskType
-     * @return
-     * @throws IllegalArgumentException
-     * @deprecated prefer the createTaskInstance(Class<T> type) method instead.
-     */
-    NexusTask<?> createTaskInstance( String taskType )
-        throws IllegalArgumentException;
-
-    /**
-     * A factory for tasks.
-     * 
-     * @param taskType
-     * @return
-     * @throws IllegalArgumentException
-     */
-    <T> T createTaskInstance( Class<T> taskType )
-        throws IllegalArgumentException;
 
     // ----------------------------------------------------------------------------
     // Default Configuration
@@ -293,81 +221,6 @@ public interface Nexus
         throws IOException;
 
     void deleteRepositoryTemplate( String id )
-        throws IOException;
-
-    // ----------------------------------------------------------------------------
-    // Search/identify
-    // ----------------------------------------------------------------------------
-
-    /**
-     * Returns the local index (the true index for hosted ones, and the true cacheds index for proxy reposes). Every
-     * repo has local index.
-     * 
-     * @param repositoryId
-     * @return
-     * @throws NoSuchRepositoryException
-     */
-    IndexingContext getRepositoryLocalIndexContext( String repositoryId )
-        throws NoSuchRepositoryException;
-
-    /**
-     * Returns the remote index. Only proxy repositories have remote index, otherwise null is returnded.
-     * 
-     * @param repositoryId
-     * @return
-     * @throws NoSuchRepositoryException
-     */
-    IndexingContext getRepositoryRemoteIndexContext( String repositoryId )
-        throws NoSuchRepositoryException;
-
-    /**
-     * Returns the "best" indexing context. If it has remoteIndex, and it is bigger then local, remote is considered
-     * "best", otherwise local.
-     * 
-     * @param repositoryId
-     * @return
-     * @throws NoSuchRepositoryException
-     */
-    IndexingContext getRepositoryBestIndexContext( String repositoryId )
-        throws NoSuchRepositoryException;
-
-    ArtifactInfo identifyArtifact( String type, String checksum )
-        throws IOException;
-
-    FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count )
-        throws NoSuchRepositoryException;
-
-    FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count )
-        throws NoSuchRepositoryException;
-
-    FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
-        String repositoryId, Integer from, Integer count )
-        throws NoSuchRepositoryException;
-
-    /**
-     * Remove the repository's storage folder
-     */
-    void removeRepositoryFolder( Repository repository );
-
-    /**
-     * List the names of files in nexus-work/conf
-     */
-    Map<String, String> getConfigurationFiles();
-
-    /**
-     * Get the content of configuration file based on the key
-     * 
-     * @param key index in configuration file name list
-     * @return
-     * @throws IOException
-     */
-    NexusStreamResponse getConfigurationAsStreamByKey( String key )
-        throws IOException;
-
-    SimpleLog4jConfig getLogConfig()
-        throws IOException;
-
-    void setLogConfig( SimpleLog4jConfig config )
         throws IOException;
 
 }

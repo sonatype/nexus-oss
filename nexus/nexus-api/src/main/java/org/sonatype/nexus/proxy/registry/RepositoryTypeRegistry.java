@@ -38,7 +38,7 @@ public interface RepositoryTypeRegistry
      * 
      * @return
      */
-    Collection<ContentClass> listRepositoryContentClasses();
+    Collection<ContentClass> getContentClasses();
 
     /**
      * Returns an unmodifiable set of FQN of classes that are known that provides Repository components.

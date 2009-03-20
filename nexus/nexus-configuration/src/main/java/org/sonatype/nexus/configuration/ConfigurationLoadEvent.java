@@ -13,8 +13,6 @@
  */
 package org.sonatype.nexus.configuration;
 
-import java.util.Collection;
-
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 /**

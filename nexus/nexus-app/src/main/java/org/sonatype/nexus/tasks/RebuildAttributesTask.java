@@ -13,8 +13,14 @@
  */
 package org.sonatype.nexus.tasks;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
@@ -31,17 +37,26 @@ public class RebuildAttributesTask
     public Object doRun()
         throws Exception
     {
+        ResourceStoreRequest req = new ResourceStoreRequest( getResourceStorePath() );
+
+        Map<String, String> initialData = new HashMap<String, String>();
+
         if ( getRepositoryGroupId() != null )
         {
-            getNexus().rebuildAttributesRepositoryGroup( getResourceStorePath(), getRepositoryGroupId() );
+            getRepositoryRegistry()
+                .getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).recreateAttributes(
+                    req,
+                    initialData );
         }
         else if ( getRepositoryId() != null )
         {
-            getNexus().rebuildAttributesRepository( getResourceStorePath(), getRepositoryId() );
+            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class ).recreateAttributes(
+                req,
+                initialData );
         }
         else
         {
-            getNexus().rebuildAttributesAllRepositories( getResourceStorePath() );
+            getNexus().rebuildAttributesAllRepositories( req );
         }
 
         return null;

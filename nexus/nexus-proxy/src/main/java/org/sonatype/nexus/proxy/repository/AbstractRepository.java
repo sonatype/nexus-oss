@@ -27,6 +27,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
+import org.sonatype.nexus.configuration.ConfigurationRollbackEvent;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -241,8 +242,11 @@ public abstract class AbstractRepository
 
             if ( revt.getRepository() == this )
             {
-                // we are being removed
+                // we are being removed, unhook from event multicaster
                 applicationEventMulticaster.removeProximityEventListener( this );
+
+                // remove ourselves from config
+                getApplicationConfiguration().getConfiguration().removeRepository( getCurrentConfiguration( false ) );
             }
         }
         else if ( evt instanceof ConfigurationPrepareForSaveEvent )
@@ -257,6 +261,13 @@ public abstract class AbstractRepository
                     getCurrentCoreConfiguration() );
 
                 psevt.getChanges().add( this );
+            }
+        }
+        else if ( evt instanceof ConfigurationRollbackEvent )
+        {
+            if ( isDirty() )
+            {
+                getCurrentCoreConfiguration().rollbackChanges();
             }
         }
     }

@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -34,17 +33,14 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CMirror;
-import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
@@ -53,10 +49,7 @@ import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
-import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.SimpleLog4jConfig;
@@ -78,29 +71,22 @@ import org.sonatype.nexus.proxy.http.HttpProxyService;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.store.DefaultEntry;
 import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.tasks.RemoveRepoFolderTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
-import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.nexus.timeline.RepositoryIdTimelineFilter;
 import org.sonatype.nexus.timeline.TimelineFilter;
-import org.sonatype.scheduling.NoSuchTaskException;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.schedules.Schedule;
 
 /**
  * The default Nexus implementation.
@@ -290,28 +276,6 @@ public class DefaultNexus
     // Repositories
     // ----------------------------------------------------------------------------------------------------------
 
-    public Repository getRepository( String repoId )
-        throws NoSuchRepositoryException
-    {
-        return repositoryRegistry.getRepository( repoId );
-    }
-
-    public <T> T getRepositoryWithFacet( String repoId, Class<T> f )
-        throws NoSuchRepositoryException
-    {
-        return repositoryRegistry.getRepositoryWithFacet( repoId, f );
-    }
-
-    public Collection<Repository> getRepositories()
-    {
-        return repositoryRegistry.getRepositories();
-    }
-
-    public <T> Collection<T> getRepositoriesWithFacet( Class<T> f )
-    {
-        return repositoryRegistry.getRepositoriesWithFacet( f );
-    }
-
     public StorageItem dereferenceLinkItem( StorageLinkItem item )
         throws NoSuchResourceStoreException,
             ItemNotFoundException,
@@ -328,181 +292,15 @@ public class DefaultNexus
         return rootRepositoryRouter;
     }
 
-    // ----------------------------------------------------------------------------------------------------------
-    // Wastebasket
-    // ----------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // Repo maintenance
+    // ----------------------------------------------------------------------------
 
-    public long getWastebasketItemCount()
-        throws IOException
-    {
-        return wastebasket.getItemCount();
-    }
-
-    public long getWastebasketSize()
-        throws IOException
-    {
-        return wastebasket.getSize();
-    }
-
-    public void wastebasketPurge()
-        throws IOException
-    {
-        wastebasket.purge();
-    }
-
-    // ------------------------------------------------------------------
-    // Security
-
-    public boolean isSecurityEnabled()
-    {
-        return nexusConfiguration.isSecurityEnabled();
-    }
-
-    public void setSecurityEnabled( boolean enabled )
-        throws IOException
-    {
-        nexusConfiguration.setSecurityEnabled( enabled );
-    }
-
-    public void setRealms( List<String> realms )
-        throws IOException
-    {
-        nexusConfiguration.getRealms().clear();
-        nexusConfiguration.setRealms( realms );
-    }
-
-    public boolean isAnonymousAccessEnabled()
-    {
-        return nexusConfiguration.isAnonymousAccessEnabled();
-    }
-
-    public void setAnonymousAccessEnabled( boolean enabled )
-        throws IOException
-    {
-        nexusConfiguration.setAnonymousAccessEnabled( enabled );
-    }
-
-    public String getAnonymousUsername()
-    {
-        return nexusConfiguration.getAnonymousUsername();
-    }
-
-    public void setAnonymousUsername( String val )
-        throws IOException
-    {
-        nexusConfiguration.setAnonymousUsername( val );
-    }
-
-    public String getAnonymousPassword()
-    {
-        return nexusConfiguration.getAnonymousPassword();
-    }
-
-    public void setAnonymousPassword( String val )
-        throws IOException
-    {
-        nexusConfiguration.setAnonymousPassword( val );
-    }
-
-    public List<String> getRealms()
-    {
-        return nexusConfiguration.getRealms();
-    }
-
-    // ------------------------------------------------------------------
-    // CRUD-like ops on config sections
-
-    public String getBaseUrl()
-    {
-        return nexusConfiguration.getBaseUrl();
-    }
-
-    public void setBaseUrl( String baseUrl )
-        throws IOException
-    {
-        nexusConfiguration.setBaseUrl( baseUrl );
-    }
-
-    public boolean isForceBaseUrl()
-    {
-        return nexusConfiguration.isForceBaseUrl();
-    }
-
-    public void setForceBaseUrl( boolean force )
-        throws IOException
-    {
-        nexusConfiguration.setForceBaseUrl( force );
-    }
-
-    // Globals are mandatory: RU
-
-    // CRemoteConnectionSettings are mandatory: RU
-
-    public CRemoteConnectionSettings readGlobalRemoteConnectionSettings()
-    {
-        return nexusConfiguration.readGlobalRemoteConnectionSettings();
-    }
-
-    public void updateGlobalRemoteConnectionSettings( CRemoteConnectionSettings settings )
+    public Repository createRepository( CRepository settings )
         throws ConfigurationException,
             IOException
     {
-        nexusConfiguration.updateGlobalRemoteConnectionSettings( settings );
-    }
-
-    // CRemoteHttpProxySettings are optional: CRUD
-
-    public void createGlobalRemoteHttpProxySettings( CRemoteHttpProxySettings settings )
-        throws ConfigurationException,
-            IOException
-    {
-        nexusConfiguration.createGlobalRemoteHttpProxySettings( settings );
-    }
-
-    public CRemoteHttpProxySettings readGlobalRemoteHttpProxySettings()
-    {
-        return nexusConfiguration.readGlobalRemoteHttpProxySettings();
-    }
-
-    public void updateGlobalRemoteHttpProxySettings( CRemoteHttpProxySettings settings )
-        throws ConfigurationException,
-            IOException
-    {
-        nexusConfiguration.updateGlobalRemoteHttpProxySettings( settings );
-    }
-
-    public void deleteGlobalRemoteHttpProxySettings()
-        throws IOException
-    {
-        nexusConfiguration.deleteGlobalRemoteHttpProxySettings();
-    }
-
-    // CRouting are mandatory: RU
-
-    public CRouting readRouting()
-    {
-        return nexusConfiguration.readRouting();
-    }
-
-    public void updateRouting( CRouting settings )
-        throws ConfigurationException,
-            IOException
-    {
-        nexusConfiguration.updateRouting( settings );
-    }
-
-    // CRepository: CRUD
-
-    public Collection<CRepository> listRepositories()
-    {
-        return nexusConfiguration.listRepositories();
-    }
-
-    public void createRepository( CRepository settings )
-        throws ConfigurationException,
-            IOException
-    {
-        nexusConfiguration.createRepository( settings );
+        Repository repository = nexusConfiguration.createRepository( settings );
 
         try
         {
@@ -521,34 +319,8 @@ public class DefaultNexus
         {
             // will not happen, just added it
         }
-    }
 
-    public CRepository readRepository( String id )
-        throws NoSuchRepositoryException
-    {
-        return nexusConfiguration.readRepository( id );
-    }
-
-    public void updateRepository( CRepository settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {
-        // check current settings for download Index
-        boolean previousDownloadRemoteIndexes = this.readRepository( settings.getId() ).isDownloadRemoteIndexes();
-
-        nexusConfiguration.updateRepository( settings );
-
-        indexerManager.setRepositoryIndexContextSearchable( settings.getId(), settings.isIndexable() );
-
-        // create the initial index
-        if ( !previousDownloadRemoteIndexes && settings.isDownloadRemoteIndexes() )
-        {
-            // Create the initial index for the repository
-            ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-            rt.setRepositoryId( settings.getId() );
-            nexusScheduler.submit( "Download remote index enabled.", rt );
-        }
+        return repository;
     }
 
     public void deleteRepository( String id )
@@ -576,108 +348,9 @@ public class DefaultNexus
         nexusConfiguration.deleteRepository( id );
     }
 
-    // CGroupsSettingPathMapping: CRUD
-
-    public Collection<CPathMappingItem> listGroupsSettingPathMapping()
-    {
-        return nexusConfiguration.listGroupsSettingPathMapping();
-    }
-
-    public void createGroupsSettingPathMapping( CPathMappingItem settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {
-        nexusConfiguration.createGroupsSettingPathMapping( settings );
-    }
-
-    public CPathMappingItem readGroupsSettingPathMapping( String id )
-        throws IOException
-    {
-        return nexusConfiguration.readGroupsSettingPathMapping( id );
-    }
-
-    public void updateGroupsSettingPathMapping( CPathMappingItem settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {
-        nexusConfiguration.updateGroupsSettingPathMapping( settings );
-    }
-
-    public void deleteGroupsSettingPathMapping( String id )
-        throws IOException
-    {
-        nexusConfiguration.deleteGroupsSettingPathMapping( id );
-    }
-
-    public Collection<CRepositoryTarget> listRepositoryTargets()
-    {
-        return nexusConfiguration.listRepositoryTargets();
-    }
-
-    public void createRepositoryTarget( CRepositoryTarget settings )
-        throws ConfigurationException,
-            IOException
-    {
-        nexusConfiguration.createRepositoryTarget( settings );
-    }
-
-    public CRepositoryTarget readRepositoryTarget( String id )
-    {
-        return nexusConfiguration.readRepositoryTarget( id );
-    }
-
-    public void updateRepositoryTarget( CRepositoryTarget settings )
-        throws ConfigurationException,
-            IOException
-    {
-        nexusConfiguration.updateRepositoryTarget( settings );
-    }
-
-    public void deleteRepositoryTarget( String id )
-        throws IOException
-    {
-        nexusConfiguration.deleteRepositoryTarget( id );
-    }
-
-    public Collection<CRemoteNexusInstance> listRemoteNexusInstances()
-    {
-        return nexusConfiguration.listRemoteNexusInstances();
-    }
-
-    public CRemoteNexusInstance readRemoteNexusInstance( String alias )
-        throws IOException
-    {
-        return nexusConfiguration.readRemoteNexusInstance( alias );
-    }
-
-    public void createRemoteNexusInstance( CRemoteNexusInstance settings )
-        throws IOException
-    {
-        nexusConfiguration.createRemoteNexusInstance( settings );
-    }
-
-    public void deleteRemoteNexusInstance( String alias )
-        throws IOException
-    {
-        nexusConfiguration.deleteRemoteNexusInstance( alias );
-    }
-
-    public CSmtpConfiguration readSmtpConfiguration()
-    {
-        return nexusConfiguration.readSmtpConfiguration();
-    }
-
-    public void updateSmtpConfiguration( CSmtpConfiguration settings )
-        throws ConfigurationException,
-            IOException
-    {
-        nexusConfiguration.updateSmtpConfiguration( settings );
-    }
-
-    // =============
+    // ----------------------------------------------------------------------------
     // Maintenance
+    // ----------------------------------------------------------------------------
 
     public NexusStreamResponse getConfigurationAsStream()
         throws IOException
@@ -691,7 +364,7 @@ public class DefaultNexus
         // TODO:
         response.setSize( 0 );
 
-        response.setInputStream( nexusConfiguration.getConfigurationAsStream() );
+        response.setInputStream( nexusConfiguration.getConfigurationSource().getConfigurationAsStream() );
 
         return response;
     }
@@ -776,70 +449,48 @@ public class DefaultNexus
         }
     }
 
-    public void clearRepositoryCaches( ResourceStoreRequest request, String repositoryId )
-        throws NoSuchRepositoryException
-    {
-        repositoryRegistry.getRepository( repositoryId ).clearCaches( path );
-    }
-
-    public void clearRepositoryGroupCaches( String path, String repositoryGroupId )
-        throws NoSuchRepositoryException
-    {
-        for ( Repository repository : repositoryRegistry.getRepositoryWithFacet(
-            repositoryGroupId,
-            GroupRepository.class ).getMemberRepositories() )
-        {
-            repository.clearCaches( path );
-        }
-    }
-
-    protected Collection<String> evictUnusedItems( long timestamp, Repository repository, boolean proxyOnly )
+    public void reindexAllRepositories( ResourceStoreRequest request )
         throws IOException
     {
-        if ( proxyOnly && repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            return repository.evictUnusedItems( timestamp );
-        }
-        else
-        {
-            return repository.evictUnusedItems( timestamp );
-        }
+        indexerManager.reindexAllRepositories( request.getRequestPath() );
     }
 
-    public Collection<String> evictAllUnusedProxiedItems( long timestamp )
+    public Collection<String> evictAllUnusedProxiedItems( ResourceStoreRequest req, long timestamp )
         throws IOException
     {
         ArrayList<String> result = new ArrayList<String>();
 
         for ( Repository repository : repositoryRegistry.getRepositories() )
         {
-            result.addAll( evictUnusedItems( timestamp, repository, true ) );
+            result.addAll( repository.evictUnusedItems( req, timestamp ) );
         }
 
         return result;
     }
 
-    public Collection<String> evictRepositoryUnusedProxiedItems( long timestamp, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException
+    public void rebuildMavenMetadataAllRepositories( ResourceStoreRequest req )
+        throws IOException
     {
-        return evictUnusedItems( timestamp, repositoryRegistry.getRepository( repositoryId ), true );
-    }
+        List<Repository> reposes = repositoryRegistry.getRepositories();
 
-    public Collection<String> evictRepositoryGroupUnusedProxiedItems( long timestamp, String repositoryGroupId )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        ArrayList<String> result = new ArrayList<String>();
-
-        for ( Repository repository : repositoryRegistry.getRepositoryWithFacet(
-            repositoryGroupId,
-            GroupRepository.class ).getMemberRepositories() )
+        for ( Repository repo : reposes )
         {
-            result.addAll( evictUnusedItems( timestamp, repository, true ) );
+            if ( repo instanceof MavenRepository )
+            {
+                ( (MavenRepository) repo ).recreateMavenMetadata( req );
+            }
         }
+    }
 
-        return result;
+    public void rebuildAttributesAllRepositories( ResourceStoreRequest req )
+        throws IOException
+    {
+        List<Repository> reposes = repositoryRegistry.getRepositories();
+
+        for ( Repository repo : reposes )
+        {
+            repo.recreateAttributes( req, null );
+        }
     }
 
     public SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
@@ -849,26 +500,46 @@ public class DefaultNexus
         return snapshotRemover.removeSnapshots( request );
     }
 
-    public void synchronizeShadow( String shadowRepositoryId )
-        throws NoSuchRepositoryException
+    public void removeRepositoryFolder( Repository repository )
     {
+        getLogger().info( "Removing storage folder of repository " + repository.getId() );
+
         try
         {
-            ShadowRepository shadowRepo = repositoryRegistry.getRepositoryWithFacet(
-                shadowRepositoryId,
-                ShadowRepository.class );
-
-            shadowRepo.synchronizeWithMaster();
+            wastebasket.deleteRepositoryFolders( repository );
         }
-        catch ( ClassCastException e )
+        catch ( IOException e )
         {
-            // the repo exists but is not shadow???
-            throw new NoSuchRepositoryException( shadowRepositoryId );
+            getLogger().warn( "Error during deleting repository folders ", e );
         }
     }
 
-    // ------------------------------------------------------------------
+    public Map<String, String> getConfigurationFiles()
+    {
+        return nexusConfiguration.getConfigurationFiles();
+    }
+
+    public NexusStreamResponse getConfigurationAsStreamByKey( String key )
+        throws IOException
+    {
+        return nexusConfiguration.getConfigurationAsStreamByKey( key );
+    }
+
+    public SimpleLog4jConfig getLogConfig()
+        throws IOException
+    {
+        return logManager.getLogConfig();
+    }
+
+    public void setLogConfig( SimpleLog4jConfig config )
+        throws IOException
+    {
+        logManager.setLogConfig( config );
+    }
+
+    // ----------------------------------------------------------------------------
     // Repo templates, CRUD
+    // ----------------------------------------------------------------------------
 
     protected Collection<Entry> filterOnPrefix( Collection<Entry> entries, String prefix )
     {
@@ -911,7 +582,7 @@ public class DefaultNexus
         createRepositoryTemplate( settings, true );
     }
 
-    public void createRepositoryTemplate( CRepository settings, boolean replace )
+    protected void createRepositoryTemplate( CRepository settings, boolean replace )
         throws IOException
     {
         DefaultEntry entry = new DefaultEntry( TEMPLATE_REPOSITORY_PREFIX + settings.getId(), settings );
@@ -960,96 +631,9 @@ public class DefaultNexus
         templatesStore.removeEntry( TEMPLATE_REPOSITORY_PREFIX + id );
     }
 
-    public Collection<CRepositoryShadow> listRepositoryShadowTemplates()
-        throws IOException
-    {
-        Collection<Entry> entries = filterOnPrefix( templatesStore.getEntries(), TEMPLATE_REPOSITORY_SHADOW_PREFIX );
-
-        ArrayList<CRepositoryShadow> result = new ArrayList<CRepositoryShadow>( entries.size() );
-
-        for ( Entry entry : entries )
-        {
-            result.add( (CRepositoryShadow) entry.getContent() );
-        }
-
-        return result;
-    }
-
-    public void createRepositoryShadowTemplate( CRepositoryShadow settings )
-        throws IOException
-    {
-        createRepositoryShadowTemplate( settings, true );
-    }
-
-    public void createRepositoryShadowTemplate( CRepositoryShadow settings, boolean replace )
-        throws IOException
-    {
-        DefaultEntry entry = new DefaultEntry( TEMPLATE_REPOSITORY_SHADOW_PREFIX + settings.getId(), settings );
-
-        if ( replace || templatesStore.getEntry( entry.getId() ) == null )
-        {
-            templatesStore.addEntry( entry );
-        }
-    }
-
-    public CRepositoryShadow readRepositoryShadowTemplate( String id )
-        throws IOException
-    {
-        Entry entry = templatesStore.getEntry( TEMPLATE_REPOSITORY_SHADOW_PREFIX + id );
-
-        if ( entry != null )
-        {
-            return (CRepositoryShadow) entry.getContent();
-        }
-        else
-        {
-            // check for default
-            if ( TEMPLATE_DEFAULT_VIRTUAL.equals( id ) )
-            {
-                createDefaultTemplate( id, false );
-
-                return readRepositoryShadowTemplate( id );
-            }
-            return null;
-        }
-    }
-
-    public void updateRepositoryShadowTemplate( CRepositoryShadow settings )
-        throws IOException
-    {
-        deleteRepositoryShadowTemplate( settings.getId() );
-
-        createRepositoryShadowTemplate( settings );
-    }
-
-    public void deleteRepositoryShadowTemplate( String id )
-        throws IOException
-    {
-        templatesStore.removeEntry( TEMPLATE_REPOSITORY_SHADOW_PREFIX + id );
-    }
-
-    // ------------------------------------------------------------------
-    // ContentClasses
-
-    public Collection<ContentClass> listRepositoryContentClasses()
-    {
-        return nexusConfiguration.listRepositoryContentClasses();
-    }
-
-    // ------------------------------------------------------------------
-    // Scheduled Tasks
-    public List<ScheduledTaskDescriptor> listScheduledTaskDescriptors()
-    {
-        return nexusConfiguration.listScheduledTaskDescriptors();
-    }
-
-    public ScheduledTaskDescriptor getScheduledTaskDescriptor( String id )
-    {
-        return nexusConfiguration.getScheduledTaskDescriptor( id );
-    }
-
-    // ------------------------------------------------------------------
-    // Configuration defaults
+    // ----------------------------------------------------------------------------
+    // Default Configuration
+    // ----------------------------------------------------------------------------
 
     public boolean isDefaultSecurityEnabled()
     {
@@ -1122,8 +706,9 @@ public class DefaultNexus
             .getConfigurationSource().getDefaultsSource().getConfiguration().getSmtpConfiguration();
     }
 
-    // =============
+    // ----------------------------------------------------------------------------
     // Feeds
+    // ----------------------------------------------------------------------------
 
     // creating
 
@@ -1232,241 +817,6 @@ public class DefaultNexus
         return feedRecorder.getAuthcAuthzEvents( null, from, count, null );
     }
 
-    // =============
-    // Schedules
-
-    public <T> ScheduledTask<T> submit( String name, NexusTask<T> task )
-        throws RejectedExecutionException,
-            NullPointerException
-    {
-        return nexusScheduler.submit( name, task );
-    }
-
-    public <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
-        throws RejectedExecutionException,
-            NullPointerException
-    {
-        return nexusScheduler.schedule( name, nexusTask, schedule );
-    }
-
-    public <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
-        throws RejectedExecutionException,
-            NullPointerException
-    {
-        return nexusScheduler.updateSchedule( task );
-    }
-
-    public Map<String, List<ScheduledTask<?>>> getAllTasks()
-    {
-        return nexusScheduler.getAllTasks();
-    }
-
-    public Map<String, List<ScheduledTask<?>>> getActiveTasks()
-    {
-        return nexusScheduler.getActiveTasks();
-    }
-
-    public ScheduledTask<?> getTaskById( String id )
-        throws NoSuchTaskException
-    {
-        return nexusScheduler.getTaskById( id );
-    }
-
-    public NexusTask<?> createTaskInstance( String taskType )
-        throws IllegalArgumentException
-    {
-        return nexusScheduler.createTaskInstance( taskType );
-    }
-
-    public <T> T createTaskInstance( Class<T> taskType )
-        throws IllegalArgumentException
-    {
-        return nexusScheduler.createTaskInstance( taskType );
-    }
-
-    // =============
-    // Search and indexing related
-
-    public void reindexAllRepositories( String path )
-        throws IOException
-    {
-        indexerManager.reindexAllRepositories( path );
-    }
-
-    public void reindexRepository( String path, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        indexerManager.reindexRepository( path, repositoryId );
-    }
-
-    public void reindexRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        indexerManager.reindexRepositoryGroup( path, repositoryGroupId );
-    }
-
-    public void downloadAllIndex()
-        throws IOException
-    {
-        indexerManager.downloadAllIndex();
-    }
-
-    public void downloadRepositoryIndex( String repositoryId )
-        throws IOException,
-            NoSuchRepositoryException
-    {
-        indexerManager.downloadRepositoryIndex( repositoryId );
-    }
-
-    public void downloadRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException,
-            NoSuchRepositoryException
-    {
-        indexerManager.downloadRepositoryGroupIndex( repositoryGroupId );
-    }
-
-    public void publishAllIndex()
-        throws IOException
-    {
-        indexerManager.publishAllIndex();
-    }
-
-    public void publishRepositoryIndex( String repositoryId )
-        throws IOException,
-            NoSuchRepositoryException
-    {
-        indexerManager.publishRepositoryIndex( repositoryId );
-    }
-
-    public void publishRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException,
-            NoSuchRepositoryException
-    {
-        indexerManager.publishRepositoryGroupIndex( repositoryGroupId );
-    }
-
-    public void rebuildMavenMetadataAllRepositories( String path )
-        throws IOException
-    {
-        List<Repository> reposes = repositoryRegistry.getRepositories();
-
-        for ( Repository repo : reposes )
-        {
-            if ( repo instanceof MavenRepository )
-            {
-                ( (MavenRepository) repo ).recreateMavenMetadata( path );
-            }
-        }
-    }
-
-    public void rebuildMavenMetadataRepository( String path, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        Repository repo = repositoryRegistry.getRepository( repositoryId );
-
-        if ( repo instanceof MavenRepository )
-        {
-            ( (MavenRepository) repo ).recreateMavenMetadata( path );
-        }
-    }
-
-    public void rebuildMavenMetadataRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        List<Repository> reposes = repositoryRegistry
-            .getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
-
-        for ( Repository repo : reposes )
-        {
-            if ( repo instanceof MavenRepository )
-            {
-                ( (MavenRepository) repo ).recreateMavenMetadata( path );
-            }
-        }
-    }
-
-    public void rebuildAttributesAllRepositories( String path )
-        throws IOException
-    {
-        List<Repository> reposes = repositoryRegistry.getRepositories();
-
-        for ( Repository repo : reposes )
-        {
-            repo.recreateAttributes( path, null );
-        }
-    }
-
-    public void rebuildAttributesRepository( String path, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        repositoryRegistry.getRepository( repositoryId ).recreateAttributes( path, null );
-    }
-
-    public void rebuildAttributesRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        List<Repository> reposes = repositoryRegistry
-            .getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
-
-        for ( Repository repo : reposes )
-        {
-            repo.recreateAttributes( path, null );
-        }
-    }
-
-    //
-    // Indexing
-    //
-
-    public IndexingContext getRepositoryLocalIndexContext( String repositoryId )
-        throws NoSuchRepositoryException
-    {
-        return indexerManager.getRepositoryLocalIndexContext( repositoryId );
-    }
-
-    public IndexingContext getRepositoryRemoteIndexContext( String repositoryId )
-        throws NoSuchRepositoryException
-    {
-        return indexerManager.getRepositoryRemoteIndexContext( repositoryId );
-    }
-
-    public IndexingContext getRepositoryBestIndexContext( String repositoryId )
-        throws NoSuchRepositoryException
-    {
-        return indexerManager.getRepositoryBestIndexContext( repositoryId );
-    }
-
-    public ArtifactInfo identifyArtifact( String type, String checksum )
-        throws IOException
-    {
-        return indexerManager.identifyArtifact( type, checksum );
-    }
-
-    public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count )
-        throws NoSuchRepositoryException
-    {
-        return indexerManager.searchArtifactFlat( term, repositoryId, from, count );
-    }
-
-    public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count )
-        throws NoSuchRepositoryException
-    {
-        return indexerManager.searchArtifactClassFlat( term, repositoryId, from, count );
-    }
-
-    public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
-        String repositoryId, Integer from, Integer count )
-        throws NoSuchRepositoryException
-    {
-        return indexerManager.searchArtifactFlat( gTerm, aTerm, vTerm, pTerm, cTerm, repositoryId, from, count );
-    }
-
     // ===========================
     // Nexus Application lifecycle
 
@@ -1547,9 +897,6 @@ public class DefaultNexus
 
             applicationStatusSource.getSystemStatus().setLastConfigChange( new Date() );
 
-            applicationStatusSource.getSystemStatus().setConfigurationValidationResponse(
-                nexusConfiguration.getConfigurationSource().getValidationResponse() );
-
             applicationStatusSource.getSystemStatus().setFirstStart( nexusConfiguration.isConfigurationDefaulted() );
 
             applicationStatusSource.getSystemStatus().setInstanceUpgraded( nexusConfiguration.isInstanceUpgraded() );
@@ -1607,9 +954,6 @@ public class DefaultNexus
         {
             applicationStatusSource.getSystemStatus().setState( SystemState.BROKEN_IO );
 
-            applicationStatusSource.getSystemStatus().setConfigurationValidationResponse(
-                nexusConfiguration.getConfigurationSource().getValidationResponse() );
-
             applicationStatusSource.getSystemStatus().setErrorCause( e );
 
             getLogger().error( "Could not start Nexus, bad IO exception!", e );
@@ -1619,9 +963,6 @@ public class DefaultNexus
         catch ( ConfigurationException e )
         {
             applicationStatusSource.getSystemStatus().setState( SystemState.BROKEN_CONFIGURATION );
-
-            applicationStatusSource.getSystemStatus().setConfigurationValidationResponse(
-                nexusConfiguration.getConfigurationSource().getValidationResponse() );
 
             applicationStatusSource.getSystemStatus().setErrorCause( e );
 
@@ -1661,17 +1002,12 @@ public class DefaultNexus
 
     private void synchronizeShadowsAtStartup()
     {
-        Collection<CRepositoryShadow> shadows = listRepositoryShadows();
+        Collection<ShadowRepository> shadows = repositoryRegistry.getRepositoriesWithFacet( ShadowRepository.class );
 
-        if ( shadows == null )
-        {
-            return;
-        }
-
-        for ( CRepositoryShadow shadow : shadows )
+        for ( ShadowRepository shadow : shadows )
         {
             // spawn tasks to do it
-            if ( shadow.isSyncAtStartup() )
+            if ( shadow.isSynchronizeAtStartup() )
             {
                 SynchronizeShadowsTask task = nexusScheduler.createTaskInstance( SynchronizeShadowsTask.class );
 
@@ -1691,19 +1027,31 @@ public class DefaultNexus
 
             CRepository hostedTemplate = new CRepository();
 
+            hostedTemplate.setProviderRole( Repository.class.getName() );
+
+            hostedTemplate.setProviderHint( "maven2" );
+
             hostedTemplate.setId( TEMPLATE_DEFAULT_HOSTED_RELEASE );
 
             hostedTemplate.setName( "Default Release Hosted Repository Template" );
 
-            hostedTemplate.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_RELEASE );
-
-            hostedTemplate.setArtifactMaxAge( -1 );
-
-            hostedTemplate.setMetadataMaxAge( 1440 );
-
             hostedTemplate.setAllowWrite( true );
 
-            hostedTemplate.setDownloadRemoteIndexes( false );
+            Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
+
+            hostedTemplate.setExternalConfiguration( ex );
+
+            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
+
+            exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+
+            exConf.setItemMaxAge( 1440 );
+
+            exConf.setArtifactMaxAge( -1 );
+
+            exConf.setMetadataMaxAge( 1440 );
+
+            exConf.applyChanges();
 
             createRepositoryTemplate( hostedTemplate, shouldRecreate );
         }
@@ -1713,19 +1061,31 @@ public class DefaultNexus
 
             CRepository hostedTemplate = new CRepository();
 
+            hostedTemplate.setProviderRole( Repository.class.getName() );
+
+            hostedTemplate.setProviderHint( "maven2" );
+
             hostedTemplate.setId( TEMPLATE_DEFAULT_HOSTED_SNAPSHOT );
 
             hostedTemplate.setName( "Default Snapshot Hosted Repository Template" );
 
-            hostedTemplate.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_SNAPSHOT );
-
-            hostedTemplate.setArtifactMaxAge( 1440 );
-
-            hostedTemplate.setMetadataMaxAge( 1440 );
-
             hostedTemplate.setAllowWrite( true );
 
-            hostedTemplate.setDownloadRemoteIndexes( false );
+            Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
+
+            hostedTemplate.setExternalConfiguration( ex );
+
+            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
+
+            exConf.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
+
+            exConf.setItemMaxAge( 1440 );
+
+            exConf.setArtifactMaxAge( 1440 );
+
+            exConf.setMetadataMaxAge( 1440 );
+
+            exConf.applyChanges();
 
             createRepositoryTemplate( hostedTemplate, shouldRecreate );
         }
@@ -1735,23 +1095,33 @@ public class DefaultNexus
 
             CRepository proxiedTemplate = new CRepository();
 
+            proxiedTemplate.setProviderRole( Repository.class.getName() );
+
+            proxiedTemplate.setProviderHint( "maven2" );
+
             proxiedTemplate.setId( TEMPLATE_DEFAULT_PROXY_RELEASE );
 
             proxiedTemplate.setName( "Default Release Proxy Repository Template" );
 
-            proxiedTemplate.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_RELEASE );
-
-            proxiedTemplate.setArtifactMaxAge( -1 );
-
             proxiedTemplate.setAllowWrite( false );
-
-            proxiedTemplate.setDownloadRemoteIndexes( true );
-
-            proxiedTemplate.setChecksumPolicy( CRepository.CHECKSUM_POLICY_WARN );
 
             proxiedTemplate.setRemoteStorage( new CRemoteStorage() );
 
             proxiedTemplate.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
+
+            Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
+
+            proxiedTemplate.setExternalConfiguration( ex );
+
+            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
+
+            exConf.setItemMaxAge( 1440 );
+
+            exConf.setArtifactMaxAge( -1 );
+
+            exConf.setMetadataMaxAge( 1440 );
+
+            exConf.applyChanges();
 
             createRepositoryTemplate( proxiedTemplate, shouldRecreate );
         }
@@ -1761,19 +1131,35 @@ public class DefaultNexus
 
             CRepository proxiedTemplate = new CRepository();
 
+            proxiedTemplate.setProviderRole( Repository.class.getName() );
+
+            proxiedTemplate.setProviderHint( "maven2" );
+
             proxiedTemplate.setId( TEMPLATE_DEFAULT_PROXY_SNAPSHOT );
 
             proxiedTemplate.setName( "Default Snapshot Proxy Repository Template" );
 
-            proxiedTemplate.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_SNAPSHOT );
-
             proxiedTemplate.setAllowWrite( false );
-
-            proxiedTemplate.setDownloadRemoteIndexes( true );
 
             proxiedTemplate.setRemoteStorage( new CRemoteStorage() );
 
             proxiedTemplate.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
+
+            Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
+
+            proxiedTemplate.setExternalConfiguration( ex );
+
+            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
+
+            exConf.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
+
+            exConf.setItemMaxAge( 1440 );
+
+            exConf.setArtifactMaxAge( 1440 );
+
+            exConf.setMetadataMaxAge( 1440 );
+
+            exConf.applyChanges();
 
             createRepositoryTemplate( proxiedTemplate, shouldRecreate );
         }
@@ -1781,76 +1167,17 @@ public class DefaultNexus
         {
             getLogger().info( "Creating default virtual repository template..." );
 
-            CRepositoryShadow shadowTemplate = new CRepositoryShadow();
+            CRepository shadowTemplate = new CRepository();
+
+            shadowTemplate.setProviderRole( ShadowRepository.class.getName() );
+
+            shadowTemplate.setProviderHint( "m1-m2-shadow" );
 
             shadowTemplate.setId( TEMPLATE_DEFAULT_VIRTUAL );
 
             shadowTemplate.setName( "Default Virtual Repository Template" );
 
-            createRepositoryShadowTemplate( shadowTemplate, shouldRecreate );
+            createRepositoryTemplate( shadowTemplate, shouldRecreate );
         }
-    }
-
-    public void removeRepositoryFolder( Repository repository )
-    {
-        getLogger().info( "Removing storage folder of repository " + repository.getId() );
-
-        try
-        {
-            wastebasket.deleteRepositoryFolders( repository );
-        }
-        catch ( IOException e )
-        {
-            getLogger().warn( "Error during deleting repository folders ", e );
-        }
-    }
-
-    public Map<String, String> getConfigurationFiles()
-    {
-        return nexusConfiguration.getConfigurationFiles();
-    }
-
-    public NexusStreamResponse getConfigurationAsStreamByKey( String key )
-        throws IOException
-    {
-        NexusStreamResponse response = new NexusStreamResponse();
-
-        response.setName( key );
-
-        response.setMimeType( "text/xml" );
-
-        // TODO:
-        response.setSize( 0 );
-
-        response.setInputStream( nexusConfiguration.getConfigurationAsStreamByKey( key ) );
-
-        return response;
-    }
-
-    public SimpleLog4jConfig getLogConfig()
-        throws IOException
-    {
-        return logManager.getLogConfig();
-    }
-
-    public void setLogConfig( SimpleLog4jConfig config )
-        throws IOException
-    {
-        logManager.setLogConfig( config );
-    }
-
-    // Mirrors
-    public void setMirrors( String repositoryId, List<CMirror> mirrors )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
-    {
-        this.nexusConfiguration.setMirrors( repositoryId, mirrors );
-    }
-
-    public Collection<CMirror> listMirrors( String repositoryId )
-        throws NoSuchRepositoryException
-    {
-        return this.nexusConfiguration.listMirrors( repositoryId );
     }
 }
