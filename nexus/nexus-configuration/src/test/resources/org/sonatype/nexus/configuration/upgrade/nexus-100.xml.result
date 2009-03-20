@@ -20,7 +20,9 @@
     <proxyHostname>fproxyint0t</proxyHostname>
     <proxyPort>8080</proxyPort>
   </globalHttpProxySettings>
-  <restApi />
+  <restApi>
+    <sessionExpiration>-1</sessionExpiration>
+  </restApi>
   <httpProxy>
     <port>8082</port>
     <proxyPolicy>strict</proxyPolicy>

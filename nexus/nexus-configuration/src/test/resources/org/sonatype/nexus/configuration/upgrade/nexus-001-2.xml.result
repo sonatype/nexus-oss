@@ -24,7 +24,9 @@
       <password></password>
     </authentication>
   </globalHttpProxySettings>
-  <restApi />
+  <restApi>
+    <sessionExpiration>-1</sessionExpiration>
+  </restApi>
   <httpProxy>
     <port>8082</port>
     <proxyPolicy>strict</proxyPolicy>

@@ -536,12 +536,7 @@ public class Upgrade108to140
             Xpp3Dom externalConfig = new Xpp3Dom( EXTERNAL_CONFIG );
             newShadow.setExternalConfiguration( externalConfig );
             ExternalConfigUtil.setNodeValue( externalConfig, "masterRepositoryId", oldshadow.getShadowOf() );
-            ExternalConfigUtil.setNodeValue( externalConfig, "syncAtStartup", Boolean.toString( oldshadow.isSyncAtStartup() ) ); // TODO,
-            // this
-            // is
-            // not
-            // added
-            // yet
+            ExternalConfigUtil.setNodeValue( externalConfig, "synchronizeAtStartup", Boolean.toString( oldshadow.isSyncAtStartup() ) );
         }
 
         return newShadow;

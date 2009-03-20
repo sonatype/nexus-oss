@@ -16,7 +16,9 @@
     <retrievalRetryCount>3</retrievalRetryCount>
     <queryString></queryString>
   </globalConnectionSettings>
-  <restApi />
+  <restApi>
+    <sessionExpiration>-1</sessionExpiration>
+  </restApi>
   <httpProxy>
     <port>8082</port>
     <proxyPolicy>strict</proxyPolicy>
@@ -426,7 +428,7 @@
       <browseable>true</browseable>
       <externalConfiguration>
         <masterRepositoryId>central</masterRepositoryId>
-        <syncAtStartup>false</syncAtStartup>
+        <synchronizeAtStartup>false</synchronizeAtStartup>
       </externalConfiguration>
     </repository>
     <repository>
@@ -441,7 +443,7 @@
       <browseable>true</browseable>
       <externalConfiguration>
         <masterRepositoryId>codehaus</masterRepositoryId>
-        <syncAtStartup>false</syncAtStartup>
+        <synchronizeAtStartup>false</synchronizeAtStartup>
       </externalConfiguration>
     </repository>
     <repository>

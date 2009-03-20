@@ -20,6 +20,7 @@
   </globalConnectionSettings>
   <restApi>
     <baseUrl>http://repository.sonatype.org</baseUrl>
+    <sessionExpiration>-1</sessionExpiration>
   </restApi>
   <httpProxy>
     <port>8082</port>
@@ -1105,7 +1106,7 @@
       <browseable>true</browseable>
       <externalConfiguration>
         <masterRepositoryId>central</masterRepositoryId>
-        <syncAtStartup>false</syncAtStartup>
+        <synchronizeAtStartup>false</synchronizeAtStartup>
       </externalConfiguration>
     </repository>
     <repository>
