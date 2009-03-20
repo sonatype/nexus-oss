@@ -30,6 +30,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -168,13 +169,16 @@ public class DefaultSnapshotRemover
             repository,
             request );
 
-        DefaultWalkerContext ctx = new DefaultWalkerContext( repository, new DottedStoreWalkerFilter() );
+        DefaultWalkerContext ctxMain = new DefaultWalkerContext(
+            repository,
+            new ResourceStoreRequest( "/" ),
+            new DottedStoreWalkerFilter() );
 
-        ctx.getProcessors().add( snapshotRemoveProcessor );
+        ctxMain.getProcessors().add( snapshotRemoveProcessor );
 
-        walker.walk( ctx );
+        walker.walk( ctxMain );
 
-        if ( ctx.getStopCause() != null )
+        if ( ctxMain.getStopCause() != null )
         {
             result.setSuccessful( false );
         }
@@ -191,17 +195,20 @@ public class DefaultSnapshotRemover
                     + " files on repository " + repository.getId() );
         }
 
-        repository.clearCaches( RepositoryItemUid.PATH_ROOT );
+        repository.clearCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
 
         RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor = new RecreateMavenMetadataWalkerProcessor();
 
-        ctx.getProcessors().remove( snapshotRemoveProcessor );
-
-        ctx.getProcessors().add( metadataRebuildProcessor );
-
         for ( String path : request.getMetadataRebuildPaths() )
         {
-            walker.walk( ctx, path );
+            DefaultWalkerContext ctxMd = new DefaultWalkerContext(
+                repository,
+                new ResourceStoreRequest( path ),
+                new DottedStoreWalkerFilter() );
+
+            ctxMd.getProcessors().add( metadataRebuildProcessor );
+
+            walker.walk( ctxMd );
         }
 
         return result;
@@ -289,7 +296,7 @@ public class DefaultSnapshotRemover
 
                 try
                 {
-                    items = repository.list( coll );
+                    items = repository.list( false, coll );
                 }
                 catch ( Exception e )
                 {
@@ -382,7 +389,7 @@ public class DefaultSnapshotRemover
                             // preserve possible subdirs
                             if ( !( item instanceof StorageCollectionItem ) )
                             {
-                                repository.deleteItem( item.getRepositoryItemUid(), item.getItemContext() );
+                                repository.deleteItem( false, new ResourceStoreRequest( item ) );
                             }
                         }
                     }
@@ -454,7 +461,7 @@ public class DefaultSnapshotRemover
 
                                 gav = (Gav) file.getItemContext().get( Gav.class.getName() );
 
-                                repository.deleteItem( file.getRepositoryItemUid(), file.getItemContext() );
+                                repository.deleteItem( false, new ResourceStoreRequest( file ) );
 
                                 deletedFiles++;
                             }
@@ -511,7 +518,7 @@ public class DefaultSnapshotRemover
         {
             try
             {
-                if ( repository.list( coll ).size() > 0 )
+                if ( repository.list( false, coll ).size() > 0 )
                 {
                     return;
                 }
@@ -522,7 +529,7 @@ public class DefaultSnapshotRemover
                         "Removing the empty directory leftover: UID=" + coll.getRepositoryItemUid().toString() );
                 }
 
-                repository.deleteItem( coll.getRepositoryItemUid(), coll.getItemContext() );
+                repository.deleteItem( false, new ResourceStoreRequest( coll ) );
             }
             catch ( ItemNotFoundException e )
             {
@@ -571,9 +578,11 @@ public class DefaultSnapshotRemover
 
                             String path = mrepository.getGavCalculator().gavToPath( releaseGav );
 
-                            RepositoryItemUid uid = mrepository.createUid( path );
+                            ResourceStoreRequest req = new ResourceStoreRequest( path );
 
-                            mrepository.retrieveItem( uid, context );
+                            req.getRequestContext().putAll( context );
+
+                            mrepository.retrieveItem( false, req );
 
                             return true;
                         }

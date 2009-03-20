@@ -16,9 +16,9 @@ package org.sonatype.nexus.proxy.maven.maven1;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.GavCalculator;
+import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 /**
@@ -61,7 +61,7 @@ public class M1LayoutedM2ShadowRepository
     }
 
     @Override
-    public RepositoryConfigurator getRepositoryConfigurator()
+    public Configurator getConfigurator()
     {
         return m1LayoutedM2ShadowRepositoryConfigurator;
     }

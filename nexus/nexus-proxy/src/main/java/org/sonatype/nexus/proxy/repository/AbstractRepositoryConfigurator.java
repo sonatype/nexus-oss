@@ -12,6 +12,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -29,7 +30,7 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 
 public abstract class AbstractRepositoryConfigurator
-    implements RepositoryConfigurator
+    implements Configurator
 {
     @Requirement
     private PlexusContainer plexusContainer;
@@ -43,32 +44,40 @@ public abstract class AbstractRepositoryConfigurator
     @Requirement( role = PluginRepositoryConfigurator.class )
     private Map<String, PluginRepositoryConfigurator> pluginRepositoryConfigurators;
 
-    public final void validate( ApplicationConfiguration configuration, CRepository repoConfig )
+    public final void validate( ApplicationConfiguration configuration, Object repoConfig )
         throws ConfigurationException
     {
-        prepareExternalConfiguration( repoConfig );
+        if ( repoConfig instanceof CRepository )
+        {
+            prepareExternalConfiguration( (CRepository) repoConfig );
 
-        doValidate( configuration, repoConfig, repoConfig.externalConfigurationImple );
+            doValidate(
+                configuration,
+                (CRepository) repoConfig,
+                ( (CRepository) repoConfig ).externalConfigurationImple );
+        }
     }
 
-    public final void applyConfiguration( Repository repository, ApplicationConfiguration configuration,
+    public final void applyConfiguration( Object target, ApplicationConfiguration configuration,
         CoreConfiguration config )
         throws ConfigurationException
     {
         prepareExternalConfiguration( (CRepository) config.getConfiguration( false ) );
 
-        doApplyConfiguration( repository, configuration, (CRepository) config.getConfiguration( false ), config
-            .getExternalConfiguration() );
+        doApplyConfiguration(
+            (Repository) target,
+            configuration,
+            (CRepository) config.getConfiguration( false ),
+            config.getExternalConfiguration() );
     }
 
-    public final void prepareForSave( Repository repository, ApplicationConfiguration configuration,
-        CoreConfiguration config )
+    public final void prepareForSave( Object target, ApplicationConfiguration configuration, CoreConfiguration config )
     {
         prepareExternalConfiguration( (CRepository) config.getConfiguration( true ) );
 
         // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
         // later we will see about it
-        doPrepareForSave( repository, configuration, (CRepository) config.getConfiguration( true ), config
+        doPrepareForSave( (Repository) target, configuration, (CRepository) config.getConfiguration( true ), config
             .getExternalConfiguration() );
 
         // commit, since doPrepareForSave() potentially modifies coreConfig or externalConfig
@@ -108,8 +117,8 @@ public abstract class AbstractRepositoryConfigurator
     }
 
     @SuppressWarnings( "unchecked" )
-    protected void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration, CRepository repo,
-        ExternalConfiguration externalConfiguration )
+    protected void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
+        CRepository repo, ExternalConfiguration externalConfiguration )
         throws ConfigurationException
     {
         List<CMirror> mirrors = (List<CMirror>) repo.getMirrors();
@@ -159,7 +168,7 @@ public abstract class AbstractRepositoryConfigurator
             // Default dir is going to be valid
             defaultStorageFile.mkdirs();
         }
-        
+
         LocalRepositoryStorage ls = getLocalRepositoryStorage( repo.getId(), repo.getLocalStorage().getProvider() );
 
         try

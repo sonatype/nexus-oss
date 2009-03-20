@@ -17,9 +17,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryConfigurator;
-import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 
-@Component( role = RepositoryConfigurator.class, hint = "maven-site" )
+@Component( role = DefaultMavenSiteRepositoryConfigurator.class )
 public class DefaultMavenSiteRepositoryConfigurator
     extends AbstractWebSiteRepositoryConfigurator
 {

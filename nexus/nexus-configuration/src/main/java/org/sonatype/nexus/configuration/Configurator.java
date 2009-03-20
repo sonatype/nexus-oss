@@ -11,28 +11,25 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.repository;
+package org.sonatype.nexus.configuration;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
 
 /**
  * A component responsible for "apply" (config -> repo) and "prepare" (repo -> config) steps.
  * 
  * @author cstamas
  */
-public interface RepositoryConfigurator
+public interface Configurator
 {
     /**
      * Validates the repoConfig.
      * 
      * @param configuration
-     * @param repoConfig
+     * @param model
      * @throws ConfigurationException on validation problem.
      */
-    public void validate( ApplicationConfiguration configuration, CRepository repoConfig )
+    public void validate( ApplicationConfiguration configuration, Object model )
         throws ConfigurationException;
 
     /**
@@ -43,7 +40,7 @@ public interface RepositoryConfigurator
      * @param repoConfig
      * @throws ConfigurationException
      */
-    void applyConfiguration( Repository repository, ApplicationConfiguration configuration,
+    void applyConfiguration( Object target, ApplicationConfiguration configuration,
         CoreConfiguration coreConfiguration )
         throws ConfigurationException;
 
@@ -55,6 +52,6 @@ public interface RepositoryConfigurator
      * @param repoConfig
      * @throws ConfigurationException
      */
-    void prepareForSave( Repository repository, ApplicationConfiguration configuration,
+    void prepareForSave( Object repository, ApplicationConfiguration configuration,
         CoreConfiguration coreConfiguration );
 }

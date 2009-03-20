@@ -18,13 +18,13 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M1ArtifactRecognizer;
+import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 
 /**
  * The default M1Repository. This class adds snapshot/release sensing and differentiated expiration handling and repo
@@ -65,7 +65,7 @@ public class M1Repository
     }
 
     @Override
-    public RepositoryConfigurator getRepositoryConfigurator()
+    public Configurator getConfigurator()
     {
         return m1RepositoryConfigurator;
     }

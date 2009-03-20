@@ -15,6 +15,9 @@ package org.sonatype.nexus.maven.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.scheduling.SchedulerTask;
 
@@ -27,21 +30,26 @@ public class RebuildMavenMetadataTask
 {
 
     public static final String REBUILD_MAVEN_METADATA_ACTION = "REBUILD_MAVEN_METADATA";
-    
+
     public Object doRun()
         throws Exception
     {
+        ResourceStoreRequest req = new ResourceStoreRequest( getResourceStorePath() );
+
         if ( getRepositoryGroupId() != null )
         {
-            getNexus().rebuildMavenMetadataRepositoryGroup( getResourceStorePath(), getRepositoryGroupId() );
+            getRepositoryRegistry()
+                .getRepositoryWithFacet( getRepositoryGroupId(), MavenGroupRepository.class ).recreateMavenMetadata(
+                    req );
         }
         else if ( getRepositoryId() != null )
         {
-            getNexus().rebuildMavenMetadataRepository( getResourceStorePath(), getRepositoryId() );
+            getRepositoryRegistry()
+                .getRepositoryWithFacet( getRepositoryId(), MavenRepository.class ).recreateMavenMetadata( req );
         }
         else
         {
-            getNexus().rebuildMavenMetadataAllRepositories( getResourceStorePath() );
+            getNexus().rebuildMavenMetadataAllRepositories( req );
         }
 
         return null;

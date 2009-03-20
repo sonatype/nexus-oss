@@ -21,19 +21,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.ConfigurationRollbackEvent;
+import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -97,7 +95,7 @@ import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
  * @author cstamas
  */
 public abstract class AbstractRepository
-    extends AbstractLogEnabled
+    extends AbstractConfigurable
     implements Repository, EventListener, Initializable
 {
     /**
@@ -148,82 +146,17 @@ public abstract class AbstractRepository
 
     // Configurable iface
 
-    public final CoreConfiguration getCurrentCoreConfiguration()
-    {
-        return repositoryConfiguration;
-    }
-
     protected CRepository getCurrentConfiguration( boolean forWrite )
     {
         return (CRepository) repositoryConfiguration.getConfiguration( forWrite );
     }
 
-    protected ExternalConfiguration getExternalConfiguration()
+    protected abstract Configurator getConfigurator();
+
+    protected CoreConfiguration wrapConfiguration( Object configuration )
     {
-        return getCurrentCoreConfiguration().getExternalConfiguration();
+        return new CRepositoryCoreConfiguration( (CRepository) configuration );
     }
-
-    public final void validateConfiguration( Object config )
-        throws ConfigurationException
-    {
-        if ( config == null )
-        {
-            throw new InvalidConfigurationException( "This configuration is null!" );
-        }
-        else if ( config instanceof CRepository )
-        {
-            doValidateConfiguration( (CRepository) config );
-        }
-        else
-        {
-            throw new InvalidConfigurationException( "This configuration is of class '" + config.getClass().getName()
-                + "' is not applicable!" );
-        }
-    }
-
-    public final void configure( Object config )
-        throws ConfigurationException
-    {
-        validateConfiguration( config );
-
-        this.repositoryConfiguration = new CRepositoryCoreConfiguration( (CRepository) config );
-
-        doConfigure( false );
-    }
-
-    public final void configure()
-        throws ConfigurationException
-    {
-        doConfigure( true );
-    }
-
-    public boolean isDirty()
-    {
-        return getCurrentCoreConfiguration().isDirty()
-            || getCurrentCoreConfiguration().getExternalConfiguration().isDirty();
-    }
-
-    protected void doValidateConfiguration( CRepository config )
-        throws ConfigurationException
-    {
-        if ( getRepositoryConfigurator() != null )
-        {
-            getRepositoryConfigurator().validate( applicationConfiguration, config );
-        }
-    }
-
-    protected void doConfigure( boolean validate )
-        throws ConfigurationException
-    {
-        if ( validate )
-        {
-            doValidateConfiguration( getCurrentConfiguration( false ) );
-        }
-
-        getRepositoryConfigurator().applyConfiguration( this, applicationConfiguration, getCurrentCoreConfiguration() );
-    }
-
-    public abstract RepositoryConfigurator getRepositoryConfigurator();
 
     // --
 
@@ -255,10 +188,7 @@ public abstract class AbstractRepository
             {
                 ConfigurationPrepareForSaveEvent psevt = (ConfigurationPrepareForSaveEvent) evt;
 
-                getRepositoryConfigurator().prepareForSave(
-                    this,
-                    applicationConfiguration,
-                    getCurrentCoreConfiguration() );
+                getConfigurator().prepareForSave( this, applicationConfiguration, getCurrentCoreConfiguration() );
 
                 psevt.getChanges().add( this );
             }

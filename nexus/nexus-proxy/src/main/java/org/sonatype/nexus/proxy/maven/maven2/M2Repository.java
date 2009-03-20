@@ -32,6 +32,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.artifact.VersionUtils;
+import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -43,7 +44,6 @@ import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.util.AlphanumComparator;
 
 /**
@@ -84,7 +84,7 @@ public class M2Repository
     }
 
     @Override
-    public RepositoryConfigurator getRepositoryConfigurator()
+    public Configurator getConfigurator()
     {
         return m2RepositoryConfigurator;
     }

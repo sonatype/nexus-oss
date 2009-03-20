@@ -16,10 +16,10 @@ package org.sonatype.nexus.proxy.maven.maven1;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.GavCalculator;
+import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 
 @Component( role = GroupRepository.class, hint = "maven1", instantiationStrategy = "per-lookup", description = "Maven1 Repository Group" )
 public class M1GroupRepository
@@ -61,7 +61,7 @@ public class M1GroupRepository
     }
 
     @Override
-    public RepositoryConfigurator getRepositoryConfigurator()
+    public Configurator getConfigurator()
     {
         return m1GroupRepositoryConfigurator;
     }

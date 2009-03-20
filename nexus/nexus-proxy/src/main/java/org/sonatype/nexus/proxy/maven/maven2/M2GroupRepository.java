@@ -32,6 +32,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
+import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -42,7 +43,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 @Component( role = GroupRepository.class, hint = "maven2", instantiationStrategy = "per-lookup", description = "Maven2 Repository Group" )
@@ -91,7 +91,7 @@ public class M2GroupRepository
     }
 
     @Override
-    public RepositoryConfigurator getRepositoryConfigurator()
+    public Configurator getConfigurator()
     {
         return m2GroupRepositoryConfigurator;
     }

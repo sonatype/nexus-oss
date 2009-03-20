@@ -18,10 +18,10 @@ import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
-import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 
@@ -38,8 +38,8 @@ public class DefaultMavenSiteRepository
     @Requirement( hint = "maven-site" )
     private ContentClass contentClass;
 
-    @Requirement( hint = "maven-site" )
-    private RepositoryConfigurator repositoryConfigurator;
+    @Requirement
+    private DefaultMavenSiteRepositoryConfigurator repositoryConfigurator;
 
     private RepositoryKind repositoryKind;
 
@@ -65,7 +65,7 @@ public class DefaultMavenSiteRepository
     }
 
     @Override
-    public RepositoryConfigurator getRepositoryConfigurator()
+    public Configurator getConfigurator()
     {
         return repositoryConfigurator;
     }
