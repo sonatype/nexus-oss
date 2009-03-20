@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.0.8</version>
+  <version>1.4.0</version>
   <security>
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <anonymousUsername>anonymous</anonymousUsername>
+    <anonymousPassword>anonymous</anonymousPassword>
     <realms>
       <realm>XmlAuthenticatingRealm</realm>
       <realm>NexusLdapAuthenticationRealm</realm>
@@ -11,370 +13,1390 @@
     </realms>
   </security>
   <globalConnectionSettings>
+    <connectionTimeout>10000</connectionTimeout>
+    <retrievalRetryCount>3</retrievalRetryCount>
+    <queryString></queryString>
     <userAgentCustomizationString>repository.sonatype.org</userAgentCustomizationString>
   </globalConnectionSettings>
   <restApi>
     <baseUrl>http://repository.sonatype.org</baseUrl>
   </restApi>
-  <httpProxy />
+  <httpProxy>
+    <port>8082</port>
+    <proxyPolicy>strict</proxyPolicy>
+  </httpProxy>
   <routing>
-    <groups />
+    <resolveLinks>true</resolveLinks>
   </routing>
   <repositories>
     <repository>
       <id>apache-snapshots</id>
       <name>Apache Snapshots</name>
-      <repositoryPolicy>snapshot</repositoryPolicy>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>https://repository.apache.org/content/groups/snapshots/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>codehaus-snapshots</id>
       <name>Codehaus Snapshots</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <repositoryPolicy>snapshot</repositoryPolicy>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://snapshots.repository.codehaus.org/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>maven.snapshots</id>
       <name>Maven Snapshots</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <repositoryPolicy>snapshot</repositoryPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>restlet</id>
       <name>Restlet</name>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://maven.restlet.org</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>eclipse</id>
       <name>Eclipse</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>eclipse-snapshots</id>
       <name>Eclipse Snapshots</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <repositoryPolicy>snapshot</repositoryPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>snapshots</id>
       <name>Snapshots</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <repositoryPolicy>snapshot</repositoryPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>central</id>
       <name>Central</name>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <localStorage>
         <url>file:///repository</url>
       </localStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>releases</id>
       <name>releases</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>plexus.releases</id>
       <name>Plexus Releases</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>central-proxy</id>
       <name>Central Proxy</name>
-      <indexable>false</indexable>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>10</notFoundCacheTTL>
-      <artifactMaxAge>-1</artifactMaxAge>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <remoteStorage>
         <url>http://repo1.maven.org/maven2</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>third-party</id>
       <name>3rd Party</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>tycho-pseudo-releases</id>
       <name>Tycho Pseudo Releases</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>plexus-releases-oss</id>
       <name>Plexus Releases (OSS)</name>
-      <artifactMaxAge>-1</artifactMaxAge>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://oss.sonatype.org/content/repositories/plexus-releases/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>sonatype-internal</id>
       <name>Sonatype Internal</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>sonatype-internal-snapshots</id>
       <name>Sonatype Internal Snapshots</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <repositoryPolicy>snapshot</repositoryPolicy>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>plexus-oss-snapshots</id>
       <name>Plexus Snapshots (OSS)</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1</notFoundCacheTTL>
-      <artifactMaxAge>1</artifactMaxAge>
-      <metadataMaxAge>1</metadataMaxAge>
-      <repositoryPolicy>snapshot</repositoryPolicy>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://oss.sonatype.org/content/repositories/plexus-snapshots/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1</artifactMaxAge>
+        <itemMaxAge>1</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>atlassian</id>
       <name>Atlassian</name>
-      <artifactMaxAge>-1</artifactMaxAge>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>https://maven.atlassian.com/public</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>maven2-dev.java.net</id>
       <name>Java.net Maven2</name>
-      <artifactMaxAge>-1</artifactMaxAge>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://download.java.net/maven/2/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>codehaus</id>
       <name>Codehaus (for searching)</name>
-      <artifactMaxAge>-1</artifactMaxAge>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://repository.codehaus.org/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>jboss</id>
       <name>JBoss (for searching)</name>
-      <artifactMaxAge>-1</artifactMaxAge>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://repository.jboss.org/maven2/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>open.iona.com</id>
       <name>FUSE (for searching)</name>
-      <artifactMaxAge>-1</artifactMaxAge>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://repo.open.iona.com/maven2/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>terracotta</id>
       <name>Terracotta (for searching)</name>
-      <artifactMaxAge>-1</artifactMaxAge>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://download.terracotta.org/maven2/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>maven-it-plugins</id>
       <name>Maven IT Plugins</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>maven-it-plugin-snapshots</id>
       <name>Maven IT Plugin Snapshots</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <repositoryPolicy>snapshot</repositoryPolicy>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>openqa-releases</id>
       <name>OpenQA Releases</name>
-      <artifactMaxAge>-1</artifactMaxAge>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://archiva.openqa.org/repository/releases</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>sonatype-apache-releases</id>
       <name>Apache Releases (Sonatype)</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>jboss-snap</id>
       <name>Jboss-snaps</name>
-      <repositoryPolicy>snapshot</repositoryPolicy>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://snapshots.jboss.org/maven2/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>ddsteps</id>
       <name>DDSteps</name>
-      <artifactMaxAge>-1</artifactMaxAge>
-      <downloadRemoteIndexes>true</downloadRemoteIndexes>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://repo.ddsteps.org/maven/release/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>third-party-internal</id>
       <name>3rd Party Internal</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>flex</id>
       <name>Flex Releases</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>mc-repo</id>
       <name>mc-repo</name>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
         <url>http://mc-repo.googlecode.com/svn/maven2/releases</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>nexus-plugins-releases</id>
       <name>Nexus Plugins Releases</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>nexus-plugins-snapshots</id>
       <name>Nexus Plugins Snapshots</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <repositoryPolicy>snapshot</repositoryPolicy>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>Procurement</id>
       <name>Procurement</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <notFoundCacheActive>false</notFoundCacheActive>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
       <remoteStorage>
         <provider>PipeRemoteRepositoryStorage</provider>
         <url>groups:public</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>flexmojos-releases</id>
       <name>Flexmojos Releases</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>flexmojos-snapshots</id>
       <name>Flexmojos Snapshots</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
       <allowWrite>true</allowWrite>
-      <repositoryPolicy>snapshot</repositoryPolicy>
-      <checksumPolicy>ignore</checksumPolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>ignore</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>nexus-3b5c0561762b7c</id>
       <name>nexus-3b5c0561762b7c (u:mpowers, a:24.62.147.223)</name>
-      <userManaged>false</userManaged>
-      <notFoundCacheActive>false</notFoundCacheActive>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>nexus-3b5c61c99c26ef</id>
       <name>nexus-3b5c61c99c26ef (u:mpowers, a:24.62.147.223)</name>
-      <userManaged>false</userManaged>
-      <notFoundCacheActive>false</notFoundCacheActive>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>nexus-3b61b1f432ba7b</id>
       <name>nexus-3b61b1f432ba7b (u:mpowers, a:24.62.147.223)</name>
-      <userManaged>false</userManaged>
-      <notFoundCacheActive>false</notFoundCacheActive>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>nexus-plugins-stage-3b623b3067e309</id>
       <name>Nexus Plugins Stage-3b623b3067e309 (u:mpowers, a:24.62.147.223)</name>
-      <userManaged>false</userManaged>
-      <notFoundCacheActive>false</notFoundCacheActive>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>all-3b6320d4d49019</id>
       <name>all-3b6320d4d49019 (u:mpowers, a:24.62.147.223)</name>
-      <userManaged>false</userManaged>
-      <notFoundCacheActive>false</notFoundCacheActive>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>nexus-commercial-3b6381ecf648ea</id>
       <name>nexus-commercial-3b6381ecf648ea (u:mpowers, a:24.62.147.223)</name>
-      <userManaged>false</userManaged>
-      <notFoundCacheActive>false</notFoundCacheActive>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>nexus-commercial-3b654eb462b37e</id>
       <name>nexus-commercial-3b654eb462b37e (u:mpowers, a:24.62.147.223)</name>
-      <userManaged>false</userManaged>
-      <notFoundCacheActive>false</notFoundCacheActive>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>nexus-commercial-3b661636333c5b</id>
       <name>nexus-commercial-3b661636333c5b (u:mpowers, a:24.62.147.223)</name>
-      <userManaged>false</userManaged>
-      <notFoundCacheActive>false</notFoundCacheActive>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
-  </repositories>
-  <repositoryShadows>
-    <repositoryShadow>
+    <repository>
       <id>centralm1</id>
       <name>CentralM1</name>
-      <shadowOf>central</shadowOf>
-      <type>m2-m1-shadow</type>
-    </repositoryShadow>
-  </repositoryShadows>
+      <providerRole>org.sonatype.nexus.proxy.repository.ShadowRepository</providerRole>
+      <providerHint>m2-m1-shadow</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <masterRepositoryId>central</masterRepositoryId>
+        <syncAtStartup>false</syncAtStartup>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>nexus-extras</id>
+      <name>Nexus Extras Dependencies</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>atlassian</memberRepository>
+          <memberRepository>maven2-dev.java.net</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>MavenITPlugins</id>
+      <name>MavenITPlugins (Meant for security)</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>maven-it-plugins</memberRepository>
+          <memberRepository>maven-it-plugin-snapshots</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>maven-eclipse</id>
+      <name>maven-eclipse</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>releases</memberRepository>
+          <memberRepository>snapshots</memberRepository>
+          <memberRepository>maven.snapshots</memberRepository>
+          <memberRepository>eclipse</memberRepository>
+          <memberRepository>eclipse-snapshots</memberRepository>
+          <memberRepository>restlet</memberRepository>
+          <memberRepository>third-party</memberRepository>
+          <memberRepository>tycho-pseudo-releases</memberRepository>
+          <memberRepository>sonatype-apache-releases</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>nexus-plugins</id>
+      <name>Nexus Plugins</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>nexus-plugins-releases</memberRepository>
+          <memberRepository>nexus-plugins-snapshots</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>forge</id>
+      <name>Forge</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>releases</memberRepository>
+          <memberRepository>snapshots</memberRepository>
+          <memberRepository>maven.snapshots</memberRepository>
+          <memberRepository>eclipse</memberRepository>
+          <memberRepository>eclipse-snapshots</memberRepository>
+          <memberRepository>restlet</memberRepository>
+          <memberRepository>third-party</memberRepository>
+          <memberRepository>tycho-pseudo-releases</memberRepository>
+          <memberRepository>plexus-oss-snapshots</memberRepository>
+          <memberRepository>plexus-releases-oss</memberRepository>
+          <memberRepository>sonatype-apache-releases</memberRepository>
+          <memberRepository>plexus.releases</memberRepository>
+          <memberRepository>nexus-plugins-releases</memberRepository>
+          <memberRepository>nexus-plugins-snapshots</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>public</id>
+      <name>public</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>releases</memberRepository>
+          <memberRepository>central</memberRepository>
+          <memberRepository>restlet</memberRepository>
+          <memberRepository>snapshots</memberRepository>
+          <memberRepository>maven.snapshots</memberRepository>
+          <memberRepository>sonatype-apache-releases</memberRepository>
+          <memberRepository>apache-snapshots</memberRepository>
+          <memberRepository>codehaus-snapshots</memberRepository>
+          <memberRepository>third-party</memberRepository>
+          <memberRepository>eclipse</memberRepository>
+          <memberRepository>eclipse-snapshots</memberRepository>
+          <memberRepository>plexus-oss-snapshots</memberRepository>
+          <memberRepository>plexus-releases-oss</memberRepository>
+          <memberRepository>plexus.releases</memberRepository>
+          <memberRepository>central-proxy</memberRepository>
+          <memberRepository>tycho-pseudo-releases</memberRepository>
+          <memberRepository>openqa-releases</memberRepository>
+          <memberRepository>atlassian</memberRepository>
+          <memberRepository>ddsteps</memberRepository>
+          <memberRepository>jboss-snap</memberRepository>
+          <memberRepository>mc-repo</memberRepository>
+          <memberRepository>flex</memberRepository>
+          <memberRepository>nexus-plugins-releases</memberRepository>
+          <memberRepository>nexus-plugins-snapshots</memberRepository>
+          <memberRepository>maven2-dev.java.net</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>sonatype-grid</id>
+      <name>Sonatype Grid</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>releases</memberRepository>
+          <memberRepository>central</memberRepository>
+          <memberRepository>restlet</memberRepository>
+          <memberRepository>snapshots</memberRepository>
+          <memberRepository>maven.snapshots</memberRepository>
+          <memberRepository>sonatype-apache-releases</memberRepository>
+          <memberRepository>apache-snapshots</memberRepository>
+          <memberRepository>codehaus-snapshots</memberRepository>
+          <memberRepository>third-party</memberRepository>
+          <memberRepository>eclipse</memberRepository>
+          <memberRepository>eclipse-snapshots</memberRepository>
+          <memberRepository>plexus-oss-snapshots</memberRepository>
+          <memberRepository>plexus-releases-oss</memberRepository>
+          <memberRepository>plexus.releases</memberRepository>
+          <memberRepository>central-proxy</memberRepository>
+          <memberRepository>tycho-pseudo-releases</memberRepository>
+          <memberRepository>openqa-releases</memberRepository>
+          <memberRepository>atlassian</memberRepository>
+          <memberRepository>ddsteps</memberRepository>
+          <memberRepository>jboss-snap</memberRepository>
+          <memberRepository>mc-repo</memberRepository>
+          <memberRepository>flex</memberRepository>
+          <memberRepository>nexus-plugins-releases</memberRepository>
+          <memberRepository>nexus-plugins-snapshots</memberRepository>
+          <memberRepository>maven2-dev.java.net</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>sonatype</id>
+      <name>sonatype</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>sonatype-internal</memberRepository>
+          <memberRepository>maven.snapshots</memberRepository>
+          <memberRepository>plexus-oss-snapshots</memberRepository>
+          <memberRepository>restlet</memberRepository>
+          <memberRepository>sonatype-internal-snapshots</memberRepository>
+          <memberRepository>codehaus-snapshots</memberRepository>
+          <memberRepository>apache-snapshots</memberRepository>
+          <memberRepository>releases</memberRepository>
+          <memberRepository>snapshots</memberRepository>
+          <memberRepository>eclipse</memberRepository>
+          <memberRepository>sonatype-apache-releases</memberRepository>
+          <memberRepository>eclipse-snapshots</memberRepository>
+          <memberRepository>plexus-releases-oss</memberRepository>
+          <memberRepository>central</memberRepository>
+          <memberRepository>plexus.releases</memberRepository>
+          <memberRepository>central-proxy</memberRepository>
+          <memberRepository>third-party</memberRepository>
+          <memberRepository>third-party-internal</memberRepository>
+          <memberRepository>tycho-pseudo-releases</memberRepository>
+          <memberRepository>atlassian</memberRepository>
+          <memberRepository>maven2-dev.java.net</memberRepository>
+          <memberRepository>ddsteps</memberRepository>
+          <memberRepository>openqa-releases</memberRepository>
+          <memberRepository>nexus-plugins-releases</memberRepository>
+          <memberRepository>nexus-plugins-snapshots</memberRepository>
+          <memberRepository>flex</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>flex-group</id>
+      <name>flex</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <pathPrefix>flex</pathPrefix>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>flex</memberRepository>
+          <memberRepository>flexmojos-releases</memberRepository>
+          <memberRepository>flexmojos-snapshots</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>nexus-plugins-with-staging</id>
+      <name>Nexus Plugins With Staging</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>nexus-plugins-releases</memberRepository>
+          <memberRepository>nexus-plugins-snapshots</memberRepository>
+          <memberRepository>nexus-plugins-stage-3b623b3067e309</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>nexus-staging</id>
+      <name>nexus-staging</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>nexus-3b5c0561762b7c</memberRepository>
+          <memberRepository>nexus-3b5c61c99c26ef</memberRepository>
+          <memberRepository>nexus-3b61b1f432ba7b</memberRepository>
+          <memberRepository>all-3b6320d4d49019</memberRepository>
+          <memberRepository>nexus-commercial-3b6381ecf648ea</memberRepository>
+          <memberRepository>nexus-commercial-3b654eb462b37e</memberRepository>
+          <memberRepository>nexus-commercial-3b661636333c5b</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+  </repositories>
   <repositoryGrouping>
     <pathMappings>
       <pathMapping>
         <id>inhouse-stuff</id>
         <groupId>*</groupId>
-        <routePattern>.*/org/sonatype/.*</routePattern>
         <routeType>inclusive</routeType>
+        <routePatterns>
+          <routePattern>.*/org/sonatype/.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>snapshots</repository>
           <repository>releases</repository>
@@ -387,8 +1409,10 @@
       <pathMapping>
         <id>118af2bcaa0</id>
         <groupId>*</groupId>
-        <routePattern>.*/org/restlet/.*</routePattern>
         <routeType>inclusive</routeType>
+        <routePatterns>
+          <routePattern>.*/org/restlet/.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>restlet</repository>
           <repository>third-party</repository>
@@ -397,8 +1421,10 @@
       <pathMapping>
         <id>1e3e1e1faa72af</id>
         <groupId>*</groupId>
-        <routePattern>.*/org/openqa/.*</routePattern>
         <routeType>inclusive</routeType>
+        <routePatterns>
+          <routePattern>.*/org/openqa/.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>openqa-releases</repository>
         </repositories>
@@ -406,211 +1432,15 @@
       <pathMapping>
         <id>2e29ecfcec8517</id>
         <groupId>public</groupId>
-        <routePattern>(?!.*/com/mtvi/.*).*</routePattern>
         <routeType>exclusive</routeType>
+        <routePatterns>
+          <routePattern>(?!.*/com/mtvi/.*).*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>maven2-dev.java.net</repository>
         </repositories>
       </pathMapping>
     </pathMappings>
-    <repositoryGroups>
-      <repositoryGroup>
-        <groupId>nexus-extras</groupId>
-        <name>Nexus Extras Dependencies</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>atlassian</repository>
-          <repository>maven2-dev.java.net</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>MavenITPlugins</groupId>
-        <name>MavenITPlugins (Meant for security)</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>maven-it-plugins</repository>
-          <repository>maven-it-plugin-snapshots</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>maven-eclipse</groupId>
-        <name>maven-eclipse</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>releases</repository>
-          <repository>snapshots</repository>
-          <repository>maven.snapshots</repository>
-          <repository>eclipse</repository>
-          <repository>eclipse-snapshots</repository>
-          <repository>restlet</repository>
-          <repository>third-party</repository>
-          <repository>tycho-pseudo-releases</repository>
-          <repository>sonatype-apache-releases</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>nexus-plugins</groupId>
-        <name>Nexus Plugins</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>nexus-plugins-releases</repository>
-          <repository>nexus-plugins-snapshots</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>forge</groupId>
-        <name>Forge</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>releases</repository>
-          <repository>snapshots</repository>
-          <repository>maven.snapshots</repository>
-          <repository>eclipse</repository>
-          <repository>eclipse-snapshots</repository>
-          <repository>restlet</repository>
-          <repository>third-party</repository>
-          <repository>tycho-pseudo-releases</repository>
-          <repository>plexus-oss-snapshots</repository>
-          <repository>plexus-releases-oss</repository>
-          <repository>sonatype-apache-releases</repository>
-          <repository>plexus.releases</repository>
-          <repository>nexus-plugins-releases</repository>
-          <repository>nexus-plugins-snapshots</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>public</groupId>
-        <name>public</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>releases</repository>
-          <repository>central</repository>
-          <repository>restlet</repository>
-          <repository>snapshots</repository>
-          <repository>maven.snapshots</repository>
-          <repository>sonatype-apache-releases</repository>
-          <repository>apache-snapshots</repository>
-          <repository>codehaus-snapshots</repository>
-          <repository>third-party</repository>
-          <repository>eclipse</repository>
-          <repository>eclipse-snapshots</repository>
-          <repository>plexus-oss-snapshots</repository>
-          <repository>plexus-releases-oss</repository>
-          <repository>plexus.releases</repository>
-          <repository>central-proxy</repository>
-          <repository>tycho-pseudo-releases</repository>
-          <repository>openqa-releases</repository>
-          <repository>atlassian</repository>
-          <repository>ddsteps</repository>
-          <repository>jboss-snap</repository>
-          <repository>mc-repo</repository>
-          <repository>flex</repository>
-          <repository>nexus-plugins-releases</repository>
-          <repository>nexus-plugins-snapshots</repository>
-          <repository>maven2-dev.java.net</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>sonatype-grid</groupId>
-        <name>Sonatype Grid</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>releases</repository>
-          <repository>central</repository>
-          <repository>restlet</repository>
-          <repository>snapshots</repository>
-          <repository>maven.snapshots</repository>
-          <repository>sonatype-apache-releases</repository>
-          <repository>apache-snapshots</repository>
-          <repository>codehaus-snapshots</repository>
-          <repository>third-party</repository>
-          <repository>eclipse</repository>
-          <repository>eclipse-snapshots</repository>
-          <repository>plexus-oss-snapshots</repository>
-          <repository>plexus-releases-oss</repository>
-          <repository>plexus.releases</repository>
-          <repository>central-proxy</repository>
-          <repository>tycho-pseudo-releases</repository>
-          <repository>openqa-releases</repository>
-          <repository>atlassian</repository>
-          <repository>ddsteps</repository>
-          <repository>jboss-snap</repository>
-          <repository>mc-repo</repository>
-          <repository>flex</repository>
-          <repository>nexus-plugins-releases</repository>
-          <repository>nexus-plugins-snapshots</repository>
-          <repository>maven2-dev.java.net</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>sonatype</groupId>
-        <name>sonatype</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>sonatype-internal</repository>
-          <repository>maven.snapshots</repository>
-          <repository>plexus-oss-snapshots</repository>
-          <repository>restlet</repository>
-          <repository>sonatype-internal-snapshots</repository>
-          <repository>codehaus-snapshots</repository>
-          <repository>apache-snapshots</repository>
-          <repository>releases</repository>
-          <repository>snapshots</repository>
-          <repository>eclipse</repository>
-          <repository>sonatype-apache-releases</repository>
-          <repository>eclipse-snapshots</repository>
-          <repository>plexus-releases-oss</repository>
-          <repository>central</repository>
-          <repository>plexus.releases</repository>
-          <repository>central-proxy</repository>
-          <repository>third-party</repository>
-          <repository>third-party-internal</repository>
-          <repository>tycho-pseudo-releases</repository>
-          <repository>atlassian</repository>
-          <repository>maven2-dev.java.net</repository>
-          <repository>ddsteps</repository>
-          <repository>openqa-releases</repository>
-          <repository>nexus-plugins-releases</repository>
-          <repository>nexus-plugins-snapshots</repository>
-          <repository>flex</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>flex-group</groupId>
-        <name>flex</name>
-        <pathPrefix>flex</pathPrefix>
-        <type>maven2</type>
-        <repositories>
-          <repository>flex</repository>
-          <repository>flexmojos-releases</repository>
-          <repository>flexmojos-snapshots</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>nexus-plugins-with-staging</groupId>
-        <name>Nexus Plugins With Staging</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>nexus-plugins-releases</repository>
-          <repository>nexus-plugins-snapshots</repository>
-          <repository>nexus-plugins-stage-3b623b3067e309</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>nexus-staging</groupId>
-        <name>nexus-staging</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>nexus-3b5c0561762b7c</repository>
-          <repository>nexus-3b5c61c99c26ef</repository>
-          <repository>nexus-3b61b1f432ba7b</repository>
-          <repository>all-3b6320d4d49019</repository>
-          <repository>nexus-commercial-3b6381ecf648ea</repository>
-          <repository>nexus-commercial-3b654eb462b37e</repository>
-          <repository>nexus-commercial-3b661636333c5b</repository>
-        </repositories>
-      </repositoryGroup>
-    </repositoryGroups>
   </repositoryGrouping>
   <repositoryTargets>
     <repositoryTarget>
@@ -844,7 +1674,7 @@
     </task>
   </tasks>
   <smtpConfiguration>
-    <host>localhost</host>
+    <hostname>localhost</hostname>
     <port>25</port>
     <systemEmailAddress>nexus@repository.sonatype.org</systemEmailAddress>
   </smtpConfiguration>

@@ -299,6 +299,7 @@ public class Upgrade108to140
         {
             CRemoteStorage remoteStorage = new CRemoteStorage();
             remoteStorage.setUrl( oldrepos.getRemoteStorage().getUrl() );
+            remoteStorage.setProvider( oldrepos.getRemoteStorage().getProvider() );
             if ( oldrepos.getRemoteStorage().getAuthentication() != null )
             {
                 remoteStorage.setAuthentication( copyCRemoteAuthentication1_0_8( oldrepos
