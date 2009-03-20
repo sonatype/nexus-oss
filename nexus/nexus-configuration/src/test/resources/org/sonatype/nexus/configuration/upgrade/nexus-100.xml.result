@@ -42,6 +42,7 @@
       <browseable>true</browseable>
       <indexable>true</indexable>
       <remoteStorage>
+        <provider>apacheHttpClient3x</provider>
         <url>http://192.168.228.40:8443/nexus/groups/public</url>
       </remoteStorage>
       <externalConfiguration>
@@ -67,6 +68,7 @@
       <browseable>true</browseable>
       <indexable>true</indexable>
       <remoteStorage>
+        <provider>apacheHttpClient3x</provider>
         <url>http://192.168.228.40:8443/nexus/groups/snapshot</url>
       </remoteStorage>
       <externalConfiguration>
