@@ -115,7 +115,7 @@ public class Upgrade103to104
         {
             // a snippet from old TaskConnfigManager
             XStream xstream = new XStream( new DomDriver() );
-
+            
             // alias the versioned class (they are frozen to 1.0.3 only!)
             xstream.alias( "org.sonatype.nexus.configuration.model.CTaskConfiguration", CTaskConfiguration.class );
             xstream.alias(
@@ -129,6 +129,7 @@ public class Upgrade103to104
             xstream.alias( "org.sonatype.nexus.configuration.model.COnceSchedule", COnceSchedule.class );
             xstream.alias( "org.sonatype.nexus.configuration.model.CRunNowSchedule", CRunNowSchedule.class );
             xstream.alias( "org.sonatype.nexus.configuration.model.CSchedule", CSchedule.class );
+            xstream.alias( "org.sonatype.nexus.configuration.model.CProps", org.sonatype.nexus.configuration.model.v1_0_3.CProps.class );
 
             tasksConfig = new CTaskConfiguration();
 

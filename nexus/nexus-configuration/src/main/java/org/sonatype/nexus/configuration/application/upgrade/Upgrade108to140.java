@@ -461,8 +461,14 @@ public class Upgrade108to140
             schedule.setCronCommand( oldschedule.getCronCommand() );
             schedule.setDaysOfMonth( oldschedule.getDaysOfMonth() );
             schedule.setDaysOfWeek( oldschedule.getDaysOfWeek() );
-            schedule.setEndDate( oldschedule.getEndDate().getTime() );
-            schedule.setStartDate( oldschedule.getStartDate().getTime() );
+            if( oldschedule.getEndDate() != null )
+            {
+                schedule.setEndDate( oldschedule.getEndDate().getTime() );
+            }
+            if( oldschedule.getStartDate() != null )
+            {
+                schedule.setStartDate( oldschedule.getStartDate().getTime() );
+            }
             schedule.setType( oldschedule.getType() );
         }
 
