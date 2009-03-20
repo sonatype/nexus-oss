@@ -57,6 +57,7 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.util.ExternalConfigUtil;
 
 /**
  * Upgrades configuration model from version 1.0.8 to 1.4.0.
@@ -142,7 +143,7 @@ public class Upgrade108to140
         newc.setGlobalConnectionSettings( copyCRemoteConnectionSettings1_0_8( oldc.getGlobalConnectionSettings() ) );
         // Global Proxy is the same
         newc.setGlobalHttpProxySettings( copyCRemoteHttpProxySettings1_0_8( oldc.getGlobalHttpProxySettings() ) );
-        // TODO: not sure about routing?
+        // the group setttings where moved into the groups
         newc.setRouting( copyCRouting1_0_8( oldc.getRouting() ) );
         // REST Api is the same
         newc.setRestApi( copyCRestApi1_0_8( oldc.getRestApi() ) );
@@ -302,15 +303,15 @@ public class Upgrade108to140
         // Manipulate the dom
         Xpp3Dom externalConfig = new Xpp3Dom( EXTERNAL_CONFIG );
         newrepo.setExternalConfiguration( externalConfig );
-        this.setNodeValue( externalConfig, "proxyMode", this.proxyMode.get( oldrepos.getProxyMode() ));
-        this.setNodeValue( externalConfig, "artifactMaxAge", Integer.toString( oldrepos.getArtifactMaxAge() ) );
-        this.setNodeValue( externalConfig, "itemMaxAge", Integer.toString( oldrepos.getMetadataMaxAge() ) );
-        this.setNodeValue( externalConfig, "cleanseRepositoryMetadata", Boolean.toString( oldrepos
-            .isMaintainProxiedRepositoryMetadata() ) ); // TODO
-        this
+        ExternalConfigUtil.setNodeValue( externalConfig, "proxyMode", this.proxyMode.get( oldrepos.getProxyMode() ));
+        ExternalConfigUtil.setNodeValue( externalConfig, "artifactMaxAge", Integer.toString( oldrepos.getArtifactMaxAge() ) );
+        ExternalConfigUtil.setNodeValue( externalConfig, "itemMaxAge", Integer.toString( oldrepos.getMetadataMaxAge() ) );
+        ExternalConfigUtil.setNodeValue( externalConfig, "cleanseRepositoryMetadata", Boolean.toString( oldrepos
+            .isMaintainProxiedRepositoryMetadata() ) );
+        ExternalConfigUtil
             .setNodeValue( externalConfig, "downloadRemoteIndex", Boolean.toString( oldrepos.isDownloadRemoteIndexes() ) );
-        this.setNodeValue( externalConfig, "checksumPolicy", this.checksumPolicy.get( oldrepos.getChecksumPolicy() ));
-        this.setNodeValue( externalConfig, "repositoryPolicy", oldrepos.getRepositoryPolicy() );
+        ExternalConfigUtil.setNodeValue( externalConfig, "checksumPolicy", this.checksumPolicy.get( oldrepos.getChecksumPolicy() ));
+        ExternalConfigUtil.setNodeValue( externalConfig, "repositoryPolicy", oldrepos.getRepositoryPolicy() );
 
         if ( oldrepos.getLocalStorage() != null )
         {
@@ -416,8 +417,7 @@ public class Upgrade108to140
         {
             restapi.setBaseUrl( oldrestapi.getBaseUrl() );
             restapi.setForceBaseUrl( oldrestapi.isForceBaseUrl() );
-            // restapi.setSessionExpiration( TODO );
-            // restapi.setAccessAllowedFrom( oldrestapi.getAccessAllowedFrom() ); //TODO
+             restapi.setSessionExpiration( -1 );
         }
 
         return restapi;
@@ -535,8 +535,8 @@ public class Upgrade108to140
             // Manipulate the dom
             Xpp3Dom externalConfig = new Xpp3Dom( EXTERNAL_CONFIG );
             newShadow.setExternalConfiguration( externalConfig );
-            this.setNodeValue( externalConfig, "masterRepositoryId", oldshadow.getShadowOf() );
-            this.setNodeValue( externalConfig, "syncAtStartup", Boolean.toString( oldshadow.isSyncAtStartup() ) ); // TODO,
+            ExternalConfigUtil.setNodeValue( externalConfig, "masterRepositoryId", oldshadow.getShadowOf() );
+            ExternalConfigUtil.setNodeValue( externalConfig, "syncAtStartup", Boolean.toString( oldshadow.isSyncAtStartup() ) ); // TODO,
             // this
             // is
             // not
@@ -601,63 +601,12 @@ public class Upgrade108to140
             // Manipulate the dom
             Xpp3Dom externalConfig = new Xpp3Dom( EXTERNAL_CONFIG );
             groupRepo.setExternalConfiguration( externalConfig );
-            this.setNodeValue( externalConfig, "mergeMetadata", Boolean.toString( mergeMetadata ) );
-            this.setCollectionValues( externalConfig, GROUP_MEMBERS_NODE, GROUP_CHILD_NODE, oldgroup.getRepositories() );
+            ExternalConfigUtil.setNodeValue( externalConfig, "mergeMetadata", Boolean.toString( mergeMetadata ) );
+            ExternalConfigUtil.setCollectionValues( externalConfig, GROUP_MEMBERS_NODE, GROUP_CHILD_NODE, oldgroup.getRepositories() );
         }
 
         return groupRepo;
     }
 
-    protected void setNodeValue( Xpp3Dom parent, String name, String value )
-    {
-        // if we do not have a current value, then just return without setting the node;
-        if ( value == null )
-        {
-            return;
-        }
-
-        Xpp3Dom node = parent.getChild( name );
-
-        if ( node == null )
-        {
-            node = new Xpp3Dom( name );
-
-            parent.addChild( node );
-        }
-
-        node.setValue( value );
-    }
-
-    protected void setCollectionValues( Xpp3Dom parent, String nodeName, String childName, Collection<String> values )
-    {
-        Xpp3Dom node = parent.getChild( nodeName );
-
-        if ( node != null )
-        {
-            for ( int i = 0; i < parent.getChildCount(); i++ )
-            {
-                Xpp3Dom existing = parent.getChild( i );
-
-                if ( StringUtils.equals( nodeName, existing.getName() ) )
-                {
-                    parent.removeChild( i );
-
-                    break;
-                }
-            }
-
-            node = null;
-        }
-
-        node = new Xpp3Dom( nodeName );
-
-        parent.addChild( node );
-
-        for ( String childVal : values )
-        {
-            Xpp3Dom childNode = new Xpp3Dom( childName );
-            node.addChild( childNode );
-            childNode.setValue( childVal );
-        }
-    }
+    
 }
