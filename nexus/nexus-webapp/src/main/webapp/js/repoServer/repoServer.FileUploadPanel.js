@@ -228,6 +228,10 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
                     allowBlank: false,
                     uploadPanel: this,
                     validator: function( v ){
+                	  var isValidVersion = /^[\w\.-]+$/.test(v);
+                	  if ( !isValidVersion ){
+                		  return 'Version is invalid, make sure it does not contain any special character';
+                	  }                	  
                       var isSnapshotVersion = /-SNAPSHOT$/.test( v ) || /LATEST$/.test( v ) || /^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$/.test( v );
                       var isSnapshotRepo = this.uploadPanel.payload.data.repoPolicy == 'snapshot';
                       if ( isSnapshotRepo ) {
