@@ -334,8 +334,14 @@ public class DefaultTaskConfigManager
         storeableTask.setName( task.getName() );
         storeableTask.setType( task.getType() );
         storeableTask.setStatus( task.getTaskState().name() );
-        storeableTask.setLastRun( task.getLastRun().getTime() );
-        storeableTask.setNextRun( task.getNextRun().getTime() );
+        if( task.getLastRun() != null )
+        {
+            storeableTask.setLastRun( task.getLastRun().getTime() );
+        }
+        if( task.getNextRun() != null )
+        {
+            storeableTask.setNextRun( task.getNextRun().getTime() );
+        }
 
         for ( String key : task.getTaskParams().keySet() )
         {
