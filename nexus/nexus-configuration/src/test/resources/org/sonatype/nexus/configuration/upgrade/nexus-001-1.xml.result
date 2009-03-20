@@ -1,86 +1,237 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.0.8</version>
+  <version>1.4.0</version>
   <security>
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <anonymousUsername>anonymous</anonymousUsername>
+    <anonymousPassword>anonymous</anonymousPassword>
     <realms>
       <realm>XmlAuthenticatingRealm</realm>
       <realm>XmlAuthorizingRealm</realm>
     </realms>
   </security>
-  <globalConnectionSettings />
+  <globalConnectionSettings>
+    <connectionTimeout>10000</connectionTimeout>
+    <retrievalRetryCount>3</retrievalRetryCount>
+    <queryString></queryString>
+  </globalConnectionSettings>
   <globalHttpProxySettings>
     <proxyHostname>proxyhost</proxyHostname>
     <proxyPort>8080</proxyPort>
   </globalHttpProxySettings>
   <restApi />
-  <httpProxy />
+  <httpProxy>
+    <port>8082</port>
+    <proxyPolicy>strict</proxyPolicy>
+  </httpProxy>
   <routing>
-    <groups />
+    <resolveLinks>true</resolveLinks>
   </routing>
   <repositories>
     <repository>
       <id>central</id>
       <name>Maven Central</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>86400</notFoundCacheTTL>
-      <artifactMaxAge>518400</artifactMaxAge>
-      <metadataMaxAge>518400</metadataMaxAge>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
+        <provider>apacheHttpClient3x</provider>
         <url>http://192.168.1.1:8080/nexus/groups/public</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>518400</artifactMaxAge>
+        <itemMaxAge>518400</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>central.snapshot</id>
       <name>Maven Central Snapshots</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>46400</notFoundCacheTTL>
-      <artifactMaxAge>60</artifactMaxAge>
-      <metadataMaxAge>60</metadataMaxAge>
-      <repositoryPolicy>snapshot</repositoryPolicy>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <indexable>true</indexable>
       <remoteStorage>
+        <provider>apacheHttpClient3x</provider>
         <url>http://192.168.1.1:8080/nexus/groups/snapshot</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>60</artifactMaxAge>
+        <itemMaxAge>60</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>release</id>
       <name>Release</name>
-      <allowWrite>true</allowWrite>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>86400</notFoundCacheTTL>
-      <artifactMaxAge>86400</artifactMaxAge>
-      <metadataMaxAge>86400</metadataMaxAge>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <allowWrite>true</allowWrite>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>86400</artifactMaxAge>
+        <itemMaxAge>86400</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>commercial</id>
       <name>Commercial Software</name>
-      <allowWrite>true</allowWrite>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>86400</notFoundCacheTTL>
-      <artifactMaxAge>86400</artifactMaxAge>
-      <metadataMaxAge>86400</metadataMaxAge>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <allowWrite>true</allowWrite>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>86400</artifactMaxAge>
+        <itemMaxAge>86400</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>team</id>
       <name>Team</name>
-      <allowWrite>true</allowWrite>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>86400</notFoundCacheTTL>
-      <artifactMaxAge>86400</artifactMaxAge>
-      <metadataMaxAge>86400</metadataMaxAge>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <allowWrite>true</allowWrite>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>86400</artifactMaxAge>
+        <itemMaxAge>86400</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>snapshot</id>
       <name>Snapshots</name>
-      <allowWrite>true</allowWrite>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>86400</notFoundCacheTTL>
-      <artifactMaxAge>86400</artifactMaxAge>
-      <metadataMaxAge>86400</metadataMaxAge>
-      <repositoryPolicy>snapshot</repositoryPolicy>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <allowWrite>true</allowWrite>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>86400</artifactMaxAge>
+        <itemMaxAge>86400</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>opensource</id>
       <name>Modified OSS</name>
-      <allowWrite>true</allowWrite>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>inService</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>86400</notFoundCacheTTL>
-      <artifactMaxAge>86400</artifactMaxAge>
-      <metadataMaxAge>86400</metadataMaxAge>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <allowWrite>true</allowWrite>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <proxyMode>allow</proxyMode>
+        <artifactMaxAge>86400</artifactMaxAge>
+        <itemMaxAge>86400</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>warn</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>torrent</id>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>release</memberRepository>
+          <memberRepository>team</memberRepository>
+          <memberRepository>commercial</memberRepository>
+          <memberRepository>opensource</memberRepository>
+          <memberRepository>central</memberRepository>
+          <memberRepository>snapshot</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>public.snapshot</id>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>central.snapshot</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
     </repository>
   </repositories>
   <repositoryGrouping>
@@ -88,8 +239,10 @@
       <pathMapping>
         <id>migrated-E1</id>
         <groupId>*</groupId>
-        <routePattern>.*/com/dec/.*</routePattern>
         <routeType>exclusive</routeType>
+        <routePatterns>
+          <routePattern>.*/com/dec/.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>central</repository>
           <repository>central.snapshot</repository>
@@ -98,35 +251,16 @@
       <pathMapping>
         <id>migrated-E2</id>
         <groupId>*</groupId>
-        <routePattern>.*/net/someproject/.*</routePattern>
         <routeType>exclusive</routeType>
+        <routePatterns>
+          <routePattern>.*/net/someproject/.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>central</repository>
           <repository>central.snapshot</repository>
         </repositories>
       </pathMapping>
     </pathMappings>
-    <repositoryGroups>
-      <repositoryGroup>
-        <groupId>torrent</groupId>
-        <type>maven2</type>
-        <repositories>
-          <repository>release</repository>
-          <repository>team</repository>
-          <repository>commercial</repository>
-          <repository>opensource</repository>
-          <repository>central</repository>
-          <repository>snapshot</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>public.snapshot</groupId>
-        <type>maven2</type>
-        <repositories>
-          <repository>central.snapshot</repository>
-        </repositories>
-      </repositoryGroup>
-    </repositoryGroups>
   </repositoryGrouping>
   <repositoryTargets>
     <repositoryTarget>
@@ -163,7 +297,7 @@
     </repositoryTarget>
   </repositoryTargets>
   <smtpConfiguration>
-    <host>smtp-host</host>
+    <hostname>smtp-host</hostname>
     <port>25</port>
     <username>smtp-username</username>
     <password>smtp-password</password>
