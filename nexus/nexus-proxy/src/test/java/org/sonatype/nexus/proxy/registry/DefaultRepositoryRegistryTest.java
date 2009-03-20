@@ -113,6 +113,7 @@ public class DefaultRepositoryRegistryTest
         M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
         exGroupRepoConf.setMemberRepositoryIds( gl );
         exGroupRepoConf.setMergeMetadata( true );
+        exGroupRepoConf.applyChanges();
 
         groupRepository.configure( repoGroupConf );
 

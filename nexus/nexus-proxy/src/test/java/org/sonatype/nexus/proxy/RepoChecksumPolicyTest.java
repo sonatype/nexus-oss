@@ -45,6 +45,7 @@ public class RepoChecksumPolicyTest
         M2Repository repo = getRepository();
 
         repo.setChecksumPolicy( policy );
+        repo.getCurrentCoreConfiguration().applyChanges();
 
         StorageFileItem item = (StorageFileItem) repo.retrieveItem( request );
 

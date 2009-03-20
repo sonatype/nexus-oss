@@ -54,8 +54,6 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
 public class RepositoryMirrorDownloadTest
     extends AbstractNexusTestEnvironment
 {
@@ -278,6 +276,8 @@ public class RepositoryMirrorDownloadTest
         M2Repository repo = createM2Repository( request.mirrors );
 
         repo.setChecksumPolicy( ChecksumPolicy.STRICT );
+        
+        repo.getCurrentCoreConfiguration().applyChanges();
 
         RepositoryItemUid uid = repo.createUid( ITEM_PATH );
 

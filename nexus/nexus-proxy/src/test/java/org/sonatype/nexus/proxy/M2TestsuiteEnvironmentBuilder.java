@@ -67,6 +67,7 @@ public class M2TestsuiteEnvironmentBuilder
             repoConf.setProviderRole( Repository.class.getName() );
             repoConf.setProviderHint( "maven2" );
             repoConf.setId( remoteRepo.getName() );
+            repoConf.setName( remoteRepo.getName() );
 
             repoConf.setLocalStorage( new CLocalStorage() );
             repoConf.getLocalStorage().setProvider( "file" );

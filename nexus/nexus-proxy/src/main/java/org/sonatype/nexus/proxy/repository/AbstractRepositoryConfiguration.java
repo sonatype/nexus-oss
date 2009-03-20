@@ -36,7 +36,19 @@ public class AbstractRepositoryConfiguration
     {
         if ( changedConfiguration != null )
         {
-            configuration = Xpp3Dom.mergeXpp3Dom( changedConfiguration, configuration );
+            Xpp3Dom result = Xpp3Dom.mergeXpp3Dom( changedConfiguration, configuration );
+
+            // shave off config root node
+            for ( int i = 0; i < configuration.getChildCount(); i++ )
+            {
+                configuration.removeChild( i );
+            }
+
+            // and put beneath it the merge result
+            for ( int i = 0; i < result.getChildCount(); i++ )
+            {
+                configuration.addChild( result.getChild( i ) );
+            }
 
             changedConfiguration = null;
         }

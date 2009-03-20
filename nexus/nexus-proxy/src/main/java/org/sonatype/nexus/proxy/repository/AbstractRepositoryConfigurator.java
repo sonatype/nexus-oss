@@ -159,12 +159,14 @@ public abstract class AbstractRepositoryConfigurator
             // Default dir is going to be valid
             defaultStorageFile.mkdirs();
         }
-
+        
         LocalRepositoryStorage ls = getLocalRepositoryStorage( repo.getId(), repo.getLocalStorage().getProvider() );
 
         try
         {
             ls.validateStorageUrl( localUrl );
+
+            repo.getLocalStorage().setUrl( localUrl );
 
             repository.setLocalStorage( ls );
         }

@@ -66,7 +66,9 @@ public class GroupingBehaviourTest
         // get metadata from a gidr router but switch merging off (default is on), spoofing should happen, and the
         // highest ranked repo
         // in group (repo1) should provide the file
-        getRepositoryRegistry().getRepositoryWithFacet( "test", MavenGroupRepository.class ).setMergeMetadata( false );
+        MavenGroupRepository mgr = getRepositoryRegistry().getRepositoryWithFacet( "test", MavenGroupRepository.class );
+        mgr.setMergeMetadata( false );
+        mgr.getCurrentCoreConfiguration().applyChanges();
         getApplicationEventMulticaster().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
@@ -128,7 +130,9 @@ public class GroupingBehaviourTest
 
         // get metadata from a gidr router but switch merging off (default is on), spoofing should happen, and the
         // highest ranked repo in group (repo1) should provide the file
-        getRepositoryRegistry().getRepositoryWithFacet( "test", MavenGroupRepository.class ).setMergeMetadata( false );
+        MavenGroupRepository mgr = getRepositoryRegistry().getRepositoryWithFacet( "test", MavenGroupRepository.class );
+        mgr.setMergeMetadata( false );
+        mgr.getCurrentCoreConfiguration().applyChanges();
         getApplicationEventMulticaster().notifyProximityEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 

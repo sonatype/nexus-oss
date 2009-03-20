@@ -64,6 +64,7 @@ public class M1RepositoryTest
 
         // a "release"
         repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        repository.getCurrentCoreConfiguration().applyChanges();
 
         StorageItem item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_RELEASE, false ) );
         checkForFileAndMatchContents( item );
@@ -84,6 +85,7 @@ public class M1RepositoryTest
 
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
+        repository.getCurrentCoreConfiguration().applyChanges();
 
         item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_SNAPSHOT, false ) );
         checkForFileAndMatchContents( item );
@@ -107,6 +109,7 @@ public class M1RepositoryTest
 
         // a "release"
         repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        repository.getCurrentCoreConfiguration().applyChanges();
 
         DefaultStorageFileItem item = new DefaultStorageFileItem(
             repository,
@@ -136,6 +139,7 @@ public class M1RepositoryTest
 
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
+        repository.getCurrentCoreConfiguration().applyChanges();
 
         item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
             SPOOF_SNAPSHOT ) );

@@ -31,7 +31,7 @@ import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CoreCRepositoryConfiguration;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -185,7 +185,7 @@ public abstract class AbstractRepository
     {
         validateConfiguration( config );
 
-        this.repositoryConfiguration = new CoreCRepositoryConfiguration( (CRepository) config );
+        this.repositoryConfiguration = new CRepositoryCoreConfiguration( (CRepository) config );
 
         doConfigure( false );
     }
@@ -217,13 +217,6 @@ public abstract class AbstractRepository
         if ( validate )
         {
             doValidateConfiguration( getCurrentConfiguration( false ) );
-        }
-
-        getCurrentCoreConfiguration().applyChanges();
-
-        if ( getCurrentCoreConfiguration().getExternalConfiguration() != null )
-        {
-            getCurrentCoreConfiguration().getExternalConfiguration().applyChanges();
         }
 
         getRepositoryConfigurator().applyConfiguration( this, applicationConfiguration, getCurrentCoreConfiguration() );
