@@ -101,7 +101,15 @@ Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
  * 
  * rowClickEvent: event name to fire when a row is clicked.
  * 
+ * rowClickHandler: a specific handler to be called on rowClick
+ * 
  * rowContextClickEvent: event name to fire when a row is right-clicked.
+ * 
+ * rowContextClickHandler: a specific handler to be called when a row is right-clicked
+ * 
+ * mouseOverEvent: event name to fire when mouse over event is fired
+ * 
+ * mouseOverHandler: a specific handler to call when mouse over grid
  * 
  * singleSelect: the 'singleSelect' property for the grid's selection model (defaults to true).
  * 
@@ -196,6 +204,10 @@ Sonatype.panels.GridViewer = function( config ) {
     listeners: {
       rowcontextmenu: {
         fn: this.rowContextMenuHandler,
+        scope: this
+      },
+      mouseover: {
+        fn: this.mouseOverGridHandler,
         scope: this
       }
     }
@@ -385,8 +397,14 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
         id: id,
         title: rec.data[this.titleColumn]
       } );
+      
+      if ( this.rowClickHandler ) {
+        this.rowClickHandler( panel, rec );
+      }
 
-      Sonatype.Events.fireEvent( this.rowClickEvent, panel, rec );
+      if ( this.rowClickEvent ) {
+        Sonatype.Events.fireEvent( this.rowClickEvent, panel, rec );
+      }
 
       if ( panel.items ) {
         if ( ! panel.tabPanel ) {
@@ -512,10 +530,20 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
     }
   },
   
+  mouseOverGridHandler: function( e, t ) {
+    if ( this.mouseOverHandler ) {
+      this.mouseOverHandler( e, t );
+    }
+    
+    if ( this.mouseOverEvent ) {      
+      Sonatype.Events.fireEvent( this.mouseOverEvent, e, t );
+    }
+  },
+  
   rowContextMenuHandler: function( grid, index, e ) {
     if ( e.target.nodeName == 'A' ) return; // no menu on links
 
-    if ( this.rowContextClickEvent ) { 
+    if ( this.rowContextClickEvent || this.rowContextClickHandler ) { 
       var rec = grid.store.getAt( index );
   
       var menu = new Sonatype.menu.Menu({
@@ -524,7 +552,13 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
         items: []
       });
   
-      Sonatype.Events.fireEvent( this.rowContextClickEvent, menu, rec );
+      if ( this.rowContextClickHandler ) {
+        this.rowContextClickHandler( menu, rec );
+      }
+      
+      if ( this.rowContextClickEvent ) {
+        Sonatype.Events.fireEvent( this.rowContextClickEvent, menu, rec );
+      }
 
       var item;
       while ( ( item = menu.items.first() ) && ! item.text ) {
@@ -541,7 +575,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
   },
 
   rowSelectHandler: function( selectionModel, index, rec ) {
-    if ( this.rowClickEvent ) {
+    if ( this.rowClickEvent || this.rowClickHandler ) {
       this.createChildPanel( rec );
     }
   }
