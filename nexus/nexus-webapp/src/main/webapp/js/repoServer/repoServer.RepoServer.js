@@ -448,6 +448,12 @@ Sonatype.repoServer.RepoServer = function(){
         });
         
         var welcomeMsg = '<p>Welcome to the <a href="http://nexus.sonatype.org" target="new">Sonatype Nexus Maven Repository Manager</a>.</p>' ;
+
+        var statusEnabled = sp.checkPermission('nexus:status', sp.READ);
+        if ( !statusEnabled ){
+        	welcomeMsg += '</br>';
+        	welcomeMsg += '<p style="color:red">Warning: Could not retrieve Nexus status, anonymous access might be disabled.</p>';
+        }
         
         if( !Sonatype.user.curr.isLoggedIn ){
         	welcomeMsg += '</br>';

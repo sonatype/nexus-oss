@@ -46,6 +46,13 @@ Sonatype.view = {
     Ext.Ajax.on( {
       "requestexception" : { 
         fn: function(conn, response, options) {
+        	
+        	if ( Sonatype.config.repos.urls.status == options.url )
+        	{
+        		// when anonymous is diabled, use not logged in might find annoying error
+        		// simply ignore it
+        		return;
+        	}
     	
 	    	if( Ext.isArray(options.suppressStatus) )
 	    	{
