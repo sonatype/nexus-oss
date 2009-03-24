@@ -170,6 +170,10 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Rebuilding maven metadata files" );
             }
+            else if ( FeedRecorder.SYSTEM_DOWNLOADINDEX_ACTION.equals( item.getAction() ))
+            {
+                entry.setTitle( "Downloading Indexes" );
+            }
             else
             {
                 entry.setTitle( item.getAction() );
