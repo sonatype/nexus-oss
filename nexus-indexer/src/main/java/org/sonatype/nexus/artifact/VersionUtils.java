@@ -8,13 +8,13 @@ package org.sonatype.nexus.artifact;
 
 import java.util.regex.Pattern;
 
-import org.apache.maven.artifact.Artifact;
-
 /**
  * Utility methods for working with artifact version strings
  */
 public class VersionUtils
 {
+	public static String SNAPSHOT_VERSION = "SNAPSHOT";
+	
     private static NexusEnforcer enforcer = new DefaultNexusEnforcer();
     
     // Note that there is an 'OR' to support 2 different patterns.
@@ -33,7 +33,7 @@ public class VersionUtils
             synchronized ( STRICT_VERSION_FILE_PATTERN )
             {
                 return STRICT_VERSION_FILE_PATTERN.matcher( baseVersion ).matches()
-                || baseVersion.endsWith( Artifact.SNAPSHOT_VERSION );   
+                || baseVersion.endsWith( SNAPSHOT_VERSION );   
             }
         }
         else
@@ -41,7 +41,7 @@ public class VersionUtils
             synchronized ( VERSION_FILE_PATTERN )
             {
                 return VERSION_FILE_PATTERN.matcher( baseVersion ).matches()
-                || baseVersion.endsWith( Artifact.SNAPSHOT_VERSION );   
+                || baseVersion.endsWith( SNAPSHOT_VERSION );   
             }
         }
     }

@@ -20,10 +20,9 @@ import java.util.zip.ZipFile;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.maven.model.Model;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -195,30 +194,35 @@ public class MinimalArtifactInfoIndexCreator
 
             ZipEntry entry = jf.getEntry( "META-INF/maven/plugin.xml" );
 
-            if ( entry != null )
+            if ( entry == null )
             {
-                is = new BufferedInputStream( jf.getInputStream( entry ) );
+                return;
+            }
 
-                PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
+            is = new BufferedInputStream( jf.getInputStream( entry ) );
 
-                PluginDescriptor descriptor = builder.build( new InputStreamReader( is ) );
+            PlexusConfiguration plexusConfig = new XmlPlexusConfiguration( Xpp3DomBuilder.build( new InputStreamReader(
+                is ) ) );
 
-                ai.prefix = descriptor.getGoalPrefix();
+            ai.prefix = plexusConfig.getChild( "goalPrefix" ).getValue();
 
-                ai.goals = new ArrayList<String>();
+            ai.goals = new ArrayList<String>();
 
-                for ( Object o : descriptor.getMojos() )
-                {
-                    ai.goals.add( ( (MojoDescriptor) o ).getGoal() );
-                }
+            PlexusConfiguration[] mojoConfigs = plexusConfig.getChild( "mojos" ).getChildren( "mojo" );
+
+            for ( PlexusConfiguration mojoConfig : mojoConfigs )
+            {
+                ai.goals.add( mojoConfig.getChild( "goal" ).getValue() );
             }
         }
         catch ( Exception e )
         {
+            getLogger().info( "Failed to parsing Maven plugin " + artifact.getAbsolutePath(), e );
         }
         finally
         {
             close( jf );
+
             IOUtil.close( is );
         }
     }
