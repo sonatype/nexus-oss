@@ -54,6 +54,8 @@ public class DefaultIndexingContext
     private static final String VERSION = "1.0";
 
     private static final Term DESCRIPTOR_TERM = new Term( FLD_DESCRIPTOR, FLD_DESCRIPTOR_CONTENTS );
+    
+    private Object indexLock = new Object();
 
     private Directory indexDirectory;
 
@@ -249,11 +251,12 @@ public class DefaultIndexingContext
 
         hdr.add( new Field( FLD_DESCRIPTOR, FLD_DESCRIPTOR_CONTENTS, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
 
-        hdr.add( new Field(
-            FLD_IDXINFO,
-            VERSION + ArtifactInfo.FS + getRepositoryId(),
-            Field.Store.YES,
-            Field.Index.NO ) );
+        hdr
+            .add( new Field(
+                FLD_IDXINFO,
+                VERSION + ArtifactInfo.FS + getRepositoryId(),
+                Field.Store.YES,
+                Field.Index.NO ) );
 
         IndexWriter w = getIndexWriter();
 
@@ -353,47 +356,61 @@ public class DefaultIndexingContext
         return analyzer;
     }
 
-    public synchronized IndexWriter getIndexWriter()
+    public IndexWriter getIndexWriter()
         throws IOException
     {
-        if ( indexWriter == null || indexWriter.isClosed() )
+        synchronized ( indexLock )
         {
-            indexWriter = new NexusIndexWriter( indexDirectory, analyzer, false );
+            if ( indexWriter == null || indexWriter.isClosed() )
+            {
+                indexWriter = new NexusIndexWriter( indexDirectory, analyzer, false );
 
-            indexWriter.setRAMBufferSizeMB( 2 );
+                indexWriter.setRAMBufferSizeMB( 2 );
+            }
+
+            return indexWriter;
         }
-        return indexWriter;
     }
 
-    public synchronized IndexReader getIndexReader()
+    public IndexReader getIndexReader()
         throws IOException
     {
-        if ( indexReader == null || !indexReader.isCurrent() )
+        synchronized ( indexLock )
         {
-            if ( indexReader != null )
+            if ( indexReader == null || !indexReader.isCurrent() )
             {
-                indexReader.close();
+                if ( indexReader != null )
+                {
+                    indexReader.close();
+                }
+
+                indexReader = IndexReader.open( indexDirectory );
             }
-            indexReader = IndexReader.open( indexDirectory );
+
+            return indexReader;
         }
-        return indexReader;
     }
 
-    public synchronized IndexSearcher getIndexSearcher()
+    public IndexSearcher getIndexSearcher()
         throws IOException
     {
-        if ( indexSearcher == null || getIndexReader() != indexSearcher.getIndexReader() )
+        synchronized ( indexLock )
         {
-            if ( indexSearcher != null )
+            if ( indexSearcher == null || getIndexReader() != indexSearcher.getIndexReader() )
             {
-                indexSearcher.close();
+                if ( indexSearcher != null )
+                {
+                    indexSearcher.close();
 
-                // the reader was supplied explicitly
-                indexSearcher.getIndexReader().close();
+                    // the reader was supplied explicitly
+                    indexSearcher.getIndexReader().close();
+                }
+
+                indexSearcher = new IndexSearcher( getIndexReader() );
             }
-            indexSearcher = new IndexSearcher( getIndexReader() );
+
+            return indexSearcher;
         }
-        return indexSearcher;
     }
 
     public void optimize()
@@ -401,8 +418,17 @@ public class DefaultIndexingContext
             IOException
     {
         IndexWriter w = getIndexWriter();
-        w.optimize();
-        w.flush();
+
+        try
+        {
+            w.optimize();
+
+            w.flush();
+        }
+        finally
+        {
+            w.close();
+        }
     }
 
     public void close( boolean deleteFiles )
@@ -410,17 +436,21 @@ public class DefaultIndexingContext
     {
         if ( indexDirectory != null )
         {
-            IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
-
-            closeReaders();
-
-            if ( deleteFiles )
+            synchronized ( indexLock )
             {
-                deleteIndexFiles();
-            }
+                IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
 
-            indexDirectory.close();
+                closeReaders();
+
+                if ( deleteFiles )
+                {
+                    deleteIndexFiles();
+                }
+
+                indexDirectory.close();
+            }
         }
+
         // TODO: this will prevent from reopening them, but needs better solution
         indexDirectory = null;
     }
@@ -428,7 +458,7 @@ public class DefaultIndexingContext
     public void purge()
         throws IOException
     {
-        if ( indexDirectory != null )
+        synchronized ( indexLock )
         {
             closeReaders();
 
@@ -449,6 +479,113 @@ public class DefaultIndexingContext
         }
     }
 
+    // XXX need some locking for reader/writer
+    public void replace( Directory directory )
+        throws IOException
+    {
+        synchronized ( indexLock )
+        {
+            closeReaders();
+
+            deleteIndexFiles();
+
+            Directory.copy( directory, indexDirectory, false );
+
+            // reclaim the index as mine
+            storeDescriptor();
+
+            timestamp = IndexUtils.getTimestamp( directory );
+
+            IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
+
+            optimize();
+        }
+    }
+
+    public void merge( Directory directory )
+        throws IOException
+    {
+        merge( directory, null );
+    }
+
+    public void merge( Directory directory, DocumentFilter filter )
+        throws IOException
+    {
+        synchronized ( indexLock )
+        {
+            closeReaders();
+
+            IndexWriter w = getIndexWriter();
+
+            IndexSearcher s = getIndexSearcher();
+
+            IndexReader r = IndexReader.open( directory );
+
+            try
+            {
+                int numDocs = r.maxDoc();
+
+                for ( int i = 0; i < numDocs; i++ )
+                {
+                    if ( r.isDeleted( i ) )
+                    {
+                        continue;
+                    }
+
+                    Document d = r.document( i );
+
+                    if ( filter != null && !filter.accept( d ) )
+                    {
+                        continue;
+                    }
+
+                    String uinfo = d.get( ArtifactInfo.UINFO );
+
+                    if ( uinfo != null )
+                    {
+                        Hits hits = s.search( new TermQuery( new Term( ArtifactInfo.UINFO, uinfo ) ) );
+
+                        if ( hits.length() == 0 )
+                        {
+                            w.addDocument( IndexUtils.updateDocument( d, this ) );
+                        }
+                    }
+                    else
+                    {
+                        String deleted = d.get( ArtifactInfo.DELETED );
+
+                        if ( deleted != null )
+                        {
+                            w.deleteDocuments( new Term( ArtifactInfo.UINFO, deleted ) );
+                        }
+                    }
+                }
+
+            }
+            finally
+            {
+                r.close();
+                closeReaders();
+            }
+
+            rebuildGroups();
+
+            Date mergedTimestamp = IndexUtils.getTimestamp( directory );
+
+            if ( getTimestamp() != null && mergedTimestamp != null && mergedTimestamp.after( getTimestamp() ) )
+            {
+                // we have both, keep the newest
+                updateTimestamp( true, mergedTimestamp );
+            }
+            else
+            {
+                updateTimestamp( true );
+            }
+
+            optimize();
+        }
+    }
+
     private void closeReaders()
         throws CorruptIndexException,
             IOException
@@ -459,6 +596,7 @@ public class DefaultIndexingContext
             {
                 indexWriter.close();
             }
+
             indexWriter = null;
         }
         if ( indexSearcher != null )
@@ -473,109 +611,9 @@ public class DefaultIndexingContext
         if ( indexReader != null )
         {
             indexReader.close();
+
             indexReader = null;
         }
-    }
-
-    // XXX need some locking for reader/writer
-    public void replace( Directory directory )
-        throws IOException
-    {
-        closeReaders();
-
-        deleteIndexFiles();
-
-        Directory.copy( directory, indexDirectory, false );
-
-        // reclaim the index as mine
-        storeDescriptor();
-
-        timestamp = IndexUtils.getTimestamp( directory );
-
-        IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
-
-        optimize();
-    }
-
-    public void merge( Directory directory )
-        throws IOException
-    {
-        merge( directory, null );
-    }
-
-    public void merge( Directory directory, DocumentFilter filter )
-        throws IOException
-    {
-        closeReaders();
-
-        IndexWriter w = getIndexWriter();
-
-        IndexSearcher s = getIndexSearcher();
-
-        IndexReader r = IndexReader.open( directory );
-
-        try
-        {
-            int numDocs = r.maxDoc();
-
-            for ( int i = 0; i < numDocs; i++ )
-            {
-                if ( r.isDeleted( i ) )
-                {
-                    continue;
-                }
-
-                Document d = r.document( i );
-
-                if ( filter != null && !filter.accept( d ) )
-                {
-                    continue;
-                }
-
-                String uinfo = d.get( ArtifactInfo.UINFO );
-
-                if ( uinfo != null )
-                {
-                    Hits hits = s.search( new TermQuery( new Term( ArtifactInfo.UINFO, uinfo ) ) );
-
-                    if ( hits.length() == 0 )
-                    {
-                        w.addDocument( IndexUtils.updateDocument( d, this ) );
-                    }
-                }
-                else
-                {
-                    String deleted = d.get( ArtifactInfo.DELETED );
-
-                    if ( deleted != null )
-                    {
-                        w.deleteDocuments( new Term( ArtifactInfo.UINFO, deleted ) );
-                    }
-                }
-            }
-
-        }
-        finally
-        {
-            r.close();
-            closeReaders();
-        }
-
-        rebuildGroups();
-
-        Date mergedTimestamp = IndexUtils.getTimestamp( directory );
-
-        if ( getTimestamp() != null && mergedTimestamp != null && mergedTimestamp.after( getTimestamp() ) )
-        {
-            // we have both, keep the newest
-            updateTimestamp( true, mergedTimestamp );
-        }
-        else
-        {
-            updateTimestamp( true );
-        }
-
-        optimize();
     }
 
     public GavCalculator getGavCalculator()
@@ -589,13 +627,18 @@ public class DefaultIndexingContext
     }
 
     // groups
-    
-    public void rebuildGroups() throws IOException
+
+    public void rebuildGroups()
+        throws IOException
     {
-        IndexUtils.rebuildGroups( this );
+        synchronized ( indexLock )
+        {
+            IndexUtils.rebuildGroups( this );
+        }
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
      * @see org.sonatype.nexus.index.context.IndexingContext#getAllGroups()
      */
     public Set<String> getAllGroups()
@@ -603,29 +646,29 @@ public class DefaultIndexingContext
     {
         return IndexUtils.getAllGroups( this );
     }
-    
+
     public void setAllGroups( Collection<String> groups )
         throws IOException
     {
         IndexUtils.setAllGroups( this, groups );
     }
-    
+
     public Set<String> getRootGroups()
         throws IOException
     {
         return IndexUtils.getRootGroups( this );
     }
-    
+
     public void setRootGroups( Collection<String> groups )
         throws IOException
     {
         IndexUtils.setRootGroups( this, groups );
     }
-    
+
     @Override
     public String toString()
     {
         return id + " : " + timestamp;
     }
-    
+
 }
