@@ -13,9 +13,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.maven.mercury.artifact.version.ArtifactVersion;
+import org.apache.maven.mercury.artifact.version.DefaultArtifactVersion;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.artifact.ArtifactVersion;
-import org.sonatype.nexus.artifact.DefaultArtifactVersion;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.VersionUtils;
 
@@ -339,6 +339,7 @@ public class ArtifactInfo
     static class VersionComparator
         implements Comparator<ArtifactInfo>
     {
+        @SuppressWarnings("unchecked")
         public int compare( ArtifactInfo f1, ArtifactInfo f2 )
         {
             int n = f1.groupId.compareTo( f2.groupId );

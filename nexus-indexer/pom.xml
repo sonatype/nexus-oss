@@ -23,6 +23,7 @@
 
   <properties>
     <archetype.version>2.0-alpha-1</archetype.version>
+    <mercury.version>1.0-alpha-5</mercury.version>
   </properties>
 
   <!-- override the snapshot included in Maven -->
@@ -84,6 +85,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+	<!-- Mercury -->
+	<dependency>
+		<groupId>org.apache.maven.mercury</groupId>
+		<artifactId>mercury-artifact</artifactId>
+		<version>${mercury.version}</version>
+	</dependency>
 
     <!-- Wagon -->
     <dependency>
