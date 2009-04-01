@@ -23,7 +23,8 @@ import org.sonatype.nexus.index.context.IndexCreator;
  */
 @Component( role = IndexCreator.class, hint = "jarContent" )
 public class JarFileContentsIndexCreator
-    extends AbstractIndexCreator implements LegacyDocumentUpdater
+    extends AbstractIndexCreator
+    implements LegacyDocumentUpdater
 {
 
     public void populateArtifactInfo( ArtifactContext artifactContext )
@@ -49,16 +50,35 @@ public class JarFileContentsIndexCreator
 
     public void updateLegacyDocument( ArtifactInfo ai, Document doc )
     {
-        updateDocument( ai, doc );
+        if ( ai.classNames != null )
+        {
+            String classNames = ai.classNames;
+
+            // downgrade the classNames if needed
+            if ( classNames.length() > 0 && classNames.charAt( 0 ) == '/' )
+            {
+                // conversion from the new format
+                String[] lines = classNames.split( "\\n" );
+                StringBuilder sb = new StringBuilder();
+                for ( String line : lines )
+                {
+                    sb.append( line.substring( 1 ) ).append( '\n' );
+                }
+
+                classNames = sb.toString();
+            }
+
+            doc.add( new Field( ArtifactInfo.NAMES, classNames, Field.Store.COMPRESS, Field.Index.TOKENIZED ) );
+        }
     }
-    
+
     public boolean updateArtifactInfo( Document doc, ArtifactInfo artifactInfo )
     {
         String names = doc.get( ArtifactInfo.NAMES );
 
         if ( names != null )
         {
-            if( names.length() == 0 || names.charAt( 0 ) == '/' )
+            if ( names.length() == 0 || names.charAt( 0 ) == '/' )
             {
                 artifactInfo.classNames = names;
             }
@@ -108,11 +128,11 @@ public class JarFileContentsIndexCreator
 
                     if ( i == -1 )
                     {
-                        if( name.charAt( 0 ) != '/' )
+                        if ( name.charAt( 0 ) != '/' )
                         {
                             sb.append( '/' );
                         }
-                        
+
                         // class name without ".class"
                         sb.append( name.substring( 0, name.length() - 6 ) ).append( '\n' );
                     }
