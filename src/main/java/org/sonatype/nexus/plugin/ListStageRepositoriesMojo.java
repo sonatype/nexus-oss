@@ -26,7 +26,7 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
-import org.sonatype.nexus.restlight.common.SimpleRESTClientException;
+import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
 
@@ -93,7 +93,7 @@ public class ListStageRepositoriesMojo
         {
             client = new StageClient( nexusUrl, username, password );
         }
-        catch ( SimpleRESTClientException e )
+        catch ( RESTLightClientException e )
         {
             throw new MojoExecutionException( "Failed to open staging client: " + e.getMessage(), e );
         }
@@ -103,7 +103,7 @@ public class ListStageRepositoriesMojo
         {
             openRepositories = client.getOpenStageRepositoriesForUser();
         }
-        catch ( SimpleRESTClientException e )
+        catch ( RESTLightClientException e )
         {
             throw new MojoExecutionException( "Failed to find open staging repository: " + e.getMessage(), e );
         }
@@ -137,7 +137,7 @@ public class ListStageRepositoriesMojo
         {
             closedStageRepositories = client.getClosedStageRepositoriesForUser();
         }
-        catch ( SimpleRESTClientException e )
+        catch ( RESTLightClientException e )
         {
             throw new MojoExecutionException( "Failed to list closed staging repositories: " + e.getMessage(), e );
         }

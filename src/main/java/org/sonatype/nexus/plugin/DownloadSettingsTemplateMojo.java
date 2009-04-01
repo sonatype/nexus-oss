@@ -30,7 +30,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.sonatype.nexus.restlight.common.SimpleRESTClientException;
+import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.m2settings.M2SettingsClient;
 
 import java.io.File;
@@ -260,7 +260,7 @@ public class DownloadSettingsTemplateMojo
         {
             client = new M2SettingsClient( baseUrl, username, password );
         }
-        catch ( SimpleRESTClientException e )
+        catch ( RESTLightClientException e )
         {
             throw new MojoExecutionException( "Failed to start REST client: " + e.getMessage(), e );
         }
@@ -269,7 +269,7 @@ public class DownloadSettingsTemplateMojo
         {
             return client.getSettingsTemplateAbsolute( url );
         }
-        catch ( SimpleRESTClientException e )
+        catch ( RESTLightClientException e )
         {
             throw new MojoExecutionException( "Failed to retrieve Maven settings.xml from: " + url + "\n(Reason: " + e.getMessage() + ")" , e );
         }

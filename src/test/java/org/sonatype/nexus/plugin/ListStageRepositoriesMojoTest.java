@@ -11,7 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.plugin.ListStageRepositoriesMojo;
-import org.sonatype.nexus.restlight.common.SimpleRESTClientException;
+import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.testharness.AbstractRESTTest;
 import org.sonatype.nexus.restlight.testharness.ConversationalFixture;
@@ -70,7 +70,7 @@ public class ListStageRepositoriesMojoTest
 
     @Test
     public void simplestUseCase()
-        throws JDOMException, IOException, SimpleRESTClientException, MojoExecutionException
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
         printTestName();
         
@@ -85,7 +85,7 @@ public class ListStageRepositoriesMojoTest
 
     @Test
     public void promptForPassword()
-        throws JDOMException, IOException, SimpleRESTClientException, MojoExecutionException
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
         printTestName();
         
@@ -105,7 +105,7 @@ public class ListStageRepositoriesMojoTest
 
     @Test
     public void promptForNexusURL()
-        throws JDOMException, IOException, SimpleRESTClientException, MojoExecutionException
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
         printTestName();
         
@@ -125,7 +125,7 @@ public class ListStageRepositoriesMojoTest
 
     @Test
     public void authUsingSettings()
-        throws JDOMException, IOException, SimpleRESTClientException, MojoExecutionException
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
         printTestName();
         
