@@ -28,23 +28,14 @@
   </licenses>
   
   <properties>
-    <pluginsRepository>http://repository.sonatype.org/service/local/staging/deploy/maven2</pluginsRepository>
-    <pluginsSnapshotRepository>http://repository.sonatype.org/content/repositories/snapshots</pluginsSnapshotRepository>
+    <forgeSiteUrl>dav:https://sites.sonatype.com/plugins/nexus-maven-plugin</forgeSiteUrl>
   </properties>
   
   <distributionManagement>
     <site>
-      <id>sonatype.plugins.site</id>
-      <url>dav:https://sites.sonatype.com/plugins/nexus-maven-plugin</url>
+      <id>forge-site</id>
+      <url>${forgeSiteUrl}</url>
     </site>
-    <repository>
-      <id>sonatype-releases</id>
-      <url>${pluginsRepository}</url>
-    </repository>
-    <snapshotRepository>
-      <id>sonatype-releases</id>
-      <url>${pluginsSnapshotRepository}</url>
-    </snapshotRepository>
   </distributionManagement>
   
 	<description>
