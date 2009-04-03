@@ -1,30 +1,24 @@
+/*
+ * Nexus Plugin for Maven
+ * Copyright (C) 2009 Sonatype, Inc.                                                                                                                          
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ *
+ */
 package org.sonatype.nexus.plugin;
 
-/*
- * Copyright 2001-2005 The Apache Software Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.SimpleLayout;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.settings.Server;
-import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.IOUtil;
 import org.jdom.Document;
@@ -42,80 +36,84 @@ import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
 /**
- * Download a settings.xml template into the local maven instance, either into $maven.home/conf or into ~/.m2.
+ * <p>
+ * Download a settings.xml template into the local maven instance. Settings can be saved to several locations:
+ * </p>
  * 
- * @goal download
+ * <ul>
+ * <li><b>destination == global</b>: Save to $maven.home/conf</li>
+ * <li><b>destination == user</b>: Save to ~/.m2</li>
+ * <li><b>target == /path/to/settings.xml</b>: Save to <code>/path/to/settings.xml</code></li>
+ * </ul>
+ * 
+ * <p>
+ * Additionally, by default any existing settings.xml file in the way will be backed up using a datestamp to ensure
+ * previous backup files are not overwritten.
+ * </p>
+ * 
+ * @goal settings-download
  * @requiresProject false
  * @aggregator
  */
 // TODO: Remove aggregator annotation once we have a better solution, but we should only run this once per build.
 public class DownloadSettingsTemplateMojo
-    extends AbstractMojo
+    extends AbstractNexusMojo
 {
-    
-    /**
-     * @component roleHint="jline"
-     */
-    private Prompter prompter;
 
     /**
+     * The full URL of a settings template available from a particular Nexus Professional instance. If missing, the mojo
+     * will prompt for this value.
+     * 
      * @parameter expression="${url}"
      */
     private String url;
-    
-    /**
-     * @parameter expression="${serverAuthId}"
-     */
-    private String serverAuthId;
 
     /**
-     * @parameter expression="${username}" default-value="${user.name}"
-     */
-    private String username;
-
-    /**
-     * @parameter expression="${password}"
-     */
-    private String password;
-
-    /**
+     * The standard destination where the downloaded settings.xml template should be saved. The <a
+     * href="#target">target</a> parameter will override this value.
+     * 
      * @parameter expression="${destination}" default-value="user"
      */
     private String destination;
-    
+
     /**
+     * If true and there is a pre-existing settings.xml file in the way of this download, backup the file to a
+     * datestamped filename, where the specific format of the datestamp is given by the <a
+     * href="#backupFormat">backupFormat</a> parameter.
+     * 
      * @parameter expression="${doBackup}" default-value="true"
      */
     private boolean doBackup;
 
     /**
+     * When backing up an existing settings.xml file, use this date format in conjunction with {@link SimpleDateFormat}
+     * to construct a new filename of the form: <code>settings.xml.$(format)</code>. Datestamps are used for backup
+     * copies of the settings.xml to avoid overwriting previously backed up settings files. This protects against the
+     * case where the download mojo is used multiple times with incorrect settings, where using a single static
+     * backup-file name would destroy the original, pre-existing settings.
+     * 
      * @parameter expression="${backupFormat}" default-value="yyyyMMdd_HHmmss"
      */
     private String backupFormat;
-    
+
     /**
-     * @parameter expression="${verboseDebug}" default-value="false"
-     */
-    private boolean verboseDebug;
-    
-    /**
+     * If set, ignore the standard location given by the <a href="#destination">destination</a> parameter, and use this
+     * file location to save the settings template instead. If this file exists, it will be backed up using the same
+     * logic as the standard locations (using the <a href="#doBackup">doBackup</a> and <a
+     * href="#backupFormat">backupFormat</a> parameters).
+     * 
      * @parameter expression="${target}"
      */
     private File target;
-    
+
     /**
+     * Use this parameter to define a non-default encoding for the settings file.
+     * 
      * @parameter expression="${encoding}"
      */
     private String encoding;
 
-    /**
-     * @parameter default-value="${settings}"
-     * @readonly
-     */
-    private Settings settings;
-    
     /**
      * @parameter default-value="${maven.home}/conf"
      * @readonly
@@ -129,44 +127,20 @@ public class DownloadSettingsTemplateMojo
     private File mavenUserConf;
 
     public void execute()
-        throws MojoExecutionException
+    throws MojoExecutionException
     {
         fillMissing();
-        
+
         initLog4j();
-        
+
         Document settingsDoc = downloadSettings();
-        
+
         save( settingsDoc );
-        
+
     }
 
-    private void initLog4j()
-    {
-        if ( getLog().isDebugEnabled() )
-        {
-            if ( verboseDebug )
-            {
-                LogManager.getRootLogger().setLevel( Level.DEBUG );
-            }
-            else
-            {
-                LogManager.getRootLogger().setLevel( Level.INFO );
-            }
-        }
-        else
-        {
-            LogManager.getRootLogger().setLevel( Level.WARN );
-        }
-        
-        if ( !LogManager.getRootLogger().getAllAppenders().hasMoreElements() )
-        {
-            LogManager.getRootLogger().addAppender( new ConsoleAppender( new SimpleLayout() ) );
-        }
-    }
-
-    private void save( Document settingsDoc )
-        throws MojoExecutionException
+    private void save( final Document settingsDoc )
+    throws MojoExecutionException
     {
         File f = target;
         if ( f == null )
@@ -175,45 +149,45 @@ public class DownloadSettingsTemplateMojo
             if ( dest == null )
             {
                 getLog().warn(
-                               "Destination parameter is invalid; using: " + SettingsDestination.user
-                                   + ". Please specify either '" + SettingsDestination.global.toString() + "' or '" + SettingsDestination.user.toString() + "'." );
-                
+                              "Destination parameter is invalid; using: " + SettingsDestination.user
+                              + ". Please specify either '" + SettingsDestination.global.toString() + "' or '" + SettingsDestination.user.toString() + "'." );
+
                 dest = SettingsDestination.user;
             }
-            
+
             if ( SettingsDestination.global == dest )
             {
                 getLog().debug( "Saving settings to global maven config directory: " + mavenHomeConf );
-                
+
                 f = new File( mavenHomeConf, "settings.xml" );
             }
             else
             {
                 getLog().debug( "Saving settings to user config directory: " + mavenUserConf );
-                
+
                 f = new File( mavenUserConf, "settings.xml" );
             }
         }
-        
+
         f = f.getAbsoluteFile();
         getLog().debug( "Settings will be saved to: " + f.getAbsolutePath() );
-        
+
         if ( doBackup && f.exists() )
         {
             String backupString = new SimpleDateFormat( backupFormat ).format( new Date() );
-            
+
             File b = new File( f.getParentFile(), "settings.xml." + backupString );
-            
+
             getLog().debug( "Backing up old settings to: " + b.getAbsolutePath() );
             if ( !f.renameTo( b ) )
             {
                 throw new MojoExecutionException( "Cannot rename existing settings to backup file.\nExisting file: "
-                    + f.getAbsolutePath() + "\nBackup file: " + b.getAbsolutePath() );
+                                                  + f.getAbsolutePath() + "\nBackup file: " + b.getAbsolutePath() );
             }
-            
+
             getLog().info( "Existing settings backed up to: " + b.getAbsolutePath() );
         }
-        
+
         Writer w = null;
         try
         {
@@ -225,7 +199,7 @@ public class DownloadSettingsTemplateMojo
             {
                 w = new FileWriter( f );
             }
-            
+
             new XMLOutputter( Format.getPrettyFormat() ).output( settingsDoc, w );
         }
         catch ( IOException e )
@@ -236,12 +210,12 @@ public class DownloadSettingsTemplateMojo
         {
             IOUtil.close( w );
         }
-        
+
         getLog().info( "Settings saved to: " + f.getAbsolutePath() );
     }
 
     private Document downloadSettings()
-        throws MojoExecutionException
+    throws MojoExecutionException
     {
         String baseUrl;
 
@@ -254,17 +228,17 @@ public class DownloadSettingsTemplateMojo
         {
             baseUrl = url.substring( 0, svcIdx );
         }
-        
+
         M2SettingsClient client;
         try
         {
-            client = new M2SettingsClient( baseUrl, username, password );
+            client = new M2SettingsClient( baseUrl, getUsername(), getPassword() );
         }
         catch ( RESTLightClientException e )
         {
             throw new MojoExecutionException( "Failed to start REST client: " + e.getMessage(), e );
         }
-        
+
         try
         {
             return client.getSettingsTemplateAbsolute( url );
@@ -275,14 +249,15 @@ public class DownloadSettingsTemplateMojo
         }
     }
 
-    private void fillMissing()
+    @Override
+    protected void fillMissing()
         throws MojoExecutionException
     {
         while ( url == null || url.trim().length() < 1 )
         {
             try
             {
-                url = prompter.prompt( "Nexus URL: " );
+                url = getPrompter().prompt( "Settings Template URL: " );
             }
             catch ( PrompterException e )
             {
@@ -290,42 +265,7 @@ public class DownloadSettingsTemplateMojo
             }
         }
 
-        if ( serverAuthId != null )
-        {
-            Server server = settings == null ? null : settings.getServer( serverAuthId );
-            if ( server != null )
-            {
-                username = server.getUsername();
-                password = server.getPassword();
-            }
-            else
-            {
-                getLog().debug( "Server entry not found for: '" + serverAuthId + "'." );
-            }
-        }
-
-        while ( password == null || password.trim().length() < 1 )
-        {
-            try
-            {
-                password = prompter.promptForPassword( "Password: " );
-            }
-            catch ( PrompterException e )
-            {
-                throw new MojoExecutionException( "Failed to read from CLI prompt: " + e.getMessage(), e );
-            }
-        }
-
-    }
-
-    public Prompter getPrompter()
-    {
-        return prompter;
-    }
-
-    public void setPrompter( Prompter prompter )
-    {
-        this.prompter = prompter;
+        super.fillMissing();
     }
 
     public String getUrl()
@@ -333,39 +273,9 @@ public class DownloadSettingsTemplateMojo
         return url;
     }
 
-    public void setUrl( String url )
+    public void setUrl( final String url )
     {
         this.url = url;
-    }
-
-    public String getServerAuthId()
-    {
-        return serverAuthId;
-    }
-
-    public void setServerAuthId( String serverAuthId )
-    {
-        this.serverAuthId = serverAuthId;
-    }
-
-    public String getUsername()
-    {
-        return username;
-    }
-
-    public void setUsername( String username )
-    {
-        this.username = username;
-    }
-
-    public String getPassword()
-    {
-        return password;
-    }
-
-    public void setPassword( String password )
-    {
-        this.password = password;
     }
 
     public String getDestination()
@@ -373,7 +283,7 @@ public class DownloadSettingsTemplateMojo
         return destination;
     }
 
-    public void setDestination( String destination )
+    public void setDestination( final String destination )
     {
         this.destination = destination;
     }
@@ -383,7 +293,7 @@ public class DownloadSettingsTemplateMojo
         return doBackup;
     }
 
-    public void setDoBackup( boolean doBackup )
+    public void setDoBackup( final boolean doBackup )
     {
         this.doBackup = doBackup;
     }
@@ -393,19 +303,9 @@ public class DownloadSettingsTemplateMojo
         return backupFormat;
     }
 
-    public void setBackupFormat( String backupFormat )
+    public void setBackupFormat( final String backupFormat )
     {
         this.backupFormat = backupFormat;
-    }
-
-    public boolean isVerboseDebug()
-    {
-        return verboseDebug;
-    }
-
-    public void setVerboseDebug( boolean verboseDebug )
-    {
-        this.verboseDebug = verboseDebug;
     }
 
     public File getTarget()
@@ -413,7 +313,7 @@ public class DownloadSettingsTemplateMojo
         return target;
     }
 
-    public void setTarget( File target )
+    public void setTarget( final File target )
     {
         this.target = target;
     }
@@ -423,19 +323,9 @@ public class DownloadSettingsTemplateMojo
         return encoding;
     }
 
-    public void setEncoding( String encoding )
+    public void setEncoding( final String encoding )
     {
         this.encoding = encoding;
-    }
-
-    public Settings getSettings()
-    {
-        return settings;
-    }
-
-    public void setSettings( Settings settings )
-    {
-        this.settings = settings;
     }
 
     public File getMavenHomeConf()
@@ -443,7 +333,7 @@ public class DownloadSettingsTemplateMojo
         return mavenHomeConf;
     }
 
-    public void setMavenHomeConf( File mavenHomeConf )
+    public void setMavenHomeConf( final File mavenHomeConf )
     {
         this.mavenHomeConf = mavenHomeConf;
     }
@@ -453,7 +343,7 @@ public class DownloadSettingsTemplateMojo
         return mavenUserConf;
     }
 
-    public void setMavenUserConf( File mavenUserConf )
+    public void setMavenUserConf( final File mavenUserConf )
     {
         this.mavenUserConf = mavenUserConf;
     }

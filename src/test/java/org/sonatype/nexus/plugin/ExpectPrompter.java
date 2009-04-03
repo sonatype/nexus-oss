@@ -1,3 +1,21 @@
+/*
+ * Nexus Plugin for Maven
+ * Copyright (C) 2009 Sonatype, Inc.                                                                                                                          
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ *
+ */
 package org.sonatype.nexus.plugin;
 
 import static junit.framework.Assert.fail;
@@ -15,53 +33,53 @@ public class ExpectPrompter
     implements Prompter
 {
     
-    private Map<String, String> expectations = new LinkedHashMap<String, String>();
-    private Set<String> used = new HashSet<String>();
+    private final Map<String, String> expectations = new LinkedHashMap<String, String>();
+    private final Set<String> used = new HashSet<String>();
     
-    public void addExpectation( String promptSubstr, String response )
+    public void addExpectation( final String promptSubstr, final String response )
     {
         expectations.put( promptSubstr, response );
     }
 
-    public String prompt( String prompt )
+    public String prompt( final String prompt )
         throws PrompterException
     {
         return expectationFor( prompt );
     }
 
-    public String prompt( String prompt, String defVal )
-        throws PrompterException
-    {
-        return expectationFor( prompt );
-    }
-
-    @SuppressWarnings("unchecked")
-    public String prompt( String prompt, List values )
+    public String prompt( final String prompt, final String defVal )
         throws PrompterException
     {
         return expectationFor( prompt );
     }
 
     @SuppressWarnings("unchecked")
-    public String prompt( String prompt, List values, String defVal )
+    public String prompt( final String prompt, final List values )
         throws PrompterException
     {
         return expectationFor( prompt );
     }
 
-    public String promptForPassword( String prompt )
+    @SuppressWarnings("unchecked")
+    public String prompt( final String prompt, final List values, final String defVal )
         throws PrompterException
     {
         return expectationFor( prompt );
     }
 
-    public void showMessage( String prompt )
+    public String promptForPassword( final String prompt )
+        throws PrompterException
+    {
+        return expectationFor( prompt );
+    }
+
+    public void showMessage( final String prompt )
         throws PrompterException
     {
         System.out.println( prompt );
     }
 
-    private String expectationFor( String prompt )
+    private String expectationFor( final String prompt )
     {
         System.out.print( prompt );
         

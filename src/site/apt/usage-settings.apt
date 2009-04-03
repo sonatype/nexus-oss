@@ -1,0 +1,47 @@
+  ---
+  Nexus Plugin for Maven: Working with the Staging Suite
+  ---
+  John Casey
+  ---
+  April 2, 2009
+  ---
+
+Plugin Usage: Working with Nexus Professional's Maven Settings Templates
+
+  Starting with version 1.3.2, Nexus Professional includes a feature called {{{http://www.sonatype.com/products/nexus/overview/features/m2-settings}Maven Settings Templates}}, which allows
+  users the appropriate permissions to define a template <<<settings.xml>>> file that contains the proper <<<server>>> entries for logging into that Nexus instance, among other things.
+  Once defined, users can login and download a <<<settings.xml>>> file which is customized to fit each user, but still retains the consistency that development teams need when writing an
+  application and using common infrastructure.
+  
+  The Nexus Plugin for Maven gives users access to this feature from the Maven command line.
+
+* Using an Absolute URL
+
+  The basic command is:
+  
++---+
+mvn nexus:settings-download
++---+
+
+  and the console output will resemble the following:
+  
++---+
+[INFO] Existing settings backed up to: /Users/jdcasey/.m2/settings.xml.20090402_204422
+[INFO] Settings saved to: /Users/jdcasey/.m2/settings.xml
++---+
+
+** TIP: Required Information
+
+  In order to access the settings templates in your Nexus instance, the plugin must be told where Nexus is. Additionally, in most cases a valid user login will be required for access. By
+  default, if you don't specify the <<<url>>> and <<<password>>> parameters, the plugin will prompt you for them. If you don't specify the <<<username>>> parameter, the Java System 
+  property <<<$\{user.name\}>>> will be used.
+  
+  For example:
+  
++---+
+[...]
+Settings Template URL: http://localhost:8082/nexus/service/local/templates/settings/myTeam/content
+Password: ********
+[...]
++---+
+

@@ -1,0 +1,21 @@
+<project name="${project.name}">
+  <publishDate position="left"/>
+  <version position="left"/>
+  <body>
+    <links>
+      <item name="Nexus Professional" href="http://www.sonatype.com/products/nexus/"/>
+      <item name="Nexus" href="http://nexus.sonatype.org/"/>
+      <item name="Maven" href="http://maven.apache.org/"/>
+    </links>
+    <menu name="Overview">
+      <item name="Introduction" href="index.html"/>
+      <item name="Goals" href="plugin-info.html"/>
+      <item name="Usage">
+        <item name="Staging" href="usage-staging.html"/>
+        <item name="Settings" href="usage-settings.html"/>
+      </item>
+    </menu>
+    <menu ref="reports"/>
+  </body>
+</project>
+      

@@ -1,3 +1,21 @@
+/*
+ * Nexus Plugin for Maven
+ * Copyright (C) 2009 Sonatype, Inc.                                                                                                                          
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ *
+ */
 package org.sonatype.nexus.plugin;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -10,7 +28,6 @@ import org.jdom.JDOMException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.plugin.FinishStageRepositoryMojo;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.testharness.AbstractRESTTest;
@@ -31,9 +48,9 @@ public class FinishStageRepositoryMojoTest
     extends AbstractRESTTest
 {
 
-    private ConversationalFixture fixture = new ConversationalFixture();
+    private final ConversationalFixture fixture = new ConversationalFixture();
 
-    private Set<File> toDelete = new HashSet<File>();
+    private final Set<File> toDelete = new HashSet<File>();
 
     private Log log;
 
@@ -166,7 +183,7 @@ public class FinishStageRepositoryMojoTest
         runMojo( mojo );
     }
 
-    private void runMojo( FinishStageRepositoryMojo mojo )
+    private void runMojo( final FinishStageRepositoryMojo mojo )
         throws JDOMException, IOException, MojoExecutionException
     {
         mojo.setLog( log );
