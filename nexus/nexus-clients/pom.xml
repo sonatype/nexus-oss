@@ -12,5 +12,6 @@
   <description />
   <modules>
   	<module>nexus-rest-client-java</module>
+  	<module>nexus-restlight-clients</module>
   </modules>
 </project>
