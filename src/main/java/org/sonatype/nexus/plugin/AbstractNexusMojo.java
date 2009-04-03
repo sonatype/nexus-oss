@@ -66,7 +66,13 @@ extends AbstractMojo
     private Settings settings;
 
     /**
+     * <p>
      * If set to true, enable the debug log-level inside commons-httpclient (used to interact with Nexus).
+     * </p>
+     * <p>
+     * <b>NOTE:</b> This parameter will ONLY work when used with the -X Maven switch (which enables debug logging for
+     * the build).
+     * </p>
      * 
      * @parameter expression="${verboseDebug}" default-value="false"
      */

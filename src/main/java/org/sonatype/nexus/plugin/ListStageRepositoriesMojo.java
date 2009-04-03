@@ -69,9 +69,18 @@ public class ListStageRepositoriesMojo
                     builder.append( "\n\n-  " )
                            .append( openRepo.getRepositoryId() )
                            .append( " (profile: " )
-                           .append( openRepo.getProfileId() )
-                           .append( ")\n   URL:" )
-                           .append( openRepo.getUrl() );
+                           .append( openRepo.getProfileName() )
+                           .append( ")" );
+
+                    if ( openRepo.getUrl() != null )
+                    {
+                        builder.append( "\n   URL:" ).append( openRepo.getUrl() );
+                    }
+
+                    if ( openRepo.getDescription() != null )
+                    {
+                        builder.append( "\n   Description:" ).append( openRepo.getDescription() );
+                    }
                 }
             }
             else

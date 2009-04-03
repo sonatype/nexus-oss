@@ -101,6 +101,7 @@ public class FinishStageRepositoryMojoTest
         mojo.setNexusUrl( getBaseUrl() );
         mojo.setUsername( "testuser" );
         mojo.setPassword( "unused" );
+        mojo.setDescription( "this is a description" );
         
         runMojo( mojo );
     }
@@ -122,6 +123,7 @@ public class FinishStageRepositoryMojoTest
         mojo.setArtifactId( "artifactId" );
         mojo.setGroupId( "group.id" );
         mojo.setVersion( "1" );
+        mojo.setDescription( "this is a description" );
         
         mojo.setNexusUrl( getBaseUrl() );
         mojo.setUsername( "testuser" );
@@ -146,6 +148,7 @@ public class FinishStageRepositoryMojoTest
         mojo.setArtifactId( "artifactId" );
         mojo.setGroupId( "group.id" );
         mojo.setVersion( "1" );
+        mojo.setDescription( "this is a description" );
         
         mojo.setUsername( "testuser" );
         mojo.setPassword( "unused" );
@@ -177,6 +180,7 @@ public class FinishStageRepositoryMojoTest
         mojo.setArtifactId( "artifactId" );
         mojo.setGroupId( "group.id" );
         mojo.setVersion( "1" );
+        mojo.setDescription( "this is a description" );
         
         mojo.setNexusUrl( getBaseUrl() );
         

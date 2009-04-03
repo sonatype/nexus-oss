@@ -37,7 +37,7 @@ public abstract class AbstractStagingMojo
      * @parameter expression="${nexusUrl}"
      */
     private String nexusUrl;
-    
+
     private StageClient client;
 
     public AbstractStagingMojo()
@@ -118,9 +118,18 @@ public abstract class AbstractStagingMojo
                 builder.append( "\n\n-  " )
                        .append( closedRepo.getRepositoryId() )
                        .append( " (profile: " )
-                       .append( closedRepo.getProfileId() )
-                       .append( ")\n   URL:" )
-                       .append( closedRepo.getUrl() );
+                       .append( closedRepo.getProfileName() )
+                       .append( ")" );
+
+                if ( closedRepo.getUrl() != null )
+                {
+                    builder.append( "\n   URL:" ).append( closedRepo.getUrl() );
+                }
+
+                if ( closedRepo.getDescription() != null )
+                {
+                    builder.append( "\n   Description:" ).append( closedRepo.getDescription() );
+                }
             }
         }
 

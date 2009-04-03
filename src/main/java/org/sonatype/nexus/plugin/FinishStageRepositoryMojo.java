@@ -19,6 +19,7 @@
 package org.sonatype.nexus.plugin;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
@@ -33,6 +34,13 @@ import org.sonatype.nexus.restlight.stage.StageRepository;
 public class FinishStageRepositoryMojo
     extends AbstractStagingMojo
 {
+
+    /**
+     * The description for the newly finished staging repository. This will show up in the Nexus UI.
+     * 
+     * @parameter expression="${description}"
+     */
+    private String description;
 
     /**
      * The artifact groupId used to select which open staging repository should be finished.
@@ -59,12 +67,12 @@ public class FinishStageRepositoryMojo
     private String version;
 
     public void execute()
-    throws MojoExecutionException
+        throws MojoExecutionException
     {
         fillMissing();
 
         initLog4j();
-        
+
         StageClient client = getClient();
 
         StageRepository openRepo;
@@ -81,24 +89,34 @@ public class FinishStageRepositoryMojo
         {
             StringBuilder builder = new StringBuilder();
             builder.append( "Finishing staging repository for: '" )
-            .append( groupId )
-            .append( ":" )
-            .append( artifactId )
-            .append( ":" )
-            .append( version )
-            .append( "':\n\n-  " )
-            .append( openRepo.getRepositoryId() )
-            .append( " (profile: " )
-            .append( openRepo.getProfileId() )
-            .append( ")\n   URL: " )
-            .append( openRepo.getUrl() )
-            .append( "\n\n" );
+                   .append( groupId )
+                   .append( ":" )
+                   .append( artifactId )
+                   .append( ":" )
+                   .append( version )
+                   .append( "':\n\n-  " )
+                   .append( openRepo.getRepositoryId() )
+                   .append( " (profile: " )
+                   .append( openRepo.getProfileName() )
+                   .append( ")" );
+
+            if ( openRepo.getUrl() != null )
+            {
+                builder.append( "\n   URL:" ).append( openRepo.getUrl() );
+            }
+
+            if ( openRepo.getDescription() != null )
+            {
+                builder.append( "\n   Description:" ).append( openRepo.getDescription() );
+            }
+
+            builder.append( "\n\n" );
 
             getLog().info( builder.toString() );
 
             try
             {
-                client.finishRepository( openRepo );
+                client.finishRepository( openRepo, description );
             }
             catch ( RESTLightClientException e )
             {
@@ -141,6 +159,35 @@ public class FinishStageRepositoryMojo
     public void setVersion( final String version )
     {
         this.version = version;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription( final String description )
+    {
+        this.description = description;
+    }
+
+    @Override
+    protected void fillMissing()
+        throws MojoExecutionException
+    {
+        super.fillMissing();
+
+        while ( getDescription() == null || getDescription().trim().length() < 1 )
+        {
+            try
+            {
+                setDescription( getPrompter().prompt( "Repository Description" ) );
+            }
+            catch ( PrompterException e )
+            {
+                throw new MojoExecutionException( "Failed to read from CLI prompt: " + e.getMessage(), e );
+            }
+        }
     }
 
 }
