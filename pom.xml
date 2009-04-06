@@ -29,7 +29,7 @@
   
   <distributionManagement>
     <site>
-      <id>plugins-site</id>
+      <id>sonatype.org-sites</id>
       <url>${pluginsSiteBaseUrl}/${project.artifactId}</url>
     </site>
   </distributionManagement>

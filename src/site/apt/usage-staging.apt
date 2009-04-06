@@ -37,17 +37,19 @@ mvn nexus:staging-list
 
 [INFO] The following OPEN staging repositories were found: 
 
--  staging-003 (profile: 112cc490b91265a1)
-   URL:http://localhost:8082/nexus/content/repositories/staging-003
+-  staging-003 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-003
 
 
 [INFO] The following FINISHED staging repositories were found: 
 
--  staging-001 (profile: 112cc490b91265a1)
-   URL:http://localhost:8082/nexus/content/repositories/staging-001
+-  staging-001 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-001
+   Description: This is a test repository
    
--  staging-002 (profile: 112cc490b91265a1)
-   URL:http://localhost:8082/nexus/content/repositories/staging-002
+-  staging-002 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-002
+   Description: This is another test repository
 +---+
 
 ** TIP: Required Information
@@ -62,6 +64,7 @@ mvn nexus:staging-list
 [...]
 Nexus URL: http://localhost:8082/nexus
 Password: ********
+Description: This is a test repository
 [...]
 +---+
 
@@ -107,17 +110,19 @@ mvn nexus:finish
 +---+
 [INFO] Finishing staging repository for: 'com.myco:my-project:1':
 
--  staging-002 (profile: 112cc490b91265a1)
+-  staging-002 (profile: Example Profile)
    URL: http://localhost:8082/nexus/content/repositories/staging-002
 
 
 [INFO] The following FINISHED staging repositories were found for: 'com.myco:my-project:1':
 
--  staging-001 (profile: 112cc490b91265a1)
-   URL:http://localhost:8082/nexus/content/repositories/staging-001
+-  staging-001 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-001
+   Description: This is a test repository
    
--  staging-002 (profile: 112cc490b91265a1)
+-  staging-002 (profile: Example Profile)
    URL: http://localhost:8082/nexus/content/repositories/staging-002
+   Description: This is another test repository
 +---+
 
   The output above shows that the <<<staging-finish>>> mojo found an open staging repository - <<<staging-001>>> - for the current project, then told Nexus to finish it. Afterward, 
@@ -131,10 +136,12 @@ No open staging repositories found. Nothing to do!
 
 [INFO] The following FINISHED staging repositories were found for: 'com.myco:my-project:1':
 
--  staging-001 (profile: 112cc490b91265a1)
-   URL:http://localhost:8082/nexus/content/repositories/staging-001
+-  staging-001 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-001
+   Description: This is a test repository
    
--  staging-002 (profile: 112cc490b91265a1)
+-  staging-002 (profile: Example Profile)
    URL: http://localhost:8082/nexus/content/repositories/staging-002
+   Description: This is another test repository
 +---+
 
