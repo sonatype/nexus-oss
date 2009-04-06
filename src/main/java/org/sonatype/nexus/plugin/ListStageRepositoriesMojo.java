@@ -74,12 +74,12 @@ public class ListStageRepositoriesMojo
 
                     if ( openRepo.getUrl() != null )
                     {
-                        builder.append( "\n   URL:" ).append( openRepo.getUrl() );
+                        builder.append( "\n   URL: " ).append( openRepo.getUrl() );
                     }
 
                     if ( openRepo.getDescription() != null )
                     {
-                        builder.append( "\n   Description:" ).append( openRepo.getDescription() );
+                        builder.append( "\n   Description: " ).append( openRepo.getDescription() );
                     }
                 }
             }

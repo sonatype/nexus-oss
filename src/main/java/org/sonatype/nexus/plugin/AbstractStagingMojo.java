@@ -123,12 +123,12 @@ public abstract class AbstractStagingMojo
 
                 if ( closedRepo.getUrl() != null )
                 {
-                    builder.append( "\n   URL:" ).append( closedRepo.getUrl() );
+                    builder.append( "\n   URL: " ).append( closedRepo.getUrl() );
                 }
 
                 if ( closedRepo.getDescription() != null )
                 {
-                    builder.append( "\n   Description:" ).append( closedRepo.getDescription() );
+                    builder.append( "\n   Description: " ).append( closedRepo.getDescription() );
                 }
             }
         }
