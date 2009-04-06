@@ -30,7 +30,7 @@
   <distributionManagement>
     <site>
       <id>forge-site</id>
-      <url>${forgeSiteUrl}</url>
+      <url>${pluginsSiteBaseUrl}/${project.artifactId}</url>
     </site>
   </distributionManagement>
   
