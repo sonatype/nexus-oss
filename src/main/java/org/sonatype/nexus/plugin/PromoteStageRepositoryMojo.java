@@ -66,6 +66,8 @@ public class PromoteStageRepositoryMojo
         {
             StageRepository repo = select( repos, "Select a repository to promote" );
             
+            promptForPromoteInfo();
+            
             StringBuilder builder = new StringBuilder();
             builder.append( "Promoting staging repository to: " ).append( getTargetRepositoryId() ).append( ":" );
 
@@ -75,8 +77,6 @@ public class PromoteStageRepositoryMojo
             builder.append( "\n\n" );
 
             getLog().info( builder.toString() );
-
-            promptForPromoteInfo();
             
             try
             {

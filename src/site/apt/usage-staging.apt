@@ -17,6 +17,18 @@ Plugin Usage: Working with the Nexus Professional Staging Suite
   
 * Before You Start: Authentication and Required Information
 
+  All of the mojos below have two important attributes:
+  
+  * If critical information is missing, the mojo will prompt you for it.
+  
+  * If you supply the <<<serverAuthId>>> parameter, it will attempt to read the Nexus URL, username, and password from your <<<settings.xml>>>
+    file using that ID. For the Nexus URL, the mojo will attempt to find a <<<mirror>>> definition with that server ID; for username and password,
+    the <<<server>>> entry with that ID is used directly.
+    
+    If you don't use <<<serverAuthId>>>, or the corresponding entries in your <<<settings.xml>>> cannot be located, you will be prompted
+    for all login information <<except>> username. In this case, the System property <<<$\{user.name\}>>> will be used unless you specify the
+    <<<username>>> parameter.
+
 ** TIP: Using your existing <<<settings.xml>>> configuration to authenticate against Nexus
 
   If you've already configured Maven to authenticate your access to Nexus in order to resolve artifacts, you can reuse this configuration when interacting with Nexus' other functions.
@@ -95,6 +107,8 @@ mvn nexus:staging-list
    Description: This is another test repository
 +---+
 
+  You can find more information about this mojo {{{staging-list-mojo.html}here}}. 
+  
 * Finishing an Open Staging Repository for Your Project
 
   Before your team can run any tests against the set of artifacts that constitute your release, you need to mark the open staging repository as <<finished>>. This means that no additional
@@ -110,6 +124,20 @@ mvn nexus:staging-finish
   If you have one or more open staging repositories that match the current project coordinate, you'll see something like the following in the console output:
   
 +---+
+[INFO] 
+
+
+Available Staging Repositories:
+
+
+1: staging-002 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-002
+
+
+
+Select a repository to finish (1) 1: : 1
+
+Repository Description: This is a test repository
 [INFO] Finishing staging repository for: 'com.myco:my-project:1':
 
 -  staging-002 (profile: Example Profile)
@@ -147,6 +175,8 @@ No open staging repositories found. Nothing to do!
    Description: This is another test repository
 +---+
 
+  You can find more information about this mojo {{{staging-finish-mojo.html}here}}. 
+  
 * Dropping a Closed Staging Repository
 
   In the unfortunate event that your project artifacts fail during testing, you may need to drop the staging repository that houses them, in order to avoid confusing them with newer 
@@ -161,6 +191,24 @@ mvn nexus:staging-drop
   If you have one or more closed staging repositories, you'll see something like the following output:
 
 +---+
+[INFO] 
+
+
+Available Staging Repositories:
+
+
+1: staging-006 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-006
+   Description: This is a test repository
+
+
+
+Select a repository to drop (1) 1: : 1
+[INFO] Dropping staged repository: 
+
+-  staging-006 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-006
+   Description: This is a test repository
 +---+
   
   The mojo will present you with a list of closed staging repositories, with the first in the list selected as the default response. If you simply hit the Enter key, the default will 
@@ -169,6 +217,58 @@ mvn nexus:staging-drop
   If you have no closed staging repositories, you'll see something like this instead: 
 
 +---+
+[INFO] 
+
+No closed staging repositories found. Nothing to do!
 +---+
 
+  You can find more information about this mojo {{{staging-drop-mojo.html}here}}. 
   
+* Promoting a Closed Staging Repository
+
+  On the other hand, if your project artifacts pass all tests, you will find that you need to promote the staging repository that houses them, in order to finalize the release and 
+  make the artifacts available for public consumption.
+
+  The basic command is:
+
++---+
+mvn nexus:staging-promote
++---+
+
+  If you have one or more closed staging repositories, you'll see something like the following output:
+
++---+
+[INFO] 
+
+
+Available Staging Repositories:
+
+
+1: staging-006 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-006
+   Description: This is a test repository
+
+
+
+Select a repository to promote (1) 1: : 1
+Target Repository ID: releases
+[INFO] Promoting staging repository to: releases:
+
+-  staging-006 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-006
+   Description: This is a test repository
++---+
+  
+  The mojo will present you with a list of closed staging repositories, with the first in the list selected as the default response. If you simply hit the Enter key, the default will 
+  be used; otherwise, the repository corresponding to the number you select will be used.
+
+  If you have no closed staging repositories, you'll see something like this instead: 
+
++---+
+[INFO] 
+
+No closed staging repositories found. Nothing to do!
++---+
+
+  You can find more information about this mojo {{{staging-promote-mojo.html}here}}. 
+    
