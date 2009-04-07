@@ -30,7 +30,7 @@ import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 
 public abstract class AbstractNexusMojo
-extends AbstractMojo
+    extends AbstractMojo
 {
 
     /**
@@ -198,4 +198,5 @@ extends AbstractMojo
         }
 
     }
+    
 }

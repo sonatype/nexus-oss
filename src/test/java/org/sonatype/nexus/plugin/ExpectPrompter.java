@@ -22,6 +22,7 @@ import static junit.framework.Assert.fail;
 
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -57,14 +58,16 @@ public class ExpectPrompter
     public String prompt( final String prompt, final List values )
         throws PrompterException
     {
-        return expectationFor( prompt );
+        String wholePrompt = StringUtils.join( values.iterator(), "\n" ) + "\n\n" + prompt + ": ";
+        return expectationFor( wholePrompt );
     }
 
     @SuppressWarnings("unchecked")
     public String prompt( final String prompt, final List values, final String defVal )
         throws PrompterException
     {
-        return expectationFor( prompt );
+        String wholePrompt = StringUtils.join( values.iterator(), "\n" ) + "\n\n" + prompt + " [" + defVal + "]: ";
+        return expectationFor( wholePrompt, defVal );
     }
 
     public String promptForPassword( final String prompt )
@@ -81,9 +84,14 @@ public class ExpectPrompter
 
     private String expectationFor( final String prompt )
     {
+        return expectationFor( prompt, null );
+    }
+
+    private String expectationFor( final String prompt, final String defaultValue )
+    {
         System.out.print( prompt );
         
-        String result = "-NOT SUPPLIED-";
+        String result = defaultValue == null ? "-NOT SUPPLIED-" : defaultValue;
         for ( Map.Entry<String, String> entry : expectations.entrySet() )
         {
             if ( prompt.indexOf( entry.getKey() ) > -1 )

@@ -94,6 +94,11 @@ public class FinishStageRepositoryMojoTest
         
         FinishStageRepositoryMojo mojo = new FinishStageRepositoryMojo();
         
+        ExpectPrompter prompter = new ExpectPrompter();
+        prompter.addExpectation( "1", "1" );
+
+        mojo.setPrompter( prompter );
+        
         mojo.setArtifactId( "artifactId" );
         mojo.setGroupId( "group.id" );
         mojo.setVersion( "1" );
@@ -117,6 +122,7 @@ public class FinishStageRepositoryMojoTest
         ExpectPrompter prompter = new ExpectPrompter();
         
         prompter.addExpectation( "Password", "unused" );
+        prompter.addExpectation( "1", "1" );
         
         mojo.setPrompter( prompter );
         
@@ -142,6 +148,7 @@ public class FinishStageRepositoryMojoTest
         ExpectPrompter prompter = new ExpectPrompter();
         
         prompter.addExpectation( "Nexus URL", getBaseUrl() );
+        prompter.addExpectation( "1", "1" );
         
         mojo.setPrompter( prompter );
         
@@ -163,6 +170,11 @@ public class FinishStageRepositoryMojoTest
         printTestName();
         
         FinishStageRepositoryMojo mojo = new FinishStageRepositoryMojo();
+        
+        ExpectPrompter prompter = new ExpectPrompter();
+        prompter.addExpectation( "1", "1" );
+
+        mojo.setPrompter( prompter );
         
         String serverId = "server";
         

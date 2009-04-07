@@ -30,7 +30,7 @@ import java.util.List;
  * access via Maven's artifact resolution process; they are waiting to be marked as "finished".
  * 
  * @goal staging-list
- * @requireProject false
+ * @requiresProject false
  * @aggregator
  */
 // TODO: Remove aggregator annotation once we have a better solution, but we should only run this once per build.
@@ -47,40 +47,27 @@ public class ListStageRepositoriesMojo
 
         StageClient client = getClient();
 
-        List<StageRepository> openRepositories;
+        List<StageRepository> repos;
         try
         {
-            openRepositories = client.getOpenStageRepositoriesForUser();
+            repos = client.getOpenStageRepositoriesForUser();
         }
         catch ( RESTLightClientException e )
         {
             throw new MojoExecutionException( "Failed to find open staging repository: " + e.getMessage(), e );
         }
 
-        if ( openRepositories != null )
+        if ( repos != null )
         {
             StringBuilder builder = new StringBuilder();
             builder.append( "The following OPEN staging repositories were found: " );
 
-            if ( !openRepositories.isEmpty() )
+            if ( !repos.isEmpty() )
             {
-                for ( StageRepository openRepo : openRepositories )
+                for ( StageRepository repo : repos )
                 {
-                    builder.append( "\n\n-  " )
-                           .append( openRepo.getRepositoryId() )
-                           .append( " (profile: " )
-                           .append( openRepo.getProfileName() )
-                           .append( ")" );
-
-                    if ( openRepo.getUrl() != null )
-                    {
-                        builder.append( "\n   URL: " ).append( openRepo.getUrl() );
-                    }
-
-                    if ( openRepo.getDescription() != null )
-                    {
-                        builder.append( "\n   Description: " ).append( openRepo.getDescription() );
-                    }
+                    builder.append( "\n\n-  " );
+                    builder.append( listRepo( repo ) );
                 }
             }
             else
@@ -97,7 +84,7 @@ public class ListStageRepositoriesMojo
             getLog().info( "\n\nNo open staging repositories found.\n\n" );
         }
 
-        listClosedRepos( null, null, null );
+        listRepos( null, null, null, "The following FINISHED staging repositories were found" );
     }
 
 }

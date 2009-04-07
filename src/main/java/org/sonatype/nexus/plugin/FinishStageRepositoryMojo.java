@@ -24,10 +24,13 @@ import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
 
+import java.util.List;
+
 /**
  * Finish a Nexus staging repository so it's available for use by Maven.
  * 
  * @goal staging-finish
+ * @requiresProject false
  * @aggregator
  */
 // TODO: Remove aggregator annotation once we have a better solution, but we should only run this once per build.
@@ -46,7 +49,6 @@ public class FinishStageRepositoryMojo
      * The artifact groupId used to select which open staging repository should be finished.
      * 
      * @parameter default-value="${project.groupId}"
-     * @readonly
      */
     private String groupId;
 
@@ -54,7 +56,6 @@ public class FinishStageRepositoryMojo
      * The artifact artifactId used to select which open staging repository should be finished.
      * 
      * @parameter default-value="${project.artifactId}"
-     * @readonly
      */
     private String artifactId;
 
@@ -62,9 +63,16 @@ public class FinishStageRepositoryMojo
      * The artifact version used to select which open staging repository should be finished.
      * 
      * @parameter default-value="${project.version}"
-     * @readonly
      */
     private String version;
+    
+    /**
+     * If true, the mojo will simply select the first result from the list of open staging repositories that match the
+     * given groupId, artifactId, and version. Otherwise, the mojo will prompt the user for input.
+     * 
+     * @parameter default-value="false"
+     */
+    private boolean auto;
 
     public void execute()
         throws MojoExecutionException
@@ -75,48 +83,48 @@ public class FinishStageRepositoryMojo
 
         StageClient client = getClient();
 
-        StageRepository openRepo;
+        List<StageRepository> repos;
         try
         {
-            openRepo = client.getOpenStageRepositoryForUser( groupId, artifactId, version );
+            repos = client.getOpenStageRepositoriesForUser( groupId, artifactId, version );
         }
         catch ( RESTLightClientException e )
         {
             throw new MojoExecutionException( "Failed to find open staging repository: " + e.getMessage(), e );
         }
-
-        if ( openRepo != null )
+        
+        if ( repos != null && !repos.isEmpty() )
         {
+            StageRepository repo;
+            if ( auto )
+            {
+                repo = repos.get( 0 );
+            }
+            else
+            {
+                repo = select( repos, "Select a repository to finish" );
+            }
+            
             StringBuilder builder = new StringBuilder();
             builder.append( "Finishing staging repository for: '" )
                    .append( groupId )
                    .append( ":" )
                    .append( artifactId )
                    .append( ":" )
-                   .append( version )
-                   .append( "':\n\n-  " )
-                   .append( openRepo.getRepositoryId() )
-                   .append( " (profile: " )
-                   .append( openRepo.getProfileName() )
-                   .append( ")" );
+                   .append( version );
 
-            if ( openRepo.getUrl() != null )
-            {
-                builder.append( "\n   URL: " ).append( openRepo.getUrl() );
-            }
-
-            if ( openRepo.getDescription() != null )
-            {
-                builder.append( "\n   Description: " ).append( openRepo.getDescription() );
-            }
+            builder.append( "\n\n-  " );
+            builder.append( listRepo( repo ) );
 
             builder.append( "\n\n" );
 
             getLog().info( builder.toString() );
 
+            promptForMissingDescription();
+            
             try
             {
-                client.finishRepository( openRepo, description );
+                client.finishRepository( repo, getDescription() );
             }
             catch ( RESTLightClientException e )
             {
@@ -128,7 +136,7 @@ public class FinishStageRepositoryMojo
             getLog().info( "\n\nNo open staging repositories found. Nothing to do!\n\n" );
         }
 
-        listClosedRepos( groupId, artifactId, version );
+        listRepos( groupId, artifactId, version, "The following FINISHED staging repositories were found" );
     }
 
     public String getGroupId()
@@ -170,6 +178,24 @@ public class FinishStageRepositoryMojo
     {
         this.description = description;
     }
+    
+    private String promptForMissingDescription()
+        throws MojoExecutionException
+    {
+        while ( getDescription() == null || getDescription().trim().length() < 1 )
+        {
+            try
+            {
+                setDescription( getPrompter().prompt( "Repository Description" ) );
+            }
+            catch ( PrompterException e )
+            {
+                throw new MojoExecutionException( "Failed to read from CLI prompt: " + e.getMessage(), e );
+            }
+        }
+        
+        return getDescription();
+    }
 
     @Override
     protected void fillMissing()
@@ -177,11 +203,35 @@ public class FinishStageRepositoryMojo
     {
         super.fillMissing();
 
-        while ( getDescription() == null || getDescription().trim().length() < 1 )
+        while ( getGroupId() == null || "${project.groupId}".equals( getGroupId() ) )
         {
             try
             {
-                setDescription( getPrompter().prompt( "Repository Description" ) );
+                setGroupId( getPrompter().prompt( "Group ID" ) );
+            }
+            catch ( PrompterException e )
+            {
+                throw new MojoExecutionException( "Failed to read from CLI prompt: " + e.getMessage(), e );
+            }
+        }
+
+        while ( getArtifactId() == null || "${project.artifactId}".equals( getArtifactId() ) )
+        {
+            try
+            {
+                setArtifactId( getPrompter().prompt( "Artifact ID" ) );
+            }
+            catch ( PrompterException e )
+            {
+                throw new MojoExecutionException( "Failed to read from CLI prompt: " + e.getMessage(), e );
+            }
+        }
+
+        while ( getVersion() == null || "${project.version}".equals( getVersion() ) )
+        {
+            try
+            {
+                setVersion( getPrompter().prompt( "Version" ) );
             }
             catch ( PrompterException e )
             {

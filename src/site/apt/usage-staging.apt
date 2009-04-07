@@ -14,6 +14,49 @@ Plugin Usage: Working with the Nexus Professional Staging Suite
   repository to finalize the release for general consumption, or dropped to make room for another attempt.
   
   The Nexus Plugin for Maven gives you access to this feature from the Maven command line.
+  
+* Before You Start: Authentication and Required Information
+
+** TIP: Using your existing <<<settings.xml>>> configuration to authenticate against Nexus
+
+  If you've already configured Maven to authenticate your access to Nexus in order to resolve artifacts, you can reuse this configuration when interacting with Nexus' other functions.
+  Simply reference the <<<server>>> entry id from your <<<settings.xml>>> file, like this:
+  
++---+
+mvn nexus:staging-list -DserverAuthId=my.nexus
++---+
+
+  If you watch the console output, you should see the following:
+  
++---+
+[...]
+[INFO] Using authentication information for server: 'my.nexus'.
+[...]
++---+
+
+  On the other hand, if the specified <<<server>>> entry doesn't exist, you'll see the following instead:
+  
++---+
+[...]
+[WARN] Server authentication entry not found for: 'my.nexus'.
+[...]
++---+
+
+** TIP: Required Information
+
+  In order to access the staging suite in your Nexus instance, the plugin must be told where Nexus is. Additionally, in most cases a valid user login will be required to access your 
+  relevant staging information. By default, if you don't specify the <<<nexusURL>>> and <<<password>>> parameters, the plugin will prompt you for them. If you don't specify the
+  <<<username>>> parameter, the Java System property <<<$\{user.name\}>>> will be used.
+  
+  For example:
+  
++---+
+[...]
+Nexus URL: http://localhost:8082/nexus
+Password: ********
+Description: This is a test repository
+[...]
++---+
 
 * Listing Your Open Staging Repositories
 
@@ -52,47 +95,6 @@ mvn nexus:staging-list
    Description: This is another test repository
 +---+
 
-** TIP: Required Information
-
-  In order to access the staging suite in your Nexus instance, the plugin must be told where Nexus is. Additionally, in most cases a valid user login will be required to access your 
-  relevant staging information. By default, if you don't specify the <<<nexusURL>>> and <<<password>>> parameters, the plugin will prompt you for them. If you don't specify the
-  <<<username>>> parameter, the Java System property <<<$\{user.name\}>>> will be used.
-  
-  For example:
-  
-+---+
-[...]
-Nexus URL: http://localhost:8082/nexus
-Password: ********
-Description: This is a test repository
-[...]
-+---+
-
-** TIP: Using your existing <<<settings.xml>>> configuration to authenticate against Nexus
-
-  If you've already configured Maven to authenticate your access to Nexus in order to resolve artifacts, you can reuse this configuration when interacting with Nexus' other functions.
-  Simply reference the <<<server>>> entry id from your <<<settings.xml>>> file, like this:
-  
-+---+
-mvn nexus:staging-list -DserverAuthId=my.nexus
-+---+
-
-  If you watch the console output, you should see the following:
-  
-+---+
-[...]
-[INFO] Using authentication information for server: 'my.nexus'.
-[...]
-+---+
-
-  On the other hand, if the specified <<<server>>> entry doesn't exist, you'll see the following instead:
-  
-+---+
-[...]
-[WARN] Server authentication entry not found for: 'my.nexus'.
-[...]
-+---+
-
 * Finishing an Open Staging Repository for Your Project
 
   Before your team can run any tests against the set of artifacts that constitute your release, you need to mark the open staging repository as <<finished>>. This means that no additional
@@ -102,10 +104,10 @@ mvn nexus:staging-list -DserverAuthId=my.nexus
   The basic command is:
 
 +---+
-mvn nexus:finish
+mvn nexus:staging-finish
 +---+
 
-  If you have an open staging repository that matches the profile rules for the current project, you'll see something like the following in the console output:
+  If you have one or more open staging repositories that match the current project coordinate, you'll see something like the following in the console output:
   
 +---+
 [INFO] Finishing staging repository for: 'com.myco:my-project:1':
@@ -145,3 +147,28 @@ No open staging repositories found. Nothing to do!
    Description: This is another test repository
 +---+
 
+* Dropping a Closed Staging Repository
+
+  In the unfortunate event that your project artifacts fail during testing, you may need to drop the staging repository that houses them, in order to avoid confusing them with newer 
+  candidate releases. 
+
+  The basic command is:
+
++---+
+mvn nexus:staging-drop
++---+
+
+  If you have one or more closed staging repositories, you'll see something like the following output:
+
++---+
++---+
+  
+  The mojo will present you with a list of closed staging repositories, with the first in the list selected as the default response. If you simply hit the Enter key, the default will 
+  be used; otherwise, the repository corresponding to the number you select will be used.
+
+  If you have no closed staging repositories, you'll see something like this instead: 
+
++---+
++---+
+
+  
