@@ -17,7 +17,6 @@
 	
 	<packaging>maven-plugin</packaging>
 	
-	
 	<name>Nexus Plugin for Maven</name>
 	
   <licenses>
