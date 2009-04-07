@@ -48,29 +48,29 @@ public class FinishStageRepositoryMojo
     /**
      * The artifact groupId used to select which open staging repository should be finished.
      * 
-     * @parameter default-value="${project.groupId}"
+     * @parameter expression="${groupId}" default-value="${project.groupId}"
      */
     private String groupId;
 
     /**
      * The artifact artifactId used to select which open staging repository should be finished.
      * 
-     * @parameter default-value="${project.artifactId}"
+     * @parameter expression="${artifactId}" default-value="${project.artifactId}"
      */
     private String artifactId;
 
     /**
      * The artifact version used to select which open staging repository should be finished.
      * 
-     * @parameter default-value="${project.version}"
+     * @parameter expression="${version}" default-value="${project.version}"
      */
     private String version;
-    
+
     /**
      * If true, the mojo will simply select the first result from the list of open staging repositories that match the
      * given groupId, artifactId, and version. Otherwise, the mojo will prompt the user for input.
      * 
-     * @parameter default-value="false"
+     * @parameter expression="${auto}" default-value="false"
      */
     private boolean auto;
 
