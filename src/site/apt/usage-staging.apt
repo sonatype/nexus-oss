@@ -96,7 +96,7 @@ mvn nexus:staging-list
    URL: http://localhost:8082/nexus/content/repositories/staging-003
 
 
-[INFO] The following FINISHED staging repositories were found: 
+[INFO] The following CLOSED staging repositories were found: 
 
 -  staging-001 (profile: Example Profile)
    URL: http://localhost:8082/nexus/content/repositories/staging-001
@@ -111,14 +111,14 @@ mvn nexus:staging-list
   
 * Finishing an Open Staging Repository for Your Project
 
-  Before your team can run any tests against the set of artifacts that constitute your release, you need to mark the open staging repository as <<finished>>. This means that no additional
-  artifacts can be added to that specific staging repository, making the set of artifacts it contains an immutable snapshot. When it is finished, the repository will become available for
+  Before your team can run any tests against the set of artifacts that constitute your release, you need to mark the open staging repository as <<closed>>. This means that no additional
+  artifacts can be added to that specific staging repository, making the set of artifacts it contains an immutable snapshot. When it is closed, the repository will become available for
   artifact resolution.
 
   The basic command is:
 
 +---+
-mvn nexus:staging-finish
+mvn nexus:staging-close
 +---+
 
   If you have one or more open staging repositories that match the current project coordinate, you'll see something like the following in the console output:
@@ -135,7 +135,7 @@ Available Staging Repositories:
 
 
 
-Select a repository to finish (1) 1: : 1
+Select a repository to close (1) 1: : 1
 
 Repository Description: This is a test repository
 [INFO] Finishing staging repository for: 'com.myco:my-project:1':
@@ -144,7 +144,7 @@ Repository Description: This is a test repository
    URL: http://localhost:8082/nexus/content/repositories/staging-002
 
 
-[INFO] The following FINISHED staging repositories were found for: 'com.myco:my-project:1':
+[INFO] The following CLOSED staging repositories were found for: 'com.myco:my-project:1':
 
 -  staging-001 (profile: Example Profile)
    URL: http://localhost:8082/nexus/content/repositories/staging-001
@@ -155,8 +155,8 @@ Repository Description: This is a test repository
    Description: This is another test repository
 +---+
 
-  The output above shows that the <<<staging-finish>>> mojo found an open staging repository - <<<staging-001>>> - for the current project, then told Nexus to finish it. Afterward, 
-  it displayed the list of finished staging repositories, which included the one we just finished. 
+  The output above shows that the <<<staging-close>>> mojo found an open staging repository - <<<staging-001>>> - for the current project, then told Nexus to close it. Afterward, 
+  it displayed the list of closed staging repositories, which included the one we just closed. 
   
   If you don't have an open staging repository, you'll see something like this instead:
   
@@ -164,7 +164,7 @@ Repository Description: This is a test repository
 No open staging repositories found. Nothing to do!
 
 
-[INFO] The following FINISHED staging repositories were found for: 'com.myco:my-project:1':
+[INFO] The following CLOSED staging repositories were found for: 'com.myco:my-project:1':
 
 -  staging-001 (profile: Example Profile)
    URL: http://localhost:8082/nexus/content/repositories/staging-001
@@ -175,7 +175,7 @@ No open staging repositories found. Nothing to do!
    Description: This is another test repository
 +---+
 
-  You can find more information about this mojo {{{staging-finish-mojo.html}here}}. 
+  You can find more information about this mojo {{{staging-close-mojo.html}here}}. 
   
 * Dropping a Closed Staging Repository
 
