@@ -76,7 +76,7 @@ public class DropStageRepositoryMojo
             }
             catch ( RESTLightClientException e )
             {
-                throw new MojoExecutionException( "Failed to finish open staging repository: " + e.getMessage(), e );
+                throw new MojoExecutionException( "Failed to drop staging repository: " + e.getMessage(), e );
             }
         }
         else
@@ -84,7 +84,7 @@ public class DropStageRepositoryMojo
             getLog().info( "\n\nNo closed staging repositories found. Nothing to do!\n\n" );
         }
 
-        listRepos( null, null, null, "The following FINISHED staging repositories were found" );
+        listRepos( null, null, null, "The following CLOSED staging repositories were found" );
     }
 
 }

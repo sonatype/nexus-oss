@@ -84,7 +84,7 @@ public class ListStageRepositoriesMojo
             getLog().info( "\n\nNo open staging repositories found.\n\n" );
         }
 
-        listRepos( null, null, null, "The following FINISHED staging repositories were found" );
+        listRepos( null, null, null, "The following CLOSED staging repositories were found" );
     }
 
 }

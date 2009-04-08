@@ -84,7 +84,7 @@ public class PromoteStageRepositoryMojo
             }
             catch ( RESTLightClientException e )
             {
-                throw new MojoExecutionException( "Failed to finish open staging repository: " + e.getMessage(), e );
+                throw new MojoExecutionException( "Failed to promote staging repository: " + e.getMessage(), e );
             }
         }
         else
@@ -92,7 +92,7 @@ public class PromoteStageRepositoryMojo
             getLog().info( "\n\nNo open staging repositories found. Nothing to do!\n\n" );
         }
 
-        listRepos( null, null, null, "The following FINISHED staging repositories were found" );
+        listRepos( null, null, null, "The following CLOSED staging repositories were found" );
     }
 
     private void promptForPromoteInfo()

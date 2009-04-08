@@ -27,40 +27,40 @@ import org.sonatype.nexus.restlight.stage.StageRepository;
 import java.util.List;
 
 /**
- * Finish a Nexus staging repository so it's available for use by Maven.
+ * Close a Nexus staging repository so it's available for use by Maven.
  * 
- * @goal staging-finish
+ * @goal staging-close
  * @requiresProject false
  * @aggregator
  */
 // TODO: Remove aggregator annotation once we have a better solution, but we should only run this once per build.
-public class FinishStageRepositoryMojo
+public class CloseStageRepositoryMojo
     extends AbstractStagingMojo
 {
 
     /**
-     * The description for the newly finished staging repository. This will show up in the Nexus UI.
+     * The description for the newly closed staging repository. This will show up in the Nexus UI.
      * 
      * @parameter expression="${description}"
      */
     private String description;
 
     /**
-     * The artifact groupId used to select which open staging repository should be finished.
+     * The artifact groupId used to select which open staging repository should be closed.
      * 
      * @parameter expression="${groupId}" default-value="${project.groupId}"
      */
     private String groupId;
 
     /**
-     * The artifact artifactId used to select which open staging repository should be finished.
+     * The artifact artifactId used to select which open staging repository should be closed.
      * 
      * @parameter expression="${artifactId}" default-value="${project.artifactId}"
      */
     private String artifactId;
 
     /**
-     * The artifact version used to select which open staging repository should be finished.
+     * The artifact version used to select which open staging repository should be closed.
      * 
      * @parameter expression="${version}" default-value="${project.version}"
      */
@@ -102,11 +102,11 @@ public class FinishStageRepositoryMojo
             }
             else
             {
-                repo = select( repos, "Select a repository to finish" );
+                repo = select( repos, "Select a repository to close" );
             }
             
             StringBuilder builder = new StringBuilder();
-            builder.append( "Finishing staging repository for: '" )
+            builder.append( "Closing staging repository for: '" )
                    .append( groupId )
                    .append( ":" )
                    .append( artifactId )
@@ -128,7 +128,7 @@ public class FinishStageRepositoryMojo
             }
             catch ( RESTLightClientException e )
             {
-                throw new MojoExecutionException( "Failed to finish open staging repository: " + e.getMessage(), e );
+                throw new MojoExecutionException( "Failed to close open staging repository: " + e.getMessage(), e );
             }
         }
         else
@@ -136,7 +136,7 @@ public class FinishStageRepositoryMojo
             getLog().info( "\n\nNo open staging repositories found. Nothing to do!\n\n" );
         }
 
-        listRepos( groupId, artifactId, version, "The following FINISHED staging repositories were found" );
+        listRepos( groupId, artifactId, version, "The following CLOSED staging repositories were found" );
     }
 
     public String getGroupId()

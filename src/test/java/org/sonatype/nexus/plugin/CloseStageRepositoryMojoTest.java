@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class FinishStageRepositoryMojoTest
+public class CloseStageRepositoryMojoTest
     extends AbstractRESTTest
 {
 
@@ -92,7 +92,7 @@ public class FinishStageRepositoryMojoTest
     {
         printTestName();
         
-        FinishStageRepositoryMojo mojo = new FinishStageRepositoryMojo();
+        CloseStageRepositoryMojo mojo = new CloseStageRepositoryMojo();
         
         ExpectPrompter prompter = new ExpectPrompter();
         prompter.addExpectation( "1", "1" );
@@ -117,7 +117,7 @@ public class FinishStageRepositoryMojoTest
     {
         printTestName();
         
-        FinishStageRepositoryMojo mojo = new FinishStageRepositoryMojo();
+        CloseStageRepositoryMojo mojo = new CloseStageRepositoryMojo();
         
         ExpectPrompter prompter = new ExpectPrompter();
         
@@ -143,7 +143,7 @@ public class FinishStageRepositoryMojoTest
     {
         printTestName();
         
-        FinishStageRepositoryMojo mojo = new FinishStageRepositoryMojo();
+        CloseStageRepositoryMojo mojo = new CloseStageRepositoryMojo();
         
         ExpectPrompter prompter = new ExpectPrompter();
         
@@ -169,7 +169,7 @@ public class FinishStageRepositoryMojoTest
     {
         printTestName();
         
-        FinishStageRepositoryMojo mojo = new FinishStageRepositoryMojo();
+        CloseStageRepositoryMojo mojo = new CloseStageRepositoryMojo();
         
         ExpectPrompter prompter = new ExpectPrompter();
         prompter.addExpectation( "1", "1" );
@@ -199,7 +199,7 @@ public class FinishStageRepositoryMojoTest
         runMojo( mojo );
     }
 
-    private void runMojo( final FinishStageRepositoryMojo mojo )
+    private void runMojo( final CloseStageRepositoryMojo mojo )
         throws JDOMException, IOException, MojoExecutionException
     {
         mojo.setLog( log );
