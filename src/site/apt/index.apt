@@ -29,7 +29,7 @@ Introduction
   
 +---+
 <pluginGroups>
-  <pluginGroup>org.sonatype.plugins</pluginGroups>
+  <pluginGroup>org.sonatype.plugins</pluginGroup>
 </pluginGroups>
 +---+
 
