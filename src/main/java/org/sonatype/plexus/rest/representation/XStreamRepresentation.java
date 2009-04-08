@@ -18,11 +18,12 @@ import org.restlet.data.MediaType;
 import org.restlet.resource.StringRepresentation;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 
 /**
  * A String representation powered by XStream. This Representation needs XStream instance in constructor, and it is best
  * if you share your (threadsafe) XStream instance in restlet Application's Context, for example.
- * 
+ *
  * @author cstamas
  */
 public class XStreamRepresentation
@@ -31,7 +32,7 @@ public class XStreamRepresentation
     private XStream xstream;
 
     public XStreamRepresentation( XStream xstream, String text, MediaType mt, Language language,
-        CharacterSet characterSet )
+                                  CharacterSet characterSet )
     {
         super( text, mt, language, characterSet );
 
@@ -49,6 +50,7 @@ public class XStreamRepresentation
     }
 
     public Object getPayload( Object root )
+        throws XStreamException
     {
         // TODO: A BIG HACK FOLLOWS, UNTIL WE DO NOT RESOLVE XSTREAM HINTING!
         // In case of JSON reading (since JSON is not self-describing), we are adding
@@ -56,8 +58,9 @@ public class XStreamRepresentation
         if ( MediaType.APPLICATION_JSON.equals( getMediaType(), true ) )
         {
             // it is JSON, applying hack, adding "envelope" object
-            StringBuffer sb = new StringBuffer( "{ \"" ).append( root.getClass().getName() ).append( "\" : " ).append(
-                getText() ).append( " }" );
+            StringBuffer sb =
+                new StringBuffer( "{ \"" ).append( root.getClass().getName() ).append( "\" : " ).append( getText() ).append(
+                                                                                                                             " }" );
 
             return xstream.fromXML( sb.toString(), root );
         }

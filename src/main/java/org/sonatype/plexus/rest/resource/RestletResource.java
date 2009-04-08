@@ -40,10 +40,11 @@ import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 
 /**
  * The delegating resource.
- * 
+ *
  * @author Jason van Zyl
  * @author cstamas
  */
@@ -112,7 +113,7 @@ public class RestletResource
     /**
      * For file uploads we are using commons-fileupload integration with restlet.org. We are storing one FileItemFactory
      * instance in context. This method simply encapsulates gettting it from Resource context.
-     * 
+     *
      * @return
      */
     protected FileItemFactory getFileItemFactory()
@@ -134,16 +135,22 @@ public class RestletResource
             {
                 String text = ( variant instanceof Representation ) ? ( (Representation) variant ).getText() : "";
 
-                if ( MediaType.APPLICATION_JSON.equals( variant.getMediaType(), true ) 
+                if ( MediaType.APPLICATION_JSON.equals( variant.getMediaType(), true )
                     || MediaType.TEXT_HTML.equals( variant.getMediaType(), true ) )
                 {
-                    representation = new XStreamRepresentation( (XStream) getContext().getAttributes().get(
-                        PlexusRestletApplicationBridge.JSON_XSTREAM ), text, variant.getMediaType() );
+                    representation =
+                        new XStreamRepresentation(
+                                                   (XStream) getContext().getAttributes().get(
+                                                                                               PlexusRestletApplicationBridge.JSON_XSTREAM ),
+                                                   text, variant.getMediaType() );
                 }
                 else if ( MediaType.APPLICATION_XML.equals( variant.getMediaType(), true ) )
                 {
-                    representation = new XStreamRepresentation( (XStream) getContext().getAttributes().get(
-                        PlexusRestletApplicationBridge.XML_XSTREAM ), text, variant.getMediaType() );
+                    representation =
+                        new XStreamRepresentation(
+                                                   (XStream) getContext().getAttributes().get(
+                                                                                               PlexusRestletApplicationBridge.XML_XSTREAM ),
+                                                   text, variant.getMediaType() );
                 }
 
                 representation.setModificationDate( getModificationDate() );
@@ -185,7 +192,7 @@ public class RestletResource
     protected Object deserialize( Object root )
         throws ResourceException
     {
-        
+
         Object result = null;
 
         if ( root != null )
@@ -207,7 +214,15 @@ public class RestletResource
 
             if ( representation != null )
             {
-                result = representation.getPayload( root );
+                try
+                {
+                    result = representation.getPayload( root );
+                }
+                catch ( XStreamException e )
+                {
+                    throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
+                                                 "Invalid XML, unable to parse using XStream", e );
+                }
             }
         }
         return result;
@@ -238,14 +253,16 @@ public class RestletResource
         }
     }
 
+    @Override
     public Representation represent( Variant variant )
         throws ResourceException
     {
         Object result = delegate.get( getContext(), getRequest(), getResponse(), variant );
 
-        return (result != null) ? doRepresent( result, variant ) : null;
+        return ( result != null ) ? doRepresent( result, variant ) : null;
     }
 
+    @Override
     public void acceptRepresentation( Representation representation )
         throws ResourceException
     {
@@ -262,7 +279,7 @@ public class RestletResource
             try
             {
                 result = delegate.post( getContext(), getRequest(), getResponse(), payload );
-                
+
                 // This is a post, so set the status correctly
                 // but only if the status was not changed to be something else, like a 202
                 if ( getResponse().getStatus() == Status.SUCCESS_OK )
@@ -277,7 +294,7 @@ public class RestletResource
                 // try to get the responseObject
                 result = e.getResultObject();
             }
-            
+
             if ( result != null )
             {
                 getResponse().setEntity( doRepresent( result, representation ) );
@@ -290,6 +307,7 @@ public class RestletResource
         }
     }
 
+    @Override
     public void storeRepresentation( Representation representation )
         throws ResourceException
     {
@@ -329,6 +347,7 @@ public class RestletResource
         }
     }
 
+    @Override
     public void removeRepresentations()
         throws ResourceException
     {
@@ -382,7 +401,7 @@ public class RestletResource
 
             result = delegate.upload( getContext(), getRequest(), getResponse(), files );
         }
-        
+
         // only if the status was not changed to be something else, like a 202
         if ( getResponse().getStatus() == Status.SUCCESS_OK )
         {
