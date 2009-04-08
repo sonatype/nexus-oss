@@ -66,7 +66,6 @@ public class XStreamPlexusResource
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
-        System.out.println("post");
         SimpleTestObject obj = (SimpleTestObject) payload;
         if ( obj.getData() == null )
         {
