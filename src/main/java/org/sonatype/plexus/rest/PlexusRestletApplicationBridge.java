@@ -122,8 +122,18 @@ public class PlexusRestletApplicationBridge
         configure();
 
         recreateRoot( true );
+        
+        // cheat, to avoid endless loop
+        setRoot( root );
+        
+        afterCreateRoot();
 
         return root;
+    }
+    
+    protected void afterCreateRoot()
+    {
+        // empty
     }
 
     protected Router getRootRouter()
