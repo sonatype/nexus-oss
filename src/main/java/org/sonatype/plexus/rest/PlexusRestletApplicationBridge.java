@@ -122,16 +122,16 @@ public class PlexusRestletApplicationBridge
         configure();
 
         recreateRoot( true );
-        
+
         // cheat, to avoid endless loop
         setRoot( root );
-        
-        afterCreateRoot();
+
+        afterCreateRoot( root );
 
         return root;
     }
-    
-    protected void afterCreateRoot()
+
+    protected void afterCreateRoot( RetargetableRestlet root )
     {
         // empty
     }
@@ -153,9 +153,10 @@ public class PlexusRestletApplicationBridge
     protected final void configure()
     {
         // sorting out the resources, collecting them
-        boolean shouldCollectPlexusResources = getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null
-            ? Boolean.parseBoolean( (String) getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) )
-            : true; // the default if not set
+        boolean shouldCollectPlexusResources =
+            getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null ? Boolean.parseBoolean( (String) getContext().getParameters().getFirstValue(
+                                                                                                                                                                         PLEXUS_DISCOVER_RESOURCES ) )
+                            : true; // the default if not set
 
         if ( shouldCollectPlexusResources )
         {
@@ -248,9 +249,9 @@ public class PlexusRestletApplicationBridge
         if ( getLogger().isLoggable( Level.FINE ) )
         {
             getLogger().log(
-                Level.FINE,
-                "Attaching Restlet of class '" + target.getClass().getName() + "' to URI='" + uriPattern
-                    + "' (strict='" + strict + "')" );
+                             Level.FINE,
+                             "Attaching Restlet of class '" + target.getClass().getName() + "' to URI='" + uriPattern
+                                 + "' (strict='" + strict + "')" );
         }
 
         Route route = router.attach( uriPattern, target );
