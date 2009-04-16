@@ -42,6 +42,7 @@ import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.NexusLegacyAnalyzer;
 import org.sonatype.nexus.index.creator.LegacyDocumentUpdater;
+import org.sonatype.nexus.index.packer.IndexPackingRequest.IndexFormat;
 import org.sonatype.nexus.index.updater.IndexDataWriter;
 
 /**
@@ -94,40 +95,49 @@ public class DefaultIndexPacker
 
             writeIndexChunks( info, chunks, request );
         }
+        
+        File legacyFile = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".zip" );
+        File v1File = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".gz" );
+        
+        // When there are no main indexes available, and none requested, we need to write them out
+        if ( request.getFormats().isEmpty() 
+            && !legacyFile.exists()
+            && !v1File.exists() )
+        {
+            getLogger().debug( "Adding LEGACY and V1 formats to request, as no index currently exists" );
+            request.getFormats().add( IndexFormat.FORMAT_LEGACY );
+            request.getFormats().add( IndexFormat.FORMAT_V1 );
+        }
 
         if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_LEGACY ) )
         {
-            File file = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".zip" );
-
-            writeIndexArchive( request.getContext(), file );
+            writeIndexArchive( request.getContext(), legacyFile );
 
             if ( request.isCreateChecksumFiles() )
             {
                 FileUtils.fileWrite(
-                    new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
-                    DigesterUtils.getSha1Digest( file ) );
+                    new File( legacyFile.getParentFile(), legacyFile.getName() + ".sha1" ).getAbsolutePath(),
+                    DigesterUtils.getSha1Digest( legacyFile ) );
 
                 FileUtils.fileWrite(
-                    new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
-                    DigesterUtils.getMd5Digest( file ) );
+                    new File( legacyFile.getParentFile(), legacyFile.getName() + ".md5" ).getAbsolutePath(),
+                    DigesterUtils.getMd5Digest( legacyFile ) );
             }
         }
 
         if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_V1 ) )
         {
-            File file = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".gz" );
-
-            writeIndexData( request.getContext(), null, file );
+            writeIndexData( request.getContext(), null, v1File );
 
             if ( request.isCreateChecksumFiles() )
             {
                 FileUtils.fileWrite(
-                    new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
-                    DigesterUtils.getSha1Digest( file ) );
+                    new File( v1File.getParentFile(), v1File.getName() + ".sha1" ).getAbsolutePath(),
+                    DigesterUtils.getSha1Digest( v1File ) );
 
                 FileUtils.fileWrite(
-                    new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
-                    DigesterUtils.getMd5Digest( file ) );
+                    new File( v1File.getParentFile(), v1File.getName() + ".md5" ).getAbsolutePath(),
+                    DigesterUtils.getMd5Digest( v1File ) );
             }
         }
 

@@ -185,6 +185,7 @@
                   <include>org.codehaus.plexus:plexus-container-default</include>
                   <include>org.codehaus.plexus:plexus-utils</include>
                   <include>com.google.code.google-collections:google-collect</include>
+                  <include>org.apache.maven.mercury:mercury-artifact</include>
                 </includes>
               </artifactSet>
             </configuration>
