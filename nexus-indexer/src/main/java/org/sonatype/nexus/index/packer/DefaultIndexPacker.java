@@ -7,19 +7,21 @@ package org.sonatype.nexus.index.packer;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -86,25 +88,62 @@ public class DefaultIndexPacker
                 throw new IllegalArgumentException( "Can't create " + request.getTargetDir().getAbsolutePath() );
             }
         }
-
-        Properties info = new Properties();
-
-        if ( request.isCreateIncrementalChunks() )
-        {
-            Map<String, List<Integer>> chunks = getIndexChunks( request );
-
-            writeIndexChunks( info, chunks, request );
-        }
         
+        // These are all of the files we'll be dealing with (except for the incremental chunks of course)
+        File propertiesFile = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".properties" );
         File legacyFile = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".zip" );
         File v1File = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".gz" );
+        
+        // In case there is no main index we will force it to be created
+        boolean forceMainIndexGeneration = false;
+
+        Properties info = null;
+        
+        try
+        {
+            // Note that for incremental indexes to work properly, a valid index.properties file
+            // must be present
+            info = readIndexProperties( propertiesFile );
+            
+            if ( request.isCreateIncrementalChunks() )
+            {
+                // Get the list of document ids that have been added since the last time
+                // the index ran
+                List<Integer> chunk = getIndexChunk( request, info );
+
+                // if chunk is null, means we had problems with property file, generate whole index instead
+                if ( chunk != null )
+                {
+                    // if no documents, then we dont need to do anything, no changes
+                    if ( chunk.size() > 0 )
+                    {
+                        writeIndexChunk( info, chunk, request );
+                    }
+                }
+                else
+                {
+                    forceMainIndexGeneration = true;
+                }
+            }
+        }
+        catch ( IOException e )
+        {
+            getLogger().info( "Unable to read properties file, will force index regeneration" );
+            info = new Properties();
+            forceMainIndexGeneration = true;
+        }
         
         // When there are no main indexes available, and none requested, we need to write them out
         if ( request.getFormats().isEmpty() 
             && !legacyFile.exists()
             && !v1File.exists() )
         {
-            getLogger().debug( "Adding LEGACY and V1 formats to request, as no index currently exists" );
+            forceMainIndexGeneration = true;
+        }
+        
+        if ( forceMainIndexGeneration )
+        {
+            getLogger().debug( "Forcing add of LEGACY and V1 formats to request" );
             request.getFormats().add( IndexFormat.FORMAT_LEGACY );
             request.getFormats().add( IndexFormat.FORMAT_V1 );
         }
@@ -141,26 +180,36 @@ public class DefaultIndexPacker
             }
         }
 
-        File file = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".properties" );
-
-        writeIndexProperties( request, info, file );
+        writeIndexProperties( request, info, propertiesFile );
 
         if ( request.isCreateChecksumFiles() )
         {
             FileUtils.fileWrite(
-                new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
-                DigesterUtils.getSha1Digest( file ) );
+                new File( propertiesFile.getParentFile(), propertiesFile.getName() + ".sha1" ).getAbsolutePath(),
+                DigesterUtils.getSha1Digest( propertiesFile ) );
 
             FileUtils.fileWrite(
-                new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
-                DigesterUtils.getMd5Digest( file ) );
+                new File( propertiesFile.getParentFile(), propertiesFile.getName() + ".md5" ).getAbsolutePath(),
+                DigesterUtils.getMd5Digest( propertiesFile ) );
         }
     }
 
-    private Map<String, List<Integer>> getIndexChunks( IndexPackingRequest request )
+    private List<Integer> getIndexChunk( IndexPackingRequest request, Properties properties )
         throws IOException
-    {
-        Map<String, List<Integer>> chunks = new TreeMap<String, List<Integer>>( Collections.<String> reverseOrder() );
+    {        
+        Date timestamp = null;
+        
+        try
+        {
+            timestamp = parse( ( String ) properties.get( IndexingContext.INDEX_TIMESTAMP ) );
+        }
+        catch ( ParseException e )
+        {
+            getLogger().debug( "Invalid timestamp, no incremental index being created." );
+            return null;
+        }
+        
+        List<Integer> chunk = new ArrayList<Integer>();
 
         IndexReader r = request.getContext().getIndexReader();
 
@@ -175,73 +224,107 @@ public class DefaultIndexPacker
                 if ( lastModified != null )
                 {
                     Date t = new Date( Long.parseLong( lastModified ) );
-
-                    String chunkId = request.getIndexChunker().getChunkId( t );
-
-                    if ( chunkId != null )
+                    
+                    // Only add documents that were added after the last time we indexed
+                    if ( t.after( timestamp ) )
                     {
-                        getChunk( chunks, chunkId ).add( i );
+                        chunk.add( i );
                     }
                 }
             }
         }
 
-        return chunks;
+        return chunk;
     }
-
-    void writeIndexChunks( Properties info, Map<String, List<Integer>> chunks, IndexPackingRequest request )
+    
+    private Properties readIndexProperties( File propertyFile )
         throws IOException
     {
-        if ( chunks.size() < 2 )
-        {
-            return; // no updates available
+        Properties properties = new Properties();
+        
+        FileInputStream fos = null;
+        
+        try
+        {            
+            fos = new FileInputStream( propertyFile );
+            properties.load( fos );
         }
-
-        IndexingContext context = request.getContext();
-
-        int n = 0;
-
-        List<Integer> currentIndexes = null;
-
-        for ( Entry<String, List<Integer>> e : chunks.entrySet() )
+        finally
         {
-            String key = e.getKey();
-
-            info.put( IndexingContext.INDEX_CHUNK_PREFIX + n, format( request.getIndexChunker().getChunkDate( key ) ) );
-
-            List<Integer> indexes = e.getValue();
-
-            if ( currentIndexes != null )
+            if ( fos != null )
             {
-                indexes.addAll( currentIndexes );
+                fos.close();
             }
+        }
+        
+        return properties;
+    }
 
-            currentIndexes = indexes;
+    void writeIndexChunk( Properties info, List<Integer> chunk, IndexPackingRequest request )
+        throws IOException
+    {
+        IndexingContext context = request.getContext();
+        
+        Date now = new Date();
+        
+        String timestamp = format( now );        
+        
+        updatePropertyFileUpdateKeys( info, request );
+        
+        info.put( IndexingContext.INDEX_CHUNK_PREFIX + "0", timestamp );
+        
+        File file = new File( request.getTargetDir(), //
+            IndexingContext.INDEX_FILE + "." + formatForFilename( now ) + ".gz" );
+        
+        writeIndexData( context, //
+            chunk,
+            file );
+        
+        if ( request.isCreateChecksumFiles() )
+        {
+            FileUtils.fileWrite(
+                new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
+                DigesterUtils.getSha1Digest( file ) );
 
-            File file = new File( request.getTargetDir(), //
-                IndexingContext.INDEX_FILE + "." + key + ".gz" );
-
-            writeIndexData( context, //
-                indexes,
-                file );
-
-            if ( request.isCreateChecksumFiles() )
-            {
-                FileUtils.fileWrite(
-                    new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
-                    DigesterUtils.getSha1Digest( file ) );
-
-                FileUtils.fileWrite(
-                    new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
-                    DigesterUtils.getMd5Digest( file ) );
+            FileUtils.fileWrite(
+                new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
+                DigesterUtils.getMd5Digest( file ) );
+        }
+    }
+    
+    private void updatePropertyFileUpdateKeys( Properties properties, IndexPackingRequest request )
+    {        
+        Set<Object> keys = new HashSet<Object>( properties.keySet() );
+        Map<Integer,String> dataMap = new TreeMap<Integer, String>();
+        
+        // First go through and retrieve all keys and their values
+        for ( Object key : keys )
+        {
+            String sKey = ( String ) key;
+            
+            if ( sKey.startsWith( IndexingContext.INDEX_CHUNK_PREFIX ) )
+            {                
+                Integer count = Integer.valueOf( sKey.substring( IndexingContext.INDEX_CHUNK_PREFIX.length() ) );
+                String value = properties.getProperty( sKey );
+                
+                dataMap.put( count, value );                
+                properties.remove( key );
             }
-
-            n++;
-
-            if ( request.getMaxIndexChunks() <= n || n == chunks.size() - 1 )
+        }
+        
+        int i = 0;
+        //Next put the items back in w/ proper keys
+        for ( Integer key : dataMap.keySet() )
+        {
+            //make sure to end if we reach limit, 0 based
+            if ( i >= ( request.getMaxIndexChunks() - 1 ) )
             {
                 break;
             }
+              
+            properties.put( IndexingContext.INDEX_CHUNK_PREFIX + ( key + 1 ), dataMap.get( key ) );
+            
+            i++;
         }
     }
 
@@ -480,19 +563,19 @@ public class DefaultIndexPacker
         df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
         return df.format( d );
     }
-
-    private List<Integer> getChunk( Map<String, List<Integer>> chunks, String key )
+    
+    private String formatForFilename( Date d )
     {
-        List<Integer> chunk = chunks.get( key );
-
-        if ( chunk == null )
-        {
-            chunk = new ArrayList<Integer>();
-
-            chunks.put( key, chunk );
-        }
-
-        return chunk;
+        SimpleDateFormat df = new SimpleDateFormat( "yyyyMMddHHmmss" );
+        df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
+        return df.format( d );
     }
-
+    
+    private Date parse( String s ) 
+        throws ParseException
+    {
+        SimpleDateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT );
+        df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
+        return df.parse( s );
+    }
 }
