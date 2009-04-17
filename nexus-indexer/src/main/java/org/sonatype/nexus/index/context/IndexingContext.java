@@ -67,6 +67,11 @@ public interface IndexingContext
      * A date format used for incremental update chunk names
      */
     public static final String INDEX_TIME_DAY_FORMAT = "yyyyMMdd";
+    
+    /**
+     * A counter used to id the chunks
+     */
+    public static final String INDEX_CHUNK_COUNTER = "last-chunk-id";
 
     /**
      * Returns this indexing context id.

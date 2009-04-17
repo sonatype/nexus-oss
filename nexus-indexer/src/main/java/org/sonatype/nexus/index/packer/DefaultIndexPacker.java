@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexUtils;
@@ -144,8 +146,7 @@ public class DefaultIndexPacker
         if ( forceMainIndexGeneration )
         {
             getLogger().debug( "Forcing add of LEGACY and V1 formats to request" );
-            request.getFormats().add( IndexFormat.FORMAT_LEGACY );
-            request.getFormats().add( IndexFormat.FORMAT_V1 );
+            request.setFormats( Arrays.asList( IndexFormat.FORMAT_LEGACY, IndexFormat.FORMAT_V1 ) );
         }
 
         if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_LEGACY ) )
@@ -265,16 +266,22 @@ public class DefaultIndexPacker
     {
         IndexingContext context = request.getContext();
         
-        Date now = new Date();
-        
-        String timestamp = format( now );        
-        
         updatePropertyFileUpdateKeys( info, request );
         
-        info.put( IndexingContext.INDEX_CHUNK_PREFIX + "0", timestamp );
+        String val = ( String ) info.getProperty( IndexingContext.INDEX_CHUNK_COUNTER );
+        
+        if ( StringUtils.isEmpty( val ) )
+        {
+            val = "0";
+        }
+        
+        int nextValue = Integer.parseInt( val ) + 1;
+        
+        info.put( IndexingContext.INDEX_CHUNK_PREFIX + "0", Integer.toString( nextValue ) );
+        info.put( IndexingContext.INDEX_CHUNK_COUNTER, Integer.toString( nextValue ) );
         
         File file = new File( request.getTargetDir(), //
-            IndexingContext.INDEX_FILE + "." + formatForFilename( now ) + ".gz" );
+            IndexingContext.INDEX_FILE + "." + nextValue + ".gz" );
         
         writeIndexData( context, //
             chunk,
@@ -295,7 +302,7 @@ public class DefaultIndexPacker
     private void updatePropertyFileUpdateKeys( Properties properties, IndexPackingRequest request )
     {        
         Set<Object> keys = new HashSet<Object>( properties.keySet() );
-        Map<Integer,String> dataMap = new TreeMap<Integer, String>();
+        Map<Integer,String> dataMap = new TreeMap<Integer, String>(); 
         
         // First go through and retrieve all keys and their values
         for ( Object key : keys )

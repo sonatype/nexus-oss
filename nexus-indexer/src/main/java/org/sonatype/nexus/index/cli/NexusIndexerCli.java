@@ -30,7 +30,6 @@ import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
 import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.packer.IndexPackingRequest;
-import org.sonatype.nexus.index.packer.IndexPackingRequest.IndexFormat;
 
 /**
  * A command line tool that can be used to index local Maven repository.
@@ -69,8 +68,6 @@ public class NexusIndexerCli
     public static final char CREATE_INCREMENTAL_CHUNKS = 'c';
 
     public static final char CREATE_FILE_CHECKSUMS = 's';
-    
-    public static final char FORMAT = 'f';
     
     public static final char INCREMENTAL_CHUNK_KEEP_COUNT = 'k';
 
@@ -119,9 +116,6 @@ public class NexusIndexerCli
 
         options.addOption( OptionBuilder.withLongOpt( "type" ).hasArg() //
         .withDescription( "Indexer type (default, min, full or coma separated list of custom types)." ).create( TYPE ) );
-        
-        options.addOption( OptionBuilder.withLongOpt( "format" ).hasArg()
-        .withDescription( "Format(s) to generate (" + IndexFormat.FORMAT_LEGACY + ", " + IndexFormat.FORMAT_V1 + " or comma seperated list of formats)." ).create( FORMAT ) );
 
         return options;
     }
@@ -168,8 +162,6 @@ public class NexusIndexerCli
         String repositoryName = cli.getOptionValue( NAME, indexFolder.getName() );
 
         List<IndexCreator> indexers = getIndexers( cli, plexus );
-        
-        List<IndexFormat> formats = getFormats( cli, plexus );
 
         boolean createChecksums = cli.hasOption( CREATE_FILE_CHECKSUMS );
 
@@ -192,17 +184,13 @@ public class NexusIndexerCli
             System.err.printf( "Will not create checksum files.\n" );
         }
         
-        if ( createIncrementalChunks && formats.size() > 0 )
+        if ( createIncrementalChunks )
         {
             System.err.printf( "Will create incremental chunks for changes, along with baseline file.\n" );
         }
-        else if ( createIncrementalChunks )
-        {
-            System.err.printf( "Will create incremental chunks.\n" );
-        }
         else
         {
-            System.err.printf( "Will not create incremental chunks.\n" );
+            System.err.printf( "Will create baseline file.\n" );
         }
 
         NexusIndexer indexer = plexus.lookup( NexusIndexer.class );
@@ -231,8 +219,6 @@ public class NexusIndexerCli
         request.setCreateChecksumFiles( createChecksums );
 
         request.setCreateIncrementalChunks( createIncrementalChunks );
-        
-        request.setFormats( formats );
         
         if ( chunkCount != null )
         {
@@ -263,29 +249,6 @@ public class NexusIndexerCli
         System.err.printf( "Final memory: %dM/%dM\n", //
             ( r.totalMemory() - r.freeMemory() ) / MB,
             r.totalMemory() / MB );
-    }
-    
-    private List<IndexFormat> getFormats( final CommandLine cli, PlexusContainer plexus )
-    {
-        List<IndexFormat> indexFormats = new ArrayList<IndexFormat>();
-        
-        if ( cli.hasOption( FORMAT ))
-        {
-            String formats = cli.getOptionValue( FORMAT );
-            
-            for ( String format : formats.split( "," ) )
-            {
-                indexFormats.add( IndexFormat.valueOf( format ) );
-            }
-        }
-        // if not incremental, then force creation
-        else if ( !cli.hasOption( CREATE_INCREMENTAL_CHUNKS ) )
-        {
-            indexFormats.add( IndexFormat.FORMAT_LEGACY );
-            indexFormats.add( IndexFormat.FORMAT_V1 );
-        }
-        
-        return indexFormats;
     }
 
     private List<IndexCreator> getIndexers( final CommandLine cli, PlexusContainer plexus )
