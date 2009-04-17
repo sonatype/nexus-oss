@@ -27,8 +27,6 @@ public class IndexPackingRequest
 
     private boolean createChecksumFiles;
 
-    private IndexChunker indexChunker;
-
     private int maxIndexChunks;
 
     private Collection<IndexFormat> formats;
@@ -42,8 +40,6 @@ public class IndexPackingRequest
         this.createIncrementalChunks = true;
 
         this.createChecksumFiles = false;
-
-        this.indexChunker = new DefaultIndexChunker();
 
         this.maxIndexChunks = MAX_CHUNKS;
 
@@ -104,16 +100,6 @@ public class IndexPackingRequest
     public void setCreateChecksumFiles( boolean createChecksumFiles )
     {
         this.createChecksumFiles = createChecksumFiles;
-    }
-
-    public IndexChunker getIndexChunker()
-    {
-        return indexChunker;
-    }
-
-    public void setIndexChunker( IndexChunker indexChunker )
-    {
-        this.indexChunker = indexChunker;
     }
 
     public int getMaxIndexChunks()
