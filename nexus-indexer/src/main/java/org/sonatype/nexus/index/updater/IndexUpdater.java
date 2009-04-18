@@ -77,7 +77,5 @@ public interface IndexUpdater
             UnsupportedExistingLuceneIndexException;
 
     Date getTimestamp( Properties properties, String key );
-
-    String getUpdateChunkName( Date contextTimestamp, Properties properties );
     
 }

@@ -42,6 +42,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.context.DocumentFilter;
 import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -87,13 +88,21 @@ public class DefaultIndexUpdater
                 {
                     return null; // index is up to date
                 }
-
-                String chunkName = getUpdateChunkName( contextTimestamp, properties );
-
-                if ( chunkName != null )
+                
+                // If we have local properties, will parse and see what we need to download
+                if ( canRetrieveAllChunks( updateRequest.getLocalProperties(), properties ) )
                 {
-                    loadIndexDirectory( updateRequest, true, chunkName );
-
+                    int maxCounter = Integer.parseInt( properties.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ) );
+                    int currentCounter = Integer.parseInt( updateRequest.getLocalProperties().getProperty( IndexingContext.INDEX_CHUNK_COUNTER ) );
+                    
+                    // Start with the next one
+                    currentCounter++;
+                    
+                    while ( currentCounter <= maxCounter )
+                    {
+                        loadIndexDirectory( updateRequest, true, IndexingContext.INDEX_FILE + "." + currentCounter++ + ".gz" );
+                    }
+                    
                     return updateTimestamp;
                 }
             }
@@ -415,42 +424,47 @@ public class DefaultIndexUpdater
             indexProperties.delete();
         }
     }
-
-    /**
-     * Returns chunk name for downloading that contain all required updates since given <code>contextTimestamp</code> or
-     * null.
-     */
-    public String getUpdateChunkName( Date contextTimestamp, Properties properties )
+    
+    private boolean canRetrieveAllChunks( Properties localProps, Properties remoteProps )
     {
-        Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
-
-        if ( updateTimestamp == null || updateTimestamp.before( contextTimestamp ) )
+        // no localprops, cant retrieve chunks
+        if ( localProps == null )
         {
-            return null; // no updates
+            return false;
         }
-
-        int n = 0;
-
-        while ( true )
+        
+        String counterProp = localProps.getProperty( IndexingContext.INDEX_CHUNK_COUNTER );
+        
+        // no counter, cant retrieve chunks
+        // not a number, cant retrieve chunks
+        if ( StringUtils.isEmpty( counterProp ) 
+            || !StringUtils.isNumeric( counterProp ) )
         {
-            Date chunkTimestamp = getTimestamp( properties, IndexingContext.INDEX_CHUNK_PREFIX + n );
-
-            if ( chunkTimestamp == null )
-            {
-                break;
-            }
-
-            if ( contextTimestamp.after( chunkTimestamp ) )
-            {
-                SimpleDateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_DAY_FORMAT );
-                df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
-                return IndexingContext.INDEX_FILE + "." + df.format( chunkTimestamp ) + ".gz";
-            }
-
-            n++;
+            return false;
         }
-
-        return null; // no update chunk available
+        
+        int currentLocalCounter = Integer.parseInt( counterProp );
+        
+        // check remote props for existence of next chunk after local
+        // if we find it, then we are ok to retrieve the rest of the chunks
+        for ( Object key : remoteProps.keySet() )
+        {
+            String sKey = ( String ) key;
+            
+            if ( sKey.startsWith( IndexingContext.INDEX_CHUNK_PREFIX ) )
+            {
+                String value = remoteProps.getProperty( sKey );
+                
+                // If we have the current counter, or the next counter, we are good to go
+                if ( Integer.toString( currentLocalCounter ).equals( value )
+                    || Integer.toString( currentLocalCounter + 1 ).equals( value ) )
+                {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
 
     public Date getTimestamp( Properties properties, String key )
@@ -611,5 +625,4 @@ public class DefaultIndexUpdater
         }
 
     }
-
 }
