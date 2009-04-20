@@ -25,6 +25,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.mortbay.jetty.EofException;
 import org.restlet.Context;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
@@ -83,7 +84,7 @@ public abstract class AbstractArtifactPlexusResource
                 "Deployment tried with both 'packaging' and/or 'extension' being empty! One of these values is mandatory!" );
         }
 
-        MavenRepository mavenRepository = getMavenRepository( repositoryId );
+        MavenRepository mavenRepository = getMavenRepository( null, repositoryId );
 
         // if extension is not given, fall-back to packaging and apply mapper
         if ( StringUtils.isBlank( e ) )
@@ -168,7 +169,7 @@ public abstract class AbstractArtifactPlexusResource
 
         try
         {
-            MavenRepository mavenRepository = getMavenRepository( repositoryId );
+            MavenRepository mavenRepository = getMavenRepository( gavRequest, repositoryId );
 
             ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
 
@@ -256,7 +257,7 @@ public abstract class AbstractArtifactPlexusResource
 
         try
         {
-            MavenRepository mavenRepository = getMavenRepository( repositoryId );
+            MavenRepository mavenRepository = getMavenRepository( gavRequest, repositoryId );
 
             ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
 
@@ -448,7 +449,7 @@ public abstract class AbstractArtifactPlexusResource
 
                         try
                         {
-                            MavenRepository mr = getMavenRepository( repositoryId );
+                            MavenRepository mr = getMavenRepository( gavRequest,  repositoryId );
 
                             ArtifactStoreHelper helper = mr.getArtifactStoreHelper();
 
@@ -519,7 +520,18 @@ public abstract class AbstractArtifactPlexusResource
     protected void handleException( Request request, Response res, Exception t )
         throws ResourceException
     {
-        if ( t instanceof ResourceException )
+        // https://issues.sonatype.org/browse/NEXUS-217
+        if ( t instanceof EofException )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "Got exception during processing " + request.getMethod() + " "
+                        + request.getResourceRef().toString() + "\n" + t.getMessage() );
+            }
+            return;
+        }
+        else if ( t instanceof ResourceException )
         {
             throw (ResourceException) t;
         }
@@ -608,7 +620,7 @@ public abstract class AbstractArtifactPlexusResource
         }
     }
 
-    protected MavenRepository getMavenRepository( String id )
+    protected MavenRepository getMavenRepository( ArtifactStoreRequest gavRequest,  String id )
         throws ResourceException
     {
         try

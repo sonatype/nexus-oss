@@ -22,11 +22,13 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.configuration.model.v1_0_8.upgrade.BasicVersionUpgrade;
+import org.sonatype.nexus.configuration.model.v1_0_8.CProps;
 import org.sonatype.nexus.configuration.model.v1_0_8.CRepository;
 import org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_0_8.CSecurity;
+import org.sonatype.nexus.configuration.model.v1_0_8.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.upgrade.Upgrader;
@@ -112,7 +114,8 @@ public class Upgrade107to108
         {
             for ( CRepository repository : (List<CRepository>) newc.getRepositories() )
             {
-                repoIds.add( repository.getId() );
+                // need to check case insensitive for windows
+                repoIds.add( repository.getId().toLowerCase() );
             }
         }
 
@@ -121,7 +124,8 @@ public class Upgrade107to108
         {
             for ( CRepositoryShadow repository : (List<CRepositoryShadow>) newc.getRepositoryShadows() )
             {
-                repoIds.add( repository.getId() );
+                // need to check case insensitive for windows
+                repoIds.add( repository.getId().toLowerCase() );
             }
         }
 
@@ -129,11 +133,15 @@ public class Upgrade107to108
         {
             for ( CRepositoryGroup group : (List<CRepositoryGroup>) newc.getRepositoryGrouping().getRepositoryGroups() )
             {
-                if ( repoIds.contains( group.getGroupId() ) )
+                // need to check case insensitive for windows
+                if ( repoIds.contains( group.getGroupId().toLowerCase() ) )
                 {
+                    String groupId = group.getGroupId();
                     // if duped only
-                    group.setPathPrefix( group.getGroupId() );
-                    group.setGroupId( group.getGroupId() + "-group" );
+                    group.setPathPrefix( groupId );
+                    group.setGroupId( groupId + "-group" );
+
+                    upgradeGroupRefsInTask( newc, groupId );
                 }
             }
         }
@@ -142,5 +150,20 @@ public class Upgrade107to108
         message.setModelVersion( org.sonatype.nexus.configuration.model.v1_0_8.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
         
+    }
+    
+    @SuppressWarnings( "unchecked" )
+    private void upgradeGroupRefsInTask( org.sonatype.nexus.configuration.model.v1_0_8.Configuration conf, String groupId )
+    {
+        for ( CScheduledTask task : (List<CScheduledTask>) conf.getTasks() )
+        {
+            for ( CProps prop : (List<CProps>) task.getProperties() )
+            {
+                if ( prop.getKey().equals( "repositoryOrGroupId" ) && prop.getValue().equals( "group_" + groupId ) )
+                {
+                    prop.setValue( "group_" + groupId + "-group" );
+                }
+            }
+        }
     }
 }

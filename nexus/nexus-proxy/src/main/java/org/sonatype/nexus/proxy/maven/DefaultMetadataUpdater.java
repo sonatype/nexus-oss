@@ -34,6 +34,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 
 @Component( role = MetadataUpdater.class )
@@ -47,9 +48,11 @@ public class DefaultMetadataUpdater
     public void deployArtifact( ArtifactStoreRequest request )
         throws IOException
     {
-        if ( !StringUtils.isEmpty( request.getClassifier() ) )
+        if ( request.getGav().isHash() || request.getGav().isSignature()
+            || StringUtils.isNotBlank( request.getGav().getClassifier() ) )
         {
-            // artifacts with classifiers have no metadata
+            // hashes and signatures are "meta"
+            // artifacts with classifiers do not change metadata
             return;
         }
 
@@ -77,7 +80,7 @@ public class DefaultMetadataUpdater
             {
                 operations.add( new SetSnapshotOperation( new SnapshotOperand( MetadataBuilder.createSnapshot( request
                     .getVersion() ) ) ) );
-                
+
                 MetadataBuilder.changeMetadata( gavMd, operations );
 
                 locator.storeGAVMetadata( request, gavMd );
@@ -118,16 +121,18 @@ public class DefaultMetadataUpdater
         }
         catch ( MetadataException e )
         {
-            // ?
+            throw new StorageException( "Not able to apply changes!", e );
         }
     }
 
     public void undeployArtifact( ArtifactStoreRequest request )
         throws IOException
     {
-        if ( !StringUtils.isEmpty( request.getClassifier() ) )
+        if ( request.getGav().isHash() || request.getGav().isSignature()
+            || StringUtils.isNotBlank( request.getGav().getClassifier() ) )
         {
-            // artifacts with classifiers have no metadata
+            // hashes and signatures are "meta"
+            // artifacts with classifiers do not change metadata
             return;
         }
 
@@ -195,13 +200,20 @@ public class DefaultMetadataUpdater
         }
         catch ( MetadataException e )
         {
-            // ?
+            throw new StorageException( "Not able to apply changes!", e );
         }
     }
 
     // ==
 
     public void deployArtifacts( Collection<ArtifactStoreRequest> requests )
+        throws IOException
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void undeployArtifacts( Collection<ArtifactStoreRequest> requests )
         throws IOException
     {
         // TODO Auto-generated method stub

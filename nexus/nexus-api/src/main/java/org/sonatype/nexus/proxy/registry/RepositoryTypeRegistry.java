@@ -34,18 +34,18 @@ public interface RepositoryTypeRegistry
     Set<RepositoryTypeDescriptor> getRepositoryTypeDescriptors();
 
     /**
-     * List existing ContentClasses that exists in system.
-     * 
-     * @return
-     */
-    Collection<ContentClass> getContentClasses();
-
-    /**
      * Returns an unmodifiable set of FQN of classes that are known that provides Repository components.
      * 
      * @return a set of repository type descriptors or empty set.
      */
     Set<String> getRepositoryRoles();
+
+    /**
+     * Returns the available content classes.
+     * 
+     * @return
+     */
+    Set<ContentClass> getContentClasses();
 
     /**
      * Returns the set of hints for the given repository role.

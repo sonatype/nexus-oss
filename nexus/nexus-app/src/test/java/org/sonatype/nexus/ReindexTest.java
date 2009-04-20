@@ -186,6 +186,8 @@ public class ReindexTest
         targetDir.mkdirs();
 
         IndexPackingRequest ipr = new IndexPackingRequest( ctx, targetDir );
+        
+        ipr.setCreateIncrementalChunks( true );
 
         indexPacker.packIndex( ipr );
 

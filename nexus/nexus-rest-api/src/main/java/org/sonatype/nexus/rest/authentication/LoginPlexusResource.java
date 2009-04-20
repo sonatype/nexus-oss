@@ -37,8 +37,6 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class LoginPlexusResource
     extends AbstractUIPermissionCalculatingPlexusResource
 {
-    @Requirement(hint="additinalRoles")
-    private PlexusUserManager userManager;
 
     @Override
     public Object getPayloadInstance()
@@ -68,16 +66,6 @@ public class LoginPlexusResource
 
         AuthenticationLoginResourceResponse result = new AuthenticationLoginResourceResponse();
         
-        String username = resource.getClientPermissions().getLoggedInUsername();
-        
-        if( StringUtils.isNotEmpty( username ))
-        {
-            // look up the realm of the user
-            PlexusUser user = userManager.getUser( username );
-            String source = (user != null) ? user.getSource() : null;
-            resource.getClientPermissions().setLoggedInUserSource( source);
-        }
-
         result.setData( resource );
 
         return result;

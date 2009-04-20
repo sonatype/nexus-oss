@@ -101,6 +101,8 @@ Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
  * 
  * rowClickEvent: event name to fire when a row is clicked.
  * 
+ * rowFocusChangedEvent: event name to fire when a row's focus changes.  Called every time a row is clicked.
+ * 
  * rowClickHandler: a specific handler to be called on rowClick
  * 
  * rowContextClickEvent: event name to fire when a row is right-clicked.
@@ -403,7 +405,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
       }
 
       if ( this.rowClickEvent ) {
-        Sonatype.Events.fireEvent( this.rowClickEvent, panel, rec );
+        Sonatype.Events.fireEvent( this.rowClickEvent, panel, rec, this );
       }
 
       if ( panel.items ) {
@@ -418,6 +420,11 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
       else {
         return;
       }
+    }
+    
+    // row clicked (not just init)
+    if( this.rowFocusChangedEvent ) {
+    	Sonatype.Events.fireEvent( this.rowFocusChangedEvent, panel, rec, this );
     }
 
     this.cardPanel.getLayout().setActiveItem( panel );

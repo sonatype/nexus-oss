@@ -13,6 +13,9 @@
  */
 package org.sonatype.nexus.rest.roles;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -36,13 +39,16 @@ public abstract class AbstractRolePlexusResource
         return nexusSecurity;
     }
 
+    @SuppressWarnings( "unchecked" )
     public RoleResource nexusToRestModel( SecurityRole role, Request request )
+        throws ResourceException
     {
         // TODO: ultimately this method will take a parameter which is the nexus object
         // and will convert to the rest object
         RoleResource resource = new RoleResource();
 
         resource.setDescription( role.getDescription() );
+
         resource.setId( role.getId() );
         resource.setName( role.getName() );
         resource.setResourceURI( this.createChildReference( request, this, resource.getId() ).toString() );
@@ -62,6 +68,7 @@ public abstract class AbstractRolePlexusResource
         return resource;
     }
 
+    @SuppressWarnings( "unchecked" )
     public SecurityRole restToNexusModel( SecurityRole role, RoleResource resource )
     {
         if ( role == null )
@@ -70,7 +77,7 @@ public abstract class AbstractRolePlexusResource
         }
 
         role.setId( resource.getId() );
-        
+
         role.setDescription( resource.getDescription() );
         role.setName( resource.getName() );
         role.setSessionTimeout( resource.getSessionTimeout() );
@@ -89,19 +96,50 @@ public abstract class AbstractRolePlexusResource
 
         return role;
     }
-    
+
     public void validateRoleContainment( SecurityRole role )
         throws ResourceException
     {
-        if ( role.getRoles().size() == 0 
-            && role.getPrivileges().size() == 0)
+        if ( role.getRoles().size() == 0 && role.getPrivileges().size() == 0 )
         {
-            throw new PlexusResourceException( 
-                Status.CLIENT_ERROR_BAD_REQUEST, 
-                "Configuration error.", 
-                getNexusErrorResponse( 
-                    "privileges", 
-                    "One or more roles/privilegs are required." ) );
+            throw new PlexusResourceException(
+                Status.CLIENT_ERROR_BAD_REQUEST,
+                "Configuration error.",
+                getNexusErrorResponse( "privileges", "One or more roles/privilegs are required." ) );
+        }
+    }
+
+    protected String encode( String s )
+        throws ResourceException
+    {
+        try
+        {
+            return URLEncoder.encode( s, "UTF-8" );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            String msg = "Could not encode id: '" + s + "'";
+
+            getLogger().warn( msg, e );
+
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, msg );
+        }
+    }
+
+    protected String decode( String s )
+        throws ResourceException
+    {
+        try
+        {
+            return URLDecoder.decode( s, "UTF-8" );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            String msg = "Could not decode id: '" + s + "'";
+
+            getLogger().warn( msg, e );
+
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, msg );
         }
     }
 

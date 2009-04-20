@@ -26,5 +26,6 @@ public interface Walker
      * @param fromPath
      * @throws WalkerException
      */
-    void walk( WalkerContext context );
+    void walk( WalkerContext context )
+        throws WalkerException;
 }

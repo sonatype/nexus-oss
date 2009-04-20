@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.permission.WildcardPermission;
@@ -28,6 +29,8 @@ import org.jsecurity.crypto.hash.Hash;
 import org.jsecurity.subject.Subject;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
+import org.sonatype.jsecurity.locators.users.PlexusUser;
+import org.sonatype.jsecurity.locators.users.PlexusUserManager;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
@@ -52,6 +55,9 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
     @Requirement
     private NexusSecurity nexusSecurity;
 
+    @Requirement(hint="additinalRoles")
+    private PlexusUserManager userManager;
+    
     protected AuthenticationClientPermissions getClientPermissionsForCurrentUser( Request request )
         throws ResourceException
     {
@@ -95,6 +101,18 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
             perms.setLoggedIn( true );
 
             perms.setLoggedInUsername( "anonymous" );
+        }
+        
+        // need to set the source of the logged in user
+        //The UI might need to show/hide something based on the user's source
+        // i.e. like the 'Change Password' link.
+        String username = perms.getLoggedInUsername();
+        if( StringUtils.isNotEmpty( username ))
+        {
+            // look up the realm of the user
+            PlexusUser user = userManager.getUser( username );
+            String source = (user != null) ? user.getSource() : null;
+            perms.setLoggedInUserSource( source);
         }
 
         Map<String, Integer> privilegeMap = new HashMap<String, Integer>();

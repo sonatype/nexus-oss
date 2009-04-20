@@ -119,9 +119,18 @@ public class RecreateMavenMetadataWalkerTest
         "/com/mycom/group1/maven-metadata.xml",
         "/com/mycom/group2/maven-p1-plugin/1.0/maven-p1-plugin-1.0.jar",
         "/com/mycom/group2/maven-p1-plugin/1.0/maven-p1-plugin-1.0.pom",
+        "/com/mycom/group2/maven-p1-plugin/2.0/maven-p1-plugin-2.0.jar",
+        "/com/mycom/group2/maven-p1-plugin/2.0/maven-p1-plugin-2.0.pom",
         "/com/mycom/group2/maven-p2-plugin/1.0/maven-p2-plugin-1.0.jar",
         "/com/mycom/group2/maven-p2-plugin/1.0/maven-p2-plugin-1.0.pom",
-        "/com/mycom/group2/maven-metadata.xml" };
+        "/com/mycom/group2/maven-metadata.xml",
+        "/com/mycom/group3/maven-a1-plugin/1.0/maven-a1-plugin-1.0.pom",
+        "/com/mycom/group3/maven-a1-plugin/2.0/maven-a1-plugin-2.0.pom",
+        "/com/mycom/group3/maven-a1-plugin/3.0/maven-a1-plugin-3.0.pom",
+        "/com/mycom/group3/maven-b1-plugin/1.0/maven-b1-plugin-1.0.pom",
+        "/com/mycom/group3/maven-c1-plugin/1.0/maven-c1-plugin-1.0.pom",
+        "/com/mycom/group3/maven-d1-plugin/1.0/maven-d1-plugin-1.0.pom"
+    };
 
     @Override
     protected EnvironmentBuilder getEnvironmentBuilder()
@@ -567,6 +576,28 @@ public class RecreateMavenMetadataWalkerTest
                 Assert.fail( "The plugin '" + plugin.getArtifactId() + "' is incorrect" );
             }
         }
+    }
+    
+    public void testGroupDirMdElementUniqueAndSorted()
+        throws Exception
+    {
+        rebuildMavenMetadata( inhouseRelease );
+
+        Map<String, Boolean> expected = new LinkedHashMap<String, Boolean>();
+        expected.put( "/com/mycom/group3/maven-metadata.xml", Boolean.TRUE );
+        expected.put( "/com/mycom/group3/maven-metadata.xml.md5", Boolean.TRUE );
+        expected.put( "/com/mycom/group3/maven-metadata.xml.sha1", Boolean.TRUE );
+
+        validateResults( inhouseRelease, expected );
+
+        Metadata md = readMavenMetadata( retrieveFile( inhouseRelease, "/com/mycom/group3/maven-metadata.xml" ) );
+
+        assertEquals( 4, md.getPlugins().size() );
+
+        assertEquals( "maven-a1-plugin", ( (Plugin) md.getPlugins().get( 0 ) ).getArtifactId() );
+        assertEquals( "maven-b1-plugin", ( (Plugin) md.getPlugins().get( 1 ) ).getArtifactId() );
+        assertEquals( "maven-c1-plugin", ( (Plugin) md.getPlugins().get( 2 ) ).getArtifactId() );
+        assertEquals( "maven-d1-plugin", ( (Plugin) md.getPlugins().get( 3 ) ).getArtifactId() );
     }
 
 }

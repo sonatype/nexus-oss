@@ -188,6 +188,15 @@ public interface Repository
     void setNotFoundCache( PathCache notFoundcache );
 
     /**
+     * Maintains NFC.
+     * 
+     * @param path
+     * @throws ItemNotFoundException
+     */
+    void maintainNotFoundCache( String path )
+        throws ItemNotFoundException;
+
+    /**
      * Adds path to NFC.
      * 
      * @param path
@@ -401,40 +410,23 @@ public interface Repository
     // Alternative (and unprotected) Content access
 
     StorageItem retrieveItem( boolean fromTask, ResourceStoreRequest request )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException;
+        throws IllegalOperationException, ItemNotFoundException, StorageException;
 
     void copyItem( boolean fromTask, ResourceStoreRequest from, ResourceStoreRequest to )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException;
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException;
 
     void moveItem( boolean fromTask, ResourceStoreRequest from, ResourceStoreRequest to )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException;
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException;
 
     void deleteItem( boolean fromTask, ResourceStoreRequest request )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException;
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException;
 
     void storeItem( boolean fromTask, StorageItem item )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            StorageException;
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException;
 
     Collection<StorageItem> list( boolean fromTask, ResourceStoreRequest request )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException;
+        throws IllegalOperationException, ItemNotFoundException, StorageException;
 
     Collection<StorageItem> list( boolean fromTask, StorageCollectionItem item )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException;
+        throws IllegalOperationException, ItemNotFoundException, StorageException;
 }

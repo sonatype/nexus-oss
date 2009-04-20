@@ -33,12 +33,12 @@ import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 public class HttpVerbMappingAuthorizationFilter
     extends org.sonatype.jsecurity.web.filter.authz.HttpVerbMappingAuthorizationFilter
 {
-    
+
     private AuthcAuthzEvent currentAuthzEvt;
     
-    protected Nexus getNexus( ServletRequest request )
+    protected Nexus getNexus()
     {
-        return (Nexus) request.getAttribute( Nexus.class.getName() );
+        return (Nexus) getAttribute( Nexus.class.getName() );
     }
 
     @Override
@@ -54,7 +54,7 @@ public class HttpVerbMappingAuthorizationFilter
 
     private void recordAuthzFailureEvent( ServletRequest request, ServletResponse response )
     {
-        Nexus nexus = getNexus( request );
+        Nexus nexus = getNexus();
 
         Subject subject = getSubject( request, response );
 
@@ -72,6 +72,8 @@ public class HttpVerbMappingAuthorizationFilter
             return;
         }
         
+        getLogger().info( msg );
+
         getLogger().info( msg );
 
         AuthcAuthzEvent authzEvt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHZ, msg );

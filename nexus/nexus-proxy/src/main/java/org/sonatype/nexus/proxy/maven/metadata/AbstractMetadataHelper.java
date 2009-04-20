@@ -17,7 +17,9 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
@@ -48,7 +50,8 @@ abstract public class AbstractMetadataHelper
 
     String currentVersion;
 
-    List<Plugin> currentPlugins = new ArrayList<Plugin>();
+    // use artifact id to prevent multiple same plugins got recorded
+    Map<String, Plugin> currentPlugins = new HashMap<String, Plugin>();
 
     List<String> currentVersions = new ArrayList<String>();
 
@@ -253,7 +256,7 @@ abstract public class AbstractMetadataHelper
                 plugin.setName( model.getName() );
             }
 
-            currentPlugins.add( plugin );
+            currentPlugins.put( plugin.getArtifactId(), plugin );
         }
     }
 

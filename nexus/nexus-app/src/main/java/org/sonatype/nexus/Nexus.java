@@ -30,7 +30,7 @@ import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
-import org.sonatype.nexus.log.SimpleLog4jConfig;
+import org.sonatype.nexus.log.LogConfig;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -64,11 +64,8 @@ public interface Nexus
     // ----------------------------------------------------------------------------
 
     StorageItem dereferenceLinkItem( StorageLinkItem item )
-        throws NoSuchResourceStoreException,
-            ItemNotFoundException,
-            AccessDeniedException,
-            IllegalOperationException,
-            StorageException;
+        throws NoSuchResourceStoreException, ItemNotFoundException, AccessDeniedException, IllegalOperationException,
+        StorageException;
 
     RepositoryRouter getRootRouter();
 
@@ -77,13 +74,10 @@ public interface Nexus
     // ----------------------------------------------------------------------------
 
     public Repository createRepository( CRepository settings )
-        throws ConfigurationException,
-            IOException;
+        throws ConfigurationException, IOException;
 
     public void deleteRepository( String id )
-        throws NoSuchRepositoryException,
-            IOException,
-            ConfigurationException;
+        throws NoSuchRepositoryException, IOException, ConfigurationException;
 
     // ----------------------------------------------------------------------------
     // Maintenance
@@ -113,8 +107,7 @@ public interface Nexus
         throws IOException;
 
     SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
-        throws NoSuchRepositoryException,
-            IllegalArgumentException;
+        throws NoSuchRepositoryException, IllegalArgumentException;
 
     /**
      * Remove the repository's storage folder
@@ -136,10 +129,10 @@ public interface Nexus
     NexusStreamResponse getConfigurationAsStreamByKey( String key )
         throws IOException;
 
-    SimpleLog4jConfig getLogConfig()
+    LogConfig getLogConfig()
         throws IOException;
 
-    void setLogConfig( SimpleLog4jConfig config )
+    void setLogConfig( LogConfig config )
         throws IOException;
 
     // ----------------------------------------------------------------------------
@@ -165,7 +158,7 @@ public interface Nexus
     List<NexusArtifactEvent> getRecentlyStorageChanges( Integer from, Integer count, Set<String> repositoryIds );
 
     List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Integer from, Integer count,
-        Set<String> repositoryIds );
+                                                                   Set<String> repositoryIds );
 
     List<NexusArtifactEvent> getRecentlyCachedArtifacts( Integer from, Integer count, Set<String> repositoryIds );
 
@@ -222,5 +215,4 @@ public interface Nexus
 
     void deleteRepositoryTemplate( String id )
         throws IOException;
-
 }

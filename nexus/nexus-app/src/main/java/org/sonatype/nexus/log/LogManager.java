@@ -18,24 +18,24 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
+ * LogManager.
+ * 
  * @author cstamas
  * @author juven
- *
  */
 public interface LogManager
 {
-    /**
-     * @return All FileAppenders' files from all loggers
-     */
     Set<File> getLogFiles();
 
     File getLogFile( String filename );
 
     void createLogDirectory();
 
-    SimpleLog4jConfig getLogConfig()
+    LogConfig getLogConfig()
         throws IOException;
+    
+    boolean isUserEdited();
 
-    void setLogConfig( SimpleLog4jConfig logConfig )
+    void setLogConfig( LogConfig logConfig )
         throws IOException;
 }

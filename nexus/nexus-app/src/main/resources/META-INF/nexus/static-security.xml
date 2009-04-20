@@ -33,7 +33,6 @@
             <privileges>
                 <privilege>1</privilege>
                 <privilege>54</privilege>
-                <privilege>56</privilege>
                 <privilege>57</privilege>
                 <privilege>58</privilege>
                 <privilege>70</privilege>
@@ -211,7 +210,6 @@
                 <privilege>46</privilege>
                 <privilege>47</privilege>
                 <privilege>48</privilege>
-                <privilege>56</privilege>
                 <privilege>70</privilege>
                 <privilege>74</privilege>
             </privileges>
@@ -1327,22 +1325,6 @@
                 <property>
                     <key>permission</key>
                     <value>nexus:repostatus</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>56</id>
-            <type>method</type>
-            <name>Repository Content Classes - (read)</name>
-            <description>Give permission to retrieve the list of repository content classes supported by nexus.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:repocontentclasses</value>
                 </property>
             </properties>
         </privilege>

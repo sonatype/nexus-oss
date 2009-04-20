@@ -119,16 +119,16 @@
   <!-- Shortcuts for outnumbered deps :) -->
   <properties>
     <plexus.appbooter.version>1.6.6</plexus.appbooter.version>
-    <jsw.binaries.version>3.2.3.4</jsw.binaries.version>
-    <plexus-jsecurity-realms.version>1.0.7-SNAPSHOT</plexus-jsecurity-realms.version>
+    <jsw.binaries.version>3.2.3.5-SNAPSHOT</jsw.binaries.version>
+    <plexus-jsecurity-realms.version>1.0.6.2-SNAPSHOT</plexus-jsecurity-realms.version>
     <slf4j.version>1.5.6</slf4j.version>
-    <maven.version>2.1-SONATYPE-653485</maven.version>
-    <nexus.indexer.version>1.2.2-SNAPSHOT</nexus.indexer.version>
-    <nexus.repository.metadata.version>1.0.1-SNAPSHOT</nexus.repository.metadata.version>
+    <maven.version>2.1.0</maven.version>
+    <nexus.indexer.version>1.2.3-SNAPSHOT</nexus.indexer.version>
+    <nexus.repository.metadata.version>1.0.0</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
     <plexus.restlet.bridge.version>1.8-SNAPSHOT</plexus.restlet.bridge.version>
     <micromailer.version>1.0.2</micromailer.version>
-    <mercury.version>1.0-alpha-5</mercury.version>
+    <mercury.version>1.0-alpha-6</mercury.version>
     <restlet.version>1.1.1-b6</restlet.version>
     <plexus-jetty6.version>1.6</plexus-jetty6.version>
     <plexus-task-scheduler.version>1.2-SNAPSHOT</plexus-task-scheduler.version>
@@ -349,44 +349,6 @@
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model</artifactId>
         <version>${maven.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-project</artifactId>
-        <version>${maven.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-plugin-api</artifactId>
-        <version>${maven.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-core</artifactId>
-        <version>${maven.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.archetype</groupId>
-        <artifactId>archetype-common</artifactId>
-        <version>2.0-alpha-1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-project</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-core</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-velocity</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>velocity</groupId>
-            <artifactId>velocity</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <!-- maven mercury -->
@@ -775,4 +737,10 @@
       </plugin>
     </plugins>
   </reporting>
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/tags/nexus-1.3.0</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/tags/nexus-1.3.0</developerConnection>
+    <url>http://svn.sonatype.org/nexus/tags/nexus-1.3.0</url>
+  </scm>
 </project>

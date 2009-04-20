@@ -1,11 +1,16 @@
 package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.mercury.repository.metadata.AddPluginOperation;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
+import org.apache.maven.mercury.repository.metadata.MetadataException;
+import org.apache.maven.mercury.repository.metadata.MetadataOperation;
 import org.apache.maven.mercury.repository.metadata.Plugin;
+import org.apache.maven.mercury.repository.metadata.PluginOperand;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -38,15 +43,21 @@ public class GroupDirMetadataProcessor
         metadataHelper.store( mdString, path + AbstractMetadataHelper.METADATA_SUFFIX );
 
     }
+    
 
     private Metadata createMetadata( String path )
+        throws MetadataException
     {
         Metadata md = new Metadata();
 
-        for ( Plugin plugin : metadataHelper.currentPlugins )
+        List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
+
+        for ( Plugin plugin : metadataHelper.currentPlugins.values() )
         {
-            md.addPlugin( plugin );
+            ops.add( new AddPluginOperation( new PluginOperand( plugin ) ) );
         }
+
+        MetadataBuilder.changeMetadata( md, ops );
 
         return md;
     }
@@ -57,10 +68,12 @@ public class GroupDirMetadataProcessor
         {
             return false;
         }
-        if ( path.substring( 1 ).replace( '/', '.' ).equals( metadataHelper.currentGroupId ) )
+
+        if ( ( "/" + metadataHelper.currentGroupId.replace( '.', '/' ) ).equals( path ) )
         {
             return true;
         }
+
         return false;
     }
 

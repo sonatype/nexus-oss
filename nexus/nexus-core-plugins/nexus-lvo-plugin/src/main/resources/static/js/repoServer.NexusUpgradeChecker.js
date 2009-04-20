@@ -18,7 +18,7 @@
 Sonatype.Events.addListener( 'nexusStatus', function() {
   Ext.Ajax.request( {
     method: 'GET',
-    suppressStatus: 404,
+    suppressStatus: [404,401],
     url: Sonatype.config.servicePath + '/lvo/nexus-' +
       Sonatype.utils.editionShort.substr( 0, 3 ).toLowerCase() + '/' + Sonatype.utils.versionShort,
     success: function( response, options ) {
@@ -29,7 +29,7 @@ Sonatype.Events.addListener( 'nexusStatus', function() {
           '<span style="color:#000">' +
           '<b>UPGRADE AVAILABLE:</b> ' +
           'Nexus ' + Sonatype.utils.edition + ' ' + r.response.version + ' is now available. ' +
-          '<a href="' + r.response.url + '">Download now!</a>' +
+          '<a href="' + r.response.url + '" target="_blank">Download now!</a>' +
           '</span>' 
         );
       }

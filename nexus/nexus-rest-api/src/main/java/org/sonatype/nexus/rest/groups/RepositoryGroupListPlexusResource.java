@@ -146,26 +146,9 @@ public class RepositoryGroupListPlexusResource
                     getNexusErrorResponse( "repositories", "The group cannot have zero repository members!" ) );
             }
 
-            try
-            {
-                CRepositoryGroup group = getNexus().readRepositoryGroup( resource.getId() );
-
-                if ( group != null )
-                {
-                    getLogger().info( "The repository group with ID=" + group.getGroupId() + " already exists!" );
-
-                    throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "The repository group with ID="
-                        + group.getGroupId() + " already exists!", getNexusErrorResponse(
-                        "id",
-                        "The repository group with id=" + group.getGroupId() + " already exists!" ) );
-                }
-            }
-            catch ( NoSuchRepositoryException ex )
-            {
-                createOrUpdateRepositoryGroup( resource, true );
-            }
+            createOrUpdateRepositoryGroup( resource, true );
         }
-        
+
         // TODO: return the group
         return null;
     }

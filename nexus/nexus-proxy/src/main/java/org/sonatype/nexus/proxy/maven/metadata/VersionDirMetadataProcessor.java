@@ -27,11 +27,14 @@ public class VersionDirMetadataProcessor
 
     public boolean isPathMatched( String path )
     {
-        if ( StringUtils.isEmpty( metadataHelper.currentVersion ) )
+        if ( StringUtils.isEmpty( metadataHelper.currentGroupId )
+            || StringUtils.isEmpty( metadataHelper.currentArtifactId )
+            || StringUtils.isEmpty( metadataHelper.currentVersion ) )
         {
             return false;
         }
-        if ( getName( path ).equals( metadataHelper.currentVersion ) )
+        if ( ( "/" + metadataHelper.currentGroupId.replace( '.', '/' ) + "/" + metadataHelper.currentArtifactId + "/" + metadataHelper.currentVersion )
+            .equals( path ) )
         {
             return true;
         }

@@ -128,12 +128,6 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             anchor: Sonatype.view.FIELD_OFFSET,
             allowBlank:false,
             itemCls: 'required-field'
-          },
-          {
-            xtype: 'button',
-            scope: this,
-            text: 'Test SMTP settings',
-            handler: this.testSmtpBtnHandler
           }
         ]
       },
@@ -585,7 +579,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       this.save();
     }
   },
-
+  
   //takes an optional config object
   // only defined value now is {restartRequired:bool}
   save : function(config) {
@@ -676,111 +670,6 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
     });
   },
   
-  testSmtpBtnHandler: function() {
-    var fpanel = this.formPanel;
-    var appSettingsPanel = fpanel.findById( fpanel.id + '_applicationServerSettings' );
-
-    if ( appSettingsPanel.collapsed ) {
-      var baseUrlField = this.find( 'name', 'baseUrl' )[0];
-      baseUrlField.setValue( '' );
-    }
-
-    
-    var data = {
-      testEmail: '',
-      host: fpanel.form.findField('smtpSettings.host').getValue(),
-      port: fpanel.form.findField('smtpSettings.port').getValue(),
-      username: fpanel.form.findField('smtpSettings.username').getValue(),
-      password: fpanel.form.findField('smtpSettings.password').getValue(),
-      systemEmailAddress: fpanel.form.findField('smtpSettings.systemEmailAddress').getValue(),
-      sslEnabled: fpanel.form.findField('smtpSettings.sslEnabled').getValue(),
-      tlsEnabled: fpanel.form.findField('smtpSettings.tlsEnabled').getValue()
-    };
-  
-    var w = new Ext.Window({
-      title: 'Validate SMTP settings',
-      closable: true,
-      autoWidth: false,
-      width: 350,
-      autoHeight: true,
-      modal:true,
-      constrain: true,
-      resizable: false,
-      draggable: false,
-      items: [
-        {
-          xtype: 'form',
-          labelWidth:60,
-          frame:true,  
-          defaultType:'textfield',
-          monitorValid:true,
-          items:[
-            {
-              xtype: 'panel',
-              style: 'padding-left: 70px; padding-bottom: 10px',
-              html: 'Please, inform an e-mail that will recieve the test message'
-            },
-            { 
-              fieldLabel: 'E-mail', 
-              name: 'email',
-              width: 200,
-              allowBlank: false 
-            }
-          ],
-          buttons: [
-            {
-              text: 'Validate',
-              formBind: true,
-              scope: this,
-              handler: function(){
-                var email = w.find('name', 'email')[0].getValue();
-                this.runStmpConfigCheck(email, data)
-                w.close();
-              }
-            },
-            {
-              text: 'Cancel',
-              formBind: false,
-              scope: this,
-              handler: function(){
-                w.close();
-              }
-            }
-          ]
-        }
-      ]
-    });
-    
-    w.show();
-  },
-  
-  runStmpConfigCheck : function(testEmail, data) {
-
-    data.testEmail = testEmail;
-      
-    Ext.Ajax.request( {
-      method: 'PUT',
-      url: Sonatype.config.repos.urls.smtpSettingsState,
-      jsonData: { data: data },
-      callback: function( options, success, response ) {
-        this.el.unmask();
-
-        if ( success ) {
-          Sonatype.MessageBox.show( {
-            title: 'SMTP configuration',
-            msg: 'SMTP configuration validated successfuly, check your inbox!',
-            buttons: Sonatype.MessageBox.OK,
-            icon: Sonatype.MessageBox.INFO
-          } );
-        }
-        else {
-          Sonatype.utils.connectionError( response, 'Error on SMTP validation!' );
-        }
-      },
-      scope : this
-    } );
-  },
-
   //(Ext.form.BasicForm, Ext.form.Action)
   actionCompleteHandler : function(form, action) {
     if (action.type == 'sonatypeSubmit'){

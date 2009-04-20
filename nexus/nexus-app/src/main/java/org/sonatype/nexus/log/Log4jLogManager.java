@@ -114,8 +114,13 @@ public class Log4jLogManager
             }
         }
     }
+    
+    public boolean isUserEdited()
+    {
+        return logConfiguration.isUserEdited();
+    }
 
-    public SimpleLog4jConfig getLogConfig()
+    public LogConfig getLogConfig()
         throws IOException
     {
         logConfiguration.load();
@@ -123,12 +128,12 @@ public class Log4jLogManager
         return new SimpleLog4jConfig( logConfiguration.getConfig() );
     }
 
-    public void setLogConfig( SimpleLog4jConfig simpleLog4jConfig )
+    public void setLogConfig( LogConfig logConfig )
         throws IOException
     {
         Map<String, String> config = logConfiguration.getConfig();
 
-        config.putAll( simpleLog4jConfig.toMap() );
+        config.putAll( logConfig );
 
         logConfiguration.apply();
 

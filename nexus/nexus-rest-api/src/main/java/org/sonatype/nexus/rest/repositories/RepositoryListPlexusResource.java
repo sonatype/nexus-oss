@@ -25,14 +25,12 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * A resource list for Repository list.
@@ -90,52 +88,16 @@ public class RepositoryListPlexusResource
             {
                 if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
                 {
-                    try
-                    {
-                        CRepositoryShadow shadow = getNexus().readRepositoryShadow( resource.getId() );
+                    CRepositoryShadow shadow = getRepositoryShadowAppModel( (RepositoryShadowResource) resource, null );
 
-                        if ( shadow != null )
-                        {
-                            getLogger().info( "Virtual repository with ID=" + resource.getId() + " already exists!" );
-
-                            throw new PlexusResourceException(
-                                Status.CLIENT_ERROR_BAD_REQUEST,
-                                "Virtual repository with id=" + resource.getId() + " already exists!",
-                                getNexusErrorResponse( "id", "Virtual repository with id=" + resource.getId()
-                                    + " already exists!" ) );
-                        }
-                    }
-                    catch ( NoSuchRepositoryException e )
-                    {
-                        CRepositoryShadow shadow = getRepositoryShadowAppModel(
-                            (RepositoryShadowResource) resource,
-                            null );
-
-                        getNexus().createRepositoryShadow( shadow );
-                    }
+                    getNexus().createRepositoryShadow( shadow );
                 }
                 else
                 {
-                    try
-                    {
-                        CRepository normal = getNexus().readRepository( resource.getId() );
+                    CRepository normal = getRepositoryAppModel( (RepositoryResource) resource, null );
 
-                        if ( normal != null )
-                        {
-                            getLogger().info( "Repository with ID=" + resource.getId() + " already exists!" );
+                    getNexus().createRepository( normal );
 
-                            throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with id="
-                                + resource.getId() + " already exists!", getNexusErrorResponse(
-                                "id",
-                                "Repository with id=" + resource.getId() + " already exists!" ) );
-                        }
-                    }
-                    catch ( NoSuchRepositoryException e )
-                    {
-                        CRepository normal = getRepositoryAppModel( (RepositoryResource) resource, null );
-
-                        getNexus().createRepository( normal );
-                    }
                 }
             }
             catch ( ConfigurationException e )

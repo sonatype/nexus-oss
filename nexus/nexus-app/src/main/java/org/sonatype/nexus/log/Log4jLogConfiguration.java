@@ -22,47 +22,47 @@ import java.util.Properties;
 import org.apache.log4j.PropertyConfigurator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.util.EnhancedProperties;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * @author juven
  */
-@Component( role = LogConfiguration.class, hint = "default" )
+@Component( role = LogConfiguration.class )
 public class Log4jLogConfiguration
-    implements LogConfiguration<EnhancedProperties>
+    implements LogConfiguration<Properties>
 {
+    private static final String NEXUS_REMARK = "Log4j configuration created by Sonatype Nexus";
 
     @Requirement
     private LogConfigurationSource<File> logConfigurationSource;
 
-    private EnhancedProperties config = new EnhancedProperties();
+    private Properties config = new Properties();
 
     public void apply()
     {
-        Properties properties = new Properties();
-
-        for ( String key : config.keySet() )
-        {
-            if ( key.startsWith( EnhancedProperties.BLANK_LINE_KEY_PREFIX ) )
-            {
-                continue;
-            }
-            if ( key.startsWith( EnhancedProperties.COMMENT_KEY_PREFIX ) )
-            {
-                continue;
-            }
-            properties.put( key, config.get( key ) );
-        }
-
-        PropertyConfigurator.configure( properties );
+        PropertyConfigurator.configure( config );
     }
 
-    public EnhancedProperties getConfig()
+    public Properties getConfig()
     {
         return config;
     }
 
-    public void setConfig( EnhancedProperties config )
+    public boolean isUserEdited()
+    {
+        try
+        {
+            String configFile = FileUtils.fileRead( logConfigurationSource.getSource() );
+
+            return !configFile.contains( NEXUS_REMARK );
+        }
+        catch ( IOException e )
+        {
+            return true;
+        }
+    }
+
+    public void setConfig( Properties config )
     {
         this.config = config;
     }
@@ -89,7 +89,7 @@ public class Log4jLogConfiguration
 
         try
         {
-            config.store( outputStream );
+            config.store( outputStream, NEXUS_REMARK );
         }
         finally
         {

@@ -67,7 +67,7 @@ public class LogConfigPlexusResource
 
         try
         {
-            SimpleLog4jConfig logConfig = getNexus().getLogConfig();
+            SimpleLog4jConfig logConfig = (SimpleLog4jConfig) getNexus().getLogConfig();
 
             LogConfigResource data = new LogConfigResource();
 
@@ -108,8 +108,8 @@ public class LogConfigPlexusResource
 
             String rootLogger = data.getRootLoggerLevel() + ", " + data.getRootLoggerAppenders();
 
-            SimpleLog4jConfig logConfig = new SimpleLog4jConfig( rootLogger, data.getFileAppenderLocation(), data
-                .getFileAppenderPattern() );
+            SimpleLog4jConfig logConfig =
+                new SimpleLog4jConfig( rootLogger, data.getFileAppenderLocation(), data.getFileAppenderPattern() );
 
             getNexus().setLogConfig( logConfig );
 

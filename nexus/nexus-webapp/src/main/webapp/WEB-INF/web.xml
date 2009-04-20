@@ -29,7 +29,7 @@
             <param-name>config</param-name>
             <param-value>
 			[filters]
-			authcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
+			authcBasic = org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter
 			authcBasic.applicationName = Sonatype Nexus Repository Manager API
 			authcBasic.fakeAuthScheme = true
 
@@ -51,9 +51,9 @@
 
             tgiperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
             tgiperms.pathPrefix = /service/local/repo_groups/(.*)/index_content(.*)
-            tgiperms.pathReplacement = /repo_groups/@1@2
+            tgiperms.pathReplacement = /groups/@1@2
 
-			contentAuthcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
+			contentAuthcBasic = org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter
 			contentAuthcBasic.applicationName = Sonatype Nexus Repository Manager
 			contentAuthcBasic.fakeAuthScheme = false
 

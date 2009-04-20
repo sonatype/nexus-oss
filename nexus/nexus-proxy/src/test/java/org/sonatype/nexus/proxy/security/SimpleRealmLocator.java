@@ -7,7 +7,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.jsecurity.realm.Realm;
-import org.sonatype.jsecurity.locators.RealmLocator;
 
 public class SimpleRealmLocator
     implements RealmLocator, Initializable

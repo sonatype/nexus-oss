@@ -125,10 +125,7 @@ public abstract class AbstractNexusTestCase
 
     protected void tearDown()
         throws Exception
-    {
-        // stop the ehCacheManager (this the default imple checks if the cache is running first )
-        this.lookup( PlexusEhCacheWrapper.class ).stop();
-        
+    {   
         super.tearDown();
     }
 

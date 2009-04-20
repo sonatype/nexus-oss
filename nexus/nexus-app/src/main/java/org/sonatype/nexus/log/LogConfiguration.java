@@ -38,6 +38,8 @@ public interface LogConfiguration<T>
     void apply();
 
     T getConfig();
+    
+    boolean isUserEdited();
 
     void setConfig( T config );
 }

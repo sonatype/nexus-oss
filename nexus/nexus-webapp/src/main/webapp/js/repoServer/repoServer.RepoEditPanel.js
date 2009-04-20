@@ -67,7 +67,10 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
   
   providerSelectHandler: function( combo, rec, index ) {
     this.form.findField( 'format' ).setValue( rec.data.format );
+    this.afterProviderSelectHandler( combo, rec, index);
   },
+  
+  afterProviderSelectHandler: function( combo, rec, index ) {},
 
   repoPolicySelectHandler: function( combo, rec, index ) {
     var repoPolicy = rec.data.value.toLowerCase();
@@ -148,7 +151,24 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
     rec.set( 'repoPolicy', receivedData.repoPolicy );
     rec.commit();
     rec.endEdit();
+  },
+  
+    //@override
+  addSorted : function(store, rec) {
+	var insertIndex = store.getCount();
+	for (var i=0 ; i < store.getCount() ; i++) {
+	  var tempRec = store.getAt(i);
+	  if (tempRec.get('repoType') == 'group') {
+	    continue;
+	  }
+	  if (tempRec.get('name').toLowerCase() > rec.get('name').toLowerCase() ) {
+	  	insertIndex = i;
+	  	break;
+	  }
+	}
+	store.insert( insertIndex, [rec] );
   }
+  
 } );
 
 Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
@@ -946,6 +966,8 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
       }
     }
   } );
+  
+  this.on( 'show', this.showHandler, this );
 };
 
 Ext.extend( Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.AbstractRepositoryEditor, {
@@ -963,7 +985,30 @@ Ext.extend( Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.Abstr
       // until we find a better solution for procurement repos
       this.buttons[0].disable();
     }
+  },
+  
+  afterProviderSelectHandler: function( combo, rec, index ) {
+  	this.updateDownloadRemoteIndexCombo(rec.data.format);
+  },
+  
+  showHandler: function ( panel ) {
+  	var formatField = this.form.findField('format');
+  	if ( formatField ){
+  		this.updateDownloadRemoteIndexCombo( formatField.getValue() );
+  	}
+  },
+  
+  updateDownloadRemoteIndexCombo: function( repoFormat ){
+  	var downloadRemoteIndexCombo = this.form.findField('downloadRemoteIndexes');
+  	if ( repoFormat == 'maven2'){
+      downloadRemoteIndexCombo.enable();  		
+  	}
+  	else{
+      downloadRemoteIndexCombo.setValue('False');
+      downloadRemoteIndexCombo.disable();    		
+  	}
   }
+
 } );
 
 Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
@@ -995,7 +1040,9 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
     id: 'id',
     fields: [
       { name: 'id' },
-      { name: 'name', sortType: Ext.data.SortTypes.asUCString }
+      { name: 'name', sortType: Ext.data.SortTypes.asUCString },
+      { name: 'format'},
+      { name: 'repoType'}
     ],
     sortInfo: { field: 'name', direction: 'asc' },
     url: Sonatype.config.repos.urls.repositories,
@@ -1099,7 +1146,9 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
         triggerAction: 'all',
         emptyText: 'Select...',
         selectOnFocus: true,
-        allowBlank: false
+        allowBlank: false,
+        // this config can solve the problem of 'filter is not applied the first time'
+        lastQuery: ''
       },
       {
         xtype: 'combo',
@@ -1123,6 +1172,32 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
 };
 
 Ext.extend( Sonatype.repoServer.VirtualRepositoryEditor, Sonatype.repoServer.AbstractRepositoryEditor, {
+	
+	afterProviderSelectHandler: function( combo, rec, index ) {
+		var provider = rec.data.provider;
+		var sourceRepoCombo = this.form.findField('shadowOf');
+		sourceRepoCombo.focus();
+		if ( provider == 'm1-m2-shadow'){
+			sourceRepoCombo.store.filterBy( 
+				function fn(rec, id){
+					if ( rec.data.repoType != 'virtual' && rec.data.format == 'maven1'){
+						return true;
+					}
+					return false;
+				}
+			);
+		}
+		else if ( provider == 'm2-m1-shadow'){
+			sourceRepoCombo.store.filterBy( 
+				function fn(rec, id){
+					if ( rec.data.repoType != 'virtual' && rec.data.format == 'maven2'){
+						return true;
+					}
+					return false;
+				}
+			);
+		}
+	}
 } );
 
 Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {

@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
 import org.codehaus.plexus.util.StringUtils;
+import org.mortbay.jetty.EofException;
 import org.restlet.Context;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
@@ -478,6 +479,16 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         if ( getLogger().isDebugEnabled() )
         {
+            // https://issues.sonatype.org/browse/NEXUS-217
+            if ( t instanceof EofException )
+            {
+                getLogger().debug(
+                    "Got exception during processing " + req.getMethod() + " " + req.getResourceRef().toString() + "\n"
+                        + t.getMessage() );
+
+                return;
+            }
+            
             getLogger().debug(
                 "Got exception during processing " + req.getMethod() + " " + req.getResourceRef().toString(),
                 t );

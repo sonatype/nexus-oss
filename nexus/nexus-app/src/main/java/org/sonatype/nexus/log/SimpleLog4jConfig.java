@@ -14,8 +14,8 @@
 package org.sonatype.nexus.log;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 /**
  * Extract the most import part of the log4j configuration file
@@ -23,83 +23,65 @@ import java.util.Properties;
  * @author juven
  */
 public class SimpleLog4jConfig
+    extends HashMap<String, String>
+    implements LogConfig
 {
+    private static final long serialVersionUID = -4276278316976003784L;
+
     private static final String KEY_ROOT_LOGGER = "log4j.rootLogger";
 
-    private static final String KEY_FILE_APPENDER_LOCAION = "log4j.appender.logfile.File";
+    private static final String KEY_FILE_APPENDER_LOCATION = "log4j.appender.logfile.File";
 
     private static final String KEY_FILE_APPENDER_PATTERN = "log4j.appender.logfile.layout.ConversionPattern";
 
-    private String rootLogger;
-
-    private String fileAppenderLocation;
-
-    private String fileAppenderPattern;
-
     public SimpleLog4jConfig( String rootLogger, String fileAppenderLocation, String fileAppenderPattern )
     {
-        this.rootLogger = rootLogger;
+        setRootLogger( rootLogger );
 
-        this.fileAppenderLocation = fileAppenderLocation;
+        setFileAppenderLocation( fileAppenderLocation );
 
-        this.fileAppenderPattern = fileAppenderPattern;
+        setFileAppenderPattern( fileAppenderPattern );
     }
 
-    public SimpleLog4jConfig( Map<String, String> prop )
+    public SimpleLog4jConfig( Properties prop )
     {
-        this.rootLogger = prop.get( KEY_ROOT_LOGGER );
-
-        this.fileAppenderLocation = prop.get( KEY_FILE_APPENDER_LOCAION );
-
-        this.fileAppenderPattern = prop.get( KEY_FILE_APPENDER_PATTERN );
-    }
-
-    public Map<String, String> toMap()
-    {
-        Map<String, String> result = new HashMap<String, String>();
-
-        result.put( KEY_ROOT_LOGGER, rootLogger );
-
-        if ( fileAppenderLocation != null )
+        for ( Entry<Object, Object> e : prop.entrySet() )
         {
-            result.put( KEY_FILE_APPENDER_LOCAION, fileAppenderLocation );
+            if ( e.getKey() != null )
+            {
+                put( e.getKey().toString(), e.getValue() != null ? e.getValue().toString() : null );
+            }
         }
-
-        if ( fileAppenderPattern != null )
-        {
-            result.put( KEY_FILE_APPENDER_PATTERN, fileAppenderPattern );
-        }
-        return result;
     }
 
     public String getFileAppenderLocation()
     {
-        return fileAppenderLocation;
+        return get( KEY_FILE_APPENDER_LOCATION );
     }
 
     public void setFileAppenderLocation( String fileAppenderLocation )
     {
-        this.fileAppenderLocation = fileAppenderLocation;
+        put( KEY_FILE_APPENDER_LOCATION, fileAppenderLocation );
     }
 
     public String getFileAppenderPattern()
     {
-        return fileAppenderPattern;
+        return get( KEY_FILE_APPENDER_PATTERN );
     }
 
     public void setFileAppenderPattern( String fileAppenderPattern )
     {
-        this.fileAppenderPattern = fileAppenderPattern;
+        put( KEY_FILE_APPENDER_PATTERN, fileAppenderPattern );
     }
 
     public String getRootLogger()
     {
-        return rootLogger;
+        return get( KEY_ROOT_LOGGER );
     }
 
     public void setRootLogger( String rootLogger )
     {
-        this.rootLogger = rootLogger;
+        put( KEY_ROOT_LOGGER, rootLogger );
     }
 
 }

@@ -69,11 +69,6 @@ public interface WalkerContext
     void setProcessors( List<WalkerProcessor> processors );
 
     /**
-     * Stops the walker.
-     */
-    void stop();
-
-    /**
      * Stops the walker with cause.
      * 
      * @param cause

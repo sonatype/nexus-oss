@@ -661,6 +661,8 @@ public class DefaultNexusConfiguration
 
         fillValidationContextRepositoryIds( result );
 
+        fillValidationContextRepositoryGroupIds( result );
+        
         return result;
     }
 

@@ -37,7 +37,7 @@ public class LvoQueryPlexusResource
     public PathProtectionDescriptor getResourceProtection()
     {
         // unprotected resource
-        return new PathProtectionDescriptor( "/lvo/*/*", "anon" );
+        return new PathProtectionDescriptor( "/lvo/*/*", "authcBasic,perms[nexus:status]" );
     }
 
     @Override

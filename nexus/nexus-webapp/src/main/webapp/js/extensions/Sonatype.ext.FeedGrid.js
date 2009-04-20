@@ -32,21 +32,24 @@ Sonatype.ext.FeedGrid = function(config) {
         autoLoad: false
     });
 
-    this.columns = [{
+    this.columns = [
+      {
         id: 'title',
         header: "Title",
         dataIndex: 'title',
         sortable:true,
         width: 420,
         renderer: this.formatTitle
-      },{
+      },
+      {
         id: 'last',
         header: "Date",
         dataIndex: 'pubDate',
         width: 150,
         renderer:  this.formatDate,
         sortable:true
-    }];
+      }
+    ];
 
     Sonatype.ext.FeedGrid.superclass.constructor.call(this, {
         title: 'Select a feed from the list',
@@ -137,7 +140,7 @@ Ext.extend(Sonatype.ext.FeedGrid, Ext.grid.GridPanel, {
 
     formatTitle: function(value, p, record, rowIndex, colIndex, store) {
         return String.format(
-                '<div class="topic"><b>{0}</b><span class="author">{1}</span></div>',
-                value, record.data.author, record.id, record.data.forumid);
+                '<div class="topic"><b><a href="{1}" target="_blank">{0}</a></b><span class="author">{2}</span></div>',
+                value, record.data.link, record.data.author);
     }
 });

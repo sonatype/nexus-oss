@@ -193,17 +193,29 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
 			}
 		});
 		
-		
-		if (this.debug) {
-			this.clipEl.applyStyles({
-				'background-color': 'green'
-			});
-			this.floatEl.applyStyles({
-				'background-color': 'red'
-			});
+		/** SONTYPE DIFF **/
+		/** Original
+		if ( this.debug ) {
+  		this.clipEl.applyStyles({
+  		  'background-color': 'green'
+  		});
+  		this.floatEl.applyStyles({
+  			'background-color': 'red'
+  		});
 		} else {
 			this.clipEl.setOpacity(0.0);
-		}
+		} **/
+		/** Fixed **/
+		this.clipEl.applyStyles({
+      'background-color': 'green'
+    });
+    this.floatEl.applyStyles({
+      'background-color': 'red'
+    });
+    if ( !this.debug ) {
+      this.clipEl.setOpacity(0.0);
+    }
+    /** SONATYPE DIFF **/
 		
 		this.createInputFile();
 	},

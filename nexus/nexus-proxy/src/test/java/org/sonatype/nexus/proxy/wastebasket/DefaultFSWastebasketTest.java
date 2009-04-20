@@ -74,11 +74,11 @@ public class DefaultFSWastebasketTest
         {
             return new File( "target/trash" );
         }
-        
-        public void delete(File file)
+
+        public void delete( File file )
             throws IOException
         {
-            super.delete( file );
+            super.delete( file, false );
         }
     }
 }

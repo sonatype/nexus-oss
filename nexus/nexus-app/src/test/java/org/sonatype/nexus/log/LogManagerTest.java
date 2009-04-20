@@ -51,7 +51,7 @@ public class LogManagerTest
     public void testLogConfig()
         throws Exception
     {
-        SimpleLog4jConfig config = manager.getLogConfig();
+        SimpleLog4jConfig config = (SimpleLog4jConfig) manager.getLogConfig();
 
         assertEquals( "DEBUG, console", config.getRootLogger() );
 
@@ -59,13 +59,13 @@ public class LogManagerTest
 
         manager.setLogConfig( config );
 
-        assertEquals( "INFO, console", manager.getLogConfig().getRootLogger() );
+        assertEquals( "INFO, console", ( (SimpleLog4jConfig) manager.getLogConfig() ).getRootLogger() );
 
         config.setRootLogger( "DEBUG, console" );
 
         manager.setLogConfig( config );
 
-        assertEquals( "DEBUG, console", manager.getLogConfig().getRootLogger() );
+        assertEquals( "DEBUG, console", ( (SimpleLog4jConfig) manager.getLogConfig() ).getRootLogger() );
     }
 
     public void testGetLogFiles()
@@ -94,9 +94,9 @@ public class LogManagerTest
         assertEquals( 2, files.size() );
         assertTrue( files.contains( appenderFileA ) );
         assertTrue( files.contains( appenderFileB ) );
-        
+
         // test getLogFile() method
-        assertEquals(appenderFileA, manager.getLogFile( "appenderA.log" ));
-        assertEquals(appenderFileB, manager.getLogFile( "appenderB.log" ));
+        assertEquals( appenderFileA, manager.getLogFile( "appenderA.log" ) );
+        assertEquals( appenderFileB, manager.getLogFile( "appenderB.log" ) );
     }
 }

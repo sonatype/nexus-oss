@@ -24,6 +24,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
@@ -62,6 +63,11 @@ public class NexusRepositoryMetadataEventInspector
             || revt.getRepository().getRepositoryContentClass().isCompatible( maven1ContentClass ) )
         {
             Repository repository = revt.getRepository();
+
+            if ( LocalStatus.OUT_OF_SERVICE.equals( repository.getLocalStatus() ) )
+            {
+                return;
+            }
 
             String repositoryUrl = null;
 
@@ -121,8 +127,8 @@ public class NexusRepositoryMetadataEventInspector
             {
                 List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
 
-                List<RepositoryMemberMetadata> memberMetadatas = new ArrayList<RepositoryMemberMetadata>( members
-                    .size() );
+                List<RepositoryMemberMetadata> memberMetadatas =
+                    new ArrayList<RepositoryMemberMetadata>( members.size() );
 
                 for ( Repository member : members )
                 {
@@ -151,9 +157,8 @@ public class NexusRepositoryMetadataEventInspector
                 // "decorate" the file attrs
                 StorageFileItem file = nrt.getLastWriteFile();
 
-                file.getAttributes().put(
-                    ContentGenerator.CONTENT_GENERATOR_ID,
-                    "NexusRepositoryMetadataContentGenerator" );
+                file.getAttributes().put( ContentGenerator.CONTENT_GENERATOR_ID,
+                                          "NexusRepositoryMetadataContentGenerator" );
 
                 repository.getLocalStorage().updateItemAttributes( repository, new ResourceStoreRequest( file ), file );
             }

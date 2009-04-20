@@ -62,8 +62,8 @@ public interface Wastebasket
         throws IOException;
 
     /**
-     * Performs a delete operation. It delets at once if item is file or link. If it is a collection, it will delete it
-     * and all it's subitems (recursively).
+     * Performs a delete operation. It deletes at once if item is file or link. If it is a collection, it will delete it
+     * and all it's sub-items (recursively).
      * 
      * @param path
      * @throws IOException
@@ -72,7 +72,7 @@ public interface Wastebasket
         throws StorageException;
 
     /**
-     * Perform a delete operation. Delete storage folder and indexer folder of a repository.
+     * Move the repository's storage folder into trash, and 'rm -fr' proxy attributes folder and index folder 
      * 
      * @param repository
      */

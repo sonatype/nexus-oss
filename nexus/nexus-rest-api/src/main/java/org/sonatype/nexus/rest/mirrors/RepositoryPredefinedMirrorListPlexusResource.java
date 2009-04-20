@@ -13,7 +13,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.repositories.metadata.NexusRepositoryMetadataHandler;
 import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
@@ -29,7 +28,7 @@ public class RepositoryPredefinedMirrorListPlexusResource
 {
     @Requirement
     private NexusRepositoryMetadataHandler repoMetadata;
-    
+
     @Requirement
     private RepositoryRegistry repoRegistry;
 
@@ -96,7 +95,7 @@ public class RepositoryPredefinedMirrorListPlexusResource
         }
         catch ( MetadataHandlerException e )
         {
-            getLogger().error( "Unable to retrieve metadata, returning no items", e );
+            getLogger().info( "Unable to retrieve metadata, returning no items: " + e.getMessage() );
         }
         catch ( IOException e )
         {

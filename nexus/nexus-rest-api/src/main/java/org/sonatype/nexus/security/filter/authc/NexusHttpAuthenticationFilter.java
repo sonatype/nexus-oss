@@ -21,6 +21,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.ExpiredCredentialsException;
@@ -47,9 +49,9 @@ public class NexusHttpAuthenticationFilter
     private final Log logger = LogFactory.getLog( this.getClass() );
 
     private boolean fakeAuthScheme;
-    
+
     private AuthcAuthzEvent currentAuthcEvt;
-    
+
     protected Log getLogger()
     {
         return logger;
@@ -80,11 +82,15 @@ public class NexusHttpAuthenticationFilter
         }
     }
 
-    protected Nexus getNexus( ServletRequest request )
+    protected Nexus getNexus()
     {
-        return (Nexus) request.getAttribute( Nexus.class.getName() );
+        return (Nexus) getAttribute( Nexus.class.getName() );
     }
-    
+
+    protected PlexusContainer getPlexusContainer()
+    {
+        return (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
+    }
 
     @Override
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
@@ -119,7 +125,7 @@ public class NexusHttpAuthenticationFilter
         else
         {
             // let the user "fall thru" until we get some permission problem
-            if ( getNexus( request ).isAnonymousAccessEnabled() )
+            if ( getNexus().isAnonymousAccessEnabled() )
             {
                 loggedIn = executeAnonymousLogin( request, response );
             }
@@ -182,7 +188,7 @@ public class NexusHttpAuthenticationFilter
 
         Subject subject = getSubject( request, response );
 
-        Nexus nexus = getNexus( request );
+        Nexus nexus = getNexus();
 
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( nexus.getAnonymousUsername(), nexus
             .getAnonymousPassword() );
@@ -216,7 +222,7 @@ public class NexusHttpAuthenticationFilter
         // means the authentication attempt either never occured, or wasn't successful:
         return false;
     }
-    
+
     @Override
     protected boolean onLoginSuccess( AuthenticationToken token, Subject subject, ServletRequest request,
         ServletResponse response )
@@ -228,7 +234,7 @@ public class NexusHttpAuthenticationFilter
 
         return true;
     }
-    
+
     private void recordAuthcEvent( ServletRequest request, String msg )
     {
         // to make feeds entries be more concise, ignore similar events which occurs in a small period of time
@@ -239,13 +245,15 @@ public class NexusHttpAuthenticationFilter
         
         getLogger().info( msg );
 
+        getLogger().info( msg );
+
         AuthcAuthzEvent evt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHC, msg );
 
-        getNexus( request ).addAuthcAuthzEvent( evt );
+        getNexus().addAuthcAuthzEvent( evt );
 
         currentAuthcEvt = evt;
     }
-    
+
     private boolean isSimilarEvent( String msg )
     {
         if ( currentAuthcEvt == null )

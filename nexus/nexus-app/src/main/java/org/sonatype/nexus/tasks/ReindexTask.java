@@ -61,11 +61,13 @@ public class ReindexTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Reindexing repository group " + getRepositoryGroupName();
+            return "Reindexing repository group " + getRepositoryGroupName() + " from path " + getResourceStorePath()
+                + " and below.";
         }
         else if ( getRepositoryId() != null )
         {
-            return "Reindexing repository " + getRepositoryName();
+            return "Reindexing repository " + getRepositoryName() + " from path " + getResourceStorePath()
+                + " and below.";
         }
         else
         {

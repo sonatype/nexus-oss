@@ -58,11 +58,13 @@ public class ArtifactDirMetadataProcessor
 
     public boolean isPathMatched( String path )
     {
-        if ( StringUtils.isEmpty( metadataHelper.currentArtifactId ) )
+        if ( StringUtils.isEmpty( metadataHelper.currentGroupId )
+            || StringUtils.isEmpty( metadataHelper.currentArtifactId ) )
         {
             return false;
         }
-        if ( getName( path ).equals( metadataHelper.currentArtifactId ) )
+        if ( ( "/" + metadataHelper.currentGroupId.replace( '.', '/' ) + "/" + metadataHelper.currentArtifactId )
+            .equals( path ) )
         {
             return true;
         }

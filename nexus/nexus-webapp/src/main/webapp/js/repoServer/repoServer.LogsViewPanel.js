@@ -203,6 +203,7 @@ Sonatype.repoServer.LogsViewPanel = function(config){
       {
         xtype: 'checkbox',
         checked: true,
+        boxLabel: 'Tail',
         listeners: {
           'check': {
             fn: function( checkbox, checked ) {
@@ -214,8 +215,7 @@ Sonatype.repoServer.LogsViewPanel = function(config){
             scope: this
           }
         }
-      },
-      'Tail'
+      }
     ],
     bbar: this.fetchMoreBar,
     items: [

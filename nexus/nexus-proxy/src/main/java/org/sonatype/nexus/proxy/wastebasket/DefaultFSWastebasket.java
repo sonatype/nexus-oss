@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
@@ -225,33 +226,56 @@ public class DefaultFSWastebasket
     public void deleteRepositoryFolders( Repository repository )
         throws IOException
     {
-        File defaultStorageFile = new File(
+        File defaultRepoStorageFolder = new File(
             new File( applicationConfiguration.getWorkingDirectory(), "storage" ),
             repository.getId() );
 
-        delete( defaultStorageFile );
+        // only remove the storage folder when in default storage case
+        if ( defaultRepoStorageFolder.toURI().toURL().toString().equals( repository.getLocalUrl() + "/" ) )
+        {
+            delete( defaultRepoStorageFolder, false );
+        }
+
+        File repoProxyAttributesFolder = new File( new File( new File(
+            applicationConfiguration.getWorkingDirectory(),
+            "proxy" ), "attributes" ), repository.getId() );
+
+        delete( repoProxyAttributesFolder, true );
+
+        if ( !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+        {
+            File indexerFolder = new File( applicationConfiguration.getWorkingDirectory(), "indexer" );
+
+            delete( new File( indexerFolder, repository.getId() + "-local" ), true );
+
+            delete( new File( indexerFolder, repository.getId() + "-remote" ), true );
+        }
     }
 
     /**
-     * Move file or directory to the trash
+     * Move the file to trash, or simply delete it forever
      * 
-     * @param file
+     * @param file file to be deleted
+     * @param deleteForever if it's true, delete the file forever, if it's false, move the file to trash
      * @throws IOException
      */
-    protected void delete( File file )
+    protected void delete( File file, boolean deleteForever )
         throws IOException
     {
-        File basketFile = new File( getWastebasketDirectory(), file.getName() );
-
-        if ( file.isDirectory() )
+        if ( !deleteForever )
         {
-            FileUtils.mkdir( basketFile.getAbsolutePath() );
+            File basketFile = new File( getWastebasketDirectory(), file.getName() );
 
-            FileUtils.copyDirectoryStructure( file, basketFile );
-        }
-        else
-        {
-            FileUtils.copyFile( file, basketFile );
+            if ( file.isDirectory() )
+            {
+                FileUtils.mkdir( basketFile.getAbsolutePath() );
+
+                FileUtils.copyDirectoryStructure( file, basketFile );
+            }
+            else
+            {
+                FileUtils.copyFile( file, basketFile );
+            }
         }
 
         FileUtils.forceDelete( file );

@@ -13,40 +13,37 @@
  */
 package org.sonatype.nexus.task;
 
-import org.sonatype.nexus.AbstractNexusTestCase;
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.tasks.RemoveRepoFolderTask;
-import org.sonatype.nexus.tasks.descriptors.RemoveRepoFolderTaskDescriptor;
-import org.sonatype.scheduling.SchedulerTask;
+import java.io.File;
 
-public class RemoveRepoFolderTaskTest extends AbstractNexusTestCase {
-	
-	private NexusScheduler nexusScheduler;
+import org.sonatype.nexus.AbstractMavenRepoContentTests;
 
-	protected boolean loadConfigurationAtSetUp() {
-		// IT IS NEEDED FROM NOW ON!
-		return true;
-	}
+/**
+ * Test if the repo folders(storage, indexer, proxy attributes) were deleted correctly
+ * 
+ * @author juven
+ */
+public class RemoveRepoFolderTaskTest
+    extends AbstractMavenRepoContentTests
+{
+    public void testRemoveRepoFolder()
+        throws Exception
+    {
+        fillInRepo();
 
-	protected void setUp() throws Exception {
-		super.setUp();
+        String repoId = snapshots.getId();
 
-		nexusScheduler = lookup(NexusScheduler.class);
+        defaultNexus.removeRepositoryFolder( snapshots );
 
-		nexusScheduler.startService();
-	}
+        File workDir = defaultNexus.getNexusConfiguration().getWorkingDirectory();
+        File trashDir = new File( workDir, "trash" );
 
-	protected void tearDown() throws Exception {
-		
-		nexusScheduler.stopService();
+        assertFalse( new File( new File( workDir, "storage" ), repoId ).exists() );
+        assertFalse( new File( new File( workDir, "indexer" ), repoId + "-local" ).exists() );
+        assertFalse( new File( new File( workDir, "indexer" ), repoId + "-remote" ).exists() );
+        assertFalse( new File( new File( new File( workDir, "proxy" ), "attributes" ), repoId ).exists() );
 
-		super.tearDown();
-	}
-	
-	public void testRemoveRepoFolder() throws Exception
-	{
-		RemoveRepoFolderTask task = (RemoveRepoFolderTask)lookup(SchedulerTask.class, RemoveRepoFolderTaskDescriptor.ID);
-	
-		nexusScheduler.submit( "task", task );
-	}
+        assertTrue( new File( trashDir, repoId ).exists() );
+        assertFalse( new File( trashDir, repoId + "-local" ).exists() );
+        assertFalse( new File( trashDir, repoId + "-remote" ).exists() );
+    }
 }

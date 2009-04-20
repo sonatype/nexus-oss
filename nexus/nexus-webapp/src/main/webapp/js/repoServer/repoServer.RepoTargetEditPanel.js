@@ -75,7 +75,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
     url: Sonatype.config.repos.urls.repoContentClasses,
     reader: this.contentClassesReader,
     sortInfo: {field: 'description', direction: 'ASC'},
-    autoLoad: true
+    autoLoad: false
   });
   
   this.COMBO_WIDTH = 300;
@@ -123,6 +123,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
         emptyText:'Select...',
         selectOnFocus:true,
         allowBlank: false,
+        disabled: true,
         listeners: {
           'select': {
             fn: function(combo, record, index) {
@@ -626,6 +627,11 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     if(sp.checkPermission('nexus:targets', sp.EDIT)){
       component.buttons[0].disabled = false;
     }
+	if ( sp.checkPermission('nexus:componentscontentclasses', sp.READ ) ){
+	  this.contentClassesDataStore.load();
+	  var contentClassCombo = component.items.get( 1 );
+	  contentClassCombo.disabled = false;
+	}
   },
 
   formDataLoader : function(formPanel, resourceURI, modFuncs){

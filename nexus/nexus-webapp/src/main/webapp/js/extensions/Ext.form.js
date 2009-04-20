@@ -715,13 +715,13 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
           for ( var i = 0; i < receivedData.length; i++ ) {
             var r = receivedData[i];
             var rec = new store.reader.recordType( r, r.resourceURI );
-            store.addSorted( rec );
+            this.addSorted( store, rec );
           }
         }
         else {
           var rec = new store.reader.recordType( receivedData, receivedData.resourceURI );
           rec.autoCreateNewRecord = true;
-          store.addSorted( rec );
+          this.addSorted( store, rec );
         }
       }
       this.isNew = false;
@@ -730,6 +730,10 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
     else if ( action.type == 'sonatypeLoad' ) {
       this.fireEvent( 'load', form, action, receivedData );
     }
+  },
+  
+  addSorted: function( store, rec ){
+  	store.addSorted( rec );
   },
   
   getActionURL: function() {

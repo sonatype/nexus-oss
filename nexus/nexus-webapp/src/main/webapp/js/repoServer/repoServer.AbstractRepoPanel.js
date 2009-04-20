@@ -68,10 +68,6 @@ Sonatype.repoServer.AbstractRepoPanel = function(config){
       text: 'Delete',
       scope:this,
       handler: this.deleteRepoItemHandler
-    },
-    uploadArtifact: {
-      text: 'Upload Artifact...',
-      handler: this.uploadArtifactHandler
     }
   };
 
@@ -357,59 +353,6 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     }
     
     Sonatype.Events.fireEvent( 'nexusRepositoryStatus', status );
-  },
-
-  uploadArtifactHandler : function( rec ){
-      
-    Ext.Ajax.request({
-      url: rec.data.resourceURI,
-      scope: this,
-      callback: function(options, success, response) {
-        if ( success ) {
-          var statusResp = Ext.decode(response.responseText);
-          if (statusResp.data) {
-            if ( statusResp.data.allowWrite ) {
-              if ( ! this.formCards ) {
-                this.formCards = this.cardPanel;
-              }
-                
-              var oldItem = this.formCards.getLayout().activeItem;
-              this.formCards.remove(oldItem, true);
-              
-              if ( this.formCards.tbar ) {
-                this.formCards.tbar.oldSize = this.formCards.tbar.getSize(); 
-                this.formCards.tbar.hide();
-                this.formCards.tbar.setHeight(0);
-              }
-
-              var panel = new Ext.Panel({
-                layout: 'fit',
-                frame: true,
-                items: [ new Sonatype.repoServer.FileUploadPanel({
-                  title: 'Artifact Upload to ' + rec.get('name'),
-//                  repoPanel: this,
-                  payload: rec
-                }) ]
-              });
-              this.formCards.insert(1, panel);
-              this.formCards.getLayout().setActiveItem(panel);
-              panel.doLayout();
-            }
-            else {
-              Sonatype.MessageBox.show({
-                title: 'Deployment Disabled',
-                icon: Sonatype.MessageBox.ERROR,
-                buttons: Sonatype.MessageBox.OK,
-                msg: 'Deployment is disabled for the selected repository.<br /><br />' +
-                  'You can enable it in the "Access Settings" section of the repository configuration'
-              });
-            }
-            return;
-          }
-        }
-        Sonatype.utils.connectionError( response, 'There was a problem obtaining repository status.' );
-      }
-    });
   },
   
   restToRemoteUrl: function( node, repoRecord ) {

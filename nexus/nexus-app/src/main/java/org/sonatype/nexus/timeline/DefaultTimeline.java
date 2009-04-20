@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.index.context.NexusIndexWriter;
@@ -163,14 +165,58 @@ public class DefaultTimeline
                 running = true;
             }
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
-            indexDirectory = null;
+            getLogger().warn( "TimeLine index is corrupted, trying to create new index files." );
 
-            running = false;
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Caused by: ", e );
+            }
+            
+            try
+            {
+                handleCrashedTimeLine();
+            }
+            catch ( IOException ioe )
+            {
+                getLogger().error( "Could not start TimeLine!", ioe );
 
-            throw new StartingException( "Cannot start Timeline!", e );
+                indexDirectory = null;
+
+                running = false;
+
+                throw new StartingException( "Could not start TimeLine!", ioe );
+            }
         }
+    }
+
+    private void handleCrashedTimeLine()
+        throws IOException
+    {
+        try
+        {
+            closeWriter();
+        }
+        catch ( IOException ioe )
+        {
+        }
+
+        File backupDir = applicationConfiguration.getWorkingDirectory( ".timeline-crashed-" + new Date().getTime() );
+
+        FileUtils.copyDirectoryStructure( timelineDirectory, backupDir );
+
+        FileUtils.cleanDirectory( timelineDirectory );
+
+        getLogger().info( "Crashed TimeLine directory is moved to " + backupDir.getAbsolutePath() );
+
+        indexDirectory = FSDirectory.getDirectory( timelineDirectory );
+
+        indexWriter = new NexusIndexWriter( indexDirectory, new KeywordAnalyzer(), true );
+
+        closeWriter();
+
+        running = true;
     }
 
     public void stop()
@@ -331,7 +377,8 @@ public class DefaultTimeline
             getLogger().error( "Could not purge timeline index!", e );
         }
     }
-
+    
+    @SuppressWarnings("unchecked")
     protected List<Map<String, String>> retrieve( Query query, long from, int count, TimelineFilter filter )
     {
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
@@ -344,7 +391,6 @@ public class DefaultTimeline
                     query,
                     new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
 
-                @SuppressWarnings( "unchecked" )
                 Iterator<Hit> i = hits.iterator();
 
                 // step over the unneeded stuff
@@ -352,7 +398,7 @@ public class DefaultTimeline
                 {
                     i.next();
                 }
-
+                
                 for ( ; i.hasNext() && result.size() < count; )
                 {
                     Hit hit = i.next();

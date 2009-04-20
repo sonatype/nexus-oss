@@ -1,7 +1,7 @@
 <ehcache>
 
     <!-- All ${...} is replaced by plexus if know to it! -->
-    <diskStore path="${nexus.home}/tmp/ehcache"/>
+    <diskStore path="${nexus-work}/tmp/ehcache"/>
     
     <!-- all created caches shares these defaults 
 

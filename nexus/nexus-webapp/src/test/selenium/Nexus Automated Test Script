@@ -188,7 +188,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//button[@style='background-image: url(/nexus/ext-2.0.2/resources/images/default/grid/page-prev.gif);']</td>
+	<td>//button[@style='background-image: url(/nexus/ext-2.2/resources/images/default/grid/page-prev.gif);']</td>
 	<td></td>
 </tr>
 <tr>

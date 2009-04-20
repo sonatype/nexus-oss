@@ -24,7 +24,6 @@ import org.codehaus.plexus.component.annotations.Component;
 public class Log4jLogConfigurationSource
     implements LogConfigurationSource<File>
 {
-
     private static final String KEY = "plexus.log4j-prop-file";
 
     public File getSource()

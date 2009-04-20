@@ -58,6 +58,14 @@ public interface MetadataUpdater
         throws IOException;
 
     /**
+     * Calling this method <b>replaces</b> the GAV, GA and G metadatas accordingly.
+     * 
+     * @param req
+     */
+    void undeployArtifacts( Collection<ArtifactStoreRequest> requests )
+        throws IOException;
+
+    /**
      * Give me a coll, and i will createate the metadata.
      * 
      * @param coll

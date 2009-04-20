@@ -75,7 +75,7 @@ public class RolePlexusResource
 
         try
         {
-            result.setData( nexusToRestModel( getNexusSecurity().readRole( getRoleId( request ) ), request ) );
+            result.setData( nexusToRestModel( getNexusSecurity().readRole( decode( getRoleId( request ) ) ), request ) );
 
         }
         catch ( NoSuchRoleException e )
@@ -96,11 +96,13 @@ public class RolePlexusResource
         if ( resourceRequest != null )
         {
             RoleResource resource = resourceRequest.getData();
-            
+
             try
             {
-                SecurityRole role = restToNexusModel( getNexusSecurity().readRole( resource.getId() ), resource );
-                
+                SecurityRole role = restToNexusModel(
+                    getNexusSecurity().readRole( decode( resource.getId() ) ),
+                    resource );
+
                 validateRoleContainment( role );
 
                 getNexusSecurity().updateRole( role );
@@ -108,16 +110,16 @@ public class RolePlexusResource
                 resourceResponse = new RoleResourceResponse();
 
                 resourceResponse.setData( resourceRequest.getData() );
-                
+
                 resourceResponse.getData().setUserManaged( !role.isReadOnly() );
 
-                resourceResponse
-                    .getData().setResourceURI( createChildReference( request, this, resource.getId() ).toString() );
+                resourceResponse.getData().setResourceURI(
+                    createChildReference( request, this, resource.getId() ).toString() );
 
             }
             catch ( NoSuchRoleException e )
             {
-                throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
             }
             catch ( InvalidConfigurationException e )
             {
@@ -134,7 +136,7 @@ public class RolePlexusResource
     {
         try
         {
-            getNexusSecurity().deleteRole( getRoleId( request ) );
+            getNexusSecurity().deleteRole( decode( getRoleId( request ) ) );
         }
         catch ( NoSuchRoleException e )
         {

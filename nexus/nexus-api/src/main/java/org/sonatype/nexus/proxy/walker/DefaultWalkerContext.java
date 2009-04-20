@@ -125,11 +125,6 @@ public class DefaultWalkerContext
         return stopCause;
     }
 
-    public void stop()
-    {
-        running = false;
-    }
-
     public void stop( Throwable cause )
     {
         running = false;

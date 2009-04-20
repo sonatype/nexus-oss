@@ -87,7 +87,7 @@ button.st-icon-refresh {
 
 .loading-indicator{
   font-size:11px;
-    background-image:url(../ext-2.0.2/resources/images/default/grid/loading.gif);
+    background-image:url(../ext-2.2/resources/images/default/grid/loading.gif);
     background-repeat:no-repeat;
     background-position:3px center;
     padding-left:22px;

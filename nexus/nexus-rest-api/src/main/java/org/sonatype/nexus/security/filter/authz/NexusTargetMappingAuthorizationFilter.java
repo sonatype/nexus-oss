@@ -127,7 +127,7 @@ public class NexusTargetMappingAuthorizationFilter
             // doing a LOCAL ONLY request to check is this exists?
             try
             {
-                getNexus( request ).getRootRouter().retrieveItem( getResourceStoreRequest( request, true ) );
+                getNexus().getRootRouter().retrieveItem( getResourceStoreRequest( request, true ) );
             }
             catch ( ItemNotFoundException e )
             {

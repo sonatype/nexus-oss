@@ -23,6 +23,12 @@
   <dependencies>
 
     <dependency>
+		  <groupId>org.sonatype.plexus</groupId>
+		  <artifactId>plexus-cipher</artifactId>
+		  <version>1.2-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-utils</artifactId>
     </dependency>

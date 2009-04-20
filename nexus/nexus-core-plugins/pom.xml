@@ -32,12 +32,5 @@ under the License.
       <module>nexus-lvo-plugin</module>
       <module>nexus-maven-site-plugin</module>
     </modules>
-    
-    <distributionManagement>
-      <repository>
-        <id>localhost</id>
-        <name>dumping to target</name>
-        <url>file://${basedir}/target/repo/</url>
-      </repository>
-    </distributionManagement>
+
 </project>
