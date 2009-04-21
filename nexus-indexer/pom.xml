@@ -23,7 +23,7 @@
 
   <properties>
     <archetype.version>2.0-alpha-1</archetype.version>
-    <mercury.version>1.0-alpha-5</mercury.version>
+    <maven-artifact.version>2.1.0</maven-artifact.version>
   </properties>
 
   <!-- override the snapshot included in Maven -->
@@ -38,6 +38,12 @@
   </dependencyManagement>
 
   <dependencies>
+    <!-- Maven -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>${maven-artifact.version}</version>
+    </dependency>
     <!-- Plexus -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -89,13 +95,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
-	<!-- Mercury -->
-	<dependency>
-		<groupId>org.apache.maven.mercury</groupId>
-		<artifactId>mercury-artifact</artifactId>
-		<version>${mercury.version}</version>
-	</dependency>
 
 	<!--For WagonManager -->
 	<dependency>
@@ -185,7 +184,6 @@
                   <include>org.codehaus.plexus:plexus-container-default</include>
                   <include>org.codehaus.plexus:plexus-utils</include>
                   <include>com.google.code.google-collections:google-collect</include>
-                  <include>org.apache.maven.mercury:mercury-artifact</include>
                 </includes>
               </artifactSet>
             </configuration>
