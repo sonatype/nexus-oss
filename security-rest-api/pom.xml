@@ -19,7 +19,7 @@
   	<dependency>
   		<groupId>org.sonatype.security</groupId>
   		<artifactId>security-manager</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>${project.version}</version>
   	</dependency>
   	<dependency>
   		<groupId>org.sonatype.jsecurity</groupId>

@@ -1,5 +1,6 @@
 package org.sonatype.security.realms.tools;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,8 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.jsecurity.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -26,6 +29,24 @@ import org.sonatype.jsecurity.model.Configuration;
 public class AllPermissionsAreDefinedTest
     extends PlexusTestCase
 {
+    
+    private static String SECURITY_FILE = "./target/security.xml";
+    
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+        
+//        FileUtils.copyFile( new File(""), new File( SECURITY_FILE ) );
+    }
+
+    @Override
+    protected void customizeContext( Context context )
+    {
+        super.customizeContext( context );
+        context.put( "security-xml-file", SECURITY_FILE );
+    }
 
     public List<PlexusResource> getPlexusResources()
         throws ComponentLookupException

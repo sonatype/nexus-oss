@@ -25,7 +25,7 @@ public class SecurityRestStaticSecurityResource
 {
     public String getResourcePath()
     {
-        return "/META-INF/security/static-security.xml";
+        return "/META-INF/security/static-security-rest.xml";
     }
 
     public Configuration getConfiguration()
