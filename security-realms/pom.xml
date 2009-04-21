@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>security-parent</artifactId>
+    <groupId>org.sonatype.security</groupId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.sonatype.security</groupId>
+  <artifactId>security-realms</artifactId>
+  <version>1.0.8-SNAPSHOT</version>
+  <packaging>pom</packaging>  
+  <name>Security: Realms Parent</name>
+  
+  <modules>
+  	<module>plexus-delegating-realm</module>
+  	<module>security-xml-realm</module>
+  	<module>security-url-realm</module>
+  </modules>
+  
+</project>

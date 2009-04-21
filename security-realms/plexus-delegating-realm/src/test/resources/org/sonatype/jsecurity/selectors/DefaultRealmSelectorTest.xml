@@ -1,0 +1,41 @@
+<plexus>
+  <components>
+    <component>
+      <role>org.jsecurity.realm.Realm</role>
+      <role-hint>FakeRealm1</role-hint>
+      <implementation>org.sonatype.jsecurity.realms.FakeRealm1</implementation>
+      <description></description>
+      <isolated-realm>false</isolated-realm>
+    </component>
+    <component>
+      <role>org.jsecurity.realm.Realm</role>
+      <role-hint>FakeRealm2</role-hint>
+      <implementation>org.sonatype.jsecurity.realms.FakeRealm2</implementation>
+      <description></description>
+      <isolated-realm>false</isolated-realm>
+    </component>
+    <component>
+      <role>org.sonatype.jsecurity.locators.RealmLocator</role>
+      <implementation>org.sonatype.jsecurity.locators.PropertyFileRealmLocator</implementation>
+      <description></description>
+      <isolated-realm>false</isolated-realm>
+      <configuration>
+        <property-file>${realm-locator-property-file}</property-file>
+      </configuration>
+      <requirements>
+        <requirement>
+          <role>org.codehaus.plexus.PlexusContainer</role>
+          <role-hint>default</role-hint>
+          <field-name>container</field-name>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.sonatype.jsecurity.locators.RememberMeLocator</role>
+      <implementation>org.sonatype.jsecurity.locators.DefaultRememberMeLocator</implementation>
+      <description></description>
+      <isolated-realm>false</isolated-realm>
+    </component>
+    
+  </components>
+</plexus>

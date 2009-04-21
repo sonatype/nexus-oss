@@ -2,13 +2,16 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-aggregator</artifactId>
-  <packaging>pom</packaging>
+  <packaging>pom</packaging>  
+  <version>1.0.8-SNAPSHOT</version>
   <name>Plexus Security Aggregator</name>
-  <version>0.0.1-SNAPSHOT</version>
+  
   <modules>
   	<module>security-parent</module>
   	<module>security-configuration</module>
   	<module>security-manager</module>
+  	<module>security-rest-api</module>
+  	<module>security-realms</module>
   </modules>
   
   <distributionManagement>

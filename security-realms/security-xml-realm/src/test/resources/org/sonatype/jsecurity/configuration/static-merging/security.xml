@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<security>
+    <version>2.0.0</version>
+    <privileges>      
+      <privilege>
+        <id>1</id>
+        <name>1</name>
+        <type>method</type>
+        <properties>
+          <property>
+            <key>method</key>
+            <value>read</value>
+          </property>
+          <property>
+            <key>permission</key>
+            <value>/some/path/</value>
+          </property>
+        </properties>
+      </privilege>
+      <privilege>
+        <id>2</id>
+        <name>2</name>
+        <type>method</type>
+        <properties>
+          <property>
+            <key>method</key>
+            <value>read</value>
+          </property>
+          <property>
+            <key>permission</key>
+            <value>/some/path/</value>
+          </property>
+        </properties>
+      </privilege>      
+    </privileges>
+</security>

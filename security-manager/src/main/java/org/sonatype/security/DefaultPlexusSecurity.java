@@ -8,11 +8,15 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
+import org.jsecurity.realm.AuthenticatingRealm;
+import org.jsecurity.realm.CachingRealm;
 import org.jsecurity.realm.Realm;
 import org.sonatype.jsecurity.locators.RealmLocator;
+import org.sonatype.jsecurity.model.CProperty;
 import org.sonatype.jsecurity.realms.XmlAuthenticatingRealm;
 import org.sonatype.jsecurity.realms.XmlAuthorizingRealm;
 import org.sonatype.jsecurity.realms.privileges.PrivilegeDescriptor;
@@ -31,10 +35,13 @@ import org.sonatype.security.configuration.ConfigurationException;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.email.NoSuchEmailException;
 import org.sonatype.security.email.SecurityEmailer;
+import org.sonatype.security.events.SecurityConfigurationChangedEvent;
+import org.sonatype.security.events.SecurityEvent;
+import org.sonatype.security.events.SecurityEventHandler;
 
 @Component( role = PlexusSecurity.class )
 public class DefaultPlexusSecurity
-    implements PlexusSecurity
+    implements PlexusSecurity, Startable
 {
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager manager;
@@ -42,8 +49,8 @@ public class DefaultPlexusSecurity
     @Requirement( hint = "file" )
     private SecurityConfigurationSource configSource;
 
-//    @Requirement
-//    private PrivilegeInheritanceManager privInheritance;
+    @Requirement
+    private PrivilegeInheritanceManager privInheritance;
 
     @Requirement
     private PasswordGenerator pwGenerator;
@@ -56,8 +63,10 @@ public class DefaultPlexusSecurity
     
     @Requirement
     private Logger logger;
+    
+    private List<SecurityEventHandler> eventHandlers = new ArrayList<SecurityEventHandler>();
 
-    public void startService()
+    public void start()
         throws StartingException
     {
         // Do this simply to upgrade the configuration if necessary
@@ -76,13 +85,14 @@ public class DefaultPlexusSecurity
             getLogger().fatalError( "Security Configuration is invalid!!!", e );
         }
 
-        getLogger().info( "Started Nexus Security" );
+        getLogger().info( "Started Plexus Security" );
     }
 
-    public void stopService()
+    public void stop()
         throws StoppingException
     {
-        getLogger().info( "Stopped Nexus Security" );
+        this.eventHandlers.clear();
+        getLogger().info( "Stopped Plexus Security" );
     }
 
     public void clearCache()
@@ -99,7 +109,7 @@ public class DefaultPlexusSecurity
     public void createPrivilege( SecurityPrivilege privilege, ValidationContext context )
         throws InvalidConfigurationException
     {
-//        addInheritedPrivileges( privilege );
+        addInheritedPrivileges( privilege );
         manager.createPrivilege( privilege, context );
         save();
     }
@@ -223,11 +233,11 @@ public class DefaultPlexusSecurity
     {
         manager.save();
 
-//        // TODO: can we do the same here as with nexus config?
-//        notifyProximityEventListeners( new ConfigurationChangeEvent( this, null ) );
+        // some components might need to do something when the config changes. (clear caches etc)
+        this.notifyEventHandlers( new SecurityConfigurationChangedEvent() );
 
         for ( Realm realm : realmLocator.getRealms() )
-        {
+        {            
             if ( XmlAuthenticatingRealm.class.isAssignableFrom( realm.getClass() ) )
             {
                 ( (XmlAuthenticatingRealm) realm ).getConfigurationManager().clearCache();
@@ -283,15 +293,6 @@ public class DefaultPlexusSecurity
     {
         manager.updateUser( user, context );
         save();
-    }
-
-    /**
-     * @deprecated Use save()
-     */
-    public void saveConfiguration()
-        throws IOException
-    {
-        // Don't use this for security
     }
 
     public void changePassword( String userId, String oldPassword, String newPassword )
@@ -395,6 +396,40 @@ public class DefaultPlexusSecurity
         }
     }
 
+    private void addInheritedPrivileges( SecurityPrivilege privilege )
+    {
+        CProperty methodProperty = null;
+
+        for ( CProperty property : (List<CProperty>) privilege.getProperties() )
+        {
+            if ( property.getKey().equals( "method" ) )
+            {
+                methodProperty = property;
+                break;
+            }
+        }
+
+        if ( methodProperty != null )
+        {
+            List<String> inheritedMethods = privInheritance.getInheritedMethods( methodProperty.getValue() );
+
+            StringBuffer buf = new StringBuffer();
+
+            for ( String method : inheritedMethods )
+            {
+                buf.append( method );
+                buf.append( "," );
+            }
+
+            if ( buf.length() > 0 )
+            {
+                buf.setLength( buf.length() - 1 );
+
+                methodProperty.setValue( buf.toString() );
+            }
+        }
+    }
+
     private String generatePassword( SecurityUser user )
     {
         String password = pwGenerator.generatePassword( 10, 10 );
@@ -475,5 +510,50 @@ public class DefaultPlexusSecurity
     protected Logger getLogger()
     {
         return this.logger;
+    }
+
+    public String getAnonymousUsername()
+    {
+        return "anonymous";
+    }
+
+    public boolean isAnonymousAccessEnabled()
+    {
+        return true;
+    }
+
+    public boolean isSecurityEnabled()
+    {
+        return true;
+    }
+
+    public void addSecurityEventHandler( SecurityEventHandler eventHandler )
+    {
+        this.eventHandlers.add( eventHandler );
+    }
+
+    public boolean removeSecurityEventHandler( SecurityEventHandler eventHandler )
+    {
+        return this.eventHandlers.remove( eventHandler );
+    }
+    
+    protected void notifyEventHandlers( SecurityEvent event )
+    {
+        for ( SecurityEventHandler handler : this.eventHandlers )
+        {
+            try
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Notifying component about security event: " + handler.getClass().getName() );
+                }
+
+                handler.handleEvent( event );
+            }
+            catch ( Exception e )
+            {
+                getLogger().info( "Unexpected exception in SecurityEventHandler: "+ handler.getClass().getName(), e );
+            }
+        }
     }
 }

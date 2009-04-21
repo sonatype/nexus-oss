@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 import org.sonatype.jsecurity.model.Configuration;
 import org.sonatype.security.configuration.ConfigurationException;
 
@@ -30,21 +32,34 @@ import org.sonatype.security.configuration.ConfigurationException;
 public class StaticConfigurationSource
     extends AbstractSecurityConfigurationSource
 {
+    
+    private static final String STATIC_SECURITY_RESOURCE = "/META-INF/security/security.xml";
+    
+    @Requirement
+    private Logger logger;
+    
     /**
      * Gets the configuration using getResourceAsStream from "/META-INF/security/security.xml".
      */
     public InputStream getConfigurationAsStream()
         throws IOException
     {
-        return getClass().getResourceAsStream( "/META-INF/security/security.xml" );
+        return getClass().getResourceAsStream( STATIC_SECURITY_RESOURCE );
     }
 
     public Configuration loadConfiguration()
         throws ConfigurationException,
             IOException
     {
-        loadConfiguration( getConfigurationAsStream() );
-
+        if( getClass().getResource( STATIC_SECURITY_RESOURCE ) != null )
+        {
+            loadConfiguration( getConfigurationAsStream() );
+        }
+        else
+        {
+            this.logger.warn( "Default static security configuration not found in classpath: "+ STATIC_SECURITY_RESOURCE );
+        }
+        
         Configuration configuration = getConfiguration();
 
         return configuration;

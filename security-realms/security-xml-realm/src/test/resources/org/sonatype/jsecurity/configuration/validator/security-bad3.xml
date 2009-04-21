@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This config will cause 2 validation error -->
+<!-- This config will cause 2 validation warnings -->
+
+<security>
+    <version>1.0.0</version>    
+    <privileges>
+      <!-- no id (Warning)-->
+      <!-- no name (Error)-->
+      <!-- no type (Error)-->
+      <privilege>
+      </privilege>
+        
+      <privilege>
+        <id>25</id>
+        <name>priv</name>
+        <type>method</type>
+        <properties>
+          <property>
+            <key>method</key>
+            <value>read</value>
+          </property>
+          <property>
+            <key>permission</key>
+            <value>/some/path/</value>
+          </property>
+        </properties>
+      </privilege>
+      
+      <privilege>
+        <id>5</id>
+        <name>priv</name>
+        <type>method</type>
+        <properties>
+          <property>
+            <key>method</key>
+            <value>read</value>
+          </property>
+          <property>
+            <key>permission</key>
+            <value>/some/path/</value>
+          </property>
+        </properties>
+      </privilege>
+      
+      <!-- duplicate id (Warning)-->
+      <privilege>
+        <id>5</id>
+        <name>priv</name>
+        <type>method</type>
+        <properties>
+          <property>
+            <key>method</key>
+            <value>create</value>
+          </property>
+          <property>
+            <key>permission</key>
+            <value>/some/path/</value>
+          </property>
+        </properties>
+      </privilege>
+    </privileges>
+</security>

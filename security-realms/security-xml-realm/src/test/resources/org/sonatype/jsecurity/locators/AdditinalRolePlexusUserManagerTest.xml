@@ -1,0 +1,39 @@
+<plexus>
+	<components>
+
+    
+     <component>
+      <role>org.sonatype.jsecurity.locators.users.PlexusUserLocator</role>
+      <implementation>org.sonatype.jsecurity.locators.MockUserLocatorA</implementation>
+      <role-hint>MockUserLocatorA</role-hint>
+      <isolated-realm>false</isolated-realm>
+    </component>   
+    <component>
+      <role>org.sonatype.jsecurity.locators.users.PlexusUserLocator</role>
+      <role-hint>MockUserLocatorB</role-hint>
+      <implementation>org.sonatype.jsecurity.locators.MockUserLocatorB</implementation>
+      <description></description>
+      <isolated-realm>false</isolated-realm>
+    </component>
+
+    <component>
+      <role>org.sonatype.jsecurity.realms.tools.ConfigurationManager</role>
+      <role-hint>resourceMerging</role-hint>
+      <implementation>org.sonatype.jsecurity.realms.tools.ResourceMergingConfigurationManager</implementation>
+      <isolated-realm>false</isolated-realm>
+      <requirements>
+        <requirement>
+          <role>org.sonatype.jsecurity.realms.tools.ConfigurationManager</role>
+          <role-hint>default</role-hint>
+          <field-name>manager</field-name>
+        </requirement>
+        <requirement>
+          <role>org.sonatype.jsecurity.realms.tools.StaticSecurityResource</role>
+          <field-name>staticResources</field-name>
+        </requirement>
+      </requirements>
+    </component>
+    
+    
+  </components>
+</plexus>

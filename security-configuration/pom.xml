@@ -7,13 +7,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-configuration</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.8-SNAPSHOT</version>
+  <name>Security: Configuration</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.sonatype.jsecurity</groupId>
 			<artifactId>security-xml-realm</artifactId>
-			<version>1.0.7-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>

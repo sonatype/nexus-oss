@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This config will cause 13 validation errors -->
+<!-- This config will cause 0 validation warnings -->
+
+<security>
+	<version>2.0.2</version>
+	<privileges>      
+      <privilege>
+        <id>1</id>
+        <name>priv</name>
+        <type>method</type>
+        <properties>
+          <property>
+            <key>method</key>
+            <value>read</value>
+          </property>
+          <property>
+            <key>permission</key>
+            <value>/some/path/</value>
+          </property>
+        </properties>
+      </privilege>      
+    </privileges>	
+	<roles>
+	  <role>
+	    <id>id</id>
+	    <name>name</name>
+	    <sessionTimeout>50</sessionTimeout>
+	    <privileges>
+	      <privilege>1</privilege>
+	    </privileges>
+	  </role>
+	</roles>
+	<users>		
+	
+		<!-- no id -->
+	    <!-- no name -->
+	    <!-- no email address -->
+	    <!-- invalid role id -->
+	    <!-- no password -->
+	    <!-- invalid status -->
+		<user>      
+            <id></id>
+        </user>
+	
+
+        <!-- invalid status -->
+        <!-- no roles -->
+        <user>      
+            <id>ausernostatus</id>
+            <password>fjsf8j4r3</password>
+            <name>Alex User</name>
+            <email>auser@auser.com</email>
+        </user>
+        <!-- no roles -->
+        <!-- duplicate email -->
+		<user>		
+			<id>auser</id>
+			<password>fjsf8j4r3</password>
+			<name>Alex User</name>
+			<email>auser@auser.com</email>
+			<status>active</status>
+		</user>
+		
+		<!-- Duplicate user id -->
+		<!-- duplicate email -->
+		<user>
+            <id>auser</id>
+            <password>fjsf8j4r3</password>
+            <name>Alex User</name>
+            <email>auser@auser.com</email>
+            <status>active</status>
+        </user>   
+        <user>
+            <id>buser</id>
+            <password>fjsf8j4r3</password>
+            <name>Alex User</name>
+            <email>unique@auser.com</email>
+            <status>active</status>
+        </user>     
+	</users>
+	
+	<userRoleMappings>
+		<!-- missing user id -->
+		<!-- missing source -->
+		<!-- invalid role id -->
+		<userRoleMapping>
+
+			<roles>
+				<role>id1</role>
+			</roles>
+		</userRoleMapping>
+		
+		<!-- missing user id -->
+		<!-- invalid role id -->
+		<userRoleMapping>
+
+			    <source>default</source>
+			<roles>
+				<role>id1</role>
+			</roles>
+		</userRoleMapping>
+
+		<userRoleMapping>
+			<userId>buser</userId>
+			    <source>default</source>
+			<roles>
+				<role>id</role>
+			</roles>
+		</userRoleMapping>
+	</userRoleMappings>
+
+</security>
