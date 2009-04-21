@@ -80,7 +80,8 @@ public class DefaultIndexUpdater
 
             if ( contextTimestamp != null )
             {
-                Properties properties = downloadIndexProperties( fetcher );
+                Properties localProperties = loadLocallyStoredRemoteProperties( context );
+                Properties properties = downloadIndexProperties( context, fetcher );
 
                 Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
 
@@ -90,10 +91,10 @@ public class DefaultIndexUpdater
                 }
                 
                 // If we have local properties, will parse and see what we need to download
-                if ( canRetrieveAllChunks( updateRequest.getLocalProperties(), properties ) )
+                if ( canRetrieveAllChunks( localProperties, properties ) )
                 {
                     int maxCounter = Integer.parseInt( properties.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ) );
-                    int currentCounter = Integer.parseInt( updateRequest.getLocalProperties().getProperty( IndexingContext.INDEX_CHUNK_COUNTER ) );
+                    int currentCounter = Integer.parseInt( localProperties.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ) );
                     
                     // Start with the next one
                     currentCounter++;
@@ -152,7 +153,7 @@ public class DefaultIndexUpdater
 
         try
         {
-            return downloadIndexProperties( fetcher );
+            return downloadIndexProperties( context, fetcher );
         }
         finally
         {
@@ -396,13 +397,42 @@ public class DefaultIndexUpdater
         }
     }
     
+    private Properties loadLocallyStoredRemoteProperties( IndexingContext context )
+    {        
+        String remoteIndexProperties = IndexingContext.INDEX_FILE + ".properties";
+
+        File indexProperties = new File( context.getIndexDirectoryFile(), remoteIndexProperties );
+
+        FileInputStream fis = null;
+
+        try
+        {
+            Properties properties = new Properties();
+
+            fis = new FileInputStream( indexProperties );
+
+            properties.load( fis );
+
+            return properties;
+        }
+        catch ( IOException e )
+        {
+            getLogger().debug( "Unable to read remote properties stored locally", e );
+        }
+        finally
+        {
+            IOUtil.close( fis );
+        }
+        
+        return null;
+    }
     
-    private Properties downloadIndexProperties( ResourceFetcher fetcher )
+    private Properties downloadIndexProperties( IndexingContext context, ResourceFetcher fetcher )
         throws IOException
     {
         String remoteIndexProperties = IndexingContext.INDEX_FILE + ".properties";
 
-        File indexProperties = File.createTempFile( remoteIndexProperties, "" );
+        File indexProperties = new File( context.getIndexDirectoryFile(), remoteIndexProperties );
 
         FileInputStream fis = null;
 
@@ -421,7 +451,6 @@ public class DefaultIndexUpdater
         finally
         {
             IOUtil.close( fis );
-            indexProperties.delete();
         }
     }
     

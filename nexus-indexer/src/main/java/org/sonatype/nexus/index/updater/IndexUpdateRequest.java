@@ -6,8 +6,6 @@
  */
 package org.sonatype.nexus.index.updater;
 
-import java.util.Properties;
-
 import org.sonatype.nexus.index.context.DocumentFilter;
 import org.sonatype.nexus.index.context.IndexingContext;
 
@@ -21,8 +19,6 @@ public class IndexUpdateRequest
     private ResourceFetcher resourceFetcher;
 
     private DocumentFilter documentFilter;
-    
-    private Properties localProperties;
 
     public IndexUpdateRequest( IndexingContext context )
     {
@@ -53,15 +49,4 @@ public class IndexUpdateRequest
     {
         this.resourceFetcher = resourceFetcher;
     }
-    
-    public Properties getLocalProperties()
-    {
-        return localProperties;
-    }
-    
-    public void setLocalProperties( Properties localProperties )
-    {
-        this.localProperties = localProperties;
-    }
-
 }

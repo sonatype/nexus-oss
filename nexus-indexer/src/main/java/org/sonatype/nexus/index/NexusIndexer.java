@@ -238,6 +238,12 @@ public interface NexusIndexer
      */
     void scan( IndexingContext context, ArtifactScanningListener listener )
         throws IOException;
+    
+    /**
+     * Performs optionally incremental scan (reindex) for the local repository
+     */
+    void scan( IndexingContext context, boolean update )
+        throws IOException;
 
     /**
      * Performs optionally incremental scan (reindex) for the local repository

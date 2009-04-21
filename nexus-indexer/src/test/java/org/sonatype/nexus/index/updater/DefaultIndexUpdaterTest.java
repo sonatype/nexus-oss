@@ -403,6 +403,7 @@ public class DefaultIndexUpdaterTest
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".properties" ), //
                 with( any( File.class ) ) );
+            
             will(new PropertiesAction() 
             {
                 @Override
@@ -414,6 +415,8 @@ public class DefaultIndexUpdaterTest
                     return properties;
                 }
             });
+            
+            allowing( tempContext ).getIndexDirectoryFile();
             
             oneOf( mockFetcher ).disconnect();
         }});
@@ -471,6 +474,8 @@ public class DefaultIndexUpdaterTest
                 }
             });
             
+            allowing( tempContext ).getIndexDirectoryFile();
+            
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".gz" ), //
                 with( Expectations.<File>anything() ) );
@@ -501,6 +506,9 @@ public class DefaultIndexUpdaterTest
         final ResourceFetcher mockFetcher = mockery.mock( ResourceFetcher.class );
         
         final IndexingContext tempContext = mockery.mock( IndexingContext.class );
+        
+        final Properties localProps = new Properties();
+        localProps.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "1" );
         
         mockery.checking(new Expectations() 
         {{
@@ -538,6 +546,11 @@ public class DefaultIndexUpdaterTest
                 }
             });
             
+            allowing( tempContext ).getIndexDirectoryFile();
+            will( new IndexDirectoryFileAction ( 
+                localProps, 
+                new File( getBasedir() + "/target/indexUpdater" ) ) );
+            
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".2.gz" ), //
                 with( Expectations.<File>anything() ) );
@@ -558,11 +571,6 @@ public class DefaultIndexUpdaterTest
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
         
         updateRequest.setResourceFetcher( mockFetcher );
-        
-        Properties localProps = new Properties();
-        localProps.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "1" );
-        
-        updateRequest.setLocalProperties( localProps );
         
         updater.fetchAndUpdateIndex( updateRequest );
         
@@ -616,6 +624,8 @@ public class DefaultIndexUpdaterTest
                 }
             });
             
+            allowing( tempContext ).getIndexDirectoryFile();
+            
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".gz" ), //
                 with( Expectations.<File>anything() ) );
@@ -654,6 +664,9 @@ public class DefaultIndexUpdaterTest
         
         final IndexingContext tempContext = mockery.mock( IndexingContext.class );
         
+        final Properties localProps = new Properties();
+        localProps.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "3" );
+        
         mockery.checking(new Expectations() 
         {{
             allowing( tempContext ).getTimestamp();
@@ -690,6 +703,11 @@ public class DefaultIndexUpdaterTest
                 }
             });
             
+            allowing( tempContext ).getIndexDirectoryFile();
+            will( new IndexDirectoryFileAction ( 
+                localProps, 
+                new File( getBasedir() + "/target/indexUpdater" ) ) );
+            
             never( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".gz" ), //
                 with( Expectations.<File>anything() ) );
@@ -719,11 +737,6 @@ public class DefaultIndexUpdaterTest
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
         
         updateRequest.setResourceFetcher( mockFetcher );
-        
-        Properties localProps = new Properties();
-        localProps.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "3" );
-        
-        updateRequest.setLocalProperties( localProps );
         
         updater.fetchAndUpdateIndex( updateRequest );
         
@@ -788,5 +801,35 @@ public class DefaultIndexUpdaterTest
 
         abstract Properties getProperties();
     }
-    
+
+    private static class IndexDirectoryFileAction extends VoidAction 
+    {
+        File file = null;
+        
+        public IndexDirectoryFileAction( Properties properties, File basedir )
+            throws Exception
+        {
+            basedir.mkdirs();
+            
+            this.file = new File( basedir, IndexingContext.INDEX_FILE + ".properties" );
+            
+            FileOutputStream fos = null;
+            try
+            {
+                fos = new FileOutputStream( this.file );
+                
+                properties.store( fos, "" );
+            }
+            finally
+            {
+                IOUtil.close( fos );
+            }            
+        }
+        
+        @Override
+        public Object invoke(Invocation invocation) throws Throwable 
+        {
+            return this.file.getParentFile();
+        }
+    }
 }

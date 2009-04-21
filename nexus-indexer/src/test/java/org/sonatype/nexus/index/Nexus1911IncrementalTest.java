@@ -78,7 +78,7 @@ public class Nexus1911IncrementalTest
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "2" ) );
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "3" ) );
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "4" ) );
-        Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ) );
+        Assert.assertEquals( props.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ), "0" );
     }
     
     public void test1Incremental()

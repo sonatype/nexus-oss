@@ -234,6 +234,12 @@ public class DefaultNexusIndexer
     {
         scan( context, null );
     }
+    
+    public void scan( IndexingContext context, boolean update )
+        throws IOException
+    {
+        scan( context, null, update );
+    }
 
     public void scan( IndexingContext context, final ArtifactScanningListener listener )
         throws IOException

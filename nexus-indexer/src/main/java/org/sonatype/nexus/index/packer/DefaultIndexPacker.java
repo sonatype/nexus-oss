@@ -132,6 +132,8 @@ public class DefaultIndexPacker
         {
             getLogger().info( "Unable to read properties file, will force index regeneration" );
             info = new Properties();
+            // new properties, so initialize to 0 for index chunks
+            info.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "0" );
             forceMainIndexGeneration = true;
         }
         
