@@ -35,7 +35,7 @@ import org.sonatype.security.rest.model.PrivilegeResourceRequest;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
 /**
- * Handles the GET and POST request for the Nexus privileges.
+ * Handles the GET and POST request for the Security privileges.
  * 
  * @author tstevens
  */
@@ -72,7 +72,7 @@ public class PrivilegeListPlexusResource
 
         for ( SecurityPrivilege priv : privs )
         {
-            PrivilegeStatusResource res = nexusToRestModel( priv, request );
+            PrivilegeStatusResource res = securityToRestModel( priv, request );
 
             if ( res != null )
             {

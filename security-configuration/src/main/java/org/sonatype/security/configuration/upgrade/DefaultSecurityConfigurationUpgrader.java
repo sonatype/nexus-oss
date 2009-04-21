@@ -93,7 +93,7 @@ public class DefaultSecurityConfigurationUpgrader
                 }
                 else
                 {
-                    // we could parse the XML but have no model version? Is this nexus config at all?
+                    // we could parse the XML but have no model version? Is this security config at all?
                     throw new UnsupportedConfigurationVersionException( modelVersion, file );
                 }
 
@@ -107,7 +107,7 @@ public class DefaultSecurityConfigurationUpgrader
         }
         else
         {
-            // we could parse the XML but have no model version? Is this nexus config at all?
+            // we could parse the XML but have no model version? Is this security config at all?
             throw new UnsupportedConfigurationVersionException( modelVersion, file );
         }
     }

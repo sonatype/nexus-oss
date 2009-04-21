@@ -39,7 +39,7 @@ public class ConfigurationIsCorruptedException
 
     public ConfigurationIsCorruptedException( String filePath, Throwable t )
     {
-        super( "Could not read or parse Nexus configuration file on path " + filePath + "! It may be corrupted.", t );
+        super( "Could not read or parse security configuration file on path " + filePath + "! It may be corrupted.", t );
     }
 
 }

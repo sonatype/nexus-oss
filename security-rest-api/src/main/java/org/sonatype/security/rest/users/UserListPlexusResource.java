@@ -66,7 +66,7 @@ public class UserListPlexusResource
 
         for ( SecurityUser user : getPlexusSecurity().listUsers() )
         {
-            UserResource res = nexusToRestModel( user, request );
+            UserResource res = securityToRestModel( user, request );
 
             if ( res != null )
             {
@@ -88,7 +88,7 @@ public class UserListPlexusResource
         {
             UserResource resource = requestResource.getData();
 
-            SecurityUser user = restToNexusModel( null, resource );
+            SecurityUser user = restToSecurityModel( null, resource );
 
             try
             {

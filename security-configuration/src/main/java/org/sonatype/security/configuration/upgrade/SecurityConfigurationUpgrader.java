@@ -18,7 +18,7 @@ import java.io.IOException;
 import org.sonatype.jsecurity.model.Configuration;
 
 /**
- * A component involved only if old Nexus configuration is found. It will fetch the old configuration, transform it to
+ * A component involved only if old security configuration is found. It will fetch the old configuration, transform it to
  * current Configuration model and return it. Nothing else.
  * 
  * @author cstamas

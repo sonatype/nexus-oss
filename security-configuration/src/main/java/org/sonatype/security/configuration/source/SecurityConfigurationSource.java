@@ -18,8 +18,8 @@ import org.sonatype.jsecurity.model.Configuration;
 import org.sonatype.security.configuration.ConfigurationException;
 
 /**
- * The Interface ApplicationConfigurationSource, responsible to fetch Nexus security configuration by some means. It also stores one
- * instance of Configuration object maintained thru life of Nexus. This component is also able to persist security config.
+ * The Interface ApplicationConfigurationSource, responsible to fetch security configuration by some means. It also stores one
+ * instance of Configuration object maintained thru life of the application. This component is also able to persist security config.
  * 
  * @author cstamas
  */

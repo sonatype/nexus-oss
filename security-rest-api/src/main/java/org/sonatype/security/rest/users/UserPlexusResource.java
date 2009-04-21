@@ -77,7 +77,7 @@ public class UserPlexusResource
 
         try
         {
-            result.setData( nexusToRestModel( getPlexusSecurity().readUser( getUserId( request ) ), request ) );
+            result.setData( securityToRestModel( getPlexusSecurity().readUser( getUserId( request ) ), request ) );
 
         }
         catch ( NoSuchUserException e )
@@ -108,7 +108,7 @@ public class UserPlexusResource
 
             try
             {
-                SecurityUser user = restToNexusModel( getPlexusSecurity().readUser( resource.getUserId() ), resource );
+                SecurityUser user = restToSecurityModel( getPlexusSecurity().readUser( resource.getUserId() ), resource );
 
                 validateUserContainment( user );
                 
@@ -160,11 +160,11 @@ public class UserPlexusResource
             if ( isCurrentUser( request ) )
             {
                 String error = "The user with user ID [" + getUserId( request )
-                    + "] cannot be deleted, as that is the user currently logged into the Nexus application.";
+                    + "] cannot be deleted, as that is the user currently logged into the application.";
 
                 getLogger().info(
                     "The user with user ID [" + getUserId( request )
-                        + "] cannot be deleted, as that is the user currently logged into the Nexus application." );
+                        + "] cannot be deleted, as that is the user currently logged into the application." );
 
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, error );
             }

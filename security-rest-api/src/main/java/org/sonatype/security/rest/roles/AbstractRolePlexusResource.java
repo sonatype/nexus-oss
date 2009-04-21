@@ -27,9 +27,8 @@ public abstract class AbstractRolePlexusResource
 {
 
 
-    public RoleResource nexusToRestModel( SecurityRole role, Request request )
+    public RoleResource securityToRestModel( SecurityRole role, Request request )
     {
-        // TODO: ultimately this method will take a parameter which is the nexus object
         // and will convert to the rest object
         RoleResource resource = new RoleResource();
 
@@ -53,7 +52,7 @@ public abstract class AbstractRolePlexusResource
         return resource;
     }
 
-    public SecurityRole restToNexusModel( SecurityRole role, RoleResource resource )
+    public SecurityRole restToSecurityModel( SecurityRole role, RoleResource resource )
     {
         if ( role == null )
         {

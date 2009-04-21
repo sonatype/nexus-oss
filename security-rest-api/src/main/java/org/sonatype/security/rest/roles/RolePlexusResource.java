@@ -74,7 +74,7 @@ public class RolePlexusResource
 
         try
         {
-            result.setData( nexusToRestModel( getPlexusSecurity().readRole( getRoleId( request ) ), request ) );
+            result.setData( securityToRestModel( getPlexusSecurity().readRole( getRoleId( request ) ), request ) );
 
         }
         catch ( NoSuchRoleException e )
@@ -98,7 +98,7 @@ public class RolePlexusResource
             
             try
             {
-                SecurityRole role = restToNexusModel( getPlexusSecurity().readRole( resource.getId() ), resource );
+                SecurityRole role = restToSecurityModel( getPlexusSecurity().readRole( resource.getId() ), resource );
                 
                 validateRoleContainment( role );
 

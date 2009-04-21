@@ -19,7 +19,7 @@ import org.jsecurity.authc.credential.Md5CredentialsMatcher;
 import org.jsecurity.authc.credential.Sha1CredentialsMatcher;
 
 /**
- * For users migrated from Artifactory, their password is encrypted with md5, while nexus users' password is enrypted
+ * For users migrated from Artifactory, their password is encrypted with md5, while users' password is enrypted
  * with sha1, so here we use first try sha1, then md5, to meet both requirements.
  * 
  * @author Juven Xu

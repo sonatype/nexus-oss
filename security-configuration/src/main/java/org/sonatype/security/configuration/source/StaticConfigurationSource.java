@@ -65,7 +65,7 @@ public class StaticConfigurationSource
     }
 
     /**
-     * This method will always throw UnsupportedOperationException, since NexusDefaultsConfigurationSource is read only.
+     * This method will always throw UnsupportedOperationException, since SecurityDefaultsConfigurationSource is read only.
      */
     public void storeConfiguration()
         throws IOException

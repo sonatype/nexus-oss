@@ -107,7 +107,7 @@ public class UserToRolePlexusResource
         // get the dto
         UserToRoleResource userToRole = mappingRequest.getData();
 
-        SecurityUserRoleMapping roleMapping = this.restToNexusModel( userToRole );
+        SecurityUserRoleMapping roleMapping = this.restToSecurityModel( userToRole );
         
         if ( roleMapping.getRoles().size() == 0 )
         {
@@ -120,7 +120,7 @@ public class UserToRolePlexusResource
         }
         // this seems a bit odd, but here is why the PUT does both create and update.
         // the users are stored in some LDAP server somewhere, but the role mapping is stored locally
-        // this resource is trying to mimic the normal nexus resource, in the future we may add write
+        // this resource is trying to mimic the normal plexus resource, in the future we may add write
         // support for ldap users ( I don't know why), so this is setting us up for that.
         // or the way I look at it, we are updating the Users Roles... so its an update.
         try
@@ -174,7 +174,7 @@ public class UserToRolePlexusResource
         }
     }
 
-    private SecurityUserRoleMapping restToNexusModel( UserToRoleResource restRoleMapping )
+    private SecurityUserRoleMapping restToSecurityModel( UserToRoleResource restRoleMapping )
     {
         SecurityUserRoleMapping roleMapping = new SecurityUserRoleMapping();
         roleMapping.setUserId( restRoleMapping.getUserId() );

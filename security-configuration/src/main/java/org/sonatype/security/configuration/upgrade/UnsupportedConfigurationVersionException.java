@@ -17,7 +17,7 @@ import java.io.File;
 import org.sonatype.security.configuration.ConfigurationException;
 
 /**
- * Thrown when the configuration has model version but it is unknown to Nexus.
+ * Thrown when the configuration has model version but it is unknown to the security layer.
  * 
  * @author cstamas
  */

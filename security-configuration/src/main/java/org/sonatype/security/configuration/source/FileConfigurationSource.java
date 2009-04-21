@@ -50,7 +50,7 @@ public class FileConfigurationSource
     private SecurityConfigurationUpgrader configurationUpgrader;
 
     /**
-     * The nexus defaults configuration source.
+     * The defaults configuration source.
      */
     @Requirement( hint = "static" )
     private SecurityConfigurationSource securityDefaults;
@@ -159,7 +159,7 @@ public class FileConfigurationSource
 
         FileUtils.copyFile( file, backup );
 
-        // set the upgradeInstance to warn Nexus about this
+        // set the upgradeInstance to warn the application about this
         setConfigurationUpgraded( true );
 
         saveConfiguration( file );
@@ -216,13 +216,13 @@ public class FileConfigurationSource
                     + "* Could not create configuration file [ "
                     + file.toString()
                     + "]!!!! *\r\n"
-                    + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
+                    + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
                     + "******************************************************************************";
 
                 getLogger().fatalError( message );
             }
 
-            // copy the current nexus config file as file.bak
+            // copy the current security config file as file.bak
             if ( file.exists() )
             {
                 FileUtils.copyFile( file, backupFile );

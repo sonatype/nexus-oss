@@ -73,7 +73,7 @@ public class PlexusUserPlexusResource
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
         }
         
-        PlexusUserResource resource = nexusToRestModel( user );
+        PlexusUserResource resource = securityToRestModel( user );
         
         result.setData( resource );
             
