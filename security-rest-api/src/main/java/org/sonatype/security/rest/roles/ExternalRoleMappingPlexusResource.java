@@ -115,11 +115,11 @@ public class ExternalRoleMappingPlexusResource
         {
             ExternalRoleMappingResource resource = new ExternalRoleMappingResource();
             result.addData( resource );
-            resource.setDefaultRole( this.nexusToRestModel( defaultRole ) );
+            resource.setDefaultRole( this.securityToRestModel( defaultRole ) );
             
             for ( PlexusRole mappedRole : roleMap.get( defaultRole ) )
             {
-                resource.addMappedRole( this.nexusToRestModel( mappedRole ) );
+                resource.addMappedRole( this.securityToRestModel( mappedRole ) );
             }
         }
 

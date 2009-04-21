@@ -66,7 +66,7 @@ public class RoleListPlexusResource
 
         for ( SecurityRole role : getPlexusSecurity().listRoles() )
         {
-            RoleResource res = nexusToRestModel( role, request );
+            RoleResource res = securityToRestModel( role, request );
 
             if ( res != null )
             {
@@ -88,7 +88,7 @@ public class RoleListPlexusResource
         {
             RoleResource resource = resourceRequest.getData();
 
-            SecurityRole role = restToNexusModel( null, resource );
+            SecurityRole role = restToSecurityModel( null, resource );
 
             try
             {

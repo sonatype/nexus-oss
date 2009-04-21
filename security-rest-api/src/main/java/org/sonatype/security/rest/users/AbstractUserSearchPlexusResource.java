@@ -44,7 +44,7 @@ public abstract class AbstractUserSearchPlexusResource
         
         for ( PlexusUser user : users )
         {
-            PlexusUserResource res = nexusToRestModel( user );
+            PlexusUserResource res = securityToRestModel( user );
 
             if ( res != null )
             {

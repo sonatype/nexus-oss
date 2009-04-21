@@ -79,7 +79,7 @@ public class PrivilegePlexusResource
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
         }
 
-        result.setData( nexusToRestModel( priv, request ) );
+        result.setData( securityToRestModel( priv, request ) );
 
         return result;
     }

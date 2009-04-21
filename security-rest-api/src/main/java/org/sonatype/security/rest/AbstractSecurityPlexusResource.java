@@ -59,24 +59,24 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
     {
         getLogger().warn( "Configuration error!", e );
 
-        ErrorResponse nexusErrorResponse;
+        ErrorResponse errorResponse;
 
         org.sonatype.jsecurity.realms.validator.ValidationResponse vr = e.getValidationResponse();
 
         if ( vr != null && vr.getValidationErrors().size() > 0 )
         {
             org.sonatype.jsecurity.realms.validator.ValidationMessage vm = vr.getValidationErrors().get( 0 );
-            nexusErrorResponse = getErrorResponse( vm.getKey(), vm.getShortMessage() );
+            errorResponse = getErrorResponse( vm.getKey(), vm.getShortMessage() );
         }
         else
         {
-            nexusErrorResponse = getErrorResponse( "*", e.getMessage() );
+            errorResponse = getErrorResponse( "*", e.getMessage() );
         }
 
-        throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", nexusErrorResponse );
+        throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", errorResponse );
     }
     
-    protected UserResource nexusToRestModel( SecurityUser user, Request request )
+    protected UserResource securityToRestModel( SecurityUser user, Request request )
     {
         UserResource resource = new UserResource();
         resource.setEmail( user.getEmail() );
@@ -94,7 +94,7 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         return resource;
     }
 
-    protected SecurityUser restToNexusModel( SecurityUser user, UserResource resource )
+    protected SecurityUser restToSecurityModel( SecurityUser user, UserResource resource )
     {
         if ( user == null )
         {
@@ -115,7 +115,7 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         return user;
     }
     
-    protected PlexusUserResource nexusToRestModel( PlexusUser user )
+    protected PlexusUserResource securityToRestModel( PlexusUser user )
     {
         PlexusUserResource resource = new PlexusUserResource();
         
@@ -126,13 +126,13 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         
         for ( PlexusRole role : user.getRoles() )
         {   
-            resource.addRole( this.nexusToRestModel( role ) );
+            resource.addRole( this.securityToRestModel( role ) );
         }
         
         return resource;
     }
     
-    protected PlexusRoleResource nexusToRestModel( PlexusRole role )
+    protected PlexusRoleResource securityToRestModel( PlexusRole role )
     {
         PlexusRoleResource roleResource = new PlexusRoleResource();
         roleResource.setRoleId( role.getRoleId() );

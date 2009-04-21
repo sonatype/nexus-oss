@@ -74,7 +74,7 @@ public class PlexusRoleListPlexusResource
         PlexusRoleListResourceResponse resourceResponse = new PlexusRoleListResourceResponse();
         for ( PlexusRole role : roles )
         {
-            resourceResponse.addData( this.nexusToRestModel( role ) );
+            resourceResponse.addData( this.securityToRestModel( role ) );
         }
 
         return resourceResponse;
