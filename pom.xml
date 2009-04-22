@@ -12,6 +12,7 @@
   	<module>security-manager</module>
   	<module>security-rest-api</module>
   	<module>security-realms</module>
+  	<module>security-system</module>
   </modules>
   
   <distributionManagement>
