@@ -34,7 +34,6 @@ public class DefaultNexusSecurityUpgradeTest
     public void testDoUpgrade() throws Exception
     {
         NexusSecurity nexusSecurity = this.lookup( NexusSecurity.class );
-        nexusSecurity.startService();
     }
     
     

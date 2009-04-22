@@ -28,6 +28,7 @@ import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 
@@ -44,7 +45,9 @@ public class DefaultSnapshotRemoverTest
         {
             try
             {
-                repository.retrieveItem( repository.createUid( entry.getKey() ), null );
+                ResourceStoreRequest request = new ResourceStoreRequest(entry.getKey());
+                
+                repository.retrieveItem( false, request );
 
                 // we succeeded, the value must be true
                 assertTrue(
@@ -69,7 +72,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        getNexus().getRepository( "central" ).setLocalStatus( LocalStatus.OUT_OF_SERVICE );
+        repositoryRegistry.getRepository( "central" ).setLocalStatus( LocalStatus.OUT_OF_SERVICE );
 
         // ---------------------------------
         // make the jar should be deleted, while the pom should be kept
@@ -100,7 +103,7 @@ public class DefaultSnapshotRemoverTest
         fillInRepo();
 
         // XXX: the test stuff is published on sonatype, so put the real central out of service for test
-        getNexus().getRepository( "central" ).setLocalStatus( LocalStatus.OUT_OF_SERVICE );
+        repositoryRegistry.getRepository( "central" ).setLocalStatus( LocalStatus.OUT_OF_SERVICE );
 
         // and now setup the request
         // process the apacheSnapshots, leave min 1 snap, remove older than 0 day and delete them if release exists

@@ -18,15 +18,17 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 
 public class DefaultNexusTest
     extends AbstractNexusTestCase
 {
-    private Nexus defaultNexus;
+    private DefaultNexus defaultNexus;
+    
+    private RepositoryTypeRegistry repositoryTypeRegistry;
 
-    public Nexus getDefaultNexus()
+    public DefaultNexus getDefaultNexus()
     {
         return defaultNexus;
     }
@@ -36,7 +38,9 @@ public class DefaultNexusTest
     {
         super.setUp();
 
-        defaultNexus = lookup( Nexus.class );
+        defaultNexus = (DefaultNexus) lookup( Nexus.class );
+        
+        repositoryTypeRegistry = lookup( RepositoryTypeRegistry.class );
     }
 
     protected boolean loadConfigurationAtSetUp()
@@ -69,74 +73,12 @@ public class DefaultNexusTest
         assertEquals( 4, templates.size() );
     }
 
-    public void testRepositoryShadowTemplates()
-        throws IOException
-    {
-        CRepositoryShadow template = new CRepositoryShadow();
-        template.setId( "aTemplate" );
-        template.setName( "This is a longish name" );
-
-        getDefaultNexus().createRepositoryShadowTemplate( template );
-
-        Collection<CRepositoryShadow> templates = getDefaultNexus().listRepositoryShadowTemplates();
-
-        assertEquals( 2, templates.size() );
-
-        CRepositoryShadow t1 = getDefaultNexus().readRepositoryShadowTemplate( "aTemplate" );
-
-        assertEquals( "aTemplate", t1.getId() );
-        assertEquals( "This is a longish name", t1.getName() );
-
-        getDefaultNexus().deleteRepositoryShadowTemplate( "aTemplate" );
-
-        templates = getDefaultNexus().listRepositoryShadowTemplates();
-
-        assertEquals( 1, templates.size() );
-    }
-
-    public void testRepositoryMixedTemplates()
-        throws IOException
-    {
-        CRepository template = new CRepository();
-        template.setId( "aTemplate" );
-        template.setName( "This is a repo" );
-
-        getDefaultNexus().createRepositoryTemplate( template );
-
-        Collection<CRepository> templates = getDefaultNexus().listRepositoryTemplates();
-
-        assertEquals( 5, templates.size() );
-
-        CRepositoryShadow stemplate = new CRepositoryShadow();
-        stemplate.setId( "aTemplate" );
-        stemplate.setName( "This is a shadow" );
-
-        getDefaultNexus().createRepositoryShadowTemplate( stemplate );
-
-        Collection<CRepositoryShadow> stemplates = getDefaultNexus().listRepositoryShadowTemplates();
-
-        assertEquals( 2, stemplates.size() );
-
-        CRepositoryShadow st1 = getDefaultNexus().readRepositoryShadowTemplate( "aTemplate" );
-
-        assertEquals( "aTemplate", st1.getId() );
-        assertEquals( "This is a shadow", st1.getName() );
-
-        getDefaultNexus().deleteRepositoryTemplate( "aTemplate" );
-
-        templates = getDefaultNexus().listRepositoryTemplates();
-        stemplates = getDefaultNexus().listRepositoryShadowTemplates();
-
-        assertEquals( 4, templates.size() );
-        assertEquals( 2, stemplates.size() );
-    }
-
     public void testListRepositoryContentClasses()
         throws Exception
     {
         Map<String, ContentClass> plexusContentClasses = getContainer().lookupMap( ContentClass.class );
 
-        Collection<ContentClass> contentClasses = getDefaultNexus().listRepositoryContentClasses();
+        Collection<ContentClass> contentClasses =  repositoryTypeRegistry.getContentClasses();
 
         assertEquals( plexusContentClasses.size(), contentClasses.size() );
 
@@ -149,8 +91,8 @@ public class DefaultNexusTest
     public void testBounceNexus()
         throws Exception
     {
-        getDefaultNexus().stopService();
+        getDefaultNexus().stop();
 
-        getDefaultNexus().startService();
+        getDefaultNexus().start();
     }
 }

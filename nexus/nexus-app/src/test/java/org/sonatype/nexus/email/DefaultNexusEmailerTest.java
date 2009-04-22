@@ -35,25 +35,25 @@ public class DefaultNexusEmailerTest
         throws Exception
     {
         CSmtpConfiguration newSmtp = new CSmtpConfiguration();
-        newSmtp.setHost( "1.2.3.4" );
+        newSmtp.setHostname(  "1.2.3.4" );
         
         assertTrue( emailer.configChanged( newSmtp ) );
         
         newSmtp = new CSmtpConfiguration();
-        newSmtp.setHost( "1.2.3.4" );
+        newSmtp.setHostname( "1.2.3.4" );
         newSmtp.setPort( 1234 );
         
         assertTrue( emailer.configChanged( newSmtp ) );
         
         newSmtp = new CSmtpConfiguration();
-        newSmtp.setHost( "1.2.3.4" );
+        newSmtp.setHostname( "1.2.3.4" );
         newSmtp.setPort( 1234 );
         newSmtp.setSystemEmailAddress( "someemail" );
         
         assertTrue( emailer.configChanged( newSmtp ) );
         
         newSmtp = new CSmtpConfiguration();
-        newSmtp.setHost( "1.2.3.4" );
+        newSmtp.setHostname( "1.2.3.4" );
         newSmtp.setPort( 1234 );
         newSmtp.setSystemEmailAddress( "someemail" );
         newSmtp.setUsername( "username" );
@@ -61,7 +61,7 @@ public class DefaultNexusEmailerTest
         assertTrue( emailer.configChanged( newSmtp ) );
         
         newSmtp = new CSmtpConfiguration();
-        newSmtp.setHost( "1.2.3.4" );
+        newSmtp.setHostname( "1.2.3.4" );
         newSmtp.setPort( 1234 );
         newSmtp.setSystemEmailAddress( "someemail" );
         newSmtp.setUsername( "username" );
@@ -70,7 +70,7 @@ public class DefaultNexusEmailerTest
         assertTrue( emailer.configChanged( newSmtp ) );
         
         newSmtp = new CSmtpConfiguration();
-        newSmtp.setHost( "1.2.3.4" );
+        newSmtp.setHostname( "1.2.3.4" );
         newSmtp.setPort( 1234 );
         newSmtp.setSystemEmailAddress( "someemail" );
         newSmtp.setUsername( "username" );
@@ -80,7 +80,7 @@ public class DefaultNexusEmailerTest
         assertTrue( emailer.configChanged( newSmtp ) );
         
         newSmtp = new CSmtpConfiguration();
-        newSmtp.setHost( "1.2.3.4" );
+        newSmtp.setHostname( "1.2.3.4" );
         newSmtp.setPort( 1234 );
         newSmtp.setSystemEmailAddress( "someemail" );
         newSmtp.setUsername( "username" );

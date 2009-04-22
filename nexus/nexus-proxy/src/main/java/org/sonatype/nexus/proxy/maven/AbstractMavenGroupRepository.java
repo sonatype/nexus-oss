@@ -37,14 +37,31 @@ public abstract class AbstractMavenGroupRepository
 
     private RepositoryKind repositoryKind;
 
+    @Override
+    protected AbstractMavenGroupRepositoryConfiguration getExternalConfiguration()
+    {
+        return (AbstractMavenGroupRepositoryConfiguration) super.getExternalConfiguration();
+    }
+
     public RepositoryKind getRepositoryKind()
     {
         if ( repositoryKind == null )
         {
-            repositoryKind = new DefaultRepositoryKind( GroupRepository.class, Arrays
-                .asList( new Class<?>[] { MavenGroupRepository.class } ) );
+            repositoryKind =
+                new DefaultRepositoryKind( GroupRepository.class,
+                                           Arrays.asList( new Class<?>[] { MavenGroupRepository.class } ) );
         }
         return repositoryKind;
+    }
+
+    public boolean isMergeMetadata()
+    {
+        return getExternalConfiguration().isMergeMetadata();
+    }
+
+    public void setMergeMetadata( boolean mergeMetadata )
+    {
+        getExternalConfiguration().setMergeMetadata( mergeMetadata );
     }
 
     public ArtifactPackagingMapper getArtifactPackagingMapper()
@@ -80,42 +97,31 @@ public abstract class AbstractMavenGroupRepository
     public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
     {
         throw new UnsupportedOperationException(
-            "Setting repository policy on a Maven group repository is not possible!" );
+                                                 "Setting repository policy on a Maven group repository is not possible!" );
     }
 
     public void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
-        throws UnsupportedStorageOperationException,
-            ItemNotFoundException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException
+        throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
+        StorageException, AccessDeniedException
     {
         getArtifactStoreHelper().storeItemWithChecksums( request, is, userAttributes );
     }
 
     public void storeItemWithChecksums( boolean fromTask, AbstractStorageItem item )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            StorageException
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
     {
         getArtifactStoreHelper().storeItemWithChecksums( fromTask, item );
     }
 
     public void deleteItemWithChecksums( ResourceStoreRequest request )
-        throws UnsupportedStorageOperationException,
-            ItemNotFoundException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException
+        throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
+        StorageException, AccessDeniedException
     {
         getArtifactStoreHelper().deleteItemWithChecksums( request );
     }
 
     public void deleteItemWithChecksums( boolean fromTask, ResourceStoreRequest request )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
     {
         getArtifactStoreHelper().deleteItemWithChecksums( fromTask, request );
     }

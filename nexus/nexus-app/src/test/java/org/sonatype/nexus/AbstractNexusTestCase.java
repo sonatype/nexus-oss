@@ -26,7 +26,6 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase

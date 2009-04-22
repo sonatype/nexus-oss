@@ -18,11 +18,16 @@ import java.io.IOException;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 public class RebuildAttributesTest
     extends AbstractNexusTestCase
 {
     private DefaultNexus defaultNexus;
+
+    private RepositoryRegistry repositoryRegistry;
 
     protected void setUp()
         throws Exception
@@ -30,14 +35,16 @@ public class RebuildAttributesTest
         super.setUp();
 
         defaultNexus = (DefaultNexus) lookup( Nexus.class );
+
+        repositoryRegistry = lookup( RepositoryRegistry.class );
     }
-    
+
     protected void tearDown()
         throws Exception
     {
         super.tearDown();
     }
-    
+
     protected boolean loadConfigurationAtSetUp()
     {
         return false;
@@ -52,7 +59,7 @@ public class RebuildAttributesTest
     {
         this.defaultNexus = defaultNexus;
     }
-        
+
     public void testRepositoryRebuildAttributes()
         throws IOException
     {
@@ -62,8 +69,11 @@ public class RebuildAttributesTest
             newRepo.setId( "test" );
             newRepo.setName( "Test" );
             getDefaultNexus().createRepository( newRepo );
-            
-            getDefaultNexus().rebuildAttributesRepository( null, "test" );
+
+            repositoryRegistry.getRepository( "test" ).recreateAttributes(
+                                                                           new ResourceStoreRequest(
+                                                                                                     RepositoryItemUid.PATH_ROOT ),
+                                                                           null );
         }
         catch ( ConfigurationException e )
         {

@@ -99,17 +99,16 @@ public class DefaultNexusConfigurationTest
 
         config = nexusConfiguration.getConfiguration();
 
-        String proxyHostName = ( (CRemoteHttpProxySettings) nexusConfiguration
-            .getRemoteStorageContext().getRemoteConnectionContextObject(
-                RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS ) ).getProxyHostname();
+        String proxyHostName =
+            ( (CRemoteHttpProxySettings) nexusConfiguration.getGlobalRemoteStorageContext().getRemoteConnectionContextObject(
+                                                                                                                              RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS ) ).getProxyHostname();
 
-        int proxyPort = ( (CRemoteHttpProxySettings) nexusConfiguration
-            .getRemoteStorageContext().getRemoteConnectionContextObject(
-                RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS ) ).getProxyPort();
+        int proxyPort =
+            ( (CRemoteHttpProxySettings) nexusConfiguration.getGlobalRemoteStorageContext().getRemoteConnectionContextObject(
+                                                                                                                              RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS ) ).getProxyPort();
 
-        assertEquals(
-            nexusConfiguration.getConfiguration().getGlobalHttpProxySettings().getProxyHostname(),
-            proxyHostName );
+        assertEquals( nexusConfiguration.getConfiguration().getGlobalHttpProxySettings().getProxyHostname(),
+                      proxyHostName );
 
         assertEquals( nexusConfiguration.getConfiguration().getGlobalHttpProxySettings().getProxyPort(), proxyPort );
 
@@ -166,46 +165,39 @@ public class DefaultNexusConfigurationTest
         assertTrue( nexusConfiguration.getConfiguration() != null );
     }
 
-    public void testGetConfigurationAsStream()
-        throws Exception
-    {
-        nexusConfiguration.loadConfiguration();
-
-        contentEquals( new FileInputStream( new File( getNexusConfiguration() ) ), nexusConfiguration
-            .getConfigurationAsStream() );
-    }
-
     public void testGetDefaultConfigurationAsStream()
         throws Exception
     {
         nexusConfiguration.loadConfiguration();
 
-        contentEquals( getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" ), nexusConfiguration
-            .getConfigurationSource().getDefaultsSource().getConfigurationAsStream() );
+        contentEquals( getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" ),
+                       nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfigurationAsStream() );
     }
 
-    public void testNX467()
-        throws Exception
-    {
-        // load default config
-        nexusConfiguration.loadConfiguration();
-
-        M2GroupRepository groupRouter = (M2GroupRepository) lookup( GroupRepository.class, "maven2" );
-
-        // runtime state should equal to config
-        assertEquals( nexusConfiguration.getConfiguration().getRouting().getGroups().isMergeMetadata(), groupRouter
-            .isMergeMetadata() );
-
-        // invert runtime state
-        groupRouter.setMergeMetadata( !groupRouter.isMergeMetadata() );
-
-        // force reloading of config
-        nexusConfiguration.loadConfiguration( true );
-
-        // runtime state should equal to config again
-        assertEquals( nexusConfiguration.getConfiguration().getRouting().getGroups().isMergeMetadata(), groupRouter
-            .isMergeMetadata() );
-    }
+    // this test have no sense anymore, after config refactoring
+    // the config and repo "live object" are from now one
+//    public void testNX467()
+//        throws Exception
+//    {
+//        // load default config
+//        nexusConfiguration.loadConfiguration();
+//
+//        M2GroupRepository groupRouter = (M2GroupRepository) lookup( GroupRepository.class, "maven2" );
+//
+//        // runtime state should equal to config
+//        assertEquals( nexusConfiguration.getConfiguration().getRouting().isMergeMetadata(),
+//                      groupRouter.isMergeMetadata() );
+//
+//        // invert runtime state
+//        groupRouter.setMergeMetadata( !groupRouter.isMergeMetadata() );
+//
+//        // force reloading of config
+//        nexusConfiguration.loadConfiguration( true );
+//
+//        // runtime state should equal to config again
+//        assertEquals( nexusConfiguration.getConfiguration().getRouting().getGroups().isMergeMetadata(),
+//                      groupRouter.isMergeMetadata() );
+//    }
 
     public void testGetAndReadConfigurationFiles()
         throws Exception
@@ -218,23 +210,23 @@ public class DefaultNexusConfigurationTest
 
         Map<String, String> confFileNames = nexusConfiguration.getConfigurationFiles();
 
-        assertTrue( confFileNames.size() > 1);
+        assertTrue( confFileNames.size() > 1 );
 
         assertTrue( confFileNames.containsValue( "nexus.xml" ) );
 
         assertTrue( confFileNames.containsValue( "test.xml" ) );
-        
+
         for ( Map.Entry<String, String> entry : confFileNames.entrySet() )
         {
             if ( entry.getValue().equals( "test.xml" ) )
             {
-                contentEquals( new ByteArrayInputStream( "test".getBytes() ), nexusConfiguration
-                    .getConfigurationAsStreamByKey( entry.getKey() ) );
+                contentEquals( new ByteArrayInputStream( "test".getBytes() ),
+                               nexusConfiguration.getConfigurationAsStreamByKey( entry.getKey() ).getInputStream() );
             }
             else if ( entry.getValue().equals( "nexus.xml" ) )
             {
-                contentEquals( new FileInputStream( new File( getNexusConfiguration() ) ), nexusConfiguration
-                    .getConfigurationAsStreamByKey( entry.getKey() ) );
+                contentEquals( new FileInputStream( new File( getNexusConfiguration() ) ),
+                               nexusConfiguration.getConfigurationAsStreamByKey( entry.getKey() ).getInputStream() );
             }
         }
         FileUtils.forceDelete( testConfFile );

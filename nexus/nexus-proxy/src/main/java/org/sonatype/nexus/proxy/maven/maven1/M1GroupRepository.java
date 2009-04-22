@@ -35,19 +35,9 @@ public class M1GroupRepository
     private M1GroupRepositoryConfigurator m1GroupRepositoryConfigurator;
 
     @Override
-    public M1GroupRepositoryConfiguration getExternalConfiguration()
+    protected M1GroupRepositoryConfiguration getExternalConfiguration()
     {
         return (M1GroupRepositoryConfiguration) super.getExternalConfiguration();
-    }
-
-    public boolean isMergeMetadata()
-    {
-        return getExternalConfiguration().isMergeMetadata();
-    }
-
-    public void setMergeMetadata( boolean mergeMetadata )
-    {
-        getExternalConfiguration().setMergeMetadata( mergeMetadata );
     }
 
     public ContentClass getRepositoryContentClass()

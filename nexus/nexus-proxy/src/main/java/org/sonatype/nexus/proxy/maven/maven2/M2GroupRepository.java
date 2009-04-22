@@ -70,16 +70,6 @@ public class M2GroupRepository
         return (M2GroupRepositoryConfiguration) super.getExternalConfiguration();
     }
 
-    public boolean isMergeMetadata()
-    {
-        return getExternalConfiguration().isMergeMetadata();
-    }
-
-    public void setMergeMetadata( boolean mergeMetadata )
-    {
-        getExternalConfiguration().setMergeMetadata( mergeMetadata );
-    }
-
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;

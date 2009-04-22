@@ -138,15 +138,13 @@ public class DefaultNexusConfiguration
     private Map<String, String> configurationFiles;
 
     public void loadConfiguration()
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         loadConfiguration( false );
     }
 
     public void loadConfiguration( boolean force )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         if ( force || configurationSource.getConfiguration() == null )
         {
@@ -167,15 +165,14 @@ public class DefaultNexusConfiguration
             if ( getConfiguration().getGlobalConnectionSettings() != null )
             {
                 remoteStorageContext.putRemoteConnectionContextObject(
-                    RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS,
-                    getConfiguration().getGlobalConnectionSettings() );
+                                                                       RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS,
+                                                                       getConfiguration().getGlobalConnectionSettings() );
             }
 
             if ( getConfiguration().getGlobalHttpProxySettings() != null )
             {
-                remoteStorageContext.putRemoteConnectionContextObject(
-                    RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS,
-                    getConfiguration().getGlobalHttpProxySettings() );
+                remoteStorageContext.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS,
+                                                                       getConfiguration().getGlobalHttpProxySettings() );
             }
 
             applyConfiguration();
@@ -183,7 +180,6 @@ public class DefaultNexusConfiguration
     }
 
     public void applyConfiguration()
-        throws IOException
     {
         getLogger().info( "Applying Nexus Configuration..." );
 
@@ -199,8 +195,9 @@ public class DefaultNexusConfiguration
 
             wastebasketDirectory = null;
 
-            applicationEventMulticaster.notifyProximityEventListeners( new ConfigurationChangeEvent( this, prepare
-                .getChanges() ) );
+            applicationEventMulticaster.notifyProximityEventListeners( new ConfigurationChangeEvent(
+                                                                                                     this,
+                                                                                                     prepare.getChanges() ) );
         }
         else
         {
@@ -211,14 +208,16 @@ public class DefaultNexusConfiguration
     public void saveConfiguration()
         throws IOException
     {
+        applyConfiguration();
+
         configurationSource.storeConfiguration();
     }
 
+    @Deprecated
+    // see above
     protected void applyAndSaveConfiguration()
         throws IOException
     {
-        applyConfiguration();
-
         saveConfiguration();
     }
 
@@ -261,10 +260,11 @@ public class DefaultNexusConfiguration
         // bad bad bad
         if ( !workingDirectory.exists() && !workingDirectory.mkdirs() )
         {
-            String message = "\r\n******************************************************************************\r\n"
-                + "* Could not create work directory [ " + workingDirectory.toString() + "]!!!! *\r\n"
-                + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
-                + "******************************************************************************";
+            String message =
+                "\r\n******************************************************************************\r\n"
+                    + "* Could not create work directory [ " + workingDirectory.toString() + "]!!!! *\r\n"
+                    + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
+                    + "******************************************************************************";
 
             getLogger().fatalError( message );
         }
@@ -485,11 +485,8 @@ public class DefaultNexusConfiguration
                     + "'" );
             }
 
-            targetRegistry.addRepositoryTarget( new Target(
-                settings.getId(),
-                settings.getName(),
-                contentClass,
-                settings.getPatterns() ) );
+            targetRegistry.addRepositoryTarget( new Target( settings.getId(), settings.getName(), contentClass,
+                                                            settings.getPatterns() ) );
         }
     }
 
@@ -588,12 +585,10 @@ public class DefaultNexusConfiguration
     }
 
     public void updateGlobalRemoteConnectionSettings( CRemoteConnectionSettings settings )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
-        remoteStorageContext.putRemoteConnectionContextObject(
-            RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS,
-            settings );
+        remoteStorageContext.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS,
+                                                               settings );
 
         getConfiguration().setGlobalConnectionSettings( settings );
 
@@ -603,12 +598,10 @@ public class DefaultNexusConfiguration
     // CRemoteHttpProxySettings are optional: CRUD
 
     public void createGlobalRemoteHttpProxySettings( CRemoteHttpProxySettings settings )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
-        remoteStorageContext.putRemoteConnectionContextObject(
-            RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS,
-            settings );
+        remoteStorageContext.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS,
+                                                               settings );
 
         getConfiguration().setGlobalHttpProxySettings( settings );
 
@@ -621,8 +614,7 @@ public class DefaultNexusConfiguration
     }
 
     public void updateGlobalRemoteHttpProxySettings( CRemoteHttpProxySettings settings )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         createGlobalRemoteHttpProxySettings( settings );
     }
@@ -645,8 +637,7 @@ public class DefaultNexusConfiguration
     }
 
     public void updateRouting( CRouting settings )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         getConfiguration().setRouting( settings );
 
@@ -660,7 +651,7 @@ public class DefaultNexusConfiguration
         ApplicationValidationContext result = new ApplicationValidationContext();
 
         fillValidationContextRepositoryIds( result );
-        
+
         return result;
     }
 
@@ -701,8 +692,7 @@ public class DefaultNexusConfiguration
     }
 
     public Repository createRepository( CRepository settings )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         validateRepository( settings, true );
 
@@ -716,9 +706,7 @@ public class DefaultNexusConfiguration
     }
 
     public void deleteRepository( String id )
-        throws NoSuchRepositoryException,
-            IOException,
-            ConfigurationException
+        throws NoSuchRepositoryException, IOException, ConfigurationException
     {
         Repository repository = repositoryRegistry.getRepository( id );
 
@@ -818,9 +806,7 @@ public class DefaultNexusConfiguration
     }
 
     public void createGroupsSettingPathMapping( CPathMappingItem settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
+        throws NoSuchRepositoryException, ConfigurationException, IOException
     {
         validateRoutePattern( settings );
 
@@ -853,9 +839,7 @@ public class DefaultNexusConfiguration
     }
 
     public void updateGroupsSettingPathMapping( CPathMappingItem settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException
+        throws NoSuchRepositoryException, ConfigurationException, IOException
     {
         validateRoutePattern( settings );
 
@@ -1002,8 +986,8 @@ public class DefaultNexusConfiguration
             if ( !contentClassExists )
             {
                 throw new ConfigurationException(
-                    "The Repository Target 'ContentClass' must exists: there is no class with id='"
-                        + settings.getContentClass() + "'!" );
+                                                  "The Repository Target 'ContentClass' must exists: there is no class with id='"
+                                                      + settings.getContentClass() + "'!" );
             }
         }
         else
@@ -1025,8 +1009,7 @@ public class DefaultNexusConfiguration
     }
 
     public void createRepositoryTarget( CRepositoryTarget settings )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         validateCRepositoryTarget( settings, true );
 
@@ -1048,8 +1031,8 @@ public class DefaultNexusConfiguration
                 + "'" );
         }
 
-        targetRegistry.addRepositoryTarget( new Target( settings.getId(), settings.getName(), contentClass, settings
-            .getPatterns() ) );
+        targetRegistry.addRepositoryTarget( new Target( settings.getId(), settings.getName(), contentClass,
+                                                        settings.getPatterns() ) );
 
         getConfiguration().addRepositoryTarget( settings );
 
@@ -1074,8 +1057,7 @@ public class DefaultNexusConfiguration
     }
 
     public void updateRepositoryTarget( CRepositoryTarget settings )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         validateCRepositoryTarget( settings, false );
 
@@ -1109,11 +1091,8 @@ public class DefaultNexusConfiguration
                     + "'" );
             }
 
-            targetRegistry.addRepositoryTarget( new Target(
-                oldTarget.getId(),
-                oldTarget.getName(),
-                contentClass,
-                oldTarget.getPatterns() ) );
+            targetRegistry.addRepositoryTarget( new Target( oldTarget.getId(), oldTarget.getName(), contentClass,
+                                                            oldTarget.getPatterns() ) );
 
             applyAndSaveConfiguration();
         }
@@ -1149,8 +1128,7 @@ public class DefaultNexusConfiguration
     }
 
     public void updateSmtpConfiguration( CSmtpConfiguration settings )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         getConfiguration().setSmtpConfiguration( settings );
 

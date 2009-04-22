@@ -22,9 +22,12 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.DirectoryWalkListener;
 import org.codehaus.plexus.util.DirectoryWalker;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
  * Tests that needs some repo content and are Maven related.
@@ -35,6 +38,10 @@ public class AbstractMavenRepoContentTests
     extends AbstractNexusTestCase
 {
     protected DefaultNexus defaultNexus;
+
+    protected NexusConfiguration nexusConfiguration;
+
+    protected RepositoryRegistry repositoryRegistry;
 
     protected MavenRepository snapshots;
 
@@ -51,13 +58,17 @@ public class AbstractMavenRepoContentTests
 
         defaultNexus = (DefaultNexus) lookup( Nexus.class );
 
+        nexusConfiguration = lookup( NexusConfiguration.class );
+
+        repositoryRegistry = lookup( RepositoryRegistry.class );
+
         // get a snapshots hosted repo
-        snapshots = (MavenRepository) defaultNexus.getRepository( "snapshots" );
+        snapshots = (MavenRepository) repositoryRegistry.getRepository( "snapshots" );
 
         // get a releases hosted repo
-        releases = (MavenRepository) defaultNexus.getRepository( "releases" );
+        releases = (MavenRepository) repositoryRegistry.getRepository( "releases" );
 
-        apacheSnapshots = (MavenRepository) defaultNexus.getRepository( "apache-snapshots" );
+        apacheSnapshots = (MavenRepository) repositoryRegistry.getRepository( "apache-snapshots" );
     }
 
     protected void tearDown()
@@ -74,8 +85,8 @@ public class AbstractMavenRepoContentTests
     public void fillInRepo()
         throws Exception
     {
-        final File sourceSnapshotsRoot = new File( getBasedir(), "src/test/resources/reposes/snapshots" )
-            .getAbsoluteFile();
+        final File sourceSnapshotsRoot =
+            new File( getBasedir(), "src/test/resources/reposes/snapshots" ).getAbsoluteFile();
 
         final URL snapshotsRootUrl = new URL( snapshots.getLocalUrl() );
 
@@ -103,17 +114,17 @@ public class AbstractMavenRepoContentTests
         // "from behind"
 
         // but clear caches
-        snapshots.clearCaches( RepositoryItemUid.PATH_ROOT );
-        releases.clearCaches( RepositoryItemUid.PATH_ROOT );
-        apacheSnapshots.clearCaches( RepositoryItemUid.PATH_ROOT );
+        ResourceStoreRequest root = new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT );
+        snapshots.clearCaches( root );
+        releases.clearCaches( root );
+        apacheSnapshots.clearCaches( root );
 
         // make apache-snapshots point to local fake repo
-        CRepository apacheSnapshotsConfig = defaultNexus.readRepository( "apache-snapshots" );
-        apacheSnapshotsConfig.getRemoteStorage().setUrl( "http://localhost:12345/apache-snapshots/" );
-        apacheSnapshotsConfig.setDownloadRemoteIndexes( false );
-        defaultNexus.updateRepository( apacheSnapshotsConfig );
+        ( (MavenProxyRepository) apacheSnapshots ).setRemoteUrl( "http://localhost:12345/apache-snapshots/" );
+        ( (MavenProxyRepository) apacheSnapshots ).setDownloadRemoteIndexes( false );
+        nexusConfiguration.saveConfiguration();
     }
-    
+
     protected File retrieveFile( MavenRepository repo, String path )
         throws Exception
     {

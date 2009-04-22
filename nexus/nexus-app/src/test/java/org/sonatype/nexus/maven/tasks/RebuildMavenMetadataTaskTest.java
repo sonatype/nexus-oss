@@ -28,15 +28,11 @@ public class RebuildMavenMetadataTaskTest
         super.setUp();
 
         nexusScheduler = lookup( NexusScheduler.class );
-
-        nexusScheduler.startService();
     }
 
     protected void tearDown()
         throws Exception
     {
-        nexusScheduler.stopService();
-
         super.tearDown();
     }
 

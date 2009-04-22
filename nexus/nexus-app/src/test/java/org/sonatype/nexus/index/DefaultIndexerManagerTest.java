@@ -17,6 +17,8 @@ import java.util.Collection;
 
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.scheduling.ScheduledTask;
 
@@ -24,6 +26,8 @@ public class DefaultIndexerManagerTest
     extends AbstractMavenRepoContentTests
 {
     private IndexerManager indexerManager;
+    
+    private NexusScheduler nexusScheduler;
 
     protected void setUp()
         throws Exception
@@ -31,6 +35,8 @@ public class DefaultIndexerManagerTest
         super.setUp();
 
         indexerManager = lookup( IndexerManager.class );
+        
+        nexusScheduler = lookup( NexusScheduler.class );
     }
 
     protected void tearDown()
@@ -46,9 +52,9 @@ public class DefaultIndexerManagerTest
     {
         fillInRepo();
 
-        ReindexTask reindexTask = defaultNexus.createTaskInstance( ReindexTask.class );
+        ReindexTask reindexTask = nexusScheduler.createTaskInstance( ReindexTask.class );
 
-        ScheduledTask<Object> st = defaultNexus.submit( "reindexAll", reindexTask );
+        ScheduledTask<Object> st = nexusScheduler.submit( "reindexAll", reindexTask );
 
         // make it block until finished
         st.get();
