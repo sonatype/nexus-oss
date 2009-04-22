@@ -18,8 +18,8 @@ import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.UserResource;
 

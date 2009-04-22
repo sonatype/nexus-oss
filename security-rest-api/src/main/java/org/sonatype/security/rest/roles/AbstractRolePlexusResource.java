@@ -17,8 +17,8 @@ import java.util.List;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.RoleResource;
 

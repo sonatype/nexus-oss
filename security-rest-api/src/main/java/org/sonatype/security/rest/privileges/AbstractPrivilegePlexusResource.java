@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.restlet.data.Request;
 import org.sonatype.security.model.CProperty;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
+import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PrivilegeProperty;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;

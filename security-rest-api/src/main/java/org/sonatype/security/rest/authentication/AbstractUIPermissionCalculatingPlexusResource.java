@@ -24,7 +24,7 @@ import org.jsecurity.authz.permission.WildcardPermission;
 import org.jsecurity.subject.Subject;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
+import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.AuthenticationClientPermissions;
 import org.sonatype.security.rest.model.ClientPermission;

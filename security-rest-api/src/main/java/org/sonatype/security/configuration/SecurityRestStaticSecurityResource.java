@@ -14,8 +14,8 @@ package org.sonatype.security.configuration;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.jsecurity.realms.tools.AbstractStaticSecurityResource;
-import org.sonatype.jsecurity.realms.tools.StaticSecurityResource;
+import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
+import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 @Component( role = StaticSecurityResource.class, hint = "SecurityRestStaticSecurityResource" )
 public class SecurityRestStaticSecurityResource

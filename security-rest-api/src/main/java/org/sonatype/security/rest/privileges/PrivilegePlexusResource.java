@@ -19,11 +19,11 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.jsecurity.realms.privileges.application.ApplicationPrivilegeDescriptor;
-import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
+import org.sonatype.security.realms.tools.NoSuchPrivilegeException;
+import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
 
 /**
