@@ -11,11 +11,6 @@
   <name>Security: Model</name>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.sonatype.security</groupId>
-			<artifactId>security-xml-realm</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
@@ -35,34 +30,49 @@
 
 <build>
 		<plugins>
-			<!--<plugin>
-				<groupId>org.codehaus.modello</groupId>
-				<artifactId>modello-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>security.xml</id>
-						<goals>
-							<goal>java</goal>
-							<goal>xpp3-reader</goal>
-							<goal>xpp3-writer</goal>
-						</goals>
-						<configuration>
-							<version>1.0.0</version>
-							<models><model>src/main/mdo/security.xml</model></models>
-						</configuration>
-					</execution>
-				</executions>
-				<configuration>
-					<packageWithVersion>false</packageWithVersion>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>commons-collections</groupId>
-						<artifactId>commons-collections</artifactId>
-						<version>3.2</version>
-					</dependency>
-				</dependencies>
-			</plugin>-->
+			<plugin>
+                <groupId>org.codehaus.modello</groupId>
+                <artifactId>modello-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>security.xml</id>
+                        <goals>
+                            <goal>java</goal>
+                            <goal>xsd</goal>
+                            <goal>xpp3-reader</goal>
+                            <goal>xpp3-writer</goal>
+                        </goals>
+                        <configuration>
+                            <version>2.0.2</version>
+                            <model>src/main/mdo/security.xml</model>
+                            <packagedVersions>
+                                <packagedVersion>2.0.0</packagedVersion>
+                                <packagedVersion>2.0.1</packagedVersion>
+                                <!-- <packagedVersion>2.0.2</packagedVersion> -->
+                            </packagedVersions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>security-old.xml</id>
+                        <goals>
+                            <goal>java</goal>
+                            <goal>xsd</goal>
+                            <goal>xpp3-reader</goal>
+                        </goals>
+                        <configuration>
+                            <version>1.0.0</version>
+                            <model>src/main/mdo/security-old.xml</model>
+                            <packageWithVersion>true</packageWithVersion>
+                            <!--<packagedVersions>
+                            	<packagedVersion>1.0.0</packagedVersion>
+                            </packagedVersions>-->
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <packageWithVersion>false</packageWithVersion>
+                </configuration>
+            </plugin>
 			<plugin>
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-component-metadata</artifactId>

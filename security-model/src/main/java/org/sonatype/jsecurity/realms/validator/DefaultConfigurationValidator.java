@@ -22,7 +22,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.jsecurity.locators.SecurityXmlPlexusUserLocator;
 import org.sonatype.jsecurity.model.CPrivilege;
 import org.sonatype.jsecurity.model.CRole;
 import org.sonatype.jsecurity.model.CUser;
@@ -41,6 +40,8 @@ public class DefaultConfigurationValidator
     @Requirement(role=PrivilegeDescriptor.class)
     private List<PrivilegeDescriptor> privilegeDescriptors;
 
+    private static String DEFAULT_SOURCE = "default";
+    
     public ValidationResponse validateModel( ValidationRequest request )
     {
         ValidationResponse response = new ValidationResponse();
@@ -81,7 +82,7 @@ public class DefaultConfigurationValidator
                 for ( CUserRoleMapping userRoleMapping : (List<CUserRoleMapping>) model.getUserRoleMappings() )
                 {
                     if ( userRoleMapping.getUserId() != null && userRoleMapping.getUserId().equals( user.getId() )
-                        && ( SecurityXmlPlexusUserLocator.SOURCE.equals(userRoleMapping.getSource() ) ) )
+                        && ( DEFAULT_SOURCE.equals(userRoleMapping.getSource() ) ) )
                     {
                         roleIds.addAll( userRoleMapping.getRoles() );
                     }

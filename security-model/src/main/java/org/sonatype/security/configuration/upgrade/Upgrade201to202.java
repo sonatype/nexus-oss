@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.jsecurity.locators.SecurityXmlPlexusUserLocator;
 import org.sonatype.jsecurity.model.v2_0_1.CPrivilege;
 import org.sonatype.jsecurity.model.v2_0_1.CProperty;
 import org.sonatype.jsecurity.model.v2_0_1.CRole;
@@ -33,6 +32,8 @@ import org.sonatype.jsecurity.model.v2_0_1.io.xpp3.SecurityConfigurationXpp3Read
 public class Upgrade201to202
     implements SecurityUpgrader
 {
+    private static String DEFAULT_SOURCE = "default";
+    
     public Object loadConfiguration( File file )
         throws IOException,
             ConfigurationIsCorruptedException
@@ -81,7 +82,7 @@ public class Upgrade201to202
             newu.setStatus( oldu.getStatus() );
             
             // convert the old roles mapping to the new one
-            this.migrateOldRolesToUserRoleMapping( oldu.getId(), SecurityXmlPlexusUserLocator.SOURCE, oldu.getRoles(), newc );
+            this.migrateOldRolesToUserRoleMapping( oldu.getId(), DEFAULT_SOURCE, oldu.getRoles(), newc );
 
             newc.addUser( newu );
         }
