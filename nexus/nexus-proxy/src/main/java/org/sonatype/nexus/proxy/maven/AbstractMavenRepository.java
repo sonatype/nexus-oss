@@ -50,6 +50,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.util.ItemPathUtils;
 
 /**
@@ -123,7 +124,19 @@ public abstract class AbstractMavenRepository
 
         ctx.getProcessors().add( walkerProcessor );
 
-        getWalker().walk( ctx );
+        try
+        {
+            getWalker().walk( ctx );
+        }
+        catch ( WalkerException e )
+        {
+            if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
+            {
+                // everything that is not ItemNotFound should be reported,
+                // otherwise just neglect it
+                throw e;
+            }
+        }
 
         getApplicationEventMulticaster().notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
@@ -152,7 +165,19 @@ public abstract class AbstractMavenRepository
 
         ctx.getProcessors().add( wp );
 
-        getWalker().walk( ctx );
+        try
+        {
+            getWalker().walk( ctx );
+        }
+        catch ( WalkerException e )
+        {
+            if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
+            {
+                // everything that is not ItemNotFound should be reported,
+                // otherwise just neglect it
+                throw e;
+            }
+        }
 
         getApplicationEventMulticaster()
             .notifyProximityEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );

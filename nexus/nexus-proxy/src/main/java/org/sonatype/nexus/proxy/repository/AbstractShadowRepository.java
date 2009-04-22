@@ -32,6 +32,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerException;
 
 /**
  * The Class ShadowRepository.
@@ -192,7 +193,19 @@ public abstract class AbstractShadowRepository
 
         ctx.getProcessors().add( sw );
 
-        getWalker().walk( ctx );
+        try
+        {
+            getWalker().walk( ctx );
+        }
+        catch ( WalkerException e )
+        {
+            if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
+            {
+                // everything that is not ItemNotFound should be reported,
+                // otherwise just neglect it
+                throw e;
+            }
+        }
     }
 
     protected StorageItem doRetrieveItemFromMaster( ResourceStoreRequest request )

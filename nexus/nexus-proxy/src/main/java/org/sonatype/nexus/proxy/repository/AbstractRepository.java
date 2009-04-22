@@ -484,7 +484,7 @@ public abstract class AbstractRepository
 
         try
         {
-            walker.walk( ctx );
+            getWalker().walk( ctx );
         }
         catch ( WalkerException e )
         {
@@ -548,7 +548,19 @@ public abstract class AbstractRepository
         ctx.getProcessors().add( walkerProcessor );
 
         // and let it loose
-        walker.walk( ctx );
+        try
+        {
+            getWalker().walk( ctx );
+        }
+        catch ( WalkerException e )
+        {
+            if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
+            {
+                // everything that is not ItemNotFound should be reported,
+                // otherwise just neglect it
+                throw e;
+            }
+        }
 
         getApplicationEventMulticaster().notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
@@ -572,7 +584,20 @@ public abstract class AbstractRepository
 
         ctx.getProcessors().add( walkerProcessor );
 
-        walker.walk( ctx );
+        // let it loose
+        try
+        {
+            getWalker().walk( ctx );
+        }
+        catch ( WalkerException e )
+        {
+            if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
+            {
+                // everything that is not ItemNotFound should be reported,
+                // otherwise just neglect it
+                throw e;
+            }
+        }
 
         getApplicationEventMulticaster().notifyProximityEventListeners( new RepositoryEventRecreateAttributes( this ) );
 
@@ -959,7 +984,19 @@ public abstract class AbstractRepository
 
             ctx.getProcessors().add( dnw );
 
-            walker.walk( ctx );
+            try
+            {
+                getWalker().walk( ctx );
+            }
+            catch ( WalkerException e )
+            {
+                if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
+                {
+                    // everything that is not ItemNotFound should be reported,
+                    // otherwise just neglect it
+                    throw e;
+                }
+            }
         }
 
         doDeleteItem( request );
