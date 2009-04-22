@@ -151,7 +151,7 @@ public class DefaultPlexusUserManager
 
                     UserManager userLocator = this.getLocator( source );
                     
-                    if( source != null )
+                    if( userLocator != null )
                     {
                         //remove from unorderd and add to orderd
                         unOrderdLocators.remove( userLocator );
