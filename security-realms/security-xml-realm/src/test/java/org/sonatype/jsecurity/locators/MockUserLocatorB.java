@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.jsecurity.locators.users.PlexusRole;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.UserManager;
+import org.sonatype.security.locators.users.PlexusRole;
+import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.locators.users.UserManager;
 
 @Component(role=UserManager.class, hint="MockUserLocatorB")
 public class MockUserLocatorB

@@ -19,9 +19,9 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
-import org.sonatype.jsecurity.locators.users.PlexusRole;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.PlexusUserManager;
+import org.sonatype.security.locators.users.PlexusRole;
+import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.locators.users.PlexusUserManager;
 
 public class MissingRolePlexusUserManagerTest
     extends PlexusTestCase

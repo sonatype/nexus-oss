@@ -27,7 +27,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.realm.AuthenticatingRealm;
 import org.jsecurity.realm.CachingRealm;
 import org.jsecurity.realm.Realm;
-import org.sonatype.jsecurity.locators.RealmLocator;
 import org.sonatype.jsecurity.model.CProperty;
 import org.sonatype.jsecurity.realms.XmlAuthenticatingRealm;
 import org.sonatype.jsecurity.realms.XmlAuthorizingRealm;
@@ -50,6 +49,7 @@ import org.sonatype.security.email.SecurityEmailer;
 import org.sonatype.security.events.SecurityConfigurationChangedEvent;
 import org.sonatype.security.events.SecurityEvent;
 import org.sonatype.security.events.SecurityEventHandler;
+import org.sonatype.security.locators.RealmLocator;
 
 @Component( role = PlexusSecurity.class )
 public class DefaultPlexusSecurity

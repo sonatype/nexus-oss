@@ -29,6 +29,11 @@ import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.NoSuchRoleException;
 import org.sonatype.jsecurity.realms.tools.NoSuchRoleMappingException;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUserRoleMapping;
+import org.sonatype.security.locators.users.DefaultPlexusUserManager;
+import org.sonatype.security.locators.users.PlexusRole;
+import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
 
 @Component( role = PlexusUserManager.class, hint = "additinalRoles" )
 public class AdditinalRolePlexusUserManager

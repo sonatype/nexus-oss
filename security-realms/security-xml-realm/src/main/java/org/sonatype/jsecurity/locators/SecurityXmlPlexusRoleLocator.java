@@ -18,10 +18,10 @@ import java.util.TreeSet;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.jsecurity.locators.users.PlexusRole;
-import org.sonatype.jsecurity.locators.users.PlexusRoleLocator;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
+import org.sonatype.security.locators.users.PlexusRole;
+import org.sonatype.security.locators.users.PlexusRoleLocator;
 
 /**
  * PlexusRoleLocator that wraps roles from security-xml-realm.

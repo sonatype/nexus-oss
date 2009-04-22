@@ -17,10 +17,10 @@ import java.util.Set;
 
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.jsecurity.locators.users.PlexusRole;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.UserManager;
-import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.locators.users.PlexusRole;
+import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.locators.users.UserManager;
 
 public abstract class AbstractPlexusUserLocator
     implements UserManager

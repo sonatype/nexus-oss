@@ -15,9 +15,9 @@ package org.sonatype.jsecurity.realms.url;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.PlexusUserManager;
-import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
 
 
 public class URLUserLocatorTest

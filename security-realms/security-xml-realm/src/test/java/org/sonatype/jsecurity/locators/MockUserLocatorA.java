@@ -16,8 +16,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.UserManager;
+import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.locators.users.UserManager;
 
 @Component(role=UserManager.class, hint="MockUserLocatorA")
 public class MockUserLocatorA

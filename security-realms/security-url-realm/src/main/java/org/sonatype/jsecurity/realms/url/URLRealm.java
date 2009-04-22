@@ -47,14 +47,14 @@ import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.PlexusUserManager;
 import org.sonatype.jsecurity.model.CPrivilege;
 import org.sonatype.jsecurity.model.CRole;
 import org.sonatype.jsecurity.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
 import org.sonatype.jsecurity.realms.tools.NoSuchRoleException;
+import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.locators.users.PlexusUserManager;
 
 @Component( role = Realm.class, hint = "url", description = "URL Realm" )
 public class URLRealm

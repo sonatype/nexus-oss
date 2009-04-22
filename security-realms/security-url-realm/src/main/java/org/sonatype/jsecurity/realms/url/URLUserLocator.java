@@ -22,12 +22,12 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.jsecurity.locators.AbstractPlexusUserLocator;
 import org.sonatype.jsecurity.locators.ConfiguredUsersPlexusUserLocator;
-import org.sonatype.jsecurity.locators.users.PlexusRole;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.UserManager;
-import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUserRoleMapping;
+import org.sonatype.security.locators.users.PlexusRole;
+import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.locators.users.UserManager;
 
 @Component( role = UserManager.class, hint = "url", description = "URL Realm Users" )
 public class URLUserLocator

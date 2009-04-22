@@ -15,9 +15,9 @@ package org.sonatype.jsecurity.locators;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.jsecurity.locators.users.PlexusRole;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.locators.users.PlexusRole;
+import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
 
 public abstract class AbstractTestUserLocator extends AbstractPlexusUserLocator
 {

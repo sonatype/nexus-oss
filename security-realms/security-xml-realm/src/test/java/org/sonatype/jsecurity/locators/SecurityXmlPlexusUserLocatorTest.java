@@ -22,10 +22,10 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
-import org.sonatype.jsecurity.locators.users.PlexusRole;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.UserManager;
-import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.locators.users.PlexusRole;
+import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.locators.users.UserManager;
 
 public class SecurityXmlPlexusUserLocatorTest
     extends PlexusTestCase

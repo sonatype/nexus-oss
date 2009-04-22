@@ -18,12 +18,12 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.UserManager;
-import org.sonatype.jsecurity.locators.users.PlexusUserManager;
-import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUserRoleMapping;
+import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.locators.users.UserManager;
 
 @Component( role = UserManager.class, hint = "allConfigured", description = "All Configured Users" )
 public class ConfiguredUsersPlexusUserLocator

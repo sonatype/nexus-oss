@@ -19,9 +19,9 @@ import junit.framework.Assert;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.jsecurity.locators.users.UserManager;
-import org.sonatype.jsecurity.locators.users.PlexusUserManager;
-import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.locators.users.UserManager;
 
 public class URLRealmConfiguredUserTest
     extends PlexusTestCase

@@ -24,7 +24,7 @@ import org.jsecurity.authz.AuthorizationInfo;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.SimplePrincipalCollection;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.jsecurity.locators.users.UserManager;
+import org.sonatype.security.locators.users.UserManager;
 
 public class URLRealmTest
     extends PlexusTestCase
