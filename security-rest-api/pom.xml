@@ -22,7 +22,7 @@
   		<version>${project.version}</version>
   	</dependency>
   	<dependency>
-  		<groupId>org.sonatype.jsecurity</groupId>
+  		<groupId>org.sonatype.security</groupId>
   		<artifactId>security-xml-realm</artifactId>
   		<version>${project.version}</version>
   	</dependency>

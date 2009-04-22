@@ -48,6 +48,10 @@
         	<artifactId>plexus-ehcache</artifactId>
         	<version>1.0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
 
 		<!-- A backend for testing -->
         <dependency>
