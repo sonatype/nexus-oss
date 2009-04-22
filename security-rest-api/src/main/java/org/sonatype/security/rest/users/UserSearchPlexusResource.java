@@ -19,10 +19,10 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.jsecurity.locators.users.PlexusRoleLocator;
-import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.locators.users.PlexusRoleLocator;
+import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResource;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResourceRequest;
 

@@ -16,9 +16,9 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.PlexusUserManager;
-import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;

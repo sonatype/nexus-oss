@@ -27,10 +27,10 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.jsecurity.locators.SecurityXmlPlexusRoleLocator;
-import org.sonatype.jsecurity.locators.users.PlexusRole;
-import org.sonatype.jsecurity.locators.users.PlexusRoleManager;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.locators.users.PlexusRole;
+import org.sonatype.security.locators.users.PlexusRoleManager;
 import org.sonatype.security.rest.model.ExternalRoleMappingResourceResponse;
 import org.sonatype.security.rest.model
 			.ExternalRoleMappingResource;
