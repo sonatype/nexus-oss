@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 import java.util.zip.ZipEntry;
@@ -42,12 +43,12 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.context.DocumentFilter;
 import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.NexusAnalyzer;
 import org.sonatype.nexus.index.context.NexusIndexWriter;
+import org.sonatype.nexus.index.incremental.IncrementHandler;
 import org.sonatype.nexus.index.updater.IndexDataReader.IndexDataReadResult;
 
 /**
@@ -61,6 +62,8 @@ public class DefaultIndexUpdater
     extends AbstractLogEnabled
     implements IndexUpdater
 {
+    @Requirement( role = IncrementHandler.class )
+    IncrementHandler incrementalHandler;
     
     @Requirement
     private WagonManager wagonManager;
@@ -90,18 +93,14 @@ public class DefaultIndexUpdater
                     return null; // index is up to date
                 }
                 
-                // If we have local properties, will parse and see what we need to download
-                if ( canRetrieveAllChunks( localProperties, properties ) )
+                List<String> filenames = incrementalHandler.loadRemoteIncrementalUpdates( updateRequest, localProperties, properties );
+                
+                // if we have some incremental files, merge them in
+                if ( filenames != null )
                 {
-                    int maxCounter = Integer.parseInt( properties.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ) );
-                    int currentCounter = Integer.parseInt( localProperties.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ) );
-                    
-                    // Start with the next one
-                    currentCounter++;
-                    
-                    while ( currentCounter <= maxCounter )
+                    for ( String filename : filenames )
                     {
-                        loadIndexDirectory( updateRequest, true, IndexingContext.INDEX_FILE + "." + currentCounter++ + ".gz" );
+                        loadIndexDirectory( updateRequest, true, filename );
                     }
                     
                     return updateTimestamp;
@@ -454,48 +453,6 @@ public class DefaultIndexUpdater
         }
     }
     
-    private boolean canRetrieveAllChunks( Properties localProps, Properties remoteProps )
-    {
-        // no localprops, cant retrieve chunks
-        if ( localProps == null )
-        {
-            return false;
-        }
-        
-        String counterProp = localProps.getProperty( IndexingContext.INDEX_CHUNK_COUNTER );
-        
-        // no counter, cant retrieve chunks
-        // not a number, cant retrieve chunks
-        if ( StringUtils.isEmpty( counterProp ) 
-            || !StringUtils.isNumeric( counterProp ) )
-        {
-            return false;
-        }
-        
-        int currentLocalCounter = Integer.parseInt( counterProp );
-        
-        // check remote props for existence of next chunk after local
-        // if we find it, then we are ok to retrieve the rest of the chunks
-        for ( Object key : remoteProps.keySet() )
-        {
-            String sKey = ( String ) key;
-            
-            if ( sKey.startsWith( IndexingContext.INDEX_CHUNK_PREFIX ) )
-            {
-                String value = remoteProps.getProperty( sKey );
-                
-                // If we have the current counter, or the next counter, we are good to go
-                if ( Integer.toString( currentLocalCounter ).equals( value )
-                    || Integer.toString( currentLocalCounter + 1 ).equals( value ) )
-                {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
-    }
-
     public Date getTimestamp( Properties properties, String key )
     {
         String indexTimestamp = properties.getProperty( key );

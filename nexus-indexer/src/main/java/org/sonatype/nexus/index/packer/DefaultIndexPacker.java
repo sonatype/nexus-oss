@@ -11,18 +11,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.TimeZone;
-import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -36,16 +30,17 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.NexusLegacyAnalyzer;
 import org.sonatype.nexus.index.creator.LegacyDocumentUpdater;
+import org.sonatype.nexus.index.incremental.IncrementHandler;
 import org.sonatype.nexus.index.packer.IndexPackingRequest.IndexFormat;
 import org.sonatype.nexus.index.updater.IndexDataWriter;
 
@@ -60,6 +55,9 @@ public class DefaultIndexPacker
     extends AbstractLogEnabled
     implements IndexPacker
 {
+    @Requirement( role = IncrementHandler.class )
+    IncrementHandler incrementalHandler;
+    
     public void packIndex( IndexPackingRequest request )
         throws IOException,
             IllegalArgumentException
@@ -109,22 +107,36 @@ public class DefaultIndexPacker
             
             if ( request.isCreateIncrementalChunks() )
             {
-                // Get the list of document ids that have been added since the last time
-                // the index ran
-                List<Integer> chunk = getIndexChunk( request, info );
-
-                // if chunk is null, means we had problems with property file, generate whole index instead
-                if ( chunk != null )
+                List<Integer> chunk = incrementalHandler.getIncrementalUpdates( request, info );
+                
+                if ( chunk == null )
                 {
-                    // if no documents, then we dont need to do anything, no changes
-                    if ( chunk.size() > 0 )
-                    {
-                        writeIndexChunk( info, chunk, request );
-                    }
+                    getLogger().debug( "Problem with Chunks, forcing regeneration of whole index" );
+                    forceMainIndexGeneration = true;
+                }
+                else if ( chunk.isEmpty() )
+                {
+                    getLogger().debug( "No incremental changes, not writing new incremental chunk" );
                 }
                 else
                 {
-                    forceMainIndexGeneration = true;
+                    File file = new File( request.getTargetDir(), //
+                        IndexingContext.INDEX_FILE + "." + info.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ) + ".gz" );
+                    
+                    writeIndexData( request.getContext(), //
+                        chunk,
+                        file );
+                    
+                    if ( request.isCreateChecksumFiles() )
+                    {
+                        FileUtils.fileWrite(
+                            new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
+                            DigesterUtils.getSha1Digest( file ) );
+                
+                        FileUtils.fileWrite(
+                            new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
+                            DigesterUtils.getMd5Digest( file ) );
+                    }
                 }
             }
         }
@@ -132,8 +144,6 @@ public class DefaultIndexPacker
         {
             getLogger().info( "Unable to read properties file, will force index regeneration" );
             info = new Properties();
-            // new properties, so initialize to 0 for index chunks
-            info.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "0" );
             forceMainIndexGeneration = true;
         }
         
@@ -155,7 +165,7 @@ public class DefaultIndexPacker
         {
             writeIndexArchive( request.getContext(), legacyFile );
 
-            if ( request.isCreateChecksumFiles() )
+        if ( request.isCreateChecksumFiles() )  
             {
                 FileUtils.fileWrite(
                     new File( legacyFile.getParentFile(), legacyFile.getName() + ".sha1" ).getAbsolutePath(),
@@ -196,49 +206,6 @@ public class DefaultIndexPacker
                 DigesterUtils.getMd5Digest( propertiesFile ) );
         }
     }
-
-    private List<Integer> getIndexChunk( IndexPackingRequest request, Properties properties )
-        throws IOException
-    {        
-        Date timestamp = null;
-        
-        try
-        {
-            timestamp = parse( ( String ) properties.get( IndexingContext.INDEX_TIMESTAMP ) );
-        }
-        catch ( ParseException e )
-        {
-            getLogger().debug( "Invalid timestamp, no incremental index being created." );
-            return null;
-        }
-        
-        List<Integer> chunk = new ArrayList<Integer>();
-
-        IndexReader r = request.getContext().getIndexReader();
-
-        for ( int i = 0; i < r.numDocs(); i++ )
-        {
-            if ( !r.isDeleted( i ) )
-            {
-                Document d = r.document( i );
-
-                String lastModified = d.get( ArtifactInfo.LAST_MODIFIED );
-
-                if ( lastModified != null )
-                {
-                    Date t = new Date( Long.parseLong( lastModified ) );
-                    
-                    // Only add documents that were added after the last time we indexed
-                    if ( t.after( timestamp ) )
-                    {
-                        chunk.add( i );
-                    }
-                }
-            }
-        }
-
-        return chunk;
-    }
     
     private Properties readIndexProperties( File propertyFile )
         throws IOException
@@ -262,81 +229,7 @@ public class DefaultIndexPacker
         
         return properties;
     }
-
-    void writeIndexChunk( Properties info, List<Integer> chunk, IndexPackingRequest request )
-        throws IOException
-    {
-        IndexingContext context = request.getContext();
-        
-        updatePropertyFileUpdateKeys( info, request );
-        
-        String val = ( String ) info.getProperty( IndexingContext.INDEX_CHUNK_COUNTER );
-        
-        if ( StringUtils.isEmpty( val ) )
-        {
-            val = "0";
-        }
-        
-        int nextValue = Integer.parseInt( val ) + 1;
-        
-        info.put( IndexingContext.INDEX_CHUNK_PREFIX + "0", Integer.toString( nextValue ) );
-        info.put( IndexingContext.INDEX_CHUNK_COUNTER, Integer.toString( nextValue ) );
-        
-        File file = new File( request.getTargetDir(), //
-            IndexingContext.INDEX_FILE + "." + nextValue + ".gz" );
-        
-        writeIndexData( context, //
-            chunk,
-            file );
-        
-        if ( request.isCreateChecksumFiles() )
-        {
-            FileUtils.fileWrite(
-                new File( file.getParentFile(), file.getName() + ".sha1" ).getAbsolutePath(),
-                DigesterUtils.getSha1Digest( file ) );
-
-            FileUtils.fileWrite(
-                new File( file.getParentFile(), file.getName() + ".md5" ).getAbsolutePath(),
-                DigesterUtils.getMd5Digest( file ) );
-        }
-    }
     
-    private void updatePropertyFileUpdateKeys( Properties properties, IndexPackingRequest request )
-    {        
-        Set<Object> keys = new HashSet<Object>( properties.keySet() );
-        Map<Integer,String> dataMap = new TreeMap<Integer, String>(); 
-        
-        // First go through and retrieve all keys and their values
-        for ( Object key : keys )
-        {
-            String sKey = ( String ) key;
-            
-            if ( sKey.startsWith( IndexingContext.INDEX_CHUNK_PREFIX ) )
-            {                
-                Integer count = Integer.valueOf( sKey.substring( IndexingContext.INDEX_CHUNK_PREFIX.length() ) );
-                String value = properties.getProperty( sKey );
-                
-                dataMap.put( count, value );                
-                properties.remove( key );
-            }
-        }
-        
-        int i = 0;
-        //Next put the items back in w/ proper keys
-        for ( Integer key : dataMap.keySet() )
-        {
-            //make sure to end if we reach limit, 0 based
-            if ( i >= ( request.getMaxIndexChunks() - 1 ) )
-            {
-                break;
-            }
-              
-            properties.put( IndexingContext.INDEX_CHUNK_PREFIX + ( key + 1 ), dataMap.get( key ) );
-            
-            i++;
-        }
-    }
-
     void writeIndexArchive( IndexingContext context, File targetArchive )
         throws IOException
     {
@@ -571,20 +464,5 @@ public class DefaultIndexPacker
         SimpleDateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT );
         df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
         return df.format( d );
-    }
-    
-    private String formatForFilename( Date d )
-    {
-        SimpleDateFormat df = new SimpleDateFormat( "yyyyMMddHHmmss" );
-        df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
-        return df.format( d );
-    }
-    
-    private Date parse( String s ) 
-        throws ParseException
-    {
-        SimpleDateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT );
-        df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
-        return df.parse( s );
     }
 }

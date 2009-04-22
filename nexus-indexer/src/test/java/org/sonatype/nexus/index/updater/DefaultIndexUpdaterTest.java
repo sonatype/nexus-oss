@@ -509,6 +509,7 @@ public class DefaultIndexUpdaterTest
         
         final Properties localProps = new Properties();
         localProps.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "1" );
+        localProps.setProperty( IndexingContext.INDEX_CHAIN_ID, "someid" );
         
         mockery.checking(new Expectations() 
         {{
@@ -539,6 +540,7 @@ public class DefaultIndexUpdaterTest
                     properties.setProperty( IndexingContext.INDEX_ID, "central" );
                     properties.setProperty( IndexingContext.INDEX_TIMESTAMP, "20081129174241.859 -0600" );
                     properties.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "3" );
+                    properties.setProperty( IndexingContext.INDEX_CHAIN_ID, "someid" );
                     properties.setProperty( IndexingContext.INDEX_CHUNK_PREFIX + "0", "3" );
                     properties.setProperty( IndexingContext.INDEX_CHUNK_PREFIX + "1", "2" );
                     properties.setProperty( IndexingContext.INDEX_CHUNK_PREFIX + "2", "1" );
@@ -617,6 +619,7 @@ public class DefaultIndexUpdaterTest
                     properties.setProperty( IndexingContext.INDEX_ID, "central" );
                     properties.setProperty( IndexingContext.INDEX_TIMESTAMP, "20081129174241.859 -0600" );
                     properties.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "3" );
+                    properties.setProperty( IndexingContext.INDEX_CHAIN_ID, "someid" );
                     properties.setProperty( IndexingContext.INDEX_CHUNK_PREFIX + "0", "3" );
                     properties.setProperty( IndexingContext.INDEX_CHUNK_PREFIX + "1", "2" );
                     properties.setProperty( IndexingContext.INDEX_CHUNK_PREFIX + "2", "1" );
@@ -666,6 +669,7 @@ public class DefaultIndexUpdaterTest
         
         final Properties localProps = new Properties();
         localProps.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "3" );
+        localProps.setProperty( IndexingContext.INDEX_CHAIN_ID, "someid" );
         
         mockery.checking(new Expectations() 
         {{
@@ -696,6 +700,7 @@ public class DefaultIndexUpdaterTest
                     properties.setProperty( IndexingContext.INDEX_ID, "central" );
                     properties.setProperty( IndexingContext.INDEX_TIMESTAMP, "20081129174241.859 -0600" );
                     properties.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "3" );
+                    properties.setProperty( IndexingContext.INDEX_CHAIN_ID, "someid" );
                     properties.setProperty( IndexingContext.INDEX_CHUNK_PREFIX + "0", "3" );
                     properties.setProperty( IndexingContext.INDEX_CHUNK_PREFIX + "1", "2" );
                     properties.setProperty( IndexingContext.INDEX_CHUNK_PREFIX + "2", "1" );

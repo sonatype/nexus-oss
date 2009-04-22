@@ -78,7 +78,8 @@ public class Nexus1911IncrementalTest
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "2" ) );
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "3" ) );
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "4" ) );
-        Assert.assertEquals( props.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ), "0" );
+        Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ) );
+        Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHAIN_ID ) );
     }
     
     public void test1Incremental()
@@ -107,6 +108,7 @@ public class Nexus1911IncrementalTest
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "3" ) );
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "4" ) );
         Assert.assertEquals( props.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ), "1" );
+        Assert.assertNotNull( props.getProperty( IndexingContext.INDEX_CHAIN_ID ) );
     }
     
     public void test2Incremental()
@@ -137,6 +139,7 @@ public class Nexus1911IncrementalTest
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "3" ) );
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "4" ) );
         Assert.assertEquals( props.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ), "2" );
+        Assert.assertNotNull( props.getProperty( IndexingContext.INDEX_CHAIN_ID ) );
     }
     
     public void test3Incremental()
@@ -168,6 +171,7 @@ public class Nexus1911IncrementalTest
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "3" ) );
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "4" ) );
         Assert.assertEquals( props.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ), "3" );
+        Assert.assertNotNull( props.getProperty( IndexingContext.INDEX_CHAIN_ID ) );
     }
     
     public void testMaxChunks()
@@ -189,7 +193,7 @@ public class Nexus1911IncrementalTest
         Assert.assertTrue( filenames.contains( IndexingContext.INDEX_FILE + ".zip" ) );
         Assert.assertTrue( filenames.contains( IndexingContext.INDEX_FILE + ".gz" ) );
         Assert.assertTrue( filenames.contains( IndexingContext.INDEX_FILE + ".properties" ) );
-        Assert.assertTrue( filenames.contains( IndexingContext.INDEX_FILE + ".1.gz" ) );
+        Assert.assertFalse( filenames.contains( IndexingContext.INDEX_FILE + ".1.gz" ) );
         Assert.assertTrue( filenames.contains( IndexingContext.INDEX_FILE + ".2.gz" ) );
         Assert.assertTrue( filenames.contains( IndexingContext.INDEX_FILE + ".3.gz" ) );
         Assert.assertTrue( filenames.contains( IndexingContext.INDEX_FILE + ".4.gz" ) );
@@ -202,6 +206,7 @@ public class Nexus1911IncrementalTest
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "3" ) );
         Assert.assertNull( props.getProperty( IndexingContext.INDEX_CHUNK_PREFIX + "4" ) );
         Assert.assertEquals( props.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ), "4" );
+        Assert.assertNotNull( props.getProperty( IndexingContext.INDEX_CHAIN_ID ) );
     }
     
     private void copyRepoContentsAndReindex( File src, IndexPackingRequest request )

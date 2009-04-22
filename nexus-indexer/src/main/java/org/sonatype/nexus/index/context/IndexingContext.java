@@ -72,6 +72,14 @@ public interface IndexingContext
      * A counter used to id the chunks
      */
     public static final String INDEX_CHUNK_COUNTER = "last-chunk-id";
+    
+    /**
+     * An id that defines the current incremental chain.
+     * 
+     * If when checking remote repo, the index chain doesnt match
+     * you'll know that you need to download the full index
+     */
+    public static final String INDEX_CHAIN_ID = "chain-id";
 
     /**
      * Returns this indexing context id.
