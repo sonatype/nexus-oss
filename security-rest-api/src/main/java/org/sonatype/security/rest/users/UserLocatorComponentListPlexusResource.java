@@ -25,7 +25,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
+import org.sonatype.jsecurity.locators.users.UserManager;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -58,7 +58,7 @@ public class UserLocatorComponentListPlexusResource
 
     protected String getRole( Request request )
     {
-        return PlexusUserLocator.class.getName();
+        return UserManager.class.getName();
     }
 
     // TODO: this was copied from the Nexus AbstractComponentListPlexusResource
