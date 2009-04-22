@@ -30,7 +30,6 @@ import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.ConfigurationRollbackEvent;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -111,9 +110,6 @@ public abstract class AbstractRepository
     private ApplicationEventMulticaster applicationEventMulticaster;
 
     @Requirement
-    private ApplicationConfiguration applicationConfiguration;
-
-    @Requirement
     private CacheManager cacheManager;
 
     @Requirement
@@ -143,14 +139,11 @@ public abstract class AbstractRepository
     /** Request processors list */
     private List<RequestProcessor> requestProcessors;
 
-    /** The configuration */
-    private CoreConfiguration repositoryConfiguration;
-
     // Configurable iface
 
     protected CRepository getCurrentConfiguration( boolean forWrite )
     {
-        return (CRepository) repositoryConfiguration.getConfiguration( forWrite );
+        return (CRepository) super.getCurrentConfiguration( forWrite );
     }
 
     protected abstract Configurator getConfigurator();
@@ -195,7 +188,7 @@ public abstract class AbstractRepository
             {
                 ConfigurationPrepareForSaveEvent psevt = (ConfigurationPrepareForSaveEvent) evt;
 
-                getConfigurator().prepareForSave( this, applicationConfiguration, getCurrentCoreConfiguration() );
+                getConfigurator().prepareForSave( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
 
                 psevt.getChanges().add( this );
             }
@@ -212,11 +205,6 @@ public abstract class AbstractRepository
     protected ApplicationEventMulticaster getApplicationEventMulticaster()
     {
         return applicationEventMulticaster;
-    }
-
-    protected ApplicationConfiguration getApplicationConfiguration()
-    {
-        return applicationConfiguration;
     }
 
     public RepositoryTaskFilter getRepositoryTaskFilter()

@@ -15,7 +15,6 @@ package org.sonatype.nexus.store.file;
 
 public class SimpleObject
 {
-
     private String aString;
 
     private int anInt;

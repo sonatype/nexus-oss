@@ -860,7 +860,7 @@ public class DefaultNexus
         }
     }
 
-    public void startService()
+    protected void startService()
         throws Exception
     {
         applicationStatusSource.getSystemStatus().setState( SystemState.STARTING );
@@ -873,6 +873,9 @@ public class DefaultNexus
 
             // create internals
             nexusConfiguration.createInternals();
+            
+            // init tasks
+            nexusScheduler.initializeTasks();
 
             // notify about start
             applicationEventMulticaster.notifyProximityEventListeners( new ConfigurationChangeEvent(
@@ -960,7 +963,7 @@ public class DefaultNexus
         }
     }
 
-    public void stopService()
+    protected void stopService()
         throws Exception
     {
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPING );

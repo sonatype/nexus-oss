@@ -49,7 +49,7 @@
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
-        <repositoryPolicy>release</repositoryPolicy>
+        <repositoryPolicy>RELEASE</repositoryPolicy>
       </externalConfiguration>
     </repository>
     <repository>
@@ -75,7 +75,7 @@
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
-        <repositoryPolicy>snapshot</repositoryPolicy>
+        <repositoryPolicy>SNAPSHOT</repositoryPolicy>
       </externalConfiguration>
     </repository>
     <repository>
@@ -101,7 +101,7 @@
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
-        <repositoryPolicy>snapshot</repositoryPolicy>
+        <repositoryPolicy>SNAPSHOT</repositoryPolicy>
       </externalConfiguration>
     </repository>
     <repository>
@@ -124,7 +124,7 @@
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
-        <repositoryPolicy>release</repositoryPolicy>
+        <repositoryPolicy>RELEASE</repositoryPolicy>
       </externalConfiguration>
     </repository>
     <repository>
@@ -147,7 +147,7 @@
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
-        <repositoryPolicy>snapshot</repositoryPolicy>
+        <repositoryPolicy>SNAPSHOT</repositoryPolicy>
       </externalConfiguration>
     </repository>
     <repository>
@@ -170,7 +170,7 @@
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
-        <repositoryPolicy>release</repositoryPolicy>
+        <repositoryPolicy>RELEASE</repositoryPolicy>
       </externalConfiguration>
     </repository>
     <repository>

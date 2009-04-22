@@ -13,8 +13,9 @@
  */
 package org.sonatype.nexus.log;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import org.sonatype.nexus.util.EnhancedProperties;
 
 /**
  * Extract the most import part of the log4j configuration file
@@ -22,7 +23,7 @@ import java.util.Map;
  * @author juven
  */
 public class SimpleLog4jConfig
-    extends HashMap<String, String>
+    extends EnhancedProperties
     implements LogConfig
 {
     private static final long serialVersionUID = -4276278316976003784L;

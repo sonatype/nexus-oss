@@ -24,6 +24,8 @@ import java.io.OutputStreamWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.codehaus.plexus.util.StringUtils;
+
 /**
  * A java.util.Properties like tool, but besides map entry, it supports comments and black lines.
  * 
@@ -81,7 +83,24 @@ public class EnhancedProperties
     public void store( OutputStream outStream )
         throws IOException
     {
+        store( outStream, null );
+    }
+
+    public void store( OutputStream outStream, String comment )
+        throws IOException
+    {
         BufferedWriter writer = new BufferedWriter( new OutputStreamWriter( outStream, "8859_1" ) );
+
+        if ( StringUtils.isNotBlank( comment ) )
+        {
+            writer.write( "# " );
+            
+            writer.write( comment );
+            
+            writer.newLine();
+
+            writer.newLine();
+        }
 
         for ( Map.Entry<String, String> entry : entrySet() )
         {

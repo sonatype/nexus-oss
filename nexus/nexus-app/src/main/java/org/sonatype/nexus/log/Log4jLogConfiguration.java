@@ -17,33 +17,42 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.nexus.util.EnhancedProperties;
 
 /**
  * @author juven
  */
 @Component( role = LogConfiguration.class )
 public class Log4jLogConfiguration
-    implements LogConfiguration<Properties>
+    implements LogConfiguration<EnhancedProperties>
 {
     private static final String NEXUS_REMARK = "Log4j configuration created by Sonatype Nexus";
 
     @Requirement
     private LogConfigurationSource<File> logConfigurationSource;
 
-    private Properties config = new Properties();
+    private EnhancedProperties config = new EnhancedProperties();
 
     public void apply()
     {
-        PropertyConfigurator.configure( config );
+        Properties props = new Properties();
+
+        for ( Map.Entry<String, String> e : config.entrySet() )
+        {
+            props.put( e.getKey(), e.getValue() );
+        }
+
+        PropertyConfigurator.configure( props );
     }
 
-    public Properties getConfig()
+    public EnhancedProperties getConfig()
     {
         return config;
     }
@@ -62,7 +71,7 @@ public class Log4jLogConfiguration
         }
     }
 
-    public void setConfig( Properties config )
+    public void setConfig( EnhancedProperties config )
     {
         this.config = config;
     }

@@ -23,6 +23,8 @@ import org.sonatype.scheduling.schedules.Schedule;
 
 public interface NexusScheduler
 {
+    void initializeTasks();
+    
     /**
      * Issue a NexusTask for immediate execution, but have a control over it.
      * 

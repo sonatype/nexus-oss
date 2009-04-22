@@ -16,6 +16,7 @@ import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
@@ -51,24 +52,19 @@ public abstract class AbstractRepositoryConfigurator
         {
             prepareExternalConfiguration( (CRepository) repoConfig );
 
-            doValidate(
-                configuration,
-                (CRepository) repoConfig,
-                ( (CRepository) repoConfig ).externalConfigurationImple );
+            doValidate( configuration, (CRepository) repoConfig,
+                        ( (CRepository) repoConfig ).externalConfigurationImple );
         }
     }
 
     public final void applyConfiguration( Object target, ApplicationConfiguration configuration,
-        CoreConfiguration config )
+                                          CoreConfiguration config )
         throws ConfigurationException
     {
         prepareExternalConfiguration( (CRepository) config.getConfiguration( false ) );
 
-        doApplyConfiguration(
-            (Repository) target,
-            configuration,
-            (CRepository) config.getConfiguration( false ),
-            config.getExternalConfiguration() );
+        doApplyConfiguration( (Repository) target, configuration, (CRepository) config.getConfiguration( false ),
+                              config.getExternalConfiguration() );
     }
 
     public final void prepareForSave( Object target, ApplicationConfiguration configuration, CoreConfiguration config )
@@ -77,8 +73,8 @@ public abstract class AbstractRepositoryConfigurator
 
         // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
         // later we will see about it
-        doPrepareForSave( (Repository) target, configuration, (CRepository) config.getConfiguration( true ), config
-            .getExternalConfiguration() );
+        doPrepareForSave( (Repository) target, configuration, (CRepository) config.getConfiguration( true ),
+                          config.getExternalConfiguration() );
 
         // commit, since doPrepareForSave() potentially modifies coreConfig or externalConfig
         config.applyChanges();
@@ -96,8 +92,8 @@ public abstract class AbstractRepositoryConfigurator
         {
             // in 1st round, i intentionally choosed to make our lives bitter, and handle config manually
             // later we will see about it
-            repoConfig.externalConfigurationImple = createExternalConfiguration( (Xpp3Dom) repoConfig
-                .getExternalConfiguration() );
+            repoConfig.externalConfigurationImple =
+                createExternalConfiguration( (Xpp3Dom) repoConfig.getExternalConfiguration() );
         }
     }
 
@@ -109,7 +105,7 @@ public abstract class AbstractRepositoryConfigurator
     }
 
     protected void doValidate( ApplicationConfiguration configuration, CRepository repo,
-        ExternalConfiguration externalConfiguration )
+                               ExternalConfiguration externalConfiguration )
         throws ConfigurationException
     {
         // TODO:
@@ -118,7 +114,7 @@ public abstract class AbstractRepositoryConfigurator
 
     @SuppressWarnings( "unchecked" )
     protected void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
-        CRepository repo, ExternalConfiguration externalConfiguration )
+                                         CRepository repo, ExternalConfiguration externalConfiguration )
         throws ConfigurationException
     {
         List<CMirror> mirrors = (List<CMirror>) repo.getMirrors();
@@ -142,8 +138,7 @@ public abstract class AbstractRepositoryConfigurator
         // Setting common things on a repository
 
         // NX-198: filling up the default variable to store the "default" local URL
-        File defaultStorageFile = new File( new File( configuration.getWorkingDirectory(), "storage" ), repository
-            .getId() );
+        File defaultStorageFile = new File( new File( configuration.getWorkingDirectory(), "storage" ), repo.getId() );
 
         try
         {
@@ -169,6 +164,13 @@ public abstract class AbstractRepositoryConfigurator
             defaultStorageFile.mkdirs();
         }
 
+        if ( repo.getLocalStorage() == null )
+        {
+            repo.setLocalStorage( new CLocalStorage() );
+
+            repo.getLocalStorage().setProvider( "file" );
+        }
+
         LocalRepositoryStorage ls = getLocalRepositoryStorage( repo.getId(), repo.getLocalStorage().getProvider() );
 
         try
@@ -183,10 +185,9 @@ public abstract class AbstractRepositoryConfigurator
         {
             ValidationResponse response = new ApplicationValidationResponse();
 
-            ValidationMessage error = new ValidationMessage(
-                "overrideLocalStorageUrl",
-                "Repository has an invalid local storage URL '" + localUrl,
-                "Invalid file location" );
+            ValidationMessage error =
+                new ValidationMessage( "overrideLocalStorageUrl", "Repository has an invalid local storage URL '"
+                    + localUrl, "Invalid file location" );
 
             response.addValidationError( error );
 
@@ -209,7 +210,7 @@ public abstract class AbstractRepositoryConfigurator
     }
 
     protected void doPrepareForSave( Repository repository, ApplicationConfiguration configuration,
-        CRepository repoConfig, ExternalConfiguration externalConfiguration )
+                                     CRepository repoConfig, ExternalConfiguration externalConfiguration )
     {
         List<Mirror> mirrors = (List<Mirror>) repository.getPublishedMirrors().getMirrors();
 

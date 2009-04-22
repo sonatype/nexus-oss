@@ -59,7 +59,7 @@ public class DefaultNexusTest
 
         Collection<CRepository> templates = getDefaultNexus().listRepositoryTemplates();
 
-        assertEquals( 5, templates.size() );
+        assertEquals( 6, templates.size() );
 
         CRepository t1 = getDefaultNexus().readRepositoryTemplate( "aTemplate" );
 
@@ -70,7 +70,7 @@ public class DefaultNexusTest
 
         templates = getDefaultNexus().listRepositoryTemplates();
 
-        assertEquals( 4, templates.size() );
+        assertEquals( 5, templates.size() );
     }
 
     public void testListRepositoryContentClasses()

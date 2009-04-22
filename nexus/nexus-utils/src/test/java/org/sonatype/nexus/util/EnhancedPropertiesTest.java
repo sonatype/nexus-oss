@@ -70,9 +70,9 @@ public class EnhancedPropertiesTest
         properties.put( "date", "Mar 11, 2009" );
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        properties.store( outStream );
+        properties.store( outStream, "a comment" );
 
-        String expected = "author=juv-away" + LINE_SEPARATOR + LINE_SEPARATOR + "#Juven Xu" + LINE_SEPARATOR
+        String expected = "# a comment" + LINE_SEPARATOR + LINE_SEPARATOR + "author=juv-away" + LINE_SEPARATOR + LINE_SEPARATOR + "#Juven Xu" + LINE_SEPARATOR
             + "date=Mar 11, 2009" + LINE_SEPARATOR;
         assertEquals( expected, outStream.toString() );
 
