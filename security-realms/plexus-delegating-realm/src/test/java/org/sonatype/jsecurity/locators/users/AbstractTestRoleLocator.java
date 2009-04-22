@@ -15,7 +15,7 @@ package org.sonatype.jsecurity.locators.users;
 import java.util.Set;
 import java.util.TreeSet;
 
-public abstract class AbstractTestRoleLocator implements UserManager
+public abstract class AbstractTestRoleLocator implements PlexusRoleLocator
 {
 
     public Set<PlexusRole> listRoles()
