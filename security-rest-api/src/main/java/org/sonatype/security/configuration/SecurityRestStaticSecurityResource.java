@@ -13,7 +13,7 @@
 package org.sonatype.security.configuration;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.security.model.Configuration;
 import org.sonatype.jsecurity.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.jsecurity.realms.tools.StaticSecurityResource;
 
