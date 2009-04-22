@@ -6,9 +6,9 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.security</groupId>
-  <artifactId>security-configuration</artifactId>
+  <artifactId>security-model</artifactId>
   <version>1.0.8-SNAPSHOT</version>
-  <name>Security: Configuration</name>
+  <name>Security: Model</name>
 
 	<dependencies>
 		<dependency>

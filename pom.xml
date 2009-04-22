@@ -8,7 +8,7 @@
   
   <modules>
   	<module>security-parent</module>
-  	<module>security-configuration</module>
+  	<module>security-model</module>
   	<module>security-manager</module>
   	<module>security-rest-api</module>
   	<module>security-realms</module>
