@@ -43,7 +43,7 @@ public class DefaultNexusSecurity
         super.save();
 
         // TODO: can we do the same here as with nexus config?
-        notifyProximityEventListeners( new ConfigurationChangeEvent( this, null ) );
+        //notifyProximityEventListeners( new ConfigurationChangeEvent( this, null ) );
     }
 
     @Override

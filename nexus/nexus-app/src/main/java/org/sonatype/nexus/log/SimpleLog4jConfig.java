@@ -14,8 +14,7 @@
 package org.sonatype.nexus.log;
 
 import java.util.HashMap;
-import java.util.Properties;
-import java.util.Map.Entry;
+import java.util.Map;
 
 /**
  * Extract the most import part of the log4j configuration file
@@ -43,15 +42,9 @@ public class SimpleLog4jConfig
         setFileAppenderPattern( fileAppenderPattern );
     }
 
-    public SimpleLog4jConfig( Properties prop )
+    public SimpleLog4jConfig( Map<String, String> prop )
     {
-        for ( Entry<Object, Object> e : prop.entrySet() )
-        {
-            if ( e.getKey() != null )
-            {
-                put( e.getKey().toString(), e.getValue() != null ? e.getValue().toString() : null );
-            }
-        }
+        putAll( prop );
     }
 
     public String getFileAppenderLocation()

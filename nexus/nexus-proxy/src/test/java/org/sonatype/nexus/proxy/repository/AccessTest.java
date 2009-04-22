@@ -8,6 +8,7 @@ import org.jsecurity.SecurityUtils;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.subject.Subject;
 import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.jsecurity.realms.PlexusSecurity;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.AccessDeniedException;

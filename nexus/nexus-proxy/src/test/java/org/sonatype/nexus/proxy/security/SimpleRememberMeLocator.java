@@ -14,6 +14,7 @@ package org.sonatype.nexus.proxy.security;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.jsecurity.subject.RememberMeManager;
+import org.sonatype.jsecurity.locators.RememberMeLocator;
 
 @Component( role = RememberMeLocator.class )
 public class SimpleRememberMeLocator

@@ -660,8 +660,6 @@ public class DefaultNexusConfiguration
         ApplicationValidationContext result = new ApplicationValidationContext();
 
         fillValidationContextRepositoryIds( result );
-
-        fillValidationContextRepositoryGroupIds( result );
         
         return result;
     }

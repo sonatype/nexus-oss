@@ -32,15 +32,11 @@ public class DefaultTimelineTest
         super.setUp();
 
         defaultTimeline = (DefaultTimeline) this.lookup( Timeline.class );
-
-        defaultTimeline.startService();
     }
 
     protected void tearDown()
         throws Exception
     {
-        defaultTimeline.stopService();
-
         super.tearDown();
     }
 

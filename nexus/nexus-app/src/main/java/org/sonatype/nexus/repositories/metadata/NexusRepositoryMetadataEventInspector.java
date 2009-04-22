@@ -8,9 +8,6 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CMirror;
-import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
@@ -21,10 +18,13 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.item.ContentGenerator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.mirror.PublishedMirrors;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.Mirror;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
@@ -48,7 +48,7 @@ public class NexusRepositoryMetadataEventInspector
     private RepositoryMetadataHandler repositoryMetadataHandler;
 
     @Requirement
-    private NexusConfiguration configuration;
+    private RepositoryRegistry repositoryRegistry;
 
     public boolean accepts( AbstractEvent evt )
     {
@@ -227,12 +227,16 @@ public class NexusRepositoryMetadataEventInspector
         {
             List<RepositoryMirrorMetadata> mirrors = new ArrayList<RepositoryMirrorMetadata>();
 
-            CRepository repo = configuration.readRepository( repositoryId );
+            Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-            for ( CMirror mirror : (List<CMirror>) repo.getMirrors() )
+            PublishedMirrors publishedMirrors = repository.getPublishedMirrors();
+
+            for ( Mirror mirror : (List<Mirror>) publishedMirrors.getMirrors() )
             {
                 RepositoryMirrorMetadata md = new RepositoryMirrorMetadata();
+
                 md.setId( mirror.getId() );
+
                 md.setUrl( mirror.getUrl() );
 
                 mirrors.add( md );
