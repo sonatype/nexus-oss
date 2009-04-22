@@ -22,7 +22,7 @@ import junit.framework.Assert;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.jsecurity.locators.users.PlexusRole;
-import org.sonatype.jsecurity.locators.users.PlexusRoleLocator;
+import org.sonatype.jsecurity.locators.users.UserManager;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
 import org.sonatype.jsecurity.locators.users.PlexusUserManager;
 import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
@@ -46,7 +46,7 @@ public class AdditinalRolePlexusUserManagerTest
 
     private Set<String> getXMLRoles() throws Exception
     {
-        PlexusRoleLocator locator = (PlexusRoleLocator) this.lookup( PlexusRoleLocator.class );
+        UserManager locator = (UserManager) this.lookup( UserManager.class );
         return locator.listRoleIds();
     }
     

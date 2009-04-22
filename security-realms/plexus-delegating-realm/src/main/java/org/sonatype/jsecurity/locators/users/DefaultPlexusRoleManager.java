@@ -26,14 +26,14 @@ public class DefaultPlexusRoleManager
 
     public static final String SOURCE_ALL = "all";
 
-    @Requirement( role = PlexusRoleLocator.class )
-    private List<PlexusRoleLocator> locators;
+    @Requirement( role = UserManager.class )
+    private List<UserManager> locators;
 
     public Set<String> listRoleIds( String source )
     {
         Set<String> roles = new TreeSet<String>();
 
-        for ( PlexusRoleLocator locator : locators )
+        for ( UserManager locator : locators )
         {
             if ( SOURCE_ALL.equals( source ) || locator.getSource().equals( source ) )
             {
@@ -52,7 +52,7 @@ public class DefaultPlexusRoleManager
     {
         Set<PlexusRole> roles = new TreeSet<PlexusRole>();
 
-        for ( PlexusRoleLocator locator : locators )
+        for ( UserManager locator : locators )
         {
             if ( SOURCE_ALL.equals( source ) || locator.getSource().equals( source ) )
             {

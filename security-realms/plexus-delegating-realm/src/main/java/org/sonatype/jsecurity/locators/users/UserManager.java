@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Handles retrieving role data from a data source.
  */
-public interface PlexusRoleLocator
+public interface UserManager
 {
     /**
      * Retrieve all role Ids (if managing full object

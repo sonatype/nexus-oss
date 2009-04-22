@@ -19,7 +19,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.jsecurity.locators.users.PlexusRoleLocator;
+import org.sonatype.jsecurity.locators.users.UserManager;
 import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -35,7 +35,7 @@ public class UserSearchPlexusResource
     public static final String USER_SOURCE_KEY = "userSource";
     
     @Requirement
-    private PlexusRoleLocator roleLocator;
+    private UserManager roleLocator;
 
     public UserSearchPlexusResource()
     {

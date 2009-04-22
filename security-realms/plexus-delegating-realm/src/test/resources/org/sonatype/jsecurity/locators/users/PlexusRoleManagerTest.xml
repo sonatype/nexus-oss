@@ -3,13 +3,13 @@
 
     
      <component>
-      <role>org.sonatype.jsecurity.locators.users.PlexusRoleLocator</role>
+      <role>org.sonatype.jsecurity.locators.users.UserManager</role>
       <implementation>org.sonatype.jsecurity.locators.users.MockRoleLocatorA</implementation>
       <role-hint>MockRoleLocatorA</role-hint>
       <isolated-realm>false</isolated-realm>
     </component>   
     <component>
-      <role>org.sonatype.jsecurity.locators.users.PlexusRoleLocator</role>
+      <role>org.sonatype.jsecurity.locators.users.UserManager</role>
       <role-hint>MockRoleLocatorB</role-hint>
       <implementation>org.sonatype.jsecurity.locators.users.MockRoleLocatorB</implementation>
       <description></description>
