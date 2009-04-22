@@ -21,7 +21,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.jsecurity.locators.users.PlexusRole;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
+import org.sonatype.jsecurity.locators.users.UserManager;
 import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 import org.sonatype.jsecurity.model.CRole;
 import org.sonatype.jsecurity.model.CUser;
@@ -31,7 +31,7 @@ import org.sonatype.jsecurity.realms.tools.NoSuchRoleException;
 import org.sonatype.jsecurity.realms.tools.NoSuchRoleMappingException;
 import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
 
-@Component( role = PlexusUserLocator.class, description = "Default" )
+@Component( role = UserManager.class, description = "Default" )
 public class SecurityXmlPlexusUserLocator
     extends AbstractPlexusUserLocator
 {

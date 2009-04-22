@@ -24,7 +24,7 @@ import org.jsecurity.authz.AuthorizationInfo;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.SimplePrincipalCollection;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
+import org.sonatype.jsecurity.locators.users.UserManager;
 
 public class URLRealmTest
     extends PlexusTestCase
@@ -69,7 +69,7 @@ public class URLRealmTest
         throws Exception
     {
         // make sure the other user locator is loaded
-        Assert.assertNotNull( this.lookup( PlexusUserLocator.class, "test" ).getUser( "bob" ) );
+        Assert.assertNotNull( this.lookup( UserManager.class, "test" ).getUser( "bob" ) );
 
         URLRealm urlRealm = this.getRealm();
 

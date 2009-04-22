@@ -33,8 +33,8 @@ public class DefaultPlexusUserManager
     @Requirement
     private Logger logger;
     
-    @Requirement( role = PlexusUserLocator.class )
-    private List<PlexusUserLocator> userlocators;
+    @Requirement( role = UserManager.class )
+    private List<UserManager> userlocators;
 
     @Requirement
     private RealmLocator realmLocator;
@@ -48,7 +48,7 @@ public class DefaultPlexusUserManager
 
         // FIXME add something that would make the primary user win over the other realms?
 
-        for ( PlexusUserLocator locator : this.getUserlocators() )
+        for ( UserManager locator : this.getUserlocators() )
         {
             if ( SOURCE_ALL.equals( source ) || locator.getSource().equals( source ) )
             {
@@ -63,7 +63,7 @@ public class DefaultPlexusUserManager
     {
         Set<PlexusUser> users = new TreeSet<PlexusUser>();
 
-        for ( PlexusUserLocator locator : this.getUserlocators() )
+        for ( UserManager locator : this.getUserlocators() )
         {
             if ( SOURCE_ALL.equals( source ) || locator.getSource().equals( source ) )
             {
@@ -78,7 +78,7 @@ public class DefaultPlexusUserManager
     {
         Set<String> userIds = new TreeSet<String>();
 
-        for ( PlexusUserLocator locator : this.getUserlocators() )
+        for ( UserManager locator : this.getUserlocators() )
         {
             if ( SOURCE_ALL.equals( source ) || locator.getSource().equals( source ) )
             {
@@ -91,7 +91,7 @@ public class DefaultPlexusUserManager
 
     public PlexusUser getUser( String userId )
     {
-        for ( PlexusUserLocator locator : this.getUserlocators() )
+        for ( UserManager locator : this.getUserlocators() )
         {
             PlexusUser user = locator.getUser( userId );
 
@@ -112,7 +112,7 @@ public class DefaultPlexusUserManager
         }
         else
         {
-            for ( PlexusUserLocator locator : this.getUserlocators() )
+            for ( UserManager locator : this.getUserlocators() )
             {
                 if ( locator.getSource().equals( source ) )
                 {
@@ -124,12 +124,12 @@ public class DefaultPlexusUserManager
         return user;
     }
 
-    private List<PlexusUserLocator> getUserlocators()
+    private List<UserManager> getUserlocators()
     {
 
-        List<PlexusUserLocator> orderedLocators = new ArrayList<PlexusUserLocator>();
+        List<UserManager> orderedLocators = new ArrayList<UserManager>();
 
-        List<PlexusUserLocator> unOrderdLocators = new ArrayList<PlexusUserLocator>( this.userlocators );
+        List<UserManager> unOrderdLocators = new ArrayList<UserManager>( this.userlocators );
 
         // get the sorted order of realms from the realm locator
         List<Realm> realms = this.realmLocator.getRealms();
@@ -149,7 +149,7 @@ public class DefaultPlexusUserManager
 
                     String source = entry.getKey();
 
-                    PlexusUserLocator userLocator = this.getLocator( source );
+                    UserManager userLocator = this.getLocator( source );
                     
                     if( source != null )
                     {
@@ -173,9 +173,9 @@ public class DefaultPlexusUserManager
         return orderedLocators;
     }
 
-    private PlexusUserLocator getLocator( String source )
+    private UserManager getLocator( String source )
     {
-        for ( PlexusUserLocator locator : this.userlocators )
+        for ( UserManager locator : this.userlocators )
         {
             if( locator.getSource().equals( source ) )
             {

@@ -15,7 +15,7 @@ package org.sonatype.jsecurity.locators.users;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AbstractTestUserLocator implements PlexusUserLocator
+public abstract class AbstractTestUserLocator implements UserManager
 {
 
 

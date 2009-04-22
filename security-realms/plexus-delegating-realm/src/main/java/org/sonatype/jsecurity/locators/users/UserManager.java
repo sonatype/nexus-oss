@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Handles retrieving user data from a data source
  */
-public interface PlexusUserLocator
+public interface UserManager
 {
     /**
      * Retrieve all PlexusUser objects

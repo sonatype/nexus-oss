@@ -24,23 +24,23 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.jsecurity.locators.users.PlexusRole;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
+import org.sonatype.jsecurity.locators.users.UserManager;
 import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 
 public class SecurityXmlPlexusUserLocatorTest
     extends PlexusTestCase
 {
 
-    public PlexusUserLocator getLocator()
+    public UserManager getLocator()
         throws Exception
     {
-        return (PlexusUserLocator) this.lookup( PlexusUserLocator.class );
+        return (UserManager) this.lookup( UserManager.class );
     }
 
     public void testListUserIds()
         throws Exception
     {
-        PlexusUserLocator userLocator = this.getLocator();
+        UserManager userLocator = this.getLocator();
 
         Set<String> userIds = userLocator.listUserIds();
         Assert.assertTrue( userIds.contains( "test-user" ) );
@@ -53,7 +53,7 @@ public class SecurityXmlPlexusUserLocatorTest
     public void testListUsers()
         throws Exception
     {
-        PlexusUserLocator userLocator = this.getLocator();
+        UserManager userLocator = this.getLocator();
 
         Set<PlexusUser> users = userLocator.listUsers();
         Map<String, PlexusUser> userMap = this.toUserMap( users );
@@ -68,7 +68,7 @@ public class SecurityXmlPlexusUserLocatorTest
     public void testGetUser()
         throws Exception
     {
-        PlexusUserLocator userLocator = this.getLocator();
+        UserManager userLocator = this.getLocator();
         PlexusUser testUser = userLocator.getUser( "test-user" );
 
         Assert.assertEquals( "Test User", testUser.getName() );
@@ -86,7 +86,7 @@ public class SecurityXmlPlexusUserLocatorTest
     public void testSearchUser()
         throws Exception
     {
-        PlexusUserLocator userLocator = this.getLocator();
+        UserManager userLocator = this.getLocator();
 
         Set<PlexusUser> users = userLocator.searchUsers( new PlexusUserSearchCriteria( "test" ) );
         Map<String, PlexusUser> userMap = this.toUserMap( users );

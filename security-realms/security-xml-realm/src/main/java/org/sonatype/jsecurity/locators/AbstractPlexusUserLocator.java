@@ -19,11 +19,11 @@ import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.jsecurity.locators.users.PlexusRole;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
+import org.sonatype.jsecurity.locators.users.UserManager;
 import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 
 public abstract class AbstractPlexusUserLocator
-    implements PlexusUserLocator
+    implements UserManager
 {
     
     protected Set<PlexusUser> filterListInMemeory( Set<PlexusUser> users, PlexusUserSearchCriteria criteria )

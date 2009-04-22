@@ -24,12 +24,12 @@ import org.sonatype.jsecurity.locators.AbstractPlexusUserLocator;
 import org.sonatype.jsecurity.locators.ConfiguredUsersPlexusUserLocator;
 import org.sonatype.jsecurity.locators.users.PlexusRole;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
+import org.sonatype.jsecurity.locators.users.UserManager;
 import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUserRoleMapping;
 
-@Component( role = PlexusUserLocator.class, hint = "url", description = "URL Realm Users" )
+@Component( role = UserManager.class, hint = "url", description = "URL Realm Users" )
 public class URLUserLocator
     extends AbstractPlexusUserLocator
 {
@@ -44,8 +44,8 @@ public class URLUserLocator
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager configuration;
 
-    @Requirement(role = PlexusUserLocator.class )
-    private List<PlexusUserLocator> userLocators;
+    @Requirement(role = UserManager.class )
+    private List<UserManager> userLocators;
 
     public String getSource()
     {
@@ -191,7 +191,7 @@ public class URLUserLocator
     {
         Set<String> userIds = new HashSet<String>();
 
-        for ( PlexusUserLocator userLocator : this.userLocators )
+        for ( UserManager userLocator : this.userLocators )
         {
             if ( !this.getSource().equals( userLocator.getSource() ) && !ConfiguredUsersPlexusUserLocator.SOURCE.equals( userLocator.getSource() ) )
             {

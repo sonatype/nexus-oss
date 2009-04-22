@@ -19,7 +19,7 @@ import junit.framework.Assert;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
+import org.sonatype.jsecurity.locators.users.UserManager;
 import org.sonatype.jsecurity.locators.users.PlexusUserManager;
 import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
 
@@ -33,8 +33,8 @@ public class URLRealmConfiguredUserTest
         throws Exception
     {
         PlexusUserManager userManager = this.lookup( PlexusUserManager.class );
-        PlexusUserLocator urlLocator = this.lookup( PlexusUserLocator.class, "url" );
-        PlexusUserLocator configuredUsersLocator = this.lookup( PlexusUserLocator.class, "allConfigured" );
+        UserManager urlLocator = this.lookup( UserManager.class, "url" );
+        UserManager configuredUsersLocator = this.lookup( UserManager.class, "allConfigured" );
 
         // try to get a normal user to make sure the search is working
         Assert.assertEquals( 1, configuredUsersLocator.searchUsers( new PlexusUserSearchCriteria( "user1" ) ).size() );

@@ -17,7 +17,7 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 
-@Component(role=PlexusUserLocator.class, hint="MockUserLocatorA")
+@Component(role=UserManager.class, hint="MockUserLocatorA")
 public class MockUserLocatorA
     extends AbstractTestUserLocator
 {

@@ -20,9 +20,9 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.jsecurity.locators.users.PlexusRole;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
+import org.sonatype.jsecurity.locators.users.UserManager;
 
-@Component(role=PlexusUserLocator.class, hint="MockUserLocatorB")
+@Component(role=UserManager.class, hint="MockUserLocatorB")
 public class MockUserLocatorB
     extends AbstractTestUserLocator
 {
