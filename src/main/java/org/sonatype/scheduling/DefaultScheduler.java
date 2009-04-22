@@ -73,8 +73,6 @@ public class DefaultScheduler
         scheduledExecutorService = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(
             20,
             plexusThreadFactory );
-
-        taskConfig.initializeTasks( this );
     }
 
     public void stop()
