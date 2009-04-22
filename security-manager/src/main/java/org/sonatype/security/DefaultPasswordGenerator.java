@@ -15,7 +15,7 @@ package org.sonatype.security;
 import java.util.Random;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.jsecurity.realms.tools.StringDigester;
+import org.sonatype.security.realms.tools.StringDigester;
 
 @Component( role = PasswordGenerator.class )
 public class DefaultPasswordGenerator

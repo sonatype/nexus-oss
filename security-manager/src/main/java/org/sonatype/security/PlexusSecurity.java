@@ -12,10 +12,10 @@
  */
 package org.sonatype.security;
 
-import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
-import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
 import org.sonatype.security.email.NoSuchEmailException;
 import org.sonatype.security.events.SecurityEventHandler;
+import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.NoSuchUserException;
 
 public interface PlexusSecurity extends ConfigurationManager
 {

@@ -13,7 +13,7 @@
 package org.sonatype.security.configuration.source;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.sonatype.jsecurity.realms.validator.ValidationResponse;
+import org.sonatype.security.realms.validator.ValidationResponse;
 
 /**
  * Abstract class that encapsulates Modello model loading and saving with interpolation.

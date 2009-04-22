@@ -1,0 +1,10 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.sonatype.security.realms.tools.StaticSecurityResource</role>
+      <role-hint>mock</role-hint>
+      <implementation>org.sonatype.security.locators.MockStaticSecurityResource</implementation>
+      <isolated-realm>false</isolated-realm>
+    </component>
+  </components>
+</component-set>

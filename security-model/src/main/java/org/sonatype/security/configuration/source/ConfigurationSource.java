@@ -15,7 +15,7 @@ package org.sonatype.security.configuration.source;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.jsecurity.realms.validator.ValidationResponse;
+import org.sonatype.security.realms.validator.ValidationResponse;
 
 /**
  * The Interface ConfigurationSource.
