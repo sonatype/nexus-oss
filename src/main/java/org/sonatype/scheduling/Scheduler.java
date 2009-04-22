@@ -22,6 +22,11 @@ import org.sonatype.scheduling.schedules.Schedule;
 public interface Scheduler
 {
     /**
+     * Loads up persisted tasks from TaskConfigManager and initializes all of them (to call on startup).
+     */
+    void initializeTasks();
+
+    /**
      * Initialize a task on bootup.
      * 
      * @param name
@@ -32,9 +37,8 @@ public interface Scheduler
      * @return
      */
     <T> ScheduledTask<T> initialize( String id, String name, String type, Callable<T> callable, Schedule schedule,
-        Map<String, String> taskParams )
-        throws RejectedExecutionException,
-            NullPointerException;
+                                     Map<String, String> taskParams )
+        throws RejectedExecutionException, NullPointerException;
 
     /**
      * Issue a Runnable for immediate execution, but have a control over it.
@@ -45,8 +49,7 @@ public interface Scheduler
      * @return
      */
     ScheduledTask<Object> submit( String name, Runnable runnable, Map<String, String> taskParams )
-        throws RejectedExecutionException,
-            NullPointerException;
+        throws RejectedExecutionException, NullPointerException;
 
     /**
      * Issue a Runnable for scheduled execution.
@@ -59,8 +62,7 @@ public interface Scheduler
      * @return
      */
     ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule, Map<String, String> taskParams )
-        throws RejectedExecutionException,
-            NullPointerException;
+        throws RejectedExecutionException, NullPointerException;
 
     /**
      * Issue a Callable for immediate execution, but have a control over it.
@@ -71,8 +73,7 @@ public interface Scheduler
      * @return
      */
     <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String, String> taskParams )
-        throws RejectedExecutionException,
-            NullPointerException;
+        throws RejectedExecutionException, NullPointerException;
 
     /**
      * Issue a Runnable for scheduled execution.
@@ -85,8 +86,7 @@ public interface Scheduler
      * @return
      */
     <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule, Map<String, String> taskParams )
-        throws RejectedExecutionException,
-            NullPointerException;
+        throws RejectedExecutionException, NullPointerException;
 
     /**
      * Issue a Runnable for scheduled execution.
@@ -95,8 +95,7 @@ public interface Scheduler
      * @return
      */
     <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
-        throws RejectedExecutionException,
-            NullPointerException;
+        throws RejectedExecutionException, NullPointerException;
 
     /**
      * Returns the map of currently active tasks. The resturned collection is an unmodifiable snapshot. It may differ

@@ -107,6 +107,11 @@ public class DefaultScheduler
             getLogger().info( "Termination interrupted", e );
         }
     }
+    
+    public void initializeTasks()
+    {
+        taskConfig.initializeTasks( this );
+    }
 
     public SchedulerTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException
