@@ -21,9 +21,9 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.jsecurity.model.Configuration;
-import org.sonatype.jsecurity.model.io.xpp3.SecurityConfigurationXpp3Reader;
-import org.sonatype.jsecurity.model.io.xpp3.SecurityConfigurationXpp3Writer;
+import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 
 /**
  * Abstract class that encapsulates Modello model loading and saving with interpolation.

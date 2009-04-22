@@ -14,7 +14,7 @@ package org.sonatype.security.configuration.source;
 
 import java.io.IOException;
 
-import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.security.model.Configuration;
 import org.sonatype.security.configuration.ConfigurationException;
 
 /**

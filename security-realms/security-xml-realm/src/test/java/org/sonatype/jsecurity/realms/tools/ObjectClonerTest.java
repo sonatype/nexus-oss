@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.jsecurity.model.CPrivilege;
-import org.sonatype.jsecurity.model.CProperty;
-import org.sonatype.jsecurity.model.CRole;
-import org.sonatype.jsecurity.model.CUser;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CProperty;
+import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.CUser;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;

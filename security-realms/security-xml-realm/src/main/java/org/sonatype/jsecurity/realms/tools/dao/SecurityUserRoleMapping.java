@@ -14,8 +14,8 @@ package org.sonatype.jsecurity.realms.tools.dao;
 
 import java.util.List;
 
-import org.sonatype.jsecurity.model.CUser;
-import org.sonatype.jsecurity.model.CUserRoleMapping;
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.CUserRoleMapping;
 
 public class SecurityUserRoleMapping
     extends CUserRoleMapping

@@ -14,10 +14,10 @@ package org.sonatype.jsecurity.realms.validator;
 
 import java.util.Set;
 
-import org.sonatype.jsecurity.model.CPrivilege;
-import org.sonatype.jsecurity.model.CRole;
-import org.sonatype.jsecurity.model.CUser;
-import org.sonatype.jsecurity.model.CUserRoleMapping;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.CUserRoleMapping;
 
 public interface ConfigurationValidator
 {

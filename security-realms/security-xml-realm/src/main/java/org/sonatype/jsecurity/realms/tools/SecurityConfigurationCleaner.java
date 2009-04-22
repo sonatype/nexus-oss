@@ -12,7 +12,7 @@
  */
 package org.sonatype.jsecurity.realms.tools;
 
-import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.security.model.Configuration;
 
 /**
  * Will handle cleaning existing configuration when an item is removed

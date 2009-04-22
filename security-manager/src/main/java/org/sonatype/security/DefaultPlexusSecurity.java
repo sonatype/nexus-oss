@@ -27,7 +27,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.realm.AuthenticatingRealm;
 import org.jsecurity.realm.CachingRealm;
 import org.jsecurity.realm.Realm;
-import org.sonatype.jsecurity.model.CProperty;
+import org.sonatype.security.model.CProperty;
 import org.sonatype.jsecurity.realms.XmlAuthenticatingRealm;
 import org.sonatype.jsecurity.realms.XmlAuthorizingRealm;
 import org.sonatype.jsecurity.realms.privileges.PrivilegeDescriptor;

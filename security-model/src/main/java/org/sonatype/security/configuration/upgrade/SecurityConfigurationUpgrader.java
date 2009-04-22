@@ -15,7 +15,7 @@ package org.sonatype.security.configuration.upgrade;
 import java.io.File;
 import java.io.IOException;
 
-import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.security.model.Configuration;
 
 /**
  * A component involved only if old security configuration is found. It will fetch the old configuration, transform it to

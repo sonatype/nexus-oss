@@ -14,10 +14,10 @@ package org.sonatype.jsecurity.realms.tools;
 
 import java.util.List;
 
-import org.sonatype.jsecurity.model.CPrivilege;
-import org.sonatype.jsecurity.model.CProperty;
-import org.sonatype.jsecurity.model.CRole;
-import org.sonatype.jsecurity.model.CUser;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CProperty;
+import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.CUser;
 
 /**
  * This class should really be doing an uber generic clone, but it is this for now

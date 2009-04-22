@@ -18,10 +18,10 @@ import java.io.Reader;
 import java.util.ArrayList;
 
 import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.jsecurity.model.CPrivilege;
-import org.sonatype.jsecurity.model.CRole;
-import org.sonatype.jsecurity.model.Configuration;
-import org.sonatype.jsecurity.model.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 
 public class DefaultConfigurationValidatorTest
     extends PlexusTestCase

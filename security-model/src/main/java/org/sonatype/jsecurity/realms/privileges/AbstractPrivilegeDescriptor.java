@@ -16,8 +16,8 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.jsecurity.model.CPrivilege;
-import org.sonatype.jsecurity.model.CProperty;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CProperty;
 import org.sonatype.jsecurity.realms.validator.ConfigurationIdGenerator;
 import org.sonatype.jsecurity.realms.validator.ValidationContext;
 import org.sonatype.jsecurity.realms.validator.ValidationMessage;

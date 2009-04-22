@@ -17,8 +17,8 @@ import java.io.StringWriter;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.jsecurity.model.Configuration;
-import org.sonatype.jsecurity.model.io.xpp3.SecurityConfigurationXpp3Writer;
+import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.configuration.AbstractSecurityConfigTest;
 import org.sonatype.security.configuration.upgrade.SecurityConfigurationUpgrader;
 

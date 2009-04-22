@@ -22,12 +22,12 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.jsecurity.model.v2_0_0.CPrivilege;
-import org.sonatype.jsecurity.model.v2_0_0.CProperty;
-import org.sonatype.jsecurity.model.v2_0_0.CRole;
-import org.sonatype.jsecurity.model.v2_0_0.CUser;
-import org.sonatype.jsecurity.model.v2_0_0.Configuration;
-import org.sonatype.jsecurity.model.v2_0_0.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.model.v2_0_0.CPrivilege;
+import org.sonatype.security.model.v2_0_0.CProperty;
+import org.sonatype.security.model.v2_0_0.CRole;
+import org.sonatype.security.model.v2_0_0.CUser;
+import org.sonatype.security.model.v2_0_0.Configuration;
+import org.sonatype.security.model.v2_0_0.io.xpp3.SecurityConfigurationXpp3Reader;
 
 @Component( role = SecurityUpgrader.class, hint = "2.0.0" )
 public class Upgrade200to201
@@ -67,13 +67,13 @@ public class Upgrade200to201
     {
         Configuration oldc = (Configuration) message.getConfiguration();
 
-        org.sonatype.jsecurity.model.v2_0_1.Configuration newc = new org.sonatype.jsecurity.model.v2_0_1.Configuration();
+        org.sonatype.security.model.v2_0_1.Configuration newc = new org.sonatype.security.model.v2_0_1.Configuration();
 
-        newc.setVersion( org.sonatype.jsecurity.model.v2_0_1.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.security.model.v2_0_1.Configuration.MODEL_VERSION );
 
         for ( CUser oldu : (List<CUser>) oldc.getUsers() )
         {
-            org.sonatype.jsecurity.model.v2_0_1.CUser newu = new org.sonatype.jsecurity.model.v2_0_1.CUser();
+            org.sonatype.security.model.v2_0_1.CUser newu = new org.sonatype.security.model.v2_0_1.CUser();
 
             newu.setEmail( oldu.getEmail() );
             newu.setId( oldu.getId() );
@@ -92,7 +92,7 @@ public class Upgrade200to201
             // Simplest case, not an internal role, just copy
             if ( !getRolesToRemove().contains( oldr.getId() ) )
             {
-                org.sonatype.jsecurity.model.v2_0_1.CRole newr = new org.sonatype.jsecurity.model.v2_0_1.CRole();
+                org.sonatype.security.model.v2_0_1.CRole newr = new org.sonatype.security.model.v2_0_1.CRole();
     
                 newr.setDescription( oldr.getDescription() );
                 newr.setId( oldr.getId() );
@@ -106,7 +106,7 @@ public class Upgrade200to201
             // If we have internally, and the user has changed the role previously (as read only is new in this version)
             else if ( shouldArchiveRole( oldr ) )
             {                
-                org.sonatype.jsecurity.model.v2_0_1.CRole newr = new org.sonatype.jsecurity.model.v2_0_1.CRole();
+                org.sonatype.security.model.v2_0_1.CRole newr = new org.sonatype.security.model.v2_0_1.CRole();
                 
                 newr.setDescription( oldr.getDescription() );
                 newr.setId( oldr.getId() + "-customized" );
@@ -126,7 +126,7 @@ public class Upgrade200to201
         {
             if ( !getPrivsToRemove().contains( oldp.getId() ) )
             {
-                org.sonatype.jsecurity.model.v2_0_1.CPrivilege newp = new org.sonatype.jsecurity.model.v2_0_1.CPrivilege();
+                org.sonatype.security.model.v2_0_1.CPrivilege newp = new org.sonatype.security.model.v2_0_1.CPrivilege();
     
                 newp.setDescription( oldp.getDescription() );
                 newp.setId( oldp.getId() );
@@ -135,7 +135,7 @@ public class Upgrade200to201
                 
                 for ( CProperty oldprop : ( List<CProperty> ) oldp.getProperties() )
                 {
-                    org.sonatype.jsecurity.model.v2_0_1.CProperty newprop = new org.sonatype.jsecurity.model.v2_0_1.CProperty();
+                    org.sonatype.security.model.v2_0_1.CProperty newprop = new org.sonatype.security.model.v2_0_1.CProperty();
                     newprop.setKey( oldprop.getKey() );
                     newprop.setValue( oldprop.getValue() );
                     newp.addProperty( newprop );
@@ -153,14 +153,14 @@ public class Upgrade200to201
         // Fix the new anon and deployment roles if assigned to users
         applyNewRepoRoles( newc );
 
-        message.setModelVersion( org.sonatype.jsecurity.model.v2_0_1.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.security.model.v2_0_1.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
     
     @SuppressWarnings("unchecked")
-    private void applyNewRepoRoles( org.sonatype.jsecurity.model.v2_0_1.Configuration config )
+    private void applyNewRepoRoles( org.sonatype.security.model.v2_0_1.Configuration config )
     {
-        for ( org.sonatype.jsecurity.model.v2_0_1.CUser user : ( List<org.sonatype.jsecurity.model.v2_0_1.CUser> )config.getUsers() )
+        for ( org.sonatype.security.model.v2_0_1.CUser user : ( List<org.sonatype.security.model.v2_0_1.CUser> )config.getUsers() )
         {
             if ( user.getRoles().contains( "anonymous" ) )
             {
@@ -173,7 +173,7 @@ public class Upgrade200to201
             }
         }
         
-        for ( org.sonatype.jsecurity.model.v2_0_1.CRole role : ( List<org.sonatype.jsecurity.model.v2_0_1.CRole> )config.getRoles() )
+        for ( org.sonatype.security.model.v2_0_1.CRole role : ( List<org.sonatype.security.model.v2_0_1.CRole> )config.getRoles() )
         {
             if ( role.getRoles().contains( "anonymous" ) )
             {
@@ -188,9 +188,9 @@ public class Upgrade200to201
     }
     
     @SuppressWarnings("unchecked")
-    private void applyArchivedRoles( RoleMap roleMap, org.sonatype.jsecurity.model.v2_0_1.Configuration config )
+    private void applyArchivedRoles( RoleMap roleMap, org.sonatype.security.model.v2_0_1.Configuration config )
     {
-        for ( org.sonatype.jsecurity.model.v2_0_1.CUser user : ( List<org.sonatype.jsecurity.model.v2_0_1.CUser> )config.getUsers() )
+        for ( org.sonatype.security.model.v2_0_1.CUser user : ( List<org.sonatype.security.model.v2_0_1.CUser> )config.getUsers() )
         {
             if ( user.getRoles().contains( roleMap.oldId ) )
             {
@@ -200,7 +200,7 @@ public class Upgrade200to201
             }
         }
         
-        for ( org.sonatype.jsecurity.model.v2_0_1.CRole role : ( List<org.sonatype.jsecurity.model.v2_0_1.CRole> )config.getRoles() )
+        for ( org.sonatype.security.model.v2_0_1.CRole role : ( List<org.sonatype.security.model.v2_0_1.CRole> )config.getRoles() )
         {
             if ( role.getRoles().contains( roleMap.oldId ) )
             {

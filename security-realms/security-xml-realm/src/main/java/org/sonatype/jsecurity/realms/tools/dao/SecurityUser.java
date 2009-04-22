@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.sonatype.jsecurity.model.CUser;
+import org.sonatype.security.model.CUser;
 
 public class SecurityUser
     extends CUser

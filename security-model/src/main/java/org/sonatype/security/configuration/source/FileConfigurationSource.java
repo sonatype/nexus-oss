@@ -22,7 +22,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.security.model.Configuration;
 import org.sonatype.security.configuration.ConfigurationException;
 import org.sonatype.security.configuration.upgrade.SecurityConfigurationUpgrader;
 

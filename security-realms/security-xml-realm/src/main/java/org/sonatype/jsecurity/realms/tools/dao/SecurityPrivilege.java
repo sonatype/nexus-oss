@@ -14,8 +14,8 @@ package org.sonatype.jsecurity.realms.tools.dao;
 
 import java.util.List;
 
-import org.sonatype.jsecurity.model.CPrivilege;
-import org.sonatype.jsecurity.model.CProperty;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CProperty;
 
 public class SecurityPrivilege
     extends CPrivilege

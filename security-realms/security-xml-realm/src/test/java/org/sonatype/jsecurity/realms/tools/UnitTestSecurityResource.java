@@ -12,7 +12,7 @@
  */
 package org.sonatype.jsecurity.realms.tools;
 
-import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.security.model.Configuration;
 
 public class UnitTestSecurityResource
     extends AbstractStaticSecurityResource

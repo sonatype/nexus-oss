@@ -14,7 +14,7 @@
     <defaults>
         <default>
             <key>package</key>
-            <value>org.sonatype.jsecurity.model</value>
+            <value>org.sonatype.security.model</value>
         </default>
     </defaults>
 

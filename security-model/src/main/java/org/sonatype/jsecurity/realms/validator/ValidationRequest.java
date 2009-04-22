@@ -12,7 +12,7 @@
  */
 package org.sonatype.jsecurity.realms.validator;
 
-import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.security.model.Configuration;
 
 /**
  * A request for validation, holding the configuration.

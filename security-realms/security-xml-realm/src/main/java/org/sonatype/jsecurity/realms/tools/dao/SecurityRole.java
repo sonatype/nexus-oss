@@ -14,7 +14,7 @@ package org.sonatype.jsecurity.realms.tools.dao;
 
 import java.util.List;
 
-import org.sonatype.jsecurity.model.CRole;
+import org.sonatype.security.model.CRole;
 
 public class SecurityRole
     extends CRole

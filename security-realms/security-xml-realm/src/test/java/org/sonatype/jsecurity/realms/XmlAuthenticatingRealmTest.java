@@ -22,7 +22,7 @@ import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
 import org.jsecurity.subject.SimplePrincipalCollection;
-import org.sonatype.jsecurity.model.CUser;
+import org.sonatype.security.model.CUser;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.DefaultConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;

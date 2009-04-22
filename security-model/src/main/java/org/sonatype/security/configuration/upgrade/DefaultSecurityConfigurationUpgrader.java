@@ -24,7 +24,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.security.model.Configuration;
 
 /**
  * Default configuration updater, using versioned Modello models. It tried to detect version signature from existing

@@ -16,9 +16,9 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.sonatype.jsecurity.model.CRole;
-import org.sonatype.jsecurity.model.CUserRoleMapping;
-import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.CUserRoleMapping;
+import org.sonatype.security.model.Configuration;
 
 @Component( role = SecurityConfigurationCleaner.class )
 public class DefaultSecurityConfigurationCleaner

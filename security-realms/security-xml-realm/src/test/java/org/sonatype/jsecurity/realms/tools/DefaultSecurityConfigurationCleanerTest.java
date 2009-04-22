@@ -15,10 +15,10 @@ package org.sonatype.jsecurity.realms.tools;
 import java.util.List;
 
 import org.sonatype.jsecurity.AbstractSecurityTestCase;
-import org.sonatype.jsecurity.model.CPrivilege;
-import org.sonatype.jsecurity.model.CRole;
-import org.sonatype.jsecurity.model.CUserRoleMapping;
-import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.CUserRoleMapping;
+import org.sonatype.security.model.Configuration;
 
 public class DefaultSecurityConfigurationCleanerTest
     extends AbstractSecurityTestCase

@@ -21,8 +21,8 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.jsecurity.model.CPrivilege;
-import org.sonatype.jsecurity.model.CRole;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CRole;
 import org.sonatype.jsecurity.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;

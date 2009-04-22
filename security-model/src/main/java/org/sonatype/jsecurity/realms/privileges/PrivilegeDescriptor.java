@@ -14,7 +14,7 @@ package org.sonatype.jsecurity.realms.privileges;
 
 import java.util.List;
 
-import org.sonatype.jsecurity.model.CPrivilege;
+import org.sonatype.security.model.CPrivilege;
 import org.sonatype.jsecurity.realms.validator.ValidationContext;
 import org.sonatype.jsecurity.realms.validator.ValidationResponse;
 

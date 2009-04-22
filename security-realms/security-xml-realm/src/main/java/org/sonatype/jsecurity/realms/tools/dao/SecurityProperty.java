@@ -12,7 +12,7 @@
  */
 package org.sonatype.jsecurity.realms.tools.dao;
 
-import org.sonatype.jsecurity.model.CProperty;
+import org.sonatype.security.model.CProperty;
 
 public class SecurityProperty
     extends CProperty
