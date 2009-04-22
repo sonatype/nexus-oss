@@ -18,7 +18,7 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.jsecurity.realm.CachingRealm;
 import org.jsecurity.realm.SimpleAccountRealm;
 import org.sonatype.jsecurity.locators.RealmLocator;
-import org.sonatype.jsecurity.realms.PlexusSecurity;
+import org.sonatype.security.PlexusSecurity;
 
 public class WebPlexusSecurityTest extends PlexusTestCase
 {

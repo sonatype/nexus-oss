@@ -22,6 +22,7 @@ import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.permission.WildcardPermission;
 import org.jsecurity.subject.SimplePrincipalCollection;
+import org.sonatype.security.PlexusSecurity;
 
 public class DefaultPlexusSecurityTest
     extends

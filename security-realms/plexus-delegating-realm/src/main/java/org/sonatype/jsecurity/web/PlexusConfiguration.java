@@ -39,7 +39,7 @@ import org.jsecurity.realm.Realm;
 import org.jsecurity.util.LifecycleUtils;
 import org.jsecurity.web.config.IniWebConfiguration;
 import org.jsecurity.web.filter.PathConfigProcessor;
-import org.sonatype.jsecurity.realms.PlexusSecurity;
+import org.sonatype.security.PlexusSecurity;
 
 @Component( role = PlexusWebConfiguration.class )
 public class PlexusConfiguration

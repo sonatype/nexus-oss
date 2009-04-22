@@ -125,10 +125,10 @@ import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
 import org.jsecurity.web.DefaultWebSecurityManager;
 import org.sonatype.jsecurity.locators.RememberMeLocator;
-import org.sonatype.jsecurity.realms.PlexusSecurity;
 import org.sonatype.jsecurity.selectors.RealmCriteria;
 import org.sonatype.jsecurity.selectors.RealmSelector;
 import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
+import org.sonatype.security.PlexusSecurity;
 
 /**
  * Currently only supports a single child realm. Plan on implementing mulitiple child realms and a seperation of
