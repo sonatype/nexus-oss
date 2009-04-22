@@ -8,7 +8,7 @@ import org.sonatype.nexus.index.packer.IndexPackingRequest;
 import org.sonatype.nexus.index.updater.IndexUpdateRequest;
 
 
-public interface IncrementHandler
+public interface IncrementalHandler
 {
     List<Integer> getIncrementalUpdates( IndexPackingRequest request, Properties properties )
         throws IOException;

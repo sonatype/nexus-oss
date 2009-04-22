@@ -40,7 +40,7 @@ import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.NexusLegacyAnalyzer;
 import org.sonatype.nexus.index.creator.LegacyDocumentUpdater;
-import org.sonatype.nexus.index.incremental.IncrementHandler;
+import org.sonatype.nexus.index.incremental.IncrementalHandler;
 import org.sonatype.nexus.index.packer.IndexPackingRequest.IndexFormat;
 import org.sonatype.nexus.index.updater.IndexDataWriter;
 
@@ -55,8 +55,8 @@ public class DefaultIndexPacker
     extends AbstractLogEnabled
     implements IndexPacker
 {
-    @Requirement( role = IncrementHandler.class )
-    IncrementHandler incrementalHandler;
+    @Requirement( role = IncrementalHandler.class )
+    IncrementalHandler incrementalHandler;
     
     public void packIndex( IndexPackingRequest request )
         throws IOException,

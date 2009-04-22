@@ -48,7 +48,7 @@ import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.NexusAnalyzer;
 import org.sonatype.nexus.index.context.NexusIndexWriter;
-import org.sonatype.nexus.index.incremental.IncrementHandler;
+import org.sonatype.nexus.index.incremental.IncrementalHandler;
 import org.sonatype.nexus.index.updater.IndexDataReader.IndexDataReadResult;
 
 /**
@@ -62,8 +62,8 @@ public class DefaultIndexUpdater
     extends AbstractLogEnabled
     implements IndexUpdater
 {
-    @Requirement( role = IncrementHandler.class )
-    IncrementHandler incrementalHandler;
+    @Requirement( role = IncrementalHandler.class )
+    IncrementalHandler incrementalHandler;
     
     @Requirement
     private WagonManager wagonManager;

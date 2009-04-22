@@ -26,10 +26,10 @@ import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.packer.IndexPackingRequest;
 import org.sonatype.nexus.index.updater.IndexUpdateRequest;
 
-@Component( role = IncrementHandler.class )
+@Component( role = IncrementalHandler.class )
 public class DefaultIncrementalHandler
     extends AbstractLogEnabled
-    implements IncrementHandler
+    implements IncrementalHandler
 {
     public List<Integer> getIncrementalUpdates( IndexPackingRequest request, Properties properties )
         throws IOException
