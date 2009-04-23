@@ -165,7 +165,7 @@ public class DefaultIndexPacker
         {
             writeIndexArchive( request.getContext(), legacyFile );
 
-        if ( request.isCreateChecksumFiles() )  
+            if ( request.isCreateChecksumFiles() )  
             {
                 FileUtils.fileWrite(
                     new File( legacyFile.getParentFile(), legacyFile.getName() + ".sha1" ).getAbsolutePath(),

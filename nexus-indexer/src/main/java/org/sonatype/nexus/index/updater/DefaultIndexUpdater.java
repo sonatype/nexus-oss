@@ -84,6 +84,9 @@ public class DefaultIndexUpdater
             if ( contextTimestamp != null )
             {
                 Properties localProperties = loadLocallyStoredRemoteProperties( context );
+                
+                // This will download the properties into context index directory so next run the
+                // loadLocallyStoredRemoteProperties() will retrieve it
                 Properties properties = downloadIndexProperties( context, fetcher );
 
                 Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );

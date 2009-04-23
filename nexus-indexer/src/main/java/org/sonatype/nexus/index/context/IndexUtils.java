@@ -49,8 +49,13 @@ public class IndexUtils
     
         return res ? artifactInfo : null;
     }
-
+    
     public static Document updateDocument( Document doc, IndexingContext context )
+    {
+        return updateDocument( doc, context, true );
+    }
+
+    public static Document updateDocument( Document doc, IndexingContext context, boolean updateLastModified )
     {
         ArtifactInfo ai = constructArtifactInfo( doc, context );
         if ( ai == null )
@@ -62,9 +67,17 @@ public class IndexUtils
         
         // unique key
         document.add( new Field( ArtifactInfo.UINFO, ai.getUinfo(), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
-    
-        document.add( new Field( ArtifactInfo.LAST_MODIFIED, //
-            Long.toString( System.currentTimeMillis() ), Field.Store.YES, Field.Index.NO ) );
+        
+        if ( updateLastModified 
+            || doc.getField( ArtifactInfo.LAST_MODIFIED ) == null )
+        {
+            document.add( new Field( ArtifactInfo.LAST_MODIFIED, //
+                Long.toString( System.currentTimeMillis() ), Field.Store.YES, Field.Index.NO ) );
+        }
+        else
+        {
+            document.add( doc.getField( ArtifactInfo.LAST_MODIFIED ) );
+        }
         
         for ( IndexCreator ic : context.getIndexCreators() )
         {
