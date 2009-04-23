@@ -1,15 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.sonatype.security</groupId>
-	<artifactId>security-parent</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+    <artifactId>security-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-system</artifactId>
   <name>Security: System</name>
   <version>1.0.8-SNAPSHOT</version>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -17,11 +18,48 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.4.2</version>
         <configuration>
-          <skipTests>true</skipTests>
+          <skipTests>false</skipTests>
         </configuration>
       </plugin>
     </plugins>
   </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.jsecurity</groupId>
+      <artifactId>jsecurity</artifactId>
+      <version>0.9.0-RC2-SONATYPE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-component-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>plexus-ehcache</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
 
-  
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+
 </project>

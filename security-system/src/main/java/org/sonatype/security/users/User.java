@@ -1,4 +1,4 @@
-package org.sonatype.security;
+package org.sonatype.security.users;
 
 public interface User
 {

@@ -1,4 +1,4 @@
-package org.sonatype.security;
+package org.sonatype.security.authorization;
 
 public class AuthorizationException
     extends Exception

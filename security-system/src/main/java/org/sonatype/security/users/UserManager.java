@@ -1,4 +1,4 @@
-package org.sonatype.security;
+package org.sonatype.security.users;
 
 import java.util.Set;
 
@@ -15,7 +15,7 @@ public interface UserManager
      * Searches for Subject objects by a criteria.
      * @return
      */
-    Set<User> searchUsers( SubjectSearchCriteria criteria);
+    Set<User> searchUsers( UserSearchCriteria criteria);
     
     /**
      * Retrieve all userids (if managing full object
