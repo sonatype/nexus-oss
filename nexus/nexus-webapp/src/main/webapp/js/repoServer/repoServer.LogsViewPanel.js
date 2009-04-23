@@ -169,7 +169,7 @@ Sonatype.repoServer.LogsViewPanel = function(config){
         tooltip: {text:'Reloads the current document'},
         icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
         cls: 'x-btn-text-icon',
-        handler: this.reloadLogFile,
+        handler: this.reloadAllFiles,
         scope: this
       },
       {
@@ -240,12 +240,15 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
     if (success){
       var resp = Ext.decode(response.responseText);
       var myMenu = Ext.menu.MenuMgr.get('log-menu');
-
-      for (var i=0; i< resp.data.length; i++) {
-        var name = resp.data[i].name;
-        var size = resp.data[i].size;
+      
+      var list = resp.data;
+      this.sortFileListByName(list);
+      
+      for (var i=0; i< list.length; i++) {
+        var name = list[i].name;
+        var size = list[i].size;
         var text = name + ' (' + this.printKb(size) + ')';
-        var uri = resp.data[i].resourceURI;
+        var uri = list[i].resourceURI;
 
         var existingItem = myMenu.items.find( function( o ) {
           return o.logUri == uri;
@@ -301,21 +304,9 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       if ( resp.data.length > 0 ){
     	  myMenu.add('-');
       }
-      
+
       var list = resp.data;
-      // bubble sort the list
-      for ( var i=1; i<list.length; i++){
-    	  for ( var j=i; j>0; j--){
-    		  if ( list[j].name.toLowerCase() < list[j-1].name.toLowerCase() ){
-    			  var temp = list[j];
-    			  list[j] = list[j-1];
-    			  list[j-1] = temp;
-    		  }
-    		  else{
-    			  break;
-    		  }
-    	  }
-      }
+      this.sortFileListByName(list);
       
       for ( var i=0; i<list.length; i++){
       	var name = list[i].name;
@@ -389,8 +380,12 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
 	  
   },
   
-  //gets the log file specified by this.currentLogUrl
-  reloadLogFile : function(){
+  //reload log and config file list
+  //reload the log file specified by this.currentLogUrl
+  reloadAllFiles : function(){
+  	this.updateLogFileList();
+    this.updateConfigFileList();
+    
     this.currentSize = 0;
     this.currentOffset = 0;
     this.tailed = this.tailEnabled;
@@ -550,5 +545,21 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       Ext.TaskMgr.stop( this.tailUpdateTask );
       this.tailUpdateTask.started = false;
     }
+  },
+  
+  sortFileListByName: function(list) {
+  	list.sort( function(a,b) {
+  		var valueA = a.name.toLowerCase();
+		var valueB = b.name.toLowerCase();
+		if ( valueA < valueB ) {
+			return -1;
+		}
+		else if ( valueA == valueB ) {
+			return 0;
+		}
+		else {
+			return 1;
+		}
+ 	 });
   }
 });
