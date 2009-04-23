@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.jsecurity.subject.Subject;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
@@ -41,6 +42,11 @@ public class HttpVerbMappingAuthorizationFilter
         return (Nexus) getAttribute( Nexus.class.getName() );
     }
 
+    protected NexusConfiguration getNexusConfiguration()
+    {
+        return (NexusConfiguration) getAttribute( NexusConfiguration.class.getName() );
+    }
+
     @Override
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
         throws IOException
@@ -54,11 +60,9 @@ public class HttpVerbMappingAuthorizationFilter
 
     private void recordAuthzFailureEvent( ServletRequest request, ServletResponse response )
     {
-        Nexus nexus = getNexus();
-
         Subject subject = getSubject( request, response );
 
-        if ( nexus.getAnonymousUsername().equals( subject.getPrincipal() ) )
+        if ( getNexusConfiguration().getAnonymousUsername().equals( subject.getPrincipal() ) )
         {
             return;
         }
@@ -78,7 +82,7 @@ public class HttpVerbMappingAuthorizationFilter
 
         AuthcAuthzEvent authzEvt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHZ, msg );
 
-        nexus.addAuthcAuthzEvent( authzEvt );
+        getNexus().addAuthcAuthzEvent( authzEvt );
 
         currentAuthzEvt = authzEvt;
     }

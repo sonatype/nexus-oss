@@ -8,8 +8,8 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.repository.DefaultRepository;
 import org.sonatype.nexus.proxy.repository.Mirror;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.MirrorStatusResource;
 import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
@@ -52,18 +52,18 @@ public class RepositoryMirrorStatusPlexusResource
         
         try
         {
-            Repository repository = getNexus().getRepository( getRepositoryId( request ) );
+            Repository repository = getRepositoryRegistry().getRepository( getRepositoryId( request ) );
             
-            if ( DefaultRepository.class.isAssignableFrom( repository.getClass() ) )
+            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
-                DefaultRepository dRepository = ( DefaultRepository ) repository;
+                ProxyRepository px = repository.adaptToFacet( ProxyRepository.class );
                 
-                for ( Mirror mirror : dRepository.getDownloadMirrors().getMirrors() )
+                for ( Mirror mirror : px.getDownloadMirrors().getMirrors() )
                 {
                     MirrorStatusResource resource = new MirrorStatusResource();
                     resource.setId( mirror.getId() );
                     resource.setUrl( mirror.getUrl() );
-                    resource.setStatus( dRepository.getDownloadMirrors().isBlacklisted( mirror ) ? "Blacklisted" : "Available" );
+                    resource.setStatus( px.getDownloadMirrors().isBlacklisted( mirror ) ? "Blacklisted" : "Available" );
                     
                     dto.addData( resource );
                 }

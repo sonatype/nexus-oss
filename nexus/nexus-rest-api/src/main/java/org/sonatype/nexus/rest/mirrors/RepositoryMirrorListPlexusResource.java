@@ -13,6 +13,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.Mirror;
 import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
@@ -83,6 +84,10 @@ public class RepositoryMirrorListPlexusResource
             List<MirrorResource> resources = ( List<MirrorResource> ) ( ( MirrorResourceListRequest ) payload ).getData();
             
             List<CMirror> mirrors = restToNexusModel( resources );
+            
+            List<Mirror> repoMirrors = null;
+            
+            getRepositoryRegistry().getRe
             
             getNexus().setMirrors( getRepositoryId( request ), mirrors );
             

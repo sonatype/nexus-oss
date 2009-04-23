@@ -19,8 +19,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.configuration.modello.CRepository;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 public abstract class AbstractNexusReleaseArtifactEventFeedSource
     extends AbstractNexusItemEventFeedSource
@@ -38,13 +40,17 @@ public abstract class AbstractNexusReleaseArtifactEventFeedSource
     {
         Set<String> result = new HashSet<String>();
 
-        Collection<CRepository> repos = getNexus().listRepositories();
+        Collection<Repository> repos = getRepositoryRegistry().getRepositories();
 
-        for ( CRepository repo : repos )
+        for ( Repository repo : repos )
         {
-            if ( repo.getRepositoryPolicy().equals( "release" ) )
+            // huh? release as policy exists for MavenRepository only?
+            if ( repo.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
             {
-                result.add( repo.getId() );
+                if ( RepositoryPolicy.RELEASE.equals( repo.adaptToFacet( MavenRepository.class ).getRepositoryPolicy() ) )
+                {
+                    result.add( repo.getId() );
+                }
             }
         }
 

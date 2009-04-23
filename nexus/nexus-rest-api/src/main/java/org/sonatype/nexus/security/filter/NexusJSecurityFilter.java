@@ -17,7 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
 import org.sonatype.jsecurity.web.PlexusJSecurityFilter;
-import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 
 /**
  * This filter simply behaves according Nexus configuration.
@@ -34,15 +34,10 @@ public class NexusJSecurityFilter
         // not setting configClassName explicitly, so we can use either configRole or configClassName
     }
 
-    protected final Nexus getNexus()
-    {
-        return (Nexus) getAttribute( Nexus.class.getName() );
-    }
-
     @Override
     protected boolean shouldNotFilter( ServletRequest request )
         throws ServletException
     {
-        return !getNexus().isSecurityEnabled();
+        return !( (NexusConfiguration) getAttribute( NexusConfiguration.class.getName() ) ).isSecurityEnabled();
     }
 }

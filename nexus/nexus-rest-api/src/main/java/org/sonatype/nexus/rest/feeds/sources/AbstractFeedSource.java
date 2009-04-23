@@ -16,6 +16,7 @@ package org.sonatype.nexus.rest.feeds.sources;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
  * And abstract class for NexusArtifactEvent based feeds. This class implements all needed to create a feed,
@@ -29,10 +30,18 @@ public abstract class AbstractFeedSource
 {
     @Requirement
     private Nexus nexus;
+    
+    @Requirement
+    private RepositoryRegistry repositoryRegistry;
 
     protected Nexus getNexus()
     {
         return nexus;
+    }
+    
+    protected RepositoryRegistry getRepositoryRegistry()
+    {
+        return repositoryRegistry;
     }
 
     public abstract String getTitle();

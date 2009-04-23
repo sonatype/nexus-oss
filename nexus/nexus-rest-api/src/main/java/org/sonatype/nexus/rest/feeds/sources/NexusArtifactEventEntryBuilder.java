@@ -63,7 +63,7 @@ public class NexusArtifactEventEntryBuilder
         }
         try
         {
-            Repository repo = getNexus().getRepository( event.getNexusItemInfo().getRepositoryId() );
+            Repository repo = getRepositoryRegistry().getRepository( event.getNexusItemInfo().getRepositoryId() );
 
             if ( MavenRepository.class.isAssignableFrom( repo.getClass() ) )
             {

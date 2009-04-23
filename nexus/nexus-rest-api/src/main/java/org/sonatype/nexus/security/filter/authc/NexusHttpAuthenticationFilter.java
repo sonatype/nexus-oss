@@ -31,6 +31,7 @@ import org.jsecurity.subject.Subject;
 import org.jsecurity.web.WebUtils;
 import org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
@@ -87,6 +88,11 @@ public class NexusHttpAuthenticationFilter
         return (Nexus) getAttribute( Nexus.class.getName() );
     }
 
+    protected NexusConfiguration getNexusConfiguration()
+    {
+        return (NexusConfiguration) getAttribute( NexusConfiguration.class.getName() );
+    }
+
     protected PlexusContainer getPlexusContainer()
     {
         return (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
@@ -125,7 +131,7 @@ public class NexusHttpAuthenticationFilter
         else
         {
             // let the user "fall thru" until we get some permission problem
-            if ( getNexus().isAnonymousAccessEnabled() )
+            if ( getNexusConfiguration().isAnonymousAccessEnabled() )
             {
                 loggedIn = executeAnonymousLogin( request, response );
             }
@@ -188,10 +194,9 @@ public class NexusHttpAuthenticationFilter
 
         Subject subject = getSubject( request, response );
 
-        Nexus nexus = getNexus();
-
-        UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( nexus.getAnonymousUsername(), nexus
-            .getAnonymousPassword() );
+        UsernamePasswordToken usernamePasswordToken =
+            new UsernamePasswordToken( getNexusConfiguration().getAnonymousUsername(),
+                                       getNexusConfiguration().getAnonymousPassword() );
 
         try
         {
@@ -209,8 +214,8 @@ public class NexusHttpAuthenticationFilter
         catch ( AuthenticationException ae )
         {
             getLogger().info(
-                "Unable to authenticate user [anonymous] from address/host [" + request.getRemoteAddr() + "/"
-                    + request.getRemoteHost() + "]" );
+                              "Unable to authenticate user [anonymous] from address/host [" + request.getRemoteAddr()
+                                  + "/" + request.getRemoteHost() + "]" );
 
             if ( getLogger().isDebugEnabled() )
             {
@@ -225,10 +230,11 @@ public class NexusHttpAuthenticationFilter
 
     @Override
     protected boolean onLoginSuccess( AuthenticationToken token, Subject subject, ServletRequest request,
-        ServletResponse response )
+                                      ServletResponse response )
     {
-        String msg = "Successfully authenticated user [" + token.getPrincipal() + "] from address/host ["
-            + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
+        String msg =
+            "Successfully authenticated user [" + token.getPrincipal() + "] from address/host ["
+                + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
 
         recordAuthcEvent( request, msg );
 
@@ -242,7 +248,7 @@ public class NexusHttpAuthenticationFilter
         {
             return;
         }
-        
+
         getLogger().info( msg );
 
         getLogger().info( msg );
@@ -272,10 +278,11 @@ public class NexusHttpAuthenticationFilter
 
     @Override
     protected boolean onLoginFailure( AuthenticationToken token, AuthenticationException ae, ServletRequest request,
-        ServletResponse response )
+                                      ServletResponse response )
     {
-        String msg = "Unable to authenticate user [" + token.getPrincipal() + "] from address/host ["
-            + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
+        String msg =
+            "Unable to authenticate user [" + token.getPrincipal() + "] from address/host [" + request.getRemoteAddr()
+                + "/" + request.getRemoteHost() + "]";
 
         recordAuthcEvent( request, msg );
 
