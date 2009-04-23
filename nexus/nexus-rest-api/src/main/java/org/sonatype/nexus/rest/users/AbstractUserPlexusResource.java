@@ -37,7 +37,7 @@ public abstract class AbstractUserPlexusResource
 
     @Requirement
     private NexusSecurity nexusSecurity;
-
+    
     protected NexusSecurity getNexusSecurity()
     {
         return nexusSecurity;
@@ -101,7 +101,7 @@ public abstract class AbstractUserPlexusResource
     protected boolean isAnonymousUser( String username, Request request )
         throws ResourceException
     {
-        return getNexus().isAnonymousAccessEnabled() && getNexus().getAnonymousUsername().equals( username );
+        return getNexusConfiguration().isAnonymousAccessEnabled() && getNexusConfiguration().getAnonymousUsername().equals( username );
     }
 
     protected void validateUserContainment( SecurityUser user )

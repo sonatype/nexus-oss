@@ -16,6 +16,7 @@ package org.sonatype.nexus.rest.identify;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -23,6 +24,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -38,10 +40,12 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class IdentifyHashPlexusResource
     extends AbstractNexusPlexusResource
 {
-
     public static final String ALGORITHM_KEY = "algorithm";
 
     public static final String HASH_KEY = "hash";
+    
+    @Requirement
+    private IndexerManager indexerManager;
 
     @Override
     public Object getPayloadInstance()
@@ -75,7 +79,7 @@ public class IdentifyHashPlexusResource
         {
             if ( "sha1".equalsIgnoreCase( alg ) )
             {
-                na = ai2Na( request, getNexus().identifyArtifact( ArtifactInfo.SHA1, checksum ) );
+                na = ai2Na( request, indexerManager.identifyArtifact( ArtifactInfo.SHA1, checksum ) );
             }
         }
         catch ( IOException e )

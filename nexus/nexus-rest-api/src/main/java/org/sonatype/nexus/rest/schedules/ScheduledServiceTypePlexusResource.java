@@ -61,7 +61,7 @@ public class ScheduledServiceTypePlexusResource
     {
         ScheduledServiceTypeResourceResponse result = new ScheduledServiceTypeResourceResponse();
 
-        List<ScheduledTaskDescriptor> taskDescriptors = getNexus().listScheduledTaskDescriptors();
+        List<ScheduledTaskDescriptor> taskDescriptors = getNexusConfiguration().listScheduledTaskDescriptors();
 
         for ( ScheduledTaskDescriptor taskDescriptor : taskDescriptors )
         {

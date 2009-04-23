@@ -65,7 +65,7 @@ public class ScheduledServiceRunPlexusResource
 
         try
         {
-            ScheduledTask<?> task = getNexus().getTaskById( scheduledServiceId );
+            ScheduledTask<?> task = getNexusScheduler().getTaskById( scheduledServiceId );
 
             task.runNow();
 

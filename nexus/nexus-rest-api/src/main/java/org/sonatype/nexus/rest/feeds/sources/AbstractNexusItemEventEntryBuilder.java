@@ -21,9 +21,11 @@ import org.restlet.data.MediaType;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 import com.sun.syndication.feed.synd.SyndContent;
@@ -38,9 +40,11 @@ abstract public class AbstractNexusItemEventEntryBuilder
     extends AbstractLogEnabled
     implements SyndEntryBuilder<NexusArtifactEvent>
 {
-
     @Requirement
     private Nexus nexus;
+
+    @Requirement
+    private RepositoryRegistry repositoryRegistry;
 
     @Requirement
     private NexusItemAuthorizer nexusItemAuthorizer;
@@ -48,6 +52,11 @@ abstract public class AbstractNexusItemEventEntryBuilder
     protected Nexus getNexus()
     {
         return nexus;
+    }
+
+    protected RepositoryRegistry getRepositoryRegistry()
+    {
+        return repositoryRegistry;
     }
 
     public SyndEntry buildEntry( NexusArtifactEvent event )
@@ -123,7 +132,7 @@ abstract public class AbstractNexusItemEventEntryBuilder
 
         try
         {
-            Repository repository = getNexus().getRepository( repoId );
+            Repository repository = getRepositoryRegistry().getRepository( repoId );
 
             return repository.getName();
         }
@@ -144,7 +153,7 @@ abstract public class AbstractNexusItemEventEntryBuilder
         if ( NexusArtifactEvent.ACTION_CACHED.equals( event.getAction() ) )
         {
             msg.append( "cached by Nexus from remote URL " ).append( event.getNexusItemInfo().getRemoteUrl() ).append(
-                "." );
+                                                                                                                       "." );
         }
         else if ( NexusArtifactEvent.ACTION_DEPLOYED.equals( event.getAction() ) )
         {
@@ -213,9 +222,11 @@ abstract public class AbstractNexusItemEventEntryBuilder
     {
         try
         {
-            Repository repo = nexus.getRepository( event.getNexusItemInfo().getRepositoryId() );
+            Repository repo = getRepositoryRegistry().getRepository( event.getNexusItemInfo().getRepositoryId() );
 
-            if ( !nexusItemAuthorizer.authorizePath( repo, event.getNexusItemInfo().getPath(), null, Action.read ) )
+            ResourceStoreRequest req = new ResourceStoreRequest( event.getNexusItemInfo().getPath() );
+
+            if ( !nexusItemAuthorizer.authorizePath( repo, req, Action.read ) )
             {
                 return false;
             }
@@ -224,8 +235,8 @@ abstract public class AbstractNexusItemEventEntryBuilder
         {
             // Can't get repository for artifact, therefore we can't authorize access, therefore you don't see it
             getLogger().debug(
-                "Feed entry contained invalid repository id " + event.getNexusItemInfo().getRepositoryId(),
-                e );
+                               "Feed entry contained invalid repository id "
+                                   + event.getNexusItemInfo().getRepositoryId(), e );
 
             return false;
         }

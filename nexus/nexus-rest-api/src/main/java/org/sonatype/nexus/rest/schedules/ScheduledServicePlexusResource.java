@@ -81,7 +81,7 @@ public class ScheduledServicePlexusResource
         ScheduledServiceResourceResponse result = new ScheduledServiceResourceResponse();
         try
         {
-            ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId( request ) );
+            ScheduledTask<?> task = getNexusScheduler().getTaskById( getScheduledServiceId( request ) );
 
             ScheduledServiceBaseResource resource = getServiceRestModel( task );
 
@@ -121,7 +121,7 @@ public class ScheduledServicePlexusResource
                 // task name
                 // task schedule (even to another type)
                 // task params
-                ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId( request ) );
+                ScheduledTask<?> task = getNexusScheduler().getTaskById( getScheduledServiceId( request ) );
 
                 task.setEnabled( resource.isEnabled() );
 
@@ -139,7 +139,7 @@ public class ScheduledServicePlexusResource
                 task.reset();
 
                 // Store the changes
-                getNexus().updateSchedule( task );
+                getNexusScheduler().updateSchedule( task );
 
                 ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
                 resourceStatus.setResource( resource );
@@ -184,7 +184,7 @@ public class ScheduledServicePlexusResource
     {
         try
         {
-            getNexus().getTaskById( getScheduledServiceId( request ) ).cancel();
+            getNexusScheduler().getTaskById( getScheduledServiceId( request ) ).cancel();
 
             response.setStatus( Status.SUCCESS_NO_CONTENT );
         }

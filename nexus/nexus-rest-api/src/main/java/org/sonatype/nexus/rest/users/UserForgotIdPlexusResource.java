@@ -63,7 +63,7 @@ public class UserForgotIdPlexusResource
 
         try
         {
-            getNexusSecurity().forgotUsername( email, getNexus().getAnonymousUsername() );
+            getNexusSecurity().forgotUsername( email, getNexusConfiguration().getAnonymousUsername() );
 
             response.setStatus( Status.SUCCESS_ACCEPTED );
         }

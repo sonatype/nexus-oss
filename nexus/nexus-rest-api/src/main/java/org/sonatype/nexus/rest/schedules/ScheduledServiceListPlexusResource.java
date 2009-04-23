@@ -76,7 +76,7 @@ public class ScheduledServiceListPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        Map<String, List<ScheduledTask<?>>> tasksMap = getNexus().getAllTasks();
+        Map<String, List<ScheduledTask<?>>> tasksMap = getNexusScheduler().getAllTasks();
 
         ScheduledServiceListResourceResponse result = new ScheduledServiceListResourceResponse();
 
@@ -101,7 +101,7 @@ public class ScheduledServiceListPlexusResource
                     item.setName( task.getName() );
                     item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
                     item.setTypeId( task.getType() );
-                    item.setTypeName( getNexus().getScheduledTaskDescriptor( task.getType() ).getName() );
+                    item.setTypeName( getNexusConfiguration().getScheduledTaskDescriptor( task.getType() ).getName() );
                     item.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
                     item.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
                     item.setNextRunTime( getNextRunTime( task ) );
@@ -134,14 +134,14 @@ public class ScheduledServiceListPlexusResource
 
                 if ( schedule != null )
                 {
-                    task = getNexus().schedule(
+                    task = getNexusScheduler().schedule(
                         getModelName( serviceResource ),
                         getModelNexusTask( serviceResource, request ),
                         schedule );
                 }
                 else
                 {
-                    task = getNexus().schedule(
+                    task = getNexusScheduler().schedule(
                         getModelName( serviceResource ),
                         getModelNexusTask( serviceResource, request ),
                         new ManualRunSchedule() );
@@ -150,7 +150,7 @@ public class ScheduledServiceListPlexusResource
                 task.setEnabled( serviceResource.isEnabled() );
 
                 // Need to store the enabled flag update
-                getNexus().updateSchedule( task );
+                getNexusScheduler().updateSchedule( task );
 
                 ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
                 resourceStatus.setResource( serviceResource );

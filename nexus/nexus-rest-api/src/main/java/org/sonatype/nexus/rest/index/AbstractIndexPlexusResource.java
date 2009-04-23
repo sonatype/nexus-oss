@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Form;
@@ -27,6 +28,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchResponse;
+import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
@@ -36,6 +38,8 @@ import org.sonatype.nexus.tasks.ReindexTask;
 public abstract class AbstractIndexPlexusResource
     extends AbstractRestorePlexusResource
 {
+    @Requirement
+    private IndexerManager indexerManager;
 
     @Override
     public Object getPayloadInstance()
@@ -103,7 +107,7 @@ public abstract class AbstractIndexPlexusResource
             {
                 try
                 {
-                    na = ai2Na( request, getNexus().identifyArtifact( ArtifactInfo.SHA1, sha1 ) );
+                    na = ai2Na( request, indexerManager.identifyArtifact( ArtifactInfo.SHA1, sha1 ) );
                 }
                 catch ( IOException e )
                 {
@@ -115,16 +119,16 @@ public abstract class AbstractIndexPlexusResource
             }
             else if ( !StringUtils.isEmpty( query ) )
             {
-                searchResult = getNexus().searchArtifactFlat( query, getRepositoryId( request ), from, count );
+                searchResult = indexerManager.searchArtifactFlat( query, getRepositoryId( request ), from, count );
             }
             else if ( !StringUtils.isEmpty( className ) )
             {
-                searchResult = getNexus().searchArtifactClassFlat( className, getRepositoryId( request ), from, count );
+                searchResult = indexerManager.searchArtifactClassFlat( className, getRepositoryId( request ), from, count );
             }
             else if ( !StringUtils.isEmpty( g ) || !StringUtils.isEmpty( a ) || !StringUtils.isEmpty( v )
                 || !StringUtils.isEmpty( p ) || !StringUtils.isEmpty( c ) )
             {
-                searchResult = getNexus().searchArtifactFlat( g, a, v, p, c, getRepositoryId( request ), from, count );
+                searchResult = indexerManager.searchArtifactFlat( g, a, v, p, c, getRepositoryId( request ), from, count );
             }
             else
             {
@@ -185,7 +189,7 @@ public abstract class AbstractIndexPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        ReindexTask task = getNexus().createTaskInstance( ReindexTask.class );
+        ReindexTask task = getNexusScheduler().createTaskInstance( ReindexTask.class );
 
         task.setRepositoryId( getRepositoryId( request ) );
 

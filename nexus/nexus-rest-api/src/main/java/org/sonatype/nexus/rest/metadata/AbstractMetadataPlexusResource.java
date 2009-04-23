@@ -37,7 +37,7 @@ public abstract class AbstractMetadataPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        RebuildMavenMetadataTask task = getNexus().createTaskInstance( RebuildMavenMetadataTask.class );
+        RebuildMavenMetadataTask task = getNexusScheduler().createTaskInstance( RebuildMavenMetadataTask.class );
 
         task.setRepositoryId( getRepositoryId( request ) );
 

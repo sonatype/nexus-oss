@@ -25,9 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.configuration.application.validator.ApplicationValidationResponse;
+import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
@@ -40,6 +41,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.iterators.MonthlySchedulerIterator;
@@ -79,10 +81,18 @@ public abstract class AbstractScheduledServicePlexusResource
 
     /** Schedule Type Advanced. */
     public static final String SCHEDULE_TYPE_ADVANCED = "advanced";
+    
+    @Requirement
+    private NexusScheduler nexusScheduler;
 
     public static final String SCHEDULED_SERVICE_ID_KEY = "scheduledServiceId";
 
     private DateFormat timeFormat = new SimpleDateFormat( "HH:mm" );
+    
+    protected NexusScheduler getNexusScheduler()
+    {
+        return nexusScheduler;
+    }
 
     protected String getScheduleShortName( Schedule schedule )
     {
@@ -307,7 +317,7 @@ public abstract class AbstractScheduledServicePlexusResource
     {
         String serviceType = model.getTypeId();
 
-        NexusTask<?> task = (NexusTask<?>) getNexus().createTaskInstance( serviceType );
+        NexusTask<?> task = (NexusTask<?>) getNexusScheduler().createTaskInstance( serviceType );
 
         for ( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
         {
