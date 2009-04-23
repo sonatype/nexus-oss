@@ -20,6 +20,10 @@ public interface SecuritySystem
     public User login( AuthenticationToken token )
         throws AuthenticationException;
 
+    /**
+     * Finds the current logged in user.
+     * @return
+     */
     public User getLoggedInUser();
 
     public void logout();
