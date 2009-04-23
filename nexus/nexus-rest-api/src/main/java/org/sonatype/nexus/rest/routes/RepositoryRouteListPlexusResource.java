@@ -27,7 +27,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
+import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.model.RepositoryRouteListResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteListResourceResponse;
@@ -78,13 +78,13 @@ public class RepositoryRouteListPlexusResource
     {
         RepositoryRouteListResourceResponse result = new RepositoryRouteListResourceResponse();
 
-        Collection<CGroupsSettingPathMappingItem> mappings = getNexus().listGroupsSettingPathMapping();
+        Collection<CPathMappingItem> mappings = getNexusConfiguration().listGroupsSettingPathMapping();
 
         RepositoryRouteListResource resource = null;
 
         try
         {
-            for ( CGroupsSettingPathMappingItem item : mappings )
+            for ( CPathMappingItem item : mappings )
             {
                 resource = new RepositoryRouteListResource();
 
@@ -94,7 +94,8 @@ public class RepositoryRouteListPlexusResource
 
                 resource.setRuleType( config2resourceType( item.getRouteType() ) );
 
-                resource.setPattern( item.getRoutePattern() );
+                // XXX: cstamas -- a hack!
+                resource.setPattern( item.getRoutePatterns().get( 0 ).toString() );
 
                 resource.setRepositories( getRepositoryRouteMemberRepositoryList( request.getResourceRef(), item
                     .getRepositories(), request ) );
@@ -141,13 +142,13 @@ public class RepositoryRouteListPlexusResource
 
             try
             {
-                CGroupsSettingPathMappingItem route = new CGroupsSettingPathMappingItem();
+                CPathMappingItem route = new CPathMappingItem();
 
                 route.setId( resource.getId() );
 
                 route.setGroupId( resource.getGroupId() );
 
-                route.setRoutePattern( resource.getPattern() );
+                route.addRoutePattern( resource.getPattern() );
 
                 route.setRouteType( resource2configType( resource.getRuleType() ) );
 
@@ -161,7 +162,7 @@ public class RepositoryRouteListPlexusResource
 
                 route.setRepositories( repositories );
 
-                getNexus().createGroupsSettingPathMapping( route );
+                getNexusConfiguration().createGroupsSettingPathMapping( route );
 
                 resource.setGroupId( route.getGroupId() );
 

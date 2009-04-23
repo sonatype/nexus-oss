@@ -26,7 +26,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
+import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
@@ -83,7 +83,7 @@ public class RepositoryRoutePlexusResource
 
         try
         {
-            CGroupsSettingPathMappingItem route = getNexus().readGroupsSettingPathMapping( getRouteId( request ) );
+            CPathMappingItem route = getNexusConfiguration().readGroupsSettingPathMapping( getRouteId( request ) );
 
             if ( route == null )
             {
@@ -98,7 +98,8 @@ public class RepositoryRoutePlexusResource
 
             resource.setRuleType( config2resourceType( route.getRouteType() ) );
 
-            resource.setPattern( route.getRoutePattern() );
+            // XXX: cstamas -- a hack!
+            resource.setPattern( route.getRoutePatterns().get( 0 ).toString() );
 
             resource.setRepositories( getRepositoryRouteMemberRepositoryList(
                 request.getResourceRef().getParentRef(),
@@ -158,7 +159,7 @@ public class RepositoryRoutePlexusResource
 
             try
             {
-                CGroupsSettingPathMappingItem route = getNexus().readGroupsSettingPathMapping( getRouteId( request ) );
+                CPathMappingItem route = getNexusConfiguration().readGroupsSettingPathMapping( getRouteId( request ) );
 
                 if ( route == null )
                 {
@@ -169,7 +170,7 @@ public class RepositoryRoutePlexusResource
 
                 route.setGroupId( resource.getGroupId() );
 
-                route.setRoutePattern( resource.getPattern() );
+                route.addRoutePattern( resource.getPattern() );
 
                 route.setRouteType( resource2configType( resource.getRuleType() ) );
 
@@ -183,7 +184,7 @@ public class RepositoryRoutePlexusResource
 
                 route.setRepositories( repositories );
 
-                getNexus().updateGroupsSettingPathMapping( route );
+                getNexusConfiguration().updateGroupsSettingPathMapping( route );
 
                 response.setStatus( Status.SUCCESS_NO_CONTENT );
             }
@@ -227,14 +228,14 @@ public class RepositoryRoutePlexusResource
     {
         try
         {
-            CGroupsSettingPathMappingItem route = getNexus().readGroupsSettingPathMapping( getRouteId( request ) );
+            CPathMappingItem route = getNexusConfiguration().readGroupsSettingPathMapping( getRouteId( request ) );
 
             if ( route == null )
             {
                 throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Route not found!" );
             }
 
-            getNexus().deleteGroupsSettingPathMapping( getRouteId( request ) );
+            getNexusConfiguration().deleteGroupsSettingPathMapping( getRouteId( request ) );
 
             response.setStatus( Status.SUCCESS_NO_CONTENT );
         }

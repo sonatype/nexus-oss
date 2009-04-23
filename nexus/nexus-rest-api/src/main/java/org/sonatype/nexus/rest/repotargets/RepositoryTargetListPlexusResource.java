@@ -69,7 +69,7 @@ public class RepositoryTargetListPlexusResource
     {
         RepositoryTargetListResourceResponse result = new RepositoryTargetListResourceResponse();
 
-        Collection<CRepositoryTarget> targets = getNexus().listRepositoryTargets();
+        Collection<CRepositoryTarget> targets = getNexusConfiguration().listRepositoryTargets();
 
         RepositoryTargetListResource res = null;
 
@@ -109,7 +109,7 @@ public class RepositoryTargetListPlexusResource
                     CRepositoryTarget target = getRestToNexusResource( resource );
 
                     // create
-                    getNexus().createRepositoryTarget( target );
+                    getNexusConfiguration().createRepositoryTarget( target );
 
                     // response
                     resourceResponse = new RepositoryTargetResourceResponse();

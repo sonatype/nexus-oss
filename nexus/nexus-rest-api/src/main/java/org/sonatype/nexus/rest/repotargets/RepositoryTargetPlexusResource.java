@@ -74,7 +74,7 @@ public class RepositoryTargetPlexusResource
     {
         RepositoryTargetResourceResponse result = new RepositoryTargetResourceResponse();
 
-        CRepositoryTarget target = getNexus().readRepositoryTarget( this.getRepoTargetId( request ) );
+        CRepositoryTarget target = getNexusConfiguration().readRepositoryTarget( this.getRepoTargetId( request ) );
 
         if ( target != null )
         {
@@ -99,7 +99,7 @@ public class RepositoryTargetPlexusResource
         {
             RepositoryTargetResource resource = requestResource.getData();
 
-            CRepositoryTarget target = getNexus().readRepositoryTarget( this.getRepoTargetId( request ) );
+            CRepositoryTarget target = getNexusConfiguration().readRepositoryTarget( this.getRepoTargetId( request ) );
 
             if ( target != null )
             {
@@ -110,7 +110,7 @@ public class RepositoryTargetPlexusResource
                         target = getRestToNexusResource( resource );
 
                         // update
-                        getNexus().updateRepositoryTarget( target );
+                        getNexusConfiguration().updateRepositoryTarget( target );
 
                         // response
                         resultResource = new RepositoryTargetResourceResponse();
@@ -146,13 +146,13 @@ public class RepositoryTargetPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        CRepositoryTarget target = getNexus().readRepositoryTarget( getRepoTargetId( request ) );
+        CRepositoryTarget target = getNexusConfiguration().readRepositoryTarget( getRepoTargetId( request ) );
 
         if ( target != null )
         {
             try
             {
-                getNexus().deleteRepositoryTarget( getRepoTargetId( request ) );
+                getNexusConfiguration().deleteRepositoryTarget( getRepoTargetId( request ) );
             }
             catch ( IOException e )
             {

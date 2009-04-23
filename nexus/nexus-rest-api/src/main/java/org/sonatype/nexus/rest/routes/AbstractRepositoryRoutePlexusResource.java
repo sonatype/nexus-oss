@@ -19,7 +19,7 @@ import java.util.List;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
+import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
@@ -72,7 +72,7 @@ public abstract class AbstractRepositoryRoutePlexusResource
             {
                 member.setId( repoId );
 
-                member.setName( getNexus().getRepository( repoId ).getName() );
+                member.setName( getRepositoryRegistry().getRepository( repoId ).getName() );
 
                 member.setResourceURI( createChildReference( request, this, repoId ).toString() );
             }
@@ -87,15 +87,15 @@ public abstract class AbstractRepositoryRoutePlexusResource
     {
         if ( RepositoryRouteResource.INCLUSION_RULE_TYPE.equals( type ) )
         {
-            return CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE;
+            return CPathMappingItem.INCLUSION_RULE_TYPE;
         }
         else if ( RepositoryRouteResource.EXCLUSION_RULE_TYPE.equals( type ) )
         {
-            return CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE;
+            return CPathMappingItem.EXCLUSION_RULE_TYPE;
         }
         else if ( RepositoryRouteResource.BLOCKING_RULE_TYPE.equals( type ) )
         {
-            return CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE;
+            return CPathMappingItem.BLOCKING_RULE_TYPE;
         }
         else
         {
@@ -105,15 +105,15 @@ public abstract class AbstractRepositoryRoutePlexusResource
 
     protected String config2resourceType( String type )
     {
-        if ( CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE.equals( type ) )
+        if ( CPathMappingItem.INCLUSION_RULE_TYPE.equals( type ) )
         {
             return RepositoryRouteResource.INCLUSION_RULE_TYPE;
         }
-        else if ( CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE.equals( type ) )
+        else if ( CPathMappingItem.EXCLUSION_RULE_TYPE.equals( type ) )
         {
             return RepositoryRouteResource.EXCLUSION_RULE_TYPE;
         }
-        else if ( CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( type ) )
+        else if ( CPathMappingItem.BLOCKING_RULE_TYPE.equals( type ) )
         {
             return RepositoryRouteResource.BLOCKING_RULE_TYPE;
         }
