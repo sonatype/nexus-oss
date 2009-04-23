@@ -10,7 +10,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.configuration.source;
+package org.sonatype.security.model.source;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +19,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.configuration.ConfigurationException;
+import org.sonatype.security.model.ConfigurationException;
+import org.sonatype.security.model.source.SecurityConfigurationSource;
 
 /**
  * A special "static" configuration source, that always return a factory provided defaults for Security configuration. It

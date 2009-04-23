@@ -10,7 +10,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.configuration.upgrade;
+package org.sonatype.security.model.upgrade;
 
 import java.io.File;
 import java.io.FileReader;
@@ -26,8 +26,8 @@ import org.sonatype.security.legacy.model.v1_0_0.CRole;
 import org.sonatype.security.legacy.model.v1_0_0.CUser;
 import org.sonatype.security.legacy.model.v1_0_0.Configuration;
 import org.sonatype.security.legacy.model.v1_0_0.io.xpp3.SecurityLegacyConfigurationXpp3Reader;
-import org.sonatype.security.configuration.upgrade.ConfigurationIsCorruptedException;
-import org.sonatype.security.configuration.upgrade.UpgradeMessage;
+import org.sonatype.security.model.upgrade.ConfigurationIsCorruptedException;
+import org.sonatype.security.model.upgrade.UpgradeMessage;
 
 @Component( role = SecurityUpgrader.class, hint = "1.0.0" )
 public class Upgrade100to200

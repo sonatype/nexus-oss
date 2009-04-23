@@ -10,25 +10,23 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.configuration;
+package org.sonatype.security.model.upgrade;
+
+import java.io.File;
+import java.io.IOException;
+
 
 /**
- * Generic exception thrown when there is a problem with configuration.
+ * A marker interface for security upgraders.
  * 
  * @author cstamas
  */
-public class ConfigurationException
-    extends Exception
+public interface SecurityUpgrader
 {
-    private static final long serialVersionUID = 7521345563289806454L;
+    Object loadConfiguration( File file )
+    throws IOException,
+        ConfigurationIsCorruptedException;
 
-    public ConfigurationException( String msg, Throwable t )
-    {
-        super( msg, t );
-    }
-
-    public ConfigurationException( String msg )
-    {
-        super( msg );
-    }
+    void upgrade( UpgradeMessage message )
+    throws ConfigurationIsCorruptedException;
 }

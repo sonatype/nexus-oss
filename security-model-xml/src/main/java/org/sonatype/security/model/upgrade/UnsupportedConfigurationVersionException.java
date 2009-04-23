@@ -10,11 +10,11 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.configuration.upgrade;
+package org.sonatype.security.model.upgrade;
 
 import java.io.File;
 
-import org.sonatype.security.configuration.ConfigurationException;
+import org.sonatype.security.model.ConfigurationException;
 
 /**
  * Thrown when the configuration has model version but it is unknown to the security layer.

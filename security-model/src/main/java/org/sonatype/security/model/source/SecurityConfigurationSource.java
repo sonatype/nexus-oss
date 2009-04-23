@@ -10,12 +10,12 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.configuration.source;
+package org.sonatype.security.model.source;
 
 import java.io.IOException;
 
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.configuration.ConfigurationException;
+import org.sonatype.security.model.ConfigurationException;
 
 /**
  * The Interface ApplicationConfigurationSource, responsible to fetch security configuration by some means. It also stores one

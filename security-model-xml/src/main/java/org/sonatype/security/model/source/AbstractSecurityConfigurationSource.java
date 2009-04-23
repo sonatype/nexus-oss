@@ -10,7 +10,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.configuration.source;
+package org.sonatype.security.model.source;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +24,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
+import org.sonatype.security.model.source.AbstractConfigurationSource;
+import org.sonatype.security.model.source.SecurityConfigurationSource;
 
 /**
  * Abstract class that encapsulates Modello model loading and saving with interpolation.

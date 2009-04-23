@@ -10,7 +10,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.configuration.source;
+package org.sonatype.security.model.source;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,8 +23,9 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.configuration.ConfigurationException;
-import org.sonatype.security.configuration.upgrade.SecurityConfigurationUpgrader;
+import org.sonatype.security.model.ConfigurationException;
+import org.sonatype.security.model.source.SecurityConfigurationSource;
+import org.sonatype.security.model.upgrade.SecurityConfigurationUpgrader;
 
 /**
  * The default configuration source powered by Modello. It will try to load configuration, upgrade if needed and

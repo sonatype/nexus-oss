@@ -10,38 +10,25 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.configuration.upgrade;
+package org.sonatype.security.model;
 
 /**
- * An upgrade message used to hold the current version and the configuration itself. Since modello generated classes
- * differs from model version to model version, it is held as Object, and the needed converter will cast it to what it
- * needs.
+ * Generic exception thrown when there is a problem with configuration.
  * 
  * @author cstamas
  */
-public class UpgradeMessage
+public class ConfigurationException
+    extends Exception
 {
-    private String modelVersion;
+    private static final long serialVersionUID = 7521345563289806454L;
 
-    private Object configuration;
-
-    public String getModelVersion()
+    public ConfigurationException( String msg, Throwable t )
     {
-        return modelVersion;
+        super( msg, t );
     }
 
-    public void setModelVersion( String modelVersion )
+    public ConfigurationException( String msg )
     {
-        this.modelVersion = modelVersion;
-    }
-
-    public Object getConfiguration()
-    {
-        return configuration;
-    }
-
-    public void setConfiguration( Object configuration )
-    {
-        this.configuration = configuration;
+        super( msg );
     }
 }

@@ -10,14 +10,14 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.configuration.source;
+package org.sonatype.security.model.source;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.security.configuration.AbstractSecurityConfigTest;
-import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.security.model.AbstractSecurityConfigTest;
+import org.sonatype.security.model.source.SecurityConfigurationSource;
 
 public abstract class AbstractSecurityConfigurationSourceTest
     extends AbstractSecurityConfigTest
