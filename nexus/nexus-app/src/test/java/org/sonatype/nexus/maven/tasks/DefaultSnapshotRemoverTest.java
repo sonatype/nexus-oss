@@ -74,6 +74,8 @@ public class DefaultSnapshotRemoverTest
 
         repositoryRegistry.getRepository( "central" ).setLocalStatus( LocalStatus.OUT_OF_SERVICE );
 
+        nexusConfiguration.applyConfiguration();
+
         // ---------------------------------
         // make the jar should be deleted, while the pom should be kept
         long threeDayAgo = System.currentTimeMillis() - 3 * 86400000L;
@@ -104,6 +106,8 @@ public class DefaultSnapshotRemoverTest
 
         // XXX: the test stuff is published on sonatype, so put the real central out of service for test
         repositoryRegistry.getRepository( "central" ).setLocalStatus( LocalStatus.OUT_OF_SERVICE );
+        
+        nexusConfiguration.applyConfiguration();
 
         // and now setup the request
         // process the apacheSnapshots, leave min 1 snap, remove older than 0 day and delete them if release exists

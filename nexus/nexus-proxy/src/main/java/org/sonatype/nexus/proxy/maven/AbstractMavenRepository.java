@@ -159,6 +159,21 @@ public abstract class AbstractMavenRepository
             "Recreating Maven2 metadata in repository ID='" + getId() + "' from path='" + request.getRequestPath()
                 + "'" );
 
+        return doRecreateMavenMetadata( request );
+    }
+    
+    protected boolean doRecreateMavenMetadata( ResourceStoreRequest request )
+    {
+        if ( !getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
+        {
+            return false;
+        }
+
+        if ( StringUtils.isEmpty( request.getRequestPath() ) )
+        {
+            request.setRequestPath( RepositoryItemUid.PATH_ROOT );
+        }
+
         RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
 
         DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
@@ -670,6 +685,6 @@ public abstract class AbstractMavenRepository
         super.deleteItem( fromTask, request );
 
         // finally rebuild metadata
-        recreateMavenMetadata( new ResourceStoreRequest( path, true ) );
+        doRecreateMavenMetadata( new ResourceStoreRequest( path, true ) );
     }
 }

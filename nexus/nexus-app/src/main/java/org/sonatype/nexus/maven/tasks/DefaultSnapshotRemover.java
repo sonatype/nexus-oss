@@ -485,9 +485,16 @@ public class DefaultSnapshotRemover
 
                                 deletedFiles++;
                             }
+                            catch ( ItemNotFoundException e )
+                            {
+                                if ( getLogger().isDebugEnabled() )
+                                {
+                                    getLogger().debug( "Could not delete file:", e );
+                                }
+                            }
                             catch ( Exception e )
                             {
-                                getLogger().warn( "Could not delete file:", e );
+                                getLogger().info( "Could not delete file:", e );
                             }
                         }
                     }
