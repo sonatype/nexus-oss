@@ -1,5 +1,5 @@
-<model xsd.namespace="http://www.sonatype.com/xsd/security-configuration-2.0.2"
-    xsd.target-namespace="http://www.sonatype.com/xsd/security-configuration-2.0.2">
+<model xsd.namespace="http://www.sonatype.com/xsd/security-model-2.0.2"
+    xsd.target-namespace="http://www.sonatype.com/xsd/security-model-2.0.2">
 
     <id>security</id>
 

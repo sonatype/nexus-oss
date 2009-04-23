@@ -9,11 +9,12 @@
   <modules>
   	<module>security-parent</module>
   	<module>security-model</module>
-    <module>security-model-xml</module>
+  	<module>security-model-xml</module>
   	<module>security-manager</module>
   	<module>security-rest-api</module>
   	<module>security-realms</module>
   	<module>security-system</module>
+  	<module>security-configuration</module>
   </modules>
   
   <distributionManagement>

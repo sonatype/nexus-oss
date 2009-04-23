@@ -1,0 +1,91 @@
+<model xsd.namespace="http://www.sonatype.com/xsd/security-configuration-2.0.3"
+    xsd.target-namespace="http://www.sonatype.com/xsd/security-configuration-2.0.3">
+
+  <id>security</id>
+
+  <name>SecurityConfiguration</name>
+
+  <description>
+      <![CDATA[
+      <p>XML Based Security Configuration.</p>
+      ]]>
+  </description>
+
+  <defaults>
+      <default>
+          <key>package</key>
+          <value>org.sonatype.security.configuration.model</value>
+      </default>
+  </defaults>
+
+  <classes>
+
+    <class rootElement="true" xml.tagName="security-configuration">
+      <name>SecurityConfiguration</name>
+      <version>2.0.3+</version>
+      <description>The security configuration.</description>
+      <fields>
+        <field>
+          <name>version</name>
+          <version>2.0.3+</version>
+          <type>String</type>
+          <description>The version of the model.</description>
+          <required>true</required>
+        </field>
+        <field>
+          <name>enabled</name>
+          <version>2.0.3+</version>
+          <type>boolean</type>
+          <description>The only mandatory element. If true, the application instance will be secured.</description>
+          <required>true</required>
+        </field>
+        <field>
+          <name>anonymousAccessEnabled</name>
+          <version>2.0.3+</version>
+          <type>boolean</type>
+          <description>
+            If enabled, the users will be able to access DAV resources unauthenticated, if Realm allows. To
+            set rights for unauthenticated users, use "anonymous" username.</description>
+          <required>true</required>
+        </field>
+        <field>
+          <name>anonymousUsername</name>
+          <version>2.0.3+</version>
+          <type>String</type>
+          <description>
+            The username used to log in as anonymous user. The account should be enabled and existing according to
+            the used JSecurity realm!</description>
+          <required>true</required>
+        </field>
+        <field>
+          <name>anonymousPassword</name>
+          <version>2.0.3+</version>
+          <type>String</type>
+          <description>
+            The username used to log in as anonymous user. The account should be enabled and existing according to
+            the used JSecurity realm!</description>
+          <required>true</required>
+        </field>
+        <field>
+          <name>realms</name>
+          <version>2.0.3+</version>
+          <description>The list of JSecurity realms used in the application.</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+            <version>2.0.3</version>
+            <code><![CDATA[
+    public static final String MODEL_VERSION = "2.0.3";
+]]></code>
+        </codeSegment>
+    </codeSegments>
+    </class>
+    
+    </classes>
+</model>

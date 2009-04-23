@@ -36,6 +36,12 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
+    <!-- other security modules -->
+    <dependency>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
