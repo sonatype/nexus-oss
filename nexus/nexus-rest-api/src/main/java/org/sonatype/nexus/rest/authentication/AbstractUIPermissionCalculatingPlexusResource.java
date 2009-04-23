@@ -15,7 +15,6 @@ package org.sonatype.nexus.rest.authentication;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,7 +24,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.permission.WildcardPermission;
-import org.jsecurity.crypto.hash.Hash;
 import org.jsecurity.subject.Subject;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
@@ -65,12 +63,12 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
 
         Subject subject = SecurityUtils.getSubject();
 
-        if ( getNexus().isSecurityEnabled() )
+        if ( getNexusConfiguration().isSecurityEnabled() )
         {
-            if ( getNexus().isAnonymousAccessEnabled() )
+            if ( getNexusConfiguration().isAnonymousAccessEnabled() )
             {
                 // we must decide is the user logged in the anon user and we must tell "false" if it is
-                if ( getNexus().getAnonymousUsername().equals( subject.getPrincipal() ) )
+                if ( getNexusConfiguration().getAnonymousUsername().equals( subject.getPrincipal() ) )
                 {
                     perms.setLoggedIn( false );
                 }
@@ -207,7 +205,7 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
         else
         {// subject is null
             // we should not have got here if security is not enabled.
-            int value = getNexus().isSecurityEnabled() ? NONE : ALL;
+            int value = getNexusConfiguration().isSecurityEnabled() ? NONE : ALL;
             for ( Entry<String, Integer> priv : privilegeMap.entrySet() )
             {
                 priv.setValue( value );

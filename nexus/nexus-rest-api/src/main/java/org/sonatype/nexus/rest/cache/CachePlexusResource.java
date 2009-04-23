@@ -65,7 +65,7 @@ public class CachePlexusResource
             // check reposes
             if ( getRepositoryGroupId( request ) != null )
             {
-                for ( Repository repository : getNexus().getRepositoryWithFacet(
+                for ( Repository repository : getRepositoryRegistry().getRepositoryWithFacet(
                     getRepositoryGroupId( request ),
                     GroupRepository.class ).getMemberRepositories() )
                 {
@@ -80,7 +80,7 @@ public class CachePlexusResource
             }
             else if ( getRepositoryId( request ) != null )
             {
-                Repository repository = getNexus().getRepository( getRepositoryId( request ) );
+                Repository repository = getRepositoryRegistry().getRepository( getRepositoryId( request ) );
 
                 NFCRepositoryResource repoNfc = new NFCRepositoryResource();
 
@@ -107,7 +107,7 @@ public class CachePlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        ClearCacheTask task = getNexus().createTaskInstance( ClearCacheTask.class );
+        ClearCacheTask task = getNexusScheduler().createTaskInstance( ClearCacheTask.class );
 
         task.setRepositoryId( getRepositoryId( request ) );
 

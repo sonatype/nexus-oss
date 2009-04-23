@@ -16,15 +16,18 @@ package org.sonatype.nexus.rest.wastebasket;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -39,6 +42,12 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class WastebasketPlexusResource
     extends AbstractNexusPlexusResource
 {
+    @Requirement
+    private Wastebasket wastebasket;
+    
+    @Requirement
+    private NexusScheduler nexusScheduler;
+    
     @Override
     public Object getPayloadInstance()
     {
@@ -67,9 +76,9 @@ public class WastebasketPlexusResource
 
             WastebasketResource resource = new WastebasketResource();
 
-            resource.setItemCount( getNexus().getWastebasketItemCount() );
+            resource.setItemCount( wastebasket.getItemCount() );
 
-            resource.setSize( getNexus().getWastebasketSize() );
+            resource.setSize( wastebasket.getSize() );
 
             result.setData( resource );
 
@@ -86,9 +95,9 @@ public class WastebasketPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        EmptyTrashTask task = getNexus().createTaskInstance( EmptyTrashTask.class );
+        EmptyTrashTask task = nexusScheduler.createTaskInstance( EmptyTrashTask.class );
 
-        getNexus().submit( "Internal", task );
+        nexusScheduler.submit( "Internal", task );
 
         response.setStatus( Status.SUCCESS_NO_CONTENT );
     }

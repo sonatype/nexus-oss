@@ -31,6 +31,7 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
@@ -41,6 +42,7 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
@@ -57,6 +59,12 @@ public abstract class AbstractNexusPlexusResource
 
     @Requirement
     private Nexus nexus;
+    
+    @Requirement
+    private NexusConfiguration nexusConfiguration;
+    
+    @Requirement
+    private RepositoryRegistry repositoryRegistry;
 
     @Requirement
     private NexusItemAuthorizer nexusItemAuthorizer;
@@ -64,6 +72,16 @@ public abstract class AbstractNexusPlexusResource
     protected Nexus getNexus()
     {
         return nexus;
+    }
+    
+    protected NexusConfiguration getNexusConfiguration()
+    {
+        return nexusConfiguration;
+    }
+    
+    protected RepositoryRegistry getRepositoryRegistry()
+    {
+        return repositoryRegistry;
     }
 
     /**
@@ -88,9 +106,9 @@ public abstract class AbstractNexusPlexusResource
     {
         Reference result = null;
 
-        if ( getNexus().isForceBaseUrl() && getNexus().getBaseUrl() != null )
+        if ( getNexusConfiguration().isForceBaseUrl() && getNexus().getNexusConfiguration() != null )
         {
-            result = new Reference( getNexus().getBaseUrl() );
+            result = new Reference( getNexusConfiguration().getBaseUrl() );
         }
         else
         {
@@ -331,7 +349,7 @@ public abstract class AbstractNexusPlexusResource
 
         try
         {
-            Repository repository = nexus.getRepository( ai.repository );
+            Repository repository = getRepositoryRegistry().getRepository( ai.repository );
 
             if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {

@@ -15,6 +15,7 @@ package org.sonatype.nexus.rest.restore;
 
 import java.util.concurrent.RejectedExecutionException;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
@@ -22,13 +23,14 @@ import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.scheduling.NexusTask;
 
 public abstract class AbstractRestorePlexusResource
     extends AbstractNexusPlexusResource
 {
-
     public static final String DOMAIN = "domain";
 
     public static final String DOMAIN_REPOSITORIES = "repositories";
@@ -37,9 +39,17 @@ public abstract class AbstractRestorePlexusResource
 
     public static final String TARGET_ID = "target";
 
+    @Requirement
+    private NexusScheduler nexusScheduler;
+
     public AbstractRestorePlexusResource()
     {
         this.setModifiable( true );
+    }
+
+    protected NexusScheduler getNexusScheduler()
+    {
+        return nexusScheduler;
     }
 
     protected String getRepositoryId( Request request )
@@ -55,7 +65,7 @@ public abstract class AbstractRestorePlexusResource
             try
             {
                 // simply to throw NoSuchRepository exception
-                getNexus().getRepositoryWithFacet( repoId, Repository.class );
+                getRepositoryRegistry().getRepositoryWithFacet( repoId, Repository.class );
             }
             catch ( NoSuchRepositoryException e )
             {
@@ -79,7 +89,7 @@ public abstract class AbstractRestorePlexusResource
             try
             {
                 // simply to throw NoSuchRepository exception
-                getNexus().getRepositoryWithFacet( groupId, GroupRepository.class );
+                getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
             }
             catch ( NoSuchRepositoryException e )
             {
@@ -127,21 +137,21 @@ public abstract class AbstractRestorePlexusResource
             // check reposes
             if ( getRepositoryGroupId( request ) != null )
             {
-                getNexus().readRepositoryGroup( getRepositoryGroupId( request ) );
+                getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId( request ), GroupRepository.class );
             }
             else if ( getRepositoryId( request ) != null )
             {
                 try
                 {
-                    getNexus().readRepository( getRepositoryId( request ) );
+                    getRepositoryRegistry().getRepository( getRepositoryId( request ) );
                 }
                 catch ( NoSuchRepositoryException e )
                 {
-                    getNexus().readRepositoryShadow( getRepositoryId( request ) );
+                    getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId( request ), ShadowRepository.class );
                 }
             }
 
-            getNexus().submit( "Internal", task );
+            getNexusScheduler().submit( "Internal", task );
 
             throw new ResourceException( Status.SUCCESS_NO_CONTENT );
         }

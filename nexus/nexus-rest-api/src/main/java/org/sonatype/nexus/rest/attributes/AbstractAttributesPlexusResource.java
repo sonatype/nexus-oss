@@ -23,7 +23,6 @@ import org.sonatype.nexus.tasks.RebuildAttributesTask;
 public abstract class AbstractAttributesPlexusResource
     extends AbstractRestorePlexusResource
 {
-
     @Override
     public Object getPayloadInstance()
     {
@@ -34,7 +33,7 @@ public abstract class AbstractAttributesPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        RebuildAttributesTask task = getNexus().createTaskInstance( RebuildAttributesTask.class );
+        RebuildAttributesTask task = getNexusScheduler().createTaskInstance( RebuildAttributesTask.class );
 
         task.setRepositoryId( getRepositoryId( request ) );
 

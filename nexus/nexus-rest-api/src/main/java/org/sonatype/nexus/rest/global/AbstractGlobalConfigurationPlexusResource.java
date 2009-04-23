@@ -46,7 +46,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         
         SmtpSettings result = new SmtpSettings();
         
-        result.setHost( settings.getHost() );
+        result.setHost( settings.getHostname() );
         
         result.setPassword( settings.getPassword() );
         
