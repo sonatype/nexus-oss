@@ -102,42 +102,30 @@ package org.sonatype.security.web;
  */
 
 import java.util.Collection;
-import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.LogEnabled;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.jsecurity.authc.AccountException;
-import org.jsecurity.authc.AuthenticationException;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.pam.FirstSuccessfulAuthenticationStrategy;
 import org.jsecurity.authc.pam.ModularRealmAuthenticator;
-import org.jsecurity.authz.AuthorizationException;
-import org.jsecurity.authz.ModularRealmAuthorizer;
-import org.jsecurity.authz.Permission;
 import org.jsecurity.cache.CacheManager;
 import org.jsecurity.cache.ehcache.EhCacheManager;
 import org.jsecurity.realm.Realm;
-import org.jsecurity.subject.PrincipalCollection;
 import org.jsecurity.web.DefaultWebSecurityManager;
 import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 import org.sonatype.security.PlexusSecurity;
+import org.sonatype.security.authz.ExceptionCatchingModularRealmAuthorizer;
 import org.sonatype.security.locators.RememberMeLocator;
-import org.sonatype.security.selectors.RealmCriteria;
 import org.sonatype.security.selectors.RealmSelector;
 
 /**
- * Currently only supports a single child realm. Plan on implementing mulitiple child realms and a seperation of
- * authentication/authorization realms
+ * An extention of the DefaultWebSecurityManager that is configured via plexus.
  */
 @Component( role = PlexusSecurity.class, hint = "web" )
 public class WebPlexusSecurity
     extends DefaultWebSecurityManager
-    implements PlexusSecurity, Initializable, Realm
+    implements PlexusSecurity, Initializable
 {
     @Requirement
     private RememberMeLocator rememberMeLocator;
@@ -145,77 +133,16 @@ public class WebPlexusSecurity
     @Requirement
     private RealmSelector realmSelector;
 
-    @Requirement
-    private Logger logger;
-    
     @Requirement 
     private PlexusEhCacheWrapper cacheWrapper;
-
-    public Realm selectRealm( RealmCriteria criteria )
-    {
-        return realmSelector.selectRealm( criteria );
-    }
-
-    public Realm selectRealm( String realmName )
-    {
-        RealmCriteria criteria = new RealmCriteria();
-        criteria.setName( realmName );
-
-        return selectRealm( criteria );
-    }
-
-    public Realm selectRealm()
-    {
-        return selectRealm( new RealmCriteria() );
-    }
-
+    
     // JSecurity Realm Implementation
 
     public String getName()
     {
         return WebPlexusSecurity.class.getName();
     }
-
-    // Authentication
-
-    // Authentication
-
-    public AuthenticationInfo getAuthenticationInfo( AuthenticationToken token )
-        throws AuthenticationException
-    {
-
-        for ( Realm realm : realmSelector.selectAllRealms() )
-        {
-            try
-            {
-                AuthenticationInfo ai = realm.getAuthenticationInfo( token );
-
-                if ( ai != null )
-                {
-                    return ai;
-                }
-            }
-            catch ( AuthenticationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
-        }
-
-        throw new AuthenticationException( "User: '"+ token.getPrincipal() + "' could not be authenticated." );
-    }
-
-    public boolean supports( AuthenticationToken token )
-    {
-        for ( Realm realm : realmSelector.selectAllRealms() )
-        {
-            if ( realm.supports( token ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
+  
     /*
      * (non-Javadoc)
      * 
@@ -224,266 +151,8 @@ public class WebPlexusSecurity
     @Override
     public Collection<Realm> getRealms()
     {
+        // FIXME: we need to make this more robust to support when the realms change
         return realmSelector.selectAllRealms();
-    }
-
-    // Authorization
-
-    public void checkPermission( PrincipalCollection subjectPrincipal, String permission )
-        throws AuthorizationException
-    {
-        for ( Realm realm : realmSelector.selectAllRealms() )
-        {
-            try
-            {
-                realm.checkPermission( subjectPrincipal, permission );
-            }
-            catch ( AuthorizationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
-        }
-    }
-
-    public void checkPermission( PrincipalCollection subjectPrincipal, Permission permission )
-        throws AuthorizationException
-    {
-        for ( Realm realm : realmSelector.selectAllRealms() )
-        {
-            try
-            {
-                realm.checkPermission( subjectPrincipal, permission );
-            }
-            catch ( AuthorizationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
-        }
-    }
-
-    public void checkPermissions( PrincipalCollection subjectPrincipal, String... permissions )
-        throws AuthorizationException
-    {
-        for ( String permission : permissions )
-        {
-            checkPermission( subjectPrincipal, permission );
-        }
-    }
-
-    public void checkPermissions( PrincipalCollection subjectPrincipal, Collection<Permission> permissions )
-        throws AuthorizationException
-    {
-        for ( Permission permission : permissions )
-        {
-            checkPermission( subjectPrincipal, permission );
-        }
-    }
-
-    public void checkRole( PrincipalCollection subjectPrincipal, String roleIdentifier )
-        throws AuthorizationException
-    {
-        for ( Realm realm : realmSelector.selectAllRealms() )
-        {
-            try
-            {
-                realm.checkRole( subjectPrincipal, roleIdentifier );
-            }
-            catch ( AuthorizationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
-        }
-    }
-
-    public void checkRoles( PrincipalCollection subjectPrincipal, Collection<String> roleIdentifiers )
-        throws AuthorizationException
-    {
-        for ( String roleIdentifier : roleIdentifiers )
-        {
-            checkRole( subjectPrincipal, roleIdentifier );
-        }
-    }
-
-    public boolean hasAllRoles( PrincipalCollection subjectPrincipal, Collection<String> roleIdentifiers )
-    {
-        for ( String roleIdentifier : roleIdentifiers )
-        {
-            if ( !hasRole( subjectPrincipal, roleIdentifier ) )
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public boolean hasRole( PrincipalCollection subjectPrincipal, String roleIdentifier )
-    {
-        for ( Realm realm : realmSelector.selectAllRealms() )
-        {
-
-            // need to catch an AuthorizationException, the user might only belong to on of the realms
-            try
-            {
-                if ( realm.hasRole( subjectPrincipal, roleIdentifier ) )
-                {
-                    return true;
-                }
-            }
-            catch ( AuthorizationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
-        }
-
-        return false;
-    }
-
-    public boolean[] hasRoles( PrincipalCollection subjectPrincipal, List<String> roleIdentifiers )
-    {
-        boolean[] combinedResult = new boolean[roleIdentifiers.size()];
-
-        for ( Realm realm : realmSelector.selectAllRealms() )
-        {
-            try
-            {
-                boolean[] result = realm.hasRoles( subjectPrincipal, roleIdentifiers );
-
-                for ( int i = 0; i < combinedResult.length; i++ )
-                {
-                    combinedResult[i] = combinedResult[i] | result[i];
-                }
-
-            }
-            catch ( AuthorizationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
-        }
-
-        return combinedResult;
-    }
-
-    public boolean isPermitted( PrincipalCollection subjectPrincipal, String permission )
-    {
-        for ( Realm realm : realmSelector.selectAllRealms() )
-        {
-            try
-            {
-                if ( realm.isPermitted( subjectPrincipal, permission ) )
-                {
-                    return true;
-                }
-
-            }
-            catch ( AuthorizationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
-        }
-
-        return false;
-    }
-
-    public boolean isPermitted( PrincipalCollection subjectPrincipal, Permission permission )
-    {
-        for ( Realm realm : realmSelector.selectAllRealms() )
-        {
-            try
-            {
-                if ( realm.isPermitted( subjectPrincipal, permission ) )
-                {
-                    return true;
-                }
-            }
-            catch ( AuthorizationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
-        }
-
-        return false;
-    }
-
-    public boolean[] isPermitted( PrincipalCollection subjectPrincipal, String... permissions )
-    {
-        boolean[] combinedResult = new boolean[permissions.length];
-
-        for ( Realm realm : realmSelector.selectAllRealms() )
-        {
-            try
-            {
-                boolean[] result = realm.isPermitted( subjectPrincipal, permissions );
-
-                for ( int i = 0; i < combinedResult.length; i++ )
-                {
-                    combinedResult[i] = combinedResult[i] | result[i];
-                }
-            }
-            catch ( AuthorizationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
-        }
-
-        return combinedResult;
-    }
-
-    public boolean[] isPermitted( PrincipalCollection subjectPrincipal, List<Permission> permissions )
-    {
-        boolean[] combinedResult = new boolean[permissions.size()];
-
-        for ( Realm realm : realmSelector.selectAllRealms() )
-        {
-            try
-            {
-                boolean[] result = realm.isPermitted( subjectPrincipal, permissions );
-
-                for ( int i = 0; i < combinedResult.length; i++ )
-                {
-                    combinedResult[i] = combinedResult[i] | result[i];
-                }
-            }
-            catch ( AuthorizationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
-        }
-
-        return combinedResult;
-    }
-
-    public boolean isPermittedAll( PrincipalCollection subjectPrincipal, String... permissions )
-    {
-        for ( String permission : permissions )
-        {
-            if ( !isPermitted( subjectPrincipal, permission ) )
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public boolean isPermittedAll( PrincipalCollection subjectPrincipal, Collection<Permission> permissions )
-    {
-        for ( Permission permission : permissions )
-        {
-            if ( !isPermitted( subjectPrincipal, permission ) )
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    protected void afterCacheManagerSet()
-    {
-        // do nothing here, stack overflow
-        super.afterCacheManagerSet();
     }
     
     @Override
@@ -498,16 +167,20 @@ public class WebPlexusSecurity
     public void initialize()
         throws InitializationException
     {
-        // // set the realm authenticator, that will automatically deligate the authentication to all the realms.
-        // ModularRealmAuthenticator realmAuthenticator = new ModularRealmAuthenticator();
-        // realmAuthenticator.setModularAuthenticationStrategy( new FirstSuccessfulAuthenticationStrategy() );
-        //        
-        // // realmAuthorizer.
-        // this.setAuthenticator( realmAuthenticator );
-        //        
-        // this.setRealms( this.getRealms() );
+         // set the realm authenticator, that will automatically deligate the authentication to all the realms.
+         ModularRealmAuthenticator realmAuthenticator = new ModularRealmAuthenticator();
+         realmAuthenticator.setModularAuthenticationStrategy( new FirstSuccessfulAuthenticationStrategy() );
+                
+         // Authenticator
+         this.setAuthenticator( realmAuthenticator );
+                
+         // FIXME: this is not updated when the realms change!!!
+         this.setRealms( this.getRealms() );
         
-        this.setRealm( this );
+//        this.setRealm( this );
+         
+         // Authorizer
+         this.setAuthorizer( new ExceptionCatchingModularRealmAuthorizer( this.getRealms() ) );
 
         setRememberMeManager( rememberMeLocator.getRememberMeManager() );
 
@@ -517,12 +190,5 @@ public class WebPlexusSecurity
         ehCacheManager.setCacheManager( this.cacheWrapper.getEhCacheManager() );
         this.setCacheManager( ehCacheManager );
         
-        
-    }
-
-    public void enableLogging( Logger logger )
-    {
-        this.logger = logger;
-
     }
 }
