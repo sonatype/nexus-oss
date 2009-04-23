@@ -28,7 +28,7 @@
         </dependency>
         <dependency>
            <groupId>org.sonatype.security</groupId>
-            <artifactId>security-model</artifactId>
+            <artifactId>security-model-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
