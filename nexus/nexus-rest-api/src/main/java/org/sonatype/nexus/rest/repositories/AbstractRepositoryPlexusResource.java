@@ -28,8 +28,6 @@ import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -81,9 +79,9 @@ public abstract class AbstractRepositoryPlexusResource
         return request.getAttributes().get( REPOSITORY_ID_KEY ).toString();
     }
 
-    protected String getRepoFormat( Class<?> role, String type )
+    protected String getRepoFormat( String role, String hint )
     {
-        ContentClass cc = repositoryTypeRegistry.getRepositoryContentClass( role.getName(), type );
+        ContentClass cc = repositoryTypeRegistry.getRepositoryContentClass( role, hint );
 
         if ( cc != null )
         {

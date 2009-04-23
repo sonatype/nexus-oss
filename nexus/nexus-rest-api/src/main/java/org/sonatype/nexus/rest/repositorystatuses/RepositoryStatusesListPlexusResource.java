@@ -22,9 +22,8 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.RepositoryStatusListResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
@@ -63,9 +62,9 @@ public class RepositoryStatusesListPlexusResource
 
         RepositoryStatusListResource repoRes;
 
-        Collection<CRepository> repositories = getNexus().listRepositories();
+        Collection<Repository> repositories = getRepositoryRegistry().getRepositories();
 
-        for ( CRepository repository : repositories )
+        for ( Repository repository : repositories )
         {
             repoRes = new RepositoryStatusListResource();
 
@@ -79,41 +78,22 @@ public class RepositoryStatusesListPlexusResource
 
             repoRes.setRepoPolicy( getRestRepoPolicy( repository ) );
 
-            repoRes.setFormat( getRepoFormat( Repository.class, repository.getType() ) );
+            repoRes.setFormat( getRepoFormat(
+                                              ( (CRepository) repository.getCurrentCoreConfiguration().getConfiguration(
+                                                                                                                         false ) ).getProviderRole(),
+                                              ( (CRepository) repository.getCurrentCoreConfiguration().getConfiguration(
+                                                                                                                         false ) ).getProviderHint() ) );
 
             repoRes.setStatus( new RepositoryStatusResource() );
 
             repoRes.getStatus().setLocalStatus( getRestRepoLocalStatus( repository ) );
 
-            if ( REPO_TYPE_PROXIED.equals( getRestRepoType( repository ) ) )
+            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
                 repoRes.getStatus().setRemoteStatus( getRestRepoRemoteStatus( repository, request, response ) );
 
                 repoRes.getStatus().setProxyMode( getRestRepoProxyMode( repository ) );
             }
-
-            result.addData( repoRes );
-        }
-
-        Collection<CRepositoryShadow> shadows = getNexus().listRepositoryShadows();
-
-        for ( CRepositoryShadow shadow : shadows )
-        {
-            repoRes = new RepositoryStatusListResource();
-
-            repoRes.setResourceURI( createChildReference( request, this, shadow.getId() ).toString() );
-
-            repoRes.setId( shadow.getId() );
-
-            repoRes.setName( shadow.getName() );
-
-            repoRes.setRepoType( getRestRepoType( shadow ) );
-
-            repoRes.setFormat( getRepoFormat( ShadowRepository.class, shadow.getType() ) );
-
-            repoRes.setStatus( new RepositoryStatusResource() );
-
-            repoRes.getStatus().setLocalStatus( getRestRepoLocalStatus( shadow ) );
 
             result.addData( repoRes );
         }
