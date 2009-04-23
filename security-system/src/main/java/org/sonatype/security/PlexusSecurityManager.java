@@ -2,15 +2,14 @@ package org.sonatype.security;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.jsecurity.JSecurityException;
 import org.jsecurity.authc.pam.FirstSuccessfulAuthenticationStrategy;
 import org.jsecurity.authc.pam.ModularRealmAuthenticator;
 import org.jsecurity.cache.CacheManager;
 import org.jsecurity.cache.ehcache.EhCacheManager;
 import org.jsecurity.mgt.DefaultSecurityManager;
 import org.jsecurity.mgt.RealmSecurityManager;
-import org.jsecurity.util.Initializable;
 import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
@@ -67,7 +66,7 @@ public class PlexusSecurityManager extends DefaultSecurityManager implements Ini
          this.setAuthenticator( realmAuthenticator );
                 
          // FIXME: this is not updated when the realms change!!!
-         this.setRealms( this.getRealms() );
+//         this.setRealms( this.getRealms() );
         
 //        this.setRealm( this );
          
@@ -82,13 +81,5 @@ public class PlexusSecurityManager extends DefaultSecurityManager implements Ini
         ehCacheManager.setCacheManager( this.cacheWrapper.getEhCacheManager() );
         this.setCacheManager( ehCacheManager );
         
-    }
-
-    public void init()
-        throws JSecurityException
-    {
-        // TODO Auto-generated method stub
-        
-    }
-    
+    }    
 }
