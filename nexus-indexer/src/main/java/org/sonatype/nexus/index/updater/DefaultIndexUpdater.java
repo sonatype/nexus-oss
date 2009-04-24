@@ -99,11 +99,6 @@ public class DefaultIndexUpdater
                 Properties properties = downloadIndexProperties( context, fetcher );
 
                 Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
-
-                if ( updateTimestamp != null && !updateTimestamp.after( contextTimestamp ) )
-                {
-                    return null; // index is up to date
-                }
                 
                 List<String> filenames = incrementalHandler.loadRemoteIncrementalUpdates( updateRequest, localProperties, properties );
                 
@@ -116,6 +111,13 @@ public class DefaultIndexUpdater
                     }
                     
                     return updateTimestamp;
+                }
+                
+                // if incremental cant be done for whatever reason, simply use old logic of 
+                // checking the timestamp, if the same, nothing to do
+                if ( updateTimestamp != null && !updateTimestamp.after( contextTimestamp ) )
+                {
+                    return null; // index is up to date
                 }
             }
 
