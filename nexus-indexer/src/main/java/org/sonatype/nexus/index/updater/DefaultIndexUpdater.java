@@ -73,9 +73,12 @@ public class DefaultIndexUpdater
     {
         ResourceFetcher fetcher = updateRequest.getResourceFetcher();
         
+        // If no resource fetcher passed in, use the wagon fetcher by default
+        // and put back in request for future use
         if ( fetcher == null )
         {
             fetcher = new WagonFetcher( wagonManager, updateRequest.getTransferListener(), updateRequest.getProxyInfo() );
+            updateRequest.setResourceFetcher( fetcher );
         }
 
         IndexingContext context = updateRequest.getIndexingContext();
