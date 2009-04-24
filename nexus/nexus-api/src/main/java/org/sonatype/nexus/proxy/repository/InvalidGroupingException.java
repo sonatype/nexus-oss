@@ -11,7 +11,10 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.registry;
+package org.sonatype.nexus.proxy.repository;
+
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
  * Thrown when invalid grouping is tried: for example grouping of repositories without same content class.
@@ -19,7 +22,7 @@ package org.sonatype.nexus.proxy.registry;
  * @author cstamas
  */
 public class InvalidGroupingException
-    extends Exception
+    extends ConfigurationException
 {
     private static final long serialVersionUID = -738329028288324297L;
 

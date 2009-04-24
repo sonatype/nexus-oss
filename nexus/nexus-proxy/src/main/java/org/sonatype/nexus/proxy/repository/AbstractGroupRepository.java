@@ -71,8 +71,7 @@ public abstract class AbstractGroupRepository
 
     @Override
     protected Collection<StorageItem> doListItems( ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            StorageException
+        throws ItemNotFoundException, StorageException
     {
         HashSet<String> names = new HashSet<String>();
         ArrayList<StorageItem> result = new ArrayList<StorageItem>();
@@ -115,14 +114,13 @@ public abstract class AbstractGroupRepository
             {
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger()
-                        .debug(
-                            "A repository CYCLE detected (doListItems()), while processing group ID='"
-                                + this.getId()
-                                + "'. The repository with ID='"
-                                + repo.getId()
-                                + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                + request.toString() );
+                    getLogger().debug(
+                                       "A repository CYCLE detected (doListItems()), while processing group ID='"
+                                           + this.getId()
+                                           + "'. The repository with ID='"
+                                           + repo.getId()
+                                           + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                           + request.toString() );
                 }
             }
         }
@@ -136,7 +134,7 @@ public abstract class AbstractGroupRepository
     }
 
     private static void addItems( HashSet<String> names, ArrayList<StorageItem> result,
-        Collection<StorageItem> listItems )
+                                  Collection<StorageItem> listItems )
     {
         for ( StorageItem item : listItems )
         {
@@ -149,9 +147,7 @@ public abstract class AbstractGroupRepository
 
     @Override
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         try
         {
@@ -193,14 +189,13 @@ public abstract class AbstractGroupRepository
             }
             else
             {
-                getLogger()
-                    .info(
-                        "A repository CYCLE detected (doRetrieveItem()), while processing group ID='"
-                            + this.getId()
-                            + "'. The repository with ID='"
-                            + repo.getId()
-                            + "' was already processed during this request! This repository is skipped from processing. Request: "
-                            + request.toString() );
+                getLogger().info(
+                                  "A repository CYCLE detected (doRetrieveItem()), while processing group ID='"
+                                      + this.getId()
+                                      + "'. The repository with ID='"
+                                      + repo.getId()
+                                      + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                      + request.toString() );
             }
         }
 
@@ -213,6 +208,7 @@ public abstract class AbstractGroupRepository
     }
 
     public void setMemberRepositoryIds( List<String> repositories )
+        throws InvalidGroupingException
     {
         getExternalConfiguration().setMemberRepositoryIds( repositories );
     }
@@ -290,14 +286,13 @@ public abstract class AbstractGroupRepository
             {
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger()
-                        .debug(
-                            "A repository CYCLE detected (doRetrieveItems()), while processing group ID='"
-                                + this.getId()
-                                + "'. The repository with ID='"
-                                + repository.getId()
-                                + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                + request.toString() );
+                    getLogger().debug(
+                                       "A repository CYCLE detected (doRetrieveItems()), while processing group ID='"
+                                           + this.getId()
+                                           + "'. The repository with ID='"
+                                           + repository.getId()
+                                           + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                           + request.toString() );
                 }
             }
         }

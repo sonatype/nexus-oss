@@ -16,7 +16,7 @@ public abstract class AbstractGroupRepositoryConfigurator
 {
     @Override
     public void doValidate( ApplicationConfiguration configuration, CRepository repo,
-        ExternalConfiguration externalConfiguration )
+                            ExternalConfiguration externalConfiguration )
         throws ConfigurationException
     {
         super.doValidate( configuration, repo, externalConfiguration );
@@ -27,7 +27,9 @@ public abstract class AbstractGroupRepositoryConfigurator
         {
             try
             {
-                ContentClass myContentClass = getRepositoryTypeRegistry().getRepositoryContentClass( repo.getProviderRole(),repo.getProviderHint() );
+                ContentClass myContentClass =
+                    getRepositoryTypeRegistry().getRepositoryContentClass( repo.getProviderRole(),
+                                                                           repo.getProviderHint() );
 
                 Repository member = getRepositoryRegistry().getRepository( repoId );
 
@@ -35,24 +37,21 @@ public abstract class AbstractGroupRepositoryConfigurator
                 {
                     ValidationResponse response = new ApplicationValidationResponse();
 
-                    ValidationMessage error = new ValidationMessage(
-                        "repositories",
-                        "Repository has incompatible content type",
-                        "Invalid content type" );
+                    ValidationMessage error =
+                        new ValidationMessage( "repositories", "Repository has incompatible content type",
+                                               "Invalid content type" );
 
                     response.addValidationError( error );
 
-                    throw new InvalidConfigurationException( response );
+                    throw new InvalidGroupingException( myContentClass, member.getRepositoryContentClass() );
                 }
             }
             catch ( NoSuchRepositoryException e )
             {
                 ValidationResponse response = new ApplicationValidationResponse();
 
-                ValidationMessage error = new ValidationMessage(
-                    "repositories",
-                    e.getMessage(),
-                    "Invalid repository selected" );
+                ValidationMessage error =
+                    new ValidationMessage( "repositories", e.getMessage(), "Invalid repository selected" );
 
                 response.addValidationError( error );
 

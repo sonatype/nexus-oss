@@ -13,13 +13,15 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.sonatype.nexus.configuration.ConfigurationException;
+
 /**
  * Throws when an incompatible master is assigned to a shadow repository.
  * 
  * @author cstamas
  */
 public class IncompatibleMasterRepositoryException
-    extends Exception
+    extends ConfigurationException
 {
     private static final long serialVersionUID = -5676236705854300582L;
 

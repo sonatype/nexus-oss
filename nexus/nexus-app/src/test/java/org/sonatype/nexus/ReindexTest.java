@@ -81,7 +81,7 @@ public class ReindexTest
         // make the central download the remote indexes is found
         central.setDownloadRemoteIndexes( true );
 
-        nexusConfiguration.applyConfiguration();
+        nexusConfiguration.saveConfiguration();
     }
 
     protected File getIndexFamilyDirectory( String path )

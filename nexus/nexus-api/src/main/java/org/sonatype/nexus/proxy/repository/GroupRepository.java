@@ -42,7 +42,8 @@ public interface GroupRepository
      * 
      * @param repositories
      */
-    void setMemberRepositoryIds( List<String> repositories );
+    void setMemberRepositoryIds( List<String> repositories )
+        throws InvalidGroupingException;
 
     /**
      * Removes a member from this group.

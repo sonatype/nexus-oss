@@ -32,8 +32,6 @@ import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
 public interface MutableConfiguration
 {
-    void applyConfiguration();
-    
     // ----------------------------------------------------------------------------------------------------------
     // Repositories
     // ----------------------------------------------------------------------------------------------------------
