@@ -144,6 +144,7 @@ public class DefaultIndexPacker
         {
             getLogger().info( "Unable to read properties file, will force index regeneration" );
             info = new Properties();
+            incrementalHandler.initializeProperties( info );
             forceMainIndexGeneration = true;
         }
         

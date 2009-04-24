@@ -15,4 +15,6 @@ public interface IncrementalHandler
     
     List<String> loadRemoteIncrementalUpdates( IndexUpdateRequest request, Properties localProperties, Properties remoteProperties )
         throws IOException;
+    
+    void initializeProperties( Properties properties );
 }

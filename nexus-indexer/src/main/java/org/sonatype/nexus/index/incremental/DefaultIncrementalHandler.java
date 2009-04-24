@@ -100,6 +100,13 @@ public class DefaultIncrementalHandler
             return false;
         }
         
+        initializeProperties( properties );
+        
+        return true;
+    }
+    
+    public void initializeProperties( Properties properties )
+    {
         if ( properties.getProperty( IndexingContext.INDEX_CHAIN_ID ) == null )
         {
             properties.setProperty( IndexingContext.INDEX_CHAIN_ID, Long.toString( new Date().getTime() ) );
@@ -110,8 +117,6 @@ public class DefaultIncrementalHandler
         {
             properties.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "0" );
         }
-        
-        return true;
     }
     
     private List<Integer> getIndexChunk( IndexPackingRequest request, Date timestamp )
