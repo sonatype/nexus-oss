@@ -24,7 +24,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
@@ -70,7 +69,7 @@ public class RepositoryPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        return this.getRepositoryResourceResponse( this.getRepositoryId( request ), getNexus() );
+        return this.getRepositoryResourceResponse( getRepositoryId( request ) );
     }
 
     @Override
@@ -135,7 +134,7 @@ public class RepositoryPlexusResource
         }
 
         // return current repo
-        return this.getRepositoryResourceResponse( this.getRepositoryId( request ), this.getNexus() );
+        return this.getRepositoryResourceResponse( getRepositoryId( request ) );
     }
 
     @Override
@@ -145,14 +144,7 @@ public class RepositoryPlexusResource
         String repoId = this.getRepositoryId( request );
         try
         {
-            try
-            {
-                getNexus().deleteRepository( repoId );
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                getNexus().deleteRepositoryShadow( repoId );
-            }
+            getNexus().deleteRepository( repoId );
 
             response.setStatus( Status.SUCCESS_NO_CONTENT );
         }
@@ -160,9 +152,8 @@ public class RepositoryPlexusResource
         {
             getLogger().warn( "Repository not deletable, it has dependants, id=" + repoId );
 
-            throw new ResourceException(
-                Status.CLIENT_ERROR_BAD_REQUEST,
-                "Repository is not deletable, it has dependants." );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
+                                         "Repository is not deletable, it has dependants." );
         }
         catch ( NoSuchRepositoryException e )
         {

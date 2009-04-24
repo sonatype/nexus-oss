@@ -24,7 +24,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
@@ -112,6 +111,6 @@ public class RepositoryListPlexusResource
             }
         }
 
-        return this.getRepositoryResourceResponse( repoId, this.getNexus() );
+        return getRepositoryResourceResponse( repoId );
     }
 }

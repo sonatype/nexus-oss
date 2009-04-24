@@ -12,7 +12,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.repositories.metadata.NexusRepositoryMetadataHandler;
 import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
@@ -29,9 +28,6 @@ public class RepositoryPredefinedMirrorListPlexusResource
     @Requirement
     private NexusRepositoryMetadataHandler repoMetadata;
 
-    @Requirement
-    private RepositoryRegistry repoRegistry;
-
     public RepositoryPredefinedMirrorListPlexusResource()
     {
         setModifiable( false );
@@ -46,7 +42,8 @@ public class RepositoryPredefinedMirrorListPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/repository_predefined_mirrors/*", "authcBasic,perms[nexus:repositorypredefinedmirrors]" );
+        return new PathProtectionDescriptor( "/repository_predefined_mirrors/*",
+                                             "authcBasic,perms[nexus:repositorypredefinedmirrors]" );
     }
 
     @Override
@@ -66,7 +63,7 @@ public class RepositoryPredefinedMirrorListPlexusResource
         // get remote metadata
         RepositoryMetadata metadata = this.getMetadata( repositoryId );
 
-        if( metadata != null )
+        if ( metadata != null )
         {
             for ( RepositoryMirrorMetadata mirror : (List<RepositoryMirrorMetadata>) metadata.getMirrors() )
             {
@@ -86,7 +83,7 @@ public class RepositoryPredefinedMirrorListPlexusResource
         RepositoryMetadata metadata = null;
         try
         {
-                metadata = repoMetadata.readRepositoryMetadata( repositoryId );
+            metadata = repoMetadata.readRepositoryMetadata( repositoryId );
         }
         catch ( NoSuchRepositoryException e )
         {

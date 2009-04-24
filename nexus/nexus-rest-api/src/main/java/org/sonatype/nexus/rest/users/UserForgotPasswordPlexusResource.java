@@ -20,11 +20,11 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
-import org.sonatype.security.email.NoSuchEmailException;
 import org.sonatype.nexus.rest.model.UserForgotPasswordRequest;
 import org.sonatype.nexus.rest.model.UserForgotPasswordResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.email.NoSuchEmailException;
 
 /**
  * @author tstevens

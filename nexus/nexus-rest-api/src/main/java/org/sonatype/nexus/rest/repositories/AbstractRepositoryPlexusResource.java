@@ -21,7 +21,6 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -29,14 +28,20 @@ import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.NexusCompat;
 import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
@@ -79,7 +84,27 @@ public abstract class AbstractRepositoryPlexusResource
         return request.getAttributes().get( REPOSITORY_ID_KEY ).toString();
     }
 
-    protected String getRepoFormat( String role, String hint )
+    // CLEAN
+    public String getRestRepoRemoteStatus( ProxyRepository repository, Request request, Response response )
+        throws ResourceException
+    {
+        Form form = request.getResourceRef().getQueryAsForm();
+
+        boolean forceCheck = form.getFirst( "forceCheck" ) != null;
+
+        RemoteStatus rs = repository.getRemoteStatus( forceCheck );
+
+        if ( RemoteStatus.UNKNOWN.equals( rs ) )
+        {
+            // set status to ACCEPTED, since we have incomplete info
+            response.setStatus( Status.SUCCESS_ACCEPTED );
+        }
+
+        return rs == null ? null : rs.toString();
+    }
+
+    // CLEAN
+    protected String _getRepoFormat( String role, String hint )
     {
         ContentClass cc = repositoryTypeRegistry.getRepositoryContentClass( role, hint );
 
@@ -93,43 +118,104 @@ public abstract class AbstractRepositoryPlexusResource
         }
     }
 
-    protected String _getHintForRoleAndFormat( Class<?> role, String format )
+    // clean
+    public String getRestRepoType( Repository repository )
     {
-        // going strict
-        if ( Repository.class.equals( role ) )
+        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
-            if ( "maven1".equals( format ) )
-            {
-                return format;
-            }
-            else if ( "maven2".equals( format ) )
-            {
-                return format;
-            }
-            else
-            {
-                return null;
-            }
+            return REPO_TYPE_PROXIED;
         }
-        else if ( ShadowRepository.class.equals( role ) )
+        else if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
         {
-            if ( "maven2".equals( format ) )
-            {
-                return "m1-m2-shadow";
-            }
-            else if ( "maven1".equals( format ) )
-            {
-                return "m2-m1-shadow";
-            }
-            else
-            {
-                return null;
-            }
+            return REPO_TYPE_HOSTED;
+        }
+        else if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+        {
+            return REPO_TYPE_VIRTUAL;
+        }
+        else if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        {
+            return REPO_TYPE_GROUP;
         }
         else
         {
-            return null;
+            throw new IllegalArgumentException( "The passed model with class" + repository.getClass().getName()
+                + " is not recognized!" );
         }
+    }
+
+    // clean
+    protected RepositoryListResourceResponse listRepositories( Request request, boolean allReposes )
+        throws ResourceException
+    {
+        RepositoryListResourceResponse result = new RepositoryListResourceResponse();
+
+        RepositoryListResource repoRes;
+
+        Collection<Repository> repositories = getRepositoryRegistry().getRepositories();
+
+        for ( Repository repository : repositories )
+        {
+            if ( allReposes || repository.isUserManaged() )
+            {
+                repoRes = new RepositoryListResource();
+
+                repoRes.setResourceURI( createRepositoryReference( request, repository.getId() ).toString() );
+
+                repoRes.setRepoType( getRestRepoType( repository ) );
+
+                repoRes.setFormat( repository.getRepositoryContentClass().getId() );
+
+                repoRes.setId( repository.getId() );
+
+                repoRes.setName( repository.getName() );
+
+                repoRes.setUserManaged( repository.isUserManaged() );
+
+                repoRes.setExposed( repository.isExposed() );
+
+                repoRes.setEffectiveLocalStorageUrl( repository.getLocalUrl() );
+
+                if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
+                {
+                    repoRes.setRepoPolicy( repository.adaptToFacet( MavenRepository.class ).getRepositoryPolicy().toString() );
+                }
+
+                if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                {
+                    repoRes.setRemoteUri( repository.adaptToFacet( ProxyRepository.class ).getRemoteUrl() );
+                }
+
+                result.addData( repoRes );
+            }
+        }
+
+        return result;
+    }
+
+    // clean
+    protected RepositoryResourceResponse getRepositoryResourceResponse( String repoId )
+        throws ResourceException
+    {
+        RepositoryResourceResponse result = new RepositoryResourceResponse();
+
+        try
+        {
+            RepositoryBaseResource resource = null;
+
+            Repository repository = getRepositoryRegistry().getRepository( repoId );
+
+            resource = getRepositoryRestModel( repository );
+
+            result.setData( resource );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            getLogger().warn( "Repository not found, id=" + repoId );
+
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Not Found" );
+        }
+        return result;
     }
 
     /**
@@ -147,7 +233,7 @@ public abstract class AbstractRepositoryPlexusResource
 
         resource.setRepoType( REPO_TYPE_VIRTUAL );
 
-        resource.setFormat( getRepoFormat( ShadowRepository.class, model.getType() ) );
+        resource.setFormat( getRepoFormat( ShadowRepository.class.getName(), model.getType() ) );
 
         resource.setShadowOf( model.getShadowOf() );
 
@@ -193,48 +279,52 @@ public abstract class AbstractRepositoryPlexusResource
     /**
      * Converting App model to REST DTO.
      */
-    public RepositoryResource getRepositoryRestModel( CRepository model )
+    public RepositoryResource getRepositoryRestModel( Repository repository )
     {
-        String repoType = getRestRepoType( model );
-
         RepositoryResource resource = null;
 
-        if ( REPO_TYPE_PROXIED.equals( repoType ) )
+        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
-            resource = getRepositoryProxyRestModel( model );
+            resource = getRepositoryProxyRestModel( repository.adaptToFacet( ProxyRepository.class ) );
         }
         else
         {
             resource = new RepositoryResource();
         }
 
-        resource.setProvider( model.getType() );
+        resource.setProvider( NexusCompat.getRepositoryProviderHint( repository ) );
 
-        resource.setFormat( getRepoFormat( Repository.class, model.getType() ) );
+        resource.setFormat( repository.getRepositoryContentClass().getId() );
 
-        resource.setRepoType( repoType );
+        resource.setRepoType( getRestRepoType( repository ) );
 
-        resource.setId( model.getId() );
+        resource.setId( repository.getId() );
 
-        resource.setName( model.getName() );
+        resource.setName( repository.getName() );
 
-        resource.setAllowWrite( model.isAllowWrite() );
+        resource.setAllowWrite( repository.isAllowWrite() );
 
-        resource.setBrowseable( model.isBrowseable() );
+        resource.setBrowseable( repository.isBrowseable() );
 
-        resource.setIndexable( model.isIndexable() );
+        resource.setIndexable( repository.isIndexable() );
 
-        resource.setNotFoundCacheTTL( model.getNotFoundCacheTTL() );
+        resource.setNotFoundCacheTTL( repository.getNotFoundCacheTimeToLive() );
 
-        resource.setDefaultLocalStorageUrl( model.defaultLocalStorageUrl );
+        resource.setDefaultLocalStorageUrl( repository.getLocalUrl() );
 
-        resource.setOverrideLocalStorageUrl( model.getLocalStorage() != null ? model.getLocalStorage().getUrl() : null );
+        resource.setOverrideLocalStorageUrl( repository.getLocalUrl() );
 
-        resource.setRepoPolicy( getRestRepoPolicy( model ) );
+        if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
+        {
+            resource.setRepoPolicy( repository.adaptToFacet( MavenRepository.class ).getRepositoryPolicy().toString() );
 
-        resource.setChecksumPolicy( getRestChecksumPolicy( model ) );
+            if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
+            {
+                resource.setChecksumPolicy( repository.adaptToFacet( MavenProxyRepository.class ).getChecksumPolicy().toString() );
 
-        resource.setDownloadRemoteIndexes( model.isDownloadRemoteIndexes() );
+                resource.setDownloadRemoteIndexes( repository.adaptToFacet( MavenProxyRepository.class ).isDownloadRemoteIndexes() );
+            }
+        }
 
         return resource;
 
@@ -243,26 +333,32 @@ public abstract class AbstractRepositoryPlexusResource
     /**
      * Converting App model to REST DTO.
      */
-    public RepositoryProxyResource getRepositoryProxyRestModel( CRepository model )
+    public RepositoryProxyResource getRepositoryProxyRestModel( ProxyRepository repository )
     {
         RepositoryProxyResource resource = new RepositoryProxyResource();
 
         resource.setRemoteStorage( new RepositoryResourceRemoteStorage() );
 
-        resource.getRemoteStorage().setRemoteStorageUrl( model.getRemoteStorage().getUrl() );
+        resource.getRemoteStorage().setRemoteStorageUrl( repository.getRemoteUrl() );
 
         resource.getRemoteStorage().setAuthentication(
-            AbstractGlobalConfigurationPlexusResource.convert( model.getRemoteStorage().getAuthentication() ) );
+                                                       AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration(
+                                                                                                                                                     repository ).getRemoteStorage().getAuthentication() ) );
 
         resource.getRemoteStorage().setConnectionSettings(
-            AbstractGlobalConfigurationPlexusResource.convert( model.getRemoteStorage().getConnectionSettings() ) );
+                                                           AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration(
+                                                                                                                                                         repository ).getRemoteStorage().getConnectionSettings() ) );
 
         resource.getRemoteStorage().setHttpProxySettings(
-            AbstractGlobalConfigurationPlexusResource.convert( model.getRemoteStorage().getHttpProxySettings() ) );
+                                                          AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration(
+                                                                                                                                                        repository ).getRemoteStorage().getHttpProxySettings() ) );
 
-        resource.setArtifactMaxAge( model.getArtifactMaxAge() );
+        if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
+        {
+            resource.setArtifactMaxAge( repository.adaptToFacet( MavenProxyRepository.class ).getArtifactMaxAge() );
 
-        resource.setMetadataMaxAge( model.getMetadataMaxAge() );
+            resource.setMetadataMaxAge( repository.adaptToFacet( MavenProxyRepository.class ).getMetadataMaxAge() );
+        }
 
         return resource;
     }
@@ -351,22 +447,22 @@ public abstract class AbstractRepositoryPlexusResource
             }
 
             target.getRemoteStorage().getAuthentication().setUsername(
-                model.getRemoteStorage().getAuthentication().getUsername() );
+                                                                       model.getRemoteStorage().getAuthentication().getUsername() );
 
             target.getRemoteStorage().getAuthentication().setPassword(
-                model.getRemoteStorage().getAuthentication().getPassword() );
+                                                                       model.getRemoteStorage().getAuthentication().getPassword() );
 
             target.getRemoteStorage().getAuthentication().setNtlmDomain(
-                model.getRemoteStorage().getAuthentication().getNtlmDomain() );
+                                                                         model.getRemoteStorage().getAuthentication().getNtlmDomain() );
 
             target.getRemoteStorage().getAuthentication().setNtlmHost(
-                model.getRemoteStorage().getAuthentication().getNtlmHost() );
+                                                                       model.getRemoteStorage().getAuthentication().getNtlmHost() );
 
             target.getRemoteStorage().getAuthentication().setPrivateKey(
-                model.getRemoteStorage().getAuthentication().getPrivateKey() );
+                                                                         model.getRemoteStorage().getAuthentication().getPrivateKey() );
 
             target.getRemoteStorage().getAuthentication().setPassphrase(
-                model.getRemoteStorage().getAuthentication().getPassphrase() );
+                                                                         model.getRemoteStorage().getAuthentication().getPassphrase() );
         }
         else
         {
@@ -381,16 +477,16 @@ public abstract class AbstractRepositoryPlexusResource
             }
 
             target.getRemoteStorage().getConnectionSettings().setConnectionTimeout(
-                model.getRemoteStorage().getConnectionSettings().getConnectionTimeout() * 1000 );
+                                                                                    model.getRemoteStorage().getConnectionSettings().getConnectionTimeout() * 1000 );
 
             target.getRemoteStorage().getConnectionSettings().setRetrievalRetryCount(
-                model.getRemoteStorage().getConnectionSettings().getRetrievalRetryCount() );
+                                                                                      model.getRemoteStorage().getConnectionSettings().getRetrievalRetryCount() );
 
             target.getRemoteStorage().getConnectionSettings().setUserAgentCustomizationString(
-                model.getRemoteStorage().getConnectionSettings().getUserAgentString() );
+                                                                                               model.getRemoteStorage().getConnectionSettings().getUserAgentString() );
 
             target.getRemoteStorage().getConnectionSettings().setQueryString(
-                model.getRemoteStorage().getConnectionSettings().getQueryString() );
+                                                                              model.getRemoteStorage().getConnectionSettings().getQueryString() );
         }
         else
         {
@@ -405,10 +501,10 @@ public abstract class AbstractRepositoryPlexusResource
             }
 
             target.getRemoteStorage().getHttpProxySettings().setProxyHostname(
-                model.getRemoteStorage().getHttpProxySettings().getProxyHostname() );
+                                                                               model.getRemoteStorage().getHttpProxySettings().getProxyHostname() );
 
             target.getRemoteStorage().getHttpProxySettings().setProxyPort(
-                model.getRemoteStorage().getHttpProxySettings().getProxyPort() );
+                                                                           model.getRemoteStorage().getHttpProxySettings().getProxyPort() );
 
             if ( model.getRemoteStorage().getHttpProxySettings().getAuthentication() != null )
             {
@@ -419,22 +515,22 @@ public abstract class AbstractRepositoryPlexusResource
                 }
 
                 target.getRemoteStorage().getHttpProxySettings().getAuthentication().setUsername(
-                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getUsername() );
+                                                                                                  model.getRemoteStorage().getHttpProxySettings().getAuthentication().getUsername() );
 
                 target.getRemoteStorage().getHttpProxySettings().getAuthentication().setPassword(
-                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassword() );
+                                                                                                  model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassword() );
 
                 target.getRemoteStorage().getHttpProxySettings().getAuthentication().setNtlmDomain(
-                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getNtlmDomain() );
+                                                                                                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getNtlmDomain() );
 
                 target.getRemoteStorage().getHttpProxySettings().getAuthentication().setNtlmHost(
-                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getNtlmHost() );
+                                                                                                  model.getRemoteStorage().getHttpProxySettings().getAuthentication().getNtlmHost() );
 
                 target.getRemoteStorage().getHttpProxySettings().getAuthentication().setPrivateKey(
-                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPrivateKey() );
+                                                                                                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPrivateKey() );
 
                 target.getRemoteStorage().getHttpProxySettings().getAuthentication().setPassphrase(
-                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassphrase() );
+                                                                                                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassphrase() );
             }
 
         }
@@ -446,250 +542,4 @@ public abstract class AbstractRepositoryPlexusResource
         return target;
     }
 
-    public String getRestRepoType( Object model )
-    {
-        if ( CRepository.class.isAssignableFrom( model.getClass() ) )
-        {
-            CRepository m = (CRepository) model;
-
-            if ( m.getRemoteStorage() != null && m.getRemoteStorage().getUrl() != null )
-            {
-                return REPO_TYPE_PROXIED;
-            }
-            else
-            {
-                return REPO_TYPE_HOSTED;
-            }
-        }
-        else if ( CRepositoryShadow.class.isAssignableFrom( model.getClass() ) )
-        {
-            return REPO_TYPE_VIRTUAL;
-        }
-        else if ( CRepositoryGroup.class.isAssignableFrom( model.getClass() ) )
-        {
-            return REPO_TYPE_GROUP;
-        }
-        else
-        {
-            throw new IllegalArgumentException( "The passed model with class" + model.getClass().getName()
-                + " is not a Repository or RepositoryShadow!" );
-        }
-    }
-
-    public String getRestRepoPolicy( Object model )
-    {
-        if ( CRepository.class.isAssignableFrom( model.getClass() ) )
-        {
-            CRepository m = (CRepository) model;
-
-            return m.getRepositoryPolicy();
-        }
-        else
-        {
-            throw new IllegalArgumentException( "The passed model with class" + model.getClass().getName()
-                + " is not a hosted or proxied Repository!" );
-        }
-    }
-
-    public String getRestChecksumPolicy( Object model )
-    {
-        if ( CRepository.class.isAssignableFrom( model.getClass() ) )
-        {
-            CRepository m = (CRepository) model;
-
-            return m.getChecksumPolicy();
-        }
-        else
-        {
-            throw new IllegalArgumentException( "The passed model with class" + model.getClass().getName()
-                + " is not a hosted or proxied Repository!" );
-        }
-    }
-
-    public String getRestRepoLocalStatus( Object model )
-    {
-        if ( CRepository.class.isAssignableFrom( model.getClass() ) )
-        {
-            CRepository m = (CRepository) model;
-
-            return m.getLocalStatus();
-        }
-        else if ( CRepositoryShadow.class.isAssignableFrom( model.getClass() ) )
-        {
-            CRepositoryShadow m = (CRepositoryShadow) model;
-
-            return m.getLocalStatus();
-        }
-        else
-        {
-            throw new IllegalArgumentException( "The passed model with class" + model.getClass().getName()
-                + " is not a Repository or RepositoryShadow!" );
-        }
-    }
-
-    public String getRestRepoRemoteStatus( Object model, Request request, Response response )
-        throws ResourceException
-    {
-        try
-        {
-            if ( CRepository.class.isAssignableFrom( model.getClass() ) )
-            {
-                Form form = request.getResourceRef().getQueryAsForm();
-
-                boolean forceCheck = form.getFirst( "forceCheck" ) != null;
-
-                CRepository m = (CRepository) model;
-
-                Repository repository = getNexus().getRepository( m.getId() );
-
-                RemoteStatus rs = null;
-
-                if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-                {
-                    rs = repository.adaptToFacet( ProxyRepository.class ).getRemoteStatus( forceCheck );
-                }
-
-                if ( RemoteStatus.UNKNOWN.equals( rs ) )
-                {
-                    // set status to ACCEPTED, since we have incomplete info
-                    response.setStatus( Status.SUCCESS_ACCEPTED );
-                }
-
-                return rs == null ? null : rs.toString();
-            }
-            else
-            {
-                return null;
-            }
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            return null;
-        }
-    }
-
-    public String getRestRepoProxyMode( Object model )
-    {
-        if ( CRepository.class.isAssignableFrom( model.getClass() ) )
-        {
-            CRepository m = (CRepository) model;
-
-            return m.getProxyMode().toString();
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    protected RepositoryResourceResponse getRepositoryResourceResponse( String repoId, Nexus nexus )
-        throws ResourceException
-    {
-        RepositoryResourceResponse result = new RepositoryResourceResponse();
-
-        try
-        {
-            RepositoryBaseResource resource = null;
-            try
-            {
-                CRepository model = nexus.readRepository( repoId );
-
-                resource = getRepositoryRestModel( model );
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                CRepositoryShadow model = nexus.readRepositoryShadow( repoId );
-
-                resource = getRepositoryShadowRestModel( model );
-            }
-
-            result.setData( resource );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getLogger().warn( "Repository not found, id=" + repoId );
-
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Not Found" );
-        }
-        return result;
-    }
-
-    protected RepositoryListResourceResponse listRepositories( Request request, boolean allReposes )
-        throws ResourceException
-    {
-        RepositoryListResourceResponse result = new RepositoryListResourceResponse();
-
-        RepositoryListResource repoRes;
-
-        Collection<CRepository> repositories = getNexus().listRepositories();
-
-        for ( CRepository repository : repositories )
-        {
-            if ( allReposes || repository.isUserManaged() )
-            {
-                repoRes = new RepositoryListResource();
-
-                repoRes.setResourceURI( createRepositoryReference( request, repository.getId() ).toString() );
-
-                repoRes.setRepoType( getRestRepoType( repository ) );
-
-                repoRes.setFormat( getRepoFormat( Repository.class, repository.getType() ) );
-
-                repoRes.setId( repository.getId() );
-
-                repoRes.setName( repository.getName() );
-
-                repoRes.setUserManaged( repository.isUserManaged() );
-
-                repoRes.setExposed( repository.isExposed() );
-
-                repoRes.setEffectiveLocalStorageUrl( repository.getLocalStorage() != null
-                    && repository.getLocalStorage().getUrl() != null
-                    ? repository.getLocalStorage().getUrl()
-                    : repository.defaultLocalStorageUrl );
-
-                repoRes.setRepoPolicy( getRestRepoPolicy( repository ) );
-
-                if ( REPO_TYPE_PROXIED.equals( repoRes.getRepoType() ) )
-                {
-                    if ( repository.getRemoteStorage() != null )
-                    {
-                        repoRes.setRemoteUri( repository.getRemoteStorage().getUrl() );
-                    }
-                }
-
-                result.addData( repoRes );
-            }
-        }
-
-        Collection<CRepositoryShadow> shadows = getNexus().listRepositoryShadows();
-
-        for ( CRepositoryShadow shadow : shadows )
-        {
-            if ( allReposes || shadow.isUserManaged() )
-            {
-                repoRes = new RepositoryListResource();
-
-                repoRes.setId( shadow.getId() );
-
-                repoRes.setFormat( getRepoFormat( ShadowRepository.class, shadow.getType() ) );
-
-                repoRes.setResourceURI( createRepositoryReference( request, shadow.getId() ).toString() );
-
-                repoRes.setRepoType( getRestRepoType( shadow ) );
-
-                repoRes.setName( shadow.getName() );
-
-                repoRes.setUserManaged( shadow.isUserManaged() );
-
-                repoRes.setEffectiveLocalStorageUrl( shadow.defaultLocalStorageUrl );
-
-                repoRes.setExposed( shadow.isExposed() );
-
-                result.addData( repoRes );
-            }
-        }
-
-        return result;
-    }
 }

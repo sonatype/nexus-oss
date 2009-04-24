@@ -15,7 +15,6 @@ package org.sonatype.nexus.rest.repositories;
 
 import java.io.IOException;
 
-import org.apache.maven.model.Repository;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -24,9 +23,11 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.RepositoryDependentStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
@@ -75,37 +76,23 @@ public class RepositoryStatusPlexusResource
         {
             RepositoryStatusResource resource = new RepositoryStatusResource();
 
-            try
+            Repository repo = getRepositoryRegistry().getRepository( repoId );
+
+            resource.setId( repo.getId() );
+
+            resource.setRepoType( getRestRepoType( repo ) );
+
+            resource.setFormat( repo.getRepositoryContentClass().getId() );
+
+            resource.setLocalStatus( repo.getLocalStatus().toString() );
+
+            if ( repo.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
-                CRepository model = getNexus().readRepository( repoId );
+                ProxyRepository prepo = repo.adaptToFacet( ProxyRepository.class );
 
-                resource.setId( model.getId() );
+                resource.setRemoteStatus( getRestRepoRemoteStatus( prepo, request, response ) );
 
-                resource.setRepoType( getRestRepoType( model ) );
-
-                resource.setFormat( getRepoFormat( Repository.class, model.getType() ) );
-
-                resource.setLocalStatus( getRestRepoLocalStatus( model ) );
-
-                if ( REPO_TYPE_PROXIED.equals( resource.getRepoType() ) )
-                {
-                    resource.setRemoteStatus( getRestRepoRemoteStatus( model, request, response ) );
-
-                    resource.setProxyMode( getRestRepoProxyMode( model ) );
-                }
-
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                CRepositoryShadow model = getNexus().readRepositoryShadow( repoId );
-
-                resource.setId( model.getId() );
-
-                resource.setRepoType( getRestRepoType( model ) );
-
-                resource.setFormat( getRepoFormat( ShadowRepository.class, model.getType() ) );
-
-                resource.setLocalStatus( getRestRepoLocalStatus( model ) );
+                resource.setProxyMode( prepo.getProxyMode().toString() );
             }
 
             result = new RepositoryStatusResourceResponse();
@@ -141,43 +128,42 @@ public class RepositoryStatusPlexusResource
 
                 if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
                 {
-                    CRepositoryShadow shadow = getNexus().readRepositoryShadow( repoId );
+                    ShadowRepository shadow =
+                        getRepositoryRegistry().getRepositoryWithFacet( repoId, ShadowRepository.class );
 
-                    shadow.setLocalStatus( resource.getLocalStatus() );
-
-                    getNexus().updateRepositoryShadow( shadow );
+                    shadow.setLocalStatus( LocalStatus.valueOf( resource.getLocalStatus() ) );
 
                     result = (RepositoryStatusResourceResponse) this.get( context, request, response, null );
                 }
                 else
                 {
-                    CRepository normal = getNexus().readRepository( repoId );
+                    Repository repository = getRepositoryRegistry().getRepository( repoId );
 
-                    normal.setLocalStatus( resource.getLocalStatus() );
+                    repository.setLocalStatus( LocalStatus.valueOf( resource.getLocalStatus() ) );
 
-                    if ( REPO_TYPE_PROXIED.equals( getRestRepoType( normal ) ) && resource.getProxyMode() != null )
+                    if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class )
+                        && resource.getProxyMode() != null )
                     {
-                        normal.setProxyMode( resource.getProxyMode() );
+                        repository.adaptToFacet( ProxyRepository.class ).setProxyMode(
+                                                                                       ProxyMode.valueOf( resource.getProxyMode() ) );
                     }
 
                     // update dependant shadows too
-                    for ( CRepositoryShadow shadow : getNexus().listRepositoryShadows() )
+                    for ( ShadowRepository shadow : getRepositoryRegistry().getRepositoriesWithFacet(
+                                                                                                      ShadowRepository.class ) )
                     {
-                        if ( normal.getId().equals( shadow.getShadowOf() ) )
+                        if ( repository.getId().equals( shadow.getMasterRepositoryId() ) )
                         {
-                            shadow.setLocalStatus( resource.getLocalStatus() );
-
-                            getNexus().updateRepositoryShadow( shadow );
+                            shadow.setLocalStatus( LocalStatus.valueOf( resource.getLocalStatus() ) );
                         }
                     }
 
-                    getNexus().updateRepository( normal );
-
                     result = (RepositoryStatusResourceResponse) this.get( context, request, response, null );
 
-                    for ( CRepositoryShadow shadow : getNexus().listRepositoryShadows() )
+                    for ( ShadowRepository shadow : getRepositoryRegistry().getRepositoriesWithFacet(
+                                                                                                     ShadowRepository.class )  )
                     {
-                        if ( normal.getId().equals( shadow.getShadowOf() ) )
+                        if ( repository.getId().equals( shadow.getMasterRepositoryId() ) )
                         {
                             RepositoryDependentStatusResource dependent = new RepositoryDependentStatusResource();
 
@@ -185,15 +171,16 @@ public class RepositoryStatusPlexusResource
 
                             dependent.setRepoType( getRestRepoType( shadow ) );
 
-                            dependent.setFormat( getRepoFormat( ShadowRepository.class, shadow.getType() ) );
+                            dependent.setFormat( shadow.getRepositoryContentClass().getId() );
 
-                            dependent.setLocalStatus( getRestRepoLocalStatus( shadow ) );
+                            dependent.setLocalStatus( shadow.getLocalStatus().toString() );
 
                             result.getData().addDependentRepo( dependent );
                         }
                     }
                 }
-
+                
+                getNexusConfiguration().saveConfiguration();
             }
             catch ( NoSuchRepositoryException e )
             {
@@ -201,15 +188,14 @@ public class RepositoryStatusPlexusResource
 
                 throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Not Found" );
             }
-            catch ( ConfigurationException e )
-            {
-                getLogger().warn( "Configuration unacceptable, repoId=" + repoId, e );
-
-                throw new PlexusResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Configuration unacceptable, repoId=" + repoId + ": " + e.getMessage(),
-                    getNexusErrorResponse( "*", e.getMessage() ) );
-            }
+//            catch ( ConfigurationException e )
+//            {
+//                getLogger().warn( "Configuration unacceptable, repoId=" + repoId, e );
+//
+//                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
+//                                                   "Configuration unacceptable, repoId=" + repoId + ": "
+//                                                       + e.getMessage(), getNexusErrorResponse( "*", e.getMessage() ) );
+//            }
             catch ( IOException e )
             {
                 getLogger().warn( "Got IO Exception!", e );

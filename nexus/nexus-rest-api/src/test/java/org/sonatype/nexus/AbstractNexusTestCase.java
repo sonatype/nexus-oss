@@ -114,7 +114,7 @@ public abstract class AbstractNexusTestCase
             // TODO: SEE WHY IS SEC NOT STARTING? (Max, JSec changes)
             nexusConfiguration.setSecurityEnabled( false );
 
-            nexusConfiguration.applyConfiguration();
+            nexusConfiguration.saveConfiguration();
         }
     }
 

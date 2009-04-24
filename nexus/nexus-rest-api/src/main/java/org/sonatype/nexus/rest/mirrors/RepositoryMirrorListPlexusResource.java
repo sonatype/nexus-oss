@@ -14,6 +14,7 @@ import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.Mirror;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
@@ -28,9 +29,8 @@ public class RepositoryMirrorListPlexusResource
     {
         setModifiable( true );
     }
-    
+
     @Override
-    //TODO: define payload object
     public Object getPayloadInstance()
     {
         return new MirrorResourceListRequest();
@@ -47,31 +47,35 @@ public class RepositoryMirrorListPlexusResource
     {
         return "/repository_mirrors/{" + REPOSITORY_ID_KEY + "}";
     }
-    
+
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        MirrorResourceListResponse dto  = new MirrorResourceListResponse();
-        //Hack to get the object created, so response contains the 'data'
-        //element even if no mirrors defined
-        dto.getData();
+        MirrorResourceListResponse dto = new MirrorResourceListResponse();
         
+        // Hack to get the object created, so response contains the 'data'
+        // element even if no mirrors defined
+        dto.getData();
+
         try
         {
-            for ( CMirror mirror : getNexus().listMirrors( getRepositoryId( request ) ) )
+            Repository repository = getRepositoryRegistry().getRepository( getRepositoryId( request ) );
+            
+            for ( Mirror mirror : getMirrors( repository ) )
             {
                 dto.addData( nexusToRestModel( mirror ) );
             }
         }
         catch ( NoSuchRepositoryException e )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid repository id " + getRepositoryId( request ), e);
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid repository id "
+                + getRepositoryId( request ), e );
         }
-        
+
         return dto;
     }
-    
+
     @Override
     //TODO: get url from rest object and update repository
     public Object post( Context context, Request request, Response response, Object payload )
@@ -83,13 +87,11 @@ public class RepositoryMirrorListPlexusResource
         {
             List<MirrorResource> resources = ( List<MirrorResource> ) ( ( MirrorResourceListRequest ) payload ).getData();
             
-            List<CMirror> mirrors = restToNexusModel( resources );
+            List<Mirror> mirrors = restToNexusModel( resources );
             
-            List<Mirror> repoMirrors = null;
-            
-            getRepositoryRegistry().getRe
-            
-            getNexus().setMirrors( getRepositoryId( request ), mirrors );
+            Repository repository = getRepositoryRegistry().getRepository( getRepositoryId( request ) ); 
+
+            setMirrors( repository, mirrors );
             
             dto.setData( nexusToRestModel( mirrors ) );
         }
@@ -97,10 +99,10 @@ public class RepositoryMirrorListPlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid repository id " + getRepositoryId( request ), e);
         }
-        catch ( ConfigurationException e )
-        {
-            handleConfigurationException( e );
-        }
+//        catch ( ConfigurationException e )
+//        {
+//            handleConfigurationException( e );
+//        }
         catch ( IOException e )
         {
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to create mirror", e );

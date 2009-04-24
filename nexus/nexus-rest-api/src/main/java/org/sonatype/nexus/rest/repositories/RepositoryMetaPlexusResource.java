@@ -21,12 +21,9 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.cache.CacheStatistics;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.RepositoryMetaResource;
 import org.sonatype.nexus.rest.model.RepositoryMetaResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -62,32 +59,17 @@ public class RepositoryMetaPlexusResource
         String repoId = this.getRepositoryId( request );
         try
         {
-            RepositoryMetaResource resource = new RepositoryMetaResource();
-
-            Repository repository = getNexus().getRepository( repoId );
+            Repository repository = getRepositoryRegistry().getRepository( repoId );
 
             String localPath = repository.getLocalUrl().substring( repository.getLocalUrl().indexOf( "file:" ) + 1 );
 
-            // TODO: clean this up, ot at least centralize somewhere!
-            // a stupid trick here
-            try
-            {
-                CRepository model = getNexus().readRepository( repoId );
-
-                resource.setRepoType( getRestRepoType( model ) );
-
-                resource.setFormat( getRepoFormat( Repository.class, model.getType() ) );
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                CRepositoryShadow model = getNexus().readRepositoryShadow( repoId );
-
-                resource.setRepoType( getRestRepoType( model ) );
-
-                resource.setFormat( getRepoFormat( ShadowRepository.class, model.getType() ) );
-            }
+            RepositoryMetaResource resource = new RepositoryMetaResource();
 
             resource.setId( repoId );
+
+            resource.setRepoType( getRestRepoType( repository ) );
+
+            resource.setFormat( repository.getRepositoryContentClass().getId() );
 
             try
             {

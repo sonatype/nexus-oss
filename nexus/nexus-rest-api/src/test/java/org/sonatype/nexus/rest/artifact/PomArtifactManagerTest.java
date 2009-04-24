@@ -20,7 +20,6 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 
 public class PomArtifactManagerTest
     extends TestCase

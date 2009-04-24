@@ -14,72 +14,62 @@
 package org.sonatype.nexus.rest.groups;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
-import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.InvalidGroupingException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
-
-import com.thoughtworks.xstream.io.xml.xppdom.Xpp3Dom;
 
 public abstract class AbstractRepositoryGroupPlexusResource
     extends AbstractNexusPlexusResource
 {
     public static final String GROUP_ID_KEY = "groupId";
 
-    @SuppressWarnings( "unchecked" )
     protected void createOrUpdateRepositoryGroup( RepositoryGroupResource model, boolean create )
+        throws ResourceException
+    {
+        if ( create )
+        {
+            createRepositoryGroup( model );
+        }
+        else
+        {
+            updateRepositoryGroup( model );
+        }
+    }
+
+    @SuppressWarnings( "unchecked" )
+    protected void updateRepositoryGroup( RepositoryGroupResource model )
         throws ResourceException
     {
         try
         {
-            GroupRepository group = null;
-
-            if ( create )
-            {
-                group = new CRepositoryGroup();
-
-                group.setGroupId( model.getId() );
-            }
-            else
-            {
-                group = getNexus().readRepositoryGroup( model.getId() );
-            }
+            GroupRepository group =
+                getRepositoryRegistry().getRepositoryWithFacet( model.getId(), GroupRepository.class );
 
             group.setName( model.getName() );
 
-            group.setType( model.getProvider() );
-
-            group.getRepositories().clear();
+            ArrayList<String> members = new ArrayList<String>();
 
             for ( RepositoryGroupMemberRepository member : (List<RepositoryGroupMemberRepository>) model.getRepositories() )
             {
-                group.addRepository( member.getId() );
+                members.add( member.getId() );
             }
 
-            if ( create )
-            {
-                getNexus().createRepositoryGroup( group );
-            }
-            else
-            {
-                getNexus().updateRepositoryGroup( group );
-            }
-        }
-        catch ( ConfigurationException e )
-        {
-            handleConfigurationException( e );
+            group.setMemberRepositoryIds( members );
+
+            getNexusConfiguration().saveConfiguration();
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -118,48 +108,33 @@ public abstract class AbstractRepositoryGroupPlexusResource
         try
         {
             CRepository group = new CRepository();
-            
+
+            group.setId( model.getId() );
+
             group.setName( model.getName() );
-            
+
             group.setProviderRole( GroupRepository.class.getName() );
 
             group.setProviderHint( model.getProvider() );
-            
-            group.getExternalConfiguration()
-            
-            M2GroupRepositoryConfiguration conf = new M2GroupRepositoryConfiguration();
 
-            group.getM.getRepositories().clear();
+            Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
+
+            group.setExternalConfiguration( ex );
+
+            M2GroupRepositoryConfiguration exConf = new M2GroupRepositoryConfiguration( ex );
+
+            List<String> members = new ArrayList<String>();
 
             for ( RepositoryGroupMemberRepository member : (List<RepositoryGroupMemberRepository>) model.getRepositories() )
             {
-                group.addRepository( member.getId() );
+                members.add( member.getId() );
             }
 
-            if ( create )
-            {
-                getNexus().createRepositoryGroup( group );
-            }
-            else
-            {
-                getNexus().updateRepositoryGroup( group );
-            }
-        }
-        catch ( ConfigurationException e )
-        {
-            handleConfigurationException( e );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getLogger().warn( "Repository referenced by Repository Group Not Found, ID=" + model.getId(), e );
+            exConf.setMemberRepositoryIds( members );
 
-            throw new PlexusResourceException(
-                                               Status.CLIENT_ERROR_BAD_REQUEST,
-                                               "Repository referenced by Repository Group Not Found, GroupId="
-                                                   + model.getId(),
-                                               e,
-                                               getNexusErrorResponse( "repositories",
-                                                                      "Repository referenced by Repository Group Not Found" ) );
+            exConf.applyChanges();
+
+            getNexus().createRepository( group );
         }
         catch ( InvalidGroupingException e )
         {
@@ -171,6 +146,10 @@ public abstract class AbstractRepositoryGroupPlexusResource
                                                e,
                                                getNexusErrorResponse( "repositories",
                                                                       "Repository referenced by Repository Group does not share same content type!" ) );
+        }
+        catch ( ConfigurationException e )
+        {
+            handleConfigurationException( e );
         }
         catch ( IOException e )
         {

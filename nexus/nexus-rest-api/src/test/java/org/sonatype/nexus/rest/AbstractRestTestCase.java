@@ -13,11 +13,11 @@
  */
 package org.sonatype.nexus.rest;
 
+import junit.framework.TestCase;
+
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 
 import com.thoughtworks.xstream.XStream;
-
-import junit.framework.TestCase;
 
 public abstract class AbstractRestTestCase
     extends TestCase

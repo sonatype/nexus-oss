@@ -24,13 +24,12 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -95,7 +94,16 @@ public class RepositoryTemplateListPlexusResource
                     && repository.getLocalStorage().getUrl() != null ? repository.getLocalStorage().getUrl()
                                 : repository.defaultLocalStorageUrl );
 
-                repoRes.setRepoPolicy( repository.getRepositoryPolicy() );
+                // XXX cstamas how???
+                // repoRes.setRepoPolicy( NexusCompat.getRepositoryPolicy( repository ));
+                if ( repository.getId().contains( "_release" ) )
+                {
+                    repoRes.setRepoPolicy( RepositoryPolicy.RELEASE.toString() );
+                }
+                else if ( repository.getId().contains( "_snapshot" ) )
+                {
+                    repoRes.setRepoPolicy( RepositoryPolicy.SNAPSHOT.toString() );
+                }
 
                 result.addData( repoRes );
             }

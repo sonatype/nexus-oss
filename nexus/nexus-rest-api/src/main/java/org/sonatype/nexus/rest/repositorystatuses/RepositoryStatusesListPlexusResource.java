@@ -22,6 +22,7 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.RepositoryStatusListResource;
@@ -76,23 +77,26 @@ public class RepositoryStatusesListPlexusResource
 
             repoRes.setRepoType( getRestRepoType( repository ) );
 
-            repoRes.setRepoPolicy( getRestRepoPolicy( repository ) );
+            if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
+            {
+                repoRes.setRepoPolicy( repository.adaptToFacet( MavenRepository.class ).getRepositoryPolicy().toString() );
+            }
 
-            repoRes.setFormat( getRepoFormat(
-                                              ( (CRepository) repository.getCurrentCoreConfiguration().getConfiguration(
-                                                                                                                         false ) ).getProviderRole(),
-                                              ( (CRepository) repository.getCurrentCoreConfiguration().getConfiguration(
-                                                                                                                         false ) ).getProviderHint() ) );
+            repoRes.setFormat( repository.getRepositoryContentClass().getId() );
 
             repoRes.setStatus( new RepositoryStatusResource() );
 
-            repoRes.getStatus().setLocalStatus( getRestRepoLocalStatus( repository ) );
+            repoRes.getStatus().setLocalStatus( repository.getLocalStatus().toString() );
 
             if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
-                repoRes.getStatus().setRemoteStatus( getRestRepoRemoteStatus( repository, request, response ) );
+                repoRes.getStatus().setRemoteStatus(
+                                                     getRestRepoRemoteStatus(
+                                                                              repository.adaptToFacet( ProxyRepository.class ),
+                                                                              request, response ) );
 
-                repoRes.getStatus().setProxyMode( getRestRepoProxyMode( repository ) );
+                repoRes.getStatus().setProxyMode(
+                                                  repository.adaptToFacet( ProxyRepository.class ).getProxyMode().toString() );
             }
 
             result.addData( repoRes );

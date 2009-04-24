@@ -27,6 +27,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.rest.NexusCompat;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
@@ -73,7 +74,6 @@ public class RepositoryGroupPlexusResource
         return request.getAttributes().get( GROUP_ID_KEY ).toString();
     }
 
-    @SuppressWarnings( "unchecked" )
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
@@ -89,7 +89,7 @@ public class RepositoryGroupPlexusResource
 
             resource.setName( groupRepo.getName() );
 
-            resource.setProvider( groupRepo.getType() );
+            resource.setProvider( NexusCompat.getRepositoryProviderHint( groupRepo ) );
 
             resource.setRepoType( AbstractRepositoryPlexusResource.REPO_TYPE_GROUP );
 
