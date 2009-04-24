@@ -27,7 +27,6 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -85,19 +84,9 @@ public class RepositoryListPlexusResource
 
             try
             {
-                if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
-                {
-                    CRepositoryShadow shadow = getRepositoryShadowAppModel( (RepositoryShadowResource) resource, null );
+                CRepository normal = getRepositoryAppModel( (RepositoryResource) resource, null );
 
-                    getNexus().createRepositoryShadow( shadow );
-                }
-                else
-                {
-                    CRepository normal = getRepositoryAppModel( (RepositoryResource) resource, null );
-
-                    getNexus().createRepository( normal );
-
-                }
+                getNexus().createRepository( normal );
             }
             catch ( ConfigurationException e )
             {

@@ -30,7 +30,6 @@ import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
-import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -40,7 +39,7 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
  */
 @Component( role = PlexusResource.class, hint = "RepositoryTemplateListPlexusResource" )
 public class RepositoryTemplateListPlexusResource
-    extends AbstractRepositoryPlexusResource
+    extends AbstractRepositoryTemplatePlexusResource
 {
     @Override
     public Object getPayloadInstance()

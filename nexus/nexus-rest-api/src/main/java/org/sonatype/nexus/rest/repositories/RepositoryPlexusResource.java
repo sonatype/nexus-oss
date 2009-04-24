@@ -23,9 +23,17 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
+import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
@@ -88,13 +96,20 @@ public class RepositoryPlexusResource
 
                 if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
                 {
+                    RepositoryShadowResource model = (RepositoryShadowResource) resource;
+
                     try
                     {
-                        CRepositoryShadow shadow = getNexus().readRepositoryShadow( repoId );
+                        ShadowRepository shadow =
+                            getRepositoryRegistry().getRepositoryWithFacet( repoId, ShadowRepository.class );
 
-                        shadow = getRepositoryShadowAppModel( (RepositoryShadowResource) resource, shadow );
+                        shadow.setName( model.getName() );
 
-                        getNexus().updateRepositoryShadow( shadow );
+                        shadow.setMasterRepositoryId( model.getShadowOf() );
+
+                        shadow.setSynchronizeAtStartup( model.isSyncAtStartup() );
+
+                        getNexusConfiguration().saveConfiguration();
                     }
                     catch ( NoSuchRepositoryException e )
                     {
@@ -105,13 +120,49 @@ public class RepositoryPlexusResource
                 }
                 else
                 {
+                    RepositoryResource model = (RepositoryResource) resource;
+
                     try
                     {
-                        CRepository normal = getNexus().readRepository( repoId );
+                        Repository repository = getRepositoryRegistry().getRepository( repoId );
 
-                        normal = getRepositoryAppModel( (RepositoryResource) resource, normal );
+                        repository.setName( model.getName() );
 
-                        getNexus().updateRepository( normal );
+                        repository.setAllowWrite( model.isAllowWrite() );
+
+                        repository.setBrowseable( model.isBrowseable() );
+
+                        repository.setIndexable( model.isIndexable() );
+
+                        repository.setNotFoundCacheTimeToLive( model.getNotFoundCacheTTL() );
+
+                        if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
+                        {
+                            repository.adaptToFacet( MavenRepository.class ).setRepositoryPolicy(
+                                                                                                  RepositoryPolicy.valueOf( model.getRepoPolicy() ) );
+
+                            if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
+                            {
+                                repository.adaptToFacet( MavenProxyRepository.class ).setChecksumPolicy(
+                                                                                                         ChecksumPolicy.valueOf( model.getChecksumPolicy() ) );
+
+                                repository.adaptToFacet( MavenProxyRepository.class ).setDownloadRemoteIndexes(
+                                                                                                                model.isDownloadRemoteIndexes() );
+                            }
+                        }
+
+                        if ( model.getOverrideLocalStorageUrl() != null )
+                        {
+                            repository.setLocalUrl( model.getOverrideLocalStorageUrl() );
+                        }
+
+                        if ( RepositoryProxyResource.class.isAssignableFrom( model.getClass() ) )
+                        {
+                            // XXX cstamas!
+                            //appModel = getRepositoryProxyAppModel( (RepositoryProxyResource) model, appModel );
+                        }
+
+                        getNexusConfiguration().saveConfiguration();
                     }
                     catch ( NoSuchRepositoryException e )
                     {
