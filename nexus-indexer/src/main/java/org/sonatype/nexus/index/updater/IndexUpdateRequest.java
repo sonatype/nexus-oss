@@ -19,10 +19,13 @@ public class IndexUpdateRequest
     private ResourceFetcher resourceFetcher;
 
     private DocumentFilter documentFilter;
+    
+    private boolean forceFullUpdate;
 
     public IndexUpdateRequest( IndexingContext context )
     {
         this.context = context;
+        this.forceFullUpdate = false;
     }
 
     public IndexingContext getIndexingContext() 
@@ -48,5 +51,15 @@ public class IndexUpdateRequest
     public void setResourceFetcher(ResourceFetcher resourceFetcher) 
     {
         this.resourceFetcher = resourceFetcher;
+    }
+    
+    public void setForceFullUpdate( boolean forceFullUpdate )
+    {
+        this.forceFullUpdate = forceFullUpdate;
+    }
+    
+    public boolean isForceFullUpdate()
+    {
+        return forceFullUpdate;
     }
 }

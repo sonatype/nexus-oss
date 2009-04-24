@@ -81,7 +81,8 @@ public class DefaultIndexUpdater
         {
             Date contextTimestamp = context.getTimestamp();
 
-            if ( contextTimestamp != null )
+            if ( contextTimestamp != null 
+                && !updateRequest.isForceFullUpdate() )
             {
                 Properties localProperties = loadLocallyStoredRemoteProperties( context );
                 

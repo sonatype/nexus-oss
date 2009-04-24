@@ -748,6 +748,98 @@ public class DefaultIndexUpdaterTest
         mockery.assertIsSatisfied();
     }
     
+    public void testUpdateForceFullUpdate() throws Exception  
+    {
+        Mockery mockery = new Mockery();
+        
+        final String indexUrl = repositoryUrl + ".index";
+        final Date contextTimestamp = df.parse( "20081128000000.000 -0600" );
+        
+        final ResourceFetcher mockFetcher = mockery.mock( ResourceFetcher.class );
+        
+        final IndexingContext tempContext = mockery.mock( IndexingContext.class );
+        
+        final Properties localProps = new Properties();
+        localProps.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "1" );
+        localProps.setProperty( IndexingContext.INDEX_CHAIN_ID, "someid" );
+        
+        mockery.checking(new Expectations() 
+        {{
+            allowing( tempContext ).getTimestamp();
+            will( returnValue( contextTimestamp ) );
+            
+            allowing( tempContext ).getId();
+            will( returnValue( repositoryId ) );
+            
+            allowing( tempContext ).getIndexUpdateUrl();
+            will( returnValue( indexUrl ) );
+
+            allowing( tempContext ).getIndexCreators();
+            will( returnValue( NexusIndexer.DEFAULT_INDEX ) );
+            
+            oneOf( mockFetcher ).connect( repositoryId, indexUrl );
+            
+            never( mockFetcher ).retrieve( //
+                with( IndexingContext.INDEX_FILE + ".properties" ), //
+                with( any( File.class ) ) );
+            
+            will(new PropertiesAction() 
+            {
+                @Override
+                Properties getProperties() 
+                {
+                    Properties properties = new Properties();
+                    properties.setProperty( IndexingContext.INDEX_ID, "central" );
+                    properties.setProperty( IndexingContext.INDEX_TIMESTAMP, "20081129174241.859 -0600" );
+                    properties.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "3" );
+                    properties.setProperty( IndexingContext.INDEX_CHAIN_ID, "someid" );
+                    properties.setProperty( IndexingContext.INDEX_CHUNK_PREFIX + "0", "3" );
+                    properties.setProperty( IndexingContext.INDEX_CHUNK_PREFIX + "1", "2" );
+                    properties.setProperty( IndexingContext.INDEX_CHUNK_PREFIX + "2", "1" );
+                    return properties;
+                }
+            });
+            
+            never( tempContext ).getIndexDirectoryFile();
+            
+            never( mockFetcher ).retrieve( //
+                with( IndexingContext.INDEX_FILE + ".1.gz" ), //
+                with( Expectations.<File>anything() ) );
+            
+            never( mockFetcher ).retrieve( //
+                with( IndexingContext.INDEX_FILE + ".2.gz" ), //
+                with( Expectations.<File>anything() ) );
+            
+            never( mockFetcher ).retrieve( //
+                with( IndexingContext.INDEX_FILE + ".3.gz" ), //
+                with( Expectations.<File>anything() ) );
+            
+            oneOf( mockFetcher ).retrieve( 
+                with( IndexingContext.INDEX_FILE + ".gz" ), //
+                with( Expectations.<File>anything() ) );
+            
+            never( tempContext ).merge( with( any( Directory.class ) ) );
+            
+            never( tempContext ).merge( with( any( Directory.class ) ) );
+            
+            oneOf( tempContext ).replace( with( any( Directory.class ) ) );
+            
+            oneOf( mockFetcher ).disconnect();
+        }});
+        
+        // tempContext.updateTimestamp( true, contextTimestamp );
+        
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
+        
+        updateRequest.setResourceFetcher( mockFetcher );
+        
+        updateRequest.setForceFullUpdate( true );
+        
+        updater.fetchAndUpdateIndex( updateRequest );
+        
+        mockery.assertIsSatisfied();
+    }
+    
     private ArtifactContext createArtifactContext( String repositoryId, String groupId, String artifactId,
         String version, String classifier )
     {
