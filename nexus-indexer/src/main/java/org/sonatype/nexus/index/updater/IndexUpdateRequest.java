@@ -6,6 +6,8 @@
  */
 package org.sonatype.nexus.index.updater;
 
+import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.sonatype.nexus.index.context.DocumentFilter;
 import org.sonatype.nexus.index.context.IndexingContext;
 
@@ -19,6 +21,10 @@ public class IndexUpdateRequest
     private ResourceFetcher resourceFetcher;
 
     private DocumentFilter documentFilter;
+    
+    private ProxyInfo proxyInfo;
+    
+    private TransferListener transferListener;
     
     private boolean forceFullUpdate;
 
@@ -48,6 +54,12 @@ public class IndexUpdateRequest
         this.documentFilter = documentFilter;
     }
 
+    /**
+     * If null, the default wagon manager will be used, incorporating
+     * the ProxyInfo and TransferListener if supplied
+     * 
+     * @param resourceFetcher
+     */
     public void setResourceFetcher(ResourceFetcher resourceFetcher) 
     {
         this.resourceFetcher = resourceFetcher;
@@ -61,5 +73,37 @@ public class IndexUpdateRequest
     public boolean isForceFullUpdate()
     {
         return forceFullUpdate;
+    }
+    
+    public ProxyInfo getProxyInfo()
+    {
+        return proxyInfo;
+    }
+    
+    /**
+     * ProxyInfo object that will be used by the default wagon manager
+     * if no other fetcher is set
+     * 
+     * @param proxyInfo
+     */
+    public void setProxyInfo( ProxyInfo proxyInfo )
+    {
+        this.proxyInfo = proxyInfo;
+    }
+    
+    public TransferListener getTransferListener()
+    {
+        return transferListener;
+    }
+    
+    /**
+     * TransferListener that will be used by the default wagon manager
+     * if no other fetcher is set
+     * 
+     * @param transferListener
+     */
+    public void setTransferListener( TransferListener transferListener )
+    {
+        this.transferListener = transferListener;
     }
 }

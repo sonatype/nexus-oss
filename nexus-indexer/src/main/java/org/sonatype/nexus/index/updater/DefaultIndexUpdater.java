@@ -72,6 +72,11 @@ public class DefaultIndexUpdater
         throws IOException
     {
         ResourceFetcher fetcher = updateRequest.getResourceFetcher();
+        
+        if ( fetcher == null )
+        {
+            fetcher = new WagonFetcher( wagonManager, updateRequest.getTransferListener(), updateRequest.getProxyInfo() );
+        }
 
         IndexingContext context = updateRequest.getIndexingContext();
 
@@ -144,7 +149,7 @@ public class DefaultIndexUpdater
     {
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( context );
 
-        updateRequest.setResourceFetcher( new WagonFetcher( wagonManager, listener, null ) );
+        updateRequest.setResourceFetcher( new WagonFetcher( wagonManager, listener, proxyInfo ) );
 
         return fetchAndUpdateIndex( updateRequest );
     }
