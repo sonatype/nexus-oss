@@ -313,11 +313,27 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
     this.artifactInformationPanel.showArtifact( rec.data );
   },
   
+  startQuickSearch: function( v ) {
+    var searchType = 'quick';
+    if ( v.search(/^[0-9a-f]{40}$/) == 0 ) {
+      searchType = 'checksum';
+    }
+    else if ( v.search(/^[A-Z]/) == 0 ) {
+      searchType = 'classname';
+    }
+    this.setSearchType( this, searchType );
+    this.searchField.setRawValue( v );
+    this.startSearch( this );
+  },
+  
   startSearch: function( p ) {
     p.searchField.triggers[0].show();
 
+    var value = p.searchField.getRawValue();
+    Ext.History.add( p.id + Sonatype.view.HISTORY_DELIMITER + value );
+    
     p.grid.store.baseParams = {};
-    p.grid.store.baseParams[p.searchField.paramName] = p.searchField.getRawValue();
+    p.grid.store.baseParams[p.searchField.paramName] = value;
     p.fetchFirst50( p );
   },
   
@@ -330,6 +346,16 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
         count: 50
       }
     });
+  },
+  
+  applyBookmark: function( bookmark ) {
+    if ( bookmark && bookmark != this.searchField.getRawValue() ) {
+      this.startQuickSearch( bookmark );
+    }
+  },
+  
+  getBookmark: function() {
+    return this.searchField.getRawValue();
   },
 
   setWarningLabel: function( s ) {

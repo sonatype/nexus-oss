@@ -230,24 +230,15 @@ Sonatype.repoServer.RepoServer = function(){
                   var v = this.getRawValue();
                   if ( v.length > 0 ) {
                     var panel = Sonatype.view.mainTabPanel.addOrShowTab(
-                      'st-nexus-search-panel', Sonatype.repoServer.SearchPanel, { title: 'Search' } );
-                    var searchType = 'quick';
-                    if ( v.search(/^[0-9a-f]{40}$/) == 0 ) {
-                      searchType = 'checksum';
-                    }
-                    else if ( v.search(/^[A-Z]/) == 0 ) {
-                      searchType = 'classname';
-                    }
-                    panel.setSearchType( panel, searchType );
-                    panel.searchField.setRawValue( this.getRawValue() );
-                    panel.startSearch( panel );
+                        'nexus-search', Sonatype.repoServer.SearchPanel, { title: 'Search' } );
+                    panel.startQuickSearch( v );
                   }
                 }
               },
               {
                 title: 'Advanced Search',
                 tabCode: Sonatype.repoServer.SearchPanel,
-                tabId: 'st-nexus-search-panel',
+                tabId: 'nexus-search',
                 tabTitle: 'Search'
               }
             ]
@@ -263,14 +254,14 @@ Sonatype.repoServer.RepoServer = function(){
           {
             enabled: sp.checkPermission( 'nexus:repostatus', sp.READ ),
             title: 'Repositories',
-            tabId: 'st-repositories',
+            tabId: 'view-repositories',
             tabCode: Sonatype.repoServer.RepositoryPanel,
             tabTitle: 'Repositories'
           },
           {
             enabled: sp.checkPermission( 'nexus:feeds', sp.READ ),
             title: 'System Feeds',
-            tabId: 'feed-view-system_changes',
+            tabId: 'feed-view-system-changes',
             tabCode: Sonatype.repoServer.FeedViewPanel
           },
           {
@@ -329,7 +320,7 @@ Sonatype.repoServer.RepoServer = function(){
                 sp.checkPermission('nexus:targets', sp.DELETE) ||
                 sp.checkPermission('nexus:targets', sp.EDIT)),
             title: 'Repository Targets',
-            tabId: 'config-repoTargets',
+            tabId: 'targets-config',
             tabCode: Sonatype.repoServer.RepoTargetEditPanel
           },
           {
@@ -444,7 +435,8 @@ Sonatype.repoServer.RepoServer = function(){
         Sonatype.view.mainTabPanel.activeTab = null;
         
         Sonatype.view.welcomeTab = new Ext.Panel({
-          title: 'Welcome'
+          title: 'Welcome',
+          id: 'welcome'
         });
         
         var welcomeMsg = '<p>Welcome to the <a href="http://nexus.sonatype.org" target="new">Sonatype Nexus Maven Repository Manager</a>.</p>' ;

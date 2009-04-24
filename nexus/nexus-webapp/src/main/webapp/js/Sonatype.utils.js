@@ -752,6 +752,8 @@ Sonatype.utils = {
               'more information</a> on configuring Nexus with it.'
             );
           }
+
+          Sonatype.utils.onHistoryChange( Ext.History.getToken() );
         }
 
         Sonatype.Events.fireEvent( 'nexusStatus' );
@@ -765,6 +767,38 @@ Sonatype.utils = {
       html: '<div class="x-toolbar-warning-box"><div class="x-form-invalid-msg" style="width: 95%;">' + msg + '</div></div>'
     } );
     Sonatype.view.welcomeTab.doLayout();
+  },
+  
+  onHistoryChange: function( token ) {
+    if ( Sonatype.initialToken ) {
+      token = Sonatype.initialToken; // handle the initial token
+    }
+    if ( token && Sonatype.user.curr.repoServer.length ) {
+      var toks = token.split( Sonatype.view.HISTORY_DELIMITER );
+      Sonatype.initialToken = '1'; // to prevent tab change events from interfering
+      
+      var tabId = toks[0];
+      var tabPanel = Sonatype.view.mainTabPanel.getComponent( tabId );
+      if ( tabPanel ) {
+        Sonatype.view.mainTabPanel.setActiveTab( tabId );
+      }
+      else {
+        var navigationPanel = Ext.getCmp( 'navigation-' + tabId );
+        if ( navigationPanel ) {
+          var c = navigationPanel.initialConfigNavigation;
+          if ( c ) {
+            tabPanel = Sonatype.view.mainTabPanel.addOrShowTab( c.tabId, c.tabCode,
+              { title: c.tabTitle ? c.tabTitle : c.title } );
+          }
+        }
+      }
+      
+      if ( tabPanel && tabPanel.applyBookmark && toks.length > 1 ) {
+        tabPanel.applyBookmark( toks[1] );
+      }
+    }
+    
+    Sonatype.initialToken = null;
   }
 };
 

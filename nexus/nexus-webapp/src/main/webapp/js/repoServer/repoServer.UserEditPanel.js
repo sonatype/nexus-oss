@@ -106,6 +106,7 @@ Sonatype.repoServer.UserEditPanel = function( config ) {
     url: Sonatype.config.repos.urls.plexusUsersAllConfigured,
     dataAutoLoad: true,
     dataId: 'userId',
+    dataBookmark: 'userId',
     columns: [
       { 
         name: 'resourceURI',

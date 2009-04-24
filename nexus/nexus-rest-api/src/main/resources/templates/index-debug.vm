@@ -26,6 +26,7 @@
   
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <link rel="shortcut icon" href="favicon.ico" type="image/gif" />
+  <link rel="search" type="application/opensearchdescription+xml" href="$serviceBase/opensearch" title="Nexus ($nexusHost)" />
 
   <!-- Plugin pre HEAD contributions start here -->
   #foreach( $pluginPreHeadContribution in $pluginPreHeadContributions )
@@ -129,6 +130,12 @@
     $pluginPostBodyContribution
 #end
 <!-- Plugin post BODY contributions ends here -->
+
+<!-- Fields required for history management -->
+<form id="history-form" class="x-hidden">
+    <input type="hidden" id="x-history-field" />
+    <iframe id="x-history-frame"></iframe>
+</form>
 
 </body>
 </html>

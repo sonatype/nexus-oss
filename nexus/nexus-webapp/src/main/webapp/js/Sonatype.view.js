@@ -16,6 +16,7 @@ Sonatype.view = {
   FIELD_OFFSET : (3 + 16)*(-1) + '', //extra padding on right of icon not needed
   FIELDSET_OFFSET : (3 + 18)*(-1) + '', // (extra room between border and scrollbar) + (scrollbar)
   FIELDSET_OFFSET_WITH_SCROLL : (3 + 18 + 3 + 30)*(-1) + '', // (extra room between border and scrollbar) + (scrollbar) + margin + (scrollbar)
+  HISTORY_DELIMITER: ';',
   
   init : function(){
     var dq = Ext.DomQuery;
@@ -31,7 +32,8 @@ Sonatype.view = {
     
     Sonatype.view.welcomeTab = new Ext.Panel({
       contentEl:'welcome-tab',
-      title: 'Welcome'
+      title: 'Welcome',
+      id: 'welcome'
     });
     
     Sonatype.view.headerPanel = new Ext.Panel( {
@@ -109,7 +111,21 @@ Sonatype.view = {
           layoutOnTabChange:true,
           //border: false,
           //bodyBorder: true,
-          items:[Sonatype.view.welcomeTab]
+          items:[Sonatype.view.welcomeTab],
+          listeners: {
+            tabchange: function( panel, tab ) {
+              if ( ! Sonatype.initialToken ) { // make sure the original token doesn't get ruined by the welcome tab
+                var bookmark = tab.id;
+                if ( tab.getBookmark ) {
+                  var b2 = tab.getBookmark();
+                  if ( b2 ) {
+                    bookmark += Sonatype.view.HISTORY_DELIMITER + b2;
+                  }
+                }
+                Ext.History.add( bookmark );
+              }
+            }
+          }
         })
        ]
     });
@@ -131,6 +147,8 @@ Sonatype.view = {
     }
     
     Sonatype.view.serverTabPanel.setActiveTab('st-nexus-tab');
+    
+    Ext.History.addListener( 'change', Sonatype.utils.onHistoryChange );
   },
   
   updateLoginLinkText : function(){

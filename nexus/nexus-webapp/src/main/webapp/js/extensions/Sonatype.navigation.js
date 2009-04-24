@@ -136,6 +136,8 @@ Ext.extend( Sonatype.navigation.Section, Ext.Panel, {
         return c.enabled == false ? null :
         {
           autoHeight: true,
+          id: 'navigation-' + c.tabId,
+          initialConfigNavigation: c,
           listeners: {
             render: {
               fn: function( panel ) {

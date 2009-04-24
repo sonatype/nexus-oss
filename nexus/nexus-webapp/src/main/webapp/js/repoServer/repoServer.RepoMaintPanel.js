@@ -206,6 +206,20 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
 };
 
 Ext.extend( Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
+  
+  applyBookmark: function( bookmark ) {
+    if ( this.groupStore.lastOptions == null ) {
+      this.groupStore.on( 'load', 
+        function( store, recs, options ) {
+          this.selectBookmarkedItem( bookmark );
+        },
+        this,
+        { single: true } 
+      );
+    }
+    else this.selectBookmarkedItem( bookmark );
+  },
+
   deleteTrashHandler: function( button, e ) {
     Sonatype.utils.defaultToNo();
     
@@ -257,7 +271,7 @@ Ext.extend( Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
   },
 
   statusCallback : function( options, success, response ) {
-    if ( !success ) {
+    if ( response.status != 202 ) {
       Ext.TaskMgr.stop( this.repoStatusTask );
     }
 
