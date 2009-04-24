@@ -65,7 +65,7 @@ public class GroupIndexContentPlexusResource
             String groupId = String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
 
             // just to test availability, this will throw NoSuchRepository if there is none found
-            getNexus().getRepositoryWithFacet( groupId, GroupRepository.class );
+            getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
 
             return indexerManager.getRepositoryBestIndexContext( groupId );
         }
@@ -92,7 +92,7 @@ public class GroupIndexContentPlexusResource
             String groupId = String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
 
             // just to test availability, this will throw NoSuchRepository if there is none found
-            getNexus().getRepositoryWithFacet( groupId, GroupRepository.class );
+            getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
 
             IndexingContext indexingContext = indexerManager.getRepositoryBestIndexContext( groupId );
 

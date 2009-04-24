@@ -92,32 +92,13 @@ public class RepositoryTemplateListPlexusResource
                 repoRes.setName( repository.getName() );
 
                 repoRes.setEffectiveLocalStorageUrl( repository.getLocalStorage() != null
-                    && repository.getLocalStorage().getUrl() != null
-                    ? repository.getLocalStorage().getUrl()
-                    : repository.defaultLocalStorageUrl );
+                    && repository.getLocalStorage().getUrl() != null ? repository.getLocalStorage().getUrl()
+                                : repository.defaultLocalStorageUrl );
 
                 repoRes.setRepoPolicy( repository.getRepositoryPolicy() );
 
                 result.addData( repoRes );
             }
-
-            Collection<CRepositoryShadow> shadows = getNexus().listRepositoryShadowTemplates();
-
-            for ( CRepositoryShadow shadow : shadows )
-            {
-                repoRes = new RepositoryListResource();
-
-                repoRes.setResourceURI( createChildReference( request, this, shadow.getId() ).toString() );
-
-                repoRes.setRepoType( "virtual" );
-
-                repoRes.setName( shadow.getName() );
-
-                repoRes.setEffectiveLocalStorageUrl( shadow.defaultLocalStorageUrl );
-
-                result.addData( repoRes );
-            }
-
         }
         catch ( IOException e )
         {
@@ -142,55 +123,25 @@ public class RepositoryTemplateListPlexusResource
             {
                 RepositoryBaseResource resource = repoRequest.getData();
 
-                if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
+                CRepository normal = getNexus().readRepositoryTemplate( resource.getId() );
+
+                if ( normal == null )
                 {
-                    CRepositoryShadow shadow = getNexus().readRepositoryShadowTemplate( resource.getId() );
+                    normal = getRepositoryAppModel( (RepositoryResource) resource, null );
 
-                    if ( shadow == null )
-                    {
-                        shadow = getRepositoryShadowAppModel( (RepositoryShadowResource) resource, null );
+                    getNexus().createRepositoryTemplate( normal );
 
-                        getNexus().createRepositoryShadowTemplate( shadow );
+                    CRepository resultRepo = getNexus().readRepositoryTemplate( resource.getId() );
 
-                        CRepositoryShadow resultRepoShadow = getNexus().readRepositoryShadowTemplate( resource.getId() );
-
-                        result.setData( getRepositoryShadowRestModel( resultRepoShadow ) );
-                    }
-                    else
-                    {
-                        getLogger().warn(
-                            "Virtual repository template with ID=" + resource.getId() + " already exists!" );
-
-                        throw new PlexusResourceException(
-                            Status.CLIENT_ERROR_BAD_REQUEST,
-                            "Virtual repository template with ID=" + resource.getId() + " already exists!",
-                            getNexusErrorResponse( "id", "Virtual repository with id=" + resource.getId()
-                                + " already exists!" ) );
-                    }
+                    result.setData( getRepositoryRestModel( resultRepo ) );
                 }
                 else
                 {
-                    CRepository normal = getNexus().readRepositoryTemplate( resource.getId() );
+                    getLogger().warn( "Repository template with ID=" + resource.getId() + " already exists!" );
 
-                    if ( normal == null )
-                    {
-                        normal = getRepositoryAppModel( (RepositoryResource) resource, null );
-
-                        getNexus().createRepositoryTemplate( normal );
-
-                        CRepository resultRepo = getNexus().readRepositoryTemplate( resource.getId() );
-
-                        result.setData( getRepositoryRestModel( resultRepo ) );
-                    }
-                    else
-                    {
-                        getLogger().warn( "Repository template with ID=" + resource.getId() + " already exists!" );
-
-                        throw new PlexusResourceException(
-                            Status.CLIENT_ERROR_BAD_REQUEST,
-                            "Repository template with ID=" + resource.getId() + " already exists!",
-                            getNexusErrorResponse( "id", "Repository with id=" + resource.getId() + " already exists!" ) );
-                    }
+                    throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository template with ID="
+                        + resource.getId() + " already exists!", getNexusErrorResponse( "id", "Repository with id="
+                        + resource.getId() + " already exists!" ) );
                 }
             }
             catch ( IOException e )

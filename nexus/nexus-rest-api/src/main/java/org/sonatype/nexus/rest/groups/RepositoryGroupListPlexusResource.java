@@ -23,7 +23,6 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
@@ -69,27 +68,26 @@ public class RepositoryGroupListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:repogroups]" );
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         RepositoryGroupListResourceResponse result = new RepositoryGroupListResourceResponse();
 
-        Collection<CRepositoryGroup> groups = getNexus().listRepositoryGroups();
+        Collection<GroupRepository> groups = getRepositoryRegistry().getRepositoriesWithFacet( GroupRepository.class );
 
         try
         {
-            for ( CRepositoryGroup group : groups )
+            for ( GroupRepository group : groups )
             {
                 RepositoryGroupListResource resource = new RepositoryGroupListResource();
 
-                resource.setResourceURI( createRepositoryGroupReference( request, group.getGroupId() ).toString() );
+                resource.setResourceURI( createRepositoryGroupReference( request, group.getId() ).toString() );
 
-                resource.setId( group.getGroupId() );
+                resource.setId( group.getId() );
 
-                resource.setFormat( getNexus()
-                    .getRepositoryWithFacet( group.getGroupId(), GroupRepository.class ).getRepositoryContentClass()
+                resource.setFormat( getRepositoryRegistry()
+                    .getRepositoryWithFacet( group.getId(), GroupRepository.class ).getRepositoryContentClass()
                     .getId() );
 
                 resource.setName( group.getName() );
@@ -97,18 +95,17 @@ public class RepositoryGroupListPlexusResource
                 // just to trigger list creation, and not stay null coz of XStream serialization
                 resource.getRepositories();
 
-                for ( String repoId : (List<String>) group.getRepositories() )
+                for ( String repoId : (List<String>) group.getMemberRepositoryIds() )
                 {
                     RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
 
                     member.setId( repoId );
 
-                    member.setName( getNexus().getRepository( repoId ).getName() );
+                    member.setName( getRepositoryRegistry().getRepository( repoId ).getName() );
 
                     member.setResourceURI( createRepositoryReference( request, repoId ).toString() );
 
                     resource.addRepository( member );
-
                 }
 
                 result.addData( resource );

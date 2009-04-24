@@ -298,6 +298,8 @@ public class GlobalConfigurationPlexusResource
 
                         getNexusConfiguration().setForceBaseUrl( resource.isForceBaseUrl() );
                     }
+                    
+                    getNexusConfiguration().saveConfiguration();
                 }
                 catch ( ConfigurationException e )
                 {

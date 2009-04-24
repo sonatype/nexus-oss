@@ -58,7 +58,7 @@ public class RepositoryGroupContentPlexusResource
     {
         String groupId = request.getAttributes().get( GROUP_ID_KEY ).toString();
 
-        return getNexus().getRepositoryWithFacet( groupId, GroupRepository.class );
+        return getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
     }
 
 }
