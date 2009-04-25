@@ -322,7 +322,12 @@ Ext.extend( Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
         break;
     }
     this.refreshHandler( button, e );
+  },
+  
+  showRecordContextMenu: function(rec) {
+  	return rec.data.exposed;
   }
+  
 } );
 
 Sonatype.repoServer.RepositoryBrowsePanel = function( config ) {
@@ -504,7 +509,9 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
   nodeContextMenuHandler: function( node, e ) {
     if ( e.target.nodeName == 'A' ) return; // no menu on links
 
-    if ( this.payload.data.exposed == false ) return; // no menu on non-managed repos
+    if ( !this.payload.data.showCtx ) {
+    	return;
+    }
 
     if ( this.nodeContextMenuEvent ) { 
 
@@ -654,6 +661,7 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
       node.setText( node.text + ' (Access Denied)' );
     }
   }
+  
 } );
 
 Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {

@@ -602,8 +602,20 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
 
   rowSelectHandler: function( selectionModel, index, rec ) {
     if ( this.rowClickEvent || this.rowClickHandler ) {
-      this.createChildPanel( rec );
-      Ext.History.add( this.id + Sonatype.view.HISTORY_DELIMITER + rec.data[this.dataBookmark] );
+        if ( this.showRecordContextMenu(rec) ){
+    		rec.beginEdit();
+    		rec.set('showCtx', true);
+			rec.commit();
+			rec.endEdit();
+    	}
+    	else{
+    		rec.beginEdit();
+    		rec.set('showCtx', false);
+			rec.commit();
+			rec.endEdit();    		
+    	}
+        this.createChildPanel( rec );
+        Ext.History.add( this.id + Sonatype.view.HISTORY_DELIMITER + rec.data[this.dataBookmark] );
     }
   },
 
@@ -614,7 +626,14 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
     if ( recIndex >= 0 ) {
       this.gridPanel.getSelectionModel().selectRecords( [this.dataStore.getAt( recIndex )] );
     }
+  },
+  
+  // Override if want to restrict the context menu
+  // default: show context menu
+  showRecordContextMenu: function(rec) {
+  	return true;	
   }
+  
 } );
 
 Sonatype.panels.TreePanel = function( config ) {
