@@ -25,7 +25,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.mortbay.jetty.EofException;
 import org.restlet.Context;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
@@ -520,18 +519,7 @@ public abstract class AbstractArtifactPlexusResource
     protected void handleException( Request request, Response res, Exception t )
         throws ResourceException
     {
-        // https://issues.sonatype.org/browse/NEXUS-217
-        if ( t instanceof EofException )
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "Got exception during processing " + request.getMethod() + " "
-                        + request.getResourceRef().toString() + "\n" + t.getMessage() );
-            }
-            return;
-        }
-        else if ( t instanceof ResourceException )
+        if ( t instanceof ResourceException )
         {
             throw (ResourceException) t;
         }
