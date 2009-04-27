@@ -21,28 +21,21 @@ public class ExceptionCatchingModularRealmAuthorizer
     extends ModularRealmAuthorizer
 {
 
+    private final Logger logger = LoggerFactory.getLogger( this.getClass() );
+    
     public ExceptionCatchingModularRealmAuthorizer( Collection<Realm> realms )
     {
         super( realms );
     }
 
-    private final Logger logger = LoggerFactory.getLogger( this.getClass() );
-    
     // Authorization
     @Override
     public void checkPermission( PrincipalCollection subjectPrincipal, String permission )
         throws AuthorizationException
     {
-        for ( Realm realm : this.getRealms() )
+        if ( !this.isPermitted( subjectPrincipal, permission ) )
         {
-            try
-            {
-                realm.checkPermission( subjectPrincipal, permission );
-            }
-            catch ( AuthorizationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
+            throw new AuthorizationException( "User is not permitted: " + permission );
         }
     }
 
@@ -50,16 +43,9 @@ public class ExceptionCatchingModularRealmAuthorizer
     public void checkPermission( PrincipalCollection subjectPrincipal, Permission permission )
         throws AuthorizationException
     {
-        for ( Realm realm : this.getRealms() )
+        if ( !this.isPermitted( subjectPrincipal, permission ) )
         {
-            try
-            {
-                realm.checkPermission( subjectPrincipal, permission );
-            }
-            catch ( AuthorizationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
+            throw new AuthorizationException( "User is not permitted: " + permission );
         }
     }
 
@@ -87,16 +73,9 @@ public class ExceptionCatchingModularRealmAuthorizer
     public void checkRole( PrincipalCollection subjectPrincipal, String roleIdentifier )
         throws AuthorizationException
     {
-        for ( Realm realm : this.getRealms() )
+        if ( !this.hasRole( subjectPrincipal, roleIdentifier ) )
         {
-            try
-            {
-                realm.checkRole( subjectPrincipal, roleIdentifier );
-            }
-            catch ( AuthorizationException e )
-            {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
-            }
+            throw new AuthorizationException( "User is not permitted role: " + roleIdentifier );
         }
     }
 
@@ -104,9 +83,9 @@ public class ExceptionCatchingModularRealmAuthorizer
     public void checkRoles( PrincipalCollection subjectPrincipal, Collection<String> roleIdentifiers )
         throws AuthorizationException
     {
-        for ( String roleIdentifier : roleIdentifiers )
+        if ( !this.hasAllRoles( subjectPrincipal, roleIdentifiers ) )
         {
-            checkRole( subjectPrincipal, roleIdentifier );
+            throw new AuthorizationException( "User is not permitted role: " + roleIdentifiers );
         }
     }
 

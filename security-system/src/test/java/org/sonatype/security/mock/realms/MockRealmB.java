@@ -1,4 +1,4 @@
-package org.sonatype.security.mock;
+package org.sonatype.security.mock.realms;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.jsecurity.authc.AuthenticationException;
@@ -7,6 +7,7 @@ import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.SimpleAuthenticationInfo;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.authz.AuthorizationInfo;
+import org.jsecurity.authz.SimpleAuthorizationInfo;
 import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
@@ -41,7 +42,22 @@ public class MockRealmB
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
     {
-        // TODO Auto-generated method stub
+
+        // make sure the user is jcool, (its just for testing)
+
+        if( principals.asList().get( 0 ).toString().equals( "jcool" ) )
+        {
+            SimpleAuthorizationInfo info = new  SimpleAuthorizationInfo();
+            
+            info.addRole( "test-role1" );
+            info.addRole( "test-role2" );
+            
+            info.addStringPermission( "test:*" );
+            
+            return info;
+            
+        }
+
         return null;
     }
 

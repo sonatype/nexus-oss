@@ -9,9 +9,10 @@ import org.jsecurity.subject.Subject;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
-import org.sonatype.security.users.User;
-import org.sonatype.security.users.UserManager;
-import org.sonatype.security.users.UserSearchCriteria;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 public interface SecuritySystem
 {
@@ -21,7 +22,7 @@ public interface SecuritySystem
     // *********************
 
     /**
-     * Authenticates a user.  If successful returns a User.
+     * Authenticates a user. If successful returns a User.
      * 
      * @param token
      * @return
@@ -32,6 +33,7 @@ public interface SecuritySystem
 
     /**
      * Finds the current logged in user.
+     * 
      * @return
      */
     public Subject getSubject();
@@ -51,16 +53,45 @@ public interface SecuritySystem
     public void checkPermission( PrincipalCollection principal, List<String> permissions )
         throws AuthorizationException;
 
+    // ******************************
+    // * Role permission management
+    // ******************************
+    public AuthorizationManager getAuthorizationManager( String sourceId );
+
     // *********************
     // * user management
     // *********************
-    public UserManager getUserManager( String sourceId );
+    // public UserManager getUserManager( String sourceId );
 
+    User addUser( User user );
+
+    /**
+     * Get a Subject object by id
+     * 
+     * @param userId
+     * @return
+     * @throws UserNotFoundException 
+     */
+    User getUser( String userId, String source ) throws UserNotFoundException;
+
+    User updateUser( User user )
+        throws UserNotFoundException;
+
+    void deleteUser( String userId, String source )
+        throws UserNotFoundException;
+
+    /**
+     * Retrieve all Subject objects
+     * 
+     * @return
+     */
+    Set<User> listUsers();
+
+    /**
+     * Searches for Subject objects by a criteria.
+     * 
+     * @return
+     */
     public Set<User> searchUsers( UserSearchCriteria criteria );
-    
-    // ******************************
-    // * Role permission management
-    // ******************************  
-    public AuthorizationManager getAuthorizationManager( String sourceId );
 
 }

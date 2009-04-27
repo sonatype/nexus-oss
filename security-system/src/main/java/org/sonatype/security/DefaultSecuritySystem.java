@@ -22,10 +22,12 @@ import org.jsecurity.subject.Subject;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
+import org.sonatype.security.authorization.Role;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
-import org.sonatype.security.users.User;
-import org.sonatype.security.users.UserManager;
-import org.sonatype.security.users.UserSearchCriteria;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 /**
  * This implementation wraps a jsecurity/Ki SecurityManager, and adds user management.
@@ -42,12 +44,15 @@ public class DefaultSecuritySystem
 
     @Requirement( role = UserManager.class )
     private Map<String, UserManager> userManagerMap;
-    
+
     @Requirement
     private PlexusContainer container;
-    
+
+    @Requirement( role = AuthorizationManager.class )
+    private Map<String, AuthorizationManager> authorizationManagers;
+
     @Requirement
-    private Logger logger; 
+    private Logger logger;
 
     public Subject login( AuthenticationToken token )
         throws AuthenticationException
@@ -109,39 +114,24 @@ public class DefaultSecuritySystem
         }
     }
 
-    public UserManager getUserManager( String sourceId )
-    {
-        return this.userManagerMap.get( sourceId );
-    }
-
-    public Set<User> searchUsers( UserSearchCriteria criteria )
-    {
-        // TODO: do we want to expose the search method, or just have use a new UserManager that will aggregate the
-        // results (like the old PlexusUserLocator) for example the sourceId 'ALL' would return the aggregator
-
-        return null;
-    }
-
     public AuthorizationManager getAuthorizationManager( String sourceId )
     {
-        // TODO Auto-generated method stub
-        return null;
+        return this.authorizationManagers.get( sourceId );
     }
 
     public void initialize()
         throws InitializationException
     {
         // load the configuration
-
         try
         {
             this.configSource.loadConfiguration();
-            
-            if( this.configSource.getConfiguration() == null)
+
+            if ( this.configSource.getConfiguration() == null )
             {
                 throw new InitializationException( "Failed to load the security configuration." );
             }
-            
+
             this.securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
         }
         catch ( Exception e )
@@ -149,7 +139,7 @@ public class DefaultSecuritySystem
             throw new InitializationException( e.getMessage(), e );
         }
     }
-    
+
     private Collection<Realm> getRealmsFromConfigSource()
     {
         Set<Realm> realms = new HashSet<Realm>();
@@ -180,5 +170,145 @@ public class DefaultSecuritySystem
 
         return realms;
     }
-    
+
+    // *********************
+    // * user management
+    // *********************
+
+    private UserManager getUserManager( String sourceId )
+    {
+        return this.userManagerMap.get( sourceId );
+    }
+
+    public User addUser( User user )
+    {
+        // first save the user
+        // this is the UserManager that owns the user
+        // FIXME: NPE alert
+        UserManager userManager = this.getUserManager( user.getSource() );
+        userManager.addUser( user );
+
+        // then save the users Roles
+        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        {
+            // skip the user manager that owns the user, we already did that
+            // these user managers will only save roles
+            if ( !tmpUserManager.getSource().equals( user.getSource() ) )
+            {
+                try
+                {
+                    tmpUserManager.setUsersRoles( user.getUserId(), user.getRoles() );
+                }
+                catch ( UserNotFoundException e )
+                {
+                    this.logger.debug( "User '" + user.getUserId() + "' is not managed by the usermanager: "
+                        + tmpUserManager.getSource() );
+                }
+            }
+        }
+
+        return user;
+    }
+
+    public User updateUser( User user )
+        throws UserNotFoundException
+    {
+        // first update the user
+        // this is the UserManager that owns the user
+        // FIXME: NPE alert
+        UserManager userManager = this.getUserManager( user.getSource() );
+        userManager.updateUser( user );
+
+        // then save the users Roles
+        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        {
+            // skip the user manager that owns the user, we already did that
+            // these user managers will only save roles
+            if ( !tmpUserManager.getSource().equals( user.getSource() ) )
+            {
+                try
+                {
+                    Set<Role> roles = tmpUserManager.getUsersRoles( user.getUserId() );
+                    if ( roles != null )
+                    {
+                        tmpUserManager.setUsersRoles( user.getUserId(), user.getRoles() );
+                    }
+                }
+                catch ( UserNotFoundException e )
+                {
+                    this.logger.debug( "User '" + user.getUserId() + "' is not managed by the usermanager: "
+                        + tmpUserManager.getSource() );
+                }
+            }
+        }
+
+        return user;
+    }
+
+    public void deleteUser( String userId, String source )
+        throws UserNotFoundException
+    {
+        // FIXME: NPE alert
+        UserManager userManager = this.getUserManager( source );
+        userManager.deleteUser( userId );
+    }
+
+    public User getUser( String userId, String source )
+        throws UserNotFoundException
+    {
+        // first get the user
+        // this is the UserManager that owns the user
+        // FIXME: NPE alert
+        UserManager userManager = this.getUserManager( source );
+        User user = userManager.getUser( userId );
+
+        // then save the users Roles
+        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        {
+            // skip the user manager that owns the user, we already did that
+            // these user managers will only have roles
+            if ( !tmpUserManager.getSource().equals( source ) )
+            {
+                try
+                {
+                    Set<Role> roles = tmpUserManager.getUsersRoles( userId );
+                    if ( roles != null )
+                    {
+                        user.getRoles().addAll( roles );
+                    }
+                }
+                catch ( UserNotFoundException e )
+                {
+                    this.logger.debug( "User '" + userId + "' is not managed by the usermanager: "
+                        + tmpUserManager.getSource() );
+                }
+            }
+        }
+
+        return user;
+    }
+
+    public Set<User> listUsers()
+    {
+        // TODO: add roles from other user managers
+        Set<User> users = new HashSet<User>();
+
+        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        {
+            users.addAll( tmpUserManager.listUsers() );
+        }
+        return users;
+    }
+
+    public Set<User> searchUsers( UserSearchCriteria criteria )
+    {
+        // TODO: add roles from other user managers
+        Set<User> users = new HashSet<User>();
+
+        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        {
+            users.addAll( tmpUserManager.searchUsers( criteria ) );
+        }
+        return users;
+    }
 }

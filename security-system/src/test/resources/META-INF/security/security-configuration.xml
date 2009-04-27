@@ -6,6 +6,7 @@
   <anonymousPassword>anonymous-pass</anonymousPassword>
   <realms>
     <realm>MockRealmA</realm>
+    <realm>ExceptionThrowingMockRealm</realm>
     <realm>MockRealmB</realm>
   </realms>
   
