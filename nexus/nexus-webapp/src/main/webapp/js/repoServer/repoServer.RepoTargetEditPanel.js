@@ -140,14 +140,14 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
           {
            	xtype: 'panel',
             layout: 'form',
-            width: 380,
+            width: 475,
             items: [
               {
                 xtype: 'textfield',
                 fieldLabel: 'Pattern Expression', 
                 helpText: ht.pattern,
                 name: 'pattern',
-                width: 205
+                width: 300
               }
             ]
           },
@@ -184,8 +184,8 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
             //note: this style matches the expected behavior
             bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
             style: 'padding: 0 20px 0 0',
-            width: 225,
-            height: 300,
+            width: 320,
+            height: 150,
             animate:true,
             lines: false,
             autoScroll:true,
