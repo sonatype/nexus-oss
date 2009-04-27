@@ -38,8 +38,6 @@ import org.sonatype.nexus.proxy.events.RepositoryEventRecreateMavenMetadata;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageCollectionItem;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
@@ -51,7 +49,6 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
-import org.sonatype.nexus.util.ItemPathUtils;
 
 /**
  * The abstract (layout unaware) Maven Repository.
@@ -660,31 +657,4 @@ public abstract class AbstractMavenRepository
         request.popRequestPath();
     }
 
-    @Override
-    public void deleteItem( boolean fromTask, ResourceStoreRequest request )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
-    {
-        // first determine from where to rebuild metadata
-        String path = RepositoryItemUid.PATH_ROOT;
-
-        StorageItem item = getLocalStorage().retrieveItem( this, request );
-
-        if ( item instanceof StorageCollectionItem )
-        {
-            path = ItemPathUtils.getParentPath( item.getPath() );
-        }
-        else if ( item instanceof StorageFileItem )
-        {
-            path = ItemPathUtils.getParentPath( ItemPathUtils.getParentPath( item.getPath() ) );
-        }
-
-        // then delete the item
-        super.deleteItem( fromTask, request );
-
-        // finally rebuild metadata
-        doRecreateMavenMetadata( new ResourceStoreRequest( path, true ) );
-    }
 }
