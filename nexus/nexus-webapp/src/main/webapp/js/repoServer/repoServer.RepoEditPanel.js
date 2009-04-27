@@ -140,6 +140,10 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
           receivedData.userManaged = true;
         }
       }
+      
+      var repoPanel = Ext.getCmp('view-repositories');
+      repoPanel.statusStart();
+      
       return;
     }
     
@@ -151,6 +155,7 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
     rec.set( 'repoPolicy', receivedData.repoPolicy );
     rec.commit();
     rec.endEdit();
+    
   },
   
     //@override
