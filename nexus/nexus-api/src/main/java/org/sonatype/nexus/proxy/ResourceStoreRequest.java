@@ -18,6 +18,7 @@ import java.util.Stack;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * Request for a resource. It drives many aspects of the request itself.
@@ -176,6 +177,26 @@ public class ResourceStoreRequest
     }
 
     /**
+     * Checks if is request group local only.
+     * 
+     * @return true, if is request group local only
+     */
+    public boolean isRequestGroupLocalOnly()
+    {
+        return getRequestContext().isRequestGroupLocalOnly();
+    }
+
+    /**
+     * Sets the request group local only.
+     * 
+     * @param requestremoteOnly the new request group local only
+     */
+    public void setRequestGroupLocalOnly( boolean requestGroupLocal )
+    {
+        getRequestContext().setRequestGroupLocalOnly( requestGroupLocal );
+    }
+
+    /**
      * Returns the list of processed repositories.
      * 
      * @return
@@ -183,6 +204,16 @@ public class ResourceStoreRequest
     public List<String> getProcessedRepositories()
     {
         return getRequestContext().getProcessedRepositories();
+    }
+
+    /**
+     * Adds repository as processed.
+     * 
+     * @param repository
+     */
+    public void addProcessedRepository( Repository repository )
+    {
+        getRequestContext().addProcessedRepository( repository );
     }
 
     /**

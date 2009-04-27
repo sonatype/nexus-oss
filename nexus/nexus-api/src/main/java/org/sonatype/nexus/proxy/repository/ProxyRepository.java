@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -123,4 +124,15 @@ public interface ProxyRepository
      * @return
      */
     DownloadMirrors getDownloadMirrors();
+
+    /**
+     * Caches an item.
+     * 
+     * @param item
+     * @return
+     * @throws StorageException
+     */
+    AbstractStorageItem doCacheItem( AbstractStorageItem item )
+        throws StorageException;
+
 }

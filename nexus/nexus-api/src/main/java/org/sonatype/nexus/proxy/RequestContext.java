@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 public class RequestContext
     extends HashMap<String, Object>
@@ -24,6 +25,9 @@ public class RequestContext
 
     /** Context flag to mark a request local only. */
     private static final String CTX_REMOTE_ONLY_FLAG = "request.remoteOnly";
+
+    /** Context flag to mark a request local only. */
+    private static final String CTX_GROUP_LOCAL_ONLY_FLAG = "request.groupLocalOnly";
 
     /** Context key for set of processed repositories. */
     private static final String CTX_PROCESSED_REPOSITORIES = "request.processedRepositories";
@@ -155,6 +159,33 @@ public class RequestContext
     }
 
     /**
+     * Checks if is request group local only.
+     * 
+     * @return true, if is request group local only
+     */
+    public boolean isRequestGroupLocalOnly()
+    {
+        if ( containsKey( CTX_GROUP_LOCAL_ONLY_FLAG ) )
+        {
+            return (Boolean) get( CTX_GROUP_LOCAL_ONLY_FLAG );
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Sets the request group local only.
+     * 
+     * @param requestremoteOnly the new request group local only
+     */
+    public void setRequestGroupLocalOnly( boolean requestGroupLocal )
+    {
+        put( CTX_GROUP_LOCAL_ONLY_FLAG, requestGroupLocal );
+    }
+
+    /**
      * Returns the list of processed repositories.
      * 
      * @return
@@ -163,6 +194,16 @@ public class RequestContext
     public List<String> getProcessedRepositories()
     {
         return (List<String>) get( CTX_PROCESSED_REPOSITORIES );
+    }
+
+    /**
+     * Adds the repository to the list of processed repositories.
+     * 
+     * @param repository
+     */
+    public void addProcessedRepository( Repository repository )
+    {
+        getProcessedRepositories().add( repository.getId() );
     }
 
     /**

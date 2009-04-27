@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 
 /**
  * A Processor that is able to process/modify the request before Nexus will serve it.
@@ -42,4 +43,14 @@ public interface RequestProcessor
      * @return
      */
     boolean shouldProxy( ProxyRepository repository, ResourceStoreRequest request );
+
+    /**
+     * Request processor is able to override generic behaviour of Repository in aspect of caching.
+     * 
+     * @param repository
+     * @param request
+     * @param item
+     * @return
+     */
+    boolean shouldCache( ProxyRepository repository, ResourceStoreRequest request, AbstractStorageItem item );
 }

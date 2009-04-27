@@ -124,7 +124,11 @@ public abstract class AbstractProxyRepository
             if ( sendNotification && !proxyMode.equals( oldProxyMode ) )
             {
                 getApplicationEventMulticaster().notifyProximityEventListeners(
-                    new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );
+                                                                                new RepositoryEventProxyModeChanged(
+                                                                                                                     this,
+                                                                                                                     oldProxyMode,
+                                                                                                                     proxyMode,
+                                                                                                                     cause ) );
             }
         }
     }
@@ -205,9 +209,7 @@ public abstract class AbstractProxyRepository
     }
 
     protected boolean isRemoteStorageReachable()
-        throws StorageException,
-            RemoteAuthenticationNeededException,
-            RemoteAccessDeniedException
+        throws StorageException, RemoteAuthenticationNeededException, RemoteAccessDeniedException
     {
         try
         {
@@ -217,11 +219,12 @@ public abstract class AbstractProxyRepository
         catch ( RemoteAccessException ex )
         {
             getLogger().warn(
-                "RemoteStorage of repository " + getId()
-                    + " throws RemoteAccessException. Please set up authorization information for repository ID='"
-                    + this.getId()
-                    + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
-                ex );
+                              "RemoteStorage of repository "
+                                  + getId()
+                                  + " throws RemoteAccessException. Please set up authorization information for repository ID='"
+                                  + this.getId()
+                                  + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
+                              ex );
 
             autoBlockProxying( ex );
 
@@ -347,7 +350,7 @@ public abstract class AbstractProxyRepository
         return dMirrors;
     }
 
-    protected AbstractStorageItem doCacheItem( AbstractStorageItem item )
+    public AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws StorageException
     {
         if ( Boolean.TRUE.equals( item.getItemContext().get( CTX_TRANSITIVE_ITEM ) ) )
@@ -362,7 +365,8 @@ public abstract class AbstractProxyRepository
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Caching item " + item.getRepositoryItemUid().toString() + " in local storage of repository." );
+                                   "Caching item " + item.getRepositoryItemUid().toString()
+                                       + " in local storage of repository." );
             }
 
             getLocalStorage().storeItem( this, item );
@@ -371,8 +375,7 @@ public abstract class AbstractProxyRepository
 
             result = getLocalStorage().retrieveItem( this, new ResourceStoreRequest( item ) );
 
-            getApplicationEventMulticaster()
-                .notifyProximityEventListeners( new RepositoryItemEventCache( this, result ) );
+            getApplicationEventMulticaster().notifyProximityEventListeners( new RepositoryItemEventCache( this, result ) );
 
             result.getItemContext().putAll( item.getItemContext() );
         }
@@ -393,9 +396,7 @@ public abstract class AbstractProxyRepository
 
     @Override
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         AbstractStorageItem item = null;
         AbstractStorageItem remoteItem = null;
@@ -451,9 +452,9 @@ public abstract class AbstractProxyRepository
                         if ( getLogger().isDebugEnabled() )
                         {
                             getLogger().debug(
-                                "Item " + request.toString()
-                                    + " is old, checking for newer file on remote then local: "
-                                    + new Date( localItem.getModified() ) );
+                                               "Item " + request.toString()
+                                                   + " is old, checking for newer file on remote then local: "
+                                                   + new Date( localItem.getModified() ) );
                         }
 
                         // check is the remote newer than the local one
@@ -468,7 +469,8 @@ public abstract class AbstractProxyRepository
                                 if ( getLogger().isDebugEnabled() )
                                 {
                                     getLogger().debug(
-                                        "No newer version of item " + request.toString() + " found on remote storage." );
+                                                       "No newer version of item " + request.toString()
+                                                           + " found on remote storage." );
                                 }
                             }
                             else
@@ -476,21 +478,21 @@ public abstract class AbstractProxyRepository
                                 if ( getLogger().isDebugEnabled() )
                                 {
                                     getLogger().debug(
-                                        "Newer version of item " + request.toString() + " is found on remote storage." );
+                                                       "Newer version of item " + request.toString()
+                                                           + " is found on remote storage." );
                                 }
                             }
 
                         }
                         catch ( RemoteAccessException ex )
                         {
-                            getLogger()
-                                .warn(
-                                    "RemoteStorage of repository "
-                                        + getId()
-                                        + " throws RemoteAccessException. Please set up authorization information for repository ID='"
-                                        + this.getId()
-                                        + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
-                                    ex );
+                            getLogger().warn(
+                                              "RemoteStorage of repository "
+                                                  + getId()
+                                                  + " throws RemoteAccessException. Please set up authorization information for repository ID='"
+                                                  + this.getId()
+                                                  + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
+                                              ex );
 
                             autoBlockProxying( ex );
 
@@ -500,14 +502,13 @@ public abstract class AbstractProxyRepository
                         }
                         catch ( StorageException ex )
                         {
-                            getLogger()
-                                .warn(
-                                    "RemoteStorage of repository "
-                                        + getId()
-                                        + " throws StorageException. Problem connecting to remote repository='"
-                                        + this.getId()
-                                        + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
-                                    ex );
+                            getLogger().warn(
+                                              "RemoteStorage of repository "
+                                                  + getId()
+                                                  + " throws StorageException. Problem connecting to remote repository='"
+                                                  + this.getId()
+                                                  + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
+                                              ex );
 
                             autoBlockProxying( ex );
 
@@ -577,11 +578,10 @@ public abstract class AbstractProxyRepository
                 // we dont have neither one, NotFoundException
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger()
-                        .debug(
-                            "Item "
-                                + request.toString()
-                                + " does not exist in local storage neither in remote storage, throwing ItemNotFoundException." );
+                    getLogger().debug(
+                                       "Item "
+                                           + request.toString()
+                                           + " does not exist in local storage neither in remote storage, throwing ItemNotFoundException." );
                 }
 
                 throw new ItemNotFoundException( request, this );
@@ -592,8 +592,8 @@ public abstract class AbstractProxyRepository
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug(
-                        "Item " + request.toString()
-                            + " does exist in local storage and is fresh, returning local one." );
+                                       "Item " + request.toString()
+                                           + " does exist in local storage and is fresh, returning local one." );
                 }
 
                 item = localItem;
@@ -614,10 +614,9 @@ public abstract class AbstractProxyRepository
             {
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger()
-                        .debug(
-                            "Item " + request.toString()
-                                + " does exist locally and cannot go remote, returning local one." );
+                    getLogger().debug(
+                                       "Item " + request.toString()
+                                           + " does exist locally and cannot go remote, returning local one." );
                 }
 
                 item = localItem;
@@ -627,8 +626,9 @@ public abstract class AbstractProxyRepository
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug(
-                        "Item " + request.toString()
-                            + " does not exist locally and cannot go remote, throwing ItemNotFoundException." );
+                                       "Item "
+                                           + request.toString()
+                                           + " does not exist locally and cannot go remote, throwing ItemNotFoundException." );
                 }
 
                 throw new ItemNotFoundException( request, this );
@@ -639,7 +639,7 @@ public abstract class AbstractProxyRepository
     }
 
     private void sendContentValidationEvents( ResourceStoreRequest request, List<NexusArtifactEvent> events,
-        boolean isContentValid )
+                                              boolean isContentValid )
     {
         if ( getLogger().isDebugEnabled() && !isContentValid )
         {
@@ -653,8 +653,7 @@ public abstract class AbstractProxyRepository
     }
 
     protected void markItemRemotelyChecked( ResourceStoreRequest request )
-        throws StorageException,
-            ItemNotFoundException
+        throws StorageException, ItemNotFoundException
     {
         // remote file unchanged, touch the local one to renew it's Age
         getLocalStorage().touchItemRemoteChecked( this, request );
@@ -667,8 +666,8 @@ public abstract class AbstractProxyRepository
      *   getRemoteStorage().retrieveItem( this, context, getRemoteUrl(), checksumUid.getPath() );
      * </code>
      */
-    protected boolean doValidateRemoteItemContent( String baseUrl, AbstractStorageItem item,
-        List<NexusArtifactEvent> events )
+    protected boolean doValidateRemoteItemContent( ResourceStoreRequest req, String baseUrl,
+                                                   AbstractStorageItem item, List<NexusArtifactEvent> events )
         throws StorageException
     {
         return true;
@@ -698,9 +697,7 @@ public abstract class AbstractProxyRepository
      * </pre>
      */
     protected AbstractStorageItem doRetrieveRemoteItem( ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            RemoteAccessException,
-            StorageException
+        throws ItemNotFoundException, RemoteAccessException, StorageException
     {
         DownloadMirrorSelector selector = getDownloadMirrors().openSelector();
 
@@ -720,8 +717,9 @@ public abstract class AbstractProxyRepository
 
                 if ( getRemoteStorageContext() != null )
                 {
-                    CRemoteConnectionSettings remoteConnectionSettings = (CRemoteConnectionSettings) getRemoteStorageContext()
-                        .getRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS );
+                    CRemoteConnectionSettings remoteConnectionSettings =
+                        (CRemoteConnectionSettings) getRemoteStorageContext().getRemoteConnectionContextObject(
+                                                                                                                RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS );
 
                     retryCount = remoteConnectionSettings.getRetrievalRetryCount();
                 }
@@ -732,16 +730,14 @@ public abstract class AbstractProxyRepository
                     {
                         // events.clear();
 
-                        AbstractStorageItem remoteItem = getRemoteStorage().retrieveItem(
-                            this,
-                            request,
-                            mirror.getUrl() );
+                        AbstractStorageItem remoteItem =
+                            getRemoteStorage().retrieveItem( this, request, mirror.getUrl() );
 
                         remoteItem.getItemContext().putAll( request.getRequestContext() );
 
                         remoteItem = doCacheItem( remoteItem );
 
-                        if ( doValidateRemoteItemContent( mirror.getUrl(), remoteItem, events ) )
+                        if ( doValidateRemoteItemContent( request, mirror.getUrl(), remoteItem, events ) )
                         {
                             sendContentValidationEvents( request, events, true );
 

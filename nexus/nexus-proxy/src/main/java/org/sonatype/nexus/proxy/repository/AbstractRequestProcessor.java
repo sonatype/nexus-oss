@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 
 /**
  * A helper base class that makes it easier to create processors. Note: despite it's name, this class is not abstract
@@ -22,10 +23,9 @@ import org.sonatype.nexus.proxy.access.Action;
  * 
  * @author cstamas
  */
-public class AbstractRequestProcessor
+public abstract class AbstractRequestProcessor
     implements RequestProcessor
 {
-
     public boolean process( Repository repository, ResourceStoreRequest request, Action action )
     {
         return true;
@@ -36,4 +36,8 @@ public class AbstractRequestProcessor
         return true;
     }
 
+    public boolean shouldCache( ProxyRepository proxy, ResourceStoreRequest request, AbstractStorageItem item )
+    {
+        return true;
+    }
 }

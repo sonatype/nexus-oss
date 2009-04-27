@@ -130,7 +130,7 @@ public class M2Repository
         }
     }
 
-    protected AbstractStorageItem doCacheItem( AbstractStorageItem item )
+    public AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws StorageException
     {
         // if the item is file, is M2 repository metadata and this repo is release-only or snapshot-only

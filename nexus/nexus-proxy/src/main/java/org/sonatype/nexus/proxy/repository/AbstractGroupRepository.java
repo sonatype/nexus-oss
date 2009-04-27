@@ -87,40 +87,43 @@ public abstract class AbstractGroupRepository
             // ignored
         }
 
-        for ( Repository repo : getMemberRepositories() )
+        if ( !request.isRequestGroupLocalOnly() )
         {
-            if ( !request.getProcessedRepositories().contains( repo.getId() ) )
+            for ( Repository repo : getMemberRepositories() )
             {
-                try
+                if ( !request.getProcessedRepositories().contains( repo.getId() ) )
                 {
-                    addItems( names, result, repo.list( false, request ) );
+                    try
+                    {
+                        addItems( names, result, repo.list( false, request ) );
 
-                    found = true;
+                        found = true;
+                    }
+                    catch ( ItemNotFoundException e )
+                    {
+                        // ignored
+                    }
+                    catch ( IllegalOperationException e )
+                    {
+                        // ignored
+                    }
+                    catch ( StorageException e )
+                    {
+                        // ignored
+                    }
                 }
-                catch ( ItemNotFoundException e )
+                else
                 {
-                    // ignored
-                }
-                catch ( IllegalOperationException e )
-                {
-                    // ignored
-                }
-                catch ( StorageException e )
-                {
-                    // ignored
-                }
-            }
-            else
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                                       "A repository CYCLE detected (doListItems()), while processing group ID='"
-                                           + this.getId()
-                                           + "'. The repository with ID='"
-                                           + repo.getId()
-                                           + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                           + request.toString() );
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                                           "A repository CYCLE detected (doListItems()), while processing group ID='"
+                                               + this.getId()
+                                               + "'. The repository with ID='"
+                                               + repo.getId()
+                                               + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                               + request.toString() );
+                    }
                 }
             }
         }
@@ -159,43 +162,46 @@ public abstract class AbstractGroupRepository
             // ignored
         }
 
-        for ( Repository repo : getRequestRepositories( request ) )
+        if ( !request.isRequestGroupLocalOnly() )
         {
-            if ( !request.getProcessedRepositories().contains( repo.getId() ) )
+            for ( Repository repo : getRequestRepositories( request ) )
             {
-                try
+                if ( !request.getProcessedRepositories().contains( repo.getId() ) )
                 {
-                    StorageItem item = repo.retrieveItem( false, request );
-
-                    if ( item instanceof StorageCollectionItem )
+                    try
                     {
-                        item = new DefaultStorageCollectionItem( this, request, true, false );
-                    }
+                        StorageItem item = repo.retrieveItem( false, request );
 
-                    return item;
+                        if ( item instanceof StorageCollectionItem )
+                        {
+                            item = new DefaultStorageCollectionItem( this, request, true, false );
+                        }
+
+                        return item;
+                    }
+                    catch ( IllegalOperationException e )
+                    {
+                        // ignored
+                    }
+                    catch ( ItemNotFoundException e )
+                    {
+                        // ignored
+                    }
+                    catch ( StorageException e )
+                    {
+                        // ignored
+                    }
                 }
-                catch ( IllegalOperationException e )
+                else
                 {
-                    // ignored
+                    getLogger().info(
+                                      "A repository CYCLE detected (doRetrieveItem()), while processing group ID='"
+                                          + this.getId()
+                                          + "'. The repository with ID='"
+                                          + repo.getId()
+                                          + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                          + request.toString() );
                 }
-                catch ( ItemNotFoundException e )
-                {
-                    // ignored
-                }
-                catch ( StorageException e )
-                {
-                    // ignored
-                }
-            }
-            else
-            {
-                getLogger().info(
-                                  "A repository CYCLE detected (doRetrieveItem()), while processing group ID='"
-                                      + this.getId()
-                                      + "'. The repository with ID='"
-                                      + repo.getId()
-                                      + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                      + request.toString() );
             }
         }
 
