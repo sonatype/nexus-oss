@@ -70,6 +70,8 @@ public class ConfigurationPlexusResource
 
         result.clear();
 
+        result.add( new Variant( MediaType.TEXT_PLAIN ) );
+        
         result.add( new Variant( MediaType.APPLICATION_XML ) );
 
         return result;

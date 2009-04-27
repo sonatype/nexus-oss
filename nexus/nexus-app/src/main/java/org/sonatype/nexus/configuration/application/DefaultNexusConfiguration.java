@@ -1179,7 +1179,16 @@ public class DefaultNexusConfiguration
                 NexusStreamResponse response = new NexusStreamResponse();
 
                 response.setName( fileName );
-                response.setMimeType( "text/xml" );
+
+                if ( fileName.endsWith( ".xml" ) )
+                {
+                    response.setMimeType( "text/xml" );
+                }
+                else
+                {
+                    response.setMimeType( "text/plain" );
+                }
+
                 response.setSize( configFile.length() );
                 response.setFromByte( 0 );
                 response.setBytesCount( configFile.length() );
