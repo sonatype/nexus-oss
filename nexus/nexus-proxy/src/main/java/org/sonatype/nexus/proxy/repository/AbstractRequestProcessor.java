@@ -36,7 +36,7 @@ public abstract class AbstractRequestProcessor
         return true;
     }
 
-    public boolean shouldCache( ProxyRepository proxy, ResourceStoreRequest request, AbstractStorageItem item )
+    public boolean shouldCache( ProxyRepository proxy, AbstractStorageItem item )
     {
         return true;
     }

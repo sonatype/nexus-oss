@@ -353,9 +353,23 @@ public abstract class AbstractProxyRepository
     public AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws StorageException
     {
+        // transitive items are not cached
         if ( Boolean.TRUE.equals( item.getItemContext().get( CTX_TRANSITIVE_ITEM ) ) )
         {
             return item;
+        }
+
+        boolean shouldCache = true;
+
+        // ask request processors too
+        for ( RequestProcessor processor : getRequestProcessors() )
+        {
+            shouldCache = processor.shouldCache( this, item );
+
+            if ( !shouldCache )
+            {
+                return item;
+            }
         }
 
         AbstractStorageItem result = null;
@@ -429,14 +443,25 @@ public abstract class AbstractProxyRepository
             }
         }
 
-        boolean shouldProxy = true;
+        // proxyMode and request.localOnly decides 1st
+        boolean shouldProxy = !request.isRequestLocalOnly() && getProxyMode() != null && getProxyMode().shouldProxy();
 
-        for ( RequestProcessor processor : getRequestProcessors() )
+        if ( shouldProxy )
         {
-            shouldProxy = shouldProxy && processor.shouldProxy( this, request );
+            // let's ask RequestProcessor
+            for ( RequestProcessor processor : getRequestProcessors() )
+            {
+                shouldProxy = processor.shouldProxy( this, request );
+
+                if ( !shouldProxy )
+                {
+                    // escape
+                    break;
+                }
+            }
         }
 
-        if ( getProxyMode() != null && getProxyMode().shouldProxy() && !request.isRequestLocalOnly() && shouldProxy )
+        if ( shouldProxy )
         {
 
             // we are able to go remote
@@ -666,8 +691,8 @@ public abstract class AbstractProxyRepository
      *   getRemoteStorage().retrieveItem( this, context, getRemoteUrl(), checksumUid.getPath() );
      * </code>
      */
-    protected boolean doValidateRemoteItemContent( ResourceStoreRequest req, String baseUrl,
-                                                   AbstractStorageItem item, List<NexusArtifactEvent> events )
+    protected boolean doValidateRemoteItemContent( ResourceStoreRequest req, String baseUrl, AbstractStorageItem item,
+                                                   List<NexusArtifactEvent> events )
         throws StorageException
     {
         return true;

@@ -52,5 +52,5 @@ public interface RequestProcessor
      * @param item
      * @return
      */
-    boolean shouldCache( ProxyRepository repository, ResourceStoreRequest request, AbstractStorageItem item );
+    boolean shouldCache( ProxyRepository repository, AbstractStorageItem item );
 }
