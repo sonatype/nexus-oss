@@ -40,7 +40,7 @@ public class SimpleRealmTest
     // Realm Tests
     /**
      * Test authentication with a valid user and password.
-     * 
+     *
      * @throws Exception
      */
     public void testValidAuthentication()
@@ -56,7 +56,7 @@ public class SimpleRealmTest
 
     /**
      * Test authentication with a valid user and invalid password.
-     * 
+     *
      * @throws Exception
      */
     public void testInvalidPasswordAuthentication()
@@ -77,7 +77,7 @@ public class SimpleRealmTest
 
     /**
      * Test authentication with a invalid user and password.
-     * 
+     *
      * @throws Exception
      */
     public void testInvalidUserAuthentication()
@@ -96,11 +96,11 @@ public class SimpleRealmTest
         }
     }
 
-    // 
+    //
     /**
      * Test authorization using the NexusMethodAuthorizingRealm. <BR/> Take a look a the security.xml in
      * src/test/resources this maps the users in the UserStore to nexus roles/privileges
-     * 
+     *
      * @throws Exception
      */
     public void testPrivileges()
@@ -145,7 +145,7 @@ public class SimpleRealmTest
         PLEXUS_HOME.mkdirs();
         WORK_HOME.mkdirs();
         CONF_HOME.mkdirs();
-        
+
         // copy the tests nexus.xml and security.xml to the correct location
         this.copyTestConfigToPlace();
 
@@ -158,37 +158,37 @@ public class SimpleRealmTest
             // TODO: SEE WHY IS SEC NOT STARTING? (Max, JSec changes)
             nexusConfiguration.setSecurityEnabled( false );
 
-            nexusConfiguration.applyConfiguration();
-        }     
+            nexusConfiguration.saveConfiguration();
+        }
     }
 
     private void copyTestConfigToPlace()
         throws FileNotFoundException,
             IOException
-    {   
+    {
         InputStream nexusConf = null;
         InputStream securityConf = null;
-        
+
         OutputStream nexusOut = null;
         OutputStream securityOut = null;
-        
+
         try
         {
             nexusConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "nexus.xml" );
             nexusOut = new FileOutputStream( getNexusConfiguration() );
             IOUtil.copy( nexusConf, nexusOut );
-    
+
             securityConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security.xml" );
             securityOut = new FileOutputStream( getNexusSecurityConfiguration() );
             IOUtil.copy( securityConf, securityOut);
         }
         finally
-        {   
+        {
             IOUtil.close( nexusConf );
             IOUtil.close( securityConf );
             IOUtil.close( nexusOut );
             IOUtil.close( securityOut );
-            
+
         }
     }
 }
