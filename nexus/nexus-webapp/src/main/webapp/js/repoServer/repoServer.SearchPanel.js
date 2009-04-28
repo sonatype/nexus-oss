@@ -328,9 +328,9 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   
   startSearch: function( p ) {
     p.searchField.triggers[0].show();
+    Sonatype.utils.updateHistory( p );
 
     var value = p.searchField.getRawValue();
-    Ext.History.add( p.id + Sonatype.view.HISTORY_DELIMITER + value );
     
     p.grid.store.baseParams = {};
     p.grid.store.baseParams[p.searchField.paramName] = value;

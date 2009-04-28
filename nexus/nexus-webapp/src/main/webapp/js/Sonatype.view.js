@@ -115,14 +115,7 @@ Sonatype.view = {
           listeners: {
             tabchange: function( panel, tab ) {
               if ( ! Sonatype.initialToken ) { // make sure the original token doesn't get ruined by the welcome tab
-                var bookmark = tab.id;
-                if ( tab.getBookmark ) {
-                  var b2 = tab.getBookmark();
-                  if ( b2 ) {
-                    bookmark += Sonatype.view.HISTORY_DELIMITER + b2;
-                  }
-                }
-                Ext.History.add( bookmark );
+                Sonatype.utils.updateHistory( tab );
               }
             }
           }
@@ -134,6 +127,7 @@ Sonatype.view = {
     Sonatype.view.viewport = viewport;
     Sonatype.view.serverTabPanel = viewport.findById('st-server-tab-panel');
     Sonatype.view.mainTabPanel = viewport.findById('st-main-tab-panel');
+    Sonatype.view.supportedNexusTabs = {};
     
     var size = Sonatype.view.serverTabPanel.getSize();
     Sonatype.view.serverTabPanel.setHeight( size.height - 20 );

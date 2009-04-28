@@ -618,7 +618,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
       
       var bookmark = rec.data[this.dataBookmark];
       if ( bookmark ) {
-        Ext.History.add( this.id + Sonatype.view.HISTORY_DELIMITER + bookmark );
+        Sonatype.utils.updateHistory( this );
       }
     }
   },

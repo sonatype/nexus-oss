@@ -132,6 +132,10 @@ Ext.extend( Sonatype.navigation.Section, Ext.Panel, {
         }
       }
       else if ( c.tabCode || c.handler ) {
+        
+        if ( Sonatype.view.supportedNexusTabs ) {
+          Sonatype.view.supportedNexusTabs[c.tabId] = true;
+        }
         // panel open action
         return c.enabled == false ? null :
         {

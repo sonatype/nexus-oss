@@ -433,6 +433,7 @@ Sonatype.repoServer.RepoServer = function(){
           this.remove( item, true );
         }, Sonatype.view.mainTabPanel);
         Sonatype.view.mainTabPanel.activeTab = null;
+        Sonatype.view.supportedNexusTabs = {};
         
         Sonatype.view.welcomeTab = new Ext.Panel({
           title: 'Welcome',

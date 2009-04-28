@@ -773,9 +773,12 @@ Sonatype.utils = {
     if ( Sonatype.initialToken ) {
       token = Sonatype.initialToken; // handle the initial token
     }
+    else {
+      Sonatype.initialToken = 'welcome'; // to prevent tab change events from interfering
+    }
+
     if ( token && Sonatype.user.curr.repoServer.length ) {
       var toks = token.split( Sonatype.view.HISTORY_DELIMITER );
-      Sonatype.initialToken = '1'; // to prevent tab change events from interfering
       
       var tabId = toks[0];
       var tabPanel = Sonatype.view.mainTabPanel.getComponent( tabId );
@@ -791,6 +794,13 @@ Sonatype.utils = {
               { title: c.tabTitle ? c.tabTitle : c.title } );
           }
         }
+//        else if ( Sonatype.view.supportedNexusTabs[tabId] && ! Sonatype.view.tokenForcedLogin ) {
+//          if ( ! Sonatype.user.curr.isLoggedIn ) {
+//            Sonatype.view.tokenForcedLogin = true;
+//            Sonatype.repoServer.RepoServer.loginHandler();
+//            return;
+//          }
+//        }
       }
       
       if ( tabPanel && tabPanel.applyBookmark && toks.length > 1 ) {
@@ -799,6 +809,24 @@ Sonatype.utils = {
     }
     
     Sonatype.initialToken = null;
+  },
+  
+  updateHistory: function( tab ) {
+    if ( tab ) {
+      if ( tab.ownerCt != Sonatype.view.mainTabPanel ) return;
+    }
+    else {
+      tab = Sonatype.view.mainTabPanel.getActiveTab();
+    }
+
+    var bookmark = tab.id;
+    if ( tab.getBookmark ) {
+      var b2 = tab.getBookmark();
+      if ( b2 ) {
+        bookmark += Sonatype.view.HISTORY_DELIMITER + b2;
+      }
+    }
+    Ext.History.add( bookmark );
   }
 };
 
