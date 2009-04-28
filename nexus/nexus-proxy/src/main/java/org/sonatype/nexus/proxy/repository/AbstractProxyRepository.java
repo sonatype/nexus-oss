@@ -15,7 +15,9 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -81,10 +83,23 @@ public abstract class AbstractProxyRepository
     /** Remote storage context to store connection configs. */
     private RemoteStorageContext remoteStorageContext;
 
+    /** Item content validators */
+    private Map<String, ItemContentValidator> itemContentValidators;
+
     @Override
     protected AbstractProxyRepositoryConfiguration getExternalConfiguration()
     {
         return (AbstractProxyRepositoryConfiguration) super.getExternalConfiguration();
+    }
+
+    public Map<String, ItemContentValidator> getItemContentValidators()
+    {
+        if ( itemContentValidators == null )
+        {
+            itemContentValidators = new HashMap<String, ItemContentValidator>();
+        }
+
+        return itemContentValidators;
     }
 
     public ProxyMode getProxyMode()
@@ -362,7 +377,7 @@ public abstract class AbstractProxyRepository
         boolean shouldCache = true;
 
         // ask request processors too
-        for ( RequestProcessor processor : getRequestProcessors() )
+        for ( RequestProcessor processor : getRequestProcessors().values() )
         {
             shouldCache = processor.shouldCache( this, item );
 
@@ -449,7 +464,7 @@ public abstract class AbstractProxyRepository
         if ( shouldProxy )
         {
             // let's ask RequestProcessor
-            for ( RequestProcessor processor : getRequestProcessors() )
+            for ( RequestProcessor processor : getRequestProcessors().values() )
             {
                 shouldProxy = processor.shouldProxy( this, request );
 
@@ -695,7 +710,14 @@ public abstract class AbstractProxyRepository
                                                    List<NexusArtifactEvent> events )
         throws StorageException
     {
-        return true;
+        boolean isValid = true;
+
+        for ( ItemContentValidator icv : getItemContentValidators().values() )
+        {
+            isValid = isValid && icv.isRemoteItemContentValid( this, req, baseUrl, item, events );
+        }
+
+        return isValid;
     }
 
     /**

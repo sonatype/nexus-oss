@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import java.util.Map;
+
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
@@ -124,6 +126,13 @@ public interface ProxyRepository
      * @return
      */
     DownloadMirrors getDownloadMirrors();
+
+    /**
+     * Returns the list of defined item content validators.
+     * 
+     * @return
+     */
+    Map<String, ItemContentValidator> getItemContentValidators();
 
     /**
      * Caches an item.

@@ -15,9 +15,8 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -137,7 +136,7 @@ public abstract class AbstractRepository
     private PathCache notFoundCache;
 
     /** Request processors list */
-    private List<RequestProcessor> requestProcessors;
+    private Map<String, RequestProcessor> requestProcessors;
 
     // Configurable iface
 
@@ -216,11 +215,11 @@ public abstract class AbstractRepository
                                                                                                                                                                                                                                                                       DefaultRepositoryTaskActivityDescriptor.ALL_ATTRIBUTES_OPERATIONS );
     }
 
-    public List<RequestProcessor> getRequestProcessors()
+    public Map<String, RequestProcessor> getRequestProcessors()
     {
         if ( requestProcessors == null )
         {
-            requestProcessors = new ArrayList<RequestProcessor>();
+            requestProcessors = new HashMap<String, RequestProcessor>();
         }
 
         return requestProcessors;
@@ -909,12 +908,13 @@ public abstract class AbstractRepository
         {
             try
             {
-                DefaultStorageFileItem target = new DefaultStorageFileItem(
-                    this,
-                    to,
-                    true,
-                    true,
-                    new PreparedContentLocator( ( (StorageFileItem) item ).getInputStream() ) );
+                DefaultStorageFileItem target =
+                    new DefaultStorageFileItem(
+                                                this,
+                                                to,
+                                                true,
+                                                true,
+                                                new PreparedContentLocator( ( (StorageFileItem) item ).getInputStream() ) );
 
                 target.getItemContext().putAll( item.getItemContext() );
 
@@ -1191,7 +1191,7 @@ public abstract class AbstractRepository
 
         if ( getRequestProcessors().size() > 0 )
         {
-            for ( RequestProcessor processor : getRequestProcessors() )
+            for ( RequestProcessor processor : getRequestProcessors().values() )
             {
                 shouldProcess = shouldProcess && processor.process( this, request, action );
             }
@@ -1209,12 +1209,8 @@ public abstract class AbstractRepository
     {
         ContentLocator content = new ByteArrayContentLocator( bytes );
 
-        DefaultStorageFileItem result = new DefaultStorageFileItem(
-            this,
-            request,
-            true /* isReadable */,
-            false /* isWritable */,
-            content );
+        DefaultStorageFileItem result =
+            new DefaultStorageFileItem( this, request, true /* isReadable */, false /* isWritable */, content );
         result.setMimeType( "text/plain" );
         result.setLength( bytes.length );
 

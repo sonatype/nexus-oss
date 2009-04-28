@@ -14,7 +14,6 @@
 package org.sonatype.nexus.proxy.repository;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.configuration.ValidatingConfigurable;
@@ -284,7 +283,7 @@ public interface Repository
      * 
      * @return
      */
-    List<RequestProcessor> getRequestProcessors();
+    Map<String, RequestProcessor> getRequestProcessors();
 
     /**
      * If is user managed, the nexus core and nexus core UI handles the store. Thus, for reposes, users are allowed to

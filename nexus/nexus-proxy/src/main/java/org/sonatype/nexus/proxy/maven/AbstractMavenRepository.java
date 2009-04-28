@@ -16,12 +16,10 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -37,7 +35,6 @@ import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.Evict
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
-import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.MutableProxyRepositoryKind;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
@@ -65,9 +62,6 @@ public abstract class AbstractMavenRepository
      */
     @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
-
-    @Requirement( hint = "ChecksumContentValidator" )
-    private ItemContentValidator checksumValidator;
 
     private MutableProxyRepositoryKind repositoryKind;
 
@@ -378,14 +372,6 @@ public abstract class AbstractMavenRepository
         }
 
         return super.doRetrieveRemoteItem( request );
-    }
-
-    @Override
-    protected boolean doValidateRemoteItemContent( ResourceStoreRequest req, String baseUrl,
-                                                   AbstractStorageItem item, List<NexusArtifactEvent> events )
-        throws StorageException
-    {
-        return checksumValidator.isRemoteItemContentValid( this, req, baseUrl, item, events );
     }
 
     private void removeLocalChecksum( ResourceStoreRequest request )
