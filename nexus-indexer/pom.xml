@@ -175,7 +175,7 @@
                   <include>aspectj:aspectjrt</include>
                   <include>commons-cli:commons-cli</include>
                   <include>org.apache.lucene:lucene-core</include>
-                  <include>org.apache.maven.artifact:maven-artifact</include>
+                  <include>org.apache.maven:maven-artifact</include>
                   <include>org.apache.maven:maven-model</include>
                   <include>org.apache.maven:maven-plugin-api</include>
                   <include>org.apache.xbean:xbean-reflect</include>
