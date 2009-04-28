@@ -22,11 +22,12 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.PlexusUserResourceResponse;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = PlexusResource.class, hint = "PlexusUserPlexusResource" )
 public class PlexusUserPlexusResource
@@ -34,8 +35,8 @@ public class PlexusUserPlexusResource
 {
     public static final String USER_ID_KEY = "userId";
     
-    @Requirement( role = PlexusUserManager.class, hint="additinalRoles" )
-    private PlexusUserManager userManager;
+    @Requirement
+    private SecuritySystem securitySystem;
     
     public PlexusUserPlexusResource()
     {
@@ -66,9 +67,12 @@ public class PlexusUserPlexusResource
     {
         PlexusUserResourceResponse result = new PlexusUserResourceResponse();
 
-        PlexusUser user = userManager.getUser( getUserId( request ) );
-        
-        if ( user == null )
+        User user;
+        try
+        {
+            user = this.securitySystem.getUser( getUserId( request ) );
+        }
+        catch ( UserNotFoundException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
         }

@@ -22,11 +22,13 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.PlexusUserResourceResponse;
+import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = PlexusResource.class, hint = "UserBySourcePlexusResource" )
 public class UserBySourcePlexusResource
@@ -36,8 +38,8 @@ public static final String USER_ID_KEY = "userId";
     
     public static final String USER_SOURCE_KEY = "userSource";
     
-    @Requirement( role = PlexusUserManager.class, hint="additinalRoles" )
-    private PlexusUserManager userManager;
+    @Requirement
+    private SecuritySystem securitySystem;
     
     public UserBySourcePlexusResource()
     {
@@ -68,11 +70,24 @@ public static final String USER_ID_KEY = "userId";
     {
         PlexusUserResourceResponse result = new PlexusUserResourceResponse();
 
-        PlexusUser user = userManager.getUser( getUserId( request ), getUserSource( request ) );
+        User user;
+        try
+        {
+            user = this.securitySystem.getUser( getUserId( request ), getUserSource( request ) );
+        }
+        catch ( UserNotFoundException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
+        }
+        catch ( NoSuchUserManager e )
+        {
+            this.getLogger().warn( e.getMessage(), e );
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
+        }
         
         if ( user == null )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
+            
         }
         
         PlexusUserResource resource = securityToRestModel( user );
