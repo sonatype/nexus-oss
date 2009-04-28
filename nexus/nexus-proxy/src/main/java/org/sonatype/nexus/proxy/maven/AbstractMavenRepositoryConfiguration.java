@@ -41,7 +41,7 @@ public abstract class AbstractMavenRepositoryConfiguration
         return RepositoryPolicy.valueOf( getNodeValue(
             getConfiguration( false ),
             REPOSITORY_POLICY,
-            RepositoryPolicy.RELEASE.toString() ) );
+            RepositoryPolicy.RELEASE.toString() ).toUpperCase() );
     }
 
     public void setRepositoryPolicy( RepositoryPolicy policy )
