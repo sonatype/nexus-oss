@@ -21,7 +21,7 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
-import org.sonatype.security.locators.RoleResolver;
+import org.sonatype.security.authorization.xml.RoleResolver;
 
 public class DefaultRoleResolverTest
     extends PlexusTestCase

@@ -111,9 +111,7 @@ public class DefaultSecuritySystemTest
     {
         SecuritySystem securitySystem = this.getSecuritySystem();
 
-        AuthorizationManager authzManager = securitySystem.getAuthorizationManager( "sourceB" );
-
-        Set<Role> roles = authzManager.getRoles();
+        Set<Role> roles = securitySystem.listRoles("sourceB");
         Assert.assertEquals( 2, roles.size() );
 
         Map<String, Role> roleMap = new HashMap<String, Role>();

@@ -10,25 +10,27 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.locators;
+package org.sonatype.security.authorization.xml;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.security.locators.users.PlexusRole;
-import org.sonatype.security.locators.users.PlexusRoleLocator;
+import org.sonatype.security.authorization.AuthorizationManager;
+import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
 
 /**
- * PlexusRoleLocator that wraps roles from security-xml-realm.
+ * RoleLocator that wraps roles from security-xml-realm.
  */
-@Component( role = PlexusRoleLocator.class )
-public class SecurityXmlPlexusRoleLocator
-    implements PlexusRoleLocator
+@Component( role = AuthorizationManager.class )
+public class SecurityXmlAuthorizationManager
+    implements AuthorizationManager
 {
 
     public static final String SOURCE = "default";
@@ -41,43 +43,44 @@ public class SecurityXmlPlexusRoleLocator
         return SOURCE;
     }
 
-    public Set<String> listRoleIds()
+    public Set<Role> listRoles()
     {
-        Set<String> roleIds = new TreeSet<String>();
+        Set<Role> roles = new HashSet<Role>();
         List<SecurityRole> secRoles = this.configuration.listRoles();
 
         for ( SecurityRole securityRole : secRoles )
         {
-            roleIds.add( securityRole.getId() );
-        }
-
-        return roleIds;
-    }
-
-    public Set<PlexusRole> listRoles()
-    {
-        Set<PlexusRole> roles = new TreeSet<PlexusRole>();
-        List<SecurityRole> secRoles = this.configuration.listRoles();
-
-        for ( SecurityRole securityRole : secRoles )
-        {
-            roles.add( this.toPlexusRole( securityRole ) );
+            roles.add( this.toRole( securityRole ) );
         }
 
         return roles;
     }
 
-    protected PlexusRole toPlexusRole( SecurityRole role )
+    protected Role toRole( SecurityRole secRole )
     {
 
-        PlexusRole plexusRole = new PlexusRole();
+        Role role = new Role();
 
-        plexusRole.setRoleId( role.getId() );
-        plexusRole.setName( role.getName() );
-        plexusRole.setSource( SOURCE );
+        role.setRoleId( secRole.getId() );
+        role.setName( secRole.getName() );
+        role.setSource( SOURCE );
 
-        return plexusRole;
+        return role;
 
     }
 
+    public Set<String> listPermissions()
+    {
+        Set<String> permissions = new HashSet<String>();
+        List<SecurityPrivilege> secPrivs = this.configuration.listPrivileges();
+
+        for ( SecurityPrivilege securityPrivilege : secPrivs )
+        {
+            // FIXME: use PermissionDescriptors
+            permissions.add( securityPrivilege.getId());
+        }
+
+        return permissions;
+    }
+    
 }

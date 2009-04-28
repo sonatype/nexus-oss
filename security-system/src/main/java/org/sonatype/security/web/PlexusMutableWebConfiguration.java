@@ -10,25 +10,13 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security.mock;
+package org.sonatype.security.web;
 
-import java.util.List;
-
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.jsecurity.realm.Realm;
-import org.sonatype.security.locators.RealmLocator;
-
-@Component( role=RealmLocator.class )
-public class MockRealmLocator implements RealmLocator
+public interface PlexusMutableWebConfiguration
+    extends PlexusWebConfiguration
 {
-    
-    @Requirement
-    private List<Realm> realms;
+    void addProtectedResource( String pathPattern, String filterExpression )
+        throws SecurityConfigurationException;
 
-    public List<Realm> getRealms()
-    {
-       return realms;
-    }
-
+    void protectedResourcesAdded();
 }

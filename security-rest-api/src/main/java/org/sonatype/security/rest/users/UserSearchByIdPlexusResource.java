@@ -20,7 +20,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 @Component( role = PlexusResource.class, hint = "UserSearchByIdPlexusResource" )
 public class UserSearchByIdPlexusResource extends AbstractUserSearchPlexusResource
@@ -55,10 +55,11 @@ public class UserSearchByIdPlexusResource extends AbstractUserSearchPlexusResour
         throws ResourceException
     {
         
-        PlexusUserSearchCriteria criteria = new PlexusUserSearchCriteria();
+        UserSearchCriteria criteria = new UserSearchCriteria();
         criteria.setUserId( this.getSearchArg( request ) );
+        criteria.setSource( this.getUserSource( request ) );
         
-        return this.search( criteria, this.getUserSource( request ) );
+        return this.search( criteria );
     }
     
     

@@ -22,8 +22,10 @@ import org.jsecurity.subject.Subject;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.security.usermanagement.NoSuchUserManager;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -114,11 +116,6 @@ public class DefaultSecuritySystem
         }
     }
 
-    public AuthorizationManager getAuthorizationManager( String sourceId )
-    {
-        return this.authorizationManagers.get( sourceId );
-    }
-
     public void initialize()
         throws InitializationException
     {
@@ -171,20 +168,47 @@ public class DefaultSecuritySystem
         return realms;
     }
 
+    public Set<Role> listRoles()
+    {
+        Set<Role> roles = new HashSet<Role>();
+        for ( AuthorizationManager authzManager : this.authorizationManagers.values() )
+        {
+            Set<Role> tmpRoles = authzManager.listRoles();
+            if ( tmpRoles != null )
+            {
+                roles.addAll( tmpRoles );
+            }
+        }
+
+        return roles;
+    }
+
+    public Set<Role> listRoles( String sourceId ) throws NoSuchAuthorizationManager
+    {
+        AuthorizationManager authzManager = this.getAuthorizationManager( sourceId );
+        return authzManager.listRoles();
+    }
+
     // *********************
     // * user management
     // *********************
 
     private UserManager getUserManager( String sourceId )
+        throws NoSuchUserManager
     {
+        if ( !this.userManagerMap.containsKey( sourceId ) )
+        {
+            throw new NoSuchUserManager( "UserManager with source: '" + sourceId + "' could not be found." );
+        }
+
         return this.userManagerMap.get( sourceId );
     }
 
     public User addUser( User user )
+        throws NoSuchUserManager
     {
         // first save the user
         // this is the UserManager that owns the user
-        // FIXME: NPE alert
         UserManager userManager = this.getUserManager( user.getSource() );
         userManager.addUser( user );
 
@@ -197,7 +221,7 @@ public class DefaultSecuritySystem
             {
                 try
                 {
-                    tmpUserManager.setUsersRoles( user.getUserId(), user.getRoles() );
+                    tmpUserManager.setUsersRoles( user.getUserId(), user.getRoles(), user.getSource() );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -211,12 +235,13 @@ public class DefaultSecuritySystem
     }
 
     public User updateUser( User user )
-        throws UserNotFoundException
+        throws UserNotFoundException,
+            NoSuchUserManager
     {
         // first update the user
         // this is the UserManager that owns the user
-        // FIXME: NPE alert
         UserManager userManager = this.getUserManager( user.getSource() );
+
         userManager.updateUser( user );
 
         // then save the users Roles
@@ -228,11 +253,7 @@ public class DefaultSecuritySystem
             {
                 try
                 {
-                    Set<Role> roles = tmpUserManager.getUsersRoles( user.getUserId() );
-                    if ( roles != null )
-                    {
-                        tmpUserManager.setUsersRoles( user.getUserId(), user.getRoles() );
-                    }
+                    tmpUserManager.setUsersRoles( user.getUserId(), user.getRoles(), user.getSource() );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -246,32 +267,153 @@ public class DefaultSecuritySystem
     }
 
     public void deleteUser( String userId, String source )
-        throws UserNotFoundException
+        throws UserNotFoundException,
+            NoSuchUserManager
     {
-        // FIXME: NPE alert
         UserManager userManager = this.getUserManager( source );
         userManager.deleteUser( userId );
     }
 
-    public User getUser( String userId, String source )
+    public User getUser( String userId )
         throws UserNotFoundException
+    {
+        List<UserManager> orderedUserManagers = this.orderUserManagers();
+        for ( UserManager userManager : orderedUserManagers )
+        {
+            try
+            {
+                return this.getUser( userId, userManager.getSource() );
+            }
+            catch ( UserNotFoundException e )
+            {
+                this.logger.debug( "User: '" + userId + "' was not found in: '" + userManager.getSource() + "' " );
+            }
+            catch ( NoSuchUserManager e )
+            {
+                // we should NEVER bet here
+                this.logger.warn( "UserManager: '" + userManager.getSource()
+                    + "' was not found, but is in the list of UserManagers", e );
+            }
+        }
+        throw new UserNotFoundException( userId );
+    }
+
+    public User getUser( String userId, String source )
+        throws UserNotFoundException,
+            NoSuchUserManager
     {
         // first get the user
         // this is the UserManager that owns the user
-        // FIXME: NPE alert
         UserManager userManager = this.getUserManager( source );
         User user = userManager.getUser( userId );
 
+        if ( user == null )
+        {
+            throw new UserNotFoundException( userId );
+        }
+
+        // add roles from other user managers
+        this.addOtherRolesToUser( user );
+
+        return user;
+    }
+
+    public Set<User> listUsers()
+    {
+        Set<User> users = new HashSet<User>();
+
+        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        {
+            users.addAll( tmpUserManager.listUsers() );
+        }
+
+        // now add all the roles to the users
+        for ( User user : users )
+        {
+            // add roles from other user managers
+            this.addOtherRolesToUser( user );
+        }
+
+        return users;
+    }
+
+    public Set<User> searchUsers( UserSearchCriteria criteria )
+    {
+        Set<User> users = new HashSet<User>();
+
+        // NOTE: if we want to leave this very generic we need to search ALL UserManagers even if the source is set
+        // the problem is that some users could be found by looking up role mappings in other realms
+
+        // search all user managers
+        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        {
+            users.addAll( tmpUserManager.searchUsers( criteria ) );
+        }
+
+        // now add all the roles to the users
+        for ( User user : users )
+        {
+            // add roles from other user managers
+            this.addOtherRolesToUser( user );
+        }
+
+        return users;
+    }
+
+    /**
+     * We need to order the UserManagers the same way as the Realms are ordered. We need to be able to find a user based
+     * on the ID. This my never go away, but the current reason why we need it is:
+     * https://issues.apache.org/jira/browse/KI-77 There is no (clean) way to resolve a realms roles into permissions.
+     * take a look at the issue and VOTE!
+     * 
+     * @return the list of UserManagers in the order (as close as possible) to the list of realms.
+     */
+    @SuppressWarnings( "unchecked" )
+    private List<UserManager> orderUserManagers()
+    {
+        List<UserManager> orderedLocators = new ArrayList<UserManager>();
+
+        List<UserManager> unOrderdLocators = new ArrayList<UserManager>( this.userManagerMap.values() );
+
+        // get the sorted order of realms from the realm locator
+        Collection<Realm> realms = this.securityManager.getRealms();
+
+        for ( Realm realm : realms )
+        {
+            try
+            {
+                UserManager userManager = this.getUserManager( realm.getName() );
+                // remove from unorderd and add to orderd
+                unOrderdLocators.remove( userManager );
+                orderedLocators.add( userManager );
+                break;
+            }
+            catch ( NoSuchUserManager e )
+            {
+                this.logger.debug( "Could not find a UserManager for realm: " + realm.getClass() + " name: "
+                    + realm.getName() );
+            }
+        }
+
+        // now add all the un-ordered ones to the ordered ones, this way they will be at the end of the ordered list
+        orderedLocators.addAll( unOrderdLocators );
+
+        return orderedLocators;
+
+    }
+
+    private void addOtherRolesToUser( User user )
+    {
         // then save the users Roles
         for ( UserManager tmpUserManager : this.userManagerMap.values() )
         {
             // skip the user manager that owns the user, we already did that
             // these user managers will only have roles
-            if ( !tmpUserManager.getSource().equals( source ) )
+            if ( !tmpUserManager.getSource().equals( user.getSource() ) )
             {
                 try
                 {
-                    Set<Role> roles = tmpUserManager.getUsersRoles( userId );
+                    Set<Role> roles = tmpUserManager.getUsersRoles( user.getUserId(), user.getSource() );
                     if ( roles != null )
                     {
                         user.getRoles().addAll( roles );
@@ -279,36 +421,20 @@ public class DefaultSecuritySystem
                 }
                 catch ( UserNotFoundException e )
                 {
-                    this.logger.debug( "User '" + userId + "' is not managed by the usermanager: "
+                    this.logger.debug( "User '" + user.getUserId() + "' is not managed by the usermanager: "
                         + tmpUserManager.getSource() );
                 }
             }
         }
-
-        return user;
     }
 
-    public Set<User> listUsers()
+    private AuthorizationManager getAuthorizationManager( String source ) throws NoSuchAuthorizationManager
     {
-        // TODO: add roles from other user managers
-        Set<User> users = new HashSet<User>();
-
-        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        if ( !this.authorizationManagers.containsKey( source ) )
         {
-            users.addAll( tmpUserManager.listUsers() );
+            throw new NoSuchAuthorizationManager("AuthorizationManager with source: '" + source + "' could not be found."  );
         }
-        return users;
-    }
 
-    public Set<User> searchUsers( UserSearchCriteria criteria )
-    {
-        // TODO: add roles from other user managers
-        Set<User> users = new HashSet<User>();
-
-        for ( UserManager tmpUserManager : this.userManagerMap.values() )
-        {
-            users.addAll( tmpUserManager.searchUsers( criteria ) );
-        }
-        return users;
+        return this.authorizationManagers.get( source );
     }
 }

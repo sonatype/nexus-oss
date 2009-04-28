@@ -16,12 +16,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.UserManager;
+import org.sonatype.security.authorization.Role;
+import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component(role=UserManager.class, hint="MockUserLocatorA")
-public class MockUserLocatorA
-    extends AbstractTestUserLocator
+public class MockUserManagerA
+    extends AbstractTestUserManager
 {
 
     public String getSource()
@@ -29,11 +32,11 @@ public class MockUserLocatorA
         return "MockUserLocatorA";
     }
 
-    public Set<PlexusUser> listUsers()
+    public Set<User> listUsers()
     {
-        Set<PlexusUser> users = new HashSet<PlexusUser>();
+        Set<User> users = new HashSet<User>();
         
-        PlexusUser a = new PlexusUser();
+        DefaultUser a = new DefaultUser();
         a.setName( "Joe Coder" );
         a.setEmailAddress( "jcoder@sonatype.org" );
         a.setSource( this.getSource() );
@@ -42,7 +45,7 @@ public class MockUserLocatorA
         a.addRole( this.createFakeRole( "RoleB" ) );
         a.addRole( this.createFakeRole( "RoleC" ) );
         
-        PlexusUser b = new PlexusUser();
+        DefaultUser b = new DefaultUser();
         b.setName( "Christine H. Dugas" );
         b.setEmailAddress( "cdugas@sonatype.org" );
         b.setSource( this.getSource() );
@@ -51,13 +54,13 @@ public class MockUserLocatorA
         b.addRole( this.createFakeRole( "RoleB" ) );
         b.addRole( this.createFakeRole( "Role1" ) );
         
-        PlexusUser c = new PlexusUser();
+        DefaultUser c = new DefaultUser();
         c.setName( "Patricia P. Peralez" );
         c.setEmailAddress( "pperalez@sonatype.org" );
         c.setSource( this.getSource() );
         c.setUserId( "pperalez" );
 
-        PlexusUser d = new PlexusUser();
+        DefaultUser d = new DefaultUser();
         d.setName( "Danille S. Knudsen" );
         d.setEmailAddress( "dknudsen@sonatype.org" );
         d.setSource( this.getSource() );
@@ -70,10 +73,7 @@ public class MockUserLocatorA
         
         return users;
     }
+    
 
-    @Override
-    public boolean isPrimary()
-    {
-        return true;
-    }
+  
 }

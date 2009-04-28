@@ -13,12 +13,18 @@ public class UserSearchCriteria
 
     public UserSearchCriteria()
     {
-
     }
-
+    
     public UserSearchCriteria( String userId )
     {
         this.userId = userId;
+    }
+    
+    public UserSearchCriteria( String userId, Set<String> oneOfRoleIds, String source )
+    {
+        this.userId = userId;
+        this.oneOfRoleIds = oneOfRoleIds;
+        this.source = source;
     }
 
     public String getUserId()

@@ -53,8 +53,9 @@ import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.NoSuchPrivilegeException;
 import org.sonatype.security.realms.tools.NoSuchRoleException;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = Realm.class, hint = "url", description = "URL Realm" )
 public class URLRealm
@@ -72,8 +73,8 @@ public class URLRealm
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager configuration;
 
-    @Requirement( role = PlexusUserManager.class, hint = "additinalRoles" )
-    private PlexusUserManager userManager;
+    @Requirement( role = UserManager.class, hint = "url" )
+    private UserManager userManager;
 
     @Requirement( role = PrivilegeDescriptor.class )
     private List<PrivilegeDescriptor> privilegeDescriptors;
@@ -240,7 +241,7 @@ public class URLRealm
         return new AllowAllCredentialsMatcher();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
     {
@@ -253,11 +254,16 @@ public class URLRealm
         String username = (String) principals.iterator().next();
 
         // we need to make sure the user can be managed by this realm
-        PlexusUser user = this.userManager.getUser( username, URLUserLocator.SOURCE );
-
-        if ( user == null )
+        try
         {
-            throw new AuthorizationException( "User '" + username + "' is not managed by this realm." );
+            if ( this.userManager.getUser( username ) == null )
+            {
+                throw new AuthorizationException( "User '" + username + "' is not managed by this realm." );
+            }
+        }
+        catch ( UserNotFoundException e )
+        {
+            throw new AuthorizationException( "User '" + username + "' is not managed by this realm.", e );
         }
 
         // we don't have a list of users for this realm, so the default role effects ALL users

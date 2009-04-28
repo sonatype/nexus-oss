@@ -16,15 +16,15 @@ import java.io.File;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.security.locators.users.PlexusUserManager;
-import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
-import org.sonatype.security.locators.users.UserManager;
+import org.sonatype.security.AbstractSecurityTestCase;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 public class URLRealmConfiguredUserTest
-    extends PlexusTestCase
+    extends AbstractSecurityTestCase
 {
 
     private String securityXmlPath = "./target/plexus-home/" + this.getClass().getSimpleName() + "/security.xml";
@@ -32,21 +32,21 @@ public class URLRealmConfiguredUserTest
     public void testURLRealmConfiguredUser()
         throws Exception
     {
-        PlexusUserManager userManager = this.lookup( PlexusUserManager.class );
+        SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
         UserManager urlLocator = this.lookup( UserManager.class, "url" );
         UserManager configuredUsersLocator = this.lookup( UserManager.class, "allConfigured" );
 
         // try to get a normal user to make sure the search is working
-        Assert.assertEquals( 1, configuredUsersLocator.searchUsers( new PlexusUserSearchCriteria( "user1" ) ).size() );
+        Assert.assertEquals( 1, configuredUsersLocator.searchUsers( new UserSearchCriteria( "user1" ) ).size() );
 
         // make sure we get the URL realm user from this search
-        Assert.assertEquals( 1, configuredUsersLocator.searchUsers( new PlexusUserSearchCriteria( "url-user" ) ).size() );
+        Assert.assertEquals( 1, configuredUsersLocator.searchUsers( new UserSearchCriteria( "url-user" ) ).size() );
 
         // do the search from the URL realm
-        Assert.assertEquals( 1, urlLocator.searchUsers( new PlexusUserSearchCriteria( "url-user" ) ).size() );
+        Assert.assertEquals( 1, urlLocator.searchUsers( new UserSearchCriteria( "url-user" ) ).size() );
 
         // do the search using the user manager.
-        Assert.assertEquals( 1, userManager.searchUsers( new PlexusUserSearchCriteria( "url-user" ), "all" ).size() );
+        Assert.assertEquals( 1, securitySystem.searchUsers( new UserSearchCriteria( "url-user" ) ).size() );
 
         // the list should contain a single user
         Assert.assertTrue( urlLocator.listUserIds().contains( "url-user" ) );

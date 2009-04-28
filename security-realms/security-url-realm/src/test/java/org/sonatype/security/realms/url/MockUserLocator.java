@@ -16,14 +16,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.security.locators.AbstractPlexusUserLocator;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
-import org.sonatype.security.locators.users.UserManager;
+import org.sonatype.security.authorization.Role;
+import org.sonatype.security.usermanagement.AbstractUserManager;
+import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 @Component( role = UserManager.class, hint = "test" )
 public class MockUserLocator
-    extends AbstractPlexusUserLocator
+    extends AbstractUserManager
 {
     private Set<String> userIds = new HashSet<String>();
 
@@ -38,11 +41,11 @@ public class MockUserLocator
         return "test";
     }
 
-    public PlexusUser getUser( String userId )
+    public User getUser( String userId )
     {
         if ( this.userIds.contains( userId ) )
         {
-            return this.toPlexusUser( userId );
+            return this.toUser( userId );
         }
         return null;
     }
@@ -57,26 +60,26 @@ public class MockUserLocator
         return userIds;
     }
 
-    public Set<PlexusUser> listUsers()
+    public Set<User> listUsers()
     {
-        Set<PlexusUser> users = new HashSet<PlexusUser>();
+        Set<User> users = new HashSet<User>();
 
         for ( String userId : this.userIds )
         {
-            users.add( this.toPlexusUser( userId ) );
+            users.add( this.toUser( userId ) );
         }
 
         return users;
     }
 
-    public Set<PlexusUser> searchUsers( PlexusUserSearchCriteria criteria )
+    public Set<User> searchUsers( UserSearchCriteria criteria )
     {
         return this.filterListInMemeory( this.listUsers(), criteria );
     }
 
-    private PlexusUser toPlexusUser( String userId )
+    private User toUser( String userId )
     {
-        PlexusUser user = new PlexusUser();
+        DefaultUser user = new DefaultUser();
 
         user.setUserId( userId );
         user.setName( userId );

@@ -20,18 +20,20 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.security.locators.AbstractPlexusUserLocator;
-import org.sonatype.security.locators.ConfiguredUsersPlexusUserLocator;
-import org.sonatype.security.locators.users.PlexusRole;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
-import org.sonatype.security.locators.users.UserManager;
+import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
+import org.sonatype.security.usermanagement.AbstractUserManager;
+import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
+import org.sonatype.security.usermanagement.xml.ConfiguredUsersUserManager;
 
 @Component( role = UserManager.class, hint = "url", description = "URL Realm Users" )
-public class URLUserLocator
-    extends AbstractPlexusUserLocator
+public class URLUserManager
+    extends AbstractUserManager
 {
     public static final String SOURCE = "url";
 
@@ -52,7 +54,7 @@ public class URLUserLocator
         return SOURCE;
     }
 
-    public PlexusUser getUser( String userId )
+    public User getUser( String userId )
     {
         // list of users to ignore
         Set<String> ignoredUsers = this.getIgnoredUserIds();
@@ -63,14 +65,14 @@ public class URLUserLocator
         }
 
         // otherwise search for the user, the search will fake the user if its not in the security.xml
-        Set<PlexusUser> users = this.searchUsers( new PlexusUserSearchCriteria( userId ) );
+        Set<User> users = this.searchUsers( new UserSearchCriteria( userId ) );
 
         // now find the user
-        for ( PlexusUser plexusUser : users )
+        for ( User User : users )
         {
-            if ( plexusUser.getUserId().equals( userId ) )
+            if ( User.getUserId().equals( userId ) )
             {
-                return plexusUser;
+                return User;
             }
         }
 
@@ -82,16 +84,16 @@ public class URLUserLocator
         return true;
     }
 
-    public Set<PlexusUser> listUsers()
+    public Set<User> listUsers()
     {
-        Set<PlexusUser> users = new HashSet<PlexusUser>();
+        Set<User> users = new HashSet<User>();
 
         List<SecurityUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
         for ( SecurityUserRoleMapping userRoleMapping : userRoleMappings )
         {
             if ( SOURCE.equals( userRoleMapping.getSource() ) )
             {
-                PlexusUser user = this.toPlexusUser( userRoleMapping.getUserId() );
+                User user = this.toUser( userRoleMapping.getUserId() );
                 if ( user != null )
                 {
                     users.add( user );
@@ -122,9 +124,9 @@ public class URLUserLocator
         return userIds;
     }
 
-    public Set<PlexusUser> searchUsers( PlexusUserSearchCriteria criteria )
+    public Set<User> searchUsers( UserSearchCriteria criteria )
     {
-        Set<PlexusUser> result = new HashSet<PlexusUser>();
+        Set<User> result = new HashSet<User>();
 
         if ( StringUtils.isNotEmpty( criteria.getUserId() ) )
         {
@@ -136,29 +138,29 @@ public class URLUserLocator
                 return result;
             }
 
-            for ( PlexusUser plexusUser : this.listUsers() )
+            for ( User User : this.listUsers() )
             {
-                if ( plexusUser.getUserId().toLowerCase().startsWith( userId.toLowerCase() ) )
+                if ( User.getUserId().toLowerCase().startsWith( userId.toLowerCase() ) )
                 {
-                    result.add( plexusUser );
+                    result.add( User );
                 }
             }
 
             // this is a bit fuzzy, because we want to return a user even if we didn't find one
             // first check if we had an exact match
 
-            PlexusUser exactUser = null;
-            for ( PlexusUser plexusUser : result )
+            User exactUser = null;
+            for ( User User : result )
             {
-                if ( plexusUser.getUserId().toLowerCase().equals( userId.toLowerCase() ) )
+                if ( User.getUserId().toLowerCase().equals( userId.toLowerCase() ) )
                 {
-                    exactUser = plexusUser;
+                    exactUser = User;
                 }
             }
             // if not exact user is found, fake it
             if ( exactUser == null )
             {
-                result.add( this.toPlexusUser( userId ) );
+                result.add( this.toUser( userId ) );
             }
         }
         else
@@ -170,15 +172,15 @@ public class URLUserLocator
         return this.filterListInMemeory( result, criteria );
     }
 
-    private PlexusUser toPlexusUser( String userId )
+    private User toUser( String userId )
     {
-        PlexusUser user = new PlexusUser();
+        DefaultUser user = new DefaultUser();
         user.setEmailAddress( userId + "@" + emailDomain );
         user.setName( userId );
         user.setSource( SOURCE );
         user.setUserId( userId );
 
-        PlexusRole role = new PlexusRole();
+        Role role = new Role();
         role.setRoleId( this.defaultRole );
         role.setName( this.defaultRole );
         role.setSource( SOURCE );
@@ -193,12 +195,44 @@ public class URLUserLocator
 
         for ( UserManager userLocator : this.userLocators )
         {
-            if ( !this.getSource().equals( userLocator.getSource() ) && !ConfiguredUsersPlexusUserLocator.SOURCE.equals( userLocator.getSource() ) )
+            if ( !this.getSource().equals( userLocator.getSource() ) && !ConfiguredUsersUserManager.SOURCE.equals( userLocator.getSource() ) )
             {
                 userIds.addAll( userLocator.listUserIds() );
             }
         }
 
         return userIds;
+    }
+
+    public User addUser( User user )
+    {
+        return null;
+    }
+
+    public void deleteUser( String userId )
+        throws UserNotFoundException
+    {        
+    }
+
+    public Set<Role> getUsersRoles( String userId, String source )
+        throws UserNotFoundException
+    {
+        return null;
+    }
+
+    public void setUsersRoles( String userId, Set<Role> roles, String source )
+        throws UserNotFoundException
+    {        
+    }
+
+    public boolean supportsWrite()
+    {
+        return false;
+    }
+
+    public User updateUser( User user )
+        throws UserNotFoundException
+    {
+        return null;
     }
 }

@@ -8,6 +8,11 @@ public class UserNotFoundException
     {
         super( buildMessage( userId, message ), cause );
     }
+    
+    public UserNotFoundException( String userId, String message )
+    {
+        super( buildMessage( userId, message ) );
+    }
 
     public UserNotFoundException( String userId )
     {

@@ -12,24 +12,64 @@
  */
 package org.sonatype.security;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.util.FileUtils;
+import org.jsecurity.realm.Realm;
+import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 
 public abstract class AbstractSecurityTestCase
     extends PlexusTestCase
 {
+
+    protected File PLEXUS_HOME = new File( "./target/plexus_home" );
+
+    protected File CONFIG_DIR = new File( PLEXUS_HOME, "conf" );
+
+    @Override
+    protected void customizeContext( Context context )
+    {
+        super.customizeContext( context );
+        context.put( "application-conf", CONFIG_DIR.getAbsolutePath() );
+    }
+
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        FileUtils.deleteDirectory( PLEXUS_HOME );
+
+        super.setUp();
+
+        CONFIG_DIR.mkdirs();
+
+        SecurityConfigurationSource source = this.lookup( SecurityConfigurationSource.class, "file" );
+        SecurityConfiguration config = source.loadConfiguration();
+
+        Map<String, Realm> realmMap = this.getContainer().lookupMap( Realm.class );
+
+        config.setRealms( new ArrayList<String>( realmMap.keySet() ) );
+        source.storeConfiguration();
+    }
+
     protected Configuration getConfigurationFromStream( InputStream is )
         throws Exception
     {
         SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-    
+
         Reader fr = new InputStreamReader( is );
-    
+
         return reader.read( fr );
     }
 }

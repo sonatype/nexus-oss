@@ -15,14 +15,13 @@ package org.sonatype.security.realms;
 import java.io.File;
 import java.util.Collection;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.jsecurity.authz.AuthorizationInfo;
 import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.permission.WildcardPermission;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.SimplePrincipalCollection;
-import org.sonatype.security.realms.XmlAuthorizingRealm;
+import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
@@ -35,7 +34,7 @@ import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 
 public class XmlAuthorizingRealmTest
-    extends PlexusTestCase
+    extends AbstractSecurityTestCase
 {
     public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
     

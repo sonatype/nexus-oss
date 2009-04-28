@@ -19,22 +19,23 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
-import org.sonatype.security.locators.users.PlexusRole;
-import org.sonatype.security.locators.users.PlexusRoleLocator;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserManager;
-import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.AbstractSecurityTestCase;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.AuthorizationManager;
+import org.sonatype.security.authorization.Role;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-public class AdditinalRolePlexusUserManagerTest
-    extends PlexusTestCase
+public class AdditinalRoleSecuritySystemTest
+    extends AbstractSecurityTestCase
 {
 
     public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
 
-    private static final String SECURITY_CONFIG_FILE_PATH = getBasedir()
-        + "/target/test-classes/"+ AdditinalRolePlexusUserManagerTest.class.getPackage().getName().replaceAll( "\\.", "\\/" ) +"/additinalRoleTest-security.xml";
+    private static final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/test-classes/"
+        + AdditinalRoleSecuritySystemTest.class.getPackage().getName().replaceAll( "\\.", "\\/" )
+        + "/additinalRoleTest-security.xml";
 
     @Override
     protected void customizeContext( Context context )
@@ -44,29 +45,37 @@ public class AdditinalRolePlexusUserManagerTest
         context.put( PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH );
     }
 
-    private Set<String> getXMLRoles() throws Exception
-    {
-        PlexusRoleLocator locator = (PlexusRoleLocator) this.lookup( PlexusRoleLocator.class );
-        return locator.listRoleIds();
-    }
-    
-    private PlexusUserManager getUserManager()
+    private Set<String> getXMLRoles()
         throws Exception
     {
-        return (PlexusUserManager) this.lookup( PlexusUserManager.class, "additinalRoles" );
+        AuthorizationManager authzManager = this.lookup( AuthorizationManager.class );
+
+        Set<String> roles = new HashSet<String>();
+        for ( Role role : authzManager.listRoles() )
+        {
+            roles.add( role.getRoleId() );
+        }
+
+        return roles;
+    }
+
+    private SecuritySystem getSecuritySystem()
+        throws Exception
+    {
+        return this.lookup( SecuritySystem.class );
     }
 
     public void testListUsers()
         throws Exception
     {
-        PlexusUserManager userManager = this.getUserManager();
-        Set<PlexusUser> users = userManager.listUsers( "MockUserLocatorA" );
+        SecuritySystem userManager = this.getSecuritySystem();
+        UserSearchCriteria criteria = new UserSearchCriteria(null, null, "MockUserLocatorA");
+        Set<User> users = userManager.searchUsers( criteria );
 
-        Map<String, PlexusUser> userMap = this.toUserMap( users );
+        Map<String, User> userMap = this.toUserMap( users );
 
-        PlexusUser user = userMap.get( "jcoder" );
+        User user = userMap.get( "jcoder" );
         Assert.assertNotNull( user );
-        Assert.assertEquals( 4, user.getRoles().size() );
 
         // A,B,C,1
         Set<String> roleIds = this.toRoleIdSet( user.getRoles() );
@@ -75,6 +84,8 @@ public class AdditinalRolePlexusUserManagerTest
         Assert.assertTrue( roleIds.contains( "RoleC" ) );
         Assert.assertTrue( roleIds.contains( "Role1" ) );
 
+        Assert.assertEquals("roles: "+ this.toRoleIdSet( user.getRoles() ), 4, user.getRoles().size() );
+        
         user = userMap.get( "dknudsen" );
         Assert.assertNotNull( user );
         Assert.assertEquals( 1, user.getRoles().size() );
@@ -99,26 +110,27 @@ public class AdditinalRolePlexusUserManagerTest
 
     }
     
-    public void testSearchEffectiveTrue() throws Exception
+    public void testSearchEffectiveTrue()
+        throws Exception
     {
-        PlexusUserSearchCriteria criteria = new PlexusUserSearchCriteria();
+        UserSearchCriteria criteria = new UserSearchCriteria();
         criteria.setOneOfRoleIds( this.getXMLRoles() );
-        
+
         criteria.setUserId( "pperalez" );
-        PlexusUser user = searchForSingleUser( criteria, "pperalez", "MockUserLocatorA" );
+        User user = searchForSingleUser( criteria, "pperalez", "MockUserLocatorA" );
         Assert.assertNull( user );
-                
+
         criteria.setUserId( "jcoder" );
-        user = searchForSingleUser( criteria, "jcoder", "MockUserLocatorA" );        
+        user = searchForSingleUser( criteria, "jcoder", "MockUserLocatorA" );
         Assert.assertNotNull( user );
-        Assert.assertEquals( "Roles: "+ this.toRoleIdSet( user.getRoles() ), 4, user.getRoles().size() );
+        Assert.assertEquals( "Roles: " + this.toRoleIdSet( user.getRoles() ), 4, user.getRoles().size() );
         // A,B,C,1
         Set<String> roleIds = this.toRoleIdSet( user.getRoles() );
         Assert.assertTrue( roleIds.contains( "RoleA" ) );
         Assert.assertTrue( roleIds.contains( "RoleB" ) );
         Assert.assertTrue( roleIds.contains( "RoleC" ) );
         Assert.assertTrue( roleIds.contains( "Role1" ) );
-        
+
         criteria.setUserId( "dknudsen" );
         user = searchForSingleUser( criteria, "dknudsen", "MockUserLocatorA" );
         Assert.assertNotNull( user );
@@ -126,7 +138,7 @@ public class AdditinalRolePlexusUserManagerTest
         // Role2
         roleIds = this.toRoleIdSet( user.getRoles() );
         Assert.assertTrue( roleIds.contains( "Role2" ) );
-        
+
         criteria.setUserId( "cdugas" );
         user = searchForSingleUser( criteria, "cdugas", "MockUserLocatorA" );
         Assert.assertNotNull( user );
@@ -137,19 +149,20 @@ public class AdditinalRolePlexusUserManagerTest
         Assert.assertTrue( roleIds.contains( "RoleA" ) );
         Assert.assertTrue( roleIds.contains( "RoleB" ) );
         Assert.assertTrue( roleIds.contains( "Role1" ) );
-        
+
     }
-    
-    public void testSearchEffectiveFalse() throws Exception
+
+    public void testSearchEffectiveFalse()
+        throws Exception
     {
-        PlexusUserSearchCriteria criteria = new PlexusUserSearchCriteria();
-        
+        UserSearchCriteria criteria = new UserSearchCriteria();
+
         criteria.setUserId( "pperalez" );
-        PlexusUser user = searchForSingleUser( criteria, "pperalez", "MockUserLocatorA" );
+        User user = searchForSingleUser( criteria, "pperalez", "MockUserLocatorA" );
         Assert.assertNotNull( user );
-                
+
         criteria.setUserId( "jcoder" );
-        user = searchForSingleUser( criteria, "jcoder", "MockUserLocatorA" );        
+        user = searchForSingleUser( criteria, "jcoder", "MockUserLocatorA" );
         Assert.assertNotNull( user );
         Assert.assertEquals( 4, user.getRoles().size() );
         // A,B,C,1
@@ -158,7 +171,7 @@ public class AdditinalRolePlexusUserManagerTest
         Assert.assertTrue( roleIds.contains( "RoleB" ) );
         Assert.assertTrue( roleIds.contains( "RoleC" ) );
         Assert.assertTrue( roleIds.contains( "Role1" ) );
-        
+
         criteria.setUserId( "dknudsen" );
         user = searchForSingleUser( criteria, "dknudsen", "MockUserLocatorA" );
         Assert.assertNotNull( user );
@@ -166,7 +179,7 @@ public class AdditinalRolePlexusUserManagerTest
         // Role2
         roleIds = this.toRoleIdSet( user.getRoles() );
         Assert.assertTrue( roleIds.contains( "Role2" ) );
-        
+
         criteria.setUserId( "cdugas" );
         user = searchForSingleUser( criteria, "cdugas", "MockUserLocatorA" );
         Assert.assertNotNull( user );
@@ -177,56 +190,59 @@ public class AdditinalRolePlexusUserManagerTest
         Assert.assertTrue( roleIds.contains( "RoleA" ) );
         Assert.assertTrue( roleIds.contains( "RoleB" ) );
         Assert.assertTrue( roleIds.contains( "Role1" ) );
-        
+
     }
-  
-  public void testNestedRoles()
+
+    public void testNestedRoles()
         throws Exception
     {
-        PlexusUserSearchCriteria criteria = new PlexusUserSearchCriteria();
+        UserSearchCriteria criteria = new UserSearchCriteria();
         criteria.getOneOfRoleIds().add( "Role1" );
 
-        Set<PlexusUser> result = this.getUserManager().searchUsers( criteria, PlexusUserManager.SOURCE_ALL );
+        Set<User> result = this.getSecuritySystem().searchUsers( criteria );
 
-        Map<String, PlexusUser> userMap = this.toUserMap( result );
+        Map<String, User> userMap = this.toUserMap( result );
 
         Assert.assertTrue( "User not found in: " + userMap, userMap.containsKey( "admin" ) );
         Assert.assertTrue( "User not found in: " + userMap, userMap.containsKey( "test-user" ) );
         Assert.assertTrue( "User not found in: " + userMap, userMap.containsKey( "jcoder" ) );
         Assert.assertTrue( "User not found in: " + userMap, userMap.containsKey( "cdugas" ) );
-//        Assert.assertTrue( "User not found in: " + userMap, userMap.containsKey( "other-user" ) ); 
+        // Assert.assertTrue( "User not found in: " + userMap, userMap.containsKey( "other-user" ) );
         // other user is only defined in the mapping, simulates a user that was deleted
 
         Assert.assertEquals( 4, result.size() );
 
     }
-  
-    private PlexusUser searchForSingleUser( PlexusUserSearchCriteria criteria, String userId, String source ) throws Exception
+
+    private User searchForSingleUser( UserSearchCriteria criteria, String userId, String source )
+        throws Exception
     {
-        PlexusUserManager userManager = this.getUserManager();
-        Set<PlexusUser>  users = userManager.searchUsers( criteria, source );
-        
-        Map<String, PlexusUser> userMap = this.toUserMap( users );
-        
-        Assert.assertTrue("More then 1 User was returned: "+ userMap.keySet(), users.size() <= 1 );
-        
+        SecuritySystem userManager = this.getSecuritySystem();
+
+        criteria.setSource( source );
+        Set<User> users = userManager.searchUsers( criteria );
+
+        Map<String, User> userMap = this.toUserMap( users );
+
+        Assert.assertTrue( "More then 1 User was returned: " + userMap.keySet(), users.size() <= 1 );
+
         return userMap.get( userId );
     }
 
-    private Map<String, PlexusUser> toUserMap( Set<PlexusUser> users )
+    private Map<String, User> toUserMap( Set<User> users )
     {
-        HashMap<String, PlexusUser> map = new HashMap<String, PlexusUser>();
-        for ( PlexusUser plexusUser : users )
+        HashMap<String, User> map = new HashMap<String, User>();
+        for ( User plexusUser : users )
         {
             map.put( plexusUser.getUserId(), plexusUser );
         }
         return map;
     }
 
-    private Set<String> toRoleIdSet( Set<PlexusRole> roles )
+    private Set<String> toRoleIdSet( Set<Role> roles )
     {
         Set<String> roleIds = new HashSet<String>();
-        for ( PlexusRole role : roles )
+        for ( Role role : roles )
         {
             roleIds.add( role.getRoleId() );
         }

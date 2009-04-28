@@ -12,34 +12,27 @@
  */
 package org.sonatype.security.realms.tools;
 
-import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.PlexusSecurity;
+import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.configuration.SecurityRestStaticSecurityResource;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 
 public class AllPermissionsAreDefinedTest
-    extends PlexusTestCase
+    extends AbstractSecurityTestCase
 {
     
     private static String SECURITY_FILE = "./target/security.xml";

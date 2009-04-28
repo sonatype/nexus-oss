@@ -12,9 +12,7 @@
  */
 package org.sonatype.security.locators;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,16 +20,16 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
-import org.sonatype.security.locators.users.PlexusRole;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
-import org.sonatype.security.locators.users.UserManager;
+import org.sonatype.security.authorization.Role;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 public class SecurityXmlPlexusUserLocatorTest
     extends PlexusTestCase
 {
 
-    public UserManager getLocator()
+    public UserManager getUserManager()
         throws Exception
     {
         return (UserManager) this.lookup( UserManager.class );
@@ -40,7 +38,7 @@ public class SecurityXmlPlexusUserLocatorTest
     public void testListUserIds()
         throws Exception
     {
-        UserManager userLocator = this.getLocator();
+        UserManager userLocator = this.getUserManager();
 
         Set<String> userIds = userLocator.listUserIds();
         Assert.assertTrue( userIds.contains( "test-user" ) );
@@ -53,10 +51,10 @@ public class SecurityXmlPlexusUserLocatorTest
     public void testListUsers()
         throws Exception
     {
-        UserManager userLocator = this.getLocator();
+        UserManager userLocator = this.getUserManager();
 
-        Set<PlexusUser> users = userLocator.listUsers();
-        Map<String, PlexusUser> userMap = this.toUserMap( users );
+        Set<User> users = userLocator.listUsers();
+        Map<String, User> userMap = this.toUserMap( users );
 
         Assert.assertTrue( userMap.containsKey( "test-user" ) );
         Assert.assertTrue( userMap.containsKey( "anonymous" ) );
@@ -68,15 +66,15 @@ public class SecurityXmlPlexusUserLocatorTest
     public void testGetUser()
         throws Exception
     {
-        UserManager userLocator = this.getLocator();
-        PlexusUser testUser = userLocator.getUser( "test-user" );
+        UserManager userLocator = this.getUserManager();
+        User testUser = userLocator.getUser( "test-user" );
 
         Assert.assertEquals( "Test User", testUser.getName() );
         Assert.assertEquals( "test-user", testUser.getUserId() );
         Assert.assertEquals( "changeme1@yourcompany.com", testUser.getEmailAddress() );
 
         // test roles
-        Map<String, PlexusRole> roleMap = this.toRoleMap( testUser.getRoles() );
+        Map<String, Role> roleMap = this.toRoleMap( testUser.getRoles() );
 
         Assert.assertTrue( roleMap.containsKey( "role1" ) );
         Assert.assertTrue( roleMap.containsKey( "role2" ) );
@@ -86,32 +84,32 @@ public class SecurityXmlPlexusUserLocatorTest
     public void testSearchUser()
         throws Exception
     {
-        UserManager userLocator = this.getLocator();
+        UserManager userLocator = this.getUserManager();
 
-        Set<PlexusUser> users = userLocator.searchUsers( new PlexusUserSearchCriteria( "test" ) );
-        Map<String, PlexusUser> userMap = this.toUserMap( users );
+        Set<User> users = userLocator.searchUsers( new UserSearchCriteria( "test" ) );
+        Map<String, User> userMap = this.toUserMap( users );
 
         Assert.assertTrue( userMap.containsKey( "test-user" ) );
 
         Assert.assertEquals( 1, users.size() );
     }
 
-    private Map<String, PlexusRole> toRoleMap( Set<PlexusRole> roles )
+    private Map<String, Role> toRoleMap( Set<Role> roles )
     {
-        Map<String, PlexusRole> results = new HashMap<String, PlexusRole>();
+        Map<String, Role> results = new HashMap<String, Role>();
 
-        for ( PlexusRole plexusRole : roles )
+        for ( Role plexusRole : roles )
         {
             results.put( plexusRole.getRoleId(), plexusRole );
         }
         return results;
     }
 
-    private Map<String, PlexusUser> toUserMap( Set<PlexusUser> users )
+    private Map<String, User> toUserMap( Set<User> users )
     {
-        Map<String, PlexusUser> results = new HashMap<String, PlexusUser>();
+        Map<String, User> results = new HashMap<String, User>();
 
-        for ( PlexusUser plexusUser : users )
+        for ( User plexusUser : users )
         {
             results.put( plexusUser.getUserId(), plexusUser );
         }

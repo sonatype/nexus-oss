@@ -18,8 +18,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
@@ -34,15 +36,16 @@ import org.jsecurity.cache.HashtableCache;
 import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.Role;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.NoSuchPrivilegeException;
 import org.sonatype.security.realms.tools.NoSuchRoleException;
-import org.sonatype.security.locators.users.PlexusRole;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = Realm.class, hint = "XmlAuthorizingRealm" )
 public class XmlAuthorizingRealm
@@ -51,11 +54,13 @@ public class XmlAuthorizingRealm
 {
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager configuration;
-    
-    @Requirement(role=PlexusUserManager.class, hint="additinalRoles")
-    private PlexusUserManager userManager;
-    
-    @Requirement(role=PrivilegeDescriptor.class)
+
+    @Requirement
+    private PlexusContainer container;
+
+    private SecuritySystem securitySystem;
+
+    @Requirement( role = PrivilegeDescriptor.class )
     private List<PrivilegeDescriptor> privilegeDescriptors;
 
     public XmlAuthorizingRealm()
@@ -93,11 +98,20 @@ public class XmlAuthorizingRealm
 
         String username = (String) principals.iterator().next();
 
-        PlexusUser user = this.userManager.getUser( username );
-        
-        if ( user == null )
+        User user;
+        try
         {
-            throw new AuthorizationException( "User '" + username + "' cannot be retrieved." );
+            // https://issues.apache.org/jira/browse/KI-77 work around
+
+            user = this.getSecuritySystem().getUser( username );
+        }
+        catch ( UserNotFoundException e )
+        {
+            throw new AuthorizationException( "User '" + username + "' cannot be retrieved.", e );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new AuthorizationException( "Unable to lookup user in SecuritySystem", e );
         }
 
         // FIXME: This should use the RoleResolver, its to late in the release cycle to change it now,
@@ -105,21 +119,20 @@ public class XmlAuthorizingRealm
         //
         // for( String permission : roleResolver.resolvePermissions( user.getRoles() )
         // {
-        //    permissions.add( new WildcardPermission( permission );
+        // permissions.add( new WildcardPermission( permission );
         // }
         //
-        
+
         LinkedList<String> rolesToProcess = new LinkedList<String>();
-        Set<PlexusRole> roles = user.getRoles();
-        
+        Set<Role> roles = user.getRoles();
+
         if ( roles != null )
         {
-            for ( PlexusRole plexusRole : roles )
+            for ( Role role : roles )
             {
-                if ( plexusRole != null
-                    && StringUtils.isNotEmpty( plexusRole.getRoleId() ) )
+                if ( role != null && StringUtils.isNotEmpty( role.getRoleId() ) )
                 {
-                    rolesToProcess.add( plexusRole.getRoleId() );
+                    rolesToProcess.add( role.getRoleId() );
                 }
             }
         }
@@ -166,17 +179,17 @@ public class XmlAuthorizingRealm
         try
         {
             CPrivilege privilege = getConfigurationManager().readPrivilege( privilegeId );
-            
+
             for ( PrivilegeDescriptor descriptor : privilegeDescriptors )
             {
                 String permission = descriptor.buildPermission( privilege );
-                
+
                 if ( permission != null )
                 {
                     return Collections.singleton( (Permission) new WildcardPermission( permission ) );
                 }
             }
-            
+
             return Collections.emptySet();
         }
         catch ( NoSuchPrivilegeException e )
@@ -189,4 +202,15 @@ public class XmlAuthorizingRealm
     {
         return configuration;
     }
+
+    private SecuritySystem getSecuritySystem()
+        throws ComponentLookupException
+    {
+        if ( securitySystem == null )
+        {
+            this.securitySystem = container.lookup( SecuritySystem.class );
+        }
+        return securitySystem;
+    }
+
 }

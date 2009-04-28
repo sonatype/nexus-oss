@@ -24,14 +24,14 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
-import org.jsecurity.realm.AuthenticatingRealm;
-import org.jsecurity.realm.CachingRealm;
-import org.jsecurity.realm.Realm;
+import org.sonatype.security.email.NoSuchEmailException;
+import org.sonatype.security.email.SecurityEmailer;
+import org.sonatype.security.events.SecurityConfigurationChangedEvent;
+import org.sonatype.security.events.SecurityEvent;
+import org.sonatype.security.events.SecurityEventHandler;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.ConfigurationException;
 import org.sonatype.security.model.source.SecurityConfigurationSource;
-import org.sonatype.security.realms.XmlAuthenticatingRealm;
-import org.sonatype.security.realms.XmlAuthorizingRealm;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.InvalidConfigurationException;
@@ -44,12 +44,6 @@ import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.realms.validator.ValidationContext;
-import org.sonatype.security.email.NoSuchEmailException;
-import org.sonatype.security.email.SecurityEmailer;
-import org.sonatype.security.events.SecurityConfigurationChangedEvent;
-import org.sonatype.security.events.SecurityEvent;
-import org.sonatype.security.events.SecurityEventHandler;
-import org.sonatype.security.locators.RealmLocator;
 
 @Component( role = PlexusSecurity.class )
 public class DefaultPlexusSecurity
@@ -69,9 +63,9 @@ public class DefaultPlexusSecurity
 
     @Requirement
     private SecurityEmailer emailer;
-
-    @Requirement
-    private RealmLocator realmLocator;
+//
+//    @Requirement
+//    private RealmLocator realmLocator;
     
     @Requirement
     private Logger logger;
@@ -248,18 +242,18 @@ public class DefaultPlexusSecurity
         // some components might need to do something when the config changes. (clear caches etc)
         this.notifyEventHandlers( new SecurityConfigurationChangedEvent() );
 
-        for ( Realm realm : realmLocator.getRealms() )
-        {            
-            if ( XmlAuthenticatingRealm.class.isAssignableFrom( realm.getClass() ) )
-            {
-                ( (XmlAuthenticatingRealm) realm ).getConfigurationManager().clearCache();
-            }
-
-            if ( XmlAuthorizingRealm.class.isAssignableFrom( realm.getClass() ) )
-            {
-                ( (XmlAuthorizingRealm) realm ).getAuthorizationCache().clear();
-            }
-        }
+//        for ( Realm realm : realmLocator.getRealms() )
+//        {            
+//            if ( XmlAuthenticatingRealm.class.isAssignableFrom( realm.getClass() ) )
+//            {
+//                ( (XmlAuthenticatingRealm) realm ).getConfigurationManager().clearCache();
+//            }
+//
+//            if ( XmlAuthorizingRealm.class.isAssignableFrom( realm.getClass() ) )
+//            {
+//                ( (XmlAuthorizingRealm) realm ).getAuthorizationCache().clear();
+//            }
+//        }
     }
 
     public void updatePrivilege( SecurityPrivilege privilege )

@@ -28,9 +28,9 @@ import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.locators.users.UserManager;
 import org.sonatype.security.rest.model.PlexusComponentListResource;
 import org.sonatype.security.rest.model.PlexusComponentListResourceResponse;
+import org.sonatype.security.usermanagement.UserManager;
 
 @Component( role = PlexusResource.class, hint = "UserLocatorComponentListPlexusResource" )
 public class UserLocatorComponentListPlexusResource

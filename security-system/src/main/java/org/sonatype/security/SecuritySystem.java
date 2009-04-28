@@ -9,8 +9,10 @@ import org.jsecurity.subject.Subject;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.Role;
+import org.sonatype.security.usermanagement.NoSuchUserManager;
 import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
@@ -56,14 +58,16 @@ public interface SecuritySystem
     // ******************************
     // * Role permission management
     // ******************************
-    public AuthorizationManager getAuthorizationManager( String sourceId );
+    public Set<Role> listRoles();
+    
+    public Set<Role> listRoles( String sourceId ) throws NoSuchAuthorizationManager;
 
     // *********************
     // * user management
     // *********************
     // public UserManager getUserManager( String sourceId );
 
-    User addUser( User user );
+    User addUser( User user ) throws NoSuchUserManager;
 
     /**
      * Get a Subject object by id
@@ -72,13 +76,16 @@ public interface SecuritySystem
      * @return
      * @throws UserNotFoundException 
      */
-    User getUser( String userId, String source ) throws UserNotFoundException;
+    User getUser( String userId, String source ) throws UserNotFoundException, NoSuchUserManager;
+    
+    // FIXME: remove when https://issues.apache.org/jira/browse/KI-77, is implemented
+    User getUser( String userId ) throws UserNotFoundException;
 
     User updateUser( User user )
-        throws UserNotFoundException;
+        throws UserNotFoundException, NoSuchUserManager;
 
     void deleteUser( String userId, String source )
-        throws UserNotFoundException;
+        throws UserNotFoundException, NoSuchUserManager;
 
     /**
      * Retrieve all Subject objects

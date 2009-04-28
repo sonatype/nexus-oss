@@ -14,21 +14,19 @@ package org.sonatype.security.realms.url;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.jsecurity.authc.AccountException;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.authz.AuthorizationException;
-import org.jsecurity.authz.AuthorizationInfo;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.SimplePrincipalCollection;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.security.locators.users.UserManager;
-import org.sonatype.security.realms.url.URLRealm;
+import org.sonatype.security.AbstractSecurityTestCase;
+import org.sonatype.security.usermanagement.UserManager;
 
 public class URLRealmTest
-    extends PlexusTestCase
+    extends AbstractSecurityTestCase
 {
 
     private String username = "test-user";

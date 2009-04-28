@@ -29,10 +29,19 @@ public interface UserManager
     void deleteUser( String userId )
         throws UserNotFoundException;
 
-    Set<Role> getUsersRoles( String userId )
+    /**
+     * Roles might be stored by a different UserManager, then the one that owns the User.
+     * For example, a User might come from a JDBC UserManager, but has additional roles mapped in XML.
+     * 
+     * @param userId
+     * @param source
+     * @return
+     * @throws UserNotFoundException
+     */
+    Set<Role> getUsersRoles( String userId, String source )
         throws UserNotFoundException;
 
-    void setUsersRoles( String userId, Set<Role> roles )
+    void setUsersRoles( String userId, Set<Role> roles, String source )
         throws UserNotFoundException;
 
     /**

@@ -17,14 +17,14 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
-import org.sonatype.security.locators.users.PlexusRole;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.AbstractSecurityTestCase;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.Role;
+import org.sonatype.security.usermanagement.User;
 
 public class MissingRolePlexusUserManagerTest
-    extends PlexusTestCase
+    extends AbstractSecurityTestCase
 {
 
     public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
@@ -46,22 +46,22 @@ public class MissingRolePlexusUserManagerTest
     // return locator.listRoleIds();
     // }
 
-    private PlexusUserManager getUserManager()
+    private SecuritySystem getSecuritySystem()
         throws Exception
     {
-        return (PlexusUserManager) this.lookup( PlexusUserManager.class, "additinalRoles" );
+        return (SecuritySystem) this.lookup( SecuritySystem.class );
     }
 
     public void testInvalidRoleMapping()
         throws Exception
     {
-        PlexusUserManager userManager = this.getUserManager();
+        SecuritySystem userManager = this.getSecuritySystem();
 
-        PlexusUser user = userManager.getUser( "jcoder" );
+        User user = userManager.getUser( "jcoder" );
         Assert.assertNotNull( user );
 
         Set<String> roleIds = new HashSet<String>();
-        for ( PlexusRole role : user.getRoles() )
+        for ( Role role : user.getRoles() )
         {
             Assert.assertNotNull( "User has null role.", role );
             roleIds.add( role.getRoleId() );

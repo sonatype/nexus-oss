@@ -12,6 +12,9 @@
  */
 package org.sonatype.security.rest.users;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -21,10 +24,11 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.locators.users.PlexusRoleLocator;
-import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResource;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResourceRequest;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 @Component( role = PlexusResource.class, hint = "UserSearchPlexusResource" )
 public class UserSearchPlexusResource
@@ -33,9 +37,9 @@ public class UserSearchPlexusResource
     public static final String USER_ID_KEY = "userId";
 
     public static final String USER_SOURCE_KEY = "userSource";
-    
+
     @Requirement
-    private PlexusRoleLocator roleLocator;
+    private SecuritySystem securitySystem;
 
     public UserSearchPlexusResource()
     {
@@ -67,36 +71,45 @@ public class UserSearchPlexusResource
         PlexusUserSearchCriteriaResource criteriaResource = ( (PlexusUserSearchCriteriaResourceRequest) payload )
             .getData();
 
-        PlexusUserSearchCriteria criteria = this.toPlexusSearchCriteria( criteriaResource );
+        UserSearchCriteria criteria = this.toPlexusSearchCriteria( criteriaResource );
+        criteria.setSource( this.getUserSource( request ) );
 
-        return this.search( criteria, this.getUserSource( request ) );
+        return this.search( criteria );
     }
-    
-    private PlexusUserSearchCriteria toPlexusSearchCriteria( PlexusUserSearchCriteriaResource criteriaResource )
+
+    private UserSearchCriteria toPlexusSearchCriteria( PlexusUserSearchCriteriaResource criteriaResource )
     {
-        PlexusUserSearchCriteria criteria = new PlexusUserSearchCriteria();
+        UserSearchCriteria criteria = new UserSearchCriteria();
         criteria.setUserId( criteriaResource.getUserId() );
-        
+
         // NOTE: in the future we could expand the REST resource to send back a list of roles, (or a single role)
         // to get a list of all users of Role 'XYZ'
-        if( criteriaResource.isEffectiveUsers() )
+        if ( criteriaResource.isEffectiveUsers() )
         {
-            criteria.setOneOfRoleIds( this.roleLocator.listRoleIds() );
+            Set<String> roleIds = new HashSet<String>();
+
+            for ( Role role : securitySystem.listRoles() )
+            {
+                roleIds.add( role.getRoleId() );
+            }
+
+            criteria.setOneOfRoleIds( roleIds );
         }
-        
+
         return criteria;
     }
-    
+
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        PlexusUserSearchCriteria criteria = new PlexusUserSearchCriteria();
+        UserSearchCriteria criteria = new UserSearchCriteria();
 
         // match all userIds
         criteria.setUserId( "" );
+        criteria.setSource( this.getUserSource( request ) );
 
-        return this.search( criteria, this.getUserSource( request ) );
+        return this.search( criteria );
     }
 
 }

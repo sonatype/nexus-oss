@@ -25,12 +25,12 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.PlexusSecurity;
-import org.sonatype.security.locators.users.PlexusRole;
-import org.sonatype.security.locators.users.PlexusUser;
+import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.UserResource;
+import org.sonatype.security.usermanagement.User;
 
 public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResource
 {
@@ -115,7 +115,7 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         return user;
     }
     
-    protected PlexusUserResource securityToRestModel( PlexusUser user )
+    protected PlexusUserResource securityToRestModel( User user )
     {
         PlexusUserResource resource = new PlexusUserResource();
         
@@ -124,7 +124,7 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         resource.setName( user.getName() );
         resource.setEmail( user.getEmailAddress() );
         
-        for ( PlexusRole role : user.getRoles() )
+        for ( Role role : user.getRoles() )
         {   
             resource.addRole( this.securityToRestModel( role ) );
         }
@@ -132,7 +132,7 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         return resource;
     }
     
-    protected PlexusRoleResource securityToRestModel( PlexusRole role )
+    protected PlexusRoleResource securityToRestModel( Role role )
     {
         PlexusRoleResource roleResource = new PlexusRoleResource();
         roleResource.setRoleId( role.getRoleId() );

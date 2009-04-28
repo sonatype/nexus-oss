@@ -18,14 +18,16 @@ import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.rest.model.AuthenticationLoginResource;
 import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * The login resource handler. It creates a user token.
@@ -36,8 +38,8 @@ import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 public class LoginPlexusResource
     extends AbstractUIPermissionCalculatingPlexusResource
 {
-    @Requirement(hint="additinalRoles")
-    private PlexusUserManager userManager;
+    @Requirement
+    private SecuritySystem securitySystem;
 
     @Override
     public Object getPayloadInstance()
@@ -66,15 +68,22 @@ public class LoginPlexusResource
         resource.setClientPermissions( getClientPermissionsForCurrentUser( request ) );
 
         AuthenticationLoginResourceResponse result = new AuthenticationLoginResourceResponse();
-        
+
         String username = resource.getClientPermissions().getLoggedInUsername();
-        
-        if( StringUtils.isNotEmpty( username ))
+
+        if ( StringUtils.isNotEmpty( username ) )
         {
             // look up the realm of the user
-            PlexusUser user = userManager.getUser( username );
-            String source = (user != null) ? user.getSource() : null;
-            resource.getClientPermissions().setLoggedInUserSource( source);
+            try
+            {
+                User user = securitySystem.getUser( username );
+                String source = ( user != null ) ? user.getSource() : null;
+                resource.getClientPermissions().setLoggedInUserSource( source );
+            }
+            catch ( UserNotFoundException e )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
+            }
         }
 
         result.setData( resource );

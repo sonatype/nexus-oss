@@ -32,7 +32,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.security.locators.SecurityXmlPlexusUserLocator;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
@@ -50,6 +49,7 @@ import org.sonatype.security.realms.validator.ConfigurationValidator;
 import org.sonatype.security.realms.validator.ValidationContext;
 import org.sonatype.security.realms.validator.ValidationMessage;
 import org.sonatype.security.realms.validator.ValidationResponse;
+import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 @Component( role = ConfigurationManager.class, hint = "default" )
 public class DefaultConfigurationManager
@@ -253,7 +253,7 @@ public class DefaultConfigurationManager
         SecurityUserRoleMapping roleMapping = new SecurityUserRoleMapping();
 
         roleMapping.setUserId( user.getId() );
-        roleMapping.setSource( SecurityXmlPlexusUserLocator.SOURCE );
+        roleMapping.setSource( SecurityXmlUserManager.SOURCE );
         roleMapping.setRoles( new ArrayList<String>( user.getRoles() ) );
 
         return roleMapping;
@@ -390,7 +390,7 @@ public class DefaultConfigurationManager
                 List<String> roles = null;
                 try
                 {
-                    SecurityUserRoleMapping roleMapping = this.readUserRoleMapping( id, SecurityXmlPlexusUserLocator.SOURCE );
+                    SecurityUserRoleMapping roleMapping = this.readUserRoleMapping( id, SecurityXmlUserManager.SOURCE );
                     if ( roleMapping != null )
                     {
                         roles = roleMapping.getRoles();

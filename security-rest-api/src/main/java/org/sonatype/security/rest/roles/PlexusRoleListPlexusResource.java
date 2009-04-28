@@ -24,8 +24,9 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.locators.users.PlexusRole;
-import org.sonatype.security.locators.users.PlexusRoleManager;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusRoleListResourceResponse;
 
@@ -34,7 +35,7 @@ public class PlexusRoleListPlexusResource
     extends AbstractSecurityPlexusResource
 {
     @Requirement
-    private PlexusRoleManager roleManager;
+    private SecuritySystem securitySystem;
 
     public static final String SOURCE_ID_KEY = "sourceId";
 
@@ -63,16 +64,19 @@ public class PlexusRoleListPlexusResource
         String source = this.getSourceId( request );
 
         // get roles for the source
-        Set<PlexusRole> roles = this.roleManager.listRoles( source );
-
-        if ( roles == null )
+        Set<Role> roles;
+        try
+        {
+            roles = this.securitySystem.listRoles( source );
+        }
+        catch ( NoSuchAuthorizationManager e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Role Source '" + source
                 + "' could not be found." );
         }
         
         PlexusRoleListResourceResponse resourceResponse = new PlexusRoleListResourceResponse();
-        for ( PlexusRole role : roles )
+        for ( Role role : roles )
         {
             resourceResponse.addData( this.securityToRestModel( role ) );
         }

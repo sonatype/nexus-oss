@@ -24,12 +24,14 @@ import org.restlet.resource.ResourceException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
-import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.realms.tools.InvalidConfigurationException;
 import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.rest.model.UserToRoleResource;
 import org.sonatype.security.rest.model.UserToRoleResourceRequest;
+import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = PlexusResource.class, hint = "UserToRolePlexusResource" )
 public class UserToRolePlexusResource
@@ -38,8 +40,8 @@ public class UserToRolePlexusResource
 
     public static final String SOURCE_ID_KEY = "sourceId";
 
-    @Requirement(hint="additinalRoles")
-    private PlexusUserManager userManager;
+    @Requirement
+    private SecuritySystem securitySystem;
 
     public UserToRolePlexusResource()
     {
@@ -77,9 +79,8 @@ public class UserToRolePlexusResource
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.sonatype.plexus.rest.resource.AbstractPlexusResource#put(org.restlet.Context, org.restlet.data.Request,
-     *      org.restlet.data.Response, java.lang.Object)
+     * org.restlet.data.Response, java.lang.Object)
      */
     @Override
     public Object put( Context context, Request request, Response response, Object payload )
@@ -98,9 +99,20 @@ public class UserToRolePlexusResource
         String sourceId = this.getSourceId( request );
 
         // check if the user exists
-        // FIXME: add source
-        if ( this.userManager.getUser( userId, sourceId ) == null )
+        try
         {
+            if ( this.securitySystem.getUser( userId, sourceId ) == null )
+            {
+
+            }
+        }
+        catch ( UserNotFoundException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "User with id '" + userId + "' not found." );
+        }
+        catch ( NoSuchUserManager e )
+        {
+            this.getLogger().warn(  e.getMessage(), e );
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "User with id '" + userId + "' not found." );
         }
 
@@ -108,15 +120,13 @@ public class UserToRolePlexusResource
         UserToRoleResource userToRole = mappingRequest.getData();
 
         SecurityUserRoleMapping roleMapping = this.restToSecurityModel( userToRole );
-        
+
         if ( roleMapping.getRoles().size() == 0 )
         {
-            throw new PlexusResourceException( 
-                Status.CLIENT_ERROR_BAD_REQUEST, 
-                "Configuration error.", 
-                getErrorResponse( 
-                    "roles", 
-                    "User requires one or more roles." ) );
+            throw new PlexusResourceException(
+                Status.CLIENT_ERROR_BAD_REQUEST,
+                "Configuration error.",
+                getErrorResponse( "roles", "User requires one or more roles." ) );
         }
         // this seems a bit odd, but here is why the PUT does both create and update.
         // the users are stored in some LDAP server somewhere, but the role mapping is stored locally
@@ -152,9 +162,8 @@ public class UserToRolePlexusResource
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.sonatype.plexus.rest.resource.AbstractPlexusResource#delete(org.restlet.Context,
-     *      org.restlet.data.Request, org.restlet.data.Response)
+     * org.restlet.data.Request, org.restlet.data.Response)
      */
     @Override
     public void delete( Context context, Request request, Response response )

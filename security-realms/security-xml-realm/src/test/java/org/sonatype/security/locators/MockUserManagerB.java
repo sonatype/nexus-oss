@@ -18,13 +18,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.security.locators.users.PlexusRole;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.UserManager;
+import org.sonatype.security.authorization.Role;
+import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManager;
 
 @Component(role=UserManager.class, hint="MockUserLocatorB")
-public class MockUserLocatorB
-    extends AbstractTestUserLocator
+public class MockUserManagerB
+    extends AbstractTestUserManager
 {
 
     public String getSource()
@@ -32,11 +33,11 @@ public class MockUserLocatorB
         return "MockUserLocatorB";
     }
 
-    public Set<PlexusUser> listUsers()
+    public Set<User> listUsers()
     {
-        Set<PlexusUser> users = new HashSet<PlexusUser>();
+        Set<User> users = new HashSet<User>();
         
-        PlexusUser a = new PlexusUser();
+        DefaultUser a = new DefaultUser();
         a.setName( "Brenda D. Burton" );
         a.setEmailAddress( "bburton@sonatype.org" );
         a.setSource( this.getSource() );
@@ -45,7 +46,7 @@ public class MockUserLocatorB
         a.addRole( this.createFakeRole( "RoleB" ) );
         a.addRole( this.createFakeRole( "RoleC" ) );
         
-        PlexusUser b = new PlexusUser();
+        DefaultUser b = new DefaultUser();
         b.setName( "Julian R. Blevins" );
         b.setEmailAddress( "jblevins@sonatype.org" );
         b.setSource( this.getSource() );
@@ -53,7 +54,7 @@ public class MockUserLocatorB
         b.addRole( this.createFakeRole( "RoleA" ) );
         b.addRole( this.createFakeRole( "RoleB" ) );
         
-        PlexusUser c = new PlexusUser();
+        DefaultUser c = new DefaultUser();
         c.setName( "Kathryn J. Simmons" );
         c.setEmailAddress( "ksimmons@sonatype.org" );
         c.setSource( this.getSource() );
@@ -61,7 +62,7 @@ public class MockUserLocatorB
         c.addRole( this.createFakeRole( "RoleA" ) );
         c.addRole( this.createFakeRole( "RoleB" ) );
 
-        PlexusUser d = new PlexusUser();
+        DefaultUser d = new DefaultUser();
         d.setName( "Florence T. Dahmen" );
         d.setEmailAddress( "fdahmen@sonatype.org" );
         d.setSource( this.getSource() );
@@ -69,13 +70,13 @@ public class MockUserLocatorB
         d.addRole( this.createFakeRole( "RoleA" ) );
         d.addRole( this.createFakeRole( "RoleB" ) );
         
-        PlexusUser e = new PlexusUser();
+        DefaultUser e = new DefaultUser();
         e.setName( "Jill  Codar" );
         e.setEmailAddress( "jcodar@sonatype.org" );
         e.setSource( this.getSource() );
         e.setUserId( "jcodar" );
         
-//        PlexusUser f = new PlexusUser();
+//        DefaultUser f = new DefaultUser();
 //        f.setName( "Joe Coder" );
 //        f.setEmailAddress( "jcoder@sonatype.org" );
 //        f.setSource( this.getSource() );
@@ -94,15 +95,15 @@ public class MockUserLocatorB
         return users;
     }
 
-    public Set<PlexusRole> getUsersAdditinalRoles( String userId )
+    public Set<Role> getUsersAdditinalRoles( String userId )
     {
         
-        Map<String, Set<PlexusRole>> userToRoleMap = new HashMap<String, Set<PlexusRole>>();
+        Map<String, Set<Role>> userToRoleMap = new HashMap<String, Set<Role>>();
         
-        Set<PlexusRole> roles1 = new HashSet<PlexusRole>();
+        Set<Role> roles1 = new HashSet<Role>();
         
-        roles1.add( new PlexusRole("ExtraRole1", "ExtraRole1", this.getSource()) );
-        roles1.add( new PlexusRole("ExtraRole2", "ExtraRole2", this.getSource()) );
+        roles1.add( new Role("ExtraRole1", "ExtraRole1", this.getSource()) );
+        roles1.add( new Role("ExtraRole2", "ExtraRole2", this.getSource()) );
         userToRoleMap.put( "jcoder", roles1 );
         
         

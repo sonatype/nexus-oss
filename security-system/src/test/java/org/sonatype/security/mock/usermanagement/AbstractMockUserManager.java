@@ -4,16 +4,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.codehaus.plexus.util.CollectionUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 public abstract class AbstractMockUserManager
-    implements UserManager
+    extends AbstractUserManager
 {
 
     private Set<User> users = new HashSet<User>();
@@ -99,65 +97,15 @@ public abstract class AbstractMockUserManager
     {
         this.users = users;
     }
-
-    protected Set<User> filterListInMemeory( Set<User> users, UserSearchCriteria criteria )
-    {
-        HashSet<User> result = new HashSet<User>();
-
-        for ( User user : users )
-        {
-            if ( userMatchesCriteria( user, criteria ) )
-            {
-                // add the user if it matches the search criteria
-                result.add( user );
-            }
-        }
-
-        return result;
-    }
-
-    protected boolean userMatchesCriteria( User user, UserSearchCriteria criteria )
-    {
-        if ( StringUtils.isNotEmpty( criteria.getUserId() )
-            && !user.getUserId().toLowerCase().startsWith( criteria.getUserId().toLowerCase() ) )
-        {
-            return false;
-        }
-        
-        if( criteria.getSource() != null && !criteria.getSource().equals( user.getSource() ))
-        {
-            return false;
-        }
-
-        if ( criteria.getOneOfRoleIds() != null && !criteria.getOneOfRoleIds().isEmpty() )
-        {
-            Set<String> userRoles = new HashSet<String>();
-            if ( user.getRoles() != null )
-            {
-                for ( Role role : user.getRoles() )
-                {
-                    userRoles.add( role.getRoleId() );
-                }
-            }
-
-            // check the intersection of the roles
-            if ( CollectionUtils.intersection( criteria.getOneOfRoleIds(), userRoles ).isEmpty() )
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public Set<Role> getUsersRoles( String userId )
+   
+    public Set<Role> getUsersRoles( String userId, String source )
         throws UserNotFoundException
     {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public void setUsersRoles( String userId, Set<Role> roles )
+    public void setUsersRoles( String userId, Set<Role> roles, String source )
         throws UserNotFoundException
     {
         // TODO Auto-generated method stub

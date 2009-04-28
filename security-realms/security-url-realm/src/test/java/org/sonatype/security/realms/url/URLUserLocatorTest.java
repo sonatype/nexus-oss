@@ -14,28 +14,28 @@ package org.sonatype.security.realms.url;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserManager;
-import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.AbstractSecurityTestCase;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 
 public class URLUserLocatorTest
-    extends PlexusTestCase
+    extends AbstractSecurityTestCase
 {
 
     public void testBasics() throws Exception
     {
         
-        PlexusUserManager userManager = this.lookup( PlexusUserManager.class );
+        SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
         
-        PlexusUser user = userManager.getUser( "ANYBODY" );
+        User user = securitySystem.getUser( "ANYBODY" );
         Assert.assertNotNull( user );
         Assert.assertEquals( "url", user.getSource() );
         
-        Assert.assertNotNull( userManager.getUser( "RANDOM", "url" ) );
+        Assert.assertNotNull( securitySystem.getUser( "RANDOM", "url" ) );
         
-        Assert.assertEquals( 1, userManager.searchUsers( new PlexusUserSearchCriteria("abcd"), "url" ).size() );
+        Assert.assertEquals( 1, securitySystem.searchUsers( new UserSearchCriteria("abcd", null, "url") ).size() );
         
         
     }

@@ -21,11 +21,12 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserManager;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 @Component( role = PlexusResource.class, hint = "PlexusUserListPlexusResource" )
 public class PlexusUserListPlexusResource
@@ -33,8 +34,8 @@ public class PlexusUserListPlexusResource
 {
     public static final String USER_SOURCE_KEY = "userSource";
     
-    @Requirement( role = PlexusUserManager.class, hint="additinalRoles" )
-    private PlexusUserManager userManager;
+    @Requirement
+    private SecuritySystem securitySystem;
     
     public PlexusUserListPlexusResource()
     {
@@ -65,7 +66,7 @@ public class PlexusUserListPlexusResource
     {
         PlexusUserListResourceResponse result = new PlexusUserListResourceResponse();
         
-        for ( PlexusUser user : userManager.listUsers( getUserSource( request ) ) )
+        for ( User user : this.securitySystem.searchUsers( new UserSearchCriteria( null, null, getUserSource( request ) ) ))
         {
             PlexusUserResource res = securityToRestModel( user );
 

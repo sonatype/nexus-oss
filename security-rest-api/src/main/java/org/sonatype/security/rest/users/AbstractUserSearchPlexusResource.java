@@ -16,18 +16,18 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
-import org.sonatype.security.locators.users.PlexusUser;
-import org.sonatype.security.locators.users.PlexusUserManager;
-import org.sonatype.security.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 public abstract class AbstractUserSearchPlexusResource
     extends AbstractSecurityPlexusResource
 {
-    @Requirement( role = PlexusUserManager.class, hint = "additinalRoles" )
-    private PlexusUserManager userManager;
+    @Requirement
+    private SecuritySystem securitySystem;
 
     public static final String USER_SOURCE_KEY = "userSource";
 
@@ -36,13 +36,13 @@ public abstract class AbstractUserSearchPlexusResource
         return request.getAttributes().get( USER_SOURCE_KEY ).toString();
     }
 
-    protected PlexusUserListResourceResponse search( PlexusUserSearchCriteria criteria, String source )
+    protected PlexusUserListResourceResponse search( UserSearchCriteria criteria )
     {
         PlexusUserListResourceResponse result = new PlexusUserListResourceResponse();
-
-        Set<PlexusUser> users = userManager.searchUsers( criteria, source );
         
-        for ( PlexusUser user : users )
+        Set<User> users = securitySystem.searchUsers( criteria );
+        
+        for ( User user : users )
         {
             PlexusUserResource res = securityToRestModel( user );
 
