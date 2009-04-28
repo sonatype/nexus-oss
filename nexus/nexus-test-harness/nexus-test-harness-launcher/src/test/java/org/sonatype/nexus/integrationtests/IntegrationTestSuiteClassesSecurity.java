@@ -188,7 +188,7 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus1560LegacyAllowRulesTest.class,
     Nexus1560LegacyAllowGroupRulesTest.class,
     Nexus1560LegacyDenyRulesTest.class,
-    Nexus1563ExternalRealmsLoginTest    
+    Nexus1563ExternalRealmsLoginTest.class
 } )
 public class IntegrationTestSuiteClassesSecurity
 {

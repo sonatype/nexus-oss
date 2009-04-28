@@ -25,8 +25,9 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
+import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
@@ -45,10 +46,8 @@ public class Nexus531RepositoryCrudJsonTests
     public Nexus531RepositoryCrudJsonTests()
         throws ComponentLookupException
     {
-        this.messageUtil = new RepositoryMessageUtil(
-            this.getJsonXStream(),
-            MediaType.APPLICATION_JSON,
-            getRepositoryTypeRegistry() );
+        this.messageUtil =
+            new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
     }
 
     @Test
@@ -223,8 +222,9 @@ public class Nexus531RepositoryCrudJsonTests
                 Assert.assertEquals( repo.getRepoType(), listRepo.getRepoType() );
                 Assert.assertEquals( repo.getRemoteStorage(), listRepo.getRemoteUri() );
 
-                String storageURL = repo.getDefaultLocalStorageUrl() != null ? repo.getDefaultLocalStorageUrl() : repo
-                    .getOverrideLocalStorageUrl();
+                String storageURL =
+                    repo.getDefaultLocalStorageUrl() != null ? repo.getDefaultLocalStorageUrl()
+                                    : repo.getOverrideLocalStorageUrl();
                 Assert.assertEquals( storageURL, listRepo.getEffectiveLocalStorageUrl() );
             }
 
@@ -233,10 +233,11 @@ public class Nexus531RepositoryCrudJsonTests
 
             if ( cRepo != null )
             {
+                M2RepositoryConfiguration cM2Repo = NexusConfigUtil.getM2Repo( listRepo.getId() );
                 Assert.assertEquals( cRepo.getId(), listRepo.getId() );
                 Assert.assertEquals( cRepo.getName(), listRepo.getName() );
-                Assert.assertEquals( cRepo.getType(), listRepo.getFormat() );
-                Assert.assertEquals( cRepo.getRepositoryPolicy(), listRepo.getRepoPolicy() );
+                //Assert.assertEquals( cM2Repo.getType(), listRepo.getFormat() );
+                Assert.assertEquals( cM2Repo.getRepositoryPolicy(), listRepo.getRepoPolicy() );
 
                 log.debug( "cRepo.getRemoteStorage(): " + cRepo.getRemoteStorage() );
                 log.debug( "listRepo.getRemoteUri(): " + listRepo.getRemoteUri() );
@@ -246,24 +247,24 @@ public class Nexus531RepositoryCrudJsonTests
             }
             else
             {
-                CRepositoryShadow cShadow = NexusConfigUtil.getRepoShadow( listRepo.getId() );
+                M2LayoutedM1ShadowRepositoryConfiguration cShadow = NexusConfigUtil.getRepoShadow( listRepo.getId() );
 
-                Assert.assertEquals( cShadow.getId(), listRepo.getId() );
-                Assert.assertEquals( cShadow.getName(), listRepo.getName() );
-                // Assert.assertEquals( cShadow.getType(), this.formatToType( listRepo.getFormat() ) );
+                Assert.assertEquals( cRepo.getId(), listRepo.getId() );
+                Assert.assertEquals( cRepo.getName(), listRepo.getName() );
+                //Assert.assertEquals( cShadow.getType(), this.formatToType( listRepo.getFormat() ) );
                 Assert.assertEquals( AbstractRepositoryPlexusResource.REPO_TYPE_VIRTUAL, listRepo.getRepoType() );
             }
 
         }
     }
 
-//    private String formatToType( String format )
-//    {
-//        Map<String, String> formatToTypeMap = new HashMap<String, String>();
-//        formatToTypeMap.put( "maven2", "m1-m2-shadow" );
-//        formatToTypeMap.put( "maven1", "m2-m1-shadow" );
-//
-//        return formatToTypeMap.get( format );
-//    }
+    // private String formatToType( String format )
+    // {
+    // Map<String, String> formatToTypeMap = new HashMap<String, String>();
+    // formatToTypeMap.put( "maven2", "m1-m2-shadow" );
+    // formatToTypeMap.put( "maven1", "m2-m1-shadow" );
+    //
+    // return formatToTypeMap.get( format );
+    // }
 
 }

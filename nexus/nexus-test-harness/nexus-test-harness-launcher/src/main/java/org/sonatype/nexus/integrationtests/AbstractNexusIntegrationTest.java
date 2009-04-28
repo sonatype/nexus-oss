@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
@@ -100,7 +101,7 @@ public class AbstractNexusIntegrationTest
 
     public static final String nexusBaseUrl;
 
-    protected static final String nexusWorkDir;
+    public static final String nexusWorkDir;
 
     public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
 
@@ -165,6 +166,8 @@ public class AbstractNexusIntegrationTest
             log.debug( "oncePerClassSetUp is init: " + NEEDS_INIT );
             if ( NEEDS_INIT )
             {
+                System.out.println( "Running Test: " + this.getClass().getSimpleName() );
+
                 // tell the console what we are doing, now that there is no output its
                 log.info( "Running Test: " + this.getClass().getSimpleName() );
 
@@ -288,7 +291,7 @@ public class AbstractNexusIntegrationTest
 
                 MavenXpp3Reader reader = new MavenXpp3Reader();
                 FileInputStream fis = new FileInputStream( pom );
-                Model model = reader.read( new FileInputStream( pom ) );
+                Model model = reader.read( new FileReader( pom ) );
                 fis.close();
 
                 // a helpful note so you don't need to dig into the code to much.
@@ -735,9 +738,14 @@ public class AbstractNexusIntegrationTest
         return baseNexusUrl;
     }
 
+    public String getNexusTestRepoUrl( String repo )
+    {
+        return baseNexusUrl + REPOSITORY_RELATIVE_URL + repo + "/";
+    }
+
     public String getNexusTestRepoUrl()
     {
-        return baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
+        return getNexusTestRepoUrl( testRepositoryId );
     }
 
     public String getNexusTestRepoServiceUrl()

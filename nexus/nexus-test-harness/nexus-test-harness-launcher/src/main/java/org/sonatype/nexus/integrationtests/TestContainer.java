@@ -24,6 +24,7 @@ import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
+import org.sonatype.nexus.test.utils.TestProperties;
 
 public class TestContainer
 {
@@ -63,17 +64,18 @@ public class TestContainer
 
         Map<Object, Object> context = new HashMap<Object, Object>();
         context.put( "plexus.home", f.getAbsolutePath() );
+        context.putAll( TestProperties.getAll() );
 
         // ----------------------------------------------------------------------------
         // Configuration
         // ----------------------------------------------------------------------------
 
-        ContainerConfiguration containerConfiguration = new DefaultContainerConfiguration()
-            .setName( "test" ).setContext( context );
+        ContainerConfiguration containerConfiguration =
+            new DefaultContainerConfiguration().setName( "test" ).setContext( context );
 
         containerConfiguration.setContainerConfigurationURL( this.getClass().getClassLoader().getResource(
-            "PlexusTestContainerConfig.xml" ) );
-        
+                                                                                                           "PlexusTestContainerConfig.xml" ) );
+
         try
         {
             this.container = new DefaultPlexusContainer( containerConfiguration );
@@ -91,7 +93,7 @@ public class TestContainer
         return container.lookup( role );
     }
 
-    public Object lookup( Class role )
+    public <E> E lookup( Class<E> role )
         throws Exception
     {
         return container.lookup( role );
@@ -103,7 +105,7 @@ public class TestContainer
         return container.lookup( role, id );
     }
 
-    public Object lookup( Class role, String id )
+    public <E> E lookup( Class<E> role, String id )
         throws Exception
     {
         return container.lookup( role, id );

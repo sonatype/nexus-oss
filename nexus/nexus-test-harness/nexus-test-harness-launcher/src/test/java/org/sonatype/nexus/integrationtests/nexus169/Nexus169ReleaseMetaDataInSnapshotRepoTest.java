@@ -14,10 +14,10 @@
 package org.sonatype.nexus.integrationtests.nexus169;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.net.URL;
 import java.util.Date;
 
@@ -31,7 +31,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
 /**
- * Adds metadata in a snapshot repo, then checks to see if it was not changed ( future version of nexus may clean metadata on the fly.) 
+ * Adds metadata in a snapshot repo, then checks to see if it was not changed ( future version of nexus may clean metadata on the fly.)
  */
 public class Nexus169ReleaseMetaDataInSnapshotRepoTest
     extends AbstractNexusIntegrationTest
@@ -112,13 +112,13 @@ public class Nexus169ReleaseMetaDataInSnapshotRepoTest
         MetadataXpp3Reader r = new MetadataXpp3Reader();
 
         File snapShotMetaDataFile = this.downloadFile( snapshotRepoMetaDataURL, "./target/downloads/snapshotMetaData.xml" );
-        
-        InputStream is = new FileInputStream(snapShotMetaDataFile);
+
+        Reader is = new FileReader(snapShotMetaDataFile);
         Metadata snapshotRepoMetaData = r.read( is );
         is.close();
 
         File groupMetaDataFile = this.downloadFile( snapshotRepoMetaDataURL, "./target/downloads/groupMetaData.xml" );
-        is = new FileInputStream(groupMetaDataFile);
+        is = new FileReader(groupMetaDataFile);
         Metadata groupMetaData = r.read( is );
         is.close();
 

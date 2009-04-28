@@ -19,12 +19,12 @@ import junit.framework.Assert;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.configuration.RepositoryStatusConverter;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
+import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
@@ -35,14 +35,6 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
 public class Nexus412RemoteLeakTest
     extends AbstractNexusIntegrationTest
 {
-    private RepositoryStatusConverter repositoryStatusConverter;
-
-    @Before
-    public void prepare()
-        throws Exception
-    {
-        repositoryStatusConverter = getContainer().lookup( RepositoryStatusConverter.class );
-    }
 
     // DISABLED: move to IT, it takes too long (no route to host + java)
     @Test
@@ -88,12 +80,13 @@ public class Nexus412RemoteLeakTest
         ProxyRepository repo = new M2Repository();
 
         CRepository cRepo = NexusConfigUtil.getRepo( repoId );
+        M2RepositoryConfiguration cM2Repo = NexusConfigUtil.getM2Repo( repoId );
 
         repo.setId( cRepo.getId() );
-        repo.setItemMaxAge( cRepo.getArtifactMaxAge() );
+        repo.setItemMaxAge( cM2Repo.getArtifactMaxAge() );
         // cRepo.getChecksumPolicy() );
 
-        repo.setLocalStatus( repositoryStatusConverter.localStatusFromModel( cRepo.getLocalStatus() ) );
+        repo.setLocalStatus( LocalStatus.valueOf( cRepo.getLocalStatus() ) );
 
         if ( cRepo.getLocalStorage() != null )
         {
@@ -103,7 +96,7 @@ public class Nexus412RemoteLeakTest
         // repo.set cRepo.getMetadataMaxAge() );
         repo.setName( cRepo.getName() );
         repo.setNotFoundCacheTimeToLive( cRepo.getNotFoundCacheTTL() );
-        repo.setProxyMode( repositoryStatusConverter.proxyModeFromModel( cRepo.getProxyMode() ) );
+        repo.setProxyMode( cM2Repo.getProxyMode() );
         repo.setRemoteUrl( cRepo.getRemoteStorage().getUrl() );
         // cRepo.getRepositoryPolicy() );
 

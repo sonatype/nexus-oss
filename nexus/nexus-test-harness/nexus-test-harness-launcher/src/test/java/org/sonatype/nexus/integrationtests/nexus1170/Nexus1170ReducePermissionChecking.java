@@ -29,7 +29,7 @@ import org.sonatype.jsecurity.model.CProperty;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.application.source.FileConfigurationSource;
+import org.sonatype.nexus.configuration.source.FileConfigurationSource;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -42,7 +42,7 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 public class Nexus1170ReducePermissionChecking
     extends AbstractNexusIntegrationTest
 {
-    
+
     @SuppressWarnings("unchecked")
     private int getExpectedPrivilegeCount() throws Exception
     {
@@ -50,7 +50,7 @@ public class Nexus1170ReducePermissionChecking
         ( ( FileConfigurationSource )configuration.getConfigurationSource()).setConfigurationFile( new File( getBasedir(), "target/plexus-home/nexus-work/conf/nexus.xml" ) );
         configuration.loadConfiguration();
         ConfigurationManager configManager = (ConfigurationManager) TestContainer.getInstance().lookup( ConfigurationManager.class, "resourceMerging");
-        
+
         Set<String> privIds = new HashSet<String>();
         for ( SecurityPrivilege priv : configManager.listPrivileges() )
         {
@@ -77,7 +77,7 @@ public class Nexus1170ReducePermissionChecking
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         List<ClientPermission> permissions = this.getPermissions();
-        
+
         Assert.assertEquals( this.getExpectedPrivilegeCount(), permissions.size() );
 
         for ( ClientPermission clientPermission : permissions )
@@ -106,7 +106,7 @@ public class Nexus1170ReducePermissionChecking
         this.checkPermission( permissions, "nexus:index", 1 );
         this.checkPermission( permissions, "nexus:identify", 1 );
         this.checkPermission( permissions, "nexus:attributes", 0 );
-        
+
         this.checkPermission( permissions, "nexus:cache", 0 );
         this.checkPermission( permissions, "nexus:routes", 0 );
         this.checkPermission( permissions, "nexus:tasks", 0 );
@@ -117,7 +117,7 @@ public class Nexus1170ReducePermissionChecking
         this.checkPermission( permissions, "nexus:configuration", 0 );
         this.checkPermission( permissions, "nexus:feeds", 1 );
         this.checkPermission( permissions, "nexus:targets", 0 );
-        
+
         this.checkPermission( permissions, "nexus:wastebasket", 0 );
         this.checkPermission( permissions, "nexus:artifact", 1 );
         this.checkPermission( permissions, "nexus:repostatus", 1 );
@@ -126,7 +126,7 @@ public class Nexus1170ReducePermissionChecking
         this.checkPermission( permissions, "nexus:usersforgotid", 9 );
         this.checkPermission( permissions, "nexus:usersreset", 0 );
         this.checkPermission( permissions, "nexus:userschangepw", 9 );
-        
+
         this.checkPermission( permissions, "nexus:command", 0 );
         this.checkPermission( permissions, "nexus:repometa", 0 );
         this.checkPermission( permissions, "nexus:tasksrun", 0 );
@@ -137,7 +137,7 @@ public class Nexus1170ReducePermissionChecking
         this.checkPermission( permissions, "nexus:componentrealmtypes", 0 );
         this.checkPermission( permissions, "nexus:componentsrepotypes", 1 );
         this.checkPermission( permissions, "nexus:componentsuserlocatortypes", 0 );
-        
+
         for ( ClientPermission outPermission : permissions )
         {
             int count = 0;
@@ -152,10 +152,10 @@ public class Nexus1170ReducePermissionChecking
                   Assert.fail( "Duplicate privilege: "+ outPermission.getId() +" found count: "+ count);
               }
             }
-            
+
         }
-       
-        
+
+
     }
 
     private void checkPermission( List<ClientPermission> permissions, String permission, int expectedValue )

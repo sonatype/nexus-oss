@@ -23,8 +23,8 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
@@ -174,11 +174,11 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         for ( Iterator<RepositoryGroupListResource> iter = groups.iterator(); iter.hasNext(); )
         {
             RepositoryGroupListResource group = iter.next();
-            CRepositoryGroup cGroup = NexusConfigUtil.getGroup( group.getId() );
+            M2GroupRepositoryConfiguration cGroup = NexusConfigUtil.getGroup( group.getId() );
 
             Assert.assertNotNull( "CRepositoryGroup", cGroup );
 
-            this.messageUtil.validateRepoLists( group.getRepositories(), cGroup.getRepositories() );
+            this.messageUtil.validateRepoLists( group.getRepositories(), cGroup.getMemberRepositoryIds() );
         }
     }
 }
