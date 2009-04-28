@@ -120,8 +120,6 @@ public class IndexTemplatePlexusResource
 
         templatingContext.put( "nexusRoot", request.getRootRef().toString() );
 
-        templatingContext.put( "nexusHost", request.getHostRef().getHostDomain() );
-
         VelocityRepresentation templateRepresentation = new VelocityRepresentation(
             context,
             templateFilename,

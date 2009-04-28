@@ -19,19 +19,19 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
+import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
-import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "openSearchTemplate" )
 public class OpenSearchTemplatePlexusResource
-    extends AbstractPlexusResource
+    extends AbstractNexusPlexusResource
 {
 
     public OpenSearchTemplatePlexusResource()
@@ -66,8 +66,11 @@ public class OpenSearchTemplatePlexusResource
     {
         Map<String, Object> map = new HashMap<String, Object>();
 
-        map.put( "nexusRoot", request.getRootRef().toString() );
-        map.put( "nexusHost", request.getHostRef().getHostDomain() );
+
+        Reference nexusRef = getContextRoot( request );
+
+        map.put( "nexusRoot", nexusRef.toString() );
+        map.put( "nexusHost", nexusRef.getHostDomain() );
 
         VelocityRepresentation templateRepresentation = new VelocityRepresentation(
             context, "/templates/opensearch.vm", map, MediaType.TEXT_XML );

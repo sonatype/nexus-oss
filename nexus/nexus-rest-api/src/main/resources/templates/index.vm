@@ -26,7 +26,7 @@
   
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <link rel="shortcut icon" href="favicon.ico" type="image/gif" />
-  <link rel="search" type="application/opensearchdescription+xml" href="$serviceBase/opensearch" title="Nexus ($nexusHost)" />
+  <link rel="search" type="application/opensearchdescription+xml" href="$serviceBase/opensearch" title="Nexus" />
 
   <!-- Plugin pre HEAD contributions start here -->
   #foreach( $pluginPreHeadContribution in $pluginPreHeadContributions )
