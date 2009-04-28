@@ -52,12 +52,12 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
 
         Subject subject = SecurityUtils.getSubject();
 
-        if ( getPlexusSecurity().isSecurityEnabled() )
+        if ( getSecuritySystem().isSecurityEnabled() )
         {
-            if ( getPlexusSecurity().isAnonymousAccessEnabled() )
+            if ( getSecuritySystem().isAnonymousAccessEnabled() )
             {
                 // we must decide is the user logged in the anon user and we must tell "false" if it is
-                if ( getPlexusSecurity().getAnonymousUsername().equals( subject.getPrincipal() ) )
+                if ( getSecuritySystem().getAnonymousUsername().equals( subject.getPrincipal() ) )
                 {
                     perms.setLoggedIn( false );
                 }
@@ -182,7 +182,7 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
         else
         {// subject is null
             // we should not have got here if security is not enabled.
-            int value = getPlexusSecurity().isSecurityEnabled() ? NONE : ALL;
+            int value = getSecuritySystem().isSecurityEnabled() ? NONE : ALL;
             for ( Entry<String, Integer> priv : privilegeMap.entrySet() )
             {
                 priv.setValue( value );

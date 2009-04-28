@@ -27,11 +27,11 @@ import org.sonatype.security.realms.XmlAuthenticatingRealm;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
 import org.sonatype.security.realms.tools.InvalidConfigurationException;
-import org.sonatype.security.realms.tools.StringDigester;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityProperty;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
+import org.sonatype.security.usermanagement.StringDigester;
 
 public class XmlAuthenticatingRealmTest
     extends PlexusTestCase

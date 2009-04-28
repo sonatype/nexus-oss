@@ -80,11 +80,6 @@ public abstract class AbstractUserManager
         return false;
     }
     
-    public User addUser( User user )
-    {
-        return null;
-    }
-
     public void deleteUser( String userId )
         throws UserNotFoundException
     {        
@@ -105,6 +100,16 @@ public abstract class AbstractUserManager
         throws UserNotFoundException
     {
         return null;
+    }
+
+    public User addUser( User user, String password )
+    {
+        return null;
+    }
+
+    public void changePassword( String userId, String newPassword )
+        throws UserNotFoundException
+    {        
     }
 
 }

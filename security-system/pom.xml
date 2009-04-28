@@ -11,7 +11,7 @@
   <name>Security: System</name>
   <version>1.0.8-SNAPSHOT</version>
 
-  
+
   <dependencies>
     <dependency>
       <groupId>org.jsecurity</groupId>
@@ -34,6 +34,11 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
     </dependency>
 
     <!-- web security -->

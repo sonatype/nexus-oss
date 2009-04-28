@@ -21,7 +21,7 @@ public interface UserManager
      */
     Set<String> listUserIds();
 
-    User addUser( User user );
+    User addUser( User user, String password );
 
     User updateUser( User user )
         throws UserNotFoundException;
@@ -69,4 +69,11 @@ public interface UserManager
 
     boolean supportsWrite();
 
+    
+    /////////////////////////
+    // from Plexus Security   
+    /////////////////////////
+    
+    void changePassword( String userId, String newPassword )
+        throws UserNotFoundException;
 }

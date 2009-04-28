@@ -101,17 +101,17 @@ public abstract class AbstractMockUserManager
     public Set<Role> getUsersRoles( String userId, String source )
         throws UserNotFoundException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void setUsersRoles( String userId, Set<Role> roles, String source )
         throws UserNotFoundException
-    {
-        // TODO Auto-generated method stub
-        
+    {        
     }
 
-    
+    public void changePassword( String userId, String newPassword )
+        throws UserNotFoundException
+    {        
+    }
     
 }

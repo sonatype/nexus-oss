@@ -10,6 +10,8 @@ public class UserSearchCriteria
     private Set<String> oneOfRoleIds = new HashSet<String>();
     
     private String source;
+    
+    private String email;
 
     public UserSearchCriteria()
     {
@@ -56,5 +58,17 @@ public class UserSearchCriteria
     {
         this.source = source;
     }
+
+    public String getEmail()
+    {
+        return email;
+    }
+
+    public void setEmail( String email )
+    {
+        this.email = email;
+    }
+    
+    
 
 }

@@ -25,6 +25,7 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.PlexusSecurity;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.rest.model.PlexusRoleResource;
@@ -37,10 +38,18 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
 
     @Requirement
     private PlexusSecurity plexusSecurity;
+    
+    @Requirement
+    private SecuritySystem securitySystem;
 
     protected PlexusSecurity getPlexusSecurity()
     {
         return plexusSecurity;
+    }
+    
+    protected SecuritySystem getSecuritySystem()
+    {
+        return securitySystem;
     }
     
     protected ErrorResponse getErrorResponse( String id, String msg )

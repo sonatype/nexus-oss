@@ -15,6 +15,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.jsecurity.authc.AuthenticationToken;
+import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.mgt.RealmSecurityManager;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
@@ -25,7 +26,12 @@ import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.security.email.NullSecurityEmailer;
+import org.sonatype.security.email.SecurityEmailer;
+import org.sonatype.security.events.SecurityEventHandler;
+import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.PasswordGenerator;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -52,6 +58,11 @@ public class DefaultSecuritySystem
 
     @Requirement( role = AuthorizationManager.class )
     private Map<String, AuthorizationManager> authorizationManagers;
+
+    @Requirement
+    private PasswordGenerator passwordGenerator;
+
+    private SecurityEmailer securityEmailer;
 
     @Requirement
     private Logger logger;
@@ -183,7 +194,8 @@ public class DefaultSecuritySystem
         return roles;
     }
 
-    public Set<Role> listRoles( String sourceId ) throws NoSuchAuthorizationManager
+    public Set<Role> listRoles( String sourceId )
+        throws NoSuchAuthorizationManager
     {
         AuthorizationManager authzManager = this.getAuthorizationManager( sourceId );
         return authzManager.listRoles();
@@ -207,10 +219,16 @@ public class DefaultSecuritySystem
     public User addUser( User user )
         throws NoSuchUserManager
     {
-        // first save the user
+        return this.addUser( user, this.generatePassword() );
+    }
+    
+    public User addUser( User user, String password )
+    throws NoSuchUserManager
+    {
+     // first save the user
         // this is the UserManager that owns the user
         UserManager userManager = this.getUserManager( user.getSource() );
-        userManager.addUser( user );
+        userManager.addUser( user, password );
 
         // then save the users Roles
         for ( UserManager tmpUserManager : this.userManagerMap.values() )
@@ -428,13 +446,182 @@ public class DefaultSecuritySystem
         }
     }
 
-    private AuthorizationManager getAuthorizationManager( String source ) throws NoSuchAuthorizationManager
+    private AuthorizationManager getAuthorizationManager( String source )
+        throws NoSuchAuthorizationManager
     {
         if ( !this.authorizationManagers.containsKey( source ) )
         {
-            throw new NoSuchAuthorizationManager("AuthorizationManager with source: '" + source + "' could not be found."  );
+            throw new NoSuchAuthorizationManager( "AuthorizationManager with source: '" + source
+                + "' could not be found." );
         }
 
         return this.authorizationManagers.get( source );
     }
+
+    public String getAnonymousUsername()
+    {
+        return this.configSource.getConfiguration().getAnonymousUsername();
+    }
+
+    public boolean isAnonymousAccessEnabled()
+    {
+        return this.configSource.getConfiguration().isAnonymousAccessEnabled();
+    }
+
+    public boolean isSecurityEnabled()
+    {
+        return this.configSource.getConfiguration().isEnabled();
+    }
+
+    // TODO: clean this up
+    // DO we even still need this?
+    private List<SecurityEventHandler> eventHandlers = new ArrayList<SecurityEventHandler>();
+
+    public void addSecurityEventHandler( SecurityEventHandler eventHandler )
+    {
+        this.eventHandlers.add( eventHandler );
+    }
+
+    public boolean removeSecurityEventHandler( SecurityEventHandler eventHandler )
+    {
+        return this.eventHandlers.remove( eventHandler );
+    }
+
+    public void changePassword( String userId, String oldPassword, String newPassword )
+        throws UserNotFoundException,
+            InvalidCredentialsException
+    {
+        // first authenticate the user
+        try
+        {
+            UsernamePasswordToken authenticationToken = new UsernamePasswordToken( userId, oldPassword );
+            if ( this.securityManager.authenticate( authenticationToken ) == null )
+            {
+                throw new InvalidCredentialsException();
+            }
+        }
+        catch ( org.jsecurity.authc.AuthenticationException e )
+        {
+            this.logger.debug( "User failed to change password reason: " + e.getMessage(), e );
+            throw new InvalidCredentialsException();
+        }
+
+        // if that was good just change the password
+        this.changePassword( userId, newPassword );
+    }
+
+    public void changePassword( String userId, String newPassword )
+        throws UserNotFoundException
+    {
+        User user = this.getUser( userId );
+
+        try
+        {
+            UserManager userManager = this.getUserManager( user.getSource() );
+            userManager.changePassword( userId, newPassword );
+        }
+        catch ( NoSuchUserManager e )
+        {
+            // this should NEVER happen
+            this.logger.warn( "User '" + userId + "' with source: '" + user.getSource()
+                + "' but could not find the UserManager for that source." );
+        }
+
+    }
+
+    public void forgotPassword( String userId, String email )
+        throws UserNotFoundException
+    {
+        UserSearchCriteria criteria = new UserSearchCriteria();
+        criteria.setEmail( email );
+        criteria.setUserId( userId );
+
+        Set<User> users = this.searchUsers( criteria );
+
+        boolean found = false;
+
+        for ( User user : users )
+        {
+            // TODO: criteria does not do exact matching
+            if ( user.getUserId().equalsIgnoreCase( userId.trim() ) && user.getEmailAddress().equals( email ) )
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if ( !found )
+        {
+            throw new UserNotFoundException( email );
+        }
+
+        resetPassword( userId );
+    }
+
+    public void forgotUsername( String email )
+        throws UserNotFoundException
+    {
+        UserSearchCriteria criteria = new UserSearchCriteria();
+        criteria.setEmail( email );
+
+        Set<User> users = this.searchUsers( criteria );
+
+        List<String> userIds = new ArrayList<String>();
+        for ( User user : users )
+        {
+            // ignore the anon user
+            if ( !user.getUserId().equalsIgnoreCase( this.getAnonymousUsername() ) )
+            {
+                userIds.add( user.getUserId() );
+            }
+        }
+
+        if ( userIds.size() > 0 )
+        {
+
+            this.getSecurityEmailer().sendForgotUsername( email, userIds );
+        }
+        else
+        {
+            throw new UserNotFoundException( email );
+        }
+
+    }
+
+    public void resetPassword( String userId )
+        throws UserNotFoundException
+    {
+        String newClearTextPassword = this.generatePassword();
+
+        User user = this.getUser( userId );
+        
+        this.changePassword( userId, newClearTextPassword );
+
+        // send email
+         this.getSecurityEmailer().sendResetPassword( user.getEmailAddress(), newClearTextPassword );
+
+    }
+
+    private String generatePassword()
+    {
+        return this.passwordGenerator.generatePassword( 10, 10 );
+    }
+
+    private SecurityEmailer getSecurityEmailer()
+    {
+        if ( this.securityEmailer == null )
+        {
+            try
+            {
+                this.securityEmailer = this.container.lookup( SecurityEmailer.class );
+            }
+            catch ( ComponentLookupException e )
+            {
+                this.logger.error( "Failed to find a SecurityEmailer" );
+                this.securityEmailer = new NullSecurityEmailer();
+            }
+        }
+        return this.securityEmailer;
+    }
+
 }

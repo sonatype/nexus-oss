@@ -10,12 +10,11 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.security;
+package org.sonatype.security.usermanagement;
 
 import java.util.Random;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.security.usermanagement.StringDigester;
 
 @Component( role = PasswordGenerator.class )
 public class DefaultPasswordGenerator

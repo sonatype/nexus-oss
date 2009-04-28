@@ -49,6 +49,7 @@ import org.sonatype.security.realms.validator.ConfigurationValidator;
 import org.sonatype.security.realms.validator.ValidationContext;
 import org.sonatype.security.realms.validator.ValidationMessage;
 import org.sonatype.security.realms.validator.ValidationResponse;
+import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 @Component( role = ConfigurationManager.class, hint = "default" )

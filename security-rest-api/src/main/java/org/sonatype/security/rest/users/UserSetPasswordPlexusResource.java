@@ -23,6 +23,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.realms.tools.NoSuchUserException;
 import org.sonatype.security.rest.model.UserChangePasswordRequest;
 import org.sonatype.security.rest.model.UserChangePasswordResource;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = PlexusResource.class, hint = "UserSetPasswordPlexusResource" )
 public class UserSetPasswordPlexusResource
@@ -66,7 +67,7 @@ public class UserSetPasswordPlexusResource
             {
                 if ( !isAnonymousUser( resource.getUserId(), request ) )
                 {
-                    getPlexusSecurity().changePassword( resource.getUserId(), resource.getNewPassword() );
+                    getSecuritySystem().changePassword( resource.getUserId(), resource.getNewPassword() );
 
                     response.setStatus( Status.SUCCESS_NO_CONTENT );
                 }
@@ -77,12 +78,11 @@ public class UserSetPasswordPlexusResource
                     getLogger().debug( "Anonymous user password change is blocked!" );
                 }
             }
-            catch ( NoSuchUserException e )
+            catch ( UserNotFoundException e )
             {
                 getLogger().debug( "Invalid user ID!", e );
 
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid credentials supplied." );
-
             }
 
         }
