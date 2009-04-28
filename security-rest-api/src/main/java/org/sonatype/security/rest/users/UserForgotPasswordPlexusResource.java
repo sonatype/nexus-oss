@@ -24,6 +24,7 @@ import org.sonatype.security.email.NoSuchEmailException;
 import org.sonatype.security.realms.tools.NoSuchUserException;
 import org.sonatype.security.rest.model.UserForgotPasswordRequest;
 import org.sonatype.security.rest.model.UserForgotPasswordResource;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * @author tstevens
@@ -70,7 +71,7 @@ public class UserForgotPasswordPlexusResource
             {
                 if ( !isAnonymousUser( resource.getUserId(), request ) )
                 {
-                    getPlexusSecurity().forgotPassword( resource.getUserId(), resource.getEmail() );
+                    getSecuritySystem().forgotPassword( resource.getUserId(), resource.getEmail() );
 
                     response.setStatus( Status.SUCCESS_ACCEPTED );
                 }
@@ -81,17 +82,11 @@ public class UserForgotPasswordPlexusResource
                     getLogger().debug( "Anonymous user forgot password is blocked" );
                 }
             }
-            catch ( NoSuchUserException e )
+            catch ( UserNotFoundException e )
             {
                 getLogger().debug( "Invalid Username", e );
 
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid Username" );
-            }
-            catch ( NoSuchEmailException e )
-            {
-                getLogger().debug( "Invalid E-mail", e );
-
-                response.setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "E-mail address not found" );
             }
         }
         // return null because the status is 202

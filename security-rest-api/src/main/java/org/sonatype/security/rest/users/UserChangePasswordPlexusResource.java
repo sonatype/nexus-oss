@@ -20,10 +20,10 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.InvalidCredentialsException;
-import org.sonatype.security.realms.tools.NoSuchUserException;
 import org.sonatype.security.rest.model.UserChangePasswordRequest;
 import org.sonatype.security.rest.model.UserChangePasswordResource;
+import org.sonatype.security.usermanagement.InvalidCredentialsException;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * @author tstevens
@@ -70,7 +70,7 @@ public class UserChangePasswordPlexusResource
             {
                 if ( !isAnonymousUser( resource.getUserId(), request ) )
                 {
-                    getPlexusSecurity().changePassword(
+                    getSecuritySystem().changePassword(
                         resource.getUserId(),
                         resource.getOldPassword(),
                         resource.getNewPassword() );
@@ -84,12 +84,11 @@ public class UserChangePasswordPlexusResource
                     getLogger().debug( "Anonymous user password change is blocked!" );
                 }
             }
-            catch ( NoSuchUserException e )
+            catch ( UserNotFoundException e )
             {
                 getLogger().debug( "Invalid user ID!", e );
 
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid credentials supplied." );
-
             }
             catch ( InvalidCredentialsException e )
             {

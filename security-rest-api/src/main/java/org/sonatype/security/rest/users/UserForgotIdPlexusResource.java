@@ -21,6 +21,7 @@ import org.restlet.resource.ResourceException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.email.NoSuchEmailException;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * @author tstevens
@@ -61,16 +62,15 @@ public class UserForgotIdPlexusResource
 
         try
         {
-            getPlexusSecurity().forgotUsername( email, getPlexusSecurity().getAnonymousUsername() );
+            getSecuritySystem().forgotUsername( email );
 
             response.setStatus( Status.SUCCESS_ACCEPTED );
         }
-        catch ( NoSuchEmailException e )
+        catch ( UserNotFoundException e )
         {
             getLogger().debug( "Invalid email received: " + email, e );
 
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Email address not found!" );
-
         }
         // don't return anything because we are setting the status to 202
         return null;

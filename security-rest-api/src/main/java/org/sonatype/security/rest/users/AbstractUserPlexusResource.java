@@ -51,7 +51,7 @@ public abstract class AbstractUserPlexusResource
     protected boolean isAnonymousUser( String username, Request request )
         throws ResourceException
     {
-        return getPlexusSecurity().isAnonymousAccessEnabled() && getPlexusSecurity().getAnonymousUsername().equals( username );
+        return getSecuritySystem().isAnonymousAccessEnabled() && getSecuritySystem().getAnonymousUsername().equals( username );
     }
 
     protected void validateUserContainment( SecurityUser user )

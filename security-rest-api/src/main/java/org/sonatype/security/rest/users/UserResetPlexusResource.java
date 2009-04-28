@@ -21,6 +21,7 @@ import org.restlet.resource.ResourceException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.realms.tools.NoSuchUserException;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * @author tstevens
@@ -64,7 +65,7 @@ public class UserResetPlexusResource
         {
             if ( !isAnonymousUser( userId, request ) )
             {
-                getPlexusSecurity().resetPassword( userId );
+                getSecuritySystem().resetPassword( userId );
 
                 response.setStatus( Status.SUCCESS_NO_CONTENT );
             }
@@ -75,7 +76,7 @@ public class UserResetPlexusResource
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Anonymous user cannot reset password!" );
             }
         }
-        catch ( NoSuchUserException e )
+        catch ( UserNotFoundException e )
         {
             getLogger().debug( "Invalid userid: " + userId, e );
 
