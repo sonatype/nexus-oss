@@ -90,12 +90,8 @@ public class DefaultIndexPacker
         }
         
         // These are all of the files we'll be dealing with (except for the incremental chunks of course)
-        File propertiesFile = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".properties" );
         File legacyFile = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".zip" );
         File v1File = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".gz" );
-        
-        // In case there is no main index we will force it to be created
-        boolean forceMainIndexGeneration = false;
 
         Properties info = null;
         
@@ -103,7 +99,7 @@ public class DefaultIndexPacker
         {
             // Note that for incremental indexes to work properly, a valid index.properties file
             // must be present
-            info = readIndexProperties( propertiesFile );
+            info = readIndexProperties( request );
             
             if ( request.isCreateIncrementalChunks() )
             {
@@ -112,7 +108,7 @@ public class DefaultIndexPacker
                 if ( chunk == null )
                 {
                     getLogger().debug( "Problem with Chunks, forcing regeneration of whole index" );
-                    forceMainIndexGeneration = true;
+                    incrementalHandler.initializeProperties( info );
                 }
                 else if ( chunk.isEmpty() )
                 {
@@ -145,79 +141,58 @@ public class DefaultIndexPacker
             getLogger().info( "Unable to read properties file, will force index regeneration" );
             info = new Properties();
             incrementalHandler.initializeProperties( info );
-            forceMainIndexGeneration = true;
         }
         
-        // When there are no main indexes available, and none requested, we need to write them out
-        if ( request.getFormats().isEmpty() 
-            && !legacyFile.exists()
-            && !v1File.exists() )
+        if ( request.isCreateMainIndex() )
         {
-            forceMainIndexGeneration = true;
+            if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_LEGACY ) )
+            {
+                writeIndexArchive( request.getContext(), legacyFile );
+    
+                if ( request.isCreateChecksumFiles() )  
+                {
+                    FileUtils.fileWrite(
+                        new File( legacyFile.getParentFile(), legacyFile.getName() + ".sha1" ).getAbsolutePath(),
+                        DigesterUtils.getSha1Digest( legacyFile ) );
+    
+                    FileUtils.fileWrite(
+                        new File( legacyFile.getParentFile(), legacyFile.getName() + ".md5" ).getAbsolutePath(),
+                        DigesterUtils.getMd5Digest( legacyFile ) );
+                }
+            }
+    
+            if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_V1 ) )
+            {
+                writeIndexData( request.getContext(), null, v1File );
+    
+                if ( request.isCreateChecksumFiles() )
+                {
+                    FileUtils.fileWrite(
+                        new File( v1File.getParentFile(), v1File.getName() + ".sha1" ).getAbsolutePath(),
+                        DigesterUtils.getSha1Digest( v1File ) );
+    
+                    FileUtils.fileWrite(
+                        new File( v1File.getParentFile(), v1File.getName() + ".md5" ).getAbsolutePath(),
+                        DigesterUtils.getMd5Digest( v1File ) );
+                }
+            }
         }
         
-        if ( forceMainIndexGeneration )
-        {
-            getLogger().debug( "Forcing add of LEGACY and V1 formats to request" );
-            request.setFormats( Arrays.asList( IndexFormat.FORMAT_LEGACY, IndexFormat.FORMAT_V1 ) );
-        }
-
-        if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_LEGACY ) )
-        {
-            writeIndexArchive( request.getContext(), legacyFile );
-
-            if ( request.isCreateChecksumFiles() )  
-            {
-                FileUtils.fileWrite(
-                    new File( legacyFile.getParentFile(), legacyFile.getName() + ".sha1" ).getAbsolutePath(),
-                    DigesterUtils.getSha1Digest( legacyFile ) );
-
-                FileUtils.fileWrite(
-                    new File( legacyFile.getParentFile(), legacyFile.getName() + ".md5" ).getAbsolutePath(),
-                    DigesterUtils.getMd5Digest( legacyFile ) );
-            }
-        }
-
-        if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_V1 ) )
-        {
-            writeIndexData( request.getContext(), null, v1File );
-
-            if ( request.isCreateChecksumFiles() )
-            {
-                FileUtils.fileWrite(
-                    new File( v1File.getParentFile(), v1File.getName() + ".sha1" ).getAbsolutePath(),
-                    DigesterUtils.getSha1Digest( v1File ) );
-
-                FileUtils.fileWrite(
-                    new File( v1File.getParentFile(), v1File.getName() + ".md5" ).getAbsolutePath(),
-                    DigesterUtils.getMd5Digest( v1File ) );
-            }
-        }
-
-        writeIndexProperties( request, info, propertiesFile );
-
-        if ( request.isCreateChecksumFiles() )
-        {
-            FileUtils.fileWrite(
-                new File( propertiesFile.getParentFile(), propertiesFile.getName() + ".sha1" ).getAbsolutePath(),
-                DigesterUtils.getSha1Digest( propertiesFile ) );
-
-            FileUtils.fileWrite(
-                new File( propertiesFile.getParentFile(), propertiesFile.getName() + ".md5" ).getAbsolutePath(),
-                DigesterUtils.getMd5Digest( propertiesFile ) );
-        }
+        writeIndexProperties( request, info );
     }
     
-    private Properties readIndexProperties( File propertyFile )
+    private Properties readIndexProperties( IndexPackingRequest request )
         throws IOException
     {
+        File file = new File( request.getContext().getIndexDirectoryFile(), IndexingContext.INDEX_FILE + ".properties" );
+        
         Properties properties = new Properties();
         
         FileInputStream fos = null;
         
         try
         {            
-            fos = new FileInputStream( propertyFile );
+            fos = new FileInputStream( file );
             properties.load( fos );
         }
         finally
@@ -432,31 +407,62 @@ public class DefaultIndexPacker
         }
     }
 
-    void writeIndexProperties( IndexPackingRequest request, Properties info, File propertiesFile )
+    void writeIndexProperties( IndexPackingRequest request, Properties info )
         throws IOException
     {
+        File propertyFile = new File( request.getContext().getIndexDirectoryFile(), IndexingContext.INDEX_FILE + ".properties" );
+        File targetPropertyFile = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".properties" );
+        
         info.setProperty( IndexingContext.INDEX_ID, request.getContext().getId() );
-
-        Date timestamp = request.getContext().getTimestamp();
-
-        if ( timestamp == null )
+        
+        // Timestamp isn't used in incremental handling, so if not generating main index, dont update timestamp
+        // this will stop clients that dont download incrementals from updating when main index isn't changed
+        if ( request.isCreateMainIndex()
+            || info.getProperty( IndexingContext.INDEX_TIMESTAMP ) == null )
         {
-            timestamp = new Date( 0 ); // never updated
+            Date timestamp = request.getContext().getTimestamp();
+    
+            if ( timestamp == null )
+            {
+                timestamp = new Date( 0 ); // never updated
+            }
+    
+            info.setProperty( IndexingContext.INDEX_TIMESTAMP, format( timestamp ) );
         }
-
-        info.setProperty( IndexingContext.INDEX_TIMESTAMP, format( timestamp ) );
 
         OutputStream os = null;
 
         try
         {
-            os = new FileOutputStream( propertiesFile );
+            os = new FileOutputStream( propertyFile );
 
             info.store( os, null );
         }
         finally
         {
             IOUtil.close( os );
+        }
+        
+        try
+        {
+            os = new FileOutputStream( targetPropertyFile );
+
+            info.store( os, null );
+        }
+        finally
+        {
+            IOUtil.close( os );
+        }
+        
+        if ( request.isCreateChecksumFiles() )
+        {
+            FileUtils.fileWrite(
+                new File( targetPropertyFile.getParentFile(), targetPropertyFile.getName() + ".sha1" ).getAbsolutePath(),
+                DigesterUtils.getSha1Digest( targetPropertyFile ) );
+
+            FileUtils.fileWrite(
+                new File( targetPropertyFile.getParentFile(), targetPropertyFile.getName() + ".md5" ).getAbsolutePath(),
+                DigesterUtils.getMd5Digest( targetPropertyFile ) );
         }
     }
 

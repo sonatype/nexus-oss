@@ -410,8 +410,8 @@ public class DefaultIndexUpdaterTest
                 Properties getProperties() 
                 {
                     Properties properties = new Properties();
-                    properties.setProperty( "nexus.index.id", "central" );
-                    properties.setProperty( "nexus.index.time", "20081125010000.000 -0600" );
+                    properties.setProperty( IndexingContext.INDEX_ID, "central" );
+                    properties.setProperty( IndexingContext.INDEX_TIMESTAMP, "20081125010000.000 -0600" );
                     return properties;
                 }
             });
@@ -468,8 +468,8 @@ public class DefaultIndexUpdaterTest
                 Properties getProperties() 
                 {
                     Properties properties = new Properties();
-                    properties.setProperty( "nexus.index.id", "central" );
-                    properties.setProperty( "nexus.index.time", "20081126010000.000 -0600" );
+                    properties.setProperty( IndexingContext.INDEX_ID, "central" );
+                    properties.setProperty( IndexingContext.INDEX_TIMESTAMP, "20081126010000.000 -0600" );
                     return properties;
                 }
             });

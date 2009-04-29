@@ -26,6 +26,8 @@ public class IndexPackingRequest
     private boolean createIncrementalChunks;
 
     private boolean createChecksumFiles;
+    
+    private boolean createMainIndex;
 
     private int maxIndexChunks;
 
@@ -38,6 +40,8 @@ public class IndexPackingRequest
         this.targetDir = targetDir;
 
         this.createIncrementalChunks = true;
+        
+        this.createMainIndex = true;
 
         this.createChecksumFiles = false;
 
@@ -111,6 +115,16 @@ public class IndexPackingRequest
     {
         this.maxIndexChunks = maxIndexChunks;
     }
+    
+    public boolean isCreateMainIndex()
+    {
+        return createMainIndex;
+    }
+    
+    public void setCreateMainIndex( boolean createMainIndex )
+    {
+        this.createMainIndex = createMainIndex;
+    }
 
     /**
      * Index format enumeration.
@@ -118,6 +132,5 @@ public class IndexPackingRequest
     public static enum IndexFormat
     {
         FORMAT_LEGACY, FORMAT_V1;
-
     }
 }

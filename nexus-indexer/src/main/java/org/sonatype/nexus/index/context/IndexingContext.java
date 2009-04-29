@@ -56,7 +56,7 @@ public interface IndexingContext
     /**
      * A prefix used to specify an incremental update chunk name
      */
-    public static final String INDEX_CHUNK_PREFIX = INDEX_PROPERTY_PREFIX + "update-";
+    public static final String INDEX_CHUNK_PREFIX = INDEX_PROPERTY_PREFIX + "incremental-";
 
     /**
      * A date format used for index timestamp
@@ -71,7 +71,7 @@ public interface IndexingContext
     /**
      * A counter used to id the chunks
      */
-    public static final String INDEX_CHUNK_COUNTER = "last-chunk-id";
+    public static final String INDEX_CHUNK_COUNTER = INDEX_PROPERTY_PREFIX + "last-incremental";
     
     /**
      * An id that defines the current incremental chain.
@@ -79,7 +79,7 @@ public interface IndexingContext
      * If when checking remote repo, the index chain doesnt match
      * you'll know that you need to download the full index
      */
-    public static final String INDEX_CHAIN_ID = "chain-id";
+    public static final String INDEX_CHAIN_ID = INDEX_PROPERTY_PREFIX + "chain-id";
 
     /**
      * Returns this indexing context id.

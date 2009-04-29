@@ -18,6 +18,7 @@ import org.apache.commons.cli.Options;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.tools.cli.AbstractCli;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactScanningListener;
@@ -65,11 +66,11 @@ public class NexusIndexerCli
 
     public static final char TARGET_DIR = 'd';
 
-    public static final char CREATE_INCREMENTAL_CHUNKS = 'c';
-
     public static final char CREATE_FILE_CHECKSUMS = 's';
     
     public static final char INCREMENTAL_CHUNK_KEEP_COUNT = 'k';
+    
+    public static final char INDEX_OUTPUT = 'o';
 
     private static final long MB = 1024 * 1024;
 
@@ -105,8 +106,8 @@ public class NexusIndexerCli
         options.addOption( OptionBuilder.withLongOpt( "name" ).hasArg() //
         .withDescription( "Repository name." ).create( NAME ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "chunks" ) //
-        .withDescription( "Create incremental chunks." ).create( CREATE_INCREMENTAL_CHUNKS ) );
+        options.addOption( OptionBuilder.withLongOpt( "output" ).hasArg() //
+        .withDescription( "Index to output (all, main, incremental)." ).create( INDEX_OUTPUT ) );
         
         options.addOption( OptionBuilder.withLongOpt( "keep" ).hasArg()
         .withDescription( "Number of incremental chunks to keep." ).create( INCREMENTAL_CHUNK_KEEP_COUNT ) );
@@ -158,6 +159,8 @@ public class NexusIndexerCli
         File outputFolder = new File( outputDirectoryName );
 
         File repositoryFolder = new File( cli.getOptionValue( REPO ) );
+        
+        String outputType = cli.getOptionValue( INDEX_OUTPUT );
 
         String repositoryName = cli.getOptionValue( NAME, indexFolder.getName() );
 
@@ -165,7 +168,9 @@ public class NexusIndexerCli
 
         boolean createChecksums = cli.hasOption( CREATE_FILE_CHECKSUMS );
 
-        boolean createIncrementalChunks = cli.hasOption( CREATE_INCREMENTAL_CHUNKS );
+        boolean createIncrementalChunks = isIncrementalOutput( outputType );
+        
+        boolean createMainIndex = isMainOutput( outputType );
         
         Integer chunkCount = cli.hasOption( INCREMENTAL_CHUNK_KEEP_COUNT ) ? Integer.parseInt( cli.getOptionValue( INCREMENTAL_CHUNK_KEEP_COUNT ) ) : null;
 
@@ -173,7 +178,8 @@ public class NexusIndexerCli
         System.err.printf( "Index Folder:      %s\n", indexFolder.getAbsolutePath() );
         System.err.printf( "Output Folder:     %s\n", outputFolder.getAbsolutePath() );
         System.err.printf( "Repository name:   %s\n", repositoryName );
-        System.err.printf( "Indexers: %s\n", indexers.toString() );
+        System.err.printf( "Indexers:          %s\n", indexers.toString() );
+        System.err.printf( "Output:            %s\n", outputType );
         
         if ( createChecksums )
         {
@@ -184,13 +190,17 @@ public class NexusIndexerCli
             System.err.printf( "Will not create checksum files.\n" );
         }
         
-        if ( createIncrementalChunks )
+        if ( createIncrementalChunks && createMainIndex )
         {
             System.err.printf( "Will create incremental chunks for changes, along with baseline file.\n" );
         }
+        else if ( createIncrementalChunks )
+        {
+            System.err.printf( "Will create incremental chunks for changes, no baseline file.\n" );
+        }
         else
         {
-            System.err.printf( "Will create baseline file.\n" );
+            System.err.printf( "Will create baseline file, no incremental chunks.\n" );
         }
 
         NexusIndexer indexer = plexus.lookup( NexusIndexer.class );
@@ -219,6 +229,8 @@ public class NexusIndexerCli
         request.setCreateChecksumFiles( createChecksums );
 
         request.setCreateIncrementalChunks( createIncrementalChunks );
+        
+        request.setCreateMainIndex( createMainIndex );
         
         if ( chunkCount != null )
         {
@@ -283,6 +295,38 @@ public class NexusIndexerCli
             }
         }
         return indexers;
+    }
+    
+    private boolean isIncrementalOutput( String outputType )
+    {
+        if ( StringUtils.isEmpty( outputType ) )
+        {
+            return false;
+        }
+        
+        if ( "all".equals( outputType )
+            || "incremental".equals( outputType ) )
+        {
+            return true;
+        }            
+        
+        return false;
+    }
+    
+    private boolean isMainOutput( String outputType )
+    {
+        if ( StringUtils.isEmpty( outputType ) )
+        {
+            return true;
+        }
+        
+        if ( "all".equals( outputType )
+            || "main".equals( outputType ) )
+        {
+            return true;
+        }            
+        
+        return false;
     }
 
     private void packIndex( IndexPacker packer, IndexPackingRequest request, boolean debug )
