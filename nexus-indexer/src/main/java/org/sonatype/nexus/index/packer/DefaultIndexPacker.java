@@ -12,7 +12,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -41,7 +40,6 @@ import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.NexusLegacyAnalyzer;
 import org.sonatype.nexus.index.creator.LegacyDocumentUpdater;
 import org.sonatype.nexus.index.incremental.IncrementalHandler;
-import org.sonatype.nexus.index.packer.IndexPackingRequest.IndexFormat;
 import org.sonatype.nexus.index.updater.IndexDataWriter;
 
 /**
@@ -143,38 +141,46 @@ public class DefaultIndexPacker
             incrementalHandler.initializeProperties( info );
         }
         
-        if ( request.isCreateMainIndex() )
+        Date timestamp = request.getContext().getTimestamp();
+        
+        if ( timestamp == null )
         {
-            if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_LEGACY ) )
+            timestamp = new Date( 0 ); // never updated
+        }
+        
+        if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_LEGACY ) )
+        {           
+            info.setProperty( IndexingContext.INDEX_LEGACY_TIMESTAMP, format( timestamp ) );
+            
+            writeIndexArchive( request.getContext(), legacyFile );
+
+            if ( request.isCreateChecksumFiles() )  
             {
-                writeIndexArchive( request.getContext(), legacyFile );
-    
-                if ( request.isCreateChecksumFiles() )  
-                {
-                    FileUtils.fileWrite(
-                        new File( legacyFile.getParentFile(), legacyFile.getName() + ".sha1" ).getAbsolutePath(),
-                        DigesterUtils.getSha1Digest( legacyFile ) );
-    
-                    FileUtils.fileWrite(
-                        new File( legacyFile.getParentFile(), legacyFile.getName() + ".md5" ).getAbsolutePath(),
-                        DigesterUtils.getMd5Digest( legacyFile ) );
-                }
+                FileUtils.fileWrite(
+                    new File( legacyFile.getParentFile(), legacyFile.getName() + ".sha1" ).getAbsolutePath(),
+                    DigesterUtils.getSha1Digest( legacyFile ) );
+
+                FileUtils.fileWrite(
+                    new File( legacyFile.getParentFile(), legacyFile.getName() + ".md5" ).getAbsolutePath(),
+                    DigesterUtils.getMd5Digest( legacyFile ) );
             }
+        }
     
-            if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_V1 ) )
+        if ( request.getFormats().contains( IndexPackingRequest.IndexFormat.FORMAT_V1 ) )
+        {
+            info.setProperty( IndexingContext.INDEX_TIMESTAMP, format( timestamp ) );
+            
+            writeIndexData( request.getContext(), null, v1File );
+
+            if ( request.isCreateChecksumFiles() )
             {
-                writeIndexData( request.getContext(), null, v1File );
-    
-                if ( request.isCreateChecksumFiles() )
-                {
-                    FileUtils.fileWrite(
-                        new File( v1File.getParentFile(), v1File.getName() + ".sha1" ).getAbsolutePath(),
-                        DigesterUtils.getSha1Digest( v1File ) );
-    
-                    FileUtils.fileWrite(
-                        new File( v1File.getParentFile(), v1File.getName() + ".md5" ).getAbsolutePath(),
-                        DigesterUtils.getMd5Digest( v1File ) );
-                }
+                FileUtils.fileWrite(
+                    new File( v1File.getParentFile(), v1File.getName() + ".sha1" ).getAbsolutePath(),
+                    DigesterUtils.getSha1Digest( v1File ) );
+
+                FileUtils.fileWrite(
+                    new File( v1File.getParentFile(), v1File.getName() + ".md5" ).getAbsolutePath(),
+                    DigesterUtils.getMd5Digest( v1File ) );
             }
         }
         
@@ -423,21 +429,6 @@ public class DefaultIndexPacker
         File targetPropertyFile = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".properties" );
         
         info.setProperty( IndexingContext.INDEX_ID, request.getContext().getId() );
-        
-        // Timestamp isn't used in incremental handling, so if not generating main index, dont update timestamp
-        // this will stop clients that dont download incrementals from updating when main index isn't changed
-        if ( request.isCreateMainIndex()
-            || info.getProperty( IndexingContext.INDEX_TIMESTAMP ) == null )
-        {
-            Date timestamp = request.getContext().getTimestamp();
-    
-            if ( timestamp == null )
-            {
-                timestamp = new Date( 0 ); // never updated
-            }
-    
-            info.setProperty( IndexingContext.INDEX_TIMESTAMP, format( timestamp ) );
-        }
 
         OutputStream os = null;
 

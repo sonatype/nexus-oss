@@ -49,9 +49,14 @@ public interface IndexingContext
     public static final String INDEX_ID = INDEX_PROPERTY_PREFIX + "id";
 
     /**
-     * A property name used to specify index timestam (the last update time)
+     * A property name used to specify legacy index timestam (the last update time)
      */
-    public static final String INDEX_TIMESTAMP = INDEX_PROPERTY_PREFIX + "time";
+    public static final String INDEX_LEGACY_TIMESTAMP = INDEX_PROPERTY_PREFIX + "time";
+    
+    /**
+     * A property name used to specify index timtestamp
+     */
+    public static final String INDEX_TIMESTAMP = INDEX_PROPERTY_PREFIX + "timestamp";
 
     /**
      * A prefix used to specify an incremental update chunk name

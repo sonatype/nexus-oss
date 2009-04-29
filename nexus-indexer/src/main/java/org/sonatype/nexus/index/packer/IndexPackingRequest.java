@@ -26,8 +26,6 @@ public class IndexPackingRequest
     private boolean createIncrementalChunks;
 
     private boolean createChecksumFiles;
-    
-    private boolean createMainIndex;
 
     private int maxIndexChunks;
     
@@ -42,8 +40,6 @@ public class IndexPackingRequest
         this.targetDir = targetDir;
 
         this.createIncrementalChunks = true;
-        
-        this.createMainIndex = true;
 
         this.createChecksumFiles = false;
 
@@ -118,16 +114,6 @@ public class IndexPackingRequest
     public void setMaxIndexChunks( int maxIndexChunks )
     {
         this.maxIndexChunks = maxIndexChunks;
-    }
-    
-    public boolean isCreateMainIndex()
-    {
-        return createMainIndex;
-    }
-    
-    public void setCreateMainIndex( boolean createMainIndex )
-    {
-        this.createMainIndex = createMainIndex;
     }
     
     public boolean isUseTargetProperties()
