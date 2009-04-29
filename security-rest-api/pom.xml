@@ -17,11 +17,11 @@
       <artifactId>plexus-restlet-bridge</artifactId>
       <version>1.8-SNAPSHOT</version>
     </dependency>
-    <dependency>
+    <!-- <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-manager</artifactId>
       <version>${project.version}</version>
-    </dependency>
+    </dependency> -->
 
     <dependency>
       <groupId>org.sonatype.security</groupId>

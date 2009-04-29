@@ -20,6 +20,9 @@ import java.util.TreeSet;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.security.authorization.AuthorizationManager;
+import org.sonatype.security.authorization.NoSuchPrivilegeException;
+import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
@@ -81,6 +84,71 @@ public class SecurityXmlAuthorizationManager
         }
 
         return permissions;
+    }
+
+    public Privilege getPrivilege()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Role getRole( String roleId )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Set<Privilege> listPrivileges()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Privilege addPrivilege( Privilege privilege )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Role addRole( Role role )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void deletePrivilege( String privilegeId )
+        throws NoSuchPrivilegeException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void deleteRole( String roleId )
+        throws NoSuchRoleException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public Privilege getPrivilege( String privilegeId )
+        throws NoSuchPrivilegeException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Privilege upatePrivilege( Privilege privilege )
+        throws NoSuchPrivilegeException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Role updateRole( Role role )
+        throws NoSuchRoleException
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
     
 }

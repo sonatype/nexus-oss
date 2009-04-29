@@ -24,27 +24,28 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
-import org.sonatype.security.PlexusSecurity;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
+import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.UserResource;
+import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserStatus;
 
 public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResource
 {
 
     @Requirement
-    private PlexusSecurity plexusSecurity;
+    private ConfigurationManager configurationManager;
     
     @Requirement
     private SecuritySystem securitySystem;
 
-    protected PlexusSecurity getPlexusSecurity()
+    protected ConfigurationManager getConfigurationManager()
     {
-        return plexusSecurity;
+        return configurationManager;
     }
     
     protected SecuritySystem getSecuritySystem()
@@ -85,40 +86,41 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", errorResponse );
     }
     
-    protected UserResource securityToRestModel( SecurityUser user, Request request )
+    protected UserResource securityToRestModel( User user, Request request )
     {
         UserResource resource = new UserResource();
-        resource.setEmail( user.getEmail() );
+        resource.setEmail( user.getEmailAddress() );
         resource.setName( user.getName() );
-        resource.setStatus( user.getStatus() );
-        resource.setUserId( user.getId() );
+//        resource.setStatus( user.getStatus() ); // FIXME: add status
+        resource.setUserId( user.getUserId() );
         resource.setResourceURI( this.createChildReference( request, this, resource.getUserId() ).toString() );
-        resource.setUserManaged( !user.isReadOnly() );
+//        resource.setUserManaged( !user.isReadOnly() ); // FIXME: add managed flag
 
-        for ( String roleId : user.getRoles() )
+        for ( Role role : user.getRoles() )
         {
-            resource.addRole( roleId );
+            resource.addRole( role.getRoleId() );
         }
 
         return resource;
     }
 
-    protected SecurityUser restToSecurityModel( SecurityUser user, UserResource resource )
+    protected User restToSecurityModel( User user, UserResource resource )
     {
         if ( user == null )
         {
-            user = new SecurityUser();
+            user = new DefaultUser();
         }
 
-        user.setEmail( resource.getEmail() );
+        user.setEmailAddress( resource.getEmail() );
         user.setName( resource.getName() );
-        user.setStatus( resource.getStatus() );
-        user.setId( resource.getUserId() );
+        user.setStatus( UserStatus.valueOf( resource.getStatus() ) );
+        user.setUserId( resource.getUserId() );
 
         user.getRoles().clear();
         for ( String roleId : (List<String>) resource.getRoles() )
         {
-            user.addRole( roleId );
+            // FIXME: role are not strings
+            user.addRole( new Role(roleId, null, null) );
         }
 
         return user;

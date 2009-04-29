@@ -24,6 +24,9 @@ import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchPrivilegeException;
+import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.email.NullSecurityEmailer;
@@ -221,11 +224,11 @@ public class DefaultSecuritySystem
     {
         return this.addUser( user, this.generatePassword() );
     }
-    
+
     public User addUser( User user, String password )
-    throws NoSuchUserManager
+        throws NoSuchUserManager
     {
-     // first save the user
+        // first save the user
         // this is the UserManager that owns the user
         UserManager userManager = this.getUserManager( user.getSource() );
         userManager.addUser( user, password );
@@ -282,6 +285,21 @@ public class DefaultSecuritySystem
         }
 
         return user;
+    }
+
+    public void deleteUser( String userId )
+        throws UserNotFoundException
+    {
+        User user = this.getUser( userId );
+        try
+        {
+            this.deleteUser( userId, user.getSource() );
+        }
+        catch ( NoSuchUserManager e )
+        {
+           this.logger.error( "User manager returned user, but could not be found: "+ e.getMessage(), e );
+           throw new IllegalStateException("User manager returned user, but could not be found: "+ e.getMessage(), e);
+        }
     }
 
     public void deleteUser( String userId, String source )
@@ -446,7 +464,7 @@ public class DefaultSecuritySystem
         }
     }
 
-    private AuthorizationManager getAuthorizationManager( String source )
+    public AuthorizationManager getAuthorizationManager( String source )
         throws NoSuchAuthorizationManager
     {
         if ( !this.authorizationManagers.containsKey( source ) )
@@ -594,11 +612,11 @@ public class DefaultSecuritySystem
         String newClearTextPassword = this.generatePassword();
 
         User user = this.getUser( userId );
-        
+
         this.changePassword( userId, newClearTextPassword );
 
         // send email
-         this.getSecurityEmailer().sendResetPassword( user.getEmailAddress(), newClearTextPassword );
+        this.getSecurityEmailer().sendResetPassword( user.getEmailAddress(), newClearTextPassword );
 
     }
 
@@ -622,6 +640,64 @@ public class DefaultSecuritySystem
             }
         }
         return this.securityEmailer;
+    }
+
+    public Set<Privilege> listPrivileges()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Role addRole( Role role, String source )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void deletePrivilege( String privilegeId, String source )
+        throws NoSuchPrivilegeException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void deleteRole( String roleId, String source )
+        throws NoSuchRoleException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public Privilege getPrivilege( String privilegeId, String source )
+        throws NoSuchPrivilegeException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Role getRole( String roleId, String source )
+        throws NoSuchRoleException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void updateRole( Role role, String source )
+        throws NoSuchRoleException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public List<Realm> getRealms()
+    {   
+        return new ArrayList<Realm>( this.securityManager.getRealms() );
+    }
+
+    public List<Realm> setRealms( List<Realm> realms )
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -8,6 +8,15 @@ public interface UserManager
 {
 
     /**
+     * Get the source string of this UserManager
+     * 
+     * @return
+     */
+    String getSource();
+
+    boolean supportsWrite();
+
+    /**
      * Retrieve all Subject objects
      * 
      * @return
@@ -30,8 +39,8 @@ public interface UserManager
         throws UserNotFoundException;
 
     /**
-     * Roles might be stored by a different UserManager, then the one that owns the User.
-     * For example, a User might come from a JDBC UserManager, but has additional roles mapped in XML.
+     * Roles might be stored by a different UserManager, then the one that owns the User. For example, a User might come
+     * from a JDBC UserManager, but has additional roles mapped in XML.
      * 
      * @param userId
      * @param source
@@ -60,20 +69,6 @@ public interface UserManager
     User getUser( String userId )
         throws UserNotFoundException;
 
-    /**
-     * Get the source string of this locator
-     * 
-     * @return
-     */
-    String getSource();
-
-    boolean supportsWrite();
-
-    
-    /////////////////////////
-    // from Plexus Security   
-    /////////////////////////
-    
     void changePassword( String userId, String newPassword )
         throws UserNotFoundException;
 }

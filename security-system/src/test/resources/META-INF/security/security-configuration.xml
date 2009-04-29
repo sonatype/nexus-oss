@@ -8,6 +8,8 @@
     <realm>MockRealmA</realm>
     <realm>ExceptionThrowingMockRealm</realm>
     <realm>MockRealmB</realm>
+    <realm>FakeRealm1</realm>
+    <realm>FakeRealm2</realm>
   </realms>
   
 </security-configuration>

@@ -16,12 +16,15 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.realms.tools.InvalidConfigurationException;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
+import org.sonatype.security.authorization.AuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.RoleListResourceResponse;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.RoleResourceRequest;
@@ -64,7 +67,7 @@ public class RoleListPlexusResource
     {
         RoleListResourceResponse result = new RoleListResourceResponse();
 
-        for ( SecurityRole role : getPlexusSecurity().listRoles() )
+        for ( Role role : getSecuritySystem().listRoles() )
         {
             RoleResource res = securityToRestModel( role, request );
 
@@ -88,28 +91,36 @@ public class RoleListPlexusResource
         {
             RoleResource resource = resourceRequest.getData();
 
-            SecurityRole role = restToSecurityModel( null, resource );
+            Role role = restToSecurityModel( null, resource );
 
             try
             {
                 validateRoleContainment( role );
-                
-                getPlexusSecurity().createRole( role );
+
+                AuthorizationManager authzManager = getSecuritySystem().getAuthorizationManager( ROLE_SOURCE );
+                authzManager.addRole( role );
 
                 result = new RoleResourceResponse();
 
-                resource.setId( role.getId() );
-                
+                resource.setId( role.getRoleId() );
+
                 resource.setUserManaged( true );
 
                 resource.setResourceURI( createChildReference( request, this, resource.getId() ).toString() );
 
                 result.setData( resource );
             }
-            catch ( InvalidConfigurationException e )
+            // catch ( InvalidConfigurationException e )
+            // {
+            // // build and throw exception
+            // handleInvalidConfigurationException( e );
+            // }
+            catch ( NoSuchAuthorizationManager e )
             {
-                // build and throw exception
-                handleInvalidConfigurationException( e );
+                this.getLogger().warn( "Could not found AuthorizationManager: " + ROLE_SOURCE, e );
+                // we should not ever get here
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Authorization Manager for: "
+                    + ROLE_SOURCE + " could not be found." );
             }
         }
         return result;

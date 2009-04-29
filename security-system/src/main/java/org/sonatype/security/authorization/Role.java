@@ -9,7 +9,14 @@ public class Role
 
     private String name;
 
+    private String description;
+
     private String source;
+
+    private boolean readOnly;
+
+    // TODO: remove this, we don't use this
+    private int sessionTimeout;
 
     private Set<String> permissions = new HashSet<String>();
 
@@ -100,14 +107,47 @@ public class Role
         return getSource().compareTo( o.getSource() );
     }
 
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription( String description )
+    {
+        this.description = description;
+    }
+
+    public boolean isReadOnly()
+    {
+        return readOnly;
+    }
+
+    public void setReadOnly( boolean readOnly )
+    {
+        this.readOnly = readOnly;
+    }
+
+    public int getSessionTimeout()
+    {
+        return sessionTimeout;
+    }
+
+    public void setSessionTimeout( int sessionTimeout )
+    {
+        this.sessionTimeout = sessionTimeout;
+    }
+
     @Override
     public int hashCode()
     {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ( ( description == null ) ? 0 : description.hashCode() );
         result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
         result = prime * result + ( ( permissions == null ) ? 0 : permissions.hashCode() );
+        result = prime * result + ( readOnly ? 1231 : 1237 );
         result = prime * result + ( ( roleId == null ) ? 0 : roleId.hashCode() );
+        result = prime * result + sessionTimeout;
         result = prime * result + ( ( source == null ) ? 0 : source.hashCode() );
         return result;
     }
@@ -122,6 +162,13 @@ public class Role
         if ( getClass() != obj.getClass() )
             return false;
         Role other = (Role) obj;
+        if ( description == null )
+        {
+            if ( other.description != null )
+                return false;
+        }
+        else if ( !description.equals( other.description ) )
+            return false;
         if ( name == null )
         {
             if ( other.name != null )
@@ -136,12 +183,16 @@ public class Role
         }
         else if ( !permissions.equals( other.permissions ) )
             return false;
+        if ( readOnly != other.readOnly )
+            return false;
         if ( roleId == null )
         {
             if ( other.roleId != null )
                 return false;
         }
         else if ( !roleId.equals( other.roleId ) )
+            return false;
+        if ( sessionTimeout != other.sessionTimeout )
             return false;
         if ( source == null )
         {

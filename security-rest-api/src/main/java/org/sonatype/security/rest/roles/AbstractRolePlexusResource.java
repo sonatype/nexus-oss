@@ -18,6 +18,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.RoleResource;
@@ -26,73 +27,79 @@ public abstract class AbstractRolePlexusResource
     extends AbstractSecurityPlexusResource
 {
 
+    protected static final String ROLE_SOURCE = "default";
 
-    public RoleResource securityToRestModel( SecurityRole role, Request request )
+    public RoleResource securityToRestModel( Role role, Request request )
     {
         // and will convert to the rest object
         RoleResource resource = new RoleResource();
 
         resource.setDescription( role.getDescription() );
-        resource.setId( role.getId() );
+        resource.setId( role.getRoleId() );
         resource.setName( role.getName() );
         resource.setResourceURI( this.createChildReference( request, this, resource.getId() ).toString() );
         resource.setSessionTimeout( role.getSessionTimeout() );
         resource.setUserManaged( !role.isReadOnly() );
 
-        for ( String roleId : (List<String>) role.getRoles() )
-        {
-            resource.addRole( roleId );
-        }
-
-        for ( String privId : (List<String>) role.getPrivileges() )
-        {
-            resource.addPrivilege( privId );
-        }
+     // FIXME: is this needed
+//        for ( String roleId : (List<String>) role.getRoles() )
+//        {
+//            resource.addRole( roleId );
+//        }
+        
+        // FIXME: is this needed
+//        for ( String privId : (List<String>) role.getPrivileges() )
+//        {
+//            resource.addPrivilege( privId );
+//        }
 
         return resource;
     }
 
-    public SecurityRole restToSecurityModel( SecurityRole role, RoleResource resource )
+    public Role restToSecurityModel( Role role, RoleResource resource )
     {
         if ( role == null )
         {
-            role = new SecurityRole();
+            role = new Role();
         }
 
-        role.setId( resource.getId() );
+        role.setRoleId( resource.getId() );
         
         role.setDescription( resource.getDescription() );
         role.setName( resource.getName() );
         role.setSessionTimeout( resource.getSessionTimeout() );
 
-        role.getRoles().clear();
-        for ( String roleId : (List<String>) resource.getRoles() )
-        {
-            role.addRole( roleId );
-        }
-
-        role.getPrivileges().clear();
-        for ( String privId : (List<String>) resource.getPrivileges() )
-        {
-            role.addPrivilege( privId );
-        }
+        // FIXME uncomment and fix this
+        
+//        role.getRoles().clear();
+//        for ( String roleId : (List<String>) resource.getRoles() )
+//        {
+//            role.addRole( roleId );
+//        }
+//
+//        role.getPrivileges().clear();
+//        for ( String privId : (List<String>) resource.getPrivileges() )
+//        {
+//            role.addPrivilege( privId );
+//        }
 
         return role;
     }
     
-    public void validateRoleContainment( SecurityRole role )
+    public void validateRoleContainment( Role role )
         throws ResourceException
     {
-        if ( role.getRoles().size() == 0 
-            && role.getPrivileges().size() == 0)
-        {
-            throw new PlexusResourceException( 
-                Status.CLIENT_ERROR_BAD_REQUEST, 
-                "Configuration error.", 
-                getErrorResponse( 
-                    "privileges", 
-                    "One or more roles/privilegs are required." ) );
-        }
+        // FIXME: uncomment this
+//        if ( role.getRoles().size() == 0 
+//            && role.getPrivileges().size() == 0)
+//        {
+//            throw new PlexusResourceException( 
+//                Status.CLIENT_ERROR_BAD_REQUEST, 
+//                "Configuration error.", 
+//                getErrorResponse( 
+//                    "privileges", 
+//                    "One or more roles/privilegs are required." ) );
+//        }
     }
 
 }

@@ -16,6 +16,10 @@ public class DefaultUser
     private String emailAddress;
 
     private String source;
+    
+    private UserStatus status;
+    
+    private boolean readOnly;
 
     private Set<Role> roles = new HashSet<Role>();
 
@@ -72,6 +76,28 @@ public class DefaultUser
     public void setRoles( Set<Role> roles )
     {
         this.roles = roles;
+    }
+    
+    
+
+    public UserStatus getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus( UserStatus status )
+    {
+        this.status = status;
+    }
+
+    public boolean isReadOnly()
+    {
+        return readOnly;
+    }
+
+    public void setReadOnly( boolean readOnly )
+    {
+        this.readOnly = readOnly;
     }
 
     @Override

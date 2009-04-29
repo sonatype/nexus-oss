@@ -22,7 +22,10 @@ import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.realms.tools.InvalidConfigurationException;
-import org.sonatype.security.realms.tools.NoSuchRoleException;
+import org.sonatype.security.authorization.AuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.RoleResourceRequest;
@@ -74,13 +77,20 @@ public class RolePlexusResource
 
         try
         {
-            result.setData( securityToRestModel( getPlexusSecurity().readRole( getRoleId( request ) ), request ) );
+            AuthorizationManager authzManager = getSecuritySystem().getAuthorizationManager( ROLE_SOURCE );
+            result.setData( securityToRestModel( authzManager.getRole( getRoleId( request ) ), request ) );
 
         }
         catch ( NoSuchRoleException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
-
+        }
+        catch ( NoSuchAuthorizationManager e )
+        {
+            this.getLogger().warn( "Could not found AuthorizationManager: " + ROLE_SOURCE, e );
+            // we should not ever get here
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Authorization Manager for: " + ROLE_SOURCE
+                + " could not be found." );
         }
         return result;
     }
@@ -95,33 +105,42 @@ public class RolePlexusResource
         if ( resourceRequest != null )
         {
             RoleResource resource = resourceRequest.getData();
-            
+
             try
             {
-                SecurityRole role = restToSecurityModel( getPlexusSecurity().readRole( resource.getId() ), resource );
-                
+                AuthorizationManager authzManager = getSecuritySystem().getAuthorizationManager( ROLE_SOURCE );
+                Role role = restToSecurityModel( authzManager.getRole( resource.getId() ), resource );
+
                 validateRoleContainment( role );
 
-                getPlexusSecurity().updateRole( role );
+                authzManager.updateRole( role );
 
                 resourceResponse = new RoleResourceResponse();
 
                 resourceResponse.setData( resourceRequest.getData() );
-                
+
                 resourceResponse.getData().setUserManaged( !role.isReadOnly() );
 
-                resourceResponse
-                    .getData().setResourceURI( createChildReference( request, this, resource.getId() ).toString() );
+                resourceResponse.getData().setResourceURI(
+                    createChildReference( request, this, resource.getId() ).toString() );
 
             }
             catch ( NoSuchRoleException e )
             {
-                throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
             }
-            catch ( InvalidConfigurationException e )
+            // FIXME: no validation
+            // catch ( InvalidConfigurationException e )
+            // {
+            // // build and throw exception
+            // handleInvalidConfigurationException( e );
+            // }
+            catch ( NoSuchAuthorizationManager e )
             {
-                // build and throw exception
-                handleInvalidConfigurationException( e );
+                this.getLogger().warn( "Could not found AuthorizationManager: " + ROLE_SOURCE, e );
+                // we should not ever get here
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Authorization Manager for: "
+                    + ROLE_SOURCE + " could not be found." );
             }
         }
         return resourceResponse;
@@ -133,11 +152,19 @@ public class RolePlexusResource
     {
         try
         {
-            getPlexusSecurity().deleteRole( getRoleId( request ) );
+            AuthorizationManager authzManager = getSecuritySystem().getAuthorizationManager( ROLE_SOURCE );
+            authzManager.deleteRole( getRoleId( request ) );
         }
         catch ( NoSuchRoleException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+        }
+        catch ( NoSuchAuthorizationManager e )
+        {
+            this.getLogger().warn( "Could not found AuthorizationManager: " + ROLE_SOURCE, e );
+            // we should not ever get here
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Authorization Manager for: "
+                + ROLE_SOURCE + " could not be found." );
         }
     }
 

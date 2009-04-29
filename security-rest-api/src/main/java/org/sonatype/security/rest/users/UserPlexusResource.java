@@ -25,12 +25,16 @@ import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.realms.tools.InvalidConfigurationException;
 import org.sonatype.security.realms.tools.NoSuchUserException;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
 import org.sonatype.security.rest.model.UserResourceResponse;
+import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * @author tstevens
@@ -77,10 +81,10 @@ public class UserPlexusResource
 
         try
         {
-            result.setData( securityToRestModel( getPlexusSecurity().readUser( getUserId( request ) ), request ) );
+            result.setData( securityToRestModel( getSecuritySystem().getUser( getUserId( request ) ), request ) );
 
         }
-        catch ( NoSuchUserException e )
+        catch ( UserNotFoundException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
         }
@@ -108,11 +112,11 @@ public class UserPlexusResource
 
             try
             {
-                SecurityUser user = restToSecurityModel( getPlexusSecurity().readUser( resource.getUserId() ), resource );
+                User user = restToSecurityModel( getSecuritySystem().getUser( resource.getUserId() ), resource );
 
                 validateUserContainment( user );
                 
-                getPlexusSecurity().updateUser( user );
+                getSecuritySystem().updateUser( user );
 
                 result = new UserResourceResponse();
 
@@ -123,14 +127,19 @@ public class UserPlexusResource
                 result.getData().setResourceURI( createChildReference( request, this, resource.getUserId() ).toString() );
 
             }
-            catch ( NoSuchUserException e )
+//            catch ( InvalidConfigurationException e )
+//            {
+//                // build and throw exception
+//                handleInvalidConfigurationException( e );
+//            }
+            catch ( UserNotFoundException e )
             {
                 throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
             }
-            catch ( InvalidConfigurationException e )
+            catch ( NoSuchUserManager e )
             {
-                // build and throw exception
-                handleInvalidConfigurationException( e );
+                ErrorResponse errorResponse = getErrorResponse( "*", e.getMessage() );
+                throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Unable to create user.", errorResponse);
             }
         }
         return result;
@@ -169,12 +178,12 @@ public class UserPlexusResource
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, error );
             }
 
-            getPlexusSecurity().deleteUser( getUserId( request ) );
+            getSecuritySystem().deleteUser( getUserId( request ) );
 
             response.setStatus( Status.SUCCESS_NO_CONTENT );
 
         }
-        catch ( NoSuchUserException e )
+        catch ( UserNotFoundException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
         }

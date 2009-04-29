@@ -24,6 +24,7 @@ import org.jsecurity.authz.permission.WildcardPermission;
 import org.jsecurity.subject.Subject;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
+import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.AuthenticationClientPermissions;
@@ -92,11 +93,11 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
 
         Map<String, Integer> privilegeMap = new HashMap<String, Integer>();
 
-        for ( SecurityPrivilege priv : getPlexusSecurity().listPrivileges() )
+        for ( Privilege priv : getSecuritySystem().listPrivileges() )
         {
             if ( priv.getType().equals( "method" ) )
             {
-                String permission = getPlexusSecurity().getPrivilegeProperty( priv, "permission" );
+                String permission = priv.getPrivilegeProperty( "permission" );
                 privilegeMap.put( permission, NONE );
             }
         }

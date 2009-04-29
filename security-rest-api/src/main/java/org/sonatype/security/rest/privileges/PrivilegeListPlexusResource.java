@@ -14,6 +14,7 @@ package org.sonatype.security.rest.privileges;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
@@ -25,6 +26,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.tools.InvalidConfigurationException;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
@@ -68,9 +70,9 @@ public class PrivilegeListPlexusResource
     {
         PrivilegeListResourceResponse result = new PrivilegeListResourceResponse();
 
-        Collection<SecurityPrivilege> privs = getPlexusSecurity().listPrivileges();
+        Set<Privilege> privs = getSecuritySystem().listPrivileges();
 
-        for ( SecurityPrivilege priv : privs )
+        for ( Privilege priv : privs )
         {
             PrivilegeStatusResource res = securityToRestModel( priv, request );
 
