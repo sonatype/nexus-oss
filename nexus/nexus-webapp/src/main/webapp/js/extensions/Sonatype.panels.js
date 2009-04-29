@@ -602,18 +602,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
 
   rowSelectHandler: function( selectionModel, index, rec ) {
     if ( this.rowClickEvent || this.rowClickHandler ) {
-    	if ( this.showRecordContextMenu(rec) ){
-    		rec.beginEdit();
-    		rec.set('showCtx', true);
-        rec.commit();
-        rec.endEdit();
-    	}
-    	else{
-    		rec.beginEdit();
-    		rec.set('showCtx', false);
-        rec.commit();
-        rec.endEdit();    		
-    	}
+      rec.data.showCtx = this.showRecordContextMenu( rec ); 
       this.createChildPanel( rec );
       
       var bookmark = rec.data[this.dataBookmark];
@@ -629,10 +618,10 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
     }, this );
     
     if ( recIndex >= 0 ) {
-      var selModel = this.gridPanel.getSelectionModel();
-      var oldSelection = selModel.getSelected();
-      var newSelection = this.dataStore.getAt( recIndex );
-      if ( oldSelection != newSelection ) selModel.selectRecords( [newSelection] );
+      var oldBookmark = this.getBookmark();
+      if ( bookmark != oldBookmark ) {
+        this.gridPanel.getSelectionModel().selectRecords( [this.dataStore.getAt( recIndex )] );
+      }
     }
   },
   
