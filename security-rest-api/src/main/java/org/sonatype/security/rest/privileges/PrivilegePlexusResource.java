@@ -21,8 +21,11 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.authorization.AuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
-import org.sonatype.security.realms.tools.NoSuchPrivilegeException;
+import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
 
@@ -33,6 +36,8 @@ import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
 public class PrivilegePlexusResource
     extends AbstractPrivilegePlexusResource
 {
+
+    protected static final String PRIVILEGE_SOURCE = "default";
 
     public PrivilegePlexusResource()
     {
@@ -68,15 +73,23 @@ public class PrivilegePlexusResource
     {
         PrivilegeStatusResourceResponse result = new PrivilegeStatusResourceResponse();
 
-        SecurityPrivilege priv = null;
+        Privilege priv = null;
 
         try
         {
-            priv = getPlexusSecurity().readPrivilege( getPrivilegeId( request ) );
+            AuthorizationManager authzManager = getSecuritySystem().getAuthorizationManager( PRIVILEGE_SOURCE );
+            priv = authzManager.getPrivilege( getPrivilegeId( request ) );
         }
         catch ( NoSuchPrivilegeException e )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Privilege could not be found." );
+        }
+        catch ( NoSuchAuthorizationManager e )
+        {
+            this.getLogger().warn( "Could not found AuthorizationManager: " + PRIVILEGE_SOURCE, e );
+            // we should not ever get here
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Authorization Manager for: "
+                + PRIVILEGE_SOURCE + " could not be found." );
         }
 
         result.setData( securityToRestModel( priv, request ) );
@@ -88,11 +101,13 @@ public class PrivilegePlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        SecurityPrivilege priv;
+        Privilege priv;
 
         try
         {
-            priv = getPlexusSecurity().readPrivilege( getPrivilegeId( request ) );
+            AuthorizationManager authzManager = getSecuritySystem().getAuthorizationManager( PRIVILEGE_SOURCE );
+
+            priv = authzManager.getPrivilege( getPrivilegeId( request ) );
 
             if ( priv.getType().equals( ApplicationPrivilegeDescriptor.TYPE ) )
             {
@@ -102,12 +117,19 @@ public class PrivilegePlexusResource
             }
             else
             {
-                getPlexusSecurity().deletePrivilege( getPrivilegeId( request ) );
+                authzManager.deletePrivilege( getPrivilegeId( request ) );
             }
         }
         catch ( NoSuchPrivilegeException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+        }
+        catch ( NoSuchAuthorizationManager e )
+        {
+            this.getLogger().warn( "Could not found AuthorizationManager: "+ PRIVILEGE_SOURCE, e );
+            // we should not ever get here
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Authorization Manager for: "
+                + PRIVILEGE_SOURCE + " could not be found." );
         }
     }
 

@@ -15,8 +15,8 @@ package org.sonatype.security.rest.privileges;
 import java.util.List;
 
 import org.restlet.data.Request;
+import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.model.CProperty;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PrivilegeProperty;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
@@ -27,7 +27,7 @@ public abstract class AbstractPrivilegePlexusResource
     public static final String PRIVILEGE_ID_KEY = "privilegeId";
 
     @SuppressWarnings( "unchecked" )
-    public PrivilegeStatusResource securityToRestModel( SecurityPrivilege privilege, Request request )
+    public PrivilegeStatusResource securityToRestModel( Privilege privilege, Request request )
     {
         PrivilegeStatusResource resource = new PrivilegeStatusResource();
         

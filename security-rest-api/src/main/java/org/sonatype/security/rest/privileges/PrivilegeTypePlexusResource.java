@@ -56,7 +56,7 @@ public class PrivilegeTypePlexusResource
     {
         PrivilegeTypeResourceResponse result = new PrivilegeTypeResourceResponse();
 
-        List<PrivilegeDescriptor> privDescriptors = getPlexusSecurity().listPrivilegeDescriptors();
+        List<PrivilegeDescriptor> privDescriptors = getConfigurationManager().listPrivilegeDescriptors();
 
         for ( PrivilegeDescriptor privDescriptor : privDescriptors )
         {

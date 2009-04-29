@@ -136,15 +136,15 @@ public class UserToRolePlexusResource
         try
         {
             // this will throw if we cannot find the user, in that case we will create one.
-            getPlexusSecurity().readUserRoleMapping( roleMapping.getUserId(), roleMapping.getSource() );
-            getPlexusSecurity().updateUserRoleMapping( roleMapping );
+            getConfigurationManager().readUserRoleMapping( roleMapping.getUserId(), roleMapping.getSource() );
+            getConfigurationManager().updateUserRoleMapping( roleMapping );
         }
         catch ( NoSuchRoleMappingException e )
         {
             // do create
             try
             {
-                getPlexusSecurity().createUserRoleMapping( roleMapping );
+                getConfigurationManager().createUserRoleMapping( roleMapping );
             }
             catch ( InvalidConfigurationException e1 )
             {
@@ -175,7 +175,7 @@ public class UserToRolePlexusResource
 
         try
         {
-            getPlexusSecurity().deleteUserRoleMapping( userId, source );
+            getConfigurationManager().deleteUserRoleMapping( userId, source );
         }
         catch ( NoSuchRoleMappingException e )
         {

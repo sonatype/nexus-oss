@@ -22,6 +22,7 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.UserResource;
+import org.sonatype.security.usermanagement.User;
 
 public abstract class AbstractUserPlexusResource
     extends AbstractSecurityPlexusResource
@@ -54,7 +55,7 @@ public abstract class AbstractUserPlexusResource
         return getSecuritySystem().isAnonymousAccessEnabled() && getSecuritySystem().getAnonymousUsername().equals( username );
     }
 
-    protected void validateUserContainment( SecurityUser user )
+    protected void validateUserContainment( User user )
         throws ResourceException
     {
         if ( user.getRoles().size() == 0 )

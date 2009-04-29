@@ -16,16 +16,22 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.realms.tools.InvalidConfigurationException;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.rest.model.UserListResourceResponse;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
 import org.sonatype.security.rest.model.UserResourceResponse;
+import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserStatus;
 
 /**
  * @author tstevens
@@ -64,7 +70,7 @@ public class UserListPlexusResource
     {
         UserListResourceResponse result = new UserListResourceResponse();
 
-        for ( SecurityUser user : getPlexusSecurity().listUsers() )
+        for ( User user : getSecuritySystem().listUsers() )
         {
             UserResource res = securityToRestModel( user, request );
 
@@ -88,19 +94,19 @@ public class UserListPlexusResource
         {
             UserResource resource = requestResource.getData();
 
-            SecurityUser user = restToSecurityModel( null, resource );
+            User user = restToSecurityModel( null, resource );
 
             try
             {
                 validateUserContainment( user );
                 
                 String password = resource.getPassword();
-                getPlexusSecurity().createUser( user, password );
+                getSecuritySystem().addUser( user, password );
 
                 result = new UserResourceResponse();
 
                 // Update the status, as that may have changed
-                resource.setStatus( user.getStatus() );
+                resource.setStatus( user.getStatus().name() );
 
                 resource.setResourceURI( createChildReference( request, this, resource.getUserId() ).toString() );
                 
@@ -109,10 +115,15 @@ public class UserListPlexusResource
                 result.setData( resource );
 
             }
-            catch ( InvalidConfigurationException e )
+//            catch ( InvalidConfigurationException e )
+//            {
+//                // build and throw exception
+//                handleInvalidConfigurationException( e );
+//            }
+            catch ( NoSuchUserManager e )
             {
-                // build and throw exception
-                handleInvalidConfigurationException( e );
+                ErrorResponse errorResponse = getErrorResponse( "*", e.getMessage() );
+                throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Unable to create user.", errorResponse);
             }
         }
         return result;
