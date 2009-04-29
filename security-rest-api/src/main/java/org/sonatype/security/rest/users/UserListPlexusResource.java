@@ -19,6 +19,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -112,11 +113,11 @@ public class UserListPlexusResource
                 result.setData( resource );
 
             }
-//            catch ( InvalidConfigurationException e )
-//            {
-//                // build and throw exception
-//                handleInvalidConfigurationException( e );
-//            }
+            catch ( InvalidConfigurationException e )
+            {
+                // build and throw exception
+                handleInvalidConfigurationException( e );
+            }
             catch ( NoSuchUserManager e )
             {
                 ErrorResponse errorResponse = getErrorResponse( "*", e.getMessage() );

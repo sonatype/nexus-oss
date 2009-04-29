@@ -19,6 +19,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.authorization.AuthorizationManager;
@@ -127,12 +128,11 @@ public class RolePlexusResource
             {
                 throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
             }
-            // FIXME: no validation
-            // catch ( InvalidConfigurationException e )
-            // {
-            // // build and throw exception
-            // handleInvalidConfigurationException( e );
-            // }
+             catch ( InvalidConfigurationException e )
+            {
+                // build and throw exception
+                handleInvalidConfigurationException( e );
+            }
             catch ( NoSuchAuthorizationManager e )
             {
                 this.getLogger().warn( "Could not found AuthorizationManager: " + ROLE_SOURCE, e );
