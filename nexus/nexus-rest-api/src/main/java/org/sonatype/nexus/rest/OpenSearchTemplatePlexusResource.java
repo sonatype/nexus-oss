@@ -68,8 +68,12 @@ public class OpenSearchTemplatePlexusResource
 
 
         Reference nexusRef = getContextRoot( request );
-
-        map.put( "nexusRoot", nexusRef.toString() );
+        String nexusRoot = nexusRef.toString();
+        if ( nexusRoot.endsWith( "/" ) ) {
+        	nexusRoot = nexusRoot.substring( 0, nexusRoot.length() - 1 );
+        }
+        
+        map.put( "nexusRoot", nexusRoot );
         map.put( "nexusHost", nexusRef.getHostDomain() );
 
         VelocityRepresentation templateRepresentation = new VelocityRepresentation(
