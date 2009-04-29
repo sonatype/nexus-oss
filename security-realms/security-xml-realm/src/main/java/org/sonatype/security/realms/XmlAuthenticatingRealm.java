@@ -29,8 +29,8 @@ import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.NoSuchUserException;
 import org.sonatype.security.realms.tools.Sha1ThenMd5CredentialsMatcher;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = Realm.class, hint = "XmlAuthenticatingRealm" )
 public class XmlAuthenticatingRealm
@@ -63,7 +63,7 @@ public class XmlAuthenticatingRealm
         {
             user = configuration.readUser( upToken.getUsername() );
         }
-        catch ( NoSuchUserException e )
+        catch ( UserNotFoundException e )
         {
             throw new AccountException( "User '" + upToken.getUsername() + "' cannot be retrieved.", e );
         }

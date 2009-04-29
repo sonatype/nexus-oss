@@ -47,13 +47,12 @@ import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.sonatype.security.authorization.NoSuchPrivilegeException;
+import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.NoSuchPrivilegeException;
-import org.sonatype.security.realms.tools.NoSuchRoleException;
-import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 

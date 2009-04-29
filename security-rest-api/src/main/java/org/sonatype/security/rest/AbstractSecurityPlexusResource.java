@@ -37,7 +37,7 @@ import org.sonatype.security.usermanagement.UserStatus;
 public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResource
 {
 
-    @Requirement
+    @Requirement( hint = "resourceMerging")
     private ConfigurationManager configurationManager;
     
     @Requirement

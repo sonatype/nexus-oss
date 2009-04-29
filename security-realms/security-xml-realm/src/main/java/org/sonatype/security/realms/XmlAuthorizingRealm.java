@@ -37,13 +37,13 @@ import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.NoSuchPrivilegeException;
+import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.NoSuchPrivilegeException;
-import org.sonatype.security.realms.tools.NoSuchRoleException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 

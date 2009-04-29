@@ -32,6 +32,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.security.authorization.NoSuchPrivilegeException;
+import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
@@ -50,6 +52,7 @@ import org.sonatype.security.realms.validator.ValidationContext;
 import org.sonatype.security.realms.validator.ValidationMessage;
 import org.sonatype.security.realms.validator.ValidationResponse;
 import org.sonatype.security.usermanagement.StringDigester;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 @Component( role = ConfigurationManager.class, hint = "default" )
@@ -329,7 +332,7 @@ public class DefaultConfigurationManager
 
     @SuppressWarnings( "unchecked" )
     public void deleteUser( String id )
-        throws NoSuchUserException
+        throws UserNotFoundException
     {
         boolean found = false;
 
@@ -345,7 +348,7 @@ public class DefaultConfigurationManager
 
         if ( !found )
         {
-            throw new NoSuchUserException( id );
+            throw new UserNotFoundException( id );
         }
     }
 
@@ -381,7 +384,7 @@ public class DefaultConfigurationManager
 
     @SuppressWarnings( "unchecked" )
     public SecurityUser readUser( String id )
-        throws NoSuchUserException
+        throws UserNotFoundException
     {
         for ( CUser user : (List<CUser>) getConfiguration().getUsers() )
         {
@@ -408,7 +411,7 @@ public class DefaultConfigurationManager
             }
         }
 
-        throw new NoSuchUserException( id );
+        throw new UserNotFoundException( id );
     }
 
     public void updatePrivilege( SecurityPrivilege privilege )
@@ -471,14 +474,14 @@ public class DefaultConfigurationManager
 
     public void updateUser( SecurityUser user )
         throws InvalidConfigurationException,
-            NoSuchUserException
+            UserNotFoundException
     {
         updateUser( user, initializeContext() );
     }
 
     public void updateUser( SecurityUser user, ValidationContext context )
         throws InvalidConfigurationException,
-            NoSuchUserException
+            UserNotFoundException
     {
         if ( context == null )
         {

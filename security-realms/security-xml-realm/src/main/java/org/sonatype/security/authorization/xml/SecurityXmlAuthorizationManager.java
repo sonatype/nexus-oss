@@ -12,6 +12,7 @@
  */
 package org.sonatype.security.authorization.xml;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +26,7 @@ import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.InvalidConfigurationException;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
 
@@ -46,6 +48,39 @@ public class SecurityXmlAuthorizationManager
         return SOURCE;
     }
 
+    protected Role toRole( SecurityRole secRole )
+    {
+        Role role = new Role();
+
+        role.setRoleId( secRole.getId() );
+        role.setName( secRole.getName() );
+        role.setSource( SOURCE );
+        role.setDescription( secRole.getDescription() );
+        role.setReadOnly( secRole.isReadOnly() );
+        role.setSessionTimeout( secRole.getSessionTimeout() );
+        role.setPermissions(  new HashSet<String>(secRole.getPrivileges() ) );
+
+        return role;
+    }
+
+    protected SecurityRole toRole( Role role )
+    {
+        SecurityRole secRole = new SecurityRole();
+        
+        secRole.setId( role.getRoleId() );
+        secRole.setName( role.getName() );
+        secRole.setDescription( role.getDescription() );
+        secRole.setReadOnly( role.isReadOnly() );
+        secRole.setSessionTimeout( role.getSessionTimeout() );
+        secRole.setPrivileges(  new ArrayList<String>(role.getPermissions() ) );
+
+        return secRole;
+    }
+
+    // //
+    // ROLE CRUDS
+    // //
+
     public Set<Role> listRoles()
     {
         Set<Role> roles = new HashSet<Role>();
@@ -59,18 +94,44 @@ public class SecurityXmlAuthorizationManager
         return roles;
     }
 
-    protected Role toRole( SecurityRole secRole )
+    public Role getRole( String roleId )
+        throws NoSuchRoleException
     {
+        return this.toRole( this.configuration.readRole( roleId ) );
+    }
 
-        Role role = new Role();
-
-        role.setRoleId( secRole.getId() );
-        role.setName( secRole.getName() );
-        role.setSource( SOURCE );
+    public Role addRole( Role role )
+    {
+        try
+        {
+            this.configuration.createRole( this.toRole( role ) );
+        }
+        catch ( InvalidConfigurationException e )
+        {
+            // FIXME Auto-generated catch block
+            e.printStackTrace();
+        }
 
         return role;
+    }
+
+    public Role updateRole( Role role )
+        throws NoSuchRoleException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void deleteRole( String roleId )
+        throws NoSuchRoleException
+    {
+        // TODO Auto-generated method stub
 
     }
+
+    // //
+    // PRIVILEGE CRUDS
+    // //
 
     public Set<String> listPermissions()
     {
@@ -80,22 +141,10 @@ public class SecurityXmlAuthorizationManager
         for ( SecurityPrivilege securityPrivilege : secPrivs )
         {
             // FIXME: use PermissionDescriptors
-            permissions.add( securityPrivilege.getId());
+            permissions.add( securityPrivilege.getId() );
         }
 
         return permissions;
-    }
-
-    public Privilege getPrivilege()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Role getRole( String roleId )
-    {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public Set<Privilege> listPrivileges()
@@ -104,34 +153,14 @@ public class SecurityXmlAuthorizationManager
         return null;
     }
 
-    public Privilege addPrivilege( Privilege privilege )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Role addRole( Role role )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void deletePrivilege( String privilegeId )
-        throws NoSuchPrivilegeException
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void deleteRole( String roleId )
-        throws NoSuchRoleException
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
     public Privilege getPrivilege( String privilegeId )
         throws NoSuchPrivilegeException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Privilege addPrivilege( Privilege privilege )
     {
         // TODO Auto-generated method stub
         return null;
@@ -144,11 +173,11 @@ public class SecurityXmlAuthorizationManager
         return null;
     }
 
-    public Role updateRole( Role role )
-        throws NoSuchRoleException
+    public void deletePrivilege( String privilegeId )
+        throws NoSuchPrivilegeException
     {
         // TODO Auto-generated method stub
-        return null;
+
     }
-    
+
 }

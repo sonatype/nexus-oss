@@ -24,6 +24,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.security.authorization.NoSuchPrivilegeException;
+import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
@@ -35,26 +37,27 @@ import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.realms.validator.ValidationContext;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = ConfigurationManager.class, hint = "resourceMerging" )
 public class ResourceMergingConfigurationManager
     extends AbstractLogEnabled
     implements ConfigurationManager
 {
-    //This will handle all normal security.xml file loading/storing
+    // This will handle all normal security.xml file loading/storing
     @Requirement( role = ConfigurationManager.class, hint = "default" )
     private ConfigurationManager manager;
-        
+
     @Requirement( role = StaticSecurityResource.class )
     private List<StaticSecurityResource> staticResources;
-    
+
     /**
      * This will hold the current configuration in memory, to reload, will need to set this to null
      */
     private Configuration configuration = null;
-    
+
     private ReentrantLock lock = new ReentrantLock();
-    
+
     public void clearCache()
     {
         manager.clearCache();
@@ -62,7 +65,7 @@ public class ResourceMergingConfigurationManager
         configuration = null;
         lock.unlock();
     }
-    
+
     public void createPrivilege( SecurityPrivilege privilege )
         throws InvalidConfigurationException
     {
@@ -76,11 +79,11 @@ public class ResourceMergingConfigurationManager
         {
             context = initializeContext();
         }
-        
+
         // The static config can't be updated, so delegate to xml file
         manager.createPrivilege( privilege, context );
     }
-    
+
     public void createRole( SecurityRole role )
         throws InvalidConfigurationException
     {
@@ -94,7 +97,7 @@ public class ResourceMergingConfigurationManager
         {
             context = initializeContext();
         }
-        
+
         // The static config can't be updated, so delegate to xml file
         manager.createRole( role, context );
     }
@@ -104,27 +107,27 @@ public class ResourceMergingConfigurationManager
     {
         manager.createUser( user, initializeContext() );
     }
-    
+
     public void createUser( SecurityUser user, String password )
-    throws InvalidConfigurationException
+        throws InvalidConfigurationException
     {
         manager.createUser( user, password, initializeContext() );
     }
-    
+
     public void createUser( SecurityUser user, ValidationContext context )
         throws InvalidConfigurationException
     {
         createUser( user, null, context );
     }
-    
-    public void createUser( SecurityUser user,String password, ValidationContext context )
-    throws InvalidConfigurationException
+
+    public void createUser( SecurityUser user, String password, ValidationContext context )
+        throws InvalidConfigurationException
     {
         if ( context == null )
         {
             context = initializeContext();
         }
-        
+
         // The static config can't be updated, so delegate to xml file
         manager.createUser( user, password, context );
     }
@@ -144,7 +147,7 @@ public class ResourceMergingConfigurationManager
     }
 
     public void deleteUser( String id )
-        throws NoSuchUserException
+        throws UserNotFoundException
     {
         // The static config can't be updated, so delegate to xml file
         manager.deleteUser( id );
@@ -160,20 +163,20 @@ public class ResourceMergingConfigurationManager
     {
         return manager.getPrivilegeProperty( id, key );
     }
-    
+
     public ValidationContext initializeContext()
     {
         ValidationContext context = new ValidationContext();
-        
+
         context.addExistingUserIds();
         context.addExistingRoleIds();
         context.addExistingPrivilegeIds();
-        
-        List<CUser> users = new ArrayList<CUser>( listUsers() );        
+
+        List<CUser> users = new ArrayList<CUser>( listUsers() );
         for ( CUser user : users )
         {
             context.getExistingUserIds().add( user.getId() );
-            
+
             context.getExistingEmailMap().put( user.getId(), user.getEmail() );
         }
 
@@ -187,7 +190,7 @@ public class ResourceMergingConfigurationManager
             containedRoles.addAll( role.getRoles() );
 
             context.getRoleContainmentMap().put( role.getId(), containedRoles );
-            
+
             context.getExistingRoleNameMap().put( role.getId(), role.getName() );
         }
 
@@ -201,38 +204,38 @@ public class ResourceMergingConfigurationManager
     }
 
     public List<SecurityPrivilege> listPrivileges()
-    {        
+    {
         List<SecurityPrivilege> list = manager.listPrivileges();
-        
-        for ( CPrivilege item : ( List<CPrivilege> ) getConfiguration().getPrivileges() )
+
+        for ( CPrivilege item : (List<CPrivilege>) getConfiguration().getPrivileges() )
         {
             list.add( new SecurityPrivilege( item, true ) );
         }
-        
+
         return list;
     }
 
     public List<SecurityRole> listRoles()
     {
         List<SecurityRole> list = manager.listRoles();
-        
-        for ( CRole item : ( List<CRole> ) getConfiguration().getRoles() )
+
+        for ( CRole item : (List<CRole>) getConfiguration().getRoles() )
         {
             list.add( new SecurityRole( item, true ) );
         }
-        
+
         return list;
     }
 
     public List<SecurityUser> listUsers()
     {
         List<SecurityUser> list = manager.listUsers();
-        
-        for ( CUser item : ( List<CUser> ) getConfiguration().getUsers() )
+
+        for ( CUser item : (List<CUser>) getConfiguration().getUsers() )
         {
             list.add( new SecurityUser( item, true ) );
         }
-        
+
         return list;
     }
 
@@ -265,7 +268,7 @@ public class ResourceMergingConfigurationManager
     }
 
     public SecurityUser readUser( String id )
-        throws NoSuchUserException
+        throws UserNotFoundException
     {
         for ( CUser user : (List<CUser>) getConfiguration().getUsers() )
         {
@@ -277,22 +280,19 @@ public class ResourceMergingConfigurationManager
 
         return manager.readUser( id );
     }
-    
-    
-    
-    
+
     public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, ValidationContext context )
         throws InvalidConfigurationException
     {
-        if( context == null)
+        if ( context == null )
         {
             context = this.initializeContext();
         }
-        
+
         this.manager.createUserRoleMapping( userRoleMapping, context );
     }
 
-    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping)
+    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping )
         throws InvalidConfigurationException
     {
         this.manager.createUserRoleMapping( userRoleMapping, this.initializeContext() );
@@ -301,7 +301,7 @@ public class ResourceMergingConfigurationManager
     public void deleteUserRoleMapping( String userId, String source )
         throws NoSuchRoleMappingException
     {
-        this.manager.deleteUserRoleMapping( userId, source );        
+        this.manager.deleteUserRoleMapping( userId, source );
     }
 
     public List<SecurityUserRoleMapping> listUserRoleMappings()
@@ -319,11 +319,11 @@ public class ResourceMergingConfigurationManager
         throws InvalidConfigurationException,
             NoSuchRoleMappingException
     {
-        if( context == null)
+        if ( context == null )
         {
             context = this.initializeContext();
         }
-        
+
         this.manager.updateUserRoleMapping( userRoleMapping, context );
     }
 
@@ -331,37 +331,37 @@ public class ResourceMergingConfigurationManager
         throws InvalidConfigurationException,
             NoSuchRoleMappingException
     {
-       this.updateUserRoleMapping( userRoleMapping, this.initializeContext() );
+        this.updateUserRoleMapping( userRoleMapping, this.initializeContext() );
     }
 
     private Configuration initializeStaticConfiguration()
     {
         lock.lock();
-        
+
         try
-        {        
+        {
             for ( StaticSecurityResource resource : staticResources )
             {
                 Configuration config = resource.getConfiguration();
-                
+
                 if ( config != null )
                 {
                     appendConfig( config );
                 }
-                
+
                 if ( resource.getResourcePath() != null )
                 {
                     Reader fr = null;
                     InputStream is = null;
-        
+
                     try
                     {
                         getLogger().debug( "Loading static security config from " + resource.getResourcePath() );
                         is = getClass().getResourceAsStream( resource.getResourcePath() );
                         SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-        
+
                         fr = new InputStreamReader( is );
-                        
+
                         appendConfig( reader.read( fr ) );
                     }
                     catch ( IOException e )
@@ -385,7 +385,7 @@ public class ResourceMergingConfigurationManager
                                 // just closing if open
                             }
                         }
-                        
+
                         if ( is != null )
                         {
                             try
@@ -407,38 +407,38 @@ public class ResourceMergingConfigurationManager
             {
                 configuration = new Configuration();
             }
-            
+
             lock.unlock();
         }
-        
+
         return configuration;
     }
-    
+
     private Configuration appendConfig( Configuration config )
     {
         if ( configuration == null )
         {
             configuration = new Configuration();
         }
-        
-        for ( CPrivilege privilege : ( List<CPrivilege> )config.getPrivileges() )
+
+        for ( CPrivilege privilege : (List<CPrivilege>) config.getPrivileges() )
         {
             configuration.addPrivilege( privilege );
         }
-        
-        for ( CRole role : ( List<CRole> )config.getRoles() )
+
+        for ( CRole role : (List<CRole>) config.getRoles() )
         {
             configuration.addRole( role );
         }
-        
-        for ( CUser user : ( List<CUser> )config.getUsers() )
+
+        for ( CUser user : (List<CUser>) config.getUsers() )
         {
             configuration.addUser( user );
         }
-        
+
         return configuration;
     }
-    
+
     private Configuration getConfiguration()
     {
         for ( StaticSecurityResource resource : staticResources )
@@ -449,13 +449,13 @@ public class ResourceMergingConfigurationManager
                 break;
             }
         }
-        
+
         if ( configuration != null )
         {
             return configuration;
         }
-        
-        return initializeStaticConfiguration();        
+
+        return initializeStaticConfiguration();
     }
 
     public void save()
@@ -470,7 +470,7 @@ public class ResourceMergingConfigurationManager
     {
         manager.updatePrivilege( privilege, initializeContext() );
     }
-    
+
     public void updatePrivilege( SecurityPrivilege privilege, ValidationContext context )
         throws InvalidConfigurationException,
             NoSuchPrivilegeException
@@ -478,8 +478,8 @@ public class ResourceMergingConfigurationManager
         if ( context == null )
         {
             context = initializeContext();
-        }   
-        
+        }
+
         // The static config can't be updated, so delegate to xml file
         manager.updatePrivilege( privilege, context );
     }
@@ -490,7 +490,7 @@ public class ResourceMergingConfigurationManager
     {
         manager.updateRole( role, initializeContext() );
     }
-    
+
     public void updateRole( SecurityRole role, ValidationContext context )
         throws InvalidConfigurationException,
             NoSuchRoleException
@@ -499,41 +499,41 @@ public class ResourceMergingConfigurationManager
         {
             context = initializeContext();
         }
-        
+
         // The static config can't be updated, so delegate to xml file
         manager.updateRole( role, context );
     }
 
     public void updateUser( SecurityUser user )
         throws InvalidConfigurationException,
-            NoSuchUserException
+            UserNotFoundException
     {
         manager.updateUser( user, initializeContext() );
     }
-    
+
     public void updateUser( SecurityUser user, ValidationContext context )
         throws InvalidConfigurationException,
-            NoSuchUserException
+            UserNotFoundException
     {
         if ( context == null )
         {
             context = initializeContext();
         }
-        
+
         // The static config can't be updated, so delegate to xml file
         manager.updateUser( user, context );
     }
-    
+
     public List<PrivilegeDescriptor> listPrivilegeDescriptors()
     {
         return manager.listPrivilegeDescriptors();
     }
-    
+
     public void cleanRemovedPrivilege( String privilegeId )
     {
         manager.cleanRemovedPrivilege( privilegeId );
     }
-    
+
     public void cleanRemovedRole( String roleId )
     {
         manager.cleanRemovedRole( roleId );

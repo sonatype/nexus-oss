@@ -21,17 +21,14 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.CollectionUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.NoSuchRoleException;
 import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
-import org.sonatype.security.realms.tools.NoSuchUserException;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
@@ -83,16 +80,10 @@ public class SecurityXmlUserManager
     }
 
     public User getUser( String userId )
+        throws UserNotFoundException
     {
-        try
-        {
-            User user = toUser( configuration.readUser( userId ) );
-            return user;
-        }
-        catch ( NoSuchUserException e )
-        {
-            return null;
-        }
+        User user = toUser( configuration.readUser( userId ) );
+        return user;
     }
 
     public Set<User> searchUsers( UserSearchCriteria criteria )
@@ -259,7 +250,7 @@ public class SecurityXmlUserManager
     private SecuritySystem getSecuritySystem()
     {
         // FIXME: hack, we need to lazy load the security system, due to a circular dependency
-        if( this.securitySystem == null )
+        if ( this.securitySystem == null )
         {
             try
             {
@@ -270,7 +261,7 @@ public class SecurityXmlUserManager
                 this.logger.error( "Unable to load SecuritySystem", e );
             }
         }
-        
+
         return this.securitySystem;
     }
 }

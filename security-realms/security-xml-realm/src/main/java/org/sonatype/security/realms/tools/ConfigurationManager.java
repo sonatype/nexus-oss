@@ -14,12 +14,15 @@ package org.sonatype.security.realms.tools;
 
 import java.util.List;
 
+import org.sonatype.security.authorization.NoSuchPrivilegeException;
+import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.realms.validator.ValidationContext;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 public interface ConfigurationManager
 {
@@ -124,7 +127,7 @@ public interface ConfigurationManager
      * @return
      */
     SecurityUser readUser( String id )
-        throws NoSuchUserException;
+        throws UserNotFoundException;
     
     /**
      * Retrieve an existing role
@@ -150,7 +153,7 @@ public interface ConfigurationManager
      */
     void updateUser( SecurityUser user )
         throws InvalidConfigurationException,
-        NoSuchUserException;
+        UserNotFoundException;
     
     /**
      * Update an existing user with a context to validate in
@@ -159,7 +162,7 @@ public interface ConfigurationManager
      */
     void updateUser( SecurityUser user, ValidationContext context )
         throws InvalidConfigurationException,
-        NoSuchUserException;
+        UserNotFoundException;
     
     /**
      * Update an existing role
@@ -218,7 +221,7 @@ public interface ConfigurationManager
      * @param id
      */
     void deleteUser( String id )
-        throws NoSuchUserException;
+        throws UserNotFoundException;
     
     /**
      * Delete an existing role

@@ -21,12 +21,13 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.security.authorization.NoSuchPrivilegeException;
+import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.NoSuchPrivilegeException;
-import org.sonatype.security.realms.tools.NoSuchRoleException;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = RoleResolver.class )
 public class DefaultRoleResolver implements RoleResolver
