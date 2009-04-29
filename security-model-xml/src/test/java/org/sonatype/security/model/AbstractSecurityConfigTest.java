@@ -21,7 +21,7 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
-public class AbstractSecurityConfigTest
+public abstract class AbstractSecurityConfigTest
     extends PlexusTestCase
 {
 

@@ -56,7 +56,7 @@ public class DefaultSecurityConfigurationUpgraderTest
         throws Exception
     {
         copyFromClasspathToFile(
-            "/org/sonatype/security/configuration/upgrade/security-100.xml",
+            "/org/sonatype/security/model/upgrade/security-100.xml",
             getSecurityConfiguration() );
 
         Configuration configuration = configurationUpgrader
@@ -64,14 +64,14 @@ public class DefaultSecurityConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        resultIsFine( "/org/sonatype/security/configuration/upgrade/security-100.xml", configuration );
+        resultIsFine( "/org/sonatype/security/model/upgrade/security-100.xml", configuration );
     }
 
     public void testFrom100Part2()
         throws Exception
     {
         copyFromClasspathToFile(
-            "/org/sonatype/security/configuration/upgrade/security-100-2.xml",
+            "/org/sonatype/security/model/upgrade/security-100-2.xml",
             getSecurityConfiguration() );
 
         Configuration configuration = configurationUpgrader
@@ -79,14 +79,14 @@ public class DefaultSecurityConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        resultIsFine( "/org/sonatype/security/configuration/upgrade/security-100-2.xml", configuration );
+        resultIsFine( "/org/sonatype/security/model/upgrade/security-100-2.xml", configuration );
     }
 
     public void testFrom201to202()
         throws Exception
     {
         copyFromClasspathToFile(
-            "/org/sonatype/security/configuration/upgrade/security-100-2.xml",
+            "/org/sonatype/security/model/upgrade/security-100-2.xml",
             getSecurityConfiguration() );
 
         Configuration configuration = configurationUpgrader
@@ -94,6 +94,6 @@ public class DefaultSecurityConfigurationUpgraderTest
 
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
-        resultIsFine( "/org/sonatype/security/configuration/upgrade/security-100-2.xml", configuration );
+        resultIsFine( "/org/sonatype/security/model/upgrade/security-100-2.xml", configuration );
     }
 }
