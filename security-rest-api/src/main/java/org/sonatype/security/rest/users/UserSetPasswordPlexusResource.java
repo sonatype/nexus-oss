@@ -20,7 +20,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.realms.tools.NoSuchUserException;
 import org.sonatype.security.rest.model.UserChangePasswordRequest;
 import org.sonatype.security.rest.model.UserChangePasswordResource;
 import org.sonatype.security.usermanagement.UserNotFoundException;
