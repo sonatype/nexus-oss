@@ -19,6 +19,9 @@ import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationMessage;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -64,18 +67,18 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
     }
     
     protected void handleInvalidConfigurationException(
-        org.sonatype.security.realms.tools.InvalidConfigurationException e )
+        InvalidConfigurationException e )
         throws PlexusResourceException
     {
         getLogger().warn( "Configuration error!", e );
 
         ErrorResponse errorResponse;
 
-        org.sonatype.security.realms.validator.ValidationResponse vr = e.getValidationResponse();
+        ValidationResponse<?> vr = e.getValidationResponse();
 
         if ( vr != null && vr.getValidationErrors().size() > 0 )
         {
-            org.sonatype.security.realms.validator.ValidationMessage vm = vr.getValidationErrors().get( 0 );
+            ValidationMessage vm = vr.getValidationErrors().get( 0 );
             errorResponse = getErrorResponse( vm.getKey(), vm.getShortMessage() );
         }
         else
