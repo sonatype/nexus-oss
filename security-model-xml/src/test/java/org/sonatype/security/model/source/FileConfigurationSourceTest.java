@@ -88,11 +88,12 @@ public class FileConfigurationSourceTest
         assertEquals( false, configurationSource.isConfigurationDefaulted() );
     }
 
-    public void testGetDefaultsSource()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
-
-        assertFalse( configurationSource.getDefaultsSource() == null );
-    }
+    // NOT EXPOSED
+//    public void testGetDefaultsSource()
+//        throws Exception
+//    {
+//        configurationSource = getConfigurationSource();
+//
+//        assertFalse( configurationSource.getDefaultsSource() == null );
+//    }
 }

@@ -21,11 +21,10 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.configuration.source.AbstractStreamConfigurationSource;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
-import org.sonatype.security.model.source.AbstractConfigurationSource;
-import org.sonatype.security.model.source.SecurityConfigurationSource;
 
 /**
  * Abstract class that encapsulates Modello model loading and saving with interpolation.
@@ -33,7 +32,7 @@ import org.sonatype.security.model.source.SecurityConfigurationSource;
  * @author cstamas
  */
 public abstract class AbstractSecurityConfigurationSource
-    extends AbstractConfigurationSource
+    extends AbstractStreamConfigurationSource<Configuration>
     implements SecurityConfigurationSource
 {
 

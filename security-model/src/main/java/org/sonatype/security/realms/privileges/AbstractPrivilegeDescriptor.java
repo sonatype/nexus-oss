@@ -16,12 +16,12 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.configuration.validation.ValidationMessage;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.realms.validator.ConfigurationIdGenerator;
-import org.sonatype.security.realms.validator.ValidationContext;
-import org.sonatype.security.realms.validator.ValidationMessage;
-import org.sonatype.security.realms.validator.ValidationResponse;
+import org.sonatype.security.realms.validator.SecurityValidationContext;
 
 public abstract class AbstractPrivilegeDescriptor
     implements PrivilegeDescriptor
@@ -42,16 +42,16 @@ public abstract class AbstractPrivilegeDescriptor
         return null;
     }
     
-    public ValidationResponse validatePrivilege( CPrivilege privilege, ValidationContext ctx, boolean update )
+    public ValidationResponse<SecurityValidationContext> validatePrivilege( CPrivilege privilege, SecurityValidationContext ctx, boolean update )
     {
-        ValidationResponse response = new ValidationResponse();
+        ValidationResponse<SecurityValidationContext> response = new ValidationResponse<SecurityValidationContext>();
 
         if ( ctx != null )
         {
             response.setContext( ctx );
         }
         
-        ValidationContext context = response.getContext();
+        SecurityValidationContext context = response.getContext();
 
         List<String> existingIds = context.getExistingPrivilegeIds();
 

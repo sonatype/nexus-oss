@@ -30,6 +30,12 @@
       <artifactId>security-model</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!--  testing -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 

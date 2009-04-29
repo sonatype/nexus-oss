@@ -24,6 +24,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CPrivilege;
@@ -36,7 +37,7 @@ import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
-import org.sonatype.security.realms.validator.ValidationContext;
+import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = ConfigurationManager.class, hint = "resourceMerging" )
@@ -72,7 +73,7 @@ public class ResourceMergingConfigurationManager
         manager.createPrivilege( privilege, initializeContext() );
     }
 
-    public void createPrivilege( SecurityPrivilege privilege, ValidationContext context )
+    public void createPrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -90,7 +91,7 @@ public class ResourceMergingConfigurationManager
         manager.createRole( role, initializeContext() );
     }
 
-    public void createRole( SecurityRole role, ValidationContext context )
+    public void createRole( SecurityRole role, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -114,13 +115,13 @@ public class ResourceMergingConfigurationManager
         manager.createUser( user, password, initializeContext() );
     }
 
-    public void createUser( SecurityUser user, ValidationContext context )
+    public void createUser( SecurityUser user, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         createUser( user, null, context );
     }
 
-    public void createUser( SecurityUser user, String password, ValidationContext context )
+    public void createUser( SecurityUser user, String password, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -164,9 +165,9 @@ public class ResourceMergingConfigurationManager
         return manager.getPrivilegeProperty( id, key );
     }
 
-    public ValidationContext initializeContext()
+    public SecurityValidationContext initializeContext()
     {
-        ValidationContext context = new ValidationContext();
+        SecurityValidationContext context = new SecurityValidationContext();
 
         context.addExistingUserIds();
         context.addExistingRoleIds();
@@ -281,7 +282,7 @@ public class ResourceMergingConfigurationManager
         return manager.readUser( id );
     }
 
-    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, ValidationContext context )
+    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -315,7 +316,7 @@ public class ResourceMergingConfigurationManager
         return this.manager.readUserRoleMapping( userId, source );
     }
 
-    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, ValidationContext context )
+    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchRoleMappingException
     {
@@ -471,7 +472,7 @@ public class ResourceMergingConfigurationManager
         manager.updatePrivilege( privilege, initializeContext() );
     }
 
-    public void updatePrivilege( SecurityPrivilege privilege, ValidationContext context )
+    public void updatePrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchPrivilegeException
     {
@@ -491,7 +492,7 @@ public class ResourceMergingConfigurationManager
         manager.updateRole( role, initializeContext() );
     }
 
-    public void updateRole( SecurityRole role, ValidationContext context )
+    public void updateRole( SecurityRole role, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchRoleException
     {
@@ -511,7 +512,7 @@ public class ResourceMergingConfigurationManager
         manager.updateUser( user, initializeContext() );
     }
 
-    public void updateUser( SecurityUser user, ValidationContext context )
+    public void updateUser( SecurityUser user, SecurityValidationContext context )
         throws InvalidConfigurationException,
             UserNotFoundException
     {

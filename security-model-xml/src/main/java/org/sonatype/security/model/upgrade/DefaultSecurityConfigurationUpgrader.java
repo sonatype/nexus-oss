@@ -24,6 +24,9 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
+import org.sonatype.configuration.upgrade.UnsupportedConfigurationVersionException;
+import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.security.model.Configuration;
 
 /**
@@ -43,6 +46,7 @@ public class DefaultSecurityConfigurationUpgrader
     /**
      * This implementation relies to plexus registered upgraders. It will cycle through them until the configuration is
      * the needed (current) model version.
+     * @throws  
      */
     public Configuration loadOldConfiguration( File file )
         throws IOException,

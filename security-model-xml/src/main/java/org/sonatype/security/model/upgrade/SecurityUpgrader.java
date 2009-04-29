@@ -12,8 +12,7 @@
  */
 package org.sonatype.security.model.upgrade;
 
-import java.io.File;
-import java.io.IOException;
+import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 
 
 /**
@@ -21,12 +20,6 @@ import java.io.IOException;
  * 
  * @author cstamas
  */
-public interface SecurityUpgrader
+public interface SecurityUpgrader extends SingleVersionUpgrader
 {
-    Object loadConfiguration( File file )
-    throws IOException,
-        ConfigurationIsCorruptedException;
-
-    void upgrade( UpgradeMessage message )
-    throws ConfigurationIsCorruptedException;
 }

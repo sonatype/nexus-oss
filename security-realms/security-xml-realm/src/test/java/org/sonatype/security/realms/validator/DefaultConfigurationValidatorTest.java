@@ -18,26 +18,24 @@ import java.io.Reader;
 import java.util.ArrayList;
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.configuration.validation.ValidationRequest;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
-import org.sonatype.security.realms.validator.ConfigurationValidator;
-import org.sonatype.security.realms.validator.ValidationContext;
-import org.sonatype.security.realms.validator.ValidationRequest;
-import org.sonatype.security.realms.validator.ValidationResponse;
 
 public class DefaultConfigurationValidatorTest
     extends PlexusTestCase
 {
-    protected ConfigurationValidator configurationValidator;
+    protected SecurityConfigurationValidator configurationValidator;
 
     public void setUp()
         throws Exception
     {
         super.setUp();
 
-        this.configurationValidator = ( ConfigurationValidator ) lookup( ConfigurationValidator.class );
+        this.configurationValidator = ( SecurityConfigurationValidator ) lookup( SecurityConfigurationValidator.class );
     }
 
     protected Configuration getConfigurationFromStream( InputStream is )
@@ -53,7 +51,7 @@ public class DefaultConfigurationValidatorTest
     public void testBad1()
         throws Exception
     {
-        ValidationResponse response = configurationValidator.validateModel( new ValidationRequest(
+        ValidationResponse<SecurityValidationContext> response = configurationValidator.validateModel( new ValidationRequest<Configuration>(
             getConfigurationFromStream( getClass().getResourceAsStream(
                 "/org/sonatype/security/configuration/validator/security-bad1.xml" ) ) ) );
 
@@ -70,7 +68,7 @@ public class DefaultConfigurationValidatorTest
     public void testBad2()
         throws Exception
     {
-        ValidationResponse response = configurationValidator.validateModel( new ValidationRequest(
+        ValidationResponse<SecurityValidationContext> response = configurationValidator.validateModel( new ValidationRequest<Configuration>(
             getConfigurationFromStream( getClass().getResourceAsStream(
                 "/org/sonatype/security/configuration/validator/security-bad2.xml" ) ) ) );
 
@@ -86,7 +84,7 @@ public class DefaultConfigurationValidatorTest
     public void testBad3()
         throws Exception
     {
-        ValidationResponse response = configurationValidator.validateModel( new ValidationRequest(
+        ValidationResponse<SecurityValidationContext> response = configurationValidator.validateModel( new ValidationRequest<Configuration>(
             getConfigurationFromStream( getClass().getResourceAsStream(
                 "/org/sonatype/security/configuration/validator/security-bad3.xml" ) ) ) );
     
@@ -102,7 +100,7 @@ public class DefaultConfigurationValidatorTest
     public void testRoles()
         throws Exception
     {
-        ValidationContext context = new ValidationContext();
+        SecurityValidationContext context = new SecurityValidationContext();
         
         CPrivilege priv = new CPrivilege();
         priv.setId( "priv" );

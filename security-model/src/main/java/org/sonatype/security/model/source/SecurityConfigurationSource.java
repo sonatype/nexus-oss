@@ -13,9 +13,10 @@
 package org.sonatype.security.model.source;
 
 import java.io.IOException;
+import java.io.InputStream;
 
+import org.sonatype.configuration.source.ConfigurationSource;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.model.ConfigurationException;
 
 /**
  * The Interface ApplicationConfigurationSource, responsible to fetch security configuration by some means. It also stores one
@@ -23,34 +24,9 @@ import org.sonatype.security.model.ConfigurationException;
  * 
  * @author cstamas
  */
-public interface SecurityConfigurationSource extends ConfigurationSource
+public interface SecurityConfigurationSource extends ConfigurationSource<Configuration>
 {
-    /**
-     * Gets the current configuration.
-     * 
-     * @return the configuration, null if not loaded
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    Configuration getConfiguration();
-    
 
-    /**
-     * Forces reloading the user configuration.
-     * 
-     * @return the configuration
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    Configuration loadConfiguration()
-        throws ConfigurationException,
-            IOException;
-    
+    InputStream getConfigurationAsStream() throws IOException;
 
-    /**
-     * Returns the configuration that this configuration uses for defaulting.
-     * 
-     * @return a config source that is default source for this config or null
-     */
-    SecurityConfigurationSource getDefaultsSource();
 }

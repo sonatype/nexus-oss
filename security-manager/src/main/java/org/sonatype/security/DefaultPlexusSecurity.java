@@ -43,7 +43,7 @@ import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
-import org.sonatype.security.realms.validator.ValidationContext;
+import org.sonatype.security.realms.validator.SecurityValidationContext;
 
 @Component( role = PlexusSecurity.class )
 public class DefaultPlexusSecurity
@@ -112,7 +112,7 @@ public class DefaultPlexusSecurity
         createPrivilege( privilege, null );
     }
 
-    public void createPrivilege( SecurityPrivilege privilege, ValidationContext context )
+    public void createPrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         addInheritedPrivileges( privilege );
@@ -126,7 +126,7 @@ public class DefaultPlexusSecurity
         createRole( role, null );
     }
 
-    public void createRole( SecurityRole role, ValidationContext context )
+    public void createRole( SecurityRole role, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         manager.createRole( role, context );
@@ -145,13 +145,13 @@ public class DefaultPlexusSecurity
         createUser( user, password, null );
     }
 
-    public void createUser( SecurityUser user, ValidationContext context )
+    public void createUser( SecurityUser user, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         createUser( user, null, context );
     }
 
-    public void createUser( SecurityUser user, String password, ValidationContext context )
+    public void createUser( SecurityUser user, String password, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         // if the password passed in is not null, hash it and use it, else, just generate one.
@@ -263,7 +263,7 @@ public class DefaultPlexusSecurity
         updatePrivilege( privilege, null );
     }
 
-    public void updatePrivilege( SecurityPrivilege privilege, ValidationContext context )
+    public void updatePrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchPrivilegeException
     {
@@ -278,7 +278,7 @@ public class DefaultPlexusSecurity
         updateRole( role, null );
     }
 
-    public void updateRole( SecurityRole role, ValidationContext context )
+    public void updateRole( SecurityRole role, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchRoleException
     {
@@ -293,7 +293,7 @@ public class DefaultPlexusSecurity
         updateUser( user, null );
     }
 
-    public void updateUser( SecurityUser user, ValidationContext context )
+    public void updateUser( SecurityUser user, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchUserException
     {
@@ -445,12 +445,12 @@ public class DefaultPlexusSecurity
         return password;
     }
 
-    public ValidationContext initializeContext()
+    public SecurityValidationContext initializeContext()
     {
         return null;
     }
 
-    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, ValidationContext context )
+    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         this.manager.createUserRoleMapping( userRoleMapping, context );
@@ -482,7 +482,7 @@ public class DefaultPlexusSecurity
         return this.manager.readUserRoleMapping( userId, source );
     }
 
-    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, ValidationContext context )
+    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchRoleMappingException
     {

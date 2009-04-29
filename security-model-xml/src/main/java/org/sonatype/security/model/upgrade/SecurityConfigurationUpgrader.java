@@ -12,9 +12,7 @@
  */
 package org.sonatype.security.model.upgrade;
 
-import java.io.File;
-import java.io.IOException;
-
+import org.sonatype.configuration.upgrade.ConfigurationUpgrader;
 import org.sonatype.security.model.Configuration;
 
 /**
@@ -23,19 +21,7 @@ import org.sonatype.security.model.Configuration;
  * 
  * @author cstamas
  */
-public interface SecurityConfigurationUpgrader
+public interface SecurityConfigurationUpgrader extends ConfigurationUpgrader<Configuration>
 {
-    /**
-     * Tries to load an old configuration from file and will try to upgrade it to current model.
-     * 
-     * @param file
-     * @return
-     * @throws IOException
-     * @throws ConfigurationIsCorruptedException
-     * @throws UnsupportedConfigurationVersionException
-     */
-    public Configuration loadOldConfiguration( File file )
-        throws IOException,
-            ConfigurationIsCorruptedException,
-            UnsupportedConfigurationVersionException;
+
 }

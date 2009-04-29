@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
+import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.security.model.v2_0_1.CPrivilege;
 import org.sonatype.security.model.v2_0_1.CProperty;
 import org.sonatype.security.model.v2_0_1.CRole;

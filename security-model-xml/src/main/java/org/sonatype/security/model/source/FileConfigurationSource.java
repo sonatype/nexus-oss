@@ -22,9 +22,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.model.ConfigurationException;
-import org.sonatype.security.model.source.SecurityConfigurationSource;
 import org.sonatype.security.model.upgrade.SecurityConfigurationUpgrader;
 
 /**
@@ -220,7 +219,7 @@ public class FileConfigurationSource
                     + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
                     + "******************************************************************************";
 
-                getLogger().fatalError( message );
+                getLogger().error( message );
             }
 
             // copy the current security config file as file.bak

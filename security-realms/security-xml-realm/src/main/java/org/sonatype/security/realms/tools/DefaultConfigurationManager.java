@@ -32,6 +32,9 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationMessage;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CPrivilege;
@@ -47,10 +50,8 @@ import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
-import org.sonatype.security.realms.validator.ConfigurationValidator;
-import org.sonatype.security.realms.validator.ValidationContext;
-import org.sonatype.security.realms.validator.ValidationMessage;
-import org.sonatype.security.realms.validator.ValidationResponse;
+import org.sonatype.security.realms.validator.SecurityConfigurationValidator;
+import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
@@ -64,7 +65,7 @@ public class DefaultConfigurationManager
     private File securityConfiguration;
 
     @Requirement
-    private ConfigurationValidator validator;
+    private SecurityConfigurationValidator validator;
     
     @Requirement( role = PrivilegeDescriptor.class )
     private List<PrivilegeDescriptor> privilegeDescriptors;
@@ -141,7 +142,7 @@ public class DefaultConfigurationManager
         createPrivilege( privilege, initializeContext() );
     }
 
-    public void createPrivilege( SecurityPrivilege privilege, ValidationContext context )
+    public void createPrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -149,7 +150,7 @@ public class DefaultConfigurationManager
             context = initializeContext();
         }
 
-        ValidationResponse vr = validator.validatePrivilege( context, privilege, false );
+        ValidationResponse<SecurityValidationContext> vr = validator.validatePrivilege( context, privilege, false );
 
         if ( vr.isValid() )
         {
@@ -167,7 +168,7 @@ public class DefaultConfigurationManager
         createRole( role, initializeContext() );
     }
 
-    public void createRole( SecurityRole role, ValidationContext context )
+    public void createRole( SecurityRole role, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -175,7 +176,7 @@ public class DefaultConfigurationManager
             context = initializeContext();
         }
 
-        ValidationResponse vr = validator.validateRole( context, role, false );
+        ValidationResponse<SecurityValidationContext> vr = validator.validateRole( context, role, false );
 
         if ( vr.isValid() )
         {
@@ -199,13 +200,13 @@ public class DefaultConfigurationManager
         createUser( user, password, initializeContext() );
     }
 
-    public void createUser( SecurityUser user, ValidationContext context )
+    public void createUser( SecurityUser user, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         createUser( user, null, context );
     }
 
-    public void createUser( SecurityUser user, String password, ValidationContext context )
+    public void createUser( SecurityUser user, String password, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -219,7 +220,7 @@ public class DefaultConfigurationManager
             user.setPassword( StringDigester.getSha1Digest( password ) );
         }
 
-        ValidationResponse vr = validator.validateUser( context, user, user.getRoles(), false );
+        ValidationResponse<SecurityValidationContext> vr = validator.validateUser( context, user, user.getRoles(), false );
 
         if ( vr.isValid() )
         {
@@ -421,7 +422,7 @@ public class DefaultConfigurationManager
         updatePrivilege( privilege, initializeContext() );
     }
 
-    public void updatePrivilege( SecurityPrivilege privilege, ValidationContext context )
+    public void updatePrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchPrivilegeException
     {
@@ -430,7 +431,7 @@ public class DefaultConfigurationManager
             context = initializeContext();
         }
 
-        ValidationResponse vr = validator.validatePrivilege( context, privilege, true );
+        ValidationResponse<SecurityValidationContext> vr = validator.validatePrivilege( context, privilege, true );
 
         if ( vr.isValid() )
         {
@@ -450,7 +451,7 @@ public class DefaultConfigurationManager
         updateRole( role, initializeContext() );
     }
 
-    public void updateRole( SecurityRole role, ValidationContext context )
+    public void updateRole( SecurityRole role, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchRoleException
     {
@@ -459,7 +460,7 @@ public class DefaultConfigurationManager
             context = initializeContext();
         }
 
-        ValidationResponse vr = validator.validateRole( context, role, true );
+        ValidationResponse<SecurityValidationContext> vr = validator.validateRole( context, role, true );
 
         if ( vr.isValid() )
         {
@@ -479,7 +480,7 @@ public class DefaultConfigurationManager
         updateUser( user, initializeContext() );
     }
 
-    public void updateUser( SecurityUser user, ValidationContext context )
+    public void updateUser( SecurityUser user, SecurityValidationContext context )
         throws InvalidConfigurationException,
             UserNotFoundException
     {
@@ -488,7 +489,7 @@ public class DefaultConfigurationManager
             context = initializeContext();
         }
 
-        ValidationResponse vr = validator.validateUser( context, user, user.getRoles(), true );
+        ValidationResponse<SecurityValidationContext> vr = validator.validateUser( context, user, user.getRoles(), true );
 
         if ( vr.isValid() )
         {
@@ -526,7 +527,7 @@ public class DefaultConfigurationManager
         this.createUserRoleMapping( userRoleMapping, this.initializeContext() );
     }
 
-    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, ValidationContext context )
+    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
 
@@ -540,7 +541,7 @@ public class DefaultConfigurationManager
             // this will throw a NoSuchRoleMappingException, if there isn't one
             this.readUserRoleMapping( userRoleMapping.getUserId(), userRoleMapping.getSource() );
 
-            ValidationResponse vr = new ValidationResponse();
+            ValidationResponse<SecurityValidationContext> vr = new ValidationResponse<SecurityValidationContext>();
             vr.addValidationError( new ValidationMessage( "*", "User Role Mapping for user '"
                 + userRoleMapping.getUserId() + "' already exists." ) );
 
@@ -551,7 +552,7 @@ public class DefaultConfigurationManager
             // expected
         }
 
-        ValidationResponse vr = validator.validateUserRoleMapping( context, userRoleMapping, false );
+        ValidationResponse<SecurityValidationContext> vr = validator.validateUserRoleMapping( context, userRoleMapping, false );
 
         if ( vr.getValidationErrors().size() > 0 )
         {
@@ -588,7 +589,7 @@ public class DefaultConfigurationManager
         this.updateUserRoleMapping( userRoleMapping, this.initializeContext() );
     }
 
-    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, ValidationContext context )
+    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchRoleMappingException
     {
@@ -599,14 +600,14 @@ public class DefaultConfigurationManager
 
         if ( this.readUserRoleMapping( userRoleMapping.getUserId(), userRoleMapping.getSource() ) == null )
         {
-            ValidationResponse vr = new ValidationResponse();
+            ValidationResponse<SecurityValidationContext> vr = new ValidationResponse<SecurityValidationContext>();
             vr.addValidationError( new ValidationMessage( "*", "No User Role Mapping found for user '" + userRoleMapping.getUserId()
                 + "'." ) );
 
             throw new InvalidConfigurationException( vr );
         }
 
-        ValidationResponse vr = validator.validateUserRoleMapping( context, userRoleMapping, true );
+        ValidationResponse<SecurityValidationContext> vr = validator.validateUserRoleMapping( context, userRoleMapping, true );
 
         if ( vr.getValidationErrors().size() > 0 )
         {
@@ -775,9 +776,9 @@ public class DefaultConfigurationManager
         return configuration;
     }
 
-    public ValidationContext initializeContext()
+    public SecurityValidationContext initializeContext()
     {
-        ValidationContext context = new ValidationContext();
+        SecurityValidationContext context = new SecurityValidationContext();
 
         context.addExistingUserIds();
         context.addExistingRoleIds();

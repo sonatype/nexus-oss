@@ -14,6 +14,7 @@ package org.sonatype.security.realms.tools;
 
 import java.util.List;
 
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
@@ -21,7 +22,7 @@ import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
-import org.sonatype.security.realms.validator.ValidationContext;
+import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 public interface ConfigurationManager
@@ -75,7 +76,7 @@ public interface ConfigurationManager
      * 
      * @param user
      */
-    void createUser( SecurityUser user, ValidationContext context )
+    void createUser( SecurityUser user, SecurityValidationContext context )
         throws InvalidConfigurationException;
     
     /**
@@ -84,7 +85,7 @@ public interface ConfigurationManager
      * @param user
     * @param password
      */
-    void createUser( SecurityUser user, String password, ValidationContext context )
+    void createUser( SecurityUser user, String password, SecurityValidationContext context )
         throws InvalidConfigurationException;
     
     
@@ -101,7 +102,7 @@ public interface ConfigurationManager
      * 
      * @param role
      */
-    void createRole( SecurityRole role, ValidationContext context )
+    void createRole( SecurityRole role, SecurityValidationContext context )
         throws InvalidConfigurationException;
     
     /**
@@ -117,7 +118,7 @@ public interface ConfigurationManager
      * 
      * @param privilege
      */
-    void createPrivilege( SecurityPrivilege privilege, ValidationContext context )
+    void createPrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException;
     
     /**
@@ -160,7 +161,7 @@ public interface ConfigurationManager
      * 
      * @param user
      */
-    void updateUser( SecurityUser user, ValidationContext context )
+    void updateUser( SecurityUser user, SecurityValidationContext context )
         throws InvalidConfigurationException,
         UserNotFoundException;
     
@@ -178,17 +179,17 @@ public interface ConfigurationManager
      * 
      * @param role
      */
-    void updateRole( SecurityRole role, ValidationContext context )
+    void updateRole( SecurityRole role, SecurityValidationContext context )
         throws InvalidConfigurationException,
         NoSuchRoleException;
     
     
     
     void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping ) throws InvalidConfigurationException;
-    void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, ValidationContext context ) throws InvalidConfigurationException;
+    void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context ) throws InvalidConfigurationException;
 
     void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping ) throws InvalidConfigurationException, NoSuchRoleMappingException;
-    void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, ValidationContext context ) throws InvalidConfigurationException, NoSuchRoleMappingException;
+    void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context ) throws InvalidConfigurationException, NoSuchRoleMappingException;
     
     SecurityUserRoleMapping readUserRoleMapping( String userId, String source ) throws NoSuchRoleMappingException;
     List<SecurityUserRoleMapping> listUserRoleMappings();
@@ -211,7 +212,7 @@ public interface ConfigurationManager
      * 
      * @param privilege
      */
-    void updatePrivilege( SecurityPrivilege privilege, ValidationContext context )
+    void updatePrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException,
         NoSuchPrivilegeException;
     
@@ -271,7 +272,7 @@ public interface ConfigurationManager
      * Initialize the context used for validation
      * @return
      */
-    ValidationContext initializeContext();
+    SecurityValidationContext initializeContext();
     
     void cleanRemovedRole( String roleId );
     

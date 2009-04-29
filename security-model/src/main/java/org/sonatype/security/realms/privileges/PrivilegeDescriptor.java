@@ -14,9 +14,9 @@ package org.sonatype.security.realms.privileges;
 
 import java.util.List;
 
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.realms.validator.ValidationContext;
-import org.sonatype.security.realms.validator.ValidationResponse;
+import org.sonatype.security.realms.validator.SecurityValidationContext;
 
 public interface PrivilegeDescriptor
 {
@@ -24,5 +24,5 @@ public interface PrivilegeDescriptor
     String getName();
     List<PrivilegePropertyDescriptor> getPropertyDescriptors();
     String buildPermission( CPrivilege privilege );
-    ValidationResponse validatePrivilege( CPrivilege privilege, ValidationContext ctx, boolean update );
+    ValidationResponse validatePrivilege( CPrivilege privilege, SecurityValidationContext ctx, boolean update );
 }

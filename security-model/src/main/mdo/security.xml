@@ -23,6 +23,9 @@
         <!-- ROOT -->
         <class rootElement="true" xml.tagName="security">
             <name>Configuration</name>
+            <interfaces>
+              <interface>org.sonatype.configuration.Configuration</interface>
+            </interfaces>
             <version>2.0.0+</version>
             <description>The root element of Security configuration.</description>
             <fields>

@@ -74,12 +74,13 @@ public class StaticConfigurationSourceTest
         assertEquals( false, configurationSource.isConfigurationDefaulted() );
     }
 
-    public void testGetDefaultsSource()
-        throws Exception
-    {
-        configurationSource = getConfigurationSource();
-
-        assertEquals( null, configurationSource.getDefaultsSource() );
-    }
+    // NOT EXPOSED
+//    public void testGetDefaultsSource()
+//        throws Exception
+//    {
+//        configurationSource = getConfigurationSource();
+//
+//        assertEquals( null, configurationSource.getDefaultsSource() );
+//    }
 
 }

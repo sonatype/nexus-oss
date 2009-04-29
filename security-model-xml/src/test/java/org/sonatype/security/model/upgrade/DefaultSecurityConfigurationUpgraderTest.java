@@ -20,7 +20,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.model.AbstractSecurityConfigTest;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
-import org.sonatype.security.model.upgrade.SecurityConfigurationUpgrader;
 
 public class DefaultSecurityConfigurationUpgraderTest
     extends AbstractSecurityConfigTest
