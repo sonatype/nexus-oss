@@ -172,11 +172,11 @@ public class ValidationResponse<V extends ValidationContext>
      * A method to append a validation response to this validation response. The errors list and warnings list are
      * simply appended, and the isValid is logically AND-ed and isModified is logically OR-ed.
      * 
-     * @param response
+     * @param validationResponse
      */
-    public void append( ValidationResponse<ValidationContext> response )
+    public void append( ValidationResponse<V> validationResponse )
     {
-        for ( ValidationMessage msg : response.getValidationErrors() )
+        for ( ValidationMessage msg : validationResponse.getValidationErrors() )
         {
             if ( getValidationError( msg.getKey() ) != null )
             {
@@ -186,7 +186,7 @@ public class ValidationResponse<V extends ValidationContext>
             addValidationError( msg );
         }
 
-        for ( ValidationMessage msg : response.getValidationWarnings() )
+        for ( ValidationMessage msg : validationResponse.getValidationWarnings() )
         {
             if ( getValidationWarning( msg.getKey() ) != null )
             {
@@ -196,9 +196,9 @@ public class ValidationResponse<V extends ValidationContext>
             addValidationWarning( msg );
         }
 
-        setValid( isValid() && response.isValid() );
+        setValid( isValid() && validationResponse.isValid() );
 
-        setModified( isModified() || response.isModified() );
+        setModified( isModified() || validationResponse.isModified() );
     }
 
     public void setContext( V context )

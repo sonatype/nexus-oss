@@ -32,7 +32,7 @@ public class InvalidConfigurationException
     /**
      * The validation response.
      */
-    private ValidationResponse<ValidationContext> validationResponse;
+    private ValidationResponse<?> validationResponse;
 
     public InvalidConfigurationException()
     {
@@ -49,14 +49,14 @@ public class InvalidConfigurationException
         super( msg, t );
     }
 
-    public InvalidConfigurationException( ValidationResponse<ValidationContext> validationResponse )
+    public InvalidConfigurationException( ValidationResponse<?> validationResponse )
     {
         this();
 
         this.validationResponse = validationResponse;
     }
 
-    public ValidationResponse<ValidationContext> getValidationResponse()
+    public ValidationResponse<?> getValidationResponse()
     {
         return validationResponse;
     }
