@@ -30,6 +30,8 @@ public class IndexPackingRequest
     private boolean createMainIndex;
 
     private int maxIndexChunks;
+    
+    private boolean useTargetProperties;
 
     private Collection<IndexFormat> formats;
 
@@ -46,6 +48,8 @@ public class IndexPackingRequest
         this.createChecksumFiles = false;
 
         this.maxIndexChunks = MAX_CHUNKS;
+        
+        this.useTargetProperties = false;
 
         this.formats = Arrays.asList( IndexFormat.FORMAT_LEGACY, IndexFormat.FORMAT_V1 );
     }
@@ -124,6 +128,16 @@ public class IndexPackingRequest
     public void setCreateMainIndex( boolean createMainIndex )
     {
         this.createMainIndex = createMainIndex;
+    }
+    
+    public boolean isUseTargetProperties()
+    {
+        return useTargetProperties;
+    }
+    
+    public void setUseTargetProperties( boolean useTargetProperties )
+    {
+        this.useTargetProperties = useTargetProperties;
     }
 
     /**

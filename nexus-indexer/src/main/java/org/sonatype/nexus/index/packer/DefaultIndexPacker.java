@@ -184,7 +184,16 @@ public class DefaultIndexPacker
     private Properties readIndexProperties( IndexPackingRequest request )
         throws IOException
     {
-        File file = new File( request.getContext().getIndexDirectoryFile(), IndexingContext.INDEX_FILE + ".properties" );
+        File file = null;
+        
+        if ( request.isUseTargetProperties() )
+        {
+            file = new File( request.getTargetDir(), IndexingContext.INDEX_FILE + ".properties" );
+        }
+        else
+        {
+            file = new File( request.getContext().getIndexDirectoryFile(), IndexingContext.INDEX_FILE + ".properties" );    
+        }
         
         Properties properties = new Properties();
         
