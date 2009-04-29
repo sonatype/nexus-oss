@@ -20,6 +20,7 @@ import org.jsecurity.mgt.RealmSecurityManager;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
 import org.jsecurity.subject.Subject;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
@@ -220,13 +221,13 @@ public class DefaultSecuritySystem
     }
 
     public User addUser( User user )
-        throws NoSuchUserManager
+        throws NoSuchUserManager, InvalidConfigurationException
     {
         return this.addUser( user, this.generatePassword() );
     }
 
     public User addUser( User user, String password )
-        throws NoSuchUserManager
+        throws NoSuchUserManager, InvalidConfigurationException
     {
         // first save the user
         // this is the UserManager that owns the user
@@ -257,7 +258,7 @@ public class DefaultSecuritySystem
 
     public User updateUser( User user )
         throws UserNotFoundException,
-            NoSuchUserManager
+            NoSuchUserManager, InvalidConfigurationException
     {
         // first update the user
         // this is the UserManager that owns the user

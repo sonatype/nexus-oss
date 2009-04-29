@@ -2,6 +2,7 @@ package org.sonatype.security.usermanagement;
 
 import java.util.Set;
 
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.Role;
 
 public interface UserManager
@@ -30,10 +31,10 @@ public interface UserManager
      */
     Set<String> listUserIds();
 
-    User addUser( User user, String password );
+    User addUser( User user, String password ) throws InvalidConfigurationException;
 
     User updateUser( User user )
-        throws UserNotFoundException;
+        throws UserNotFoundException, InvalidConfigurationException;
 
     void deleteUser( String userId )
         throws UserNotFoundException;
@@ -51,7 +52,7 @@ public interface UserManager
         throws UserNotFoundException;
 
     void setUsersRoles( String userId, Set<Role> roles, String source )
-        throws UserNotFoundException;
+        throws UserNotFoundException, InvalidConfigurationException;
 
     /**
      * Searches for Subject objects by a criteria.

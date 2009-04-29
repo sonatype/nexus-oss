@@ -7,6 +7,7 @@ import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
 import org.jsecurity.subject.Subject;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
@@ -75,10 +76,10 @@ public interface SecuritySystem
     // public UserManager getUserManager( String sourceId );
 
     User addUser( User user )
-        throws NoSuchUserManager;
+        throws NoSuchUserManager, InvalidConfigurationException;
 
     User addUser( User user, String password )
-        throws NoSuchUserManager;
+        throws NoSuchUserManager, InvalidConfigurationException;
 
     /**
      * Get a Subject object by id
@@ -98,7 +99,7 @@ public interface SecuritySystem
 
     User updateUser( User user )
         throws UserNotFoundException,
-            NoSuchUserManager;
+            NoSuchUserManager, InvalidConfigurationException;
 
     void deleteUser( String userId )
         throws UserNotFoundException;
@@ -138,22 +139,6 @@ public interface SecuritySystem
     void changePassword( String userId, String newPassword )
         throws UserNotFoundException;
 
-//    public Role getRole( String roleId, String source )
-//        throws NoSuchRoleException;
-//
-//    public Privilege getPrivilege( String privilegeId, String source )
-//        throws NoSuchPrivilegeException;
-//
-//    public Role addRole( Role role, String source );
-//
-//    public void updateRole( Role role, String source )
-//        throws NoSuchRoleException;
-//
-//    public void deleteRole( String roleId, String source )
-//        throws NoSuchRoleException;
-//
-//    public void deletePrivilege( String privilegeId, String source ) throws NoSuchPrivilegeException;
-    
     // //
     // Authorization Management
     // //

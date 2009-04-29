@@ -94,10 +94,10 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         UserResource resource = new UserResource();
         resource.setEmail( user.getEmailAddress() );
         resource.setName( user.getName() );
-//        resource.setStatus( user.getStatus() ); // FIXME: add status
+        resource.setStatus( user.getStatus().name() );
         resource.setUserId( user.getUserId() );
         resource.setResourceURI( this.createChildReference( request, this, resource.getUserId() ).toString() );
-//        resource.setUserManaged( !user.isReadOnly() ); // FIXME: add managed flag
+        resource.setUserManaged( !user.isReadOnly() );
 
         for ( Role role : user.getRoles() )
         {

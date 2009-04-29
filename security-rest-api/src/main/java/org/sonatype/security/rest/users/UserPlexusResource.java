@@ -22,6 +22,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -124,11 +125,11 @@ public class UserPlexusResource
                 result.getData().setResourceURI( createChildReference( request, this, resource.getUserId() ).toString() );
 
             }
-//            catch ( InvalidConfigurationException e )
-//            {
-//                // build and throw exception
-//                handleInvalidConfigurationException( e );
-//            }
+            catch ( InvalidConfigurationException e )
+            {
+                // build and throw exception
+                handleInvalidConfigurationException( e );
+            }
             catch ( UserNotFoundException e )
             {
                 throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );

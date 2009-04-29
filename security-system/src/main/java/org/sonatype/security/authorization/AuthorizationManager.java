@@ -2,6 +2,8 @@ package org.sonatype.security.authorization;
 
 import java.util.Set;
 
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+
 public interface AuthorizationManager
 {
     public String getSource();
@@ -12,10 +14,10 @@ public interface AuthorizationManager
     public Role getRole( String roleId )
         throws NoSuchRoleException;
 
-    public Role addRole( Role role );
+    public Role addRole( Role role ) throws InvalidConfigurationException;
 
     public Role updateRole( Role role )
-        throws NoSuchRoleException;
+        throws NoSuchRoleException, InvalidConfigurationException;
 
     public void deleteRole( String roleId )
         throws NoSuchRoleException;
@@ -27,10 +29,10 @@ public interface AuthorizationManager
     public Privilege getPrivilege( String privilegeId )
         throws NoSuchPrivilegeException;
 
-    public Privilege addPrivilege( Privilege privilege );
+    public Privilege addPrivilege( Privilege privilege ) throws InvalidConfigurationException;
 
     public Privilege upatePrivilege( Privilege privilege )
-        throws NoSuchPrivilegeException;
+        throws NoSuchPrivilegeException, InvalidConfigurationException;
 
     public void deletePrivilege( String privilegeId )
         throws NoSuchPrivilegeException;
