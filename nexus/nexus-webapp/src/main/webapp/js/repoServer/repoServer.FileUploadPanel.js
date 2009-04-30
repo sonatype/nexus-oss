@@ -146,6 +146,10 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
                     disabled: true,
                     regex: /^(pom.xml)|(.*\.pom)$/i,
                     regexText: 'POM file name must be pom.xml or file extension must be .pom'
+                  },
+                  {
+                    xtype: 'label',
+                    text: 'Note that if you only intend to upload a POM file, there is no need to add additional artifacts below, simply click the Upload Artifact(s) button.'
                   }
                 ]
               },
