@@ -27,9 +27,9 @@ import org.sonatype.security.model.Configuration;
  * 
  * @author cstamas
  */
-@Component( role = SecurityConfigurationSource.class, hint = "static" )
-public class StaticConfigurationSource
-    extends AbstractSecurityConfigurationSource
+@Component( role = SecurityModelConfigurationSource.class, hint = "static" )
+public class StaticModelConfigurationSource
+    extends AbstractSecurityModelConfigurationSource
 {
     
     private static final String STATIC_SECURITY_RESOURCE = "/META-INF/security/security.xml";

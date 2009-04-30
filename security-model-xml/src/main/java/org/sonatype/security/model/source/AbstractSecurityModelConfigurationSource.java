@@ -31,9 +31,9 @@ import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
  * 
  * @author cstamas
  */
-public abstract class AbstractSecurityConfigurationSource
+public abstract class AbstractSecurityModelConfigurationSource
     extends AbstractStreamConfigurationSource<Configuration>
-    implements SecurityConfigurationSource
+    implements SecurityModelConfigurationSource
 {
 
     /** The configuration. */
@@ -145,7 +145,7 @@ public abstract class AbstractSecurityConfigurationSource
     /**
      * Returns the default source of ConfigurationSource. May be null.
      */
-    public SecurityConfigurationSource getDefaultsSource()
+    public SecurityModelConfigurationSource getDefaultsSource()
     {
         return null;
     }

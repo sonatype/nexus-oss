@@ -31,7 +31,7 @@ import org.sonatype.security.events.SecurityEvent;
 import org.sonatype.security.events.SecurityEventHandler;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.ConfigurationException;
-import org.sonatype.security.model.source.SecurityConfigurationSource;
+import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.InvalidConfigurationException;
@@ -53,7 +53,7 @@ public class DefaultPlexusSecurity
     private ConfigurationManager manager;
 
     @Requirement( hint = "file" )
-    private SecurityConfigurationSource configSource;
+    private SecurityModelConfigurationSource configSource;
 
     @Requirement
     private PrivilegeInheritanceManager privInheritance;

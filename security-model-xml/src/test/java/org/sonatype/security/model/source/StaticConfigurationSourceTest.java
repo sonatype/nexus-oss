@@ -15,17 +15,17 @@ package org.sonatype.security.model.source;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.security.model.source.SecurityConfigurationSource;
+import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 
 public class StaticConfigurationSourceTest
     extends AbstractSecurityConfigurationSourceTest
 {
 
     @Override
-    protected SecurityConfigurationSource getConfigurationSource()
+    protected SecurityModelConfigurationSource getConfigurationSource()
         throws Exception
     {
-        return ( SecurityConfigurationSource ) lookup( SecurityConfigurationSource.class, "static" );
+        return ( SecurityModelConfigurationSource ) lookup( SecurityModelConfigurationSource.class, "static" );
     }
 
     @Override

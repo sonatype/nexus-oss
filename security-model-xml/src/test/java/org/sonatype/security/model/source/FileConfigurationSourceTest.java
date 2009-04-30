@@ -16,17 +16,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.security.model.source.FileConfigurationSource;
-import org.sonatype.security.model.source.SecurityConfigurationSource;
+import org.sonatype.security.model.source.FileModelConfigurationSource;
+import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 
 public class FileConfigurationSourceTest
     extends AbstractSecurityConfigurationSourceTest
 
 {
-    protected SecurityConfigurationSource getConfigurationSource()
+    protected SecurityModelConfigurationSource getConfigurationSource()
         throws Exception
     {
-        FileConfigurationSource source = ( FileConfigurationSource ) lookup( SecurityConfigurationSource.class, "file" );
+        FileModelConfigurationSource source = ( FileModelConfigurationSource ) lookup( SecurityModelConfigurationSource.class, "file" );
         
         source.setConfigurationFile( new File( getSecurityConfiguration() ) );
         

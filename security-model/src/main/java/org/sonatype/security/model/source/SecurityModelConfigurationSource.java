@@ -24,7 +24,7 @@ import org.sonatype.security.model.Configuration;
  * 
  * @author cstamas
  */
-public interface SecurityConfigurationSource extends ConfigurationSource<Configuration>
+public interface SecurityModelConfigurationSource extends ConfigurationSource<Configuration>
 {
 
     InputStream getConfigurationAsStream() throws IOException;

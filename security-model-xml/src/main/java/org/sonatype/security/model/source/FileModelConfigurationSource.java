@@ -32,9 +32,9 @@ import org.sonatype.security.model.upgrade.SecurityConfigurationUpgrader;
  * 
  * @author cstamas
  */
-@Component( role = SecurityConfigurationSource.class, hint = "file" )
-public class FileConfigurationSource
-    extends AbstractSecurityConfigurationSource
+@Component( role = SecurityModelConfigurationSource.class, hint = "file" )
+public class FileModelConfigurationSource
+    extends AbstractSecurityModelConfigurationSource
 {
 
     /**
@@ -53,7 +53,7 @@ public class FileConfigurationSource
      * The defaults configuration source.
      */
     @Requirement( hint = "static" )
-    private SecurityConfigurationSource securityDefaults;
+    private SecurityModelConfigurationSource securityDefaults;
 
     /** Flag to mark defaulted config */
     private boolean configurationDefaulted;
@@ -141,7 +141,7 @@ public class FileConfigurationSource
         return new FileInputStream( getConfigurationFile() );
     }
 
-    public SecurityConfigurationSource getDefaultsSource()
+    public SecurityModelConfigurationSource getDefaultsSource()
     {
         return securityDefaults;
     }

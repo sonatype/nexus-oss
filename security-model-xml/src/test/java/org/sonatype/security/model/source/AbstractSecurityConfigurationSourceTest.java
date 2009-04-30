@@ -17,15 +17,15 @@ import java.io.InputStream;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.model.AbstractSecurityConfigTest;
-import org.sonatype.security.model.source.SecurityConfigurationSource;
+import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 
 public abstract class AbstractSecurityConfigurationSourceTest
     extends AbstractSecurityConfigTest
 {
     
-    protected SecurityConfigurationSource configurationSource;
+    protected SecurityModelConfigurationSource configurationSource;
 
-    protected abstract SecurityConfigurationSource getConfigurationSource()
+    protected abstract SecurityModelConfigurationSource getConfigurationSource()
         throws Exception;
 
     protected abstract InputStream getOriginatingConfigurationInputStream()

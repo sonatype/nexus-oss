@@ -35,7 +35,7 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.model.source.SecurityConfigurationSource;
+import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
@@ -56,7 +56,7 @@ public class DefaultConfigurationManager
 //    private File securityConfiguration;
 
     @Requirement(hint="file")
-    private SecurityConfigurationSource configurationSource;
+    private SecurityModelConfigurationSource configurationSource;
     
     @Requirement
     private SecurityConfigurationValidator validator;
