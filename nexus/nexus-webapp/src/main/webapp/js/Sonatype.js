@@ -24,9 +24,6 @@ window.Sonatype = function(){
       });
       
       Ext.History.init();
-      if ( window.location.hash ) {
-        Sonatype.initialToken = window.location.hash.substring( 1 );
-      }
 
       Ext.get('header').hide();
       Ext.get('welcome-tab').hide();

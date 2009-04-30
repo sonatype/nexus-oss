@@ -657,6 +657,7 @@ Sonatype.utils = {
       success: function(response, options){
         activeWindow.getEl().unmask();
         if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
+          Sonatype.view.loginSuccessfulToken = Sonatype.view.afterLoginToken;
           Sonatype.repoServer.RepoServer.loginWindow.hide();
           Sonatype.repoServer.RepoServer.loginForm.getForm().reset();
         }
@@ -691,6 +692,8 @@ Sonatype.utils = {
       callback: function(options, success, response){
         var baseUrlMismatch = false;
 
+        Sonatype.view.historyDisabled = true;
+        
         if ( success ) {
           var respObj = Ext.decode(response.responseText);
   
@@ -735,9 +738,8 @@ Sonatype.utils = {
         
         Ext.get('version').update(Sonatype.utils.version);
         if ( !versionOnly ){
+
           Sonatype.view.updateLoginLinkText();
-          Sonatype.repoServer.RepoServer.resetMainTabPanel();
-          Sonatype.repoServer.RepoServer.createSubComponents();
           Sonatype.view.serverTabPanel.doLayout();
   
           if ( baseUrlMismatch && Sonatype.lib.Permissions.checkPermission(
@@ -753,10 +755,19 @@ Sonatype.utils = {
             );
           }
 
-          Sonatype.utils.onHistoryChange( Ext.History.getToken() );
         }
 
         Sonatype.Events.fireEvent( 'nexusStatus' );
+
+        Sonatype.view.historyDisabled = false;
+        var token = Ext.History.getToken();
+        if ( Sonatype.view.loginSuccessfulToken ) {
+          token = Sonatype.view.loginSuccessfulToken;
+          Sonatype.view.loginSuccessfulToken = null;
+        }
+        Sonatype.utils.onHistoryChange( token );
+        Sonatype.utils.updateHistory();
+        Sonatype.view.justLoggedOut = false;
       }
     });
   },
@@ -770,14 +781,13 @@ Sonatype.utils = {
   },
   
   onHistoryChange: function( token ) {
-    if ( Sonatype.initialToken ) {
-      token = Sonatype.initialToken; // handle the initial token
-    }
-    else {
-      Sonatype.initialToken = 'welcome'; // to prevent tab change events from interfering
+    if ( ! token && window.location.hash ) {
+      token = window.location.hash.substring( 1 );
     }
 
     if ( token && Sonatype.user.curr.repoServer.length ) {
+      Sonatype.view.historyDisabled = true;
+
       var toks = token.split( Sonatype.view.HISTORY_DELIMITER );
       
       var tabId = toks[0];
@@ -794,24 +804,25 @@ Sonatype.utils = {
               { title: c.tabTitle ? c.tabTitle : c.title } );
           }
         }
-//        else if ( Sonatype.view.supportedNexusTabs[tabId] && ! Sonatype.view.tokenForcedLogin ) {
-//          if ( ! Sonatype.user.curr.isLoggedIn ) {
-//            Sonatype.view.tokenForcedLogin = true;
-//            Sonatype.repoServer.RepoServer.loginHandler();
-//            return;
-//          }
-//        }
+        else if ( Sonatype.view.supportedNexusTabs[tabId] && ! Sonatype.view.justLoggedOut &&
+            ! Sonatype.user.curr.isLoggedIn ) {
+          Sonatype.view.historyDisabled = false;
+          Sonatype.view.afterLoginToken = token;
+          Sonatype.repoServer.RepoServer.loginHandler();
+          return;
+        }
       }
+      Sonatype.view.historyDisabled = false;
       
       if ( tabPanel && tabPanel.applyBookmark && toks.length > 1 ) {
         tabPanel.applyBookmark( toks[1] );
       }
     }
-    
-    Sonatype.initialToken = null;
   },
   
   updateHistory: function( tab ) {
+    if ( Sonatype.view.historyDisabled ) return;
+
     if ( tab ) {
       if ( tab.ownerCt != Sonatype.view.mainTabPanel ) return;
     }

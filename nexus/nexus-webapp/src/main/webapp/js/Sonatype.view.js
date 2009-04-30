@@ -111,14 +111,7 @@ Sonatype.view = {
           layoutOnTabChange:true,
           //border: false,
           //bodyBorder: true,
-          items:[Sonatype.view.welcomeTab],
-          listeners: {
-            tabchange: function( panel, tab ) {
-              if ( ! Sonatype.initialToken ) { // make sure the original token doesn't get ruined by the welcome tab
-                Sonatype.utils.updateHistory( tab );
-              }
-            }
-          }
+          items:[Sonatype.view.welcomeTab]
         })
        ]
     });
@@ -143,6 +136,9 @@ Sonatype.view = {
     Sonatype.view.serverTabPanel.setActiveTab('st-nexus-tab');
     
     Ext.History.addListener( 'change', Sonatype.utils.onHistoryChange );
+    Sonatype.view.mainTabPanel.addListener( 'tabchange', function( panel, tab ) {
+      Sonatype.utils.updateHistory( tab );
+    } );
   },
   
   updateLoginLinkText : function(){

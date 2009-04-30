@@ -180,6 +180,7 @@ Sonatype.repoServer.RepoServer = function(){
       
       this.loginWindow.on('hide', function(){
         this.loginForm.getForm().reset();
+        Sonatype.view.afterLoginToken = null;
       }, this);
     },
     
@@ -412,6 +413,7 @@ Sonatype.repoServer.RepoServer = function(){
           url: Sonatype.config.repos.urls.logout,
           callback: function(options, success, response){
             Sonatype.utils.authToken = null;
+            Sonatype.view.justLoggedOut = true;
             Sonatype.utils.loadNexusStatus();
           }
         });
