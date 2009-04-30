@@ -153,9 +153,19 @@ public class EnvironmentMojo
      */
     private File resourcesDestinationLocation;
 
+    /**
+     * @parameter expression="${maven.test.skip}"
+     */
+    private boolean testSkip;
+
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
+        if ( testSkip )
+        {
+            return;
+        }
+
         init();
 
         allocatePorts();
