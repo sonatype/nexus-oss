@@ -36,7 +36,7 @@ import com.thoughtworks.xstream.XStream;
 
 public class GroupMessageUtil
 {
-    private static final String SERVICE_PART = "service/local/repo_groups";
+    public static final String SERVICE_PART = "service/local/repo_groups";
 
     private XStream xstream;
 

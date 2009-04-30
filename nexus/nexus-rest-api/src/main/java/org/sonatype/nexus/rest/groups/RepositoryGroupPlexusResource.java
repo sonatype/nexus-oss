@@ -79,22 +79,41 @@ public class RepositoryGroupPlexusResource
         throws ResourceException
     {
         RepositoryGroupResourceResponse result = new RepositoryGroupResourceResponse();
+
+        GroupRepository groupRepo = null;
+
+        RepositoryGroupResource resource = new RepositoryGroupResource();
+
         try
         {
-            GroupRepository groupRepo = getRepositoryRegistry().getRepositoryWithFacet( getGroupId( request ), GroupRepository.class );
+            groupRepo = getRepositoryRegistry().getRepositoryWithFacet( getGroupId( request ), GroupRepository.class );
 
-            RepositoryGroupResource resource = new RepositoryGroupResource();
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            getLogger().warn( "Repository Group not found, id=" + getGroupId( request ) );
 
-            resource.setId( groupRepo.getId() );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Cause by: ", e );
+            }
 
-            resource.setName( groupRepo.getName() );
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Group Not Found" );
+        }
+        resource = new RepositoryGroupResource();
 
-            resource.setProvider( NexusCompat.getRepositoryProviderHint( groupRepo ) );
+        resource.setId( groupRepo.getId() );
 
-            resource.setRepoType( AbstractRepositoryPlexusResource.REPO_TYPE_GROUP );
+        resource.setName( groupRepo.getName() );
 
-            resource.setFormat( groupRepo.getRepositoryContentClass().getId() );
+        resource.setProvider( NexusCompat.getRepositoryProviderHint( groupRepo ) );
 
+        resource.setRepoType( AbstractRepositoryPlexusResource.REPO_TYPE_GROUP );
+
+        resource.setFormat( groupRepo.getRepositoryContentClass().getId() );
+
+        try
+        {
             // just to trigger list creation, and not stay null coz of XStream serialization
             resource.getRepositories();
 
@@ -167,7 +186,7 @@ public class RepositoryGroupPlexusResource
         {
             // to check does ID really cover a group?
             getRepositoryRegistry().getRepositoryWithFacet( getGroupId( request ), GroupRepository.class );
-            
+
             getNexus().deleteRepository( getGroupId( request ) );
         }
         catch ( NoSuchRepositoryException e )
