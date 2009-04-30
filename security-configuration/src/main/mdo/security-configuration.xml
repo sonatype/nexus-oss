@@ -23,6 +23,9 @@
     <class rootElement="true" xml.tagName="security-configuration">
       <name>SecurityConfiguration</name>
       <version>2.0.3+</version>
+      <interfaces>
+        <interface>org.sonatype.configuration.Configuration</interface>
+      </interfaces>
       <description>The security configuration.</description>
       <fields>
         <field>

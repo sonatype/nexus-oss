@@ -21,9 +21,9 @@ import java.io.InputStream;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 /**
@@ -34,7 +34,7 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
  */
 @Component( role = SecurityConfigurationSource.class, hint = "file" )
 public class FileSecurityConfigurationSource
-    extends AbstractFileConfigurationSource
+    extends AbstractSecurityConfigurationSource
 {
     
     /**
@@ -79,7 +79,7 @@ public class FileSecurityConfigurationSource
     }
 
     public SecurityConfiguration loadConfiguration()
-        throws SecurityConfigurationException,
+        throws ConfigurationException,
             IOException
     {
         // propagate call and fill in defaults too
@@ -87,7 +87,7 @@ public class FileSecurityConfigurationSource
 
         if ( getConfigurationFile() == null || getConfigurationFile().getAbsolutePath().contains( "${" ) )
         {
-            throw new SecurityConfigurationException( "The configuration file is not set or resolved properly: "
+            throw new ConfigurationException( "The configuration file is not set or resolved properly: "
                 + ( getConfigurationFile() == null ? "null" : getConfigurationFile().getAbsolutePath() ) );
         }
 
@@ -220,7 +220,7 @@ public class FileSecurityConfigurationSource
                     + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
                     + "******************************************************************************";
 
-                this.getLogger().fatalError( message );
+                this.getLogger().error( message );
             }
 
             // copy the current security config file as file.bak

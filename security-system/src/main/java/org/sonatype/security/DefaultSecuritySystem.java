@@ -29,7 +29,7 @@ import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.email.NullSecurityEmailer;
 import org.sonatype.security.email.SecurityEmailer;
 import org.sonatype.security.events.SecurityEventHandler;
@@ -48,8 +48,8 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 public class DefaultSecuritySystem
     implements SecuritySystem, Initializable
 {
-    @Requirement( hint = "file" )
-    private SecurityConfigurationSource configSource;
+    @Requirement
+    private SecurityConfigurationManager securityConfiguration;
 
     @Requirement
     private RealmSecurityManager securityManager;
@@ -137,13 +137,6 @@ public class DefaultSecuritySystem
         // load the configuration
         try
         {
-            this.configSource.loadConfiguration();
-
-            if ( this.configSource.getConfiguration() == null )
-            {
-                throw new InitializationException( "Failed to load the security configuration." );
-            }
-
             this.securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
         }
         catch ( Exception e )
@@ -156,7 +149,7 @@ public class DefaultSecuritySystem
     {
         Set<Realm> realms = new HashSet<Realm>();
 
-        List<String> realmIds = this.configSource.getConfiguration().getRealms();
+        List<String> realmIds = this.securityConfiguration.getRealms();
 
         for ( String realmId : realmIds )
         {
@@ -479,17 +472,17 @@ public class DefaultSecuritySystem
 
     public String getAnonymousUsername()
     {
-        return this.configSource.getConfiguration().getAnonymousUsername();
+        return this.securityConfiguration.getAnonymousUsername();
     }
 
     public boolean isAnonymousAccessEnabled()
     {
-        return this.configSource.getConfiguration().isAnonymousAccessEnabled();
+        return this.securityConfiguration.isAnonymousAccessEnabled();
     }
 
     public boolean isSecurityEnabled()
     {
-        return this.configSource.getConfiguration().isEnabled();
+        return this.securityConfiguration.isEnabled();
     }
 
     // TODO: clean this up

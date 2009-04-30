@@ -1,6 +1,7 @@
-package org.sonatype.security.configuration.source;
+package org.sonatype.security.configuration;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -8,9 +9,8 @@ import junit.framework.Assert;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.security.configuration.model.SecurityConfiguration;
 
-public class FileSecurityConfigurationSourceTest
+public class SecurityConfigurationManagerTest
     extends PlexusTestCase
 {
     private File PLEXUS_HOME = new File( "./target/plexus-home/" );
@@ -40,13 +40,7 @@ public class FileSecurityConfigurationSourceTest
     public void testLoadEmptyDefaults()
         throws Exception
     {
-        SecurityConfigurationSource source = this.lookup( SecurityConfigurationSource.class, "file" );
-
-        // set things up
-        source.loadConfiguration();
-
-        // this should work, but everything should be empty
-        SecurityConfiguration config = source.getConfiguration();
+        SecurityConfigurationManager config = this.lookup( SecurityConfigurationManager.class );
 
         Assert.assertNotNull( config );
 
@@ -65,33 +59,29 @@ public class FileSecurityConfigurationSourceTest
     public void testWrite()
         throws Exception
     {
-        SecurityConfigurationSource source = this.lookup( SecurityConfigurationSource.class, "file" );
+        SecurityConfigurationManager config = this.lookup( SecurityConfigurationManager.class );
 
-        // set things up
-        source.loadConfiguration();
-
-        // this should work, but everything should be empty
-        SecurityConfiguration config = source.getConfiguration();
 
         config.setAnonymousAccessEnabled( true );
         config.setEnabled( false );
         config.setAnonymousPassword( "new-pass" );
         config.setAnonymousUsername( "new-user" );
 
-        config.getRealms().remove( 1 );
+        List<String> realms = new ArrayList<String>(config.getRealms());
+        realms.remove( 1 );
+        config.setRealms( realms );
 
-        source.storeConfiguration();
+        config.save();
 
-        source.loadConfiguration();
-        config = source.getConfiguration();
-
+        config.clearCache();
+        
         Assert.assertEquals( "new-pass", config.getAnonymousPassword() );
         Assert.assertEquals( "new-user", config.getAnonymousUsername() );
 
         Assert.assertEquals( true, config.isAnonymousAccessEnabled() );
         Assert.assertEquals( false, config.isEnabled() );
 
-        List<String> realms = config.getRealms();
+        realms = config.getRealms();
         Assert.assertEquals( 1, realms.size() );
         Assert.assertEquals( "MyRealmHint1", realms.get( 0 ) );
 

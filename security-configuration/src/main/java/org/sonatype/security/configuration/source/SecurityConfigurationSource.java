@@ -12,9 +12,9 @@
  */
 package org.sonatype.security.configuration.source;
 
-import java.io.IOException;
-
+import org.sonatype.configuration.source.ConfigurationSource;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
+
 
 /**
  * The Interface ApplicationConfigurationSource, responsible to fetch security configuration by some means. It also
@@ -23,63 +23,6 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
  * 
  * @author cstamas
  */
-public interface SecurityConfigurationSource
-{
-
-    // /**
-    // * Returns the validation response, if any. It is created on the loading of the user configuration.
-    // *
-    // * @return the response or null if not applicable or config was still not loaded.
-    // */
-    // ValidationResponse getValidationResponse();
-
-    /**
-     * Persists the current configuration.
-     * 
-     * @throws IOException
-     */
-    void storeConfiguration()
-        throws IOException;
-
-     /**
-     * Gets the current configuration.
-     *
-     * @return the configuration, null if not loaded
-     * @throws SecurityConfigurationException
-     * @throws IOException
-     */
-     SecurityConfiguration getConfiguration();
-        
-    
-     /**
-     * Forces reloading the user configuration.
-     *
-     * @return the configuration
-     * @throws SecurityConfigurationException
-     * @throws IOException
-     */
-     SecurityConfiguration loadConfiguration()
-     throws SecurityConfigurationException,
-     IOException;
-
-    /**
-     * Returns the configuration that this configuration uses for defaulting.
-     * 
-     * @return a config source that is default source for this config or null
-     */
-    SecurityConfigurationSource getDefaultsSource();
-
-    /**
-     * Returns whether the configuration was upgraded.
-     * 
-     * @return true if the user configuration was upgraded, false otherwise
-     */
-    boolean isConfigurationUpgraded();
-
-    /**
-     * Returns true if the configuration was got from defaults.
-     * 
-     * @return
-     */
-    boolean isConfigurationDefaulted();
+public interface SecurityConfigurationSource extends ConfigurationSource<SecurityConfiguration>
+{   
 }

@@ -16,8 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 /**
@@ -28,7 +27,7 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
  */
 @Component( role = SecurityConfigurationSource.class, hint = "static" )
 public class StaticSecurityConfigurationSource
-    extends AbstractFileConfigurationSource
+    extends AbstractSecurityConfigurationSource
 {
     
     private static final String STATIC_SECURITY_RESOURCE = "/META-INF/security/security-configuration.xml";
@@ -43,7 +42,7 @@ public class StaticSecurityConfigurationSource
     }
 
     public SecurityConfiguration loadConfiguration()
-        throws SecurityConfigurationException,
+        throws ConfigurationException,
             IOException
     {
         if( getClass().getResource( STATIC_SECURITY_RESOURCE ) != null )

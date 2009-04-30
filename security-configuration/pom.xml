@@ -27,6 +27,18 @@
       <artifactId>plexus-container-default</artifactId>
     </dependency>
     
+    <dependency>
+      <groupId>org.sonatype.configuration</groupId>
+      <artifactId>base-configuration</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    
+    <!-- TESTS -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+    </dependency>
+    
   </dependencies>
 
   <build>
