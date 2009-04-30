@@ -3,8 +3,8 @@
     <version>2.0.0</version>
     <privileges>      
       <privilege>
-        <id>3</id>
-        <name>3</name>
+        <id>3-test</id>
+        <name>3-test</name>
         <type>method</type>
         <properties>
           <property>
@@ -18,8 +18,8 @@
         </properties>
       </privilege>
       <privilege>
-        <id>4</id>
-        <name>4</name>
+        <id>4-test</id>
+        <name>4-test</name>
         <type>method</type>
         <properties>
           <property>

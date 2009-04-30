@@ -12,15 +12,7 @@
  */
 package org.sonatype.security.realms.tools;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -31,7 +23,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -43,8 +35,7 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
-import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
+import org.sonatype.security.model.source.SecurityConfigurationSource;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
@@ -61,9 +52,12 @@ public class DefaultConfigurationManager
     extends AbstractLogEnabled
     implements ConfigurationManager
 {
-    @org.codehaus.plexus.component.annotations.Configuration( value = "${security-xml-file}" )
-    private File securityConfiguration;
+//    @org.codehaus.plexus.component.annotations.Configuration( value = "${security-xml-file}" )
+//    private File securityConfiguration;
 
+    @Requirement(hint="file")
+    private SecurityConfigurationSource configurationSource;
+    
     @Requirement
     private SecurityConfigurationValidator validator;
     
@@ -265,7 +259,6 @@ public class DefaultConfigurationManager
 
     }
 
-    @SuppressWarnings( "unchecked" )
     public void deletePrivilege( String id )
         throws NoSuchPrivilegeException
     {
@@ -298,7 +291,6 @@ public class DefaultConfigurationManager
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     public void deleteRole( String id )
         throws NoSuchRoleException
     {
@@ -575,7 +567,7 @@ public class DefaultConfigurationManager
         throw new NoSuchRoleMappingException( "No User Role Mapping for user: " + userId );
     }
     
-    @SuppressWarnings( "unchecked" )
+
     public SecurityUserRoleMapping readUserRoleMapping( String userId, String source )
         throws NoSuchRoleMappingException
     {
@@ -673,17 +665,9 @@ public class DefaultConfigurationManager
     {
         lock.lock();
 
-        securityConfiguration.getParentFile().mkdirs();
-
-        Writer fw = null;
-
         try
         {
-            fw = new OutputStreamWriter( new FileOutputStream( securityConfiguration ) );
-
-            SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
-
-            writer.write( fw, configuration );
+            this.configurationSource.storeConfiguration();
         }
         catch ( IOException e )
         {
@@ -691,20 +675,6 @@ public class DefaultConfigurationManager
         }
         finally
         {
-            if ( fw != null )
-            {
-                try
-                {
-                    fw.flush();
-
-                    fw.close();
-                }
-                catch ( IOException e )
-                {
-                    // just closing if open
-                }
-            }
-
             lock.unlock();
         }
     }
@@ -718,58 +688,22 @@ public class DefaultConfigurationManager
 
         lock.lock();
 
-        Reader fr = null;
-        FileInputStream is = null;
-
         try
         {
-            is = new FileInputStream( securityConfiguration );
+            this.configurationSource.loadConfiguration();
 
-            SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-
-            fr = new InputStreamReader( is );
-
-            configuration = reader.read( fr );
-        }
-        catch ( FileNotFoundException e )
-        {
-            // This is ok, may not exist first time around
-            configuration = new Configuration();
+            configuration = this.configurationSource.getConfiguration();
         }
         catch ( IOException e )
         {
             getLogger().error( "IOException while retrieving configuration file", e );
         }
-        catch ( XmlPullParserException e )
+        catch ( ConfigurationException e )
         {
-            getLogger().error( "Invalid XML Configuration", e );
+            getLogger().error( "Invalid Configuration", e );
         }
         finally
-        {
-            if ( fr != null )
-            {
-                try
-                {
-                    fr.close();
-                }
-                catch ( IOException e )
-                {
-                    // just closing if open
-                }
-            }
-
-            if ( is != null )
-            {
-                try
-                {
-                    is.close();
-                }
-                catch ( IOException e )
-                {
-                    // just closing if open
-                }
-            }
-
+        {  
             lock.unlock();
         }
 

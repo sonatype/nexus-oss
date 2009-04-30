@@ -97,6 +97,15 @@ public class FileConfigurationSource
 
             // get the defaults and stick it to place
             setConfiguration( securityDefaults.getConfiguration() );
+            
+            // check for a configuration before saving
+            // if it is null use an empty configuraiton
+            if( this.getConfiguration() == null)
+            {
+                Configuration configuration = new Configuration();
+                configuration.setVersion( Configuration.MODEL_VERSION );
+                this.setConfiguration( configuration );
+            }
 
             saveConfiguration( getConfigurationFile() );
 

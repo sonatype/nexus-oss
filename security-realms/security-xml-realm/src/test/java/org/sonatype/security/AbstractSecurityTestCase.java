@@ -42,6 +42,7 @@ public abstract class AbstractSecurityTestCase
     {
         super.customizeContext( context );
         context.put( "application-conf", CONFIG_DIR.getAbsolutePath() );
+        context.put( "security-xml-file", CONFIG_DIR.getAbsolutePath() + "/security.xml" );
     }
 
     @Override

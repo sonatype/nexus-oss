@@ -12,6 +12,7 @@
  */
 package org.sonatype.security.realms.tools;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.PlexusTestCase;
@@ -46,18 +47,30 @@ public class ResourceMergingConfigurationManagerTest
     {
         List<SecurityPrivilege> privs = manager.listPrivileges();
         
-        assertEquals( 4, privs.size() );
-        
-        SecurityPrivilege priv = manager.readPrivilege( "1" );        
+        SecurityPrivilege priv = manager.readPrivilege( "1-test" );        
         assertTrue( priv != null );
         
-        priv = manager.readPrivilege( "2" );
+        priv = manager.readPrivilege( "2-test" );
         assertTrue( priv != null );
         
-        priv = manager.readPrivilege( "3" );
+        priv = manager.readPrivilege( "3-test" );
         assertTrue( priv != null );
         
-        priv = manager.readPrivilege( "4" );
+        priv = manager.readPrivilege( "4-test" );
         assertTrue( priv != null );
+        
+        assertEquals( "privs: "+ this.privilegeListToStringList( privs ), 4, privs.size() );
+    }
+    
+    private List<String> privilegeListToStringList( List<SecurityPrivilege> privs )
+    {
+        List<String> ids = new ArrayList<String>();
+        
+        for ( SecurityPrivilege priv : privs )
+        {
+            ids.add( priv.getId() );
+        }
+        
+        return ids;
     }
 }
