@@ -31,7 +31,7 @@ public interface AuthorizationManager
 
     public Privilege addPrivilege( Privilege privilege ) throws InvalidConfigurationException;
 
-    public Privilege upatePrivilege( Privilege privilege )
+    public Privilege updatePrivilege( Privilege privilege )
         throws NoSuchPrivilegeException, InvalidConfigurationException;
 
     public void deletePrivilege( String privilegeId )

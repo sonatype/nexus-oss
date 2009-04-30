@@ -99,7 +99,7 @@ public class MockAuthorizationManagerB
         return null;
     }
 
-    public Privilege upatePrivilege( Privilege privilege )
+    public Privilege updatePrivilege( Privilege privilege )
         throws NoSuchPrivilegeException
     {
         // TODO Auto-generated method stub

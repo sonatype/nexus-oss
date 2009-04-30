@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -25,6 +26,7 @@ import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.model.CProperty;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
@@ -57,7 +59,7 @@ public class SecurityXmlAuthorizationManager
         role.setDescription( secRole.getDescription() );
         role.setReadOnly( secRole.isReadOnly() );
         role.setSessionTimeout( secRole.getSessionTimeout() );
-        role.setPermissions(  new HashSet<String>(secRole.getPrivileges() ) );
+        role.setPermissions( new HashSet<String>( secRole.getPrivileges() ) );
 
         return role;
     }
@@ -65,15 +67,58 @@ public class SecurityXmlAuthorizationManager
     protected SecurityRole toRole( Role role )
     {
         SecurityRole secRole = new SecurityRole();
-        
+
         secRole.setId( role.getRoleId() );
         secRole.setName( role.getName() );
         secRole.setDescription( role.getDescription() );
         secRole.setReadOnly( role.isReadOnly() );
         secRole.setSessionTimeout( role.getSessionTimeout() );
-        secRole.setPrivileges(  new ArrayList<String>(role.getPermissions() ) );
+        secRole.setPrivileges( new ArrayList<String>( role.getPermissions() ) );
 
         return secRole;
+    }
+
+    protected SecurityPrivilege toPrivilege( Privilege privilege )
+    {
+        SecurityPrivilege secPriv = new SecurityPrivilege();
+        secPriv.setId( privilege.getId() );
+        secPriv.setName( privilege.getName() );
+        secPriv.setDescription( privilege.getDescription() );
+        secPriv.setReadOnly( privilege.isReadOnly() );
+        secPriv.setType( privilege.getType() );
+
+        if ( privilege.getProperties().entrySet() != null )
+        {
+            for ( Entry<String, String> entry : privilege.getProperties().entrySet() )
+            {
+                CProperty prop = new CProperty();
+                prop.setKey( entry.getKey() );
+                prop.setValue( entry.getValue() );
+                secPriv.addProperty( prop );
+            }
+        }
+
+        return secPriv;
+    }
+    
+    protected Privilege toPrivilege( SecurityPrivilege secPriv )
+    {
+        Privilege privilege = new Privilege();
+        privilege.setId( secPriv.getId() );
+        privilege.setName( secPriv.getName() );
+        privilege.setDescription( secPriv.getDescription() );
+        privilege.setReadOnly( secPriv.isReadOnly() );
+        privilege.setType( secPriv.getType() );
+
+        if ( secPriv.getProperties() != null )
+        {
+            for ( CProperty prop : (List<CProperty>) secPriv.getProperties() )
+            {
+                privilege.addProperty( prop.getKey(), prop.getValue() );
+            }
+        }
+
+        return privilege;
     }
 
     // //
@@ -100,39 +145,33 @@ public class SecurityXmlAuthorizationManager
     }
 
     public Role addRole( Role role )
+        throws InvalidConfigurationException
     {
-        try
-        {
-            this.configuration.createRole( this.toRole( role ) );
-        }
-        catch ( InvalidConfigurationException e )
-        {
-            // FIXME Auto-generated catch block
-            e.printStackTrace();
-        }
+        this.configuration.createRole( this.toRole( role ) );
 
+        // TODO: return new role?
         return role;
     }
 
     public Role updateRole( Role role )
-        throws NoSuchRoleException
+        throws NoSuchRoleException,
+            InvalidConfigurationException
     {
-        // TODO Auto-generated method stub
-        return null;
+        this.configuration.updateRole( this.toRole( role ) );
+        return role;
     }
 
     public void deleteRole( String roleId )
         throws NoSuchRoleException
     {
-        // TODO Auto-generated method stub
-
+        this.configuration.deleteRole( roleId );
     }
 
     // //
     // PRIVILEGE CRUDS
     // //
 
-    public Set<String> listPermissions()
+    public Set<String> listPrivilegeIds()
     {
         Set<String> permissions = new HashSet<String>();
         List<SecurityPrivilege> secPrivs = this.configuration.listPrivileges();
@@ -148,35 +187,42 @@ public class SecurityXmlAuthorizationManager
 
     public Set<Privilege> listPrivileges()
     {
-        // TODO Auto-generated method stub
-        return null;
+        Set<Privilege> privileges = new HashSet<Privilege>();
+        List<SecurityPrivilege> secPrivs = this.configuration.listPrivileges();
+
+        for ( SecurityPrivilege securityPrivilege : secPrivs )
+        {
+            privileges.add( this.toPrivilege( securityPrivilege ) );
+        }
+
+        return privileges;
     }
 
     public Privilege getPrivilege( String privilegeId )
         throws NoSuchPrivilegeException
     {
-        // TODO Auto-generated method stub
-        return null;
+        return this.toPrivilege( this.configuration.readPrivilege( privilegeId ) );
     }
 
-    public Privilege addPrivilege( Privilege privilege )
+    public Privilege addPrivilege( Privilege privilege ) throws InvalidConfigurationException
     {
-        // TODO Auto-generated method stub
-        return null;
+       this.configuration.createPrivilege( this.toPrivilege( privilege ) );
+       
+       return privilege;
     }
 
-    public Privilege upatePrivilege( Privilege privilege )
-        throws NoSuchPrivilegeException
+    public Privilege updatePrivilege( Privilege privilege )
+        throws NoSuchPrivilegeException, InvalidConfigurationException
     {
-        // TODO Auto-generated method stub
-        return null;
+        this.configuration.updatePrivilege( this.toPrivilege( privilege ) );
+        
+        return privilege;
     }
 
     public void deletePrivilege( String privilegeId )
         throws NoSuchPrivilegeException
     {
-        // TODO Auto-generated method stub
-
+        this.configuration.deletePrivilege( privilegeId );
     }
 
 }

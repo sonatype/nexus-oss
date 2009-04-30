@@ -76,6 +76,11 @@ public class Privilege
     {
         return properties;
     }
+    
+    public void addProperty( String key, String value)
+    {
+        this.properties.put( key, value );
+    }
 
     public void setProperties( Map<String, String> properties )
     {
