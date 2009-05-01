@@ -24,7 +24,6 @@ import org.codehaus.plexus.logging.Logger;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchRoleException;
-import org.sonatype.security.authorization.Role;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
@@ -35,6 +34,7 @@ import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -75,7 +75,7 @@ public class SecurityXmlUserManager
         secUser.setReadOnly( user.isReadOnly() );
         // secUser.setPassword( password )// FIXME
 
-        for ( Role role : user.getRoles() )
+        for ( RoleIdentifier role : user.getRoles() )
         {
             secUser.addRole( role.getRoleId() );
         }
@@ -113,7 +113,7 @@ public class SecurityXmlUserManager
         return user;
     }
 
-    protected Role toRole( String roleId )
+    protected RoleIdentifier toRole( String roleId )
     {
         if ( roleId == null )
         {
@@ -123,14 +123,9 @@ public class SecurityXmlUserManager
         try
         {
             CRole role = configuration.readRole( roleId );
-
-            Role plexusRole = new Role();
-
-            plexusRole.setRoleId( role.getId() );
-            plexusRole.setName( role.getName() );
-            plexusRole.setSource( SOURCE );
-
-            return plexusRole;
+            
+            RoleIdentifier roleIdentifier = new RoleIdentifier(SOURCE, role.getId());
+            return roleIdentifier;
         }
         catch ( NoSuchRoleException e )
         {
@@ -223,10 +218,10 @@ public class SecurityXmlUserManager
         this.saveConfiguration();
     }
 
-    public Set<Role> getUsersRoles( String userId, String source )
+    public Set<RoleIdentifier> getUsersRoles( String userId, String source )
         throws UserNotFoundException
     {
-        Set<Role> roles = new HashSet<Role>();
+        Set<RoleIdentifier> roles = new HashSet<RoleIdentifier>();
 
         CUserRoleMapping roleMapping;
         try
@@ -237,7 +232,7 @@ public class SecurityXmlUserManager
             {
                 for ( String roleId : (List<String>) roleMapping.getRoles() )
                 {
-                    Role role = toRole( roleId );
+                    RoleIdentifier role = toRole( roleId );
                     if ( role != null )
                     {
                         roles.add( role );
@@ -250,13 +245,6 @@ public class SecurityXmlUserManager
             this.logger.debug( "No user role mapping found for user: " + userId );
         }
         return roles;
-    }
-
-    public void setUsersRoles( String userId, Set<Role> roles, String source )
-        throws UserNotFoundException
-    {
-        // TODO Auto-generated method stub
-
     }
 
     private void saveConfiguration()
@@ -332,5 +320,13 @@ public class SecurityXmlUserManager
         }
         
         return clearPassword;
+    }
+
+    public void setUsersRoles( String userId, Set<RoleIdentifier> roleIdentifiers )
+        throws UserNotFoundException,
+            InvalidConfigurationException
+    {
+        // TODO Auto-generated method stub
+        
     }
 }

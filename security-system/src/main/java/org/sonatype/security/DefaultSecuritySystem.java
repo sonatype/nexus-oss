@@ -2,6 +2,7 @@ package org.sonatype.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import org.sonatype.security.events.SecurityEventHandler;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
 import org.sonatype.security.usermanagement.PasswordGenerator;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -236,7 +238,7 @@ public class DefaultSecuritySystem
             {
                 try
                 {
-                    tmpUserManager.setUsersRoles( user.getUserId(), user.getRoles(), user.getSource() );
+                    tmpUserManager.setUsersRoles( user.getUserId(), RoleIdentifier.getRoleIdentifiersForSource( user.getSource(), user.getRoles() ) );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -268,7 +270,7 @@ public class DefaultSecuritySystem
             {
                 try
                 {
-                    tmpUserManager.setUsersRoles( user.getUserId(), user.getRoles(), user.getSource() );
+                    tmpUserManager.setUsersRoles( user.getUserId(), RoleIdentifier.getRoleIdentifiersForSource( user.getSource(), user.getRoles() ) );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -443,10 +445,10 @@ public class DefaultSecuritySystem
             {
                 try
                 {
-                    Set<Role> roles = tmpUserManager.getUsersRoles( user.getUserId(), user.getSource() );
-                    if ( roles != null )
+                    Set<RoleIdentifier> roleIdentifiers = tmpUserManager.getUsersRoles( user.getUserId(), user.getSource() );
+                    if ( roleIdentifiers != null )
                     {
-                        user.getRoles().addAll( roles );
+                        user.addAllRoles( roleIdentifiers );
                     }
                 }
                 catch ( UserNotFoundException e )
@@ -693,5 +695,4 @@ public class DefaultSecuritySystem
         // TODO Auto-generated method stub
         return null;
     }
-
 }

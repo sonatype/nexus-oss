@@ -20,11 +20,11 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -46,7 +46,7 @@ public class URLUserManager
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager configuration;
 
-    @Requirement(role = UserManager.class )
+    @Requirement( role = UserManager.class )
     private List<UserManager> userLocators;
 
     public String getSource()
@@ -180,11 +180,7 @@ public class URLUserManager
         user.setSource( SOURCE );
         user.setUserId( userId );
 
-        Role role = new Role();
-        role.setRoleId( this.defaultRole );
-        role.setName( this.defaultRole );
-        role.setSource( SOURCE );
-        user.addRole( role );
+        user.addRole( new RoleIdentifier( SOURCE, this.defaultRole ) );
 
         return user;
     }
@@ -195,7 +191,8 @@ public class URLUserManager
 
         for ( UserManager userLocator : this.userLocators )
         {
-            if ( !this.getSource().equals( userLocator.getSource() ) && !ConfiguredUsersUserManager.SOURCE.equals( userLocator.getSource() ) )
+            if ( !this.getSource().equals( userLocator.getSource() )
+                && !ConfiguredUsersUserManager.SOURCE.equals( userLocator.getSource() ) )
             {
                 userIds.addAll( userLocator.listUserIds() );
             }
@@ -204,11 +201,9 @@ public class URLUserManager
         return userIds;
     }
 
-    public Set<Role> getUsersRoles( String userId, String source )
+    public Set<RoleIdentifier> getUsersRoles( String userId, String userSource )
         throws UserNotFoundException
     {
-        // TODO Auto-generated method stub
         return null;
     }
-  
 }

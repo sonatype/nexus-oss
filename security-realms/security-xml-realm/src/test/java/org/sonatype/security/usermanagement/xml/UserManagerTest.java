@@ -1,7 +1,6 @@
 package org.sonatype.security.usermanagement.xml;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -9,15 +8,13 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
-import org.jsecurity.authc.credential.Sha1CredentialsMatcher;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -91,8 +88,8 @@ public class UserManagerTest
         user.setSource( user.getUserId() + "default" );
         user.setEmailAddress( "email@email" );
         user.setStatus( UserStatus.active );
-        user.addRole( new Role( "role1", "Role 1", "default" ) );
-        user.addRole( new Role( "role3", "Role 3", "default" ) );
+        user.addRole( new RoleIdentifier( "default", "role1" ) );
+        user.addRole( new RoleIdentifier( "default", "role3" ) );
 
         userManager.addUser( user, "my-password" );
 
@@ -136,8 +133,9 @@ public class UserManagerTest
 
         user.setName( "new Name" );
         user.setEmailAddress( "newemail@foo" );
-        Set<Role> roles = new HashSet<Role>();
-        roles.add( new Role( "role3", "Role 3", "default" ) );
+        
+        Set<RoleIdentifier> roles = new HashSet<RoleIdentifier>();
+        roles.add( new RoleIdentifier( "default", "role3" ) );
         user.setRoles( roles );
         userManager.updateUser( user );
 
@@ -152,7 +150,7 @@ public class UserManagerTest
         Assert.assertEquals( secUser.getStatus(), user.getStatus().name() );
 
         Assert.assertTrue( secUser.getRoles().contains( "role3" ) );
-        Assert.assertEquals( 1, user.getRoles().size() );
+        Assert.assertEquals("roles: "+ user.getRoles(), 1, user.getRoles().size() );
     }
 
     public void testDeleteUser()
@@ -209,7 +207,7 @@ public class UserManagerTest
     {
         List<String> roleIds = new ArrayList<String>();
 
-        for ( Role role : user.getRoles() )
+        for ( RoleIdentifier role : user.getRoles() )
         {
             roleIds.add( role.getRoleId() );
         }

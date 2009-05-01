@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.security.authorization.Role;
 
 public abstract class AbstractUserManager
     implements UserManager
@@ -33,9 +32,9 @@ public abstract class AbstractUserManager
         Set<String> userRoles = new HashSet<String>();
         if ( user.getRoles() != null )
         {
-            for ( Role role : user.getRoles() )
+            for ( RoleIdentifier roleIdentifier : user.getRoles() )
             {
-                userRoles.add( role.getRoleId() );
+                userRoles.add( roleIdentifier.getRoleId() );
             }
         }
 

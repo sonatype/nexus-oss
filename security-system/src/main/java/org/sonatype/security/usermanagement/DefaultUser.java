@@ -1,5 +1,6 @@
 package org.sonatype.security.usermanagement;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class DefaultUser
     
     private boolean readOnly;
 
-    private Set<Role> roles = new HashSet<Role>();
+    private Set<RoleIdentifier> roleIdentifiers = new HashSet<RoleIdentifier>();
 
     public String getUserId()
     {
@@ -63,22 +64,25 @@ public class DefaultUser
         this.source = source;
     }
 
-    public Set<Role> getRoles()
+    public Set<RoleIdentifier> getRoles()
     {
-        return roles;
+        return Collections.unmodifiableSet( roleIdentifiers );
     }
 
-    public void addRole( Role role )
+    public void addRole( RoleIdentifier roleIdentifier )
     {
-        this.roles.add( role );
+        this.roleIdentifiers.add( roleIdentifier );
     }
 
-    public void setRoles( Set<Role> roles )
+    public void addAllRoles( Set<RoleIdentifier> roleIdentifiers )
     {
-        this.roles = roles;
+        this.roleIdentifiers.addAll( roleIdentifiers );
     }
     
-    
+    public void setRoles( Set<RoleIdentifier> roles )
+    {
+        this.roleIdentifiers = roles;
+    }
 
     public UserStatus getStatus()
     {

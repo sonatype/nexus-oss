@@ -3,7 +3,6 @@ package org.sonatype.security.usermanagement;
 import java.util.Set;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.security.authorization.Role;
 
 public interface UserManager
 {
@@ -44,14 +43,14 @@ public interface UserManager
      * from a JDBC UserManager, but has additional roles mapped in XML.
      * 
      * @param userId
-     * @param source
+     * @param userSource
      * @return
      * @throws UserNotFoundException
      */
-    Set<Role> getUsersRoles( String userId, String source )
+    Set<RoleIdentifier> getUsersRoles( String userId, String userSource )
         throws UserNotFoundException;
 
-    void setUsersRoles( String userId, Set<Role> roles, String source )
+    void setUsersRoles( String userId, Set<RoleIdentifier> roleIdentifiers )
         throws UserNotFoundException, InvalidConfigurationException;
 
     /**

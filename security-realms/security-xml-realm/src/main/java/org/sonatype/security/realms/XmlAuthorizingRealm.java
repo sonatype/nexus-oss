@@ -44,6 +44,7 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
@@ -124,11 +125,11 @@ public class XmlAuthorizingRealm
         //
 
         LinkedList<String> rolesToProcess = new LinkedList<String>();
-        Set<Role> roles = user.getRoles();
+        Set<RoleIdentifier> roles = user.getRoles();
 
         if ( roles != null )
         {
-            for ( Role role : roles )
+            for ( RoleIdentifier role : roles )
             {
                 if ( role != null && StringUtils.isNotEmpty( role.getRoleId() ) )
                 {

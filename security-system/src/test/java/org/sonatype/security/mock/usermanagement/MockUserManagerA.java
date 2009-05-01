@@ -1,8 +1,8 @@
 package org.sonatype.security.mock.usermanagement;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.security.authorization.Role;
 import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserManager;
 
 @Component( role = UserManager.class, hint = "MockUserManagerA" )
@@ -18,18 +18,18 @@ public class MockUserManagerA
         a.setEmailAddress( "jcoder@sonatype.org" );
         a.setSource( this.getSource() );
         a.setUserId( "jcoder" );
-        a.addRole( new Role( "RoleA", "", this.getSource() ) );
-        a.addRole( new Role( "RoleB", "", this.getSource() ) );
-        a.addRole( new Role( "RoleC", "", this.getSource() ) );
+        a.addRole( new RoleIdentifier( this.getSource(), "RoleA" ) );
+        a.addRole( new RoleIdentifier( this.getSource(), "RoleB" ) );
+        a.addRole( new RoleIdentifier( this.getSource(), "RoleC" ) );
 
         DefaultUser b = new DefaultUser();
         b.setName( "Christine H. Dugas" );
         b.setEmailAddress( "cdugas@sonatype.org" );
         b.setSource( this.getSource() );
         b.setUserId( "cdugas" );
-        b.addRole( new Role( "RoleA", "", this.getSource() ) );
-        b.addRole( new Role( "RoleB", "", this.getSource() ) );
-        b.addRole( new Role( "Role1", "", this.getSource() ) );
+        b.addRole( new RoleIdentifier( this.getSource(), "RoleA" ) );
+        b.addRole( new RoleIdentifier( this.getSource(), "RoleB" ) );
+        b.addRole( new RoleIdentifier( this.getSource(), "Role1" ) );
 
         DefaultUser c = new DefaultUser();
         c.setName( "Patricia P. Peralez" );

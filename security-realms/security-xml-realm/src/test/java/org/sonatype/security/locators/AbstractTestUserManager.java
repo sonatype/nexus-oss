@@ -15,15 +15,14 @@ package org.sonatype.security.locators;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.security.authorization.Role;
-import org.sonatype.security.usermanagement.AbstractUserManager;
+import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 public abstract class AbstractTestUserManager
-    extends AbstractUserManager
+    extends AbstractReadOnlyUserManager
 {
 
     public User getUser( String userId )
@@ -61,69 +60,18 @@ public abstract class AbstractTestUserManager
         return this.filterListInMemeory( this.listUsers(), criteria );
     }
 
-    protected Role createFakeRole( String roleId )
+    protected RoleIdentifier createFakeRole( String roleId )
     {
-        Role role = new Role();
-        role.setName( roleId );
-        role.setRoleId( roleId );
-        role.setSource( this.getSource() );
-
+        RoleIdentifier role = new RoleIdentifier(  this.getSource(), roleId );
         return role;
     }
 
-    public boolean supportsWrite()
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
-    public User addUser( User user )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void deleteUser( String userId )
-        throws UserNotFoundException
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public Set<Role> getUsersRoles( String userId, String source )
+    public Set<RoleIdentifier> getUsersRoles( String userId, String userSource )
         throws UserNotFoundException
     {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public void setUsersRoles( String userId, Set<Role> roles, String source )
-        throws UserNotFoundException
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public User updateUser( User user )
-        throws UserNotFoundException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public User addUser( User user, String password )
-        throws InvalidConfigurationException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void changePassword( String userId, String newPassword )
-        throws UserNotFoundException,
-            InvalidConfigurationException
-    {
-        // TODO Auto-generated method stub
-        
     }
 
 }

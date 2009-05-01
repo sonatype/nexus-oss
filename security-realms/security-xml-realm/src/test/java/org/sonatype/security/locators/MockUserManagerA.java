@@ -18,6 +18,7 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -73,7 +74,5 @@ public class MockUserManagerA
         
         return users;
     }
-    
-
   
 }

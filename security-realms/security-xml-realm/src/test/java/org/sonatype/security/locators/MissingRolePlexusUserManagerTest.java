@@ -20,7 +20,7 @@ import junit.framework.Assert;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.authorization.Role;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 
 public class MissingRolePlexusUserManagerTest
@@ -61,7 +61,7 @@ public class MissingRolePlexusUserManagerTest
         Assert.assertNotNull( user );
 
         Set<String> roleIds = new HashSet<String>();
-        for ( Role role : user.getRoles() )
+        for ( RoleIdentifier role : user.getRoles() )
         {
             Assert.assertNotNull( "User has null role.", role );
             roleIds.add( role.getRoleId() );

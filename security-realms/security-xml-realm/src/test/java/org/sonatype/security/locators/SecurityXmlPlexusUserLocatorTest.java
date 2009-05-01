@@ -20,7 +20,7 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
-import org.sonatype.security.authorization.Role;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
@@ -74,7 +74,7 @@ public class SecurityXmlPlexusUserLocatorTest
         Assert.assertEquals( "changeme1@yourcompany.com", testUser.getEmailAddress() );
 
         // test roles
-        Map<String, Role> roleMap = this.toRoleMap( testUser.getRoles() );
+        Map<String, RoleIdentifier> roleMap = this.toRoleMap( testUser.getRoles() );
 
         Assert.assertTrue( roleMap.containsKey( "role1" ) );
         Assert.assertTrue( roleMap.containsKey( "role2" ) );
@@ -94,11 +94,11 @@ public class SecurityXmlPlexusUserLocatorTest
         Assert.assertEquals( 1, users.size() );
     }
 
-    private Map<String, Role> toRoleMap( Set<Role> roles )
+    private Map<String, RoleIdentifier> toRoleMap( Set<RoleIdentifier> roles )
     {
-        Map<String, Role> results = new HashMap<String, Role>();
+        Map<String, RoleIdentifier> results = new HashMap<String, RoleIdentifier>();
 
-        for ( Role plexusRole : roles )
+        for ( RoleIdentifier plexusRole : roles )
         {
             results.put( plexusRole.getRoleId(), plexusRole );
         }

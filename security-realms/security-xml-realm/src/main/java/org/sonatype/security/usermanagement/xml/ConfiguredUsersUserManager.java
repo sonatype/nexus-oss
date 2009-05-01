@@ -23,11 +23,11 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -140,10 +140,10 @@ public class ConfiguredUsersUserManager
         return this.securitySystem;
     }
 
-    public Set<Role> getUsersRoles( String userId, String source )
+
+    public Set<RoleIdentifier> getUsersRoles( String userId, String userSource )
         throws UserNotFoundException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 

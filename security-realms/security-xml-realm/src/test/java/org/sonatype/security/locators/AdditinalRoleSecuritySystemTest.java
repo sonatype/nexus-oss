@@ -24,6 +24,7 @@ import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
@@ -82,7 +83,7 @@ public class AdditinalRoleSecuritySystemTest
         Assert.assertTrue( roleIds.contains( "RoleA" ) );
         Assert.assertTrue( roleIds.contains( "RoleB" ) );
         Assert.assertTrue( roleIds.contains( "RoleC" ) );
-        Assert.assertTrue( roleIds.contains( "Role1" ) );
+        Assert.assertTrue( "roles: "+ this.toRoleIdSet( user.getRoles() ), roleIds.contains( "Role1" ) );
 
         Assert.assertEquals("roles: "+ this.toRoleIdSet( user.getRoles() ), 4, user.getRoles().size() );
         
@@ -239,10 +240,10 @@ public class AdditinalRoleSecuritySystemTest
         return map;
     }
 
-    private Set<String> toRoleIdSet( Set<Role> roles )
+    private Set<String> toRoleIdSet( Set<RoleIdentifier> roles )
     {
         Set<String> roleIds = new HashSet<String>();
-        for ( Role role : roles )
+        for ( RoleIdentifier role : roles )
         {
             roleIds.add( role.getRoleId() );
         }

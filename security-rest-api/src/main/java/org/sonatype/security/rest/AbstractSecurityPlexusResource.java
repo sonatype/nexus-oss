@@ -34,6 +34,7 @@ import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserStatus;
 
@@ -46,6 +47,8 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
     @Requirement
     private SecuritySystem securitySystem;
 
+    protected static final String DEFAULT_SOURCE = "default";
+    
     protected ConfigurationManager getConfigurationManager()
     {
         return configurationManager;
@@ -99,7 +102,7 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         resource.setResourceURI( this.createChildReference( request, this, resource.getUserId() ).toString() );
         resource.setUserManaged( !user.isReadOnly() );
 
-        for ( Role role : user.getRoles() )
+        for ( RoleIdentifier role : user.getRoles() )
         {
             resource.addRole( role.getRoleId() );
         }
@@ -123,7 +126,7 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         for ( String roleId : (List<String>) resource.getRoles() )
         {
             // FIXME: role are not strings
-            user.addRole( new Role(roleId, null, null) );
+            user.addRole( new RoleIdentifier( DEFAULT_SOURCE, roleId ) );
         }
 
         return user;
@@ -138,7 +141,7 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         resource.setName( user.getName() );
         resource.setEmail( user.getEmailAddress() );
         
-        for ( Role role : user.getRoles() )
+        for ( RoleIdentifier role : user.getRoles() )
         {   
             resource.addRole( this.securityToRestModel( role ) );
         }
@@ -151,6 +154,17 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         PlexusRoleResource roleResource = new PlexusRoleResource();
         roleResource.setRoleId( role.getRoleId() );
         roleResource.setName( role.getName() );
+        roleResource.setSource( role.getSource() );
+        
+        return roleResource;
+    }
+    
+    // TODO: come back to this, we need to change the PlexusRoleResource
+    protected PlexusRoleResource securityToRestModel( RoleIdentifier role )
+    {
+        PlexusRoleResource roleResource = new PlexusRoleResource();
+        roleResource.setRoleId( role.getRoleId() );
+        roleResource.setName( role.getRoleId() );
         roleResource.setSource( role.getSource() );
         
         return roleResource;

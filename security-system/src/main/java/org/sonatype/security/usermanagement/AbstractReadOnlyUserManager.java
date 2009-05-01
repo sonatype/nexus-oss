@@ -33,11 +33,12 @@ public abstract class AbstractReadOnlyUserManager
         this.throwException();
     }
 
-    public void setUsersRoles( String userId, Set<Role> roles, String source )
+
+
+    public void setUsersRoles( String userId, Set<RoleIdentifier> roleIdentifiers )
         throws UserNotFoundException,
             InvalidConfigurationException
-    {
-        this.throwException();
+    {        
     }
 
     public User updateUser( User user )
