@@ -33,7 +33,7 @@ import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 
 /**
  * A filter that maps the targetId from the Request.
- * 
+ *
  * @author cstamas
  */
 public class NexusTargetMappingAuthorizationFilter
@@ -117,7 +117,7 @@ public class NexusTargetMappingAuthorizationFilter
     }
 
     @Override
-    protected String getActionFromHttpVerb( ServletRequest request )
+    protected Action getActionFromHttpVerb( ServletRequest request )
     {
         String action = ( (HttpServletRequest) request ).getMethod().toLowerCase();
 
@@ -127,7 +127,7 @@ public class NexusTargetMappingAuthorizationFilter
             // doing a LOCAL ONLY request to check is this exists?
             try
             {
-                getNexus().getRootRouter().retrieveItem( getResourceStoreRequest( request, true ) );
+                getNexus(request).getRootRouter().retrieveItem( getResourceStoreRequest( request, true ) );
             }
             catch ( ItemNotFoundException e )
             {
@@ -186,7 +186,6 @@ public class NexusTargetMappingAuthorizationFilter
             }
         }
 
-        return nexusItemAuthorizer.authorizePath( getResourceStoreRequest( request, false ), Action
-            .valueOf( getActionFromHttpVerb( request ) ) );
+        return nexusItemAuthorizer.authorizePath( getResourceStoreRequest( request, false ), getActionFromHttpVerb( request ) ) ;
     }
 }

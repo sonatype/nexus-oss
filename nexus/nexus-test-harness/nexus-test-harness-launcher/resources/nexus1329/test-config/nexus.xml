@@ -36,6 +36,7 @@
     <repository>
       <id>nexus1329-repo</id>
       <name>Repo NEXUS-1329 With Mirrors</name>
+      <proxyMode>allow</proxyMode>
       <remoteStorage>
         <url>http://localhost:${webproxy-server-port}/repository</url>
         <mirrors>

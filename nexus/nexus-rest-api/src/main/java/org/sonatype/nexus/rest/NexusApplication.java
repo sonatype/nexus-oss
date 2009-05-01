@@ -147,14 +147,14 @@ public class NexusApplication
         xstream.alias( "project", Model.class );
 
         // omitting modelEncoding
-        xstream.omitField( ErrorResponse.class, "modelEncoding" );
+        xstream.omitField( NexusErrorResponse.class, "modelEncoding" );
         // xstream.addImplicitCollection( ErrorResponse.class, "errors", "error", ErrorMessage.class ); // FIXME:
         // this might break the JSON parser, test it before checking in
-        xstream.omitField( ErrorMessage.class, "modelEncoding" );
-        xstream.alias( "nexus-error", ErrorResponse.class );
-        xstream.alias( "error", ErrorMessage.class );
-        xstream.registerLocalConverter( ErrorResponse.class, "errors",
-                                        new AliasingListConverter(ErrorMessage.class, "error" ) );
+        xstream.omitField( NexusError.class, "modelEncoding" );
+        xstream.alias( "nexus-error", NexusErrorResponse.class );
+        xstream.alias( "error", NexusError.class );
+        xstream.registerLocalConverter( NexusErrorResponse.class, "errors",
+                                        new AliasingListConverter(NexusError.class, "error" ) );
 
         xstream.omitField( ContentListResourceResponse.class, "modelEncoding" );
         xstream.omitField( ContentListResource.class, "modelEncoding" );

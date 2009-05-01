@@ -871,6 +871,9 @@ public class DefaultNexus
             // applies configuration and notifies listeners
             nexusConfiguration.loadConfiguration( true );
 
+            // essential service
+            security.startService();
+
             // create internals
             nexusConfiguration.createInternals();
             
@@ -974,6 +977,8 @@ public class DefaultNexus
         applicationEventMulticaster.notifyProximityEventListeners( new NexusStoppedEvent() );
 
         nexusConfiguration.dropInternals();
+        
+        security.stopService();
 
         try
         {

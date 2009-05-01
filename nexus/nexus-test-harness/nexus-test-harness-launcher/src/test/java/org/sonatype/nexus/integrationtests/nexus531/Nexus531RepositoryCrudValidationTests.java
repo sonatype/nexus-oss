@@ -102,7 +102,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
@@ -136,7 +136,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
@@ -172,7 +172,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
@@ -206,7 +206,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         try
         {
@@ -241,7 +241,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
@@ -291,7 +291,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
@@ -335,7 +335,7 @@ public class Nexus531RepositoryCrudValidationTests
         resource.setOverrideLocalStorageUrl( "foo.bar" ); // file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
@@ -370,7 +370,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         resource.setDefaultLocalStorageUrl( "foo.bar" ); // file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
@@ -401,7 +401,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
         resource = (RepositoryResource) this.messageUtil.createRepository( resource );
@@ -446,14 +446,14 @@ public class Nexus531RepositoryCrudValidationTests
         resource.setOverrideLocalStorageUrl( null );
 
         // invalid checksum
-        resource.setChecksumPolicy( "junk" );
+        resource.setChecksumPolicy( "JUNK" );
         this.sendAndExpectError( Method.PUT, resource );
-        resource.setChecksumPolicy( "ignore" );
+        resource.setChecksumPolicy( "IGNORE" );
 
         // no checksum
         resource.setChecksumPolicy( null );
         this.sendAndExpectError( Method.PUT, resource );
-        resource.setChecksumPolicy( "ignore" );
+        resource.setChecksumPolicy( "IGNORE" );
 
         // FIXME: these tests are disabled... NEXUS-741 NEXUS-740
         if ( !this.printKnownErrorButDoNotFail( this.getClass(), "updateValidatioinTest" ) )

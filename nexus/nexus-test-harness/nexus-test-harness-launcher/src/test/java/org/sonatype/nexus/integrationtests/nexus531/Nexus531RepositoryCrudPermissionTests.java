@@ -30,7 +30,7 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 {
 
-    
+
     @Test
     public void testCreatePermission()
         throws IOException
@@ -43,14 +43,14 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven1" );
         repo.setRepoPolicy( "snapshot" );
-        repo.setChecksumPolicy( "ignore" );
+        repo.setChecksumPolicy( "IGNORE" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         Response response = this.repoUtil.sendMessage( Method.POST, repo );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-        
+
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
@@ -94,7 +94,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven1" );
         repo.setRepoPolicy( "snapshot" );
-        repo.setChecksumPolicy( "ignore" );
+        repo.setChecksumPolicy( "IGNORE" );
 
         Response response = this.repoUtil.sendMessage( Method.POST, repo );
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
@@ -134,7 +134,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
     }
-    
+
     @Test
     public void testReadPermission()
         throws IOException
@@ -150,7 +150,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven1" );
         repo.setRepoPolicy( "snapshot" );
-        repo.setChecksumPolicy( "ignore" );
+        repo.setChecksumPolicy( "IGNORE" );
 
         Response response = this.repoUtil.sendMessage( Method.POST, repo );
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
@@ -184,14 +184,14 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         // delete should fail
         response = this.repoUtil.sendMessage( Method.PUT, repo );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-        
+
      // should work now...
         response = this.repoUtil.sendMessage( Method.DELETE, repo );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
     }
-    
-    
+
+
     @Test
     public void testDeletePermission()
         throws IOException
@@ -207,7 +207,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven1" );
         repo.setRepoPolicy( "snapshot" );
-        repo.setChecksumPolicy( "ignore" );
+        repo.setChecksumPolicy( "IGNORE" );
 
         Response response = this.repoUtil.sendMessage( Method.POST, repo );
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
@@ -241,11 +241,11 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         // delete should fail
         response = this.repoUtil.sendMessage( Method.PUT, repo );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-        
+
      // should work now...
         response = this.repoUtil.sendMessage( Method.DELETE, repo );
         Assert.assertEquals( "Response status: ", 204, response.getStatus().getCode() );
 
     }
-    
+
 }

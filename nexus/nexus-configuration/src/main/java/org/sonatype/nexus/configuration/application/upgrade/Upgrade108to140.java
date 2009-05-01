@@ -17,16 +17,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
@@ -54,14 +50,13 @@ import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.upgrade.Upgrader;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.util.ExternalConfigUtil;
 
 /**
  * Upgrades configuration model from version 1.0.8 to 1.4.0.
- * 
+ *
  * @author cstamas
  */
 @Component( role = Upgrader.class, hint = "1.0.8" )
@@ -75,11 +70,11 @@ public class Upgrade108to140
     private static final String GROUP_MEMBERS_NODE = "memberRepositories";
 
     private static final String GROUP_CHILD_NODE = "memberRepository";
-    
+
     private final Map<String, String> localStatus = new HashMap<String, String>();
     private final Map<String, String> checksumPolicy = new HashMap<String, String>();
     private final Map<String, String> proxyMode = new HashMap<String, String>();
-    
+
     public Upgrade108to140()
     {
         // migrate to ENUMS
@@ -128,6 +123,7 @@ public class Upgrade108to140
         return conf;
     }
 
+    @SuppressWarnings("unchecked")
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
@@ -197,7 +193,7 @@ public class Upgrade108to140
                 }
                 newc.setRepositoryGrouping( repositoryGrouping );
             }
-            
+
             // mergeMetadata
             boolean mergeMetadata = true;
 
@@ -282,6 +278,7 @@ public class Upgrade108to140
         return cs;
     }
 
+    @SuppressWarnings("unchecked")
     protected CRepository copyCRepository1_0_8( org.sonatype.nexus.configuration.model.v1_0_8.CRepository oldrepos )
     {
         CRepository newrepo = new CRepository();
@@ -296,7 +293,8 @@ public class Upgrade108to140
         newrepo.setMirrors( copyCMirrors1_0_8( oldrepos.getMirrors() ) );
         newrepo.setNotFoundCacheActive( oldrepos.isNotFoundCacheActive() );
         newrepo.setPathPrefix( oldrepos.getPathPrefix() );
-        newrepo.setProviderHint( oldrepos.getType() );
+        String providerHint = oldrepos.getType() != null ? oldrepos.getType() : "maven2";
+        newrepo.setProviderHint( providerHint );
         newrepo.setProviderRole( Repository.class.getName() );
         newrepo.setUserManaged( oldrepos.isUserManaged() );
 
@@ -313,10 +311,13 @@ public class Upgrade108to140
         ExternalConfigUtil.setNodeValue( externalConfig, "checksumPolicy", this.checksumPolicy.get( oldrepos.getChecksumPolicy() ));
         ExternalConfigUtil.setNodeValue( externalConfig, "repositoryPolicy", oldrepos.getRepositoryPolicy() );
 
-        if ( oldrepos.getLocalStorage() != null )
+        org.sonatype.nexus.configuration.model.v1_0_8.CLocalStorage oldLocalStorage = oldrepos.getLocalStorage();
+        if ( oldLocalStorage != null )
         {
             CLocalStorage localStorage = new CLocalStorage();
-            localStorage.setUrl( oldrepos.getLocalStorage().getUrl() );
+            localStorage.setUrl( oldLocalStorage.getUrl() );
+            String provider = oldLocalStorage.getProvider() == null ? "file" : oldLocalStorage.getProvider();
+            localStorage.setProvider( provider );
             newrepo.setLocalStorage( localStorage );
         }
 
@@ -340,6 +341,9 @@ public class Upgrade108to140
                 remoteStorage.setHttpProxySettings( copyCRemoteHttpProxySettings1_0_8( oldrepos
                     .getRemoteStorage().getHttpProxySettings() ) );
             }
+
+            remoteStorage.setMirrors( copyCMirrors1_0_8( oldrepos.getRemoteStorage().getMirrors() ) );
+
             newrepo.setRemoteStorage( remoteStorage );
         }
         return newrepo;
@@ -474,7 +478,7 @@ public class Upgrade108to140
             }
             task.setName( oldtask.getName() );
             task.setStatus( oldtask.getStatus() );
-            task.setProperties( copyCProps1_0_8( (List<org.sonatype.nexus.configuration.model.v1_0_8.CProps>) oldtask
+            task.setProperties( copyCProps1_0_8( oldtask
                 .getProperties() ) );
             task.setSchedule( copyCScheduleConfig1_0_8( oldtask.getSchedule() ) );
         }
@@ -571,14 +575,15 @@ public class Upgrade108to140
         {
             groupRepo.setId( oldgroup.getGroupId() );
             groupRepo.setName( oldgroup.getName() );
-            groupRepo.setProviderHint( oldgroup.getType() );
+            String providerHint = oldgroup.getType() != null ? oldgroup.getType() : "maven2";
+            groupRepo.setProviderHint( providerHint );
             groupRepo.setProviderRole( GroupRepository.class.getName() );
             groupRepo.setAllowWrite( false );
             groupRepo.setBrowseable( true );
             groupRepo.setExposed( true );
             groupRepo.setIndexable( false );
             groupRepo.setLocalStatus( LocalStatus.IN_SERVICE.toString());
-            
+
             if ( oldgroup.getLocalStorage() != null )
             {
                 CLocalStorage localStorage = new CLocalStorage();
@@ -603,5 +608,5 @@ public class Upgrade108to140
         return groupRepo;
     }
 
-    
+
 }

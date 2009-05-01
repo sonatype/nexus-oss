@@ -26,8 +26,13 @@ import org.restlet.data.Response;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.rest.model.RepositoryStatusResource;
+import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.nexus.test.utils.XStreamFactory;
+import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 public abstract class AbstractNexusProxyIntegrationTest
     extends AbstractNexusIntegrationTest
@@ -86,24 +91,24 @@ public abstract class AbstractNexusProxyIntegrationTest
 
     // TODO: Refactor this into the AbstractNexusIntegrationTest or some util class, to make more generic
 
-    public void setBlockProxy( String nexusBaseUrl, String repoId, boolean block ) throws IOException
+    public void setBlockProxy( String nexusBaseUrl, String repoId, boolean block )
+        throws IOException
     {
 
         String serviceURI = "service/local/repositories/" + repoId + "/status?undefined";
 
         // unblock string
-        String blockOrNotCommand = "\"unavailable\",\"proxyMode\":\"allow\"";
+        String blockOrNotCommand = "\"unavailable\",\"proxyMode\":\"ALLOW\"";
         // change to block if true
         if ( block == true )
         {
-            blockOrNotCommand = "\"available\",\"proxyMode\":\"blockedManual\"";
+            blockOrNotCommand = "\"available\",\"proxyMode\":\"BLOCKED_MANUAL\"";
         }
 
-        StringRepresentation representation = new StringRepresentation("{\"data\":{\"id\":\"" + repoId
-                                 + "\",\"repoType\":\"proxy\",\"localStatus\":\"inService\",\"remoteStatus\":" + blockOrNotCommand + "}}",
-                                 MediaType.APPLICATION_JSON);
-
-
+        StringRepresentation representation =
+            new StringRepresentation( "{\"data\":{\"id\":\"" + repoId
+                + "\",\"repoType\":\"proxy\",\"localStatus\":\"IN_SERVICE\",\"remoteStatus\":" + blockOrNotCommand
+                + "}}", MediaType.APPLICATION_JSON );
 
         Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
 
@@ -114,22 +119,31 @@ public abstract class AbstractNexusProxyIntegrationTest
         }
     }
 
-    public void setOutOfServiceProxy( String nexusBaseUrl, String repoId, boolean outOfService ) throws IOException
+    public void setOutOfServiceProxy( String nexusBaseUrl, String repoId, boolean outOfService )
+        throws IOException
     {
 
         String serviceURI = "service/local/repositories/" + repoId + "/status?undefined";
 
         // unblock string
-        String servicePart = outOfService ? "outOfService" : "inService";
+        String servicePart = outOfService ? LocalStatus.OUT_OF_SERVICE.name() : LocalStatus.IN_SERVICE.name();
+        RepositoryStatusResource data = new RepositoryStatusResource();
+        data.setId( repoId );
+        data.setRepoType( "proxy" );
+        data.setLocalStatus( servicePart );
 
-        StringRepresentation representation = new StringRepresentation("{\"data\":{\"id\":\"" + repoId + "\",\"repoType\":\"proxy\",\"localStatus\":\""
-            + servicePart + "\"}}", MediaType.APPLICATION_JSON );
+        RepositoryStatusResourceResponse req = new RepositoryStatusResourceResponse();
+        req.setData( data );
+        XStreamRepresentation representation =
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), "", MediaType.APPLICATION_XML );
+        representation.setPayload( req );
 
         Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not set proxy out of service status (Status: "+response.getStatus()+ ": " + repoId + "\n" + response.getEntity().getText());
+            Assert.fail( "Could not set proxy out of service status (Status: " + response.getStatus() + ": " + repoId
+                + "\n" + response.getEntity().getText() );
         }
     }
 
@@ -145,7 +159,7 @@ public abstract class AbstractNexusProxyIntegrationTest
             return;
         }
 
-        FileTestingUtils.interpolationDirectoryCopy( source, new File(localStorageDir), TestProperties.getAll() );
+        FileTestingUtils.interpolationDirectoryCopy( source, new File( localStorageDir ), TestProperties.getAll() );
 
     }
 }

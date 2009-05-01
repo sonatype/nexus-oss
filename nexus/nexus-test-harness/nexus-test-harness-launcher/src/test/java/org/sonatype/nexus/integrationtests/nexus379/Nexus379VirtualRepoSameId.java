@@ -59,7 +59,7 @@ public class Nexus379VirtualRepoSameId
         // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven2" );
         repo.setRepoPolicy( "release" );
-        repo.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        repo.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
         repo = (RepositoryResource) this.messageUtil.createRepository( repo );
 
         // now create a virtual one, this should fail

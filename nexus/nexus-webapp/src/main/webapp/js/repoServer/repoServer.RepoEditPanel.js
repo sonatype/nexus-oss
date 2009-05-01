@@ -192,7 +192,7 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
         browseable: Sonatype.utils.convert.stringContextToBool,
         indexable: Sonatype.utils.convert.stringContextToBool,
         downloadRemoteIndexes: function() { return false; },
-        checksumPolicy: function() { return 'ignore'; }
+        checksumPolicy: function() { return 'IGNORE'; }
       }
     },
     referenceData: Sonatype.repoServer.referenceData.repositoryState.hosted
@@ -449,8 +449,8 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
   } );
 
   this.checksumPolicyStore = new Ext.data.SimpleStore( {
-    fields: ['value'], 
-    data: [['Ignore'], ['Warn'], ['StrictIfExists'], ['Strict']]
+    fields: ['label', 'value'], 
+    data: [['Ignore', 'IGNORE'], ['Warn', 'WARN'], ['StrictIfExists', 'STRICT_IF_EXISTS'], ['Strict', 'STRICT']]
   } );
 
   this.providerStore = new Ext.data.JsonStore( {
@@ -624,7 +624,8 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
             name: 'checksumPolicy',
             width: 95,
             store: this.checksumPolicyStore,
-            displayField: 'value',
+            displayField: 'label',
+            valueField: 'value',
             editable: false,
             forceSelection: true,
             mode: 'local',

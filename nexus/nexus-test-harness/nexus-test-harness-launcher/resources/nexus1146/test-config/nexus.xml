@@ -71,7 +71,7 @@
     <repository>
       <id>release-proxy-repo-1</id>
       <name>Jetty Test Server</name>
-      <proxyMode>blockedAuto</proxyMode>
+      <proxyMode>allow</proxyMode>
       <remoteStorage>
         <url>${proxy-repo-base-url}release-proxy-repo-1</url>
         <httpProxySettings>

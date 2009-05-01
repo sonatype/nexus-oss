@@ -64,7 +64,7 @@ public class Nexus688ReindexOnRepoAdd
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( "release" );
-        resource.setChecksumPolicy( "ignore" );
+        resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( true );
         resource.setAllowWrite( true );
@@ -97,7 +97,7 @@ public class Nexus688ReindexOnRepoAdd
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( "release" );
-        resource.setChecksumPolicy( "ignore" );
+        resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( false );
         resource.setAllowWrite( true );
@@ -134,7 +134,7 @@ public class Nexus688ReindexOnRepoAdd
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( "release" );
-        resource.setChecksumPolicy( "ignore" );
+        resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( true );
         resource.setAllowWrite( true );
@@ -171,7 +171,7 @@ public class Nexus688ReindexOnRepoAdd
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( "release" );
-        resource.setChecksumPolicy( "ignore" );
+        resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( true );
         resource.setAllowWrite( true );
@@ -208,7 +208,7 @@ public class Nexus688ReindexOnRepoAdd
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( "release" );
-        resource.setChecksumPolicy( "ignore" );
+        resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( false );
         resource.setAllowWrite( true );

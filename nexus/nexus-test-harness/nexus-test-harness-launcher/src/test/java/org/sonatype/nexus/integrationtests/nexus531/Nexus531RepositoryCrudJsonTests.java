@@ -73,7 +73,7 @@ public class Nexus531RepositoryCrudJsonTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
         this.messageUtil.createRepository( resource );
@@ -102,7 +102,7 @@ public class Nexus531RepositoryCrudJsonTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
         this.messageUtil.createRepository( resource ); // this currently also calls GET, but that will change
@@ -137,7 +137,7 @@ public class Nexus531RepositoryCrudJsonTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
         resource = (RepositoryResource) this.messageUtil.createRepository( resource );
@@ -171,7 +171,7 @@ public class Nexus531RepositoryCrudJsonTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
         resource = (RepositoryResource) this.messageUtil.createRepository( resource );
@@ -201,7 +201,7 @@ public class Nexus531RepositoryCrudJsonTests
         // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
         repo.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
-        repo.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        repo.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
         repo = (RepositoryResource) this.messageUtil.createRepository( repo );

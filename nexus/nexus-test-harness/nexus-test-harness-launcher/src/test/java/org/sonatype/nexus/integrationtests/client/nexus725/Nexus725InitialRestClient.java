@@ -128,7 +128,7 @@ public class Nexus725InitialRestClient
         // repoResoruce.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // repoResoruce.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // repoResoruce.setDownloadRemoteIndexes( true );
-        repoResoruce.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+        repoResoruce.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         RepositoryBaseResource repoResult = client.createRepository( repoResoruce );
         RepositoryBaseResource repoExpected = client.getRepository( "testCreate" );
@@ -261,7 +261,7 @@ public class Nexus725InitialRestClient
         throws Exception
     {
         NexusClient client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
-        
+
         try
         {
             client.connect( AbstractNexusIntegrationTest.baseNexusUrl, "admin", "wrong-password" );

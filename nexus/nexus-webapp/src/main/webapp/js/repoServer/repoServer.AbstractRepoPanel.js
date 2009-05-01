@@ -188,7 +188,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         data: {
           id: rec.data.id,
           repoType: rec.data.repoType,
-          localStatus: 'inService'
+          localStatus: 'IN_SERVICE'
         }
       },
       callback: this.putInServiceCallback,
@@ -216,7 +216,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         data: {
           id: rec.data.id,
           repoType: rec.data.repoType,
-          localStatus: 'outOfService'
+          localStatus: 'OUT_OF_SERVICE'
         }
       },
       callback: this.putOutOfServiceCallback,
@@ -236,7 +236,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
             repoType: rec.data.repoType,
             localStatus: rec.data.status.localStatus,
             remoteStatus: rec.data.status.remoteStatus,
-            proxyMode: 'allow'
+            proxyMode: 'ALLOW'
           }
         },
         callback: this.allowProxyCallback,
@@ -268,7 +268,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
             repoType: rec.data.repoType,
             localStatus: rec.data.status.localStatus,
             remoteStatus: rec.data.status.remoteStatus,
-            proxyMode: 'blockedManual'
+            proxyMode: 'BLOCKED_MANUAL'
           }
         },
         callback: this.blockProxyCallback,
@@ -305,17 +305,17 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     if ( ! parent.status ) return '<I>retrieving...</I>';
     
     var remoteStatus = ( '' + status.remoteStatus ).toLowerCase();
-    var sOut = ( status.localStatus == 'inService' ) ? 'In Service' : 'Out of Service';
+    var sOut = ( status.localStatus == 'IN_SERVICE' ) ? 'In Service' : 'Out of Service';
     
     if ( parent.repoType == 'proxy' ) {
 
-      if ( status.proxyMode.search( /blocked/ ) === 0 ) {
-        sOut += status.proxyMode == 'blockedAuto' ?
+      if ( status.proxyMode.search( /BLOCKED/ ) === 0 ) {
+        sOut += status.proxyMode == 'BLOCKED_AUTO' ?
           ' - Remote Automatically Blocked' : ' - Remote Manually Blocked';
         sOut += remoteStatus == 'available' ? ' and Available' : ' and Unavailable';
       }
       else { //allow
-        if ( status.localStatus == 'inService' ) {
+        if ( status.localStatus == 'IN_SERVICE' ) {
           if ( remoteStatus != 'available' ) {
             sOut += remoteStatus == 'unknown' ?
               ' - <I>checking remote...</I>' : ' - Attempting to Proxy and Remote Unavailable';
@@ -432,7 +432,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
 
     if ( this.sp.checkPermission( 'nexus:repostatus', this.sp.EDIT ) ) {
       if ( isProxy ) {
-        if ( repoRecord.data.status && repoRecord.data.status.proxyMode == 'allow' ) {
+        if ( repoRecord.data.status && repoRecord.data.status.proxyMode == 'ALLOW' ) {
           menu.add( this.repoActions.blockProxy );
         }
         else {
@@ -441,7 +441,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       }
     
       if ( ! isGroup ) {
-        if ( repoRecord.data.status && repoRecord.data.status.localStatus == 'inService' ) {
+        if ( repoRecord.data.status && repoRecord.data.status.localStatus == 'IN_SERVICE' ) {
           menu.add( this.repoActions.putOutOfService );
         }
         else {

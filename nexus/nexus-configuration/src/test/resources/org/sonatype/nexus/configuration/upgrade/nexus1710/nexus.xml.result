@@ -214,6 +214,7 @@
       <browseable>true</browseable>
       <indexable>true</indexable>
       <localStorage>
+        <provider>file</provider>
         <url>file:///repository</url>
       </localStorage>
       <externalConfiguration>

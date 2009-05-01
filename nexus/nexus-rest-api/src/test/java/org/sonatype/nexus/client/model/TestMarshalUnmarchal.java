@@ -35,8 +35,6 @@ import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDesc
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.nexus.rest.NexusApplication;
 import org.sonatype.nexus.rest.model.*;
-import org.sonatype.plexus.rest.resource.error.ErrorMessage;
-import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
@@ -51,6 +49,7 @@ public class TestMarshalUnmarchal
 
     private XStream xstreamJSON;
 
+    @Override
     protected void setUp()
         throws Exception
     {
@@ -65,8 +64,8 @@ public class TestMarshalUnmarchal
 
     public void testNexusErrorResponse()
     {
-        ErrorResponse errorResponse = new ErrorResponse();
-        ErrorMessage error = new ErrorMessage();
+        NexusErrorResponse errorResponse = new NexusErrorResponse();
+        NexusError error = new NexusError();
         error.setId( "ID" );
         error.setMsg( "Error Message" );
         errorResponse.addError( error );
@@ -133,7 +132,7 @@ public class TestMarshalUnmarchal
         repo.setNotFoundCacheTTL( 1440 );
         repo.setRepoPolicy( "release" );
         repo.setDownloadRemoteIndexes( true );
-        repo.setChecksumPolicy( "ignore" );
+        repo.setChecksumPolicy( "IGNORE" );
 
         RepositoryResourceResponse resourceResponse = new RepositoryResourceResponse();
         resourceResponse.setData( repo );
@@ -175,7 +174,7 @@ public class TestMarshalUnmarchal
         repo.setNotFoundCacheTTL( 1440 );
         repo.setRepoPolicy( "release" );
         repo.setDownloadRemoteIndexes( true );
-        repo.setChecksumPolicy( "ignore" );
+        repo.setChecksumPolicy( "IGNORE" );
         repo.setMetadataMaxAge( 42 );
         repo.setArtifactMaxAge( 41 );
 
@@ -645,7 +644,7 @@ public class TestMarshalUnmarchal
         perms.addPermission( permission );
         perms.setLoggedIn( true );
         perms.setLoggedInUsername( "fred" );
-        
+
         loginResource.setClientPermissions( perms );
         resourceResponse.setData( loginResource );
 
@@ -1150,15 +1149,15 @@ public class TestMarshalUnmarchal
         appResource1.setName( "Name1" );
         appResource1.setDescription( "Description1" );
         appResource1.setType( ApplicationPrivilegeDescriptor.TYPE );
-        
+
         PrivilegeProperty prop = new PrivilegeProperty();
         prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
-        prop.setValue( "Method1" );        
+        prop.setValue( "Method1" );
         appResource1.addProperty( prop );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( ApplicationPrivilegePermissionPropertyDescriptor.ID );
-        prop.setValue( "Permission1" );        
+        prop.setValue( "Permission1" );
         appResource1.addProperty( prop );
 
         PrivilegeStatusResource appResource2 = new PrivilegeStatusResource();
@@ -1167,15 +1166,15 @@ public class TestMarshalUnmarchal
         appResource2.setName( "Name2" );
         appResource2.setDescription( "Description2" );
         appResource2.setType( ApplicationPrivilegeDescriptor.TYPE );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
-        prop.setValue( "Method2" );        
+        prop.setValue( "Method2" );
         appResource2.addProperty( prop );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( ApplicationPrivilegePermissionPropertyDescriptor.ID );
-        prop.setValue( "Permission2" );        
+        prop.setValue( "Permission2" );
         appResource2.addProperty( prop );
 
         PrivilegeStatusResource targetResource1 = new PrivilegeStatusResource();
@@ -1184,25 +1183,25 @@ public class TestMarshalUnmarchal
         targetResource1.setName( "Name1" );
         targetResource1.setDescription( "Description1" );
         targetResource1.setType( TargetPrivilegeDescriptor.TYPE );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( TargetPrivilegeGroupPropertyDescriptor.ID );
-        prop.setValue( "RepositoryGroupId1" );        
+        prop.setValue( "RepositoryGroupId1" );
         targetResource1.addProperty( prop );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( TargetPrivilegeRepositoryPropertyDescriptor.ID );
-        prop.setValue( "RepositoryId1" );        
+        prop.setValue( "RepositoryId1" );
         targetResource1.addProperty( prop );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( TargetPrivilegeRepositoryTargetPropertyDescriptor.ID );
-        prop.setValue( "RepositoryTargetId1" );        
+        prop.setValue( "RepositoryTargetId1" );
         targetResource1.addProperty( prop );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
-        prop.setValue( "Method1" );        
+        prop.setValue( "Method1" );
         targetResource1.addProperty( prop );
 
         PrivilegeStatusResource targetResource2 = new PrivilegeStatusResource();
@@ -1211,25 +1210,25 @@ public class TestMarshalUnmarchal
         targetResource2.setName( "Name2" );
         targetResource2.setDescription( "Description2" );
         targetResource2.setType( TargetPrivilegeDescriptor.TYPE );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( TargetPrivilegeGroupPropertyDescriptor.ID );
-        prop.setValue( "RepositoryGroupId2" );        
+        prop.setValue( "RepositoryGroupId2" );
         targetResource2.addProperty( prop );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( TargetPrivilegeRepositoryPropertyDescriptor.ID );
-        prop.setValue( "RepositoryId2" );        
+        prop.setValue( "RepositoryId2" );
         targetResource2.addProperty( prop );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( TargetPrivilegeRepositoryTargetPropertyDescriptor.ID );
-        prop.setValue( "RepositoryTargetId2" );        
+        prop.setValue( "RepositoryTargetId2" );
         targetResource2.addProperty( prop );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
-        prop.setValue( "Method2" );        
+        prop.setValue( "Method2" );
         targetResource2.addProperty( prop );
 
         resourceResponse.addData( appResource1 );
@@ -1250,12 +1249,12 @@ public class TestMarshalUnmarchal
         appResource1.setName( "Name1" );
         appResource1.setDescription( "Description1" );
         appResource1.setType( ApplicationPrivilegeDescriptor.TYPE );
-        
+
         PrivilegeProperty prop = new PrivilegeProperty();
         prop.setKey( ApplicationPrivilegePermissionPropertyDescriptor.ID );
         prop.setValue( "Permission1" );
         appResource1.addProperty( prop );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
         prop.setValue( "Method1" );
@@ -1266,29 +1265,29 @@ public class TestMarshalUnmarchal
 
         this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
-        
+
         PrivilegeStatusResource targetResource1 = new PrivilegeStatusResource();
         targetResource1.setId( "Id1" );
         targetResource1.setResourceURI( "ResourceURI1" );
         targetResource1.setName( "Name1" );
         targetResource1.setDescription( "Description1" );
         targetResource1.setType( TargetPrivilegeDescriptor.TYPE );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( TargetPrivilegeGroupPropertyDescriptor.ID );
         prop.setValue( "RepositoryGroupId1" );
         targetResource1.addProperty( prop );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( TargetPrivilegeRepositoryPropertyDescriptor.ID );
         prop.setValue( "RepositoryId1" );
         targetResource1.addProperty( prop );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( TargetPrivilegeRepositoryTargetPropertyDescriptor.ID );
         prop.setValue( "RepositoryTargetId1" );
         targetResource1.addProperty( prop );
-        
+
         prop = new PrivilegeProperty();
         prop.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
         prop.setValue( "Method1" );
@@ -1300,51 +1299,51 @@ public class TestMarshalUnmarchal
         this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
-    
+
     public void testPrivilegeTypeResourceResponse()
     {
         PrivilegeTypeResourceResponse response = new PrivilegeTypeResourceResponse();
-        
+
         PrivilegeTypeResource type = new PrivilegeTypeResource();
         type.setId( "id1" );
         type.setName( "name1" );
-        
+
         PrivilegeTypePropertyResource property = new PrivilegeTypePropertyResource();
         property.setId( "id1" );
         property.setName( "name1" );
         property.setHelpText( "help1" );
-        
+
         type.addProperty( property );
-        
+
         property = new PrivilegeTypePropertyResource();
         property.setId( "id2" );
         property.setName( "name2" );
         property.setHelpText( "help2" );
-        
+
         type.addProperty( property );
-        
+
         response.addData( type );
-        
+
         type = new PrivilegeTypeResource();
         type.setId( "id2" );
         type.setName( "name2" );
-        
+
         property = new PrivilegeTypePropertyResource();
         property.setId( "id3" );
         property.setName( "name3" );
         property.setHelpText( "help3" );
-        
+
         type.addProperty( property );
-        
+
         property = new PrivilegeTypePropertyResource();
         property.setId( "id4" );
         property.setName( "name4" );
         property.setHelpText( "help4" );
-        
+
         type.addProperty( property );
-        
+
         response.addData( type );
-        
+
         this.marshalUnmarchalThenCompare( response );
         this.validateXmlHasNoPackageNames( response );
     }
@@ -1473,7 +1472,7 @@ public class TestMarshalUnmarchal
         UserToRoleResourceRequest resourceResponse = new UserToRoleResourceRequest();
         UserToRoleResource resource = new UserToRoleResource();
         resourceResponse.setData( resource );
-        
+
         resource.setUserId( "userId" );
         resource.setSource( "source" );
         resource.addRole( "role1" );
@@ -1483,13 +1482,13 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
 
     }
-    
+
     public void testPlexusUserResourceResponse()
     {
         PlexusUserResourceResponse resourceResponse = new PlexusUserResourceResponse();
         PlexusUserResource resource = new PlexusUserResource();
         resourceResponse.setData( resource );
-        
+
         resource.setUserId( "userId" );
         resource.setSource( "source" );
         resource.setEmail( "email" );
@@ -1509,13 +1508,13 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
 
     }
-    
+
     public void testPlexusUserListResourceResponse()
     {
         PlexusUserListResourceResponse resourceResponse = new PlexusUserListResourceResponse();
         PlexusUserResource resource1 = new PlexusUserResource();
         resourceResponse.addData( resource1 );
-        
+
         resource1.setUserId( "userId" );
         resource1.setSource( "source" );
         resource1.setEmail( "email" );
@@ -1530,11 +1529,11 @@ public class TestMarshalUnmarchal
         role1.setSource( "source2" );
         role1.setRoleId( "roleId2" );
         resource1.addRole( role2 );
-        
-        
+
+
         PlexusUserResource resource2 = new PlexusUserResource();
         resourceResponse.addData( resource2 );
-        
+
         resource2.setUserId( "userId" );
         resource2.setSource( "source" );
         resource2.setEmail( "email" );
@@ -1554,7 +1553,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
 
     }
-    
+
     public void testPlexusComponentListResourceResponse()
     {
         PlexusComponentListResourceResponse resourceResponse = new PlexusComponentListResourceResponse();
@@ -1573,47 +1572,47 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
 
     }
-    
+
     public void testExternalRoleMappingResourceResponse()
     {
         ExternalRoleMappingResourceResponse resourceResponse = new ExternalRoleMappingResourceResponse();
 
         ExternalRoleMappingResource resource1 = new ExternalRoleMappingResource();
         resourceResponse.addData( resource1 );
-        
-        PlexusRoleResource role1 = new PlexusRoleResource();        
+
+        PlexusRoleResource role1 = new PlexusRoleResource();
         role1.setName( "role1" );
         role1.setSource( "source1" );
         role1.setRoleId( "roleId1" );
         resource1.setDefaultRole( role1 );
-        
+
         PlexusRoleResource role2 = new PlexusRoleResource();
         role2.setName( "role2" );
         role2.setSource( "source2" );
         role2.setRoleId( "roleId2" );
         resource1.addMappedRole( role2 );
-        
+
         PlexusRoleResource role3 = new PlexusRoleResource();
         role3.setName( "role3" );
         role3.setSource( "source3" );
         role3.setRoleId( "roleId3" );
         resource1.addMappedRole( role3 );
-        
+
         ExternalRoleMappingResource resource2 = new ExternalRoleMappingResource();
         resourceResponse.addData( resource2 );
-        
-        PlexusRoleResource role4 = new PlexusRoleResource();        
+
+        PlexusRoleResource role4 = new PlexusRoleResource();
         role4.setName( "role4" );
         role4.setSource( "source4" );
         role4.setRoleId( "roleId4" );
         resource2.setDefaultRole( role4 );
-        
+
         PlexusRoleResource role5 = new PlexusRoleResource();
         role5.setName( "role5" );
         role5.setSource( "source5" );
         role5.setRoleId( "roleId5" );
         resource2.addMappedRole( role5 );
-        
+
         PlexusRoleResource role6 = new PlexusRoleResource();
         role6.setName( "role6" );
         role6.setSource( "source6" );
@@ -1624,11 +1623,11 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
 
     }
-    
+
     public void testPlexusRoleListPlexusResource()
     {
         PlexusRoleListResourceResponse resourceResponse = new PlexusRoleListResourceResponse();
-        
+
         PlexusRoleResource role1 = new PlexusRoleResource();
         role1.setName( "role1" );
         role1.setSource( "source1" );
@@ -1650,7 +1649,7 @@ public class TestMarshalUnmarchal
     {
         // do xml
         String xml = this.xstreamXML.toXML( obj );
-        
+
 //        System.out.println( "xml: \n"+  xml);
         this.compareObjects( obj, xstreamXML.fromXML( xml ) );
 
@@ -1691,7 +1690,7 @@ public class TestMarshalUnmarchal
         // // print out each type of method, so i can rafb it
         // System.out.println( "\n\nClass: "+ obj.getClass() +"\n" );
         // System.out.println( xml+"\n" );
-        //        
+        //
         // Assert.assertFalse( "Found <string> XML: " + obj.getClass() + "\n" + xml, xml.contains( "<string>" ) );
 
         // also check for modelEncoding

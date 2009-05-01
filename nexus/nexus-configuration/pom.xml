@@ -130,6 +130,18 @@
               </models>
             </configuration>
           </execution>
+					<execution>
+						<id>security.xml</id>
+						<goals>
+							<goal>java</goal>
+							<goal>xpp3-reader</goal>
+							<goal>xpp3-writer</goal>
+						</goals>
+						<configuration>
+							<version>1.0.0</version>
+							<models><model>src/main/mdo/security.xml</model></models>
+						</configuration>
+					</execution>
         </executions>
         <configuration>
           <packageWithVersion>false</packageWithVersion>

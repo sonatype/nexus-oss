@@ -18,28 +18,33 @@ import java.net.URL;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 
 /**
  * @author Juven Xu
  */
 public class PlexusContainerContextListener
-    extends org.sonatype.plexus.rest.PlexusContainerContextListener
+    implements ServletContextListener
 {
+    private static final String KEY_PLEXUS = "plexus";
+
+    PlexusContainerConfigurationUtils plexusContainerConfigurationUtils = new PlexusContainerConfigurationUtils();
+
+    PlexusContainerUtils plexusContainerUtils = new PlexusContainerUtils();
 
     public void contextInitialized( ServletContextEvent sce )
     {
         ServletContext context = sce.getServletContext();
 
-        ContainerConfiguration plexusContainerConfiguration = this.buildContainerConfiguration( context );
+        ContainerConfiguration plexusContainerConfiguration = plexusContainerConfigurationUtils
+            .buildContainerConfiguration( context );
 
         NexusWorkDirUtils.setUpNexusWorkDir( plexusContainerConfiguration.getContext() );
-        
-        // configure log4j
-        this.initizlizeLog4j( context );
 
         try
         {
@@ -50,11 +55,17 @@ public class PlexusContainerContextListener
             throw new IllegalStateException( "Could start plexus container", e );
         }
     }
-    
-    private void initizlizeLog4j( ServletContext context )
+
+    public void contextDestroyed( ServletContextEvent sce )
+    {
+        plexusContainerUtils.stopContainer();
+    }
+
+    private void initizlizePlexusContainer( ServletContext context, ContainerConfiguration configuration )
+        throws PlexusContainerException
     {
         String path = "/WEB-INF/log4j.properties";
-        
+
         try
         {
             // a simple logger only for plexus container, note that nexus will use another log4j.properties which will
@@ -67,5 +78,9 @@ public class PlexusContainerContextListener
         {
             context.log( "Could not load simple log config from: " + path, e );
         }
+
+        PlexusContainer plexusContainer = plexusContainerUtils.startContainer( configuration );
+
+        context.setAttribute( KEY_PLEXUS, plexusContainer );
     }
 }

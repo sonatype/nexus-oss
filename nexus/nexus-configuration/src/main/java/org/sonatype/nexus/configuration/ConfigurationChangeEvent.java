@@ -20,7 +20,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 /**
  * An event fired on configuration change.
- * 
+ *
  * @author cstamas
  */
 public class ConfigurationChangeEvent
