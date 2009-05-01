@@ -133,6 +133,9 @@ public interface FeedRecorder
 
     List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
         TimelineFilter filter );
+    
+    List<NexusArtifactEvent> getNexusArtifactEvents( Set<String> subtypes, Long ts, Integer count, 
+        TimelineFilter filter );
 
     List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter );
 

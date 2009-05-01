@@ -239,11 +239,32 @@ public class DefaultFeedRecorder
             return timeline.retrieveNewest( cnt, types, subtypes, filter );
         }
     }
+    
+    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Long ts, Integer count,
+        TimelineFilter filter )
+    {
+        int cnt = count != null ? count : DEFAULT_PAGE_SIZE;
+        
+        if ( ts == null )
+        {
+            return timeline.retrieveNewest( cnt, types, subtypes, filter );
+        }
+        else
+        {
+            return timeline.retrieve( ts, cnt, types, subtypes, filter );
+        }
+    }
 
     public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
         TimelineFilter filter )
     {
         return getAisFromMaps( getEvents( REPO_EVENT_TYPE_SET, subtypes, from, count, filter ) );
+    }
+    
+    public List<NexusArtifactEvent> getNexusArtifactEvents( Set<String> subtypes, Long ts, Integer count,
+        TimelineFilter filter )
+    {
+        return getAisFromMaps( getEvents( REPO_EVENT_TYPE_SET, subtypes, ts, count, filter ) );
     }
 
     public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter )
