@@ -50,11 +50,11 @@ public class PlexusConfiguration
 
     public static final String SECURITY_MANAGER_ROLE = "securityManagerRole";
 
-    public static final String DEFAULT_SECURITY_SYSTEM_ROLE = SecuritySystem.class.getName();
+    public static final String DEFAULT_SECURITY_SYSTEM_ROLE = RealmSecurityManager.class.getName();
 
     public static final String SECURITY_MANAGER_ROLE_HINT = "securityManagerRoleHint";
 
-    public static final String DEFAULT_SECURITY_MANAGER_ROLE_HINT = "web";
+    public static final String DEFAULT_SECURITY_MANAGER_ROLE_HINT = "default";
 
     private static final Logger logger = LoggerFactory.getLogger( PlexusConfiguration.class );
 
@@ -75,6 +75,18 @@ public class PlexusConfiguration
         throws ContextException
     {
         plexusContainer = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+
+        // TODO: do somethign different
+        // start up the security system before we load the security manager, so the configuraiton is set
+        try
+        {
+            plexusContainer.lookup( SecuritySystem.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            this.getLogger().error( "Cannot lookup 'SecuritySystem', illegal state.", e );
+            throw new ContextException( "Cannot lookup 'SecuritySystem', illegal state.", e );
+        }
     }
 
     public String getSecurityManagerRole()
@@ -165,7 +177,7 @@ public class PlexusConfiguration
 
         try
         {
-            securityManager = (SecurityManager) container.lookup(
+            securityManager = (RealmSecurityManager) container.lookup(
                 getSecurityManagerRole(),
                 getSecurityManagerRoleHint() );
 
@@ -175,11 +187,13 @@ public class PlexusConfiguration
         }
         catch ( ComponentLookupException e )
         {
-//            getLogger().info(
-//                "Could not lookup SecurityManager with role='" + getSecurityManagerRole() + "' and roleHint='"
-//                    + getSecurityManagerRoleHint() + "'. Will look for Realms..." );
-            getLogger().warn(  "Could not lookup SecurityManager with role='" + getSecurityManagerRole() + "' and roleHint='"
-                + getSecurityManagerRoleHint() + "'. Will look for Realms...", e );
+            // getLogger().info(
+            // "Could not lookup SecurityManager with role='" + getSecurityManagerRole() + "' and roleHint='"
+            // + getSecurityManagerRoleHint() + "'. Will look for Realms..." );
+            getLogger().warn(
+                "Could not lookup SecurityManager with role='" + getSecurityManagerRole() + "' and roleHint='"
+                    + getSecurityManagerRoleHint() + "'. Will look for Realms...",
+                e );
 
             securityManager = null;
         }
@@ -202,7 +216,6 @@ public class PlexusConfiguration
         return securityManager;
     }
 
-    @SuppressWarnings( "unchecked" )
     protected SecurityManager createDefaultSecurityManagerFromRealms( PlexusContainer container,
         Map<String, Map<String, String>> sections )
     {
@@ -357,8 +370,8 @@ public class PlexusConfiguration
             {
                 if ( this.getLogger().isDebugEnabled() )
                 {
-                    this.getLogger().debug( "Applying path [" + path + "] to filter [" + name + "] " + "with config [" + config
-                        + "]" );
+                    this.getLogger().debug(
+                        "Applying path [" + path + "] to filter [" + name + "] " + "with config [" + config + "]" );
                 }
                 ( (PathConfigProcessor) filter ).processPathConfig( path, config );
             }
