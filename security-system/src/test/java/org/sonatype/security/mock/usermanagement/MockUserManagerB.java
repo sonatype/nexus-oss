@@ -61,12 +61,12 @@ public class MockUserManagerB
         f.addRole( new Role( "Role2", "", this.getSource() ) );
         f.addRole( new Role( "Role3", "", this.getSource() ) );
 
-        this.addUser( a );
-        this.addUser( b );
-        this.addUser( c );
-        this.addUser( d );
-        this.addUser( e );
-        this.addUser( f );
+        this.addUser( a, a.getUserId() );
+        this.addUser( b, b.getUserId() );
+        this.addUser( c, c.getUserId() );
+        this.addUser( d, d.getUserId() );
+        this.addUser( e, e.getUserId() );
+        this.addUser( f, f.getUserId() );
     }
 
     public String getSource()

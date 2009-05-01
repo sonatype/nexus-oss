@@ -15,6 +15,7 @@ package org.sonatype.security.locators;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.User;
@@ -108,6 +109,21 @@ public abstract class AbstractTestUserManager
     {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public User addUser( User user, String password )
+        throws InvalidConfigurationException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void changePassword( String userId, String newPassword )
+        throws UserNotFoundException,
+            InvalidConfigurationException
+    {
+        // TODO Auto-generated method stub
+        
     }
 
 }

@@ -71,5 +71,5 @@ public interface UserManager
         throws UserNotFoundException;
 
     void changePassword( String userId, String newPassword )
-        throws UserNotFoundException;
+        throws UserNotFoundException, InvalidConfigurationException;
 }

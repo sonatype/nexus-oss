@@ -501,7 +501,7 @@ public class DefaultSecuritySystem
 
     public void changePassword( String userId, String oldPassword, String newPassword )
         throws UserNotFoundException,
-            InvalidCredentialsException
+            InvalidCredentialsException, InvalidConfigurationException
     {
         // first authenticate the user
         try
@@ -523,7 +523,7 @@ public class DefaultSecuritySystem
     }
 
     public void changePassword( String userId, String newPassword )
-        throws UserNotFoundException
+        throws UserNotFoundException, InvalidConfigurationException
     {
         User user = this.getUser( userId );
 
@@ -542,7 +542,7 @@ public class DefaultSecuritySystem
     }
 
     public void forgotPassword( String userId, String email )
-        throws UserNotFoundException
+        throws UserNotFoundException, InvalidConfigurationException
     {
         UserSearchCriteria criteria = new UserSearchCriteria();
         criteria.setEmail( email );
@@ -601,7 +601,7 @@ public class DefaultSecuritySystem
     }
 
     public void resetPassword( String userId )
-        throws UserNotFoundException
+        throws UserNotFoundException, InvalidConfigurationException
     {
         String newClearTextPassword = this.generatePassword();
 

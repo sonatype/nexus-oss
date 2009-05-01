@@ -21,7 +21,7 @@ public abstract class AbstractMockUserManager
         return true;
     }
 
-    public User addUser( User user )
+    public User addUser( User user, String password )
     {
         this.getUsers().add( user );
         return user;

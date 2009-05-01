@@ -23,7 +23,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
-import org.sonatype.security.usermanagement.AbstractUserManager;
+import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -33,7 +33,7 @@ import org.sonatype.security.usermanagement.xml.ConfiguredUsersUserManager;
 
 @Component( role = UserManager.class, hint = "url", description = "URL Realm Users" )
 public class URLUserManager
-    extends AbstractUserManager
+    extends AbstractReadOnlyUserManager
 {
     public static final String SOURCE = "url";
 
@@ -204,35 +204,11 @@ public class URLUserManager
         return userIds;
     }
 
-    public User addUser( User user )
-    {
-        return null;
-    }
-
-    public void deleteUser( String userId )
-        throws UserNotFoundException
-    {        
-    }
-
     public Set<Role> getUsersRoles( String userId, String source )
         throws UserNotFoundException
     {
+        // TODO Auto-generated method stub
         return null;
     }
-
-    public void setUsersRoles( String userId, Set<Role> roles, String source )
-        throws UserNotFoundException
-    {        
-    }
-
-    public boolean supportsWrite()
-    {
-        return false;
-    }
-
-    public User updateUser( User user )
-        throws UserNotFoundException
-    {
-        return null;
-    }
+  
 }

@@ -26,7 +26,7 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
-import org.sonatype.security.usermanagement.AbstractUserManager;
+import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -35,7 +35,7 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 @Component( role = UserManager.class, hint = "allConfigured", description = "All Configured Users" )
 public class ConfiguredUsersUserManager
-    extends AbstractUserManager
+    extends AbstractReadOnlyUserManager
 {
 
     @Requirement
@@ -122,38 +122,6 @@ public class ConfiguredUsersUserManager
         return this.filterListInMemeory( this.listUsers(), criteria );
     }
 
-    public boolean supportsWrite()
-    {
-        return false;
-    }
-
-    public User addUser( User user )
-    {
-        return null;
-    }
-
-    public User updateUser( User user )
-        throws UserNotFoundException
-    {
-        return null;
-    }
-
-    public void deleteUser( String userId )
-        throws UserNotFoundException
-    {
-    }
-
-    public Set<Role> getUsersRoles( String userId, String source )
-        throws UserNotFoundException
-    {
-        return null;
-    }
-
-    public void setUsersRoles( String userId, Set<Role> roles, String source )
-        throws UserNotFoundException
-    {
-    }
-
     private SecuritySystem getSecuritySystem()
     {
         // FIXME: hack, we need to lazy load the security system, due to a circular dependency
@@ -170,6 +138,13 @@ public class ConfiguredUsersUserManager
         }
 
         return this.securitySystem;
+    }
+
+    public Set<Role> getUsersRoles( String userId, String source )
+        throws UserNotFoundException
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

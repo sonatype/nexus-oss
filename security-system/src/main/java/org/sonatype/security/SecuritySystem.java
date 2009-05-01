@@ -124,20 +124,20 @@ public interface SecuritySystem
 
     // forget / change password
     void forgotPassword( String userId, String email )
-        throws UserNotFoundException;
+        throws UserNotFoundException, InvalidConfigurationException;
 
     void forgotUsername( String email )
         throws UserNotFoundException;
 
     void resetPassword( String userId )
-        throws UserNotFoundException;
+        throws UserNotFoundException, InvalidConfigurationException;
 
     void changePassword( String userId, String oldPassword, String newPassword )
         throws UserNotFoundException,
-            InvalidCredentialsException;
+            InvalidCredentialsException, InvalidConfigurationException;
 
     void changePassword( String userId, String newPassword )
-        throws UserNotFoundException;
+        throws UserNotFoundException, InvalidConfigurationException;
 
     // //
     // Authorization Management

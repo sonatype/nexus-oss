@@ -21,6 +21,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Role;
@@ -29,14 +30,17 @@ import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
+import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
+import org.sonatype.security.usermanagement.UserStatus;
 
 @Component( role = UserManager.class, description = "Default" )
 public class SecurityXmlUserManager
@@ -54,6 +58,85 @@ public class SecurityXmlUserManager
 
     @Requirement
     private Logger logger;
+
+    protected SecurityUser toUser( User user )
+    {
+        if ( user == null )
+        {
+            return null;
+        }
+
+        SecurityUser secUser = new SecurityUser();
+
+        secUser.setId( user.getUserId() );
+        secUser.setName( user.getName() );
+        secUser.setEmail( user.getEmailAddress() );
+        secUser.setStatus( user.getStatus().name() );
+        secUser.setReadOnly( user.isReadOnly() );
+        // secUser.setPassword( password )// FIXME
+
+        for ( Role role : user.getRoles() )
+        {
+            secUser.addRole( role.getRoleId() );
+        }
+
+        return secUser;
+    }
+    
+    protected User toUser( CUser cUser )
+    {
+        if ( cUser == null )
+        {
+            return null;
+        }
+
+        DefaultUser user = new DefaultUser();
+
+        user.setUserId( cUser.getId() );
+        user.setName( cUser.getName() );
+        user.setEmailAddress( cUser.getEmail() );
+        user.setSource( SOURCE );
+        user.setStatus( UserStatus.valueOf( cUser.getStatus() ) );
+        user.setReadOnly( false );
+
+        try
+        {
+            user.setRoles( this.getUsersRoles( cUser.getId(), SOURCE ) );
+        }
+        catch ( UserNotFoundException e )
+        {
+            // We should NEVER get here
+            this.logger.warn( "Could not find user: '" + cUser.getId() + "' of source: '" + SOURCE
+                + "' while looking up the users roles.", e );
+        }
+
+        return user;
+    }
+
+    protected Role toRole( String roleId )
+    {
+        if ( roleId == null )
+        {
+            return null;
+        }
+
+        try
+        {
+            CRole role = configuration.readRole( roleId );
+
+            Role plexusRole = new Role();
+
+            plexusRole.setRoleId( role.getId() );
+            plexusRole.setName( role.getName() );
+            plexusRole.setSource( SOURCE );
+
+            return plexusRole;
+        }
+        catch ( NoSuchRoleException e )
+        {
+            return null;
+        }
+    }
 
     public Set<User> listUsers()
     {
@@ -84,6 +167,101 @@ public class SecurityXmlUserManager
     {
         User user = toUser( configuration.readUser( userId ) );
         return user;
+    }
+
+   
+
+    public String getSource()
+    {
+        return SOURCE;
+    }
+
+    public boolean supportsWrite()
+    {
+        return true;
+    }
+
+    public User addUser( User user, String password )
+        throws InvalidConfigurationException
+    {
+        SecurityUser secUser = this.toUser( user );
+        secUser.setPassword( this.hashPassword( password ) );
+        this.configuration.createUser( secUser );
+        this.saveConfiguration();
+
+        // TODO: i am starting to feel we shouldn't return a user.
+        return user;
+    }
+
+    public void changePassword( String userId, String newPassword )
+        throws UserNotFoundException, InvalidConfigurationException
+    {
+       SecurityUser secUser = this.configuration.readUser( userId );
+       secUser.setPassword( this.hashPassword( newPassword ) );
+       this.configuration.updateUser( secUser );
+       this.saveConfiguration();
+    }
+
+    public User updateUser( User user )
+        throws UserNotFoundException,
+            InvalidConfigurationException
+    {
+        // we need to pull the users password off off the old user object
+        SecurityUser oldSecUser = this.configuration.readUser( user.getUserId() );
+        SecurityUser newSecUser = this.toUser( user );
+        newSecUser.setPassword( oldSecUser.getPassword() );
+        
+        this.configuration.updateUser( newSecUser );
+        this.saveConfiguration();
+        return user;
+    }
+
+    public void deleteUser( String userId )
+        throws UserNotFoundException
+    {
+        this.configuration.deleteUser( userId );
+        this.saveConfiguration();
+    }
+
+    public Set<Role> getUsersRoles( String userId, String source )
+        throws UserNotFoundException
+    {
+        Set<Role> roles = new HashSet<Role>();
+
+        CUserRoleMapping roleMapping;
+        try
+        {
+            roleMapping = this.configuration.readUserRoleMapping( userId, source );
+
+            if ( roleMapping != null )
+            {
+                for ( String roleId : (List<String>) roleMapping.getRoles() )
+                {
+                    Role role = toRole( roleId );
+                    if ( role != null )
+                    {
+                        roles.add( role );
+                    }
+                }
+            }
+        }
+        catch ( NoSuchRoleMappingException e )
+        {
+            this.logger.debug( "No user role mapping found for user: " + userId );
+        }
+        return roles;
+    }
+
+    public void setUsersRoles( String userId, Set<Role> roles, String source )
+        throws UserNotFoundException
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void saveConfiguration()
+    {
+        this.configuration.save();
     }
 
     public Set<User> searchUsers( UserSearchCriteria criteria )
@@ -127,126 +305,6 @@ public class SecurityXmlUserManager
         return users;
     }
 
-    protected User toUser( CUser cUser )
-    {
-        if ( cUser == null )
-        {
-            return null;
-        }
-
-        DefaultUser user = new DefaultUser();
-
-        user.setUserId( cUser.getId() );
-        user.setName( cUser.getName() );
-        user.setEmailAddress( cUser.getEmail() );
-        user.setSource( SOURCE );
-
-        try
-        {
-            user.setRoles( this.getUsersRoles( cUser.getId(), SOURCE ) );
-        }
-        catch ( UserNotFoundException e )
-        {
-            // We should NEVER get here
-            this.logger.warn( "Could not find user: '" + cUser.getId() + "' of source: '" + SOURCE
-                + "' while looking up the users roles.", e );
-        }
-
-        return user;
-    }
-
-    protected Role toRole( String roleId )
-    {
-        if ( roleId == null )
-        {
-            return null;
-        }
-
-        try
-        {
-            CRole role = configuration.readRole( roleId );
-
-            Role plexusRole = new Role();
-
-            plexusRole.setRoleId( role.getId() );
-            plexusRole.setName( role.getName() );
-            plexusRole.setSource( SOURCE );
-
-            return plexusRole;
-        }
-        catch ( NoSuchRoleException e )
-        {
-            return null;
-        }
-    }
-
-    public String getSource()
-    {
-        return SOURCE;
-    }
-
-    public boolean supportsWrite()
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public User addUser( User user )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public User updateUser( User user )
-        throws UserNotFoundException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void deleteUser( String userId )
-        throws UserNotFoundException
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public Set<Role> getUsersRoles( String userId, String source )
-        throws UserNotFoundException
-    {
-        Set<Role> roles = new HashSet<Role>();
-
-        CUserRoleMapping roleMapping;
-        try
-        {
-            roleMapping = this.configuration.readUserRoleMapping( userId, source );
-
-            if ( roleMapping != null )
-            {
-                for ( String roleId : (List<String>) roleMapping.getRoles() )
-                {
-                    Role role = toRole( roleId );
-                    if ( role != null )
-                    {
-                        roles.add( role );
-                    }
-                }
-            }
-        }
-        catch ( NoSuchRoleMappingException e )
-        {
-            this.logger.debug( "No user role mapping found for user: " + userId );
-        }
-        return roles;
-    }
-
-    public void setUsersRoles( String userId, Set<Role> roles, String source )
-        throws UserNotFoundException
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     private SecuritySystem getSecuritySystem()
     {
         // FIXME: hack, we need to lazy load the security system, due to a circular dependency
@@ -263,5 +321,16 @@ public class SecurityXmlUserManager
         }
 
         return this.securitySystem;
+    }
+    
+    private String hashPassword( String clearPassword )
+    {
+        // set the password if its not null
+        if ( clearPassword != null && clearPassword.trim().length() > 0 )
+        {
+            return StringDigester.getSha1Digest( clearPassword );
+        }
+        
+        return clearPassword;
     }
 }

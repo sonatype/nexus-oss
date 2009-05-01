@@ -17,7 +17,7 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.usermanagement.AbstractUserManager;
+import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -26,7 +26,7 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 @Component( role = UserManager.class, hint = "test" )
 public class MockUserLocator
-    extends AbstractUserManager
+    extends AbstractReadOnlyUserManager
 {
     private Set<String> userIds = new HashSet<String>();
 
@@ -87,6 +87,13 @@ public class MockUserLocator
         user.setSource( this.getSource() );
 
         return user;
+    }
+
+    public Set<Role> getUsersRoles( String userId, String source )
+        throws UserNotFoundException
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

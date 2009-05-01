@@ -73,43 +73,5 @@ public abstract class AbstractUserManager
 
         return true;
     }
-    
-    
-    public boolean supportsWrite()
-    {
-        return false;
-    }
-    
-    public void deleteUser( String userId )
-        throws UserNotFoundException
-    {        
-    }
-
-    public Set<Role> getUsersRoles( String userId, String source )
-        throws UserNotFoundException
-    {
-        return null;
-    }
-
-    public void setUsersRoles( String userId, Set<Role> roles, String source )
-        throws UserNotFoundException
-    {        
-    }
-
-    public User updateUser( User user )
-        throws UserNotFoundException
-    {
-        return null;
-    }
-
-    public User addUser( User user, String password )
-    {
-        return null;
-    }
-
-    public void changePassword( String userId, String newPassword )
-        throws UserNotFoundException
-    {        
-    }
 
 }

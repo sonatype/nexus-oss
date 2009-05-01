@@ -43,10 +43,10 @@ public class MockUserManagerA
         d.setSource( this.getSource() );
         d.setUserId( "dknudsen" );
 
-        this.addUser( a );
-        this.addUser( b );
-        this.addUser( c );
-        this.addUser( d );
+        this.addUser( a, a.getUserId() );
+        this.addUser( b, b.getUserId() );
+        this.addUser( c, c.getUserId() );
+        this.addUser( d, d.getUserId() );
     }
 
     public String getSource()
