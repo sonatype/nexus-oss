@@ -18,6 +18,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.rest.model.UserForgotPasswordRequest;
@@ -85,6 +86,13 @@ public class UserForgotPasswordPlexusResource
                 getLogger().debug( "Invalid Username", e );
 
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid Username" );
+            }
+            catch ( InvalidConfigurationException e )
+            {
+                // this should never happen
+                getLogger().warn( "Failed to set password!", e );
+
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Failed to set password!." );
             }
         }
         // return null because the status is 202
