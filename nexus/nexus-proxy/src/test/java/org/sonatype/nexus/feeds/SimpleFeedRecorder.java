@@ -78,6 +78,12 @@ public class SimpleFeedRecorder
     {
         return Collections.emptyList();
     }
+    
+    public List<NexusArtifactEvent> getNexusArtifactEvents( Set<String> subtypes, Long ts, Integer count,
+        TimelineFilter filter )
+    {
+        return Collections.emptyList();
+    }
 
     public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter )
     {
