@@ -34,10 +34,6 @@ public class UserManagerTest
     {
         super.setUp();
 
-        // copy the file to a different location because we are going to change it
-        FileUtils.copyFile( new File( "target/test-classes/org/sonatype/security/locators/security.xml" ), new File(
-            "target/test-classes/org/sonatype/security/locators/security-test.xml" ) );
-
         // copy the securityConf into place
         String securityXml = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security.xml";
         FileUtils.copyURLToFile( Thread.currentThread().getContextClassLoader().getResource( securityXml ), new File(

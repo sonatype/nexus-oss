@@ -148,6 +148,7 @@ public class SecurityXmlAuthorizationManager
         throws InvalidConfigurationException
     {
         this.configuration.createRole( this.toRole( role ) );
+        this.saveConfiguration();
 
         // TODO: return new role?
         return role;
@@ -158,6 +159,7 @@ public class SecurityXmlAuthorizationManager
             InvalidConfigurationException
     {
         this.configuration.updateRole( this.toRole( role ) );
+        this.saveConfiguration();
         return role;
     }
 
@@ -165,25 +167,12 @@ public class SecurityXmlAuthorizationManager
         throws NoSuchRoleException
     {
         this.configuration.deleteRole( roleId );
+        this.saveConfiguration();
     }
 
     // //
     // PRIVILEGE CRUDS
     // //
-
-    public Set<String> listPrivilegeIds()
-    {
-        Set<String> permissions = new HashSet<String>();
-        List<SecurityPrivilege> secPrivs = this.configuration.listPrivileges();
-
-        for ( SecurityPrivilege securityPrivilege : secPrivs )
-        {
-            // FIXME: use PermissionDescriptors
-            permissions.add( securityPrivilege.getId() );
-        }
-
-        return permissions;
-    }
 
     public Set<Privilege> listPrivileges()
     {
@@ -207,6 +196,7 @@ public class SecurityXmlAuthorizationManager
     public Privilege addPrivilege( Privilege privilege ) throws InvalidConfigurationException
     {
        this.configuration.createPrivilege( this.toPrivilege( privilege ) );
+       this.saveConfiguration();
        
        return privilege;
     }
@@ -215,6 +205,7 @@ public class SecurityXmlAuthorizationManager
         throws NoSuchPrivilegeException, InvalidConfigurationException
     {
         this.configuration.updatePrivilege( this.toPrivilege( privilege ) );
+        this.saveConfiguration();
         
         return privilege;
     }
@@ -223,6 +214,13 @@ public class SecurityXmlAuthorizationManager
         throws NoSuchPrivilegeException
     {
         this.configuration.deletePrivilege( privilegeId );
+        this.saveConfiguration();
     }
+    
+    private void saveConfiguration()
+    {
+        this.configuration.save();
+    }
+
 
 }

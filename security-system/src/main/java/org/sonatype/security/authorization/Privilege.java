@@ -1,5 +1,6 @@
 package org.sonatype.security.authorization;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Privilege
@@ -28,7 +29,7 @@ public class Privilege
     /**
      * Field properties
      */
-    private Map<String, String> properties;
+    private Map<String, String> properties = new HashMap<String, String>();
     
     private boolean readOnly;
 
