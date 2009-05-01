@@ -824,7 +824,8 @@ Sonatype.utils = {
     if ( Sonatype.view.historyDisabled ) return;
 
     if ( tab ) {
-      if ( tab.ownerCt != Sonatype.view.mainTabPanel ) return;
+      if ( tab.ownerCt != Sonatype.view.mainTabPanel ||
+          tab != Sonatype.view.mainTabPanel.getActiveTab() ) return;
     }
     else {
       tab = Sonatype.view.mainTabPanel.getActiveTab();
@@ -837,7 +838,10 @@ Sonatype.utils = {
         bookmark += Sonatype.view.HISTORY_DELIMITER + b2;
       }
     }
-    Ext.History.add( bookmark );
+    var oldBookmark = Ext.History.getToken();
+    if ( bookmark != oldBookmark ) {
+      Ext.History.add( bookmark );
+    }
   }
 };
 
