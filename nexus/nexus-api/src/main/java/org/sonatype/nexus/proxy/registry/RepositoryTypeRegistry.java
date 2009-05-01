@@ -13,7 +13,6 @@
  */
 package org.sonatype.nexus.proxy.registry;
 
-import java.util.Collection;
 import java.util.Set;
 
 /**
