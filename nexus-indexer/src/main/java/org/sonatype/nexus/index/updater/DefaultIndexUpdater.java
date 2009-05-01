@@ -100,17 +100,25 @@ public class DefaultIndexUpdater
 
                 Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
                 
-                List<String> filenames = incrementalHandler.loadRemoteIncrementalUpdates( updateRequest, localProperties, properties );
-                
-                // if we have some incremental files, merge them in
-                if ( filenames != null )
+                //If new timestamp is missing, dont bother checking incremental, we have an old file
+                if ( updateTimestamp != null )
                 {
-                    for ( String filename : filenames )
-                    {
-                        loadIndexDirectory( updateRequest, true, filename );
-                    }
+                    List<String> filenames = incrementalHandler.loadRemoteIncrementalUpdates( updateRequest, localProperties, properties );
                     
-                    return updateTimestamp;
+                    // if we have some incremental files, merge them in
+                    if ( filenames != null )
+                    {
+                        for ( String filename : filenames )
+                        {
+                            loadIndexDirectory( updateRequest, true, filename );
+                        }
+                        
+                        return updateTimestamp;
+                    }
+                }
+                else
+                {
+                    updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_LEGACY_TIMESTAMP );
                 }
                 
                 // if incremental cant be done for whatever reason, simply use old logic of 
