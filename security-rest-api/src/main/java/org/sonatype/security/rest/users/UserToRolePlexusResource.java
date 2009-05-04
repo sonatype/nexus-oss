@@ -12,7 +12,9 @@
  */
 package org.sonatype.security.rest.users;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -26,11 +28,10 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
-import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.rest.model.UserToRoleResource;
 import org.sonatype.security.rest.model.UserToRoleResourceRequest;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = PlexusResource.class, hint = "UserToRolePlexusResource" )
@@ -112,48 +113,35 @@ public class UserToRolePlexusResource
         }
         catch ( NoSuchUserManager e )
         {
-            this.getLogger().warn(  e.getMessage(), e );
+            this.getLogger().warn( e.getMessage(), e );
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "User with id '" + userId + "' not found." );
         }
 
         // get the dto
         UserToRoleResource userToRole = mappingRequest.getData();
 
-        SecurityUserRoleMapping roleMapping = this.restToSecurityModel( userToRole );
+        Set<RoleIdentifier> roleIdentifiers = this.restToSecurityModel( userToRole );
 
-        if ( roleMapping.getRoles().size() == 0 )
+        if ( roleIdentifiers.size() == 0 )
         {
             throw new PlexusResourceException(
                 Status.CLIENT_ERROR_BAD_REQUEST,
                 "Configuration error.",
                 getErrorResponse( "roles", "User requires one or more roles." ) );
         }
-        // this seems a bit odd, but here is why the PUT does both create and update.
-        // the users are stored in some LDAP server somewhere, but the role mapping is stored locally
-        // this resource is trying to mimic the normal plexus resource, in the future we may add write
-        // support for ldap users ( I don't know why), so this is setting us up for that.
-        // or the way I look at it, we are updating the Users Roles... so its an update.
+
         try
         {
             // this will throw if we cannot find the user, in that case we will create one.
-            getConfigurationManager().readUserRoleMapping( roleMapping.getUserId(), roleMapping.getSource() );
-            getConfigurationManager().updateUserRoleMapping( roleMapping );
-        }
-        catch ( NoSuchRoleMappingException e )
-        {
-            // do create
-            try
-            {
-                getConfigurationManager().createUserRoleMapping( roleMapping );
-            }
-            catch ( InvalidConfigurationException e1 )
-            {
-                this.handleInvalidConfigurationException( e1 );
-            }
+            getSecuritySystem().setUsersRoles( userToRole.getUserId(), userToRole.getSource(), roleIdentifiers );
         }
         catch ( InvalidConfigurationException e )
         {
             this.handleInvalidConfigurationException( e );
+        }
+        catch ( UserNotFoundException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "User with id '" + userId + "' not found." );
         }
 
         response.setStatus( Status.SUCCESS_NO_CONTENT );
@@ -175,25 +163,29 @@ public class UserToRolePlexusResource
 
         try
         {
-            getConfigurationManager().deleteUserRoleMapping( userId, source );
+            getSecuritySystem().setUsersRoles( userId, source, null );
         }
-        catch ( NoSuchRoleMappingException e )
+        catch ( InvalidConfigurationException e )
+        {
+            this.handleInvalidConfigurationException( e );
+        }
+        catch ( UserNotFoundException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "User with id '" + userId + "' not found." );
         }
     }
 
-    private SecurityUserRoleMapping restToSecurityModel( UserToRoleResource restRoleMapping )
+    private Set<RoleIdentifier> restToSecurityModel( UserToRoleResource restRoleMapping )
     {
-        SecurityUserRoleMapping roleMapping = new SecurityUserRoleMapping();
-        roleMapping.setUserId( restRoleMapping.getUserId() );
-        roleMapping.setSource( restRoleMapping.getSource() );
+        // FIXME: loss of roles source, currently we only support CRUDS on the XML realm but, that is temporary.
 
-        for ( String role : (List<String>) restRoleMapping.getRoles() )
+        Set<RoleIdentifier> roleIdentifiers = new HashSet<RoleIdentifier>();
+
+        for ( String roleId : (List<String>) restRoleMapping.getRoles() )
         {
-            roleMapping.addRole( role );
+            roleIdentifiers.add( new RoleIdentifier( DEFAULT_SOURCE, roleId ) );
         }
 
-        return roleMapping;
+        return roleIdentifiers;
     }
 }
