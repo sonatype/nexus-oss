@@ -15,6 +15,7 @@ package org.sonatype.security.rest.privileges;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -24,6 +25,7 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
+import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.rest.model.PrivilegeTypePropertyResource;
 import org.sonatype.security.rest.model.PrivilegeTypeResource;
 import org.sonatype.security.rest.model.PrivilegeTypeResourceResponse;
@@ -32,6 +34,9 @@ import org.sonatype.security.rest.model.PrivilegeTypeResourceResponse;
 public class PrivilegeTypePlexusResource
     extends AbstractPrivilegePlexusResource
 {
+    @Requirement( hint = "resourceMerging")
+    private ConfigurationManager configurationManager;
+    
     @Override
     public Object getPayloadInstance()
     {
@@ -56,7 +61,7 @@ public class PrivilegeTypePlexusResource
     {
         PrivilegeTypeResourceResponse result = new PrivilegeTypeResourceResponse();
 
-        List<PrivilegeDescriptor> privDescriptors = getConfigurationManager().listPrivilegeDescriptors();
+        List<PrivilegeDescriptor> privDescriptors = this.configurationManager.listPrivilegeDescriptors();
 
         for ( PrivilegeDescriptor privDescriptor : privDescriptors )
         {

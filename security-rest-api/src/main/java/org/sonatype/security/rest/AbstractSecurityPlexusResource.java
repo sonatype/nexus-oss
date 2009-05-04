@@ -15,21 +15,19 @@ package org.sonatype.security.rest;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.UserResource;
@@ -40,19 +38,14 @@ import org.sonatype.security.usermanagement.UserStatus;
 
 public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResource
 {
-
-    @Requirement( hint = "resourceMerging")
-    private ConfigurationManager configurationManager;
     
     @Requirement
     private SecuritySystem securitySystem;
 
     protected static final String DEFAULT_SOURCE = "default";
     
-    protected ConfigurationManager getConfigurationManager()
-    {
-        return configurationManager;
-    }
+    @Requirement
+    protected ReferenceFactory referenceFactory;
     
     protected SecuritySystem getSecuritySystem()
     {
@@ -99,7 +92,7 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         resource.setName( user.getName() );
         resource.setStatus( user.getStatus().name() );
         resource.setUserId( user.getUserId() );
-        resource.setResourceURI( this.createChildReference( request, this, resource.getUserId() ).toString() );
+        resource.setResourceURI( this.createChildReference( request, resource.getUserId() ).toString() );
         resource.setUserManaged( !user.isReadOnly() );
 
         for ( RoleIdentifier role : user.getRoles() )
@@ -125,7 +118,6 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         user.getRoles().clear();
         for ( String roleId : (List<String>) resource.getRoles() )
         {
-            // FIXME: role are not strings
             user.addRole( new RoleIdentifier( DEFAULT_SOURCE, roleId ) );
         }
 
@@ -170,79 +162,9 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         return roleResource;
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    /**
-     * Centralized, since this is the only "dependent" stuff that relies on knowledge where restlet.Application is
-     * mounted (we had a /service => / move).
-     * 
-     * @param request
-     * @return
-     */
-    protected Reference getContextRoot( Request request )
+    protected Reference createChildReference( Request request, String childPath )
     {
-        Reference result = null;
-
-//        if ( getNexus().isForceBaseUrl() && getNexus().getBaseUrl() != null )
-//        {
-//            result = new Reference( getNexus().getBaseUrl() );
-//        }
-//        else
-//        {
-            result = request.getRootRef();
-//        }
-
-        // fix for when restlet is at webapp root
-        if ( StringUtils.isEmpty( result.getPath() ) )
-        {
-            result.setPath( "/" );
-        }
-
-        return result;
-    }
-    
-    private Reference updateBaseRefPath( Reference reference )
-    {
-        if ( reference.getBaseRef().getPath() == null )
-        {
-            reference.getBaseRef().setPath( "/" );
-        }
-        else if ( !reference.getBaseRef().getPath().endsWith( "/" ) )
-        {
-            reference.getBaseRef().setPath( reference.getBaseRef().getPath() + "/" );
-        }
-        
-        return reference;
-    }
-    
-    protected Reference createChildReference( Request request, PlexusResource resource, String childPath )
-    {
-        String uriPart = request.getResourceRef().getTargetRef().toString().substring(
-            request.getRootRef().getTargetRef().toString().length() );
-        
-        // trim leading slash
-        if ( uriPart.startsWith( "/" ) )
-        {
-            uriPart = uriPart.substring( 1 );
-        }
-        
-        Reference result = updateBaseRefPath( new Reference( getContextRoot( request ),  uriPart ) ).addSegment( childPath );
-
-        if ( result.hasQuery() )
-        {
-            result.setQuery( null );
-        }
-
-        return result.getTargetRef();
+        return this.referenceFactory.createChildReference( request, childPath );
     }
     
 }
