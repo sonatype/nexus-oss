@@ -368,8 +368,13 @@ public class DefaultTaskConfigManager
                 storeableSchedule.setType( CScheduleConfig.TYPE_MONTHLY );
 
                 storeableSchedule.setStartDate( ( (MonthlySchedule) schedule ).getStartDate().getTime() );
+                
+                Date endDate = ( (MonthlySchedule) schedule ).getEndDate();
 
-                storeableSchedule.setEndDate( ( (MonthlySchedule) schedule ).getEndDate().getTime() );
+                if ( endDate != null )
+                {
+                    storeableSchedule.setEndDate( endDate.getTime() );
+                }
 
                 for ( Iterator iter = ( (MonthlySchedule) schedule ).getDaysToRun().iterator(); iter.hasNext(); )
                 {
@@ -384,8 +389,13 @@ public class DefaultTaskConfigManager
                 storeableSchedule.setType( CScheduleConfig.TYPE_WEEKLY );
 
                 storeableSchedule.setStartDate( ( (WeeklySchedule) schedule ).getStartDate().getTime() );
+                
+                Date endDate = ( (WeeklySchedule) schedule ).getEndDate();
 
-                storeableSchedule.setEndDate( ( (WeeklySchedule) schedule ).getEndDate().getTime() );
+                if ( endDate != null )
+                {
+                    storeableSchedule.setEndDate( endDate.getTime() );
+                }
 
                 for ( Iterator iter = ( (WeeklySchedule) schedule ).getDaysToRun().iterator(); iter.hasNext(); )
                 {
@@ -400,16 +410,26 @@ public class DefaultTaskConfigManager
                 storeableSchedule.setType( CScheduleConfig.TYPE_DAILY );
 
                 storeableSchedule.setStartDate( ( (DailySchedule) schedule ).getStartDate().getTime() );
+                
+                Date endDate = ( (DailySchedule) schedule ).getEndDate();
 
-                storeableSchedule.setEndDate( ( (DailySchedule) schedule ).getEndDate().getTime() );
+                if ( endDate != null )
+                {
+                    storeableSchedule.setEndDate( endDate.getTime() );
+                }
             }
             else if ( HourlySchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
                 storeableSchedule.setType( CScheduleConfig.TYPE_HOURLY );
 
                 storeableSchedule.setStartDate( ( (HourlySchedule) schedule ).getStartDate().getTime() );
+                
+                Date endDate = ( (HourlySchedule) schedule ).getEndDate();
 
-                storeableSchedule.setEndDate( ( (HourlySchedule) schedule ).getEndDate().getTime() );
+                if ( endDate != null )
+                {
+                    storeableSchedule.setEndDate( endDate.getTime() );
+                }
             }
             else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
