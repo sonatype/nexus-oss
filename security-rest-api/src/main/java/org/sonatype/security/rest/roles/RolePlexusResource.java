@@ -121,7 +121,7 @@ public class RolePlexusResource
                 resourceResponse.getData().setUserManaged( !role.isReadOnly() );
 
                 resourceResponse.getData().setResourceURI(
-                    createChildReference( request, this, resource.getId() ).toString() );
+                    createChildReference( request, resource.getId() ).toString() );
 
             }
             catch ( NoSuchRoleException e )
