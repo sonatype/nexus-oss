@@ -337,7 +337,39 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
                   root :new Ext.tree.TreeNode( {
                     text :'root',
                     draggable: false
-                  })
+                  }),
+                  invalidText: 'Add one or more artifacts',
+                  validate: function(){
+                    var pomMode = this.find( 'name', 'gavDefinition' )[0].getValue() == 'pom';
+                    
+                    if ( pomMode ){
+                      return true;
+                    }
+                    
+                    return this.find( 'name', 'artifact-list' )[0].root.childNodes.length > 0;
+                  },
+                  invalid: false,
+                  listeners: {
+                    'append' : {
+                      fn: function(tree, parentNode, insertedNode, i) {
+                        if (tree.invalid) {
+                          this.clearInvalid();
+                        }
+                      },
+                      scope: this
+                    },
+                    'remove' : {
+                      fn: function(tree, parentNode, removedNode) {
+                        if(tree.root.childNodes.length < 1 && tree.required) {
+                          this.markTreeInvalid(null);
+                        }
+                        else {
+                          this.clearInvalid();
+                        }
+                      },
+                      scope: this
+                    }
+                  }
                 }, {
                   xtype :'panel',
                   width :120,
@@ -397,6 +429,38 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
 };
 
 Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
+  clearInvalid: function() {
+    var tree = this.find('name', 'artifact-list')[0];
+    if (tree.invalid) {
+      //remove error messaging
+      tree.getEl().child('.x-panel-body').setStyle( {
+        'background-color' : '#FFFFFF',
+        border : '1px solid #B5B8C8'
+      } );
+      Ext.form.Field.msgFx['normal'].hide( tree.errorEl, tree );
+    }
+  },  
+  markTreeInvalid : function( errortext ) {
+    var tree = this.find('name', 'artifact-list')[0];
+    var elp = tree.getEl();
+    
+    if ( ! tree.errorEl ){
+      tree.errorEl = elp.createChild( { cls: 'x-form-invalid-msg' } );
+      tree.errorEl.setWidth( elp.getWidth( true ) ); //note removed -20 like on form fields
+    }
+    tree.invalid = true;
+    var oldErrorText = tree.invalidText;
+    if ( errortext ) {
+      tree.invalidText = errortext;
+    }
+    tree.errorEl.update( tree.invalidText );
+    tree.invalidText = oldErrorText;
+    elp.child( '.x-panel-body' ).setStyle( {
+      'background-color': '#fee',
+      border: '1px solid #dd7870'
+    });
+    Ext.form.Field.msgFx['normal'].show( tree.errorEl, tree );
+  },
   resetFields : function() {
     //reset the artifact panels
     var filenameField = this.find('name', 'filenameField')[0];
@@ -650,6 +714,7 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
         item.disable();
       }
     });
+    this.clearInvalid();
     //Then find the proper card to activate (based upon the selected schedule type)
     if (record.data.value == 'pom'){
       gavDefinitionPanel.getLayout().setActiveItem(gavDefinitionPanel.items.itemAt(1));
@@ -675,7 +740,11 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
     this.doLayout();
   },
   uploadArtifacts : function(){
-    if ( this.form.isValid() ) {
+    var tree = this.find( 'name', 'artifact-list')[0];
+    if ( !tree.validate.call( this ) ) {
+      this.markTreeInvalid( null );
+    }
+    else if ( this.form.isValid() ) {
       this.doUpload();
     }
   },
