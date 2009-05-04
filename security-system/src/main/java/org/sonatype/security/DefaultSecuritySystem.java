@@ -217,13 +217,15 @@ public class DefaultSecuritySystem
     }
 
     public User addUser( User user )
-        throws NoSuchUserManager, InvalidConfigurationException
+        throws NoSuchUserManager,
+            InvalidConfigurationException
     {
         return this.addUser( user, this.generatePassword() );
     }
 
     public User addUser( User user, String password )
-        throws NoSuchUserManager, InvalidConfigurationException
+        throws NoSuchUserManager,
+            InvalidConfigurationException
     {
         // first save the user
         // this is the UserManager that owns the user
@@ -235,12 +237,15 @@ public class DefaultSecuritySystem
         {
             // skip the user manager that owns the user, we already did that
             // these user managers will only save roles
-            if ( !tmpUserManager.getSource().equals( user.getSource() ) && RoleMappingUserManager.class.isInstance( tmpUserManager )  )
-            { 
+            if ( !tmpUserManager.getSource().equals( user.getSource() )
+                && RoleMappingUserManager.class.isInstance( tmpUserManager ) )
+            {
                 try
                 {
                     RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
-                    roleMappingUserManager.setUsersRoles( user.getUserId(), RoleIdentifier.getRoleIdentifiersForSource( user.getSource(), user.getRoles() ) );
+                    roleMappingUserManager.setUsersRoles( user.getUserId(), RoleIdentifier.getRoleIdentifiersForSource(
+                        user.getSource(),
+                        user.getRoles() ) );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -255,7 +260,8 @@ public class DefaultSecuritySystem
 
     public User updateUser( User user )
         throws UserNotFoundException,
-            NoSuchUserManager, InvalidConfigurationException
+            NoSuchUserManager,
+            InvalidConfigurationException
     {
         // first update the user
         // this is the UserManager that owns the user
@@ -268,12 +274,15 @@ public class DefaultSecuritySystem
         {
             // skip the user manager that owns the user, we already did that
             // these user managers will only save roles
-            if ( !tmpUserManager.getSource().equals( user.getSource() ) &&  RoleMappingUserManager.class.isInstance( tmpUserManager )  )
-            { 
+            if ( !tmpUserManager.getSource().equals( user.getSource() )
+                && RoleMappingUserManager.class.isInstance( tmpUserManager ) )
+            {
                 try
                 {
                     RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
-                    roleMappingUserManager.setUsersRoles( user.getUserId(), RoleIdentifier.getRoleIdentifiersForSource( user.getSource(), user.getRoles() ) );
+                    roleMappingUserManager.setUsersRoles( user.getUserId(), RoleIdentifier.getRoleIdentifiersForSource(
+                        user.getSource(),
+                        user.getRoles() ) );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -296,8 +305,8 @@ public class DefaultSecuritySystem
         }
         catch ( NoSuchUserManager e )
         {
-           this.logger.error( "User manager returned user, but could not be found: "+ e.getMessage(), e );
-           throw new IllegalStateException("User manager returned user, but could not be found: "+ e.getMessage(), e);
+            this.logger.error( "User manager returned user, but could not be found: " + e.getMessage(), e );
+            throw new IllegalStateException( "User manager returned user, but could not be found: " + e.getMessage(), e );
         }
     }
 
@@ -307,6 +316,49 @@ public class DefaultSecuritySystem
     {
         UserManager userManager = this.getUserManager( source );
         userManager.deleteUser( userId );
+    }
+
+    public Set<RoleIdentifier> getUsersRoles( String userId, String source )
+        throws UserNotFoundException,
+            NoSuchUserManager
+    {
+        User user = this.getUser( userId, source );
+        return user.getRoles();
+    }
+
+    public void setUsersRoles( String userId, String source, Set<RoleIdentifier> roleIdentifiers )
+        throws InvalidConfigurationException, UserNotFoundException
+    {
+        // TODO: this is a bit sticky, what we really want to do is just expose the RoleMappingUserManagers this way (i
+        // think), maybe this is to generic
+
+        boolean foundUser = false;
+
+        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        {
+            // skip the user manager that owns the user, we already did that
+            // these user managers will only have roles
+            if ( !tmpUserManager.getSource().equals( source )
+                && RoleMappingUserManager.class.isInstance( tmpUserManager ) )
+            {
+                RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
+                try
+                {
+                    foundUser = true;
+                    roleMappingUserManager.setUsersRoles( userId, roleIdentifiers );
+                }
+                catch ( UserNotFoundException e )
+                {
+                    this.logger.debug( "User '" + userId + "' is not managed by the usermanager: "
+                        + tmpUserManager.getSource() );
+                }
+            }
+        }
+
+        if ( !foundUser )
+        {
+            throw new UserNotFoundException( userId );
+        }
     }
 
     public User getUser( String userId )
@@ -444,12 +496,14 @@ public class DefaultSecuritySystem
         {
             // skip the user manager that owns the user, we already did that
             // these user managers will only have roles
-            if ( !tmpUserManager.getSource().equals( user.getSource() ) && RoleMappingUserManager.class.isInstance( tmpUserManager )  )
+            if ( !tmpUserManager.getSource().equals( user.getSource() )
+                && RoleMappingUserManager.class.isInstance( tmpUserManager ) )
             {
                 try
                 {
                     RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
-                    Set<RoleIdentifier> roleIdentifiers = roleMappingUserManager.getUsersRoles( user.getUserId(), user.getSource() );
+                    Set<RoleIdentifier> roleIdentifiers = roleMappingUserManager.getUsersRoles( user.getUserId(), user
+                        .getSource() );
                     if ( roleIdentifiers != null )
                     {
                         user.addAllRoles( roleIdentifiers );
@@ -507,7 +561,8 @@ public class DefaultSecuritySystem
 
     public void changePassword( String userId, String oldPassword, String newPassword )
         throws UserNotFoundException,
-            InvalidCredentialsException, InvalidConfigurationException
+            InvalidCredentialsException,
+            InvalidConfigurationException
     {
         // first authenticate the user
         try
@@ -529,7 +584,8 @@ public class DefaultSecuritySystem
     }
 
     public void changePassword( String userId, String newPassword )
-        throws UserNotFoundException, InvalidConfigurationException
+        throws UserNotFoundException,
+            InvalidConfigurationException
     {
         User user = this.getUser( userId );
 
@@ -548,7 +604,8 @@ public class DefaultSecuritySystem
     }
 
     public void forgotPassword( String userId, String email )
-        throws UserNotFoundException, InvalidConfigurationException
+        throws UserNotFoundException,
+            InvalidConfigurationException
     {
         UserSearchCriteria criteria = new UserSearchCriteria();
         criteria.setEmail( email );
@@ -607,7 +664,8 @@ public class DefaultSecuritySystem
     }
 
     public void resetPassword( String userId )
-        throws UserNotFoundException, InvalidConfigurationException
+        throws UserNotFoundException,
+            InvalidConfigurationException
     {
         String newClearTextPassword = this.generatePassword();
 
@@ -658,14 +716,14 @@ public class DefaultSecuritySystem
         throws NoSuchPrivilegeException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void deleteRole( String roleId, String source )
         throws NoSuchRoleException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public Privilege getPrivilege( String privilegeId, String source )
@@ -686,11 +744,11 @@ public class DefaultSecuritySystem
         throws NoSuchRoleException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public List<Realm> getRealms()
-    {   
+    {
         return new ArrayList<Realm>( this.securityManager.getRealms() );
     }
 

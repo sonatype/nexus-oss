@@ -12,13 +12,12 @@ import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchAuthorizationManager;
-import org.sonatype.security.authorization.NoSuchPrivilegeException;
-import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.events.SecurityEventHandler;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
@@ -108,6 +107,10 @@ public interface SecuritySystem
         throws UserNotFoundException,
             NoSuchUserManager;
 
+    Set<RoleIdentifier> getUsersRoles(String userId, String source) throws UserNotFoundException, NoSuchUserManager;
+    
+    void setUsersRoles(String userId, String source, Set<RoleIdentifier> roleIdentifiers ) throws InvalidConfigurationException, UserNotFoundException;
+    
     /**
      * Retrieve all Subject objects
      * 
