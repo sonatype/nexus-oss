@@ -160,18 +160,18 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
   
     //@override
   addSorted : function(store, rec) {
-	var insertIndex = store.getCount();
-	for (var i=0 ; i < store.getCount() ; i++) {
-	  var tempRec = store.getAt(i);
-	  if (tempRec.get('repoType') == 'group') {
-	    continue;
-	  }
-	  if (tempRec.get('name').toLowerCase() > rec.get('name').toLowerCase() ) {
-	  	insertIndex = i;
-	  	break;
-	  }
-	}
-	store.insert( insertIndex, [rec] );
+  var insertIndex = store.getCount();
+  for (var i=0 ; i < store.getCount() ; i++) {
+    var tempRec = store.getAt(i);
+    if (tempRec.get('repoType') == 'group') {
+      continue;
+    }
+    if (tempRec.get('name').toLowerCase() > rec.get('name').toLowerCase() ) {
+      insertIndex = i;
+      break;
+    }
+  }
+  store.insert( insertIndex, [rec] );
   }
   
 } );
@@ -181,13 +181,13 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
   var defaultConfig = {
     dataModifiers: {
       load: {
-        repoPolicy: Sonatype.utils.capitalize,
+        repoPolicy: Sonatype.utils.upperFirstCharLowerRest,
         allowWrite: Sonatype.utils.capitalize,
         browseable: Sonatype.utils.capitalize,
         indexable: Sonatype.utils.capitalize
       },
       submit: { 
-        repoPolicy: Sonatype.utils.lowercase,
+        repoPolicy: Sonatype.utils.uppercase,
         allowWrite: Sonatype.utils.convert.stringContextToBool,
         browseable: Sonatype.utils.convert.stringContextToBool,
         indexable: Sonatype.utils.convert.stringContextToBool,
@@ -416,20 +416,20 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
   var defaultConfig = {
     dataModifiers: {
       load: {
-        repoPolicy: Sonatype.utils.capitalize,
+        repoPolicy: Sonatype.utils.upperFirstCharLowerRest,
         allowWrite: Sonatype.utils.capitalize,
         browseable: Sonatype.utils.capitalize,
         indexable: Sonatype.utils.capitalize,
         downloadRemoteIndexes: Sonatype.utils.capitalize,
-        checksumPolicy: Sonatype.utils.capitalize
+        checksumPolicy: Sonatype.utils.upperFirstCharLowerRest
       },
       submit: { 
-        repoPolicy: Sonatype.utils.lowercase,
+        repoPolicy: Sonatype.utils.uppercase,
         allowWrite: Sonatype.utils.convert.stringContextToBool,
         browseable: Sonatype.utils.convert.stringContextToBool,
         indexable: Sonatype.utils.convert.stringContextToBool,
         downloadRemoteIndexes: Sonatype.utils.convert.stringContextToBool,
-        checksumPolicy: Sonatype.utils.lowercaseFirstChar
+        checksumPolicy: Sonatype.utils.uppercase
       }
     },
     referenceData: Sonatype.repoServer.referenceData.repositoryState.proxy
@@ -994,25 +994,25 @@ Ext.extend( Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.Abstr
   },
   
   afterProviderSelectHandler: function( combo, rec, index ) {
-  	this.updateDownloadRemoteIndexCombo(rec.data.format);
+    this.updateDownloadRemoteIndexCombo(rec.data.format);
   },
   
   showHandler: function ( panel ) {
-  	var formatField = this.form.findField('format');
-  	if ( formatField ){
-  		this.updateDownloadRemoteIndexCombo( formatField.getValue() );
-  	}
+    var formatField = this.form.findField('format');
+    if ( formatField ){
+      this.updateDownloadRemoteIndexCombo( formatField.getValue() );
+    }
   },
   
   updateDownloadRemoteIndexCombo: function( repoFormat ){
-  	var downloadRemoteIndexCombo = this.form.findField('downloadRemoteIndexes');
-  	if ( repoFormat == 'maven2'){
-      downloadRemoteIndexCombo.enable();  		
-  	}
-  	else{
+    var downloadRemoteIndexCombo = this.form.findField('downloadRemoteIndexes');
+    if ( repoFormat == 'maven2'){
+      downloadRemoteIndexCombo.enable();      
+    }
+    else{
       downloadRemoteIndexCombo.setValue('False');
-      downloadRemoteIndexCombo.disable();    		
-  	}
+      downloadRemoteIndexCombo.disable();       
+    }
   }
 
 } );
@@ -1178,32 +1178,32 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
 };
 
 Ext.extend( Sonatype.repoServer.VirtualRepositoryEditor, Sonatype.repoServer.AbstractRepositoryEditor, {
-	
-	afterProviderSelectHandler: function( combo, rec, index ) {
-		var provider = rec.data.provider;
-		var sourceRepoCombo = this.form.findField('shadowOf');
-		sourceRepoCombo.focus();
-		if ( provider == 'm1-m2-shadow'){
-			sourceRepoCombo.store.filterBy( 
-				function fn(rec, id){
-					if ( rec.data.repoType != 'virtual' && rec.data.format == 'maven1'){
-						return true;
-					}
-					return false;
-				}
-			);
-		}
-		else if ( provider == 'm2-m1-shadow'){
-			sourceRepoCombo.store.filterBy( 
-				function fn(rec, id){
-					if ( rec.data.repoType != 'virtual' && rec.data.format == 'maven2'){
-						return true;
-					}
-					return false;
-				}
-			);
-		}
-	}
+  
+  afterProviderSelectHandler: function( combo, rec, index ) {
+    var provider = rec.data.provider;
+    var sourceRepoCombo = this.form.findField('shadowOf');
+    sourceRepoCombo.focus();
+    if ( provider == 'm1-m2-shadow'){
+      sourceRepoCombo.store.filterBy( 
+        function fn(rec, id){
+          if ( rec.data.repoType != 'virtual' && rec.data.format == 'maven1'){
+            return true;
+          }
+          return false;
+        }
+      );
+    }
+    else if ( provider == 'm2-m1-shadow'){
+      sourceRepoCombo.store.filterBy( 
+        function fn(rec, id){
+          if ( rec.data.repoType != 'virtual' && rec.data.format == 'maven2'){
+            return true;
+          }
+          return false;
+        }
+      );
+    }
+  }
 } );
 
 Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {

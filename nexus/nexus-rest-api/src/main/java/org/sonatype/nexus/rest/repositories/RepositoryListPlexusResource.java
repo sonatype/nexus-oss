@@ -67,7 +67,7 @@ public class RepositoryListPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        return listRepositories( request, false );
+        return listRepositories( request, false, false );
     }
 
     @Override

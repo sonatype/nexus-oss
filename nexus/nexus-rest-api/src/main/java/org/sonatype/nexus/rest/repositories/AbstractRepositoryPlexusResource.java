@@ -144,9 +144,15 @@ public abstract class AbstractRepositoryPlexusResource
                 + " is not recognized!" );
         }
     }
+    
+    protected RepositoryListResourceResponse listRepositories( Request request, boolean allReposes )
+        throws ResourceException
+    {
+        return listRepositories( request, allReposes, true );
+    }
 
     // clean
-    protected RepositoryListResourceResponse listRepositories( Request request, boolean allReposes )
+    protected RepositoryListResourceResponse listRepositories( Request request, boolean allReposes, boolean includeGroups )
         throws ResourceException
     {
         RepositoryListResourceResponse result = new RepositoryListResourceResponse();
@@ -157,7 +163,9 @@ public abstract class AbstractRepositoryPlexusResource
 
         for ( Repository repository : repositories )
         {
-            if ( allReposes || repository.isUserManaged() )
+            // To save UI changes at the moment, not including groups in repo call
+            if ( ( allReposes || repository.isUserManaged() )
+                && ( includeGroups || !repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) ) )
             {
                 repoRes = new RepositoryListResource();
 

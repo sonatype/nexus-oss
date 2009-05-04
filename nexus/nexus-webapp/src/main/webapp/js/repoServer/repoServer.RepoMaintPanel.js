@@ -172,7 +172,8 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
       { 
         name: 'repoPolicy',
         header: 'Policy',
-        width: 70
+        width: 70,
+        convert: Sonatype.utils.upperFirstCharLowerRest
       },
       { 
         name: 'displayStatus',

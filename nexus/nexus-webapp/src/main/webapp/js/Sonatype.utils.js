@@ -30,6 +30,16 @@ Sonatype.utils = {
     str = str.toString();
     return str.charAt(0).toLowerCase() + str.slice(1);
   },
+  upperFirstCharLowerRest : function(str){
+    if (Ext.isEmpty(str)) {return str;}
+    str = str.toString();
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  },
+  uppercase : function(str){
+    if (Ext.isEmpty(str)) {return str;}
+    str = str.toString();
+    return str.toUpperCase();
+  },
   capitalize : function(str){
     if (Ext.isEmpty(str)) {return str;}
     str = str.toString();
