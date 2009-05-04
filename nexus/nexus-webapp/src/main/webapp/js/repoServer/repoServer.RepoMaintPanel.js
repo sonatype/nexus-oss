@@ -654,7 +654,7 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
       }
       node.setText( node.text + ( node.isRoot ? ' (Not Available)' : ' (Not Found)' ) );
     }
-    else if ( response.status == 401 ) {
+    else if ( response.status == 401 || response.status == 403 ) {
       if ( Sonatype.MessageBox.isVisible() ) {
         Sonatype.MessageBox.hide();   
       }

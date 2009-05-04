@@ -300,12 +300,9 @@ public class NexusHttpAuthenticationFilter
     public void postHandle( ServletRequest request, ServletResponse response )
         throws Exception
     {
-        Subject subject = getSubject( request, response );
-
-        if ( request.getAttribute( ANONYMOUS_LOGIN ) != null
-            || request.getAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED ) != null )
+        if ( request.getAttribute( ANONYMOUS_LOGIN ) != null )
         {
-            subject.logout();
+            getSubject( request, response ).logout();
 
             if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
             {
@@ -318,15 +315,34 @@ public class NexusHttpAuthenticationFilter
             }
         }
 
-        // is perms elevation needed?
         if ( request.getAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED ) != null )
         {
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug( "Request processing is rejected coz lacking of perms/roles, rechallenging..." );
+                getLogger().debug( "Request processing is rejected coz lacking of perms/roles." );
             }
 
-            sendChallenge( request, response );
+            if ( request.getAttribute( ANONYMOUS_LOGIN ) != null )
+            {
+                sendChallenge( request, response );
+            }
+            else
+            {
+                sendForbidden( request, response );
+            }
         }
+    }
+
+    /**
+     * set http 403 forbidden header for the response
+     * 
+     * @param request
+     * @param response
+     */
+    protected void sendForbidden( ServletRequest request, ServletResponse response )
+    {
+        HttpServletResponse httpResponse = WebUtils.toHttp( response );
+
+        httpResponse.setStatus( HttpServletResponse.SC_FORBIDDEN );
     }
 }
