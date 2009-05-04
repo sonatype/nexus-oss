@@ -62,7 +62,7 @@ public class Nexus429UploadArtifactPrivilegeTest
 
         // with pom should fail
         int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
-        Assert.assertEquals( "Status should have been 401", 401, status );
+        Assert.assertEquals( "Status should have been 403", 403, status );
                 
         // give deployment role
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -99,7 +99,7 @@ public class Nexus429UploadArtifactPrivilegeTest
 
         // with gav should fail
         int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
-        Assert.assertEquals( "Status should have been 401", 401, status );
+        Assert.assertEquals( "Status should have been 403", 403, status );
         
         // give deployment role
         TestContainer.getInstance().getTestContext().useAdminForRequests();

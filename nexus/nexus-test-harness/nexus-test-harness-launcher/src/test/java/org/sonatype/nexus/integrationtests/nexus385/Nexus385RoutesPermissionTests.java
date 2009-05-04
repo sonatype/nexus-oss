@@ -43,7 +43,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         Response response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
@@ -67,11 +67,11 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         
         // update should fail
         response = this.routeUtil.sendMessage( Method.PUT, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
         
         // delete should fail
         response = this.routeUtil.sendMessage( Method.DELETE, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
     }
 
@@ -99,7 +99,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         route.setPattern( ".*testUpdatePermission2.*" );
         response = this.routeUtil.sendMessage( Method.PUT, route );
 //        log.debug( "PROBLEM: "+ this.userUtil.getUser( "test-user" ) );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
@@ -123,11 +123,11 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         
         // update should fail
         response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
         
         // delete should fail
         response = this.routeUtil.sendMessage( Method.DELETE, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
         
         
     }
@@ -153,7 +153,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.routeUtil.sendMessage( Method.PUT, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
@@ -169,7 +169,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         
         // update user
         response = this.routeUtil.sendMessage( Method.PUT, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // read should fail
         response = this.routeUtil.sendMessage( Method.GET, route );
@@ -177,11 +177,11 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         
         // update should fail
         response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
         
         // delete should fail
         response = this.routeUtil.sendMessage( Method.DELETE, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
         
         
     }
@@ -208,7 +208,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
 
 
         response = this.routeUtil.sendMessage( Method.DELETE, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
@@ -224,7 +224,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         
         // update user
         response = this.routeUtil.sendMessage( Method.PUT, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // read should succeed (inherited)
         response = this.routeUtil.sendMessage( Method.GET, route );
@@ -232,7 +232,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         
         // update should fail
         response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
         
         // delete should fail
         response = this.routeUtil.sendMessage( Method.DELETE, route );

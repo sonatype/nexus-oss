@@ -59,14 +59,14 @@ public class Nexus930AutoDiscoverComponent
             MediaType.APPLICATION_XML );
         Assert.assertEquals( "Expected list should have size() equal 2.", 2, result1.size() );
 
-        // 401 test
+        // 403 test
         this.overwriteUserRole( TEST_USER_NAME, "login-only" + role, "2" );
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
         Response response = sendMessage( role, this.getXMLXStream(), MediaType.APPLICATION_XML );
         Assert.assertTrue( "Expected Error: Status was: " + response.getStatus().getCode(), response
             .getStatus().isClientError() );
-        Assert.assertEquals( 401, response.getStatus().getCode() );
+        Assert.assertEquals( 403, response.getStatus().getCode() );
 
         // only content class priv
         this.overwriteUserRole( TEST_USER_NAME, "content-classes" + role, "70" );
@@ -88,14 +88,14 @@ public class Nexus930AutoDiscoverComponent
             MediaType.APPLICATION_XML );
         Assert.assertTrue( "Expected list larger then 1.", result1.size() > 1 );
 
-        // 401 test
+        // 403 test
         this.overwriteUserRole( TEST_USER_NAME, "login-only" + role, "2" );
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
         Response response = sendMessage( role, this.getXMLXStream(), MediaType.APPLICATION_XML );
         Assert.assertTrue( "Expected Error: Status was: " + response.getStatus().getCode(), response
             .getStatus().isClientError() );
-        Assert.assertEquals( 401, response.getStatus().getCode() );
+        Assert.assertEquals( 403, response.getStatus().getCode() );
 
         // only content class priv
         this.overwriteUserRole( TEST_USER_NAME, "schedule_types" + role, "71" );

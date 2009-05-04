@@ -106,11 +106,11 @@ public class Nexus999SetUsersPassword
 
         // NOT Should be able to forgot my own username
         Status status = ChangePasswordUtils.changePassword( "test-user", "123admin" );
-        Assert.assertEquals( 401, status.getCode() );
+        Assert.assertEquals( 403, status.getCode() );
 
         // NOT Should be able to forgot anyone username
         status = ChangePasswordUtils.changePassword( "admin", "123admin" );
-        Assert.assertEquals( 401, status.getCode() );
+        Assert.assertEquals( 403, status.getCode() );
     }
 
 }

@@ -62,11 +62,11 @@ public class Nexus395ForgotUsernamePermissionTest
 
         // NOT Should be able to forgot anyone username
         Status status = ForgotUsernameUtils.recoverUsername( "changeme2@yourcompany.com" );
-        Assert.assertEquals( 401, status.getCode() );
+        Assert.assertEquals( 403, status.getCode() );
 
         // NOT Should be able to forgot my own username
         status = ForgotUsernameUtils.recoverUsername( "nexus-dev2@sonatype.org" );
-        Assert.assertEquals( 401, status.getCode() );
+        Assert.assertEquals( 403, status.getCode() );
 
     }
 }

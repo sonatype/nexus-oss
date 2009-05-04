@@ -408,7 +408,7 @@ public class Nexus537RepoTargetsTests
 
         if ( !shouldDelete )
         {
-            Assert.assertEquals( "Response Status: " + responseText, 401, statusCode );
+            Assert.assertEquals( "Response Status: " + responseText, 403, statusCode );
         }
         else
         {

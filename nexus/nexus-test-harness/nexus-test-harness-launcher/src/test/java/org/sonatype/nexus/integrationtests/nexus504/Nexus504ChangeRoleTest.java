@@ -66,7 +66,7 @@ public class Nexus504ChangeRoleTest
         testContext.setPassword( TEST_USER_PASSWORD );
 
         Status status = UserCreationUtil.login();
-        Assert.assertEquals( "User should not be able to login ", 401, status.getCode() );
+        Assert.assertEquals( "User should not be able to login ", 403, status.getCode() );
 
         // add login privilege to role
         testContext.useAdminForRequests();

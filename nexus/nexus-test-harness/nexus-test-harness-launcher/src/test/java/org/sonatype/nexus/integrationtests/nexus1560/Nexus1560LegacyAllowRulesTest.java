@@ -46,7 +46,7 @@ public class Nexus1560LegacyAllowRulesTest
             GROUP_REPOSITORY_RELATIVE_URL + NEXUS1560_GROUP + "/" + getRelitiveArtifactPath( gavArtifact1 );
 
         Status status = download( downloadUrl ).getStatus();
-        Assert.assertEquals( "Unable to download artifact from repository: " + status, 401, status.getCode() );
+        Assert.assertEquals( "Unable to download artifact from repository: " + status, 403, status.getCode() );
     }
 
     @Test( expected = FileNotFoundException.class )

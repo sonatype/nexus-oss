@@ -99,7 +99,7 @@ public class Nexus429WagonDeployPrivilegeTest
         }
         catch ( VerificationException e )
         {
-            // expected 401
+            // expected 403
         }
 
         // give deployment role
@@ -119,7 +119,7 @@ public class Nexus429WagonDeployPrivilegeTest
         }
         catch ( VerificationException e )
         {
-            // expected 401
+            // expected 403
         }
 
         // try again
@@ -146,7 +146,7 @@ public class Nexus429WagonDeployPrivilegeTest
         }
         catch ( VerificationException e )
         {
-            // expected 401
+            // expected 403
         }
 
         // now the user should be able to redeploy
@@ -172,7 +172,7 @@ public class Nexus429WagonDeployPrivilegeTest
         response =
             RequestFacade.sendMessage( "content/repositories/" + this.getTestRepositoryId() + "/" + this.getTestId(),
                                        Method.DELETE );
-        Assert.assertEquals( "Artifact should have been deleted", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Artifact should have been deleted", 403, response.getStatus().getCode() );
 
     }
 

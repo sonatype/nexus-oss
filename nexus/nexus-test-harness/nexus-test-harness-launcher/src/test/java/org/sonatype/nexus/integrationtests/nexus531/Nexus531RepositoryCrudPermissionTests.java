@@ -49,7 +49,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         Response response = this.repoUtil.sendMessage( Method.POST, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -71,11 +71,11 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 
         // update should fail
         response = this.repoUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // delete should fail
         response = this.repoUtil.sendMessage( Method.DELETE, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
     }
 
@@ -106,7 +106,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         // update repo
         repo.setName( "tesUpdatePermission2" );
         response = this.repoUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -127,11 +127,11 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 
         // update should fail
         response = this.repoUtil.sendMessage( Method.POST, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // delete should fail
         response = this.repoUtil.sendMessage( Method.DELETE, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
     }
 
@@ -162,7 +162,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         // update repo
         repo.setName( "tesUpdatePermission2" );
         response = this.repoUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -179,15 +179,15 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 
         // update should fail
         response = this.repoUtil.sendMessage( Method.POST, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // delete should fail
         response = this.repoUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
      // should work now...
         response = this.repoUtil.sendMessage( Method.DELETE, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
     }
 
@@ -219,7 +219,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         // update repo
         repo.setName( "tesUpdatePermission2" );
         response = this.repoUtil.sendMessage( Method.DELETE, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -236,11 +236,11 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 
         // update should fail
         response = this.repoUtil.sendMessage( Method.POST, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // delete should fail
         response = this.repoUtil.sendMessage( Method.PUT, repo );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
      // should work now...
         response = this.repoUtil.sendMessage( Method.DELETE, repo );
