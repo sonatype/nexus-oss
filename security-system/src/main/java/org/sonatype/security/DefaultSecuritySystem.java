@@ -38,6 +38,7 @@ import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
 import org.sonatype.security.usermanagement.PasswordGenerator;
 import org.sonatype.security.usermanagement.RoleIdentifier;
+import org.sonatype.security.usermanagement.RoleMappingUserManager;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -234,11 +235,12 @@ public class DefaultSecuritySystem
         {
             // skip the user manager that owns the user, we already did that
             // these user managers will only save roles
-            if ( !tmpUserManager.getSource().equals( user.getSource() ) )
-            {
+            if ( !tmpUserManager.getSource().equals( user.getSource() ) && RoleMappingUserManager.class.isInstance( tmpUserManager )  )
+            { 
                 try
                 {
-                    tmpUserManager.setUsersRoles( user.getUserId(), RoleIdentifier.getRoleIdentifiersForSource( user.getSource(), user.getRoles() ) );
+                    RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
+                    roleMappingUserManager.setUsersRoles( user.getUserId(), RoleIdentifier.getRoleIdentifiersForSource( user.getSource(), user.getRoles() ) );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -266,11 +268,12 @@ public class DefaultSecuritySystem
         {
             // skip the user manager that owns the user, we already did that
             // these user managers will only save roles
-            if ( !tmpUserManager.getSource().equals( user.getSource() ) )
-            {
+            if ( !tmpUserManager.getSource().equals( user.getSource() ) &&  RoleMappingUserManager.class.isInstance( tmpUserManager )  )
+            { 
                 try
                 {
-                    tmpUserManager.setUsersRoles( user.getUserId(), RoleIdentifier.getRoleIdentifiersForSource( user.getSource(), user.getRoles() ) );
+                    RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
+                    roleMappingUserManager.setUsersRoles( user.getUserId(), RoleIdentifier.getRoleIdentifiersForSource( user.getSource(), user.getRoles() ) );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -441,11 +444,12 @@ public class DefaultSecuritySystem
         {
             // skip the user manager that owns the user, we already did that
             // these user managers will only have roles
-            if ( !tmpUserManager.getSource().equals( user.getSource() ) )
+            if ( !tmpUserManager.getSource().equals( user.getSource() ) && RoleMappingUserManager.class.isInstance( tmpUserManager )  )
             {
                 try
                 {
-                    Set<RoleIdentifier> roleIdentifiers = tmpUserManager.getUsersRoles( user.getUserId(), user.getSource() );
+                    RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
+                    Set<RoleIdentifier> roleIdentifiers = roleMappingUserManager.getUsersRoles( user.getUserId(), user.getSource() );
                     if ( roleIdentifiers != null )
                     {
                         user.addAllRoles( roleIdentifiers );

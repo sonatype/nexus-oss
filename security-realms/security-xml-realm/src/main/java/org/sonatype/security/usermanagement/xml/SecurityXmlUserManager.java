@@ -35,6 +35,7 @@ import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
 import org.sonatype.security.usermanagement.RoleIdentifier;
+import org.sonatype.security.usermanagement.RoleMappingUserManager;
 import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -44,7 +45,7 @@ import org.sonatype.security.usermanagement.UserStatus;
 
 @Component( role = UserManager.class, description = "Default" )
 public class SecurityXmlUserManager
-    extends AbstractUserManager
+    extends AbstractUserManager implements RoleMappingUserManager
 {
     public static final String SOURCE = "default";
 

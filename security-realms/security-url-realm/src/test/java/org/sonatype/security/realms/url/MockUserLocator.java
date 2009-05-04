@@ -89,12 +89,4 @@ public class MockUserLocator
 
         return user;
     }
-
-    public Set<RoleIdentifier> getUsersRoles( String userId, String userSource )
-        throws UserNotFoundException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

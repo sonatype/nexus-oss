@@ -140,11 +140,4 @@ public class ConfiguredUsersUserManager
         return this.securitySystem;
     }
 
-
-    public Set<RoleIdentifier> getUsersRoles( String userId, String userSource )
-        throws UserNotFoundException
-    {
-        return null;
-    }
-
 }

@@ -40,11 +40,6 @@ public abstract class AbstractTestUserManager
         return null;
     }
 
-    public boolean isPrimary()
-    {
-        return false;
-    }
-
     public Set<String> listUserIds()
     {
         Set<String> result = new HashSet<String>();
@@ -65,13 +60,4 @@ public abstract class AbstractTestUserManager
         RoleIdentifier role = new RoleIdentifier(  this.getSource(), roleId );
         return role;
     }
-
-
-    public Set<RoleIdentifier> getUsersRoles( String userId, String userSource )
-        throws UserNotFoundException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

@@ -200,10 +200,4 @@ public class URLUserManager
 
         return userIds;
     }
-
-    public Set<RoleIdentifier> getUsersRoles( String userId, String userSource )
-        throws UserNotFoundException
-    {
-        return null;
-    }
 }

@@ -108,18 +108,5 @@ public abstract class AbstractMockUserManager
     public void changePassword( String userId, String newPassword )
         throws UserNotFoundException
     {        
-    }
-
-    public Set<RoleIdentifier> getUsersRoles( String userId )
-        throws UserNotFoundException
-    {
-        return null;
-    }
-
-    public void setUsersRoles( String userId, Set<RoleIdentifier> roleIdentifiers )
-        throws UserNotFoundException,
-            InvalidConfigurationException
-    {        
-    }
-    
+    }    
 }
