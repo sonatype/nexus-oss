@@ -31,10 +31,12 @@ public class NexusBooterListener
             PlexusContainer c = (PlexusContainer) sce.getServletContext().getAttribute( "plexus" );
 
             Nexus nexus = c.lookup( Nexus.class );
+            nexus.getClass(); // Just wanna be sure nexus is not null
 
             sce.getServletContext().setAttribute( Nexus.class.getName(), nexus );
 
             NexusConfiguration nexusConfiguration = c.lookup( NexusConfiguration.class );
+            nexusConfiguration.getClass(); // Just wanna be sure nexusConfiguration is not null
 
             sce.getServletContext().setAttribute( NexusConfiguration.class.getName(), nexusConfiguration );
         }
