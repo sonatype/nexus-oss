@@ -97,14 +97,20 @@ Ext.extend(Ext.tree.UserTreeLoader, Ext.tree.SonatypeTreeLoader, {
       }
 
       if ( isRole ) {
-        var role = this.roleDataStore.getAt( this.roleDataStore.find( 'id', id ) );
+        var role = this.roleDataStore.getAt( this.roleDataStore.findBy( 
+            function( rec, recid ) {
+              return rec.id == id;
+            }, this ) );
         attr.id = parentId + '$$' + Sonatype.config.repos.urls.roles + '/' + id + '/';
         attr.text = role.data.name;
         attr.qtip = role.data.description;
         attr.leaf = false;
       }
       else {
-        var priv = this.privDataStore.getAt( this.privDataStore.find( 'id', id ) );
+        var priv = this.privDataStore.getAt( this.privDataStore.findBy( 
+            function( rec, recid ) {
+              return rec.id == id;
+            }, this ) );
         attr.id = parentId + '$$' + Sonatype.config.repos.urls.privileges + '/' + id + '/';
         attr.text = priv.data.name;
         attr.qtip = priv.data.description;
