@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.subject.Subject;
 import org.jsecurity.web.filter.authz.PermissionsAuthorizationFilter;
 import org.sonatype.nexus.Nexus;
@@ -31,6 +33,7 @@ import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
+import org.sonatype.nexus.web.NexusBooterListener;
 
 /**
  * A filter that maps the action from the HTTP Verb.
@@ -61,7 +64,21 @@ public class HttpVerbMappingAuthorizationFilter
 
     protected Nexus getNexus( ServletRequest request )
     {
-        return (Nexus) request.getAttribute( Nexus.class.getName() );
+        Nexus nexus = (Nexus) request.getAttribute( Nexus.class.getName() );
+        if ( nexus == null )
+        {
+            PlexusContainer plexus = NexusBooterListener.getPlexus();
+
+            try
+            {
+                nexus = plexus.lookup( Nexus.class );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new IllegalArgumentException( "Unable to lookup for nexus", e );
+            }
+        }
+        return nexus;
     }
 
     protected NexusConfiguration getNexusConfiguration()
@@ -111,7 +128,8 @@ public class HttpVerbMappingAuthorizationFilter
                 }
 
                 getLogger().debug(
-                    "MAPPED '" + action + "' action to permission: " + sb.toString().substring( 0, sb.length() - 2 ) );
+                                   "MAPPED '" + action + "' action to permission: "
+                                       + sb.toString().substring( 0, sb.length() - 2 ) );
             }
 
             return mappedPerms;
@@ -159,9 +177,10 @@ public class HttpVerbMappingAuthorizationFilter
             return;
         }
 
-        String msg = "Unable to authorize user [" + subject.getPrincipal() + "] for " + getActionFromHttpVerb( request )
-            + " to " + ( (HttpServletRequest) request ).getRequestURI() + " from address/host ["
-            + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
+        String msg =
+            "Unable to authorize user [" + subject.getPrincipal() + "] for " + getActionFromHttpVerb( request ).name()
+                + " to " + ( (HttpServletRequest) request ).getRequestURI() + " from address/host ["
+                + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
 
         if ( isSimilarEvent( msg ) )
         {
@@ -170,11 +189,13 @@ public class HttpVerbMappingAuthorizationFilter
 
         getLogger().info( msg );
 
-        getLogger().info( msg );
-
         AuthcAuthzEvent authzEvt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHZ, msg );
 
-        getNexus(request).addAuthcAuthzEvent( authzEvt );
+        Nexus nexus = getNexus( request );
+        if ( nexus != null )
+        {
+            nexus.addAuthcAuthzEvent( authzEvt );
+        }
 
         currentAuthzEvt = authzEvt;
     }

@@ -152,7 +152,6 @@ public class Nexus779RssFeedFilteringTest
         role.addPrivilege( "44" );
         role.addPrivilege( "54" );
         role.addPrivilege( "55" );
-        role.addPrivilege( "56" );
         role.addPrivilege( "57" );
         role.addPrivilege( "58" );
         role.addPrivilege( "64" );

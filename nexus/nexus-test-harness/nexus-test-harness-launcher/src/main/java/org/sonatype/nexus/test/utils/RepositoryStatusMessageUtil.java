@@ -34,7 +34,7 @@ public class RepositoryStatusMessageUtil
         return changeStatus( status );
     }
 
-    private static Response changeStatus( RepositoryStatusResource status )
+    public static Response changeStatus( RepositoryStatusResource status )
         throws IOException
     {
         String serviceURI = "service/local/repositories/" + status.getId() + "/status?undefined";
@@ -49,4 +49,5 @@ public class RepositoryStatusMessageUtil
         return response;
 
     }
+
 }

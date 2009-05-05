@@ -32,7 +32,7 @@ public class Nexus408ChangePasswordPermissionTest
         throws Exception
     {
         overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-changepw", "1", "2" /* login */, "6", "14", "17",
-                           "19", "44", "54", "55", "56", "57", "58", "59", "64"/* change pw */, "T1", "T2" );
+                           "19", "44", "54", "55", "57", "58", "59", "64"/* change pw */, "T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -52,7 +52,7 @@ public class Nexus408ChangePasswordPermissionTest
         throws Exception
     {
         overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-but-changepw", "1", "2" /* login */, "6", "14",
-                           "17", "19", "44", "54", "55", "56", "57", "58", "59", /* "64" change pw, */"T1", "T2" );
+                           "17", "19", "44", "54", "55", "57", "58", "59", /* "64" change pw, */"T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );

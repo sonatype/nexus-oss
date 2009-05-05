@@ -45,11 +45,11 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.rest.model.NexusError;
-import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.plexus.rest.resource.error.ErrorMessage;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 public abstract class AbstractNexusPlexusResource
     extends AbstractPlexusResource
@@ -59,10 +59,10 @@ public abstract class AbstractNexusPlexusResource
 
     @Requirement
     private Nexus nexus;
-    
+
     @Requirement
     private NexusConfiguration nexusConfiguration;
-    
+
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
@@ -73,12 +73,12 @@ public abstract class AbstractNexusPlexusResource
     {
         return nexus;
     }
-    
+
     protected NexusConfiguration getNexusConfiguration()
     {
         return nexusConfiguration;
     }
-    
+
     protected RepositoryRegistry getRepositoryRegistry()
     {
         return repositoryRegistry;
@@ -87,7 +87,7 @@ public abstract class AbstractNexusPlexusResource
     /**
      * For file uploads we are using commons-fileupload integration with restlet.org. We are storing one FileItemFactory
      * instance in context. This method simply encapsulates gettting it from Resource context.
-     * 
+     *
      * @return
      */
     protected FileItemFactory getFileItemFactory( Context context )
@@ -98,7 +98,7 @@ public abstract class AbstractNexusPlexusResource
     /**
      * Centralized, since this is the only "dependent" stuff that relies on knowledge where restlet.Application is
      * mounted (we had a /service => / move).
-     * 
+     *
      * @param request
      * @return
      */
@@ -245,10 +245,10 @@ public abstract class AbstractNexusPlexusResource
         return (PlexusContainer) context.getAttributes().get( PlexusConstants.PLEXUS_KEY );
     }
 
-    protected NexusErrorResponse getNexusErrorResponse( String id, String msg )
+    protected ErrorResponse getNexusErrorResponse( String id, String msg )
     {
-        NexusErrorResponse ner = new NexusErrorResponse();
-        NexusError ne = new NexusError();
+        ErrorResponse ner = new ErrorResponse();
+        ErrorMessage ne = new ErrorMessage();
         ne.setId( id );
         ne.setMsg( msg );
         ner.addError( ne );
@@ -261,7 +261,7 @@ public abstract class AbstractNexusPlexusResource
     {
         getLogger().warn( "Configuration error!", e );
 
-        NexusErrorResponse nexusErrorResponse;
+        ErrorResponse nexusErrorResponse;
 
         org.sonatype.jsecurity.realms.validator.ValidationResponse vr = e.getValidationResponse();
 
@@ -283,7 +283,7 @@ public abstract class AbstractNexusPlexusResource
     {
         getLogger().warn( "Configuration error!", e );
 
-        NexusErrorResponse nexusErrorResponse;
+        ErrorResponse nexusErrorResponse;
 
         if ( InvalidConfigurationException.class.isAssignableFrom( e.getClass() ) )
         {
@@ -309,7 +309,7 @@ public abstract class AbstractNexusPlexusResource
 
     /**
      * Convert a collection of ArtifactInfo's to NexusArtifacts
-     * 
+     *
      * @param aic
      * @return
      */
@@ -334,7 +334,7 @@ public abstract class AbstractNexusPlexusResource
 
     /**
      * Convert from ArtifactInfo to a NexusArtifact
-     * 
+     *
      * @param ai
      * @return
      */

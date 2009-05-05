@@ -40,7 +40,7 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * A resource list for Repository route list.
- * 
+ *
  * @author cstamas
  * @author tstevens
  */
@@ -97,8 +97,8 @@ public class RepositoryRouteListPlexusResource
                 // XXX: cstamas -- a hack!
                 resource.setPattern( item.getRoutePatterns().get( 0 ).toString() );
 
-                resource.setRepositories( getRepositoryRouteMemberRepositoryList( request.getResourceRef(), item
-                    .getRepositories(), request ) );
+                resource.setRepositories( getRepositoryRouteMemberRepositoryList( request.getResourceRef(),
+                                                                                  item.getRepositories(), request ) );
 
                 result.addData( resource );
             }
@@ -129,9 +129,10 @@ public class RepositoryRouteListPlexusResource
                 && ( resource.getRepositories() == null || resource.getRepositories().size() == 0 ) )
             {
                 throw new PlexusResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "The route cannot have zero repository members!",
-                    getNexusErrorResponse( "repositories", "The route cannot have zero repository members!" ) );
+                                                   Status.CLIENT_ERROR_BAD_REQUEST,
+                                                   "The route cannot have zero repository members!",
+                                                   getNexusErrorResponse( "repositories",
+                                                                          "The route cannot have zero repository members!" ) );
             }
             else if ( RepositoryRouteResource.BLOCKING_RULE_TYPE.equals( resource.getRuleType() ) )
             {
@@ -148,14 +149,13 @@ public class RepositoryRouteListPlexusResource
 
                 route.setGroupId( resource.getGroupId() );
 
-                route.addRoutePattern( resource.getPattern() );
+                route.getRoutePatterns().add( resource.getPattern() );
 
                 route.setRouteType( resource2configType( resource.getRuleType() ) );
 
                 List<String> repositories = new ArrayList<String>( resource.getRepositories().size() );
 
-                for ( RepositoryRouteMemberRepository repo : (List<RepositoryRouteMemberRepository>) resource
-                    .getRepositories() )
+                for ( RepositoryRouteMemberRepository repo : (List<RepositoryRouteMemberRepository>) resource.getRepositories() )
                 {
                     repositories.add( repo.getId() );
                 }
@@ -173,10 +173,8 @@ public class RepositoryRouteListPlexusResource
             {
                 if ( e.getCause() != null && e.getCause() instanceof PatternSyntaxException )
                 {
-                    throw new PlexusResourceException(
-                        Status.CLIENT_ERROR_BAD_REQUEST,
-                        "Configuration error.",
-                        getNexusErrorResponse( "pattern", e.getMessage() ) );
+                    throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.",
+                                                       getNexusErrorResponse( "pattern", e.getMessage() ) );
                 }
                 else
                 {
@@ -188,9 +186,10 @@ public class RepositoryRouteListPlexusResource
                 getLogger().warn( "Cannot find a repository referenced within a route!", e );
 
                 throw new PlexusResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Cannot find a repository referenced within a route!",
-                    getNexusErrorResponse( "repositories", "Cannot find a repository referenced within a route!" ) );
+                                                   Status.CLIENT_ERROR_BAD_REQUEST,
+                                                   "Cannot find a repository referenced within a route!",
+                                                   getNexusErrorResponse( "repositories",
+                                                                          "Cannot find a repository referenced within a route!" ) );
             }
             catch ( IOException e )
             {

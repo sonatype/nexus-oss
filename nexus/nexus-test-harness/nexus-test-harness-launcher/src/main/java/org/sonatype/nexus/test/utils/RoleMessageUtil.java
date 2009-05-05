@@ -55,14 +55,15 @@ public class RoleMessageUtil
         throws IOException
     {
         Response response = this.sendMessage( Method.POST, role );
+        String responseString = response.getEntity().getText();
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not create role: " + response.getStatus() );
+            Assert.fail( "Could not create role: " + response.getStatus() + " - " + responseString );
         }
 
         // get the Resource object
-        RoleResource responseResource = this.getResourceFromResponse( response );
+        RoleResource responseResource = this.getResourceFromResponse( responseString );
 
         // make sure the id != null
         Assert.assertNotNull( responseResource.getId() );
@@ -127,7 +128,7 @@ public class RoleMessageUtil
 
     /**
      * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     * 
+     *
      * @return
      * @throws IOException
      */
@@ -137,13 +138,11 @@ public class RoleMessageUtil
     {
         String responseText = RequestFacade.doGetRequest( "service/local/roles" ).getEntity().getText();
 
-        XStreamRepresentation representation = new XStreamRepresentation(
-            XStreamFactory.getXmlXStream(),
-            responseText,
-            MediaType.APPLICATION_XML );
+        XStreamRepresentation representation =
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
 
-        RoleListResourceResponse resourceResponse = (RoleListResourceResponse) representation
-            .getPayload( new RoleListResourceResponse() );
+        RoleListResourceResponse resourceResponse =
+            (RoleListResourceResponse) representation.getPayload( new RoleListResourceResponse() );
 
         return resourceResponse.getData();
 
@@ -155,11 +154,17 @@ public class RoleMessageUtil
         String responseString = response.getEntity().getText();
         LOG.debug( " getResourceFromResponse: " + responseString );
 
+        return getResourceFromResponse( responseString );
+    }
+
+    public RoleResource getResourceFromResponse( String responseString )
+        throws IOException
+    {
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
         // this
-        RoleResourceRequest roleResourceRequest = (RoleResourceRequest) representation
-            .getPayload( new RoleResourceRequest() );
+        RoleResourceRequest roleResourceRequest =
+            (RoleResourceRequest) representation.getPayload( new RoleResourceRequest() );
 
         return roleResourceRequest.getData();
     }
@@ -207,20 +212,19 @@ public class RoleMessageUtil
         // external_role_map
         String uriPart = RequestFacade.SERVICE_LOCAL + "external_role_map/" + source;
 
-        Response response = RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation(
-            "",
-            this.mediaType ) );
+        Response response =
+            RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
         String responseString = response.getEntity().getText();
-        Assert.assertTrue( "Status: " + response.getStatus() + "\nResponse:\n" + responseString, response
-            .getStatus().isSuccess() );
+        Assert.assertTrue( "Status: " + response.getStatus() + "\nResponse:\n" + responseString,
+                           response.getStatus().isSuccess() );
 
-        ExternalRoleMappingResourceResponse result = (ExternalRoleMappingResourceResponse) this.parseResponseText(
-            responseString,
-            new ExternalRoleMappingResourceResponse() );
+        ExternalRoleMappingResourceResponse result =
+            (ExternalRoleMappingResourceResponse) this.parseResponseText( responseString,
+                                                                          new ExternalRoleMappingResourceResponse() );
 
         return result.getData();
     }
-    
+
     @SuppressWarnings( "unchecked" )
     public List<PlexusRoleResource> getRoles( String source )
         throws IOException
@@ -228,18 +232,17 @@ public class RoleMessageUtil
         // plexus_roles
         String uriPart = RequestFacade.SERVICE_LOCAL + "plexus_roles/" + source;
 
-        Response response = RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation(
-            "",
-            this.mediaType ) );
+        Response response =
+            RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
         String responseString = response.getEntity().getText();
-        Assert.assertTrue( "Status: " + response.getStatus() + "\nResponse:\n" + responseString, response
-            .getStatus().isSuccess() );
-        
-        System.out.println( "response: "+ responseString );
+        Assert.assertTrue( "Status: " + response.getStatus() + "\nResponse:\n" + responseString,
+                           response.getStatus().isSuccess() );
 
-        PlexusRoleListResourceResponse result = (PlexusRoleListResourceResponse) this.parseResponseText(
-            responseString,
-            new PlexusRoleListResourceResponse() );
+        System.out.println( "response: " + responseString );
+
+        PlexusRoleListResourceResponse result =
+            (PlexusRoleListResourceResponse) this.parseResponseText( responseString,
+                                                                     new PlexusRoleListResourceResponse() );
 
         return result.getData();
     }

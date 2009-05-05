@@ -38,44 +38,6 @@
       <fields></fields>
     </class>
 
-    <!-- Error response -->
-    <class>
-      <name>NexusErrorResponse</name>
-      <version>1.0.0+</version>
-      <superClass>NexusResponse</superClass>
-      <fields>
-        <field>
-          <name>errors</name>
-          <version>1.0.0+</version>
-          <association>
-            <type>NexusError</type>
-            <multiplicity>*</multiplicity>
-          </association>
-          <required>true</required>
-        </field>
-      </fields>
-    </class>
-
-    <class>
-      <name>NexusError</name>
-      <version>1.0.0+</version>
-      <description>An item describing the error.</description>
-      <fields>
-        <field>
-          <name>id</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
-        <field>
-          <name>msg</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
-      </fields>
-    </class>
-
     <!-- Reused stuff on many resources -->
     <class>
       <name>AuthenticationSettings</name>

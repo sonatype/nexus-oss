@@ -38,10 +38,10 @@ import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
 import org.sonatype.nexus.rest.NexusApplication;
-import org.sonatype.nexus.rest.model.NexusError;
-import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.nexus.rest.model.NexusResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.plexus.rest.resource.error.ErrorMessage;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
@@ -104,9 +104,8 @@ public class RestClientHelper
         for ( Iterator<Entry<String, String>> iter = args.entrySet().iterator(); iter.hasNext(); )
         {
             Entry<String, String> entry = iter.next();
-            params
-                .append( entry.getKey() ).append( "=" ).append( URLEncoder.encode( entry.getValue(), "UTF-8" ) )
-                .append( "&" );
+            params.append( entry.getKey() ).append( "=" ).append( URLEncoder.encode( entry.getValue(), "UTF-8" ) ).append(
+                                                                                                                           "&" );
         }
         return params.toString();
     }
@@ -125,16 +124,14 @@ public class RestClientHelper
     }
 
     public Object get( String service, String id )
-        throws NexusClientException,
-            NexusConnectionException
+        throws NexusClientException, NexusConnectionException
     {
         String url = this.buildUrl( service, id );
         return this.sendMessage( Method.GET, url, (NexusResponse) null );
     }
 
     public Object get( String service, Map<String, String> args )
-        throws NexusClientException,
-            NexusConnectionException
+        throws NexusClientException, NexusConnectionException
     {
         String url;
         try
@@ -149,8 +146,7 @@ public class RestClientHelper
     }
 
     public Object getList( String service )
-        throws NexusClientException,
-            NexusConnectionException
+        throws NexusClientException, NexusConnectionException
     {
         String url = this.buildUrl( service, "" );
         return this.sendMessage( Method.GET, url, (NexusResponse) null );
@@ -173,9 +169,8 @@ public class RestClientHelper
     public Object sendCommand( String service, String command )
         throws NexusConnectionException
     {
-        return this.sendMessage( Method.PUT, this.buildUrl( service, "command" ), new StringRepresentation(
-            command,
-            MediaType.TEXT_ALL ) );
+        return this.sendMessage( Method.PUT, this.buildUrl( service, "command" ),
+                                 new StringRepresentation( command, MediaType.TEXT_ALL ) );
     }
 
     public Response sendRequest( Method method, String url, Representation representation )
@@ -219,7 +214,7 @@ public class RestClientHelper
         if ( !response.getStatus().isSuccess() )
         {
             String errorMessage = "Error in response from server: " + response.getStatus() + ".";
-            List<NexusError> errors = new ArrayList<NexusError>();
+            List<ErrorMessage> errors = new ArrayList<ErrorMessage>();
             try
             {
                 if ( response.getEntity() != null )
@@ -231,17 +226,16 @@ public class RestClientHelper
                     if ( responseText.contains( "<error" ) ) // quick check before we parse the string
                     {
                         // try to parse the response
-                        NexusErrorResponse errorResponse = (NexusErrorResponse) this.xstream.fromXML(
-                            responseText,
-                            new NexusErrorResponse() );
-                        // if we made it this far we can stick the NexusErrors in the Exception
+                        ErrorResponse errorResponse =
+                            (ErrorResponse) this.xstream.fromXML( responseText, new ErrorResponse() );
+                        // if we made it this far we can stick the ErrorMessages in the Exception
                         errors = errorResponse.getErrors();
                     }
                     else
                     {
                         // the response text might be helpful in debugging, so we will add it
-                        errorMessage += "\nResponse: "
-                            + ( !StringUtils.isEmpty( responseText ) ? "\n" + responseText : "<empty>" );
+                        errorMessage +=
+                            "\nResponse: " + ( !StringUtils.isEmpty( responseText ) ? "\n" + responseText : "<empty>" );
                     }
                 }
                 else

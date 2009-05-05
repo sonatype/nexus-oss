@@ -35,6 +35,8 @@ import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDesc
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.nexus.rest.NexusApplication;
 import org.sonatype.nexus.rest.model.*;
+import org.sonatype.plexus.rest.resource.error.ErrorMessage;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
@@ -62,10 +64,10 @@ public class TestMarshalUnmarchal
         xstreamJSON = napp.doConfigureXstream( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
     }
 
-    public void testNexusErrorResponse()
+    public void testErrorResponse()
     {
-        NexusErrorResponse errorResponse = new NexusErrorResponse();
-        NexusError error = new NexusError();
+        ErrorResponse errorResponse = new ErrorResponse();
+        ErrorMessage error = new ErrorMessage();
         error.setId( "ID" );
         error.setMsg( "Error Message" );
         errorResponse.addError( error );

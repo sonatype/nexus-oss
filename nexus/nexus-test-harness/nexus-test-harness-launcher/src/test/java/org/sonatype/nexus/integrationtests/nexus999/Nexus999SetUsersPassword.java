@@ -53,7 +53,6 @@ public class Nexus999SetUsersPassword
             "44",
             "54",
             "55",
-            "56",
             "57",
             "58",
             "59",
@@ -94,7 +93,6 @@ public class Nexus999SetUsersPassword
             "44",
             "54",
             "55",
-            "56",
             "57",
             "58",
             "59", /* "72" set pw, */

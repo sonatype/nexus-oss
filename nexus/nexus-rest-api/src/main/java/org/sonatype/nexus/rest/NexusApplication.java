@@ -55,7 +55,7 @@ import com.thoughtworks.xstream.XStream;
 /**
  * Nexus REST Application. This will ultimately replace the two applications we have now, and provide us plugin UI
  * extension capability.
- * 
+ *
  * @author cstamas
  */
 @Component( role = Application.class, hint = "nexus" )
@@ -65,7 +65,7 @@ public class NexusApplication
 {
     @Requirement
     private Nexus nexus;
-    
+
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
 
@@ -147,14 +147,14 @@ public class NexusApplication
         xstream.alias( "project", Model.class );
 
         // omitting modelEncoding
-        xstream.omitField( NexusErrorResponse.class, "modelEncoding" );
+        xstream.omitField( ErrorResponse.class, "modelEncoding" );
         // xstream.addImplicitCollection( ErrorResponse.class, "errors", "error", ErrorMessage.class ); // FIXME:
         // this might break the JSON parser, test it before checking in
-        xstream.omitField( NexusError.class, "modelEncoding" );
-        xstream.alias( "nexus-error", NexusErrorResponse.class );
-        xstream.alias( "error", NexusError.class );
-        xstream.registerLocalConverter( NexusErrorResponse.class, "errors",
-                                        new AliasingListConverter(NexusError.class, "error" ) );
+        xstream.omitField( ErrorMessage.class, "modelEncoding" );
+        xstream.alias( "nexus-error", ErrorResponse.class );
+        xstream.alias( "error", ErrorMessage.class );
+        xstream.registerLocalConverter( ErrorResponse.class, "errors",
+                                        new AliasingListConverter(ErrorMessage.class, "error" ) );
 
         xstream.omitField( ContentListResourceResponse.class, "modelEncoding" );
         xstream.omitField( ContentListResource.class, "modelEncoding" );
@@ -525,7 +525,7 @@ public class NexusApplication
 
     /**
      * "Decorating" the root with our resources.
-     * 
+     *
      * @TODO Move this to PlexusResources, except Status (see isStarted usage below!)
      */
     @Override

@@ -175,7 +175,7 @@ public class Nexus778SearchResultsFilteringTest
         resource.setRepositoryTargetId( targetId );
         resource.addMethod( "read" );
 
-        return (PrivilegeStatusResource) privUtil.createPrivileges( resource ).iterator().next();
+        return privUtil.createPrivileges( resource ).iterator().next();
     }
 
     private RoleResource createRole( String name, List<String> privilegeIds )
@@ -199,7 +199,6 @@ public class Nexus778SearchResultsFilteringTest
         role.addPrivilege( "44" );
         role.addPrivilege( "54" );
         role.addPrivilege( "55" );
-        role.addPrivilege( "56" );
         role.addPrivilege( "57" );
         role.addPrivilege( "58" );
         role.addPrivilege( "64" );

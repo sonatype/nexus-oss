@@ -50,7 +50,7 @@ public class NexusConfigUtil
         try
         {
             config = TestContainer.getInstance().lookup( NexusConfiguration.class );
-            config.loadConfiguration();
+            config.loadConfiguration( true );
         }
         catch ( Exception e )
         {

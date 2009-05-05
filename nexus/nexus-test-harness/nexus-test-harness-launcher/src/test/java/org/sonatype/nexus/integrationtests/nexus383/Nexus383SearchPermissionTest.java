@@ -44,9 +44,9 @@ public class Nexus383SearchPermissionTest
         {
             return;
         }
-        
+
         overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-search", "1", "2" /* login */, "6", "14",
-                           "17" /* search */, "19", "44", "54", "55", "56", "57", "58", "59", "T1", "T2" );
+                           "17" /* search */, "19", "44", "54", "55", "57", "58", "59", "T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -64,9 +64,9 @@ public class Nexus383SearchPermissionTest
         {
             return;
         }
-        
+
         overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-but-search", "1", "2" /* login */, "6", "14", "19",
-        /* "17" search, */"44", "54", "55", "56", "57", "58", "59", "T1", "T2" );
+        /* "17" search, */"44", "54", "55", "57", "58", "59", "T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -82,7 +82,7 @@ public class Nexus383SearchPermissionTest
     // throws Exception
     // {
     // overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-but-repo", "1", "2" /* login */, "6", "14", "19",
-    // "17", "44", "54", "55", "56", "57", "58", "59"/* , "T1", "T2" */);
+    // "17", "44", "54", "55", "57", "58", "59"/* , "T1", "T2" */);
     //
     // TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
     // TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );

@@ -31,7 +31,7 @@ public class Nexus394ForgotPasswordPermissionTest
         throws Exception
     {
         overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-forgot", "1", "2" /* login */, "6", "14", "17", "19",
-                           "44", "54", "55", "56", "57"/* forgot */, "58", "59", "T1", "T2" );
+                           "44", "54", "55", "57"/* forgot */, "58", "59", "T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -51,7 +51,7 @@ public class Nexus394ForgotPasswordPermissionTest
         throws Exception
     {
         overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-but-forgot", "1", "2" /* login */, "6", "14", "17", "19",
-                           "44", "54", "55", "56", /* "57" forgot, */"58", "59", "T1", "T2" );
+                           "44", "54", "55", /* "57" forgot, */"58", "59", "T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );

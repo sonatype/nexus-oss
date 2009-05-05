@@ -20,19 +20,16 @@ import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.restlet.resource.StringRepresentation;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
+import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
-import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.RepositoryStatusMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.sonatype.nexus.test.utils.XStreamFactory;
-import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 public abstract class AbstractNexusProxyIntegrationTest
     extends AbstractNexusIntegrationTest
@@ -94,23 +91,21 @@ public abstract class AbstractNexusProxyIntegrationTest
     public void setBlockProxy( String nexusBaseUrl, String repoId, boolean block )
         throws IOException
     {
-
-        String serviceURI = "service/local/repositories/" + repoId + "/status?undefined";
-
-        // unblock string
-        String blockOrNotCommand = "\"unavailable\",\"proxyMode\":\"ALLOW\"";
-        // change to block if true
-        if ( block == true )
+        RepositoryStatusResource status = new RepositoryStatusResource();
+        status.setId( repoId );
+        status.setRepoType( "proxy" );
+        status.setLocalStatus( LocalStatus.IN_SERVICE.name() );
+        if ( block )
         {
-            blockOrNotCommand = "\"available\",\"proxyMode\":\"BLOCKED_MANUAL\"";
+            status.setRemoteStatus( RemoteStatus.UNAVAILABLE.name() );
+            status.setProxyMode( ProxyMode.ALLOW.name() );
         }
-
-        StringRepresentation representation =
-            new StringRepresentation( "{\"data\":{\"id\":\"" + repoId
-                + "\",\"repoType\":\"proxy\",\"localStatus\":\"IN_SERVICE\",\"remoteStatus\":" + blockOrNotCommand
-                + "}}", MediaType.APPLICATION_JSON );
-
-        Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
+        else
+        {
+            status.setRemoteStatus( RemoteStatus.AVAILABLE.name() );
+            status.setProxyMode( ProxyMode.BLOKED_MANUAL.name() );
+        }
+        Response response = RepositoryStatusMessageUtil.changeStatus( status );
 
         if ( !response.getStatus().isSuccess() )
         {
@@ -123,22 +118,18 @@ public abstract class AbstractNexusProxyIntegrationTest
         throws IOException
     {
 
-        String serviceURI = "service/local/repositories/" + repoId + "/status?undefined";
-
-        // unblock string
-        String servicePart = outOfService ? LocalStatus.OUT_OF_SERVICE.name() : LocalStatus.IN_SERVICE.name();
-        RepositoryStatusResource data = new RepositoryStatusResource();
-        data.setId( repoId );
-        data.setRepoType( "proxy" );
-        data.setLocalStatus( servicePart );
-
-        RepositoryStatusResourceResponse req = new RepositoryStatusResourceResponse();
-        req.setData( data );
-        XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), "", MediaType.APPLICATION_XML );
-        representation.setPayload( req );
-
-        Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
+        RepositoryStatusResource status = new RepositoryStatusResource();
+        status.setId( repoId );
+        status.setRepoType( "proxy" );
+        if ( outOfService )
+        {
+            status.setLocalStatus( LocalStatus.OUT_OF_SERVICE.name() );
+        }
+        else
+        {
+            status.setLocalStatus( LocalStatus.IN_SERVICE.name() );
+        }
+        Response response = RepositoryStatusMessageUtil.changeStatus( status );
 
         if ( !response.getStatus().isSuccess() )
         {

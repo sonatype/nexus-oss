@@ -31,7 +31,7 @@ public class Nexus393ResetPasswordPermissionTest
         throws Exception
     {
         overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-reset", "1", "2" /* login */, "6", "14", "17", "19",
-                           "44", "54", "55", "56", "57", "58", "59"/* reset */, "T1", "T2" );
+                           "44", "54", "55", "57", "58", "59"/* reset */, "T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -53,7 +53,7 @@ public class Nexus393ResetPasswordPermissionTest
         throws Exception
     {
         overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-but-reset", "1", "2" /* login */, "6", "14", "17",
-                           "19", "44", "54", "55", "56", "57", "58", /* "59" reset , */"T1", "T2" );
+                           "19", "44", "54", "55", "57", "58", /* "59" reset , */"T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );

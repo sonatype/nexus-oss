@@ -22,7 +22,6 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
@@ -34,7 +33,6 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 @Component( role = PlexusResource.class, hint = "RepositoryStatusPlexusResource" )
 public class RepositoryStatusPlexusResource
@@ -126,6 +124,11 @@ public class RepositoryStatusPlexusResource
             {
                 RepositoryStatusResource resource = repoStatusRequest.getData();
 
+                if ( resource.getLocalStatus() == null )
+                {
+                    throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Local status must be defined" );
+                }
+
                 if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
                 {
                     ShadowRepository shadow =
@@ -161,7 +164,7 @@ public class RepositoryStatusPlexusResource
                     result = (RepositoryStatusResourceResponse) this.get( context, request, response, null );
 
                     for ( ShadowRepository shadow : getRepositoryRegistry().getRepositoriesWithFacet(
-                                                                                                     ShadowRepository.class )  )
+                                                                                                      ShadowRepository.class ) )
                     {
                         if ( repository.getId().equals( shadow.getMasterRepositoryId() ) )
                         {
@@ -179,7 +182,7 @@ public class RepositoryStatusPlexusResource
                         }
                     }
                 }
-                
+
                 getNexusConfiguration().saveConfiguration();
             }
             catch ( NoSuchRepositoryException e )
@@ -188,14 +191,14 @@ public class RepositoryStatusPlexusResource
 
                 throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Not Found" );
             }
-//            catch ( ConfigurationException e )
-//            {
-//                getLogger().warn( "Configuration unacceptable, repoId=" + repoId, e );
-//
-//                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
-//                                                   "Configuration unacceptable, repoId=" + repoId + ": "
-//                                                       + e.getMessage(), getNexusErrorResponse( "*", e.getMessage() ) );
-//            }
+            // catch ( ConfigurationException e )
+            // {
+            // getLogger().warn( "Configuration unacceptable, repoId=" + repoId, e );
+            //
+            // throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
+            // "Configuration unacceptable, repoId=" + repoId + ": "
+            // + e.getMessage(), getNexusErrorResponse( "*", e.getMessage() ) );
+            // }
             catch ( IOException e )
             {
                 getLogger().warn( "Got IO Exception!", e );

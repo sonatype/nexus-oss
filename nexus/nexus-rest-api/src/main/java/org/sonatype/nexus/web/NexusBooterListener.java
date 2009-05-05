@@ -24,20 +24,18 @@ public class NexusBooterListener
     implements ServletContextListener
 {
 
+    private static PlexusContainer plexus;
+
     public void contextInitialized( ServletContextEvent sce )
     {
         try
         {
-            PlexusContainer c = (PlexusContainer) sce.getServletContext().getAttribute( "plexus" );
+            plexus = (PlexusContainer) sce.getServletContext().getAttribute( "plexus" );
 
-            Nexus nexus = c.lookup( Nexus.class );
-            nexus.getClass(); // Just wanna be sure nexus is not null
-
+            Nexus nexus = plexus.lookup( Nexus.class );
             sce.getServletContext().setAttribute( Nexus.class.getName(), nexus );
 
-            NexusConfiguration nexusConfiguration = c.lookup( NexusConfiguration.class );
-            nexusConfiguration.getClass(); // Just wanna be sure nexusConfiguration is not null
-
+            NexusConfiguration nexusConfiguration = plexus.lookup( NexusConfiguration.class );
             sce.getServletContext().setAttribute( NexusConfiguration.class.getName(), nexusConfiguration );
         }
         catch ( Exception e )
@@ -48,6 +46,10 @@ public class NexusBooterListener
 
     public void contextDestroyed( ServletContextEvent sce )
     {
+        plexus = null;
     }
 
+    public static PlexusContainer getPlexus() {
+        return plexus;
+    }
 }
