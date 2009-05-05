@@ -101,12 +101,14 @@ Ext.extend(Ext.tree.UserTreeLoader, Ext.tree.SonatypeTreeLoader, {
         attr.id = parentId + '$$' + Sonatype.config.repos.urls.roles + '/' + id + '/';
         attr.text = role.data.name;
         attr.qtip = role.data.description;
+        attr.leaf = false;
       }
       else {
         var priv = this.privDataStore.getAt( this.privDataStore.find( 'id', id ) );
         attr.id = parentId + '$$' + Sonatype.config.repos.urls.privileges + '/' + id + '/';
         attr.text = priv.data.name;
         attr.qtip = priv.data.description;
+        attr.leaf = true;
       }
 
       if(this.applyLoader !== false){
