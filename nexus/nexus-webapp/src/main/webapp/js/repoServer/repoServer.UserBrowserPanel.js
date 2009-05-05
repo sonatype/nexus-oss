@@ -1,35 +1,5 @@
 Ext.tree.UserTreeLoader = function(config){
     Ext.tree.UserTreeLoader.superclass.constructor.call(this, config);
-    
-    this.roleDataStore = new Ext.data.JsonStore( {
-      root: 'data',
-      id: 'id',
-      url: Sonatype.config.repos.urls.roles,
-      sortInfo: { field: 'name', direction: 'ASC' },
-      autoLoad: true,
-      fields: [
-        { name: 'id' },
-        { name: 'name', sortType:Ext.data.SortTypes.asUCString },
-        { name: 'description'}
-      ]
-    } );
-    
-    this.roleDataStore.load();
-    
-    this.privDataStore = new Ext.data.JsonStore( {
-      root: 'data',
-      id: 'id',
-      url: Sonatype.config.repos.urls.privileges,
-      sortInfo: { field: 'name', direction: 'ASC' },
-      autoLoad: true,
-      fields: [
-        { name: 'id' },
-        { name: 'name', sortType:Ext.data.SortTypes.asUCString },
-        { name: 'description'}
-      ]
-    } );
-    
-    this.privDataStore.load();
 };
 
 Ext.extend(Ext.tree.UserTreeLoader, Ext.tree.SonatypeTreeLoader, {  
@@ -149,6 +119,62 @@ Sonatype.repoServer.UserBrowsePanel = function( config ) {
   };
   Ext.apply( this, config, defaultConfig );
   
+  this.roleDataStore = new Ext.data.JsonStore( {
+    root: 'data',
+    id: 'id',
+    url: Sonatype.config.repos.urls.roles,
+    sortInfo: { field: 'name', direction: 'ASC' },
+    autoLoad: true,
+    fields: [
+      { name: 'id' },
+      { name: 'name', sortType:Ext.data.SortTypes.asUCString },
+      { name: 'description'}
+    ],
+    listeners: {
+      load: {
+        fn: function(){
+            this.rolesLoaded = true;
+            if ( this.privsLoaded ){
+              this.root.reload();
+              this.privsLoaded = false;
+              this.rolesLoaded = false;
+            }
+          },
+        scope: this
+      }
+    }
+  } );
+  
+  this.roleDataStore.load();
+  
+  this.privDataStore = new Ext.data.JsonStore( {
+    root: 'data',
+    id: 'id',
+    url: Sonatype.config.repos.urls.privileges,
+    sortInfo: { field: 'name', direction: 'ASC' },
+    autoLoad: true,
+    fields: [
+      { name: 'id' },
+      { name: 'name', sortType:Ext.data.SortTypes.asUCString },
+      { name: 'description'}
+    ],
+    listeners: {
+      load: {
+        fn: function(){
+            this.privsLoaded = true;
+            if ( this.rolesLoaded ){
+              this.root.reload();
+              this.privsLoaded = false;
+              this.rolesLoaded = false;
+            }
+          },
+        scope: this
+      }
+    }
+  } );
+  
+  this.privDataStore.load();
+  
   Sonatype.repoServer.RepositoryBrowsePanel.superclass.constructor.call( this, {
     anchor: '0 -2',
     bodyStyle: 'background-color:#FFFFFF',
@@ -169,6 +195,8 @@ Sonatype.repoServer.UserBrowsePanel = function( config ) {
     ],
     loader: new Ext.tree.UserTreeLoader( {
       url: '',
+      roleDataStore: this.roleDataStore, 
+      privDataStore: this.privDataStore,
       listeners: {
         loadexception: this.treeLoadExceptionHandler,
         scope: this
@@ -180,7 +208,7 @@ Sonatype.repoServer.UserBrowsePanel = function( config ) {
     } 
   } );
 
-  new Ext.tree.TreeSorter( this, { folderSort:true } );
+  new Ext.tree.TreeSorter( this, { folderSort: true } );
 
   var root = new Ext.tree.AsyncTreeNode( {
     text: this.payload.data[this.titleColumn],
@@ -204,7 +232,10 @@ Ext.extend( Sonatype.repoServer.UserBrowsePanel, Ext.tree.TreePanel, {
   refreshHandler: function( button, e ) {
     this.root.setText( this.payload ? this.payload.get( this.titleColumn ) : '/' );
     this.root.id = this.payload.data.resourceURI;
-    this.root.reload();
+    
+    //the load listener on these stores will reload the node
+    this.roleDataStore.reload();
+    this.privDataStore.reload();
   },
   treeLoadExceptionHandler : function( treeLoader, node, response ) {
     if ( !response.status == '200' ) {
