@@ -1050,7 +1050,7 @@ Ext.extend( Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
 } );
 
 Sonatype.Events.addListener( 'userViewInit', function( cardPanel, rec ) {
-  var config = { payload: rec };
+  var config = { payload: rec, tabTitle: 'Config' };
   cardPanel.add( rec.data.source == 'default' ?
     new Sonatype.repoServer.DefaultUserEditor( config ) :
     new Sonatype.repoServer.UserMappingEditor( config )
