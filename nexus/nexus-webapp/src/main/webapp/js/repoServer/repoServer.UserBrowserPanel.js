@@ -218,8 +218,10 @@ Ext.extend( Sonatype.repoServer.UserBrowsePanel, Ext.tree.TreePanel, {
 } );
 
 Sonatype.Events.addListener( 'userViewInit', function( cardPanel, rec, gridPanel ) {
-  cardPanel.add( 
-      new Sonatype.repoServer.UserBrowsePanel( 
-          { payload: rec,
-            tabTitle: 'Browse'} ) );
+  if ( rec.data.resourceURI ) {
+    cardPanel.add( 
+        new Sonatype.repoServer.UserBrowsePanel( 
+            { payload: rec,
+              tabTitle: 'Browse'} ) );
+  }
 } );
