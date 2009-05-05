@@ -47,7 +47,7 @@ public class Nexus233PrivilegePermissionTests
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         Response response = this.privUtil.sendMessage( Method.POST, privilege );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
@@ -70,11 +70,11 @@ public class Nexus233PrivilegePermissionTests
 
         // update should fail
         response = this.privUtil.sendMessage( Method.PUT, privilege, responsePrivilege.getId() );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // delete should fail
         response = this.privUtil.sendMessage( Method.DELETE, null, responsePrivilege.getId() );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
     }
 
@@ -101,7 +101,7 @@ public class Nexus233PrivilegePermissionTests
 
 
         response = this.privUtil.sendMessage( Method.GET, null, responsePrivilege.getId() );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
@@ -115,7 +115,7 @@ public class Nexus233PrivilegePermissionTests
 
         // should work now...
         response = this.privUtil.sendMessage( Method.PUT, privilege, responsePrivilege.getId() );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // read should fail
         response = this.privUtil.sendMessage( Method.GET, null, responsePrivilege.getId() );
@@ -123,11 +123,11 @@ public class Nexus233PrivilegePermissionTests
 
         // update should fail
         response = this.privUtil.sendMessage( Method.POST, privilege );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // delete should fail
         response = this.privUtil.sendMessage( Method.DELETE, null, responsePrivilege.getId() );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
     }
     
@@ -153,7 +153,7 @@ public class Nexus233PrivilegePermissionTests
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.privUtil.sendMessage( Method.DELETE, null, responsePrivilege.getId() );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
@@ -167,7 +167,7 @@ public class Nexus233PrivilegePermissionTests
 
         // should work now...
         response = this.privUtil.sendMessage( Method.PUT, privilege, responsePrivilege.getId() );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // read should succeed (inherited by delete)
         response = this.privUtil.sendMessage( Method.GET, null, responsePrivilege.getId() );
@@ -175,7 +175,7 @@ public class Nexus233PrivilegePermissionTests
 
         // update should fail
         response = this.privUtil.sendMessage( Method.POST, privilege );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // delete should fail
         response = this.privUtil.sendMessage( Method.DELETE, null, responsePrivilege.getId() );
