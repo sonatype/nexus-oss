@@ -8,14 +8,13 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.packer.IndexPackingRequest;
 
 public class Nexus1911IncrementalTest
-    extends PlexusTestCase
+    extends AbstractIndexCreatorHelper
 {
     NexusIndexer indexer;
     IndexingContext context;
@@ -43,7 +42,7 @@ public class Nexus1911IncrementalTest
 
         File repo = new File( getBasedir(), "target/repos/nexus-1911/repo" );
 
-        context = indexer.addIndexingContext( "test", "test", repo, indexDir, null, null, NexusIndexer.DEFAULT_INDEX );
+        context = indexer.addIndexingContext( "test", "test", repo, indexDir, null, null, DEFAULT_CREATORS );
         indexer.scan( context );
     }
     

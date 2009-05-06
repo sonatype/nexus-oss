@@ -44,7 +44,7 @@ public class IndexDataTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
 
         // assertNull( context.getTimestamp() ); // unknown upon creation
 
@@ -84,7 +84,7 @@ public class IndexDataTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
 
         assertNull( context.getTimestamp() ); // unknown upon creation
 

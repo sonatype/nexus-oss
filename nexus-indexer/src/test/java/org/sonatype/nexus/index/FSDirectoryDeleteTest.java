@@ -10,12 +10,11 @@ import java.io.File;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 public class FSDirectoryDeleteTest
-    extends PlexusTestCase
+    extends AbstractIndexCreatorHelper
 {
     protected NexusIndexer nexusIndexer;
     
@@ -46,7 +45,7 @@ public class FSDirectoryDeleteTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
         
         nexusIndexer.scan( context );
         
@@ -59,7 +58,7 @@ public class FSDirectoryDeleteTest
             otherIndexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
         
         nexusIndexer.scan( otherContext );
     }

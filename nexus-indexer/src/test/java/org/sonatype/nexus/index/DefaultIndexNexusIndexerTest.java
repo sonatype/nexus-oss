@@ -47,7 +47,7 @@ public class DefaultIndexNexusIndexerTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
 
         assertNull( context.getTimestamp() ); // unknown upon creation
 
@@ -325,7 +325,7 @@ public class DefaultIndexNexusIndexerTest
             newIndexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
 
         assertEquals( context.getTimestamp().getTime(), newContext.getTimestamp().getTime() );
 
@@ -366,7 +366,7 @@ public class DefaultIndexNexusIndexerTest
             newIndexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
 
         assertEquals( timestamp, newContext.getTimestamp() );
 

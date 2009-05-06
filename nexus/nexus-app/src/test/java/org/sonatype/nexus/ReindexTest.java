@@ -166,7 +166,7 @@ public class ReindexTest
 
         IndexingContext ctx =
             nexusIndexer.addIndexingContextForced( repositoryId + "-temp", repositoryId, repositoryRoot, directory,
-                                                   null, null, NexusIndexer.FULL_INDEX );
+                                                   null, null, FULL_CREATORS );
 
         // shifting if needed (very crude way to do it, but heh)
         shiftContextInTime( ctx, shiftDays );

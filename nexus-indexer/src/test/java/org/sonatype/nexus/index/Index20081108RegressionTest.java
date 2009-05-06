@@ -40,7 +40,7 @@ public class Index20081108RegressionTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
         
         InputStream is = new FileInputStream( getBasedir() +  //
             File.separator + "src" +  // 

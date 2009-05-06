@@ -19,13 +19,13 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.IOUtil;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.VoidAction;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.index.AbstractIndexCreatorHelper;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchRequest;
@@ -38,7 +38,7 @@ import org.sonatype.nexus.index.context.IndexingContext;
  * @author Eugene Kuleshov
  */
 public class DefaultIndexUpdaterTest
-    extends PlexusTestCase
+    extends AbstractIndexCreatorHelper
 {
     String repositoryId = "test";
 
@@ -71,7 +71,7 @@ public class DefaultIndexUpdaterTest
             indexDirectory,
             repositoryUrl,
             null,
-            NexusIndexer.MINIMAL_INDEX );
+            MIN_CREATORS );
     }
 
     public void testReplaceIndex()
@@ -99,7 +99,7 @@ public class DefaultIndexUpdaterTest
             tempIndexDirectory,
             repositoryUrl,
             null,
-            NexusIndexer.MINIMAL_INDEX );
+            MIN_CREATORS );
 
         indexer.addArtifactToIndex(
             createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.3", null ),
@@ -159,7 +159,7 @@ public class DefaultIndexUpdaterTest
                 tempIndexDirectory,
                 repositoryUrl,
                 null,
-                NexusIndexer.MINIMAL_INDEX );
+                MIN_CREATORS );
 
             // indexer.addArtifactToIndex(
             // createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.2", null ),
@@ -220,7 +220,7 @@ public class DefaultIndexUpdaterTest
                 tempIndexDirectory,
                 repositoryUrl,
                 null,
-                NexusIndexer.MINIMAL_INDEX );
+                MIN_CREATORS );
 
             indexer.addArtifactToIndex( createArtifactContext(
                 repositoryId,
@@ -278,7 +278,7 @@ public class DefaultIndexUpdaterTest
             indexDir1,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
         indexer.scan( context1 );
 
         File repo2 = new File( getBasedir(), "src/test/nexus-13" );
@@ -291,7 +291,7 @@ public class DefaultIndexUpdaterTest
             indexDir2,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
         indexer.scan( context2 );
 
         context1.merge( indexDir2 );
@@ -337,7 +337,7 @@ public class DefaultIndexUpdaterTest
                 tempIndexDirectory,
                 repositoryUrl,
                 null,
-                NexusIndexer.MINIMAL_INDEX );
+                MIN_CREATORS );
 
             indexer.addArtifactToIndex( createArtifactContext(
                 repositoryId,
@@ -396,7 +396,7 @@ public class DefaultIndexUpdaterTest
             will( returnValue( indexUrl ) );
 
             allowing( tempContext ).getIndexCreators();
-            will( returnValue( NexusIndexer.DEFAULT_INDEX ) );
+            will( returnValue( DEFAULT_CREATORS ) );
             
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
             
@@ -455,7 +455,7 @@ public class DefaultIndexUpdaterTest
             will( returnValue( indexUrl ) );
             
             allowing( tempContext ).getIndexCreators();
-            will( returnValue( NexusIndexer.DEFAULT_INDEX ) );
+            will( returnValue( DEFAULT_CREATORS ) );
             
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
             
@@ -523,7 +523,7 @@ public class DefaultIndexUpdaterTest
             will( returnValue( indexUrl ) );
 
             allowing( tempContext ).getIndexCreators();
-            will( returnValue( NexusIndexer.DEFAULT_INDEX ) );
+            will( returnValue( DEFAULT_CREATORS ) );
             
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
             
@@ -602,7 +602,7 @@ public class DefaultIndexUpdaterTest
             will( returnValue( indexUrl ) );
 
             allowing( tempContext ).getIndexCreators();
-            will( returnValue( NexusIndexer.DEFAULT_INDEX ) );
+            will( returnValue( DEFAULT_CREATORS ) );
             
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
             
@@ -683,7 +683,7 @@ public class DefaultIndexUpdaterTest
             will( returnValue( indexUrl ) );
 
             allowing( tempContext ).getIndexCreators();
-            will( returnValue( NexusIndexer.DEFAULT_INDEX ) );
+            will( returnValue( DEFAULT_CREATORS ) );
             
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
             
@@ -775,7 +775,7 @@ public class DefaultIndexUpdaterTest
             will( returnValue( indexUrl ) );
 
             allowing( tempContext ).getIndexCreators();
-            will( returnValue( NexusIndexer.DEFAULT_INDEX ) );
+            will( returnValue( DEFAULT_CREATORS ) );
             
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
             

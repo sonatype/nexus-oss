@@ -8,7 +8,6 @@ package org.sonatype.nexus.index;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -20,8 +19,6 @@ import org.sonatype.nexus.index.cli.NexusIndexerCli;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
-import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
-import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.updater.IndexUpdater;
 
@@ -88,27 +85,6 @@ import org.sonatype.nexus.index.updater.IndexUpdater;
 public interface NexusIndexer
 {
     String ROLE = NexusIndexer.class.getName();
-
-    // ----------------------------------------------------------------------------
-    // Contexts
-    // ----------------------------------------------------------------------------
-
-    /**
-     * The minimal set of index creators.
-     */
-    public static final List<? extends IndexCreator> MINIMAL_INDEX =
-        Arrays.asList( new MinimalArtifactInfoIndexCreator() );
-        // Collections.singletonList(new MinimalArtifactInfoIndexCreator());
-    /**
-     * The full set of index creators.
-     */
-    public static final List<? extends IndexCreator> FULL_INDEX = Arrays.<IndexCreator>asList(
-        new MinimalArtifactInfoIndexCreator(),
-        new JarFileContentsIndexCreator() );
-    /**
-     * The "default" set of index creators. It adds Jar contents (classes) to minimal index.
-     */
-    public static final List<? extends IndexCreator> DEFAULT_INDEX = FULL_INDEX;
     
     /**
      * Adds an indexing context to Nexus indexer.

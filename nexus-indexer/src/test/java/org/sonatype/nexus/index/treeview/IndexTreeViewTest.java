@@ -40,7 +40,7 @@ public class IndexTreeViewTest
             indexDir,
             null,
             null,
-            NexusIndexer.MINIMAL_INDEX );
+            MIN_CREATORS );
         nexusIndexer.scan( context );
     }
 

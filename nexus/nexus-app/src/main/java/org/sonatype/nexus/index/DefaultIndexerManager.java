@@ -39,6 +39,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.packer.IndexPackingRequest;
@@ -105,6 +106,9 @@ public class DefaultIndexerManager
 
     @Requirement
     private NexusScheduler nexusScheduler;
+    
+    @Requirement( role = IndexCreator.class, hints = {"min","jarContent"})
+    private List<IndexCreator> indexCreators;
 
     private File workingDirectory;
 
@@ -181,14 +185,14 @@ public class DefaultIndexerManager
                 nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
                                                        repoRoot, new File( getWorkingDirectory(),
                                                                            getLocalContextId( repository.getId() ) ),
-                                                       null, null, NexusIndexer.FULL_INDEX );
+                                                       null, null, indexCreators );
             ctxLocal.setSearchable( false );
 
             ctxRemote =
                 nexusIndexer.addIndexingContextForced( getRemoteContextId( repository.getId() ), repository.getId(),
                                                        repoRoot, new File( getWorkingDirectory(),
                                                                            getRemoteContextId( repository.getId() ) ),
-                                                       null, null, NexusIndexer.FULL_INDEX );
+                                                       null, null, indexCreators );
             ctxRemote.setSearchable( false );
         }
         else
@@ -202,14 +206,14 @@ public class DefaultIndexerManager
                 nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
                                                        repoRoot, new File( getWorkingDirectory(),
                                                                            getLocalContextId( repository.getId() ) ),
-                                                       null, null, NexusIndexer.FULL_INDEX );
+                                                       null, null, indexCreators );
             ctxLocal.setSearchable( repository.isIndexable() );
 
             ctxRemote =
                 nexusIndexer.addIndexingContextForced( getRemoteContextId( repository.getId() ), repository.getId(),
                                                        repoRoot, new File( getWorkingDirectory(),
                                                                            getRemoteContextId( repository.getId() ) ),
-                                                       null, null, NexusIndexer.FULL_INDEX );
+                                                       null, null, indexCreators );
             ctxRemote.setSearchable( repository.isIndexable() );
         }
     }

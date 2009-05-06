@@ -6,13 +6,14 @@ import java.util.Properties;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.nexus.index.AbstractIndexCreatorHelper;
 import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.packer.IndexPackingRequest;
 import org.sonatype.nexus.index.updater.IndexUpdateRequest;
 
 public class DefaultIncrementalHandlerTest
-    extends PlexusTestCase
+    extends AbstractIndexCreatorHelper
 {
     IncrementalHandler handler = null;
     NexusIndexer indexer = null;
@@ -34,7 +35,7 @@ public class DefaultIncrementalHandlerTest
         FileUtils.deleteDirectory( indexDir );
         FileUtils.deleteDirectory( repoDir );
         
-        context = indexer.addIndexingContext( "test", "test", repoDir, indexDir, null, null, NexusIndexer.DEFAULT_INDEX );
+        context = indexer.addIndexingContext( "test", "test", repoDir, indexDir, null, null, DEFAULT_CREATORS );
     }
     
     @Override

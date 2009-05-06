@@ -13,11 +13,10 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 public abstract class AbstractNexusIndexerTest
-    extends PlexusTestCase
+    extends AbstractIndexCreatorHelper
 {
     protected NexusIndexer nexusIndexer;
 

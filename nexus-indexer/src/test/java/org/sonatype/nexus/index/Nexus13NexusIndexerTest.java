@@ -42,7 +42,7 @@ public class Nexus13NexusIndexerTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
         nexusIndexer.scan( context );
     }
 
@@ -114,7 +114,7 @@ public class Nexus13NexusIndexerTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
         
         Directory newIndexDir = new RAMDirectory();
         

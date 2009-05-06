@@ -23,7 +23,6 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.store.RAMDirectory;
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -34,7 +33,7 @@ import org.sonatype.nexus.index.updater.DefaultIndexUpdater;
 
 /** @author Jason van Zyl */
 public class NexusIndexerTest
-    extends PlexusTestCase
+    extends AbstractIndexCreatorHelper
 {
 
     private IndexingContext context;
@@ -242,7 +241,7 @@ public class NexusIndexerTest
 
         File repo = new File( getBasedir(), "src/test/repo" );
 
-        context = indexer.addIndexingContext( "test", "test", repo, indexDir, null, null, NexusIndexer.DEFAULT_INDEX );
+        context = indexer.addIndexingContext( "test", "test", repo, indexDir, null, null, DEFAULT_CREATORS );
         indexer.scan( context );
 
 //        IndexReader indexReader = context.getIndexSearcher().getIndexReader();

@@ -33,7 +33,7 @@ public class MinimalIndexNexusIndexerTest
             repo,
             indexDir,
             null,
-            null, NexusIndexer.MINIMAL_INDEX );
+            null, MIN_CREATORS );
         nexusIndexer.scan( context );
     }
 

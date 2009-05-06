@@ -30,7 +30,7 @@ public class Nexus645NexusIndexerTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            DEFAULT_CREATORS );
         nexusIndexer.scan( context );
     }
 

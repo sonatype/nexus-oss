@@ -18,6 +18,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -26,6 +28,7 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.index.context.IndexCreator;
 
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase
@@ -45,6 +48,10 @@ public abstract class AbstractNexusTestCase
     protected static final File CONF_HOME = new File( WORK_HOME, "conf" );
 
     protected NexusConfiguration nexusConfiguration;
+    
+    public List<IndexCreator> DEFAULT_CREATORS;
+    public List<IndexCreator> FULL_CREATORS;
+    public List<IndexCreator> MIN_CREATORS;
 
     protected void customizeContext( Context ctx )
     {
@@ -108,6 +115,20 @@ public abstract class AbstractNexusTestCase
         PLEXUS_HOME.mkdirs();
         WORK_HOME.mkdirs();
         CONF_HOME.mkdirs();
+        
+        DEFAULT_CREATORS = new ArrayList<IndexCreator>();
+        FULL_CREATORS = new ArrayList<IndexCreator>();
+        MIN_CREATORS = new ArrayList<IndexCreator>();
+        
+        IndexCreator min = lookup( IndexCreator.class, "min" );
+        IndexCreator jar = lookup( IndexCreator.class, "jarContent" );
+        
+        MIN_CREATORS.add( min );
+        
+        FULL_CREATORS.add( min );
+        FULL_CREATORS.add( jar );
+        
+        DEFAULT_CREATORS.addAll( FULL_CREATORS );
 
         if ( loadConfigurationAtSetUp() )
         {
