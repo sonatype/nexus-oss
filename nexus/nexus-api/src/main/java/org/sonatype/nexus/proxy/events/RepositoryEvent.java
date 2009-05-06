@@ -22,16 +22,11 @@ import org.sonatype.plexus.appevents.AbstractEvent;
  * @author cstamas
  */
 public abstract class RepositoryEvent
-    extends AbstractEvent
+    extends AbstractEvent<Repository>
 {
-    /** The repository in question. */
-    private final Repository repository;
-
     public RepositoryEvent( final Repository repository )
     {
         super( repository );
-
-        this.repository = repository;
     }
 
     /**
@@ -41,7 +36,6 @@ public abstract class RepositoryEvent
      */
     public Repository getRepository()
     {
-        return this.repository;
+        return getEventSender();
     }
-
 }

@@ -22,21 +22,16 @@ import org.sonatype.plexus.appevents.AbstractEvent;
  * @author cstamas
  */
 public abstract class RepositoryRegistryEvent
-    extends AbstractEvent
+    extends AbstractEvent<RepositoryRegistry>
 {
-    /** The repository registry. */
-    private final RepositoryRegistry repositoryRegistry;
-
     public RepositoryRegistryEvent( final RepositoryRegistry repositoryRegistry )
     {
         super( repositoryRegistry );
-
-        this.repositoryRegistry = repositoryRegistry;
     }
 
     public RepositoryRegistry getRepositoryRegistry()
     {
-        return repositoryRegistry;
+        return getEventSender();
     }
 
 }

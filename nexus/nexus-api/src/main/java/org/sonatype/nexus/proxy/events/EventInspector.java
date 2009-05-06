@@ -22,7 +22,7 @@ import org.sonatype.plexus.appevents.Event;
  */
 public interface EventInspector
 {
-    boolean accepts( Event evt );
+    boolean accepts( Event<?> evt );
 
-    void inspect( Event evt );
+    void inspect( Event<?> evt );
 }

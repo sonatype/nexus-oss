@@ -23,10 +23,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class RepositoryEventEvictUnusedItems
     extends RepositoryMaintenanceEvent
 {
-
     public RepositoryEventEvictUnusedItems( final Repository repository )
     {
         super( repository );
     }
-
 }

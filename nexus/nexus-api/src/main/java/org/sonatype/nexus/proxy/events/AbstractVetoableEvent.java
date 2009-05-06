@@ -6,13 +6,13 @@ import java.util.List;
 
 import org.sonatype.plexus.appevents.AbstractEvent;
 
-public class AbstractVetoableEvent
-    extends AbstractEvent
+public class AbstractVetoableEvent<T>
+    extends AbstractEvent<T>
     implements Vetoable
 {
     private final ArrayList<Object> vetos = new ArrayList<Object>();
 
-    public AbstractVetoableEvent( Object component )
+    public AbstractVetoableEvent( T component )
     {
         super( component );
     }

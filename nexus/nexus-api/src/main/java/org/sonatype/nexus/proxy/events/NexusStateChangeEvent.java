@@ -19,7 +19,7 @@ package org.sonatype.nexus.proxy.events;
  * @author cstamas
  */
 public abstract class NexusStateChangeEvent
-    extends AbstractVetoableEvent
+    extends AbstractVetoableEvent<Object>
 {
     public NexusStateChangeEvent( Object sender )
     {

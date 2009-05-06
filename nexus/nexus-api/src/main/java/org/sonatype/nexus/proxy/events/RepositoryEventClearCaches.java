@@ -24,7 +24,7 @@ public class RepositoryEventClearCaches
     extends RepositoryMaintenanceEvent
 {
     /** From where it happened */
-    private String path;
+    private final String path;
 
     public RepositoryEventClearCaches( final Repository repository, String path )
     {
