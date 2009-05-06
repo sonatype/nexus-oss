@@ -507,12 +507,18 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditor, Sonatype.ext.FormPanel, {
   
   repositorySelectHandler: function( combo, rec, index ) {
     var targetCombo = this.form.findField( 'repositoryTargetId' );
+    var previousValue = targetCombo.getValue();
     targetCombo.setValue( null );
     targetCombo.store.clearFilter();
 
     var filterValue = rec.data.format;
     if ( filterValue ) {
       targetCombo.store.filter( 'contentClass', filterValue );
+    }
+    
+    if ( targetCombo.store.getById(previousValue) )
+    {
+    	targetCombo.setValue(previousValue);
     }
   }
 } );
