@@ -143,7 +143,12 @@ public abstract class AbstractFeedPlexusResource
     {
         FeedSource src = feeds.get( channelKey );
 
-        return src.getFeed( from, count, params );
+        if ( src != null )
+        {
+            return src.getFeed( from, count, params );
+        }
+
+        throw new ComponentLookupException( "Feed with key '" + channelKey + "' not found.", "FeedSource", channelKey );
     }
 
     protected abstract String getChannelKey( Request request );
