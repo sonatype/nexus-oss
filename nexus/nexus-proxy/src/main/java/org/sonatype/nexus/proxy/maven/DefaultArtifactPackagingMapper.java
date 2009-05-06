@@ -57,6 +57,9 @@ public class DefaultArtifactPackagingMapper
         defaults.put( "maven-plugin", "jar" );
         defaults.put( "maven-archetype", "jar" );
         defaults.put( "plexus-application", "jar" );
+        defaults.put( "eclipse-plugin", "jar" );
+        defaults.put( "eclipse-feature", "jar" );
+        defaults.put( "eclipse-application", "zip" );
     }
 
     public Map<String, String> getPackaging2extensionMapping()
