@@ -13,6 +13,8 @@ public class CRepositoryCoreConfiguration
     @Override
     protected void copyTransients( Object source, Object destination )
     {
+        ( (CRepository) destination ).setExternalConfiguration( ( (CRepository) source ).getExternalConfiguration() );
+
         ( (CRepository) destination ).externalConfigurationImple = ( (CRepository) source ).externalConfigurationImple;
     }
 
