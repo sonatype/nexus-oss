@@ -311,10 +311,10 @@ public class FileConfigurationSource
             }
 
             // Clone the conf so we can encrypt the passwords
-            Configuration copyOfConfig = this.cloneConfiguration( this.getConfiguration() );
+            Configuration copyOfConfig = cloneConfiguration( this.getConfiguration() );
 
             // encrypt the passwords
-            this.encryptDecryptPasswords( copyOfConfig, true );
+            encryptDecryptPasswords( copyOfConfig, true );
 
             fos = new FileOutputStream( file );
 
@@ -387,22 +387,22 @@ public class FileConfigurationSource
         {
             try
             {
-                return this.passwordHelper.encrypt( password );
+                return passwordHelper.encrypt( password );
             }
             catch ( PlexusCipherException e )
             {
-                this.getLogger().error( "Failed to encrypt password in nexus.xml.", e );
+                getLogger().error( "Failed to encrypt password in nexus.xml.", e );
             }
         }
         else
         {
             try
             {
-                return this.passwordHelper.decrypt( password );
+                return passwordHelper.decrypt( password );
             }
             catch ( PlexusCipherException e )
             {
-                this.getLogger().error( "Failed to decrypt password in nexus.xml.", e );
+                getLogger().error( "Failed to decrypt password in nexus.xml.", e );
             }
         }
 
@@ -420,7 +420,7 @@ public class FileConfigurationSource
     private Configuration cloneConfiguration( Configuration config )
     {
         // use Xstream
-        return (Configuration) this.xstream.fromXML( this.xstream.toXML( config ));
+        return (Configuration) xstream.fromXML( xstream.toXML( config ));
     }
 
 }
