@@ -253,6 +253,6 @@ Sonatype.Events.addListener( 'userViewInit', function( cardPanel, rec, gridPanel
     cardPanel.add( 
         new Sonatype.repoServer.UserBrowsePanel( 
             { payload: rec,
-              tabTitle: 'Browse'} ) );
+              tabTitle: 'Role Tree'} ) );
   }
 } );

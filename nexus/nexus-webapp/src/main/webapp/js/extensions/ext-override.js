@@ -82,6 +82,36 @@ Ext.lib.Ajax.setHeader = function(o) {
 /*
  * ext-all-debug
  */
+Ext.override(Ext.form.TextArea, {
+  wordWrap : true,
+  onRender : function(ct, position){
+    if(!this.el){
+        this.defaultAutoCreate = {
+            tag: "textarea",
+            style:"width:100px;height:60px;",
+            autocomplete: "off"
+        };
+    }
+    Ext.form.TextArea.superclass.onRender.call(this, ct, position);
+    if(this.grow){
+        this.textSizeEl = Ext.DomHelper.append(document.body, {
+            tag: "pre", cls: "x-form-grow-sizer"
+        });
+        if(this.preventScrollbars){
+            this.el.setStyle("overflow", "hidden");
+        }
+        this.el.setHeight(this.growMin);
+    }
+    this.el.setOverflow('auto');
+    if (this.wordWrap === false) {
+        if (!Ext.isIE) {
+           this.el.set({wrap:'off'})
+        } else {
+          this.el.dom.wrap = "off";
+        }
+    }
+  }
+});
 Ext.override(Ext.data.Connection, {
   request : function(o){
     if (this.fireEvent("beforerequest", this, o) !== false){

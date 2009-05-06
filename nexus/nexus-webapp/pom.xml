@@ -188,6 +188,7 @@
                                         <include>${compressed-dir}/js/repoServer/repoServer.LogEditPanel.js</include>
                                         <include>${compressed-dir}/js/repoServer/repoServer.MirrorConfigPanel.js</include>
                                         <include>${compressed-dir}/js/repoServer/repoServer.UserBrowserPanel.js</include>
+                                        <include>${compressed-dir}/js/repoServer/repoServer.UserPrivilegeBrowserPanel.js</include>
                                     </includes>
                                 </aggregation>
                             </aggregations>
