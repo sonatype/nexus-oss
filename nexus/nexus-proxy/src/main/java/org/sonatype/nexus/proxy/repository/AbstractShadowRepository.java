@@ -19,7 +19,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -33,6 +32,7 @@ import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
+import org.sonatype.plexus.appevents.Event;
 
 /**
  * The Class ShadowRepository.
@@ -119,9 +119,9 @@ public abstract class AbstractShadowRepository
     }
 
     @Override
-    public void onProximityEvent( AbstractEvent evt )
+    public void onEvent( Event evt )
     {
-        super.onProximityEvent( evt );
+        super.onEvent( evt );
 
         if ( evt instanceof RepositoryItemEvent )
         {

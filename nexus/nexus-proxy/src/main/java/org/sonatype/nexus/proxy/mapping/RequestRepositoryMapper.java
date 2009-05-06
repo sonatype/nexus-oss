@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -25,7 +24,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * repositories using some technique.
  */
 public interface RequestRepositoryMapper
-    extends EventListener
 {
     /**
      * Gets the mapped repositories.

@@ -25,13 +25,13 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.plexus.appevents.Event;
 
 /**
  * An abstract group repository. The specific behaviour (ie. metadata merge) should be implemented in subclases.
@@ -55,9 +55,9 @@ public abstract class AbstractGroupRepository
     }
 
     @Override
-    public void onProximityEvent( AbstractEvent evt )
+    public void onEvent( Event evt )
     {
-        super.onProximityEvent( evt );
+        super.onEvent( evt );
 
         // act automatically on repo removal. Remove it from myself if member.
         if ( evt instanceof RepositoryRegistryEventRemove )

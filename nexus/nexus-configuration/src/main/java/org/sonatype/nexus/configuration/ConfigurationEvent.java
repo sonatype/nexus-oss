@@ -14,7 +14,7 @@
 package org.sonatype.nexus.configuration;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
  * The event that is occured when configuration related change had occured.
@@ -28,7 +28,7 @@ public abstract class ConfigurationEvent
 
     public ConfigurationEvent( ApplicationConfiguration configuration )
     {
-        super();
+        super( configuration );
 
         this.configuration = configuration;
     }

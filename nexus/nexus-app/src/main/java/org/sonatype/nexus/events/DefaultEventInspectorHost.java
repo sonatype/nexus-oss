@@ -18,8 +18,8 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.plexus.appevents.Event;
 
 /**
  * A default implementation of EventInspectorHost, a component simply collecting all EventInspectors and re-emitting
@@ -35,7 +35,7 @@ public class DefaultEventInspectorHost
     @Requirement( role = EventInspector.class )
     private Map<String, EventInspector> eventInspectors;
 
-    public void processEvent( AbstractEvent evt )
+    public void processEvent( Event evt )
     {
         for ( Map.Entry<String, EventInspector> entry : eventInspectors.entrySet() )
         {
@@ -51,14 +51,13 @@ public class DefaultEventInspectorHost
             catch ( Throwable e )
             {
                 getLogger().warn(
-                    "EventInspector hint='" + entry.getKey() + "' class='" + ei.getClass().getName()
-                        + "' had problem inspecting an event='" + evt.getClass() + "'",
-                    e );
+                                  "EventInspector hint='" + entry.getKey() + "' class='" + ei.getClass().getName()
+                                      + "' had problem inspecting an event='" + evt.getClass() + "'", e );
             }
         }
     }
 
-    public void onProximityEvent( AbstractEvent evt )
+    public void onEvent( Event evt )
     {
         processEvent( evt );
     }

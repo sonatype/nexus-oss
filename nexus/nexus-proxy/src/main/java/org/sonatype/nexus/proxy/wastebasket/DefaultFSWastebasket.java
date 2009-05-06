@@ -29,9 +29,6 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -40,6 +37,9 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * A default FS based implementation.
@@ -63,10 +63,10 @@ public class DefaultFSWastebasket
     public void initialize()
         throws InitializationException
     {
-        applicationEventMulticaster.addProximityEventListener( this );
+        applicationEventMulticaster.addEventListener( this );
     }
 
-    public void onProximityEvent( AbstractEvent evt )
+    public void onEvent( Event evt )
     {
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {

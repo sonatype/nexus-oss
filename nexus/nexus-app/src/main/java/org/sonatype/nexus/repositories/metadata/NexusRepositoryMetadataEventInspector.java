@@ -10,7 +10,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
@@ -32,6 +31,7 @@ import org.sonatype.nexus.repository.metadata.RepositoryMetadataHandler;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMemberMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMirrorMetadata;
+import org.sonatype.plexus.appevents.Event;
 
 @Component( role = EventInspector.class, hint = "NexusRepositoryMetadataEventInspector" )
 public class NexusRepositoryMetadataEventInspector
@@ -50,12 +50,12 @@ public class NexusRepositoryMetadataEventInspector
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    public boolean accepts( AbstractEvent evt )
+    public boolean accepts( Event evt )
     {
         return ( evt instanceof RepositoryRegistryEventAdd ) || ( evt instanceof RepositoryRegistryEventUpdate );
     }
 
-    public void inspect( AbstractEvent evt )
+    public void inspect( Event evt )
     {
         RepositoryRegistryRepositoryEvent revt = (RepositoryRegistryRepositoryEvent) evt;
 

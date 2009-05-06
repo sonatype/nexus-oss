@@ -27,7 +27,6 @@ import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
@@ -37,6 +36,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
+import org.sonatype.plexus.appevents.Event;
 
 /**
  * @author Juven Xu
@@ -56,7 +56,7 @@ public class RepositoryItemEventInspector
         return indexerManager;
     }
 
-    public boolean accepts( AbstractEvent evt )
+    public boolean accepts( Event evt )
     {
         if ( evt instanceof RepositoryItemEvent )
         {
@@ -65,14 +65,14 @@ public class RepositoryItemEventInspector
         return false;
     }
 
-    public void inspect( AbstractEvent evt )
+    public void inspect( Event evt )
     {
         inspectForNexus( evt );
 
         inspectForIndexerManager( evt );
     }
 
-    private void inspectForNexus( AbstractEvent evt )
+    private void inspectForNexus( Event evt )
     {
         RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 
@@ -126,7 +126,7 @@ public class RepositoryItemEventInspector
         }
     }
 
-    private void inspectForIndexerManager( AbstractEvent evt )
+    private void inspectForIndexerManager(Event evt )
     {
         try
         {

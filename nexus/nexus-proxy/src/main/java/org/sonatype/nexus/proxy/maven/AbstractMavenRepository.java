@@ -127,7 +127,7 @@ public abstract class AbstractMavenRepository
             }
         }
 
-        getApplicationEventMulticaster().notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
+        getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
         return walkerProcessor.getFiles();
     }
@@ -183,7 +183,7 @@ public abstract class AbstractMavenRepository
             }
         }
 
-        getApplicationEventMulticaster().notifyProximityEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
+        getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
 
         return !ctx.isStopped();
     }

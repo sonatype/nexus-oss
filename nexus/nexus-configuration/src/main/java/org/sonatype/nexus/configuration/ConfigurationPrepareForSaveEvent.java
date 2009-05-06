@@ -34,7 +34,7 @@ public class ConfigurationPrepareForSaveEvent
 
     public ConfigurationPrepareForSaveEvent( ApplicationConfiguration configuration )
     {
-        super();
+        super( configuration );
 
         this.configuration = configuration;
 

@@ -15,10 +15,10 @@ package org.sonatype.nexus.events;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.plexus.appevents.Event;
 
 /**
  * @author Juven Xu
@@ -28,7 +28,7 @@ public class RepositoryEventLocalStatusChangedInspector
     extends AbstractFeedRecorderEventInspector
 {
 
-    public boolean accepts( AbstractEvent evt )
+    public boolean accepts( Event evt )
     {
         if ( evt instanceof RepositoryEventLocalStatusChanged )
         {
@@ -37,7 +37,7 @@ public class RepositoryEventLocalStatusChangedInspector
         return false;
     }
 
-    public void inspect( AbstractEvent evt )
+    public void inspect( Event evt )
     {
         RepositoryEventLocalStatusChanged revt = (RepositoryEventLocalStatusChanged) evt;
 

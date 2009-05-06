@@ -69,7 +69,7 @@ public class GroupingBehaviourTest
         MavenGroupRepository mgr = getRepositoryRegistry().getRepositoryWithFacet( "test", MavenGroupRepository.class );
         mgr.setMergeMetadata( false );
         mgr.getCurrentCoreConfiguration().applyChanges();
-        getApplicationEventMulticaster().notifyProximityEventListeners(
+        getApplicationEventMulticaster().notifyEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         StorageItem item = getRootRouter()
@@ -90,7 +90,7 @@ public class GroupingBehaviourTest
         Metadata md1, md2;
 
         // get metadata from a gidr router with merging on (default is on), merge should happen
-        getApplicationEventMulticaster().notifyProximityEventListeners(
+        getApplicationEventMulticaster().notifyEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         StorageItem item = getRootRouter()
@@ -133,7 +133,7 @@ public class GroupingBehaviourTest
         MavenGroupRepository mgr = getRepositoryRegistry().getRepositoryWithFacet( "test", MavenGroupRepository.class );
         mgr.setMergeMetadata( false );
         mgr.getCurrentCoreConfiguration().applyChanges();
-        getApplicationEventMulticaster().notifyProximityEventListeners(
+        getApplicationEventMulticaster().notifyEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
         item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );

@@ -21,8 +21,8 @@ package org.sonatype.nexus.proxy.events;
 public class NexusStoppedEvent
     extends NexusStateChangeEvent
 {
-    public NexusStoppedEvent()
+    public NexusStoppedEvent( Object sender )
     {
-        super();
+        super( sender );
     }
 }

@@ -14,11 +14,11 @@
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 public class DeletionNotifierWalker
     extends AbstractFileWalkerProcessor
@@ -40,7 +40,7 @@ public class DeletionNotifierWalker
         item.getItemContext().putAll( request.getRequestContext() );
 
         // just fire it, and someone will eventually catch it
-        applicationEventMulticaster.notifyProximityEventListeners( new RepositoryItemEventDelete(
+        applicationEventMulticaster.notifyEventListeners( new RepositoryItemEventDelete(
             ctx.getRepository(),
             item ) );
     }

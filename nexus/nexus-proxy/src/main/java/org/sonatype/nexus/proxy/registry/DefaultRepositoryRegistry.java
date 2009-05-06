@@ -23,7 +23,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
@@ -31,6 +30,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryStatusCheckerThread;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 /**
  * Repository registry. It holds handles to registered repositories and sorts them properly. This class is used to get a
@@ -219,11 +219,11 @@ public class DefaultRepositoryRegistry
         if ( isAddOperation )
         {
             applicationEventMulticaster
-                .notifyProximityEventListeners( new RepositoryRegistryEventAdd( this, repository ) );
+                .notifyEventListeners( new RepositoryRegistryEventAdd( this, repository ) );
         }
         else
         {
-            applicationEventMulticaster.notifyProximityEventListeners( new RepositoryRegistryEventUpdate(
+            applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventUpdate(
                 this,
                 repository ) );
         }
@@ -233,7 +233,7 @@ public class DefaultRepositoryRegistry
     {
         if ( !silently )
         {
-            applicationEventMulticaster.notifyProximityEventListeners( new RepositoryRegistryEventRemove(
+            applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventRemove(
                 this,
                 repository ) );
         }

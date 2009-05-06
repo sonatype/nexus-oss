@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
  * The event that is occured within a Repository, such as content changes or other maintenance stuff.
@@ -28,7 +29,7 @@ public abstract class RepositoryEvent
 
     public RepositoryEvent( final Repository repository )
     {
-        super();
+        super( repository );
 
         this.repository = repository;
     }

@@ -34,9 +34,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -51,6 +48,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.util.ItemPathUtils;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * The simplest re-implementation for RepositoryRouter that does only routing.
@@ -360,10 +360,10 @@ public class DefaultRepositoryRouter
 
     public void initialize()
     {
-        applicationEventMulticaster.addProximityEventListener( this );
+        applicationEventMulticaster.addEventListener( this );
     }
 
-    public void onProximityEvent( AbstractEvent evt )
+    public void onEvent( Event evt )
     {
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {

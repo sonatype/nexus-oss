@@ -138,7 +138,7 @@ public abstract class AbstractProxyRepository
 
             if ( sendNotification && !proxyMode.equals( oldProxyMode ) )
             {
-                getApplicationEventMulticaster().notifyProximityEventListeners(
+                getApplicationEventMulticaster().notifyEventListeners(
                                                                                 new RepositoryEventProxyModeChanged(
                                                                                                                      this,
                                                                                                                      oldProxyMode,
@@ -404,7 +404,7 @@ public abstract class AbstractProxyRepository
 
             result = getLocalStorage().retrieveItem( this, new ResourceStoreRequest( item ) );
 
-            getApplicationEventMulticaster().notifyProximityEventListeners( new RepositoryItemEventCache( this, result ) );
+            getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventCache( this, result ) );
 
             result.getItemContext().putAll( item.getItemContext() );
         }

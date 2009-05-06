@@ -15,7 +15,6 @@ package org.sonatype.nexus.configuration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Vector;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -24,8 +23,6 @@ import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
@@ -35,8 +32,6 @@ public class SimpleSecureApplicationConfiguration
     private Configuration configuration;
     
     private CSecurity security;
-
-    private Vector<EventListener> listeners = new Vector<EventListener>();
     
     private RemoteStorageContext remoteStorageContext = new DefaultRemoteStorageContext( null );
 
@@ -111,23 +106,4 @@ public class SimpleSecureApplicationConfiguration
     {
         return this.security.isEnabled();
     }
-
-    public void addProximityEventListener( EventListener listener )
-    {
-        listeners.add( listener );
-    }
-
-    public void removeProximityEventListener( EventListener listener )
-    {
-        listeners.remove( listener );
-    }
-
-    public void notifyProximityEventListeners( AbstractEvent evt )
-    {
-        for ( EventListener l : listeners )
-        {
-            l.onProximityEvent( evt );
-        }
-    }
-
 }

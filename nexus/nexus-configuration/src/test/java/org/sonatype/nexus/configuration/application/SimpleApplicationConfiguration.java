@@ -15,23 +15,18 @@ package org.sonatype.nexus.configuration.application;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Vector;
 
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 public class SimpleApplicationConfiguration
     implements ApplicationConfiguration
 {
     private Configuration configuration;
-
-    private Vector<EventListener> listeners = new Vector<EventListener>();
 
     private RemoteStorageContext remoteStorageContext = new SimpleRemoteStorageContext();
 
@@ -102,23 +97,4 @@ public class SimpleApplicationConfiguration
     {
         return false;
     }
-
-    public void addProximityEventListener( EventListener listener )
-    {
-        listeners.add( listener );
-    }
-
-    public void removeProximityEventListener( EventListener listener )
-    {
-        listeners.remove( listener );
-    }
-
-    public void notifyProximityEventListeners( AbstractEvent evt )
-    {
-        for ( EventListener l : listeners )
-        {
-            l.onProximityEvent( evt );
-        }
-    }
-
 }

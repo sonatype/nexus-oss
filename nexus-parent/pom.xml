@@ -106,6 +106,20 @@
             </dependency>
           </dependencies>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <version>2.6</version>
+          <configuration>
+            <downloadSources>true</downloadSources>
+            <downloadJavadocs>true</downloadJavadocs>
+            <projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
+            <wtpmanifest>true</wtpmanifest>
+            <wtpapplicationxml>true</wtpapplicationxml>
+            <wtpversion>2.0</wtpversion>
+            <manifest>${basedir}/src/main/resources/META-INF/MANIFEST.MF</manifest>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>

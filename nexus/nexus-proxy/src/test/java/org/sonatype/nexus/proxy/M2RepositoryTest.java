@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.nexus.artifact.VersionUtils;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -29,6 +27,8 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.appevents.EventListener;
 
 public class M2RepositoryTest
     extends M2ResourceStoreTest
@@ -269,7 +269,7 @@ public class M2RepositoryTest
 
         M2Repository repository = (M2Repository) getResourceStore();
 
-        getApplicationEventMulticaster().addProximityEventListener( ch );
+        getApplicationEventMulticaster().addEventListener( ch );
 
         File mdFile = new File( new File( getBasedir() ), "target/test-classes/repo1/spoof/maven-metadata.xml" );
 
@@ -363,7 +363,7 @@ public class M2RepositoryTest
             this.requestCount = 0;
         }
 
-        public void onProximityEvent( AbstractEvent evt )
+        public void onEvent( Event evt )
         {
             if ( evt instanceof RepositoryItemEventCache
                 && ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith( "maven-metadata.xml" ) )

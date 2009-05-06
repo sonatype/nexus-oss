@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import org.sonatype.plexus.appevents.Event;
+
 /**
  * A simple event inspector, a component that receives events emitted by Nexus and processes them in way they want.
  * 
@@ -20,7 +22,7 @@ package org.sonatype.nexus.proxy.events;
  */
 public interface EventInspector
 {
-    boolean accepts( AbstractEvent evt );
+    boolean accepts( Event evt );
 
-    void inspect( AbstractEvent evt );
+    void inspect( Event evt );
 }

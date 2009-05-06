@@ -50,7 +50,6 @@ import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
@@ -64,6 +63,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 /**
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
@@ -185,7 +185,7 @@ public class DefaultNexusConfiguration
 
         ConfigurationPrepareForSaveEvent prepare = new ConfigurationPrepareForSaveEvent( this );
 
-        applicationEventMulticaster.notifyProximityEventListeners( prepare );
+        applicationEventMulticaster.notifyEventListeners( prepare );
 
         if ( !prepare.isVetoed() )
         {
@@ -195,7 +195,7 @@ public class DefaultNexusConfiguration
 
             wastebasketDirectory = null;
 
-            applicationEventMulticaster.notifyProximityEventListeners( new ConfigurationChangeEvent(
+            applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent(
                                                                                                      this,
                                                                                                      prepare.getChanges() ) );
         }

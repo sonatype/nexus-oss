@@ -144,6 +144,7 @@
     <log4j.version>1.2.14</log4j.version>
     <plexus-ehcache.version>1.0.1-SNAPSHOT</plexus-ehcache.version>
     <plexus-jetty-testsuite.version>1.3</plexus-jetty-testsuite.version>
+    <plexus-app-events.version>1.0.0-SNAPSHOT</plexus-app-events.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -176,6 +177,16 @@
       </dependency>
 
       <!-- Plexus et al -->
+      <dependency>
+        <groupId>org.sonatype.plexus.appevents</groupId>
+        <artifactId>plexus-app-events-api</artifactId>
+        <version>${plexus-app-events.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plexus.appevents</groupId>
+        <artifactId>simple-event-multicaster</artifactId>
+        <version>${plexus-app-events.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-jetty6</artifactId>

@@ -54,9 +54,9 @@ import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.index.context.NexusIndexWriter;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
-import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * The default implementation of timeline based on Lucene.
@@ -94,10 +94,10 @@ public class DefaultTimeline
 
     public void initialize()
     {
-        applicationEventMulticaster.addProximityEventListener( this );
+        applicationEventMulticaster.addEventListener( this );
     }
 
-    public void onProximityEvent( AbstractEvent evt )
+    public void onEvent( Event evt )
     {
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {

@@ -26,10 +26,11 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * The Class PathBasedRequestRepositoryMapper filters repositories to search using supplied list of filter expressions.
@@ -51,7 +52,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 @Component( role = RequestRepositoryMapper.class )
 public class PathBasedRequestRepositoryMapper
     extends AbstractLogEnabled
-    implements RequestRepositoryMapper, Initializable
+    implements RequestRepositoryMapper, EventListener, Initializable
 {
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
@@ -73,10 +74,10 @@ public class PathBasedRequestRepositoryMapper
 
     public void initialize()
     {
-        applicationEventMulticaster.addProximityEventListener( this );
+        applicationEventMulticaster.addEventListener( this );
     }
 
-    public void onProximityEvent( AbstractEvent evt )
+    public void onEvent( Event evt )
     {
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {
@@ -90,7 +91,7 @@ public class PathBasedRequestRepositoryMapper
     }
 
     public List<Repository> getMappedRepositories( Repository repository, ResourceStoreRequest request,
-        List<Repository> resolvedRepositories )
+                                                   List<Repository> resolvedRepositories )
         throws NoSuchRepositoryException
     {
         if ( !compiled )
@@ -112,8 +113,9 @@ public class PathBasedRequestRepositoryMapper
                 reposList.clear();
 
                 getLogger().info(
-                    "The request path [" + request.toString() + "] is blocked by rule "
-                        + mapping.getPatterns().toString() + " defined for group='" + mapping.getGroupId() + "'" );
+                                  "The request path [" + request.toString() + "] is blocked by rule "
+                                      + mapping.getPatterns().toString() + " defined for group='"
+                                      + mapping.getGroupId() + "'" );
 
                 return reposList;
             }
@@ -178,8 +180,8 @@ public class PathBasedRequestRepositoryMapper
                 if ( reposList.size() == 0 )
                 {
                     getLogger().debug(
-                        "Mapping for path [" + request.toString()
-                            + "] excluded all storages from servicing the request." );
+                                       "Mapping for path [" + request.toString()
+                                           + "] excluded all storages from servicing the request." );
                 }
                 else
                 {
@@ -219,8 +221,8 @@ public class PathBasedRequestRepositoryMapper
             return;
         }
 
-        List<CPathMappingItem> pathMappings = getApplicationConfiguration()
-            .getConfiguration().getRepositoryGrouping().getPathMappings();
+        List<CPathMappingItem> pathMappings =
+            getApplicationConfiguration().getConfiguration().getRepositoryGrouping().getPathMappings();
 
         for ( CPathMappingItem item : pathMappings )
         {
@@ -245,8 +247,9 @@ public class PathBasedRequestRepositoryMapper
                 }
             }
 
-            RepositoryPathMapping mapping = new RepositoryPathMapping( CPathMappingItem.ALL_GROUPS.equals( item
-                .getGroupId() ), item.getGroupId(), item.getRoutePatterns(), reposes );
+            RepositoryPathMapping mapping =
+                new RepositoryPathMapping( CPathMappingItem.ALL_GROUPS.equals( item.getGroupId() ), item.getGroupId(),
+                                           item.getRoutePatterns(), reposes );
 
             if ( CPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
             {

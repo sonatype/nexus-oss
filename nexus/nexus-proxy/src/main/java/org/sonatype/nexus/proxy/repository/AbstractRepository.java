@@ -42,9 +42,6 @@ import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.RepositoryEventClearCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
@@ -76,6 +73,9 @@ import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskActivityDescriptor;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * <p>
@@ -157,15 +157,15 @@ public abstract class AbstractRepository
     public void initialize()
         throws InitializationException
     {
-        applicationEventMulticaster.addProximityEventListener( this );
+        applicationEventMulticaster.addEventListener( this );
     }
 
     public void dispose()
     {
-        applicationEventMulticaster.removeProximityEventListener( this );
+        applicationEventMulticaster.removeEventListener( this );
     }
 
-    public void onProximityEvent( AbstractEvent evt )
+    public void onEvent( Event evt )
     {
         // act automatically on repo removal
         if ( evt instanceof RepositoryRegistryEventRemove )
@@ -175,7 +175,7 @@ public abstract class AbstractRepository
             if ( revt.getRepository() == this )
             {
                 // we are being removed, unhook from event multicaster
-                applicationEventMulticaster.removeProximityEventListener( this );
+                applicationEventMulticaster.removeEventListener( this );
 
                 // remove ourselves from config
                 getApplicationConfiguration().getConfiguration().removeRepository( getCurrentConfiguration( false ) );
@@ -209,10 +209,10 @@ public abstract class AbstractRepository
     public RepositoryTaskFilter getRepositoryTaskFilter()
     {
         // we are allowing all, and subclasses will filter as they want
-        return new DefaultRepositoryTaskFilter().setAllowsRepositoryScanning( true ).setAllowsScheduledTasks( true ).setAllowsUserInitiatedTasks(
-                                                                                                                                                  true ).setContentOperators(
-                                                                                                                                                                              DefaultRepositoryTaskActivityDescriptor.ALL_CONTENT_OPERATIONS ).setAttributeOperators(
-                                                                                                                                                                                                                                                                      DefaultRepositoryTaskActivityDescriptor.ALL_ATTRIBUTES_OPERATIONS );
+        return new DefaultRepositoryTaskFilter().setAllowsRepositoryScanning( true ).setAllowsScheduledTasks( true )
+            .setAllowsUserInitiatedTasks( true )
+            .setContentOperators( DefaultRepositoryTaskActivityDescriptor.ALL_CONTENT_OPERATIONS )
+            .setAttributeOperators( DefaultRepositoryTaskActivityDescriptor.ALL_ATTRIBUTES_OPERATIONS );
     }
 
     public Map<String, RequestProcessor> getRequestProcessors()
@@ -356,11 +356,8 @@ public abstract class AbstractRepository
 
             getCurrentConfiguration( true ).setLocalStatus( localStatus.toString() );
 
-            getApplicationEventMulticaster().notifyProximityEventListeners(
-                                                                            new RepositoryEventLocalStatusChanged(
-                                                                                                                   this,
-                                                                                                                   oldLocalStatus,
-                                                                                                                   localStatus ) );
+            getApplicationEventMulticaster()
+                .notifyEventListeners( new RepositoryEventLocalStatusChanged( this, oldLocalStatus, localStatus ) );
         }
     }
 
@@ -530,15 +527,15 @@ public abstract class AbstractRepository
             }
         }
 
-        getApplicationEventMulticaster().notifyProximityEventListeners(
-                                                                        new RepositoryEventClearCaches(
-                                                                                                        this,
-                                                                                                        request.getRequestPath() ) );
+        getApplicationEventMulticaster().notifyEventListeners(
+                                                               new RepositoryEventClearCaches( this, request
+                                                                   .getRequestPath() ) );
     }
 
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
     {
-        getLogger().info( "Evicting unused items from repository " + getId() + " from path " + request.getRequestPath() );
+        getLogger()
+            .info( "Evicting unused items from repository " + getId() + " from path " + request.getRequestPath() );
 
         EvictUnusedItemsWalkerProcessor walkerProcessor = new EvictUnusedItemsWalkerProcessor( timestamp );
 
@@ -561,7 +558,7 @@ public abstract class AbstractRepository
             }
         }
 
-        getApplicationEventMulticaster().notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
+        getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
         return walkerProcessor.getFiles();
     }
@@ -598,7 +595,7 @@ public abstract class AbstractRepository
             }
         }
 
-        getApplicationEventMulticaster().notifyProximityEventListeners( new RepositoryEventRecreateAttributes( this ) );
+        getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventRecreateAttributes( this ) );
 
         return true;
     }
@@ -860,8 +857,7 @@ public abstract class AbstractRepository
                 }
             }
 
-            getApplicationEventMulticaster().notifyProximityEventListeners(
-                                                                            new RepositoryItemEventRetrieve( this, item ) );
+            getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventRetrieve( this, item ) );
 
             if ( getLogger().isDebugEnabled() )
             {
@@ -967,14 +963,14 @@ public abstract class AbstractRepository
         StorageItem item = getLocalStorage().retrieveItem( this, request );
 
         // fire the event for file being deleted
-        getApplicationEventMulticaster().notifyProximityEventListeners( new RepositoryItemEventDelete( this, item ) );
+        getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventDelete( this, item ) );
 
         if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
         {
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug(
-                                   "We are deleting a collection, starting a walker to send delete notifications per-file." );
+                getLogger()
+                    .debug( "We are deleting a collection, starting a walker to send delete notifications per-file." );
             }
 
             // it is collection, walk it and below and fire events for all files
@@ -1024,7 +1020,7 @@ public abstract class AbstractRepository
         // remove the "request" item from n-cache if there
         removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
 
-        getApplicationEventMulticaster().notifyProximityEventListeners( new RepositoryItemEventStore( this, item ) );
+        getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventStore( this, item ) );
     }
 
     public Collection<StorageItem> list( boolean fromTask, ResourceStoreRequest request )

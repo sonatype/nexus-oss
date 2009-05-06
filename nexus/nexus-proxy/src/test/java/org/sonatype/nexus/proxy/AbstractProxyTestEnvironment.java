@@ -33,9 +33,6 @@ import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.attributes.DefaultAttributeStorage;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -45,6 +42,10 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
+import org.sonatype.plexus.appevents.AbstractEvent;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * The Class AbstractProxyTestEnvironment.
@@ -206,7 +207,7 @@ public abstract class AbstractProxyTestEnvironment
 
         testEventListener = new TestItemEventListener();
 
-        applicationEventMulticaster.addProximityEventListener( testEventListener );
+        applicationEventMulticaster.addEventListener( testEventListener );
 
         attributesHandler = lookup( AttributesHandler.class );
 
@@ -221,11 +222,10 @@ public abstract class AbstractProxyTestEnvironment
 
         getEnvironmentBuilder().buildEnvironment( this );
 
-        applicationEventMulticaster.notifyProximityEventListeners( new ConfigurationChangeEvent(
-            applicationConfiguration,
-            null ) );
+        applicationEventMulticaster
+            .notifyEventListeners( new ConfigurationChangeEvent( applicationConfiguration, null ) );
 
-        applicationEventMulticaster.notifyProximityEventListeners( new NexusStartedEvent() );
+        applicationEventMulticaster.notifyEventListeners( new NexusStartedEvent( null ) );
 
         getEnvironmentBuilder().startService();
     }
@@ -352,14 +352,14 @@ public abstract class AbstractProxyTestEnvironment
     protected class TestItemEventListener
         implements EventListener
     {
-        private List<AbstractEvent> events = new ArrayList<AbstractEvent>();
+        private List<Event> events = new ArrayList<Event>();
 
-        public List<AbstractEvent> getEvents()
+        public List<Event> getEvents()
         {
             return events;
         }
 
-        public AbstractEvent getFirstEvent()
+        public Event getFirstEvent()
         {
             if ( events.size() > 0 )
             {
@@ -371,7 +371,7 @@ public abstract class AbstractProxyTestEnvironment
             }
         }
 
-        public AbstractEvent getLastEvent()
+        public Event getLastEvent()
         {
             if ( events.size() > 0 )
             {
@@ -388,7 +388,7 @@ public abstract class AbstractProxyTestEnvironment
             events.clear();
         }
 
-        public void onProximityEvent( AbstractEvent evt )
+        public void onEvent( Event evt )
         {
             if ( RepositoryItemEvent.class.isAssignableFrom( evt.getClass() ) )
             {
@@ -400,14 +400,14 @@ public abstract class AbstractProxyTestEnvironment
     protected class TestRepositoryEventListener
         implements EventListener
     {
-        private List<AbstractEvent> events = new ArrayList<AbstractEvent>();
+        private List<Event> events = new ArrayList<Event>();
 
-        public List<AbstractEvent> getEvents()
+        public List<Event> getEvents()
         {
             return events;
         }
 
-        public AbstractEvent getFirstEvent()
+        public Event getFirstEvent()
         {
             if ( events.size() > 0 )
             {
@@ -419,7 +419,7 @@ public abstract class AbstractProxyTestEnvironment
             }
         }
 
-        public AbstractEvent getLastEvent()
+        public Event getLastEvent()
         {
             if ( events.size() > 0 )
             {
@@ -436,7 +436,7 @@ public abstract class AbstractProxyTestEnvironment
             events.clear();
         }
 
-        public void onProximityEvent( AbstractEvent evt )
+        public void onEvent( Event evt )
         {
             if ( !RepositoryItemEvent.class.isAssignableFrom( evt.getClass() ) )
             {

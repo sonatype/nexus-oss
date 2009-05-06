@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
  * The repository registry events superclass.
@@ -28,7 +29,7 @@ public abstract class RepositoryRegistryEvent
 
     public RepositoryRegistryEvent( final RepositoryRegistry repositoryRegistry )
     {
-        super();
+        super( repositoryRegistry );
 
         this.repositoryRegistry = repositoryRegistry;
     }

@@ -17,7 +17,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -28,6 +27,7 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.plexus.appevents.Event;
 
 /**
  * @author Juven Xu
@@ -44,7 +44,7 @@ public class RepositoryRegistryRepositoryEventInspector
         return indexerManager;
     }
 
-    public boolean accepts( AbstractEvent evt )
+    public boolean accepts( Event evt )
     {
         if ( evt instanceof RepositoryRegistryRepositoryEvent )
         {
@@ -53,14 +53,14 @@ public class RepositoryRegistryRepositoryEventInspector
         return false;
     }
 
-    public void inspect( AbstractEvent evt )
+    public void inspect( Event evt )
     {
         inspectForNexus( evt );
 
         inspectForIndexerManager( evt );
     }
 
-    private void inspectForNexus( AbstractEvent evt )
+    private void inspectForNexus( Event evt )
     {
         RepositoryRegistryRepositoryEvent revt = (RepositoryRegistryRepositoryEvent) evt;
 
@@ -131,7 +131,7 @@ public class RepositoryRegistryRepositoryEventInspector
 
     }
 
-    private void inspectForIndexerManager( AbstractEvent evt )
+    private void inspectForIndexerManager( Event evt )
     {
         try
         {

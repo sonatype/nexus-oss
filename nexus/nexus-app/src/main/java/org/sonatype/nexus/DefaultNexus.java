@@ -64,7 +64,6 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.cache.CacheManager;
-import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.http.HttpProxyService;
@@ -88,6 +87,7 @@ import org.sonatype.nexus.tasks.RemoveRepoFolderTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.nexus.timeline.RepositoryIdTimelineFilter;
 import org.sonatype.nexus.timeline.TimelineFilter;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 /**
  * The default Nexus implementation.
@@ -629,27 +629,32 @@ public class DefaultNexus
 
     public boolean isDefaultSecurityEnabled()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().isEnabled();
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity()
+                                 .isEnabled();
     }
 
     public boolean isDefaultAnonymousAccessEnabled()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().isAnonymousAccessEnabled();
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity()
+                                 .isAnonymousAccessEnabled();
     }
 
     public String getDefaultAnonymousUsername()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().getAnonymousUsername();
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity()
+                                 .getAnonymousUsername();
     }
 
     public String getDefaultAnonymousPassword()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().getAnonymousPassword();
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity()
+                                 .getAnonymousPassword();
     }
 
     public List<String> getDefaultRealms()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().getRealms();
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity()
+                                 .getRealms();
     }
 
     public NexusStreamResponse getDefaultConfigurationAsStream()
@@ -664,19 +669,22 @@ public class DefaultNexus
         // TODO:
         response.setSize( 0 );
 
-        response.setInputStream( nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfigurationAsStream() );
+        response.setInputStream( nexusConfiguration.getConfigurationSource().getDefaultsSource()
+                                                   .getConfigurationAsStream() );
 
         return response;
     }
 
     public CRemoteConnectionSettings readDefaultGlobalRemoteConnectionSettings()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getGlobalConnectionSettings();
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration()
+                                 .getGlobalConnectionSettings();
     }
 
     public CRemoteHttpProxySettings readDefaultGlobalRemoteHttpProxySettings()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getGlobalHttpProxySettings();
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration()
+                                 .getGlobalHttpProxySettings();
     }
 
     public CRouting readDefaultRouting()
@@ -686,7 +694,8 @@ public class DefaultNexus
 
     public CSmtpConfiguration readDefaultSmtpConfiguration()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSmtpConfiguration();
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration()
+                                 .getSmtpConfiguration();
     }
 
     // ----------------------------------------------------------------------------
@@ -757,9 +766,11 @@ public class DefaultNexus
             ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
                             : new RepositoryIdTimelineFilter( repositoryIds );
 
-        return feedRecorder.getNexusArtifectEvents(
+        return feedRecorder
+                           .getNexusArtifectEvents(
                                                     new HashSet<String>(
-                                                                         Arrays.asList( new String[] { NexusArtifactEvent.ACTION_CACHED } ) ),
+                                                                         Arrays
+                                                                               .asList( new String[] { NexusArtifactEvent.ACTION_CACHED } ) ),
                                                     from, count, filter );
     }
 
@@ -769,9 +780,11 @@ public class DefaultNexus
             ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
                             : new RepositoryIdTimelineFilter( repositoryIds );
 
-        return feedRecorder.getNexusArtifectEvents(
+        return feedRecorder
+                           .getNexusArtifectEvents(
                                                     new HashSet<String>(
-                                                                         Arrays.asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ),
+                                                                         Arrays
+                                                                               .asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ),
                                                     from, count, filter );
     }
 
@@ -815,17 +828,16 @@ public class DefaultNexus
         sysInfoLog.append( "\n" );
         sysInfoLog.append( "-------------------------------------------------\n" );
         sysInfoLog.append( "\n" );
-        sysInfoLog.append( "Initializing Nexus (" ).append( applicationStatusSource.getSystemStatus().getEditionShort() ).append(
-                                                                                                                                  "), Version " ).append(
-                                                                                                                                                          applicationStatusSource.getSystemStatus().getVersion() ).append(
-                                                                                                                                                                                                                           "\n" );
+        sysInfoLog.append( "Initializing Nexus (" )
+                  .append( applicationStatusSource.getSystemStatus().getEditionShort() ).append( "), Version " )
+                  .append( applicationStatusSource.getSystemStatus().getVersion() ).append( "\n" );
         sysInfoLog.append( "\n" );
         sysInfoLog.append( "-------------------------------------------------" );
 
         getLogger().info( sysInfoLog.toString() );
 
         // EventInspectorHost
-        applicationEventMulticaster.addProximityEventListener( eventInspectorHost );
+        applicationEventMulticaster.addEventListener( eventInspectorHost );
 
         applicationStatusSource.setState( SystemState.STOPPED );
 
@@ -876,14 +888,12 @@ public class DefaultNexus
 
             // create internals
             nexusConfiguration.createInternals();
-            
+
             // init tasks
             nexusScheduler.initializeTasks();
 
             // notify about start
-            applicationEventMulticaster.notifyProximityEventListeners( new ConfigurationChangeEvent(
-                                                                                                     nexusConfiguration,
-                                                                                                     null ) );
+            applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( nexusConfiguration, null ) );
 
             addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Starting Nexus (version "
                 + getSystemStatus().getVersion() + " " + getSystemStatus().getEditionShort() + ")" );
@@ -894,24 +904,24 @@ public class DefaultNexus
 
             applicationStatusSource.getSystemStatus().setInstanceUpgraded( nexusConfiguration.isInstanceUpgraded() );
 
-            applicationStatusSource.getSystemStatus().setConfigurationUpgraded(
-                                                                                nexusConfiguration.isConfigurationUpgraded() );
+            applicationStatusSource.getSystemStatus()
+                                   .setConfigurationUpgraded( nexusConfiguration.isConfigurationUpgraded() );
 
             // creating default templates if needed
-            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_RELEASE,
-                                   applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_RELEASE, applicationStatusSource.getSystemStatus()
+                                                                                           .isInstanceUpgraded() );
 
-            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_SNAPSHOT,
-                                   applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_SNAPSHOT, applicationStatusSource.getSystemStatus()
+                                                                                            .isInstanceUpgraded() );
 
-            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_RELEASE,
-                                   applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_RELEASE, applicationStatusSource.getSystemStatus()
+                                                                                          .isInstanceUpgraded() );
 
-            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_SNAPSHOT,
-                                   applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_SNAPSHOT, applicationStatusSource.getSystemStatus()
+                                                                                           .isInstanceUpgraded() );
 
-            createDefaultTemplate( TEMPLATE_DEFAULT_VIRTUAL,
-                                   applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_VIRTUAL, applicationStatusSource.getSystemStatus()
+                                                                                    .isInstanceUpgraded() );
 
             if ( applicationStatusSource.getSystemStatus().isFirstStart() )
             {
@@ -942,7 +952,7 @@ public class DefaultNexus
                               "Started Nexus (version " + getSystemStatus().getVersion() + " "
                                   + getSystemStatus().getEditionShort() + ")" );
 
-            applicationEventMulticaster.notifyProximityEventListeners( new NexusStartedEvent() );
+            applicationEventMulticaster.notifyEventListeners( new NexusStartedEvent( this ) );
         }
         catch ( IOException e )
         {
@@ -974,10 +984,10 @@ public class DefaultNexus
         addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version " + getSystemStatus().getVersion()
             + " " + getSystemStatus().getEditionShort() + ")" );
 
-        applicationEventMulticaster.notifyProximityEventListeners( new NexusStoppedEvent() );
+        applicationEventMulticaster.notifyEventListeners( new NexusStoppedEvent( this ) );
 
         nexusConfiguration.dropInternals();
-        
+
         security.stopService();
 
         try

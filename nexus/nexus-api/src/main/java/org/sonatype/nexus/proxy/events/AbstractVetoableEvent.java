@@ -4,11 +4,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.sonatype.plexus.appevents.AbstractEvent;
+
 public class AbstractVetoableEvent
     extends AbstractEvent
     implements Vetoable
 {
     private final ArrayList<Object> vetos = new ArrayList<Object>();
+
+    public AbstractVetoableEvent( Object component )
+    {
+        super( component );
+    }
 
     public List<Object> getVetos()
     {

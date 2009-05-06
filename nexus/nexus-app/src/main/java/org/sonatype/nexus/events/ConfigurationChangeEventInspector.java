@@ -18,8 +18,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.plexus.appevents.Event;
 
 /**
  * @author Juven Xu
@@ -36,7 +36,7 @@ public class ConfigurationChangeEventInspector
         return indexerManager;
     }
 
-    public boolean accepts( AbstractEvent evt )
+    public boolean accepts( Event evt )
     {
         if ( evt instanceof ConfigurationChangeEvent )
         {
@@ -45,14 +45,14 @@ public class ConfigurationChangeEventInspector
         return false;
     }
 
-    public void inspect( AbstractEvent evt )
+    public void inspect( Event evt )
     {
         inspectForNexus( evt );
 
         inspectForIndexerManager( evt );
     }
 
-    private void inspectForNexus( AbstractEvent evt )
+    private void inspectForNexus( Event evt )
     {
         // TODO: This causes cycle!
         // getNexus().getSystemStatus().setLastConfigChange( new Date() );
@@ -61,7 +61,7 @@ public class ConfigurationChangeEventInspector
 
     }
 
-    private void inspectForIndexerManager( AbstractEvent evt )
+    private void inspectForIndexerManager( Event evt )
     {
         getIndexerManager().resetConfiguration();
     }

@@ -29,9 +29,6 @@ import org.sonatype.jsecurity.web.SecurityConfigurationException;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.ApplicationEventMulticaster;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.rest.model.*;
@@ -40,6 +37,9 @@ import org.sonatype.nexus.rest.repositories.RepositoryResourceResponseConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServicePropertyResourceConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceResourceResponseConverter;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.appevents.EventListener;
 import org.sonatype.plexus.rest.PlexusResourceFinder;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.RetargetableRestlet;
@@ -96,7 +96,7 @@ public class NexusApplication
     /**
      * Listener.
      */
-    public void onProximityEvent( AbstractEvent evt )
+    public void onEvent( Event evt )
     {
         if ( NexusStartedEvent.class.isAssignableFrom( evt.getClass() ) )
         {
@@ -115,7 +115,7 @@ public class NexusApplication
     protected void doConfigure()
     {
         // adding ourselves as listener
-        applicationEventMulticaster.addProximityEventListener( this );
+        applicationEventMulticaster.addEventListener( this );
     }
 
     /**

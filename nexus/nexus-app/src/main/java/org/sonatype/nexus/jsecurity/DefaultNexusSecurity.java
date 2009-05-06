@@ -44,13 +44,14 @@ import org.sonatype.jsecurity.realms.validator.ValidationContext;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.security.source.SecurityConfigurationSource;
 import org.sonatype.nexus.email.NexusEmailer;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.plexus.appevents.EventMulticaster;
 
 @Component( role = NexusSecurity.class )
 public class DefaultNexusSecurity
     extends AbstractLogEnabled
-    implements NexusSecurity
+    implements NexusSecurity, EventMulticaster
 {
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager manager;
@@ -300,17 +301,17 @@ public class DefaultNexusSecurity
         save();
     }
 
-    public void addProximityEventListener( EventListener listener )
+    public void addEventListener( EventListener listener )
     {
         listeners.add( listener );
     }
 
-    public void removeProximityEventListener( EventListener listener )
+    public void removeEventListener( EventListener listener )
     {
         listeners.remove( listener );
     }
 
-    public void notifyProximityEventListeners( AbstractEvent evt )
+    public void notifyEventListeners( Event evt )
     {
         for ( EventListener l : listeners )
         {
@@ -321,7 +322,7 @@ public class DefaultNexusSecurity
                     getLogger().debug( "Notifying component about security config change: " + l.getClass().getName() );
                 }
 
-                l.onProximityEvent( evt );
+                l.onEvent( evt );
             }
             catch ( Exception e )
             {
