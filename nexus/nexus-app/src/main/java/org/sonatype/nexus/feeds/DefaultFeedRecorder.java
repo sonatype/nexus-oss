@@ -349,13 +349,13 @@ public class DefaultFeedRecorder
 
     public SystemProcess systemProcessStarted( String action, String message )
     {
-        SystemProcess event = new SystemProcess( action, message, new Date() );
+        SystemProcess prc = new SystemProcess( action, message, new Date() );
 
-        addToTimeline( event );
+        addToTimeline( prc );
 
-        getLogger().info( event.getMessage() );
+        getLogger().info( prc.getMessage() );
 
-        return event;
+        return prc;
     }
 
     public void systemProcessFinished( SystemProcess prc, String finishMessage )
@@ -364,10 +364,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( prc );
 
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( prc.getFinishedMessage() );
-        }
+        getLogger().info( prc.getMessage() );
     }
 
     public void systemProcessBroken( SystemProcess prc, Throwable e )
