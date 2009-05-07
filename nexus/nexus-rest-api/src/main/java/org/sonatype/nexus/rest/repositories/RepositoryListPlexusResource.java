@@ -16,6 +16,7 @@ package org.sonatype.nexus.rest.repositories;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -23,15 +24,34 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.model.CLocalStorage;
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
+import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
+import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
+import org.sonatype.nexus.rest.model.RepositoryProxyResource;
+import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
+import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * A resource list for Repository list.
- *
+ * 
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "RepositoryListPlexusResource" )
@@ -101,4 +121,336 @@ public class RepositoryListPlexusResource
 
         return getRepositoryResourceResponse( repoId );
     }
+
+    // --
+
+    /**
+     * Converting REST DTO + possible App model to App model. If app model is given, "update" happens, otherwise if
+     * target is null, "create".
+     * 
+     * @param model
+     * @param target
+     * @return app model, merged or created
+     * @throws ResourceException
+     */
+    public CRepository getRepositoryAppModel( RepositoryBaseResource resource, CRepository target )
+        throws ResourceException
+    {
+        CRepository appModel = new DefaultCRepository();
+
+        Xpp3Dom ex = null;
+
+        appModel.setLocalStatus( LocalStatus.IN_SERVICE.name() );
+        if ( target != null )
+        {
+            appModel.setLocalStatus( target.getLocalStatus() );
+
+            ex = (Xpp3Dom) target.getExternalConfiguration();
+        }
+        else
+        {
+            ex = new Xpp3Dom( "externalConfiguration" );
+        }
+
+        appModel.setId( resource.getId() );
+
+        appModel.setName( resource.getName() );
+
+        if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
+        {
+            appModel.setProviderRole( ShadowRepository.class.getName() );
+
+            appModel.setExternalConfiguration( ex );
+
+            RepositoryShadowResource repoResource = (RepositoryShadowResource) resource;
+
+            M2LayoutedM1ShadowRepositoryConfiguration exConf = new M2LayoutedM1ShadowRepositoryConfiguration( ex );
+
+            exConf.setMasterRepositoryId( repoResource.getShadowOf() );
+
+            exConf.setSynchronizeAtStartup( repoResource.isSyncAtStartup() );
+
+            exConf.applyChanges();
+
+        }
+        else if ( REPO_TYPE_GROUP.equals( resource.getRepoType() ) )
+        {
+            appModel.setProviderRole( GroupRepository.class.getName() );
+        }
+        else
+        {
+
+            appModel.setProviderRole( Repository.class.getName() );
+
+            RepositoryResource repoResource = (RepositoryResource) resource;
+
+            appModel.setAllowWrite( repoResource.isAllowWrite() );
+
+            appModel.setBrowseable( repoResource.isBrowseable() );
+
+            appModel.setIndexable( repoResource.isIndexable() );
+            
+            appModel.setNotFoundCacheTTL( repoResource.getNotFoundCacheTTL() );
+
+            appModel.setExternalConfiguration( ex );
+
+            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
+
+            exConf.setRepositoryPolicy( RepositoryPolicy.valueOf( repoResource.getRepoPolicy() ) );
+
+            exConf.applyChanges();
+
+            if ( repoResource.getOverrideLocalStorageUrl() != null )
+            {
+                appModel.setLocalStorage( new CLocalStorage() );
+
+                appModel.getLocalStorage().setUrl( repoResource.getOverrideLocalStorageUrl() );
+            }
+            else
+            {
+                appModel.setLocalStorage( null );
+            }
+
+            RepositoryResourceRemoteStorage remoteStorage = repoResource.getRemoteStorage();
+            if ( remoteStorage != null )
+            {
+                appModel.setRemoteStorage( new CRemoteStorage() );
+
+                appModel.getRemoteStorage().setUrl( remoteStorage.getRemoteStorageUrl() );
+
+                if ( remoteStorage.getConnectionSettings() != null )
+                {
+
+                    CRemoteConnectionSettings appModelSettings = new CRemoteConnectionSettings();
+
+                    appModelSettings
+                        .setConnectionTimeout( remoteStorage.getConnectionSettings().getConnectionTimeout() );
+
+                    appModelSettings.setQueryString( remoteStorage.getConnectionSettings().getQueryString() );
+
+                    appModelSettings.setRetrievalRetryCount( remoteStorage.getConnectionSettings()
+                        .getRetrievalRetryCount() );
+
+                    appModelSettings.setUserAgentCustomizationString( remoteStorage.getConnectionSettings()
+                        .getUserAgentString() );
+
+                    appModel.getRemoteStorage().setConnectionSettings( appModelSettings );
+                }
+
+                AuthenticationSettings authentication = remoteStorage.getAuthentication();
+                if ( authentication != null )
+                {
+
+                    CRemoteAuthentication appModelSettings = convertAuthentication( authentication );
+
+                    appModel.getRemoteStorage().setAuthentication( appModelSettings );
+                }
+
+                if ( remoteStorage.getHttpProxySettings() != null )
+                {
+
+                    CRemoteHttpProxySettings appModelSettings = new CRemoteHttpProxySettings();
+
+                    appModelSettings.setProxyHostname( remoteStorage.getHttpProxySettings().getProxyHostname() );
+
+                    appModelSettings.setProxyPort( remoteStorage.getHttpProxySettings().getProxyPort() );
+
+                    appModelSettings.setAuthentication( convertAuthentication( remoteStorage.getHttpProxySettings()
+                        .getAuthentication() ) );
+
+                    appModel.getRemoteStorage().setHttpProxySettings( appModelSettings );
+                }
+
+                appModel.getRemoteStorage().setProvider( "apacheHttpClient3x" );
+
+            }
+        }
+
+        appModel.setProviderHint( resource.getProvider() );
+
+        if ( RepositoryProxyResource.class.isAssignableFrom( resource.getClass() ) )
+        {
+            appModel = getRepositoryProxyAppModel( (RepositoryProxyResource) resource, appModel );
+        }
+
+        return appModel;
+    }
+
+    private CRemoteAuthentication convertAuthentication( AuthenticationSettings authentication )
+    {
+        if ( authentication == null )
+        {
+            return null;
+        }
+
+        CRemoteAuthentication appModelSettings = new CRemoteAuthentication();
+
+        appModelSettings.setUsername( authentication.getUsername() );
+        appModelSettings.setPassword( authentication.getPassword() );
+        appModelSettings.setPrivateKey( authentication.getPrivateKey() );
+        appModelSettings.setPassphrase( authentication.getPassphrase() );
+        appModelSettings.setNtlmDomain( authentication.getNtlmDomain() );
+        appModelSettings.setNtlmHost( authentication.getNtlmHost() );
+
+        return appModelSettings;
+    }
+
+    /**
+     * Converting REST DTO + possible App model to App model. If app model is given, "update" happens, otherwise if
+     * target is null, "create".
+     * 
+     * @param model
+     * @param target
+     * @return app model, merged or created
+     */
+    public CRepository getRepositoryProxyAppModel( RepositoryProxyResource model, CRepository target )
+    {
+        M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( (Xpp3Dom) target.getExternalConfiguration() );
+
+        exConf.setChecksumPolicy( ChecksumPolicy.valueOf( model.getChecksumPolicy() ) );
+
+        exConf.setDownloadRemoteIndex( model.isDownloadRemoteIndexes() );
+
+        exConf.setArtifactMaxAge( model.getArtifactMaxAge() );
+
+        exConf.setMetadataMaxAge( model.getMetadataMaxAge() );
+
+        exConf.applyChanges();
+
+        if ( target.getRemoteStorage() == null )
+        {
+            target.setRemoteStorage( new CRemoteStorage() );
+        }
+
+        target.getRemoteStorage().setUrl( model.getRemoteStorage().getRemoteStorageUrl() );
+
+        if ( model.getRemoteStorage().getAuthentication() != null )
+        {
+            if ( target.getRemoteStorage().getAuthentication() == null )
+            {
+                target.getRemoteStorage().setAuthentication( new CRemoteAuthentication() );
+            }
+
+            target.getRemoteStorage().getAuthentication().setUsername(
+                                                                       model.getRemoteStorage().getAuthentication()
+                                                                           .getUsername() );
+
+            target.getRemoteStorage().getAuthentication().setPassword(
+                                                                       model.getRemoteStorage().getAuthentication()
+                                                                           .getPassword() );
+
+            target.getRemoteStorage().getAuthentication().setNtlmDomain(
+                                                                         model.getRemoteStorage().getAuthentication()
+                                                                             .getNtlmDomain() );
+
+            target.getRemoteStorage().getAuthentication().setNtlmHost(
+                                                                       model.getRemoteStorage().getAuthentication()
+                                                                           .getNtlmHost() );
+
+            target.getRemoteStorage().getAuthentication().setPrivateKey(
+                                                                         model.getRemoteStorage().getAuthentication()
+                                                                             .getPrivateKey() );
+
+            target.getRemoteStorage().getAuthentication().setPassphrase(
+                                                                         model.getRemoteStorage().getAuthentication()
+                                                                             .getPassphrase() );
+        }
+        else
+        {
+            target.getRemoteStorage().setAuthentication( null );
+        }
+
+        if ( model.getRemoteStorage().getConnectionSettings() != null )
+        {
+            if ( target.getRemoteStorage().getConnectionSettings() == null )
+            {
+                target.getRemoteStorage().setConnectionSettings( new CRemoteConnectionSettings() );
+            }
+
+            target.getRemoteStorage().getConnectionSettings().setConnectionTimeout(
+                                                                                    model.getRemoteStorage()
+                                                                                        .getConnectionSettings()
+                                                                                        .getConnectionTimeout() * 1000 );
+
+            target.getRemoteStorage().getConnectionSettings().setRetrievalRetryCount(
+                                                                                      model.getRemoteStorage()
+                                                                                          .getConnectionSettings()
+                                                                                          .getRetrievalRetryCount() );
+
+            target
+                .getRemoteStorage()
+                .getConnectionSettings()
+                .setUserAgentCustomizationString( model.getRemoteStorage().getConnectionSettings().getUserAgentString() );
+
+            target.getRemoteStorage().getConnectionSettings().setQueryString(
+                                                                              model.getRemoteStorage()
+                                                                                  .getConnectionSettings()
+                                                                                  .getQueryString() );
+        }
+        else
+        {
+            target.getRemoteStorage().setConnectionSettings( null );
+        }
+
+        if ( model.getRemoteStorage().getHttpProxySettings() != null )
+        {
+            if ( target.getRemoteStorage().getHttpProxySettings() == null )
+            {
+                target.getRemoteStorage().setHttpProxySettings( new CRemoteHttpProxySettings() );
+            }
+
+            target.getRemoteStorage().getHttpProxySettings().setProxyHostname(
+                                                                               model.getRemoteStorage()
+                                                                                   .getHttpProxySettings()
+                                                                                   .getProxyHostname() );
+
+            target.getRemoteStorage().getHttpProxySettings().setProxyPort(
+                                                                           model.getRemoteStorage()
+                                                                               .getHttpProxySettings().getProxyPort() );
+
+            if ( model.getRemoteStorage().getHttpProxySettings().getAuthentication() != null )
+            {
+
+                if ( target.getRemoteStorage().getHttpProxySettings().getAuthentication() == null )
+                {
+                    target.getRemoteStorage().getHttpProxySettings().setAuthentication( new CRemoteAuthentication() );
+                }
+
+                target.getRemoteStorage().getHttpProxySettings().getAuthentication()
+                    .setUsername( model.getRemoteStorage().getHttpProxySettings().getAuthentication().getUsername() );
+
+                target.getRemoteStorage().getHttpProxySettings().getAuthentication()
+                    .setPassword( model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassword() );
+
+                target
+                    .getRemoteStorage()
+                    .getHttpProxySettings()
+                    .getAuthentication()
+                    .setNtlmDomain( model.getRemoteStorage().getHttpProxySettings().getAuthentication().getNtlmDomain() );
+
+                target.getRemoteStorage().getHttpProxySettings().getAuthentication()
+                    .setNtlmHost( model.getRemoteStorage().getHttpProxySettings().getAuthentication().getNtlmHost() );
+
+                target
+                    .getRemoteStorage()
+                    .getHttpProxySettings()
+                    .getAuthentication()
+                    .setPrivateKey( model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPrivateKey() );
+
+                target
+                    .getRemoteStorage()
+                    .getHttpProxySettings()
+                    .getAuthentication()
+                    .setPassphrase( model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassphrase() );
+            }
+
+        }
+        else
+        {
+            target.getRemoteStorage().setHttpProxySettings( null );
+        }
+
+        return target;
+    }
+
 }
