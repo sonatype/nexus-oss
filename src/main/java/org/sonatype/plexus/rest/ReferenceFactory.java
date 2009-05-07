@@ -8,5 +8,6 @@ public interface ReferenceFactory
 
     Reference createChildReference( Request request, String childPath );
     
+    Reference getContextRoot( Request request );
     
 }

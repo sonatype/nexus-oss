@@ -21,7 +21,7 @@ public class DefaultReferenceFactory
      * @param request
      * @return
      */
-    protected Reference getContextRoot( Request request )
+    public Reference getContextRoot( Request request )
     {
         Reference result = null;
 
