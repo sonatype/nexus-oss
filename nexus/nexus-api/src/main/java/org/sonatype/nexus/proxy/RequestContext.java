@@ -1,12 +1,9 @@
 package org.sonatype.nexus.proxy;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 public class RequestContext
     extends HashMap<String, Object>
@@ -15,36 +12,31 @@ public class RequestContext
     private static final long serialVersionUID = 7200598686103502266L;
 
     /** Context URL of the app root on the incoming connector. */
-    private static final String CTX_REQUEST_APP_ROOT_URL = "request.appRootUrl";
+    public static final String CTX_REQUEST_APP_ROOT_URL = "request.appRootUrl";
 
     /** Context URL of the original resource requested on the incoming connector. */
-    private static final String CTX_REQUEST_URL = "request.url";
+    public static final String CTX_REQUEST_URL = "request.url";
 
     /** Context flag to mark a request local only. */
-    private static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
+    public static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
 
     /** Context flag to mark a request local only. */
-    private static final String CTX_REMOTE_ONLY_FLAG = "request.remoteOnly";
+    public static final String CTX_REMOTE_ONLY_FLAG = "request.remoteOnly";
 
     /** Context flag to mark a request local only. */
-    private static final String CTX_GROUP_LOCAL_ONLY_FLAG = "request.groupLocalOnly";
-
-    /** Context key for set of processed repositories. */
-    private static final String CTX_PROCESSED_REPOSITORIES = "request.processedRepositories";
+    public static final String CTX_GROUP_LOCAL_ONLY_FLAG = "request.groupLocalOnly";
 
     /** Context key for condition "if-modified-since" */
-    private static final String CTX_CONDITION_IF_MODIFIED_SINCE = "request.condition.ifModifiedSince";
+    public static final String CTX_CONDITION_IF_MODIFIED_SINCE = "request.condition.ifModifiedSince";
 
     /** Context key for condition "if-none-match" */
-    private static final String CTX_CONDITION_IF_NONE_MATCH = "request.condition.ifNoneMatch";
+    public static final String CTX_CONDITION_IF_NONE_MATCH = "request.condition.ifNoneMatch";
 
     private RequestContext parent;
 
     public RequestContext()
     {
         super();
-
-        put( CTX_PROCESSED_REPOSITORIES, new ArrayList<String>() );
 
         this.parent = null;
     }
@@ -183,27 +175,6 @@ public class RequestContext
     public void setRequestGroupLocalOnly( boolean requestGroupLocal )
     {
         put( CTX_GROUP_LOCAL_ONLY_FLAG, requestGroupLocal );
-    }
-
-    /**
-     * Returns the list of processed repositories.
-     * 
-     * @return
-     */
-    @SuppressWarnings( "unchecked" )
-    public List<String> getProcessedRepositories()
-    {
-        return (List<String>) get( CTX_PROCESSED_REPOSITORIES );
-    }
-
-    /**
-     * Adds the repository to the list of processed repositories.
-     * 
-     * @param repository
-     */
-    public void addProcessedRepository( Repository repository )
-    {
-        getProcessedRepositories().add( repository.getId() );
     }
 
     /**

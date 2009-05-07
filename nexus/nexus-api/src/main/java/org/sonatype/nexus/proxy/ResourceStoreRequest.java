@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -35,12 +36,16 @@ public class ResourceStoreRequest
 
     /** Used internally by Routers. */
     private Stack<String> pathStack;
+    
+    /** Used internally to track reposes where this request was */
+    private List<String> processedRepositories;
 
     public ResourceStoreRequest( String requestPath, boolean localOnly, boolean remoteOnly )
     {
         super();
         this.requestPath = requestPath;
         this.pathStack = new Stack<String>();
+        this.processedRepositories = new ArrayList<String>();
         this.requestContext = new RequestContext();
         this.requestContext.setRequestLocalOnly( localOnly );
         this.requestContext.setRequestRemoteOnly( remoteOnly );
@@ -77,9 +82,6 @@ public class ResourceStoreRequest
         this( item.getRepositoryItemUid().getPath(), true, false );
 
         this.requestContext = item.getItemContext();
-
-        // but clear up the list of processed repositories
-        this.requestContext.getProcessedRepositories().clear();
     }
 
     /**
@@ -196,6 +198,7 @@ public class ResourceStoreRequest
         getRequestContext().setRequestGroupLocalOnly( requestGroupLocal );
     }
 
+
     /**
      * Returns the list of processed repositories.
      * 
@@ -203,17 +206,17 @@ public class ResourceStoreRequest
      */
     public List<String> getProcessedRepositories()
     {
-        return getRequestContext().getProcessedRepositories();
+        return processedRepositories;
     }
 
     /**
-     * Adds repository as processed.
+     * Adds the repository to the list of processed repositories.
      * 
      * @param repository
      */
     public void addProcessedRepository( Repository repository )
     {
-        getRequestContext().addProcessedRepository( repository );
+        processedRepositories.add( repository.getId() );
     }
 
     /**
