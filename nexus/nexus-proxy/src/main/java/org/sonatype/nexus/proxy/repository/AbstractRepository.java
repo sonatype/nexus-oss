@@ -165,7 +165,7 @@ public abstract class AbstractRepository
         applicationEventMulticaster.removeEventListener( this );
     }
 
-    public void onEvent( Event evt )
+    public void onEvent( Event<?> evt )
     {
         // act automatically on repo removal
         if ( evt instanceof RepositoryRegistryEventRemove )

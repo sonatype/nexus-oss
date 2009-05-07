@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.List;
 
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -31,7 +32,7 @@ public interface GroupRepository
     extends Repository
 {
     /**
-     * Returns the ID list of the members of this group.
+     * Returns the unmodifiable ID list of the members of this group.
      * 
      * @return
      */
@@ -43,7 +44,15 @@ public interface GroupRepository
      * @param repositories
      */
     void setMemberRepositoryIds( List<String> repositories )
-        throws InvalidGroupingException;
+        throws NoSuchRepositoryException, InvalidGroupingException;
+
+    /**
+     * Adds a member to this group.
+     * 
+     * @param repositoryId
+     */
+    void addMemberRepositoryId( String repositoryId )
+        throws NoSuchRepositoryException, InvalidGroupingException;
 
     /**
      * Removes a member from this group.

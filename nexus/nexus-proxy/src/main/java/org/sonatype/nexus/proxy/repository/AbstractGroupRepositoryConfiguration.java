@@ -1,5 +1,6 @@
 package org.sonatype.nexus.proxy.repository;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -19,9 +20,21 @@ public abstract class AbstractGroupRepositoryConfiguration
         return getCollection( getConfiguration( false ), MEMBER_REPOSITORIES );
     }
 
-    public void setMemberRepositoryIds( List<String> vals )
+    public void setMemberRepositoryIds( List<String> ids )
     {
-        setCollection( getConfiguration( true ), MEMBER_REPOSITORIES, vals );
+        setCollection( getConfiguration( true ), MEMBER_REPOSITORIES, ids );
+    }
+
+    public void clearMemberRepositoryIds()
+    {
+        List<String> empty = Collections.emptyList();
+
+        setCollection( getConfiguration( true ), MEMBER_REPOSITORIES, empty );
+    }
+
+    public void addMemberRepositoryId( String repositoryId )
+    {
+        addToCollection( getConfiguration( true ), MEMBER_REPOSITORIES, repositoryId, true );
     }
 
     public void removeMemberRepositoryId( String repositoryId )

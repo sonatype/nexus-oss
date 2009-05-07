@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public abstract class AbstractGroupRepository
     }
 
     @Override
-    public void onEvent( Event evt )
+    public void onEvent( Event<?> evt )
     {
         super.onEvent( evt );
 
@@ -116,13 +117,14 @@ public abstract class AbstractGroupRepository
                 {
                     if ( getLogger().isDebugEnabled() )
                     {
-                        getLogger().debug(
-                                           "A repository CYCLE detected (doListItems()), while processing group ID='"
-                                               + this.getId()
-                                               + "'. The repository with ID='"
-                                               + repo.getId()
-                                               + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                               + request.toString() );
+                        getLogger()
+                            .debug(
+                                    "A repository CYCLE detected (doListItems()), while processing group ID='"
+                                        + this.getId()
+                                        + "'. The repository with ID='"
+                                        + repo.getId()
+                                        + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                        + request.toString() );
                     }
                 }
             }
@@ -194,13 +196,14 @@ public abstract class AbstractGroupRepository
                 }
                 else
                 {
-                    getLogger().info(
-                                      "A repository CYCLE detected (doRetrieveItem()), while processing group ID='"
-                                          + this.getId()
-                                          + "'. The repository with ID='"
-                                          + repo.getId()
-                                          + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                          + request.toString() );
+                    getLogger()
+                        .info(
+                               "A repository CYCLE detected (doRetrieveItem()), while processing group ID='"
+                                   + this.getId()
+                                   + "'. The repository with ID='"
+                                   + repo.getId()
+                                   + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                   + request.toString() );
                 }
             }
         }
@@ -210,13 +213,55 @@ public abstract class AbstractGroupRepository
 
     public List<String> getMemberRepositoryIds()
     {
-        return getExternalConfiguration().getMemberRepositoryIds();
+        ArrayList<String> result = new ArrayList<String>( getExternalConfiguration().getMemberRepositoryIds().size() );
+
+        for ( String id : getExternalConfiguration().getMemberRepositoryIds() )
+        {
+            result.add( id );
+        }
+
+        return Collections.unmodifiableList( result );
     }
 
     public void setMemberRepositoryIds( List<String> repositories )
-        throws InvalidGroupingException
+        throws NoSuchRepositoryException, InvalidGroupingException
     {
-        getExternalConfiguration().setMemberRepositoryIds( repositories );
+        getExternalConfiguration().clearMemberRepositoryIds();
+
+        try
+        {
+            for ( String repoId : repositories )
+            {
+                addMemberRepositoryId( repoId );
+            }
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            getExternalConfiguration().rollbackChanges();
+
+            throw e;
+        }
+        catch ( InvalidGroupingException e )
+        {
+            getExternalConfiguration().rollbackChanges();
+
+            throw e;
+        }
+    }
+
+    public void addMemberRepositoryId( String repositoryId )
+        throws NoSuchRepositoryException, InvalidGroupingException
+    {
+        Repository repo = repoRegistry.getRepository( repositoryId );
+
+        if ( repo.getRepositoryContentClass().isCompatible( getRepositoryContentClass() ) )
+        {
+            getExternalConfiguration().addMemberRepositoryId( repositoryId );
+        }
+        else
+        {
+            throw new InvalidGroupingException( getRepositoryContentClass(), repo.getRepositoryContentClass() );
+        }
     }
 
     public void removeMemberRepositoryId( String repositoryId )
@@ -292,13 +337,14 @@ public abstract class AbstractGroupRepository
             {
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug(
-                                       "A repository CYCLE detected (doRetrieveItems()), while processing group ID='"
-                                           + this.getId()
-                                           + "'. The repository with ID='"
-                                           + repository.getId()
-                                           + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                           + request.toString() );
+                    getLogger()
+                        .debug(
+                                "A repository CYCLE detected (doRetrieveItems()), while processing group ID='"
+                                    + this.getId()
+                                    + "'. The repository with ID='"
+                                    + repository.getId()
+                                    + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                    + request.toString() );
                 }
             }
         }
