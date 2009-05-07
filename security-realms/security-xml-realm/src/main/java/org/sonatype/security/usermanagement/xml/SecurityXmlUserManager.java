@@ -323,11 +323,53 @@ public class SecurityXmlUserManager
         return clearPassword;
     }
 
-    public void setUsersRoles( String userId, Set<RoleIdentifier> roleIdentifiers )
+    public void setUsersRoles( String userId, String userSource, Set<RoleIdentifier> roleIdentifiers )
         throws UserNotFoundException,
             InvalidConfigurationException
     {
-        // TODO Auto-generated method stub
+        // delete if no roleIdentifiers
+        if( roleIdentifiers == null || roleIdentifiers.isEmpty())
+        {
+            try
+            {
+                this.configuration.deleteUserRoleMapping( userId, userSource );
+            }
+            catch ( NoSuchRoleMappingException e )
+            {
+                this.logger.debug( "User role mapping for user: "+ userId +" source: "+ userSource + " could not be deleted because it does not exist." );
+            }
+        }
+        else
+        {
+            SecurityUserRoleMapping roleMapping = new SecurityUserRoleMapping();
+            roleMapping.setUserId( userId );
+            roleMapping.setSource( userSource );
+            
+            for ( RoleIdentifier roleIdentifier : roleIdentifiers )
+            {
+                // make sure we only save roles that we manage
+                // TODO: although we shouldn't need to worry about this.
+                if( this.getSource().equals( roleIdentifier.getSource() ))
+                {
+                    roleMapping.addRole( roleIdentifier.getRoleId() );
+                }
+            }
+            
+            // try to update first
+            try
+            {
+                this.configuration.updateUserRoleMapping( roleMapping );
+            }
+            catch ( NoSuchRoleMappingException e )
+            {
+                // update failed try create
+                this.logger.debug( "Update of user role mapping for user: "+ userId +" source: "+ userSource +" did not exist, creating new one.");
+                this.configuration.createUserRoleMapping( roleMapping );
+            }
+        }
+        
+        // save the config
+        this.saveConfiguration();
         
     }
 }

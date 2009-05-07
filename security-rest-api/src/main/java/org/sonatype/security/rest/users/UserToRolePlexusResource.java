@@ -41,9 +41,6 @@ public class UserToRolePlexusResource
 
     public static final String SOURCE_ID_KEY = "sourceId";
 
-    @Requirement
-    private SecuritySystem securitySystem;
-
     public UserToRolePlexusResource()
     {
         this.setModifiable( true );
@@ -102,7 +99,7 @@ public class UserToRolePlexusResource
         // check if the user exists
         try
         {
-            if ( this.securitySystem.getUser( userId, sourceId ) == null )
+            if ( this.getSecuritySystem().getUser( userId, sourceId ) == null )
             {
 
             }

@@ -1,0 +1,12 @@
+    <plexus>
+    <components>
+    
+     <component>
+      <role>org.sonatype.security.usermanagement.UserManager</role>
+      <implementation>org.sonatype.security.rest.users.MockUserManager</implementation>
+      <role-hint>MockUserManager</role-hint>
+      <isolated-realm>false</isolated-realm>
+    </component>
+    
+  </components>
+</plexus>

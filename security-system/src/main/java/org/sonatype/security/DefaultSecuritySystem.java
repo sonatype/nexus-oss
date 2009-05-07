@@ -2,7 +2,6 @@ package org.sonatype.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -230,6 +229,12 @@ public class DefaultSecuritySystem
         // first save the user
         // this is the UserManager that owns the user
         UserManager userManager = this.getUserManager( user.getSource() );
+        
+        if( !userManager.supportsWrite() )
+        {
+            throw new InvalidConfigurationException( "UserManager: "+ userManager.getSource() +" does not support writing." );
+        }
+        
         userManager.addUser( user, password );
 
         // then save the users Roles
@@ -243,7 +248,7 @@ public class DefaultSecuritySystem
                 try
                 {
                     RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
-                    roleMappingUserManager.setUsersRoles( user.getUserId(), RoleIdentifier.getRoleIdentifiersForSource(
+                    roleMappingUserManager.setUsersRoles( user.getUserId(), user.getSource(), RoleIdentifier.getRoleIdentifiersForSource(
                         user.getSource(),
                         user.getRoles() ) );
                 }
@@ -267,6 +272,11 @@ public class DefaultSecuritySystem
         // this is the UserManager that owns the user
         UserManager userManager = this.getUserManager( user.getSource() );
 
+        if( !userManager.supportsWrite() )
+        {
+            throw new InvalidConfigurationException( "UserManager: "+ userManager.getSource() +" does not support writing." );
+        }
+        
         userManager.updateUser( user );
 
         // then save the users Roles
@@ -280,7 +290,7 @@ public class DefaultSecuritySystem
                 try
                 {
                     RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
-                    roleMappingUserManager.setUsersRoles( user.getUserId(), RoleIdentifier.getRoleIdentifiersForSource(
+                    roleMappingUserManager.setUsersRoles( user.getUserId(), user.getSource(), RoleIdentifier.getRoleIdentifiersForSource(
                         user.getSource(),
                         user.getRoles() ) );
                 }
@@ -345,7 +355,7 @@ public class DefaultSecuritySystem
                 try
                 {
                     foundUser = true;
-                    roleMappingUserManager.setUsersRoles( userId, roleIdentifiers );
+                    roleMappingUserManager.setUsersRoles( userId, source, roleIdentifiers );
                 }
                 catch ( UserNotFoundException e )
                 {
