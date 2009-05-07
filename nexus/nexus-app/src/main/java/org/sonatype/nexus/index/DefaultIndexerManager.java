@@ -334,6 +334,14 @@ public class DefaultIndexerManager
     public void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
         throws IOException, NoSuchRepositoryException
     {
+        Repository repository = repositoryRegistry.getRepository( repositoryId );
+        
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+        {
+            // shadows are left out completely for now
+            return;
+        }
+        
         IndexingContext ctx = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
 
         IndexingContext rctx = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryId ) );
