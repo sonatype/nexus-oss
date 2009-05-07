@@ -760,7 +760,7 @@ Sonatype.utils = {
               'does not match your actual URL! ' +
               'If you\'re running Apache mod_proxy, here\'s ' +
               '<a href="http://nexus.sonatype.org/about/faq.html#' +
-              'QHowcanIforceNexustogenerateHTTPSURLswhenintegratedwithApacheHttpdandModProxy">' +
+              'QHowcanIintegrateNexuswithApacheHttpdandModProxy">' +
               'more information</a> on configuring Nexus with it.'
             );
           }
