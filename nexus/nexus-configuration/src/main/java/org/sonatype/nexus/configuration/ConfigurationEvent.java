@@ -22,19 +22,15 @@ import org.sonatype.plexus.appevents.AbstractEvent;
  * @author cstamas
  */
 public abstract class ConfigurationEvent
-    extends AbstractEvent
+    extends AbstractEvent<ApplicationConfiguration>
 {
-    private final ApplicationConfiguration configuration;
-
     public ConfigurationEvent( ApplicationConfiguration configuration )
     {
         super( configuration );
-
-        this.configuration = configuration;
     }
 
     public ApplicationConfiguration getApplicationConfiguration()
     {
-        return configuration;
+        return getEventSender();
     }
 }

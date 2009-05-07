@@ -26,24 +26,20 @@ import org.sonatype.nexus.proxy.events.AbstractVetoableEvent;
  * @author cstamas
  */
 public class ConfigurationPrepareForSaveEvent
-    extends AbstractVetoableEvent
+    extends AbstractVetoableEvent<ApplicationConfiguration>
 {
-    private final ApplicationConfiguration configuration;
-
     private final Collection<Configurable> changes;
 
     public ConfigurationPrepareForSaveEvent( ApplicationConfiguration configuration )
     {
         super( configuration );
 
-        this.configuration = configuration;
-
         this.changes = new ArrayList<Configurable>();
     }
 
     public ApplicationConfiguration getConfiguration()
     {
-        return configuration;
+        return getEventSender();
     }
 
     public Collection<Configurable> getChanges()
