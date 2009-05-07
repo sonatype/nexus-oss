@@ -26,6 +26,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
@@ -123,7 +124,7 @@ public class Nexus725InitialRestClient
         repoResoruce.setBrowseable( true );
         repoResoruce.setIndexable( true );
         // repoResoruce.setNotFoundCacheTTL( 1440 );
-        repoResoruce.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        repoResoruce.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // repoResoruce.setRealmnId(?)
         // repoResoruce.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // repoResoruce.setDefaultLocalStorageUrl( "" ); //file://repos/internal

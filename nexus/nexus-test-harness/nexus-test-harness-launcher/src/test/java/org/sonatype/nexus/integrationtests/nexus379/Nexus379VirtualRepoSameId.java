@@ -22,6 +22,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
@@ -58,8 +59,7 @@ public class Nexus379VirtualRepoSameId
         repo.setProvider( "maven2" );
         // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven2" );
-        repo.setRepoPolicy( "release" );
-        repo.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
+        repo.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         repo = (RepositoryResource) this.messageUtil.createRepository( repo );
 
         // now create a virtual one, this should fail

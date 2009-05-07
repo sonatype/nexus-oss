@@ -22,6 +22,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.FeedUtil;
@@ -31,6 +32,7 @@ import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
+import com.thoughtworks.xstream.XStream;
 
 public class Nexus538SystemFeeds
     extends AbstractNexusIntegrationTest
@@ -39,9 +41,7 @@ public class Nexus538SystemFeeds
     @SuppressWarnings( "unchecked" )
     @Test
     public void bootEventTest()
-        throws Exception,
-            IllegalArgumentException,
-            FeedException
+        throws Exception, IllegalArgumentException, FeedException
     {
 
         // restart and look for event in feed
@@ -51,19 +51,21 @@ public class Nexus538SystemFeeds
         SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
         List<SyndEntry> entries = feed.getEntries();
 
-        // the first item should be the boot event
-        SyndEntry entry = entries.get( 0 );
-        Assert.assertEquals( "Booting", entry.getTitle() );
+        for ( SyndEntry entry : entries )
+        {
+            if ( "Booting".equals( entry.getTitle() ) )
+            {
+                return;
+            }
+        }
+
+        Assert.fail( "Unable to find booting entry!" );
     }
 
     @SuppressWarnings( "unchecked" )
     @Test
     public void updateRepoTest()
-        throws IOException,
-            IllegalArgumentException,
-            FeedException,
-            InterruptedException,
-            ComponentLookupException
+        throws IOException, IllegalArgumentException, FeedException, InterruptedException, ComponentLookupException
     {
 
         // sleep a little so we can make sure its the first item
@@ -71,10 +73,8 @@ public class Nexus538SystemFeeds
         Thread.sleep( 1000 );
 
         // change the name of the test repo
-        RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(
-            this.getXMLXStream(),
-            MediaType.APPLICATION_XML,
-            getRepositoryTypeRegistry() );
+        RepositoryMessageUtil repoUtil =
+            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
 
         RepositoryBaseResource repo = repoUtil.getRepository( this.getTestRepositoryId() );
         String oldName = repo.getName();
@@ -85,23 +85,23 @@ public class Nexus538SystemFeeds
         SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
         List<SyndEntry> entries = feed.getEntries();
 
-        // the first item should be the boot event
-        SyndEntry entry = entries.get( 0 );
-        Assert.assertEquals( "Feed entry: " + entry.getPublishedDate(), "Configuration change", entry.getTitle() );
-        Assert.assertTrue( "Could not find new repo id in feed entry, Entry body:\n"
-            + entry.getDescription().getValue(), entry.getDescription().getValue().contains( newName ) );
-        Assert.assertTrue( "Could not find old repo id in feed entry, Entry body:\n"
-            + entry.getDescription().getValue(), entry.getDescription().getValue().contains( oldName ) );
+        for ( SyndEntry entry : entries )
+        {
+            if ( "Configuration change".equals( entry.getTitle() )
+                && entry.getDescription().getValue().contains( newName )
+                && entry.getDescription().getValue().contains( oldName ) )
+            {
+                return;
+            }
+        }
+
+        Assert.fail( "Unable to find a valid entry to repository update:\n" + new XStream().toXML( entries ) );
     }
 
     @SuppressWarnings( "unchecked" )
     @Test
     public void changeProxyStatusTest()
-        throws IOException,
-            IllegalArgumentException,
-            FeedException,
-            InterruptedException,
-            ComponentLookupException
+        throws IOException, IllegalArgumentException, FeedException, InterruptedException, ComponentLookupException
     {
 
         // sleep a little so we can make sure its the first item
@@ -109,13 +109,11 @@ public class Nexus538SystemFeeds
         Thread.sleep( 1000 );
 
         // change the name of the test repo
-        RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(
-            this.getXMLXStream(),
-            MediaType.APPLICATION_XML,
-            getRepositoryTypeRegistry() );
+        RepositoryMessageUtil repoUtil =
+            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
 
         RepositoryStatusResource repo = repoUtil.getStatus( "release-proxy-repo-1" );
-        repo.setProxyMode( "blockedAuto" );
+        repo.setProxyMode( ProxyMode.BLOCKED_AUTO.name() );
         repoUtil.updateStatus( repo );
 
         SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
@@ -123,22 +121,20 @@ public class Nexus538SystemFeeds
 
         // the first item should be the boot event
         SyndEntry entry = entries.get( 0 );
-        Assert.assertEquals( "Feed entry: " + entry.getPublishedDate(), "Repository proxy mode change", entry
-            .getTitle() );
-        Assert.assertTrue(
-            "Could not find repo id in feed entry, Entry body:\n" + entry.getDescription().getValue(),
-            entry.getDescription().getValue().contains( "release-proxy-repo-1" ) );
+        Assert.assertEquals( "Feed entry: " + entry.getPublishedDate(), "Repository proxy mode change",
+                             entry.getTitle() );
+        Assert.assertTrue( "Could not find repo id in feed entry, Entry body:\n" + entry.getDescription().getValue(),
+                           entry.getDescription().getValue().contains( "release-proxy-repo-1" ) );
 
         feed = FeedUtil.getFeed( "systemRepositoryStatusChanges" );
         entries = feed.getEntries();
 
         // the first item should be the boot event
         entry = entries.get( 0 );
-        Assert.assertEquals( "Feed entry: " + entry.getPublishedDate(), "Repository proxy mode change", entry
-            .getTitle() );
-        Assert.assertTrue(
-            "Could not find repo id in feed entry, Entry body:\n" + entry.getDescription().getValue(),
-            entry.getDescription().getValue().contains( "release-proxy-repo-1" ) );
+        Assert.assertEquals( "Feed entry: " + entry.getPublishedDate(), "Repository proxy mode change",
+                             entry.getTitle() );
+        Assert.assertTrue( "Could not find repo id in feed entry, Entry body:\n" + entry.getDescription().getValue(),
+                           entry.getDescription().getValue().contains( "release-proxy-repo-1" ) );
     }
 
 }

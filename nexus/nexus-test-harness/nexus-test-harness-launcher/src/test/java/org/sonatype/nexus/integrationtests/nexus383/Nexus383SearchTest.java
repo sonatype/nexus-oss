@@ -19,6 +19,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
@@ -27,6 +28,7 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
  * Test Search operations.
@@ -46,6 +48,13 @@ public class Nexus383SearchTest
     public Nexus383SearchTest()
     {
         this.messageUtil = new SearchMessageUtil();
+    }
+
+    @Before
+    public void waitForTasks()
+        throws Exception
+    {
+        TaskScheduleUtil.waitForTasks();
     }
 
     @Test
@@ -199,14 +208,17 @@ public class Nexus383SearchTest
         // Multi repository deploy
         DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_REPO, fileToDeploy, pomFile, null, null );
         DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_REPO2, fileToDeploy, pomFile, null, null );
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, fileToDeploy, pomFile, null, null );
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, fileToDeploy, pomFile, null,
+                                            null );
 
         // if you deploy the same item multiple times to the same repo, that is only a single item
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, fileToDeploy, pomFile, null, null );
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, fileToDeploy, pomFile, null, null );
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, fileToDeploy, pomFile, null,
+                                            null );
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, fileToDeploy, pomFile, null,
+                                            null );
 
         RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,
-                                        NEXUS_TEST_HARNESS_RELEASE_REPO );
+                                             NEXUS_TEST_HARNESS_RELEASE_REPO );
 
         List<NexusArtifact> results = messageUtil.searchFor( "crossArtifact" );
         Assert.assertEquals( 3, results.size() );
@@ -214,7 +226,9 @@ public class Nexus383SearchTest
     }
 
     @BeforeClass
-    public static void cleanWorkFolder() throws Exception {
+    public static void cleanWorkFolder()
+        throws Exception
+    {
         cleanWorkDir();
     }
 

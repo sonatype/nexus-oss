@@ -64,7 +64,7 @@ public class Nexus652Beta5To10UpgradeTest
                              nexusConfig.getRestApi().getBaseUrl() );
 
         // we will glance over the repos, because the unit tests cover this.
-        Assert.assertEquals( "Repository Count:", 7, nexusConfig.getRepositories().size() );
+        Assert.assertEquals( "Repository Count:", 9, nexusConfig.getRepositories().size() );
 
         Assert.assertNotNull( "repo: central", NexusConfigUtil.getRepo( "central" ) );
         Assert.assertNotNull( "repo: apache-snapshots", NexusConfigUtil.getRepo( "apache-snapshots" ) );

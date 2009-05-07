@@ -14,7 +14,6 @@
 package org.sonatype.nexus.rest.groups;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
@@ -117,7 +116,7 @@ public class RepositoryGroupPlexusResource
             // just to trigger list creation, and not stay null coz of XStream serialization
             resource.getRepositories();
 
-            for ( String repoId : (List<String>) groupRepo.getMemberRepositoryIds() )
+            for ( String repoId : groupRepo.getMemberRepositoryIds() )
             {
                 RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
 

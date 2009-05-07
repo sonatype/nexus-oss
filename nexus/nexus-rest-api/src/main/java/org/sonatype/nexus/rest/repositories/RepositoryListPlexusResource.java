@@ -25,14 +25,13 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
-import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * A resource list for Repository list.
- * 
+ *
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "RepositoryListPlexusResource" )
@@ -84,7 +83,7 @@ public class RepositoryListPlexusResource
 
             try
             {
-                CRepository normal = getRepositoryAppModel( (RepositoryResource) resource, null );
+                CRepository normal = getRepositoryAppModel( resource, null );
 
                 getNexus().createRepository( normal );
             }

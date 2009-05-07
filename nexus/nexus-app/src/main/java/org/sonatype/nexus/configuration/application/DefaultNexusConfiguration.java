@@ -702,6 +702,8 @@ public class DefaultNexusConfiguration
 
         repositoryRegistry.addRepository( repository );
 
+        saveConfiguration();
+
         return repository;
     }
 

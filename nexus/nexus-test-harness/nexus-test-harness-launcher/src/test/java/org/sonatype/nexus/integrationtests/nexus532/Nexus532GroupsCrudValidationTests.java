@@ -48,6 +48,7 @@ public class Nexus532GroupsCrudValidationTests
         // resource.setId( "noIdTest" );
         resource.setName( "noIdTest" );
         resource.setFormat( "maven2" );
+        resource.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
@@ -72,6 +73,7 @@ public class Nexus532GroupsCrudValidationTests
         resource.setId( "" );
         resource.setName( "emptyIdTest" );
         resource.setFormat( "maven2" );
+        resource.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
@@ -96,6 +98,7 @@ public class Nexus532GroupsCrudValidationTests
         resource.setId( "noNameTest" );
         // resource.setName( "noNameTest" );
         resource.setFormat( "maven2" );
+        resource.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
@@ -122,6 +125,7 @@ public class Nexus532GroupsCrudValidationTests
         resource.setId( "emptyNameTest" );
         resource.setName( "" );
         resource.setFormat( "maven2" );
+        resource.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
@@ -147,15 +151,16 @@ public class Nexus532GroupsCrudValidationTests
 
         resource.setId( "maven2Maven2GroupTest" );
         resource.setName( "maven2Maven2GroupTest" );
+        resource.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository m2Repo = new RepositoryGroupMemberRepository();
         m2Repo.setId( "nexus-test-harness-repo" );
         resource.addRepository( m2Repo );
-        
+
         RepositoryGroupMemberRepository m1Repo = new RepositoryGroupMemberRepository();
         m1Repo.setId( "nexus-test-harness-shadow" );
         resource.addRepository( m1Repo );
-        
+
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
@@ -176,6 +181,7 @@ public class Nexus532GroupsCrudValidationTests
         resource.setId( "noRepos" );
         resource.setName( "noRepos" );
         resource.setFormat( "maven2" );
+        resource.setProvider( "maven2" );
 
         // RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         // member.setId( "nexus-test-harness-repo" );
@@ -200,6 +206,7 @@ public class Nexus532GroupsCrudValidationTests
         resource.setId( "invalidRepoId" );
         resource.setName( "invalidRepoId" );
         resource.setFormat( "maven2" );
+        resource.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "really-invalid-repo-name" );
@@ -223,6 +230,7 @@ public class Nexus532GroupsCrudValidationTests
         resource.setId( "updateValidationTest" );
         resource.setName( "updateValidationTest" );
         resource.setFormat( "maven2" );
+        resource.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
@@ -233,7 +241,7 @@ public class Nexus532GroupsCrudValidationTests
         Response response = null;
         String responseText = null;
 
-       
+
 
         // no groups
         resource.getRepositories().clear();
@@ -256,7 +264,7 @@ public class Nexus532GroupsCrudValidationTests
         Assert.assertTrue( "Response text did not contain an error message. Status: " + response.getStatus()
             + "\nResponse Text:\n " + responseText, responseText.contains( "<errors>" ) );
         resource.setId( "updateValidationTest" );
-        
+
         // missing name
         resource.setName( null );
         response = this.messageUtil.sendMessage( Method.PUT, resource );

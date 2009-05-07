@@ -22,6 +22,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 
 /**
@@ -42,7 +43,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         repo.setProvider( "maven1" );
         // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven1" );
-        repo.setRepoPolicy( "snapshot" );
+        repo.setRepoPolicy( RepositoryPolicy.SNAPSHOT.name() );
         repo.setChecksumPolicy( "IGNORE" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -93,7 +94,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         repo.setProvider( "maven1" );
         // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven1" );
-        repo.setRepoPolicy( "snapshot" );
+        repo.setRepoPolicy( RepositoryPolicy.SNAPSHOT.name() );
         repo.setChecksumPolicy( "IGNORE" );
 
         Response response = this.repoUtil.sendMessage( Method.POST, repo );
@@ -149,7 +150,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         repo.setProvider( "maven1" );
         // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven1" );
-        repo.setRepoPolicy( "snapshot" );
+        repo.setRepoPolicy( RepositoryPolicy.SNAPSHOT.name() );
         repo.setChecksumPolicy( "IGNORE" );
 
         Response response = this.repoUtil.sendMessage( Method.POST, repo );
@@ -206,7 +207,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         repo.setProvider( "maven1" );
         // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven1" );
-        repo.setRepoPolicy( "snapshot" );
+        repo.setRepoPolicy( RepositoryPolicy.SNAPSHOT.name() );
         repo.setChecksumPolicy( "IGNORE" );
 
         Response response = this.repoUtil.sendMessage( Method.POST, repo );

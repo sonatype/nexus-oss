@@ -33,11 +33,13 @@ import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -45,6 +47,7 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.NexusCompat;
 import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
+import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
@@ -52,6 +55,7 @@ import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
+import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 
 public abstract class AbstractRepositoryPlexusResource
     extends AbstractNexusPlexusResource
@@ -321,13 +325,15 @@ public abstract class AbstractRepositoryPlexusResource
      * @param model
      * @param target
      * @return app model, merged or created
+     * @throws ResourceException
      */
-    public CRepository getRepositoryAppModel( RepositoryResource model, CRepository target )
+    public CRepository getRepositoryAppModel( RepositoryBaseResource resource, CRepository target ) throws ResourceException
     {
         CRepository appModel = new CRepository();
 
         Xpp3Dom ex = null;
 
+        appModel.setLocalStatus( LocalStatus.IN_SERVICE.name() );
         if ( target != null )
         {
             appModel.setLocalStatus( target.getLocalStatus() );
@@ -339,64 +345,144 @@ public abstract class AbstractRepositoryPlexusResource
             ex = new Xpp3Dom( "externalConfiguration" );
         }
 
-        appModel.setId( model.getId() );
+        appModel.setId( resource.getId() );
 
-        appModel.setName( model.getName() );
+        appModel.setName( resource.getName() );
 
-        if ( REPO_TYPE_VIRTUAL.equals( model.getRepoType() ) )
+        if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
         {
             appModel.setProviderRole( ShadowRepository.class.getName() );
+
+            appModel.setExternalConfiguration( ex );
+
+            RepositoryShadowResource repoResource = (RepositoryShadowResource) resource;
+
+            M2LayoutedM1ShadowRepositoryConfiguration exConf = new M2LayoutedM1ShadowRepositoryConfiguration( ex );
+
+            exConf.setMasterRepositoryId( repoResource.getShadowOf() );
+
+            exConf.setSynchronizeAtStartup( repoResource.isSyncAtStartup() );
+
+            exConf.applyChanges();
+
         }
-        else if ( REPO_TYPE_GROUP.equals( model.getRepoType() ) )
+        else if ( REPO_TYPE_GROUP.equals( resource.getRepoType() ) )
         {
             appModel.setProviderRole( GroupRepository.class.getName() );
         }
         else
         {
+
             appModel.setProviderRole( Repository.class.getName() );
+
+            RepositoryResource repoResource = (RepositoryResource) resource;
+
+            appModel.setAllowWrite( repoResource.isAllowWrite() );
+
+            appModel.setBrowseable( repoResource.isBrowseable() );
+
+            appModel.setIndexable( repoResource.isIndexable() );
+
+            appModel.setNotFoundCacheTTL( repoResource.getNotFoundCacheTTL() );
+
+            appModel.setExternalConfiguration( ex );
+
+            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
+
+            exConf.setRepositoryPolicy( RepositoryPolicy.valueOf( repoResource.getRepoPolicy() ) );
+
+            exConf.applyChanges();
+
+            if ( repoResource.getOverrideLocalStorageUrl() != null )
+            {
+                appModel.setLocalStorage( new CLocalStorage() );
+
+                appModel.getLocalStorage().setUrl( repoResource.getOverrideLocalStorageUrl() );
+            }
+            else
+            {
+                appModel.setLocalStorage( null );
+            }
+
+            RepositoryResourceRemoteStorage remoteStorage = repoResource.getRemoteStorage();
+            if(remoteStorage != null) {
+                appModel.setRemoteStorage( new CRemoteStorage() );
+
+                appModel.getRemoteStorage().setUrl( remoteStorage.getRemoteStorageUrl() );
+
+                if(remoteStorage.getConnectionSettings() != null) {
+
+                    CRemoteConnectionSettings appModelSettings = new CRemoteConnectionSettings();
+
+                    appModelSettings.setConnectionTimeout( remoteStorage.getConnectionSettings().getConnectionTimeout() );
+
+                    appModelSettings.setQueryString( remoteStorage.getConnectionSettings().getQueryString() );
+
+                    appModelSettings.setRetrievalRetryCount( remoteStorage.getConnectionSettings().getRetrievalRetryCount() );
+
+                    appModelSettings.setUserAgentCustomizationString( remoteStorage.getConnectionSettings().getUserAgentString() );
+
+                    appModel.getRemoteStorage().setConnectionSettings( appModelSettings  );
+                }
+
+                AuthenticationSettings authentication = remoteStorage.getAuthentication();
+                if(authentication != null) {
+
+                    CRemoteAuthentication appModelSettings = convertAuthentication( authentication );
+
+                    appModel.getRemoteStorage().setAuthentication( appModelSettings  );
+                }
+
+                if(remoteStorage.getHttpProxySettings() != null) {
+
+                    CRemoteHttpProxySettings appModelSettings = new CRemoteHttpProxySettings();
+
+                    appModelSettings.setProxyHostname( remoteStorage.getHttpProxySettings().getProxyHostname() );
+
+                    appModelSettings.setProxyPort( remoteStorage.getHttpProxySettings().getProxyPort() );
+
+                    appModelSettings.setAuthentication( convertAuthentication( remoteStorage.getHttpProxySettings().getAuthentication() ) );
+
+                    appModel.getRemoteStorage().setHttpProxySettings( appModelSettings  );
+                }
+
+                appModel.getRemoteStorage().setProvider( "apacheHttpClient3x" );
+
+            }
         }
 
-        appModel.setProviderHint( model.getProvider() );
+        appModel.setProviderHint( resource.getProvider() );
 
-        appModel.setAllowWrite( model.isAllowWrite() );
-
-        appModel.setBrowseable( model.isBrowseable() );
-
-        appModel.setIndexable( model.isIndexable() );
-
-        appModel.setNotFoundCacheTTL( model.getNotFoundCacheTTL() );
-
-        appModel.setExternalConfiguration( ex );
-
-        M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
-
-        exConf.setRepositoryPolicy( RepositoryPolicy.valueOf( model.getRepoPolicy() ) );
-
-        exConf.applyChanges();
-
-        if ( model.getOverrideLocalStorageUrl() != null )
+        if ( RepositoryProxyResource.class.isAssignableFrom( resource.getClass() ) )
         {
-            appModel.setLocalStorage( new CLocalStorage() );
-
-            appModel.getLocalStorage().setUrl( model.getOverrideLocalStorageUrl() );
-        }
-        else
-        {
-            appModel.setLocalStorage( null );
-        }
-
-        if ( RepositoryProxyResource.class.isAssignableFrom( model.getClass() ) )
-        {
-            appModel = getRepositoryProxyAppModel( (RepositoryProxyResource) model, appModel );
+            appModel = getRepositoryProxyAppModel( (RepositoryProxyResource) resource, appModel );
         }
 
         return appModel;
     }
 
+    private CRemoteAuthentication convertAuthentication( AuthenticationSettings authentication )
+    {
+        if(authentication == null) {
+            return null;
+        }
+
+        CRemoteAuthentication appModelSettings = new CRemoteAuthentication();
+
+        appModelSettings.setUsername( authentication.getUsername() );
+        appModelSettings.setPassword( authentication.getPassword() );
+        appModelSettings.setPrivateKey( authentication.getPrivateKey() );
+        appModelSettings.setPassphrase( authentication.getPassphrase() );
+        appModelSettings.setNtlmDomain( authentication.getNtlmDomain() );
+        appModelSettings.setNtlmHost( authentication.getNtlmHost() );
+
+        return appModelSettings;
+    }
+
     /**
      * Converting REST DTO + possible App model to App model. If app model is given, "update" happens, otherwise if
      * target is null, "create".
-     * 
+     *
      * @param model
      * @param target
      * @return app model, merged or created
@@ -405,14 +491,14 @@ public abstract class AbstractRepositoryPlexusResource
     {
         M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( (Xpp3Dom) target.getExternalConfiguration() );
 
-        exConf.setChecksumPolicy( ChecksumPolicy.valueOf( model.getChecksumPolicy() ));
+        exConf.setChecksumPolicy( ChecksumPolicy.valueOf( model.getChecksumPolicy() ) );
 
         exConf.setDownloadRemoteIndex( model.isDownloadRemoteIndexes() );
 
         exConf.setArtifactMaxAge( model.getArtifactMaxAge() );
 
         exConf.setMetadataMaxAge( model.getMetadataMaxAge() );
-        
+
         exConf.applyChanges();
 
         if ( target.getRemoteStorage() == null )

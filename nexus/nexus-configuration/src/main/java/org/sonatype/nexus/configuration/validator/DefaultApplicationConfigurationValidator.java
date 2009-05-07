@@ -298,7 +298,7 @@ public class DefaultApplicationConfigurationValidator
 
         if ( !validateLocalStatus( repo.getLocalStatus() ) )
         {
-            response.addValidationError( "LocalStatus of repository with ID='" + repo.getId() + "' is wrong! (Allowed values are: '" + LocalStatus.IN_SERVICE + "' and '"
+            response.addValidationError( "LocalStatus of repository with ID='" + repo.getId() + "' is wrong " + repo.getLocalStatus() + "! (Allowed values are: '" + LocalStatus.IN_SERVICE + "' and '"
                 + LocalStatus.OUT_OF_SERVICE + "')" );
         }
 /*

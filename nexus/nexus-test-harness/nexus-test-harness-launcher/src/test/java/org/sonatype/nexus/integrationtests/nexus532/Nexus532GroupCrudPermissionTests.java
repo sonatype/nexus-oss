@@ -40,6 +40,7 @@ public class Nexus532GroupCrudPermissionTests
         group.setId( "testCreatePermission" );
         group.setName( "testCreatePermission" );
         group.setFormat( "maven2" );
+        group.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
@@ -90,6 +91,7 @@ public class Nexus532GroupCrudPermissionTests
         group.setId( "testUpdatePermission" );
         group.setName( "testUpdatePermission" );
         group.setFormat( "maven2" );
+        group.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
@@ -145,6 +147,7 @@ public class Nexus532GroupCrudPermissionTests
         group.setId( "testReadPermission" );
         group.setName( "testReadPermission" );
         group.setFormat( "maven2" );
+        group.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
@@ -200,6 +203,7 @@ public class Nexus532GroupCrudPermissionTests
         group.setId( "testDeletePermission" );
         group.setName( "testDeletePermission" );
         group.setFormat( "maven2" );
+        group.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );

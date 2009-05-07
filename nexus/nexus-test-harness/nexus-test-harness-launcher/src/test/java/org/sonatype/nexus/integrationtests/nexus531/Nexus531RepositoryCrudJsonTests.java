@@ -26,6 +26,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
@@ -68,12 +69,12 @@ public class Nexus531RepositoryCrudJsonTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
+        // only valid for proxy repos resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
         this.messageUtil.createRepository( resource );
@@ -97,12 +98,12 @@ public class Nexus531RepositoryCrudJsonTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
+        // only valid for proxy repos resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
         this.messageUtil.createRepository( resource ); // this currently also calls GET, but that will change
@@ -132,18 +133,18 @@ public class Nexus531RepositoryCrudJsonTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
+        // only valid for proxy repos resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
         resource = (RepositoryResource) this.messageUtil.createRepository( resource );
 
         // udpdate the repo
-        resource.setRepoPolicy( "snapshot" );
+        resource.setRepoPolicy( RepositoryPolicy.SNAPSHOT.name() );
 
         this.messageUtil.updateRepo( resource );
 
@@ -166,12 +167,12 @@ public class Nexus531RepositoryCrudJsonTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
+        // only valid for proxy repos resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
         resource = (RepositoryResource) this.messageUtil.createRepository( resource );
@@ -200,8 +201,8 @@ public class Nexus531RepositoryCrudJsonTests
         repo.setProvider( "maven2" );
         // format is neglected by server from now on, provider is the new guy in the town
         repo.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
-        repo.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
-        repo.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
+        repo.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
+        // only valid for proxy repos repo.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
         repo = (RepositoryResource) this.messageUtil.createRepository( repo );
@@ -236,8 +237,8 @@ public class Nexus531RepositoryCrudJsonTests
                 M2RepositoryConfiguration cM2Repo = NexusConfigUtil.getM2Repo( listRepo.getId() );
                 Assert.assertEquals( cRepo.getId(), listRepo.getId() );
                 Assert.assertEquals( cRepo.getName(), listRepo.getName() );
-                //Assert.assertEquals( cM2Repo.getType(), listRepo.getFormat() );
-                Assert.assertEquals( cM2Repo.getRepositoryPolicy(), listRepo.getRepoPolicy() );
+                // Assert.assertEquals( cM2Repo.getType(), listRepo.getFormat() );
+                Assert.assertEquals( cM2Repo.getRepositoryPolicy().name(), listRepo.getRepoPolicy() );
 
                 log.debug( "cRepo.getRemoteStorage(): " + cRepo.getRemoteStorage() );
                 log.debug( "listRepo.getRemoteUri(): " + listRepo.getRemoteUri() );
@@ -251,7 +252,7 @@ public class Nexus531RepositoryCrudJsonTests
 
                 Assert.assertEquals( cRepo.getId(), listRepo.getId() );
                 Assert.assertEquals( cRepo.getName(), listRepo.getName() );
-                //Assert.assertEquals( cShadow.getType(), this.formatToType( listRepo.getFormat() ) );
+                // Assert.assertEquals( cShadow.getType(), this.formatToType( listRepo.getFormat() ) );
                 Assert.assertEquals( AbstractRepositoryPlexusResource.REPO_TYPE_VIRTUAL, listRepo.getRepoType() );
             }
 

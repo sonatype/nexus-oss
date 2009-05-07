@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 
 import junit.framework.Assert;
 
@@ -25,6 +26,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
@@ -43,10 +45,8 @@ public class Nexus688ReindexOnRepoAdd
     public Nexus688ReindexOnRepoAdd()
         throws ComponentLookupException
     {
-        messageUtil = new RepositoryMessageUtil(
-            this.getXMLXStream(),
-            MediaType.APPLICATION_XML,
-            getRepositoryTypeRegistry() );
+        messageUtil =
+            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
     }
 
     @Test
@@ -63,8 +63,8 @@ public class Nexus688ReindexOnRepoAdd
         resource.setProvider( "maven2" );
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
-        resource.setRepoPolicy( "release" );
-        resource.setChecksumPolicy( "IGNORE" );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+        // invalid for hosted repo resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( true );
         resource.setAllowWrite( true );
@@ -96,8 +96,8 @@ public class Nexus688ReindexOnRepoAdd
         resource.setProvider( "maven2" );
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
-        resource.setRepoPolicy( "release" );
-        resource.setChecksumPolicy( "IGNORE" );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+        // invalid for hosted repo resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( false );
         resource.setAllowWrite( true );
@@ -133,7 +133,7 @@ public class Nexus688ReindexOnRepoAdd
         resource.setProvider( "maven2" );
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
-        resource.setRepoPolicy( "release" );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( true );
@@ -170,7 +170,7 @@ public class Nexus688ReindexOnRepoAdd
         resource.setProvider( "maven2" );
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
-        resource.setRepoPolicy( "release" );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( true );
@@ -207,7 +207,7 @@ public class Nexus688ReindexOnRepoAdd
         resource.setProvider( "maven2" );
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
-        resource.setRepoPolicy( "release" );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( false );
@@ -236,12 +236,19 @@ public class Nexus688ReindexOnRepoAdd
     }
 
     private File downloadIndexFromRepository( String repoId )
-        throws MalformedURLException,
-            IOException
+        throws MalformedURLException, IOException
     {
         String repositoryUrl = this.getRepositoryUrl( repoId );
         URL url = new URL( repositoryUrl + INDEX_FILE );
-        return this.downloadFile( url, "target/downloads/index.zip" );
+        try
+        {
+            return this.downloadFile( url, "target/downloads/index.zip" );
+        }
+        catch ( FileNotFoundException e )
+        {
+            throw new FileNotFoundException( e.getMessage() + "\n Found files:\n"
+                + Arrays.toString( new File( nexusWorkDir, "storage/" + repoId + "/.index" ).listFiles() ) );
+        }
     }
 
 }

@@ -76,32 +76,32 @@ public class GroupMessageUtil
         return responseResource;
     }
 
-    public void validateResourceResponse( RepositoryGroupResource group, RepositoryGroupResource responseResource )
+    @SuppressWarnings( "unchecked" )
+    public void validateResourceResponse( RepositoryGroupResource expected, RepositoryGroupResource actual )
         throws IOException
     {
-        Assert.assertEquals( group.getId(), responseResource.getId() );
-        Assert.assertEquals( group.getName(), responseResource.getName() );
-        Assert.assertEquals( group.getFormat(), responseResource.getFormat() );
+        Assert.assertEquals( expected.getId(), actual.getId() );
+        Assert.assertEquals( expected.getName(), actual.getName() );
+        Assert.assertEquals( expected.getFormat(), actual.getFormat() );
 
-        LOG.debug( "group repos: " + group.getRepositories() );
-        LOG.debug( "other repos: " + responseResource.getRepositories() );
+        LOG.debug( "group repos: " + expected.getRepositories() );
+        LOG.debug( "other repos: " + actual.getRepositories() );
 
-        validateRepoLists( group.getRepositories(), responseResource.getRepositories() );
+        validateRepoLists( expected.getRepositories(), actual.getRepositories() );
 
         // check nexus.xml
-        this.validateRepoInNexusConfig( responseResource );
+        this.validateRepoInNexusConfig( actual );
     }
 
     /**
      * @param expected
      * @param actual a list of RepositoryGroupMemberRepository, or a list of repo Ids.
      */
-    public void validateRepoLists( List<RepositoryGroupMemberRepository> expected, List actual )
+    public void validateRepoLists( List<RepositoryGroupMemberRepository> expected, List<String> actual )
     {
 
-
-
-        Assert.assertEquals( "Size of groups repository list, \nexpected: " + this.repoListToStringList( expected ) + "\nactual: "+ this.repoListToStringList( actual ) +"\n", expected.size(), actual.size() );
+        Assert.assertEquals( "Size of groups repository list, \nexpected: " + this.repoListToStringList( expected )
+            + "\nactual: " + this.repoListToStringList( actual ) + "\n", expected.size(), actual.size() );
 
         for ( int ii = 0; ii < expected.size(); ii++ )
         {
@@ -123,21 +123,21 @@ public class GroupMessageUtil
         }
     }
 
-    private List<String> repoListToStringList( List repos )
+    private List<String> repoListToStringList( List<?> repos )
     {
-     // convert actual list to strings( if not already )
+        // convert actual list to strings( if not already )
         List<String> repoIdList = new ArrayList<String>();
         for ( Object tmpObj : repos )
         {
             if ( tmpObj instanceof RepositoryGroupMemberRepository )
             {
                 RepositoryGroupMemberRepository actualRepo = (RepositoryGroupMemberRepository) tmpObj;
-                repoIdList.add( actualRepo.getId());
+                repoIdList.add( actualRepo.getId() );
             }
             else
             {
                 // expected string.
-                repoIdList.add( tmpObj.toString());
+                repoIdList.add( tmpObj.toString() );
             }
         }
         return repoIdList;
@@ -151,7 +151,8 @@ public class GroupMessageUtil
         String responseText = response.getEntity().getText();
         LOG.debug( "responseText: \n" + responseText );
 
-        Assert.assertTrue( "Failed to return Group: "+ groupId+"\nResponse:\n"+ responseText, response.getStatus().isSuccess());
+        Assert.assertTrue( "Failed to return Group: " + groupId + "\nResponse:\n" + responseText,
+                           response.getStatus().isSuccess() );
 
         // this should use call to: getResourceFromResponse
         XStreamRepresentation representation =
@@ -248,7 +249,7 @@ public class GroupMessageUtil
         return resourceResponse.getData();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     private void validateRepoInNexusConfig( RepositoryGroupResource group )
         throws IOException
     {
@@ -258,7 +259,7 @@ public class GroupMessageUtil
         Assert.assertEquals( group.getName(), cGroup.getName() );
 
         List expectedRepos = group.getRepositories();
-        List actualRepos = NexusConfigUtil.getGroup( group.getId() ).getMemberRepositoryIds();
+        List<String> actualRepos = NexusConfigUtil.getGroup( group.getId() ).getMemberRepositoryIds();
 
         this.validateRepoLists( expectedRepos, actualRepos );
     }

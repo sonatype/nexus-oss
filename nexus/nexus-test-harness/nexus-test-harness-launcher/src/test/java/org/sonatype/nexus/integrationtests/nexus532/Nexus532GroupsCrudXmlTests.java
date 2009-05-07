@@ -56,6 +56,7 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         resource.setId( "createTestGroup" );
         resource.setName( "createTestGroup" );
         resource.setFormat( "maven2" );
+        resource.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
@@ -65,7 +66,7 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         // this also validates
         this.messageUtil.createGroup( resource );
     }
-    
+
     @Test
     public void notFoundTest()
         throws Exception
@@ -87,6 +88,7 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         resource.setId( "readTestGroup" );
         resource.setName( "readTestGroup" );
         resource.setFormat( "maven2" );
+        resource.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
@@ -113,6 +115,7 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         resource.setId( "updateTestGroup" );
         resource.setName( "updateTestGroup" );
         resource.setFormat( "maven2" );
+        resource.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
@@ -140,6 +143,7 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         resource.setId( "deleteTestGroup" );
         resource.setName( "deleteTestGroup" );
         resource.setFormat( "maven2" );
+        resource.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
@@ -171,6 +175,7 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         resource.setId( "listTestGroup" );
         resource.setName( "listTestGroup" );
         resource.setFormat( "maven2" );
+        resource.setProvider( "maven2" );
 
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );

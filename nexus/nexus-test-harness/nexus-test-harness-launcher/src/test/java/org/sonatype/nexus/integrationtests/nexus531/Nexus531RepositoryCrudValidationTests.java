@@ -23,6 +23,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
@@ -61,7 +62,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
@@ -131,7 +132,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
@@ -167,7 +168,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
@@ -201,7 +202,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
@@ -236,7 +237,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
@@ -286,7 +287,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
@@ -330,7 +331,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         resource.setOverrideLocalStorageUrl( "foo.bar" ); // file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
@@ -365,7 +366,7 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         resource.setDefaultLocalStorageUrl( "foo.bar" ); // file://repos/internal
@@ -396,12 +397,12 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setBrowseable( true );
         // resource.setIndexable( true );
         // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
         // resource.setRealmnId(?)
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
+        // invalid to hosted repo resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
         resource = (RepositoryResource) this.messageUtil.createRepository( resource );
@@ -409,7 +410,7 @@ public class Nexus531RepositoryCrudValidationTests
         // invalid policy
         resource.setRepoPolicy( "junk" );
         this.sendAndExpectError( Method.PUT, resource );
-        resource.setRepoPolicy( "release" );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
 
         // invalid format
         resource.setProvider( "junk" );
@@ -433,12 +434,12 @@ public class Nexus531RepositoryCrudValidationTests
         resource.setRepoPolicy( "junk" );
         Response response = this.messageUtil.sendMessage( Method.PUT, resource );
         this.sendAndExpectError( Method.PUT, resource );
-        resource.setRepoPolicy( "release" );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
 
         // no policy
         resource.setRepoPolicy( null );
         this.sendAndExpectError( Method.PUT, resource );
-        resource.setRepoPolicy( "release" );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
 
         // invlaid overridlocal storage
         resource.setOverrideLocalStorageUrl( "foo.bar" );

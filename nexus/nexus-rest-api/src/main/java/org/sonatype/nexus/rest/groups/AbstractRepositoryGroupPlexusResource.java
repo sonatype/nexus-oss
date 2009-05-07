@@ -26,6 +26,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.InvalidGroupingException;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
@@ -116,6 +117,8 @@ public abstract class AbstractRepositoryGroupPlexusResource
             group.setProviderRole( GroupRepository.class.getName() );
 
             group.setProviderHint( model.getProvider() );
+
+            group.setLocalStatus( LocalStatus.IN_SERVICE.name() );
 
             Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
 

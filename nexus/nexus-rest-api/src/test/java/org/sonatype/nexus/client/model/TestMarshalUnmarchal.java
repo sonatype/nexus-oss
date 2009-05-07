@@ -33,6 +33,7 @@ import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.NexusApplication;
 import org.sonatype.nexus.rest.model.*;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
@@ -132,7 +133,7 @@ public class TestMarshalUnmarchal
         repo.setBrowseable( true );
         repo.setIndexable( true );
         repo.setNotFoundCacheTTL( 1440 );
-        repo.setRepoPolicy( "release" );
+        repo.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         repo.setDownloadRemoteIndexes( true );
         repo.setChecksumPolicy( "IGNORE" );
 
@@ -174,7 +175,7 @@ public class TestMarshalUnmarchal
         repo.setBrowseable( true );
         repo.setIndexable( true );
         repo.setNotFoundCacheTTL( 1440 );
-        repo.setRepoPolicy( "release" );
+        repo.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         repo.setDownloadRemoteIndexes( true );
         repo.setChecksumPolicy( "IGNORE" );
         repo.setMetadataMaxAge( 42 );
