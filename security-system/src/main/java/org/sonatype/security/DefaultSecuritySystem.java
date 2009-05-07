@@ -14,6 +14,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.mgt.RealmSecurityManager;
@@ -79,6 +80,19 @@ public class DefaultSecuritySystem
         try
         {
             return this.securityManager.login( token );
+        }
+        catch ( org.jsecurity.authc.AuthenticationException e )
+        {
+            throw new AuthenticationException( e.getMessage(), e );
+        }
+    }
+
+    public AuthenticationInfo authenticate( AuthenticationToken token )
+        throws AuthenticationException
+    {
+        try
+        {
+           return this.securityManager.authenticate( token );
         }
         catch ( org.jsecurity.authc.AuthenticationException e )
         {

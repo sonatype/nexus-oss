@@ -3,6 +3,7 @@ package org.sonatype.security;
 import java.util.List;
 import java.util.Set;
 
+import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
@@ -39,6 +40,10 @@ public interface SecuritySystem
     public Subject login( AuthenticationToken token )
         throws AuthenticationException;
 
+
+    public AuthenticationInfo authenticate( AuthenticationToken token )
+    throws AuthenticationException;
+    
     /**
      * Finds the current logged in user.
      * 
