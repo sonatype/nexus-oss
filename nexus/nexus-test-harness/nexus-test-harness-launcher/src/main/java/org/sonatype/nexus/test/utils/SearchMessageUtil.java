@@ -57,7 +57,22 @@ public class SearchMessageUtil
     public Response doSearchFor( Map<String, String> queryArgs )
         throws Exception
     {
-        StringBuffer serviceURI = new StringBuffer( "service/local/data_index?" );
+        return doSearchFor( queryArgs, null );
+    }
+
+    public Response doSearchFor( Map<String, String> queryArgs, String repositoryId )
+        throws Exception
+    {
+        StringBuffer serviceURI = null;
+
+        if ( repositoryId == null )
+        {
+            serviceURI = new StringBuffer( "service/local/data_index?" );
+        }
+        else
+        {
+            serviceURI = new StringBuffer( "service/local/data_index/repositories/" + repositoryId + "?");
+        }
 
         for ( Entry<String, String> entry : queryArgs.entrySet() )
         {
@@ -79,7 +94,13 @@ public class SearchMessageUtil
     public List<NexusArtifact> searchFor( Map<String, String> queryArgs )
         throws Exception
     {
-        String responseText = doSearchFor( queryArgs ).getEntity().getText();
+        return searchFor( queryArgs, null );
+    }
+
+    public List<NexusArtifact> searchFor( Map<String, String> queryArgs, String repositoryId )
+        throws Exception
+    {
+        String responseText = doSearchFor( queryArgs, repositoryId ).getEntity().getText();
 
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
