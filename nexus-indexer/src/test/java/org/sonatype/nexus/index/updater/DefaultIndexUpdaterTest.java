@@ -19,6 +19,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -41,6 +42,8 @@ import org.sonatype.nexus.index.context.IndexingContext;
 public class DefaultIndexUpdaterTest
     extends AbstractIndexCreatorHelper
 {
+    private File testBasedir ;
+
     String repositoryId = "test";
 
     String repositoryUrl = "http://repo1.maven.org/maven2/";
@@ -59,6 +62,9 @@ public class DefaultIndexUpdaterTest
     {
         super.setUp();
 
+        testBasedir = new File( getBasedir() , "/target/indexUpdater" );
+        testBasedir.mkdirs();
+
         indexer = lookup( NexusIndexer.class );
 
         updater = lookup( IndexUpdater.class );
@@ -73,6 +79,15 @@ public class DefaultIndexUpdaterTest
             repositoryUrl,
             null,
             MIN_CREATORS );
+    }
+
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        super.tearDown();
+
+        FileUtils.forceDelete( testBasedir );
     }
 
     public void testReplaceIndex()
@@ -389,7 +404,7 @@ public class DefaultIndexUpdaterTest
         {{
             allowing( tempContext ).getIndexDirectoryFile();
             will( new ReturnValueAction (
-                new File( getBasedir() + "/target/indexUpdater" ) ) );
+                testBasedir ) );
 
             allowing( tempContext ).getTimestamp();
             will( returnValue( contextTimestamp ) );
@@ -452,7 +467,7 @@ public class DefaultIndexUpdaterTest
         {{
             allowing( tempContext ).getIndexDirectoryFile();
             will( new ReturnValueAction (
-                new File( getBasedir() + "/target/indexUpdater" ) ) );
+                testBasedir ) );
 
             allowing( tempContext ).getTimestamp();
             will( returnValue( contextTimestamp ) );
@@ -560,7 +575,7 @@ public class DefaultIndexUpdaterTest
             allowing( tempContext ).getIndexDirectoryFile();
             will( new IndexDirectoryFileAction (
                 localProps,
-                new File( getBasedir() + "/target/indexUpdater" ) ) );
+                testBasedir ) );
 
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".2.gz" ), //
@@ -603,7 +618,7 @@ public class DefaultIndexUpdaterTest
         {{
             allowing( tempContext ).getIndexDirectoryFile();
             will( new ReturnValueAction(
-                new File( getBasedir() + "/target/indexUpdater" ) ) );
+                testBasedir ) );
 
             allowing( tempContext ).getTimestamp();
             will( returnValue( contextTimestamp ) );
@@ -722,7 +737,7 @@ public class DefaultIndexUpdaterTest
             allowing( tempContext ).getIndexDirectoryFile();
             will( new IndexDirectoryFileAction (
                 localProps,
-                new File( getBasedir() + "/target/indexUpdater" ) ) );
+                testBasedir ) );
 
             never( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".gz" ), //
@@ -774,7 +789,7 @@ public class DefaultIndexUpdaterTest
         {{
             allowing( tempContext ).getIndexDirectoryFile();
             will( new ReturnValueAction (
-                new File( getBasedir() + "/target/indexUpdater" ) ) );
+                testBasedir ) );
 
             allowing( tempContext ).getTimestamp();
             will( returnValue( contextTimestamp ) );
