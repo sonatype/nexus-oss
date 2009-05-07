@@ -7,6 +7,8 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 public interface AuthorizationManager
 {
     public String getSource();
+    
+    boolean supportsWrite();
 
     // ROLE CRUDS
     public Set<Role> listRoles();

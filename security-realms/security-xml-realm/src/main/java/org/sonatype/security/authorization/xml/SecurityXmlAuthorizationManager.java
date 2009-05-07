@@ -222,5 +222,10 @@ public class SecurityXmlAuthorizationManager
         this.configuration.save();
     }
 
+    public boolean supportsWrite()
+    {
+        return true;
+    }
+
 
 }
