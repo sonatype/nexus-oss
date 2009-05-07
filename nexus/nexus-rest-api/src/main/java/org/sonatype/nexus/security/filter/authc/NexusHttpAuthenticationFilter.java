@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.ExpiredCredentialsException;
@@ -34,6 +35,8 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 
 public class NexusHttpAuthenticationFilter
@@ -52,6 +55,8 @@ public class NexusHttpAuthenticationFilter
     private boolean fakeAuthScheme;
 
     private AuthcAuthzEvent currentAuthcEvt;
+    
+    private RemoteIPFinder ipFinder;
 
     protected Log getLogger()
     {
@@ -254,10 +259,42 @@ public class NexusHttpAuthenticationFilter
         getLogger().info( msg );
 
         AuthcAuthzEvent evt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHC, msg );
+        
+        if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
+        {
+            RemoteIPFinder finder = getIPFinder();
+            
+            if ( finder != null )
+            {
+                String ip = finder.findIP( ( HttpServletRequest ) request );
+                
+                if ( ip != null )
+                {
+                    evt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
+                }
+            }
+        }
 
         getNexus().addAuthcAuthzEvent( evt );
 
         currentAuthcEvt = evt;
+    }
+    
+    private RemoteIPFinder getIPFinder()
+    {
+        if ( this.ipFinder == null )
+        {
+            try
+            {
+                ipFinder = getPlexusContainer().lookup( RemoteIPFinder.class );
+            }
+            catch ( ComponentLookupException e )
+            {
+                getLogger().error( "Unable to lookup remote IP finder", e );
+            }
+        }
+        
+        return ipFinder;
     }
 
     private boolean isSimilarEvent( String msg )

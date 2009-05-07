@@ -95,5 +95,11 @@ public class SimpleFeedRecorder
     {
         return Collections.emptyList();
     }
+    
+    public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Long ts, Integer count,
+        TimelineFilter filter )
+    {
+        return Collections.emptyList();
+    }
 
 }

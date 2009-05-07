@@ -277,6 +277,12 @@ public class DefaultFeedRecorder
     {
         return getAaesFromMaps( getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, from, count, filter ) );
     }
+    
+    public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Long ts, Integer count,
+        TimelineFilter filter )
+    {
+        return getAaesFromMaps( getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, ts, count, filter) );
+    }
 
     public void addSystemEvent( String action, String message )
     {
