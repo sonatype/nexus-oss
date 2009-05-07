@@ -32,4 +32,10 @@ public class DefaultIndexPlexusResource
     {
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:index]" );
     }
+
+    @Override
+    protected boolean getIsFullReindex()
+    {
+        return true;
+    }
 }

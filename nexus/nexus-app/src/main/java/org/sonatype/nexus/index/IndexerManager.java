@@ -45,7 +45,7 @@ public interface IndexerManager
     /**
      * Returns the local index (the true index for hosted ones, and the true cacheds index for proxy reposes). Every
      * repo has local index.
-     * 
+     *
      * @param repositoryId
      * @return
      * @throws NoSuchRepositoryException
@@ -55,7 +55,7 @@ public interface IndexerManager
 
     /**
      * Returns the remote index. Only proxy repositories have remote index, otherwise null is returnded.
-     * 
+     *
      * @param repositoryId
      * @return
      * @throws NoSuchRepositoryException
@@ -66,7 +66,7 @@ public interface IndexerManager
     /**
      * Returns the "best" indexing context. If it has remoteIndex, and it is bigger then local, remote is considered
      * "best", otherwise local.
-     * 
+     *
      * @param repositoryId
      * @return
      * @throws NoSuchRepositoryException
@@ -76,7 +76,7 @@ public interface IndexerManager
 
     /**
      * Flags an indexing context should be searched in global searches or not.
-     * 
+     *
      * @param repositoryId
      * @param searchable
      * @throws IOException
@@ -96,14 +96,14 @@ public interface IndexerManager
     // Reindexing related (will do local-scan, remote-download, merge, publish)
     // ----------------------------------------------------------------------------
 
-    void reindexAllRepositories( String path )
+    void reindexAllRepositories( String path, boolean fullReindex )
         throws IOException;
 
-    void reindexRepository( String path, String repositoryId )
+    void reindexRepository( String path, String repositoryId, boolean fullReindex )
         throws NoSuchRepositoryException,
             IOException;
 
-    void reindexRepositoryGroup( String path, String repositoryGroupId )
+    void reindexRepositoryGroup( String path, String repositoryGroupId, boolean fullReindex )
         throws NoSuchRepositoryException,
             IOException;
 

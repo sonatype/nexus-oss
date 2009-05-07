@@ -35,4 +35,10 @@ public class RepositoryOrGroupIndexPlexusResource
         return new PathProtectionDescriptor( "/data_index/*/**", "authcBasic,perms[nexus:index]" );
     }
 
+    @Override
+    protected boolean getIsFullReindex()
+    {
+        return true;
+    }
+
 }

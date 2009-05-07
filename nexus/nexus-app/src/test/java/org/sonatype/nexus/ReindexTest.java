@@ -215,7 +215,7 @@ public class ReindexTest
     {
         fillInRepo();
 
-        indexerManager.reindexRepository( null, "releases" );
+        indexerManager.reindexRepository( null, "releases", true );
 
         validateIndexWithIdentify( true, "86e12071021fa0be4ec809d4d2e08f07b80d4877", "org.sonatype.nexus",
                                    "nexus-indexer", "1.0-beta-4" );
@@ -230,7 +230,7 @@ public class ReindexTest
 
         makeCentralPointTo( "http://localhost:12345/central/" );
 
-        indexerManager.reindexRepository( null, "central" );
+        indexerManager.reindexRepository( null, "central", true );
 
         validateIndexWithIdentify( true, "057b8740427ee6d7b0b60792751356cad17dc0d9", "log4j", "log4j", "1.2.12" );
     }
@@ -245,7 +245,7 @@ public class ReindexTest
         makeCentralPointTo( "http://localhost:12345/central/" );
 
         // central is member of public group
-        indexerManager.reindexRepositoryGroup( null, "public" );
+        indexerManager.reindexRepositoryGroup( null, "public", true );
 
         validateIndexWithIdentify( true, "057b8740427ee6d7b0b60792751356cad17dc0d9", "log4j", "log4j", "1.2.12" );
     }
@@ -258,7 +258,7 @@ public class ReindexTest
 
         makeCentralPointTo( "http://localhost:12345/central-inc1/" );
 
-        indexerManager.reindexRepository( null, "central" );
+        indexerManager.reindexRepository( null, "central", true );
 
         // validation
         validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );
@@ -274,7 +274,7 @@ public class ReindexTest
 
         makeCentralPointTo( "http://localhost:12345/central-inc2/" );
 
-        indexerManager.reindexRepository( null, "central" );
+        indexerManager.reindexRepository( null, "central", true );
 
         // validation
         validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );
@@ -290,7 +290,7 @@ public class ReindexTest
 
         makeCentralPointTo( "http://localhost:12345/central-inc3/" );
 
-        indexerManager.reindexRepository( null, "central" );
+        indexerManager.reindexRepository( null, "central", true );
 
         // validation
         validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );
@@ -307,7 +307,7 @@ public class ReindexTest
         // day 1
         makeCentralPointTo( "http://localhost:12345/central-inc1-v1/" );
 
-        indexerManager.reindexRepository( null, "central" );
+        indexerManager.reindexRepository( null, "central", true );
 
         // validation
         validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );
@@ -320,7 +320,7 @@ public class ReindexTest
         // day 2
         makeCentralPointTo( "http://localhost:12345/central-inc2-v1/" );
 
-        indexerManager.reindexRepository( null, "central" );
+        indexerManager.reindexRepository( null, "central", true );
 
         // validation
         validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );
@@ -333,7 +333,7 @@ public class ReindexTest
         // day 3
         makeCentralPointTo( "http://localhost:12345/central-inc3-v1/" );
 
-        indexerManager.reindexRepository( null, "central" );
+        indexerManager.reindexRepository( null, "central", true );
 
         // validation
         validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );

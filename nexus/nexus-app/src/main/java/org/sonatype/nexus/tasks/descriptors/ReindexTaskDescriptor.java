@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.tasks.descriptors.properties.ForceFullReindexPropertyDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "Reindex", description = "Reindex Repositories" )
@@ -28,6 +29,9 @@ public class ReindexTaskDescriptor
 
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
     private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
+
+    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = ForceFullReindexPropertyDescriptor.ID )
+    private ScheduledTaskPropertyDescriptor fullReindex;
 
     public String getId()
     {
@@ -44,6 +48,7 @@ public class ReindexTaskDescriptor
         List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
 
         properties.add( repositoryOrGroupId );
+        properties.add( fullReindex );
 
         return properties;
     }

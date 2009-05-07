@@ -19,11 +19,12 @@ import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.properties.ForceFullReindexPropertyDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Reindex task.
- * 
+ *
  * @author cstamas
  */
 @Component( role = SchedulerTask.class, hint = ReindexTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
@@ -33,30 +34,44 @@ public class ReindexTask
     @Requirement
     private IndexerManager indexerManager;
 
+    public boolean getFullReindex()
+    {
+        boolean fullReindex = new Boolean( getParameter( ForceFullReindexPropertyDescriptor.ID ) );
+        return fullReindex;
+    }
+
+    public void setFullReindex( boolean fullReindex )
+    {
+        getParameters().put( ForceFullReindexPropertyDescriptor.ID, String.valueOf( fullReindex ) );
+    }
+
+    @Override
     public Object doRun()
         throws Exception
     {
         if ( getRepositoryId() != null )
         {
-            indexerManager.reindexRepository( getResourceStorePath(), getRepositoryId() );
+            indexerManager.reindexRepository( getResourceStorePath(), getRepositoryId(), getFullReindex()  );
         }
         else if ( getRepositoryGroupId() != null )
         {
-            indexerManager.reindexRepositoryGroup( getResourceStorePath(), getRepositoryGroupId() );
+            indexerManager.reindexRepositoryGroup( getResourceStorePath(), getRepositoryId(), getFullReindex()  );
         }
         else
         {
-            indexerManager.reindexAllRepositories( getResourceStorePath() );
+            indexerManager.reindexAllRepositories( getResourceStorePath(), getFullReindex() );
         }
 
         return null;
     }
 
+    @Override
     protected String getAction()
     {
         return FeedRecorder.SYSTEM_REINDEX_ACTION;
     }
 
+    @Override
     protected String getMessage()
     {
         if ( getRepositoryGroupId() != null )

@@ -99,6 +99,7 @@ Sonatype.config = function() {
           proxy_snapshot : servicePath + '/templates/repositories/default_proxy_snapshot'
         },
         index : servicePath + '/data_index',
+        incrementalIndex : servicePath + '/data_incremental_index',
         metadata : servicePath + '/metadata',
         cache : servicePath + '/data_cache',
         groups : servicePath + '/repo_groups',

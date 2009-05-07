@@ -37,8 +37,14 @@ Sonatype.repoServer.AbstractRepoPanel = function(config){
       handler: this.clearCacheHandler
     },
     reIndex: {
-      text: 'Re-Index',
-      handler: this.reIndexHandler
+      text: 'ReIndex',
+      handler: this.reIndexHandler,
+      scope: this
+    },
+    incrementalReIndex: {
+      text: 'Incremental ReIndex',
+      handler: this.incrementalReIndexHandler,
+      scope: this
     },
     rebuildMetadata: {
       text: 'Rebuild Metadata',
@@ -118,9 +124,23 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     }
   },
 
+  incrementalReIndexHandler: function( rec ){
+  	this.reindexAction(rec, false);
+  },
   
   reIndexHandler: function( rec ){
-    var url = Sonatype.config.repos.urls.index +
+    this.reindexAction(rec, true);
+  },
+  
+  reindexAction: function (rec, full) {
+  	var indexUrl = null;
+  	if(full) {
+  		indexUrl = Sonatype.config.repos.urls.index;
+  	} else {
+  		indexUrl = Sonatype.config.repos.urls.incrementalIndex;
+  	}
+
+    var url = indexUrl +
       rec.data.resourceURI.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
     
     if ( url.indexOf( Sonatype.config.browseIndexPathSnippet ) > -1 ) {
@@ -423,6 +443,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
 
     if ( this.sp.checkPermission( 'nexus:index', this.sp.DELETE ) && ! isVirtual ) {
       menu.add( this.repoActions.reIndex );
+      menu.add( this.repoActions.incrementalReIndex );
     }
 
     if ( this.sp.checkPermission( 'nexus:metadata', this.sp.DELETE ) && ( isHosted || isGroup ) ) {
@@ -468,6 +489,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       }
       if ( this.sp.checkPermission( 'nexus:index', this.sp.DELETE ) && ! isVirtual ) {
         menu.add( this.repoActions.reIndex );
+        menu.add( this.repoActions.incrementalReIndex );
       }
       if ( this.sp.checkPermission( 'nexus:metadata', this.sp.DELETE ) && ( isHosted || isGroup ) ) {
         menu.add( this.repoActions.rebuildMetadata );

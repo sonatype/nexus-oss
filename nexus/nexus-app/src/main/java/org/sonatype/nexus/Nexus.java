@@ -94,7 +94,7 @@ public interface Nexus
 
     void clearAllCaches( ResourceStoreRequest request );
 
-    void reindexAllRepositories( ResourceStoreRequest request )
+    void reindexAllRepositories( String path, boolean fullReindex )
         throws IOException;
 
     void rebuildAttributesAllRepositories( ResourceStoreRequest request )

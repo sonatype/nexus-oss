@@ -451,10 +451,10 @@ public class DefaultNexus
         }
     }
 
-    public void reindexAllRepositories( ResourceStoreRequest request )
+    public void reindexAllRepositories( String path, boolean fullReindex )
         throws IOException
     {
-        indexerManager.reindexAllRepositories( request.getRequestPath() );
+        indexerManager.reindexAllRepositories( path, fullReindex );
     }
 
     public Collection<String> evictAllUnusedProxiedItems( ResourceStoreRequest req, long timestamp )

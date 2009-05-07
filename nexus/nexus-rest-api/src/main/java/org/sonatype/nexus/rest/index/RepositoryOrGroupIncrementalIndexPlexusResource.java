@@ -17,26 +17,28 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = PlexusResource.class, hint = "IndexContentPlexusResource" )
-public class IndexContentPlexusResource
+@Component( role = PlexusResource.class, hint = "RepositoryOrGroupIncrementalIndexPlexusResource" )
+public class RepositoryOrGroupIncrementalIndexPlexusResource
     extends AbstractIndexPlexusResource
 {
+
     @Override
     public String getResourceUri()
     {
-        return "/data_index/{" + AbstractIndexPlexusResource.DOMAIN + "}/{" + AbstractIndexPlexusResource.TARGET_ID
-            + "}/content";
+        return "/data_incremental_index/{" + AbstractIndexPlexusResource.DOMAIN + "}/{" + AbstractIndexPlexusResource.TARGET_ID
+            + "}";
     }
 
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/data_index/*/*/content**", "authcBasic,perms[nexus:index]" );
+        return new PathProtectionDescriptor( "/data_incremental_index/*/**", "authcBasic,perms[nexus:index]" );
     }
 
     @Override
     protected boolean getIsFullReindex()
     {
-        return true;
+        return false;
     }
+
 }
