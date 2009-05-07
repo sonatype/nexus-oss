@@ -23,6 +23,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.api.Invocation;
+import org.jmock.lib.action.ReturnValueAction;
 import org.jmock.lib.action.VoidAction;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.AbstractIndexCreatorHelper;
@@ -47,7 +48,7 @@ public class DefaultIndexUpdaterTest
     NexusIndexer indexer;
 
     IndexUpdater updater;
-    
+
     IndexingContext context;
 
     SimpleDateFormat df = new SimpleDateFormat( "yyyyMMddHHmmss.SSS Z" );
@@ -61,7 +62,7 @@ public class DefaultIndexUpdaterTest
         indexer = lookup( NexusIndexer.class );
 
         updater = lookup( IndexUpdater.class );
-        
+
         Directory indexDirectory = new RAMDirectory();
 
         context = indexer.addIndexingContext(
@@ -84,7 +85,7 @@ public class DefaultIndexUpdaterTest
         Query q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
 
         FlatSearchResponse response1 = indexer.searchFlat( new FlatSearchRequest( q ) );
-        Collection<ArtifactInfo> content1 = response1.getResults(); 
+        Collection<ArtifactInfo> content1 = response1.getResults();
 
         assertEquals( content1.toString(), 1, content1.size() );
 
@@ -110,7 +111,7 @@ public class DefaultIndexUpdaterTest
             tempContext );
 
         FlatSearchResponse response2 = indexer.searchFlat( new FlatSearchRequest( q, tempContext ) );
-        Collection<ArtifactInfo> tempContent = response2.getResults(); 
+        Collection<ArtifactInfo> tempContent = response2.getResults();
         assertEquals( tempContent.toString(), 2, tempContent.size() );
 
         // RAMDirectory is closed with context, forcing timestamp update
@@ -127,7 +128,7 @@ public class DefaultIndexUpdaterTest
         assertEquals( newIndexTimestamp, context.getTimestamp() );
 
         FlatSearchResponse response3 = indexer.searchFlat( new FlatSearchRequest( q ) );
-        Collection<ArtifactInfo> content2 = response3.getResults(); 
+        Collection<ArtifactInfo> content2 = response3.getResults();
         assertEquals( content2.toString(), 2, content2.size() );
     }
 
@@ -139,10 +140,10 @@ public class DefaultIndexUpdaterTest
             context );
 
         Query q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
-        
+
         {
             FlatSearchResponse response1 = indexer.searchFlat( new FlatSearchRequest( q ) );
-            Collection<ArtifactInfo> content1 = response1.getResults(); 
+            Collection<ArtifactInfo> content1 = response1.getResults();
 
             assertEquals( content1.toString(), 1, content1.size() );
         }
@@ -180,7 +181,7 @@ public class DefaultIndexUpdaterTest
                 null ), tempContext );
 
             FlatSearchResponse tempResponse = indexer.searchFlat( new FlatSearchRequest( q ) );
-            Collection<ArtifactInfo> tempContent = tempResponse.getResults(); 
+            Collection<ArtifactInfo> tempContent = tempResponse.getResults();
             assertEquals( tempContent.toString(), 3, tempContent.size() );
 
             RAMDirectory tempDir2 = new RAMDirectory( tempContext.getIndexDirectory() );
@@ -190,7 +191,7 @@ public class DefaultIndexUpdaterTest
             context.merge( tempDir2 );
 
             FlatSearchResponse response2 = indexer.searchFlat( new FlatSearchRequest( q ) );
-            Collection<ArtifactInfo> content2 = response2.getResults(); 
+            Collection<ArtifactInfo> content2 = response2.getResults();
             assertEquals( content2.toString(), 3, content2.size() );
         }
     }
@@ -372,42 +373,46 @@ public class DefaultIndexUpdaterTest
 
         assertEquals( allGroups.toString(), 5, allGroups.size() );
     }
-    
-    public void testNoIndexUpdate() throws Exception 
+
+    public void testNoIndexUpdate() throws Exception
     {
         Mockery mockery = new Mockery();
-        
+
         final String indexUrl = repositoryUrl + ".index";
         final Date contextTimestamp = df.parse( "20081125010000.000 -0600" );
-        
+
         final ResourceFetcher mockFetcher = mockery.mock( ResourceFetcher.class );
 
         final IndexingContext tempContext = mockery.mock( IndexingContext.class );
-        
-        mockery.checking(new Expectations() 
+
+        mockery.checking(new Expectations()
         {{
+            allowing( tempContext ).getIndexDirectoryFile();
+            will( new ReturnValueAction (
+                new File( getBasedir() + "/target/indexUpdater" ) ) );
+
             allowing( tempContext ).getTimestamp();
             will( returnValue( contextTimestamp ) );
-            
+
             allowing( tempContext ).getId();
             will( returnValue( repositoryId ) );
-            
+
             allowing( tempContext ).getIndexUpdateUrl();
             will( returnValue( indexUrl ) );
 
             allowing( tempContext ).getIndexCreators();
             will( returnValue( DEFAULT_CREATORS ) );
-            
+
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
-            
+
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".properties" ), //
                 with( any( File.class ) ) );
-            
-            will(new PropertiesAction() 
+
+            will(new PropertiesAction()
             {
                 @Override
-                Properties getProperties() 
+                Properties getProperties()
                 {
                     Properties properties = new Properties();
                     properties.setProperty( IndexingContext.INDEX_ID, "central" );
@@ -415,57 +420,61 @@ public class DefaultIndexUpdaterTest
                     return properties;
                 }
             });
-            
+
             allowing( tempContext ).getIndexDirectoryFile();
-            
+
             oneOf( mockFetcher ).disconnect();
         }});
-        
+
         // tempContext.updateTimestamp( true, contextTimestamp );
-        
+
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-        
+
         updateRequest.setResourceFetcher( mockFetcher );
 
         updater.fetchAndUpdateIndex( updateRequest );
-        
+
         mockery.assertIsSatisfied();
     }
 
-    public void testFullIndexUpdate() throws Exception 
+    public void testFullIndexUpdate() throws Exception
     {
         Mockery mockery = new Mockery();
-        
+
         final String indexUrl = repositoryUrl + ".index";
         final Date contextTimestamp = df.parse( "20081125010000.000 -0600" );
-        
+
         final ResourceFetcher mockFetcher = mockery.mock( ResourceFetcher.class );
 
         final IndexingContext tempContext = mockery.mock( IndexingContext.class );
-        
-        mockery.checking(new Expectations() 
+
+        mockery.checking(new Expectations()
         {{
+            allowing( tempContext ).getIndexDirectoryFile();
+            will( new ReturnValueAction (
+                new File( getBasedir() + "/target/indexUpdater" ) ) );
+
             allowing( tempContext ).getTimestamp();
             will( returnValue( contextTimestamp ) );
-            
+
             allowing( tempContext ).getId();
             will( returnValue( repositoryId ) );
-            
+
             allowing( tempContext ).getIndexUpdateUrl();
             will( returnValue( indexUrl ) );
-            
+
             allowing( tempContext ).getIndexCreators();
             will( returnValue( DEFAULT_CREATORS ) );
-            
+
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
-            
+
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".properties" ), //
                 with( any( File.class ) ) );
-            will(new PropertiesAction() 
+            will(new PropertiesAction()
             {
                 @Override
-                Properties getProperties() 
+                Properties getProperties()
                 {
                     Properties properties = new Properties();
                     properties.setProperty( IndexingContext.INDEX_ID, "central" );
@@ -473,68 +482,68 @@ public class DefaultIndexUpdaterTest
                     return properties;
                 }
             });
-            
+
             allowing( tempContext ).getIndexDirectoryFile();
-            
+
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".gz" ), //
                 with( Expectations.<File>anything() ) );
-            
+
             oneOf( tempContext ).replace( with( any( Directory.class ) ) );
-            
+
             oneOf( mockFetcher ).disconnect();
         }});
-        
+
         // tempContext.updateTimestamp( true, contextTimestamp );
-        
+
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-        
+
         updateRequest.setResourceFetcher( mockFetcher );
 
         updater.fetchAndUpdateIndex( updateRequest );
-        
+
         mockery.assertIsSatisfied();
     }
 
-    public void testIncrementalIndexUpdate() throws Exception 
+    public void testIncrementalIndexUpdate() throws Exception
     {
         Mockery mockery = new Mockery();
-        
+
         final String indexUrl = repositoryUrl + ".index";
         final Date contextTimestamp = df.parse( "20081128000000.000 -0600" );
-        
+
         final ResourceFetcher mockFetcher = mockery.mock( ResourceFetcher.class );
-        
+
         final IndexingContext tempContext = mockery.mock( IndexingContext.class );
-        
+
         final Properties localProps = new Properties();
         localProps.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "1" );
         localProps.setProperty( IndexingContext.INDEX_CHAIN_ID, "someid" );
-        
-        mockery.checking(new Expectations() 
+
+        mockery.checking(new Expectations()
         {{
             allowing( tempContext ).getTimestamp();
             will( returnValue( contextTimestamp ) );
-            
+
             allowing( tempContext ).getId();
             will( returnValue( repositoryId ) );
-            
+
             allowing( tempContext ).getIndexUpdateUrl();
             will( returnValue( indexUrl ) );
 
             allowing( tempContext ).getIndexCreators();
             will( returnValue( DEFAULT_CREATORS ) );
-            
+
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
-            
+
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".properties" ), //
                 with( any( File.class ) ) );
-            
-            will(new PropertiesAction() 
+
+            will(new PropertiesAction()
             {
                 @Override
-                Properties getProperties() 
+                Properties getProperties()
                 {
                     Properties properties = new Properties();
                     properties.setProperty( IndexingContext.INDEX_ID, "central" );
@@ -547,12 +556,12 @@ public class DefaultIndexUpdaterTest
                     return properties;
                 }
             });
-            
+
             allowing( tempContext ).getIndexDirectoryFile();
-            will( new IndexDirectoryFileAction ( 
-                localProps, 
+            will( new IndexDirectoryFileAction (
+                localProps,
                 new File( getBasedir() + "/target/indexUpdater" ) ) );
-            
+
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".2.gz" ), //
                 with( Expectations.<File>anything() ) );
@@ -560,60 +569,64 @@ public class DefaultIndexUpdaterTest
                 with( IndexingContext.INDEX_FILE + ".3.gz" ), //
                 with( Expectations.<File>anything() ) );
             // could create index archive there and verify that it is merged correctly
-            
+
             oneOf( tempContext ).merge( with( any( Directory.class ) ) );
-            
+
             oneOf( tempContext ).merge( with( any( Directory.class ) ) );
-            
+
             oneOf( mockFetcher ).disconnect();
         }});
-        
+
         // tempContext.updateTimestamp( true, contextTimestamp );
-        
+
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-        
+
         updateRequest.setResourceFetcher( mockFetcher );
-        
+
         updater.fetchAndUpdateIndex( updateRequest );
-        
+
         mockery.assertIsSatisfied();
     }
-    
-    public void testIncrementalIndexUpdateNoCounter() throws Exception 
+
+    public void testIncrementalIndexUpdateNoCounter() throws Exception
     {
         Mockery mockery = new Mockery();
-        
+
         final String indexUrl = repositoryUrl + ".index";
         final Date contextTimestamp = df.parse( "20081128000000.000 -0600" );
-        
+
         final ResourceFetcher mockFetcher = mockery.mock( ResourceFetcher.class );
-        
+
         final IndexingContext tempContext = mockery.mock( IndexingContext.class );
-        
-        mockery.checking(new Expectations() 
+
+        mockery.checking(new Expectations()
         {{
+            allowing( tempContext ).getIndexDirectoryFile();
+            will( new ReturnValueAction(
+                new File( getBasedir() + "/target/indexUpdater" ) ) );
+
             allowing( tempContext ).getTimestamp();
             will( returnValue( contextTimestamp ) );
-            
+
             allowing( tempContext ).getId();
             will( returnValue( repositoryId ) );
-            
+
             allowing( tempContext ).getIndexUpdateUrl();
             will( returnValue( indexUrl ) );
 
             allowing( tempContext ).getIndexCreators();
             will( returnValue( DEFAULT_CREATORS ) );
-            
+
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
-            
+
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".properties" ), //
                 with( any( File.class ) ) );
-            
-            will(new PropertiesAction() 
+
+            will(new PropertiesAction()
             {
                 @Override
-                Properties getProperties() 
+                Properties getProperties()
                 {
                     Properties properties = new Properties();
                     properties.setProperty( IndexingContext.INDEX_ID, "central" );
@@ -626,75 +639,73 @@ public class DefaultIndexUpdaterTest
                     return properties;
                 }
             });
-            
-            allowing( tempContext ).getIndexDirectoryFile();
-            
+
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".gz" ), //
                 with( Expectations.<File>anything() ) );
             // could create index archive there and verify that it is merged correctly
 
             oneOf( tempContext ).replace( with( any( Directory.class ) ) );
-            
+
             never( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".2.gz" ), //
                 with( Expectations.<File>anything() ) );
-            
+
             never( tempContext ).merge( with( any( Directory.class ) ) );
-            
+
             oneOf( mockFetcher ).disconnect();
         }});
-        
+
         // tempContext.updateTimestamp( true, contextTimestamp );
-        
+
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-        
+
         updateRequest.setResourceFetcher( mockFetcher );
-        
+
         updater.fetchAndUpdateIndex( updateRequest );
-        
+
         mockery.assertIsSatisfied();
     }
-    
-    public void testIncrementalIndexUpdateNoUpdateNecessary() throws Exception 
+
+    public void testIncrementalIndexUpdateNoUpdateNecessary() throws Exception
     {
         Mockery mockery = new Mockery();
-        
+
         final String indexUrl = repositoryUrl + ".index";
         final Date contextTimestamp = df.parse( "20081128000000.000 -0600" );
-        
+
         final ResourceFetcher mockFetcher = mockery.mock( ResourceFetcher.class );
-        
+
         final IndexingContext tempContext = mockery.mock( IndexingContext.class );
-        
+
         final Properties localProps = new Properties();
         localProps.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "3" );
         localProps.setProperty( IndexingContext.INDEX_CHAIN_ID, "someid" );
-        
-        mockery.checking(new Expectations() 
+
+        mockery.checking(new Expectations()
         {{
             allowing( tempContext ).getTimestamp();
             will( returnValue( contextTimestamp ) );
-            
+
             allowing( tempContext ).getId();
             will( returnValue( repositoryId ) );
-            
+
             allowing( tempContext ).getIndexUpdateUrl();
             will( returnValue( indexUrl ) );
 
             allowing( tempContext ).getIndexCreators();
             will( returnValue( DEFAULT_CREATORS ) );
-            
+
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
-            
+
             oneOf( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".properties" ), //
                 with( any( File.class ) ) );
-            
-            will(new PropertiesAction() 
+
+            will(new PropertiesAction()
             {
                 @Override
-                Properties getProperties() 
+                Properties getProperties()
                 {
                     Properties properties = new Properties();
                     properties.setProperty( IndexingContext.INDEX_ID, "central" );
@@ -707,86 +718,86 @@ public class DefaultIndexUpdaterTest
                     return properties;
                 }
             });
-            
+
             allowing( tempContext ).getIndexDirectoryFile();
-            will( new IndexDirectoryFileAction ( 
-                localProps, 
+            will( new IndexDirectoryFileAction (
+                localProps,
                 new File( getBasedir() + "/target/indexUpdater" ) ) );
-            
+
             never( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".gz" ), //
                 with( Expectations.<File>anything() ) );
             // could create index archive there and verify that it is merged correctly
-            
+
             never( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".1.gz" ), //
                 with( Expectations.<File>anything() ) );
-            
+
             never( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".2.gz" ), //
                 with( Expectations.<File>anything() ) );
-            
+
             never( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".3.gz" ), //
                 with( Expectations.<File>anything() ) );
-            
+
             never( tempContext ).merge( with( any( Directory.class ) ) );
 
             never( tempContext ).replace( with( any( Directory.class ) ) );
-            
+
             oneOf( mockFetcher ).disconnect();
         }});
-        
+
         // tempContext.updateTimestamp( true, contextTimestamp );
-        
+
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-        
+
         updateRequest.setResourceFetcher( mockFetcher );
-        
+
         updater.fetchAndUpdateIndex( updateRequest );
-        
+
         mockery.assertIsSatisfied();
     }
-    
-    public void testUpdateForceFullUpdate() throws Exception  
+
+    public void testUpdateForceFullUpdate() throws Exception
     {
         Mockery mockery = new Mockery();
-        
+
         final String indexUrl = repositoryUrl + ".index";
         final Date contextTimestamp = df.parse( "20081128000000.000 -0600" );
-        
+
         final ResourceFetcher mockFetcher = mockery.mock( ResourceFetcher.class );
-        
+
         final IndexingContext tempContext = mockery.mock( IndexingContext.class );
-        
-        final Properties localProps = new Properties();
-        localProps.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "1" );
-        localProps.setProperty( IndexingContext.INDEX_CHAIN_ID, "someid" );
-        
-        mockery.checking(new Expectations() 
+
+        mockery.checking(new Expectations()
         {{
+            allowing( tempContext ).getIndexDirectoryFile();
+            will( new ReturnValueAction (
+                new File( getBasedir() + "/target/indexUpdater" ) ) );
+
             allowing( tempContext ).getTimestamp();
             will( returnValue( contextTimestamp ) );
-            
+
             allowing( tempContext ).getId();
             will( returnValue( repositoryId ) );
-            
+
             allowing( tempContext ).getIndexUpdateUrl();
             will( returnValue( indexUrl ) );
 
             allowing( tempContext ).getIndexCreators();
             will( returnValue( DEFAULT_CREATORS ) );
-            
+
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
-            
+
             never( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".properties" ), //
                 with( any( File.class ) ) );
-            
-            will(new PropertiesAction() 
+
+            will(new PropertiesAction()
             {
                 @Override
-                Properties getProperties() 
+                Properties getProperties()
                 {
                     Properties properties = new Properties();
                     properties.setProperty( IndexingContext.INDEX_ID, "central" );
@@ -799,47 +810,47 @@ public class DefaultIndexUpdaterTest
                     return properties;
                 }
             });
-            
+
             never( tempContext ).getIndexDirectoryFile();
-            
+
             never( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".1.gz" ), //
                 with( Expectations.<File>anything() ) );
-            
+
             never( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".2.gz" ), //
                 with( Expectations.<File>anything() ) );
-            
+
             never( mockFetcher ).retrieve( //
                 with( IndexingContext.INDEX_FILE + ".3.gz" ), //
                 with( Expectations.<File>anything() ) );
-            
-            oneOf( mockFetcher ).retrieve( 
+
+            oneOf( mockFetcher ).retrieve(
                 with( IndexingContext.INDEX_FILE + ".gz" ), //
                 with( Expectations.<File>anything() ) );
-            
+
             never( tempContext ).merge( with( any( Directory.class ) ) );
-            
+
             never( tempContext ).merge( with( any( Directory.class ) ) );
-            
+
             oneOf( tempContext ).replace( with( any( Directory.class ) ) );
-            
+
             oneOf( mockFetcher ).disconnect();
         }});
-        
+
         // tempContext.updateTimestamp( true, contextTimestamp );
-        
+
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-        
+
         updateRequest.setResourceFetcher( mockFetcher );
-        
+
         updateRequest.setForceFullUpdate( true );
-        
+
         updater.fetchAndUpdateIndex( updateRequest );
-        
+
         mockery.assertIsSatisfied();
     }
-    
+
     private ArtifactContext createArtifactContext( String repositoryId, String groupId, String artifactId,
         String version, String classifier )
     {
@@ -871,60 +882,60 @@ public class DefaultIndexUpdaterTest
             + ( classifier == null ? "" : "-" + classifier );
     }
 
-    
-    abstract static class PropertiesAction extends VoidAction 
+
+    abstract static class PropertiesAction extends VoidAction
     {
         @Override
-        public Object invoke(Invocation invocation) throws Throwable 
+        public Object invoke(Invocation invocation) throws Throwable
         {
             File file = (File) invocation.getParameter( 1 );
-            
+
             Properties properties = getProperties();
-    
+
             FileOutputStream is = null;
-            try 
+            try
             {
                 is = new FileOutputStream(file);
                 properties.store(is, null);
                 is.flush();
-            } 
-            finally 
+            }
+            finally
             {
                 IOUtil.close(is);
             }
-            
+
             return null;
         }
 
         abstract Properties getProperties();
     }
 
-    private static class IndexDirectoryFileAction extends VoidAction 
+    private static class IndexDirectoryFileAction extends VoidAction
     {
         File file = null;
-        
+
         public IndexDirectoryFileAction( Properties properties, File basedir )
             throws Exception
         {
             basedir.mkdirs();
-            
+
             this.file = new File( basedir, IndexingContext.INDEX_FILE + ".properties" );
-            
+
             FileOutputStream fos = null;
             try
             {
                 fos = new FileOutputStream( this.file );
-                
+
                 properties.store( fos, "" );
             }
             finally
             {
                 IOUtil.close( fos );
-            }            
+            }
         }
-        
+
         @Override
-        public Object invoke(Invocation invocation) throws Throwable 
+        public Object invoke(Invocation invocation) throws Throwable
         {
             return this.file.getParentFile();
         }
