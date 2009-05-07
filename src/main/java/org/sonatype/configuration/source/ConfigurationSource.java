@@ -49,7 +49,8 @@ public interface ConfigurationSource <E extends Configuration>
      * @throws IOException
      */
     E getConfiguration();
-    
+
+    void setConfiguration( E configuration );
 
     /**
      * Forces reloading the user configuration.
