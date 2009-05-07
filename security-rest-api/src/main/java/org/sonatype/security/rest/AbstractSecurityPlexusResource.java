@@ -162,6 +162,11 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         return roleResource;
     }
     
+    protected Reference getContextRoot( Request request )
+    {
+        return this.referenceFactory.getContextRoot( request );
+    }
+    
     protected Reference createChildReference( Request request, String childPath )
     {
         return this.referenceFactory.createChildReference( request, childPath );
