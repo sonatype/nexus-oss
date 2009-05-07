@@ -30,13 +30,13 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.security</groupId>
+      <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-xml-realm</artifactId>
       <version>${project.version}</version>
     </dependency>
     
     <dependency>
-      <groupId>org.sonatype.security</groupId>
+      <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-xml-realm</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
