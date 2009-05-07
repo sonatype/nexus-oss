@@ -189,6 +189,11 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
+        <artifactId>plexus-cipher</artifactId>
+        <version>1.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-jetty6</artifactId>
         <version>${plexus-jetty6.version}</version>
       </dependency>
