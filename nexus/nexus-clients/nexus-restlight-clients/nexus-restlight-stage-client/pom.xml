@@ -8,6 +8,7 @@
   </parent>
   
   <artifactId>nexus-restlight-stage-client</artifactId>
+  <name>Nexus Lightweight REST Clients: Stage</name>
   
   <dependencies>
     <dependency>

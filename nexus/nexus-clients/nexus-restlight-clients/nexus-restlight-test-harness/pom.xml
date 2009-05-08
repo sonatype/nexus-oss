@@ -9,6 +9,7 @@
   </parent>
 
   <artifactId>nexus-restlight-test-harness</artifactId>
+  <name>Nexus Lightweight REST Clients: Test Harness</name>
 
   <dependencies>
     <dependency>

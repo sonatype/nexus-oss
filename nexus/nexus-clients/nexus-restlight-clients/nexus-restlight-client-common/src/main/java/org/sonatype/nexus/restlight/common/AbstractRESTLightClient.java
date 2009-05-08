@@ -20,24 +20,6 @@
  */
 package org.sonatype.nexus.restlight.common;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthPolicy;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.log4j.LogManager;
-import org.codehaus.plexus.util.IOUtil;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.Text;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -48,6 +30,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthPolicy;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.log4j.LogManager;
+import org.codehaus.plexus.util.IOUtil;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.Text;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.jdom.xpath.XPath;
 
 /**
  * <p>
@@ -400,30 +403,7 @@ public abstract class AbstractRESTLightClient
     {
         GetMethod method = urlIsAbsolute ? new GetMethod( url ) : new GetMethod( baseUrl + url );
 
-        if ( requestParams != null )
-        {
-            for ( Map.Entry<String, ? extends Object> entry : requestParams.entrySet() )
-            {
-                if ( entry.getValue() instanceof Collection )
-                {
-                    Collection<Object> values = (Collection<Object>) entry.getValue();
-                    if ( values != null && !values.isEmpty() )
-                    {
-                        for ( Object val : values )
-                        {
-                            if ( val != null )
-                            {
-                                method.addRequestHeader( entry.getKey(), String.valueOf( val ) );
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    method.addRequestHeader( entry.getKey(), String.valueOf( entry.getValue() ) );
-                }
-            }
-        }
+        addRequestParams( method, requestParams );
 
         try
         {
@@ -501,7 +481,6 @@ public abstract class AbstractRESTLightClient
      * @return null if expectResponseBody == false, the result {@link Document} otherwise.
      * @throws RESTLightClientException
      */
-    @SuppressWarnings( "unchecked" )
     protected Document doPost( final String path, final Map<String, ? extends Object> requestParams, final Document body,
                                final boolean expectResponseBody )
     throws RESTLightClientException
@@ -525,30 +504,7 @@ public abstract class AbstractRESTLightClient
             }
         }
 
-        if ( requestParams != null )
-        {
-            for ( Map.Entry<String, ? extends Object> entry : requestParams.entrySet() )
-            {
-                if ( entry.getValue() instanceof Collection )
-                {
-                    Collection<Object> values = (Collection<Object>) entry.getValue();
-                    if ( values != null && !values.isEmpty() )
-                    {
-                        for ( Object val : values )
-                        {
-                            if ( val != null )
-                            {
-                                method.addRequestHeader( entry.getKey(), String.valueOf( val ) );
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    method.addRequestHeader( entry.getKey(), String.valueOf( entry.getValue() ) );
-                }
-            }
-        }
+        addRequestParams( method, requestParams );
 
         try
         {
@@ -584,6 +540,236 @@ public abstract class AbstractRESTLightClient
             catch ( IOException e )
             {
                 throw new RESTLightClientException( "Could not retrieve body as a String from POST request.", e );
+            }
+            finally
+            {
+                method.releaseConnection();
+            }
+        }
+        else
+        {
+            method.releaseConnection();
+
+            return null;
+        }
+    }
+    
+    /**
+     * Submit a PUT request to the relative URL-path given (relative to the base-URL used to construct the client),
+     * ignore the response body. Use the given requestParams map to inject into the HTTP PUT method.
+     */
+    protected void put( final String path, final Map<String, ? extends Object> requestParams, final Document body )
+        throws RESTLightClientException
+    {
+        doPut( path, requestParams, body, false );
+    }
+
+    /**
+     * Submit a PUT request to the relative URL-path given (relative to the base-URL used to construct the client), and
+     * parse the response as an XML {@link Document} (JDOM) instance. Use the given requestParams map to inject into the
+     * HTTP PUT method.
+     */
+    protected Document putWithResponse( final String path, final Map<String, ? extends Object> requestParams,
+        final Document body )
+        throws RESTLightClientException
+    {
+        return doPut( path, requestParams, body, true );
+    }
+    
+    protected Document doPut( final String path, final Map<String, ? extends Object> requestParams,
+        final Document body, final boolean expectResponseBody )
+        throws RESTLightClientException
+    {
+        LogManager.getLogger( getClass().getName() ).debug( "Putting to: '" + path + "'" );
+
+        PutMethod method = new PutMethod( baseUrl + path );
+
+        method.addRequestHeader( "Content-Type", "application/xml" );
+
+        if ( body != null && body.getRootElement() != null )
+        {
+            try
+            {
+                method.setRequestEntity( new StringRequestEntity( new XMLOutputter( Format.getCompactFormat() )
+                    .outputString( body ), "text/plain", "UTF-8" ) );
+            }
+            catch ( UnsupportedEncodingException e )
+            {
+                throw new RESTLightClientException( "Failed to construct POST request. Reason: " + e.getMessage(), e );
+            }
+        }
+
+        addRequestParams( method, requestParams );
+
+        try
+        {
+            client.executeMethod( method );
+        }
+        catch ( HttpException e )
+        {
+            throw new RESTLightClientException( "PUT request execution failed. Reason: " + e.getMessage(), e );
+        }
+        catch ( IOException e )
+        {
+            throw new RESTLightClientException( "PUT request execution failed. Reason: " + e.getMessage(), e );
+        }
+
+        int status = method.getStatusCode();
+
+        String statusText = method.getStatusText();
+
+        if ( status < 200 || status > 299 )
+        {
+            throw new RESTLightClientException( "PUT request failed; HTTP status: " + status + ": " + statusText );
+        }
+
+        if ( expectResponseBody )
+        {
+            try
+            {
+                return new SAXBuilder().build( method.getResponseBodyAsStream() );
+            }
+            catch ( JDOMException e )
+            {
+                throw new RESTLightClientException( "Failed to parse response body as XML for PUT request.", e );
+            }
+            catch ( IOException e )
+            {
+                throw new RESTLightClientException( "Could not retrieve body as a String from PUT request.", e );
+            }
+            finally
+            {
+                method.releaseConnection();
+            }
+        }
+        else
+        {
+            method.releaseConnection();
+
+            return null;
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void addRequestParams( final HttpMethodBase method, final Map<String, ? extends Object> requestParams )
+    {
+        if ( requestParams == null )
+        {
+            return;
+        }
+
+        for ( Map.Entry<String, ? extends Object> entry : requestParams.entrySet() )
+        {
+            if ( entry.getValue() instanceof Collection )
+            {
+                Collection<Object> values = (Collection<Object>) entry.getValue();
+
+                if ( values != null && !values.isEmpty() )
+                {
+                    for ( Object val : values )
+                    {
+                        if ( val != null )
+                        {
+                            method.addRequestHeader( entry.getKey(), String.valueOf( val ) );
+                        }
+                    }
+                }
+            }
+            else
+            {
+                method.addRequestHeader( entry.getKey(), String.valueOf( entry.getValue() ) );
+            }
+        }
+    }
+    
+    
+    /**
+     * Submit a DELETE request to the relative URL-path given (relative to the base-URL used to construct the client),
+     * ignore the response body. Use the given requestParams map to inject into the HTTP DELETE method.
+     */
+    protected void delete( final String path, final Map<String, ? extends Object> requestParams )
+        throws RESTLightClientException
+    {
+        doDelete( path, requestParams, false );
+    }
+
+    /**
+     * Submit a DELETE request to the relative URL-path given (relative to the base-URL used to construct the client),
+     * and parse the response as an XML {@link Document} (JDOM) instance. Use the given requestParams map to inject into
+     * the HTTP DELETE method.
+     */
+    protected Document deleteWithResponse( final String path, final Map<String, ? extends Object> requestParams,
+        final Document body )
+        throws RESTLightClientException
+    {
+        return doDelete( path, requestParams, true );
+    }
+
+    /**
+     * Submit a DELETE request to the URL <b>path</b> given (relative to the Nexus base-URL given in the constructor),
+     * and parse the response as an XML {@link Document} (JDOM) instance <b>if</b> expectResponseBody == true. Use the
+     * given requestParams map to inject into the HTTP DELETE method.
+     */
+    protected Document doDelete( final String url, final Map<String, ? extends Object> requestParams,
+        final boolean expectResponseBody )
+        throws RESTLightClientException
+    {
+        return doDelete( url, requestParams, false, expectResponseBody );
+    }
+
+    /**
+     * <p>
+     * Low-level DELETE implementation.
+     * </p>
+     * <p>
+     * Submit a DELETE request to the URL given (absolute or relative-to-base-URL depends on urlIsAbsolute flag), and
+     * parse the response as an XML {@link Document} (JDOM) instance <b>if</b> expectResponseBody == true. Use the given
+     * requestParams map to inject into the HTTP DELETE method.
+     * </p>
+     */
+    protected Document doDelete( final String url, final Map<String, ? extends Object> requestParams,
+        final boolean urlIsAbsolute, final boolean expectResponseBody )
+        throws RESTLightClientException
+    {
+        DeleteMethod method = urlIsAbsolute ? new DeleteMethod( url ) : new DeleteMethod( baseUrl + url );
+
+        addRequestParams( method, requestParams );
+
+        try
+        {
+            client.executeMethod( method );
+        }
+        catch ( HttpException e )
+        {
+            throw new RESTLightClientException( "DELETE request execution failed. Reason: " + e.getMessage(), e );
+        }
+        catch ( IOException e )
+        {
+            throw new RESTLightClientException( "DELETE request execution failed. Reason: " + e.getMessage(), e );
+        }
+
+        int status = method.getStatusCode();
+
+        String statusText = method.getStatusText();
+
+        if ( status != 200 )
+        {
+            throw new RESTLightClientException( "DELETE request failed; HTTP status: " + status + ": " + statusText );
+        }
+
+        if ( expectResponseBody )
+        {
+            try
+            {
+                return new SAXBuilder().build( method.getResponseBodyAsStream() );
+            }
+            catch ( JDOMException e )
+            {
+                throw new RESTLightClientException( "Failed to parse response body as XML for DELETE request.", e );
+            }
+            catch ( IOException e )
+            {
+                throw new RESTLightClientException( "Could not retrieve body as a String from DELETE request.", e );
             }
             finally
             {

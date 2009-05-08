@@ -8,6 +8,7 @@
   </parent>
   
   <artifactId>nexus-restlight-client-common</artifactId>
+  <name>Nexus Lightweight REST Clients: Common</name>
   
   <dependencies>
     <dependency>
