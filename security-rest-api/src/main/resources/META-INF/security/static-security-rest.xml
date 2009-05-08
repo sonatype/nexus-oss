@@ -5,7 +5,22 @@
     <version>2.0.2</version>
     
     <privileges>
-    
+    <privilege>
+        <id>1001</id>
+        <type>method</type>
+        <name>Security administrator privilege (ALL)</name>
+        <description>Give permission to everything security related.</description>
+        <properties>
+            <property>
+                <key>method</key>
+                <value>*</value>
+            </property>
+            <property>
+                <key>permission</key>
+                <value>security:*</value>
+            </property>
+        </properties>
+    </privilege>
     <privilege>
             <id>2</id>
             <type>method</type>

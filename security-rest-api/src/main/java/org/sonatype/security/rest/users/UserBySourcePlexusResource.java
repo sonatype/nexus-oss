@@ -37,10 +37,7 @@ public class UserBySourcePlexusResource
 public static final String USER_ID_KEY = "userId";
     
     public static final String USER_SOURCE_KEY = "userSource";
-    
-    @Requirement
-    private SecuritySystem securitySystem;
-    
+        
     public UserBySourcePlexusResource()
     {
         setModifiable( false );
@@ -73,7 +70,7 @@ public static final String USER_ID_KEY = "userId";
         User user;
         try
         {
-            user = this.securitySystem.getUser( getUserId( request ), getUserSource( request ) );
+            user = this.getSecuritySystem().getUser( getUserId( request ), getUserSource( request ) );
         }
         catch ( UserNotFoundException e )
         {

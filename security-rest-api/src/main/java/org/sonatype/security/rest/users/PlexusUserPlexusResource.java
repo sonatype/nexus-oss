@@ -35,9 +35,6 @@ public class PlexusUserPlexusResource
 {
     public static final String USER_ID_KEY = "userId";
     
-    @Requirement
-    private SecuritySystem securitySystem;
-    
     public PlexusUserPlexusResource()
     {
         setModifiable( false );
@@ -70,7 +67,7 @@ public class PlexusUserPlexusResource
         User user;
         try
         {
-            user = this.securitySystem.getUser( getUserId( request ) );
+            user = this.getSecuritySystem().getUser( getUserId( request ) );
         }
         catch ( UserNotFoundException e )
         {

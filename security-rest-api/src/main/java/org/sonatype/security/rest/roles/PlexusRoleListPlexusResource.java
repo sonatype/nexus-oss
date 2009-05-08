@@ -34,9 +34,6 @@ import org.sonatype.security.rest.model.PlexusRoleListResourceResponse;
 public class PlexusRoleListPlexusResource
     extends AbstractSecurityPlexusResource
 {
-    @Requirement
-    private SecuritySystem securitySystem;
-
     public static final String SOURCE_ID_KEY = "sourceId";
 
     @Override
@@ -67,7 +64,7 @@ public class PlexusRoleListPlexusResource
         Set<Role> roles;
         try
         {
-            roles = this.securitySystem.listRoles( source );
+            roles = this.getSecuritySystem().listRoles( source );
         }
         catch ( NoSuchAuthorizationManager e )
         {

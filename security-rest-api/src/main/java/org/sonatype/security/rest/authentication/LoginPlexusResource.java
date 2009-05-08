@@ -38,9 +38,6 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 public class LoginPlexusResource
     extends AbstractUIPermissionCalculatingPlexusResource
 {
-    @Requirement
-    private SecuritySystem securitySystem;
-
     @Override
     public Object getPayloadInstance()
     {
@@ -76,7 +73,7 @@ public class LoginPlexusResource
             // look up the realm of the user
             try
             {
-                User user = securitySystem.getUser( username );
+                User user = this.getSecuritySystem().getUser( username );
                 String source = ( user != null ) ? user.getSource() : null;
                 resource.getClientPermissions().setLoggedInUserSource( source );
             }
