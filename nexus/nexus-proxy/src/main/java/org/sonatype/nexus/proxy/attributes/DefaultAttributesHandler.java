@@ -32,7 +32,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * The Class DefaultAttributesHandler.
- * 
+ *
  * @author cstamas
  */
 @Component( role = AttributesHandler.class )
@@ -67,7 +67,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the attribute storage.
-     * 
+     *
      * @return the attribute storage
      */
     public AttributeStorage getAttributeStorage()
@@ -77,7 +77,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the attribute storage.
-     * 
+     *
      * @param attributeStorage the new attribute storage
      */
     public void setAttributeStorage( AttributeStorage attributeStorage )
@@ -87,7 +87,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the item inspector list.
-     * 
+     *
      * @return the item inspector list
      */
     public List<StorageItemInspector> getItemInspectorList()
@@ -97,7 +97,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the item inspector list.
-     * 
+     *
      * @param itemInspectorList the new item inspector list
      */
     public void setItemInspectorList( List<StorageItemInspector> itemInspectorList )
@@ -107,7 +107,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the file item inspector list.
-     * 
+     *
      * @return the file item inspector list
      */
     public List<StorageFileItemInspector> getFileItemInspectorList()
@@ -117,7 +117,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the file item inspector list.
-     * 
+     *
      * @param fileItemInspectorList the new file item inspector list
      */
     public void setFileItemInspectorList( List<StorageFileItemInspector> fileItemInspectorList )
@@ -195,7 +195,7 @@ public class DefaultAttributesHandler
 
     /**
      * Expand custom item attributes.
-     * 
+     *
      * @param item the item
      * @param inputStream the input stream
      */
@@ -212,8 +212,7 @@ public class DefaultAttributesHandler
                 try
                 {
                     // unpack the file
-                    tmpFile = new File( applicationConfiguration.getTemporaryDirectory(), "px-" + item.getName()
-                        + ".tmp" );
+                    tmpFile = File.createTempFile( "px-" + item.getName(), ".tmp",  applicationConfiguration.getTemporaryDirectory());
 
                     OutputStream tmpFileStream = new FileOutputStream( tmpFile );
 
