@@ -37,7 +37,7 @@ public class CoreClientTest
     }
 
     @Test
-    public void getUserList()
+    public void listUser()
         throws Exception
     {
         List<RESTTestFixture> conversation = new ArrayList<RESTTestFixture>();
@@ -50,7 +50,7 @@ public class CoreClientTest
 
         CoreClient client = new CoreClient( getBaseUrl(), "testuser", "unused" );
 
-        List<User> users = client.getUserList();
+        List<User> users = client.listUser();
 
         List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
         if ( unused != null && !unused.isEmpty() )
@@ -109,7 +109,8 @@ public class CoreClientTest
         List<RESTTestFixture> conversation = new ArrayList<RESTTestFixture>();
         POSTFixture userPostFixture = new POSTFixture();
         userPostFixture.setExactURI( CoreClient.USER_PATH );
-        userPostFixture.setResponseDocument( readTestDocumentResource( "user-post.xml" ) );
+        userPostFixture.setRequestDocument( readTestDocumentResource( "user-post-req.xml" ) );
+        userPostFixture.setResponseDocument( readTestDocumentResource( "user-post-resp.xml" ) );
         conversation.add( getVersionCheckFixture() );
         conversation.add( userPostFixture );
         fixture.setConversation( conversation );
@@ -190,4 +191,80 @@ public class CoreClientTest
         client.deleteUser( userId );
     }
 
+    @Test
+    public void listRole()
+        throws Exception
+    {
+        List<RESTTestFixture> conversation = new ArrayList<RESTTestFixture>();
+        GETFixture userListGetFixture = new GETFixture();
+        userListGetFixture.setExactURI( CoreClient.ROLE_PATH );
+        userListGetFixture.setResponseDocument( readTestDocumentResource( "role-list.xml" ) );
+        conversation.add( getVersionCheckFixture() );
+        conversation.add( userListGetFixture );
+        fixture.setConversation( conversation );
+
+        CoreClient client = new CoreClient( getBaseUrl(), "testuser", "unused" );
+
+        List<Role> roles = client.listRole();
+
+        assertNotNull( roles );
+        assertEquals( 4, roles.size() );
+        assertEquals( "http://localhost:8080/nexus/service/local/roles/anonymous", roles.get( 3 ).getResourceURI() );
+        assertEquals( "anonymous", roles.get( 3 ).getId() );
+        assertEquals( "Nexus Anonymous Role", roles.get( 3 ).getName() );
+        assertEquals( "Anonymous role for Nexus", roles.get( 3 ).getDescription() );
+        assertEquals( 60, roles.get( 3 ).getSessionTimeout() );
+        assertEquals( false, roles.get( 3 ).isUserManaged() );
+        List<String> subRoles = new ArrayList<String>( 3 );
+        subRoles.add( "ui-repo-browser" );
+        subRoles.add( "ui-search" );
+        subRoles.add( "ui-system-feeds" );
+        assertEquals( subRoles, roles.get( 3 ).getRoles() );
+        List<String> privileges = new ArrayList<String>( 6 );
+        privileges.add( "1" );
+        privileges.add( "54" );
+        privileges.add( "57" );
+        privileges.add( "58" );
+        privileges.add( "70" );
+        privileges.add( "74" );
+        assertEquals( privileges, roles.get( 3 ).getPrivileges() );
+    }
+
+    @Test
+    public void postRole()
+        throws Exception
+    {
+        List<RESTTestFixture> conversation = new ArrayList<RESTTestFixture>();
+        POSTFixture postFixture = new POSTFixture();
+        postFixture.setExactURI( CoreClient.ROLE_PATH );
+        postFixture.setRequestDocument( readTestDocumentResource( "role-post-req.xml" ) );
+        postFixture.setResponseDocument( readTestDocumentResource( "role-post-resp.xml" ) );
+        conversation.add( getVersionCheckFixture() );
+        conversation.add( postFixture );
+        fixture.setConversation( conversation );
+
+        Role role = new Role();
+        role.setId( "a1" );
+        role.setName( "a11" );
+        role.setDescription( "a111" );
+        role.setSessionTimeout( 100 );
+        role.getRoles().add( "anonymous" );
+        role.getPrivileges().add( "18" );
+
+        CoreClient client = new CoreClient( getBaseUrl(), "testuser", "unused" );
+
+        Role roleResp = client.postRole( role );
+
+        assertNotNull( roleResp );
+        assertEquals( "http://localhost:8080/nexus/service/local/roles/a1", roleResp.getResourceURI() );
+        assertEquals( "a1", roleResp.getId() );
+        assertEquals( "a11", roleResp.getName() );
+        assertEquals( "a111", roleResp.getDescription() );
+        assertEquals( 100, roleResp.getSessionTimeout() );
+        assertEquals( true, roleResp.isUserManaged() );
+        assertEquals( 1, roleResp.getRoles().size() );
+        assertEquals( "anonymous", roleResp.getRoles().get( 0 ) );
+        assertEquals( 1, roleResp.getPrivileges().size() );
+        assertEquals( "18", roleResp.getPrivileges().get( 0 ) );
+    }
 }

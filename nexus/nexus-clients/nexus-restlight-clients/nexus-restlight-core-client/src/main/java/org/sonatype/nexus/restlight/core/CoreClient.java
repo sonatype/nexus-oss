@@ -1,6 +1,7 @@
 package org.sonatype.nexus.restlight.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.jdom.Document;
@@ -18,11 +19,14 @@ public class CoreClient
      */
     public static final String USER_PATH = SVC_BASE + "/users";
 
+    public static final String ROLE_PATH = SVC_BASE + "/roles";
+
     /*
      * Element Name
      */
     private static final String RESOURCE_URI_ELEMENT = "resourceURI";
 
+    // User
     private static final String USER_REQUEST_ELEMENT = "user-request";
 
     private static final String USER_ID_ELEMENT = "userId";
@@ -35,9 +39,30 @@ public class CoreClient
 
     private static final String USER_USER_MANAGED_ELEMENT = "userManaged";
 
-    private static final String USER_ROLES = "roles";
+    private static final String USER_ROLES_ELEMENT = "roles";
 
-    private static final String USER_ROLE = "role";
+    private static final String USER_ROLE_ELEMENT = "role";
+
+    // Role
+    private static final String ROLE_REQUEST_ELEMENT = "role-request";
+
+    private static final String ROLE_ID_ELEMENT = "id";
+
+    private static final String ROLE_NAME_ELEMENT = "name";
+
+    private static final String ROLE_DESCRIPTION_ELEMENT = "description";
+
+    private static final String ROLE_SESSION_TIMEOUT_ELEMENT = "sessionTimeout";
+
+    private static final String ROLE_USER_MANAGED_ELEMENT = "userManaged";
+
+    private static final String ROLE_ROLES_ELEMENT = "roles";
+
+    private static final String ROLE_ROLE_ELEMENT = "role";
+
+    private static final String ROLE_PRIVILEGES_ELEMENT = "privileges";
+
+    private static final String ROLE_PRIVILEGE_ELEMENT = "privilege";
 
     /*
      * XPath
@@ -46,7 +71,9 @@ public class CoreClient
 
     private static final String USER_XPATH = "//data";
 
-    private static final String USER_ROLE_XPATH = "//roles/role";
+    private static final String ROLE_LIST_XPATH = "//roles-list-item";
+
+    private static final String ROLE_XPATH = "//data";
 
     public CoreClient( final String baseUrl, final String username, final String password )
         throws RESTLightClientException
@@ -54,7 +81,7 @@ public class CoreClient
         super( baseUrl, username, password, "core/" );
     }
 
-    public List<User> getUserList()
+    public List<User> listUser()
         throws RESTLightClientException
     {
         Document doc = get( USER_PATH );
@@ -96,30 +123,99 @@ public class CoreClient
         delete( USER_PATH + "/" + userId, null );
     }
 
-    @SuppressWarnings( "unchecked" )
-    private List<User> parseUserList( final Document doc )
+    public List<Role> listRole()
         throws RESTLightClientException
     {
-        XPath userListXPath = newXPath( USER_LIST_XPATH );
+        Document doc = get( ROLE_PATH );
 
-        List<Element> elements;
+        return parseRoleList( doc );
+    }
 
-        try
+    public Role postRole( Role role )
+        throws RESTLightClientException
+    {
+        Document docReq = buildRole( role );
+
+        Document docResp = postWithResponse( ROLE_PATH, null, docReq );
+
+        return parseRole( docResp );
+    }
+
+    // TODO getRole()
+    // TODO putRole()
+    // TODO deleteRole()
+
+    private List<Role> parseRoleList( final Document doc )
+        throws RESTLightClientException
+    {
+        List<Role> result = new ArrayList<Role>();
+
+        List<Element> elements = parseElements( newXPath( ROLE_LIST_XPATH ), doc.getRootElement() );
+
+        for ( Element element : elements )
         {
-            elements = userListXPath.selectNodes( doc.getRootElement() );
-        }
-        catch ( JDOMException e )
-        {
-            throw new RESTLightClientException( "XPath selection failed: '" + userListXPath + "' (Root node: "
-                + doc.getRootElement().getName() + ").", e );
+            result.add( parseRole( element ) );
         }
 
-        if ( elements == null )
+        return result;
+    }
+
+    private Role parseRole( final Document doc )
+        throws RESTLightClientException
+    {
+        List<Element> elements = parseElements( newXPath( ROLE_XPATH ), doc.getRootElement() );
+
+        if ( elements.isEmpty() )
         {
             return null;
         }
 
+        return parseRole( elements.get( 0 ) );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private Role parseRole( Element element )
+        throws RESTLightClientException
+    {
+        Role role = new Role();
+
+        role.setResourceURI( element.getChildText( RESOURCE_URI_ELEMENT ) );
+        role.setId( element.getChildText( ROLE_ID_ELEMENT ) );
+        role.setName( element.getChildText( ROLE_NAME_ELEMENT ) );
+        role.setDescription( element.getChildText( ROLE_DESCRIPTION_ELEMENT ) );
+        role.setSessionTimeout( Integer.parseInt( element.getChildText( ROLE_SESSION_TIMEOUT_ELEMENT ) ) );
+
+        Element subRoles = element.getChild( ROLE_ROLES_ELEMENT );
+
+        if ( subRoles != null )
+        {
+            for ( Element subRole : (List<Element>) subRoles.getChildren( ROLE_ROLE_ELEMENT ) )
+            {
+                role.getRoles().add( subRole.getValue() );
+            }
+        }
+
+        Element privileges = element.getChild( ROLE_PRIVILEGES_ELEMENT );
+
+        if ( privileges != null )
+        {
+            for ( Element privilege : (List<Element>) privileges.getChildren( ROLE_PRIVILEGE_ELEMENT ) )
+            {
+                role.getPrivileges().add( privilege.getValue() );
+            }
+        }
+
+        role.setUserManaged( element.getChildText( ROLE_USER_MANAGED_ELEMENT ).equals( "true" ) ? true : false );
+        
+        return role;
+    }
+
+    private List<User> parseUserList( final Document doc )
+        throws RESTLightClientException
+    {
         List<User> result = new ArrayList<User>();
+
+        List<Element> elements = parseElements( newXPath( USER_LIST_XPATH ), doc.getRootElement() );
 
         for ( Element element : elements )
         {
@@ -129,25 +225,12 @@ public class CoreClient
         return result;
     }
 
-    @SuppressWarnings( "unchecked" )
     private User parseUser( final Document doc )
         throws RESTLightClientException
     {
-        XPath userXPath = newXPath( USER_XPATH );
+        List<Element> elements = parseElements( newXPath( USER_XPATH ), doc.getRootElement() );
 
-        List<Element> elements;
-
-        try
-        {
-            elements = userXPath.selectNodes( doc.getRootElement() );
-        }
-        catch ( JDOMException e )
-        {
-            throw new RESTLightClientException( "XPath selection failed: '" + userXPath + "' (Root node: "
-                + doc.getRootElement().getName() + ").", e );
-        }
-
-        if ( elements == null || elements.size() == 0 )
+        if ( elements.isEmpty() )
         {
             return null;
         }
@@ -164,35 +247,25 @@ public class CoreClient
         user.setResourceURI( element.getChildText( RESOURCE_URI_ELEMENT ) );
         user.setUserId( element.getChildText( USER_ID_ELEMENT ) );
         user.setName( element.getChildText( USER_NAME_ELEMENT ) );
-        user.setEmail( element.getChildText( USER_EMAIL_ELEMENT ) );
         user.setStatus( element.getChildText( USER_STATUS_ELEMENT ) );
-        user.setUserManaged( element.getChildText( USER_USER_MANAGED_ELEMENT ).equals( "true" ) ? true : false );
+        user.setEmail( element.getChildText( USER_EMAIL_ELEMENT ) );
+        
+        Element roles = element.getChild( USER_ROLES_ELEMENT );
 
-        XPath userRoleXPath = newXPath( USER_ROLE_XPATH );
-
-        try
+        if ( roles != null )
         {
-            List<Element> elements = userRoleXPath.selectNodes( element );
-
-            if ( elements != null && !elements.isEmpty() )
+            for ( Element role : (List<Element>) roles.getChildren( USER_ROLE_ELEMENT ) )
             {
-                for ( Element roleElement : elements )
-                {
-                    user.getRoles().add( roleElement.getValue() );
-                }
+                user.getRoles().add( role.getValue() );
             }
         }
-        catch ( JDOMException e )
-        {
-            throw new RESTLightClientException( "XPath selection failed: '" + userRoleXPath + "' (Root node: "
-                + element.getName() + ").", e );
-        }
 
+        user.setUserManaged( element.getChildText( USER_USER_MANAGED_ELEMENT ).equals( "true" ) ? true : false );
+        
         return user;
     }
 
     private Document buildUser( User user )
-        throws RESTLightClientException
     {
         Element root = new Element( USER_REQUEST_ELEMENT );
 
@@ -206,16 +279,52 @@ public class CoreClient
         data.addContent( new Element( USER_NAME_ELEMENT ).setText( user.getName() ) );
         data.addContent( new Element( USER_STATUS_ELEMENT ).setText( user.getStatus() ) );
         data.addContent( new Element( USER_EMAIL_ELEMENT ).setText( user.getEmail() ) );
-        data.addContent( new Element( USER_USER_MANAGED_ELEMENT ).setText( user.isUserManaged() ? "true" : "false" ) );
 
-        Element roles = new Element( USER_ROLES );
+        Element roles = new Element( USER_ROLES_ELEMENT );
 
         for ( String role : user.getRoles() )
         {
-            roles.addContent( new Element( USER_ROLE ).setText( role ) );
+            roles.addContent( new Element( USER_ROLE_ELEMENT ).setText( role ) );
         }
 
         data.addContent( roles );
+        
+        data.addContent( new Element( USER_USER_MANAGED_ELEMENT ).setText( user.isUserManaged() ? "true" : "false" ) );
+
+        return doc;
+    }
+
+    private Document buildRole( Role role )
+    {
+        Element root = new Element( ROLE_REQUEST_ELEMENT );
+
+        Document doc = new Document().setRootElement( root );
+
+        Element data = new Element( "data" );
+
+        root.addContent( data );
+
+        data.addContent( new Element( ROLE_ID_ELEMENT ).setText( role.getId() ) );
+        data.addContent( new Element( ROLE_NAME_ELEMENT ).setText( role.getName() ) );
+        data.addContent( new Element( ROLE_DESCRIPTION_ELEMENT ).setText( role.getDescription() ) );
+        data.addContent( new Element( ROLE_SESSION_TIMEOUT_ELEMENT ).setText( role.getSessionTimeout() + "" ) );
+        
+
+        Element subRoles = new Element( ROLE_ROLES_ELEMENT );
+        for ( String subRole : role.getRoles() )
+        {
+            subRoles.addContent( new Element( ROLE_ROLE_ELEMENT ).setText( subRole ) );
+        }
+        data.addContent( subRoles );
+
+        Element privileges = new Element( ROLE_PRIVILEGES_ELEMENT );
+        for ( String privilege : role.getPrivileges() )
+        {
+            privileges.addContent( new Element( ROLE_PRIVILEGE_ELEMENT ).setText( privilege ) );
+        }
+        data.addContent( privileges );
+        
+        data.addContent( new Element( ROLE_USER_MANAGED_ELEMENT ).setText( role.isUserManaged() ? "true" : "false" ) );
 
         return doc;
     }
@@ -233,4 +342,22 @@ public class CoreClient
         }
     }
 
+    @SuppressWarnings( "unchecked" )
+    private List<Element> parseElements( XPath xPath, Element root )
+        throws RESTLightClientException
+    {
+        List<Element> elements = null;
+
+        try
+        {
+            elements = xPath.selectNodes( root );
+        }
+        catch ( JDOMException e )
+        {
+            throw new RESTLightClientException( "XPath selection failed: '" + xPath + "' (Root node: " + root.getName()
+                + ").", e );
+        }
+
+        return (List<Element>) ( elements == null ? Collections.emptyList() : elements );
+    }
 }

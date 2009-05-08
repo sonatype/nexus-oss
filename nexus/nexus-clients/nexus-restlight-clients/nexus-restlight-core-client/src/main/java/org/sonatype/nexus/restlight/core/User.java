@@ -15,7 +15,7 @@ public class User
 
     private String status;
 
-    private boolean userManaged;
+    private boolean userManaged = true;
 
     private List<String> roles = new ArrayList<String>();
 
