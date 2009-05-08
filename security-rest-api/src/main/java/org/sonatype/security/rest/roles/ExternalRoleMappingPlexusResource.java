@@ -39,9 +39,6 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 public class ExternalRoleMappingPlexusResource
     extends AbstractRolePlexusResource
 {
-    @Requirement
-    private SecuritySystem securitySystem;
-
     public static final String SOURCE_ID_KEY = "sourceId";
 
     @Override
@@ -71,7 +68,7 @@ public class ExternalRoleMappingPlexusResource
         try
         {
             // get roles for the source
-            Set<Role> roles = this.securitySystem.listRoles( source );
+            Set<Role> roles = this.getSecuritySystem().listRoles( source );
 
             if ( roles == null )
             {
@@ -79,7 +76,7 @@ public class ExternalRoleMappingPlexusResource
                     + "' could not be found." );
             }
 
-            Set<Role> defaultRoles = this.securitySystem.listRoles( SecurityXmlUserManager.SOURCE );
+            Set<Role> defaultRoles = this.getSecuritySystem().listRoles( SecurityXmlUserManager.SOURCE );
 
             Map<Role, Set<Role>> roleMap = new HashMap<Role, Set<Role>>();
 

@@ -92,7 +92,7 @@ public class DefaultSecuritySystem
     {
         try
         {
-           return this.securityManager.authenticate( token );
+            return this.securityManager.authenticate( token );
         }
         catch ( org.jsecurity.authc.AuthenticationException e )
         {
@@ -213,6 +213,21 @@ public class DefaultSecuritySystem
         AuthorizationManager authzManager = this.getAuthorizationManager( sourceId );
         return authzManager.listRoles();
     }
+    
+    public Set<Privilege> listPrivileges()
+    {
+        Set<Privilege> privileges = new HashSet<Privilege>();
+        for ( AuthorizationManager authzManager : this.authorizationManagers.values() )
+        {
+            Set<Privilege> tmpPrivileges = authzManager.listPrivileges();
+            if ( tmpPrivileges != null )
+            {
+                privileges.addAll( tmpPrivileges );
+            }
+        }
+
+        return privileges;
+    }
 
     // *********************
     // * user management
@@ -243,12 +258,13 @@ public class DefaultSecuritySystem
         // first save the user
         // this is the UserManager that owns the user
         UserManager userManager = this.getUserManager( user.getSource() );
-        
-        if( !userManager.supportsWrite() )
+
+        if ( !userManager.supportsWrite() )
         {
-            throw new InvalidConfigurationException( "UserManager: "+ userManager.getSource() +" does not support writing." );
+            throw new InvalidConfigurationException( "UserManager: " + userManager.getSource()
+                + " does not support writing." );
         }
-        
+
         userManager.addUser( user, password );
 
         // then save the users Roles
@@ -262,9 +278,8 @@ public class DefaultSecuritySystem
                 try
                 {
                     RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
-                    roleMappingUserManager.setUsersRoles( user.getUserId(), user.getSource(), RoleIdentifier.getRoleIdentifiersForSource(
-                        user.getSource(),
-                        user.getRoles() ) );
+                    roleMappingUserManager.setUsersRoles( user.getUserId(), user.getSource(), RoleIdentifier
+                        .getRoleIdentifiersForSource( user.getSource(), user.getRoles() ) );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -286,11 +301,12 @@ public class DefaultSecuritySystem
         // this is the UserManager that owns the user
         UserManager userManager = this.getUserManager( user.getSource() );
 
-        if( !userManager.supportsWrite() )
+        if ( !userManager.supportsWrite() )
         {
-            throw new InvalidConfigurationException( "UserManager: "+ userManager.getSource() +" does not support writing." );
+            throw new InvalidConfigurationException( "UserManager: " + userManager.getSource()
+                + " does not support writing." );
         }
-        
+
         userManager.updateUser( user );
 
         // then save the users Roles
@@ -304,9 +320,8 @@ public class DefaultSecuritySystem
                 try
                 {
                     RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
-                    roleMappingUserManager.setUsersRoles( user.getUserId(), user.getSource(), RoleIdentifier.getRoleIdentifiersForSource(
-                        user.getSource(),
-                        user.getRoles() ) );
+                    roleMappingUserManager.setUsersRoles( user.getUserId(), user.getSource(), RoleIdentifier
+                        .getRoleIdentifiersForSource( user.getSource(), user.getRoles() ) );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -351,7 +366,8 @@ public class DefaultSecuritySystem
     }
 
     public void setUsersRoles( String userId, String source, Set<RoleIdentifier> roleIdentifiers )
-        throws InvalidConfigurationException, UserNotFoundException
+        throws InvalidConfigurationException,
+            UserNotFoundException
     {
         // TODO: this is a bit sticky, what we really want to do is just expose the RoleMappingUserManagers this way (i
         // think), maybe this is to generic
@@ -724,61 +740,43 @@ public class DefaultSecuritySystem
         return this.securityEmailer;
     }
 
-    public Set<Privilege> listPrivileges()
+    public List<String> getRealms()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return new ArrayList<String>( this.securityConfiguration.getRealms() );
     }
 
-    public Role addRole( Role role, String source )
+    public void setRealms( List<String> realms )
+        throws InvalidConfigurationException
     {
-        // TODO Auto-generated method stub
-        return null;
+        this.securityConfiguration.setRealms( realms );
+
+        // update the realms in the security manager
+        this.securityManager.setRealms( this.getRealmsFromConfigSource() );
     }
 
-    public void deletePrivilege( String privilegeId, String source )
-        throws NoSuchPrivilegeException
+    public void setAnonymousAccessEnabled( boolean enabled )
     {
-        // TODO Auto-generated method stub
-
+        this.securityConfiguration.setAnonymousAccessEnabled( enabled );
     }
 
-    public void deleteRole( String roleId, String source )
-        throws NoSuchRoleException
+    public void setAnonymousUsername( String anonymousUsername )
+        throws InvalidConfigurationException
     {
-        // TODO Auto-generated method stub
-
+        this.securityConfiguration.setAnonymousUsername( anonymousUsername );
     }
 
-    public Privilege getPrivilege( String privilegeId, String source )
-        throws NoSuchPrivilegeException
+    public void setSecurityEnabled( boolean enabled )
     {
-        // TODO Auto-generated method stub
-        return null;
+        this.securityConfiguration.setEnabled( enabled );
     }
 
-    public Role getRole( String roleId, String source )
-        throws NoSuchRoleException
+    public String getAnonymousPassword()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return this.securityConfiguration.getAnonymousPassword();
     }
 
-    public void updateRole( Role role, String source )
-        throws NoSuchRoleException
+    public void setAnonymousPassword( String anonymousPassword ) throws InvalidConfigurationException
     {
-        // TODO Auto-generated method stub
-
-    }
-
-    public List<Realm> getRealms()
-    {
-        return new ArrayList<Realm>( this.securityManager.getRealms() );
-    }
-
-    public List<Realm> setRealms( List<Realm> realms )
-    {
-        // TODO Auto-generated method stub
-        return null;
+        this.securityConfiguration.setAnonymousPassword( anonymousPassword );
     }
 }

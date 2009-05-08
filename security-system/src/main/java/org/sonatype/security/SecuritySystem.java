@@ -40,10 +40,9 @@ public interface SecuritySystem
     public Subject login( AuthenticationToken token )
         throws AuthenticationException;
 
-
     public AuthenticationInfo authenticate( AuthenticationToken token )
-    throws AuthenticationException;
-    
+        throws AuthenticationException;
+
     /**
      * Finds the current logged in user.
      * 
@@ -80,10 +79,12 @@ public interface SecuritySystem
     // public UserManager getUserManager( String sourceId );
 
     User addUser( User user )
-        throws NoSuchUserManager, InvalidConfigurationException;
+        throws NoSuchUserManager,
+            InvalidConfigurationException;
 
     User addUser( User user, String password )
-        throws NoSuchUserManager, InvalidConfigurationException;
+        throws NoSuchUserManager,
+            InvalidConfigurationException;
 
     /**
      * Get a Subject object by id
@@ -103,7 +104,8 @@ public interface SecuritySystem
 
     User updateUser( User user )
         throws UserNotFoundException,
-            NoSuchUserManager, InvalidConfigurationException;
+            NoSuchUserManager,
+            InvalidConfigurationException;
 
     void deleteUser( String userId )
         throws UserNotFoundException;
@@ -112,10 +114,14 @@ public interface SecuritySystem
         throws UserNotFoundException,
             NoSuchUserManager;
 
-    Set<RoleIdentifier> getUsersRoles(String userId, String source) throws UserNotFoundException, NoSuchUserManager;
-    
-    void setUsersRoles(String userId, String source, Set<RoleIdentifier> roleIdentifiers ) throws InvalidConfigurationException, UserNotFoundException;
-    
+    Set<RoleIdentifier> getUsersRoles( String userId, String source )
+        throws UserNotFoundException,
+            NoSuchUserManager;
+
+    void setUsersRoles( String userId, String source, Set<RoleIdentifier> roleIdentifiers )
+        throws InvalidConfigurationException,
+            UserNotFoundException;
+
     /**
      * Retrieve all Subject objects
      * 
@@ -132,45 +138,60 @@ public interface SecuritySystem
 
     // forget / change password
     void forgotPassword( String userId, String email )
-        throws UserNotFoundException, InvalidConfigurationException;
+        throws UserNotFoundException,
+            InvalidConfigurationException;
 
     void forgotUsername( String email )
         throws UserNotFoundException;
 
     void resetPassword( String userId )
-        throws UserNotFoundException, InvalidConfigurationException;
+        throws UserNotFoundException,
+            InvalidConfigurationException;
 
     void changePassword( String userId, String oldPassword, String newPassword )
         throws UserNotFoundException,
-            InvalidCredentialsException, InvalidConfigurationException;
+            InvalidCredentialsException,
+            InvalidConfigurationException;
 
     void changePassword( String userId, String newPassword )
-        throws UserNotFoundException, InvalidConfigurationException;
+        throws UserNotFoundException,
+            InvalidConfigurationException;
 
     // //
     // Authorization Management
     // //
     public Set<Privilege> listPrivileges();
-    
-    public AuthorizationManager getAuthorizationManager( String source ) throws NoSuchAuthorizationManager;
-    
+
+    public AuthorizationManager getAuthorizationManager( String source )
+        throws NoSuchAuthorizationManager;
+
     // //
     // Application configuration, TODO: I don't think all of these need to be exposed, but they currently are
     // //
 
-    List<Realm> getRealms();
-    
-    List<Realm> setRealms( List<Realm> realms );
-    
+    List<String> getRealms();
+
+    void setRealms( List<String> realms ) throws InvalidConfigurationException;
+
     boolean isAnonymousAccessEnabled();
+
+    void setAnonymousAccessEnabled( boolean enabled );
 
     String getAnonymousUsername();
 
+    void setAnonymousUsername( String anonymousUsername ) throws InvalidConfigurationException;
+    
+    String getAnonymousPassword();
+
+    void setAnonymousPassword( String anonymousPassword ) throws InvalidConfigurationException;
+
     boolean isSecurityEnabled();
+
+    void setSecurityEnabled( boolean enabled );
 
     // TODO, do we need these for something other then clearing caches on realms?
     void addSecurityEventHandler( SecurityEventHandler eventHandler );
 
     boolean removeSecurityEventHandler( SecurityEventHandler eventHandler );
-    
+
 }

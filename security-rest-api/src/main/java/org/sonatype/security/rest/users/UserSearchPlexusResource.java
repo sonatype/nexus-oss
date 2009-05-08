@@ -38,9 +38,6 @@ public class UserSearchPlexusResource
 
     public static final String USER_SOURCE_KEY = "userSource";
 
-    @Requirement
-    private SecuritySystem securitySystem;
-
     public UserSearchPlexusResource()
     {
         setModifiable( true );
@@ -88,7 +85,7 @@ public class UserSearchPlexusResource
         {
             Set<String> roleIds = new HashSet<String>();
 
-            for ( Role role : securitySystem.listRoles() )
+            for ( Role role : this.getSecuritySystem().listRoles() )
             {
                 roleIds.add( role.getRoleId() );
             }

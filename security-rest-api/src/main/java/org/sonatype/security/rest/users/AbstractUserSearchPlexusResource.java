@@ -26,9 +26,6 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 public abstract class AbstractUserSearchPlexusResource
     extends AbstractSecurityPlexusResource
 {
-    @Requirement
-    private SecuritySystem securitySystem;
-
     public static final String USER_SOURCE_KEY = "userSource";
 
     protected String getUserSource( Request request )
@@ -40,7 +37,7 @@ public abstract class AbstractUserSearchPlexusResource
     {
         PlexusUserListResourceResponse result = new PlexusUserListResourceResponse();
         
-        Set<User> users = securitySystem.searchUsers( criteria );
+        Set<User> users = this.getSecuritySystem().searchUsers( criteria );
         
         for ( User user : users )
         {

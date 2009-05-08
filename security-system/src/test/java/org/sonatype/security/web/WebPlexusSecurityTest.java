@@ -16,6 +16,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.jsecurity.mgt.RealmSecurityManager;
 import org.jsecurity.realm.CachingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.realm.SimpleAccountRealm;
@@ -29,29 +30,32 @@ public class WebPlexusSecurityTest
     public void testCacheManagerInit()
         throws Exception
     {
-        // this is a singleton
+        // Start up security
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
-
-        List<Realm> realms = securitySystem.getRealms();
+        
+        RealmSecurityManager realmSecurityManager = this.lookup( RealmSecurityManager.class );
+        
+        List<String> realms = securitySystem.getRealms();
         realms.clear();
-        realms.add( new SimpleAccountRealm() );
+        realms.add( SimpleAccountRealm.class.getName() );
         securitySystem.setRealms( realms );
 
         // now if we grab one of the realms from the Realm locator, it should have its cache set
-        CachingRealm cRealm1 = (CachingRealm) securitySystem.getRealms().get( 0 );
+        CachingRealm cRealm1 = (CachingRealm) realmSecurityManager.getRealms().iterator().next();
         Assert.assertNotNull( "Realm has null cacheManager", cRealm1.getCacheManager() );
 
         // // so far so good, the cacheManager should be set on all the child realms, but what if we add one after the
         // init method?
-        realms.add( new SimpleAccountRealm() );
+        realms.add( SimpleAccountRealm.class.getName() );
         securitySystem.setRealms( realms );
-        CachingRealm cRealm2 = (CachingRealm) securitySystem.getRealms().get( 1 );
-        Assert.assertNotNull( "Realm has null cacheManager", cRealm2.getCacheManager() );
-
-        // and just for kicks try the first one again
-        cRealm1 = (CachingRealm) securitySystem.getRealms().get( 0 );
-        Assert.assertNotNull( "Realm has null cacheManager", cRealm1.getCacheManager() );
-
+        
+        // this list should have exactly 2 elements
+        Assert.assertEquals( 2, realmSecurityManager.getRealms().size() );
+        
+        for ( Realm realm : realmSecurityManager.getRealms() )
+        {
+            Assert.assertNotNull( "Realm has null cacheManager", ((CachingRealm) realm).getCacheManager() );
+        }
     }
 
 }

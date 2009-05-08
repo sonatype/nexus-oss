@@ -34,9 +34,6 @@ public class PlexusUserListPlexusResource
 {
     public static final String USER_SOURCE_KEY = "userSource";
     
-    @Requirement
-    private SecuritySystem securitySystem;
-    
     public PlexusUserListPlexusResource()
     {
         setModifiable( false );
@@ -66,7 +63,7 @@ public class PlexusUserListPlexusResource
     {
         PlexusUserListResourceResponse result = new PlexusUserListResourceResponse();
         
-        for ( User user : this.securitySystem.searchUsers( new UserSearchCriteria( null, null, getUserSource( request ) ) ))
+        for ( User user : this.getSecuritySystem().searchUsers( new UserSearchCriteria( null, null, getUserSource( request ) ) ))
         {
             PlexusUserResource res = securityToRestModel( user );
 
