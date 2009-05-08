@@ -49,7 +49,6 @@ import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentGenerator;
@@ -91,7 +90,7 @@ import org.sonatype.plexus.appevents.EventListener;
  * </ul>
  * <p>
  * The subclasses only needs to implement the abstract method focusing on item retrieaval and other "basic" functions.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractRepository
@@ -140,13 +139,16 @@ public abstract class AbstractRepository
 
     // Configurable iface
 
+    @Override
     protected CRepository getCurrentConfiguration( boolean forWrite )
     {
         return (CRepository) super.getCurrentConfiguration( forWrite );
     }
 
+    @Override
     protected abstract Configurator getConfigurator();
 
+    @Override
     protected CoreConfiguration wrapConfiguration( Object configuration )
     {
         return new CRepositoryCoreConfiguration( (CRepository) configuration );
@@ -168,20 +170,7 @@ public abstract class AbstractRepository
     public void onEvent( Event<?> evt )
     {
         // act automatically on repo removal
-        if ( evt instanceof RepositoryRegistryEventRemove )
-        {
-            RepositoryRegistryEventRemove revt = (RepositoryRegistryEventRemove) evt;
-
-            if ( revt.getRepository() == this )
-            {
-                // we are being removed, unhook from event multicaster
-                applicationEventMulticaster.removeEventListener( this );
-
-                // remove ourselves from config
-                getApplicationConfiguration().getConfiguration().removeRepository( getCurrentConfiguration( false ) );
-            }
-        }
-        else if ( evt instanceof ConfigurationPrepareForSaveEvent )
+        if ( evt instanceof ConfigurationPrepareForSaveEvent )
         {
             if ( isDirty() )
             {
@@ -227,7 +216,7 @@ public abstract class AbstractRepository
 
     /**
      * Gets the cache manager.
-     * 
+     *
      * @return the cache manager
      */
     protected CacheManager getCacheManager()
@@ -237,7 +226,7 @@ public abstract class AbstractRepository
 
     /**
      * Sets the cache manager.
-     * 
+     *
      * @param cacheManager the new cache manager
      */
     protected void setCacheManager( CacheManager cacheManager )
@@ -247,7 +236,7 @@ public abstract class AbstractRepository
 
     /**
      * Gets the not found cache.
-     * 
+     *
      * @return the not found cache
      */
     public PathCache getNotFoundCache()
@@ -263,7 +252,7 @@ public abstract class AbstractRepository
 
     /**
      * Sets the not found cache.
-     * 
+     *
      * @param notFoundcache the new not found cache
      */
     public void setNotFoundCache( PathCache notFoundcache )
@@ -1084,7 +1073,7 @@ public abstract class AbstractRepository
     // Inner stuff
     /**
      * Maintains not found cache.
-     * 
+     *
      * @param path the path
      * @throws ItemNotFoundException the item not found exception
      */
@@ -1119,7 +1108,7 @@ public abstract class AbstractRepository
 
     /**
      * Adds the uid to not found cache.
-     * 
+     *
      * @param path the path
      */
     public void addToNotFoundCache( String path )
@@ -1137,7 +1126,7 @@ public abstract class AbstractRepository
 
     /**
      * Removes the uid from not found cache.
-     * 
+     *
      * @param path the path
      */
     public void removeFromNotFoundCache( String path )
@@ -1155,7 +1144,7 @@ public abstract class AbstractRepository
 
     /**
      * Check conditions, such as availability, permissions, etc.
-     * 
+     *
      * @param request the request
      * @param permission the permission
      * @return false, if the request should not be processed with response appropriate for current method, or true is
