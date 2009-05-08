@@ -19,7 +19,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
@@ -50,10 +49,15 @@ public class Nexus383SearchTest
         this.messageUtil = new SearchMessageUtil();
     }
 
-    @Before
-    public void waitForTasks()
+    @Override
+    protected void runOnce()
         throws Exception
     {
+        super.runOnce();
+
+        RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_RELEASE_REPO, NEXUS_TEST_HARNESS_REPO2,
+                                             NEXUS_TEST_HARNESS_REPO );
+
         TaskScheduleUtil.waitForTasks();
     }
 
@@ -94,11 +98,11 @@ public class Nexus383SearchTest
         throws Exception
     {
         // know-artifact-1
-        NexusArtifact result = messageUtil.searchForSHA1( "2e4213cd44e95dd306a74ba002ed1fa1282f0a51" );
+        NexusArtifact result = messageUtil.searchForSHA1( "4ce1d96bd11b8959b32a75c1fa5b738d7b87d408" );
         Assert.assertNotNull( result );
 
         // know-artifact-2
-        result = messageUtil.searchForSHA1( "807f665cd73a2e62e169453e5af4cd5241b9a232" );
+        result = messageUtil.searchForSHA1( "230377663ac3b19ad83c99b0afdb056dd580c5c8" );
         Assert.assertNotNull( result );
 
         // velo's picture
@@ -219,6 +223,8 @@ public class Nexus383SearchTest
 
         RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,
                                              NEXUS_TEST_HARNESS_RELEASE_REPO );
+
+        TaskScheduleUtil.waitForTasks();
 
         List<NexusArtifact> results = messageUtil.searchFor( "crossArtifact" );
         Assert.assertEquals( 3, results.size() );

@@ -71,13 +71,15 @@ public class SearchMessageUtil
         }
         else
         {
-            serviceURI = new StringBuffer( "service/local/data_index/repositories/" + repositoryId + "?");
+            serviceURI = new StringBuffer( "service/local/data_index/repositories/" + repositoryId + "?" );
         }
 
         for ( Entry<String, String> entry : queryArgs.entrySet() )
         {
             serviceURI.append( entry.getKey() ).append( "=" ).append( entry.getValue() ).append( "&" );
         }
+
+        log.info( "Search serviceURI " + serviceURI );
 
         return RequestFacade.doGetRequest( serviceURI.toString() );
     }
@@ -113,13 +115,17 @@ public class SearchMessageUtil
     public NexusArtifact searchForSHA1( String sha1 )
         throws Exception
     {
-//        http://localhost:4495/nexus/service/local/data_index?_dc=1236186182435&from=0&count=50&sha1=2e4213cd44e95dd306a74ba002ed1fa1282f0a51
+        // http://localhost:4495/nexus/service/local/data_index?_dc=1236186182435&from=0&count=50&sha1=2e4213cd44e95dd306a74ba002ed1fa1282f0a51
         HashMap<String, String> queryArgs = new HashMap<String, String>();
         queryArgs.put( "sha1", sha1 );
         List<NexusArtifact> result = searchFor( queryArgs );
 
-        Assert.assertEquals( 1, result.size() );
-        return result.get( 0 );
+        if ( result.size() == 1 )
+        {
+            return result.get( 0 );
+        }
+
+        return null;
     }
 
     public void allowBrowsing( String repositoryName, boolean allowBrowsing )

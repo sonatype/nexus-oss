@@ -27,6 +27,7 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.test.utils.ChangePasswordUtils;
+import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
