@@ -25,7 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.subject.Subject;
 import org.jsecurity.web.filter.authz.PermissionsAuthorizationFilter;
 import org.sonatype.nexus.Nexus;
@@ -50,8 +49,6 @@ public class HttpVerbMappingAuthorizationFilter
     private final Log logger = LogFactory.getLog( this.getClass() );
 
     private AuthcAuthzEvent currentAuthzEvt;
-    
-    private RemoteIPFinder ipFinder;
 
     private Map<String, String> mapping = new HashMap<String, String>();
     {
@@ -203,16 +200,11 @@ public class HttpVerbMappingAuthorizationFilter
         
         if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
         {
-            RemoteIPFinder finder = getIPFinder();
+            String ip = RemoteIPFinder.findIP( ( HttpServletRequest ) request );
             
-            if ( finder != null )
+            if ( ip != null )
             {
-                String ip = finder.findIP( ( HttpServletRequest ) request );
-                
-                if ( ip != null )
-                {
-                    authzEvt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
-                }
+                authzEvt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
             }
         }
 
@@ -223,23 +215,6 @@ public class HttpVerbMappingAuthorizationFilter
         }
 
         currentAuthzEvt = authzEvt;
-    }
-    
-    private RemoteIPFinder getIPFinder()
-    {
-        if ( this.ipFinder == null )
-        {
-            try
-            {
-                ipFinder = getPlexusContainer().lookup( RemoteIPFinder.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                getLogger().error( "Unable to lookup remote IP finder", e );
-            }
-        }
-        
-        return ipFinder;
     }
 
     private boolean isSimilarEvent( String msg )

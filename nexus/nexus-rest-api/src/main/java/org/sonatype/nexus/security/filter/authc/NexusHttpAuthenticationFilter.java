@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.ExpiredCredentialsException;
@@ -55,8 +54,6 @@ public class NexusHttpAuthenticationFilter
     private boolean fakeAuthScheme;
 
     private AuthcAuthzEvent currentAuthcEvt;
-    
-    private RemoteIPFinder ipFinder;
 
     protected Log getLogger()
     {
@@ -262,39 +259,17 @@ public class NexusHttpAuthenticationFilter
         
         if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
         {
-            RemoteIPFinder finder = getIPFinder();
+            String ip = RemoteIPFinder.findIP( ( HttpServletRequest ) request );
             
-            if ( finder != null )
+            if ( ip != null )
             {
-                String ip = finder.findIP( ( HttpServletRequest ) request );
-                
-                if ( ip != null )
-                {
-                    evt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
-                }
+                evt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
             }
         }
 
         getNexus().addAuthcAuthzEvent( evt );
 
         currentAuthcEvt = evt;
-    }
-    
-    private RemoteIPFinder getIPFinder()
-    {
-        if ( this.ipFinder == null )
-        {
-            try
-            {
-                ipFinder = getPlexusContainer().lookup( RemoteIPFinder.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                getLogger().error( "Unable to lookup remote IP finder", e );
-            }
-        }
-        
-        return ipFinder;
     }
 
     private boolean isSimilarEvent( String msg )
