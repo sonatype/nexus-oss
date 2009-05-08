@@ -12,7 +12,9 @@
  */
 package org.sonatype.security.rest;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Reference;
@@ -115,12 +117,14 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         user.setStatus( UserStatus.valueOf( resource.getStatus() ) );
         user.setUserId( resource.getUserId() );
 
-        user.getRoles().clear();
+        Set<RoleIdentifier> roles = new HashSet<RoleIdentifier>();
         for ( String roleId : (List<String>) resource.getRoles() )
         {
-            user.addRole( new RoleIdentifier( DEFAULT_SOURCE, roleId ) );
+            roles.add( new RoleIdentifier( DEFAULT_SOURCE, roleId ) );
         }
 
+        user.addAllRoles( roles );
+        
         return user;
     }
     
