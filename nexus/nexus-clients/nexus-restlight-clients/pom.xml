@@ -19,6 +19,7 @@
     <module>nexus-restlight-stage-client</module>
     <module>nexus-restlight-m2-settings-client</module>
     <module>nexus-restlight-test-harness</module>
+    <module>nexus-restlight-core-client</module>
   </modules>
   
   <dependencyManagement>

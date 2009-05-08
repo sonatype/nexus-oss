@@ -1,0 +1,14 @@
+<user-response>
+  <data>
+    <resourceURI>http://localhost:8081/nexus/service/local/users/deployment</resourceURI>
+    <userId>deployment</userId>
+    <name>Deployment User</name>
+    <status>active</status>
+    <email>changeme1@yourcompany.com</email>
+    <roles>
+      <role>deployment</role>
+      <role>repo-all-full</role>
+    </roles>
+    <userManaged>true</userManaged>
+  </data>
+</user-response>

@@ -1,0 +1,36 @@
+<users-list>
+  <data>
+    <users-list-item>
+      <resourceURI>http://localhost:8081/nexus/service/local/users/admin</resourceURI>
+      <userId>admin</userId>
+      <name>Administrator</name>
+      <status>active</status>
+      <email>changeme@yourcompany.com</email>
+      <userManaged>true</userManaged>
+    </users-list-item>
+    <users-list-item>
+      <resourceURI>http://localhost:8081/nexus/service/local/users/deployment</resourceURI>
+      <userId>deployment</userId>
+      <name>Deployment User</name>
+      <status>active</status>
+      <email>changeme1@yourcompany.com</email>
+      <userManaged>true</userManaged>
+    </users-list-item>
+    <users-list-item>
+      <resourceURI>http://localhost:8081/nexus/service/local/users/anonymous</resourceURI>
+      <userId>anonymous</userId>
+      <name>Nexus Anonynmous User</name>
+      <status>active</status>
+      <email>changeme2@yourcompany.com</email>
+      <userManaged>true</userManaged>
+    </users-list-item>
+    <users-list-item>
+      <resourceURI>http://localhost:8081/nexus/service/local/users/sdfg</resourceURI>
+      <userId>sdfg</userId>
+      <name>sdfg</name>
+      <status>active</status>
+      <email>sdfg@sdf.com</email>
+      <userManaged>true</userManaged>
+    </users-list-item>
+  </data>
+</users-list>
