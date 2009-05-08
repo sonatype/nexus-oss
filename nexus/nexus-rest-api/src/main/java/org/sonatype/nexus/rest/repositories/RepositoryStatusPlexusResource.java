@@ -31,6 +31,7 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.RepositoryDependentStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
+import org.sonatype.nexus.rest.util.EnumUtil;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -129,12 +130,13 @@ public class RepositoryStatusPlexusResource
                     throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Local status must be defined" );
                 }
 
+                LocalStatus localStatus = EnumUtil.valueOf( resource.getLocalStatus(), LocalStatus.class );
                 if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
                 {
                     ShadowRepository shadow =
                         getRepositoryRegistry().getRepositoryWithFacet( repoId, ShadowRepository.class );
 
-                    shadow.setLocalStatus( LocalStatus.valueOf( resource.getLocalStatus() ) );
+                    shadow.setLocalStatus( localStatus );
 
                     result = (RepositoryStatusResourceResponse) this.get( context, request, response, null );
                 }
@@ -142,13 +144,13 @@ public class RepositoryStatusPlexusResource
                 {
                     Repository repository = getRepositoryRegistry().getRepository( repoId );
 
-                    repository.setLocalStatus( LocalStatus.valueOf( resource.getLocalStatus() ) );
+                    repository.setLocalStatus( localStatus );
 
                     if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class )
                         && resource.getProxyMode() != null )
                     {
-                        repository.adaptToFacet( ProxyRepository.class ).setProxyMode(
-                                                                                       ProxyMode.valueOf( resource.getProxyMode() ) );
+                        ProxyMode proxyMode = EnumUtil.valueOf( resource.getProxyMode(), ProxyMode.class );
+                        repository.adaptToFacet( ProxyRepository.class ).setProxyMode( proxyMode );
                     }
 
                     // update dependant shadows too
@@ -157,7 +159,7 @@ public class RepositoryStatusPlexusResource
                     {
                         if ( repository.getId().equals( shadow.getMasterRepositoryId() ) )
                         {
-                            shadow.setLocalStatus( LocalStatus.valueOf( resource.getLocalStatus() ) );
+                            shadow.setLocalStatus( localStatus );
                         }
                     }
 
