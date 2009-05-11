@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -194,6 +195,10 @@ public abstract class AbstractProxyRepository
 
             getCurrentConfiguration( true ).getRemoteStorage().setUrl( trstr );
         }
+        else
+        {
+            throw new StorageException( "No remote storage set, hence cannot set remoteUrl!" );
+        }
     }
 
     /**
@@ -333,7 +338,7 @@ public abstract class AbstractProxyRepository
     public void setRemoteStorageContext( RemoteStorageContext remoteStorageContext )
     {
         this.remoteStorageContext = remoteStorageContext;
-        
+
         if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
         {
             // perm changes? retry if autoBlocked
@@ -398,6 +403,15 @@ public abstract class AbstractProxyRepository
         if ( remoteStorage == null )
         {
             getCurrentConfiguration( true ).setRemoteStorage( null );
+        }
+        else
+        {
+            if ( getCurrentConfiguration( true ).getRemoteStorage() == null )
+            {
+                getCurrentConfiguration( true ).setRemoteStorage( new CRemoteStorage() );
+            }
+
+            getCurrentConfiguration( true ).getRemoteStorage().setProvider( remoteStorage.getProviderId() );
         }
 
         setAllowWrite( remoteStorage == null );
