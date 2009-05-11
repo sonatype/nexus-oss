@@ -30,6 +30,7 @@ import org.sonatype.security.rest.model.UserResourceRequest;
 import org.sonatype.security.rest.model.UserResourceResponse;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 /**
  * @author tstevens
@@ -68,7 +69,7 @@ public class UserListPlexusResource
     {
         UserListResourceResponse result = new UserListResourceResponse();
 
-        for ( User user : getSecuritySystem().listUsers() )
+        for ( User user : getSecuritySystem().searchUsers( new UserSearchCriteria(null, null, DEFAULT_SOURCE) ) )
         {
             UserResource res = securityToRestModel( user, request );
 
@@ -92,10 +93,10 @@ public class UserListPlexusResource
         {
             UserResource resource = requestResource.getData();
 
-            User user = restToSecurityModel( null, resource );
-
             try
             {
+                User user = restToSecurityModel( null, resource );
+                
                 validateUserContainment( user );
                 
                 String password = resource.getPassword();

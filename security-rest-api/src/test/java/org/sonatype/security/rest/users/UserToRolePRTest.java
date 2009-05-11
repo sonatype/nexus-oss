@@ -35,14 +35,8 @@ import org.sonatype.security.rest.model.UserToRoleResource;
 import org.sonatype.security.rest.model.UserToRoleResourceRequest;
 
 public class UserToRolePRTest
-    extends PlexusTestCase
+    extends AbstractSecurityRestTest
 {
-
-    private static final String REALM_KEY = new MockUserManager().getSource();
-
-    private static final String NEXUS_WORK = "target/UserToRolePRTest";
-
-    private static final String TEST_CONFIG = "target/test-classes/"+UserToRolePRTest.class.getName().replaceAll( "\\.", "\\/" ) +"-security.xml";
 
     private UserToRolePlexusResource getResource()
         throws Exception
@@ -269,28 +263,6 @@ public class UserToRolePRTest
             Assert.assertEquals( 404, e.getStatus().getCode() );
         }
 
-    }
-
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        FileUtils.copyFile( new File( TEST_CONFIG ), new File( NEXUS_WORK, "/conf/security.xml" ) );
-        
-        // start security
-        this.lookup( SecuritySystem.class );
-    }
-
-    @Override
-    protected void customizeContext( Context context )
-    {
-        super.customizeContext( context );
-
-        context.put( "nexus-work", NEXUS_WORK );
-        context.put( "security-xml-file", NEXUS_WORK + "/conf/security.xml" );
-        context.put( "application-conf", NEXUS_WORK + "/conf/" );
     }
 
 }

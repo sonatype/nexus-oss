@@ -21,6 +21,7 @@ import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
+import org.sonatype.security.usermanagement.UserStatus;
 
 public class MockUserManager extends AbstractReadOnlyUserManager
 {
@@ -38,6 +39,7 @@ public class MockUserManager extends AbstractReadOnlyUserManager
         a.setEmailAddress( "jcoder@sonatype.org" );
         a.setSource( this.getSource() );
         a.setUserId( "jcoder" );
+        a.setStatus( UserStatus.active );
         a.addRole( this.createFakeRole( "Role1" ) );
         a.addRole( this.createFakeRole( "Role2" ) );
         a.addRole( this.createFakeRole( "Role3" ) );
@@ -47,6 +49,7 @@ public class MockUserManager extends AbstractReadOnlyUserManager
         b.setEmailAddress( "cdugas@sonatype.org" );
         b.setSource( this.getSource() );
         b.setUserId( "cdugas" );
+        b.setStatus( UserStatus.active );
         b.addRole( this.createFakeRole( "Role2" ) );
         b.addRole( this.createFakeRole( "Role3" ) );
 
@@ -55,6 +58,7 @@ public class MockUserManager extends AbstractReadOnlyUserManager
         c.setEmailAddress( "pperalez@sonatype.org" );
         c.setSource( this.getSource() );
         c.setUserId( "pperalez" );
+        c.setStatus( UserStatus.active );
         c.addRole( this.createFakeRole( "Role1" ) );
         c.addRole( this.createFakeRole( "Role2" ) );
 
@@ -63,6 +67,7 @@ public class MockUserManager extends AbstractReadOnlyUserManager
         d.setEmailAddress( "dknudsen@sonatype.org" );
         d.setSource( this.getSource() );
         d.setUserId( "dknudsen" );
+        d.setStatus( UserStatus.active );
         d.addRole( this.createFakeRole( "Role4" ) );
         d.addRole( this.createFakeRole( "Role2" ) );
 

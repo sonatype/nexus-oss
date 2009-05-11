@@ -21,6 +21,7 @@ import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationContext;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.plexus.rest.ReferenceFactory;
@@ -105,17 +106,23 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         return resource;
     }
 
-    protected User restToSecurityModel( User user, UserResource resource )
+    protected User restToSecurityModel( User user, UserResource resource ) throws InvalidConfigurationException
     {
         if ( user == null )
         {
             user = new DefaultUser();
         }
 
+        // validate users Status, converting to an ENUM throws an exception, so we need to explicitly check it
+        this.checkUsersStatus( resource.getStatus() );
+        
         user.setEmailAddress( resource.getEmail() );
         user.setName( resource.getName() );
         user.setStatus( UserStatus.valueOf( resource.getStatus() ) );
         user.setUserId( resource.getUserId() );
+        
+        // set the users source
+        user.setSource( DEFAULT_SOURCE );
 
         Set<RoleIdentifier> roles = new HashSet<RoleIdentifier>();
         for ( String roleId : (List<String>) resource.getRoles() )
@@ -174,6 +181,25 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
     protected Reference createChildReference( Request request, String childPath )
     {
         return this.referenceFactory.createChildReference( request, childPath );
+    }
+    
+    protected void checkUsersStatus(String status) throws InvalidConfigurationException
+    {
+        boolean found = false;
+        for ( UserStatus userStatus : UserStatus.values() )
+        {
+            if( userStatus.name().equals( status ))
+            {
+                found = true;
+            }
+        }
+        
+        if( !found )
+        {
+            ValidationResponse<ValidationContext> response = new ValidationResponse<ValidationContext>();
+            response.addValidationError( new ValidationMessage("status", "Users status is not valid.") );
+            throw new InvalidConfigurationException(response);
+        }
     }
     
 }
