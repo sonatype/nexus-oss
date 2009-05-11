@@ -3,6 +3,7 @@ package org.sonatype.security;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +15,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.UsernamePasswordToken;
@@ -213,7 +215,7 @@ public class DefaultSecuritySystem
         AuthorizationManager authzManager = this.getAuthorizationManager( sourceId );
         return authzManager.listRoles();
     }
-    
+
     public Set<Privilege> listPrivileges()
     {
         Set<Privilege> privileges = new HashSet<Privilege>();
@@ -255,6 +257,12 @@ public class DefaultSecuritySystem
         throws NoSuchUserManager,
             InvalidConfigurationException
     {
+        // if the password is null, generate one
+        if ( password == null )
+        {
+            password = this.generatePassword();
+        }
+
         // first save the user
         // this is the UserManager that owns the user
         UserManager userManager = this.getUserManager( user.getSource() );
@@ -475,6 +483,20 @@ public class DefaultSecuritySystem
         for ( UserManager tmpUserManager : this.userManagerMap.values() )
         {
             users.addAll( tmpUserManager.searchUsers( criteria ) );
+        }
+
+        // now check for broken UserManagers (not filter on the source)
+        // we cannot assume all of the pluggable UserManager will do the correct thing
+        if ( StringUtils.isNotEmpty( criteria.getSource() ) )
+        {
+            for ( Iterator<User> iterator = users.iterator(); iterator.hasNext(); )
+            {
+                User user = iterator.next();
+                if ( criteria.equals( user.getSource() ) )
+                {
+                    iterator.remove();
+                }
+            }
         }
 
         // now add all the roles to the users
@@ -775,7 +797,8 @@ public class DefaultSecuritySystem
         return this.securityConfiguration.getAnonymousPassword();
     }
 
-    public void setAnonymousPassword( String anonymousPassword ) throws InvalidConfigurationException
+    public void setAnonymousPassword( String anonymousPassword )
+        throws InvalidConfigurationException
     {
         this.securityConfiguration.setAnonymousPassword( anonymousPassword );
     }

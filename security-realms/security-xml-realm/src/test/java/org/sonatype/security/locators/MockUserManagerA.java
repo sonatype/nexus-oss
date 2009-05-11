@@ -22,6 +22,7 @@ import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.security.usermanagement.UserStatus;
 
 @Component(role=UserManager.class, hint="MockUserLocatorA")
 public class MockUserManagerA
@@ -42,6 +43,7 @@ public class MockUserManagerA
         a.setEmailAddress( "jcoder@sonatype.org" );
         a.setSource( this.getSource() );
         a.setUserId( "jcoder" );
+        a.setStatus( UserStatus.active );
         a.addRole( this.createFakeRole( "RoleA" ) );
         a.addRole( this.createFakeRole( "RoleB" ) );
         a.addRole( this.createFakeRole( "RoleC" ) );
@@ -51,6 +53,7 @@ public class MockUserManagerA
         b.setEmailAddress( "cdugas@sonatype.org" );
         b.setSource( this.getSource() );
         b.setUserId( "cdugas" );
+        b.setStatus( UserStatus.active );
         b.addRole( this.createFakeRole( "RoleA" ) );
         b.addRole( this.createFakeRole( "RoleB" ) );
         b.addRole( this.createFakeRole( "Role1" ) );
@@ -60,12 +63,14 @@ public class MockUserManagerA
         c.setEmailAddress( "pperalez@sonatype.org" );
         c.setSource( this.getSource() );
         c.setUserId( "pperalez" );
+        c.setStatus( UserStatus.active );
 
         DefaultUser d = new DefaultUser();
         d.setName( "Danille S. Knudsen" );
         d.setEmailAddress( "dknudsen@sonatype.org" );
         d.setSource( this.getSource() );
         d.setUserId( "dknudsen" );
+        d.setStatus( UserStatus.active );
         
         users.add( a );
         users.add( b );

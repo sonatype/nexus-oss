@@ -14,7 +14,10 @@ import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserStatus;
 
 public class DefaultSecuritySystemTest
     extends AbstractSecurityTest
@@ -111,7 +114,7 @@ public class DefaultSecuritySystemTest
     {
         SecuritySystem securitySystem = this.getSecuritySystem();
 
-        Set<Role> roles = securitySystem.listRoles("sourceB");
+        Set<Role> roles = securitySystem.listRoles( "sourceB" );
         Assert.assertEquals( 2, roles.size() );
 
         Map<String, Role> roleMap = new HashMap<String, Role>();
@@ -129,6 +132,24 @@ public class DefaultSecuritySystemTest
         Assert.assertTrue( role1.getPermissions().contains( "from-role1:read" ) );
         Assert.assertTrue( role1.getPermissions().contains( "from-role1:delete" ) );
 
+    }
+
+    public void testAddUser() throws Exception
+    {
+        SecuritySystem securitySystem = this.getSecuritySystem();
+
+        User user = new DefaultUser();
+        user.setEmailAddress( "email@foo.com" );
+        user.setName( "testAddUser" );
+        user.setReadOnly( false );
+        user.setSource( "MockUserManagerA" );
+        user.setStatus( UserStatus.active );
+        user.setUserId( "testAddUser" );
+
+        user.addRole( new RoleIdentifier( "default", "test-role1" ) );
+
+        Assert.assertNotNull( securitySystem.addUser( user ) );
+        
     }
 
 }

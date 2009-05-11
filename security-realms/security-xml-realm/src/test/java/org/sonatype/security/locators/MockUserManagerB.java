@@ -22,6 +22,7 @@ import org.sonatype.security.authorization.Role;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserStatus;
 
 @Component(role=UserManager.class, hint="MockUserLocatorB")
 public class MockUserManagerB
@@ -42,6 +43,7 @@ public class MockUserManagerB
         a.setEmailAddress( "bburton@sonatype.org" );
         a.setSource( this.getSource() );
         a.setUserId( "bburton" );
+        a.setStatus( UserStatus.active );
         a.addRole( this.createFakeRole( "RoleA" ) );
         a.addRole( this.createFakeRole( "RoleB" ) );
         a.addRole( this.createFakeRole( "RoleC" ) );
@@ -51,6 +53,7 @@ public class MockUserManagerB
         b.setEmailAddress( "jblevins@sonatype.org" );
         b.setSource( this.getSource() );
         b.setUserId( "jblevins" );
+        b.setStatus( UserStatus.active );
         b.addRole( this.createFakeRole( "RoleA" ) );
         b.addRole( this.createFakeRole( "RoleB" ) );
         
@@ -59,6 +62,7 @@ public class MockUserManagerB
         c.setEmailAddress( "ksimmons@sonatype.org" );
         c.setSource( this.getSource() );
         c.setUserId( "ksimmons" );
+        c.setStatus( UserStatus.active );
         c.addRole( this.createFakeRole( "RoleA" ) );
         c.addRole( this.createFakeRole( "RoleB" ) );
 
@@ -67,6 +71,7 @@ public class MockUserManagerB
         d.setEmailAddress( "fdahmen@sonatype.org" );
         d.setSource( this.getSource() );
         d.setUserId( "fdahmen" );
+        d.setStatus( UserStatus.active );
         d.addRole( this.createFakeRole( "RoleA" ) );
         d.addRole( this.createFakeRole( "RoleB" ) );
         
@@ -75,6 +80,7 @@ public class MockUserManagerB
         e.setEmailAddress( "jcodar@sonatype.org" );
         e.setSource( this.getSource() );
         e.setUserId( "jcodar" );
+        e.setStatus( UserStatus.active );
         
 //        DefaultUser f = new DefaultUser();
 //        f.setName( "Joe Coder" );
