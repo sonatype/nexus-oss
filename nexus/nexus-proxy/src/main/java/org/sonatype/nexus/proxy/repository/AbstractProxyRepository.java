@@ -23,7 +23,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -83,6 +82,9 @@ public abstract class AbstractProxyRepository
     /** Remote storage context to store connection configs. */
     private RemoteStorageContext remoteStorageContext;
 
+    /** Proxy selector, if set */
+    private ProxySelector proxySelector;
+
     /** Item content validators */
     private Map<String, ItemContentValidator> itemContentValidators;
 
@@ -138,12 +140,8 @@ public abstract class AbstractProxyRepository
 
             if ( sendNotification && !proxyMode.equals( oldProxyMode ) )
             {
-                getApplicationEventMulticaster().notifyEventListeners(
-                                                                                new RepositoryEventProxyModeChanged(
-                                                                                                                     this,
-                                                                                                                     oldProxyMode,
-                                                                                                                     proxyMode,
-                                                                                                                     cause ) );
+                getApplicationEventMulticaster()
+                    .notifyEventListeners( new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );
             }
         }
     }
@@ -233,13 +231,13 @@ public abstract class AbstractProxyRepository
         }
         catch ( RemoteAccessException ex )
         {
-            getLogger().warn(
-                              "RemoteStorage of repository "
-                                  + getId()
-                                  + " throws RemoteAccessException. Please set up authorization information for repository ID='"
-                                  + this.getId()
-                                  + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
-                              ex );
+            getLogger()
+                .warn(
+                       "RemoteStorage of repository "
+                           + getId()
+                           + " throws RemoteAccessException. Please set up authorization information for repository ID='"
+                           + this.getId()
+                           + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.", ex );
 
             autoBlockProxying( ex );
 
@@ -335,12 +333,57 @@ public abstract class AbstractProxyRepository
     public void setRemoteStorageContext( RemoteStorageContext remoteStorageContext )
     {
         this.remoteStorageContext = remoteStorageContext;
-
+        
         if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
         {
             // perm changes? retry if autoBlocked
             setProxyMode( ProxyMode.ALLOW );
         }
+    }
+
+    public RemoteConnectionSettings getRemoteConnectionSettings()
+    {
+        return getRemoteStorageContext().getRemoteConnectionSettings();
+    }
+
+    public void setRemoteConnectionSettings( RemoteConnectionSettings settings )
+    {
+        getRemoteStorageContext().setRemoteConnectionSettings( settings );
+    }
+
+    public RemoteAuthenticationSettings getRemoteAuthenticationSettings()
+    {
+        return getRemoteStorageContext().getRemoteAuthenticationSettings();
+    }
+
+    public void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings )
+    {
+        getRemoteStorageContext().setRemoteAuthenticationSettings( settings );
+    }
+
+    public RemoteProxySettings getRemoteProxySettings()
+    {
+        return getRemoteStorageContext().getRemoteProxySettings();
+    }
+
+    public void setRemoteProxySettings( RemoteProxySettings settings )
+    {
+        getRemoteStorageContext().setRemoteProxySettings( settings );
+    }
+
+    public ProxySelector getProxySelector()
+    {
+        if ( proxySelector == null )
+        {
+            proxySelector = new DefaultProxySelector();
+        }
+
+        return proxySelector;
+    }
+
+    public void setProxySelector( ProxySelector selector )
+    {
+        this.proxySelector = selector;
     }
 
     public RemoteRepositoryStorage getRemoteStorage()
@@ -526,13 +569,14 @@ public abstract class AbstractProxyRepository
                         }
                         catch ( RemoteAccessException ex )
                         {
-                            getLogger().warn(
-                                              "RemoteStorage of repository "
-                                                  + getId()
-                                                  + " throws RemoteAccessException. Please set up authorization information for repository ID='"
-                                                  + this.getId()
-                                                  + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
-                                              ex );
+                            getLogger()
+                                .warn(
+                                       "RemoteStorage of repository "
+                                           + getId()
+                                           + " throws RemoteAccessException. Please set up authorization information for repository ID='"
+                                           + this.getId()
+                                           + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
+                                       ex );
 
                             autoBlockProxying( ex );
 
@@ -542,13 +586,14 @@ public abstract class AbstractProxyRepository
                         }
                         catch ( StorageException ex )
                         {
-                            getLogger().warn(
-                                              "RemoteStorage of repository "
-                                                  + getId()
-                                                  + " throws StorageException. Problem connecting to remote repository='"
-                                                  + this.getId()
-                                                  + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
-                                              ex );
+                            getLogger()
+                                .warn(
+                                       "RemoteStorage of repository "
+                                           + getId()
+                                           + " throws StorageException. Problem connecting to remote repository='"
+                                           + this.getId()
+                                           + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
+                                       ex );
 
                             autoBlockProxying( ex );
 
@@ -618,10 +663,11 @@ public abstract class AbstractProxyRepository
                 // we dont have neither one, NotFoundException
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug(
-                                       "Item "
-                                           + request.toString()
-                                           + " does not exist in local storage neither in remote storage, throwing ItemNotFoundException." );
+                    getLogger()
+                        .debug(
+                                "Item "
+                                    + request.toString()
+                                    + " does not exist in local storage neither in remote storage, throwing ItemNotFoundException." );
                 }
 
                 throw new ItemNotFoundException( request, this );
@@ -665,10 +711,10 @@ public abstract class AbstractProxyRepository
             {
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug(
-                                       "Item "
-                                           + request.toString()
-                                           + " does not exist locally and cannot go remote, throwing ItemNotFoundException." );
+                    getLogger()
+                        .debug(
+                                "Item " + request.toString()
+                                    + " does not exist locally and cannot go remote, throwing ItemNotFoundException." );
                 }
 
                 throw new ItemNotFoundException( request, this );
@@ -764,11 +810,7 @@ public abstract class AbstractProxyRepository
 
                 if ( getRemoteStorageContext() != null )
                 {
-                    CRemoteConnectionSettings remoteConnectionSettings =
-                        (CRemoteConnectionSettings) getRemoteStorageContext().getRemoteConnectionContextObject(
-                                                                                                                RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS );
-
-                    retryCount = remoteConnectionSettings.getRetrievalRetryCount();
+                    retryCount = getRemoteStorageContext().getRemoteConnectionSettings().getRetrievalRetryCount();
                 }
 
                 for ( int i = 0; i < retryCount; i++ )

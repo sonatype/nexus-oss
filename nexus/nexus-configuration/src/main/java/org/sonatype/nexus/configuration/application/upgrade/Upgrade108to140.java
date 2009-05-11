@@ -238,8 +238,9 @@ public class Upgrade108to140
             newauth.setPassword( oldauth.getPassword() );
             newauth.setNtlmHost( oldauth.getNtlmHost() );
             newauth.setNtlmDomain( oldauth.getNtlmDomain() );
-            newauth.setPrivateKey( oldauth.getPrivateKey() );
-            newauth.setPassphrase( oldauth.getPassphrase() );
+            // not used in pre 1.4.x
+            // newauth.setPrivateKey( oldauth.getPrivateKey() );
+            // newauth.setPassphrase( oldauth.getPassphrase() );
             return newauth;
         }
         else

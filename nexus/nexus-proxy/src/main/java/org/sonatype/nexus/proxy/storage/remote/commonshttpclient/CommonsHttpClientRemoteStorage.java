@@ -56,7 +56,12 @@ import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
+import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -67,12 +72,14 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
  * 
  * @author cstamas
  */
-@Component( role = RemoteRepositoryStorage.class, hint = "apacheHttpClient3x" )
+@Component( role = RemoteRepositoryStorage.class, hint = CommonsHttpClientRemoteStorage.PROVIDER_STRING )
 public class CommonsHttpClientRemoteStorage
     extends AbstractRemoteRepositoryStorage
     implements RemoteRepositoryStorage
 {
-    public static final String CTX_KEY = "apacheHttpClient3x";
+    public static final String PROVIDER_STRING = "apacheHttpClient3x";
+
+    public static final String CTX_KEY = PROVIDER_STRING;
 
     public static final String CTX_KEY_CLIENT = CTX_KEY + ".client";
 
@@ -81,9 +88,9 @@ public class CommonsHttpClientRemoteStorage
     // ===============================================================================
     // RemoteStorage iface
 
-    public String getName()
+    public String getProviderId()
     {
-        return CTX_KEY;
+        return PROVIDER_STRING;
     }
 
     public void validateStorageUrl( String url )
@@ -105,8 +112,7 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException,
-            StorageException
+        throws RemoteAccessException, StorageException
     {
         boolean result = false;
 
@@ -125,16 +131,13 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException,
-            StorageException
+        throws RemoteAccessException, StorageException
     {
         return checkRemoteAvailability( newerThen, repository, request, false );
     }
 
     public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
-        throws ItemNotFoundException,
-            RemoteAccessException,
-            StorageException
+        throws ItemNotFoundException, RemoteAccessException, StorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( baseUrl, request.getRequestPath() );
 
@@ -171,12 +174,9 @@ public class CommonsHttpClientRemoteStorage
                     is = new GZIPInputStream( is );
                 }
 
-                DefaultStorageFileItem httpItem = new DefaultStorageFileItem(
-                    repository,
-                    request,
-                    true,
-                    true,
-                    new PreparedContentLocator( new HttpClientInputStream( get, is ) ) );
+                DefaultStorageFileItem httpItem =
+                    new DefaultStorageFileItem( repository, request, true, true,
+                                                new PreparedContentLocator( new HttpClientInputStream( get, is ) ) );
 
                 if ( get.getResponseContentLength() != -1 )
                 {
@@ -228,9 +228,7 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public void storeItem( ProxyRepository repository, StorageItem item )
-        throws UnsupportedStorageOperationException,
-            RemoteAccessException,
-            StorageException
+        throws UnsupportedStorageOperationException, RemoteAccessException, StorageException
     {
         if ( !( item instanceof StorageFileItem ) )
         {
@@ -270,10 +268,7 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
-            RemoteAccessException,
-            StorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException, StorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( repository, request );
 
@@ -309,7 +304,7 @@ public class CommonsHttpClientRemoteStorage
 
         getLogger().info( "Remote storage settings change detected, updating HttpClient..." );
 
-        int timeout = getRemoteConnectionSettings( ctx ).getConnectionTimeout();
+        int timeout = ctx.getRemoteConnectionSettings().getConnectionTimeout();
 
         HttpConnectionManagerParams connManagerParams = new HttpConnectionManagerParams();
         connManagerParams.setConnectionTimeout( timeout );
@@ -326,118 +321,127 @@ public class CommonsHttpClientRemoteStorage
         httpConfiguration = httpClient.getHostConfiguration();
 
         // BASIC and DIGEST auth only
-        if ( getRemoteAuthenticationSettings( ctx ) != null
-            && StringUtils.isNotBlank( getRemoteAuthenticationSettings( ctx ).getUsername() ) )
+        RemoteAuthenticationSettings ras = ctx.getRemoteAuthenticationSettings();
+
+        if ( ras != null )
         {
-            // we have proxy authentication, let's do it preemptive
+            // we have authentication, let's do it preemptive
             httpClient.getParams().setAuthenticationPreemptive( true );
 
             List<String> authPrefs = new ArrayList<String>( 2 );
             authPrefs.add( AuthPolicy.DIGEST );
             authPrefs.add( AuthPolicy.BASIC );
 
-            if ( StringUtils.isNotBlank( getRemoteAuthenticationSettings( ctx ).getNtlmDomain() ) )
+            if ( ras instanceof ClientSSLRemoteAuthenticationSettings )
             {
+                // ClientSSLRemoteAuthenticationSettings cras = (ClientSSLRemoteAuthenticationSettings) ras;
+
+                // TODO - implement this
+            }
+            else if ( ras instanceof NtlmRemoteAuthenticationSettings )
+            {
+                NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
+
                 // Using NTLM auth, adding it as first in policies
                 authPrefs.add( 0, AuthPolicy.NTLM );
 
-                getLogger().info(
-                    "... authentication setup for NTLM domain {}"
-                        + getRemoteAuthenticationSettings( ctx ).getNtlmDomain() );
-                httpConfiguration.setHost( getRemoteAuthenticationSettings( ctx ).getNtlmHost() );
+                getLogger().info( "... authentication setup for NTLM domain {}" + nras.getNtlmDomain() );
+
+                httpConfiguration.setHost( nras.getNtlmHost() );
 
                 httpClient.getState().setCredentials(
-                    AuthScope.ANY,
-                    new NTCredentials(
-                        getRemoteAuthenticationSettings( ctx ).getUsername(),
-                        getRemoteAuthenticationSettings( ctx ).getPassword(),
-                        getRemoteAuthenticationSettings( ctx ).getNtlmHost(),
-                        getRemoteAuthenticationSettings( ctx ).getNtlmDomain() ) );
+                                                      AuthScope.ANY,
+                                                      new NTCredentials( nras.getUsername(), nras.getPassword(), nras
+                                                          .getNtlmHost(), nras.getNtlmDomain() ) );
             }
-            else
+            else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
             {
+                UsernamePasswordRemoteAuthenticationSettings uras = (UsernamePasswordRemoteAuthenticationSettings) ras;
 
                 // Using Username/Pwd auth, will not add NTLM
-                getLogger().info(
-                    "... setting authentication setup for remote storage with username "
-                        + getRemoteAuthenticationSettings( ctx ).getUsername() );
+                getLogger().info( "... authentication setup for remote storage with username " + uras.getUsername() );
 
                 httpClient.getState().setCredentials(
-                    AuthScope.ANY,
-                    new UsernamePasswordCredentials(
-                        getRemoteAuthenticationSettings( ctx ).getUsername(),
-                        getRemoteAuthenticationSettings( ctx ).getPassword() ) );
-
+                                                      AuthScope.ANY,
+                                                      new UsernamePasswordCredentials( uras.getUsername(), uras
+                                                          .getPassword() ) );
             }
+
             httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
         }
 
-        if ( getRemoteHttpProxySettings( ctx ) != null
-            && StringUtils.isNotBlank( getRemoteHttpProxySettings( ctx ).getProxyHostname() ) )
-        {
-            getLogger().info( "... proxy setup with host " + getRemoteHttpProxySettings( ctx ).getProxyHostname() );
-            httpConfiguration.setProxy(
-                getRemoteHttpProxySettings( ctx ).getProxyHostname(),
-                getRemoteHttpProxySettings( ctx ).getProxyPort() );
+        RemoteProxySettings rps = ctx.getRemoteProxySettings();
 
-            if ( getRemoteHttpProxySettings( ctx ).getAuthentication() != null
-                && StringUtils.isNotBlank( getRemoteHttpProxySettings( ctx ).getAuthentication().getUsername() ) )
+        if ( rps != null )
+        {
+            getLogger().info( "... proxy setup with host " + rps.getHostname() );
+
+            httpConfiguration.setProxy( rps.getHostname(), rps.getPort() );
+
+            if ( rps.getProxyAuthentication() != null )
             {
                 List<String> authPrefs = new ArrayList<String>( 2 );
                 authPrefs.add( AuthPolicy.DIGEST );
                 authPrefs.add( AuthPolicy.BASIC );
 
-                if ( StringUtils.isNotBlank( getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmDomain() ) )
+                if ( ras instanceof ClientSSLRemoteAuthenticationSettings )
                 {
+                    // ClientSSLRemoteAuthenticationSettings cras = (ClientSSLRemoteAuthenticationSettings) ras;
+
+                    // TODO - implement this
+                }
+                else if ( ras instanceof NtlmRemoteAuthenticationSettings )
+                {
+                    NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
 
                     // Using NTLM auth, adding it as first in policies
                     authPrefs.add( 0, AuthPolicy.NTLM );
 
-                    if ( getRemoteHttpProxySettings( ctx ).getAuthentication().getUsername() != null )
+                    if ( ctx.getRemoteAuthenticationSettings() != null
+                        && ( ctx.getRemoteAuthenticationSettings() instanceof NtlmRemoteAuthenticationSettings ) )
                     {
                         getLogger().warn(
-                            "... CommonsHttpClient is unable to use NTLM auth scheme\n"
-                                + " for BOTH server side and proxy side authentication!\n"
-                                + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
-                                + " if you have to use NTLM proxy, since otherwise it will not work!\n"
-                                + " *** SERVER SIDE AUTH OVERRIDDEN" );
+                                          "... Apache Commons HttpClient 3.x is unable to use NTLM auth scheme\n"
+                                              + " for BOTH server side and proxy side authentication!\n"
+                                              + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
+                                              + " if you have to use NTLM proxy, otherwise it will not work!\n"
+                                              + " *** SERVER SIDE AUTH OVERRIDDEN" );
                     }
-                    getLogger().info(
-                        "... proxy authentication setup for NTLM domain "
-                            + getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmDomain() );
-                    httpConfiguration.setHost( getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmHost() );
+
+                    getLogger().info( "... proxy authentication setup for NTLM domain " + nras.getNtlmDomain() );
+
+                    httpConfiguration.setHost( nras.getNtlmHost() );
 
                     httpClient.getState().setProxyCredentials(
-                        AuthScope.ANY,
-                        new NTCredentials(
-                            getRemoteHttpProxySettings( ctx ).getAuthentication().getUsername(),
-                            getRemoteHttpProxySettings( ctx ).getAuthentication().getPassword(),
-                            getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmHost(),
-                            getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmDomain() ) );
+                                                               AuthScope.ANY,
+                                                               new NTCredentials( nras.getUsername(), nras
+                                                                   .getPassword(), nras.getNtlmHost(), nras
+                                                                   .getNtlmDomain() ) );
                 }
-                else
+                else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
                 {
+                    UsernamePasswordRemoteAuthenticationSettings uras =
+                        (UsernamePasswordRemoteAuthenticationSettings) ras;
 
                     // Using Username/Pwd auth, will not add NTLM
                     getLogger().info(
-                        "... proxy authentication setup for http proxy "
-                            + getRemoteHttpProxySettings( ctx ).getProxyHostname() );
+                                      "... proxy authentication setup for remote storage with username "
+                                          + uras.getUsername() );
 
                     httpClient.getState().setProxyCredentials(
-                        AuthScope.ANY,
-                        new UsernamePasswordCredentials( getRemoteHttpProxySettings( ctx )
-                            .getAuthentication().getUsername(), getRemoteHttpProxySettings( ctx )
-                            .getAuthentication().getPassword() ) );
-
+                                                               AuthScope.ANY,
+                                                               new UsernamePasswordCredentials( uras.getUsername(),
+                                                                                                uras.getPassword() ) );
                 }
+
                 httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
             }
 
         }
 
-        ctx.getRemoteConnectionContext().put( CTX_KEY_CLIENT, httpClient );
+        ctx.putRemoteConnectionContextObject( CTX_KEY_CLIENT, httpClient );
 
-        ctx.getRemoteConnectionContext().put( CTX_KEY_HTTP_CONFIGURATION, httpConfiguration );
+        ctx.putRemoteConnectionContextObject( CTX_KEY_HTTP_CONFIGURATION, httpConfiguration );
     }
 
     /**
@@ -448,16 +452,16 @@ public class CommonsHttpClientRemoteStorage
      * @return the int
      */
     protected int executeMethod( ProxyRepository repository, ResourceStoreRequest request, HttpMethod method,
-        URL remoteUrl )
-        throws RemoteAccessException,
-            StorageException
+                                 URL remoteUrl )
+        throws RemoteAccessException, StorageException
     {
         if ( getLogger().isDebugEnabled() )
         {
             try
             {
                 getLogger().debug(
-                    "Invoking HTTP " + method.getName() + " method against remote location " + method.getURI() );
+                                   "Invoking HTTP " + method.getName() + " method against remote location "
+                                       + method.getURI() );
             }
             catch ( URIException e )
             {
@@ -467,10 +471,10 @@ public class CommonsHttpClientRemoteStorage
 
         RemoteStorageContext ctx = getRemoteStorageContext( repository );
 
-        HttpClient httpClient = (HttpClient) ctx.getRemoteConnectionContext().get( CTX_KEY_CLIENT );
+        HttpClient httpClient = (HttpClient) ctx.getRemoteConnectionContextObject( CTX_KEY_CLIENT );
 
-        HostConfiguration httpConfiguration = (HostConfiguration) ctx.getRemoteConnectionContext().get(
-            CTX_KEY_HTTP_CONFIGURATION );
+        HostConfiguration httpConfiguration =
+            (HostConfiguration) ctx.getRemoteConnectionContextObject( CTX_KEY_HTTP_CONFIGURATION );
 
         method.setRequestHeader( new Header( "user-agent", formatUserAgentString( ctx, repository ) ) );
         method.setRequestHeader( new Header( "accept", "*/*" ) );
@@ -487,9 +491,9 @@ public class CommonsHttpClientRemoteStorage
 
         method.setFollowRedirects( true );
 
-        if ( !StringUtils.isEmpty( getRemoteConnectionSettings( ctx ).getQueryString() ) )
+        if ( StringUtils.isNotBlank( ctx.getRemoteConnectionSettings().getQueryString() ) )
         {
-            method.setQueryString( getRemoteConnectionSettings( ctx ).getQueryString() );
+            method.setQueryString( ctx.getRemoteConnectionSettings().getQueryString() );
         }
 
         int resultCode = 0;
@@ -549,8 +553,8 @@ public class CommonsHttpClientRemoteStorage
             catch ( DateParseException ex )
             {
                 getLogger().warn(
-                    "Could not parse date '" + date + "', using system current time as item creation time.",
-                    ex );
+                                  "Could not parse date '" + date
+                                      + "', using system current time as item creation time.", ex );
             }
             catch ( NullPointerException ex )
             {
@@ -588,10 +592,8 @@ public class CommonsHttpClientRemoteStorage
      * @throws StorageException
      */
     protected boolean checkRemoteAvailability( long newerThen, ProxyRepository repository,
-        ResourceStoreRequest request, boolean relaxedCheck )
-        throws RemoteAuthenticationNeededException,
-            RemoteAccessException,
-            StorageException
+                                               ResourceStoreRequest request, boolean relaxedCheck )
+        throws RemoteAuthenticationNeededException, RemoteAccessException, StorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( repository, request );
 

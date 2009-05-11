@@ -19,15 +19,7 @@ import java.net.URL;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.mortbay.jetty.HttpHeaders;
-import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
-import org.mortbay.jetty.client.HttpDestination;
-import org.mortbay.jetty.client.security.ProxyAuthorization;
-import org.mortbay.jetty.client.security.Realm;
-import org.mortbay.jetty.client.security.RealmResolver;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
@@ -37,6 +29,8 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -44,7 +38,14 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 public class JettyClientRemoteRepositoryStorage
     extends AbstractRemoteRepositoryStorage
 {
-    public static final String CTX_KEY = "jettyClient";
+    public static final String PROVIDER_STRING = "jettyClient";
+
+    public static final String CTX_KEY = PROVIDER_STRING;
+
+    public String getProviderId()
+    {
+        return PROVIDER_STRING;
+    }
 
     @Override
     protected void updateContext( ProxyRepository repository, RemoteStorageContext context )
@@ -54,7 +55,7 @@ public class JettyClientRemoteRepositoryStorage
         {
             HttpClient jettyClient = new HttpClient();
 
-            final CRemoteConnectionSettings rcs = getRemoteConnectionSettings( context );
+            final RemoteConnectionSettings rcs = context.getRemoteConnectionSettings();
 
             if ( rcs != null )
             {
@@ -63,66 +64,67 @@ public class JettyClientRemoteRepositoryStorage
                 jettyClient.setTimeout( rcs.getConnectionTimeout() );
             }
 
-            final CRemoteAuthentication ra = getRemoteAuthenticationSettings( context );
+            final RemoteAuthenticationSettings ra = context.getRemoteAuthenticationSettings();
 
-            if ( ra != null && !StringUtils.isEmpty( ra.getUsername() ) )
-            {
-                if ( !StringUtils.isEmpty( ra.getNtlmDomain() ) || !StringUtils.isEmpty( ra.getNtlmHost() ) )
-                {
-                    // NTLM not supported
-                    throw new StorageException( "NTLM authentication not supported!" );
-                }
+//            if ( ra != null && !StringUtils.isEmpty( ra.getUsername() ) )
+//            {
+//                if ( !StringUtils.isEmpty( ra.getNtlmDomain() ) || !StringUtils.isEmpty( ra.getNtlmHost() ) )
+//                {
+//                    // NTLM not supported
+//                    throw new StorageException( "NTLM authentication not supported!" );
+//                }
+//
+//                jettyClient.setRealmResolver( new RealmResolver()
+//                {
+//                    public Realm getRealm( String realmName, HttpDestination destination, String path )
+//                        throws IOException
+//                    {
+//                        return new Realm()
+//                        {
+//                            public String getPrincipal()
+//                            {
+//                                return ra.getUsername();
+//                            }
+//
+//                            public String getCredentials()
+//                            {
+//                                return ra.getPassword();
+//                            }
+//
+//                            public String getId()
+//                            {
+//                                return ra.getUsername();
+//                            }
+//                        };
+//                    }
+//
+//                } );
+//            }
 
-                jettyClient.setRealmResolver( new RealmResolver()
-                {
-                    public Realm getRealm( String realmName, HttpDestination destination, String path )
-                        throws IOException
-                    {
-                        return new Realm()
-                        {
-                            public String getPrincipal()
-                            {
-                                return ra.getUsername();
-                            }
-
-                            public String getCredentials()
-                            {
-                                return ra.getPassword();
-                            }
-
-                            public String getId()
-                            {
-                                return ra.getUsername();
-                            }
-                        };
-                    }
-
-                } );
-            }
-
-            final CRemoteHttpProxySettings hps = getRemoteHttpProxySettings( context );
-
-            if ( hps != null && !StringUtils.isEmpty( hps.getProxyHostname() ) )
-            {
-                // we have proxy
-                jettyClient.setProxy( new Address( hps.getProxyHostname(), hps.getProxyPort() ) );
-
-                if ( hps.getAuthentication() != null && !StringUtils.isEmpty( hps.getAuthentication().getUsername() ) )
-                {
-                    // we have proxy auth
-                    if ( !StringUtils.isEmpty( hps.getAuthentication().getNtlmDomain() )
-                        || !StringUtils.isEmpty( hps.getAuthentication().getNtlmHost() ) )
-                    {
-                        // NTLM not supported
-                        throw new StorageException( "NTLM not supported for HTTP Proxy authentication!" );
-                    }
-
-                    jettyClient.setProxyAuthentication( new ProxyAuthorization(
-                        hps.getAuthentication().getUsername(),
-                        hps.getAuthentication().getPassword() ) );
-                }
-
-            }
+//            final RemoteProxySettings hps = context.getRemoteProxySettings();
+//
+//            if ( hps != null && !StringUtils.isEmpty( hps.getHostname() ) )
+//            {
+//                // we have proxy
+//                jettyClient.setProxy( new Address( hps.getHostname(), hps.getPort() ) );
+//
+//                if ( hps.getProxyAuthentication() != null
+//                    && !StringUtils.isEmpty( hps.getProxyAuthentication().getUsername() ) )
+//                {
+//                    // we have proxy auth
+//                    if ( !StringUtils.isEmpty( hps.getAuthentication().getNtlmDomain() )
+//                        || !StringUtils.isEmpty( hps.getAuthentication().getNtlmHost() ) )
+//                    {
+//                        // NTLM not supported
+//                        throw new StorageException( "NTLM not supported for HTTP Proxy authentication!" );
+//                    }
+//
+//                    jettyClient
+//                        .setProxyAuthentication( new ProxyAuthorization( hps.getAuthentication().getUsername(), hps
+//                            .getAuthentication().getPassword() ) );
+//                }
+//
+//            }
 
             jettyClient.start();
 
@@ -135,9 +137,7 @@ public class JettyClientRemoteRepositoryStorage
     }
 
     public boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAuthenticationNeededException,
-            RemoteAccessException,
-            StorageException
+        throws RemoteAuthenticationNeededException, RemoteAccessException, StorageException
     {
         boolean result = false;
 
@@ -177,8 +177,7 @@ public class JettyClientRemoteRepositoryStorage
     }
 
     public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
-        throws ItemNotFoundException,
-            StorageException
+        throws ItemNotFoundException, StorageException
     {
         RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
@@ -192,8 +191,7 @@ public class JettyClientRemoteRepositoryStorage
     }
 
     public void storeItem( ProxyRepository repository, StorageItem item )
-        throws UnsupportedStorageOperationException,
-            StorageException
+        throws UnsupportedStorageOperationException, StorageException
     {
         RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
@@ -214,9 +212,7 @@ public class JettyClientRemoteRepositoryStorage
     }
 
     public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
-            StorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, StorageException
     {
         RemoteStorageContext rsc = getRemoteStorageContext( repository );
 
@@ -250,14 +246,14 @@ public class JettyClientRemoteRepositoryStorage
     // ----
 
     protected void setUpExchange( AbstractNexusExchange exchange, RemoteStorageContext rsc, ProxyRepository repository,
-        ResourceStoreRequest request )
+                                  ResourceStoreRequest request )
         throws StorageException
     {
         URL requestURL = getAbsoluteUrlFromBase( repository, request );
 
         StringBuffer requestStringBuffer = new StringBuffer( requestURL.toString() );
 
-        CRemoteConnectionSettings rcs = getRemoteConnectionSettings( rsc );
+        RemoteConnectionSettings rcs = rsc.getRemoteConnectionSettings();
 
         if ( rcs != null )
         {
@@ -296,10 +292,5 @@ public class JettyClientRemoteRepositoryStorage
         {
             throw new StorageException( "Could not send HttpExchange!", e );
         }
-    }
-
-    public String getName()
-    {
-        return CTX_KEY;
     }
 }

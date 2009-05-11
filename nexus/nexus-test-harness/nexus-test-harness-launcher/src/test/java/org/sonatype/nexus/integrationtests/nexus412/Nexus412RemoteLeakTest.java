@@ -72,8 +72,9 @@ public class Nexus412RemoteLeakTest
         RemoteStorageContext ctx = new DefaultRemoteStorageContext( null );
 
         MultiThreadedHttpConnectionManager cm =
-            (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx.getRemoteConnectionContext().get(
-                                                                                                      CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) ).getHttpConnectionManager();
+            (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx
+                .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+                .getHttpConnectionManager();
         Assert.assertEquals( 2, cm.getConnectionsInPool() );
 
     }

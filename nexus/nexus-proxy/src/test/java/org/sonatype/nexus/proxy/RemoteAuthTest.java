@@ -14,11 +14,10 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 public class RemoteAuthTest
     extends AbstractProxyTestEnvironment
@@ -39,32 +38,35 @@ public class RemoteAuthTest
         throws Exception
     {
         // remote target of repo1 is not protected
-        StorageItem item = getRepositoryRegistry().getRepository( "repo1" ).retrieveItem(
-            new ResourceStoreRequest( "/repo1.txt", false ) );
+        StorageItem item =
+            getRepositoryRegistry().getRepository( "repo1" ).retrieveItem(
+                                                                           new ResourceStoreRequest( "/repo1.txt",
+                                                                                                     false ) );
         checkForFileAndMatchContents( item );
 
         // remote target of repo2 is protected with HTTP BASIC
-        CRemoteAuthentication dras2 = new CRemoteAuthentication();
-        dras2.setUsername( "cstamas" );
-        dras2.setPassword( "cstamas123" );
+        UsernamePasswordRemoteAuthenticationSettings settings2 =
+            new UsernamePasswordRemoteAuthenticationSettings( "cstamas", "cstamas123" );
         DefaultRemoteStorageContext ctx2 = new DefaultRemoteStorageContext( null );
-        ctx2.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS, dras2 );
+        ctx2.setRemoteAuthenticationSettings( settings2 );
         getRepositoryRegistry().getRepositoryWithFacet( "repo2", ProxyRepository.class ).setRemoteStorageContext( ctx2 );
 
-        item = getRepositoryRegistry().getRepository( "repo2" ).retrieveItem(
-            new ResourceStoreRequest( "/repo2.txt", false ) );
+        item =
+            getRepositoryRegistry().getRepository( "repo2" ).retrieveItem(
+                                                                           new ResourceStoreRequest( "/repo2.txt",
+                                                                                                     false ) );
         checkForFileAndMatchContents( item );
 
         // remote target of repo3 is protected with HTTP DIGEST
-        CRemoteAuthentication dras3 = new CRemoteAuthentication();
-        dras3.setUsername( "brian" );
-        dras3.setPassword( "brian123" );
+        UsernamePasswordRemoteAuthenticationSettings settings3 = new UsernamePasswordRemoteAuthenticationSettings("brian", "brian123");
         DefaultRemoteStorageContext ctx3 = new DefaultRemoteStorageContext( null );
-        ctx3.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS, dras3 );
+        ctx3.setRemoteAuthenticationSettings( settings3 );
         getRepositoryRegistry().getRepositoryWithFacet( "repo3", ProxyRepository.class ).setRemoteStorageContext( ctx3 );
 
-        item = getRepositoryRegistry().getRepository( "repo3" ).retrieveItem(
-            new ResourceStoreRequest( "/repo3.txt", false ) );
+        item =
+            getRepositoryRegistry().getRepository( "repo3" ).retrieveItem(
+                                                                           new ResourceStoreRequest( "/repo3.txt",
+                                                                                                     false ) );
         checkForFileAndMatchContents( item );
     }
 }

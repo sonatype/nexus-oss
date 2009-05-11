@@ -287,8 +287,9 @@ public class RepositoryListPlexusResource
 
         appModelSettings.setUsername( authentication.getUsername() );
         appModelSettings.setPassword( authentication.getPassword() );
-        appModelSettings.setPrivateKey( authentication.getPrivateKey() );
-        appModelSettings.setPassphrase( authentication.getPassphrase() );
+        // XXX cstamas - config changes
+        // appModelSettings.setPrivateKey( authentication.getPrivateKey() );
+        // appModelSettings.setPassphrase( authentication.getPassphrase() );
         appModelSettings.setNtlmDomain( authentication.getNtlmDomain() );
         appModelSettings.setNtlmHost( authentication.getNtlmHost() );
 
@@ -346,12 +347,12 @@ public class RepositoryListPlexusResource
 
                 target.getRemoteStorage().getAuthentication().setNtlmHost(
                                                                            model.getRemoteStorage().getAuthentication().getNtlmHost() );
+                // XXX cstamas - config changes
+                // target.getRemoteStorage().getAuthentication().setPrivateKey(
+                //                                                              model.getRemoteStorage().getAuthentication().getPrivateKey() );
 
-                target.getRemoteStorage().getAuthentication().setPrivateKey(
-                                                                             model.getRemoteStorage().getAuthentication().getPrivateKey() );
-
-                target.getRemoteStorage().getAuthentication().setPassphrase(
-                                                                             model.getRemoteStorage().getAuthentication().getPassphrase() );
+                // target.getRemoteStorage().getAuthentication().setPassphrase(
+                //                                                              model.getRemoteStorage().getAuthentication().getPassphrase() );
             }
             else
             {
@@ -415,11 +416,12 @@ public class RepositoryListPlexusResource
                     target.getRemoteStorage().getHttpProxySettings().getAuthentication().setNtlmHost(
                                                                                                       model.getRemoteStorage().getHttpProxySettings().getAuthentication().getNtlmHost() );
 
-                    target.getRemoteStorage().getHttpProxySettings().getAuthentication().setPrivateKey(
-                                                                                                        model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPrivateKey() );
+                    // XXX cstamas - config changes
+                    // target.getRemoteStorage().getHttpProxySettings().getAuthentication().setPrivateKey(
+                    //                                                                                     model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPrivateKey() );
 
-                    target.getRemoteStorage().getHttpProxySettings().getAuthentication().setPassphrase(
-                                                                                                        model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassphrase() );
+                    // target.getRemoteStorage().getHttpProxySettings().getAuthentication().setPassphrase(
+                    //                                                                                     model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassphrase() );
                 }
 
             }

@@ -276,6 +276,13 @@
       <description>The HTTP Proxy defines proxies used to access the internet.</description>
       <fields>
         <field>
+          <name>blockInheritance</name>
+          <version>1.4.0+</version>
+          <type>boolean</type>
+          <description>Set to true if you want to block inheritance.</description>
+          <required>true</required>
+        </field>
+        <field>
           <name>proxyHostname</name>
           <version>1.4.0+</version>
           <type>String</type>
@@ -337,17 +344,31 @@
           <required>false</required>
         </field>
         <field>
-          <name>privateKey</name>
+          <name>trustStore</name>
           <version>1.4.0+</version>
           <type>String</type>
-          <description>The path of the private key to use in remote authentication.</description>
+          <description>The path of the trustStore to use in remote authentication (server).</description>
           <required>false</required>
         </field>
         <field>
-          <name>passphrase</name>
+          <name>trustStorePassword</name>
           <version>1.4.0+</version>
           <type>String</type>
-          <description>The passphrase of the private key.</description>
+          <description>The passphrase of the trustStore.</description>
+          <required>false</required>
+        </field>
+        <field>
+          <name>keyStore</name>
+          <version>1.4.0+</version>
+          <type>String</type>
+          <description>The path of the keyStore to use in remote authentication (client).</description>
+          <required>false</required>
+        </field>
+        <field>
+          <name>keyStorePassword</name>
+          <version>1.4.0+</version>
+          <type>String</type>
+          <description>The passphrase of the keyStore.</description>
           <required>false</required>
         </field>
       </fields>

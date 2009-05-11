@@ -137,18 +137,20 @@ public class RepositoryMirrorDownloadTest
         RepositoryItemUid uid = repo.createUid( ITEM_PATH );
 
         RemoteRepositoryStorage rs = createMock( RemoteRepositoryStorage.class );
-        
+
+        expect( rs.getProviderId() ).andReturn( "dummy" );
+
         // have to ask the mirror
         expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( MIRROR1.getUrl() ) ) )
             .andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
-        
+
         // checksums are from canonical
-        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andThrow(
-            itemNotFount );
-        
+        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
+            .andThrow( itemNotFount );
+
         // checksums are from canonical
-        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andThrow(
-            itemNotFount );
+        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
+            .andThrow( itemNotFount );
 
         repo.setRemoteStorage( rs );
 
@@ -276,7 +278,7 @@ public class RepositoryMirrorDownloadTest
         M2Repository repo = createM2Repository( request.mirrors );
 
         repo.setChecksumPolicy( ChecksumPolicy.STRICT );
-        
+
         repo.getCurrentCoreConfiguration().applyChanges();
 
         RepositoryItemUid uid = repo.createUid( ITEM_PATH );
@@ -292,8 +294,7 @@ public class RepositoryMirrorDownloadTest
             if ( exception instanceof InvalidItemContentException )
             {
                 expect(
-                    rs
-                        .retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
+                        rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
                             .getUrl() ) ) ).andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
 
                 expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
@@ -302,8 +303,7 @@ public class RepositoryMirrorDownloadTest
             else
             {
                 expect(
-                    rs
-                        .retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
+                        rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
                             .getUrl() ) ) ).andThrow( exception );
             }
         }
@@ -311,8 +311,9 @@ public class RepositoryMirrorDownloadTest
         if ( request.mirrorSuccess )
         {
             expect(
-                rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0].getUrl() ) ) )
-                .andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
+                    rs
+                        .retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
+                            .getUrl() ) ) ).andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
 
             expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
                 .andReturn( newRemoteStorageFileItem( hashUid, ITEM_SHA1_HASH.getBytes() ) );
@@ -433,8 +434,9 @@ public class RepositoryMirrorDownloadTest
     private AbstractStorageItem newRemoteStorageFileItem( RepositoryItemUid uid, byte[] bytes )
     {
         ContentLocator content = new ByteArrayContentLocator( bytes );
-        DefaultStorageFileItem item = new DefaultStorageFileItem( uid.getRepository(), new ResourceStoreRequest( uid
-            .getPath() ), true, false, content );
+        DefaultStorageFileItem item =
+            new DefaultStorageFileItem( uid.getRepository(), new ResourceStoreRequest( uid.getPath() ), true, false,
+                                        content );
         if ( bytes.length == 0 )
         {
             item.getAttributes().put( "digest.sha1", ITEM_SHA1_HASH );
@@ -443,14 +445,14 @@ public class RepositoryMirrorDownloadTest
     }
 
     private LocalRepositoryStorage createMockEmptyLocalStorage()
-        throws ItemNotFoundException,
-            StorageException,
-            UnsupportedStorageOperationException
+        throws ItemNotFoundException, StorageException, UnsupportedStorageOperationException
     {
         LocalRepositoryStorage ls = createMock( LocalRepositoryStorage.class );
 
-        expect( ls.retrieveItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() ) ).andThrow(
-            itemNotFount ).anyTimes();
+        expect( ls.getProviderId() ).andReturn( "dummy" );
+
+        expect( ls.retrieveItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() ) )
+            .andThrow( itemNotFount ).anyTimes();
 
         ls.deleteItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() );
         expectLastCall().andThrow( itemNotFount ).anyTimes();

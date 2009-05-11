@@ -92,6 +92,67 @@ public interface ProxyRepository
         throws StorageException;
 
     /**
+     * Gets the download mirrors.
+     * 
+     * @return
+     */
+    DownloadMirrors getDownloadMirrors();
+
+    /**
+     * Gets the remote connections settings. Delegates to RemoteStorageContext.
+     * 
+     * @return
+     */
+    RemoteConnectionSettings getRemoteConnectionSettings();
+
+    /**
+     * Set remote connection settings. Delegates to RemoteStorageContext.
+     * 
+     * @param settings
+     */
+    void setRemoteConnectionSettings( RemoteConnectionSettings settings );
+
+    /**
+     * Gets remote authentication settings. Delegates to RemoteStorageContext.
+     */
+    RemoteAuthenticationSettings getRemoteAuthenticationSettings();
+
+    /**
+     * Sets remote authentication settings. Delegates to RemoteStorageContext.
+     * 
+     * @param settings
+     */
+    void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings );
+
+    /**
+     * Gets remote proxy settings. Delegates to RemoteStorageContext.
+     * 
+     * @return
+     */
+    RemoteProxySettings getRemoteProxySettings();
+
+    /**
+     * Sets remote proxy settings. Delegates to RemoteStorageContext.
+     * 
+     * @param settings
+     */
+    void setRemoteProxySettings( RemoteProxySettings settings );
+
+    /**
+     * Gets the proxy selector of this repository.
+     * 
+     * @return
+     */
+    ProxySelector getProxySelector();
+
+    /**
+     * Sets the proxy selector of this repository.
+     */
+    void setProxySelector( ProxySelector proxySelector );
+
+    // --
+
+    /**
      * Returns repository specific remote connection context.
      * 
      * @return null if none
@@ -119,13 +180,6 @@ public interface ProxyRepository
      * @param storage the storage
      */
     void setRemoteStorage( RemoteRepositoryStorage storage );
-
-    /**
-     * Gets the download mirrors.
-     * 
-     * @return
-     */
-    DownloadMirrors getDownloadMirrors();
 
     /**
      * Returns the list of defined item content validators.

@@ -33,6 +33,13 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 public interface LocalRepositoryStorage
 {
     /**
+     * Returns a designator to identify the local storage implementation (hint: for example the Plexus role hint).
+     * 
+     * @return
+     */
+    String getProviderId();
+    
+    /**
      * Validate that the URL that defines storage location is valid.
      * 
      * @param url

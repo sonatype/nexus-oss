@@ -596,6 +596,8 @@ public abstract class AbstractRepository
 
     public void setLocalStorage( LocalRepositoryStorage localStorage )
     {
+        getCurrentConfiguration( true ).getLocalStorage().setProvider( localStorage.getProviderId() );
+
         this.localStorage = localStorage;
     }
 

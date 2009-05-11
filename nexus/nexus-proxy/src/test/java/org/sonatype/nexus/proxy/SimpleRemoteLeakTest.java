@@ -47,20 +47,18 @@ public class SimpleRemoteLeakTest
     {
         // mangle one repos to have quasi different host, thus different HttpCommons HostConfig
         // but make it succeed! (127.0.0.1 is localhost, so will be able to connect)
-        getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).setRemoteUrl(
-            getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).getRemoteUrl().replace(
-                "localhost",
-                "127.0.0.1" ) );
+        getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class )
+            .setRemoteUrl(
+                           getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class )
+                               .getRemoteUrl().replace( "localhost", "127.0.0.1" ) );
 
         ProxyRepository repo1 = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
         ProxyRepository repo2 = getRepositoryRegistry().getRepositoryWithFacet( "repo2", ProxyRepository.class );
 
-        ResourceStoreRequest req1 = new ResourceStoreRequest(
-            "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar",
-            false );
-        ResourceStoreRequest req2 = new ResourceStoreRequest(
-            "/repositories/repo2/xstream/xstream/1.2.2/xstream-1.2.2.pom",
-            false );
+        ResourceStoreRequest req1 =
+            new ResourceStoreRequest( "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false );
+        ResourceStoreRequest req2 =
+            new ResourceStoreRequest( "/repositories/repo2/xstream/xstream/1.2.2/xstream-1.2.2.pom", false );
 
         for ( int i = 0; i < 10; i++ )
         {
@@ -71,30 +69,30 @@ public class SimpleRemoteLeakTest
             checkForFileAndMatchContents( item2 );
 
             // to force refetch
-            getRepositoryRegistry().getRepository( item1.getRepositoryId() ).deleteItem(
-                false,
-                new ResourceStoreRequest( item1 ) );
+            getRepositoryRegistry().getRepository( item1.getRepositoryId() )
+                .deleteItem( false, new ResourceStoreRequest( item1 ) );
 
-            getRepositoryRegistry().getRepository( item2.getRepositoryId() ).deleteItem(
-                false,
-                new ResourceStoreRequest( item2 ) );
+            getRepositoryRegistry().getRepository( item2.getRepositoryId() )
+                .deleteItem( false, new ResourceStoreRequest( item2 ) );
         }
 
         // get the default context, since they used it
         RemoteStorageContext ctx1 = repo1.getRemoteStorageContext();
 
-        MultiThreadedHttpConnectionManager cm1 = (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx1
-            .getRemoteConnectionContext().get( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
-            .getHttpConnectionManager();
-        
+        MultiThreadedHttpConnectionManager cm1 =
+            (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx1
+                .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+                .getHttpConnectionManager();
+
         assertEquals( 1, cm1.getConnectionsInPool() );
 
         RemoteStorageContext ctx2 = repo2.getRemoteStorageContext();
 
-        MultiThreadedHttpConnectionManager cm2 = (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx2
-            .getRemoteConnectionContext().get( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
-            .getHttpConnectionManager();
-        
+        MultiThreadedHttpConnectionManager cm2 =
+            (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx2
+                .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+                .getHttpConnectionManager();
+
         assertEquals( 1, cm2.getConnectionsInPool() );
     }
 
@@ -104,10 +102,10 @@ public class SimpleRemoteLeakTest
     {
         // mangle one repos to have quasi different host, thus different HttpCommons HostConfig
         // but make it fail! (unknown host, so will not be able to connect)
-        getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).setRemoteUrl(
-            getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).getRemoteUrl().replace(
-                "localhost",
-                "1.1.1.1" ) );
+        getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class )
+            .setRemoteUrl(
+                           getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class )
+                               .getRemoteUrl().replace( "localhost", "1.1.1.1" ) );
 
         ProxyRepository repo1 = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
         ProxyRepository repo2 = getRepositoryRegistry().getRepositoryWithFacet( "repo2", ProxyRepository.class );
@@ -128,18 +126,20 @@ public class SimpleRemoteLeakTest
         // get the default context, since they used it
         RemoteStorageContext ctx1 = repo1.getRemoteStorageContext();
 
-        MultiThreadedHttpConnectionManager cm1 = (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx1
-            .getRemoteConnectionContext().get( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
-            .getHttpConnectionManager();
-        
+        MultiThreadedHttpConnectionManager cm1 =
+            (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx1
+                .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+                .getHttpConnectionManager();
+
         assertEquals( 1, cm1.getConnectionsInPool() );
 
         RemoteStorageContext ctx2 = repo2.getRemoteStorageContext();
 
-        MultiThreadedHttpConnectionManager cm2 = (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx2
-            .getRemoteConnectionContext().get( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
-            .getHttpConnectionManager();
-        
+        MultiThreadedHttpConnectionManager cm2 =
+            (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx2
+                .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+                .getHttpConnectionManager();
+
         assertEquals( 1, cm2.getConnectionsInPool() );
     }
 

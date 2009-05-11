@@ -207,9 +207,9 @@ public class GlobalConfigurationPlexusResource
 
                             auth.setNtlmHost( s.getAuthentication().getNtlmHost() );
 
-                            auth.setPrivateKey( s.getAuthentication().getPrivateKey() );
+                            // auth.setPrivateKey( s.getAuthentication().getPrivateKey() );
 
-                            auth.setPassphrase( s.getAuthentication().getPassphrase() );
+                            // auth.setPassphrase( s.getAuthentication().getPassphrase() );
 
                             proxy.setAuthentication( auth );
                         }

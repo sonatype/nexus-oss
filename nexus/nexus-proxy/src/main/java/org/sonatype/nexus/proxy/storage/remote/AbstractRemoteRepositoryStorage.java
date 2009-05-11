@@ -23,15 +23,13 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -113,14 +111,14 @@ public abstract class AbstractRemoteRepositoryStorage
         {
             // we have repo specific settings
             // if contextContains key and is newer, or does not contain yet
-            if ( ( repositoryContexts.containsKey( repository.getId() ) && repository
-                .getRemoteStorageContext().getLastChanged() > repositoryContexts.get( repository.getId() ).longValue() )
+            if ( ( repositoryContexts.containsKey( repository.getId() ) && repository.getRemoteStorageContext()
+                .getLastChanged() > repositoryContexts.get( repository.getId() ).longValue() )
                 || !repositoryContexts.containsKey( repository.getId() ) )
             {
                 updateContext( repository, repository.getRemoteStorageContext() );
 
-                repositoryContexts.put( repository.getId(), Long.valueOf( repository
-                    .getRemoteStorageContext().getLastChanged() ) );
+                repositoryContexts.put( repository.getId(), Long.valueOf( repository.getRemoteStorageContext()
+                    .getLastChanged() ) );
             }
         }
 
@@ -128,9 +126,7 @@ public abstract class AbstractRemoteRepositoryStorage
     }
 
     public boolean containsItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAuthenticationNeededException,
-            RemoteAccessException,
-            StorageException
+        throws RemoteAuthenticationNeededException, RemoteAccessException, StorageException
     {
         return containsItem( 0, repository, request );
     }
@@ -154,11 +150,12 @@ public abstract class AbstractRemoteRepositoryStorage
         {
             platformEditionShort = status.getEditionShort();
 
-            userAgentPlatformInfo = new StringBuffer( "Nexus/" )
-                .append( status.getVersion() ).append( " (" ).append( status.getEditionShort() ).append( "; " ).append(
-                    System.getProperty( "os.name" ) ).append( "; " ).append( System.getProperty( "os.version" ) )
-                .append( "; " ).append( System.getProperty( "os.arch" ) ).append( "; " ).append(
-                    System.getProperty( "java.version" ) ).append( ") " ).toString();
+            userAgentPlatformInfo =
+                new StringBuffer( "Nexus/" ).append( status.getVersion() ).append( " (" )
+                    .append( status.getEditionShort() ).append( "; " ).append( System.getProperty( "os.name" ) )
+                    .append( "; " ).append( System.getProperty( "os.version" ) ).append( "; " )
+                    .append( System.getProperty( "os.arch" ) ).append( "; " )
+                    .append( System.getProperty( "java.version" ) ).append( ") " ).toString();
         }
 
         return userAgentPlatformInfo;
@@ -169,10 +166,10 @@ public abstract class AbstractRemoteRepositoryStorage
     {
         StringBuffer buf = new StringBuffer( getUserAgentPlatformInfo() );
 
-        buf.append( getName() ).append( "/" ).append( getVersion() );
+        buf.append( getProviderId() ).append( "/" ).append( getVersion() );
 
         // user customization
-        CRemoteConnectionSettings remoteConnectionSettings = getRemoteConnectionSettings( ctx );
+        RemoteConnectionSettings remoteConnectionSettings = ctx.getRemoteConnectionSettings();
 
         if ( !StringUtils.isEmpty( remoteConnectionSettings.getUserAgentCustomizationString() ) )
         {
@@ -181,23 +178,4 @@ public abstract class AbstractRemoteRepositoryStorage
 
         return buf.toString();
     }
-
-    protected CRemoteConnectionSettings getRemoteConnectionSettings( RemoteStorageContext ctx )
-    {
-        return (CRemoteConnectionSettings) ctx
-            .getRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS );
-    }
-
-    protected CRemoteAuthentication getRemoteAuthenticationSettings( RemoteStorageContext ctx )
-    {
-        return (CRemoteAuthentication) ctx
-            .getRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS );
-    }
-
-    protected CRemoteHttpProxySettings getRemoteHttpProxySettings( RemoteStorageContext ctx )
-    {
-        return (CRemoteHttpProxySettings) ctx
-            .getRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS );
-    }
-
 }

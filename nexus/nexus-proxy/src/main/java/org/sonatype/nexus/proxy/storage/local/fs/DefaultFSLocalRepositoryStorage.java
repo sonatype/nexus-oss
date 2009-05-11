@@ -55,10 +55,12 @@ import org.sonatype.nexus.util.ItemPathUtils;
  * 
  * @author cstamas
  */
-@Component( role = LocalRepositoryStorage.class, hint = "file" )
+@Component( role = LocalRepositoryStorage.class, hint = DefaultFSLocalRepositoryStorage.PROVIDER_STRING )
 public class DefaultFSLocalRepositoryStorage
     extends AbstractLocalRepositoryStorage
 {
+    public static final String PROVIDER_STRING = "file";
+    
     private static final String LINK_PREFIX = "LINK to ";
 
     /**
@@ -66,6 +68,11 @@ public class DefaultFSLocalRepositoryStorage
      */
     @Requirement
     private RepositoryItemUidFactory repositoryItemUidFactory;
+    
+    public String getProviderId()
+    {
+        return PROVIDER_STRING;
+    }
 
     public void validateStorageUrl( String url )
         throws StorageException
@@ -564,5 +571,4 @@ public class DefaultFSLocalRepositoryStorage
             return null;
         }
     }
-
 }

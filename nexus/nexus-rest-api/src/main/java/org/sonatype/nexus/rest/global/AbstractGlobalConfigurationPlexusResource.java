@@ -133,9 +133,9 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
         auth.setNtlmDomain( settings.getNtlmDomain() );
 
-        auth.setPrivateKey( settings.getPrivateKey() );
+        // auth.setPrivateKey( settings.getPrivateKey() );
 
-        auth.setPassphrase( settings.getPassphrase() );
+        // auth.setPassphrase( settings.getPassphrase() );
 
         return auth;
     }

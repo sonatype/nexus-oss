@@ -36,7 +36,7 @@ public interface RemoteRepositoryStorage
      * 
      * @return
      */
-    String getName();
+    String getProviderId();
 
     /**
      * Returns a version to identify the version of remote storage implementation.

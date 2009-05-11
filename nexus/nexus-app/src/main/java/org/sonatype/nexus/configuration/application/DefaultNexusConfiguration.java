@@ -44,6 +44,7 @@ import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.model.RemoteSettingsUtil;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
@@ -56,6 +57,8 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
@@ -164,15 +167,18 @@ public class DefaultNexusConfiguration
 
             if ( getConfiguration().getGlobalConnectionSettings() != null )
             {
-                remoteStorageContext.putRemoteConnectionContextObject(
-                                                                       RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS,
-                                                                       getConfiguration().getGlobalConnectionSettings() );
+                RemoteConnectionSettings rcs =
+                    RemoteSettingsUtil.convertFromModel( getConfiguration().getGlobalConnectionSettings() );
+
+                remoteStorageContext.setRemoteConnectionSettings( rcs );
             }
 
             if ( getConfiguration().getGlobalHttpProxySettings() != null )
             {
-                remoteStorageContext.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS,
-                                                                       getConfiguration().getGlobalHttpProxySettings() );
+                RemoteProxySettings rps =
+                    RemoteSettingsUtil.convertFromModel( getConfiguration().getGlobalHttpProxySettings() );
+
+                remoteStorageContext.setRemoteProxySettings( rps );
             }
 
             applyConfiguration();
@@ -195,9 +201,8 @@ public class DefaultNexusConfiguration
 
             wastebasketDirectory = null;
 
-            applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent(
-                                                                                                     this,
-                                                                                                     prepare.getChanges() ) );
+            applicationEventMulticaster
+                .notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges() ) );
         }
         else
         {
@@ -587,8 +592,7 @@ public class DefaultNexusConfiguration
     public void updateGlobalRemoteConnectionSettings( CRemoteConnectionSettings settings )
         throws ConfigurationException, IOException
     {
-        remoteStorageContext.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS,
-                                                               settings );
+        remoteStorageContext.setRemoteConnectionSettings( RemoteSettingsUtil.convertFromModel( settings ) );
 
         getConfiguration().setGlobalConnectionSettings( settings );
 
@@ -600,8 +604,7 @@ public class DefaultNexusConfiguration
     public void createGlobalRemoteHttpProxySettings( CRemoteHttpProxySettings settings )
         throws ConfigurationException, IOException
     {
-        remoteStorageContext.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS,
-                                                               settings );
+        remoteStorageContext.setRemoteProxySettings( RemoteSettingsUtil.convertFromModel( settings ) );
 
         getConfiguration().setGlobalHttpProxySettings( settings );
 
@@ -622,7 +625,7 @@ public class DefaultNexusConfiguration
     public void deleteGlobalRemoteHttpProxySettings()
         throws IOException
     {
-        remoteStorageContext.removeRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS );
+        remoteStorageContext.removeRemoteProxySettings();
 
         getConfiguration().setGlobalHttpProxySettings( null );
 
@@ -1033,8 +1036,8 @@ public class DefaultNexusConfiguration
                 + "'" );
         }
 
-        targetRegistry.addRepositoryTarget( new Target( settings.getId(), settings.getName(), contentClass,
-                                                        settings.getPatterns() ) );
+        targetRegistry.addRepositoryTarget( new Target( settings.getId(), settings.getName(), contentClass, settings
+            .getPatterns() ) );
 
         getConfiguration().addRepositoryTarget( settings );
 

@@ -14,9 +14,10 @@
 package org.sonatype.nexus.proxy.storage.remote;
 
 import java.util.HashMap;
-import java.util.Map;
 
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 
 /**
  * The default remote storage context.
@@ -26,40 +27,34 @@ import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 public class DefaultRemoteStorageContext
     implements RemoteStorageContext
 {
+    private final HashMap<String, Object> context = new HashMap<String, Object>();
+
     private long lastChanged = System.currentTimeMillis();
 
-    private HashMap<String, Object> context = new HashMap<String, Object>();
+    private RemoteStorageContext parent;
 
-    private RemoteStorageContext defaults;
-
-    public DefaultRemoteStorageContext( RemoteStorageContext defaults )
+    public DefaultRemoteStorageContext( RemoteStorageContext parent )
     {
-        super();
+        this.parent = parent;
 
-        this.defaults = defaults;
-
-        if ( defaults == null )
+        if ( parent == null )
         {
             // Note: this is needed since RemoteConnectionsSettings, in contrary to the other two (HttpProxy and Auth)
             // is _mandatory_ and is always used, while the other two is used if present, otherwise not (like
             // HttpProxy).
             // Also, when we have no "parent" (defaults, to delegate lookup to), that means that we have to create a
             // default one.
-            CRemoteConnectionSettings connSettings = new CRemoteConnectionSettings();
-            
-            connSettings.setConnectionTimeout( 10000 );
-            
-            connSettings.setRetrievalRetryCount( 3 );
-            
-            this.putRemoteConnectionContextObject( REMOTE_CONNECTIONS_SETTINGS, connSettings );
+            RemoteConnectionSettings defaultRemoteConnectionSettings = new RemoteConnectionSettings();
+
+            setRemoteConnectionSettings( defaultRemoteConnectionSettings );
         }
     }
 
     public long getLastChanged()
     {
-        if ( defaults != null )
+        if ( parent != null )
         {
-            return defaults.getLastChanged() > lastChanged ? defaults.getLastChanged() : lastChanged;
+            return parent.getLastChanged() > lastChanged ? parent.getLastChanged() : lastChanged;
         }
         else
         {
@@ -67,32 +62,25 @@ public class DefaultRemoteStorageContext
         }
     }
 
-    public void setLastChanged( long ts )
+    protected void setLastChanged( long ts )
     {
         lastChanged = ts;
     }
 
-    public Map<String, Object> getRemoteConnectionContext()
+    public RemoteStorageContext getParentRemoteStorageContext()
     {
-        return context;
+        return parent;
     }
 
     public Object getRemoteConnectionContextObject( String key )
     {
         if ( context.containsKey( key ) )
         {
-            if ( NOT_INHERITED.equals( context.get( key ) ) )
-            {
-                return null;
-            }
-            else
-            {
-                return context.get( key );
-            }
+            return context.get( key );
         }
-        else if ( defaults != null )
+        else if ( parent != null )
         {
-            return defaults.getRemoteConnectionContextObject( key );
+            return parent.getRemoteConnectionContextObject( key );
         }
         else
         {
@@ -100,22 +88,83 @@ public class DefaultRemoteStorageContext
         }
     }
 
-    public void removeRemoteConnectionContextObject( String key )
-    {
-        context.remove( key );
-
-        lastChanged = System.currentTimeMillis();
-    }
-
     public void putRemoteConnectionContextObject( String key, Object value )
     {
         context.put( key, value );
 
-        lastChanged = System.currentTimeMillis();
+        setLastChanged( System.currentTimeMillis() );
     }
 
-    public RemoteStorageContext getParentRemoteStorageContext()
+    public void removeRemoteConnectionContextObject( String key )
     {
-        return defaults;
+        context.remove( key );
+
+        setLastChanged( System.currentTimeMillis() );
+    }
+
+    public boolean hasRemoteConnectionContextObject( String key )
+    {
+        return context.containsKey( key );
+    }
+
+    public boolean hasRemoteAuthenticationSettings()
+    {
+        return hasRemoteConnectionContextObject( RemoteAuthenticationSettings.class.getName() );
+    }
+
+    public RemoteAuthenticationSettings getRemoteAuthenticationSettings()
+    {
+        return (RemoteAuthenticationSettings) getRemoteConnectionContextObject( RemoteAuthenticationSettings.class
+            .getName() );
+    }
+
+    public void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings )
+    {
+        putRemoteConnectionContextObject( RemoteAuthenticationSettings.class.getName(), settings );
+    }
+
+    public void removeRemoteAuthenticationSettings()
+    {
+        removeRemoteConnectionContextObject( RemoteAuthenticationSettings.class.getName() );
+    }
+
+    public boolean hasRemoteConnectionSettings()
+    {
+        return hasRemoteConnectionContextObject( RemoteConnectionSettings.class.getName() );
+    }
+
+    public RemoteConnectionSettings getRemoteConnectionSettings()
+    {
+        return (RemoteConnectionSettings) getRemoteConnectionContextObject( RemoteConnectionSettings.class.getName() );
+    }
+
+    public void setRemoteConnectionSettings( RemoteConnectionSettings settings )
+    {
+        putRemoteConnectionContextObject( RemoteConnectionSettings.class.getName(), settings );
+    }
+
+    public void removeRemoteConnectionSettings()
+    {
+        removeRemoteConnectionContextObject( RemoteConnectionSettings.class.getName() );
+    }
+
+    public boolean hasRemoteProxySettings()
+    {
+        return hasRemoteConnectionContextObject( RemoteProxySettings.class.getName() );
+    }
+
+    public RemoteProxySettings getRemoteProxySettings()
+    {
+        return (RemoteProxySettings) getRemoteConnectionContextObject( RemoteProxySettings.class.getName() );
+    }
+
+    public void setRemoteProxySettings( RemoteProxySettings settings )
+    {
+        putRemoteConnectionContextObject( RemoteProxySettings.class.getName(), settings );
+    }
+
+    public void removeRemoteProxySettings()
+    {
+        removeRemoteConnectionContextObject( RemoteProxySettings.class.getName() );
     }
 }

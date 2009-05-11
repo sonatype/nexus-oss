@@ -13,7 +13,9 @@
  */
 package org.sonatype.nexus.proxy.storage.remote;
 
-import java.util.Map;
+import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 
 /**
  * The remote storage settings and context.
@@ -22,25 +24,79 @@ import java.util.Map;
  */
 public interface RemoteStorageContext
 {
-    public static final String REMOTE_CONNECTIONS_SETTINGS = "remoteConnectionSettings";
+    // change detection
 
-    public static final String REMOTE_HTTP_PROXY_SETTINGS = "remoteHttpProxySettings";
-
-    public static final String REMOTE_AUTHENTICATION_SETTINGS = "remoteAuthenticationSettings";
-
-    public static final String NOT_INHERITED = "not inherited";
-
+    /**
+     * Returns the timestamp of latest change. Will propagate to parent if it is more recently changed as this (and
+     * parent is set).
+     */
     long getLastChanged();
 
-    void setLastChanged( long ts );
+    // parent
 
+    /**
+     * Returns the parent context, or null if not set.
+     * 
+     * @return
+     */
+    RemoteStorageContext getParentRemoteStorageContext();
+
+    // modification
+
+    /**
+     * Gets an object from context. Will propagate to parent if not found in this context (and parent is set).
+     * 
+     * @param key
+     * @return
+     */
     Object getRemoteConnectionContextObject( String key );
 
+    /**
+     * Puts an object into this context.
+     * 
+     * @param key
+     * @param value
+     */
     void putRemoteConnectionContextObject( String key, Object value );
 
+    /**
+     * Removed an object from this context. Parent is unchanged.
+     * 
+     * @param key
+     */
     void removeRemoteConnectionContextObject( String key );
 
-    Map<String, Object> getRemoteConnectionContext();
+    /**
+     * Returns true if this context has an object under the given key.
+     * 
+     * @param key
+     * @return
+     */
+    boolean hasRemoteConnectionContextObject( String key );
 
-    RemoteStorageContext getParentRemoteStorageContext();
+    // --
+
+    boolean hasRemoteConnectionSettings();
+
+    RemoteConnectionSettings getRemoteConnectionSettings();
+
+    void setRemoteConnectionSettings( RemoteConnectionSettings settings );
+
+    void removeRemoteConnectionSettings();
+
+    boolean hasRemoteAuthenticationSettings();
+
+    RemoteAuthenticationSettings getRemoteAuthenticationSettings();
+
+    void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings );
+
+    void removeRemoteAuthenticationSettings();
+
+    boolean hasRemoteProxySettings();
+
+    RemoteProxySettings getRemoteProxySettings();
+
+    void setRemoteProxySettings( RemoteProxySettings settings );
+
+    void removeRemoteProxySettings();
 }
