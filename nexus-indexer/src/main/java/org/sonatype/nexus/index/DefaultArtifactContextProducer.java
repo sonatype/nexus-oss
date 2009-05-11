@@ -119,8 +119,7 @@ public class DefaultArtifactContextProducer
             || filename.endsWith( ".xml" )
             || filename.endsWith( ".asc" ) 
             || filename.endsWith( ".md5" )
-            || filename.endsWith( ".sha1" )
-            || ( filename.endsWith( ".pom" ) && new File( file.getParent(), filename.replaceAll( "\\.pom$", ".jar" ) ).exists() ) )
+            || filename.endsWith( ".sha1" ) )
         {
             return false;
         }
