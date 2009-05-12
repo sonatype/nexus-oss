@@ -371,8 +371,12 @@ public class DefaultScheduledTask<T>
             }
         }
 
+        if ( TaskState.BROKEN == getTaskState() )
+        {
+            //do nothing, let user fix or delete it
+        }
         // If manually running or having future, park this task to submitted
-        if ( isManualRunScheduled() )
+        else if ( isManualRunScheduled() )
         {
             setTaskState( TaskState.SUBMITTED );
         }

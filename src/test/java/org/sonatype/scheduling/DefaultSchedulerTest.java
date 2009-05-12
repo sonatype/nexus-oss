@@ -240,6 +240,28 @@ public class DefaultSchedulerTest
 
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
+    
+    public void testBrokenCallable()
+        throws Exception
+    {
+        BrokenTestCallable callable = new BrokenTestCallable();
+
+        long nearFuture = System.currentTimeMillis() + 500;
+
+        Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 1200 ) );
+
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "default", callable, schedule, null );
+
+        Thread.sleep( 700 );
+
+        assertEquals( TaskState.BROKEN, task.getTaskState() );
+
+        Thread.sleep( 1000 );
+
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+
+        assertEquals( TaskState.BROKEN, task.getTaskState() );
+    }
 
     protected Schedule getEverySecondSchedule( Date start, Date stop )
     {
@@ -306,6 +328,16 @@ public class DefaultSchedulerTest
         public int getRunCount()
         {
             return runCount;
+        }
+    }
+    
+    public class BrokenTestCallable
+        implements Callable<Integer>
+    {
+        public Integer call()
+            throws Exception
+        {
+            throw new Exception( "Test task failed to run" );
         }
     }
 
