@@ -152,9 +152,9 @@ public class RepositoryMirrorDownloadTest
         expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
             .andThrow( itemNotFount );
 
-        repo.setRemoteStorage( rs );
-
         replay( rs );
+
+        repo.setRemoteStorage( rs );
 
         ResourceStoreRequest req = new ResourceStoreRequest( ITEM_PATH, false );
         repo.retrieveItem( req );
@@ -287,6 +287,8 @@ public class RepositoryMirrorDownloadTest
 
         RemoteRepositoryStorage rs = createMock( RemoteRepositoryStorage.class );
 
+        expect( rs.getProviderId() ).andReturn( "mock" );
+
         checkOrder( rs, true );
 
         for ( Exception exception : request.mirrorFailures )
@@ -346,9 +348,9 @@ public class RepositoryMirrorDownloadTest
                 .andReturn( newRemoteStorageFileItem( hashUid, ITEM_SHA1_HASH.getBytes() ) );
         }
 
-        repo.setRemoteStorage( rs );
-
         replay( rs );
+
+        repo.setRemoteStorage( rs );
 
         ResourceStoreRequest req = new ResourceStoreRequest( ITEM_PATH, false );
 
