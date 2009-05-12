@@ -26,6 +26,7 @@ import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
 import com.thoughtworks.xstream.converters.ConversionException;
@@ -378,7 +379,7 @@ public class Nexus531RepositoryCrudValidationTests
         RepositoryResource resource = new RepositoryResource();
 
         resource.setId( "updateValidatioinTest" );
-        resource.setRepoType( "hosted" ); // [hosted, proxy, virtual]
+        resource.setRepoType( "proxy" ); // [hosted, proxy, virtual]
         resource.setName( "Update Test Repo" );
         // resource.setRepoType( ? )
         resource.setProvider( "maven2" );
@@ -393,7 +394,10 @@ public class Nexus531RepositoryCrudValidationTests
         // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
         // resource.setDownloadRemoteIndexes( true );
-        // invalid to hosted repo resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
+        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
+        RepositoryResourceRemoteStorage remote = new RepositoryResourceRemoteStorage();
+        remote.setRemoteStorageUrl( "http://localhost:123/remote_resource_repo" );
+        resource.setRemoteStorage( remote  );
 
         // this also validates
         resource = (RepositoryResource) this.messageUtil.createRepository( resource );
