@@ -68,22 +68,28 @@ public class DefaultFSWastebasket
 
     public void onEvent( Event evt )
     {
-        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
+        if ( evt instanceof ConfigurationChangeEvent )
         {
-            wastebasketDirectory = null;
+            synchronized ( this )
+            {
+                wastebasketDirectory = null;
+            }
         }
     }
 
     protected File getWastebasketDirectory()
     {
-        if ( wastebasketDirectory == null )
+        synchronized ( this )
         {
-            wastebasketDirectory = applicationConfiguration.getWastebasketDirectory();
+            if ( wastebasketDirectory == null )
+            {
+                wastebasketDirectory = applicationConfiguration.getWastebasketDirectory();
 
-            wastebasketDirectory.mkdirs();
+                wastebasketDirectory.mkdirs();
+            }
+
+            return wastebasketDirectory;
         }
-
-        return wastebasketDirectory;
     }
 
     protected File getFileForItem( AbstractStorageItem item )
