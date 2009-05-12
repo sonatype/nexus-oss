@@ -370,6 +370,13 @@ public class DefaultIndexerManager
             nexusScheduler.submit( "Searchable re-enabled", rt );
         }
 
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(
+                               "Indexing on repository ID='" + repositoryId + "' is enabled: "
+                                   + String.valueOf( searchable ) );
+        }
+
         ctx.setSearchable( searchable );
 
         rctx.setSearchable( searchable );

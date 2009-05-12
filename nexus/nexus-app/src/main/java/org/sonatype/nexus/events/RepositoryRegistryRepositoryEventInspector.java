@@ -18,9 +18,9 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -46,11 +46,8 @@ public class RepositoryRegistryRepositoryEventInspector
 
     public boolean accepts( Event evt )
     {
-        if ( evt instanceof RepositoryRegistryRepositoryEvent )
-        {
-            return true;
-        }
-        return false;
+        return ( evt instanceof RepositoryRegistryRepositoryEvent )
+            || ( evt instanceof RepositoryConfigurationUpdatedEvent );
     }
 
     public void inspect( Event evt )
@@ -62,9 +59,16 @@ public class RepositoryRegistryRepositoryEventInspector
 
     private void inspectForNexus( Event evt )
     {
-        RepositoryRegistryRepositoryEvent revt = (RepositoryRegistryRepositoryEvent) evt;
+        Repository repository = null;
 
-        Repository repository = revt.getRepository();
+        if ( evt instanceof RepositoryRegistryRepositoryEvent )
+        {
+            repository = ( (RepositoryRegistryRepositoryEvent) evt ).getRepository();
+        }
+        else
+        {
+            repository = ( (RepositoryConfigurationUpdatedEvent) evt ).getRepository();
+        }
 
         StringBuffer sb = new StringBuffer();
 
@@ -77,11 +81,11 @@ public class RepositoryRegistryRepositoryEventInspector
             sb.append( " repository " );
         }
 
-        sb.append( revt.getRepository().getName() );
+        sb.append( repository.getName() );
 
         sb.append( " (ID=" );
 
-        sb.append( revt.getRepository().getId() );
+        sb.append( repository.getId() );
 
         sb.append( ") " );
 
@@ -89,7 +93,7 @@ public class RepositoryRegistryRepositoryEventInspector
         {
             sb.append( " as proxy repository for URL " );
 
-            sb.append( revt.getRepository().adaptToFacet( ProxyRepository.class ).getRemoteUrl() );
+            sb.append( repository.adaptToFacet( ProxyRepository.class ).getRemoteUrl() );
         }
         else if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
         {
@@ -99,30 +103,30 @@ public class RepositoryRegistryRepositoryEventInspector
         {
             sb.append( " as " );
 
-            sb.append( revt.getRepository().getClass().getName() );
+            sb.append( repository.getClass().getName() );
 
             sb.append( " virtual repository for " );
 
-            sb.append( revt.getRepository().adaptToFacet( ShadowRepository.class ).getMasterRepository().getName() );
+            sb.append( repository.adaptToFacet( ShadowRepository.class ).getMasterRepository().getName() );
 
             sb.append( " (ID=" );
 
-            sb.append( revt.getRepository().adaptToFacet( ShadowRepository.class ).getMasterRepository().getId() );
+            sb.append( repository.adaptToFacet( ShadowRepository.class ).getMasterRepository().getId() );
 
             sb.append( ") " );
         }
 
         sb.append( "." );
 
-        if ( revt instanceof RepositoryRegistryEventAdd )
+        if ( evt instanceof RepositoryRegistryEventAdd )
         {
             sb.insert( 0, "Registered" );
         }
-        else if ( revt instanceof RepositoryRegistryEventRemove )
+        else if ( evt instanceof RepositoryRegistryEventRemove )
         {
             sb.insert( 0, "Unregistered" );
         }
-        else if ( revt instanceof RepositoryRegistryEventUpdate )
+        else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
         {
             sb.insert( 0, "Updated" );
         }
@@ -135,18 +139,27 @@ public class RepositoryRegistryRepositoryEventInspector
     {
         try
         {
-            Repository repository = ( (RepositoryRegistryRepositoryEvent) evt ).getRepository();
+            Repository repository = null;
+
+            if ( evt instanceof RepositoryRegistryRepositoryEvent )
+            {
+                repository = ( (RepositoryRegistryRepositoryEvent) evt ).getRepository();
+            }
+            else
+            {
+                repository = ( (RepositoryConfigurationUpdatedEvent) evt ).getRepository();
+            }
 
             // we are handling repo events, like addition and removal
-            if ( RepositoryRegistryEventAdd.class.isAssignableFrom( evt.getClass() ) )
+            if ( evt instanceof RepositoryRegistryEventAdd )
             {
                 getIndexerManager().addRepositoryIndexContext( repository.getId() );
             }
-            else if ( RepositoryRegistryEventRemove.class.isAssignableFrom( evt.getClass() ) )
+            else if ( evt instanceof RepositoryRegistryEventRemove )
             {
                 getIndexerManager().removeRepositoryIndexContext( repository.getId(), false );
             }
-            else if ( RepositoryRegistryEventUpdate.class.isAssignableFrom( evt.getClass() ) )
+            else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
             {
                 getIndexerManager().updateRepositoryIndexContext( repository.getId() );
             }

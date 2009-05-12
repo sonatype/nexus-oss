@@ -42,6 +42,7 @@ import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
+import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventClearCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
@@ -179,6 +180,10 @@ public abstract class AbstractRepository
                 getConfigurator().prepareForSave( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
 
                 psevt.getChanges().add( this );
+                
+                // cstamas
+                // XXX: hrm, emitting an event in event handler?
+                applicationEventMulticaster.notifyEventListeners( new RepositoryConfigurationUpdatedEvent(this) );
             }
         }
         else if ( evt instanceof ConfigurationRollbackEvent )

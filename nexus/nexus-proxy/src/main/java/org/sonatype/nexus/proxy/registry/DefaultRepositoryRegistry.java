@@ -25,7 +25,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -58,34 +57,17 @@ public class DefaultRepositoryRegistry
     private Map<String, Repository> repositories = new HashMap<String, Repository>();
 
     /** The repo status checkrs */
-    private Map<String, RepositoryStatusCheckerThread> repositoryStatusCheckers = new HashMap<String, RepositoryStatusCheckerThread>();
+    private Map<String, RepositoryStatusCheckerThread> repositoryStatusCheckers =
+        new HashMap<String, RepositoryStatusCheckerThread>();
 
     public void addRepository( Repository repository )
     {
         insertRepository( repository );
 
         getLogger().info(
-            "Added repository ID='" + repository.getId() + "' (contentClass='"
-                + repository.getRepositoryContentClass().getId() + "', mainFacet='"
-                + repository.getRepositoryKind().getMainFacet().getName() + "')" );
-    }
-
-    public void updateRepository( Repository repository )
-        throws NoSuchRepositoryException
-    {
-        if ( repositories.containsKey( repository.getId() ) )
-        {
-            insertRepository( repository );
-
-            getLogger().info(
-                "Updated repository ID='" + repository.getId() + "' (contentClass='"
-                    + repository.getRepositoryContentClass().getId() + "', mainFacet='"
-                    + repository.getRepositoryKind().getMainFacet().getName() + "')" );
-        }
-        else
-        {
-            throw new NoSuchRepositoryException( repository.getId() );
-        }
+                          "Added repository ID='" + repository.getId() + "' (contentClass='"
+                              + repository.getRepositoryContentClass().getId() + "', mainFacet='"
+                              + repository.getRepositoryKind().getMainFacet().getName() + "')" );
     }
 
     public void removeRepository( String repoId )
@@ -96,9 +78,9 @@ public class DefaultRepositoryRegistry
         deleteRepository( repository, false );
 
         getLogger().info(
-            "Removed repository ID='" + repository.getId() + "' (contentClass='"
-                + repository.getRepositoryContentClass().getId() + "', mainFacet='"
-                + repository.getRepositoryKind().getMainFacet().getName() + "')" );
+                          "Removed repository ID='" + repository.getId() + "' (contentClass='"
+                              + repository.getRepositoryContentClass().getId() + "', mainFacet='"
+                              + repository.getRepositoryKind().getMainFacet().getName() + "')" );
     }
 
     public void removeRepositorySilently( String repoId )
@@ -194,8 +176,6 @@ public class DefaultRepositoryRegistry
 
     private void insertRepository( Repository repository )
     {
-        boolean isAddOperation = !repositories.containsKey( repository.getId() );
-
         repositories.put( repository.getId(), repository );
 
         if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
@@ -216,26 +196,14 @@ public class DefaultRepositoryRegistry
             thread.start();
         }
 
-        if ( isAddOperation )
-        {
-            applicationEventMulticaster
-                .notifyEventListeners( new RepositoryRegistryEventAdd( this, repository ) );
-        }
-        else
-        {
-            applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventUpdate(
-                this,
-                repository ) );
-        }
+        applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventAdd( this, repository ) );
     }
 
     private void deleteRepository( Repository repository, boolean silently )
     {
         if ( !silently )
         {
-            applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventRemove(
-                this,
-                repository ) );
+            applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventRemove( this, repository ) );
         }
 
         repositories.remove( repository.getId() );

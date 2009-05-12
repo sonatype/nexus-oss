@@ -11,9 +11,8 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.item.ContentGenerator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -52,18 +51,25 @@ public class NexusRepositoryMetadataEventInspector
 
     public boolean accepts( Event evt )
     {
-        return ( evt instanceof RepositoryRegistryEventAdd ) || ( evt instanceof RepositoryRegistryEventUpdate );
+        return ( evt instanceof RepositoryRegistryEventAdd ) || ( evt instanceof RepositoryConfigurationUpdatedEvent );
     }
 
     public void inspect( Event evt )
     {
-        RepositoryRegistryRepositoryEvent revt = (RepositoryRegistryRepositoryEvent) evt;
+        Repository repository = null;
 
-        if ( revt.getRepository().getRepositoryContentClass().isCompatible( maven2ContentClass )
-            || revt.getRepository().getRepositoryContentClass().isCompatible( maven1ContentClass ) )
+        if ( evt instanceof RepositoryRegistryEventAdd )
         {
-            Repository repository = revt.getRepository();
+            repository = ( (RepositoryRegistryEventAdd) evt ).getRepository();
+        }
+        else
+        {
+            repository = ( (RepositoryConfigurationUpdatedEvent) evt ).getRepository();
+        }
 
+        if ( repository.getRepositoryContentClass().isCompatible( maven2ContentClass )
+            || repository.getRepositoryContentClass().isCompatible( maven1ContentClass ) )
+        {
             if ( LocalStatus.OUT_OF_SERVICE.equals( repository.getLocalStatus() ) )
             {
                 return;
@@ -84,7 +90,7 @@ public class NexusRepositoryMetadataEventInspector
             else if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
             {
                 // this is a maven repository
-                MavenRepository mrepository = revt.getRepository().adaptToFacet( MavenRepository.class );
+                MavenRepository mrepository = repository.adaptToFacet( MavenRepository.class );
 
                 if ( mrepository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
                 {
