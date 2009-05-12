@@ -270,7 +270,7 @@ public class DefaultIndexerManager
         {
             return;
         }
-        
+
         if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
         {
             // group repository
@@ -293,6 +293,9 @@ public class DefaultIndexerManager
 
             addRepositoryIndexContext( repositoryId );
         }
+
+        // set include in search/indexable
+        setRepositoryIndexContextSearchable( repositoryId, repository.isIndexable() );
     }
 
     public IndexingContext getRepositoryLocalIndexContext( String repositoryId )
