@@ -24,6 +24,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -38,6 +39,8 @@ import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.util.EnumUtil;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 /**
  * Resource handler for Repository resource.
@@ -137,15 +140,15 @@ public class RepositoryPlexusResource
 
                         if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
                         {
-                            RepositoryPolicy repoPolicy = EnumUtil.valueOf( model.getRepoPolicy(), RepositoryPolicy.class );
-                            repository.adaptToFacet( MavenRepository.class ).setRepositoryPolicy(
-                                                                                                  repoPolicy );
+                            RepositoryPolicy repoPolicy =
+                                EnumUtil.valueOf( model.getRepoPolicy(), RepositoryPolicy.class );
+                            repository.adaptToFacet( MavenRepository.class ).setRepositoryPolicy( repoPolicy );
 
                             if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
                             {
-                                ChecksumPolicy checksum = EnumUtil.valueOf( model.getChecksumPolicy(), ChecksumPolicy.class );
-                                repository.adaptToFacet( MavenProxyRepository.class ).setChecksumPolicy(
-                                                                                                         checksum );
+                                ChecksumPolicy checksum =
+                                    EnumUtil.valueOf( model.getChecksumPolicy(), ChecksumPolicy.class );
+                                repository.adaptToFacet( MavenProxyRepository.class ).setChecksumPolicy( checksum );
 
                                 repository.adaptToFacet( MavenProxyRepository.class ).setDownloadRemoteIndexes(
                                                                                                                 model.isDownloadRemoteIndexes() );
@@ -160,7 +163,7 @@ public class RepositoryPlexusResource
                         if ( RepositoryProxyResource.class.isAssignableFrom( model.getClass() ) )
                         {
                             // XXX cstamas!
-                            //appModel = getRepositoryProxyAppModel( (RepositoryProxyResource) model, appModel );
+                            // appModel = getRepositoryProxyAppModel( (RepositoryProxyResource) model, appModel );
                         }
 
                         getNexusConfiguration().saveConfiguration();
@@ -176,6 +179,12 @@ public class RepositoryPlexusResource
             catch ( ConfigurationException e )
             {
                 handleConfigurationException( e );
+            }
+            catch ( StorageException e )
+            {
+                ErrorResponse nexusErrorResponse = getNexusErrorResponse( "*", e.getMessage() );
+                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.",
+                                                   nexusErrorResponse );
             }
             catch ( IOException e )
             {
