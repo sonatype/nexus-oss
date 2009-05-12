@@ -380,6 +380,8 @@ public class CommonsHttpClientRemoteStorage
 
             if ( rps.getProxyAuthentication() != null )
             {
+                ras = rps.getProxyAuthentication();
+                
                 List<String> authPrefs = new ArrayList<String>( 2 );
                 authPrefs.add( AuthPolicy.DIGEST );
                 authPrefs.add( AuthPolicy.BASIC );
