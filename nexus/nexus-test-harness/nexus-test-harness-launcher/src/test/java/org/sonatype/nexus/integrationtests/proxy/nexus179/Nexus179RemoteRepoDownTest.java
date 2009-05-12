@@ -15,7 +15,6 @@ package org.sonatype.nexus.integrationtests.proxy.nexus179;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Date;
 
 import junit.framework.Assert;
@@ -27,6 +26,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
  * Create an http server. Create a proxy repo to http server. Access a file from http server. Stop http server. access
@@ -36,11 +36,9 @@ public class Nexus179RemoteRepoDownTest
     extends AbstractNexusProxyIntegrationTest
 {
 
-    public static final String TEST_RELEASE_REPO = "release-proxy-repo-1";
-
     public Nexus179RemoteRepoDownTest()
     {
-        super( TEST_RELEASE_REPO );
+        super( REPO_RELEASE_PROXY_REPO1 );
     }
 
     @Test
@@ -57,7 +55,7 @@ public class Nexus179RemoteRepoDownTest
             new Gav( this.getTestId(), "repo-down-test-artifact", "1.0.0", null, "xml", 0, new Date().getTime(),
                      "Simple Test Artifact", false, false, null, false, null );
 
-        File localFile = this.getLocalFile( TEST_RELEASE_REPO, gav );
+        File localFile = this.getLocalFile( REPO_RELEASE_PROXY_REPO1, gav );
 
         // make sure this exists first, or the test is invalid anyway.
         Assert.assertTrue( "The File: " + localFile + " does not exist.", localFile.exists() );
@@ -86,11 +84,8 @@ public class Nexus179RemoteRepoDownTest
 
         clearProxyCache();
 
-        // Give task a chance to run
-        Thread.sleep( 4000 );
-
         // unblock the proxy
-        this.setBlockProxy( this.getBaseNexusUrl(), TEST_RELEASE_REPO, false );
+        this.setBlockProxy( this.getBaseNexusUrl(), REPO_RELEASE_PROXY_REPO1, false );
 
         File artifact = this.downloadArtifact( gav, "target/downloads" );
 
@@ -98,17 +93,19 @@ public class Nexus179RemoteRepoDownTest
     }
 
     private void clearProxyCache()
-        throws IOException
+        throws Exception
     {
 
-        String serviceURI = "service/local/data_cache/repositories/" + TEST_RELEASE_REPO + "/content";
+        String serviceURI = "service/local/data_cache/repositories/" + REPO_RELEASE_PROXY_REPO1 + "/content";
 
         Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not clear the cache for repo: " + TEST_RELEASE_REPO );
+            Assert.fail( "Could not clear the cache for repo: " + REPO_RELEASE_PROXY_REPO1 );
         }
+
+        TaskScheduleUtil.waitForTasks();
     }
 
 }

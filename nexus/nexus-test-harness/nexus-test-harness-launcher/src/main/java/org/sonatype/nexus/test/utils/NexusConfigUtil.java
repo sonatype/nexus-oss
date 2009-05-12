@@ -21,6 +21,7 @@ import java.io.Writer;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Assert;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -41,11 +42,13 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 public class NexusConfigUtil
 {
 
+    private static Logger log = Logger.getLogger( NexusConfigUtil.class );
+
     public static Configuration getNexusConfig()
         throws IOException
     {
-//        TestContainer.getInstance().getContainer().addContextValue( "nexus-work",
-//                                                                    AbstractNexusIntegrationTest.nexusWorkDir );
+        // TestContainer.getInstance().getContainer().addContextValue( "nexus-work",
+        // AbstractNexusIntegrationTest.nexusWorkDir );
         NexusConfiguration config;
         try
         {
@@ -54,6 +57,7 @@ public class NexusConfigUtil
         }
         catch ( Exception e )
         {
+            log.error( e.getMessage(), e );
             Assert.fail( "Unable to load config " + e.getMessage() );
             config = null;
         }

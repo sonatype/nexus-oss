@@ -53,6 +53,7 @@ import org.sonatype.nexus.integrationtests.nexus260.Nexus260MultipleDeployTest;
 import org.sonatype.nexus.integrationtests.nexus261.Nexus261NexusGroupDownloadTest;
 import org.sonatype.nexus.integrationtests.nexus292.Nexus292SoftRestartTest;
 import org.sonatype.nexus.integrationtests.nexus379.Nexus379VirtualRepoSameId;
+import org.sonatype.nexus.integrationtests.nexus383.Nexus383SearchTest;
 import org.sonatype.nexus.integrationtests.nexus384.Nexus384DotAndDashSearchTest;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesValidationTests;
@@ -212,7 +213,8 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1116.Nexus1116InvalidPr
     Nexus1329RetryMirrorTest.class,
     Nexus1329UnavailableTest.class,
     Nexus1696ValidateBaseUrl.class,
-    Nexus1563ExternalRealmsTest.class
+    Nexus1563ExternalRealmsTest.class,
+    Nexus383SearchTest.class
 } )
 public class IntegrationTestSuiteClasses
 {

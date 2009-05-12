@@ -97,13 +97,13 @@ public abstract class AbstractNexusProxyIntegrationTest
         status.setLocalStatus( LocalStatus.IN_SERVICE.name() );
         if ( block )
         {
-            status.setRemoteStatus( RemoteStatus.UNAVAILABLE.name() );
-            status.setProxyMode( ProxyMode.ALLOW.name() );
+            status.setRemoteStatus( RemoteStatus.AVAILABLE.name() );
+            status.setProxyMode( ProxyMode.BLOKED_MANUAL.name() );
         }
         else
         {
-            status.setRemoteStatus( RemoteStatus.AVAILABLE.name() );
-            status.setProxyMode( ProxyMode.BLOKED_MANUAL.name() );
+            status.setRemoteStatus( RemoteStatus.UNAVAILABLE.name() );
+            status.setProxyMode( ProxyMode.ALLOW.name() );
         }
         Response response = RepositoryStatusMessageUtil.changeStatus( status );
 
