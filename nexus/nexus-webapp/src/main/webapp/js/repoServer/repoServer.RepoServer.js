@@ -130,9 +130,14 @@ Sonatype.repoServer.RepoServer = function(){
         formBind: true,
         scope: this,
         handler:function(){
+          var usernameField = this.loginForm.find('name', 'username')[0];
+          var passwordField = this.loginForm.find('name', 'password')[0];
+          
+          if ( usernameField.isValid() && passwordField.isValid() ){
           Sonatype.utils.doLogin( this.loginWindow,
-            this.loginForm.find('name', 'username')[0].getValue(),
-            this.loginForm.find('name', 'password')[0].getValue()); 
+            usernameField.getValue(),
+            passwordField.getValue());
+          }
         } 
       }];
       
