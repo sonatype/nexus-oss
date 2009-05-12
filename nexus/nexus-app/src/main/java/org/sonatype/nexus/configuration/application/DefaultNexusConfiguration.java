@@ -54,9 +54,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
-import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -72,7 +70,7 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
  * state with p ersisted user configuration. All changes incoming thru its iface is reflect/maintained in Nexus current
  * state and Nexus user config.
- * 
+ *
  * @author cstamas
  */
 @Component( role = NexusConfiguration.class )
@@ -714,13 +712,6 @@ public class DefaultNexusConfiguration
         throws NoSuchRepositoryException, IOException, ConfigurationException
     {
         Repository repository = repositoryRegistry.getRepository( id );
-
-        if ( !repository.getRepositoryKind().isFacetAvailable( HostedRepository.class )
-            && !repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            // this is something else
-            throw new NoSuchRepositoryException( id );
-        }
 
         repository.setLocalStatus( LocalStatus.OUT_OF_SERVICE );
 
