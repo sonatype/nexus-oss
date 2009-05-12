@@ -235,7 +235,7 @@ public abstract class AbstractIndexContentPlexusResource
 
     protected ContentListResource createFileResource( Request request, String path, ArtifactInfo ai, String resourceURI )
     {
-        String filename = ai.artifactId + "-" + ai.version + ".jar";
+        String filename = ai.artifactId + "-" + ai.version + "." + ai.packaging;
         path += ai.artifactId + "/" + ai.version + "/" + filename;
         ContentListResource fileResource = new ContentListResource();
         fileResource.setText( filename );
