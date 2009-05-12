@@ -212,27 +212,5 @@ public class Nexus874SecurityRealmReplacementTest
             // OK
         }
 
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
-
-        try
-        {
-            userUtil.getList();
-            Assert.fail();
-        }
-        catch ( Exception e )
-        {
-            // OK
-        }
-
-        try
-        {
-            roleUtil.getList();
-            Assert.fail();
-        }
-        catch ( Exception e )
-        {
-            // OK
-        }
     }
 }

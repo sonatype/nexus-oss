@@ -102,7 +102,7 @@ public class TaskScheduleUtil
     public static void waitForTasks()
         throws Exception
     {
-        waitForTasks( 300 );
+        waitForTasks( 40 );
     }
 
     public static void waitForTasks( int maxAttempts )
@@ -137,7 +137,7 @@ public class TaskScheduleUtil
 
     /**
      * Blocks while waiting for a task to finish.
-     * 
+     *
      * @param name
      * @return
      * @throws Exception
@@ -236,7 +236,7 @@ public class TaskScheduleUtil
         ScheduledServicePropertyResource... properties )
         throws Exception
     {
-        return runTask( taskName, typeId, 300, properties );
+        return runTask( taskName, typeId, 40, properties );
     }
 
 }

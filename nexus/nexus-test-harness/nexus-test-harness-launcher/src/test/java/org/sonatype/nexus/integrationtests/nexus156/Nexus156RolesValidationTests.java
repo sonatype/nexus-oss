@@ -31,7 +31,7 @@ import org.sonatype.nexus.test.utils.SecurityConfigUtil;
  */
 public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
 {
-    
+
     protected RoleMessageUtil messageUtil;
 
     public Nexus156RolesValidationTests()
@@ -60,7 +60,7 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
         }
         Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
     }
-    
+
     @Test
     public void roleWithNoName()
         throws IOException
@@ -81,7 +81,7 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
         }
         Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
     }
-    
+
     @Test
     public void roleWithSpaceInId()
         throws IOException
@@ -96,13 +96,12 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
-        if ( response.getStatus().isSuccess() )
+        if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Response: "+ response.getEntity().getText() +"Role should not have been created: " + response.getStatus() );
+            Assert.fail( "Response: "+ response.getEntity().getText() +"Role should have been created: " + response.getStatus() );
         }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
     }
-    
+
     @Test
     public void duplicateIdTest()
         throws IOException
@@ -129,7 +128,7 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
         }
         Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
     }
-    
+
     @Test
     public void createWithNoTimeout()
         throws IOException
@@ -150,7 +149,7 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
         }
         Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
     }
-    
+
     @Test
     public void createRecursiveContainment()
         throws IOException
@@ -159,63 +158,63 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
         resourceA.setName( "recursive1" );
         resourceA.setSessionTimeout( 60 );
         resourceA.addPrivilege( "1" );
-        
+
         Response response = this.messageUtil.sendMessage( Method.POST, resourceA );
-        
+
         if ( !response.getStatus().isSuccess() )
         {
             Assert.fail( "Role should have been created: " + response.getStatus() );
         }
-        
+
         // get the Resource object
         RoleResource responseResourceA = this.messageUtil.getResourceFromResponse( response );
-        
+
         RoleResource resourceB = new RoleResource();
         resourceB = new RoleResource();
         resourceB.setName( "recursive2" );
         resourceB.setSessionTimeout( 60 );
         resourceB.addRole( responseResourceA.getId() );
-        
+
         response = this.messageUtil.sendMessage( Method.POST, resourceB );
-        
+
         if ( !response.getStatus().isSuccess() )
         {
             Assert.fail( "Role should have been created: " + response.getStatus() );
         }
-        
+
         // get the Resource object
         RoleResource responseResourceB = this.messageUtil.getResourceFromResponse( response );
-        
+
         RoleResource resourceC = new RoleResource();
         resourceC = new RoleResource();
         resourceC.setName( "recursive3" );
         resourceC.setSessionTimeout( 60 );
         resourceC.addRole( responseResourceB.getId() );
-        
+
         response = this.messageUtil.sendMessage( Method.POST, resourceC );
-        
+
         if ( !response.getStatus().isSuccess() )
         {
             Assert.fail( "Role should have been created: " + response.getStatus() );
         }
-        
+
         // get the Resource object
         RoleResource responseResourceC = this.messageUtil.getResourceFromResponse( response );
-        
+
         resourceA.setId( responseResourceA.getId() );
         resourceA.getRoles().clear();
         resourceA.addRole( responseResourceC.getId() );
-        
+
         response = this.messageUtil.sendMessage( Method.PUT, resourceA );
 
         if ( response.getStatus().isSuccess() )
         {
             Assert.fail( "Role should not have been updated: " + response.getStatus() );
         }
-        
+
         Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
     }
-    
+
     @Test
     public void updateValidationTests() throws IOException
     {
@@ -250,7 +249,7 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
 
         SecurityConfigUtil.verifyRole( resource );
 
-        
+
         /*
          * NO Name
          */
@@ -267,10 +266,10 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
         {
             Assert.fail( "Role should not have been updated: " + response.getStatus() );
         }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );        
-        
-        
-        
+        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+
+
+
         /*
          * NO Privs
          */
@@ -287,7 +286,7 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
             Assert.fail( "Role should not have been updated: " + response.getStatus() );
         }
         Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
-        
+
         /*
          * INVALID Privs
          */
@@ -304,7 +303,7 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
             Assert.fail( "Role should not have been updated: " + response.getStatus() );
         }
         Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
-     
+
         /*
          * Update Id
          */
@@ -324,9 +323,9 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
         }
         // expect a 404
         Assert.assertEquals( 404, response.getStatus().getCode() );
-        
-        
+
+
     }
-    
-    
+
+
 }

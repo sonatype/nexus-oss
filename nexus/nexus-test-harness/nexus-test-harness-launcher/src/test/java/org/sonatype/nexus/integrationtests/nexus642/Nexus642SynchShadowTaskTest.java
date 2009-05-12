@@ -14,10 +14,12 @@
 package org.sonatype.nexus.integrationtests.nexus642;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -32,6 +34,13 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public class Nexus642SynchShadowTaskTest
     extends AbstractNexusIntegrationTest
 {
+
+    @BeforeClass
+    public static void cleanEnv()
+        throws IOException
+    {
+        cleanWorkDir();
+    }
 
     @Test
     public void synchShadowTest()

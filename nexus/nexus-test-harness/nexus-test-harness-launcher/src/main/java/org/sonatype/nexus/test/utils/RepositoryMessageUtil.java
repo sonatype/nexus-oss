@@ -320,7 +320,7 @@ public class RepositoryMessageUtil
         }
 
         // let s w8 a few time for indexes
-        Thread.sleep( 1000 * repositories.length );
+        TaskScheduleUtil.waitForTasks();
 
     }
 

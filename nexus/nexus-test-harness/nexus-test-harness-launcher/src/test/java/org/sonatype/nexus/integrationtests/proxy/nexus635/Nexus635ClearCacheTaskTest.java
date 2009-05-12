@@ -16,12 +16,15 @@ package org.sonatype.nexus.integrationtests.proxy.nexus635;
 import static org.sonatype.nexus.test.utils.FileTestingUtils.compareFileSHA1s;
 
 import java.io.File;
+import java.io.IOException;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ClearCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.MavenDeployer;
@@ -36,6 +39,13 @@ public class Nexus635ClearCacheTaskTest
 
     private static final Gav GAV =
         new Gav( "nexus635", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, true, false, null, false, null );
+
+    @BeforeClass
+    public static void cleanEnv()
+        throws IOException
+    {
+        cleanWorkDir();
+    }
 
     public Nexus635ClearCacheTaskTest()
     {
@@ -62,13 +72,13 @@ public class Nexus635ClearCacheTaskTest
         addSnapshotArtifactToProxy( artifact1 );
 
         File firstDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
-        Assert.assertTrue( "First time, should download artifact 1", // 
+        Assert.assertTrue( "First time, should download artifact 1", //
                            compareFileSHA1s( firstDownload, artifact1 ) );
 
         File artifact2 = getTestFile( "artifact-2.jar" );
         addSnapshotArtifactToProxy( artifact2 );
         File secondDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
-        Assert.assertTrue( "Before ClearCache should download artifact 1",// 
+        Assert.assertTrue( "Before ClearCache should download artifact 1",//
                            compareFileSHA1s( secondDownload, artifact1 ) );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
@@ -80,7 +90,8 @@ public class Nexus635ClearCacheTaskTest
         // prop.setValue( "/" );
 
         // This is THE important part
-        TaskScheduleUtil.runTask( ClearCacheTaskDescriptor.ID, prop );
+        ScheduledServiceListResource task = TaskScheduleUtil.runTask( ClearCacheTaskDescriptor.ID, prop );
+        Assert.assertNotNull( task );
 
         File thirdDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
         Assert.assertTrue( "After ClearCache should download artifact 2", //

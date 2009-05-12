@@ -25,6 +25,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
@@ -44,6 +45,13 @@ import com.thoughtworks.xstream.XStream;
 public class Nexus636EvictUnusedProxiedTaskTest
     extends AbstractNexusIntegrationTest
 {
+
+    @BeforeClass
+    public static void cleanEnv()
+        throws IOException
+    {
+        cleanWorkDir();
+    }
 
     private File repositoryPath;
 

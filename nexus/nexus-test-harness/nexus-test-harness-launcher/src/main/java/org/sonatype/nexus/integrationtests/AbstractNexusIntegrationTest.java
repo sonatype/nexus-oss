@@ -53,6 +53,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
+import org.sonatype.nexus.test.utils.NexusIllegalStateException;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
@@ -64,7 +65,7 @@ import com.thoughtworks.xstream.XStream;
  * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code>
  * issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
-
+// @RunWith(ConsoleLoggingRunner.class)
 public class AbstractNexusIntegrationTest
 {
 
@@ -118,6 +119,8 @@ public class AbstractNexusIntegrationTest
      */
     private boolean verifyNexusConfigBeforeStart = true;
 
+    private static boolean isNexusCrashed = false;
+
     static
     {
         nexusApplicationPort = TestProperties.getInteger( "nexus.application.port" );
@@ -166,6 +169,15 @@ public class AbstractNexusIntegrationTest
             log.debug( "oncePerClassSetUp is init: " + NEEDS_INIT );
             if ( NEEDS_INIT )
             {
+                File[] logs = new File( nexusLogDir ).listFiles();
+                for ( File log : logs )
+                {
+                    if ( log.getName().startsWith( "nexus.log" ) )
+                    {
+                        log.delete();
+                    }
+                }
+
                 System.out.println( "Running Test: " + this.getClass().getSimpleName() );
 
                 // tell the console what we are doing, now that there is no output its
@@ -346,6 +358,8 @@ public class AbstractNexusIntegrationTest
         // reset this for each test
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
+        FileUtils.copyFile( new File( nexusLogDir, "nexus.log" ), new File( nexusLogDir, "nexus-" + getTestId()
+            + ".log" ) );
     }
 
     private void startNexus()
@@ -359,35 +373,43 @@ public class AbstractNexusIntegrationTest
         // if nexus is running but stopped we only want to do a softstart
         // and we don't want to start if it is already running.
 
-        if ( NexusStatusUtil.isNexusRunning() )
+        try
         {
-            // we have nothing to do if its running
-            return;
+            if ( NexusStatusUtil.isNexusRunning() )
+            {
+                // we have nothing to do if its running
+                return;
+            }
+            else if ( NexusStatusUtil.isNexusAlive() )
+            {
+                NexusStatusUtil.doSoftStart();
+            }
+            else
+            {
+                // nexus is not running....
+                // that is ok, most likely someone ran a single test from eclipse
+
+                // we need a hard start
+                NEEDS_HARD_STOP = true;
+
+                log.info( "***************************" );
+                log.info( "*\n*" );
+                log.info( "*  DOING A HARD START OF NEXUS." );
+                log.info( "*  If your not running a single test manually, then something bad happened" );
+                log.info( "*\n*" );
+                log.info( "***************************" );
+
+                NexusStatusUtil.doHardStart();
+            }
         }
-        else if ( NexusStatusUtil.isNexusAlive() )
+        catch ( NexusIllegalStateException e )
         {
-            NexusStatusUtil.doSoftStart();
-        }
-        else
-        {
-            // nexus is not running....
-            // that is ok, most likely someone ran a single test from eclipse
-
-            // we need a hard start
-            NEEDS_HARD_STOP = true;
-
-            log.info( "***************************" );
-            log.info( "*\n*" );
-            log.info( "*  DOING A HARD START OF NEXUS." );
-            log.info( "*  If your not running a single test manually, then something bad happened" );
-            log.info( "*\n*" );
-            log.info( "***************************" );
-
-            NexusStatusUtil.doHardStart();
+            log.error( "Nexus crashed, skipping remmaing tests", e );
+            isNexusCrashed = true;
         }
     }
 
-    private void stopNexus()
+    private static void stopNexus()
         throws Exception
     {
         log.info( "stopping Nexus" );
@@ -515,6 +537,11 @@ public class AbstractNexusIntegrationTest
     @BeforeClass
     public static void staticOncePerClassSetUp()
     {
+        if ( isNexusCrashed )
+        {
+            throw new IllegalStateException( "Nexus crashed, unable to run ITs" );
+        }
+
         log.debug( "staticOncePerClassSetUp" );
         // hacky state machine
         NEEDS_INIT = true;
@@ -524,8 +551,13 @@ public class AbstractNexusIntegrationTest
     public static void oncePerClassTearDown()
         throws Exception
     {
+        if ( isNexusCrashed )
+        {
+            throw new IllegalStateException( "Nexus crashed, unable to run ITs" );
+        }
+
         // stop nexus
-        new AbstractNexusIntegrationTest().stopNexus();
+        AbstractNexusIntegrationTest.stopNexus();
     }
 
     protected void setupContainer()

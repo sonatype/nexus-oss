@@ -13,10 +13,12 @@
  */
 package org.sonatype.nexus.integrationtests.nexus639;
 
+import java.io.IOException;
 import java.util.List;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
@@ -34,36 +36,43 @@ import com.sun.syndication.feed.synd.SyndFeed;
 public class Nexus639PurgeTaskTest
     extends AbstractNexusIntegrationTest
 {
-    
+
+    @BeforeClass
+    public static void cleanEnv()
+        throws IOException
+    {
+        cleanWorkDir();
+    }
+
     @Test
     public void doPurgeTaskTest() throws Exception
     {
         // an artifact was deployed already, so test the deploy feed has something.
-        
+
         SyndFeed feed = FeedUtil.getFeed( "recentlyDeployedArtifacts" );
         List<SyndEntry> entries = feed.getEntries();
-        
+
         Assert.assertTrue("Expected artifacts in the recentlyDeployed feed.", entries.size() > 0 );
-        
+
         // run the purge task for everything
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setId( "purgeOlderThan" );
         repo.setValue( "0" );
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( "purge", PurgeTimelineTaskDescriptor.ID, repo );
-        
+
         Assert.assertNotNull( task );
         Assert.assertEquals( "SUBMITTED", task.getStatus() );
-        
+
         // validate the feeds contain nothing.
-        
+
         feed = FeedUtil.getFeed( "recentlyDeployedArtifacts" );
         entries = feed.getEntries();
-        
+
 //        for ( SyndEntry syndEntry : entries )
 //        {
 //            System.out.println( "entry: "+ syndEntry.getTitle() );
 //        }
-//        
+//
         Assert.assertTrue("Expected ZERO artifacts in the recentlyDeployed feed.", entries.size() == 0 );
     }
 

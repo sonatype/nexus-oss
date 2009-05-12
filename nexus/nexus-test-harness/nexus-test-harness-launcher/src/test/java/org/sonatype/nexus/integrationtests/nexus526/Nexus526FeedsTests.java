@@ -13,12 +13,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus526;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -36,23 +38,19 @@ public class Nexus526FeedsTests
 
     private Gav gav;
 
+    @BeforeClass
+    public static void cleanEnv()
+        throws IOException
+    {
+        cleanWorkDir();
+    }
+
     public Nexus526FeedsTests()
     {
         super( "nexus-test-harness-repo" );
-        this.gav = new Gav(
-            this.getTestId(),
-            "artifact1",
-            "1.0.0",
-            null,
-            "jar",
-            0,
-            new Date().getTime(),
-            "Artifact 1",
-            false,
-            false,
-            null,
-            false,
-            null );
+        this.gav =
+            new Gav( this.getTestId(), "artifact1", "1.0.0", null, "jar", 0, new Date().getTime(), "Artifact 1", false,
+                     false, null, false, null );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -64,7 +62,8 @@ public class Nexus526FeedsTests
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( entries.size() >= 2 );
+        Assert.assertTrue( "Expected more then 2 entries, but got " + entries.size() + " - " + entries,
+                           entries.size() >= 2 );
 
         List<SyndEntry> latestEntries = new ArrayList<SyndEntry>( 2 );
 
@@ -84,7 +83,8 @@ public class Nexus526FeedsTests
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( entries.size() >= 2 );
+        Assert.assertTrue( "Expected more then 2 entries, but got " + entries.size() + " - " + entries,
+                           entries.size() >= 2 );
 
         List<SyndEntry> latestEntries = new ArrayList<SyndEntry>( 2 );
 
@@ -104,7 +104,8 @@ public class Nexus526FeedsTests
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( entries.size() >= 2 );
+        Assert.assertTrue( "Expected more then 2 entries, but got " + entries.size() + " - " + entries,
+                           entries.size() >= 2 );
 
         List<SyndEntry> latestEntries = new ArrayList<SyndEntry>( 2 );
 
@@ -124,8 +125,8 @@ public class Nexus526FeedsTests
 
         List<SyndEntry> entries = feed.getEntries();
 
-        // although there are 2 files, but that is only 1 Maven artifact
-        Assert.assertTrue( entries.size() >= 1 );
+        Assert.assertTrue( "Expected more then 1 entries, but got " + entries.size() + " - " + entries,
+                           entries.size() >= 1 );
 
         List<SyndEntry> latestEntries = new ArrayList<SyndEntry>( 1 );
 
@@ -143,7 +144,8 @@ public class Nexus526FeedsTests
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( entries.size() >= 1 );
+        Assert.assertTrue( "Expected more then 1 entries, but got " + entries.size() + " - " + entries,
+                           entries.size() >= 1 );
 
         List<SyndEntry> latestEntries = new ArrayList<SyndEntry>( 1 );
 
@@ -161,7 +163,8 @@ public class Nexus526FeedsTests
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( entries.size() >= 1 );
+        Assert.assertTrue( "Expected more then 1 entries, but got " + entries.size() + " - " + entries,
+                           entries.size() >= 1 );
 
         List<SyndEntry> latestEntries = new ArrayList<SyndEntry>( 1 );
 
@@ -173,22 +176,23 @@ public class Nexus526FeedsTests
     private void validateArtifactInFeedEntries( List<SyndEntry> entries )
         throws Exception
     {
-        String link = getBaseNexusUrl() + "content/repositories/" + getTestRepositoryId() + "/"
-            + getRelitiveArtifactPath( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), "pom", null );
+        String link =
+            getBaseNexusUrl() + "content/repositories/" + getTestRepositoryId() + "/"
+                + getRelitiveArtifactPath( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), "pom", null );
 
         for ( SyndEntry entry : entries )
         {
             // check if the title contains the groupid, artifactid, and version
             String title = entry.getTitle();
 
-            Assert.assertTrue( "Feed title does not contain the groupId. Title was: " + title, title.contains( gav
-                .getGroupId() ) );
+            Assert.assertTrue( "Feed title does not contain the groupId. Title was: " + title,
+                               title.contains( gav.getGroupId() ) );
 
-            Assert.assertTrue( "Feed title does not contain the artifactId. Title was: " + title, title.contains( gav
-                .getArtifactId() ) );
+            Assert.assertTrue( "Feed title does not contain the artifactId. Title was: " + title,
+                               title.contains( gav.getArtifactId() ) );
 
-            Assert.assertTrue( "Feed title does not contain the version. Title was: " + title, title.contains( gav
-                .getVersion() ) );
+            Assert.assertTrue( "Feed title does not contain the version. Title was: " + title,
+                               title.contains( gav.getVersion() ) );
 
             Assert.assertEquals( link, entry.getLink() );
         }
