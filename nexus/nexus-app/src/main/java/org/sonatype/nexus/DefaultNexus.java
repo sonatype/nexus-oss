@@ -43,6 +43,7 @@ import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
@@ -1031,7 +1032,7 @@ public class DefaultNexus
         {
             getLogger().info( "Creating default hosted release repository template..." );
 
-            CRepository hostedTemplate = new CRepository();
+            CRepository hostedTemplate = new DefaultCRepository();
 
             hostedTemplate.setProviderRole( Repository.class.getName() );
 
@@ -1065,7 +1066,7 @@ public class DefaultNexus
         {
             getLogger().info( "Creating default hosted snapshot repository template..." );
 
-            CRepository hostedTemplate = new CRepository();
+            CRepository hostedTemplate = new DefaultCRepository();
 
             hostedTemplate.setProviderRole( Repository.class.getName() );
 
@@ -1099,7 +1100,7 @@ public class DefaultNexus
         {
             getLogger().info( "Creating default proxied release repository template..." );
 
-            CRepository proxiedTemplate = new CRepository();
+            CRepository proxiedTemplate = new DefaultCRepository();
 
             proxiedTemplate.setProviderRole( Repository.class.getName() );
 
@@ -1135,7 +1136,7 @@ public class DefaultNexus
         {
             getLogger().info( "Creating default proxied snapshot repository template..." );
 
-            CRepository proxiedTemplate = new CRepository();
+            CRepository proxiedTemplate = new DefaultCRepository();
 
             proxiedTemplate.setProviderRole( Repository.class.getName() );
 
@@ -1173,7 +1174,7 @@ public class DefaultNexus
         {
             getLogger().info( "Creating default virtual repository template..." );
 
-            CRepository shadowTemplate = new CRepository();
+            CRepository shadowTemplate = new DefaultCRepository();
 
             shadowTemplate.setProviderRole( ShadowRepository.class.getName() );
 
