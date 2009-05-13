@@ -91,7 +91,7 @@ public class EnvironmentMojo
      * @required
      */
     private File destination;
-
+    
     /**
      * Artifact file containing nexus bundle
      *
@@ -184,11 +184,19 @@ public class EnvironmentMojo
 
         Artifact bundle = getMavenArtifact( nexusBundleArtifact );
 
-        unpack( bundle.getFile(), destination, bundle.getType() );
+        if( this.markerExist( "bundle" ) )
+        {
+            unpack( bundle.getFile(), destination, bundle.getType() );
+            this.createMarkerFile( "bundle" );
+        }
 
         File nexusBaseDir = new File( destination, bundle.getArtifactId() + "-" + bundle.getBaseVersion() );
         project.getProperties().put( "nexus-base-dir", getPath( nexusBaseDir ) );
         project.getProperties().put( "nexus-work-dir", getPath( new File( destination, "nexus-work-dir" ) ) );
+        
+        // conf dir
+        project.getProperties().put( "application-conf", getPath( new File( destination, "nexus-work-dir/conf" ) ) );
+        
 
         copyUrl( "/default-config/plexus.properties", new File( nexusBaseDir, "conf/plexus.properties" ) );
         project.getProperties().put( "nexus-plexus-config-file", getPath( new File( nexusBaseDir, "conf/plexus.xml" ) ) );
@@ -227,6 +235,7 @@ public class EnvironmentMojo
 
             copyUrl( "/default-config/nexus.xml", new File( defaultConfig, "nexus.xml" ) );
             copyUrl( "/default-config/security.xml", new File( defaultConfig, "security.xml" ) );
+            copyUrl( "/default-config/security-configuration.xml", new File( defaultConfig, "security-configuration.xml" ) );
             copyUrl( "/default-config/settings.xml", new File( defaultConfig, "settings.xml" ) );
             copyUrl( "/default-config/log4j.properties", new File( defaultConfig, "log4j.properties" ) );
 
@@ -482,7 +491,13 @@ public class EnvironmentMojo
         throws MojoExecutionException, MojoFailureException
     {
         Artifact artifact = getMavenArtifact( mavenArtifact );
-        unpack( artifact.getFile(), mavenLocation, artifact.getType() );
+        
+        if( !this.markerExist(  "maven" ))
+        {
+            unpack( artifact.getFile(), mavenLocation, artifact.getType() );
+            this.createMarkerFile( "maven" );
+        }
+        
         return artifact;
     }
 
@@ -664,6 +679,32 @@ public class EnvironmentMojo
         throws ContextException
     {
         plexus = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+    }
+    
+    private boolean markerExist( String markerName )
+    {
+        File marker = new File( project.getBuild().getDirectory(), markerName +".marker");
+        return marker.exists();
+    }
+    
+    private void createMarkerFile( String markerName )
+    {
+        File marker = new File( project.getBuild().getDirectory(), markerName +".marker");
+            try
+        {
+            if ( !marker.createNewFile() )
+            {
+                this.getLog().warn(
+                    "Failed to create marker file: " + marker.getAbsolutePath()
+                        + " bundle will be extracted every time you run the build." );
+            }
+        }
+        catch ( IOException e )
+        {
+            this.getLog().warn(
+                "Failed to create marker file: " + marker.getAbsolutePath()
+                    + " bundle will be extracted every time you run the build." );
+        }
     }
 
 }
