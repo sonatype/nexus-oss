@@ -184,7 +184,7 @@ public class EnvironmentMojo
 
         Artifact bundle = getMavenArtifact( nexusBundleArtifact );
 
-        if( this.markerExist( "bundle" ) )
+        if( !this.markerExist( "bundle" ) )
         {
             unpack( bundle.getFile(), destination, bundle.getType() );
             this.createMarkerFile( "bundle" );
