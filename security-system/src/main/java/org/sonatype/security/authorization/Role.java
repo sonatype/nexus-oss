@@ -18,19 +18,10 @@ public class Role
     // TODO: remove this, we don't use this
     private int sessionTimeout;
 
-    private Set<String> permissions = new HashSet<String>();
+    private Set<String> roles = new HashSet<String>();
+    
+    private Set<String> privileges = new HashSet<String>();
 
-    public Role()
-    {
-
-    }
-
-    public Role( String roleId, String name, String source )
-    {
-        this.roleId = roleId;
-        this.name = name;
-        this.source = source;
-    }
 
     public String getRoleId()
     {
@@ -62,19 +53,34 @@ public class Role
         this.source = source;
     }
 
-    public Set<String> getPermissions()
+    public Set<String> getRoles()
     {
-        return permissions;
+        return roles;
     }
 
-    public void addPermission( String permission )
+    public void addRole( String role )
     {
-        this.permissions.add( permission );
+        this.roles.add( role );
+    }
+    
+    public void setRoles( Set<String> roles )
+    {
+        this.roles = roles;
     }
 
-    public void setPermissions( Set<String> permissions )
+    public Set<String> getPrivileges()
     {
-        this.permissions = permissions;
+        return privileges;
+    }
+
+    public void addPrivilege( String privilege )
+    {
+        this.privileges.add( privilege );
+    }
+
+    public void setPrivileges( Set<String> privilege )
+    {
+        this.privileges = privilege;
     }
 
     public int compareTo( Role o )
@@ -144,9 +150,10 @@ public class Role
         int result = 1;
         result = prime * result + ( ( description == null ) ? 0 : description.hashCode() );
         result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
-        result = prime * result + ( ( permissions == null ) ? 0 : permissions.hashCode() );
+        result = prime * result + ( ( privileges == null ) ? 0 : privileges.hashCode() );
         result = prime * result + ( readOnly ? 1231 : 1237 );
         result = prime * result + ( ( roleId == null ) ? 0 : roleId.hashCode() );
+        result = prime * result + ( ( roles == null ) ? 0 : roles.hashCode() );
         result = prime * result + sessionTimeout;
         result = prime * result + ( ( source == null ) ? 0 : source.hashCode() );
         return result;
@@ -176,12 +183,12 @@ public class Role
         }
         else if ( !name.equals( other.name ) )
             return false;
-        if ( permissions == null )
+        if ( privileges == null )
         {
-            if ( other.permissions != null )
+            if ( other.privileges != null )
                 return false;
         }
-        else if ( !permissions.equals( other.permissions ) )
+        else if ( !privileges.equals( other.privileges ) )
             return false;
         if ( readOnly != other.readOnly )
             return false;
@@ -191,6 +198,13 @@ public class Role
                 return false;
         }
         else if ( !roleId.equals( other.roleId ) )
+            return false;
+        if ( roles == null )
+        {
+            if ( other.roles != null )
+                return false;
+        }
+        else if ( !roles.equals( other.roles ) )
             return false;
         if ( sessionTimeout != other.sessionTimeout )
             return false;
@@ -204,4 +218,5 @@ public class Role
         return true;
     }
 
+    
 }

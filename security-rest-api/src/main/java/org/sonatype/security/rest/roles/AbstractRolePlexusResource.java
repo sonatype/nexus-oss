@@ -41,17 +41,15 @@ public abstract class AbstractRolePlexusResource
         resource.setSessionTimeout( role.getSessionTimeout() );
         resource.setUserManaged( !role.isReadOnly() );
 
-     // FIXME: is this needed
-//        for ( String roleId : (List<String>) role.getRoles() )
-//        {
-//            resource.addRole( roleId );
-//        }
+        for ( String roleId : role.getRoles() )
+        {
+            resource.addRole( roleId );
+        }
         
-        // FIXME: is this needed
-//        for ( String privId : (List<String>) role.getPrivileges() )
-//        {
-//            resource.addPrivilege( privId );
-//        }
+        for ( String privId : role.getPrivileges() )
+        {
+            resource.addPrivilege( privId );
+        }
 
         return resource;
     }
@@ -69,19 +67,17 @@ public abstract class AbstractRolePlexusResource
         role.setName( resource.getName() );
         role.setSessionTimeout( resource.getSessionTimeout() );
 
-        // FIXME uncomment and fix this
-        
-//        role.getRoles().clear();
-//        for ( String roleId : (List<String>) resource.getRoles() )
-//        {
-//            role.addRole( roleId );
-//        }
-//
-//        role.getPrivileges().clear();
-//        for ( String privId : (List<String>) resource.getPrivileges() )
-//        {
-//            role.addPrivilege( privId );
-//        }
+        role.getRoles().clear();
+        for ( String roleId : (List<String>) resource.getRoles() )
+        {
+            role.addRole( roleId );
+        }
+
+        role.getPrivileges().clear();
+        for ( String privId : (List<String>) resource.getPrivileges() )
+        {
+            role.addPrivilege( privId );
+        }
 
         return role;
     }
@@ -89,17 +85,16 @@ public abstract class AbstractRolePlexusResource
     public void validateRoleContainment( Role role )
         throws ResourceException
     {
-        // FIXME: uncomment this
-//        if ( role.getRoles().size() == 0 
-//            && role.getPrivileges().size() == 0)
-//        {
-//            throw new PlexusResourceException( 
-//                Status.CLIENT_ERROR_BAD_REQUEST, 
-//                "Configuration error.", 
-//                getErrorResponse( 
-//                    "privileges", 
-//                    "One or more roles/privilegs are required." ) );
-//        }
+        if ( role.getRoles().size() == 0 
+            && role.getPrivileges().size() == 0)
+        {
+            throw new PlexusResourceException( 
+                Status.CLIENT_ERROR_BAD_REQUEST, 
+                "Configuration error.", 
+                getErrorResponse( 
+                    "privileges", 
+                    "One or more roles/privilegs are required." ) );
+        }
     }
 
 }

@@ -12,6 +12,7 @@
  */
 package org.sonatype.security.usermanagement.xml;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.realms.tools.ConfigurationManager;
@@ -140,4 +142,37 @@ public class ConfiguredUsersUserManager
         return this.securitySystem;
     }
 
+
+    
+    /* (non-Javadoc)
+     * @see org.sonatype.security.usermanagement.AbstractUserManager#matchesCriteria(java.lang.String, java.lang.String, java.util.Collection, org.sonatype.security.usermanagement.UserSearchCriteria)
+     */
+    protected boolean matchesCriteria( String userId, String userSource, Collection<String> usersRoles,
+        UserSearchCriteria criteria )
+    {
+        // basically the same as the super, but we don't want to check the source
+        if ( StringUtils.isNotEmpty( criteria.getUserId() )
+            && !userId.toLowerCase().startsWith( criteria.getUserId().toLowerCase() ) )
+        {
+            return false;
+        }
+
+        if ( criteria.getOneOfRoleIds() != null && !criteria.getOneOfRoleIds().isEmpty() )
+        {
+            Set<String> userRoles = new HashSet<String>();
+            if ( usersRoles != null )
+            {
+                userRoles.addAll( usersRoles );
+            }
+
+            // check the intersection of the roles
+            if ( CollectionUtils.intersection( criteria.getOneOfRoleIds(), userRoles ).isEmpty() )
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
 }

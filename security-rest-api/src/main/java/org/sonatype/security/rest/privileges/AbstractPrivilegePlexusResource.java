@@ -12,11 +12,10 @@
  */
 package org.sonatype.security.rest.privileges;
 
-import java.util.List;
+import java.util.Map.Entry;
 
 import org.restlet.data.Request;
 import org.sonatype.security.authorization.Privilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PrivilegeProperty;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
@@ -31,7 +30,7 @@ public abstract class AbstractPrivilegePlexusResource
     {
         PrivilegeStatusResource resource = new PrivilegeStatusResource();
         
-        for ( CProperty prop : (List<CProperty>) privilege.getProperties() )
+        for ( Entry<String, String> prop : privilege.getProperties().entrySet() )
         {
             PrivilegeProperty privProp = new PrivilegeProperty();
             privProp.setKey( prop.getKey() );

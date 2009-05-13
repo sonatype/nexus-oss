@@ -15,11 +15,16 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.UsernamePasswordToken;
+import org.jsecurity.cache.Cache;
 import org.jsecurity.mgt.RealmSecurityManager;
+import org.jsecurity.realm.AuthorizingRealm;
+import org.jsecurity.realm.CachingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
 import org.jsecurity.subject.Subject;
@@ -28,8 +33,6 @@ import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchAuthorizationManager;
-import org.sonatype.security.authorization.NoSuchPrivilegeException;
-import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
@@ -338,6 +341,9 @@ public class DefaultSecuritySystem
                 }
             }
         }
+        
+        // clear the realm caches
+        this.clearRealmCaches();
 
         return user;
     }
@@ -483,20 +489,6 @@ public class DefaultSecuritySystem
         for ( UserManager tmpUserManager : this.userManagerMap.values() )
         {
             users.addAll( tmpUserManager.searchUsers( criteria ) );
-        }
-
-        // now check for broken UserManagers (not filter on the source)
-        // we cannot assume all of the pluggable UserManager will do the correct thing
-        if ( StringUtils.isNotEmpty( criteria.getSource() ) )
-        {
-            for ( Iterator<User> iterator = users.iterator(); iterator.hasNext(); )
-            {
-                User user = iterator.next();
-                if ( criteria.equals( user.getSource() ) )
-                {
-                    iterator.remove();
-                }
-            }
         }
 
         // now add all the roles to the users
@@ -707,7 +699,7 @@ public class DefaultSecuritySystem
         for ( User user : users )
         {
             // ignore the anon user
-            if ( !user.getUserId().equalsIgnoreCase( this.getAnonymousUsername() ) )
+            if ( !user.getUserId().equalsIgnoreCase( this.getAnonymousUsername() ) && email.equalsIgnoreCase( user.getEmailAddress() ) )
             {
                 userIds.add( user.getUserId() );
             }
@@ -771,6 +763,7 @@ public class DefaultSecuritySystem
         throws InvalidConfigurationException
     {
         this.securityConfiguration.setRealms( realms );
+        this.securityConfiguration.save();
 
         // update the realms in the security manager
         this.securityManager.setRealms( this.getRealmsFromConfigSource() );
@@ -779,17 +772,20 @@ public class DefaultSecuritySystem
     public void setAnonymousAccessEnabled( boolean enabled )
     {
         this.securityConfiguration.setAnonymousAccessEnabled( enabled );
+        this.securityConfiguration.save();
     }
 
     public void setAnonymousUsername( String anonymousUsername )
         throws InvalidConfigurationException
     {
         this.securityConfiguration.setAnonymousUsername( anonymousUsername );
+        this.securityConfiguration.save();
     }
 
     public void setSecurityEnabled( boolean enabled )
     {
         this.securityConfiguration.setEnabled( enabled );
+        this.securityConfiguration.save();
     }
 
     public String getAnonymousPassword()
@@ -801,5 +797,40 @@ public class DefaultSecuritySystem
         throws InvalidConfigurationException
     {
         this.securityConfiguration.setAnonymousPassword( anonymousPassword );
+        this.securityConfiguration.save();
     }
+
+    public void start()
+        throws StartingException
+    {
+        // reload the config
+        this.securityConfiguration.clearCache();
+        this.clearRealmCaches();
+    }
+
+    public void stop()
+        throws StoppingException
+    {
+        // we don't have anything to do on stop
+    }
+    
+    private void clearRealmCaches()
+    {
+        for ( Realm realm : this.securityManager.getRealms() )
+        {
+            // check if its a AuthorizingRealm, if so clear the cache
+            if( AuthorizingRealm.class.isInstance( realm ))
+            {
+                // clear the cache
+                AuthorizingRealm aRealm = (AuthorizingRealm) realm;
+                
+                Cache cache = aRealm.getAuthorizationCache();
+                if( cache != null)
+                {
+                    cache.clear();
+                }
+            }
+        }
+    }
+    
 }

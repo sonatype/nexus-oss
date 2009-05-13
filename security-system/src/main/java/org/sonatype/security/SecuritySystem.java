@@ -3,6 +3,7 @@ package org.sonatype.security;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.realm.Realm;
@@ -23,7 +24,7 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-public interface SecuritySystem
+public interface SecuritySystem extends Startable
 {
 
     // *********************

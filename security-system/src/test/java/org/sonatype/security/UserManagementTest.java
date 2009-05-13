@@ -22,9 +22,6 @@ public class UserManagementTest
         Set<User> users = securitySystem.listUsers();
         Assert.assertFalse( users.isEmpty() );
 
-        // 2 different jcoders
-        Assert.assertEquals( 10, users.size() );
-
         // put users in map for easy search
         Map<String, User> userMap = this.getMapFromSet( users );
 
@@ -33,12 +30,17 @@ public class UserManagementTest
         Assert.assertTrue( userMap.containsKey( "cdugas" ) );
         Assert.assertTrue( userMap.containsKey( "pperalez" ) );
         Assert.assertTrue( userMap.containsKey( "dknudsen" ) );
-
+        Assert.assertTrue( userMap.containsKey( "anonymous-user" ) );
+        
         Assert.assertTrue( userMap.containsKey( "bburton" ) );
         Assert.assertTrue( userMap.containsKey( "jblevins" ) );
         Assert.assertTrue( userMap.containsKey( "ksimmons" ) );
         Assert.assertTrue( userMap.containsKey( "fdahmen" ) );
         Assert.assertTrue( userMap.containsKey( "jcodar" ) );
+        
+        // 2 different jcoders
+        Assert.assertEquals( 11, users.size() );
+
 
         // we just need to check to make sure there are 2 jcoders with the correct source (the counts are already
         // checked above)

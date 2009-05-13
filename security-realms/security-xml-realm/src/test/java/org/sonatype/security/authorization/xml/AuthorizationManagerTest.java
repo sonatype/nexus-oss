@@ -77,9 +77,9 @@ public class AuthorizationManagerTest
         Assert.assertEquals( "RoleThree", role3.getName() );
         Assert.assertEquals( "Role Three", role3.getDescription() );
         Assert.assertEquals( 60, role3.getSessionTimeout() );
-        Assert.assertTrue( role3.getPermissions().contains( "1" ) );
-        Assert.assertTrue( role3.getPermissions().contains( "4" ) );
-        Assert.assertEquals( 2, role3.getPermissions().size() );
+        Assert.assertTrue( role3.getPrivileges().contains( "1" ) );
+        Assert.assertTrue( role3.getPrivileges().contains( "4" ) );
+        Assert.assertEquals( 2, role3.getPrivileges().size() );
     }
 
     public void testGetRole()
@@ -93,9 +93,9 @@ public class AuthorizationManagerTest
         Assert.assertEquals( "RoleOne", role1.getName() );
         Assert.assertEquals( "Role One", role1.getDescription() );
         Assert.assertEquals( 60, role1.getSessionTimeout() );
-        Assert.assertTrue( role1.getPermissions().contains( "1" ) );
-        Assert.assertTrue( role1.getPermissions().contains( "2" ) );
-        Assert.assertEquals( 2, role1.getPermissions().size() );
+        Assert.assertTrue( role1.getPrivileges().contains( "1" ) );
+        Assert.assertTrue( role1.getPrivileges().contains( "2" ) );
+        Assert.assertEquals( 2, role1.getPrivileges().size() );
     }
     
     public void testAddRole() throws Exception
@@ -108,8 +108,8 @@ public class AuthorizationManagerTest
         role.setName( "new-name" );
         role.setDescription( "new-description" );
         role.setSessionTimeout( 42 );
-        role.addPermission( "2" );
-        role.addPermission( "4" );
+        role.addPrivilege( "2" );
+        role.addPrivilege( "4" );
 
         authzManager.addRole(role );
 
@@ -137,7 +137,7 @@ public class AuthorizationManagerTest
 
         Set<String> permissions = new HashSet<String>();
         permissions.add( "2" );
-        role2.setPermissions( permissions );
+        role2.setPrivileges( permissions );
 
         authzManager.updateRole( role2 );
 

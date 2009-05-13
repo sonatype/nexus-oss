@@ -106,13 +106,21 @@ public class MockUserManagerB
         
         Map<String, Set<Role>> userToRoleMap = new HashMap<String, Set<Role>>();
         
-        Set<Role> roles1 = new HashSet<Role>();
+        Set<Role> roles = new HashSet<Role>();
         
-        roles1.add( new Role("ExtraRole1", "ExtraRole1", this.getSource()) );
-        roles1.add( new Role("ExtraRole2", "ExtraRole2", this.getSource()) );
-        userToRoleMap.put( "jcoder", roles1 );
+        Role role1 = new Role();
+        role1.setSource( this.getSource() );
+        role1.setName( "ExtraRole1" );
+        role1.setRoleId( "ExtraRole1" );
         
+        Role role2 = new Role();
+        role2.setSource( this.getSource() );
+        role2.setName( "ExtraRole2" );
+        role2.setRoleId( "ExtraRole2" );
         
+        roles.add( role1 );
+        roles.add( role2 );
+        userToRoleMap.put( "jcoder", roles );
         
         return userToRoleMap.get( userId );
     }

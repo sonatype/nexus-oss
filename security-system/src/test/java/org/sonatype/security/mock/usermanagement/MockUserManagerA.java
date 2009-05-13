@@ -42,11 +42,18 @@ public class MockUserManagerA
         d.setEmailAddress( "dknudsen@sonatype.org" );
         d.setSource( this.getSource() );
         d.setUserId( "dknudsen" );
+        
+        DefaultUser e = new DefaultUser();
+        e.setName( "Anon e Mous" );
+        e.setEmailAddress( "anonymous@sonatype.org" );
+        e.setSource( this.getSource() );
+        e.setUserId( "anonymous-user" );
 
         this.addUser( a, a.getUserId() );
         this.addUser( b, b.getUserId() );
         this.addUser( c, c.getUserId() );
         this.addUser( d, d.getUserId() );
+        this.addUser( e, e.getUserId() );
     }
 
     public String getSource()

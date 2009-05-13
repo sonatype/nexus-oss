@@ -129,8 +129,8 @@ public class DefaultSecuritySystemTest
         Role role1 = roleMap.get( "test-role1" );
         Assert.assertEquals( "Role 1", role1.getName() );
 
-        Assert.assertTrue( role1.getPermissions().contains( "from-role1:read" ) );
-        Assert.assertTrue( role1.getPermissions().contains( "from-role1:delete" ) );
+        Assert.assertTrue( role1.getPrivileges().contains( "from-role1:read" ) );
+        Assert.assertTrue( role1.getPrivileges().contains( "from-role1:delete" ) );
 
     }
 

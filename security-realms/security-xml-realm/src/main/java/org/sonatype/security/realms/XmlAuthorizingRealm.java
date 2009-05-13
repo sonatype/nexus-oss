@@ -32,14 +32,12 @@ import org.jsecurity.authz.AuthorizationInfo;
 import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.SimpleAuthorizationInfo;
 import org.jsecurity.authz.permission.WildcardPermission;
-import org.jsecurity.cache.HashtableCache;
 import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
-import org.sonatype.security.authorization.Role;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
@@ -67,7 +65,6 @@ public class XmlAuthorizingRealm
     public XmlAuthorizingRealm()
     {
         setCredentialsMatcher( new Sha1CredentialsMatcher() );
-        setAuthorizationCache( new HashtableCache( null ) );
     }
 
     @Override

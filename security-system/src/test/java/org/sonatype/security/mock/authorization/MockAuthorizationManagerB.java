@@ -12,7 +12,8 @@ import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 
 @Component( role = AuthorizationManager.class, hint = "sourceB" )
-public class MockAuthorizationManagerB extends AbstractReadOnlyAuthorizationManager
+public class MockAuthorizationManagerB
+    extends AbstractReadOnlyAuthorizationManager
 {
 
     public String getSource()
@@ -34,13 +35,19 @@ public class MockAuthorizationManagerB extends AbstractReadOnlyAuthorizationMana
     {
         Set<Role> roles = new HashSet<Role>();
 
-        Role role1 = new Role( "test-role1", "Role 1", this.getSource() );
-        role1.addPermission( "from-role1:read" );
-        role1.addPermission( "from-role1:delete" );
+        Role role1 = new Role();
+        role1.setSource( this.getSource() );
+        role1.setName( "Role 1" );
+        role1.setRoleId( "test-role1" );
+        role1.addPrivilege( "from-role1:read" );
+        role1.addPrivilege( "from-role1:delete" );
 
-        Role role2 = new Role( "test-role2", "Role 2", this.getSource() );
-        role2.addPermission( "from-role2:read" );
-        role2.addPermission( "from-role2:delete" );
+        Role role2 = new Role();
+        role2.setSource( this.getSource() );
+        role2.setName( "Role 2" );
+        role2.setRoleId( "test-role2" );
+        role2.addPrivilege( "from-role2:read" );
+        role2.addPrivilege( "from-role2:delete" );
 
         roles.add( role1 );
         roles.add( role2 );

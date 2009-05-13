@@ -51,6 +51,5 @@ public class PlexusSecurityManager
         EhCacheManager ehCacheManager = new EhCacheManager();
         ehCacheManager.setCacheManager( this.cacheWrapper.getEhCacheManager() );
         this.setCacheManager( ehCacheManager );
-
     }
 }

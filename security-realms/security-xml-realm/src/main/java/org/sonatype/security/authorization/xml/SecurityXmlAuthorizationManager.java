@@ -43,6 +43,9 @@ public class SecurityXmlAuthorizationManager
 
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager configuration;
+    
+    @Requirement
+    private PrivilegeInheritanceManager privInheritance;
 
     public String getSource()
     {
@@ -59,7 +62,8 @@ public class SecurityXmlAuthorizationManager
         role.setDescription( secRole.getDescription() );
         role.setReadOnly( secRole.isReadOnly() );
         role.setSessionTimeout( secRole.getSessionTimeout() );
-        role.setPermissions( new HashSet<String>( secRole.getPrivileges() ) );
+        role.setPrivileges( new HashSet<String>( secRole.getPrivileges() ) );
+        role.setRoles( new HashSet<String>( secRole.getRoles() ) );
 
         return role;
     }
@@ -73,7 +77,8 @@ public class SecurityXmlAuthorizationManager
         secRole.setDescription( role.getDescription() );
         secRole.setReadOnly( role.isReadOnly() );
         secRole.setSessionTimeout( role.getSessionTimeout() );
-        secRole.setPrivileges( new ArrayList<String>( role.getPermissions() ) );
+        secRole.setPrivileges( new ArrayList<String>( role.getPrivileges() ) );
+        secRole.setRoles( new ArrayList<String>( role.getRoles() ) );
 
         return secRole;
     }
@@ -100,7 +105,7 @@ public class SecurityXmlAuthorizationManager
 
         return secPriv;
     }
-    
+
     protected Privilege toPrivilege( SecurityPrivilege secPriv )
     {
         Privilege privilege = new Privilege();
@@ -147,20 +152,25 @@ public class SecurityXmlAuthorizationManager
     public Role addRole( Role role )
         throws InvalidConfigurationException
     {
-        this.configuration.createRole( this.toRole( role ) );
+        // the roleId of the secRole might change, so we need to keep the reference
+        SecurityRole secRole = this.toRole( role );
+
+        this.configuration.createRole( secRole );
         this.saveConfiguration();
 
-        // TODO: return new role?
-        return role;
+        return this.toRole( secRole );
     }
 
     public Role updateRole( Role role )
         throws NoSuchRoleException,
             InvalidConfigurationException
     {
-        this.configuration.updateRole( this.toRole( role ) );
+        SecurityRole secRole = this.toRole( role );
+
+        this.configuration.updateRole( secRole );
         this.saveConfiguration();
-        return role;
+
+        return this.toRole( secRole );
     }
 
     public void deleteRole( String roleId )
@@ -193,21 +203,28 @@ public class SecurityXmlAuthorizationManager
         return this.toPrivilege( this.configuration.readPrivilege( privilegeId ) );
     }
 
-    public Privilege addPrivilege( Privilege privilege ) throws InvalidConfigurationException
+    public Privilege addPrivilege( Privilege privilege )
+        throws InvalidConfigurationException
     {
-       this.configuration.createPrivilege( this.toPrivilege( privilege ) );
-       this.saveConfiguration();
-       
-       return privilege;
+        SecurityPrivilege secPriv = this.toPrivilege( privilege );
+        // create implies read, so we need to add logic for that
+        addInheritedPrivileges( secPriv ); 
+        
+        this.configuration.createPrivilege( secPriv );
+        this.saveConfiguration();
+
+        return this.toPrivilege( secPriv );
     }
 
     public Privilege updatePrivilege( Privilege privilege )
-        throws NoSuchPrivilegeException, InvalidConfigurationException
+        throws NoSuchPrivilegeException,
+            InvalidConfigurationException
     {
-        this.configuration.updatePrivilege( this.toPrivilege( privilege ) );
+        SecurityPrivilege secPriv = this.toPrivilege( privilege );
+        this.configuration.updatePrivilege( secPriv );
         this.saveConfiguration();
-        
-        return privilege;
+
+        return this.toPrivilege( secPriv );
     }
 
     public void deletePrivilege( String privilegeId )
@@ -216,7 +233,7 @@ public class SecurityXmlAuthorizationManager
         this.configuration.deletePrivilege( privilegeId );
         this.saveConfiguration();
     }
-    
+
     private void saveConfiguration()
     {
         this.configuration.save();
@@ -226,6 +243,40 @@ public class SecurityXmlAuthorizationManager
     {
         return true;
     }
+    
+    
+    private void addInheritedPrivileges( SecurityPrivilege privilege )
+    {
+        CProperty methodProperty = null;
 
+        for ( CProperty property : (List<CProperty>) privilege.getProperties() )
+        {
+            if ( property.getKey().equals( "method" ) )
+            {
+                methodProperty = property;
+                break;
+            }
+        }
+
+        if ( methodProperty != null )
+        {
+            List<String> inheritedMethods = privInheritance.getInheritedMethods( methodProperty.getValue() );
+
+            StringBuffer buf = new StringBuffer();
+
+            for ( String method : inheritedMethods )
+            {
+                buf.append( method );
+                buf.append( "," );
+            }
+
+            if ( buf.length() > 0 )
+            {
+                buf.setLength( buf.length() - 1 );
+
+                methodProperty.setValue( buf.toString() );
+            }
+        }
+    }
 
 }
