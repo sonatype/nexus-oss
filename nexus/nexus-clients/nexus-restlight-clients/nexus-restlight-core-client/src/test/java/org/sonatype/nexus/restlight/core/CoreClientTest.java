@@ -267,4 +267,63 @@ public class CoreClientTest
         assertEquals( 1, roleResp.getPrivileges().size() );
         assertEquals( "18", roleResp.getPrivileges().get( 0 ) );
     }
+
+    @Test
+    public void putUserToRole()
+        throws Exception
+    {
+        String source = "url";
+        String userId = "test";
+
+        List<RESTTestFixture> conversation = new ArrayList<RESTTestFixture>();
+        PUTFixture putFixture = new PUTFixture();
+        putFixture.setExactURI( CoreClient.USER_TO_ROLE_PATH + "/" + source + "/" + userId );
+        putFixture.setRequestDocument( readTestDocumentResource( "user-to-role-put.xml" ) );
+        conversation.add( getVersionCheckFixture() );
+        conversation.add( putFixture );
+        fixture.setConversation( conversation );
+
+        UserToRole userToRole = new UserToRole();
+        userToRole.setUserId( userId );
+        userToRole.setSource( source );
+        userToRole.getRoles().add( "anonymous" );
+        userToRole.getRoles().add( "developer" );
+
+        CoreClient client = new CoreClient( getBaseUrl(), "testuser", "unused" );
+        client.putUserToRole( userToRole );
+    }
+
+    @Test
+    public void getPlexusUser()
+        throws Exception
+    {
+        final String userId = "deployment";
+
+        List<RESTTestFixture> conversation = new ArrayList<RESTTestFixture>();
+        GETFixture getFixture = new GETFixture();
+        getFixture.setExactURI( CoreClient.PLEXUS_USER_PATH + "/" + userId );
+        getFixture.setResponseDocument( readTestDocumentResource( "plexus-user-get.xml" ) );
+        conversation.add( getVersionCheckFixture() );
+        conversation.add( getFixture );
+        fixture.setConversation( conversation );
+
+        CoreClient client = new CoreClient( getBaseUrl(), "testuser", "unused" );
+
+        PlexusUser plexusUser = client.getPlexusUser( userId );
+
+        assertNotNull( plexusUser );
+
+        assertEquals( "deployment", plexusUser.getUserId() );
+        assertEquals( "Deployment User", plexusUser.getName() );
+        assertEquals( "changeme1@yourcompany.com", plexusUser.getEmail() );
+        assertEquals( "default", plexusUser.getSource() );
+
+        assertEquals( 2, plexusUser.getPlexusRoles().size() );
+        assertEquals( "repo-all-full", plexusUser.getPlexusRoles().get( 0 ).getRoleId() );
+        assertEquals( "Repo: All Repositories (Full Control)", plexusUser.getPlexusRoles().get( 0 ).getName() );
+        assertEquals( "default", plexusUser.getPlexusRoles().get( 0 ).getSource() );
+        assertEquals( "deployment", plexusUser.getPlexusRoles().get( 1 ).getRoleId() );
+        assertEquals( "Nexus Deployment Role", plexusUser.getPlexusRoles().get( 1 ).getName() );
+        assertEquals( "default", plexusUser.getPlexusRoles().get( 1 ).getSource() );
+    }
 }

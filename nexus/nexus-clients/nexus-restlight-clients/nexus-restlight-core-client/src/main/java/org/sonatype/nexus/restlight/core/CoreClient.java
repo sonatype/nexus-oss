@@ -21,6 +21,10 @@ public class CoreClient
 
     public static final String ROLE_PATH = SVC_BASE + "/roles";
 
+    public static final String PLEXUS_USER_PATH = SVC_BASE + "/plexus_user";
+
+    public static final String USER_TO_ROLE_PATH = SVC_BASE + "/user_to_roles";
+
     /*
      * Element Name
      */
@@ -42,6 +46,29 @@ public class CoreClient
     private static final String USER_ROLES_ELEMENT = "roles";
 
     private static final String USER_ROLE_ELEMENT = "role";
+
+    // Plexus User
+    private static final String PLEXUS_USER_ID_ELEMENT = "userId";
+
+    private static final String PLEXUS_USER_NAME_ELEMENT = "name";
+
+    private static final String PLEXUS_USER_EMAIL_ELEMENT = "email";
+
+    private static final String PLEXUS_USER_SOURCE_ELEMENT = "source";
+
+    private static final String PLEXUS_USER_ROLES_ELEMENT = "roles";
+
+    // Plexus Role
+
+    private static final String PLEXUS_ROLE_ID_ELEMENT = "roleId";
+
+    private static final String PLEXUS_ROLE_NAME_ELEMENT = "name";
+
+    private static final String PLEXUS_ROLE_SOURCE_ELEMENT = "source";
+
+    // User To Role
+
+    private static final String USER_TO_ROLE_REQUEST_ELEMENT = "user-to-role";
 
     // Role
     private static final String ROLE_REQUEST_ELEMENT = "role-request";
@@ -75,6 +102,8 @@ public class CoreClient
 
     private static final String ROLE_XPATH = "//data";
 
+    private static final String PLEXUS_USER_XPATH = "//data";
+
     public CoreClient( final String baseUrl, final String username, final String password )
         throws RESTLightClientException
     {
@@ -95,6 +124,14 @@ public class CoreClient
         Document doc = get( USER_PATH + "/" + userId );
 
         return parseUser( doc );
+    }
+
+    public PlexusUser getPlexusUser( String userId )
+        throws RESTLightClientException
+    {
+        Document doc = get( PLEXUS_USER_PATH + "/" + userId );
+
+        return parsePlexusUser( doc );
     }
 
     public User putUser( User user )
@@ -206,8 +243,42 @@ public class CoreClient
         }
 
         role.setUserManaged( element.getChildText( ROLE_USER_MANAGED_ELEMENT ).equals( "true" ) ? true : false );
-        
+
         return role;
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private PlexusUser parsePlexusUser( Element element )
+    {
+        PlexusUser plexusUser = new PlexusUser();
+
+        plexusUser.setUserId( element.getChildText( PLEXUS_USER_ID_ELEMENT ) );
+        plexusUser.setName( element.getChildText( PLEXUS_USER_NAME_ELEMENT ) );
+        plexusUser.setEmail( element.getChildText( PLEXUS_USER_EMAIL_ELEMENT ) );
+        plexusUser.setSource( element.getChildText( PLEXUS_USER_SOURCE_ELEMENT ) );
+
+        Element rolesElement = element.getChild( PLEXUS_USER_ROLES_ELEMENT );
+
+        if ( rolesElement != null )
+        {
+            for ( Element roleElement : (List<Element>) rolesElement.getChildren() )
+            {
+                plexusUser.getPlexusRoles().add( parsePlexusRole( roleElement ) );
+            }
+        }
+
+        return plexusUser;
+    }
+
+    private PlexusRole parsePlexusRole( Element element )
+    {
+        PlexusRole plexusRole = new PlexusRole();
+
+        plexusRole.setRoleId( element.getChildText( PLEXUS_ROLE_ID_ELEMENT ) );
+        plexusRole.setName( element.getChildText( PLEXUS_ROLE_NAME_ELEMENT ) );
+        plexusRole.setSource( element.getChildText( PLEXUS_ROLE_SOURCE_ELEMENT ) );
+
+        return plexusRole;
     }
 
     private List<User> parseUserList( final Document doc )
@@ -238,6 +309,19 @@ public class CoreClient
         return parseUser( elements.get( 0 ) );
     }
 
+    private PlexusUser parsePlexusUser( final Document doc )
+        throws RESTLightClientException
+    {
+        List<Element> elements = parseElements( newXPath( PLEXUS_USER_XPATH ), doc.getRootElement() );
+
+        if ( elements.isEmpty() )
+        {
+            return null;
+        }
+
+        return parsePlexusUser( elements.get( 0 ) );
+    }
+
     @SuppressWarnings( "unchecked" )
     private User parseUser( final Element element )
         throws RESTLightClientException
@@ -249,7 +333,7 @@ public class CoreClient
         user.setName( element.getChildText( USER_NAME_ELEMENT ) );
         user.setStatus( element.getChildText( USER_STATUS_ELEMENT ) );
         user.setEmail( element.getChildText( USER_EMAIL_ELEMENT ) );
-        
+
         Element roles = element.getChild( USER_ROLES_ELEMENT );
 
         if ( roles != null )
@@ -261,7 +345,7 @@ public class CoreClient
         }
 
         user.setUserManaged( element.getChildText( USER_USER_MANAGED_ELEMENT ).equals( "true" ) ? true : false );
-        
+
         return user;
     }
 
@@ -288,8 +372,34 @@ public class CoreClient
         }
 
         data.addContent( roles );
-        
+
         data.addContent( new Element( USER_USER_MANAGED_ELEMENT ).setText( user.isUserManaged() ? "true" : "false" ) );
+
+        return doc;
+    }
+
+    private Document buildUserToRole( UserToRole userToRole )
+    {
+        Element root = new Element( USER_TO_ROLE_REQUEST_ELEMENT );
+
+        Document doc = new Document().setRootElement( root );
+
+        Element data = new Element( "data" );
+
+        root.addContent( data );
+
+        data.addContent( new Element( "userId" ).setText( userToRole.getUserId() ) );
+
+        data.addContent( new Element( "source" ).setText( userToRole.getSource() ) );
+
+        Element rolesElement = new Element( "roles" );
+
+        for ( String role : userToRole.getRoles() )
+        {
+            rolesElement.addContent( new Element( "role" ).setText( role ) );
+        }
+
+        data.addContent( rolesElement );
 
         return doc;
     }
@@ -308,7 +418,6 @@ public class CoreClient
         data.addContent( new Element( ROLE_NAME_ELEMENT ).setText( role.getName() ) );
         data.addContent( new Element( ROLE_DESCRIPTION_ELEMENT ).setText( role.getDescription() ) );
         data.addContent( new Element( ROLE_SESSION_TIMEOUT_ELEMENT ).setText( role.getSessionTimeout() + "" ) );
-        
 
         Element subRoles = new Element( ROLE_ROLES_ELEMENT );
         for ( String subRole : role.getRoles() )
@@ -323,7 +432,7 @@ public class CoreClient
             privileges.addContent( new Element( ROLE_PRIVILEGE_ELEMENT ).setText( privilege ) );
         }
         data.addContent( privileges );
-        
+
         data.addContent( new Element( ROLE_USER_MANAGED_ELEMENT ).setText( role.isUserManaged() ? "true" : "false" ) );
 
         return doc;
@@ -359,5 +468,13 @@ public class CoreClient
         }
 
         return (List<Element>) ( elements == null ? Collections.emptyList() : elements );
+    }
+
+    public void putUserToRole( UserToRole userToRole )
+        throws RESTLightClientException
+    {
+        Document doc = buildUserToRole( userToRole );
+
+        this.put( USER_TO_ROLE_PATH + "/" + userToRole.getSource() + "/" + userToRole.getUserId(), null, doc );
     }
 }
