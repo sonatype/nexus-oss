@@ -166,14 +166,9 @@ Ext.extend( Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
 
     var response = [];
     for ( var i = 0; i < repoIds.length; i++ ) {
-      var rec = this.repoStore.getById( repoIds[i] );
-      if ( rec ) {
-        response.push( {
-          id: rec.data.id,
-          name: rec.data.name,
-          resourceURI: rec.data.resourceURI
-        } );
-      }
+      response.push( {
+        id: repoIds[i]
+      } );
     }
 
     return response;
