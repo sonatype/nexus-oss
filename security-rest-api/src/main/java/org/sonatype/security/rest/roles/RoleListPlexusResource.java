@@ -67,14 +67,22 @@ public class RoleListPlexusResource
     {
         RoleListResourceResponse result = new RoleListResourceResponse();
 
-        for ( Role role : getSecuritySystem().listRoles() )
+        try
         {
-            RoleResource res = securityToRestModel( role, request );
-
-            if ( res != null )
+            for ( Role role : getSecuritySystem().getAuthorizationManager( DEFAULT_SOURCE ).listRoles() )
             {
-                result.addData( res );
+                RoleResource res = securityToRestModel( role, request );
+
+                if ( res != null )
+                {
+                    result.addData( res );
+                }
             }
+        }
+        catch ( NoSuchAuthorizationManager e )
+        {
+           this.getLogger().error( "Unable to find AuthorizationManager 'default'", e );
+           throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to find AuthorizationManager 'default'" );
         }
 
         return result;
@@ -98,7 +106,7 @@ public class RoleListPlexusResource
                 validateRoleContainment( role );
 
                 AuthorizationManager authzManager = getSecuritySystem().getAuthorizationManager( ROLE_SOURCE );
-                authzManager.addRole( role );
+                role = authzManager.addRole( role );
 
                 result = new RoleResourceResponse();
 

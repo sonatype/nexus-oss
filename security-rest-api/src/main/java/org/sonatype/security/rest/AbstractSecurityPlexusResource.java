@@ -130,7 +130,7 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
             roles.add( new RoleIdentifier( DEFAULT_SOURCE, roleId ) );
         }
 
-        user.addAllRoles( roles );
+        user.setRoles( roles );
         
         return user;
     }
