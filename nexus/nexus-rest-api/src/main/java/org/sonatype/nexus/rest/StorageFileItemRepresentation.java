@@ -16,6 +16,7 @@ package org.sonatype.nexus.rest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketException;
 import java.util.Date;
 
 import org.codehaus.plexus.util.IOUtil;
@@ -80,6 +81,10 @@ public class StorageFileItemRepresentation
             IOUtil.copy( is, outputStream );
         }
         catch ( EofException e )
+        {
+            // https://issues.sonatype.org/browse/NEXUS-217
+        }
+        catch ( SocketException e )
         {
             // https://issues.sonatype.org/browse/NEXUS-217
         }
