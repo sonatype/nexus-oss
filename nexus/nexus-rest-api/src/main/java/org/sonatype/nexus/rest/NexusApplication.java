@@ -439,6 +439,7 @@ public class NexusApplication
         xstream.omitField( UserToRoleResourceRequest.class, "modelEncoding" );
         xstream.omitField( UserToRoleResource.class, "modelEncoding" );
         xstream.alias( "user-to-role", UserToRoleResourceRequest.class );
+        xstream.registerLocalConverter( UserToRoleResource.class, "roles", new AliasingListConverter( String.class, "role" ) );
 
         xstream.omitField( PlexusUserResourceResponse.class, "modelEncoding" );
         xstream.alias( "plexus-user", PlexusUserResourceResponse.class );
