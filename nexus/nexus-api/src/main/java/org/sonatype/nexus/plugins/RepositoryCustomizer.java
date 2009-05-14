@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * 
  * @author cstamas
  */
-public interface PluginRepositoryConfigurator
+public interface RepositoryCustomizer
 {
     boolean isHandledRepository( Repository repository );
 

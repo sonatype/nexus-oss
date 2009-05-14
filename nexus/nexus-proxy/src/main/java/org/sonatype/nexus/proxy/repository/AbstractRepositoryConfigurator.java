@@ -23,7 +23,7 @@ import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
-import org.sonatype.nexus.plugins.PluginRepositoryConfigurator;
+import org.sonatype.nexus.plugins.RepositoryCustomizer;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
@@ -42,8 +42,8 @@ public abstract class AbstractRepositoryConfigurator
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
-    @Requirement( role = PluginRepositoryConfigurator.class )
-    private Map<String, PluginRepositoryConfigurator> pluginRepositoryConfigurators;
+    @Requirement( role = RepositoryCustomizer.class )
+    private Map<String, RepositoryCustomizer> pluginRepositoryConfigurators;
 
     public final void validate( ApplicationConfiguration configuration, Object repoConfig )
         throws ConfigurationException
@@ -194,7 +194,7 @@ public abstract class AbstractRepositoryConfigurator
             throw new InvalidConfigurationException( response );
         }
 
-        for ( PluginRepositoryConfigurator configurator : pluginRepositoryConfigurators.values() )
+        for ( RepositoryCustomizer configurator : pluginRepositoryConfigurators.values() )
         {
             if ( configurator.isHandledRepository( repository ) )
             {
