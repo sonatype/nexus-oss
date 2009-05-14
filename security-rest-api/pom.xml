@@ -11,17 +11,16 @@
   <version>1.0.8-SNAPSHOT</version>
   <name>Security: REST API</name>
 
+  <properties>
+    <plexus-restlet-bridge.version>1.9-SNAPSHOT</plexus-restlet-bridge.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-restlet-bridge</artifactId>
-      <version>1.9-SNAPSHOT</version>
+      <version>${plexus-restlet-bridge.version}</version>
     </dependency>
-    <!-- <dependency>
-      <groupId>org.sonatype.security</groupId>
-      <artifactId>security-manager</artifactId>
-      <version>${project.version}</version>
-    </dependency> -->
 
     <dependency>
       <groupId>org.sonatype.security</groupId>
