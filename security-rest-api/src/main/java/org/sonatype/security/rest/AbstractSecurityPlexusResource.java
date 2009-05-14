@@ -30,6 +30,8 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
@@ -39,22 +41,23 @@ import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserStatus;
 
-public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResource
+public abstract class AbstractSecurityPlexusResource
+    extends AbstractPlexusResource
 {
-    
+
     @Requirement
     private SecuritySystem securitySystem;
 
     protected static final String DEFAULT_SOURCE = "default";
-    
+
     @Requirement
     protected ReferenceFactory referenceFactory;
-    
+
     protected SecuritySystem getSecuritySystem()
     {
         return securitySystem;
     }
-    
+
     protected ErrorResponse getErrorResponse( String id, String msg )
     {
         ErrorResponse ner = new ErrorResponse();
@@ -64,9 +67,8 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         ner.addError( ne );
         return ner;
     }
-    
-    protected void handleInvalidConfigurationException(
-        InvalidConfigurationException e )
+
+    protected void handleInvalidConfigurationException( InvalidConfigurationException e )
         throws PlexusResourceException
     {
         getLogger().warn( "Configuration error!", e );
@@ -87,7 +89,7 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
 
         throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", errorResponse );
     }
-    
+
     protected UserResource securityToRestModel( User user, Request request )
     {
         UserResource resource = new UserResource();
@@ -106,7 +108,8 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         return resource;
     }
 
-    protected User restToSecurityModel( User user, UserResource resource ) throws InvalidConfigurationException
+    protected User restToSecurityModel( User user, UserResource resource )
+        throws InvalidConfigurationException
     {
         if ( user == null )
         {
@@ -115,12 +118,12 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
 
         // validate users Status, converting to an ENUM throws an exception, so we need to explicitly check it
         this.checkUsersStatus( resource.getStatus() );
-        
+
         user.setEmailAddress( resource.getEmail() );
         user.setName( resource.getName() );
         user.setStatus( UserStatus.valueOf( resource.getStatus() ) );
         user.setUserId( resource.getUserId() );
-        
+
         // set the users source
         user.setSource( DEFAULT_SOURCE );
 
@@ -131,75 +134,99 @@ public abstract class AbstractSecurityPlexusResource extends AbstractPlexusResou
         }
 
         user.setRoles( roles );
-        
+
         return user;
     }
-    
+
     protected PlexusUserResource securityToRestModel( User user )
     {
         PlexusUserResource resource = new PlexusUserResource();
-        
+
         resource.setUserId( user.getUserId() );
         resource.setSource( user.getSource() );
         resource.setName( user.getName() );
         resource.setEmail( user.getEmailAddress() );
-        
+
         for ( RoleIdentifier role : user.getRoles() )
-        {   
+        {
             resource.addRole( this.securityToRestModel( role ) );
         }
-        
+
         return resource;
     }
-    
+
     protected PlexusRoleResource securityToRestModel( Role role )
     {
         PlexusRoleResource roleResource = new PlexusRoleResource();
         roleResource.setRoleId( role.getRoleId() );
         roleResource.setName( role.getName() );
         roleResource.setSource( role.getSource() );
-        
+
         return roleResource;
     }
-    
+
     // TODO: come back to this, we need to change the PlexusRoleResource
     protected PlexusRoleResource securityToRestModel( RoleIdentifier role )
     {
+        // TODO: we need to get the name of the Role, this could be slow if a user has 100 roles from an external realm
+        // (JDBC, LDAP), and no caching, we will need to come back to this.
+        // We shouldn't be looking up the role name here anyway... this should get pushed up to the SecuritySystem.
+        SecuritySystem securitySystem = this.getSecuritySystem();
+
+        String roleName = role.getRoleId();
+
+        // if this blows up we don't need to stop, we already have the ID, and really this should never happen because
+        // we just looked up this info
+        
+        try
+        {
+            roleName = securitySystem.getAuthorizationManager( role.getSource() ).getRole( role.getRoleId() ).getName();
+        }
+        catch ( NoSuchRoleException e )
+        {
+            this.getLogger().error( "Failed to lookup the users Role: "+ role.getRoleId() +" source: "+ role.getSource() +" but the user has this role.", e);
+        }
+        catch ( NoSuchAuthorizationManager e )
+        {
+            this.getLogger().error( "Failed to lookup the users Role: "+ role.getRoleId() +" source: "+ role.getSource() +" but the user has this role.", e);
+        }
+        
         PlexusRoleResource roleResource = new PlexusRoleResource();
         roleResource.setRoleId( role.getRoleId() );
-        roleResource.setName( role.getRoleId() );
+        roleResource.setName( roleName );
         roleResource.setSource( role.getSource() );
-        
+
         return roleResource;
     }
-    
+
     protected Reference getContextRoot( Request request )
     {
         return this.referenceFactory.getContextRoot( request );
     }
-    
+
     protected Reference createChildReference( Request request, String childPath )
     {
         return this.referenceFactory.createChildReference( request, childPath );
     }
-    
-    protected void checkUsersStatus(String status) throws InvalidConfigurationException
+
+    protected void checkUsersStatus( String status )
+        throws InvalidConfigurationException
     {
         boolean found = false;
         for ( UserStatus userStatus : UserStatus.values() )
         {
-            if( userStatus.name().equals( status ))
+            if ( userStatus.name().equals( status ) )
             {
                 found = true;
             }
         }
-        
-        if( !found )
+
+        if ( !found )
         {
             ValidationResponse<ValidationContext> response = new ValidationResponse<ValidationContext>();
-            response.addValidationError( new ValidationMessage("status", "Users status is not valid.") );
-            throw new InvalidConfigurationException(response);
+            response.addValidationError( new ValidationMessage( "status", "Users status is not valid." ) );
+            throw new InvalidConfigurationException( response );
         }
     }
-    
+
 }

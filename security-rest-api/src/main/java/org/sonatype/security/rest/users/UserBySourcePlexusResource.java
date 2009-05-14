@@ -70,7 +70,18 @@ public static final String USER_ID_KEY = "userId";
         User user;
         try
         {
-            user = this.getSecuritySystem().getUser( getUserId( request ), getUserSource( request ) );
+            // TODO: remove the "all" we either need to move it down into the SecuritySystem, or remove it, i vote remove it.
+            String source = getUserSource( request );
+            
+            if( "all".equalsIgnoreCase( source ))
+            {
+                user = this.getSecuritySystem().getUser( getUserId( request ) );
+            }
+            else
+            {
+                user = this.getSecuritySystem().getUser( getUserId( request ), source );
+            }
+            
         }
         catch ( UserNotFoundException e )
         {

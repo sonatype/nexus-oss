@@ -12,6 +12,8 @@
  */
 package org.sonatype.security.rest.users;
 
+import java.util.Set;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -33,12 +35,12 @@ public class PlexusUserListPlexusResource
     extends AbstractSecurityPlexusResource
 {
     public static final String USER_SOURCE_KEY = "userSource";
-    
+
     public PlexusUserListPlexusResource()
     {
         setModifiable( false );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -56,14 +58,26 @@ public class PlexusUserListPlexusResource
     {
         return "/plexus_users/{" + USER_SOURCE_KEY + "}";
     }
-    
+
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         PlexusUserListResourceResponse result = new PlexusUserListResourceResponse();
-        
-        for ( User user : this.getSecuritySystem().searchUsers( new UserSearchCriteria( null, null, getUserSource( request ) ) ))
+
+        // TODO: this logic should be removed from the this resource
+        String source = getUserSource( request );
+        Set<User> users = null;
+        if( "all".equalsIgnoreCase( source ))
+        {
+            users = this.getSecuritySystem().listUsers();
+        }
+        else
+        {
+            users = this.getSecuritySystem().searchUsers( new UserSearchCriteria( null, null, source ) );
+        }
+
+        for ( User user : users )
         {
             PlexusUserResource res = securityToRestModel( user );
 
@@ -75,7 +89,7 @@ public class PlexusUserListPlexusResource
 
         return result;
     }
-    
+
     protected String getUserSource( Request request )
     {
         return request.getAttributes().get( USER_SOURCE_KEY ).toString();

@@ -3,7 +3,6 @@ package org.sonatype.security;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,18 +16,19 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.cache.Cache;
 import org.jsecurity.mgt.RealmSecurityManager;
 import org.jsecurity.realm.AuthorizingRealm;
-import org.jsecurity.realm.CachingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
 import org.jsecurity.subject.Subject;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.appevents.EventListener;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
@@ -38,7 +38,7 @@ import org.sonatype.security.authorization.Role;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.email.NullSecurityEmailer;
 import org.sonatype.security.email.SecurityEmailer;
-import org.sonatype.security.events.SecurityEventHandler;
+import org.sonatype.security.events.AuthorizationConfigurationChangedEvent;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
 import org.sonatype.security.usermanagement.PasswordGenerator;
@@ -54,7 +54,7 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
  */
 @Component( role = SecuritySystem.class )
 public class DefaultSecuritySystem
-    implements SecuritySystem, Initializable
+    implements SecuritySystem, Initializable, EventListener
 {
     @Requirement
     private SecurityConfigurationManager securityConfiguration;
@@ -74,10 +74,15 @@ public class DefaultSecuritySystem
     @Requirement
     private PasswordGenerator passwordGenerator;
 
+    @Requirement
+    private ApplicationEventMulticaster eventMulticaster;
+    
     private SecurityEmailer securityEmailer;
 
     @Requirement
     private Logger logger;
+
+    private static final String ALL_ROLES_KEY = "all";
 
     public Subject login( AuthenticationToken token )
         throws AuthenticationException
@@ -164,6 +169,10 @@ public class DefaultSecuritySystem
         {
             throw new InitializationException( e.getMessage(), e );
         }
+        
+        // add event handler
+        this.eventMulticaster.addEventListener( this );
+        
     }
 
     private Collection<Realm> getRealmsFromConfigSource()
@@ -215,8 +224,15 @@ public class DefaultSecuritySystem
     public Set<Role> listRoles( String sourceId )
         throws NoSuchAuthorizationManager
     {
-        AuthorizationManager authzManager = this.getAuthorizationManager( sourceId );
-        return authzManager.listRoles();
+        if ( ALL_ROLES_KEY.equalsIgnoreCase( sourceId ) )
+        {
+            return this.listRoles();
+        }
+        else
+        {
+            AuthorizationManager authzManager = this.getAuthorizationManager( sourceId );
+            return authzManager.listRoles();
+        }
     }
 
     public Set<Privilege> listPrivileges()
@@ -300,6 +316,9 @@ public class DefaultSecuritySystem
             }
         }
 
+        // don't forget to email the user!
+        this.getSecurityEmailer().sendNewUserCreated( user.getEmailAddress(), user.getUserId(), password );
+        
         return user;
     }
 
@@ -341,9 +360,9 @@ public class DefaultSecuritySystem
                 }
             }
         }
-        
+
         // clear the realm caches
-        this.clearRealmCaches();
+        this.eventMulticaster.notifyEventListeners( new AuthorizationConfigurationChangedEvent(null) );
 
         return user;
     }
@@ -599,20 +618,6 @@ public class DefaultSecuritySystem
         return this.securityConfiguration.isEnabled();
     }
 
-    // TODO: clean this up
-    // DO we even still need this?
-    private List<SecurityEventHandler> eventHandlers = new ArrayList<SecurityEventHandler>();
-
-    public void addSecurityEventHandler( SecurityEventHandler eventHandler )
-    {
-        this.eventHandlers.add( eventHandler );
-    }
-
-    public boolean removeSecurityEventHandler( SecurityEventHandler eventHandler )
-    {
-        return this.eventHandlers.remove( eventHandler );
-    }
-
     public void changePassword( String userId, String oldPassword, String newPassword )
         throws UserNotFoundException,
             InvalidCredentialsException,
@@ -699,7 +704,8 @@ public class DefaultSecuritySystem
         for ( User user : users )
         {
             // ignore the anon user
-            if ( !user.getUserId().equalsIgnoreCase( this.getAnonymousUsername() ) && email.equalsIgnoreCase( user.getEmailAddress() ) )
+            if ( !user.getUserId().equalsIgnoreCase( this.getAnonymousUsername() )
+                && email.equalsIgnoreCase( user.getEmailAddress() ) )
             {
                 userIds.add( user.getUserId() );
             }
@@ -813,24 +819,31 @@ public class DefaultSecuritySystem
     {
         // we don't have anything to do on stop
     }
-    
+
     private void clearRealmCaches()
     {
         for ( Realm realm : this.securityManager.getRealms() )
         {
             // check if its a AuthorizingRealm, if so clear the cache
-            if( AuthorizingRealm.class.isInstance( realm ))
+            if ( AuthorizingRealm.class.isInstance( realm ) )
             {
                 // clear the cache
                 AuthorizingRealm aRealm = (AuthorizingRealm) realm;
-                
+
                 Cache cache = aRealm.getAuthorizationCache();
-                if( cache != null)
+                if ( cache != null )
                 {
                     cache.clear();
                 }
             }
         }
     }
-    
+
+    public void onEvent( Event<?> evt )
+    {
+        if( AuthorizationConfigurationChangedEvent.class.isInstance( evt ))
+        {
+            this.clearRealmCaches();
+        }
+    }
 }

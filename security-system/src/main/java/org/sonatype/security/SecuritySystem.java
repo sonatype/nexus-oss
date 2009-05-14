@@ -6,7 +6,6 @@ import java.util.Set;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
 import org.jsecurity.subject.Subject;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -16,7 +15,6 @@ import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.events.SecurityEventHandler;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -189,10 +187,5 @@ public interface SecuritySystem extends Startable
     boolean isSecurityEnabled();
 
     void setSecurityEnabled( boolean enabled );
-
-    // TODO, do we need these for something other then clearing caches on realms?
-    void addSecurityEventHandler( SecurityEventHandler eventHandler );
-
-    boolean removeSecurityEventHandler( SecurityEventHandler eventHandler );
 
 }

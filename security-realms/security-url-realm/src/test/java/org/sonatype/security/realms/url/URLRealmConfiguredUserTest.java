@@ -34,13 +34,12 @@ public class URLRealmConfiguredUserTest
     {
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
         UserManager urlLocator = this.lookup( UserManager.class, "url" );
-        UserManager configuredUsersLocator = this.lookup( UserManager.class, "allConfigured" );
 
         // try to get a normal user to make sure the search is working
-        Assert.assertEquals( 1, configuredUsersLocator.searchUsers( new UserSearchCriteria( "user1" ) ).size() );
+        Assert.assertEquals( 1, securitySystem.searchUsers( new UserSearchCriteria( "user1", null, "allConfigured" ) ).size() );
 
         // make sure we get the URL realm user from this search
-        Assert.assertEquals( 1, configuredUsersLocator.searchUsers( new UserSearchCriteria( "url-user" ) ).size() );
+        Assert.assertEquals( 1, securitySystem.searchUsers( new UserSearchCriteria( "url-user", null, "allConfigured"  ) ).size() );
 
         // do the search from the URL realm
         Assert.assertEquals( 1, urlLocator.searchUsers( new UserSearchCriteria( "url-user" ) ).size() );

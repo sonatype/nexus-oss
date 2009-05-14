@@ -21,11 +21,13 @@ import java.util.Map.Entry;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.events.AuthorizationConfigurationChangedEvent;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
@@ -46,6 +48,9 @@ public class SecurityXmlAuthorizationManager
     
     @Requirement
     private PrivilegeInheritanceManager privInheritance;
+    
+    @Requirement
+    private ApplicationEventMulticaster eventMulticaster;
 
     public String getSource()
     {
@@ -237,6 +242,9 @@ public class SecurityXmlAuthorizationManager
     private void saveConfiguration()
     {
         this.configuration.save();
+        
+        // notify any listeners that the config changed
+        this.fireAuthorizationChangedEvent();
     }
 
     public boolean supportsWrite()
@@ -277,6 +285,11 @@ public class SecurityXmlAuthorizationManager
                 methodProperty.setValue( buf.toString() );
             }
         }
+    }
+    
+    private void fireAuthorizationChangedEvent()
+    {
+        this.eventMulticaster.notifyEventListeners( new AuthorizationConfigurationChangedEvent(null) );
     }
 
 }

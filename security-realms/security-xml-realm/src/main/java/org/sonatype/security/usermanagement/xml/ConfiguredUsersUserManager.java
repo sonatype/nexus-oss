@@ -35,6 +35,8 @@ import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
+import edu.emory.mathcs.backport.java.util.Collections;
+
 @Component( role = UserManager.class, hint = "allConfigured", description = "All Configured Users" )
 public class ConfiguredUsersUserManager
     extends AbstractReadOnlyUserManager
@@ -121,7 +123,15 @@ public class ConfiguredUsersUserManager
 
     public Set<User> searchUsers( UserSearchCriteria criteria )
     {
-        return this.filterListInMemeory( this.listUsers(), criteria );
+        // we only want to do this if the criteria is set to the source
+        if ( this.getSource().equals( criteria.getSource() ))
+        {
+            return this.filterListInMemeory( this.listUsers(), criteria );
+        }
+        else
+        {
+            return new HashSet<User>();
+        }
     }
 
     private SecuritySystem getSecuritySystem()

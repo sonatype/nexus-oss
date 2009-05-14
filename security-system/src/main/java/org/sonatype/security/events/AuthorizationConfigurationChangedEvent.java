@@ -12,9 +12,14 @@
  */
 package org.sonatype.security.events;
 
-public interface SecurityEventHandler
+import org.sonatype.plexus.appevents.AbstractEvent;
+
+public class AuthorizationConfigurationChangedEvent extends AbstractEvent<Object>
 {
 
-    void handleEvent( SecurityEvent event );
-    
+    public AuthorizationConfigurationChangedEvent( Object component )
+    {
+        super( component );
+    }
+
 }
