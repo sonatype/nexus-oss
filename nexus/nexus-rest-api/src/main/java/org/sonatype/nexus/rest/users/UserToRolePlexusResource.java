@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.rest.users;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -22,6 +23,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.sonatype.jsecurity.locators.users.PlexusUserManager;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
 import org.sonatype.jsecurity.realms.tools.NoSuchRoleMappingException;
@@ -45,7 +47,8 @@ public class UserToRolePlexusResource
     public UserToRolePlexusResource()
     {
         this.setModifiable( true );
-        this.setReadable( false );
+        
+        this.setReadable( true );
     }
 
     @Override
@@ -150,6 +153,31 @@ public class UserToRolePlexusResource
         response.setStatus( Status.SUCCESS_NO_CONTENT );
         return null;
     }
+    
+    @Override
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
+    {
+        String userId = this.getUserId( request );
+
+        String sourceId = this.getSourceId( request );
+
+        try
+        {
+            SecurityUserRoleMapping mapping = getNexusSecurity().readUserRoleMapping( userId, sourceId );
+
+            UserToRoleResourceRequest resp = new UserToRoleResourceRequest();
+
+            resp.setData( nexusToRestModel( mapping ) );
+
+            return resp;
+        }
+        catch ( NoSuchRoleMappingException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "User-Role mapping with sourceId = '"
+                + sourceId + "' and userId = '" + userId + "' not found!" );
+        }
+    }
 
     /*
      * (non-Javadoc)
@@ -175,10 +203,13 @@ public class UserToRolePlexusResource
         }
     }
 
+    @SuppressWarnings( "unchecked" )
     private SecurityUserRoleMapping restToNexusModel( UserToRoleResource restRoleMapping )
     {
         SecurityUserRoleMapping roleMapping = new SecurityUserRoleMapping();
+        
         roleMapping.setUserId( restRoleMapping.getUserId() );
+        
         roleMapping.setSource( restRoleMapping.getSource() );
 
         for ( String role : (List<String>) restRoleMapping.getRoles() )
@@ -187,5 +218,26 @@ public class UserToRolePlexusResource
         }
 
         return roleMapping;
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private UserToRoleResource nexusToRestModel( SecurityUserRoleMapping mapping )
+    {
+        UserToRoleResource resource = new UserToRoleResource();
+
+        resource.setUserId( mapping.getUserId() );
+
+        resource.setSource( mapping.getSource() );
+
+        List<String> roles = new ArrayList<String>();
+
+        for ( String role : (List<String>) mapping.getRoles() )
+        {
+            roles.add( role );
+        }
+
+        resource.setRoles( roles );
+
+        return resource;
     }
 }
