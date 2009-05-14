@@ -20,7 +20,6 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>1.5.8</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -30,7 +29,6 @@
     <dependency>
       <groupId>org.sonatype.configuration</groupId>
       <artifactId>base-configuration</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
     </dependency>
     
     <!-- TESTS -->

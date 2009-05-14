@@ -6,17 +6,14 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.sonatype.security</groupId>
   <artifactId>security-system</artifactId>
   <name>Security: System</name>
   <version>1.0.8-SNAPSHOT</version>
-
 
   <dependencies>
     <dependency>
       <groupId>org.jsecurity</groupId>
       <artifactId>jsecurity</artifactId>
-      <version>0.9.0-RC2-SONATYPE</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -29,23 +26,19 @@
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>plexus-ehcache</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    
     <dependency>
       <groupId>org.sonatype.plexus.appevents</groupId>
       <artifactId>plexus-app-events-api</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
     </dependency>
     
     <dependency>
       <groupId>org.sonatype.plexus.appevents</groupId>
       <artifactId>simple-event-multicaster</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
     </dependency>
     
     <dependency>
@@ -56,7 +49,6 @@
     <dependency>
       <groupId>org.sonatype.configuration</groupId>
       <artifactId>base-configuration</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
     </dependency>
 
     <!-- web security -->
