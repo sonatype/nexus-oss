@@ -12,6 +12,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.locator.ArtifactLocator;
 import org.sonatype.nexus.index.locator.GavHelpedLocator;
 import org.sonatype.nexus.index.locator.Locator;
 import org.sonatype.nexus.index.locator.MetadataLocator;
@@ -52,13 +53,33 @@ public class DefaultArtifactContextProducer
             return null;  // skipped
         }
 
-        String path = artifactPath.substring( repositoryPath.length() + 1 ).replace( '\\', '/' );
-        
-        Gav gav = context.getGavCalculator().pathToGav( path );
+        Gav gav = getGavFromPath( context, repositoryPath, artifactPath );
 
         if ( gav == null )
         {
             return null; // not an artifact
+        }
+        
+        File pom;
+        File artifact;
+
+        if ( file.getName().endsWith( ".pom" ) )
+        {
+            ArtifactLocator al = new ArtifactLocator( context );
+            artifact = al.locate( file, context.getGavCalculator(), gav );
+            
+            //If we found the matching artifact, switch over to indexing that, instead of the pom
+            if ( artifact != null )
+            {
+                gav = getGavFromPath( context, repositoryPath, artifact.getAbsolutePath() );
+            }
+            
+            pom = file;
+        }
+        else
+        {
+            artifact = file;
+            pom = pl.locate( file, context.getGavCalculator(), gav );
         }
 
         String groupId = gav.getGroupId();
@@ -77,25 +98,8 @@ public class DefaultArtifactContextProducer
             ai.packaging = gav.getExtension();
         }
         
-        ai.fextension = gav.getExtension();
         ai.fname = file.getName();
-        
-        File pom;
-        File artifact;
-
-        if ( file.getName().endsWith( ".pom" ) )
-        {
-            // there is no "reliable" way to go from pom to artifact.
-            // if artifact exists, scan will find it and will "update" existing Lucene document.
-            // API consumers should send artifacts to being added to index, not only poms.
-            artifact = null;
-            pom = file;
-        }
-        else
-        {
-            artifact = file;
-            pom = pl.locate( file, context.getGavCalculator(), gav );
-        }
+        ai.fextension = gav.getExtension();
 
         File metadata = ml.locate( pom );
 
@@ -125,6 +129,13 @@ public class DefaultArtifactContextProducer
         }
         
         return true;
+    }
+    
+    private Gav getGavFromPath( IndexingContext context, String repositoryPath, String artifactPath )
+    {
+        String path = artifactPath.substring( repositoryPath.length() + 1 ).replace( '\\', '/' );
+        
+        return context.getGavCalculator().pathToGav( path );
     }
 
 }
