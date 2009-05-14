@@ -70,6 +70,14 @@ public class CoreClient
 
     private static final String USER_TO_ROLE_REQUEST_ELEMENT = "user-to-role";
 
+    private static final String USER_TO_ROLE_USER_ID_ELEMENT = "userId";
+
+    private static final String USER_TO_ROLE_SOURCE_ELEMENT = "source";
+
+    private static final String USER_TO_ROLE_ROLES_ELEMENT = "roles";
+
+    private static final String USER_TO_ROLE_ROLE_ELEMENT = "role";
+
     // Role
     private static final String ROLE_REQUEST_ELEMENT = "role-request";
 
@@ -103,6 +111,8 @@ public class CoreClient
     private static final String ROLE_XPATH = "//data";
 
     private static final String PLEXUS_USER_XPATH = "//data";
+
+    private static final String USER_TO_ROLE_XPATH = "//data";
 
     public CoreClient( final String baseUrl, final String username, final String password )
         throws RESTLightClientException
@@ -309,6 +319,41 @@ public class CoreClient
         return parseUser( elements.get( 0 ) );
     }
 
+    private UserToRole parseUserToRole( final Document doc )
+        throws RESTLightClientException
+    {
+        List<Element> elements = parseElements( newXPath( USER_TO_ROLE_XPATH ), doc.getRootElement() );
+
+        if ( elements.isEmpty() )
+        {
+            return null;
+        }
+
+        return parseUserToRole( elements.get( 0 ) );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private UserToRole parseUserToRole( final Element element )
+    {
+        UserToRole userToRole = new UserToRole();
+
+        userToRole.setUserId( element.getChildText( USER_TO_ROLE_USER_ID_ELEMENT ) );
+
+        userToRole.setSource( element.getChildText( USER_TO_ROLE_SOURCE_ELEMENT ) );
+
+        Element rolesElement = element.getChild( USER_TO_ROLE_ROLES_ELEMENT );
+
+        if ( rolesElement != null )
+        {
+            for ( Element roleElement : (List<Element>) rolesElement.getChildren( USER_TO_ROLE_ROLE_ELEMENT ) )
+            {
+                userToRole.getRoles().add( roleElement.getValue() );
+            }
+        }
+
+        return userToRole;
+    }
+
     private PlexusUser parsePlexusUser( final Document doc )
         throws RESTLightClientException
     {
@@ -388,15 +433,15 @@ public class CoreClient
 
         root.addContent( data );
 
-        data.addContent( new Element( "userId" ).setText( userToRole.getUserId() ) );
+        data.addContent( new Element( USER_TO_ROLE_USER_ID_ELEMENT ).setText( userToRole.getUserId() ) );
 
-        data.addContent( new Element( "source" ).setText( userToRole.getSource() ) );
+        data.addContent( new Element( USER_TO_ROLE_SOURCE_ELEMENT ).setText( userToRole.getSource() ) );
 
-        Element rolesElement = new Element( "roles" );
+        Element rolesElement = new Element( USER_TO_ROLE_ROLES_ELEMENT );
 
         for ( String role : userToRole.getRoles() )
         {
-            rolesElement.addContent( new Element( "role" ).setText( role ) );
+            rolesElement.addContent( new Element( USER_TO_ROLE_ROLE_ELEMENT ).setText( role ) );
         }
 
         data.addContent( rolesElement );
@@ -477,4 +522,13 @@ public class CoreClient
 
         this.put( USER_TO_ROLE_PATH + "/" + userToRole.getSource() + "/" + userToRole.getUserId(), null, doc );
     }
+
+    public UserToRole getUserToRole( String userId, String source )
+        throws RESTLightClientException
+    {
+        Document doc = get( USER_TO_ROLE_PATH + "/" + source + "/" + userId );
+
+        return parseUserToRole( doc );
+    }
+
 }

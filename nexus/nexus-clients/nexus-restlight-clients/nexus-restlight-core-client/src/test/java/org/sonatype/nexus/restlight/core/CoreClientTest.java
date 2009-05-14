@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.BeforeClass;
@@ -291,6 +292,31 @@ public class CoreClientTest
 
         CoreClient client = new CoreClient( getBaseUrl(), "testuser", "unused" );
         client.putUserToRole( userToRole );
+    }
+    
+    @Test
+    public void getUserToRole()
+        throws Exception
+    {
+        String source = "url";
+        String userId = "juven";
+
+        List<RESTTestFixture> conversation = new ArrayList<RESTTestFixture>();
+        GETFixture getFixture = new GETFixture();
+        getFixture.setExactURI( CoreClient.USER_TO_ROLE_PATH + "/" + source + "/" + userId );
+        getFixture.setResponseDocument( readTestDocumentResource( "user-to-role-get.xml" ) );
+        conversation.add( getVersionCheckFixture() );
+        conversation.add( getFixture );
+        fixture.setConversation( conversation );
+
+        CoreClient client = new CoreClient( getBaseUrl(), "testuser", "unused" );
+        UserToRole result = client.getUserToRole( userId, source );
+
+        assertNotNull( result );
+        assertEquals( "url", result.getSource() );
+        assertEquals( "juven", result.getUserId() );
+        String[] roles = { "ui-basic", "ui-logs-config-files" };
+        assertEquals( Arrays.asList( roles ), result.getRoles() );
     }
 
     @Test
