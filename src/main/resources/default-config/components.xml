@@ -121,7 +121,7 @@
             <name>remote</name>
             <authenticationInfo>
               <authMethod>BASIC</authMethod>
-              <credentialsFilePath>${basedir}/target/test-classes/default-config/realm.properties</credentialsFilePath>
+              <credentialsFilePath>${basedir}/target/resources/default-configs/realm.properties</credentialsFilePath>
             </authenticationInfo>
             <servletInfos>
               <servletInfo>
