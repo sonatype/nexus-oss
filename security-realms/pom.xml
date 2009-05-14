@@ -12,7 +12,6 @@
   <name>Security: Realms Parent</name>
   
   <modules>
-  	<!-- <module>plexus-delegating-realm</module>  -->
   	<module>security-xml-realm</module>
   	<module>security-url-realm</module>
   </modules>
