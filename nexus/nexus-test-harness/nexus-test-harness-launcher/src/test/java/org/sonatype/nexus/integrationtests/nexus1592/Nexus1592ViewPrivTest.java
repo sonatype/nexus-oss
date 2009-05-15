@@ -65,7 +65,7 @@ public class Nexus1592ViewPrivTest
         throws IOException
     {
         int response = deploy( gav );
-        Assert.assertTrue( "Unable to deploy artifact: " + response, Status.isError( response ) );
+        Assert.assertTrue( "Deployment should have failed: " + response, Status.isError( response ) );
         return response;
     }
 

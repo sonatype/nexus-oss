@@ -44,15 +44,6 @@
           <required>true</required>
         </field>
         <field>
-          <name>security</name>
-          <version>1.4.0+</version>
-          <description>This section defines Nexus security.</description>
-          <association>
-            <type>CSecurity</type>
-          </association>
-          <required>true</required>
-        </field>
-        <field>
           <name>globalConnectionSettings</name>
           <version>1.4.0+</version>
           <description>
@@ -180,58 +171,6 @@
 ]]></code>
         </codeSegment>
       </codeSegments>
-    </class>
-
-    <class>
-      <name>CSecurity</name>
-      <version>1.4.0+</version>
-      <description>The security section of Nexus configuration.</description>
-      <fields>
-        <field>
-          <name>enabled</name>
-          <version>1.4.0+</version>
-          <type>boolean</type>
-          <description>The only mandatory element. If true, Nexus instance will be secured.</description>
-          <required>true</required>
-        </field>
-        <field>
-          <name>anonymousAccessEnabled</name>
-          <version>1.4.0+</version>
-          <type>boolean</type>
-          <description>
-            If enabled, the users will be able to access DAV resources unauthenticated, if Realm allows. To
-            set rights for unauthenticated users, use "anonymous" username.</description>
-          <required>true</required>
-        </field>
-        <field>
-          <name>anonymousUsername</name>
-          <version>1.4.0+</version>
-          <type>String</type>
-          <description>
-            The username used to log in as anonymous user. The account should be enabled and existing according to
-            the used JSecurity realm!</description>
-          <required>true</required>
-        </field>
-        <field>
-          <name>anonymousPassword</name>
-          <version>1.4.0+</version>
-          <type>String</type>
-          <description>
-            The username used to log in as anonymous user. The account should be enabled and existing according to
-            the used JSecurity realm!</description>
-          <required>true</required>
-        </field>
-        <field>
-          <name>realms</name>
-          <version>1.4.0+</version>
-          <description>The list of JSecurity realms used in Nexus.</description>
-          <association>
-            <type>String</type>
-            <multiplicity>*</multiplicity>
-          </association>
-          <required>true</required>
-        </field>
-      </fields>
     </class>
 
     <class>

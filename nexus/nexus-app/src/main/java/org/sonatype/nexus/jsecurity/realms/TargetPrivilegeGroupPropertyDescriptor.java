@@ -1,7 +1,7 @@
 package org.sonatype.nexus.jsecurity.realms;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.jsecurity.realms.privileges.PrivilegePropertyDescriptor;
+import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 
 @Component( role = PrivilegePropertyDescriptor.class, hint = "TargetPrivilegeGroupPropertyDescriptor" )
 public class TargetPrivilegeGroupPropertyDescriptor

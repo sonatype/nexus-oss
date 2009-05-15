@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -41,7 +42,6 @@ import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.v1_0_8.Configuration;
 import org.sonatype.nexus.configuration.model.v1_0_8.io.xpp3.NexusConfigurationXpp3Reader;
@@ -53,6 +53,8 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.util.ExternalConfigUtil;
+import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 
 /**
  * Upgrades configuration model from version 1.0.8 to 1.4.0.
@@ -64,7 +66,9 @@ public class Upgrade108to140
     extends AbstractLogEnabled
     implements Upgrader
 {
-
+    @Requirement( hint="file")
+    private SecurityConfigurationSource securityConfigurationSource;
+    
     private static final String EXTERNAL_CONFIG = "externalConfiguration";
 
     private static final String GROUP_MEMBERS_NODE = "memberRepositories";
@@ -130,11 +134,21 @@ public class Upgrade108to140
         Configuration oldc = (Configuration) message.getConfiguration();
         org.sonatype.nexus.configuration.model.Configuration newc = new org.sonatype.nexus.configuration.model.Configuration();
 
+        // Security has been moved out of the Nexus.xml
+        try
+        {
+            this.upgradeSecurity( oldc.getSecurity() );
+        }
+        catch ( IOException e )
+        {
+           throw new ConfigurationIsCorruptedException( "nexus.xml", e );
+        }
+        
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         // SMTP info is the same
         newc.setSmtpConfiguration( copyCSmtpConfiguration1_0_8( oldc.getSmtpConfiguration() ) );
         // Security info is the same
-        newc.setSecurity( copyCSecurity1_0_8( oldc.getSecurity() ) );
+//        newc.setSecurity( copyCSecurity1_0_8( oldc.getSecurity() ) );
         // Global Connection is the same
         newc.setGlobalConnectionSettings( copyCRemoteConnectionSettings1_0_8( oldc.getGlobalConnectionSettings() ) );
         // Global Proxy is the same
@@ -213,6 +227,26 @@ public class Upgrade108to140
 
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
+    }
+    
+    private void upgradeSecurity(org.sonatype.nexus.configuration.model.v1_0_8.CSecurity oldsecurity) throws IOException
+    {
+        // if the oldsecurity is null, we can just use the defaults at runtime
+        if ( oldsecurity != null )
+        {
+            SecurityConfiguration securityConfig = new SecurityConfiguration();
+            // set the version
+            securityConfig.setVersion( SecurityConfiguration.MODEL_VERSION );
+            
+            securityConfig.setAnonymousAccessEnabled( oldsecurity.isAnonymousAccessEnabled() );
+            securityConfig.setAnonymousUsername( oldsecurity.getAnonymousUsername() );
+            securityConfig.setAnonymousPassword( oldsecurity.getAnonymousPassword() );
+            securityConfig.setEnabled( oldsecurity.isEnabled() );
+            securityConfig.getRealms().addAll( oldsecurity.getRealms() );
+            
+            securityConfigurationSource.setConfiguration( securityConfig );
+            securityConfigurationSource.storeConfiguration();
+        }
     }
 
     protected List<CProps> copyCProps1_0_8( List<org.sonatype.nexus.configuration.model.v1_0_8.CProps> oldprops )
@@ -383,22 +417,6 @@ public class Upgrade108to140
         }
 
         return smtp;
-    }
-
-    protected CSecurity copyCSecurity1_0_8( org.sonatype.nexus.configuration.model.v1_0_8.CSecurity oldsecurity )
-    {
-        CSecurity security = new CSecurity();
-
-        if ( oldsecurity != null )
-        {
-            security.setAnonymousAccessEnabled( oldsecurity.isAnonymousAccessEnabled() );
-            security.setAnonymousUsername( oldsecurity.getAnonymousUsername() );
-            security.setAnonymousPassword( oldsecurity.getAnonymousPassword() );
-            security.setEnabled( oldsecurity.isEnabled() );
-            security.getRealms().addAll( oldsecurity.getRealms() );
-        }
-
-        return security;
     }
 
     protected CRouting copyCRouting1_0_8( org.sonatype.nexus.configuration.model.v1_0_8.CRouting oldrouting )

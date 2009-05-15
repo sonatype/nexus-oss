@@ -26,19 +26,21 @@ import org.sonatype.micromailer.MailRequest;
 import org.sonatype.micromailer.imp.DefaultMailType;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.security.email.SecurityEmailer;
 
 /**
  * The default emailer.
  * 
  * @author cstamas
  */
-@Component( role = NexusEmailer.class )
+@Component( role = SecurityEmailer.class )
 public class DefaultNexusEmailer
-    implements NexusEmailer, EventListener, Initializable
+    implements SecurityEmailer, EventListener, Initializable
 {
     @Requirement
     private EMailer emailer;
@@ -46,6 +48,9 @@ public class DefaultNexusEmailer
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
 
+    @Requirement
+    private NexusConfiguration nexusConfiguration;
+    
     private CSmtpConfiguration smtp;
 
     private static final String NEXUS_MAIL_ID = "Nexus";
@@ -122,6 +127,11 @@ public class DefaultNexusEmailer
         throws InitializationException
     {
         applicationEventMulticaster.addEventListener( this );
+        
+        // now initialize the smtp config
+        this.configChanged( nexusConfiguration.getConfiguration().getSmtpConfiguration() );
+        // update the config on the mailer component
+        this.updateConfig();
     }
 
     public void onEvent( Event evt )

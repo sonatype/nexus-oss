@@ -38,6 +38,7 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
+import org.sonatype.security.SecuritySystem;
 
 public class NexusConfigUtil
 {
@@ -112,18 +113,9 @@ public class NexusConfigUtil
     }
 
     public static void enableSecurity( boolean enabled )
-        throws IOException
+        throws Exception
     {
-        Configuration config = getNexusConfig();
-
-        if ( config.getSecurity().isEnabled() != enabled )
-        {
-            config.getSecurity().setEnabled( enabled );
-
-            // save it
-            saveConfig( config );
-        }
-
+        TestContainer.getInstance().lookup( SecuritySystem.class ).setSecurityEnabled( enabled );
     }
 
     public static M2LayoutedM1ShadowRepositoryConfiguration getRepoShadow( String repoId )

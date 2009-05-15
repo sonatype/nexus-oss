@@ -21,17 +21,18 @@ import java.io.OutputStream;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.subject.PrincipalCollection;
 import org.jsecurity.subject.SimplePrincipalCollection;
-import org.sonatype.jsecurity.realms.PlexusSecurity;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authentication.AuthenticationException;
 
 public class SimpleRealmTest
     extends AbstractNexusTestCase
@@ -46,7 +47,7 @@ public class SimpleRealmTest
     public void testValidAuthentication()
         throws Exception
     {
-        PlexusSecurity plexusSecurity = this.lookup( PlexusSecurity.class, "web" );
+        SecuritySystem plexusSecurity = this.lookup( SecuritySystem.class );
         AuthenticationToken token = new UsernamePasswordToken( "admin-simple", "admin123" );
         AuthenticationInfo authInfo = plexusSecurity.authenticate( token );
 
@@ -62,7 +63,7 @@ public class SimpleRealmTest
     public void testInvalidPasswordAuthentication()
         throws Exception
     {
-        PlexusSecurity plexusSecurity = this.lookup( PlexusSecurity.class, "web" );
+        SecuritySystem plexusSecurity = this.lookup( SecuritySystem.class );
         AuthenticationToken token = new UsernamePasswordToken( "admin-simple", "INVALID" );
 
         try
@@ -83,7 +84,7 @@ public class SimpleRealmTest
     public void testInvalidUserAuthentication()
         throws Exception
     {
-        PlexusSecurity plexusSecurity = this.lookup( PlexusSecurity.class, "web" );
+        SecuritySystem plexusSecurity = this.lookup( SecuritySystem.class );
         AuthenticationToken token = new UsernamePasswordToken( "INVALID", "INVALID" );
 
         try
@@ -106,9 +107,9 @@ public class SimpleRealmTest
     public void testPrivileges()
         throws Exception
     {
-        PlexusSecurity plexusSecurity = this.lookup( PlexusSecurity.class, "web" );
+        SecuritySystem plexusSecurity = this.lookup( SecuritySystem.class );
 
-        PrincipalCollection principal = new SimplePrincipalCollection( "admin-simple", PlexusSecurity.class
+        PrincipalCollection principal = new SimplePrincipalCollection( "admin-simple", SecuritySystem.class
             .getSimpleName() );
 
         // test one of the privleges that the admin user has
@@ -124,9 +125,9 @@ public class SimpleRealmTest
     public void testPrivilegesInvalidUser()
         throws Exception
     {
-        PlexusSecurity plexusSecurity = this.lookup( PlexusSecurity.class, "web" );
+        SecuritySystem plexusSecurity = this.lookup( SecuritySystem.class );
 
-        PrincipalCollection principal = new SimplePrincipalCollection( "INVALID", PlexusSecurity.class
+        PrincipalCollection principal = new SimplePrincipalCollection( "INVALID", SecuritySystem.class
             .getSimpleName() );
 
         // test one of the privleges
@@ -148,7 +149,7 @@ public class SimpleRealmTest
 
         // copy the tests nexus.xml and security.xml to the correct location
         this.copyTestConfigToPlace();
-
+        
         if ( loadConfigurationAtSetUp() )
         {
             nexusConfiguration = this.lookup( NexusConfiguration.class );
@@ -161,16 +162,26 @@ public class SimpleRealmTest
             nexusConfiguration.saveConfiguration();
         }
     }
+    
+
+    @Override
+    protected void customizeContext( Context ctx )
+    {
+        super.customizeContext( ctx );
+        ctx.put( "application-conf", CONF_HOME.getAbsolutePath() );
+    }
 
     private void copyTestConfigToPlace()
         throws FileNotFoundException,
             IOException
     {
         InputStream nexusConf = null;
+        InputStream security = null;
         InputStream securityConf = null;
 
         OutputStream nexusOut = null;
         OutputStream securityOut = null;
+        OutputStream securityConfOut = null;
 
         try
         {
@@ -178,9 +189,13 @@ public class SimpleRealmTest
             nexusOut = new FileOutputStream( getNexusConfiguration() );
             IOUtil.copy( nexusConf, nexusOut );
 
-            securityConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security.xml" );
+            security = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security.xml" );
             securityOut = new FileOutputStream( getNexusSecurityConfiguration() );
-            IOUtil.copy( securityConf, securityOut);
+            IOUtil.copy( security, securityOut);
+            
+            securityConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security-configuration.xml" );
+            securityConfOut = new FileOutputStream( CONF_HOME + "/security-configuration.xml" );
+            IOUtil.copy( securityConf, securityConfOut);
         }
         finally
         {
@@ -188,6 +203,8 @@ public class SimpleRealmTest
             IOUtil.close( securityConf );
             IOUtil.close( nexusOut );
             IOUtil.close( securityOut );
+            IOUtil.close( security );
+            IOUtil.close( securityConfOut );
 
         }
     }

@@ -23,8 +23,8 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
+import org.sonatype.security.rest.model.UserResource;
 
 /**
  * Put a bunch of artifacts in a repo, and then run a maven project to download them 

@@ -15,8 +15,8 @@ package org.sonatype.nexus.rest.users;
 
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.rest.AbstractRestTestCase;
-import org.sonatype.nexus.rest.model.UserResourceRequest;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.security.rest.model.UserResourceRequest;
 
 public class UserTest
     extends AbstractRestTestCase

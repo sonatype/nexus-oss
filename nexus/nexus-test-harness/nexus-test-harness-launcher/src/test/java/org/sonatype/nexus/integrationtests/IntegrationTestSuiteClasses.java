@@ -215,6 +215,8 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1116.Nexus1116InvalidPr
     Nexus1696ValidateBaseUrl.class,
     Nexus1563ExternalRealmsTest.class,
     Nexus383SearchTest.class
+    
+    // not in suites: Nexus1719OOSRepoEvictUnusedTaskTest.class, 
 } )
 public class IntegrationTestSuiteClasses
 {

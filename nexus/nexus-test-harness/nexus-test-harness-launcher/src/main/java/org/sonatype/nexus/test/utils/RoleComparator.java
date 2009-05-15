@@ -13,9 +13,14 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import org.sonatype.jsecurity.model.CRole;
+import org.codehaus.plexus.util.CollectionUtils;
+import org.sonatype.security.model.CRole;
 
 /**
  * This only works for equals...
@@ -71,18 +76,25 @@ public class RoleComparator
             if ( role2.getPrivileges() != null )
                 return -1;
         }
-        else if ( !role1.getPrivileges().equals( role2.getPrivileges() ) )
+        
+        Set<String> role1Privileges = new HashSet<String>(role1.getPrivileges());
+        Set<String> role2Privileges = new HashSet<String>(role2.getPrivileges());
+        
+        if ( !role1Privileges.equals( role2Privileges ) )
             return -1;
         if ( role1.getRoles() == null )
         {
             if ( role2.getRoles() != null )
                 return -1;
         }
-        else if ( !role1.getRoles().equals( role2.getRoles() ) )
+        
+        Set<String> role1Roles = new HashSet<String>(role1.getRoles());
+        Set<String> role2Roles = new HashSet<String>(role2.getRoles());
+        
+        if ( !role1Roles.equals( role2Roles ) )
             return -1;
         if ( role1.getSessionTimeout() != role2.getSessionTimeout() )
             return -1;
         return 0;
-        
     }
 }

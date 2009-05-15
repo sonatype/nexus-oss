@@ -24,7 +24,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 
 @RunWith( Suite.class )
-@SuiteClasses( { IntegrationTestSuiteClasses.class/*, IntegrationTestSuiteClassesSecurity.class */ } )
+@SuiteClasses( { IntegrationTestSuiteClasses.class/*, IntegrationTestSuiteClassesSecurity.class*/ } )
 public class IntegrationTestSuite
 {
 
@@ -38,7 +38,7 @@ public class IntegrationTestSuite
         FileUtils.copyFile( testConfigFile, outputFile );
 
         NexusStatusUtil.doHardStart();
-
+        
         NexusStatusUtil.doSoftStop();
     }
 

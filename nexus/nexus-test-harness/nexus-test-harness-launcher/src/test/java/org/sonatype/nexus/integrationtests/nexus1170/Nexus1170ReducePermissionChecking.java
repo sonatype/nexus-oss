@@ -25,9 +25,6 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.jsecurity.model.CProperty;
-import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.source.FileConfigurationSource;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -35,9 +32,12 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.AuthenticationLoginResource;
 import org.sonatype.nexus.rest.model.AuthenticationLoginResourceResponse;
-import org.sonatype.nexus.rest.model.ClientPermission;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.security.model.CProperty;
+import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
+import org.sonatype.security.rest.model.ClientPermission;
 
 public class Nexus1170ReducePermissionChecking
     extends AbstractNexusIntegrationTest

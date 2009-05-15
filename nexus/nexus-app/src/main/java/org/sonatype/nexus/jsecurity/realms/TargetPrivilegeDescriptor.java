@@ -6,15 +6,16 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.jsecurity.model.CPrivilege;
-import org.sonatype.jsecurity.model.CProperty;
-import org.sonatype.jsecurity.realms.privileges.AbstractPrivilegeDescriptor;
-import org.sonatype.jsecurity.realms.privileges.PrivilegeDescriptor;
-import org.sonatype.jsecurity.realms.privileges.PrivilegePropertyDescriptor;
-import org.sonatype.jsecurity.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
-import org.sonatype.jsecurity.realms.validator.ValidationContext;
-import org.sonatype.jsecurity.realms.validator.ValidationMessage;
-import org.sonatype.jsecurity.realms.validator.ValidationResponse;
+import org.sonatype.configuration.validation.ValidationContext;
+import org.sonatype.configuration.validation.ValidationMessage;
+import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CProperty;
+import org.sonatype.security.realms.privileges.AbstractPrivilegeDescriptor;
+import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
+import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
+import org.sonatype.security.realms.validator.SecurityValidationContext;
 
 @Component( role = PrivilegeDescriptor.class, hint = "TargetPrivilegeDescriptor" )
 public class TargetPrivilegeDescriptor
@@ -109,7 +110,7 @@ public class TargetPrivilegeDescriptor
     }
     
     @Override
-    public ValidationResponse validatePrivilege( CPrivilege privilege, ValidationContext ctx, boolean update )
+    public ValidationResponse<SecurityValidationContext> validatePrivilege( CPrivilege privilege, SecurityValidationContext ctx, boolean update )
     {
         ValidationResponse response = super.validatePrivilege( privilege, ctx, update );
         

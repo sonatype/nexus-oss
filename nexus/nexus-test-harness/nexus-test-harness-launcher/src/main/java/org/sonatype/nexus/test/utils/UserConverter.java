@@ -13,8 +13,8 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import org.sonatype.jsecurity.model.CUser;
-import org.sonatype.nexus.rest.model.UserResource;
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.rest.model.UserResource;
 
 public class UserConverter
 {

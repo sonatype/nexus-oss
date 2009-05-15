@@ -51,7 +51,6 @@ import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.log.LogConfig;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
@@ -89,6 +88,8 @@ import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.nexus.timeline.RepositoryIdTimelineFilter;
 import org.sonatype.nexus.timeline.TimelineFilter;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 
 /**
  * The default Nexus implementation.
@@ -110,6 +111,9 @@ public class DefaultNexus
     @Requirement
     private NexusConfiguration nexusConfiguration;
 
+    @Requirement( hint="static" )
+    private SecurityConfigurationSource defaultSecurityConfigurationSource;
+    
     /**
      * The NexusIndexer.
      */
@@ -165,12 +169,6 @@ public class DefaultNexus
     private CacheManager cacheManager;
 
     /**
-     * The NexusSecurity.
-     */
-    @Requirement
-    private NexusSecurity security;
-
-    /**
      * The SecurityConfiguration component.
      */
     @Requirement
@@ -193,6 +191,13 @@ public class DefaultNexus
      */
     @Requirement
     private ApplicationStatusSource applicationStatusSource;
+    
+    
+    /**
+     * Security component 
+     */
+    @Requirement
+    private SecuritySystem securitySystem;
 
     // ----------------------------------------------------------------------------------------------------------
     // Template names and prefixes, not allowed to go out of this class
@@ -630,32 +635,27 @@ public class DefaultNexus
 
     public boolean isDefaultSecurityEnabled()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity()
-                                 .isEnabled();
+        return this.defaultSecurityConfigurationSource.getConfiguration().isEnabled();
     }
 
     public boolean isDefaultAnonymousAccessEnabled()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity()
-                                 .isAnonymousAccessEnabled();
+        return this.defaultSecurityConfigurationSource.getConfiguration().isAnonymousAccessEnabled();
     }
 
     public String getDefaultAnonymousUsername()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity()
-                                 .getAnonymousUsername();
+        return this.defaultSecurityConfigurationSource.getConfiguration().getAnonymousUsername();
     }
 
     public String getDefaultAnonymousPassword()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity()
-                                 .getAnonymousPassword();
+        return this.defaultSecurityConfigurationSource.getConfiguration().getAnonymousPassword();
     }
 
     public List<String> getDefaultRealms()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity()
-                                 .getRealms();
+        return this.defaultSecurityConfigurationSource.getConfiguration().getRealms();
     }
 
     public NexusStreamResponse getDefaultConfigurationAsStream()
@@ -885,7 +885,7 @@ public class DefaultNexus
             nexusConfiguration.loadConfiguration( true );
 
             // essential service
-            security.startService();
+            securitySystem.start();
 
             // create internals
             nexusConfiguration.createInternals();
@@ -989,7 +989,7 @@ public class DefaultNexus
 
         nexusConfiguration.dropInternals();
 
-        security.stopService();
+        securitySystem.stop();
 
         try
         {

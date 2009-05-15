@@ -1,29 +1,30 @@
 package org.sonatype.nexus.proxy.repository;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Arrays;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.util.FileUtils;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.subject.Subject;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.jsecurity.realms.PlexusSecurity;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
-import org.sonatype.nexus.proxy.IllegalOperationException;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.proxy.target.TargetMatch;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authentication.AuthenticationException;
 
 public class AccessTest
     extends AbstractProxyTestEnvironment
@@ -43,11 +44,8 @@ public class AccessTest
     }
 
     public void testGroupAccess()
-        throws NoSuchRepositoryException,
-            StorageException,
-            AccessDeniedException,
-            IllegalOperationException,
-            ItemNotFoundException
+        throws AuthenticationException,
+            Exception
     {
 
         // user does not have access to the group
@@ -69,11 +67,8 @@ public class AccessTest
     }
 
     public void testRepositoryAccess()
-        throws NoSuchRepositoryException,
-            StorageException,
-            AccessDeniedException,
-            IllegalOperationException,
-            ItemNotFoundException
+        throws AuthenticationException,
+            Exception
     {
         // Not true, currently perms are always transitive
         // group access imples repository access, IF NOT EXPOSED, SO "UN"-EXPOSE IT
@@ -105,13 +100,12 @@ public class AccessTest
     // }
 
     private StorageItem getItem( String username, String repositoryId, String path )
-        throws NoSuchRepositoryException,
-            StorageException,
-            AccessDeniedException,
-            IllegalOperationException,
-            ItemNotFoundException
+        throws AuthenticationException,
+            Exception
     {
-        Subject subject = SecurityUtils.getSecurityManager().login( new UsernamePasswordToken( username, "" ) );
+        SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
+        
+        Subject subject = securitySystem.login( new UsernamePasswordToken( username, "" ) );
 
         Repository repo = this.getRepositoryRegistry().getRepository( repositoryId );
 
@@ -121,7 +115,7 @@ public class AccessTest
 
         // not sure if we really need to log the user out, we are not using a remember me,
         // but what can it hurt?
-        SecurityUtils.getSecurityManager().logout( subject.getPrincipals() );
+        securitySystem.logout( subject.getPrincipals() );
 
         return item;
     }
@@ -147,12 +141,13 @@ public class AccessTest
         throws Exception
     {
         ApplicationConfiguration applicationConfiguration = this.lookup( ApplicationConfiguration.class );
-        applicationConfiguration.getConfiguration().getSecurity().setEnabled( true );
         applicationConfiguration.saveConfiguration();
 
-        System.out.println( "ApplicationConfiguration (test): " + applicationConfiguration );
-
         super.setUp();
+
+        String resource = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security-configuration.xml";
+        URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
+        FileUtils.copyURLToFile( url, new File( CONF_HOME, "security-configuration.xml" ) );
 
         TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
 
@@ -162,9 +157,14 @@ public class AccessTest
         targetRegistry.addRepositoryTarget( t1 );
 
         // setup security
-        PlexusSecurity securityManager = this.lookup( PlexusSecurity.class );
-        SecurityUtils.setSecurityManager( securityManager );
+        this.lookup( SecuritySystem.class );
+    }
 
+    @Override
+    protected void customizeContext( Context ctx )
+    {
+        super.customizeContext( ctx );
+        ctx.put( "security-xml-file", new File( CONF_HOME, "security.xml" ).getAbsolutePath() );
     }
 
 }

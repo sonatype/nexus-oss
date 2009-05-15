@@ -18,19 +18,22 @@ import java.io.FileOutputStream;
 import java.io.StringWriter;
 import java.util.TimeZone;
 
+import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
+import org.sonatype.nexus.configuration.upgrade.Upgrader;
 
 public class DefaultApplicationConfigurationUpgraderTest
     extends AbstractNexusTestCase
 {
+    private static final File SECURITY_CONF = new File( CONF_HOME, "security-configuration.xml" );
 
     protected ApplicationConfigurationUpgrader configurationUpgrader;
-
+    
     public void setUp()
         throws Exception
     {
@@ -69,11 +72,26 @@ public class DefaultApplicationConfigurationUpgraderTest
             {
                 IOUtil.close( out );
             }
-            String diffMessage = "diff "+ expected.getAbsolutePath() + " "+ actual.getAbsolutePath();
-            String message = "Files differ, you can manually diff them:\n" +diffMessage;
+            String diffMessage = "diff " + expected.getAbsolutePath() + " " + actual.getAbsolutePath();
+            String message = "Files differ, you can manually diff them:\n" + diffMessage;
 
             // the method makes the error pretty, so we can keep it.
             assertEquals( message, shouldBe, sw.toString() );
+        }
+    }
+
+    protected void securityResultIsFine( String path )
+        throws Exception
+    {
+
+        String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path ) );
+
+        String actual = FileUtils.fileRead( SECURITY_CONF );
+
+        if ( !StringUtils.equals( shouldBe, actual ) )
+        {
+            // the method makes the error pretty, so we can keep it.
+            assertEquals( shouldBe, actual );
         }
     }
 
@@ -91,6 +109,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-001-1.xml", configuration );
+        securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-001-1.xml" );
     }
 
     public void testFromDECDmz()
@@ -108,6 +127,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( 3, configuration.getRepositoryGrouping().getPathMappings().size() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-001-2.xml", configuration );
+        securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-001-2.xml" );
     }
 
     public void testFromDECInt()
@@ -124,6 +144,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-001-3.xml", configuration );
+        securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-001-3.xml" );
     }
 
     public void testFrom100()
@@ -141,6 +162,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-100.xml", configuration );
+        securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-100.xml" );
     }
 
     public void testFrom101()
@@ -158,6 +180,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( 4, configuration.getRepositoryGrouping().getPathMappings().size() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-101.xml", configuration );
+        securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-101.xml" );
     }
 
     public void testFrom103_1()
@@ -189,6 +212,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/103-1/nexus-103.xml", configuration );
+        securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/103-1/security-configuration-103.xml" );
     }
 
     public void testFrom103_2()
@@ -209,6 +233,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/103-2/nexus-103.xml", configuration );
+        securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/103-2/security-configuration-103.xml" );
     }
 
     public void testFrom104()
@@ -221,6 +246,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-104.xml", configuration );
+        securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-104.xml" );
     }
 
     public void testFrom105()
@@ -233,6 +259,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-105.xml", configuration );
+        securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-105.xml" );
     }
 
     public void testNEXUS1710()
@@ -247,33 +274,40 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus1710/nexus.xml", configuration );
+        securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus1710/security-configuration-1710.xml" );
+    }
+
+    public void testLookup() throws Exception
+    {
+        // this has slf4f deps and plexus might skip it
+        this.lookup( Upgrader.class, "1.0.8" );
     }
     
-//    public void testUpgradeStaticConfig()
-//    throws Exception
-//    {
-//        copyFromClasspathToFile( "/META-INF/nexus/nexus.xml", getNexusConfiguration() );
-//        
-//        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
-//
-//        Assert.assertNotNull( configuration );
-//        
-//        NexusConfigurationXpp3Writer w = new NexusConfigurationXpp3Writer();
-//
-//        StringWriter sw = new StringWriter();
-//
-//        w.write( sw, configuration );
-//        
-//        File actual = new File( "target", "upgraded-nexus.xml" );
-//        FileOutputStream out = new FileOutputStream( actual );
-//        try
-//        {
-//            IOUtil.copy( sw.toString(), out );
-//        }
-//        finally
-//        {
-//            IOUtil.close( out );
-//        }
-//        
-//    }
+    // public void testUpgradeStaticConfig()
+    // throws Exception
+    // {
+    // copyFromClasspathToFile( "/META-INF/nexus/nexus.xml", getNexusConfiguration() );
+    //        
+    // Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
+    //
+    // Assert.assertNotNull( configuration );
+    //        
+    // NexusConfigurationXpp3Writer w = new NexusConfigurationXpp3Writer();
+    //
+    // StringWriter sw = new StringWriter();
+    //
+    // w.write( sw, configuration );
+    //        
+    // File actual = new File( "target", "upgraded-nexus.xml" );
+    // FileOutputStream out = new FileOutputStream( actual );
+    // try
+    // {
+    // IOUtil.copy( sw.toString(), out );
+    // }
+    // finally
+    // {
+    // IOUtil.close( out );
+    // }
+    //        
+    // }
 }

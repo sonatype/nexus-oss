@@ -15,7 +15,7 @@ package org.sonatype.nexus.test.utils;
 
 import java.util.Comparator;
 
-import org.sonatype.jsecurity.model.CUser;
+import org.sonatype.security.model.CUser;
 
 
 public class UserComparator implements Comparator<CUser>

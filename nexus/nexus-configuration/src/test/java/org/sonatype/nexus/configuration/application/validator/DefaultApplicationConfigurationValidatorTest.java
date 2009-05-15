@@ -218,5 +218,6 @@ public class DefaultApplicationConfigurationValidatorTest
         assertTrue( response.isValid() );
 
         assertFalse( response.isModified() );
+        
     }
 }

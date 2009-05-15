@@ -12,6 +12,7 @@
             <sessionTimeout>30</sessionTimeout>
             <privileges>
                 <privilege>1000</privilege>
+                <privilege>1001</privilege> <!-- Security Admin -->
             </privileges>
             <roles />
         </role>
@@ -497,22 +498,6 @@
             </properties>
         </privilege>
         <privilege>
-            <id>2</id>
-            <type>method</type>
-            <name>Login to UI</name>
-            <description>Give permission to allow a user to login to nexus.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:authentication</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
             <id>3</id>
             <type>method</type>
             <name>Server Settings - (read)</name>
@@ -945,198 +930,6 @@
             </properties>
         </privilege>
         <privilege>
-            <id>30</id>
-            <type>method</type>
-            <name>User Privileges - (create,read)</name>
-            <description>Give permission to create,read privileges.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>create,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:privileges</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>31</id>
-            <type>method</type>
-            <name>User Privileges - (read)</name>
-            <description>Give permission to read existing privilege configuration.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:privileges</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>32</id>
-            <type>method</type>
-            <name>User Privileges - (update,read)</name>
-            <description>Give permission to update,read existing privilege configuration.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>update,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:privileges</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>33</id>
-            <type>method</type>
-            <name>User Privileges - (delete,read)</name>
-            <description>Give permission to delete,read existing privileges.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>delete,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:privileges</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>34</id>
-            <type>method</type>
-            <name>User Roles - (create,read)</name>
-            <description>Give permission to create,read user roles.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>create,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:roles</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>35</id>
-            <type>method</type>
-            <name>User Roles - (read)</name>
-            <description>Give permission to read existing user role configuration.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:roles</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>36</id>
-            <type>method</type>
-            <name>User Roles - (update,read)</name>
-            <description>Give permission to update,read existing user role configuration.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>update,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:roles</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>37</id>
-            <type>method</type>
-            <name>User Roles - (delete,read)</name>
-            <description>Give permission to delete,read existing user roles.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>delete,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:roles</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>38</id>
-            <type>method</type>
-            <name>Users - (create,read)</name>
-            <description>Give permission to create,read users.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>create,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:users</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>39</id>
-            <type>method</type>
-            <name>Users - (read)</name>
-            <description>Give permission to read existing user configuration.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:users</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>40</id>
-            <type>method</type>
-            <name>Users - (update,read)</name>
-            <description>Give permission to update,read existing user configuration.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>update,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:users</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>41</id>
-            <type>method</type>
-            <name>Users - (delete,read)</name>
-            <description>Give permission to delete,read existing users.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>delete,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:users</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
             <id>42</id>
             <type>method</type>
             <name>Logs - (read)</name>
@@ -1329,70 +1122,6 @@
             </properties>
         </privilege>
         <privilege>
-            <id>57</id>
-            <type>method</type>
-            <name>User Forgot Password - (create,read)</name>
-            <description>Give permission to request that a password be generated an emailed to a certain user.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>create,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:usersforgotpw</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>58</id>
-            <type>method</type>
-            <name>User Forgot User Id - (create,read)</name>
-            <description>Give permission to request that a username be emailed to a certain email address.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>create,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:usersforgotid</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>59</id>
-            <type>method</type>
-            <name>User Reset Password - (delete,read)</name>
-            <description>Give permission to reset any user's password.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>delete,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:usersreset</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>64</id>
-            <type>method</type>
-            <name>User Change Password - (create,read)</name>
-            <description>Give permission to change a user's password.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>create,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:userschangepw</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
             <id>65</id>
             <type>method</type>
             <name>Artifact Upload</name>
@@ -1505,22 +1234,6 @@
             </properties>
 		</privilege>
 		<privilege>
-            <id>72</id>
-            <type>method</type>
-            <name>User Set Password - (create,read)</name>
-            <description>Give permission to set a user's password.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>create,read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:userssetpw</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
             <id>73</id>
             <type>method</type>
             <name>Realm Types Component - (read)</name>
@@ -1549,22 +1262,6 @@
                 <property>
                     <key>permission</key>
                     <value>nexus:componentsrepotypes</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>75</id>
-            <type>method</type>
-            <name>User Locator Types Component - (read)</name>
-            <description>Give permission to retrieve the list of User Locator types supported by nexus.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:componentsuserlocatortypes</value>
                 </property>
             </properties>
         </privilege>
@@ -1631,22 +1328,6 @@
               <value>nexus:repositorymirrors</value>
             </property>
           </properties>
-        </privilege>
-        <privilege>
-            <id>80</id>
-            <type>method</type>
-            <name>User Privilege Types - (read)</name>
-            <description>Give permission to read existing privilege types.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:privilegetypes</value>
-                </property>
-            </properties>
         </privilege>
         <privilege>
           <id>81</id>

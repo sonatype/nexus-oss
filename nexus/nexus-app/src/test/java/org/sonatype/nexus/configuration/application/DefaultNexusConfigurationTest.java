@@ -26,11 +26,16 @@ import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.Configuration;
 
+import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.security.SecuritySystem;
+
 public class DefaultNexusConfigurationTest
     extends AbstractNexusTestCase
 {
 
     protected DefaultNexusConfiguration nexusConfiguration;
+    
+    protected SecuritySystem securitySystem;
 
     protected void setUp()
         throws Exception
@@ -38,6 +43,8 @@ public class DefaultNexusConfigurationTest
         super.setUp();
 
         nexusConfiguration = (DefaultNexusConfiguration) this.lookup( NexusConfiguration.class );
+        
+        securitySystem = this.lookup( SecuritySystem.class );
     }
 
     protected void tearDown()
@@ -58,9 +65,9 @@ public class DefaultNexusConfigurationTest
 
         Configuration config = nexusConfiguration.getConfiguration();
 
-        assertEquals( true, config.getSecurity().isEnabled() );
+        assertEquals( true, this.securitySystem.isSecurityEnabled() );
 
-        config.getSecurity().setEnabled( false );
+        this.securitySystem.setSecurityEnabled( false );
 
         nexusConfiguration.saveConfiguration();
 
@@ -68,7 +75,7 @@ public class DefaultNexusConfigurationTest
 
         config = nexusConfiguration.getConfiguration();
 
-        assertEquals( false, config.getSecurity().isEnabled() );
+        assertEquals( false, this.securitySystem.isSecurityEnabled() );
     }
 
     public void testSaveGlobalProxyConfiguration()
@@ -118,10 +125,10 @@ public class DefaultNexusConfigurationTest
         Configuration config = nexusConfiguration.getConfiguration();
 
         // check it for default value
-        assertEquals( true, config.getSecurity().isEnabled() );
+        assertEquals( "smtp-host", config.getSmtpConfiguration().getHostname() );
 
         // modify it
-        config.getSecurity().setEnabled( false );
+        config.getSmtpConfiguration().setHostname( "NEW-HOST" );
 
         // save it
         nexusConfiguration.saveConfiguration();
@@ -146,7 +153,7 @@ public class DefaultNexusConfigurationTest
         config = nexusConfiguration.getConfiguration();
 
         // it again contains default value, coz we overwritten it before
-        assertEquals( true, config.getSecurity().isEnabled() );
+        assertEquals( "smtp-host", config.getSmtpConfiguration().getHostname() );
     }
 
     public void testGetConfiguration()

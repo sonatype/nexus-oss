@@ -64,10 +64,10 @@ public class ClearPasswordTest
         config.setGlobalHttpProxySettings( new CRemoteHttpProxySettings() );
         config.getGlobalHttpProxySettings().setAuthentication( new CRemoteAuthentication() );
         config.getGlobalHttpProxySettings().getAuthentication().setPassword( password );
-        config.getSecurity().setAnonymousPassword( password );
-
-        // anon username
-        config.getSecurity().setAnonymousPassword( password );
+//        config.getSecurity().setAnonymousPassword( password );
+//
+//        // anon username
+//        config.getSecurity().setAnonymousPassword( password );
 
         // repo auth pass
         CRepository central = this.getCentralRepo( config );
@@ -102,7 +102,7 @@ public class ClearPasswordTest
         Configuration newConfig = source.loadConfiguration();
         Assert.assertEquals( password, newConfig.getSmtpConfiguration().getPassword() );
         Assert.assertEquals( password, newConfig.getGlobalHttpProxySettings().getAuthentication().getPassword() );
-        Assert.assertEquals( password, newConfig.getSecurity().getAnonymousPassword() );
+//        Assert.assertEquals( password, newConfig.getSecurity().getAnonymousPassword() );
 
         central = this.getCentralRepo( newConfig );
         Assert.assertEquals( password, central.getRemoteStorage().getAuthentication().getPassword() );

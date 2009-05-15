@@ -20,7 +20,6 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
@@ -39,7 +38,6 @@ public class SimpleApplicationConfiguration
 
         this.configuration = new Configuration();
 
-        configuration.setSecurity( new CSecurity() );
         configuration.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
         // configuration.setGlobalHttpProxySettings( new CRemoteHttpProxySettings() );
         configuration.setRouting( new CRouting() );

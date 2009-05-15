@@ -16,7 +16,6 @@ package org.sonatype.nexus.configuration.application.source;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.nexus.configuration.security.source.SecurityConfigurationSource;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 
 public class StaticConfigurationSourceTest

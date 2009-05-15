@@ -17,17 +17,21 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.rest.authentication.AbstractUIPermissionCalculatingPlexusResource;
+import org.sonatype.nexus.rest.model.NexusAuthenticationClientPermissions;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.security.rest.authentication.AbstractUIPermissionCalculatingPlexusResource;
+import org.sonatype.security.rest.model.AuthenticationClientPermissions;
 
 @Component( role = ManagedPlexusResource.class, hint = "StatusPlexusResource" )
 public class StatusPlexusResource
@@ -35,6 +39,9 @@ public class StatusPlexusResource
     implements ManagedPlexusResource
 {
 
+    @Requirement
+    private Nexus nexus;
+    
     @Override
     public Object getPayloadInstance()
     {
@@ -57,7 +64,7 @@ public class StatusPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        SystemStatus status = getNexus().getSystemStatus();
+        SystemStatus status = this.nexus.getSystemStatus();
 
         StatusResource resource = new StatusResource();
 
@@ -91,27 +98,27 @@ public class StatusPlexusResource
 
         resource.setErrorCause( spit( status.getErrorCause() ) );
 
-//        if ( status.getConfigurationValidationResponse() != null )
-//        {
-//            resource.setConfigurationValidationResponse( new StatusConfigurationValidationResponse() );
-//
-//            resource.getConfigurationValidationResponse().setValid(
-//                status.getConfigurationValidationResponse().isValid() );
-//
-//            resource.getConfigurationValidationResponse().setModified(
-//                status.getConfigurationValidationResponse().isModified() );
-//
-//            for ( ValidationMessage msg : status.getConfigurationValidationResponse().getValidationErrors() )
-//            {
-//                resource.getConfigurationValidationResponse().addValidationError( msg.toString() );
-//            }
-//            for ( ValidationMessage msg : status.getConfigurationValidationResponse().getValidationWarnings() )
-//            {
-//                resource.getConfigurationValidationResponse().addValidationWarning( msg.toString() );
-//            }
-//        }
+        // if ( status.getConfigurationValidationResponse() != null )
+        // {
+        // resource.setConfigurationValidationResponse( new StatusConfigurationValidationResponse() );
+        //
+        // resource.getConfigurationValidationResponse().setValid(
+        // status.getConfigurationValidationResponse().isValid() );
+        //
+        // resource.getConfigurationValidationResponse().setModified(
+        // status.getConfigurationValidationResponse().isModified() );
+        //
+        // for ( ValidationMessage msg : status.getConfigurationValidationResponse().getValidationErrors() )
+        // {
+        // resource.getConfigurationValidationResponse().addValidationError( msg.toString() );
+        // }
+        // for ( ValidationMessage msg : status.getConfigurationValidationResponse().getValidationWarnings() )
+        // {
+        // resource.getConfigurationValidationResponse().addValidationWarning( msg.toString() );
+        // }
+        // }
 
-        resource.setClientPermissions( getClientPermissionsForCurrentUser( request ) );
+        resource.setClientPermissions( this.getClientPermissions( request ) );
 
         resource.setBaseUrl( getContextRoot( request ).toString() );
 
@@ -120,6 +127,23 @@ public class StatusPlexusResource
         result.setData( resource );
 
         return result;
+    }
+
+    private NexusAuthenticationClientPermissions getClientPermissions(Request request) throws ResourceException
+    {
+        AuthenticationClientPermissions originalClientPermissions = getClientPermissionsForCurrentUser( request );
+        
+        // TODO: this is a modello work around,
+        // the SystemStatus could not include a field of type AuthenticationClientPermissions
+        // because it is in a different model, but I can extend that class... and include it.
+        
+        NexusAuthenticationClientPermissions clientPermissions = new NexusAuthenticationClientPermissions();
+        clientPermissions.setLoggedIn( originalClientPermissions.isLoggedIn() );
+        clientPermissions.setLoggedInUsername( originalClientPermissions.getLoggedInUsername() );
+        clientPermissions.setLoggedInUserSource( originalClientPermissions.getLoggedInUserSource() );
+        clientPermissions.setPermissions( originalClientPermissions.getPermissions() );
+        
+        return clientPermissions;
     }
 
     private String spit( Throwable t )

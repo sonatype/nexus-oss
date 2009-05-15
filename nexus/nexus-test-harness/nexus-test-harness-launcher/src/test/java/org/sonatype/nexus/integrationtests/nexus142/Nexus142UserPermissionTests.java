@@ -22,7 +22,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.rest.model.UserResource;
+import org.sonatype.security.rest.model.UserResource;
 
 /**
  * Test the privileges for CRUD operations.

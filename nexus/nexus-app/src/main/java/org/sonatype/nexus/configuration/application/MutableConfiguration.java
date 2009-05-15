@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -49,17 +50,17 @@ public interface MutableConfiguration
     String getAnonymousUsername();
 
     void setAnonymousUsername( String val )
-        throws IOException;
+        throws InvalidConfigurationException;
 
     String getAnonymousPassword();
 
     void setAnonymousPassword( String val )
-        throws IOException;
+        throws InvalidConfigurationException;
 
     List<String> getRealms();
 
     void setRealms( List<String> realms )
-        throws IOException;
+        throws InvalidConfigurationException;
 
     // ----------------------------------------------------------------------------
     // Scheduled Tasks

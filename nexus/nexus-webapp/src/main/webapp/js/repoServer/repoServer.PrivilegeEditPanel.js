@@ -86,7 +86,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
   Sonatype.repoServer.PrivilegeEditPanel.superclass.constructor.call( this, {
     addMenuInitEvent: 'privilegeAddMenuInit',
     rowClickEvent: 'privilegeViewInit',
-    deleteButton: this.sp.checkPermission( 'nexus:privileges', this.sp.DELETE ),
+    deleteButton: this.sp.checkPermission( 'security:privileges', this.sp.DELETE ),
     url: Sonatype.config.repos.urls.privileges,
     dataStores: [this.privilegeTypeStore, this.groupStore, this.repoStore, this.targetStore],
     columns: [
@@ -227,7 +227,7 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
   },
   
   onAddMenuInit: function( menu ) {
-    if ( this.sp.checkPermission( 'nexus:privileges', this.sp.CREATE ) ) {
+    if ( this.sp.checkPermission( 'security:privileges', this.sp.CREATE ) ) {
       menu.add( [
         '-',
         {
@@ -330,7 +330,7 @@ Sonatype.repoServer.PrivilegeEditor = function( config ) {
   this.initCombinedStore();
 
   this.checkPayload();
-  if ( ! ( this.sp.checkPermission( 'nexus:privileges', this.sp.UPDATE ) || this.isNew ) ) {
+  if ( ! ( this.sp.checkPermission( 'security:privileges', this.sp.UPDATE ) || this.isNew ) ) {
     this.readOnly = true;
   }
   

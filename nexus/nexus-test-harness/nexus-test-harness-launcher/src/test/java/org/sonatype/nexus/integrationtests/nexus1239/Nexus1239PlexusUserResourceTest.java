@@ -22,9 +22,9 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.rest.model.PlexusRoleResource;
-import org.sonatype.nexus.rest.model.PlexusUserResource;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
+import org.sonatype.security.rest.model.PlexusRoleResource;
+import org.sonatype.security.rest.model.PlexusUserResource;
 
 public class Nexus1239PlexusUserResourceTest
     extends AbstractNexusIntegrationTest

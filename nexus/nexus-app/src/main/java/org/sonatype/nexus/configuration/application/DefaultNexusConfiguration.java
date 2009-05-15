@@ -65,6 +65,7 @@ import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.security.SecuritySystem;
 
 /**
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
@@ -120,6 +121,9 @@ public class DefaultNexusConfiguration
     @Requirement( role = ScheduledTaskDescriptor.class )
     private List<ScheduledTaskDescriptor> scheduledTaskDescriptors;
 
+    @Requirement
+    private SecuritySystem securitySystem;
+    
     /** The global remote storage context. */
     private RemoteStorageContext remoteStorageContext;
 
@@ -228,7 +232,7 @@ public class DefaultNexusConfiguration
     {
         return configurationSource.getConfiguration();
     }
-
+    
     public ApplicationConfigurationSource getConfigurationSource()
     {
         return configurationSource;
@@ -347,67 +351,55 @@ public class DefaultNexusConfiguration
 
     public boolean isSecurityEnabled()
     {
-        return getConfiguration().getSecurity() != null && getConfiguration().getSecurity().isEnabled();
+        return getSecuritySystem() != null && getSecuritySystem().isSecurityEnabled();
     }
 
     public void setSecurityEnabled( boolean enabled )
         throws IOException
     {
-        getConfiguration().getSecurity().setEnabled( enabled );
-
-        applyAndSaveConfiguration();
+        getSecuritySystem().setSecurityEnabled( enabled );
     }
 
     public void setRealms( List<String> realms )
-        throws IOException
+    throws org.sonatype.configuration.validation.InvalidConfigurationException
     {
-        getConfiguration().getSecurity().setRealms( realms );
-
-        applyAndSaveConfiguration();
+        getSecuritySystem().setRealms( realms );
     }
 
     public boolean isAnonymousAccessEnabled()
     {
-        return getConfiguration().getSecurity() != null && getConfiguration().getSecurity().isAnonymousAccessEnabled();
+        return getSecuritySystem() != null && getSecuritySystem().isAnonymousAccessEnabled();
     }
 
     public void setAnonymousAccessEnabled( boolean enabled )
-        throws IOException
     {
-        getConfiguration().getSecurity().setAnonymousAccessEnabled( enabled );
-
-        applyAndSaveConfiguration();
+        getSecuritySystem().setAnonymousAccessEnabled( enabled );
     }
 
     public String getAnonymousUsername()
     {
-        return getConfiguration().getSecurity().getAnonymousUsername();
+        return getSecuritySystem().getAnonymousUsername();
     }
 
-    public void setAnonymousUsername( String val )
-        throws IOException
+    public void setAnonymousUsername( String val ) throws org.sonatype.configuration.validation.InvalidConfigurationException
     {
-        getConfiguration().getSecurity().setAnonymousUsername( val );
-
-        applyAndSaveConfiguration();
+        getSecuritySystem().setAnonymousUsername( val );
     }
 
     public String getAnonymousPassword()
     {
-        return getConfiguration().getSecurity().getAnonymousPassword();
+        return getSecuritySystem().getAnonymousPassword();
     }
 
     public void setAnonymousPassword( String val )
-        throws IOException
+        throws org.sonatype.configuration.validation.InvalidConfigurationException
     {
-        getConfiguration().getSecurity().setAnonymousPassword( val );
-
-        applyAndSaveConfiguration();
+        getSecuritySystem().setAnonymousPassword( val );
     }
 
     public List<String> getRealms()
     {
-        return getConfiguration().getSecurity().getRealms();
+        return getSecuritySystem().getRealms();
     }
 
     // ------------------------------------------------------------------
@@ -1201,5 +1193,10 @@ public class DefaultNexusConfiguration
         {
             return null;
         }
+    }
+    
+    protected SecuritySystem getSecuritySystem()
+    {
+        return this.securitySystem;
     }
 }

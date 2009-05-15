@@ -20,7 +20,6 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
@@ -31,8 +30,6 @@ public class SimpleSecureApplicationConfiguration
 {
     private Configuration configuration;
     
-    private CSecurity security;
-    
     private RemoteStorageContext remoteStorageContext = new DefaultRemoteStorageContext( null );
 
     public SimpleSecureApplicationConfiguration()
@@ -40,11 +37,6 @@ public class SimpleSecureApplicationConfiguration
         super();
 
         this.configuration = new Configuration();
-
-        this.security = new CSecurity();
-//        security.setAnonymousAccessEnabled( true );
-        security.setEnabled( true );
-        configuration.setSecurity( security );
         
         configuration.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
         // configuration.setGlobalHttpProxySettings( new CRemoteHttpProxySettings() );
@@ -104,6 +96,6 @@ public class SimpleSecureApplicationConfiguration
 
     public boolean isSecurityEnabled()
     {
-        return this.security.isEnabled();
+        return true;
     }
 }

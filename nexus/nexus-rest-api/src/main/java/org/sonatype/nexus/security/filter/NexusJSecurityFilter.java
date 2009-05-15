@@ -16,8 +16,8 @@ package org.sonatype.nexus.security.filter;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
-import org.sonatype.jsecurity.web.PlexusJSecurityFilter;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.security.web.PlexusJSecurityFilter;
 
 /**
  * This filter simply behaves according Nexus configuration.

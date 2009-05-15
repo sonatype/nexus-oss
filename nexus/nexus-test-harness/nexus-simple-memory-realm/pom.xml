@@ -18,14 +18,9 @@
     <dependencies>
     
         <dependency>
-        	<artifactId>plexus-delegating-realm</artifactId>
-            <groupId>org.sonatype.jsecurity</groupId>
-            <version>${plexus-jsecurity-realms.version}</version>	
-        </dependency>
-    
-        <dependency>
-            <groupId>org.jsecurity</groupId>
-            <artifactId>jsecurity</artifactId>
+          <groupId>org.sonatype.security</groupId>
+          <artifactId>security-system</artifactId>
+          <version>${plexus-security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>

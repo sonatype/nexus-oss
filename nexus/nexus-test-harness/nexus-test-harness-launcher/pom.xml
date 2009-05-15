@@ -53,9 +53,12 @@
           <argLine>-Xmx512M</argLine>
           <skip>false</skip>
           <forkMode>always</forkMode>
-          <includes>
+          <!--<includes>
             <include>**/IntegrationTestSuite.java</include>
-          </includes>
+          </includes>-->
+          <excludes>
+            <exclude>**Suite*</exclude>
+          </excludes>
         </configuration>
       </plugin>
 
@@ -163,6 +166,12 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-client-java</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-rest-api</artifactId>
+      <version>${plexus-security.version}</version>
     </dependency>
 
     <dependency>

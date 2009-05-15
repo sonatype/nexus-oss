@@ -18,9 +18,9 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.jsecurity.locators.users.PlexusUser;
-import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
-import org.sonatype.jsecurity.locators.users.PlexusUserSearchCriteria;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 public class SimpleUserLocatorTest
     extends PlexusTestCase
@@ -30,15 +30,15 @@ public class SimpleUserLocatorTest
         throws Exception
     {
         // a bit of plexus back ground, this is how you can look up a component from a test class
-        this.lookup( PlexusUserLocator.class, "Simple" );
+        this.lookup( UserManager.class, "Simple" );
     }
 
     public void testSearch()
         throws Exception
     {
-        PlexusUserLocator userLocator = this.lookup( PlexusUserLocator.class, "Simple" );
+        UserManager userLocator = this.lookup( UserManager.class, "Simple" );
 
-        Set<PlexusUser> result = userLocator.searchUsers( new PlexusUserSearchCriteria( "adm" ) );
+        Set<User> result = userLocator.searchUsers( new UserSearchCriteria( "adm" ) );
         Assert.assertEquals( 1, result.size() );
         // your test could be a bit more robust
         Assert.assertEquals( result.iterator().next().getUserId(), "admin-simple" );
@@ -47,7 +47,7 @@ public class SimpleUserLocatorTest
     public void testIdList()
         throws Exception
     {
-        PlexusUserLocator userLocator = this.lookup( PlexusUserLocator.class, "Simple" );
+        UserManager userLocator = this.lookup( UserManager.class, "Simple" );
 
         Set<String> ids = userLocator.listUserIds();
 
@@ -61,9 +61,9 @@ public class SimpleUserLocatorTest
     public void testUserList()
         throws Exception
     {
-        PlexusUserLocator userLocator = this.lookup( PlexusUserLocator.class, "Simple" );
+        UserManager userLocator = this.lookup( UserManager.class, "Simple" );
 
-        Set<PlexusUser> users = userLocator.listUsers();
+        Set<User> users = userLocator.listUsers();
         // your test could be a bit more robust
         Assert.assertEquals( 3, users.size() );
     }

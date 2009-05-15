@@ -348,33 +348,33 @@ Sonatype.repoServer.RepoServer = function(){
         items: [
           {
             enabled: Sonatype.user.curr.isLoggedIn && Sonatype.user.curr.loggedInUserSource == 'default' && 
-              sp.checkPermission( 'nexus:userschangepw', sp.CREATE ),
+              sp.checkPermission( 'security:userschangepw', sp.CREATE ),
             title: 'Change Password',
             handler: Sonatype.utils.changePassword
           },
           {
-            enabled: sp.checkPermission( 'nexus:users', sp.READ ) && 
-              ( sp.checkPermission('nexus:users', sp.CREATE) &&
-                sp.checkPermission('nexus:users', sp.DELETE) &&
-                sp.checkPermission('nexus:users', sp.EDIT)),
+            enabled: sp.checkPermission( 'security:users', sp.READ ) && 
+              ( sp.checkPermission('security:users', sp.CREATE) &&
+                sp.checkPermission('security:users', sp.DELETE) &&
+                sp.checkPermission('security:users', sp.EDIT)),
             title: 'Users',
             tabId: 'security-users',
             tabCode: Sonatype.repoServer.UserEditPanel
           },
           {
-            enabled: sp.checkPermission('nexus:roles', sp.READ ) && 
-              ( sp.checkPermission('nexus:roles', sp.CREATE) ||
-                sp.checkPermission('nexus:roles', sp.DELETE) ||
-                sp.checkPermission('nexus:roles', sp.EDIT)),
+            enabled: sp.checkPermission('security:roles', sp.READ ) && 
+              ( sp.checkPermission('security:roles', sp.CREATE) ||
+                sp.checkPermission('security:roles', sp.DELETE) ||
+                sp.checkPermission('security:roles', sp.EDIT)),
             title: 'Roles',
             tabId: 'security-roles',
             tabCode: Sonatype.repoServer.RoleEditPanel
           },
           {
-            enabled: sp.checkPermission('nexus:privileges', sp.READ ) && 
-              ( sp.checkPermission('nexus:privileges', sp.CREATE) ||
-                sp.checkPermission('nexus:privileges', sp.DELETE) ||
-                sp.checkPermission('nexus:privileges', sp.EDIT)),
+            enabled: sp.checkPermission('security:privileges', sp.READ ) && 
+              ( sp.checkPermission('security:privileges', sp.CREATE) ||
+                sp.checkPermission('security:privileges', sp.DELETE) ||
+                sp.checkPermission('security:privileges', sp.EDIT)),
             title: 'Privileges',
             tabId: 'security-privileges',
             tabCode: Sonatype.repoServer.PrivilegeEditPanel

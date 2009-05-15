@@ -38,6 +38,8 @@ public abstract class AbstractNexusTestCase
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
 
     public static final String APPS_CONFIGURATION_KEY = "apps";
+    
+    public static final String APPLICATION_CONF_KEY = "application-conf";
 
     public static final String SECURITY_CONFIG_KEY = "security-xml-file";
 
@@ -62,6 +64,8 @@ public abstract class AbstractNexusTestCase
         ctx.put( RUNTIME_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
 
         ctx.put( SECURITY_CONFIG_KEY, CONF_HOME.getAbsolutePath() + "/security.xml" );
+        
+        ctx.put( APPLICATION_CONF_KEY, CONF_HOME.getAbsolutePath() );
     }
 
     protected String getNexusConfiguration()

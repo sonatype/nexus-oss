@@ -17,10 +17,10 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.rest.model.UserForgotPasswordRequest;
-import org.sonatype.nexus.rest.model.UserForgotPasswordResource;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.security.rest.model.UserForgotPasswordRequest;
+import org.sonatype.security.rest.model.UserForgotPasswordResource;
 
 import com.thoughtworks.xstream.XStream;
 

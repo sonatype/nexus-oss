@@ -82,7 +82,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.sonatype.jsecurity</groupId>
+			<groupId>org.sonatype.security.realms</groupId>
 			<artifactId>security-xml-realm</artifactId>
 			<exclusions>
 				<exclusion>

@@ -37,7 +37,10 @@ import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationRequest;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.components.cipher.PlexusCipherException;
+import org.sonatype.security.events.AuthorizationConfigurationChangedEvent;
+import org.sonatype.security.events.SecurityConfigurationChangedEvent;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -78,6 +81,9 @@ public class FileConfigurationSource
 
     @Requirement
     private PasswordHelper passwordHelper;
+
+    @Requirement
+    private ApplicationEventMulticaster eventMulticaster;
 
     /** Flag to mark defaulted config */
     private boolean configurationDefaulted;
@@ -171,6 +177,13 @@ public class FileConfigurationSource
             upgradeConfiguration( getConfigurationFile() );
 
             loadConfiguration( getConfigurationFile() );
+            
+            // if the configuration is upgraded we need to reload the security.
+            // it would be great if this was put somewhere else, but I am out of ideas.
+            // the problem is the default security was already loaded with the security-system component was loaded
+            // so it has the defaults, the upgrade from 1.0.8 -> 1.4 moves security out of the nexus.xml
+            // and we cannot use the 'correct' way of updating the info, because that would cause an infinit loop loading the nexus.xml
+            this.eventMulticaster.notifyEventListeners( new SecurityConfigurationChangedEvent( null ) );
         }
 
         ValidationResponse vResponse = getConfigurationValidator().validateModel(
@@ -333,13 +346,6 @@ public class FileConfigurationSource
 
     private void encryptDecryptPasswords(Configuration config, boolean encrypt )
     {
-        
-        // anonymous pass
-        if( config.getSecurity() != null && StringUtils.isNotEmpty( config.getSecurity().getAnonymousPassword() ))
-        {
-            config.getSecurity().setAnonymousPassword( this.encryptDecryptPassword( config.getSecurity().getAnonymousPassword(), encrypt ) );
-        }
-        
         // smtp
         if ( config.getSmtpConfiguration() != null
             && StringUtils.isNotEmpty( config.getSmtpConfiguration().getPassword() ) )

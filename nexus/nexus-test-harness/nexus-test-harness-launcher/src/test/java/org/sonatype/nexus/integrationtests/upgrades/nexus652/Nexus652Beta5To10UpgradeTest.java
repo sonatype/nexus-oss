@@ -22,6 +22,8 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
+import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 
 /**
  * Test nexus.xml after and upgrade from 1.0.0-beta-5 to 1.0.0.
@@ -39,9 +41,12 @@ public class Nexus652Beta5To10UpgradeTest
 
     @Test
     public void checkNexusConfig()
-        throws IOException
+        throws Exception
     {
         // if we made it this far the upgrade worked...
+        
+        SecurityConfigurationSource securitySource = TestContainer.getInstance().lookup( SecurityConfigurationSource.class, "file" );
+        SecurityConfiguration securityConfig = securitySource.loadConfiguration();
 
         Configuration nexusConfig = NexusConfigUtil.getNexusConfig();
 
@@ -50,13 +55,13 @@ public class Nexus652Beta5To10UpgradeTest
         Assert.assertEquals( "Smtp username:", "void", nexusConfig.getSmtpConfiguration().getUsername() );
         Assert.assertEquals( "Smtp port:", 465, nexusConfig.getSmtpConfiguration().getPort() );
 
-        Assert.assertEquals( "Security anon username:", "User3", nexusConfig.getSecurity().getAnonymousUsername() );
-        Assert.assertEquals( "Security anon password:", "y6i0t9q1e3", nexusConfig.getSecurity().getAnonymousPassword() );
-        Assert.assertEquals( "Security anon access:", true, nexusConfig.getSecurity().isAnonymousAccessEnabled() );
-        Assert.assertEquals( "Security enabled:", true, nexusConfig.getSecurity().isEnabled() );
-        Assert.assertEquals( "Security realm size:", 2, nexusConfig.getSecurity().getRealms().size() );
-        Assert.assertEquals( "Security realm:", "XmlAuthenticatingRealm", nexusConfig.getSecurity().getRealms().get( 0 ) );
-        Assert.assertEquals( "Security realm:", "XmlAuthorizingRealm", nexusConfig.getSecurity().getRealms().get( 1 ) );
+        Assert.assertEquals( "Security anon username:", "User3", securityConfig.getAnonymousUsername() );
+        Assert.assertEquals( "Security anon password:", "y6i0t9q1e3", securityConfig.getAnonymousPassword() );
+        Assert.assertEquals( "Security anon access:", true, securityConfig.isAnonymousAccessEnabled() );
+        Assert.assertEquals( "Security enabled:", true, securityConfig.isEnabled() );
+        Assert.assertEquals( "Security realm size:", 2, securityConfig.getRealms().size() );
+        Assert.assertEquals( "Security realm:", "XmlAuthenticatingRealm", securityConfig.getRealms().get( 0 ) );
+        Assert.assertEquals( "Security realm:", "XmlAuthorizingRealm", securityConfig.getRealms().get( 1 ) );
 
         Assert.assertEquals( "http proxy:", true, nexusConfig.getHttpProxy().isEnabled() );
 
@@ -82,7 +87,7 @@ public class Nexus652Beta5To10UpgradeTest
     public void checkSecurityConfig()
         throws IOException
     {
-        org.sonatype.jsecurity.model.Configuration secConfig = SecurityConfigUtil.getSecurityConfig();
+        org.sonatype.security.model.Configuration secConfig = SecurityConfigUtil.getSecurityConfig();
 
         Assert.assertEquals( "User Count:", 7, secConfig.getUsers().size());
         Assert.assertEquals( "Roles Count:", 22, secConfig.getRoles().size());

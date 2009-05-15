@@ -15,8 +15,8 @@ package org.sonatype.nexus.test.utils;
 
 import java.util.List;
 
-import org.sonatype.jsecurity.model.CRole;
-import org.sonatype.nexus.rest.model.RoleResource;
+import org.sonatype.security.model.CRole;
+import org.sonatype.security.rest.model.RoleResource;
 
 
 public class RoleConverter

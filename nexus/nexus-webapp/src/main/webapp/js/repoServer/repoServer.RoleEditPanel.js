@@ -370,7 +370,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
             handler: this.mapExternalRoles,
             disabled: true
           }]}),
-        disabled: !this.sp.checkPermission('nexus:roles', this.sp.CREATE)
+        disabled: !this.sp.checkPermission('security:roles', this.sp.CREATE)
       },
       {
         id: 'role-delete-btn',
@@ -379,7 +379,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope:this,
         handler: this.deleteHandler,
-        disabled: !this.sp.checkPermission('nexus:roles', this.sp.DELETE)
+        disabled: !this.sp.checkPermission('security:roles', this.sp.DELETE)
       }
     ],
 
@@ -685,7 +685,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
             gridSelectModel.selectRow(i);
             var rec = store.getById(formLayout.activeItem.id);
             if (rec.data.userManaged == true
-            		&& this.sp.checkPermission('nexus:roles', this.sp.DELETE)){
+            		&& this.sp.checkPermission('security:roles', this.sp.DELETE)){
             	this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').enable();
             }
             else{
@@ -845,7 +845,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
 
   rowSelect : function( selectionModel, index, rec ) {
     if (rec.data.userManaged == true
-    		&& this.sp.checkPermission('nexus:roles', this.sp.DELETE)) {
+    		&& this.sp.checkPermission('security:roles', this.sp.DELETE)) {
       this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').enable();
     } else {
       this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').disable();
@@ -865,7 +865,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
       formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
       
       if (rec.data.userManaged == true
-          && this.sp.checkPermission('nexus:roles', this.sp.EDIT)){
+          && this.sp.checkPermission('security:roles', this.sp.EDIT)){
           formPanel.buttons[0].disabled = false;
       }
       
@@ -914,7 +914,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     });
     
     if (this.ctxRecord.data.userManaged == true
-    		&& this.sp.checkPermission('nexus:roles', this.sp.DELETE)){
+    		&& this.sp.checkPermission('security:roles', this.sp.DELETE)){
         menu.add(this.actions.deleteAction);
     }
     
@@ -1135,7 +1135,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     }
 
     // if there are any realms left, enable the mapping button
-    if ( store.getCount() > 0 ) { //&& this.sp.checkPermission( 'nexus:roles', this.sp.CREATE ) ) {
+    if ( store.getCount() > 0 ) { //&& this.sp.checkPermission( 'security:roles', this.sp.CREATE ) ) {
       Ext.getCmp( 'role-map-menu-item' ).enable();
     }
   },

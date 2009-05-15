@@ -19,7 +19,6 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.restlet.Context;
 import org.restlet.data.Reference;
@@ -28,7 +27,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.jsecurity.realms.PlexusSecurity;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -42,6 +41,8 @@ import org.sonatype.nexus.rest.model.SmtpSettings;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authentication.AuthenticationException;
 
 /**
  * The GlobalConfiguration resource. It simply gets and builds the requested config REST model (DTO) and passes
@@ -63,8 +64,8 @@ public class GlobalConfigurationPlexusResource
     /** Name denoting default Nexus configuration */
     public static final String DEFAULT_CONFIG_NAME = "default";
 
-    @Requirement( hint = "web" )
-    private PlexusSecurity securityManager;
+    @Requirement
+    private SecuritySystem securitySystem;
 
     public GlobalConfigurationPlexusResource()
     {
@@ -249,7 +250,7 @@ public class GlobalConfigurationPlexusResource
                             {
                                 // try to "log in" with supplied credentials
                                 // the anon user a) should exists b) the pwd must work
-                                securityManager.authenticate( new UsernamePasswordToken( resource
+                                securitySystem.authenticate( new UsernamePasswordToken( resource
                                     .getSecurityAnonymousUsername(), resource.getSecurityAnonymousPassword() ) );
                             }
                             catch ( AuthenticationException e )
@@ -315,6 +316,12 @@ public class GlobalConfigurationPlexusResource
                     getLogger().warn( "Got IO Exception during update of Nexus configuration.", e );
 
                     throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+                }
+                catch ( InvalidConfigurationException e )
+                {
+                    // TODO: this should be removed from the Global config, as it is NO longer part of the nexus.xml
+                    getLogger().debug( "Configuraiton Exception while setting security values", e );   
+                    this.handleInvalidConfigurationException( e );
                 }
 
             }

@@ -19,11 +19,11 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.restlet.data.MediaType;
-import org.sonatype.jsecurity.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
-import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
+import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
 /**
  * GETS for application privileges where returning an error, so this is a really simple test to make sure the GET will work.

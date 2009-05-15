@@ -25,13 +25,13 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.rest.model.PlexusUserListResourceResponse;
-import org.sonatype.nexus.rest.model.PlexusUserResource;
-import org.sonatype.nexus.rest.model.PlexusUserResourceResponse;
-import org.sonatype.nexus.rest.model.UserListResourceResponse;
-import org.sonatype.nexus.rest.model.UserResource;
-import org.sonatype.nexus.rest.model.UserResourceRequest;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
+import org.sonatype.security.rest.model.PlexusUserResource;
+import org.sonatype.security.rest.model.PlexusUserResourceResponse;
+import org.sonatype.security.rest.model.UserListResourceResponse;
+import org.sonatype.security.rest.model.UserResource;
+import org.sonatype.security.rest.model.UserResourceRequest;
 
 import com.thoughtworks.xstream.XStream;
 

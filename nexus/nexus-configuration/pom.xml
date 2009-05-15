@@ -37,7 +37,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.sonatype.jsecurity</groupId>
+			<groupId>org.sonatype.security.realms</groupId>
 			<artifactId>security-xml-realm</artifactId>
 			<exclusions>
 				<exclusion>
@@ -46,6 +46,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+    
+        <dependency>
+          <groupId>org.sonatype.security</groupId>
+          <artifactId>security-configuration</artifactId>
+          <version>${plexus-security.version}</version>
+        </dependency>
 
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
@@ -79,7 +85,13 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
-		</dependency>
+		</dependency>        
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <version>${slf4j.version}</version>
+          <scope>test</scope>
+        </dependency>
 
 	</dependencies>
 
@@ -132,7 +144,7 @@
 							</models>
 						</configuration>
 					</execution>
-					<execution>
+					<!--<execution>
 						<id>security.xml</id>
 						<goals>
 							<goal>java</goal>
@@ -146,7 +158,7 @@
 								</model>
 							</models>
 						</configuration>
-					</execution>
+					</execution>-->
 				</executions>
 				<configuration>
 					<packageWithVersion>false</packageWithVersion>

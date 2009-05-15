@@ -36,7 +36,7 @@ public class Nexus393ResetPasswordTest
     {
         String username = "test-user";
         Response response = ResetPasswordUtils.resetPassword( username );
-        Assert.assertTrue( "Status: "+ response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( "Status: "+ response.getStatus() +"\n"+ response.getEntity().getText(), response.getStatus().isSuccess() );
 
         // Need 1 message
         server.waitForIncomingEmail( 1000, 1 );

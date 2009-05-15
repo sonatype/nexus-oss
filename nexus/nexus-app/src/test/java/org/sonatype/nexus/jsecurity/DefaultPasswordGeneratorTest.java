@@ -14,6 +14,8 @@
 package org.sonatype.nexus.jsecurity;
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.security.usermanagement.DefaultPasswordGenerator;
+import org.sonatype.security.usermanagement.PasswordGenerator;
 
 public class DefaultPasswordGeneratorTest
     extends PlexusTestCase

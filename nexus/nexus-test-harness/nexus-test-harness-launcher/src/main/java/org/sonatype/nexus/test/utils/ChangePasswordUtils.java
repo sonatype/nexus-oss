@@ -18,9 +18,9 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.rest.model.UserChangePasswordRequest;
-import org.sonatype.nexus.rest.model.UserChangePasswordResource;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.security.rest.model.UserChangePasswordRequest;
+import org.sonatype.security.rest.model.UserChangePasswordResource;
 
 import com.thoughtworks.xstream.XStream;
 

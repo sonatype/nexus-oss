@@ -5,24 +5,7 @@
 			<role>org.sonatype.nexus.configuration.application.ApplicationConfiguration</role>
 			<implementation>org.sonatype.nexus.configuration.SimpleSecureApplicationConfiguration</implementation>
 		</component>
-		
-		<component>
-		    <role>org.sonatype.jsecurity.locators.RememberMeLocator</role>
-		    <implementation>org.sonatype.nexus.proxy.security.SimpleRememberMeLocator</implementation>
-		</component>
-		
-		<component>
-		    <role>org.sonatype.jsecurity.locators.RealmLocator</role>
-		    <implementation>org.sonatype.nexus.proxy.security.SimpleRealmLocator</implementation>
-			<requirements>
-	        <requirement>
-	          <role>org.jsecurity.realm.Realm</role>
-	          <role-hint>default</role-hint>
-	          <field-name>realm</field-name>
-	        </requirement>
-	      </requirements>
-		</component>
-		
+
 		<component>
 		    <role>org.jsecurity.realm.Realm</role>
 		    <implementation>org.sonatype.nexus.proxy.security.PlexusConfiguredRealm</implementation>

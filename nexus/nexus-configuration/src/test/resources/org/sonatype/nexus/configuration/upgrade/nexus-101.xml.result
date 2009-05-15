@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
   <version>1.4.0</version>
-  <security>
-    <enabled>true</enabled>
-    <anonymousAccessEnabled>true</anonymousAccessEnabled>
-    <anonymousUsername>anonymous</anonymousUsername>
-    <anonymousPassword>anonymous</anonymousPassword>
-    <realms>
-      <realm>XmlAuthenticatingRealm</realm>
-      <realm>XmlAuthorizingRealm</realm>
-    </realms>
-  </security>
   <globalConnectionSettings>
     <connectionTimeout>10000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>

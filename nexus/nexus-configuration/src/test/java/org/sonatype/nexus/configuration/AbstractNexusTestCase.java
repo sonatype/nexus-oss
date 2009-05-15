@@ -34,6 +34,8 @@ public abstract class AbstractNexusTestCase
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
 
     public static final String APPS_CONFIGURATION_KEY = "apps";
+    
+    public static final String CONF_DIR_KEY = "application-conf";
 
     protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
 
@@ -45,6 +47,7 @@ public abstract class AbstractNexusTestCase
     {
         ctx.put( WORK_CONFIGURATION_KEY, WORK_HOME.getAbsolutePath() );
         ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
+        ctx.put( CONF_DIR_KEY, CONF_HOME.getAbsolutePath() );
     }
 
     protected String getNexusConfiguration()

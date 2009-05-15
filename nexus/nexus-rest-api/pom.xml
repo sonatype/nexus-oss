@@ -48,6 +48,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>org.sonatype.security</groupId>
+    	<artifactId>security-rest-api</artifactId>
+    	<version>${plexus-security.version}</version>
+    </dependency>
     <!-- In the JSec filters -->
     <dependency>
       <groupId>org.slf4j</groupId>

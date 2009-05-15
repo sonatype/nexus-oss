@@ -29,7 +29,7 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-public class AbstractSnapshotRemoverTest
+public abstract class AbstractSnapshotRemoverTest
     extends AbstractNexusIntegrationTest
 {
 

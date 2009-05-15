@@ -23,9 +23,9 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
+import org.sonatype.security.rest.model.RoleResource;
 
 /**
  * CRUD tests for JSON request/response.

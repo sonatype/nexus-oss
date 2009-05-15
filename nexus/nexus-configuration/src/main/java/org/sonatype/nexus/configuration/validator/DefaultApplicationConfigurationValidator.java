@@ -41,7 +41,6 @@ import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -71,21 +70,6 @@ public class DefaultApplicationConfigurationValidator
         Configuration model = (Configuration) request.getConfiguration();
 
         ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
-
-        // check for security model
-        if ( model.getSecurity() != null )
-        {
-            response.append( validateSecurity( context, model.getSecurity() ) );
-        }
-        else
-        {
-            model.setSecurity( new CSecurity() );
-
-            response
-                .addValidationWarning( "Security configuration block, which is mandatory, was missing. Reset with defaults." );
-
-            response.setModified( true );
-        }
 
         // global conn settings
         if ( model.getGlobalConnectionSettings() != null )
@@ -242,33 +226,6 @@ public class DefaultApplicationConfigurationValidator
 
     // ---------------
     // Public
-
-    public ValidationResponse validateSecurity( ApplicationValidationContext ctx, CSecurity settings )
-    {
-        ValidationResponse response = new ApplicationValidationResponse();
-
-        if ( ctx != null )
-        {
-            response.setContext( ctx );
-        }
-
-        // if security enabled, at least one realm should exist
-        if ( settings.isEnabled() )
-        {
-            if ( settings.getRealms().size() == 0 )
-            {
-                settings.addRealm( "XmlAuthenticatingRealm" );
-                settings.addRealm( "NexusMethodAuthorizingRealm" );
-                settings.addRealm( "NexusTargetAuthorizingRealm" );
-
-                response.addValidationWarning( "Security is enabled, but no realm is set, setting 'default' realm." );
-
-                response.setModified( true );
-            }
-        }
-
-        return response;
-    }
 
     public ValidationResponse validateRepository( ApplicationValidationContext ctx, CRepository repo )
     {

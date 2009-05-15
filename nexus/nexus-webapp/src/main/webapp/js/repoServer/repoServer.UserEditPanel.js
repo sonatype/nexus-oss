@@ -100,7 +100,7 @@ Sonatype.repoServer.UserEditPanel = function( config ) {
 
   Sonatype.repoServer.UserEditPanel.superclass.constructor.call( this, {
     addMenuInitEvent: 'userAddMenuInit',
-    deleteButton: this.sp.checkPermission( 'nexus:users', this.sp.DELETE ),
+    deleteButton: this.sp.checkPermission( 'security:users', this.sp.DELETE ),
     rowClickEvent: 'userViewInit',
     rowContextClickEvent: 'userMenuInit',
     url: Sonatype.config.repos.urls.plexusUsersAllConfigured,
@@ -417,7 +417,7 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
   
   onAddMenuInit: function( menu ) {
     menu.add( '-' );
-    if ( this.sp.checkPermission( 'nexus:users', this.sp.CREATE ) ) {
+    if ( this.sp.checkPermission( 'security:users', this.sp.CREATE ) ) {
       menu.add( {
         text: 'Nexus User',
         autoCreateNewRecord: true,
@@ -442,11 +442,11 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
         ) {
 
       if ( userRecord.data.resourceURI.substring( 0, 4 ) != 'new_' ) {
-        if ( this.sp.checkPermission( 'nexus:usersreset', this.sp.DELETE ) ) {
+        if ( this.sp.checkPermission( 'security:usersreset', this.sp.DELETE ) ) {
           menu.add(this.actions.resetPasswordAction);
         }
 
-        if ( this.sp.checkPermission( 'nexus:users', this.sp.EDIT ) ) {
+        if ( this.sp.checkPermission( 'security:users', this.sp.EDIT ) ) {
           menu.add( this.actions.changePasswordAction );
         }
       }

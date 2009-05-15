@@ -19,7 +19,6 @@ import java.io.IOException;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
@@ -36,7 +35,6 @@ public class SimpleApplicationConfiguration
 
         this.configuration = new Configuration();
 
-        configuration.setSecurity( new CSecurity() );
         configuration.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
         // configuration.setGlobalHttpProxySettings( new CRemoteHttpProxySettings() );
         configuration.setRouting( new CRouting() );

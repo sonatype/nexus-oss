@@ -15,8 +15,8 @@ package org.sonatype.nexus.rest.roles;
 
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.rest.AbstractRestTestCase;
-import org.sonatype.nexus.rest.model.RoleResourceRequest;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.security.rest.model.RoleResourceRequest;
 
 public class RoleTest
     extends AbstractRestTestCase

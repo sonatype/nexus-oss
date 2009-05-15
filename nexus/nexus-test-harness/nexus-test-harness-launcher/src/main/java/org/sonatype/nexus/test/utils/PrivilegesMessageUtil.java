@@ -25,14 +25,14 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
-import org.sonatype.nexus.rest.model.PrivilegeResource;
-import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
-import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
-import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
+import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
+import org.sonatype.security.rest.model.PrivilegeResource;
+import org.sonatype.security.rest.model.PrivilegeResourceRequest;
+import org.sonatype.security.rest.model.PrivilegeStatusResource;
+import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -99,6 +99,11 @@ public class PrivilegesMessageUtil
 
         String privId = ( method == Method.POST ) ? "" : "/" + id;
         String serviceURI = "service/local/privileges" + privId;
+        
+        if( method == Method.POST )
+        {
+            serviceURI += "_target";
+        }
 
         if ( method == Method.POST || method == Method.PUT ) // adding put so we can check for the 405, without a resource you get a 400
         {
@@ -146,7 +151,7 @@ public class PrivilegesMessageUtil
         // REMEMBER! You cannot use the XStreamInitializer 1:1 from Server!
         // It does n->1 mapping (maps different types to field data), while the client
         // has to do 1->n mapping (it knows what _will_ 'data' field contain)
-        xstream.alias( "data", org.sonatype.nexus.rest.model.PrivilegeListResourceResponse.class );
+        xstream.alias( "data", PrivilegeListResourceResponse.class );
 
         ErrorResponse errorResponse = (ErrorResponse) xstream.fromXML( xml, new ErrorResponse() );
 

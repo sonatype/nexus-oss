@@ -29,7 +29,6 @@ import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 
 /**
@@ -56,14 +55,6 @@ public interface ApplicationConfigurationValidator
      */
     ValidationResponse validateRemoteConnectionSettings( ApplicationValidationContext ctx,
         CRemoteConnectionSettings settings );
-
-    /**
-     * Validates security settings.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateSecurity( ApplicationValidationContext ctx, CSecurity settings );
 
     /**
      * Validates remote proxy settings.

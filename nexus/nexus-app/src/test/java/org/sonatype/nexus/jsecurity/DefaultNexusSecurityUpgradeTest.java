@@ -18,6 +18,7 @@ import java.io.File;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.security.SecuritySystem;
 
 public class DefaultNexusSecurityUpgradeTest
     extends PlexusTestCase
@@ -33,7 +34,7 @@ public class DefaultNexusSecurityUpgradeTest
     
     public void testDoUpgrade() throws Exception
     {
-        NexusSecurity nexusSecurity = this.lookup( NexusSecurity.class );
+       this.lookup( SecuritySystem.class );
     }
     
     
@@ -56,6 +57,7 @@ public class DefaultNexusSecurityUpgradeTest
         context.put( "nexus-work", workDir );
         
 //        context.put( "security-xml-file", COPY_CONFIG_FILE );
+        context.put( "application-conf", workDir+ "/conf" );
     }
 
 }
