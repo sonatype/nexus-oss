@@ -79,7 +79,7 @@ public class UserPlexusResource
 
         try
         {
-            result.setData( securityToRestModel( getSecuritySystem().getUser( getUserId( request ) ), request ) );
+            result.setData( securityToRestModel( getSecuritySystem().getUser( getUserId( request ) ), request, false ) );
 
         }
         catch ( UserNotFoundException e )
