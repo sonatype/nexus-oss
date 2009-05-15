@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>org.sonatype.security</groupId>
+    <groupId>org.sonatype.security.realms</groupId>
     <artifactId>security-realms</artifactId>
     <version>1.0.8-SNAPSHOT</version>
   </parent>
@@ -32,7 +32,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.security</groupId>
+      <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-xml-realm</artifactId>
       <version>${project.version}</version>
       <classifier>tests</classifier>
