@@ -278,7 +278,7 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
 Sonatype.repoServer.PrivilegeEditor = function( config ) {
   var config = config || {};
   var defaultConfig = {
-    uri: Sonatype.config.repos.urls.privileges,
+    uri: Sonatype.config.repos.urls.privileges + '_target',
     dataModifiers: {
       load: {
         properties: function( value, parent, fpanel ) {
