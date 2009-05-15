@@ -24,6 +24,7 @@ import org.jsecurity.mgt.RealmSecurityManager;
 import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
+import org.jsecurity.subject.SimplePrincipalCollection;
 import org.jsecurity.subject.Subject;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
@@ -39,6 +40,7 @@ import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.email.NullSecurityEmailer;
 import org.sonatype.security.email.SecurityEmailer;
 import org.sonatype.security.events.AuthorizationConfigurationChangedEvent;
+import org.sonatype.security.events.SecurityConfigurationChangedEvent;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
 import org.sonatype.security.usermanagement.PasswordGenerator;
@@ -76,7 +78,7 @@ public class DefaultSecuritySystem
 
     @Requirement
     private ApplicationEventMulticaster eventMulticaster;
-    
+
     private SecurityEmailer securityEmailer;
 
     @Requirement
@@ -157,22 +159,9 @@ public class DefaultSecuritySystem
         }
     }
 
-    public void initialize()
-        throws InitializationException
+    public boolean hasRole( PrincipalCollection principals, String string )
     {
-        // load the configuration
-        try
-        {
-            this.securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
-        }
-        catch ( Exception e )
-        {
-            throw new InitializationException( e.getMessage(), e );
-        }
-        
-        // add event handler
-        this.eventMulticaster.addEventListener( this );
-        
+        return this.securityManager.hasRole( principals, string );
     }
 
     private Collection<Realm> getRealmsFromConfigSource()
@@ -318,7 +307,7 @@ public class DefaultSecuritySystem
 
         // don't forget to email the user!
         this.getSecurityEmailer().sendNewUserCreated( user.getEmailAddress(), user.getUserId(), password );
-        
+
         return user;
     }
 
@@ -362,7 +351,7 @@ public class DefaultSecuritySystem
         }
 
         // clear the realm caches
-        this.eventMulticaster.notifyEventListeners( new AuthorizationConfigurationChangedEvent(null) );
+        this.eventMulticaster.notifyEventListeners( new AuthorizationConfigurationChangedEvent( null ) );
 
         return user;
     }
@@ -812,6 +801,7 @@ public class DefaultSecuritySystem
         // reload the config
         this.securityConfiguration.clearCache();
         this.clearRealmCaches();
+        this.securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
     }
 
     public void stop()
@@ -841,9 +831,34 @@ public class DefaultSecuritySystem
 
     public void onEvent( Event<?> evt )
     {
-        if( AuthorizationConfigurationChangedEvent.class.isInstance( evt ))
+        if ( AuthorizationConfigurationChangedEvent.class.isInstance( evt ) )
         {
             this.clearRealmCaches();
         }
+
+        if ( SecurityConfigurationChangedEvent.class.isInstance( evt ) )
+        {
+            this.clearRealmCaches();
+            this.securityConfiguration.clearCache();
+            this.securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
+        }
+    }
+
+    public void initialize()
+        throws InitializationException
+    {
+        // load the configuration
+        try
+        {
+            this.securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
+        }
+        catch ( Exception e )
+        {
+            throw new InitializationException( e.getMessage(), e );
+        }
+
+        // add event handler
+        this.eventMulticaster.addEventListener( this );
+
     }
 }

@@ -64,6 +64,8 @@ public interface SecuritySystem extends Startable
     public void checkPermission( PrincipalCollection principal, List<String> permissions )
         throws AuthorizationException;
 
+    public boolean hasRole( PrincipalCollection principals, String string );
+    
     // ******************************
     // * Role permission management
     // ******************************

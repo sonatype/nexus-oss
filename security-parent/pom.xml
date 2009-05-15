@@ -95,12 +95,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
-        <version>1.5.3</version>
+        <version>1.5.6</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.5.3</version>
+        <version>1.5.6</version>
       </dependency>
 
       <!-- TESTING -->
@@ -120,7 +120,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>1.5.3</version>
+        <version>1.5.6</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
