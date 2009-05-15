@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.permission.WildcardPermission;
@@ -28,6 +29,8 @@ import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.AuthenticationClientPermissions;
 import org.sonatype.security.rest.model.ClientPermission;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 public abstract class AbstractUIPermissionCalculatingPlexusResource
     extends AbstractSecurityPlexusResource
@@ -43,7 +46,6 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
     private static final int CREATE = 8;
 
     private static final int ALL = READ | UPDATE | DELETE | CREATE;
-
 
     protected AuthenticationClientPermissions getClientPermissionsForCurrentUser( Request request )
         throws ResourceException
@@ -88,6 +90,26 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
             perms.setLoggedIn( true );
 
             perms.setLoggedInUsername( "anonymous" );
+        }
+
+        // need to set the source of the logged in user
+        // The UI might need to show/hide something based on the user's source
+        // i.e. like the 'Change Password' link.
+        String username = perms.getLoggedInUsername();
+        if ( StringUtils.isNotEmpty( username ) )
+        {
+            // look up the realm of the user
+            try
+            {
+                User user = this.getSecuritySystem().getUser( username );
+                String source = ( user != null ) ? user.getSource() : null;
+                perms.setLoggedInUserSource( source );
+            }
+            catch ( UserNotFoundException e )
+            {
+                this.getLogger().warn( "Failed to lookup user: " + username, e );
+            }
+
         }
 
         Map<String, Integer> privilegeMap = new HashMap<String, Integer>();
