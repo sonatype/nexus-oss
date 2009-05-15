@@ -26,33 +26,24 @@ public abstract class AbstractPrivilegePlexusResource
     public static final String PRIVILEGE_ID_KEY = "privilegeId";
 
     @SuppressWarnings( "unchecked" )
-    public PrivilegeStatusResource securityToRestModel( Privilege privilege, Request request, boolean append )
+    public PrivilegeStatusResource securityToRestModel( Privilege privilege, Request request )
     {
         PrivilegeStatusResource resource = new PrivilegeStatusResource();
-
+        
         for ( Entry<String, String> prop : privilege.getProperties().entrySet() )
         {
             PrivilegeProperty privProp = new PrivilegeProperty();
             privProp.setKey( prop.getKey() );
             privProp.setValue( prop.getValue() );
-
+            
             resource.addProperty( privProp );
         }
-
+        
         resource.setType( privilege.getType() );
         resource.setId( privilege.getId() );
         resource.setName( privilege.getName() );
         resource.setDescription( privilege.getDescription() );
-
-        if ( append )
-        {
-            resource.setResourceURI( createChildReference( request, resource.getId() ).toString() );
-        }
-        else
-        {
-            resource.setResourceURI( request.getResourceRef().getPath() );
-        }
-
+        resource.setResourceURI( createChildReference( request, resource.getId() ).toString() );
         resource.setUserManaged( !privilege.isReadOnly() );
 
         return resource;

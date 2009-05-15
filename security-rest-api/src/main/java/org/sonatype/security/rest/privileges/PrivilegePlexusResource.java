@@ -92,7 +92,7 @@ public class PrivilegePlexusResource
                 + PRIVILEGE_SOURCE + " could not be found." );
         }
 
-        result.setData( securityToRestModel( priv, request, false ) );
+        result.setData( securityToRestModel( priv, request ) );
 
         return result;
     }
