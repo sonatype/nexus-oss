@@ -97,7 +97,7 @@ public abstract class AbstractSecurityPlexusResource
         resource.setName( user.getName() );
         resource.setStatus( user.getStatus().name() );
         resource.setUserId( user.getUserId() );
-        resource.setResourceURI( this.createChildReference( request, resource.getUserId() ).toString() );
+        resource.setResourceURI( request.getResourceRef().getPath() );
         resource.setUserManaged( !user.isReadOnly() );
 
         for ( RoleIdentifier role : user.getRoles() )
