@@ -141,6 +141,7 @@ public class StatusPlexusResource
         clientPermissions.setLoggedIn( originalClientPermissions.isLoggedIn() );
         clientPermissions.setLoggedInUsername( originalClientPermissions.getLoggedInUsername() );
         clientPermissions.setLoggedInUserSource( originalClientPermissions.getLoggedInUserSource() );
+        clientPermissions.setLoggedInUserSource( originalClientPermissions.getLoggedInUserSource() );
         clientPermissions.setPermissions( originalClientPermissions.getPermissions() );
         
         return clientPermissions;

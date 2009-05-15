@@ -56,10 +56,10 @@ Sonatype.repoServer.RepoServer = function(){
     buildRecoveryText : function(){
         var htmlString = null;
         
-        if(sp.checkPermission('nexus:usersforgotid', sp.CREATE)){
+        if(sp.checkPermission('security:usersforgotid', sp.CREATE)){
           htmlString = 'Forgot your <a id="recover-username" href="#">username</a>'
         }
-        if(sp.checkPermission('nexus:usersforgotpw', sp.CREATE)){
+        if(sp.checkPermission('security:usersforgotpw', sp.CREATE)){
           if (htmlString != null){
             htmlString += ' or ';
           }
