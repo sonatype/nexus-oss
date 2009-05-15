@@ -7,13 +7,10 @@ package org.sonatype.nexus.index.creator;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -26,7 +23,6 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.ArtifactAvailablility;
@@ -46,8 +42,6 @@ import org.sonatype.nexus.index.locator.SourcesLocator;
 public class MinimalArtifactInfoIndexCreator
     extends AbstractIndexCreator implements LegacyDocumentUpdater
 {
-    private ModelReader modelReader = new ModelReader();
-
     private Locator jl = new JavadocLocator();
 
     private Locator sl = new SourcesLocator();
@@ -66,21 +60,6 @@ public class MinimalArtifactInfoIndexCreator
 
         if ( pom != null )
         {
-            Model model = modelReader.readModel( pom, ai.groupId, ai.artifactId, ai.version );
-
-            if ( model != null )
-            {
-                ai.name = model.getName();
-
-                ai.description = model.getDescription();
-
-                if ( model.getPackaging() != null && ai.classifier == null )
-                {
-                    // only when this is not a classified artifact
-                    ai.packaging = model.getPackaging();
-                }
-            }
-
             ai.lastModified = pom.lastModified();
 
             ai.fextension = "pom";
@@ -147,6 +126,21 @@ public class MinimalArtifactInfoIndexCreator
             if ( ai.packaging == null )
             {
                 ai.packaging = ai.fextension;
+            }            
+        }
+        
+        Model model = ac.getPomModel();
+
+        if ( model != null )
+        {
+            ai.name = model.getName();
+
+            ai.description = model.getDescription();
+
+            if ( model.getPackaging() != null && ai.classifier == null )
+            {
+                // only when this is not a classified artifact
+                ai.packaging = model.getPackaging();
             }
         }
 
@@ -413,138 +407,6 @@ public class MinimalArtifactInfoIndexCreator
             {
             }
         }
-    }
-
-    /**
-     * Caching lightweight model reader
-     */
-    public static class ModelReader
-    {
-        private final HashMap<File, Model> models = new HashMap<File, Model>();
-
-        public Model getModel( File pom, String groupId, String artifactId, String version )
-        {
-            Model model = models.get( pom );
-            if ( model == null )
-            {
-                model = readModel( pom, groupId, artifactId, version );
-                models.put( pom, model );
-            }
-            return model;
-        }
-
-        public Model readModel( File pom, String groupId, String artifactId, String version )
-        {
-            Xpp3Dom dom = readPom( pom );
-
-            if ( dom == null )
-            {
-                return null;
-            }
-
-            String packaging = null;
-
-            if ( dom.getChild( "packaging" ) != null )
-            {
-                packaging = dom.getChild( "packaging" ).getValue();
-            }
-
-            // Xpp3Dom parent = dom.getChild( "parent" );
-            //
-            // if ( parent != null )
-            // {
-            // String parentGroupId = parent.getChild( "groupId" ).getValue();
-            //
-            // String parentArtifactId = parent.getChild( "artifactId" ).getValue();
-            //
-            // String parentVersion = parent.getChild( "version" ).getValue();
-            //
-            // String parentPomPath = getPath( parentGroupId, parentArtifactId, parentVersion, artifactId + "-"
-            // + version + ".pom" );
-            //
-            // String repository = getRepository( groupId, artifactId, version, pom );
-            //
-            // // if ( repository != null )
-            // // {
-            // // Model parentModel = getModel( new File( repository, parentPomPath ), parentGroupId, parentArtifactId,
-            // // parentVersion );
-            // //
-            // // if ( parentModel !=null )
-            // // {
-            // // //
-            // // }
-            // // }
-            // }
-
-            Model model = new Model();
-
-            model.setPackaging( packaging );
-
-            if ( dom.getChild( "name" ) != null )
-            {
-                model.setName( dom.getChild( "name" ).getValue() );
-            }
-
-            if ( dom.getChild( "description" ) != null )
-            {
-                model.setDescription( dom.getChild( "description" ).getValue() );
-            }
-
-            return model;
-        }
-
-        // private String getRepository( String groupId, String artifactId, String version, File pom )
-        // {
-        // String pomPath = getPath( groupId, artifactId, version, pom.getName() );
-        //
-        // String fullPomPath = pom.getAbsolutePath();
-        //
-        // int n = fullPomPath.replace( '\\', '/' ).indexOf( pomPath.replace( '\\', '/' ) );
-        //
-        // if ( n == -1 )
-        // {
-        // return null;
-        // }
-        //
-        // return fullPomPath.substring( 0, n );
-        // }
-        //
-        // private String getPath( String groupId, String artifactId, String version, String fname )
-        // {
-        // return new StringBuilder()
-        // .append( groupId.replace( '.', File.separatorChar ) ).append( File.separatorChar ).append( artifactId )
-        // .append( File.separatorChar ).append( version ).append( File.separatorChar ).append( fname ).toString();
-        // }
-
-        private Xpp3Dom readPom( File pom )
-        {
-            Reader r = null;
-            try
-            {
-                r = new FileReader( pom );
-
-                return Xpp3DomBuilder.build( r );
-            }
-            catch ( Exception e )
-            {
-                // e.printStackTrace();
-            }
-            finally
-            {
-                if ( r != null )
-                {
-                    try
-                    {
-                        r.close();
-                    }
-                    catch ( IOException ex )
-                    {
-                    }
-                }
-            }
-            return null;
-        }
-
     }
 
     @Override

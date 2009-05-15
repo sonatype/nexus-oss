@@ -7,14 +7,26 @@
 package org.sonatype.nexus.index;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
+import org.apache.maven.model.Model;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -62,7 +74,63 @@ public class ArtifactContext
     {
         return pom;
     }
+    
+    public Model getPomModel()
+    {
+        // First check for local pom file
+        if ( getPom() != null && getPom().exists() )
+        {
+            try
+            {
+                return new ModelReader().readModel( new FileInputStream( getPom() ) );
+            }
+            catch ( FileNotFoundException e )
+            {
+            }
+        }
+        // Otherwise, check for pom contained in maven generated artifact
+        else if ( getArtifact() != null )
+        {
+            ZipFile jar = null;
 
+            try
+            {
+                jar = new ZipFile( getArtifact() );
+
+                Enumeration<? extends ZipEntry> en = jar.entries();
+                while ( en.hasMoreElements() )
+                {
+                    ZipEntry e = en.nextElement();
+                    String name = e.getName();
+
+                    // pom will be stored under /META-INF/maven/groupId/artifactId/pom.xml
+                    if ( name.equals( "META-INF/maven/" + gav.getGroupId() + "/" + gav.getArtifactId() + "/pom.xml" ) )
+                    {
+                        return new ModelReader().readModel( jar.getInputStream( e ) );
+                    }
+                }
+            }
+            catch ( IOException e )
+            {
+            }
+            finally
+            {
+                if ( jar != null )
+                {
+                    try
+                    {
+                        jar.close();
+                    }
+                    catch ( Exception e )
+                    {
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
+    
     public File getArtifact()
     {
         return artifact;
@@ -126,5 +194,74 @@ public class ArtifactContext
         }
     
         return doc;
+    }
+    
+    public static class ModelReader
+    {
+        public Model readModel( InputStream pom )
+        {
+            if ( pom == null )
+            {
+                return null;
+            }
+
+            Model model = new Model();
+            
+            Xpp3Dom dom = readPomInputStream( pom );
+            
+            if ( dom == null )
+            {
+                return null;
+            }
+            
+            if ( dom.getChild( "packaging" ) != null )
+            {
+                model.setPackaging( dom.getChild( "packaging" ).getValue() );
+            }
+            // Special case, packaging should be null instead of default .jar if not set in pom
+            else
+            {
+                model.setPackaging( null );
+            }
+            
+            if ( dom.getChild( "name" ) != null )
+            {
+                model.setName( dom.getChild( "name" ).getValue() );
+            }
+
+            if ( dom.getChild( "description" ) != null )
+            {
+                model.setDescription( dom.getChild( "description" ).getValue() );
+            }
+
+            return model;
+        }
+    
+        private Xpp3Dom readPomInputStream( InputStream is )
+        {
+            Reader r = new InputStreamReader( is );
+            try
+            {
+                return Xpp3DomBuilder.build( r );
+            }
+            catch ( XmlPullParserException e )
+            {
+            }
+            catch ( IOException e )
+            {
+            }
+            finally
+            {
+                try
+                {
+                    r.close();
+                }
+                catch ( IOException e )
+                {
+                }
+            }
+            
+            return null;
+        }
     }
 }
