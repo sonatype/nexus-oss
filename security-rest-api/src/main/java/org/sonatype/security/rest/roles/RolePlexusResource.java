@@ -77,7 +77,7 @@ public class RolePlexusResource
         try
         {
             AuthorizationManager authzManager = getSecuritySystem().getAuthorizationManager( ROLE_SOURCE );
-            result.setData( securityToRestModel( authzManager.getRole( getRoleId( request ) ), request, false ) );
+            result.setData( securityToRestModel( authzManager.getRole( getRoleId( request ) ), request ) );
 
         }
         catch ( NoSuchRoleException e )

@@ -71,7 +71,7 @@ public class UserListPlexusResource
 
         for ( User user : getSecuritySystem().searchUsers( new UserSearchCriteria(null, null, DEFAULT_SOURCE) ) )
         {
-            UserResource res = securityToRestModel( user, request, true );
+            UserResource res = securityToRestModel( user, request );
 
             if ( res != null )
             {
