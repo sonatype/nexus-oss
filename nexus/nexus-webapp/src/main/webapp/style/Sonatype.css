@@ -283,3 +283,5 @@ button.st-icon-refresh {
   position:relative;
   zoom:1;
 }
+
+.x-form-empty-field{color:darkblue;}
