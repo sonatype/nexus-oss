@@ -71,7 +71,7 @@ public class RoleListPlexusResource
         {
             for ( Role role : getSecuritySystem().getAuthorizationManager( DEFAULT_SOURCE ).listRoles() )
             {
-                RoleResource res = securityToRestModel( role, request );
+                RoleResource res = securityToRestModel( role, request, true );
 
                 if ( res != null )
                 {

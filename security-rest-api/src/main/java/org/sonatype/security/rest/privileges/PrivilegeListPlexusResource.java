@@ -65,7 +65,7 @@ public class PrivilegeListPlexusResource
 
         for ( Privilege priv : privs )
         {
-            PrivilegeStatusResource res = securityToRestModel( priv, request );
+            PrivilegeStatusResource res = securityToRestModel( priv, request, true );
 
             if ( res != null )
             {

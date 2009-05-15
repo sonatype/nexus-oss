@@ -19,7 +19,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.RoleResource;
 
@@ -29,7 +28,7 @@ public abstract class AbstractRolePlexusResource
 
     protected static final String ROLE_SOURCE = "default";
 
-    public RoleResource securityToRestModel( Role role, Request request )
+    public RoleResource securityToRestModel( Role role, Request request, boolean append )
     {
         // and will convert to the rest object
         RoleResource resource = new RoleResource();
@@ -37,7 +36,16 @@ public abstract class AbstractRolePlexusResource
         resource.setDescription( role.getDescription() );
         resource.setId( role.getRoleId() );
         resource.setName( role.getName() );
-        resource.setResourceURI( this.createChildReference( request, resource.getId() ).toString() );
+
+        if ( append )
+        {
+            resource.setResourceURI( createChildReference( request, resource.getId() ).toString() );
+        }
+        else
+        {
+            resource.setResourceURI( request.getResourceRef().getPath() );
+        }
+
         resource.setSessionTimeout( role.getSessionTimeout() );
         resource.setUserManaged( !role.isReadOnly() );
 
@@ -45,7 +53,7 @@ public abstract class AbstractRolePlexusResource
         {
             resource.addRole( roleId );
         }
-        
+
         for ( String privId : role.getPrivileges() )
         {
             resource.addPrivilege( privId );
