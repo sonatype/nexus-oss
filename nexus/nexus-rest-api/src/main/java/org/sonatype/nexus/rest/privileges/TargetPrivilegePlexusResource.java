@@ -124,7 +124,7 @@ public class TargetPrivilegePlexusResource
 
                         priv = getSecuritySystem().getAuthorizationManager( DEFAULT_SOURCE ).addPrivilege( priv );
 
-                        result.addData( this.securityToRestModel( priv, request ) );
+                        result.addData( this.securityToRestModel( priv, request, true ) );
                     }
                 }
                 catch ( InvalidConfigurationException e )
