@@ -125,4 +125,9 @@ public class MockUserManagerB
         return userToRoleMap.get( userId );
     }
 
+    public String getAuthenticationRealmName()
+    {
+        return null;
+    }
+
 }

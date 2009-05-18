@@ -82,4 +82,10 @@ public class MockUserManagerB
         return "MockUserManagerB";
     }
 
+
+    public String getAuthenticationRealmName()
+    {
+        return "MockRealmB";
+    }
+    
 }

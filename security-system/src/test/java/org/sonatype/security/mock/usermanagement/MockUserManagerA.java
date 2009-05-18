@@ -42,7 +42,7 @@ public class MockUserManagerA
         d.setEmailAddress( "dknudsen@sonatype.org" );
         d.setSource( this.getSource() );
         d.setUserId( "dknudsen" );
-        
+
         DefaultUser e = new DefaultUser();
         e.setName( "Anon e Mous" );
         e.setEmailAddress( "anonymous@sonatype.org" );
@@ -59,6 +59,11 @@ public class MockUserManagerA
     public String getSource()
     {
         return "MockUserManagerA";
+    }
+
+    public String getAuthenticationRealmName()
+    {
+        return "MockRealmA";
     }
 
 }

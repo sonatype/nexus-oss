@@ -2,6 +2,7 @@ package org.sonatype.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,11 +21,11 @@ import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.cache.Cache;
+import org.jsecurity.crypto.hash.Hash;
 import org.jsecurity.mgt.RealmSecurityManager;
 import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
-import org.jsecurity.subject.SimplePrincipalCollection;
 import org.jsecurity.subject.Subject;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
@@ -166,7 +167,7 @@ public class DefaultSecuritySystem
 
     private Collection<Realm> getRealmsFromConfigSource()
     {
-        Set<Realm> realms = new HashSet<Realm>();
+        List<Realm> realms = new ArrayList<Realm>();
 
         List<String> realmIds = this.securityConfiguration.getRealms();
 
@@ -524,23 +525,28 @@ public class DefaultSecuritySystem
 
         List<UserManager> unOrderdLocators = new ArrayList<UserManager>( this.userManagerMap.values() );
 
+        Map<String, UserManager> realmToUserManagerMap = new HashMap<String, UserManager>();
+
+        for ( UserManager userManager : this.userManagerMap.values() )
+        {
+            if ( userManager.getAuthenticationRealmName() != null )
+            {
+                realmToUserManagerMap.put( userManager.getAuthenticationRealmName(), userManager );
+            }
+        }
+
         // get the sorted order of realms from the realm locator
         Collection<Realm> realms = this.securityManager.getRealms();
 
         for ( Realm realm : realms )
         {
-            try
+            // now user the realm.name to find the UserManager
+            if ( realmToUserManagerMap.containsKey( realm.getName() ) )
             {
-                UserManager userManager = this.getUserManager( realm.getName() );
+                UserManager userManager = realmToUserManagerMap.get( realm.getName() );
                 // remove from unorderd and add to orderd
                 unOrderdLocators.remove( userManager );
                 orderedLocators.add( userManager );
-                break;
-            }
-            catch ( NoSuchUserManager e )
-            {
-                this.logger.debug( "Could not find a UserManager for realm: " + realm.getClass() + " name: "
-                    + realm.getName() );
             }
         }
 

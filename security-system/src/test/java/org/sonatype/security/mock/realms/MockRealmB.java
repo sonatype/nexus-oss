@@ -45,20 +45,26 @@ public class MockRealmB
 
         // make sure the user is jcool, (its just for testing)
 
-        if( principals.asList().get( 0 ).toString().equals( "jcool" ) )
+        if ( principals.asList().get( 0 ).toString().equals( "jcool" ) )
         {
-            SimpleAuthorizationInfo info = new  SimpleAuthorizationInfo();
-            
+            SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+
             info.addRole( "test-role1" );
             info.addRole( "test-role2" );
-            
+
             info.addStringPermission( "test:*" );
-            
+
             return info;
-            
+
         }
 
         return null;
+    }
+
+    @Override
+    public String getName()
+    {
+        return "MockRealmB";
     }
 
 }

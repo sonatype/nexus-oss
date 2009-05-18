@@ -88,6 +88,12 @@ public class URLRealm
     private static int INSTANCE_COUNT = 0;
 
     @Override
+    public String getName()
+    {
+        return "url";
+    }
+
+    @Override
     protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token )
         throws AuthenticationException
     {

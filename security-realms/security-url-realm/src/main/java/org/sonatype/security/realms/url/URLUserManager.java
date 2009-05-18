@@ -200,4 +200,9 @@ public class URLUserManager
 
         return userIds;
     }
+
+    public String getAuthenticationRealmName()
+    {
+        return "url";
+    }
 }

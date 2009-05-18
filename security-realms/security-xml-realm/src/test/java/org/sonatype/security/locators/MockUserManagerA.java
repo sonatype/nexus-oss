@@ -16,12 +16,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.security.authorization.Role;
 import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
-import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserStatus;
 
 @Component(role=UserManager.class, hint="MockUserLocatorA")
@@ -78,6 +75,11 @@ public class MockUserManagerA
         users.add( d );
         
         return users;
+    }
+
+    public String getAuthenticationRealmName()
+    {
+        return null;
     }
   
 }

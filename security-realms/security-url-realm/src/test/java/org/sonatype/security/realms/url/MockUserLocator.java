@@ -89,4 +89,9 @@ public class MockUserLocator
 
         return user;
     }
+
+    public String getAuthenticationRealmName()
+    {
+        return null;
+    }
 }

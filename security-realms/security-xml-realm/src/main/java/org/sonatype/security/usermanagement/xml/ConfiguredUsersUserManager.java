@@ -184,5 +184,10 @@ public class ConfiguredUsersUserManager
 
         return true;
     }
+
+    public String getAuthenticationRealmName()
+    {
+        return null;
+    }
     
 }

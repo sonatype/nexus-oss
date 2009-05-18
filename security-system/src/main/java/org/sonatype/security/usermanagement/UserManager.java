@@ -13,6 +13,8 @@ public interface UserManager
      * @return
      */
     String getSource();
+    
+    String getAuthenticationRealmName();
 
     boolean supportsWrite();
 

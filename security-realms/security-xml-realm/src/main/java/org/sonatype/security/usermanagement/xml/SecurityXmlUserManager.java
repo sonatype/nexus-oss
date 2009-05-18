@@ -372,4 +372,9 @@ public class SecurityXmlUserManager
         this.saveConfiguration();
         
     }
+
+    public String getAuthenticationRealmName()
+    {
+        return "XmlAuthenticatingRealm";
+    }
 }

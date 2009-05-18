@@ -42,46 +42,52 @@ public class MockRealmA
         return null;
     }
 
+    @Override
+    public String getName()
+    {
+        return "MockRealmA";
+    }
+
     public void checkPermission( PrincipalCollection subjectPrincipal, String permission )
         throws AuthorizationException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void checkPermission( PrincipalCollection subjectPrincipal, Permission permission )
         throws AuthorizationException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void checkPermissions( PrincipalCollection subjectPrincipal, String... permissions )
         throws AuthorizationException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void checkPermissions( PrincipalCollection subjectPrincipal, Collection<Permission> permissions )
         throws AuthorizationException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void checkRole( PrincipalCollection subjectPrincipal, String roleIdentifier )
         throws AuthorizationException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void checkRoles( PrincipalCollection subjectPrincipal, Collection<String> roleIdentifiers )
         throws AuthorizationException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public boolean hasAllRoles( PrincipalCollection subjectPrincipal, Collection<String> roleIdentifiers )
