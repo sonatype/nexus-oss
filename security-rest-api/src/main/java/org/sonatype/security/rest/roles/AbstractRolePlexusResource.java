@@ -29,7 +29,7 @@ public abstract class AbstractRolePlexusResource
 
     protected static final String ROLE_SOURCE = "default";
 
-    public RoleResource securityToRestModel( Role role, Request request )
+    public RoleResource securityToRestModel( Role role, Request request, boolean appendResourceId )
     {
         // and will convert to the rest object
         RoleResource resource = new RoleResource();
@@ -37,7 +37,14 @@ public abstract class AbstractRolePlexusResource
         resource.setDescription( role.getDescription() );
         resource.setId( role.getRoleId() );
         resource.setName( role.getName() );
-        resource.setResourceURI( this.createChildReference( request, resource.getId() ).toString() );
+
+        String resourceId = "";
+        if ( appendResourceId )
+        {
+            resourceId = resource.getId();
+        }
+        resource.setResourceURI( this.createChildReference( request, resourceId ).toString() );
+
         resource.setSessionTimeout( role.getSessionTimeout() );
         resource.setUserManaged( !role.isReadOnly() );
 
@@ -45,7 +52,7 @@ public abstract class AbstractRolePlexusResource
         {
             resource.addRole( roleId );
         }
-        
+
         for ( String privId : role.getPrivileges() )
         {
             resource.addPrivilege( privId );
