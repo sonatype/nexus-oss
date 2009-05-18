@@ -22,6 +22,7 @@
     <plexus-ehcache.version>1.0.0-SNAPSHOT</plexus-ehcache.version>
     <plexus-events.version>1.0.0-SNAPSHOT</plexus-events.version>
     <base-configuration.version>0.0.1-SNAPSHOT</base-configuration.version>
+    <plexus-cipher.version>1.5-SNAPSHOT</plexus-cipher.version>
   </properties>
 
   <dependencyManagement>
@@ -90,6 +91,12 @@
         <groupId>org.sonatype.configuration</groupId>
         <artifactId>base-configuration</artifactId>
         <version>${base-configuration.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.plexus</groupId>
+        <artifactId>plexus-cipher</artifactId>
+        <version>${plexus-cipher.version}</version>
       </dependency>
 
       <dependency>

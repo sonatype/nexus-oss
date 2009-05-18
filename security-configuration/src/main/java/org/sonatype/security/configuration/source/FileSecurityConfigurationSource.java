@@ -23,7 +23,9 @@ import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 /**
@@ -36,24 +38,27 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
 public class FileSecurityConfigurationSource
     extends AbstractSecurityConfigurationSource
 {
-    
+
     /**
      * The configuration file.
      */
     @Configuration( value = "${application-conf}/security-configuration.xml" )
     private File configurationFile;
 
-//    /**
-//     * The configuration upgrader.
-//     */
-//    @Requirement
-//    private SecurityConfigurationUpgrader configurationUpgrader;
+    // /**
+    // * The configuration upgrader.
+    // */
+    // @Requirement
+    // private SecurityConfigurationUpgrader configurationUpgrader;
 
     /**
      * The defaults configuration source.
      */
     @Requirement( hint = "static" )
     private SecurityConfigurationSource securityDefaults;
+
+    @Requirement
+    private PasswordHelper passwordHelper;
 
     /** Flag to mark defaulted config */
     private boolean configurationDefaulted;
@@ -110,13 +115,13 @@ public class FileSecurityConfigurationSource
         loadConfiguration( getConfigurationFile() );
 
         // TODO: handle upgrade
-//        // check for loaded model
-//        if ( getConfiguration() == null )
-//        {
-//            upgradeConfiguration( getConfigurationFile() );
-//
-//            loadConfiguration( getConfigurationFile() );
-//        }
+        // // check for loaded model
+        // if ( getConfiguration() == null )
+        // {
+        // upgradeConfiguration( getConfigurationFile() );
+        //
+        // loadConfiguration( getConfigurationFile() );
+        // }
 
         return getConfiguration();
     }
@@ -138,33 +143,33 @@ public class FileSecurityConfigurationSource
         return securityDefaults;
     }
 
-//    protected void upgradeConfiguration( File file )
-//        throws IOException,
-//            ConfigurationException
-//    {
-//        this.getLogger().info( "Trying to upgrade the configuration file " + file.getAbsolutePath() );
-//
-//        setConfiguration( configurationUpgrader.loadOldConfiguration( file ) );
-//
-//        // after all we should have a configuration
-//        if ( getConfiguration() == null )
-//        {
-//            throw new ConfigurationException( "Could not upgrade Security configuration! Please replace the "
-//                + file.getAbsolutePath() + " file with a valid Security configuration file." );
-//        }
-//
-//        this.getLogger().info( "Creating backup from the old file and saving the upgraded configuration." );
-//
-//        // backup the file
-//        File backup = new File( file.getParentFile(), file.getName() + ".bak" );
-//
-//        FileUtils.copyFile( file, backup );
-//
-//        // set the upgradeInstance to warn the application about this
-//        setConfigurationUpgraded( true );
-//
-//        saveConfiguration( file );
-//    }
+    // protected void upgradeConfiguration( File file )
+    // throws IOException,
+    // ConfigurationException
+    // {
+    // this.getLogger().info( "Trying to upgrade the configuration file " + file.getAbsolutePath() );
+    //
+    // setConfiguration( configurationUpgrader.loadOldConfiguration( file ) );
+    //
+    // // after all we should have a configuration
+    // if ( getConfiguration() == null )
+    // {
+    // throw new ConfigurationException( "Could not upgrade Security configuration! Please replace the "
+    // + file.getAbsolutePath() + " file with a valid Security configuration file." );
+    // }
+    //
+    // this.getLogger().info( "Creating backup from the old file and saving the upgraded configuration." );
+    //
+    // // backup the file
+    // File backup = new File( file.getParentFile(), file.getName() + ".bak" );
+    //
+    // FileUtils.copyFile( file, backup );
+    //
+    // // set the upgradeInstance to warn the application about this
+    // setConfigurationUpgraded( true );
+    //
+    // saveConfiguration( file );
+    // }
 
     /**
      * Load configuration.
@@ -184,6 +189,25 @@ public class FileSecurityConfigurationSource
             fis = new FileInputStream( file );
 
             loadConfiguration( fis );
+
+            // decrypte the anon users password
+            SecurityConfiguration configuration = this.getConfiguration();
+            if ( configuration != null && StringUtils.isNotEmpty( configuration.getAnonymousPassword() ) )
+            {
+                String encryptedPassword = configuration.getAnonymousPassword();
+                try
+                {
+                    configuration.setAnonymousPassword( this.passwordHelper.decrypt( encryptedPassword ) );
+                }
+                catch ( PlexusCipherException e )
+                {
+                    this
+                        .getLogger()
+                        .error(
+                            "Failed to decrype anonymous user's password in security-configuration.xml, password might be encrypted in memory.",
+                            e );
+                }
+            }
         }
         finally
         {
@@ -229,9 +253,25 @@ public class FileSecurityConfigurationSource
                 FileUtils.copyFile( file, backupFile );
             }
 
+            SecurityConfiguration configuration = getConfiguration();
+
+            String clearPassword = configuration.getAnonymousPassword();
+            try
+            {
+                String encryptedPassword = this.passwordHelper.encrypt( clearPassword );
+                configuration.setAnonymousPassword( encryptedPassword );
+            }
+            catch ( PlexusCipherException e )
+            {
+                this.getLogger().error( "Filed to encrypte the anonymous users password, using clear text: " + e );
+            }
+
             fos = new FileOutputStream( file );
 
-            saveConfiguration( fos, getConfiguration() );
+            saveConfiguration( fos, configuration );
+
+            // set back to clear text
+            configuration.setAnonymousPassword( clearPassword );
 
             fos.flush();
         }
