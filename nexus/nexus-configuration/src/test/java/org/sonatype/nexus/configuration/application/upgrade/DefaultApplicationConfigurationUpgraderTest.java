@@ -15,9 +15,11 @@ package org.sonatype.nexus.configuration.application.upgrade;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.TimeZone;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -26,6 +28,10 @@ import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.nexus.configuration.upgrade.Upgrader;
+import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
+import org.sonatype.security.configuration.source.FileSecurityConfigurationSource;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 
 public class DefaultApplicationConfigurationUpgraderTest
     extends AbstractNexusTestCase
@@ -33,7 +39,9 @@ public class DefaultApplicationConfigurationUpgraderTest
     private static final File SECURITY_CONF = new File( CONF_HOME, "security-configuration.xml" );
 
     protected ApplicationConfigurationUpgrader configurationUpgrader;
-    
+
+    private FileSecurityConfigurationSource securitySource;
+
     public void setUp()
         throws Exception
     {
@@ -42,6 +50,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         FileUtils.cleanDirectory( new File( getNexusConfiguration() ).getParentFile() );
 
         this.configurationUpgrader = (ApplicationConfigurationUpgrader) lookup( ApplicationConfigurationUpgrader.class );
+        this.securitySource = (FileSecurityConfigurationSource) this.lookup( SecurityConfigurationSource.class, "file" );
     }
 
     protected void resultIsFine( String path, Configuration configuration )
@@ -86,7 +95,12 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path ) );
 
-        String actual = FileUtils.fileRead( SECURITY_CONF );
+        // we can only compare the string with no encrypted passwords, because the encryption is different every time.
+        SecurityConfiguration securityConfig = this.securitySource.loadConfiguration();
+        SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
+        StringWriter stringWriter = new StringWriter();
+        writer.write( stringWriter, securityConfig );
+        String actual = stringWriter.toString();
 
         if ( !StringUtils.equals( shouldBe, actual ) )
         {
@@ -277,12 +291,13 @@ public class DefaultApplicationConfigurationUpgraderTest
         securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus1710/security-configuration-1710.xml" );
     }
 
-    public void testLookup() throws Exception
+    public void testLookup()
+        throws Exception
     {
         // this has slf4f deps and plexus might skip it
         this.lookup( Upgrader.class, "1.0.8" );
     }
-    
+
     // public void testUpgradeStaticConfig()
     // throws Exception
     // {
