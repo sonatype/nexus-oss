@@ -90,14 +90,21 @@ public abstract class AbstractSecurityPlexusResource
         throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", errorResponse );
     }
 
-    protected UserResource securityToRestModel( User user, Request request )
+    protected UserResource securityToRestModel( User user, Request request, boolean appendResourceId )
     {
         UserResource resource = new UserResource();
         resource.setEmail( user.getEmailAddress() );
         resource.setName( user.getName() );
         resource.setStatus( user.getStatus().name() );
         resource.setUserId( user.getUserId() );
-        resource.setResourceURI( this.createChildReference( request, resource.getUserId() ).toString() );
+
+        String resourceId = "";
+        if ( appendResourceId )
+        {
+            resourceId = resource.getUserId();
+        }
+        resource.setResourceURI( this.createChildReference( request, resourceId ).toString() );
+
         resource.setUserManaged( !user.isReadOnly() );
 
         for ( RoleIdentifier role : user.getRoles() )
