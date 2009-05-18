@@ -81,49 +81,71 @@ Sonatype.repoServer.UserPrivilegeBrowsePanel = function( config ) {
           layout: 'column',
           items: [
             {
-              xtype :'treepanel',
+              xtype :'panel',
+              layout :'auto',
               columnWidth: .5,
-              name :'privilege-list',
-              title :'Privileges',
-              border :true,
-              bodyBorder :true,
-              bodyStyle :'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-              style :'padding: 0 50px 0 0',
-              width :325,
-              height :275,
-              animate :true,
-              lines :false,
-              autoScroll :true,
-              containerScroll :true,
-              rootVisible :false,
-              ddScroll: false,
-              enableDD: false,
-              root :new Ext.tree.TreeNode( {
-                text :'root',
-                draggable: false
-              })
+              items :[
+                {
+                  xtype: 'panel',
+                  style :'padding: 10px 0 10px 0',
+                  html: 'Select a privilege to view the role(s) in the user<br>that grant the privilege.'
+                },
+                {
+                  xtype :'treepanel',                  
+                  name :'privilege-list',
+                  title :'Privileges',
+                  border :true,
+                  bodyBorder :true,
+                  bodyStyle :'background-color:#FFFFFF; border: 1px solid #B5B8C8',
+                  style :'padding: 0 50px 0 0',
+                  width :325,
+                  height :275,
+                  animate :true,
+                  lines :false,
+                  autoScroll :true,
+                  containerScroll :true,
+                  rootVisible :false,
+                  ddScroll: false,
+                  enableDD: false,
+                  root :new Ext.tree.TreeNode( {
+                    text :'root',
+                    draggable: false
+                  })
+                }
+              ]
             },
             {
-              xtype :'treepanel',
+              xtype :'panel',
+              layout :'auto',
               columnWidth: .5,
-              name :'role-tree',
-              title :'Role Containment',
-              border :true,
-              bodyBorder :true,
-              bodyStyle :'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-              width :325,
-              height :275,
-              animate :true,
-              lines :false,
-              autoScroll :true,
-              containerScroll :true,
-              rootVisible :false,
-              ddScroll: false,
-              enableDD: false,
-              root :new Ext.tree.TreeNode( {
-                text :'root',
-                draggable: false
-              })
+              items :[
+                {
+                  xtype: 'panel',
+                  style :'padding: 10px 0 10px 0',
+                  html: 'List of roles in the user that grant the selected privilege.<br>Expand the role to find nested role(s) that contain<br>the privilege.'
+                },
+                {
+                  xtype :'treepanel',
+                  name :'role-tree',
+                  title :'Role Containment',
+                  border :true,
+                  bodyBorder :true,
+                  bodyStyle :'background-color:#FFFFFF; border: 1px solid #B5B8C8',
+                  width :325,
+                  height :275,
+                  animate :true,
+                  lines :false,
+                  autoScroll :true,
+                  containerScroll :true,
+                  rootVisible :false,
+                  ddScroll: false,
+                  enableDD: false,
+                  root :new Ext.tree.TreeNode( {
+                    text :'root',
+                    draggable: false
+                  })
+                }
+              ]
             }
           ]
         }
@@ -145,21 +167,31 @@ Ext.extend( Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
     }    
     var routeArray = this.getPrivilegeRouteArray( id );
     if ( routeArray ){
+      
       for ( var i = 0 ; i < routeArray.length ; i++ ){
         var roles = routeArray[i].split('||');
         if ( roles ){
           var base = tree.root;
           for ( var j = 0 ; j < roles.length ; j++ ){
-            base = base.appendChild(
-              new Ext.tree.TreeNode({
-                id: ( base == tree.root ) ? roles[j] : ( base.id + '$$' + roles[j] ),
-                text: roles[j],
-                payload: roles[j],
-                allowChildren: ( j + 1 == roles.length ) ? false : true,
-                draggable: false,
-                leaf: ( j + 1 == roles.length ) ? true : false
-              })
-            );
+            var nodeId = ( base == tree.root ) ? roles[j] : ( base.id + '$$' + roles[j] );
+            var foundNode = base.findChild('id', nodeId);
+            
+            if ( foundNode ){
+              base = foundNode;
+            }
+            else {
+              base = base.appendChild(
+                new Ext.tree.TreeNode({
+                  id: nodeId,
+                  text: roles[j],
+                  payload: roles[j],
+                  allowChildren: ( j + 1 == roles.length ) ? false : true,
+                  draggable: false,
+                  leaf: ( j + 1 == roles.length ) ? true : false,
+                  icon: Sonatype.config.extPath + '/resources/images/default/tree/folder.gif'
+                })
+              );
+            }
           }
         }
       }
@@ -246,6 +278,8 @@ Ext.extend( Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
         }        
       }
     }
+    
+    routeArray.sort();
     
     return routeArray;
   },
