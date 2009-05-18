@@ -150,6 +150,7 @@
                 <privilege>79</privilege>
                 <privilege>81</privilege>
                 <privilege>82</privilege>
+                <privilege>74</privilege>
             </privileges>
             <roles>
             	<role>ui-repo-browser</role>
