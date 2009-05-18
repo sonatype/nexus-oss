@@ -128,4 +128,9 @@ public class MockUserManager extends AbstractReadOnlyUserManager
         return role;
     }
 
+    public String getAuthenticationRealmName()
+    {
+        return null;
+    }
+
 }
