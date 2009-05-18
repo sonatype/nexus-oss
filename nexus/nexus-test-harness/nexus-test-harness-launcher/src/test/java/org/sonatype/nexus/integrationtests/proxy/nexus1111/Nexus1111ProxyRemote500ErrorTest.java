@@ -20,7 +20,7 @@ import org.mortbay.jetty.Server;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ClearCacheTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
@@ -82,7 +82,7 @@ public class Nexus1111ProxyRemote500ErrorTest
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setId( "repositoryOrGroupId" );
         prop.setValue( testRepositoryId );
-        TaskScheduleUtil.runTask( ClearCacheTaskDescriptor.ID, prop );
+        TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, prop );
 
         // the proxy is now working
         downloadArtifact( "nexus1111", "artifact", "1.1", "jar", null, "target/downloads" );

@@ -18,12 +18,12 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 
-public class ClearCacheWalker
+public class ExpireCacheWalker
     extends AbstractFileWalkerProcessor
 {
     private final Repository repository;
 
-    public ClearCacheWalker( Repository repository )
+    public ExpireCacheWalker( Repository repository )
     {
         this.repository = repository;
     }

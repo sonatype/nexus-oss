@@ -26,14 +26,14 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ClearCacheTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
- * Tests the clear cache task.
+ * Tests the expire cache task.
  */
-public class Nexus635ClearCacheTaskTest
+public class Nexus635ExpireCacheTaskTest
     extends AbstractNexusProxyIntegrationTest
 {
 
@@ -47,7 +47,7 @@ public class Nexus635ClearCacheTaskTest
         cleanWorkDir();
     }
 
-    public Nexus635ClearCacheTaskTest()
+    public Nexus635ExpireCacheTaskTest()
     {
         super( "tasks-snapshot-repo" );
     }
@@ -60,7 +60,7 @@ public class Nexus635ClearCacheTaskTest
     }
 
     @Test
-    public void clearCacheTask()
+    public void expireCacheTask()
         throws Exception
     {
         /*
@@ -78,7 +78,7 @@ public class Nexus635ClearCacheTaskTest
         File artifact2 = getTestFile( "artifact-2.jar" );
         addSnapshotArtifactToProxy( artifact2 );
         File secondDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
-        Assert.assertTrue( "Before ClearCache should download artifact 1",//
+        Assert.assertTrue( "Before ExpireCache should download artifact 1",//
                            compareFileSHA1s( secondDownload, artifact1 ) );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
@@ -90,11 +90,11 @@ public class Nexus635ClearCacheTaskTest
         // prop.setValue( "/" );
 
         // This is THE important part
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask( ClearCacheTaskDescriptor.ID, prop );
+        ScheduledServiceListResource task = TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, prop );
         Assert.assertNotNull( task );
 
         File thirdDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
-        Assert.assertTrue( "After ClearCache should download artifact 2", //
+        Assert.assertTrue( "After ExpireCache should download artifact 2", //
                            compareFileSHA1s( thirdDownload, artifact2 ) );
     }
 

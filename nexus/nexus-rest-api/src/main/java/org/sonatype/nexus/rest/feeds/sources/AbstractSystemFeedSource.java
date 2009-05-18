@@ -142,9 +142,9 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Repository proxy mode change (user intervention may be needed!)" );
             }
-            else if ( FeedRecorder.SYSTEM_CLEARCACHE_ACTION.equals( item.getAction() ) )
+            else if ( FeedRecorder.SYSTEM_EXPIRE_CACHE_ACTION.equals( item.getAction() ) )
             {
-                entry.setTitle( "Clearing caches" );
+                entry.setTitle( "Expiring caches" );
             }
             else if ( FeedRecorder.SYSTEM_EVICT_UNUSED_PROXIED_ITEMS_ACTION.equals( item.getAction() ) )
             {

@@ -106,7 +106,7 @@ import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTe
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTest;
-import org.sonatype.nexus.integrationtests.proxy.nexus635.Nexus635ClearCacheTaskTest;
+import org.sonatype.nexus.integrationtests.proxy.nexus635.Nexus635ExpireCacheTaskTest;
 import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10UpgradeTest;
 import org.sonatype.nexus.integrationtests.webproxy.nexus1101.Nexus1101NexusOverWebproxyTest;
 import org.sonatype.nexus.integrationtests.webproxy.nexus1113.Nexus1113WebProxyWithAuthenticationTest;
@@ -173,7 +173,7 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1116.Nexus1116InvalidPr
     Nexus637PublishIndexTest.class,
     Nexus652Beta5To10UpgradeTest.class,
     Nexus602SearchSnapshotArtifactTest.class,
-    Nexus635ClearCacheTaskTest.class,
+    Nexus635ExpireCacheTaskTest.class,
     Nexus634RemoveAllTest.class,
     Nexus634KeepNewSnapshotsTest.class,
     Nexus634KeepTwoSnapshotsTest.class,

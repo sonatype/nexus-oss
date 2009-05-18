@@ -17,7 +17,7 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-public class RepositoryClearCacheTest
+public class RepositoryExpireCacheTest
     extends AbstractProxyTestEnvironment
 {
 
@@ -85,11 +85,11 @@ public class RepositoryClearCacheTest
         assertEquals( 2, getRepository().getNotFoundCache().getStatistics().getSize() );
 
         // remove one
-        getRepository().clearCaches( new ResourceStoreRequest( "/activemq1/activemq-core", true ) );
+        getRepository().expireCaches( new ResourceStoreRequest( "/activemq1/activemq-core", true ) );
 
         assertEquals( 1, getRepository().getNotFoundCache().getStatistics().getSize() );
 
-        getRepository().clearCaches( new ResourceStoreRequest( "/", true ) );
+        getRepository().expireCaches( new ResourceStoreRequest( "/", true ) );
 
         assertEquals( 0, getRepository().getNotFoundCache().getStatistics().getSize() );
 

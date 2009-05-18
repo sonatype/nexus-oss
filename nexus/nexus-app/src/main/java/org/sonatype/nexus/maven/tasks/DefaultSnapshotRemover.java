@@ -193,7 +193,7 @@ public class DefaultSnapshotRemover
                                    + " files on repository " + repository.getId() );
         }
 
-        repository.clearCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
+        repository.expireCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
 
         RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor = new RecreateMavenMetadataWalkerProcessor();
 

@@ -19,7 +19,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
-import org.sonatype.nexus.tasks.descriptors.ClearCacheTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
@@ -27,8 +27,8 @@ import org.sonatype.scheduling.SchedulerTask;
  * 
  * @author cstamas
  */
-@Component( role = SchedulerTask.class, hint = ClearCacheTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
-public class ClearCacheTask
+@Component( role = SchedulerTask.class, hint = ExpireCacheTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
+public class ExpireCacheTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
     public Object doRun()
@@ -39,15 +39,15 @@ public class ClearCacheTask
         if ( getRepositoryGroupId() != null )
         {
             getRepositoryRegistry()
-                .getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).clearCaches( req );
+                .getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).expireCaches( req );
         }
         else if ( getRepositoryId() != null )
         {
-            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class ).clearCaches( req );
+            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class ).expireCaches( req );
         }
         else
         {
-            getNexus().clearAllCaches( new ResourceStoreRequest( getResourceStorePath() ) );
+            getNexus().expireAllCaches( new ResourceStoreRequest( getResourceStorePath() ) );
         }
 
         return null;
@@ -55,24 +55,24 @@ public class ClearCacheTask
 
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_CLEARCACHE_ACTION;
+        return FeedRecorder.SYSTEM_EXPIRE_CACHE_ACTION;
     }
 
     protected String getMessage()
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Clearing caches for repository group " + getRepositoryGroupName() + " from path "
+            return "Expiring caches for repository group " + getRepositoryGroupName() + " from path "
                 + getResourceStorePath() + " and below.";
         }
         else if ( getRepositoryId() != null )
         {
-            return "Clearing caches for repository " + getRepositoryName() + " from path " + getResourceStorePath()
+            return "Expiring caches for repository " + getRepositoryName() + " from path " + getResourceStorePath()
                 + " and below.";
         }
         else
         {
-            return "Clearing caches for all registered repositories from path " + getResourceStorePath()
+            return "Expiring caches for all registered repositories from path " + getResourceStorePath()
                 + " and below.";
         }
     }

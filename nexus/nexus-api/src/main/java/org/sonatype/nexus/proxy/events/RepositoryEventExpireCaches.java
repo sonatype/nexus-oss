@@ -16,17 +16,17 @@ package org.sonatype.nexus.proxy.events;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The event fired on ClearCache.
+ * The event fired on Expiring cache.
  * 
  * @author cstamas
  */
-public class RepositoryEventClearCaches
+public class RepositoryEventExpireCaches
     extends RepositoryMaintenanceEvent
 {
     /** From where it happened */
     private final String path;
 
-    public RepositoryEventClearCaches( final Repository repository, String path )
+    public RepositoryEventExpireCaches( final Repository repository, String path )
     {
         super( repository );
 

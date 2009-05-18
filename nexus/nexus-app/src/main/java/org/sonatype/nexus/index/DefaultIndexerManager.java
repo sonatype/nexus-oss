@@ -673,7 +673,7 @@ public class DefaultIndexerManager
         throws IOException, IllegalOperationException, ItemNotFoundException
     {
         // this will force remote check for newer files
-        repository.clearCaches( new ResourceStoreRequest( "/.index" ) );
+        repository.expireCaches( new ResourceStoreRequest( "/.index" ) );
 
         IndexingContext context = null;
 

@@ -43,7 +43,7 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
-import org.sonatype.nexus.proxy.events.RepositoryEventClearCaches;
+import org.sonatype.nexus.proxy.events.RepositoryEventExpireCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
@@ -456,7 +456,7 @@ public abstract class AbstractRepository
         this.accessManager = accessManager;
     }
 
-    public void clearCaches( ResourceStoreRequest request )
+    public void expireCaches( ResourceStoreRequest request )
     {
         if ( StringUtils.isEmpty( request.getRequestPath() ) )
         {
@@ -470,7 +470,7 @@ public abstract class AbstractRepository
         // 1st, expire all the files below path
         DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
 
-        ctx.getProcessors().add( new ClearCacheWalker( this ) );
+        ctx.getProcessors().add( new ExpireCacheWalker( this ) );
 
         try
         {
@@ -487,10 +487,10 @@ public abstract class AbstractRepository
         }
 
         // 2nd, remove the items from NFC
-        clearNotFoundCaches( request );
+        expireNotFoundCaches( request );
     }
 
-    public void clearNotFoundCaches( ResourceStoreRequest request )
+    public void expireNotFoundCaches( ResourceStoreRequest request )
     {
         if ( StringUtils.isBlank( request.getRequestPath() ) )
         {
@@ -522,7 +522,7 @@ public abstract class AbstractRepository
         }
 
         getApplicationEventMulticaster().notifyEventListeners(
-                                                               new RepositoryEventClearCaches( this, request
+                                                               new RepositoryEventExpireCaches( this, request
                                                                    .getRequestPath() ) );
     }
 

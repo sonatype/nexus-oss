@@ -81,7 +81,7 @@ public class M1RepositoryTest
         }
 
         // reset NFC
-        repository.clearCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ) );
+        repository.expireCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ) );
 
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
@@ -135,7 +135,7 @@ public class M1RepositoryTest
         }
 
         // reset NFC
-        repository.clearCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ) );
+        repository.expireCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ) );
 
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );

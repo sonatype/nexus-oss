@@ -22,30 +22,31 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "ClearCache", description="Clear Repository Caches" )
-public class ClearCacheTaskDescriptor
+@Component( role = ScheduledTaskDescriptor.class, hint = "ExpireCache", description = "Expire Repository Caches" )
+public class ExpireCacheTaskDescriptor
     extends AbstractScheduledTaskDescriptor
     implements Initializable
 {
-    public static final String ID = "ClearCacheTask";
-    
+    public static final String ID = "ExpireCacheTask";
+
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
     private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
-    
+
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "ResourceStorePath" )
     private ScheduledTaskPropertyDescriptor resourceStorePath;
-    
+
     public void initialize()
         throws InitializationException
     {
-        repositoryOrGroupId.setHelpText( "Type in the repository path from which to clear caches recursively (ie. \"/\" for root or \"/org/apache\")" );
+        repositoryOrGroupId
+            .setHelpText( "Type in the repository path from which to expire caches recursively (ie. \"/\" for root or \"/org/apache\")" );
     }
-    
+
     public String getId()
     {
         return ID;
     }
-    
+
     public String getName()
     {
         return "Expire Repository Caches";
@@ -54,10 +55,10 @@ public class ClearCacheTaskDescriptor
     public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
     {
         List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
-        
+
         properties.add( repositoryOrGroupId );
-        properties.add(  resourceStorePath );
-        
+        properties.add( resourceStorePath );
+
         return properties;
     }
 }

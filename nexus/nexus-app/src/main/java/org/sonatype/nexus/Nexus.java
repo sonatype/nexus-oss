@@ -92,7 +92,7 @@ public interface Nexus
     NexusStreamResponse getApplicationLogAsStream( String logFile, long fromByte, long bytesCount )
         throws IOException;
 
-    void clearAllCaches( ResourceStoreRequest request );
+    void expireAllCaches( ResourceStoreRequest request );
 
     void reindexAllRepositories( String path, boolean fullReindex )
         throws IOException;

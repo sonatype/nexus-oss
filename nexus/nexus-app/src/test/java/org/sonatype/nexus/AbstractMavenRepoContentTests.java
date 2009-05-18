@@ -115,9 +115,9 @@ public class AbstractMavenRepoContentTests
 
         // but clear caches
         ResourceStoreRequest root = new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT );
-        snapshots.clearCaches( root );
-        releases.clearCaches( root );
-        apacheSnapshots.clearCaches( root );
+        snapshots.expireCaches( root );
+        releases.expireCaches( root );
+        apacheSnapshots.expireCaches( root );
 
         // make apache-snapshots point to local fake repo
         ( (MavenProxyRepository) apacheSnapshots ).setRemoteUrl( "http://localhost:12345/apache-snapshots/" );

@@ -446,13 +446,13 @@ public class DefaultNexus
         logManager.setLogConfig( config );
     }
 
-    public void clearAllCaches( ResourceStoreRequest request )
+    public void expireAllCaches( ResourceStoreRequest request )
     {
         for ( Repository repository : repositoryRegistry.getRepositories() )
         {
             if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
             {
-                repository.clearCaches( request );
+                repository.expireCaches( request );
             }
         }
     }

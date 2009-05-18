@@ -78,9 +78,9 @@ public interface FeedRecorder
     public static final String SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION = "REPO_PSTATUS_AUTO_CHANGES";
 
     /**
-     * System event action: clearCache
+     * System event action: expire cache
      */
-    public static final String SYSTEM_CLEARCACHE_ACTION = "CLEARCACHE";
+    public static final String SYSTEM_EXPIRE_CACHE_ACTION = "EXPIRE_CACHE";
 
     /**
      * System event action: shadow sync

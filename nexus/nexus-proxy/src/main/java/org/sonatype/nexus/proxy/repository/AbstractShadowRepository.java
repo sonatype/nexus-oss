@@ -177,7 +177,7 @@ public abstract class AbstractShadowRepository
 
         ResourceStoreRequest root = new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true );
 
-        clearCaches( root );
+        expireCaches( root );
 
         AbstractFileWalkerProcessor sw = new AbstractFileWalkerProcessor()
         {

@@ -367,14 +367,14 @@ public interface Repository
      * 
      * @param path a path from to start descending. If null, it is taken as "root".
      */
-    void clearCaches( ResourceStoreRequest request );
+    void expireCaches( ResourceStoreRequest request );
 
     /**
      * Purges the NFC caches from path and below.
      * 
      * @param path
      */
-    void clearNotFoundCaches( ResourceStoreRequest request );
+    void expireNotFoundCaches( ResourceStoreRequest request );
 
     /**
      * Evicts items that were last used before timestamp.

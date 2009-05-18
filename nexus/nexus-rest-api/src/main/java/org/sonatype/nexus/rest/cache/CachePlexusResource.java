@@ -27,7 +27,7 @@ import org.sonatype.nexus.rest.model.NFCRepositoryResource;
 import org.sonatype.nexus.rest.model.NFCResource;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
 import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
-import org.sonatype.nexus.tasks.ClearCacheTask;
+import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -107,7 +107,7 @@ public class CachePlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        ClearCacheTask task = getNexusScheduler().createTaskInstance( ClearCacheTask.class );
+        ExpireCacheTask task = getNexusScheduler().createTaskInstance( ExpireCacheTask.class );
 
         task.setRepositoryId( getRepositoryId( request ) );
 
