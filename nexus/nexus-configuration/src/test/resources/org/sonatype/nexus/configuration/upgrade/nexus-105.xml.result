@@ -634,7 +634,7 @@
       <id>2</id>
       <name>weekly</name>
       <enabled>true</enabled>
-      <type>ClearCacheTask</type>
+      <type>ExpireCacheTask</type>
       <status>SUBMITTED</status>
       <nextRun>1225168020000</nextRun>
       <schedule>

@@ -76,8 +76,14 @@ public class Upgrade108to140
     private static final String GROUP_CHILD_NODE = "memberRepository";
 
     private final Map<String, String> localStatus = new HashMap<String, String>();
+
     private final Map<String, String> checksumPolicy = new HashMap<String, String>();
+
     private final Map<String, String> proxyMode = new HashMap<String, String>();
+
+    private final Map<String, String> taskTypes = new HashMap<String, String>();
+
+    private static final String TASK_EXPIRE_CACHE_OLD = "ClearCacheTask";
 
     public Upgrade108to140()
     {
@@ -93,6 +99,8 @@ public class Upgrade108to140
         this.proxyMode.put( "allow", "ALLOW" );
         this.proxyMode.put( "blockedAuto", "BLOCKED_AUTO" );
         this.proxyMode.put( "blockedManual", "BLOKED_MANUAL" );
+
+        this.taskTypes.put( TASK_EXPIRE_CACHE_OLD, "ExpireCacheTask" );
     }
 
     public Object loadConfiguration( File file )
@@ -168,12 +176,14 @@ public class Upgrade108to140
         }
         newc.setRepositoryTargets( targets );
 
-        // tasks are the same
+        // tasks are the same, except the clear cache task
         List<CScheduledTask> tasks = new ArrayList<CScheduledTask>( oldc.getTasks().size() );
-        for ( org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask oldtasks : (List<org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask>) oldc
+        for ( org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask oldTask : (List<org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask>) oldc
             .getTasks() )
         {
-            tasks.add( copyCScheduledTask1_0_8( oldtasks ) );
+            upgradeTask( oldTask );
+
+            tasks.add( copyCScheduledTask1_0_8( oldTask ) );
         }
         newc.setTasks( tasks );
 
@@ -627,5 +637,11 @@ public class Upgrade108to140
         return groupRepo;
     }
 
-
+    private void upgradeTask( org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask task )
+    {
+        if ( TASK_EXPIRE_CACHE_OLD.equals( task.getType() ) )
+        {
+            task.setType( this.taskTypes.get( TASK_EXPIRE_CACHE_OLD ) );
+        }
+    }
 }
