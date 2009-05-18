@@ -35,7 +35,7 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
 
   Sonatype.repoServer.ArtifactUploadPanel.superclass.constructor.call(this, {
     region: 'center',
-    id: 'uploadFormId',
+    id: ( this.id ) ? this.id : 'uploadFormId',
     trackResetOnLoad: true,
     autoScroll: true,
     bodyStyle:'overflow:auto;',
