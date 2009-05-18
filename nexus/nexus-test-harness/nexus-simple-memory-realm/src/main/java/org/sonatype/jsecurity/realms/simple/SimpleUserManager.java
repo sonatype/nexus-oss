@@ -133,4 +133,9 @@ public class SimpleUserManager extends AbstractReadOnlyUserManager
         return user;
     }
 
+    public String getAuthenticationRealmName()
+    {
+        return "MemoryRealm";
+    }
+
 }
