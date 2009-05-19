@@ -620,7 +620,18 @@ public abstract class AbstractRESTLightClient
 
         if ( status < 200 || status > 299 )
         {
-            throw new RESTLightClientException( "PUT request failed; HTTP status: " + status + ": " + statusText );
+            String errorBody = "";
+
+            try
+            {
+                errorBody = method.getResponseBodyAsString();
+            }
+            catch ( IOException ioe )
+            {
+            }
+
+            throw new RESTLightClientException( "PUT request failed; HTTP status: " + status + ", " + statusText
+                + "\nHTTP body: " + errorBody );
         }
 
         if ( expectResponseBody )
