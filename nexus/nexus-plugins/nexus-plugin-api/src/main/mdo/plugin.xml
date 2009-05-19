@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <!--
+    Nexus: Maven Repository Manager Copyright (C) 2008 Sonatype, Inc.
+    This file is part of Nexus. This program is free software; you can
+    redistribute it and/or modify it under the terms of the GNU Lesser
+    General Public License as published by the Free Software Foundation;
+    either version 3 of the License, or (at your option) any later
+    version. This program is distributed in the hope that it will be
+    useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+    of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser General Public License for more details. You should have
+    received a copy of the GNU Lesser General Public License along with
+    this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+  -->
+
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd">
+
+  <id>plugin</id>
+  <name>NexusPlugin</name>
+
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.sonatype.nexus.plugins.model</value>
+    </default>
+  </defaults>
+
+  <versionDefinition>
+    <type>field</type>
+    <value>modelVersion</value>
+  </versionDefinition>
+
+  <classes>
+    <!-- ROOT -->
+    <class rootElement="true" xml.tagName="nexusPlugin">
+      <name>PluginMetadata</name>
+      <version>1.0.0+</version>
+      <description>The root element of Nexus plugin metadata.</description>
+      <fields>
+        <field>
+          <name>modelVersion</name>
+          <version>1.0.0+</version>
+          <description>
+            The version of the persisted model.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>groupId</name>
+          <version>1.0.0+</version>
+          <description>Plugin groupId.</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>1.0.0+</version>
+          <description>Plugin artifactId.</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>version</name>
+          <version>1.0.0+</version>
+          <description>Plugin version.</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>name</name>
+          <version>1.0.0+</version>
+          <description>Plugin short name (for display purposes).</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>description</name>
+          <version>1.0.0+</version>
+          <description>Plugin description (for display purposes).</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>pluginSite</name>
+          <version>1.0.0+</version>
+          <description>Plugin site URL, if any (for UI purposes).</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+
+        <field>
+          <name>requiredFeatures</name>
+          <version>1.0.0+</version>
+          <description>Plugin required features, that must be present in system.</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+
+        <field>
+          <name>plugin</name>
+          <version>1.0.0+</version>
+          <description>Plugin extension point implementation.</description>
+          <association>
+            <type>Plugin</type>
+            <multiplicity>1</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+        
+        <field>
+          <name>extensions</name>
+          <version>1.0.0+</version>
+          <description>Plugin contributed extension point implementations.</description>
+          <association>
+            <type>Extension</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+
+        <field>
+          <name>components</name>
+          <version>1.0.0+</version>
+          <description>Plugin contributed managed components..</description>
+          <association>
+            <type>Component</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+
+        <field>
+          <name>resources</name>
+          <version>1.0.0+</version>
+          <description>Plugin contributed static resources.</description>
+          <association>
+            <type>Resource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "1.0.0";
+]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+
+    <class>
+      <name>Plugin</name>
+      <version>1.0.0+</version>
+      <description>The Plugin implementation within this plugin.</description>
+      <fields>
+        <field>
+          <name>implementation</name>
+          <version>1.0.0+</version>
+          <description>
+            The implementation class.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>requirements</name>
+          <version>1.0.0+</version>
+          <description>
+            The (optional) requirements of the component.
+          </description>
+          <association>
+            <type>Requirement</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>Extension</name>
+      <version>1.0.0+</version>
+      <description>The extensions within this plugin.</description>
+      <fields>
+        <field>
+          <name>extensionPoint</name>
+          <version>1.0.0+</version>
+          <description>
+            The extension point.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>qualifier</name>
+          <version>1.0.0+</version>
+          <description>
+            The (optional) string qualifier of the extension point.
+          </description>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
+          <name>implementation</name>
+          <version>1.0.0+</version>
+          <description>
+            The implementation class.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>requirements</name>
+          <version>1.0.0+</version>
+          <description>
+            The (optional) requirements of the component.
+          </description>
+          <association>
+            <type>Requirement</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>Component</name>
+      <version>1.0.0+</version>
+      <description>Managed components.</description>
+      <fields>
+        <field>
+          <name>componentContract</name>
+          <version>1.0.0+</version>
+          <description>
+            The interface of the component.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>qualifier</name>
+          <version>1.0.0+</version>
+          <description>
+            The (optional) string qualifier of the component.
+          </description>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
+          <name>implementation</name>
+          <version>1.0.0+</version>
+          <description>
+            The implementation class.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>requirements</name>
+          <version>1.0.0+</version>
+          <description>
+            The (optional) requirements of the component.
+          </description>
+          <association>
+            <type>Requirement</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Requirement</name>
+      <version>1.0.0+</version>
+      <description>The requirements of managed component.</description>
+      <fields>
+        <field>
+          <name>fieldName</name>
+          <version>1.0.0+</version>
+          <description>
+            The field name of the target where to inject.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>componentContract</name>
+          <version>1.0.0+</version>
+          <description>
+            The interface of the component.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>qualifier</name>
+          <version>1.0.0+</version>
+          <description>
+            The (optional) string qualifier of the component.
+          </description>
+          <type>String</type>
+          <required>false</required>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>Resource</name>
+      <version>1.0.0+</version>
+      <description>The static resources in this plugin.</description>
+      <fields>
+        <field>
+          <name>resourcePath</name>
+          <version>1.0.0+</version>
+          <description>
+            The path of the static resource within JAR (path will be used as in getting it from classpath and also to publish it from nexus base URL).
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>publishedPath</name>
+          <version>1.0.0+</version>
+          <description>
+            The path of the static resource (path will be used to publish it from nexus base URL, overrides resourcePath if present).
+          </description>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
+          <name>contentType</name>
+          <version>1.0.0+</version>
+          <description>
+            The content type of the static resource.
+          </description>
+          <type>String</type>
+          <required>false</required>
+        </field>
+      </fields>
+    </class>
+
+  </classes>
+</model>
