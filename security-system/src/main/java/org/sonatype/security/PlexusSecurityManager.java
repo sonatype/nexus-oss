@@ -2,6 +2,7 @@ package org.sonatype.security;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.jsecurity.authc.pam.FirstSuccessfulAuthenticationStrategy;
@@ -16,7 +17,7 @@ import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthoriz
 @Component( role = RealmSecurityManager.class )
 public class PlexusSecurityManager
     extends DefaultSecurityManager
-    implements Initializable
+    implements Initializable, Disposable
 {
 
     @Requirement
@@ -51,5 +52,10 @@ public class PlexusSecurityManager
         EhCacheManager ehCacheManager = new EhCacheManager();
         ehCacheManager.setCacheManager( this.cacheWrapper.getEhCacheManager() );
         this.setCacheManager( ehCacheManager );
+    }
+
+    public void dispose()
+    {
+        super.destroy();
     }
 }
