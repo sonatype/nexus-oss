@@ -158,7 +158,10 @@ Ext.extend( Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
     //the load listener on these stores will reload the privileges
     this.roleDataStore.reload();
     this.privDataStore.reload();
-    this.find('name', 'privRouteList')[0].setValue( '' )
+    var tree = this.find('name', 'role-tree')[0];
+    while (tree.root.lastChild) {
+      tree.root.removeChild(tree.root.lastChild);
+    }  
   },
   handleNodeClicked : function( id ) {
     var tree = this.find('name', 'role-tree')[0];
