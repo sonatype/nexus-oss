@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import org.sonatype.nexus.plugins.ExtensionPoint;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -20,6 +21,7 @@ import org.sonatype.plexus.appevents.Event;
  * 
  * @author cstamas
  */
+@ExtensionPoint
 public interface EventInspector
 {
     boolean accepts( Event<?> evt );

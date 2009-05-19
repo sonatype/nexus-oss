@@ -1,57 +1,92 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<!-- Parent POM -->
-	<parent>
-		<groupId>org.sonatype.nexus</groupId>
-		<artifactId>nexus</artifactId>
-		<version>1.4.0-SNAPSHOT</version>
-	</parent>
+  <!-- Parent POM -->
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus</artifactId>
+    <version>1.4.0-SNAPSHOT</version>
+  </parent>
 
-	<!-- the version of maven's project object model -->
-	<modelVersion>4.0.0</modelVersion>
+  <!-- the version of maven's project object model -->
+  <modelVersion>4.0.0</modelVersion>
 
-	<!-- a unique name for this project -->
-	<artifactId>nexus-api</artifactId>
+  <!-- a unique name for this project -->
+  <artifactId>nexus-api</artifactId>
 
-	<!-- POM packaging -->
-	<packaging>jar</packaging>
+  <!-- POM packaging -->
+  <packaging>jar</packaging>
 
-	<!-- a short but descriptive name for the project -->
-	<name>Nexus (API)</name>
+  <!-- a short but descriptive name for the project -->
+  <name>Nexus (API)</name>
 
-	<dependencies>
+  <dependencies>
 
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-component-annotations</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.plexus.appevents</groupId>
-			<artifactId>plexus-app-events-api</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-component-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-interpolation</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plexus.appevents</groupId>
+      <artifactId>plexus-app-events-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-task-scheduler</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.sonatype.nexus</groupId>
-			<artifactId>nexus-utils</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-utils</artifactId>
+    </dependency>
 
-		<!-- Testing -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-indexer</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-classworlds</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>aspectj</groupId>
+          <artifactId>aspectjrt</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-	</dependencies>
+    <!-- Testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-component-metadata</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

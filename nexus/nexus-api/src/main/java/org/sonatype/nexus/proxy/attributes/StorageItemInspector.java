@@ -13,11 +13,13 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
+import org.sonatype.nexus.plugins.ExtensionPoint;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * The Interface StorageItemInspector.
  */
+@ExtensionPoint
 public interface StorageItemInspector
 {
     /**

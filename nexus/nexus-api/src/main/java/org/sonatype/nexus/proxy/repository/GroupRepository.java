@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.List;
 
+import org.sonatype.nexus.plugins.ExtensionPoint;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -28,6 +29,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  * 
  * @author cstamas
  */
+@ExtensionPoint
 public interface GroupRepository
     extends Repository
 {

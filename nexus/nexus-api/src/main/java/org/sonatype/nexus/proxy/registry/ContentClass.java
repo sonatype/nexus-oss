@@ -13,6 +13,9 @@
  */
 package org.sonatype.nexus.proxy.registry;
 
+import org.sonatype.nexus.plugins.ExtensionPoint;
+
+@ExtensionPoint
 public interface ContentClass
 {
     String getId();

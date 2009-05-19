@@ -423,7 +423,7 @@ public abstract class AbstractRepository
     @SuppressWarnings( "unchecked" )
     public <F> F adaptToFacet( Class<F> t )
     {
-        if ( t.isAssignableFrom( this.getClass() ) )
+        if (getRepositoryKind().isFacetAvailable( t ))
         {
             return (F) this;
         }

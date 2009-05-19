@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.sonatype.nexus.plugins.ExtensionPoint;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
@@ -22,6 +23,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  * 
  * @author cstamas
  */
+@ExtensionPoint
 public interface ShadowRepository
     extends Repository
 {

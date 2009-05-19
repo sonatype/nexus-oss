@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.sonatype.nexus.plugins.ExtensionPoint;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -22,6 +23,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
  * 
  * @author cstamas
  */
+@ExtensionPoint
 public interface RequestProcessor
 {
     /**

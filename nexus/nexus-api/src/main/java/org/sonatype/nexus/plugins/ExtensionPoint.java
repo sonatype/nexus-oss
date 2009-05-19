@@ -7,12 +7,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Marks an interface as Nexus Extension Point.
+ * 
+ * @author cstamas
+ */
 @Documented
 @Inherited
-@Managed
 @Target( ElementType.TYPE )
-@Retention(RetentionPolicy.RUNTIME)
+@Retention( RetentionPolicy.RUNTIME )
 public @interface ExtensionPoint
 {
-
 }

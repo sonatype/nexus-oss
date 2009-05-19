@@ -1,7 +1,26 @@
 package org.sonatype.nexus.plugins;
 
-@ExtensionPoint
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * Marks and interface (must extends org.sonatype.nexus.proxy.repository.Repository) as new repository type to be
+ * handled by Nexus.
+ * 
+ * @author cstamas
+ */
+@Documented
+@Inherited
+@Target( ElementType.TYPE )
+@Retention( RetentionPolicy.RUNTIME )
 public @interface RepositoryType
 {
-    String pathPrefix() default "";
+    /**
+     * The path prefix to "mount" under content URL.
+     */
+    String pathPrefix();
 }

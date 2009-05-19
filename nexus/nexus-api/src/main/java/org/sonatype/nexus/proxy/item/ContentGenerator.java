@@ -1,5 +1,6 @@
 package org.sonatype.nexus.proxy.item;
 
+import org.sonatype.nexus.plugins.ExtensionPoint;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.StorageException;
@@ -11,6 +12,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * 
  * @author cstamas
  */
+@ExtensionPoint
 public interface ContentGenerator
 {
     public static final String CONTENT_GENERATOR_ID = "contentGenerator";
