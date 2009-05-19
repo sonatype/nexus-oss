@@ -34,7 +34,7 @@ public class LogConfigurationTest
         throws Exception
     {
         super.setUp();
-        
+
         File logFile = new File( getBasedir(), "target/test-classes/log4j.properties" );
 
         assertTrue( logFile.exists() );
@@ -48,9 +48,12 @@ public class LogConfigurationTest
         logConfiguration.apply();
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
+        super.tearDown();
+
         EnhancedProperties config = logConfiguration.getConfig();
 
         config.put( "log4j.rootLogger", "DEBUG, console" );

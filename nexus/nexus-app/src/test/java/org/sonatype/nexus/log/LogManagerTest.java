@@ -29,23 +29,19 @@ public class LogManagerTest
 {
     private LogManager manager;
 
-    public LogManagerTest()
-        throws Exception
-    {
-        super.setUp();
-    }
-
     @Override
     public void setUp()
         throws Exception
     {
+        super.setUp();
+
         File logFile = new File( getBasedir(), "target/test-classes/log4j.properties" );
 
         assertTrue( logFile.exists() );
 
         System.getProperties().put( "plexus.log4j-prop-file", logFile.getAbsolutePath() );
 
-        manager = (LogManager) lookup( LogManager.class );
+        manager = lookup( LogManager.class );
     }
 
     public void testLogConfig()

@@ -38,7 +38,7 @@ public abstract class AbstractNexusTestCase
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
 
     public static final String APPS_CONFIGURATION_KEY = "apps";
-    
+
     public static final String APPLICATION_CONF_KEY = "application-conf";
 
     public static final String SECURITY_CONFIG_KEY = "security-xml-file";
@@ -50,11 +50,12 @@ public abstract class AbstractNexusTestCase
     protected static final File CONF_HOME = new File( WORK_HOME, "conf" );
 
     protected NexusConfiguration nexusConfiguration;
-    
+
     public List<IndexCreator> DEFAULT_CREATORS;
     public List<IndexCreator> FULL_CREATORS;
     public List<IndexCreator> MIN_CREATORS;
 
+    @Override
     protected void customizeContext( Context ctx )
     {
         ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
@@ -64,7 +65,7 @@ public abstract class AbstractNexusTestCase
         ctx.put( RUNTIME_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
 
         ctx.put( SECURITY_CONFIG_KEY, CONF_HOME.getAbsolutePath() + "/security.xml" );
-        
+
         ctx.put( APPLICATION_CONF_KEY, CONF_HOME.getAbsolutePath() );
     }
 
@@ -89,7 +90,7 @@ public abstract class AbstractNexusTestCase
     {
         this.copyResource( "/META-INF/nexus/security.xml", getNexusSecurityConfiguration() );
     }
-    
+
     protected void copyResource(String resource, String dest ) throws IOException
     {
         InputStream stream = null;
@@ -109,29 +110,30 @@ public abstract class AbstractNexusTestCase
         return true;
     }
 
+    @Override
     protected void setUp()
         throws Exception
     {
-        super.setUp();
-
         FileUtils.deleteDirectory( PLEXUS_HOME );
 
         PLEXUS_HOME.mkdirs();
         WORK_HOME.mkdirs();
         CONF_HOME.mkdirs();
-        
+
+        super.setUp();
+
         DEFAULT_CREATORS = new ArrayList<IndexCreator>();
         FULL_CREATORS = new ArrayList<IndexCreator>();
         MIN_CREATORS = new ArrayList<IndexCreator>();
-        
+
         IndexCreator min = lookup( IndexCreator.class, "min" );
         IndexCreator jar = lookup( IndexCreator.class, "jarContent" );
-        
+
         MIN_CREATORS.add( min );
-        
+
         FULL_CREATORS.add( min );
         FULL_CREATORS.add( jar );
-        
+
         DEFAULT_CREATORS.addAll( FULL_CREATORS );
 
         if ( loadConfigurationAtSetUp() )
@@ -147,10 +149,13 @@ public abstract class AbstractNexusTestCase
         }
     }
 
+    @Override
     protected void tearDown()
         throws Exception
-    {   
+    {
         super.tearDown();
+
+        FileUtils.deleteDirectory( PLEXUS_HOME );
     }
 
     protected LoggerManager getLoggerManager() throws ComponentLookupException

@@ -31,10 +31,10 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
  * Tests that needs some repo content and are Maven related.
- * 
+ *
  * @author cstamas
  */
-public class AbstractMavenRepoContentTests
+public abstract class AbstractMavenRepoContentTests
     extends AbstractNexusTestCase
 {
     protected DefaultNexus defaultNexus;
@@ -49,6 +49,7 @@ public class AbstractMavenRepoContentTests
 
     protected MavenRepository apacheSnapshots;
 
+    @Override
     protected void setUp()
         throws Exception
     {
@@ -71,6 +72,7 @@ public class AbstractMavenRepoContentTests
         apacheSnapshots = (MavenRepository) repositoryRegistry.getRepository( "apache-snapshots" );
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
