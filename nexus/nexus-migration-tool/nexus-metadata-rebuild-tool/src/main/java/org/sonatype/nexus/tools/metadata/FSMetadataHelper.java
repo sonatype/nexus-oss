@@ -20,6 +20,7 @@ import java.security.MessageDigest;
 
 import org.apache.commons.codec.binary.Hex;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.proxy.maven.metadata.AbstractMetadataHelper;
 
@@ -27,6 +28,11 @@ import org.sonatype.nexus.proxy.maven.metadata.AbstractMetadataHelper;
 public class FSMetadataHelper
     extends AbstractMetadataHelper
 {
+    public FSMetadataHelper( Logger logger )
+    {
+        super( logger );
+    }
+
     private String repo;
 
     @Override

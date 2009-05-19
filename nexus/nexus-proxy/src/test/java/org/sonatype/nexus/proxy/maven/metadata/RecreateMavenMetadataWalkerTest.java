@@ -74,7 +74,11 @@ public class RecreateMavenMetadataWalkerTest
         "/com/mycom/proj1/1.0/proj1-1.0.pom",
         "/com/mycom/proj1/2.0/proj1-2.0.jar",
         "/com/mycom/proj1/2.0/proj1-2.0.pom",
-        "/com/mycom/proj1/maven-metadata.xml" };
+        "/com/mycom/proj1/maven-metadata.xml",
+        "/com/mycom/proj5/1.0/proj5-1.0.jar",
+        "/com/mycom/proj5/1.0/proj5-1.0.pom",
+        "/com/mycom/proj6/1.0/proj6-1.0.jar",
+        "/com/mycom/proj6/1.0/proj6-1.0.pom",};
 
     private String[] snapshotArtifactFiles = {
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.180215-1.jar",
@@ -194,7 +198,7 @@ public class RecreateMavenMetadataWalkerTest
 
     private void rebuildMavenMetadata( Repository repo )
     {
-        RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
+        RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor( getLogger() );
 
         DefaultWalkerContext ctx = new DefaultWalkerContext( repo, new ResourceStoreRequest(
             RepositoryItemUid.PATH_ROOT,
@@ -599,5 +603,58 @@ public class RecreateMavenMetadataWalkerTest
         assertEquals( "maven-c1-plugin", ( (Plugin) md.getPlugins().get( 2 ) ).getArtifactId() );
         assertEquals( "maven-d1-plugin", ( (Plugin) md.getPlugins().get( 3 ) ).getArtifactId() );
     }
+    
+    public void testRecreatingOnBadPOM()
+        throws Exception
+    {
+        rebuildMavenMetadata( inhouseRelease );
+        
+        Map<String, Boolean> expected = new LinkedHashMap<String, Boolean>();
+        expected.put( "/com/mycom/proj1/maven-metadata.xml", Boolean.TRUE );
+        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.jar", Boolean.TRUE );
+        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.jar.md5", Boolean.TRUE );
+        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.jar.sha1", Boolean.TRUE );
+        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.pom", Boolean.TRUE );
+        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.pom.md5", Boolean.TRUE );
+        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.pom.sha1", Boolean.TRUE );
+        expected.put( "/com/mycom/proj5/maven-metadata.xml", Boolean.FALSE );
+        expected.put( "/com/mycom/proj5/1.0/proj5-1.0.jar", Boolean.TRUE );
+        expected.put( "/com/mycom/proj5/1.0/proj5-1.0.jar.md5", Boolean.TRUE );
+        expected.put( "/com/mycom/proj5/1.0/proj5-1.0.jar.sha1", Boolean.TRUE );
+        expected.put( "/com/mycom/proj5/1.0/proj5-1.0.pom", Boolean.TRUE );
+        expected.put( "/com/mycom/proj5/1.0/proj5-1.0.pom.md5", Boolean.TRUE );
+        expected.put( "/com/mycom/proj5/1.0/proj5-1.0.pom.sha1", Boolean.TRUE );
+        
+        validateResults( inhouseRelease, expected );
+        
+        // should see warning log here
+    }
+    
+    public void testRecreatingOnInappropiatePOM()
+        throws Exception
+    {
+        rebuildMavenMetadata( inhouseRelease );
+        
+        Map<String, Boolean> expected = new LinkedHashMap<String, Boolean>();
+        expected.put( "/com/mycom/proj1/maven-metadata.xml", Boolean.TRUE );
+        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.jar", Boolean.TRUE );
+        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.jar.md5", Boolean.TRUE );
+        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.jar.sha1", Boolean.TRUE );
+        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.pom", Boolean.TRUE );
+        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.pom.md5", Boolean.TRUE );
+        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.pom.sha1", Boolean.TRUE );
+        expected.put( "/com/mycom/proj6/maven-metadata.xml", Boolean.FALSE );
+        expected.put( "/com/mycom/proj6/1.0/proj6-1.0.jar", Boolean.TRUE );
+        expected.put( "/com/mycom/proj6/1.0/proj6-1.0.jar.md5", Boolean.TRUE );
+        expected.put( "/com/mycom/proj6/1.0/proj6-1.0.jar.sha1", Boolean.TRUE );
+        expected.put( "/com/mycom/proj6/1.0/proj6-1.0.pom", Boolean.TRUE );
+        expected.put( "/com/mycom/proj6/1.0/proj6-1.0.pom.md5", Boolean.TRUE );
+        expected.put( "/com/mycom/proj6/1.0/proj6-1.0.pom.sha1", Boolean.TRUE );
+        
+        validateResults( inhouseRelease, expected );
+        
+        // should see warning log here
+    }
+    
 
 }

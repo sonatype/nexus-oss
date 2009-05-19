@@ -163,7 +163,7 @@ public abstract class AbstractMavenRepository
             request.setRequestPath( RepositoryItemUid.PATH_ROOT );
         }
 
-        RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
+        RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor( this.getLogger() );
 
         DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
 

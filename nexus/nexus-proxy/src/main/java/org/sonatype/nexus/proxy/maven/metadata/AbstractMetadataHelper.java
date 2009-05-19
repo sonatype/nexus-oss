@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -40,7 +41,11 @@ abstract public class AbstractMetadataHelper
     static final String SHA1_SUFFIX = ".sha1";
 
     static final String METADATA_SUFFIX = "/maven-metadata.xml";
+    
+    static final String APPROPRIATE_GAV_PATTERN = "^[\\d\\w\\.-]*$";
 
+    protected Logger logger;
+    
     /**
      * current groupId based on the current collection, if no groupId, it's null
      */
@@ -59,8 +64,10 @@ abstract public class AbstractMetadataHelper
 
     private Collection<AbstractMetadataProcessor> metadataProcessors;
 
-    public AbstractMetadataHelper()
+    public AbstractMetadataHelper( Logger logger)
     {
+        this.logger = logger;
+        
         // here the order matters
         metadataProcessors = new ArrayList<AbstractMetadataProcessor>( 3 );
 
@@ -74,52 +81,43 @@ abstract public class AbstractMetadataHelper
     }
 
     public void onDirEnter( String path )
+        throws Exception
     {
         // do nothing
     }
 
     public void onDirExit( String path )
+        throws Exception
     {
-        try
-        {
-            for ( AbstractMetadataProcessor metadataProcessor : metadataProcessors )
-            {
-                if ( metadataProcessor.process( path ) )
-                {
-                    break;
-                }
-            }
 
-            cleanGAV( path );
-        }
-        catch ( Exception e )
+        for ( AbstractMetadataProcessor metadataProcessor : metadataProcessors )
         {
-            // TODO: add error info to system error feeds
+            if ( metadataProcessor.process( path ) )
+            {
+                break;
+            }
         }
+
+        cleanGAV( path );
+
     }
 
     public void processFile( String path )
+        throws Exception
     {
-        try
+        // remove rotten checksum
+        if ( isObsoleteChecksum( path ) )
         {
-            // remove rotten checksum
-            if ( isObsoleteChecksum( path ) )
-            {
-                remove( path );
+            remove( path );
 
-                return;
-            }
-
-            if ( path.endsWith( "pom" ) )
-            {
-                updateMavenInfo( path );
-            }
-
-            rebuildChecksum( path );
+            return;
         }
-        catch ( Exception e )
+
+        rebuildChecksum( path );
+        
+        if ( path.endsWith( "pom" ) )
         {
-            // TODO: add error info to system error feeds
+            updateMavenInfo( path );
         }
     }
 
@@ -188,33 +186,27 @@ abstract public class AbstractMetadataHelper
     }
 
     protected void updateMavenInfo( String path )
+        throws Exception
     {
+        Reader reader = ReaderFactory.newXmlReader( retrieveContent( path ) );
+
+        MavenXpp3Reader xpp3 = new MavenXpp3Reader();
+
         Model model = null;
+
         try
         {
-            Reader reader = ReaderFactory.newXmlReader( retrieveContent( path ) );
-
-            MavenXpp3Reader xpp3 = new MavenXpp3Reader();
-
-            try
-            {
-                model = xpp3.read( reader );
-            }
-            finally
-            {
-                reader.close();
-                reader = null;
-            }
+            model = xpp3.read( reader );
         }
         catch ( Exception e )
         {
-            // skip
-            return;
+            throw new Exception( "Unable to parse POM model from '" + path + "'.", e );
         }
-
-        if ( model == null )
+        finally
         {
-            return;
+            reader.close();
+
+            reader = null;
         }
 
         currentArtifactId = model.getArtifactId();
@@ -240,6 +232,12 @@ abstract public class AbstractMetadataHelper
 
             currentVersions.add( model.getParent().getVersion() );
         }
+        
+        // IF gav has potential problem, tell the user
+        warnIfNotAppropriate( currentGroupId, path, "Group Id" );
+        warnIfNotAppropriate( currentArtifactId, path, "Artifact Id" );
+        warnIfNotAppropriate( currentVersion, path, "Version" );
+        
 
         currentArtifacts.add( path );
 
@@ -257,6 +255,25 @@ abstract public class AbstractMetadataHelper
             }
 
             currentPlugins.put( plugin.getArtifactId(), plugin );
+        }
+    }
+    
+    /**
+     * 
+     * @param idToValidate
+     * @param path
+     * @param logKey
+     */
+    private void warnIfNotAppropriate( String idToValidate, String path, String logKey )
+    {
+        if ( StringUtils.isEmpty( idToValidate ) )
+        {
+            logger.warn( logKey + " parsed from '" + path + "' is empty." );
+        }
+        else if ( !idToValidate.matches( APPROPRIATE_GAV_PATTERN ) )
+        {
+            logger.warn( logKey + "'" + idToValidate + "' parsed from '" + path
+                + "' is inappropriate, related maven-metadata.xml might not be recreated." );
         }
     }
 

@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.InputStream;
 
+import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -39,8 +40,10 @@ public class DefaultMetadataHelper
 {
     private Repository repository;
 
-    public DefaultMetadataHelper( Repository repository )
+    public DefaultMetadataHelper( Logger logger, Repository repository )
     {
+        super( logger );
+
         this.repository = repository;
     }
 

@@ -195,7 +195,7 @@ public class DefaultSnapshotRemover
 
         repository.expireCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
 
-        RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor = new RecreateMavenMetadataWalkerProcessor();
+        RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor = new RecreateMavenMetadataWalkerProcessor( getLogger() );
 
         for ( String path : request.getMetadataRebuildPaths() )
         {
