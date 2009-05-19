@@ -12,22 +12,22 @@
  */
 package org.sonatype.security.rest.users;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
-import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.rest.model.UserToRoleResource;
 import org.sonatype.security.rest.model.UserToRoleResourceRequest;
 import org.sonatype.security.usermanagement.NoSuchUserManager;
@@ -44,7 +44,7 @@ public class UserToRolePlexusResource
     public UserToRolePlexusResource()
     {
         this.setModifiable( true );
-        this.setReadable( false );
+        this.setReadable( true );
     }
 
     @Override
@@ -145,6 +145,35 @@ public class UserToRolePlexusResource
         return null;
     }
 
+    @Override
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
+    {
+        String userId = this.getUserId( request );
+
+        String sourceId = this.getSourceId( request );
+
+        try
+        {
+            Set<RoleIdentifier> roleIds = getSecuritySystem().getUsersRoles( userId, sourceId );
+
+            UserToRoleResourceRequest resp = new UserToRoleResourceRequest();
+
+            resp.setData( securityToRestModel( userId, sourceId, roleIds ) );
+
+            return resp;
+        }
+        catch ( UserNotFoundException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Could not find user '" + userId + "'." );
+        }
+        catch ( NoSuchUserManager e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Could not find user manager for source '"
+                + sourceId + "'." );
+        }
+    }
+
     /*
      * (non-Javadoc)
      * @see org.sonatype.plexus.rest.resource.AbstractPlexusResource#delete(org.restlet.Context,
@@ -184,5 +213,25 @@ public class UserToRolePlexusResource
         }
 
         return roleIdentifiers;
+    }
+
+    private UserToRoleResource securityToRestModel( String userId, String source, Set<RoleIdentifier> roleIds )
+    {
+        UserToRoleResource resource = new UserToRoleResource();
+
+        resource.setUserId( userId );
+
+        resource.setSource( source );
+
+        List<String> roles = new ArrayList<String>();
+
+        for ( RoleIdentifier roleId : roleIds )
+        {
+            roles.add( roleId.getRoleId() );
+        }
+
+        resource.setRoles( roles );
+
+        return resource;
     }
 }
