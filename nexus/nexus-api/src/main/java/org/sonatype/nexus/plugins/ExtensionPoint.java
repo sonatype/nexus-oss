@@ -8,7 +8,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks an interface as Nexus Extension Point.
+ * Marks an interface as Nexus Extension Point. This annotation is meant for "host" (the extensible system/app)
+ * developers to mark their extension points.
  * 
  * @author cstamas
  */
@@ -18,4 +19,18 @@ import java.lang.annotation.Target;
 @Retention( RetentionPolicy.RUNTIME )
 public @interface ExtensionPoint
 {
+    /**
+     * Should the extension point component be created as singleton, or per-lookup?
+     * 
+     * @return
+     */
+    boolean isSingleton() default true;
+
+    /**
+     * Is the qualifier (roleHint in plexus) needed to be "human readable" (does it appear in some user editable config
+     * file)?
+     * 
+     * @return
+     */
+    boolean isHumanReadableQualifierNeeded() default false;
 }

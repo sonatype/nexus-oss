@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks and interface (must extends org.sonatype.nexus.proxy.repository.Repository) as new repository type to be
+ * Marks an interface (must extends org.sonatype.nexus.proxy.repository.Repository) as new repository type to be
  * handled by Nexus.
  * 
  * @author cstamas
