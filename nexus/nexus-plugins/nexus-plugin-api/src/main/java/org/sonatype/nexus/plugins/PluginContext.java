@@ -1,8 +1,6 @@
 package org.sonatype.nexus.plugins;
 
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import java.io.File;
 
 /**
  * The plugin repository context. UNDER HEAVY CONSTRUCTION, this is in flux! Please consider major changes on this
@@ -12,9 +10,10 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
  */
 public interface PluginContext
 {
-    ApplicationEventMulticaster getApplicationEventMulticaster();
-
-    RepositoryTypeRegistry getRepositoryTypeRegistry();
-
-    RepositoryRegistry getRepositoryRegistry();
+    /**
+     * The directory on disk provided for the plugin to use for persistencing extra stuff if needed.
+     * 
+     * @return
+     */
+    File getBasedir();
 }
