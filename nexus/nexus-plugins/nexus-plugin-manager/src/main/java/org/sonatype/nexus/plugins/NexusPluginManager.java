@@ -1,7 +1,5 @@
 package org.sonatype.nexus.plugins;
 
-import java.io.File;
-import java.net.URL;
 import java.util.Map;
 
 /**
@@ -11,20 +9,13 @@ import java.util.Map;
  */
 public interface NexusPluginManager
 {
-    /**
-     * Lists the installed plugins.
-     * 
-     * @return
-     */
     Map<String, PluginDescriptor> getInstalledPlugins();
+    
+    void activatePlugin(String pluginKey);
+    
+    void activateInstalledPlugins();
 
-    void discoverPlugins( File localRepository );
+    void installPlugin( PluginCoordinates coords );
 
-    /**
-     * Installs a plugin from remote location???
-     * 
-     * @param source
-     */
-    void installPlugin( URL source );
-
+    void uninstallPlugin( PluginCoordinates coords );
 }
