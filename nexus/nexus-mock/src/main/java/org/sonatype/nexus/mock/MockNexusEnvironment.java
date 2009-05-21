@@ -25,13 +25,19 @@ public class MockNexusEnvironment
 
     private PlexusContainer plexusContainer;
 
+    public static void main(String[] args) throws Exception {
+        System.setProperty("plexus-index.template.file", "templates/index-debug.vm");
+        MockNexusEnvironment e = new MockNexusEnvironment(12345, "/nexus");
+        e.start();
+    }
+
     public static Server createSimpleJettyServer( int port )
     {
         Server server = new Server();
 
         SelectChannelConnector connector = new SelectChannelConnector();
 
-        connector.setHost( "localhost" );
+        connector.setHost(null);
 
         connector.setPort( port );
 
@@ -81,7 +87,7 @@ public class MockNexusEnvironment
                 .setClassWorld( cw ).setContainerConfigurationURL( Class.class.getResource( "/plexus/plexus.xml" ) )
                 .setContext( createContainerContext() ).addComponentDiscoveryListener(
                     new InhibitingComponentDiscovererListener() );
-            
+
             plexusContainer = new DefaultPlexusContainer( cc );
         }
 
@@ -96,7 +102,14 @@ public class MockNexusEnvironment
 
         containerContext.put( "nexus-work", new File( "target/nexus-work" ).getAbsolutePath() );
 
+        containerContext.put( "application-conf", new File( "target/nexus-work/conf/" ).getAbsolutePath() );
         containerContext.put( "security-xml-file", new File( "target/nexus-work/conf/security.xml" ).getAbsolutePath() );
+
+
+        File webappRoot = new File("../nexus-webapp/src/main/webapp");
+        if (webappRoot.exists()) {
+            containerContext.put("index.template.file", "templates/index-debug.vm");
+        }
 
         // for EHCache component
         System.setProperty( "nexus.home", new File( "target/nexus-work" ).getAbsolutePath() );
@@ -125,16 +138,22 @@ public class MockNexusEnvironment
     {
         // prepare config
         FileUtils.copyFile( new File("src/test/resources/nexus-1.xml"), new File( "target/nexus-work/conf/nexus.xml" ) );
-        
+        FileUtils.copyFile( new File("src/test/resources/security-1.xml"), new File( "target/nexus-work/conf/security.xml" ) );
+
         // create plexus
         createPlexusContainer();
 
         // add mock nexus
         ContextHandlerCollection ctxHandler = new ContextHandlerCollection();
 
+        File webappRoot = new File("../nexus-webapp/src/main/webapp");
+        if (!webappRoot.exists()) {
+            webappRoot = new File("target/nexus-ui");
+        }
+
         WebAppContext webapp = new WebAppContext(
             ctxHandler,
-            new File( "target/nexus-ui" ).getAbsolutePath(),
+            webappRoot.getAbsolutePath(),
             contextPath );
 
         // spoof in our simplified web.xml

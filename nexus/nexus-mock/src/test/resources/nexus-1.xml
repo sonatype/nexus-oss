@@ -18,7 +18,7 @@
 	</smtpConfiguration>
 
 	<security>
-		<enabled>false</enabled>
+		<enabled>true</enabled>
 		<anonymousAccessEnabled>true</anonymousAccessEnabled>
 		<anonymousUsername>anonymous</anonymousUsername>
 		<anonymousPassword>anonymous</anonymousPassword>
@@ -48,7 +48,7 @@
 	</restApi>
 
 	<httpProxy>
-		<enabled>true</enabled>
+		<enabled>false</enabled>
 		<port>8082</port>
 		<proxyPolicy>strict</proxyPolicy>
 	</httpProxy>

@@ -1,12 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <!-- the version of maven's project object model -->
   <modelVersion>4.0.0</modelVersion>
   <!-- Parent POM -->
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
-    <version>1.3.4-SNAPSHOT</version>
+    <version>1.4.0-SNAPSHOT</version>
   </parent>
   <!-- a unique name for this project -->
   <artifactId>nexus-mock</artifactId>
@@ -14,30 +13,21 @@
   <packaging>jar</packaging>
   <!-- a short but descriptive name for the project -->
   <name>Nexus (Mock Application frontend)</name>
-  <dependencies>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.mortbay.jetty</groupId>
-          <artifactId>servlet-api-2.5</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-webapp</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>openqa-snapshots</id>
+      <name>OpenQA Snapshots</name>
+      <url>http://nexus.openqa.org/content/repositories/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
   <build>
     <plugins>
       <plugin>
@@ -61,6 +51,164 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>port-allocator-maven-plugin</artifactId>
+        <version>1.1-SNAPSHOT</version>
+        <configuration>
+          <ports>
+            <port>
+              <name>jettyPort</name>
+            </port>
+          </ports>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>allocate-ports</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <property>
+              <name>jettyPort</name>
+              <value>${jettyPort}</value>
+            </property>
+            <property>
+              <name>seleniumPort</name>
+              <value>${seleniumPort}</value>
+            </property>
+            <property>
+              <name>seleniumServer</name>
+              <value>${seleniumServer}</value>
+            </property>
+            <property>
+              <name>seleniumBrowser</name>
+              <value>${seleniumBrowser}</value>
+            </property>
+          </systemProperties>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>local-selenium</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>selenium-maven-plugin</artifactId>
+            <version>1.0-rc-1</version>
+            <configuration>
+              <port>${seleniumPort}</port>
+              <background>true</background>
+            </configuration>
+            <executions>
+              <execution>
+                <id>start-server</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>start-server</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>stop-server</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>stop-server</goal>
+                </goals>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.seleniumhq.selenium.server</groupId>
+                <artifactId>selenium-server</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <classifier>standalone</classifier>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <dependencies>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>servlet-api-2.5</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-webapp</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.seleniumhq.selenium.client-drivers</groupId>
+      <artifactId>selenium-java-client-driver</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium.server</groupId>
+          <artifactId>selenium-server</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium.core</groupId>
+          <artifactId>selenium-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.ethz.ganymed</groupId>
+      <artifactId>ganymed-ssh2</artifactId>
+      <version>build210</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-rest-api</artifactId>
+      <version>1.0.8-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
 </project>
