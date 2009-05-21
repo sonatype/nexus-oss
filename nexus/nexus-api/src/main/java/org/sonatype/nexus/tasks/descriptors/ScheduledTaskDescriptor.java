@@ -15,8 +15,10 @@ package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.List;
 
+import org.sonatype.nexus.plugins.ExtensionPoint;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
+@ExtensionPoint
 public interface ScheduledTaskDescriptor
 {
     String getId();

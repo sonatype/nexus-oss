@@ -22,6 +22,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * 
  * @author cstamas
  */
+@ExtensionPoint
 public interface RepositoryCustomizer
 {
     boolean isHandledRepository( Repository repository );
