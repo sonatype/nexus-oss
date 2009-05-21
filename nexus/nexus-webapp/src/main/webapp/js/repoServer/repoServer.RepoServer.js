@@ -149,6 +149,7 @@ Sonatype.repoServer.RepoServer = function(){
       
       this.loginForm = new Ext.form.FormPanel(this.loginFormConfig);
       this.loginWindow = new Ext.Window({
+        id: 'login-window',
         title:'Nexus Log In',
         animateTarget: 'login-link',
         closable: true,

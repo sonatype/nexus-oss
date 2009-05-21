@@ -1,270 +1,172 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.sonatype.nexus</groupId>
-		<artifactId>nexus-test-harness</artifactId>
-		<version>1.4.0-SNAPSHOT</version>
-	</parent>
-	<artifactId>nexus-test-harness-selenium</artifactId>
-	<name>Nexus Test Harness selenium</name>
-	<properties>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-test-harness</artifactId>
+    <version>1.4.0-SNAPSHOT</version>
+  </parent>
 
-		<bundle-expanded-dir>target/bundle</bundle-expanded-dir>
-		<config-expanded-dir>target/test-nexus-config</config-expanded-dir>
+  <artifactId>nexus-test-harness-selenium</artifactId>
+  <name>Nexus Test Harness selenium</name>
 
-		<nexus-relative-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-relative-basedir>
-		<nexus-base-dir>${project.build.directory}/bundle/nexus-webapp-${project.version}</nexus-base-dir>
-		<emma-sources-base>target/emma/sources</emma-sources-base>
+  <build>
 
-		<config-target-dir>${nexus-base-dir}/runtime/apps/nexus/conf</config-target-dir>
-		<work-target-dir>${nexus-base-dir}/runtime/work</work-target-dir>
-		<proxy-repo-target-dir-name>proxyRepo</proxy-repo-target-dir-name>
-		<proxy-repo-target-dir>${project.build.directory}/test-classes/${proxy-repo-target-dir-name}</proxy-repo-target-dir>
-		<nexus-plexus-config-file>${nexus-base-dir}/conf/plexus.xml</nexus-plexus-config-file>
-		<proxy-repo-plexus-config-file>${project.build.directory}/test-classes/proxyRepo/conf/ProxyRepoPlexus.xml</proxy-repo-plexus-config-file>
-		<proxy-repo-port>8092</proxy-repo-port>
-		<proxy-repo-base-url>http://localhost:${proxy-repo-port}/remote/</proxy-repo-base-url>
-		<nexus-application-protocol>http</nexus-application-protocol>
-		<nexus-application-host>localhost</nexus-application-host>
-		<nexus-application-name>nexus</nexus-application-name>
-		<nexus-application-port>8091</nexus-application-port>
-		<jetty-application-host>0.0.0.0</jetty-application-host>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-test-environment-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>setup-environment</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <nexusPluginsArtifacts>
+            <plugin>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>nexus-simple-memory-realm</artifactId>
+            </plugin>
+          </nexusPluginsArtifacts>
+        </configuration>
+      </plugin>
 
-		<nexus-base-url>${nexus-application-protocol}://${nexus-application-host}:${nexus-application-port}/${nexus-application-name}/</nexus-base-url>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>port-allocator-maven-plugin</artifactId>
+        <version>1.1-SNAPSHOT</version>
+        <configuration>
+          <ports>
+            <port>
+              <name>selenium-server-port</name>
+            </port>
+          </ports>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>allocate-ports</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 
-		<nexus-control-port>33002</nexus-control-port>
-	</properties>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>selenium-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>server</id>
+            <phase>process-test-classes</phase>
+            <goals>
+              <goal>start-server</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <port>${selenium-server-port}</port>
+          <background>true</background>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
+  <profiles>
+    <profile>
+      <id>linux</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>selenium-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>xvfb</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>xvfb</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
-
-
-	<repositories>
-		<repository>
-			<id>openqa.org</id>
-			<name>Openqa Release Repository</name>
-			<url>http://archiva.openqa.org/repository/releases</url>
-			<layout>default</layout>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>openqa.org</id>
-			<name>Openqa Snapshot Repository</name>
-			<url>http://archiva.openqa.org/repository/snapshots</url>
-			<layout>default</layout>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
-				<checksumPolicy>ignore</checksumPolicy>
-			</snapshots>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-	</repositories>
-
-	<dependencies>
-		<dependency>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-webapp</artifactId>
-            <version>${project.version}</version>
-            <classifier>bundle</classifier>
-            <type>zip</type>
-            <scope>provided</scope>
-        </dependency>
-
-
-
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.plexus</groupId>
-			<artifactId>plexus-jetty-testsuite</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-            <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-            <artifactId>plexus-app-booter</artifactId>
-            <scope>test</scope>
-        </dependency>
-		<dependency>
-		    <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-archiver</artifactId>
-            <version>1.0-alpha-9</version>
-            <scope>test</scope>
-		</dependency>
-	  <dependency>
-      <groupId>org.sonatype.appbooter</groupId>
-      <artifactId>plexus-forked-app-booter</artifactId>
-      <version>${plexus.appbooter.version}</version>
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>jetty</artifactId>
+          <groupId>org.mortbay.jetty</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jetty-util</artifactId>
+          <groupId>org.mortbay.jetty</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jetty-util</artifactId>
+          <groupId>org.mortbay.jetty</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
-	<dependency>
-	    <groupId>com.icegreen</groupId>
-	    <artifactId>greenmail</artifactId>
-	    <version>1.3</version>
-        <!-- TODO test scope is not transitive <scope>test</scope> -->
-	</dependency>
-
-	<dependency>
-		<groupId>org.apache.maven.its</groupId>
-		<artifactId>maven-integration-test-helper</artifactId>
-		<version>2.1-SNAPSHOT</version>
-        <!-- TODO test scope is not transitive <scope>test</scope> -->
-	</dependency>
-	<dependency>
-		<groupId>com.thoughtworks.qdox</groupId>
-		<artifactId>qdox</artifactId>
-		<version>1.6.3</version>
-	</dependency>
-
-
-
-	<dependency>
-    	<groupId>org.openqa.selenium.client-drivers</groupId>
-        <artifactId>selenium-java-client-driver</artifactId>
-        <version>1.0-beta-1</version>
-        <scope>test</scope>
-        <exclusions>
-			<exclusion>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging</artifactId>
-			</exclusion>
-		</exclusions>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <classifier>repo</classifier>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+      <artifactId>plexus-app-booter</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.seleniumhq.selenium.client-drivers</groupId>
+      <artifactId>selenium-java-client-driver</artifactId>
+      <version>1.0-beta-2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium.server</groupId>
+          <artifactId>selenium-server</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium.server</groupId>
+          <artifactId>selenium-server-coreless</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-
-	</dependencies>
-	<build>
-		<filters>
-			<filter>src/test/filters/filter.txt</filter>
-		</filters>
-
-		<testResources>
-
-			<testResource>
-				<directory>src/test/resources</directory>
-				<filtering>true</filtering>
-			</testResource>
-
-			<testResource>
-				<directory>src/test/bundle-conf</directory>
-				<filtering>true</filtering>
-				<targetPath>../../${nexus-relative-basedir}</targetPath>
-			</testResource>
-
-			<testResource>
-				<directory>
-					src/test/resources/default-config
-				</directory>
-				<filtering>true</filtering>
-				<targetPath>
-					../../${nexus-relative-basedir}/runtime/work/conf
-				</targetPath>
-				<excludes>
-				    <exclude>**/settings.xml</exclude>
-				    <exclude>**/log4j.properties</exclude>
-				</excludes>
-			</testResource>
-
-		</testResources>
-		<plugins>
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.0</version>
-				<executions>
-					<execution>
-						<id>unpack-bundle</id>
-						<phase>generate-test-resources</phase>
-						<goals>
-							<goal>unpack-dependencies</goal>
-						</goals>
-						<configuration>
-							<includeArtifactIds>
-								nexus-webapp
-							</includeArtifactIds>
-							<outputDirectory>
-								${bundle-expanded-dir}
-							</outputDirectory>
-							<excludes>
-								**/conf/plexus.properties
-							</excludes>
-						</configuration>
-					</execution>
-
-				</executions>
-			</plugin>
-
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-				<executions>
-
-					<execution>
-						<id>test</id>
-						<phase>test</phase>
-						<goals>
-							<goal>test</goal>
-						</goals>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</execution>
-	
-					<execution>
-						<id>integration</id>
-						<phase>integration-test</phase>
-						<goals>
-							<goal>test</goal>
-						</goals>
-						<configuration>
-							<testFailureIgnore>false</testFailureIgnore>
-							<skip>false</skip>
-							<includes>
-								<include>**/UserSeleniumTest.java</include>
-							</includes>
-						</configuration>
-					</execution>
-
-				</executions>
-			</plugin>
-		
-		
-			<plugin>
-    			<groupId>org.codehaus.mojo</groupId>
- 		    	<artifactId>selenium-maven-plugin</artifactId>
- 	   			<executions>
-        			<execution>
-        		    	<phase>pre-integration-test</phase>
-        		    	<goals>
-        		        	<goal>start-server</goal>
-        		    	</goals>
-        		    	<configuration>
-              				<background>true</background>
-               				<browserSideLog>true</browserSideLog>
-                			<debug>true</debug>
-		            	</configuration>
-        			</execution>
-    			</executions>
-			</plugin>
-				
-		</plugins>
-
-	</build>
+  </dependencies>
 
 </project>

@@ -251,6 +251,7 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
                   success: function(response, options){
                     w.close();
                     Sonatype.MessageBox.show( {
+                      id: 'password-changed-messagebox',
                       title: 'Password Changed',
                       msg: 'Password change request completed successfully.',
                       buttons: Sonatype.MessageBox.OK,

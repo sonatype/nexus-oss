@@ -15,5 +15,6 @@
 	<modules>
 		<module>nexus-simple-memory-realm</module>
         <module>nexus-test-harness-launcher</module>
+<!--        <module>nexus-test-harness-selenium</module> -->
     </modules>
 </project>
