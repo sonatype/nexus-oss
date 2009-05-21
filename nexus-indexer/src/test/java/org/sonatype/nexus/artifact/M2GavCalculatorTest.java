@@ -553,6 +553,9 @@ public class M2GavCalculatorTest
 
         gav = gavCalculator.pathToGav( "org/apache/maven/scm/maven-scm" );
         assertEquals( null, gav );
+        
+        gav = gavCalculator.pathToGav( "org/apache/geronimo/javamail/geronimo-javamail_1.4_mail" );
+        assertEquals( null, gav );
     }
 
     public void testIssueNexus57()

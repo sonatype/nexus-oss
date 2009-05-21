@@ -110,7 +110,8 @@ public class M2GavCalculator
         boolean signature, Gav.HashType checksumType,
         Gav.SignatureType signatureType) 
     {
-        if ( !fileName.startsWith( artifactId + "-" + version ) ) 
+        if ( !fileName.startsWith( artifactId + "-" + version + "." )
+            && !fileName.startsWith( artifactId + "-" + version + "-" ) )
         {
             return null;
         }
