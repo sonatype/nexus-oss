@@ -44,6 +44,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -67,6 +68,9 @@ public abstract class AbstractNexusPlexusResource
 
     @Requirement
     private NexusItemAuthorizer nexusItemAuthorizer;
+    
+    @Requirement
+    private ReferenceFactory referenceFactory;
 
     protected Nexus getNexus()
     {
@@ -103,24 +107,7 @@ public abstract class AbstractNexusPlexusResource
      */
     protected Reference getContextRoot( Request request )
     {
-        Reference result = null;
-
-        if ( getNexusConfiguration().isForceBaseUrl() && getNexus().getNexusConfiguration() != null )
-        {
-            result = new Reference( getNexusConfiguration().getBaseUrl() );
-        }
-        else
-        {
-            result = request.getRootRef();
-        }
-
-        // fix for when restlet is at webapp root
-        if ( StringUtils.isEmpty( result.getPath() ) )
-        {
-            result.setPath( "/" );
-        }
-
-        return result;
+        return this.referenceFactory.getContextRoot( request );
     }
 
     private Reference updateBaseRefPath( Reference reference )
@@ -146,24 +133,7 @@ public abstract class AbstractNexusPlexusResource
 
     protected Reference createChildReference( Request request, PlexusResource resource, String childPath )
     {
-        String uriPart = request.getResourceRef().getTargetRef().toString().substring(
-            request.getRootRef().getTargetRef().toString().length() );
-
-        // trim leading slash
-        if ( uriPart.startsWith( "/" ) )
-        {
-            uriPart = uriPart.substring( 1 );
-        }
-
-        Reference result = updateBaseRefPath( new Reference( getContextRoot( request ), uriPart ) ).addSegment(
-            childPath );
-
-        if ( result.hasQuery() )
-        {
-            result.setQuery( null );
-        }
-
-        return result.getTargetRef();
+        return this.referenceFactory.createChildReference( request, childPath );
     }
 
     protected Reference createRootReference( Request request, String relPart )
