@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>nexus-maven-site-plugin</artifactId>
-  <name>Nexus Maven Site Plugin (Extras)</name>
+  <name>Nexus Enterprise Plugin :: Maven Site Plugin</name>
   <description>Nexus Maven Site Plugin (Extras).</description>
 
   <scm>
