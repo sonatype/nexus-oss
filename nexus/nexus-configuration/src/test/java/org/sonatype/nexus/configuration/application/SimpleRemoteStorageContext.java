@@ -125,4 +125,10 @@ public class SimpleRemoteStorageContext
         
     }
 
+    public void setParentRemoteStorageContext( RemoteStorageContext parent )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

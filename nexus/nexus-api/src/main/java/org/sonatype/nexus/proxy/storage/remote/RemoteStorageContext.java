@@ -41,6 +41,13 @@ public interface RemoteStorageContext
      */
     RemoteStorageContext getParentRemoteStorageContext();
 
+    /**
+     * Sets the parent context, or nullify it.
+     * 
+     * @return
+     */
+    void setParentRemoteStorageContext( RemoteStorageContext parent );
+
     // modification
 
     /**

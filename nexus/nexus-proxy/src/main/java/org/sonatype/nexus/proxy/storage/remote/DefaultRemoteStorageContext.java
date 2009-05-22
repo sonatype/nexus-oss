@@ -72,6 +72,11 @@ public class DefaultRemoteStorageContext
         return parent;
     }
 
+    public void setParentRemoteStorageContext( RemoteStorageContext parent )
+    {
+        this.parent = parent;
+    }
+
     public Object getRemoteConnectionContextObject( String key )
     {
         if ( context.containsKey( key ) )

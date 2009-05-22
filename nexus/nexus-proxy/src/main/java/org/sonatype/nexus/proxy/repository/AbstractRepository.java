@@ -43,8 +43,8 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
-import org.sonatype.nexus.proxy.events.RepositoryEventExpireCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
+import org.sonatype.nexus.proxy.events.RepositoryEventExpireCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -107,7 +107,7 @@ public abstract class AbstractRepository
 
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
-
+    
     @Requirement
     private CacheManager cacheManager;
 

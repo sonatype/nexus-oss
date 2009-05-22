@@ -162,13 +162,6 @@ public interface ProxyRepository
     RemoteStorageContext getRemoteStorageContext();
 
     /**
-     * Sets the repository specific remote connection context.
-     * 
-     * @param ctx
-     */
-    void setRemoteStorageContext( RemoteStorageContext ctx );
-
-    /**
      * Returns the remoteStorage of the repository. Per repository instance may exists.
      * 
      * @return remoteStorage or null.

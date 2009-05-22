@@ -16,7 +16,6 @@ import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
@@ -67,18 +66,15 @@ public abstract class AbstractProxyRepositoryConfigurator
                         prepository.getDownloadMirrors().setMirrors( null );
                     }
 
-                    DefaultRemoteStorageContext ctx =
-                        new DefaultRemoteStorageContext( configuration.getGlobalRemoteStorageContext() );
-
                     if ( repo.getRemoteStorage().getAuthentication() != null )
                     {
-                        ctx.setRemoteAuthenticationSettings( RemoteSettingsUtil.convertFromModel( repo
+                        prepository.setRemoteAuthenticationSettings( RemoteSettingsUtil.convertFromModel( repo
                             .getRemoteStorage().getAuthentication() ) );
                     }
 
                     if ( repo.getRemoteStorage().getConnectionSettings() != null )
                     {
-                        ctx.setRemoteConnectionSettings( RemoteSettingsUtil.convertFromModel( repo.getRemoteStorage()
+                        prepository.setRemoteConnectionSettings( RemoteSettingsUtil.convertFromModel( repo.getRemoteStorage()
                             .getConnectionSettings() ) );
                     }
 
@@ -86,22 +82,18 @@ public abstract class AbstractProxyRepositoryConfigurator
                     {
                         if ( repo.getRemoteStorage().getHttpProxySettings().isBlockInheritance() )
                         {
-                            ctx.setRemoteProxySettings( null );
+                            prepository.setRemoteProxySettings( null );
                         }
                         else
                         {
-                            ctx.setRemoteProxySettings( RemoteSettingsUtil.convertFromModel( repo.getRemoteStorage()
+                            prepository.setRemoteProxySettings( RemoteSettingsUtil.convertFromModel( repo.getRemoteStorage()
                                 .getHttpProxySettings() ) );
                         }
                     }
-
-                    prepository.setRemoteStorageContext( ctx );
                 }
                 else
                 {
                     prepository.setRemoteStorage( null );
-
-                    prepository.setRemoteStorageContext( null );
                 }
             }
             catch ( StorageException e )
@@ -123,74 +115,78 @@ public abstract class AbstractProxyRepositoryConfigurator
     {
         super.doPrepareForSave( repository, configuration, repoConfig, externalConfiguration );
 
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        if ( repository instanceof ProxyRepository )
         {
-            ProxyRepository prepository = repository.adaptToFacet( ProxyRepository.class );
+            // real cast needed here, adapt would return null!
+            ProxyRepository prepository = (ProxyRepository) repository;
 
-            List<Mirror> mirrors = (List<Mirror>) prepository.getDownloadMirrors().getMirrors();
-
-            if ( mirrors != null && mirrors.size() > 0 )
+            if ( repoConfig.getRemoteStorage() != null )
             {
-                List<CMirror> runtimeMirrors = new ArrayList<CMirror>();
+                List<Mirror> mirrors = (List<Mirror>) prepository.getDownloadMirrors().getMirrors();
 
-                for ( Mirror mirror : mirrors )
+                if ( mirrors != null && mirrors.size() > 0 )
                 {
-                    CMirror cmirror = new CMirror();
+                    List<CMirror> runtimeMirrors = new ArrayList<CMirror>();
 
-                    cmirror.setId( mirror.getId() );
-                    cmirror.setUrl( mirror.getUrl() );
-                    runtimeMirrors.add( cmirror );
-                }
+                    for ( Mirror mirror : mirrors )
+                    {
+                        CMirror cmirror = new CMirror();
 
-                repoConfig.getRemoteStorage().setMirrors( runtimeMirrors );
-            }
-            else
-            {
-                repoConfig.getRemoteStorage().getMirrors().clear();
-            }
+                        cmirror.setId( mirror.getId() );
+                        cmirror.setUrl( mirror.getUrl() );
+                        runtimeMirrors.add( cmirror );
+                    }
 
-            RemoteStorageContext rsc = prepository.getRemoteStorageContext();
-
-            if ( rsc.hasRemoteAuthenticationSettings() )
-            {
-                repoConfig.getRemoteStorage().setAuthentication(
-                                                                 RemoteSettingsUtil.convertToModel( rsc
-                                                                     .getRemoteAuthenticationSettings() ) );
-            }
-            else
-            {
-                repoConfig.getRemoteStorage().setAuthentication( null );
-            }
-
-            if ( rsc.hasRemoteConnectionSettings() )
-            {
-                repoConfig.getRemoteStorage().setConnectionSettings(
-                                                                     RemoteSettingsUtil.convertToModel( rsc
-                                                                         .getRemoteConnectionSettings() ) );
-            }
-            else
-            {
-                repoConfig.getRemoteStorage().setConnectionSettings( null );
-            }
-
-            if ( rsc.hasRemoteProxySettings() )
-            {
-                if ( rsc.getRemoteProxySettings() != null )
-                {
-                    repoConfig.getRemoteStorage().setHttpProxySettings(
-                                                                        RemoteSettingsUtil.convertToModel( rsc
-                                                                            .getRemoteProxySettings() ) );
+                    repoConfig.getRemoteStorage().setMirrors( runtimeMirrors );
                 }
                 else
                 {
-                    repoConfig.getRemoteStorage().setHttpProxySettings( new CRemoteHttpProxySettings() );
-
-                    repoConfig.getRemoteStorage().getHttpProxySettings().setBlockInheritance( true );
+                    repoConfig.getRemoteStorage().getMirrors().clear();
                 }
-            }
-            else
-            {
-                repoConfig.getRemoteStorage().setHttpProxySettings( null );
+
+                RemoteStorageContext rsc = prepository.getRemoteStorageContext();
+
+                if ( rsc.hasRemoteAuthenticationSettings() )
+                {
+                    repoConfig.getRemoteStorage().setAuthentication(
+                                                                     RemoteSettingsUtil.convertToModel( rsc
+                                                                         .getRemoteAuthenticationSettings() ) );
+                }
+                else
+                {
+                    repoConfig.getRemoteStorage().setAuthentication( null );
+                }
+
+                if ( rsc.hasRemoteConnectionSettings() )
+                {
+                    repoConfig.getRemoteStorage().setConnectionSettings(
+                                                                         RemoteSettingsUtil.convertToModel( rsc
+                                                                             .getRemoteConnectionSettings() ) );
+                }
+                else
+                {
+                    repoConfig.getRemoteStorage().setConnectionSettings( null );
+                }
+
+                if ( rsc.hasRemoteProxySettings() )
+                {
+                    if ( rsc.getRemoteProxySettings() != null )
+                    {
+                        repoConfig.getRemoteStorage().setHttpProxySettings(
+                                                                            RemoteSettingsUtil.convertToModel( rsc
+                                                                                .getRemoteProxySettings() ) );
+                    }
+                    else
+                    {
+                        repoConfig.getRemoteStorage().setHttpProxySettings( new CRemoteHttpProxySettings() );
+
+                        repoConfig.getRemoteStorage().getHttpProxySettings().setBlockInheritance( true );
+                    }
+                }
+                else
+                {
+                    repoConfig.getRemoteStorage().setHttpProxySettings( null );
+                }
             }
         }
     }

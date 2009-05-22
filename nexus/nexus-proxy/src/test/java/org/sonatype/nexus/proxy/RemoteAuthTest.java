@@ -17,7 +17,6 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
-import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 
 public class RemoteAuthTest
     extends AbstractProxyTestEnvironment
@@ -47,9 +46,8 @@ public class RemoteAuthTest
         // remote target of repo2 is protected with HTTP BASIC
         UsernamePasswordRemoteAuthenticationSettings settings2 =
             new UsernamePasswordRemoteAuthenticationSettings( "cstamas", "cstamas123" );
-        DefaultRemoteStorageContext ctx2 = new DefaultRemoteStorageContext( null );
-        ctx2.setRemoteAuthenticationSettings( settings2 );
-        getRepositoryRegistry().getRepositoryWithFacet( "repo2", ProxyRepository.class ).setRemoteStorageContext( ctx2 );
+        getRepositoryRegistry().getRepositoryWithFacet( "repo2", ProxyRepository.class ).getRemoteStorageContext()
+            .setRemoteAuthenticationSettings( settings2 );
 
         item =
             getRepositoryRegistry().getRepository( "repo2" ).retrieveItem(
@@ -58,10 +56,10 @@ public class RemoteAuthTest
         checkForFileAndMatchContents( item );
 
         // remote target of repo3 is protected with HTTP DIGEST
-        UsernamePasswordRemoteAuthenticationSettings settings3 = new UsernamePasswordRemoteAuthenticationSettings("brian", "brian123");
-        DefaultRemoteStorageContext ctx3 = new DefaultRemoteStorageContext( null );
-        ctx3.setRemoteAuthenticationSettings( settings3 );
-        getRepositoryRegistry().getRepositoryWithFacet( "repo3", ProxyRepository.class ).setRemoteStorageContext( ctx3 );
+        UsernamePasswordRemoteAuthenticationSettings settings3 =
+            new UsernamePasswordRemoteAuthenticationSettings( "brian", "brian123" );
+        getRepositoryRegistry().getRepositoryWithFacet( "repo3", ProxyRepository.class ).getRemoteStorageContext()
+            .setRemoteAuthenticationSettings( settings3 );
 
         item =
             getRepositoryRegistry().getRepository( "repo3" ).retrieveItem(

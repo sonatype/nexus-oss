@@ -43,6 +43,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrorSelector;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
@@ -332,18 +333,13 @@ public abstract class AbstractProxyRepository
 
     public RemoteStorageContext getRemoteStorageContext()
     {
-        return remoteStorageContext;
-    }
-
-    public void setRemoteStorageContext( RemoteStorageContext remoteStorageContext )
-    {
-        this.remoteStorageContext = remoteStorageContext;
-
-        if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
+        if ( remoteStorageContext == null )
         {
-            // perm changes? retry if autoBlocked
-            setProxyMode( ProxyMode.ALLOW );
+            remoteStorageContext =
+                new DefaultRemoteStorageContext( getApplicationConfiguration().getGlobalRemoteStorageContext() );
         }
+
+        return remoteStorageContext;
     }
 
     public RemoteConnectionSettings getRemoteConnectionSettings()
@@ -364,6 +360,12 @@ public abstract class AbstractProxyRepository
     public void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings )
     {
         getRemoteStorageContext().setRemoteAuthenticationSettings( settings );
+
+        if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
+        {
+            // perm changes? retry if autoBlocked
+            setProxyMode( ProxyMode.ALLOW );
+        }
     }
 
     public RemoteProxySettings getRemoteProxySettings()
@@ -374,6 +376,12 @@ public abstract class AbstractProxyRepository
     public void setRemoteProxySettings( RemoteProxySettings settings )
     {
         getRemoteStorageContext().setRemoteProxySettings( settings );
+
+        if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
+        {
+            // perm changes? retry if autoBlocked
+            setProxyMode( ProxyMode.ALLOW );
+        }
     }
 
     public ProxySelector getProxySelector()
