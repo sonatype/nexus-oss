@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -63,14 +64,25 @@ public class RepoConversionTest
         inhouseToMadeProxy.setRemoteStorage( remoteRepositoryStorage );
 
         inhouseToMadeProxy.setRemoteUrl( "http://repo1.maven.org/maven2/" );
-        
+
         getApplicationConfiguration().saveConfiguration();
 
         // check
-        assertTrue( "repo is hosted", inhouse.getRepositoryKind().isFacetAvailable( HostedRepository.class ) );
-        assertTrue( "repo is hosted", inhouse.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) );
-        assertFalse( "repo is not proxied", inhouse.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) );
-        assertFalse( "repo is not proxied", inhouse.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) );
+        assertFalse( "repo is not hosted", inhouse.getRepositoryKind().isFacetAvailable( HostedRepository.class ) );
+        assertFalse( "repo is not hosted", inhouse.getRepositoryKind().isFacetAvailable( MavenHostedRepository.class ) );
+        assertTrue( "repo is proxied", inhouse.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) );
+        assertTrue( "repo is proxied", inhouse.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) );
 
+        // now we just walk in, like nothing of above happened :)
+        MavenProxyRepository aProxy =
+            getRepositoryRegistry().getRepositoryWithFacet( "inhouse", MavenProxyRepository.class );
+
+        assertNotNull( "It should exists (heh, but NoSuchRepo exception should be thrown anyway)", aProxy );
+
+        assertEquals( "This should match, since they should be the same!", remoteRepositoryStorage.getProviderId(),
+                      aProxy.getRemoteStorage().getProviderId() );
+
+        assertEquals( "", remoteRepositoryStorage.getProviderId(), ( (CRepository) aProxy.getCurrentCoreConfiguration()
+            .getConfiguration( false ) ).getRemoteStorage().getProvider() );
     }
 }
