@@ -7,7 +7,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.security.SecuritySystem;
 
 
-public class AbstractSecurityRestTest extends PlexusTestCase
+public abstract class AbstractSecurityRestTest extends PlexusTestCase
 {
 
     protected static final String REALM_KEY = new MockUserManager().getSource();
