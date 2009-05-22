@@ -30,7 +30,6 @@ under the License.
 
     <modules>
       <module>nexus-lvo-plugin</module>
-      <module>nexus-maven-site-plugin</module>
     </modules>
 
 </project>
