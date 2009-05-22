@@ -120,11 +120,14 @@ public class AbstractRepositoryConfiguration
 
         if ( node == null )
         {
-            node = new Xpp3Dom( name );
+            return defaultValue;
+            
+            // do NOT create nodes for inspection, only explicitly with setNodeValue()
+            // node = new Xpp3Dom( name );
 
-            node.setValue( defaultValue );
+            // node.setValue( defaultValue );
 
-            parent.addChild( node );
+            // parent.addChild( node );
         }
 
         return node.getValue();
@@ -164,9 +167,12 @@ public class AbstractRepositoryConfiguration
 
         if ( node == null )
         {
-            node = new Xpp3Dom( name );
+            return Collections.emptyList();
+            
+            // do NOT create nodes for inspection, only explicitly with setNodeValue()
+            // node = new Xpp3Dom( name );
 
-            parent.addChild( node );
+            // parent.addChild( node );
         }
 
         ArrayList<String> result = new ArrayList<String>( node.getChildCount() );
@@ -271,9 +277,12 @@ public class AbstractRepositoryConfiguration
 
         if ( node == null )
         {
-            node = new Xpp3Dom( name );
+            // do NOT create nodes for inspection, only explicitly with setNodeValue()
+            return false;
+            
+            // node = new Xpp3Dom( name );
 
-            parent.addChild( node );
+            // parent.addChild( node );
         }
 
         for ( int i = 0; i < node.getChildCount(); i++ )
