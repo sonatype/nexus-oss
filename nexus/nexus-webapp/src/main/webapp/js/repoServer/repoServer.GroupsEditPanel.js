@@ -55,7 +55,7 @@ Sonatype.repoServer.RepositoryGroupEditor = function( config ) {
       { name: 'name', sortType: Ext.data.SortTypes.asUCString }
     ],
     sortInfo: { field: 'name', direction: 'asc' },
-    url: Sonatype.config.repos.urls.repositories
+    url: Sonatype.config.repos.urls.allRepositories
   } );
   
   this.checkPayload();
