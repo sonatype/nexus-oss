@@ -32,6 +32,12 @@ public class DefaultSampleRepository
     implements SampleRepository
 {
 
+    public String boo()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     public <F> F adaptToFacet( Class<F> t )
     {
         // TODO Auto-generated method stub
@@ -458,9 +464,4 @@ public class DefaultSampleRepository
         return false;
     }
 
-    public String boo()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

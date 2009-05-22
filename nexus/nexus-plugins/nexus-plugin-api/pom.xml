@@ -70,6 +70,7 @@
             <id>plugin.xml</id>
             <goals>
               <goal>java</goal>
+              <goal>xsd</goal>
               <goal>xpp3-reader</goal>
               <goal>xpp3-writer</goal>
             </goals>
