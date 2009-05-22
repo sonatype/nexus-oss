@@ -91,6 +91,18 @@ public class DefaultTimeline
     private NexusIndexWriter indexWriter;
 
     private boolean running = false;
+    
+    private String dirName;
+    
+    public DefaultTimeline()
+    {
+        this.dirName = "timeline";
+    }
+    
+    public DefaultTimeline( String dirName )
+    {
+        this.dirName = dirName;
+    }
 
     public void initialize()
     {
@@ -142,7 +154,7 @@ public class DefaultTimeline
                     indexDirectory.close();
                 }
 
-                timelineDirectory = applicationConfiguration.getWorkingDirectory( "timeline" );
+                timelineDirectory = applicationConfiguration.getWorkingDirectory( dirName );
 
                 indexDirectory = FSDirectory.getDirectory( timelineDirectory );
 

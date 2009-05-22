@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.ExpiredCredentialsException;
@@ -32,11 +33,14 @@ import org.jsecurity.web.WebUtils;
 import org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.auth.AuthenticationItem;
+import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 public class NexusHttpAuthenticationFilter
     extends BasicHttpAuthenticationFilter
@@ -210,6 +214,8 @@ public class NexusHttpAuthenticationFilter
             {
                 getLogger().debug( "Successfully logged in as anonymous" );
             }
+            
+            postAuthcEvent( request, getNexusConfiguration().getAnonymousUsername(), true );
 
             return true;
         }
@@ -239,8 +245,30 @@ public class NexusHttpAuthenticationFilter
                 + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
 
         recordAuthcEvent( request, msg );
+        
+        postAuthcEvent( request, token.getPrincipal().toString(), true );
 
         return true;
+    }
+    
+    private void postAuthcEvent( ServletRequest request, String username, boolean success )
+    {
+        try
+        {
+            ApplicationEventMulticaster multicaster = getPlexusContainer().lookup( ApplicationEventMulticaster.class );
+            
+            multicaster.notifyEventListeners( 
+                new NexusAuthenticationEvent(
+                    this,
+                    new AuthenticationItem( 
+                        username, 
+                        RemoteIPFinder.findIP( ( HttpServletRequest ) request ),
+                        success ) ) );
+        }
+        catch ( ComponentLookupException e )
+        {
+            getLogger().error( "Unable to lookup component", e );
+        }
     }
 
     private void recordAuthcEvent( ServletRequest request, String msg )
@@ -297,6 +325,8 @@ public class NexusHttpAuthenticationFilter
                 + "/" + request.getRemoteHost() + "]";
 
         recordAuthcEvent( request, msg );
+        
+        postAuthcEvent( request, token.getPrincipal().toString(), false );
 
         HttpServletResponse httpResponse = WebUtils.toHttp( response );
 
