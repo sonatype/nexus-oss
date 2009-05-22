@@ -1,9 +1,9 @@
 package org.sonatype.nexus.mock;
 
-import org.junit.Ignore;
-import org.junit.BeforeClass;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
 
@@ -18,7 +18,6 @@ public abstract class NexusTestCase {
             env.start();
 
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                @Override
                 public void run() {
                     try {
                         env.stop();

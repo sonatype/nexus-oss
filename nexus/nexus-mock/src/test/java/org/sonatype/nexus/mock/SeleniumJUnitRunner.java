@@ -1,10 +1,10 @@
 package org.sonatype.nexus.mock;
 
+import org.junit.internal.runners.statements.InvokeMethod;
 import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.internal.runners.statements.InvokeMethod;
 
 /**
  * <p>
@@ -27,6 +27,7 @@ public class SeleniumJUnitRunner extends BlockJUnit4ClassRunner {
     }
 
 
+    @Override
     protected Statement methodInvoker(FrameworkMethod method, Object test) {
         if (!(test instanceof SeleniumTest)) {
             throw new RuntimeException("Only works with SeleniumTest");

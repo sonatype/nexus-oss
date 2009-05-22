@@ -1,9 +1,10 @@
 package org.sonatype.nexus.mock.components;
 
-import com.thoughtworks.selenium.Selenium;
+import java.util.concurrent.TimeUnit;
+
 import org.sonatype.nexus.mock.util.ThreadUtils;
 
-import java.util.concurrent.TimeUnit;
+import com.thoughtworks.selenium.Selenium;
 
 public class Component {
     private Component parent;
@@ -100,7 +101,6 @@ public class Component {
 
     public void waitForHidden() {
         boolean success = ThreadUtils.waitFor(new ThreadUtils.WaitCondition() {
-            @Override
             public boolean checkCondition(long elapsedTimeInMs) {
                 return hidden();
             }
@@ -113,7 +113,6 @@ public class Component {
 
     public void waitForVisible() {
         boolean success = ThreadUtils.waitFor(new ThreadUtils.WaitCondition() {
-            @Override
             public boolean checkCondition(long elapsedTimeInMs) {
                 return visible();
             }

@@ -1,13 +1,14 @@
 package org.sonatype.nexus.mock.pages;
 
-import com.thoughtworks.selenium.Selenium;
-import org.sonatype.nexus.mock.components.TextField;
+import java.util.concurrent.TimeUnit;
+
 import org.sonatype.nexus.mock.components.Button;
+import org.sonatype.nexus.mock.components.TextField;
 import org.sonatype.nexus.mock.components.Window;
 import org.sonatype.nexus.mock.models.User;
 import org.sonatype.nexus.mock.util.ThreadUtils;
 
-import java.util.concurrent.TimeUnit;
+import com.thoughtworks.selenium.Selenium;
 
 public class LoginWindow extends Window {
     private TextField username;
@@ -55,7 +56,6 @@ public class LoginWindow extends Window {
 
         // wait for the login-link to change
         ThreadUtils.waitFor(new ThreadUtils.WaitCondition() {
-            @Override
             public boolean checkCondition(long elapsedTimeInMs) {
                 return !mainPage.loginLinkAvailable();
             }

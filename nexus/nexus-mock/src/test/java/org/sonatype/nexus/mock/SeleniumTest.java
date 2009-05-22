@@ -1,30 +1,33 @@
 package org.sonatype.nexus.mock;
 
-import com.thoughtworks.selenium.DefaultSelenium;
-import com.thoughtworks.selenium.Selenium;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+
+import org.apache.commons.codec.binary.Base64;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.runner.Description;
+import org.junit.runner.RunWith;
 import org.sonatype.nexus.mock.pages.MainPage;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
 import org.sonatype.nexus.mock.util.SocketTestWaitCondition;
-import org.junit.runner.Description;
-import org.junit.runner.RunWith;
-import org.junit.Ignore;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.apache.commons.codec.binary.Base64;
-
-import java.lang.reflect.Proxy;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.Inet4Address;
-import java.io.*;
-import java.util.Enumeration;
 
 import ch.ethz.ssh2.Connection;
+
+import com.thoughtworks.selenium.DefaultSelenium;
+import com.thoughtworks.selenium.Selenium;
 
 @Ignore
 @RunWith(SeleniumJUnitRunner.class)
@@ -107,7 +110,6 @@ public abstract class SeleniumTest extends NexusTestCase {
                 sshConn.createLocalPortForwarder(4444, "localhost", 4444);
 
                 Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                    @Override
                     public void run() {
                         sshConn.close();
                     }
@@ -125,7 +127,6 @@ public abstract class SeleniumTest extends NexusTestCase {
         final Selenium original = new DefaultSelenium(seleniumServer, seleniumPort, seleniumBrowser, "http://localhost:" + PropUtil.get("jettyPort", 12345));
 
         selenium = (Selenium) Proxy.newProxyInstance(Selenium.class.getClassLoader(), new Class<?>[] { Selenium.class }, new InvocationHandler() {
-            @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 // check assertions on every remote call we do!
                 MockHelper.checkAssertions();
