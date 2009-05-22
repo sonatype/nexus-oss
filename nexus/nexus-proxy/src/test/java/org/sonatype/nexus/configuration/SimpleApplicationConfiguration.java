@@ -24,10 +24,13 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 public class SimpleApplicationConfiguration
     implements ApplicationConfiguration
 {
+    private ApplicationEventMulticaster applicationEventMulticaster;
+
     private Configuration configuration;
 
     private RemoteStorageContext remoteStorageContext = new DefaultRemoteStorageContext( null );
@@ -91,7 +94,9 @@ public class SimpleApplicationConfiguration
     public void saveConfiguration()
         throws IOException
     {
-        // NOTHING TO DO HERE
+        // send events out, but nothing else
+        applicationEventMulticaster.notifyEventListeners( new ConfigurationPrepareForSaveEvent( this ) );
+        applicationEventMulticaster.notifyEventListeners( new ConfigurationSaveEvent( this ) );
     }
 
     public boolean isSecurityEnabled()
