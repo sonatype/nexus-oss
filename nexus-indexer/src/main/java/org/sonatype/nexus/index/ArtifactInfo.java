@@ -204,36 +204,10 @@ public class ArtifactInfo
 
     private String uinfo = null;
     
-    private Map<String,String> attributes = new HashMap<String,String>();
+    private final Map<String,String> attributes = new HashMap<String,String>();
 
     public ArtifactInfo()
     {
-    }
-
-    public ArtifactInfo( String fname, String fextension, String groupId, String artifactId, String version,
-        String classifier, String packaging, String name, String description, long lastModified, long size, String md5,
-        String sha1, ArtifactAvailablility sourcesExists, ArtifactAvailablility javadocExists,
-        ArtifactAvailablility signatureExists, String repository )
-    {
-        // artifact unique
-        this.fname = fname;
-        this.fextension = fextension;
-        this.version = version;
-        this.classifier = classifier;
-        this.lastModified = lastModified;
-        this.size = size;
-        this.md5 = md5;
-        this.sha1 = sha1;
-        this.sourcesExists = sourcesExists;
-        this.javadocExists = javadocExists;
-        this.signatureExists = signatureExists;
-        // artifact constant
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.packaging = packaging;
-        this.repository = repository;
-        this.name = name;
-        this.description = description;
     }
 
     public ArtifactInfo( String repository, String groupId, String artifactId, String version, String classifier )
@@ -298,16 +272,11 @@ public class ArtifactInfo
             null ); // signatureType
     }
     
-    public void addAttribute( String name, String value )
+    public Map<String, String> getAttributes()
     {
-        this.attributes.put( name, value );
+        return attributes;
     }
     
-    public String getAttribute( String name )
-    {
-        return this.attributes.get( name );
-    }
-
     @Override
     public String toString()
     {
