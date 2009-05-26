@@ -10,7 +10,9 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -201,6 +203,8 @@ public class ArtifactInfo
     public List<String> goals;
 
     private String uinfo = null;
+    
+    private Map<String,String> attributes = new HashMap<String,String>();
 
     public ArtifactInfo()
     {
@@ -292,6 +296,16 @@ public class ArtifactInfo
             null,   // hashType
             false,  // signature
             null ); // signatureType
+    }
+    
+    public void addAttribute( String name, String value )
+    {
+        this.attributes.put( name, value );
+    }
+    
+    public String getAttribute( String name )
+    {
+        return this.attributes.get( name );
     }
 
     @Override
