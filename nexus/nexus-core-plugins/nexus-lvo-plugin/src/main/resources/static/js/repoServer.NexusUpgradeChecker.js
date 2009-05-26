@@ -18,7 +18,7 @@
 Sonatype.Events.addListener( 'nexusStatus', function() {
   Ext.Ajax.request( {
     method: 'GET',
-    suppressStatus: [404,401],
+    suppressStatus: [404,401,-1],
     url: Sonatype.config.servicePath + '/lvo/nexus-' +
       Sonatype.utils.editionShort.substr( 0, 3 ).toLowerCase() + '/' + Sonatype.utils.versionShort,
     success: function( response, options ) {
