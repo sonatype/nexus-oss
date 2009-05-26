@@ -67,7 +67,7 @@ public abstract class SeleniumTest extends NexusTestCase {
                 int port = PropUtil.get("jettyPort", 12345);
 
                 // spin up SSH connection
-                sshConn = new Connection("grid.sonatype.org", 10023);
+                sshConn = new Connection("grid.sonatype.org", PropUtil.get("serverPort", 10023));
                 sshConn.connect();
 
                 // authenticate

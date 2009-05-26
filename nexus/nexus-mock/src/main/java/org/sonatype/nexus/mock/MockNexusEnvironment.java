@@ -25,9 +25,17 @@ public class MockNexusEnvironment
 
     private PlexusContainer plexusContainer;
 
-    public static void main(String[] args) throws Exception {
-        System.setProperty("plexus-index.template.file", "templates/index-debug.vm");
-        MockNexusEnvironment e = new MockNexusEnvironment(12345, "/nexus");
+    public static void main( String[] args )
+        throws Exception
+    {
+        File webappRoot = new File( "../nexus-webapp/src/main/webapp" );
+        if ( !webappRoot.exists() )
+        {
+            webappRoot = new File( "target/nexus-ui" );
+        }
+
+        System.setProperty( "plexus-index.template.file", "templates/index-debug.vm" );
+        MockNexusEnvironment e = new MockNexusEnvironment( 12345, "/nexus", webappRoot );
         e.start();
     }
 
@@ -37,7 +45,7 @@ public class MockNexusEnvironment
 
         SelectChannelConnector connector = new SelectChannelConnector();
 
-        connector.setHost(null);
+        connector.setHost( null );
 
         connector.setPort( port );
 
@@ -46,18 +54,18 @@ public class MockNexusEnvironment
         return server;
     }
 
-    public MockNexusEnvironment( int port, String contextPath )
+    public MockNexusEnvironment( int port, String contextPath, File webappRoot )
         throws Exception
     {
-        this( createSimpleJettyServer( port ), contextPath );
+        this( createSimpleJettyServer( port ), contextPath, webappRoot );
     }
 
-    public MockNexusEnvironment( Server server, String contextPath )
+    public MockNexusEnvironment( Server server, String contextPath, File webappRoot )
         throws Exception
     {
         this.server = server;
 
-        addNexus( server, contextPath );
+        addNexus( server, contextPath, webappRoot );
     }
 
     public Server getServer()
@@ -77,16 +85,21 @@ public class MockNexusEnvironment
         {
             ClassWorld cw = new ClassWorld( "default", Thread.currentThread().getContextClassLoader() );
 
-            ClassRealm realm = cw.newRealm( "nexus-war", new URLClassLoader( new URL[] { new File(
-                "target/nexus-ui/WEB-INF/classes" ).toURI().toURL() }, cw.getRealm( "default" ) ) );
+            ClassRealm realm =
+                cw.newRealm(
+                             "nexus-war",
+                             new URLClassLoader(
+                                                 new URL[] { new File( "target/nexus-ui/WEB-INF/classes" ).toURI().toURL() },
+                                                 cw.getRealm( "default" ) ) );
 
             realm.setParentRealm( cw.getRealm( "default" ) );
 
             // create one
-            ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .setClassWorld( cw ).setContainerConfigurationURL( Class.class.getResource( "/plexus/plexus.xml" ) )
-                .setContext( createContainerContext() ).addComponentDiscoveryListener(
-                    new InhibitingComponentDiscovererListener() );
+            ContainerConfiguration cc =
+                new DefaultContainerConfiguration().setClassWorld( cw ).setContainerConfigurationURL(
+                                                                                                      Class.class.getResource( "/plexus/plexus.xml" ) ).setContext(
+                                                                                                                                                                    createContainerContext() ).addComponentDiscoveryListener(
+                                                                                                                                                                                                                              new InhibitingComponentDiscovererListener() );
 
             plexusContainer = new DefaultPlexusContainer( cc );
         }
@@ -105,10 +118,10 @@ public class MockNexusEnvironment
         containerContext.put( "application-conf", new File( "target/nexus-work/conf/" ).getAbsolutePath() );
         containerContext.put( "security-xml-file", new File( "target/nexus-work/conf/security.xml" ).getAbsolutePath() );
 
-
-        File webappRoot = new File("../nexus-webapp/src/main/webapp");
-        if (webappRoot.exists()) {
-            containerContext.put("index.template.file", "templates/index-debug.vm");
+        File webappRoot = new File( "../nexus-webapp/src/main/webapp" );
+        if ( webappRoot.exists() )
+        {
+            containerContext.put( "index.template.file", "templates/index-debug.vm" );
         }
 
         // for EHCache component
@@ -133,12 +146,13 @@ public class MockNexusEnvironment
         plexusContainer = null;
     }
 
-    public void addNexus( Server server, String contextPath )
+    public void addNexus( Server server, String contextPath, File webappRoot )
         throws Exception
     {
         // prepare config
-        FileUtils.copyFile( new File("src/test/resources/nexus-1.xml"), new File( "target/nexus-work/conf/nexus.xml" ) );
-        FileUtils.copyFile( new File("src/test/resources/security-1.xml"), new File( "target/nexus-work/conf/security.xml" ) );
+        FileUtils.copyFile( new File( "src/test/resources/nexus-1.xml" ), new File( "target/nexus-work/conf/nexus.xml" ) );
+        FileUtils.copyFile( new File( "src/test/resources/security-1.xml" ),
+                            new File( "target/nexus-work/conf/security.xml" ) );
 
         // create plexus
         createPlexusContainer();
@@ -146,15 +160,7 @@ public class MockNexusEnvironment
         // add mock nexus
         ContextHandlerCollection ctxHandler = new ContextHandlerCollection();
 
-        File webappRoot = new File("../nexus-webapp/src/main/webapp");
-        if (!webappRoot.exists()) {
-            webappRoot = new File("target/nexus-ui");
-        }
-
-        WebAppContext webapp = new WebAppContext(
-            ctxHandler,
-            webappRoot.getAbsolutePath(),
-            contextPath );
+        WebAppContext webapp = new WebAppContext( ctxHandler, webappRoot.getAbsolutePath(), contextPath );
 
         // spoof in our simplified web.xml
         webapp.setDescriptor( new File( "target/test-classes/nexus-ui/WEB-INF/web.xml" ).getAbsolutePath() );
