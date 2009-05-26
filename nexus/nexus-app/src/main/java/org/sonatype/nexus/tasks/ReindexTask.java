@@ -51,11 +51,11 @@ public class ReindexTask
     {
         if ( getRepositoryId() != null )
         {
-            indexerManager.reindexRepository( getResourceStorePath(), getRepositoryId(), getFullReindex()  );
+            indexerManager.reindexRepository( getResourceStorePath(), getRepositoryId(), getFullReindex() );
         }
         else if ( getRepositoryGroupId() != null )
         {
-            indexerManager.reindexRepositoryGroup( getResourceStorePath(), getRepositoryId(), getFullReindex()  );
+            indexerManager.reindexRepositoryGroup( getResourceStorePath(), getRepositoryGroupId(), getFullReindex() );
         }
         else
         {
