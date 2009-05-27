@@ -112,6 +112,11 @@ public class NexusPluginDiscoverer
 
                 extd.setImplementation( ext.getImplementation() );
 
+                if ( !ext.isIsSingleton() )
+                {
+                    extd.setInstantiationStrategy( "per-lookup" );
+                }
+
                 extd.addRequirements( getRequirements( ext.getRequirements() ) );
 
                 csd.addComponentDescriptor( extd );
@@ -133,6 +138,11 @@ public class NexusPluginDiscoverer
                 }
 
                 cmpd.setImplementation( cmp.getImplementation() );
+
+                if ( !cmp.isIsSingleton() )
+                {
+                    cmpd.setInstantiationStrategy( "per-lookup" );
+                }
 
                 cmpd.addRequirements( getRequirements( cmp.getRequirements() ) );
 
