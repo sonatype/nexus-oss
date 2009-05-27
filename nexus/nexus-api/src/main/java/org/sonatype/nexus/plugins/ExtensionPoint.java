@@ -25,12 +25,4 @@ public @interface ExtensionPoint
      * @return
      */
     boolean isSingleton() default true;
-
-    /**
-     * Is the qualifier (roleHint in plexus) needed to be "human readable" (does it appear in some user editable config
-     * file)?
-     * 
-     * @return
-     */
-    boolean isHumanReadableQualifierNeeded() default false;
 }
