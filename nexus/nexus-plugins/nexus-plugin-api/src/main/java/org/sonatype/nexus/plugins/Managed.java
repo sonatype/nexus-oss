@@ -18,4 +18,10 @@ import java.lang.annotation.Target;
 @Retention( RetentionPolicy.RUNTIME )
 public @interface Managed
 {
+    /**
+     * Should the extension point component be created as singleton, or per-lookup?
+     * 
+     * @return
+     */
+    boolean isSingleton() default true;
 }
