@@ -20,19 +20,19 @@ public interface NexusPluginManager
      * Should be called even before boot process, simply to make plugin-contributed components available to Plexus,
      * since reading up Nexus config may already need those!
      */
-    void activateInstalledPlugins();
+    PluginManagerResponse activateInstalledPlugins();
 
     /**
      * Called for a given plugin, usually invoked by some user interaction (UI).
      * 
      * @param coords
      */
-    void installPlugin( PluginCoordinates coords );
+    PluginManagerResponse installPlugin( PluginCoordinates coords );
 
     /**
      * Called for a given plugin, usually invoked by some user interaction (UI).
      * 
      * @param coords
      */
-    void uninstallPlugin( PluginCoordinates coords );
+    PluginManagerResponse uninstallPlugin( PluginCoordinates coords );
 }

@@ -1,9 +1,11 @@
 package org.sonatype.nexus.plugins;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.Map;
 
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -52,40 +54,72 @@ public class DefaultNexusPluginManager
     @Configuration( value = "${nexus-work}/plugins" )
     private File nexusPluginsDirectory;
 
+    protected File getNexusPluginsDirectory()
+    {
+        if ( !nexusPluginsDirectory.exists() )
+        {
+            nexusPluginsDirectory.mkdirs();
+        }
+
+        return nexusPluginsDirectory;
+    }
+
     public Map<String, PluginDescriptor> getInstalledPlugins()
     {
         return Collections.unmodifiableMap( nexusPluginCollector.getPluginDescriptors() );
     }
 
-    public void installPlugin( PluginCoordinates coords )
+    public PluginManagerResponse installPlugin( PluginCoordinates coords )
     {
         // We have a showstopper here:
         // M3 + Mercury is no go
         // furthermore, we would need the transitive hull of plugin (Shane or Oleg)?
 
-        // resolve the plugin against repository
-
-        PluginMetadata pm = new PluginMetadata( coords.getGroupId(), coords.getArtifactId(), coords.getVersion() );
-
-        PluginResolutionRequest rreq = new PluginResolutionRequest();
-
-        rreq.setPluginMetadata( pm );
-
-        // rreq.addLocalRepository( getNexusLocalRepository() );
-
-        // rreq.addRemoteRepository( remoteRepository );
+        // TODO
+        return new PluginManagerResponse( RequestResult.FAILED );
     }
 
-    public void activateInstalledPlugins()
+    public PluginManagerResponse activateInstalledPlugins()
     {
-        // TODO Auto-generated method stub
+        File[] pluginDirs = getNexusPluginsDirectory().listFiles();
 
+        if ( pluginDirs != null )
+        {
+            for ( File pluginDir : pluginDirs )
+            {
+                if ( pluginDir.isDirectory() )
+                {
+                    ClassRealm pluginRealm = plexusPluginManager.createClassRealm( pluginDir.getName() );
+
+                    File[] pluginConstituents = pluginDir.listFiles();
+
+                    if ( pluginConstituents != null )
+                    {
+                        for ( File pluginConstituent : pluginConstituents )
+                        {
+                            try
+                            {
+                                pluginRealm.addURL( pluginConstituent.toURI().toURL() );
+                            }
+                            catch ( MalformedURLException e )
+                            {
+                                // will not happen
+                            }
+                        }
+                    }
+
+                    plexusPluginManager.discoverComponents( pluginRealm );
+                }
+            }
+        }
+
+        return new PluginManagerResponse( RequestResult.COMPLETELY_EXECUTED );
     }
 
-    public void uninstallPlugin( PluginCoordinates coords )
+    public PluginManagerResponse uninstallPlugin( PluginCoordinates coords )
     {
-        // TODO Auto-generated method stub
-
+        // TODO
+        return new PluginManagerResponse( RequestResult.FAILED );
     }
 
 }
