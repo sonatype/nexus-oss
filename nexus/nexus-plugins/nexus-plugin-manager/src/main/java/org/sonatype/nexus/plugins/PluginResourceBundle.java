@@ -9,6 +9,7 @@ import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.plugins.PluginStaticResource.PluginStaticResourceModel;
 import org.sonatype.nexus.plugins.model.Resource;
+import org.sonatype.nexus.plugins.plexus.NexusPluginCollector;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 

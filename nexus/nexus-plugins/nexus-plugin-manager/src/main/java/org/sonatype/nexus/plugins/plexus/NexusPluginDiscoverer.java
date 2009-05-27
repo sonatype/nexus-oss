@@ -1,4 +1,4 @@
-package org.sonatype.nexus.plugins;
+package org.sonatype.nexus.plugins.plexus;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -13,6 +13,9 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.plugins.NexusPlugin;
+import org.sonatype.nexus.plugins.PluginDescriptor;
+import org.sonatype.nexus.plugins.PluginResourceBundle;
 import org.sonatype.nexus.plugins.model.Component;
 import org.sonatype.nexus.plugins.model.Extension;
 import org.sonatype.nexus.plugins.model.PluginMetadata;

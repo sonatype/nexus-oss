@@ -1,6 +1,5 @@
-package org.sonatype.nexus.plugins;
+package org.sonatype.nexus.plugins.plexus;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +7,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+import org.sonatype.nexus.plugins.PluginDescriptor;
 
 @Component( role = NexusPluginCollector.class )
 public class NexusPluginCollector
@@ -41,6 +41,6 @@ public class NexusPluginCollector
 
     public Map<String, PluginDescriptor> getPluginDescriptors()
     {
-        return Collections.unmodifiableMap( pluginDescriptors );
+        return pluginDescriptors;
     }
 }
