@@ -21,7 +21,6 @@ import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.cache.Cache;
-import org.jsecurity.crypto.hash.Hash;
 import org.jsecurity.mgt.RealmSecurityManager;
 import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;

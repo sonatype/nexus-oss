@@ -42,6 +42,9 @@ public class DefaultSecurityConfigurationUpgrader
 {
     @Requirement( role = SecurityUpgrader.class )
     private Map<String, SecurityUpgrader> upgraders;
+    
+    @Requirement( role = SecurityDataUpgrader.class )
+    private Map<String, SecurityDataUpgrader> dataUpgraders;
 
     /**
      * This implementation relies to plexus registered upgraders. It will cycle through them until the configuration is
@@ -86,14 +89,23 @@ public class DefaultSecurityConfigurationUpgrader
             getLogger().info(
                 "Upgrading old Security configuration file (version " + msg.getModelVersion() + ") from "
                     + file.getAbsolutePath() );
-
+            
             msg.setConfiguration( upgrader.loadConfiguration( file ) );
 
             while ( !Configuration.MODEL_VERSION.equals( msg.getModelVersion() ) )
             {
+                
+                // an application might need to upgrade content, that is NOT part of the model
+                SecurityDataUpgrader dataUpgrader = this.dataUpgraders.get( msg.getModelVersion() );
+                
                 if ( upgrader != null )
                 {
                     upgrader.upgrade( msg );
+                    
+                    if( dataUpgrader != null)
+                    {
+                        dataUpgrader.upgrade( msg.getConfiguration() );
+                    }
                 }
                 else
                 {

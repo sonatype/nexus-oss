@@ -1,0 +1,13 @@
+
+<plexus>
+  <components>
+
+    <component>
+      <role>org.sonatype.security.model.upgrade.SecurityDataUpgrader</role>
+      <implementation>org.sonatype.security.model.upgrade.MockSecurityDataUpgrader</implementation>
+      <role-hint>2.0.1</role-hint>
+      <isolated-realm>false</isolated-realm>
+    </component>
+
+  </components>
+</plexus>
