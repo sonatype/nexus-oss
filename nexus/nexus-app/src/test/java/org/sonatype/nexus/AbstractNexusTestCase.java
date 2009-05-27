@@ -138,14 +138,18 @@ public abstract class AbstractNexusTestCase
 
         if ( loadConfigurationAtSetUp() )
         {
+            System.out.println( "== Shutting down SECURITY!" );
+            
             nexusConfiguration = this.lookup( NexusConfiguration.class );
 
-            nexusConfiguration.loadConfiguration();
+            nexusConfiguration.loadConfiguration( false );
 
             // TODO: SEE WHY IS SEC NOT STARTING? (Max, JSec changes)
             nexusConfiguration.setSecurityEnabled( false );
 
             nexusConfiguration.saveConfiguration();
+
+            System.out.println( "== Shutting down SECURITY!" );
         }
     }
 
