@@ -480,9 +480,6 @@ public class DefaultIndexerManager
         List<Repository> group =
             repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
 
-        // purge it, and below will be repopulated
-        purgeRepositoryGroupIndex( repositoryGroupId );
-
         for ( Repository repository : group )
         {
             reindexRepository( repository, fullReindex );
