@@ -137,19 +137,9 @@ public class DefaultWalker
             // we have a cause, report any non-ItemNotFounds with stack trace
             if ( context.getStopCause() instanceof ItemNotFoundException )
             {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().info(
-                        "Aborted walking on repository ID='" + context.getRepository().getId() + "' from path='"
-                            + fromPath + "', cause: ",
-                        context.getStopCause() );
-                }
-                else
-                {
-                    getLogger().info(
-                        "Aborted walking on repository ID='" + context.getRepository().getId() + "' from path='"
-                            + fromPath + "', cause: " + context.getStopCause().getMessage() );
-                }
+                getLogger().info(
+                    "Aborted walking on repository ID='" + context.getRepository().getId() + "' from path='"
+                        + fromPath + "', cause: " + context.getStopCause().getMessage() );
             }
             else
             {
