@@ -200,8 +200,6 @@ public class RepositoryListPlexusResource
 
             exConf.setRepositoryPolicy( EnumUtil.valueOf( repoResource.getRepoPolicy(), RepositoryPolicy.class ) );
 
-            exConf.applyChanges();
-
             if ( repoResource.getOverrideLocalStorageUrl() != null )
             {
                 appModel.setLocalStorage( new CLocalStorage() );
@@ -221,6 +219,8 @@ public class RepositoryListPlexusResource
                 appModel.setRemoteStorage( new CRemoteStorage() );
 
                 appModel.getRemoteStorage().setUrl( remoteStorage.getRemoteStorageUrl() );
+
+                exConf.setChecksumPolicy( EnumUtil.valueOf( repoResource.getChecksumPolicy(), ChecksumPolicy.class ) );
 
                 if ( remoteStorage.getConnectionSettings() != null )
                 {
@@ -264,6 +264,9 @@ public class RepositoryListPlexusResource
                 appModel.getRemoteStorage().setProvider( "apacheHttpClient3x" );
 
             }
+
+            exConf.applyChanges();
+
         }
 
         appModel.setProviderHint( resource.getProvider() );
@@ -349,10 +352,10 @@ public class RepositoryListPlexusResource
                                                                            model.getRemoteStorage().getAuthentication().getNtlmHost() );
                 // XXX cstamas - config changes
                 // target.getRemoteStorage().getAuthentication().setPrivateKey(
-                //                                                              model.getRemoteStorage().getAuthentication().getPrivateKey() );
+                // model.getRemoteStorage().getAuthentication().getPrivateKey() );
 
                 // target.getRemoteStorage().getAuthentication().setPassphrase(
-                //                                                              model.getRemoteStorage().getAuthentication().getPassphrase() );
+                // model.getRemoteStorage().getAuthentication().getPassphrase() );
             }
             else
             {
@@ -418,10 +421,10 @@ public class RepositoryListPlexusResource
 
                     // XXX cstamas - config changes
                     // target.getRemoteStorage().getHttpProxySettings().getAuthentication().setPrivateKey(
-                    //                                                                                     model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPrivateKey() );
+                    // model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPrivateKey() );
 
                     // target.getRemoteStorage().getHttpProxySettings().getAuthentication().setPassphrase(
-                    //                                                                                     model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassphrase() );
+                    // model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassphrase() );
                 }
 
             }

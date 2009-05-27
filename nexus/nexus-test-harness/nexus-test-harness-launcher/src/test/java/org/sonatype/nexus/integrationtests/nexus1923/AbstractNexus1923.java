@@ -16,6 +16,8 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
@@ -100,6 +102,7 @@ public abstract class AbstractNexus1923
         resource.setName( HOSTED_REPO_ID );
         resource.setRepoType( "hosted" );
         resource.setAllowWrite( true );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         repoUtils.createRepository( resource );
     }
 
@@ -115,6 +118,8 @@ public abstract class AbstractNexus1923
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
         remoteStorage.setRemoteStorageUrl( getBaseNexusUrl() + "content/repositories/" + HOSTED_REPO_ID );
         resource.setRemoteStorage( remoteStorage );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+        resource.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );
         repoUtils.createRepository( resource );
     }
 
@@ -126,6 +131,7 @@ public abstract class AbstractNexus1923
         resource.setName( SECOND_HOSTED_REPO_ID );
         resource.setRepoType( "hosted" );
         resource.setAllowWrite( true );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         repoUtils.createRepository( resource );
     }
 

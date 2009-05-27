@@ -12,16 +12,23 @@
   <packaging>pom</packaging>
   <name>Nexus Test Harness</name>
 
-  <modules>
-    <module>nexus-simple-memory-realm</module>
-    <module>nexus-test-harness-launcher</module>
-  </modules>
-
   <profiles>
     <profile>
       <id>selenium-tests</id>
       <modules>
         <module>nexus-test-harness-selenium</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <activation>
+        <property>
+          <name>!maven.test.skip</name>
+        </property>
+      </activation>
+      <modules>
+        <module>nexus-simple-memory-realm</module>
+        <module>nexus-test-harness-launcher</module>
       </modules>
     </profile>
   </profiles>
