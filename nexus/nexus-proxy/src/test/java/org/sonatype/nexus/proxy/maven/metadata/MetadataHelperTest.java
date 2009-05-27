@@ -13,14 +13,12 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.apache.maven.mercury.repository.metadata.Metadata;
-import org.sonatype.nexus.proxy.maven.metadata.AbstractMetadataHelper;
 
 /**
  * @author juven
@@ -74,11 +72,11 @@ public class MetadataHelperTest
     {
         List<String> snapshotArtifacts = new ArrayList<String>();
 
-        snapshotArtifacts.add( "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.180215-1.pom" );
-        snapshotArtifacts.add( "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.182430-2.pom" );
-        snapshotArtifacts.add( "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.pom" );
-        snapshotArtifacts.add( "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.pom" );
-        snapshotArtifacts.add( "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-SNAPSHOT.pom" );
+        snapshotArtifacts.add( "nexus-api-1.2.0-20081022.180215-1.pom" );
+        snapshotArtifacts.add( "nexus-api-1.2.0-20081022.182430-2.pom" );
+        snapshotArtifacts.add( "nexus-api-1.2.0-20081022.184527-3.pom" );
+        snapshotArtifacts.add( "nexus-api-1.2.0-20081025.143218-32.pom" );
+        snapshotArtifacts.add( "nexus-api-1.2.0-SNAPSHOT.pom" );
 
         Metadata metadata = new Metadata();
         metadata.setGroupId( "org.sonatype.nexus" );

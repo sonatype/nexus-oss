@@ -2,6 +2,7 @@ package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.mercury.repository.metadata.AddPluginOperation;
@@ -11,7 +12,6 @@ import org.apache.maven.mercury.repository.metadata.MetadataException;
 import org.apache.maven.mercury.repository.metadata.MetadataOperation;
 import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.mercury.repository.metadata.PluginOperand;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Process maven metadata in plugin group directory
@@ -43,7 +43,6 @@ public class GroupDirMetadataProcessor
         metadataHelper.store( mdString, path + AbstractMetadataHelper.METADATA_SUFFIX );
 
     }
-    
 
     private Metadata createMetadata( String path )
         throws MetadataException
@@ -52,7 +51,7 @@ public class GroupDirMetadataProcessor
 
         List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
 
-        for ( Plugin plugin : metadataHelper.currentPlugins.values() )
+        for ( Plugin plugin : metadataHelper.gData.get( path ) )
         {
             ops.add( new AddPluginOperation( new PluginOperand( plugin ) ) );
         }
@@ -62,30 +61,12 @@ public class GroupDirMetadataProcessor
         return md;
     }
 
-    public boolean isPathMatched( String path )
-    {
-        if ( StringUtils.isEmpty( metadataHelper.currentGroupId ) )
-        {
-            return false;
-        }
-
-        if ( ( "/" + metadataHelper.currentGroupId.replace( '.', '/' ) ).equals( path ) )
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     @Override
     public boolean shouldProcessMetadata( String path )
     {
-        if ( !isPathMatched( path ) )
-        {
-            return false;
-        }
+        Collection<Plugin> plugins = metadataHelper.gData.get( path );
 
-        if ( !metadataHelper.currentPlugins.isEmpty() )
+        if ( plugins != null && !plugins.isEmpty() )
         {
             return true;
         }
@@ -94,9 +75,9 @@ public class GroupDirMetadataProcessor
     }
 
     @Override
-    public void postProcessMetadata()
+    public void postProcessMetadata( String path )
     {
-        metadataHelper.currentPlugins.clear();
+        metadataHelper.gData.remove( path );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -109,6 +90,11 @@ public class GroupDirMetadataProcessor
         Metadata md = createMetadata( path );
 
         List<Plugin> oldPlugins = oldMd.getPlugins();
+
+        if ( oldPlugins == null )
+        {
+            return false;
+        }
 
         List<Plugin> plugins = md.getPlugins();
 

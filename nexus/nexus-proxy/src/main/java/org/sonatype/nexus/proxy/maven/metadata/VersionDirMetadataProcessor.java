@@ -2,6 +2,7 @@ package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.mercury.repository.metadata.Metadata;
@@ -10,7 +11,6 @@ import org.apache.maven.mercury.repository.metadata.MetadataException;
 import org.apache.maven.mercury.repository.metadata.MetadataOperation;
 import org.apache.maven.mercury.repository.metadata.SetSnapshotOperation;
 import org.apache.maven.mercury.repository.metadata.StringOperand;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Process maven metadata in snapshot version directory
@@ -25,34 +25,17 @@ public class VersionDirMetadataProcessor
         super( metadataHelper );
     }
 
-    public boolean isPathMatched( String path )
-    {
-        if ( StringUtils.isEmpty( metadataHelper.currentGroupId )
-            || StringUtils.isEmpty( metadataHelper.currentArtifactId )
-            || StringUtils.isEmpty( metadataHelper.currentVersion ) )
-        {
-            return false;
-        }
-        if ( ( "/" + metadataHelper.currentGroupId.replace( '.', '/' ) + "/" + metadataHelper.currentArtifactId + "/" + metadataHelper.currentVersion )
-            .equals( path ) )
-        {
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public boolean shouldProcessMetadata( String path )
     {
-        if ( !isPathMatched( path ) )
-        {
-            return false;
-        }
 
-        if ( !metadataHelper.currentArtifacts.isEmpty() && metadataHelper.currentVersion.endsWith( "SNAPSHOT" ) )
+        Collection<String> names = metadataHelper.gavData.get( path );
+
+        if ( names != null && !names.isEmpty() )
         {
             return true;
         }
+
         return false;
     }
 
@@ -78,34 +61,53 @@ public class VersionDirMetadataProcessor
     {
         Metadata md = new Metadata();
 
-        md.setGroupId( metadataHelper.currentGroupId );
+        md.setGroupId( calculateGroupId( path ) );
 
-        md.setArtifactId( metadataHelper.currentArtifactId );
+        md.setArtifactId( calculateArtifactId( path ) );
 
-        md.setVersion( metadataHelper.currentVersion );
+        md.setVersion( calculateVersion( path ) );
 
-        versioning( md, metadataHelper.currentArtifacts );
+        versioning( md, metadataHelper.gavData.get( path ) );
 
         return md;
     }
 
-    void versioning( Metadata metadata, List<String> artifacts )
+    private String calculateGroupId( String path )
+    {
+        String gaPath = path.substring( 0, path.lastIndexOf( '/' ) );
+
+        return gaPath.substring( 1, gaPath.lastIndexOf( '/' ) ).replace( '/', '.' );
+    }
+
+    private String calculateArtifactId( String path )
+    {
+        String gaPath = path.substring( 0, path.lastIndexOf( '/' ) );
+
+        return gaPath.substring( gaPath.lastIndexOf( '/' ) + 1 );
+    }
+
+    private String calculateVersion( String path )
+    {
+        return path.substring( path.lastIndexOf( '/' ) + 1 );
+    }
+
+    void versioning( Metadata metadata, Collection<String> artifactNames )
         throws MetadataException
     {
         List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
 
-        for ( String artifact : artifacts )
+        for ( String artifactName : artifactNames )
         {
-            ops.add( new SetSnapshotOperation( new StringOperand( getName( artifact ) ) ) );
+            ops.add( new SetSnapshotOperation( new StringOperand( artifactName ) ) );
         }
 
         MetadataBuilder.changeMetadata( metadata, ops );
     }
 
     @Override
-    public void postProcessMetadata()
+    public void postProcessMetadata( String path )
     {
-        metadataHelper.currentArtifacts.clear();
+        metadataHelper.gavData.remove( path );
     }
 
     @Override
@@ -113,6 +115,13 @@ public class VersionDirMetadataProcessor
         throws Exception
     {
         Metadata oldMd = readMetadata( path );
+
+        if ( oldMd.getArtifactId() == null || oldMd.getGroupId() == null || oldMd.getVersion() == null
+            || oldMd.getVersioning() == null || oldMd.getVersioning().getSnapshot() == null
+            || oldMd.getVersioning().getSnapshot().getTimestamp() == null )
+        {
+            return false;
+        }
 
         Metadata md = createMetadata( path );
 

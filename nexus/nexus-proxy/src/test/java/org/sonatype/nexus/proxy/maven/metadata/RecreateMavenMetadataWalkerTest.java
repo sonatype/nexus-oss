@@ -18,8 +18,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -78,7 +80,12 @@ public class RecreateMavenMetadataWalkerTest
         "/com/mycom/proj5/1.0/proj5-1.0.jar",
         "/com/mycom/proj5/1.0/proj5-1.0.pom",
         "/com/mycom/proj6/1.0/proj6-1.0.jar",
-        "/com/mycom/proj6/1.0/proj6-1.0.pom",};
+        "/com/mycom/proj6/1.0/proj6-1.0.pom",
+        "/com/mycom1/1-proj/1.0/1-proj-1.0.pom",
+        "/com/mycom1/1.0/mycom1-1.0.pom",
+        "/com/mycom1/2-proj/1.0/2-proj-1.0.pom",
+        "/com/mycom1/2.0/mycom1-2.0.pom"
+    };
 
     private String[] snapshotArtifactFiles = {
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.180215-1.jar",
@@ -654,6 +661,27 @@ public class RecreateMavenMetadataWalkerTest
         validateResults( inhouseRelease, expected );
         
         // should see warning log here
+    }
+    
+    public void testGroupPathIsArtifactPathAtTheSameTime()
+        throws Exception
+    {
+        rebuildMavenMetadata( inhouseRelease );
+
+        Map<String, Boolean> expected = new LinkedHashMap<String, Boolean>();
+        expected.put( "/com/mycom1/maven-metadata.xml", Boolean.TRUE );
+        validateResults( inhouseRelease, expected );
+
+        Metadata md = readMavenMetadata( retrieveFile( inhouseRelease, "/com/mycom1/maven-metadata.xml" ) );
+        assertEquals( "com", md.getGroupId() );
+        assertEquals( "mycom1", md.getArtifactId() );
+        assertEquals( "2.0", md.getVersioning().getLatest() );
+        assertEquals( "2.0", md.getVersioning().getRelease() );
+
+        List<String> versions = new ArrayList<String>( 2 );
+        versions.add( "1.0" );
+        versions.add( "2.0" );
+        assertEquals( versions, md.getVersioning().getVersions() );
     }
     
 

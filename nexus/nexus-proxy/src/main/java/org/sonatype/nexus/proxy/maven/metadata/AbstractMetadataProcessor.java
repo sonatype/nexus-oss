@@ -36,7 +36,7 @@ public abstract class AbstractMetadataProcessor
         {
             if ( isMetadataCorrect( path ) )
             {
-                postProcessMetadata();
+                postProcessMetadata( path );
 
                 return true;
             }
@@ -48,7 +48,7 @@ public abstract class AbstractMetadataProcessor
 
         processMetadata( path );
 
-        postProcessMetadata();
+        postProcessMetadata( path );
 
         buildMetadataChecksum( path );
 
@@ -110,17 +110,5 @@ public abstract class AbstractMetadataProcessor
     protected abstract void processMetadata( String path )
         throws Exception;
 
-    protected abstract void postProcessMetadata();
-
-    protected String getName( String path )
-    {
-        int pos = path.lastIndexOf( '/' );
-
-        if ( pos == -1 )
-        {
-            return path;
-        }
-
-        return path.substring( pos + 1 );
-    }
+    protected abstract void postProcessMetadata( String path );
 }

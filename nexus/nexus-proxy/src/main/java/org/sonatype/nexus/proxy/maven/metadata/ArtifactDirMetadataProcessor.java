@@ -2,6 +2,7 @@ package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.mercury.repository.metadata.AddVersionOperation;
@@ -10,7 +11,6 @@ import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
 import org.apache.maven.mercury.repository.metadata.MetadataOperation;
 import org.apache.maven.mercury.repository.metadata.StringOperand;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Process maven metadata in artifactId directory
@@ -47,46 +47,39 @@ public class ArtifactDirMetadataProcessor
     {
         Metadata md = new Metadata();
 
-        md.setGroupId( metadataHelper.currentGroupId );
+        md.setGroupId( calculateGroupId( path ) );
 
-        md.setArtifactId( metadataHelper.currentArtifactId );
+        md.setArtifactId( calculateArtifactId( path ) );
 
-        versioning( md, metadataHelper.currentVersions );
+        versioning( md, metadataHelper.gaData.get( path ) );
 
         return md;
     }
 
-    public boolean isPathMatched( String path )
+    private String calculateGroupId( String path )
     {
-        if ( StringUtils.isEmpty( metadataHelper.currentGroupId )
-            || StringUtils.isEmpty( metadataHelper.currentArtifactId ) )
-        {
-            return false;
-        }
-        if ( ( "/" + metadataHelper.currentGroupId.replace( '.', '/' ) + "/" + metadataHelper.currentArtifactId )
-            .equals( path ) )
-        {
-            return true;
-        }
-        return false;
+        return path.substring( 1, path.lastIndexOf( '/' ) ).replace( '/', '.' );
+    }
+
+    private String calculateArtifactId( String path )
+    {
+        return path.substring( path.lastIndexOf( '/' ) + 1 );
     }
 
     @Override
     public boolean shouldProcessMetadata( String path )
     {
-        if ( !isPathMatched( path ) )
-        {
-            return false;
-        }
+        Collection<String> versions = metadataHelper.gaData.get( path );
 
-        if ( !metadataHelper.currentVersions.isEmpty() )
+        if ( versions != null && !versions.isEmpty() )
         {
             return true;
         }
+
         return false;
     }
 
-    void versioning( Metadata metadata, List<String> versions )
+    void versioning( Metadata metadata, Collection<String> versions )
         throws MetadataException
     {
         List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
@@ -100,9 +93,9 @@ public class ArtifactDirMetadataProcessor
     }
 
     @Override
-    public void postProcessMetadata()
+    public void postProcessMetadata( String path )
     {
-        metadataHelper.currentVersions.clear();
+        metadataHelper.gaData.remove( path );
     }
 
     @Override
@@ -121,6 +114,16 @@ public class ArtifactDirMetadataProcessor
         if ( md.getVersioning().getRelease() == null )
         {
             md.getVersioning().setRelease( "" );
+        }
+
+        if ( oldMd.getVersioning().getLatest() == null )
+        {
+            return false;
+        }
+
+        if ( oldMd.getVersioning().getVersions() == null )
+        {
+            return false;
         }
 
         if ( oldMd.getArtifactId().equals( md.getArtifactId() ) && oldMd.getGroupId().equals( md.getGroupId() )

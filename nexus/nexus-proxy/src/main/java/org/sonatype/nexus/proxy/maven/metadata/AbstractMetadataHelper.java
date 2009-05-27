@@ -18,7 +18,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.mercury.repository.metadata.Plugin;
@@ -41,33 +40,26 @@ abstract public class AbstractMetadataHelper
     static final String SHA1_SUFFIX = ".sha1";
 
     static final String METADATA_SUFFIX = "/maven-metadata.xml";
-    
+
     static final String APPROPRIATE_GAV_PATTERN = "^[\\d\\w\\.-]*$";
 
     protected Logger logger;
-    
-    /**
-     * current groupId based on the current collection, if no groupId, it's null
-     */
-    String currentGroupId;
 
-    String currentArtifactId;
+    // key is the path where need to create g md, value is a collection of plugins
+    Map<String, Collection<Plugin>> gData = new HashMap<String, Collection<Plugin>>();
 
-    String currentVersion;
+    // key is the path where need to create ga md, value is a collection of versions
+    Map<String, Collection<String>> gaData = new HashMap<String, Collection<String>>();
 
-    // use artifact id to prevent multiple same plugins got recorded
-    Map<String, Plugin> currentPlugins = new HashMap<String, Plugin>();
-
-    List<String> currentVersions = new ArrayList<String>();
-
-    List<String> currentArtifacts = new ArrayList<String>();
+    // key is the path where need to create gav md, value is a collection of path names
+    Map<String, Collection<String>> gavData = new HashMap<String, Collection<String>>();
 
     private Collection<AbstractMetadataProcessor> metadataProcessors;
 
-    public AbstractMetadataHelper( Logger logger)
+    public AbstractMetadataHelper( Logger logger )
     {
         this.logger = logger;
-        
+
         // here the order matters
         metadataProcessors = new ArrayList<AbstractMetadataProcessor>( 3 );
 
@@ -98,8 +90,6 @@ abstract public class AbstractMetadataHelper
             }
         }
 
-        cleanGAV( path );
-
     }
 
     public void processFile( String path )
@@ -114,7 +104,7 @@ abstract public class AbstractMetadataHelper
         }
 
         rebuildChecksum( path );
-        
+
         if ( path.endsWith( "pom" ) )
         {
             updateMavenInfo( path );
@@ -151,40 +141,6 @@ abstract public class AbstractMetadataHelper
         return path.substring( pos + 1 );
     }
 
-    private boolean inGroupIdPath( String path )
-    {
-        if ( StringUtils.isEmpty( currentGroupId ) )
-        {
-            return false;
-        }
-        if ( path.substring( 1 ).replace( '/', '.' ).equals( currentGroupId ) )
-        {
-            return true;
-        }
-        return false;
-    }
-
-    private void cleanGAV( String path )
-    {
-        if ( currentVersion != null )
-        {
-            currentArtifacts.clear();
-        }
-
-        if ( currentVersion != null && getName( path ).equals( currentVersion ) )
-        {
-            currentVersion = null;
-        }
-        else if ( currentVersion == null && currentArtifactId != null && getName( path ).equals( currentArtifactId ) )
-        {
-            currentArtifactId = null;
-        }
-        else if ( currentArtifactId == null && currentGroupId != null && inGroupIdPath( path ) )
-        {
-            currentGroupId = null;
-        }
-    }
-
     protected void updateMavenInfo( String path )
         throws Exception
     {
@@ -209,57 +165,68 @@ abstract public class AbstractMetadataHelper
             reader = null;
         }
 
-        currentArtifactId = model.getArtifactId();
+        // groupId, artifactId, version, artifactName
+        String g, a, v, n;
 
-        if ( !StringUtils.isEmpty( model.getGroupId() ) )
-        {
-            currentGroupId = model.getGroupId();
-        }
-        else
-        {
-            currentGroupId = model.getParent().getGroupId();
-        }
+        g = model.getGroupId() == null ? model.getParent().getGroupId() : model.getGroupId();
+        a = model.getArtifactId();
+        v = model.getVersion() == null ? model.getParent().getVersion() : model.getVersion();
+        n = path.substring( path.lastIndexOf( '/' ) + 1 );
 
-        if ( !StringUtils.isEmpty( model.getVersion() ) )
-        {
-            currentVersion = model.getVersion();
-
-            currentVersions.add( model.getVersion() );
-        }
-        else
-        {
-            currentVersion = model.getParent().getVersion();
-
-            currentVersions.add( model.getParent().getVersion() );
-        }
-        
         // IF gav has potential problem, tell the user
-        warnIfNotAppropriate( currentGroupId, path, "Group Id" );
-        warnIfNotAppropriate( currentArtifactId, path, "Artifact Id" );
-        warnIfNotAppropriate( currentVersion, path, "Version" );
-        
+        warnIfNotAppropriate( g, path, "Group Id" );
+        warnIfNotAppropriate( a, path, "Artifact Id" );
+        warnIfNotAppropriate( v, path, "Version" );
 
-        currentArtifacts.add( path );
+        // GA
+        String gaPath = "/" + g.replace( '.', '/' ) + "/" + a;
 
+        if ( gaData.get( gaPath ) == null )
+        {
+            gaData.put( gaPath, new ArrayList<String>() );
+        }
+
+        gaData.get( gaPath ).add( v );
+
+        // GAV
+        if ( v.endsWith( "-SNAPSHOT" ) )
+        {
+            String gavPath = "/" + g.replace( '.', '/' ) + "/" + a + "/" + v;
+
+            if ( gavData.get( gavPath ) == null )
+            {
+                gavData.put( gavPath, new ArrayList<String>() );
+            }
+
+            gavData.get( gavPath ).add( n );
+        }
+
+        // G
         if ( model.getPackaging().equals( "maven-plugin" ) )
         {
             Plugin plugin = new Plugin();
 
-            plugin.setArtifactId( model.getArtifactId() );
+            plugin.setArtifactId( a );
 
-            plugin.setPrefix( getPluginPrefix( model.getArtifactId() ) );
+            plugin.setPrefix( getPluginPrefix( a ) );
 
             if ( !StringUtils.isEmpty( model.getName() ) )
             {
                 plugin.setName( model.getName() );
             }
 
-            currentPlugins.put( plugin.getArtifactId(), plugin );
+            String gPath = "/" + g.replace( '.', '/' );
+
+            if ( gData.get( gPath ) == null )
+            {
+                gData.put( gPath, new ArrayList<Plugin>() );
+            }
+
+            gData.get( gPath ).add( plugin );
         }
     }
-    
+
     /**
-     * 
      * @param idToValidate
      * @param path
      * @param logKey

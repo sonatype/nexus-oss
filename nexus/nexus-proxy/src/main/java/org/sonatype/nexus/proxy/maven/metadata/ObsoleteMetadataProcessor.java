@@ -25,7 +25,7 @@ public class ObsoleteMetadataProcessor
     }
 
     @Override
-    protected void postProcessMetadata()
+    public void postProcessMetadata( String path )
     {
         // do nothing
     }
