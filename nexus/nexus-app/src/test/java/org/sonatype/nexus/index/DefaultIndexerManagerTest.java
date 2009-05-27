@@ -13,40 +13,12 @@
  */
 package org.sonatype.nexus.index;
 
-import java.util.Collection;
-
-import org.apache.lucene.search.Query;
-import org.sonatype.nexus.AbstractMavenRepoContentTests;
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.scheduling.ScheduledTask;
 
 public class DefaultIndexerManagerTest
-    extends AbstractMavenRepoContentTests
+    extends AbstractIndexerManagerTest
 {
-    private IndexerManager indexerManager;
-    
-    private NexusScheduler nexusScheduler;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        indexerManager = lookup( IndexerManager.class );
-        
-        nexusScheduler = lookup( NexusScheduler.class );
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        indexerManager.shutdown( false );
-
-        super.tearDown();
-    }
-
     public void testRepoReindex()
         throws Exception
     {
@@ -59,21 +31,7 @@ public class DefaultIndexerManagerTest
         // make it block until finished
         st.get();
 
-        Query query = indexerManager.getNexusIndexer().constructQuery( ArtifactInfo.GROUP_ID, "org.sonatype.nexus" );
-        FlatSearchRequest request = new FlatSearchRequest( query );
-        
-        FlatSearchResponse response = indexerManager.getNexusIndexer().searchFlat( request );
-        
-        Collection<ArtifactInfo> result = response.getResults(); 
-
-        // expected result set
-        // org.sonatype.nexus:nexus-indexer:1.0-beta-5-SNAPSHOT:null:jar, 
-        // org.sonatype.nexus:nexus-indexer:1.0-beta-4:null:jar, 
-        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT:null:jar, 
-        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT:cli:jar, 
-        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT:jdk14:jar, 
-        // org.sonatype.nexus:nexus-indexer:1.0-beta-4-SNAPSHOT:sources:jar
-
-        assertEquals( result.toString(), 9, result.size() );
+        searchFor( "org.sonatype.nexus", 9 );
     }
+
 }

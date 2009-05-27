@@ -107,6 +107,9 @@ public interface IndexerManager
         throws NoSuchRepositoryException,
             IOException;
 
+    void resetGroupIndex( String groupId )
+        throws NoSuchRepositoryException, IOException;
+
     // ----------------------------------------------------------------------------
     // Downloading remote indexes (will do remote-download, merge only)
     // ----------------------------------------------------------------------------

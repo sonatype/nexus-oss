@@ -36,9 +36,11 @@ import org.apache.lucene.search.Query;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
+import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -52,6 +54,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.events.RepositoryConfigurationPreUpdatedEvent;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -67,6 +70,10 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.ResetGroupIndexTask;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * Indexer Manager. This is a thin layer above Nexus Indexer and simply manages indexingContext additions, updates and
@@ -76,13 +83,13 @@ import org.sonatype.nexus.tasks.ReindexTask;
  * remote peer is publishing index). In case of group reposes, the things are little different: their local context
  * contains the index of GroupRepository local storage, and remote context contains the merged indexes of it's member
  * repositories.
- * 
+ *
  * @author Tamas Cservenak
  */
 @Component( role = IndexerManager.class )
 public class DefaultIndexerManager
     extends AbstractLogEnabled
-    implements IndexerManager
+    implements IndexerManager, EventListener, Initializable
 
 {
     /** Context id local suffix */
@@ -114,6 +121,9 @@ public class DefaultIndexerManager
 
     @Requirement( hint = "maven2" )
     private ContentClass maven2;
+
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
 
     private File workingDirectory;
 
@@ -252,13 +262,13 @@ public class DefaultIndexerManager
         }
 
         // remove context for repository
-        nexusIndexer
-            .removeIndexingContext( nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) ),
-                                    deleteFiles );
+        nexusIndexer.removeIndexingContext(
+                                            nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) ),
+                                            deleteFiles );
 
-        nexusIndexer
-            .removeIndexingContext( nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryId ) ),
-                                    deleteFiles );
+        nexusIndexer.removeIndexingContext(
+                                            nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryId ) ),
+                                            deleteFiles );
     }
 
     public void updateRepositoryIndexContext( String repositoryId )
@@ -384,7 +394,7 @@ public class DefaultIndexerManager
 
     /**
      * Extracts the repo root on local FS as File. It may return null!
-     * 
+     *
      * @param repository
      * @return
      * @throws MalformedURLException
@@ -468,8 +478,7 @@ public class DefaultIndexerManager
         throws NoSuchRepositoryException, IOException
     {
         List<Repository> group =
-            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class )
-                .getMemberRepositories();
+            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
 
         // purge it, and below will be repopulated
         purgeRepositoryGroupIndex( repositoryGroupId );
@@ -480,6 +489,28 @@ public class DefaultIndexerManager
         }
 
         publishRepositoryGroupIndex( repositoryGroupId );
+    }
+
+    public void resetGroupIndex( String groupId )
+        throws NoSuchRepositoryException, IOException
+    {
+        getLogger().info( "Remerging group '" +  groupId + "'");
+        List<Repository> repositoriesList =
+            repositoryRegistry.getRepositoryWithFacet( groupId, GroupRepository.class ).getMemberRepositories();
+
+        IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( groupId ) );
+        purgeCurrentIndex( context );
+
+        // purge it, and below will be repopulated
+        purgeRepositoryGroupIndex( groupId );
+
+        for ( Repository repository : repositoriesList )
+        {
+            getLogger().info( "Remerging '" + repository.getId() + "' to '" + groupId + "'");
+            mergeRepositoryGroupIndexWithMember( repository );
+        }
+
+        publishRepositoryGroupIndex( groupId );
     }
 
     protected void reindexRepository( Repository repository, boolean fullReindex )
@@ -502,12 +533,7 @@ public class DefaultIndexerManager
             {
                 if ( fullReindex )
                 {
-                    File repoDir = context.getRepository();
-                    if ( repoDir != null && repoDir.isDirectory() )
-                    {
-                        File indexDir = new File( repoDir, ".index" );
-                        FileUtils.forceDelete( indexDir );
-                    }
+                    purgeCurrentIndex( context );
                     nexusIndexer.scan( context, false );
                 }
                 else
@@ -526,6 +552,17 @@ public class DefaultIndexerManager
         finally
         {
             repository.setIndexable( repositoryIndexable );
+        }
+    }
+
+    private void purgeCurrentIndex( IndexingContext context )
+        throws IOException
+    {
+        File repoDir = context.getRepository();
+        if ( repoDir != null && repoDir.isDirectory() )
+        {
+            File indexDir = new File( repoDir, ".index" );
+            FileUtils.forceDelete( indexDir );
         }
     }
 
@@ -576,8 +613,7 @@ public class DefaultIndexerManager
         throws IOException, NoSuchRepositoryException
     {
         List<Repository> group =
-            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class )
-                .getMemberRepositories();
+            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
 
         for ( Repository repository : group )
         {
@@ -1411,4 +1447,30 @@ public class DefaultIndexerManager
     {
         return repositoryId + CTX_REMOTE_SUFIX;
     }
+
+    public void onEvent( Event<?> evt )
+    {
+        if ( evt instanceof RepositoryConfigurationPreUpdatedEvent )
+        {
+            Repository repo = ( (RepositoryConfigurationPreUpdatedEvent) evt ).getRepository();
+
+            if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            {
+                ExternalConfiguration external = repo.getCurrentCoreConfiguration().getExternalConfiguration();
+                if ( external.isDirty() )
+                {
+                    // Update the repo
+                    ResetGroupIndexTask rt = nexusScheduler.createTaskInstance( ResetGroupIndexTask.class );
+                    rt.setRepositoryGroupId( repo.getId() );
+                    nexusScheduler.submit( "Update group index.", rt );
+                }
+            }
+        }
+    }
+
+    public void initialize()
+    {
+        applicationEventMulticaster.addEventListener( this );
+    }
+
 }
