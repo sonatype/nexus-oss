@@ -211,4 +211,9 @@ public class DefaultNexusItemAuthorizer
             return true;
         }
     }
+
+    public boolean isViewable( Repository repository )
+    {
+        return authorizePermission( "nexus:repoview:" + repository.getId() );
+    }
 }

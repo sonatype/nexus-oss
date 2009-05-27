@@ -11,7 +11,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.MirrorMessageUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
 
-public class AbstractMirrorTest
+public abstract class AbstractMirrorTest
     extends AbstractNexusIntegrationTest
 {
 

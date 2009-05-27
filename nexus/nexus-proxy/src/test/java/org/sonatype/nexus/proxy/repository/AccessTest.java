@@ -8,7 +8,6 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
-import org.jsecurity.SecurityUtils;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.subject.Subject;
 import org.sonatype.jettytestsuite.ServletServer;

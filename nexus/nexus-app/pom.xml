@@ -120,6 +120,12 @@
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
       <scope>test</scope>
+    </dependency>    
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-proxy</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

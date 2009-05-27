@@ -46,9 +46,6 @@ abstract public class AbstractNexusItemEventEntryBuilder
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    @Requirement
-    private NexusItemAuthorizer nexusItemAuthorizer;
-
     protected Nexus getNexus()
     {
         return nexus;
@@ -220,27 +217,6 @@ abstract public class AbstractNexusItemEventEntryBuilder
 
     public boolean shouldBuildEntry( NexusArtifactEvent event )
     {
-        try
-        {
-            Repository repo = getRepositoryRegistry().getRepository( event.getNexusItemInfo().getRepositoryId() );
-
-            ResourceStoreRequest req = new ResourceStoreRequest( event.getNexusItemInfo().getPath() );
-
-            if ( !nexusItemAuthorizer.authorizePath( repo, req, Action.read ) )
-            {
-                return false;
-            }
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // Can't get repository for artifact, therefore we can't authorize access, therefore you don't see it
-            getLogger().debug(
-                               "Feed entry contained invalid repository id "
-                                   + event.getNexusItemInfo().getRepositoryId(), e );
-
-            return false;
-        }
-
         return true;
     }
 }

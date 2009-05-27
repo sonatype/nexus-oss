@@ -47,14 +47,14 @@ public class Nexus429WagonDeployPrivilegeTest
         super( TEST_RELEASE_REPO );
     }
 
-//    @Test
+    @Test
     public void doReleaseArtifactTest()
         throws Exception
     {
         Gav gav =
             new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
                      null, false, null );
-        this.setTestRepositoryId( TEST_RELEASE_REPO );
+        this.setTestRepositoryId( TEST_RELEASE_REPO );        
         this.deployPrivWithWagon( gav, this.getNexusTestRepoUrl() );
     }
 
@@ -65,8 +65,18 @@ public class Nexus429WagonDeployPrivilegeTest
         Gav gav =
             new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "", false,
                      false, null, false, null );
-        this.setTestRepositoryId( TEST_SNAPSHOT_REPO );
+        this.setTestRepositoryId( TEST_SNAPSHOT_REPO );        
         this.deployPrivWithWagon( gav, this.getNexusTestRepoUrl() );
+    }
+    
+    @Override
+    public void resetTestUserPrivs()
+    throws Exception
+    {
+        super.resetTestUserPrivs();
+        
+        // give use view access to everything, (this acts like > 1.4)
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
     }
 
     private void deployPrivWithWagon( Gav gav, String repoUrl )

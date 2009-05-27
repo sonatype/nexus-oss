@@ -125,6 +125,9 @@ public class DefaultIndexerManager
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
 
+    @Requirement
+    private IndexArtifactFilter indexArtifactFilter;
+    
     private File workingDirectory;
 
     private File tempDirectory;
@@ -1385,8 +1388,17 @@ public class DefaultIndexerManager
         {
             ArtifactInfo ai = i.next();
 
-            ai.context = formatContextId( ai );
+            if ( this.indexArtifactFilter.filterArtifactInfo( ai ) )
+            {
+                ai.context = formatContextId( ai );
+            }
+            else
+            {
+                // remove the artifact, the user does not have access to it
+                i.remove();
+            }
         }
+
     }
 
     protected String formatContextId( ArtifactInfo ai )

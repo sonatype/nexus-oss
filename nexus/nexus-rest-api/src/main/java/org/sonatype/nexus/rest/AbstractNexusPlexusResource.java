@@ -364,12 +364,6 @@ public abstract class AbstractNexusPlexusResource
                     null );
 
                 ResourceStoreRequest req = new ResourceStoreRequest( mr.getGavCalculator().gavToPath( gav ) );
-
-                if ( !nexusItemAuthorizer.authorizePath( mr, req, Action.read ) )
-                {
-                    return null;
-                }
-
                 a.setResourceURI( createRepositoryReference( request, ai.repository, req.getRequestPath() ).toString() );
             }
         }

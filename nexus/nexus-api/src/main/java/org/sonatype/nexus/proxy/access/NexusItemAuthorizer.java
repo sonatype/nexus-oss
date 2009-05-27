@@ -44,10 +44,20 @@ public interface NexusItemAuthorizer
     boolean authorizePath( Repository repository, ResourceStoreRequest request, Action action );
 
     /**
+     * A shorthand for "view" permission.
+     * 
+     * @param repository
+     * @return
+     */
+    boolean isViewable( Repository repository );
+
+    
+    /**
      * Used to authorize a simple permission string
      * 
      * @param permission
      * @return
      */
     boolean authorizePermission( String permission );
+
 }

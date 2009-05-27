@@ -20,7 +20,10 @@ public class Nexus1560LegacyAllowGroupRulesTest
     @Test
     public void fromGroup()
         throws Exception
-    {
+    {   
+        // the user also needs the view priv
+        addPrivilege( TEST_USER_NAME, "repository-"+ NEXUS1560_GROUP );
+        
         String downloadUrl = GROUP_REPOSITORY_RELATIVE_URL + NEXUS1560_GROUP + "/" + getRelitiveArtifactPath( gavArtifact1 );
 
         successDownload( downloadUrl );
@@ -30,6 +33,9 @@ public class Nexus1560LegacyAllowGroupRulesTest
     public void fromRepository()
         throws Exception
     {
+     // the user also needs the view priv
+        addPrivilege( TEST_USER_NAME, "repository-"+ REPO_TEST_HARNESS_REPO );
+        
         String downloadUrl =
             REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO + "/" + getRelitiveArtifactPath( gavArtifact1 );
 

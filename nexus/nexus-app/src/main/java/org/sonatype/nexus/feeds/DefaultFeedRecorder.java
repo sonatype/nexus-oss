@@ -97,6 +97,13 @@ public class DefaultFeedRecorder
      */
     @Requirement
     private Timeline timeline;
+    
+    /**
+     * The Feed filter (will checks for user access )
+     */
+    @Requirement
+    private FeedArtifactEventFilter feedArtifactEventFilter;
+
 
     protected DateFormat getDateFormat()
     {
@@ -151,7 +158,7 @@ public class DefaultFeedRecorder
             result.add( nae );
         }
 
-        return result;
+        return this.feedArtifactEventFilter.filterArtifactEventList( result );
     }
 
     protected List<SystemEvent> getSesFromMaps( List<Map<String, String>> data )
