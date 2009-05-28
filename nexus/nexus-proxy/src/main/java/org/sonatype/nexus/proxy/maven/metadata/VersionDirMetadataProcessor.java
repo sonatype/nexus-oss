@@ -11,6 +11,7 @@ import org.apache.maven.mercury.repository.metadata.MetadataException;
 import org.apache.maven.mercury.repository.metadata.MetadataOperation;
 import org.apache.maven.mercury.repository.metadata.SetSnapshotOperation;
 import org.apache.maven.mercury.repository.metadata.StringOperand;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Process maven metadata in snapshot version directory
@@ -125,13 +126,15 @@ public class VersionDirMetadataProcessor
 
         Metadata md = createMetadata( path );
 
-        if ( oldMd.getArtifactId().equals( md.getArtifactId() )
-            && oldMd.getGroupId().equals( md.getGroupId() )
-            && oldMd.getVersion().equals( md.getVersion() )
-            && oldMd.getVersioning().getSnapshot().getTimestamp().equals(
-                md.getVersioning().getSnapshot().getTimestamp() )
-            && oldMd.getVersioning().getSnapshot().getBuildNumber() == md
-                .getVersioning().getSnapshot().getBuildNumber() )
+        if ( StringUtils.equals( oldMd.getArtifactId(), md.getArtifactId() )
+            && StringUtils.equals( oldMd.getGroupId(), md.getGroupId() )
+            && StringUtils.equals( oldMd.getVersion(), md.getVersion() )
+            && md.getVersioning() != null
+            && md.getVersioning().getSnapshot() != null
+            && StringUtils.equals( oldMd.getVersioning().getSnapshot().getTimestamp(), md.getVersioning().getSnapshot()
+                .getTimestamp() )
+            && oldMd.getVersioning().getSnapshot().getBuildNumber() == md.getVersioning().getSnapshot()
+                .getBuildNumber() )
         {
             return true;
         }

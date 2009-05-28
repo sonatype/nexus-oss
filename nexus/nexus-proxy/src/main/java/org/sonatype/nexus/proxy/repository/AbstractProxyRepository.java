@@ -170,7 +170,7 @@ public abstract class AbstractProxyRepository
 
     public String getRemoteUrl()
     {
-        if ( getRemoteStorage() != null )
+        if ( getCurrentConfiguration( false ).getRemoteStorage() != null )
         {
             return getCurrentConfiguration( false ).getRemoteStorage().getUrl();
         }

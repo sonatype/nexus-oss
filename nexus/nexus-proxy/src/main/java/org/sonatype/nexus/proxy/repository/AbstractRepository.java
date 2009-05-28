@@ -42,7 +42,6 @@ import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
-import org.sonatype.nexus.proxy.events.RepositoryConfigurationPreUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireCaches;
@@ -92,7 +91,7 @@ import org.sonatype.plexus.appevents.EventListener;
  * </ul>
  * <p>
  * The subclasses only needs to implement the abstract method focusing on item retrieaval and other "basic" functions.
- *
+ * 
  * @author cstamas
  */
 public abstract class AbstractRepository
@@ -171,22 +170,23 @@ public abstract class AbstractRepository
 
     public void onEvent( Event<?> evt )
     {
-        // act automatically on repo removal
+        // act automatically on config events
         if ( evt instanceof ConfigurationPrepareForSaveEvent )
         {
             if ( isDirty() )
             {
-                applicationEventMulticaster.notifyEventListeners( new RepositoryConfigurationPreUpdatedEvent(this) );
+                getConfigurator().prepareForSave( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
 
                 ConfigurationPrepareForSaveEvent psevt = (ConfigurationPrepareForSaveEvent) evt;
-
-                getConfigurator().prepareForSave( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
 
                 psevt.getChanges().add( this );
 
                 // cstamas
                 // XXX: hrm, emitting an event in event handler?
-                applicationEventMulticaster.notifyEventListeners( new RepositoryConfigurationUpdatedEvent(this) );
+                // do something in plexus-app-events like "chainable" events? Let Event have something like
+                // evt.addPostFireEvent( evt1 ) which could be a list, and all events added to that list would invoke
+                // another round of notifyEventListeners call )and would be handled by plexus-app-events in generic way)
+                applicationEventMulticaster.notifyEventListeners( new RepositoryConfigurationUpdatedEvent( this ) );
             }
         }
         else if ( evt instanceof ConfigurationRollbackEvent )
@@ -224,7 +224,7 @@ public abstract class AbstractRepository
 
     /**
      * Gets the cache manager.
-     *
+     * 
      * @return the cache manager
      */
     protected CacheManager getCacheManager()
@@ -234,7 +234,7 @@ public abstract class AbstractRepository
 
     /**
      * Sets the cache manager.
-     *
+     * 
      * @param cacheManager the new cache manager
      */
     protected void setCacheManager( CacheManager cacheManager )
@@ -244,7 +244,7 @@ public abstract class AbstractRepository
 
     /**
      * Gets the not found cache.
-     *
+     * 
      * @return the not found cache
      */
     public PathCache getNotFoundCache()
@@ -260,7 +260,7 @@ public abstract class AbstractRepository
 
     /**
      * Sets the not found cache.
-     *
+     * 
      * @param notFoundcache the new not found cache
      */
     public void setNotFoundCache( PathCache notFoundcache )
@@ -426,7 +426,7 @@ public abstract class AbstractRepository
     @SuppressWarnings( "unchecked" )
     public <F> F adaptToFacet( Class<F> t )
     {
-        if (getRepositoryKind().isFacetAvailable( t ))
+        if ( getRepositoryKind().isFacetAvailable( t ) )
         {
             return (F) this;
         }
@@ -1083,7 +1083,7 @@ public abstract class AbstractRepository
     // Inner stuff
     /**
      * Maintains not found cache.
-     *
+     * 
      * @param path the path
      * @throws ItemNotFoundException the item not found exception
      */
@@ -1118,7 +1118,7 @@ public abstract class AbstractRepository
 
     /**
      * Adds the uid to not found cache.
-     *
+     * 
      * @param path the path
      */
     public void addToNotFoundCache( String path )
@@ -1136,7 +1136,7 @@ public abstract class AbstractRepository
 
     /**
      * Removes the uid from not found cache.
-     *
+     * 
      * @param path the path
      */
     public void removeFromNotFoundCache( String path )
@@ -1154,7 +1154,7 @@ public abstract class AbstractRepository
 
     /**
      * Check conditions, such as availability, permissions, etc.
-     *
+     * 
      * @param request the request
      * @param permission the permission
      * @return false, if the request should not be processed with response appropriate for current method, or true is

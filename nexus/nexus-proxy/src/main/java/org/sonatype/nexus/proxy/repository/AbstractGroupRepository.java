@@ -20,12 +20,14 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -58,6 +60,9 @@ public abstract class AbstractGroupRepository
     @Override
     public void onEvent( Event<?> evt )
     {
+        // we must do this before the super.onEvent() call!
+        boolean membersChanged = getExternalConfiguration().isDirty() && getExternalConfiguration().membersChanged();
+
         super.onEvent( evt );
 
         // act automatically on repo removal. Remove it from myself if member.
@@ -68,6 +73,12 @@ public abstract class AbstractGroupRepository
             // remove it from members (will nothing happen if not amongs them)
             removeMemberRepositoryId( revt.getRepository().getId() );
         }
+        else if ( evt instanceof ConfigurationPrepareForSaveEvent && membersChanged )
+        {
+            // fire another event
+            getApplicationEventMulticaster().notifyEventListeners( new RepositoryGroupMembersChangedEvent( this ) );
+        }
+
     }
 
     @Override

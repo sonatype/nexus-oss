@@ -16,6 +16,10 @@ public class CRepositoryCoreConfiguration
         ( (CRepository) destination ).setExternalConfiguration( ( (CRepository) source ).getExternalConfiguration() );
 
         ( (CRepository) destination ).externalConfigurationImple = ( (CRepository) source ).externalConfigurationImple;
+
+        // trick with RemoteStorage, which is an object, and XStream will not "overlap" it properly (ie. destionation !=
+        // null but source == null)
+        ( (CRepository) destination ).setRemoteStorage( ( (CRepository) source ).getRemoteStorage() );
     }
 
     public ExternalConfiguration getExternalConfiguration()

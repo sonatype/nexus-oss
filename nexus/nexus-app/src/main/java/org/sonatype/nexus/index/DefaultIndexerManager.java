@@ -40,7 +40,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
-import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -54,7 +53,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.events.RepositoryConfigurationPreUpdatedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -83,7 +82,7 @@ import org.sonatype.plexus.appevents.EventListener;
  * remote peer is publishing index). In case of group reposes, the things are little different: their local context
  * contains the index of GroupRepository local storage, and remote context contains the merged indexes of it's member
  * repositories.
- *
+ * 
  * @author Tamas Cservenak
  */
 @Component( role = IndexerManager.class )
@@ -265,13 +264,13 @@ public class DefaultIndexerManager
         }
 
         // remove context for repository
-        nexusIndexer.removeIndexingContext(
-                                            nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) ),
-                                            deleteFiles );
+        nexusIndexer
+            .removeIndexingContext( nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) ),
+                                    deleteFiles );
 
-        nexusIndexer.removeIndexingContext(
-                                            nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryId ) ),
-                                            deleteFiles );
+        nexusIndexer
+            .removeIndexingContext( nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryId ) ),
+                                    deleteFiles );
     }
 
     public void updateRepositoryIndexContext( String repositoryId )
@@ -397,7 +396,7 @@ public class DefaultIndexerManager
 
     /**
      * Extracts the repo root on local FS as File. It may return null!
-     *
+     * 
      * @param repository
      * @return
      * @throws MalformedURLException
@@ -481,7 +480,8 @@ public class DefaultIndexerManager
         throws NoSuchRepositoryException, IOException
     {
         List<Repository> group =
-            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
+            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class )
+                .getMemberRepositories();
 
         for ( Repository repository : group )
         {
@@ -617,7 +617,8 @@ public class DefaultIndexerManager
         throws IOException, NoSuchRepositoryException
     {
         List<Repository> group =
-            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
+            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class )
+                .getMemberRepositories();
 
         for ( Repository repository : group )
         {
@@ -1463,21 +1464,14 @@ public class DefaultIndexerManager
 
     public void onEvent( Event<?> evt )
     {
-        if ( evt instanceof RepositoryConfigurationPreUpdatedEvent )
+        if ( evt instanceof RepositoryGroupMembersChangedEvent )
         {
-            Repository repo = ( (RepositoryConfigurationPreUpdatedEvent) evt ).getRepository();
+            GroupRepository repo = ( (RepositoryGroupMembersChangedEvent) evt ).getGroupRepository();
 
-            if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
-            {
-                ExternalConfiguration external = repo.getCurrentCoreConfiguration().getExternalConfiguration();
-                if ( external.isDirty() )
-                {
-                    // Update the repo
-                    ResetGroupIndexTask rt = nexusScheduler.createTaskInstance( ResetGroupIndexTask.class );
-                    rt.setRepositoryGroupId( repo.getId() );
-                    nexusScheduler.submit( "Update group index.", rt );
-                }
-            }
+            // Update the repo
+            ResetGroupIndexTask rt = nexusScheduler.createTaskInstance( ResetGroupIndexTask.class );
+            rt.setRepositoryGroupId( repo.getId() );
+            nexusScheduler.submit( "Update group index.", rt );
         }
     }
 
