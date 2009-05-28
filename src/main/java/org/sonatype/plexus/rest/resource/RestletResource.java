@@ -355,7 +355,7 @@ public class RestletResource
 
         // if we have an Entity set, then return a 200 (default)
         // if not return a 204
-        if ( !getResponse().isEntityAvailable() )
+        if ( getResponse().getStatus() == Status.SUCCESS_OK && !getResponse().isEntityAvailable() )
         {
             getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
         }
