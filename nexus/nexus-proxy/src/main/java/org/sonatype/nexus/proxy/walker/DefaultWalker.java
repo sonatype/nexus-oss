@@ -71,7 +71,7 @@ public class DefaultWalker
 
         try
         {
-            item = context.getRepository().retrieveItem( context.getResourceStoreRequest() );
+            item = context.getRepository().retrieveItem( true, context.getResourceStoreRequest() );
         }
         catch ( ItemNotFoundException ex )
         {
