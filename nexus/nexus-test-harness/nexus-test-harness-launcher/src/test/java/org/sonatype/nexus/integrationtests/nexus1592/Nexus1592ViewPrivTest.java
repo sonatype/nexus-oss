@@ -118,7 +118,7 @@ public class Nexus1592ViewPrivTest
     {
         Response response = delete();
         Status status = response.getStatus();
-        Assert.assertTrue( "Unable to download artifact from repository: " + status, status.isError() );
+        Assert.assertTrue( "Delete should have failed: " + status, status.isError() );
         return response;
     }
 
@@ -127,7 +127,7 @@ public class Nexus1592ViewPrivTest
     {
         Response response = delete();
         Status status = response.getStatus();
-        Assert.assertTrue( "Unable to download artifact from repository: " + status, status.isSuccess() );
+        Assert.assertTrue( "Unable to delete artifact from repository: " + status, status.isSuccess() );
         return response;
     }
 
