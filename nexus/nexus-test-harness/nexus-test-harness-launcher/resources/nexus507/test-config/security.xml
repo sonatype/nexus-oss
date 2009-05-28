@@ -66,6 +66,7 @@
       <sessionTimeout>1</sessionTimeout>
       <privileges>
         <privilege>1000</privilege>
+        <privilege>1001</privilege> <!-- Security admin needed to access users -->
       </privileges>
     </role>
   </roles>

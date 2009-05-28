@@ -142,10 +142,10 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.4.2</version>
         <configuration>
-          <!--<excludes>
+          <excludes>
             <exclude>**/M1LayoutedM2ShadowRepositoryTest.java</exclude>
             <exclude>**/ConfigurationChangeEventTest.java</exclude>
-          </excludes>-->
+          </excludes>
 
         </configuration>
       </plugin>

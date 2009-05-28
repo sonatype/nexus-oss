@@ -22,6 +22,7 @@ import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.proxy.target.TargetMatch;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
+import org.sonatype.nexus.security.WebSecurityUtil;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 
@@ -102,8 +103,10 @@ public class AccessTest
         throws AuthenticationException,
             Exception
     {
+        WebSecurityUtil.setupWebContext( username + "-" + repositoryId + "-" + path );
+
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
-        
+
         Subject subject = securitySystem.login( new UsernamePasswordToken( username, "" ) );
 
         Repository repo = this.getRepositoryRegistry().getRepository( repositoryId );
@@ -165,5 +168,4 @@ public class AccessTest
         super.customizeContext( ctx );
         ctx.put( "security-xml-file", new File( CONF_HOME, "security.xml" ).getAbsolutePath() );
     }
-
 }

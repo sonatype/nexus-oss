@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
+import org.sonatype.nexus.security.WebSecurityUtil;
 import org.sonatype.nexus.timeline.DefaultTimeline;
 import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.security.DefaultSecuritySystem;
@@ -120,6 +121,8 @@ public class ViewAccessTest
         throws AccessDeniedException,
             Exception
     {
+        WebSecurityUtil.setupWebContext( username + "-" + repositoryId + "-" + path );
+
         Subject subject = securitySystem.login( new UsernamePasswordToken( username, "" ) );
 
         Repository repo = this.getRepositoryRegistry().getRepository( repositoryId );
@@ -183,6 +186,7 @@ public class ViewAccessTest
         throws AuthenticationException
     {
         // login
+        WebSecurityUtil.setupWebContext( username + "-feed" );
         Subject subject = securitySystem.login( new UsernamePasswordToken( username, "" ) );
 
         List<NexusArtifactEvent> events = this.feedRecorder.getNexusArtifactEvents( new HashSet<String>( Arrays
@@ -203,7 +207,8 @@ public class ViewAccessTest
     // search tests!
     public void testSearch()
         throws NoSuchRepositoryException,
-            IOException, AuthenticationException
+            IOException,
+            AuthenticationException
     {
         String repoId = "test";
         String artifactId = "foo";
@@ -235,21 +240,24 @@ public class ViewAccessTest
         ArtifactInfo resultArtifact = this.searchForSingleArtifact( "alltest", artifactId, repoId );
         Assert.assertNotNull( resultArtifact );
         Assert.assertEquals( artifactId, resultArtifact.artifactId );
-        
+
         // now try with a user with no access
         resultArtifact = this.searchForSingleArtifact( "wrong-target", artifactId, repoId );
         Assert.assertNull( resultArtifact );
-        
+
         // and now for a user with the target priv but no view
         resultArtifact = this.searchForSingleArtifact( "test-noview", artifactId, repoId );
         Assert.assertNotNull( resultArtifact );
         Assert.assertEquals( artifactId, resultArtifact.artifactId );
-        
+
     }
 
-    private ArtifactInfo searchForSingleArtifact( String username, String artifactId, String repositoryId ) throws AuthenticationException, NoSuchRepositoryException
+    private ArtifactInfo searchForSingleArtifact( String username, String artifactId, String repositoryId )
+        throws AuthenticationException,
+            NoSuchRepositoryException
     {
         // login
+        WebSecurityUtil.setupWebContext( username + "-" + repositoryId );
         Subject subject = securitySystem.login( new UsernamePasswordToken( username, "" ) );
 
         FlatSearchResponse searchResult = indexerManager.searchArtifactFlat(
@@ -263,12 +271,12 @@ public class ViewAccessTest
         // logout
         securitySystem.logout( subject.getPrincipals() );
 
-        if( !searchResult.getResults().isEmpty())
+        if ( !searchResult.getResults().isEmpty() )
         {
             return searchResult.getResults().iterator().next();
         }
-        
+
         return null;
-        
+
     }
 }

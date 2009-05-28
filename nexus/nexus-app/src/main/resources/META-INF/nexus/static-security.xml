@@ -498,6 +498,22 @@
                 </property>
             </properties>
         </privilege>
+            <privilege>
+            <id>2</id>
+            <type>method</type>
+            <name>Login to UI</name>
+            <description>Give permission to allow a user to login to nexus.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:authentication</value>
+                </property>
+            </properties>
+        </privilege>
         <privilege>
             <id>3</id>
             <type>method</type>
