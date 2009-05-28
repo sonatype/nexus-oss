@@ -12,17 +12,28 @@
  */
 package org.sonatype.security.realms;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
 import java.util.Collection;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.easymock.EasyMock;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.authz.Permission;
 import org.jsecurity.subject.SimplePrincipalCollection;
 import org.jsecurity.subject.Subject;
+import org.jsecurity.web.WebUtils;
 import org.sonatype.security.AbstractSecurityTest;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 
-public class DefaultPlexusSecurityTest
+public class SecurityAuthenticationTest
     extends AbstractSecurityTest
 {
     private SecuritySystem security;
@@ -40,6 +51,21 @@ public class DefaultPlexusSecurityTest
     {
         UsernamePasswordToken upToken = new UsernamePasswordToken( "username", "password" );
 
+        HttpServletRequest mockRequest = EasyMock.createNiceMock( HttpServletRequest.class );
+        HttpServletResponse mockResponse = EasyMock.createNiceMock( HttpServletResponse.class );
+        HttpSession mockSession = EasyMock.createNiceMock( HttpSession.class );
+        
+        EasyMock.expect(mockSession.getId()).andReturn("test").anyTimes();
+        EasyMock.expect(mockRequest.getCookies()).andReturn(null).anyTimes();
+        EasyMock.expect( mockRequest.getSession()).andReturn( mockSession ).anyTimes();
+        EasyMock.expect( mockRequest.getSession( false )).andReturn( mockSession ).anyTimes();
+        replay(mockSession);
+        replay(mockRequest);
+        
+        // we need to bind for the "web" impl of the RealmSecurityManager to work
+        WebUtils.bind( mockRequest );
+        WebUtils.bind( mockResponse );
+        
         Subject ai = security.login( upToken );
        
         assertEquals( "username", ai.getPrincipal().toString() );

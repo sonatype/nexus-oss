@@ -61,7 +61,11 @@ public class DefaultSecuritySystem
     @Requirement
     private SecurityConfigurationManager securityConfiguration;
 
-    @Requirement
+    /**
+     * This is the jsecurity Security Manager. IDEA: we could lazy load this so the config could be in the
+     * security-configuration.xml file. or of course you could just change the plexus.xml
+     */
+    @Requirement( hint = "web" )
     private RealmSecurityManager securityManager;
 
     @Requirement( role = UserManager.class )

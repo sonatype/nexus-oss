@@ -15,7 +15,7 @@ import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
 @Component( role = RealmSecurityManager.class )
-public class PlexusSecurityManager
+public class DefaultPlexusSecurityManager
     extends DefaultSecurityManager
     implements Initializable, Disposable
 {

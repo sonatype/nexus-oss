@@ -33,7 +33,7 @@ public class WebPlexusSecurityTest
         // Start up security
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
         
-        RealmSecurityManager realmSecurityManager = this.lookup( RealmSecurityManager.class );
+        RealmSecurityManager realmSecurityManager = this.lookup( RealmSecurityManager.class, "web" );
         
         List<String> realms = securitySystem.getRealms();
         realms.clear();

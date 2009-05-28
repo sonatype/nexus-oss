@@ -54,7 +54,7 @@ public class PlexusConfiguration
 
     public static final String SECURITY_MANAGER_ROLE_HINT = "securityManagerRoleHint";
 
-    public static final String DEFAULT_SECURITY_MANAGER_ROLE_HINT = "default";
+    public static final String DEFAULT_SECURITY_MANAGER_ROLE_HINT = "web";
 
     private static final Logger logger = LoggerFactory.getLogger( PlexusConfiguration.class );
 

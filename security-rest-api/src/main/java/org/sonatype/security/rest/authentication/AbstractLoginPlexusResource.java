@@ -12,8 +12,6 @@
  */
 package org.sonatype.security.rest.authentication;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -21,9 +19,6 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.rest.model.AuthenticationLoginResource;
 import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.security.usermanagement.User;
@@ -34,8 +29,7 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * 
  * @author cstamas
  */
-@Component( role = PlexusResource.class, hint = "LoginPlexusResource" )
-public class LoginPlexusResource
+public abstract class AbstractLoginPlexusResource
     extends AbstractUIPermissionCalculatingPlexusResource
 {
     @Override
@@ -48,12 +42,6 @@ public class LoginPlexusResource
     public String getResourceUri()
     {
         return "/authentication/login";
-    }
-
-    @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[security:authentication]" );
     }
 
     @Override
