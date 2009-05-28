@@ -109,7 +109,7 @@ public class RepositoryMessageUtil
             RepositoryResource expected = (RepositoryResource) repo;
             RepositoryResource actual = (RepositoryResource) responseResource;
 
-//            Assert.assertEquals( expected.getChecksumPolicy(), actual.getChecksumPolicy() );
+            // Assert.assertEquals( expected.getChecksumPolicy(), actual.getChecksumPolicy() );
 
             // TODO: sometimes the storage dir ends with a '/' SEE: NEXUS-542
             if ( actual.getDefaultLocalStorageUrl().endsWith( "/" ) )
@@ -310,10 +310,24 @@ public class RepositoryMessageUtil
     public static void updateIndexes( String... repositories )
         throws Exception
     {
+        reindex( repositories, false );
+    }
 
+    private static void reindex( String[] repositories, boolean incremental )
+        throws IOException, Exception
+    {
         for ( String repo : repositories )
         {
-            String serviceURI = "service/local/data_index/repositories/" + repo + "/content";
+            String serviceURI;
+            if ( incremental )
+            {
+                serviceURI = "service/local/data_incremental_index/repositories/" + repo + "/content";
+            }
+            else
+            {
+                serviceURI = "service/local/data_index/repositories/" + repo + "/content";
+            }
+
             Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
             Status status = response.getStatus();
             Assert.assertTrue( "Fail to update " + repo + " repository index " + status, status.isSuccess() );
@@ -321,7 +335,12 @@ public class RepositoryMessageUtil
 
         // let s w8 a few time for indexes
         TaskScheduleUtil.waitForTasks();
+    }
 
+    public static void updateIncrementalIndexes( String... repositories )
+        throws Exception
+    {
+        reindex( repositories, true );
     }
 
     public RepositoryStatusResource getStatus( String repoId )

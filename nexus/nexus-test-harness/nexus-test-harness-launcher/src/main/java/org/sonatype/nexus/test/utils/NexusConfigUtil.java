@@ -14,10 +14,7 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,7 +25,6 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationRequest;
@@ -65,29 +61,6 @@ public class NexusConfigUtil
         return config.getConfiguration();
     }
 
-    private static void saveConfig( Configuration config )
-        throws IOException
-    {
-        Writer fw = null;
-        try
-        {
-            FileOutputStream fos = new FileOutputStream( getNexusFile() );
-            fw = new OutputStreamWriter( fos );
-
-            NexusConfigurationXpp3Writer writer = new NexusConfigurationXpp3Writer();
-
-            writer.write( fw, config );
-        }
-        finally
-        {
-            if ( fw != null )
-            {
-                fw.flush();
-                fw.close();
-            }
-        }
-    }
-
     public static File getNexusFile()
     {
         return new File( AbstractNexusIntegrationTest.WORK_CONF_DIR, "nexus.xml" );
@@ -118,6 +91,7 @@ public class NexusConfigUtil
         TestContainer.getInstance().lookup( SecuritySystem.class ).setSecurityEnabled( enabled );
     }
 
+    @SuppressWarnings("unchecked")
     public static M2LayoutedM1ShadowRepositoryConfiguration getRepoShadow( String repoId )
         throws IOException
     {
@@ -140,6 +114,7 @@ public class NexusConfigUtil
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static CRepository getRepo( String repoId )
         throws IOException
     {
@@ -172,6 +147,7 @@ public class NexusConfigUtil
 
     }
 
+    @SuppressWarnings("unchecked")
     public static M2GroupRepositoryConfiguration getGroup( String groupId )
         throws IOException
     {
@@ -194,6 +170,7 @@ public class NexusConfigUtil
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static M2RepositoryConfiguration getM2Repo( String id )
         throws IOException
     {

@@ -49,6 +49,8 @@ public abstract class AbstractMavenRepoContentTests
 
     protected MavenRepository apacheSnapshots;
 
+    protected MavenProxyRepository central;
+
     @Override
     protected void setUp()
         throws Exception
@@ -70,6 +72,8 @@ public abstract class AbstractMavenRepoContentTests
         releases = (MavenRepository) repositoryRegistry.getRepository( "releases" );
 
         apacheSnapshots = (MavenRepository) repositoryRegistry.getRepository( "apache-snapshots" );
+
+        central = (MavenProxyRepository) repositoryRegistry.getRepository( "central" );
     }
 
     @Override

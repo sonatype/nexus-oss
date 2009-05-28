@@ -127,7 +127,7 @@ public class DefaultIndexerManager
 
     @Requirement
     private IndexArtifactFilter indexArtifactFilter;
-    
+
     private File workingDirectory;
 
     private File tempDirectory;
@@ -494,19 +494,18 @@ public class DefaultIndexerManager
     public void resetGroupIndex( String groupId )
         throws NoSuchRepositoryException, IOException
     {
-        getLogger().info( "Remerging group '" +  groupId + "'");
+        getLogger().info( "Remerging group '" + groupId + "'" );
         List<Repository> repositoriesList =
             repositoryRegistry.getRepositoryWithFacet( groupId, GroupRepository.class ).getMemberRepositories();
 
-        IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( groupId ) );
-        purgeCurrentIndex( context );
+        purgeCurrentIndex( groupId );
 
         // purge it, and below will be repopulated
         purgeRepositoryGroupIndex( groupId );
 
         for ( Repository repository : repositoriesList )
         {
-            getLogger().info( "Remerging '" + repository.getId() + "' to '" + groupId + "'");
+            getLogger().info( "Remerging '" + repository.getId() + "' to '" + groupId + "'" );
             mergeRepositoryGroupIndexWithMember( repository );
         }
 
@@ -527,13 +526,14 @@ public class DefaultIndexerManager
         {
             repository.setIndexable( false );
 
+            purgeCurrentIndex( repository.getId() );
+
             IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
 
             synchronized ( context )
             {
                 if ( fullReindex )
                 {
-                    purgeCurrentIndex( context );
                     nexusIndexer.scan( context, false );
                 }
                 else
@@ -555,14 +555,18 @@ public class DefaultIndexerManager
         }
     }
 
-    private void purgeCurrentIndex( IndexingContext context )
+    private void purgeCurrentIndex( String repositoryId )
         throws IOException
     {
-        File repoDir = context.getRepository();
-        if ( repoDir != null && repoDir.isDirectory() )
+        IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
+        synchronized ( context )
         {
-            File indexDir = new File( repoDir, ".index" );
-            FileUtils.forceDelete( indexDir );
+            File repoDir = context.getRepository();
+            if ( repoDir != null && repoDir.isDirectory() )
+            {
+                File indexDir = new File( repoDir, ".index" );
+                FileUtils.forceDelete( indexDir );
+            }
         }
     }
 

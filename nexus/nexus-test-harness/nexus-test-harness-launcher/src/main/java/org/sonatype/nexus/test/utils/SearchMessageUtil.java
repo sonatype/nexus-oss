@@ -25,6 +25,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryResource;
@@ -37,7 +38,7 @@ import com.thoughtworks.xstream.XStream;
 public class SearchMessageUtil
 {
 
-    private Logger log = Logger.getLogger( getClass() );
+    private static Logger log = Logger.getLogger( SearchMessageUtil.class );
 
     private static XStream xstream;
 
@@ -60,7 +61,7 @@ public class SearchMessageUtil
         return doSearchFor( queryArgs, null );
     }
 
-    public Response doSearchFor( Map<String, String> queryArgs, String repositoryId )
+    public static Response doSearchFor( Map<String, String> queryArgs, String repositoryId )
         throws Exception
     {
         StringBuffer serviceURI = null;
@@ -92,14 +93,14 @@ public class SearchMessageUtil
         return searchFor( queryArgs );
     }
 
-    @SuppressWarnings( "unchecked" )
-    public List<NexusArtifact> searchFor( Map<String, String> queryArgs )
+    public static List<NexusArtifact> searchFor( Map<String, String> queryArgs )
         throws Exception
     {
         return searchFor( queryArgs, null );
     }
 
-    public List<NexusArtifact> searchFor( Map<String, String> queryArgs, String repositoryId )
+    @SuppressWarnings( "unchecked" )
+    public static List<NexusArtifact> searchFor( Map<String, String> queryArgs, String repositoryId )
         throws Exception
     {
         String responseText = doSearchFor( queryArgs, repositoryId ).getEntity().getText();
@@ -205,7 +206,13 @@ public class SearchMessageUtil
         return RequestFacade.doGetRequest( serviceURI );
     }
 
-    public List<NexusArtifact> searchFor( String groupId, String artifactId, String version )
+    public static List<NexusArtifact> searchFor( String groupId, String artifactId, String version )
+        throws Exception
+    {
+        return searchFor( groupId, artifactId, version, null );
+    }
+
+    public static List<NexusArtifact> searchFor( String groupId, String artifactId, String version, String repositoryId )
         throws Exception
     {
         Map<String, String> args = new HashMap<String, String>();
@@ -213,7 +220,13 @@ public class SearchMessageUtil
         args.put( "a", artifactId );
         args.put( "v", version );
 
-        return searchFor( args );
+        return searchFor( args, repositoryId );
+    }
+
+    public static List<NexusArtifact> searchFor( Gav gav, String repositoryId )
+        throws Exception
+    {
+        return searchFor( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), repositoryId );
     }
 
 }
