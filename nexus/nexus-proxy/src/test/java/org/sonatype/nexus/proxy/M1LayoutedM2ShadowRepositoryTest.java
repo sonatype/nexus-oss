@@ -34,15 +34,13 @@ public class M1LayoutedM2ShadowRepositoryTest
     extends AbstractProxyTestEnvironment
 {
 
-    private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-
     @Override
     protected EnvironmentBuilder getEnvironmentBuilder()
         throws Exception
     {
         ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
-        this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder( ss );
-        return jettyTestsuiteEnvironmentBuilder;
+        
+        return new M2TestsuiteEnvironmentBuilder( ss );
     }
 
     protected void addShadowReposes()

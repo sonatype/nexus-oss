@@ -22,6 +22,7 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -48,7 +49,7 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 @Component( role = RepositoryRegistry.class )
 public class DefaultRepositoryRegistry
     extends AbstractLogEnabled
-    implements RepositoryRegistry
+    implements RepositoryRegistry, Disposable
 {
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
@@ -213,6 +214,15 @@ public class DefaultRepositoryRegistry
             RepositoryStatusCheckerThread thread = repositoryStatusCheckers.remove( repository.getId() );
 
             thread.interrupt();
+        }
+    }
+
+    public void dispose()
+    {
+        // kill the checker daemon threads
+        for ( Map.Entry<String, RepositoryStatusCheckerThread> entry : repositoryStatusCheckers.entrySet() )
+        {
+            entry.getValue().interrupt();
         }
     }
 

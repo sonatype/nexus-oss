@@ -61,7 +61,6 @@ public class RepositoryStatusCheckerThread
         }
         catch ( InterruptedException e )
         {
-
         }
     }
 }

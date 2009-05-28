@@ -25,24 +25,22 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class ConfigurationChangeEventTest
     extends AbstractProxyTestEnvironment
 {
-
-    private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-
     @Override
     protected EnvironmentBuilder getEnvironmentBuilder()
         throws Exception
     {
         ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
-        this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder( ss );
-        return jettyTestsuiteEnvironmentBuilder;
+
+        return new M2TestsuiteEnvironmentBuilder( ss );
     }
 
     public void testSimplePull()
         throws Exception
     {
         // flush all potential changes
-        getApplicationEventMulticaster().notifyEventListeners( new ConfigurationPrepareForSaveEvent( getApplicationConfiguration() ) );
-        
+        getApplicationEventMulticaster()
+            .notifyEventListeners( new ConfigurationPrepareForSaveEvent( getApplicationConfiguration() ) );
+
         // get hold on all registered reposes
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
         Repository repo2 = getRepositoryRegistry().getRepository( "repo2" );
