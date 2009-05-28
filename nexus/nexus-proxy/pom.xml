@@ -136,21 +136,6 @@
   </dependencies>
   <build>
     <plugins>
-    
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.4.2</version>
-        <configuration>
-          <excludes>
-            <exclude>**/M1LayoutedM2ShadowRepositoryTest.java</exclude>
-            <exclude>**/ConfigurationChangeEventTest.java</exclude>
-          </excludes>
-
-        </configuration>
-      </plugin>
-
-    
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
