@@ -38,6 +38,12 @@ public class IndexUtils
 
     public static ArtifactInfo constructArtifactInfo( Document doc, IndexingContext context )
     {
+        // if no UINFO can't create, must be a different type of record
+        if ( doc.get( ArtifactInfo.UINFO ) == null )
+        {
+            return null;
+        }
+        
         boolean res = false;
     
         ArtifactInfo artifactInfo = new ArtifactInfo();
