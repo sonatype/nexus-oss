@@ -455,7 +455,7 @@ public class DefaultNexus
     {
         for ( Repository repository : repositoryRegistry.getRepositories() )
         {
-            if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
+            if ( repository.getLocalStatus().shouldServiceRequest() )
             {
                 repository.expireCaches( request );
             }

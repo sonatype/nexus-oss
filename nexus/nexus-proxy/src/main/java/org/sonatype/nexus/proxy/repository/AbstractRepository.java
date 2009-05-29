@@ -465,6 +465,8 @@ public abstract class AbstractRepository
         {
             request.setRequestPath( RepositoryItemUid.PATH_ROOT );
         }
+        
+        request.setRequestLocalOnly( true );
 
         getLogger().info(
                           "Expiring local cache in repository ID='" + getId() + "' from path='"
