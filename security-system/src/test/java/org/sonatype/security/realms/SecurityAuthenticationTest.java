@@ -51,20 +51,7 @@ public class SecurityAuthenticationTest
     {
         UsernamePasswordToken upToken = new UsernamePasswordToken( "username", "password" );
 
-        HttpServletRequest mockRequest = EasyMock.createNiceMock( HttpServletRequest.class );
-        HttpServletResponse mockResponse = EasyMock.createNiceMock( HttpServletResponse.class );
-        HttpSession mockSession = EasyMock.createNiceMock( HttpSession.class );
-        
-        EasyMock.expect(mockSession.getId()).andReturn("test").anyTimes();
-        EasyMock.expect(mockRequest.getCookies()).andReturn(null).anyTimes();
-        EasyMock.expect( mockRequest.getSession()).andReturn( mockSession ).anyTimes();
-        EasyMock.expect( mockRequest.getSession( false )).andReturn( mockSession ).anyTimes();
-        replay(mockSession);
-        replay(mockRequest);
-        
-        // we need to bind for the "web" impl of the RealmSecurityManager to work
-        WebUtils.bind( mockRequest );
-        WebUtils.bind( mockResponse );
+        this.setupLoginContext( "test" );
         
         Subject ai = security.login( upToken );
        

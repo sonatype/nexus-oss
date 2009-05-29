@@ -29,6 +29,9 @@ public class DefaultSecuritySystemTest
 
         SecuritySystem securitySystem = this.getSecuritySystem();
 
+        // bind to a servlet request/response
+        this.setupLoginContext( "test" );
+        
         // login
         UsernamePasswordToken token = new UsernamePasswordToken( "jcoder", "jcoder" );
         Subject subject = securitySystem.login( token );
@@ -51,6 +54,9 @@ public class DefaultSecuritySystemTest
 
         SecuritySystem securitySystem = this.getSecuritySystem();
 
+        // bind to a servlet request/response
+        this.setupLoginContext( "test" );
+        
         // login
         UsernamePasswordToken token = new UsernamePasswordToken( "jcoder", "jcoder" );
         Subject subject = securitySystem.login( token );
