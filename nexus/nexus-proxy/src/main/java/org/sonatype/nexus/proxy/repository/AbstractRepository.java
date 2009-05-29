@@ -535,6 +535,8 @@ public abstract class AbstractRepository
     {
         getLogger()
             .info( "Evicting unused items from repository " + getId() + " from path " + request.getRequestPath() );
+        
+        request.setRequestLocalOnly( true );
 
         EvictUnusedItemsWalkerProcessor walkerProcessor = new EvictUnusedItemsWalkerProcessor( timestamp );
 
