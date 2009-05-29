@@ -1,6 +1,7 @@
 package org.sonatype.plugin.nexus.testenvironment;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -229,6 +230,15 @@ public class EnvironmentMojo
             {
                 copyDirectory( fakeRepository, fakeRepoDest );
             }
+            
+            try
+            {
+                deleteHiddenFolders( fakeRepoDest, true );
+            }
+            catch ( IOException e )
+            {
+                getLog().error( "Unable to delete hidden folders from " + fakeRepoDest.getPath() );
+            }
 
             File defaultConfig = new File( resourcesDestinationLocation, "default-configs" );
             project.getProperties().put( "default-configs", getPath( defaultConfig ) );
@@ -271,6 +281,41 @@ public class EnvironmentMojo
         if ( componentsXml.exists() )
         {
             copyAndInterpolate( componentsXml.getParentFile(), destinationComponents.getParentFile() );
+        }
+    }
+    
+    private void deleteHiddenFolders( File directory, boolean recursive ) 
+        throws IOException
+    {
+        if ( directory != null 
+            && directory.isDirectory()
+            && directory.exists() )
+        {
+            File[] files = directory.listFiles( 
+                new FileFilter() {
+                    public boolean accept( File pathname )
+                    {
+                        if ( pathname.isDirectory() )
+                        {
+                            return true;
+                        }
+                        
+                        return false;
+                    }
+                }
+            );
+            
+            for ( File file : files )
+            {
+                if ( file.getName().startsWith( "." ) )
+                {
+                    FileUtils.deleteDirectory( file );
+                }
+                else if ( recursive )
+                {
+                    deleteHiddenFolders( file, true );
+                }
+            }
         }
     }
 
