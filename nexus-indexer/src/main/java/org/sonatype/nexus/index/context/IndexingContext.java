@@ -23,9 +23,9 @@ import org.sonatype.nexus.artifact.GavCalculator;
 
 /**
  * An indexing context is representing artifact repository for indexing and searching.
- * Indexing context is a statefull component, it keeps state of index readers 
- * and writers. 
- * 
+ * Indexing context is a statefull component, it keeps state of index readers
+ * and writers.
+ *
  * @author Jason van Zyl
  * @author Tamas Cservenak
  * @author Eugene Kuleshov
@@ -52,7 +52,7 @@ public interface IndexingContext
      * A property name used to specify legacy index timestam (the last update time)
      */
     public static final String INDEX_LEGACY_TIMESTAMP = INDEX_PROPERTY_PREFIX + "time";
-    
+
     /**
      * A property name used to specify index timtestamp
      */
@@ -72,15 +72,15 @@ public interface IndexingContext
      * A date format used for incremental update chunk names
      */
     public static final String INDEX_TIME_DAY_FORMAT = "yyyyMMdd";
-    
+
     /**
      * A counter used to id the chunks
      */
     public static final String INDEX_CHUNK_COUNTER = INDEX_PROPERTY_PREFIX + "last-incremental";
-    
+
     /**
      * An id that defines the current incremental chain.
-     * 
+     *
      * If when checking remote repo, the index chain doesnt match
      * you'll know that you need to download the full index
      */
@@ -114,14 +114,14 @@ public interface IndexingContext
     /**
      * Is the context searchable when doing "non-targeted" searches? Ie. Should it take a part when searching without
      * specifying context?
-     * 
+     *
      * @return
      */
     boolean isSearchable();
 
     /**
      * Sets is the context searchable when doing "non-targeted" searches.
-     * 
+     *
      * @param searchable
      */
     void setSearchable( boolean searchable );
@@ -142,7 +142,7 @@ public interface IndexingContext
 
     /**
      * Returns the Lucene IndexReader of this context.
-     * 
+     *
      * @return reader
      * @throws IOException
      */
@@ -151,7 +151,7 @@ public interface IndexingContext
 
     /**
      * Returns the Lucene IndexSearcher of this context.
-     * 
+     *
      * @return searcher
      * @throws IOException
      */
@@ -160,7 +160,7 @@ public interface IndexingContext
 
     /**
      * Returns the Lucene IndexWriter of this context.
-     * 
+     *
      * @return indexWriter
      * @throws IOException
      */
@@ -169,14 +169,14 @@ public interface IndexingContext
 
     /**
      * List of IndexCreators used in this context.
-     * 
+     *
      * @return list of index creators.
      */
     List<IndexCreator> getIndexCreators();
 
     /**
      * Returns the Lucene Analyzer of this context used for by IndexWriter and IndexSearcher.
-     * 
+     *
      * @return
      */
     Analyzer getAnalyzer();
@@ -196,7 +196,7 @@ public interface IndexingContext
 
     /**
      * Purge (cleans) the context, deletes/empties the index and restores the context to new/empty state.
-     * 
+     *
      * @throws IOException
      */
     void purge()
@@ -204,7 +204,7 @@ public interface IndexingContext
 
     /**
      * Merges content of given Lucene directory with this context.
-     * 
+     *
      * @param directory - the directory to merge
      */
     void merge( Directory directory )
@@ -212,7 +212,7 @@ public interface IndexingContext
 
     /**
      * Merges content of given Lucene directory with this context, but filters out the unwanted ones.
-     * 
+     *
      * @param directory - the directory to merge
      */
     void merge( Directory directory, DocumentFilter filter )
@@ -220,7 +220,7 @@ public interface IndexingContext
 
     /**
      * Replaces the Lucene index with the one from supplied directory.
-     * 
+     *
      * @param directory
      * @throws IOException
      */

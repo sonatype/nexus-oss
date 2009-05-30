@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.rest.repositories;
 
+import java.io.IOException;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
@@ -25,7 +27,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * Repository index content resource.
- * 
+ *
  * @author dip
  */
 @Component( role = PlexusResource.class, hint = "repoIndexResource" )
@@ -46,6 +48,7 @@ public class RepositoryIndexContentPlexusResource
         return new PathProtectionDescriptor( "/repositories/*/index_content/**", "authcBasic,tiperms" );
     }
 
+    @Override
     protected IndexingContext getIndexingContext( Request request )
         throws ResourceException
     {
@@ -53,11 +56,15 @@ public class RepositoryIndexContentPlexusResource
         {
             String repositoryId = String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
 
-            return indexerManager.getRepositoryBestIndexContext( repositoryId );
+            return indexerManager.getRepositoryIndexContext( repositoryId );
         }
         catch ( NoSuchRepositoryException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e );
+        }
+        catch ( IOException e )
+        {
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
         }
     }
 }

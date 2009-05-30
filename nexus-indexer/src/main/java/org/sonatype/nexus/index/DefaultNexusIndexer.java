@@ -414,7 +414,7 @@ public class DefaultNexusIndexer
     public FlatSearchResponse searchFlat( FlatSearchRequest request )
         throws IOException
     {
-        if ( request.getContext() == null )
+        if ( request.getContexts() == null )
         {
             return searcher.searchFlatPaged( request, indexingContexts.values() );
         }

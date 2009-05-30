@@ -26,18 +26,18 @@ import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
  * A default search engine implementation
- * 
+ *
  * @author Eugene Kuleshov
  * @author Tamas Cservenak
  */
-@Component(role = SearchEngine.class)
+@Component( role = SearchEngine.class )
 public class DefaultSearchEngine
     extends AbstractLogEnabled
     implements SearchEngine
 {
     @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
-        IndexingContext indexingContext, Query query )
+                                         IndexingContext indexingContext, Query query )
         throws IOException
     {
         return searchFlatPaged( new FlatSearchRequest( query, artifactInfoComparator, indexingContext ) ).getResults();
@@ -45,7 +45,7 @@ public class DefaultSearchEngine
 
     @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
-        Collection<IndexingContext> indexingContexts, Query query )
+                                         Collection<IndexingContext> indexingContexts, Query query )
         throws IOException
     {
         return searchFlatPaged( new FlatSearchRequest( query, artifactInfoComparator ), indexingContexts ).getResults();
@@ -56,8 +56,11 @@ public class DefaultSearchEngine
     {
         TreeSet<ArtifactInfo> result = new TreeSet<ArtifactInfo>( request.getArtifactInfoComparator() );
 
-        int totalHits = searchFlat( result, request.getContext(), request.getQuery(), request.getStart(), request
-            .getAiCount() );
+        int totalHits = 0;
+        for ( IndexingContext context : request.getContexts() )
+        {
+            totalHits += searchFlat( result, context, request.getQuery(), request.getStart(), request.getAiCount() );
+        }
 
         return new FlatSearchResponse( request.getQuery(), totalHits, result );
     }
@@ -83,8 +86,8 @@ public class DefaultSearchEngine
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request )
         throws IOException
     {
-        TreeMap<String, ArtifactInfoGroup> result = new TreeMap<String, ArtifactInfoGroup>( request
-            .getGroupKeyComparator() );
+        TreeMap<String, ArtifactInfoGroup> result =
+            new TreeMap<String, ArtifactInfoGroup>( request.getGroupKeyComparator() );
 
         int totalHits = searchGrouped( result, request.getGrouping(), request.getContext(), request.getQuery() );
 
@@ -92,11 +95,11 @@ public class DefaultSearchEngine
     }
 
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request,
-        Collection<IndexingContext> indexingContexts )
+                                                Collection<IndexingContext> indexingContexts )
         throws IOException
     {
-        TreeMap<String, ArtifactInfoGroup> result = new TreeMap<String, ArtifactInfoGroup>( request
-            .getGroupKeyComparator() );
+        TreeMap<String, ArtifactInfoGroup> result =
+            new TreeMap<String, ArtifactInfoGroup>( request.getGroupKeyComparator() );
 
         int totalHits = 0;
 
@@ -112,18 +115,17 @@ public class DefaultSearchEngine
     }
 
     protected int searchFlat( Collection<ArtifactInfo> result, IndexingContext context, Query query, int from,
-        int aiCount )
+                              int aiCount )
         throws IOException
     {
-        Hits hits = context.getIndexSearcher().search(
-            query,
-            new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
+        Hits hits =
+            context.getIndexSearcher().search( query, new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
 
-        if ( hits == null || hits.length() == 0 ) 
+        if ( hits == null || hits.length() == 0 )
         {
             return 0;
         }
-        
+
         int hitCount = hits.length();
 
         int start = from == FlatSearchRequest.UNDEFINED ? 0 : from;
@@ -161,17 +163,16 @@ public class DefaultSearchEngine
                 }
             }
         }
-        
+
         return hitCount;
     }
 
-    protected int searchGrouped( Map<String, ArtifactInfoGroup> result, Grouping grouping,
-        IndexingContext context, Query query )
+    protected int searchGrouped( Map<String, ArtifactInfoGroup> result, Grouping grouping, IndexingContext context,
+                                 Query query )
         throws IOException
     {
-        Hits hits = context.getIndexSearcher().search(
-            query,
-            new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
+        Hits hits =
+            context.getIndexSearcher().search( query, new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
 
         if ( hits != null && hits.length() != 0 )
         {
@@ -201,5 +202,5 @@ public class DefaultSearchEngine
             return 0;
         }
     }
-    
+
 }

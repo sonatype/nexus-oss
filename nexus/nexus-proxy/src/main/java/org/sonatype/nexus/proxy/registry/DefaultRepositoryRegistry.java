@@ -43,7 +43,7 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
  * ProximityEvents: this component just "concentrates" the repositiry events of all known repositories by it. It can be
  * used as single point to access all repository events. TODO this is not a good place to keep group repository
  * management code
- * 
+ *
  * @author cstamas
  */
 @Component( role = RepositoryRegistry.class )
@@ -163,6 +163,31 @@ public class DefaultRepositoryRegistry
                         result.add( group.getId() );
 
                         break;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<GroupRepository> getGroupsOfRepository( Repository repository )
+    {
+        ArrayList<GroupRepository> result = new ArrayList<GroupRepository>();
+
+        for ( Repository repo : getRepositories() )
+        {
+            if ( !repo.getId().equals( repository.getId() )
+                && repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            {
+                GroupRepository group = repo.adaptToFacet( GroupRepository.class );
+
+                members: for ( Repository member : group.getMemberRepositories() )
+                {
+                    if ( repository.getId().equals( member.getId() ) )
+                    {
+                        result.add( group );
+                        break members;
                     }
                 }
             }

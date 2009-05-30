@@ -3,7 +3,6 @@ package org.sonatype.nexus;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,7 +18,6 @@ import org.jsecurity.subject.Subject;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.NexusItemInfo;
-import org.sonatype.nexus.feeds.DefaultFeedRecorder;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.index.ArtifactContext;
@@ -39,8 +37,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.security.WebSecurityUtil;
-import org.sonatype.nexus.timeline.DefaultTimeline;
-import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.security.DefaultSecuritySystem;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
@@ -76,8 +72,8 @@ public class ViewAccessTest
 
         TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
 
-        Target t1 = new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays
-            .asList( new String[] { ".*" } ) );
+        Target t1 =
+            new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays.asList( new String[] { ".*" } ) );
 
         targetRegistry.addRepositoryTarget( t1 );
 
@@ -111,15 +107,13 @@ public class ViewAccessTest
     }
 
     public void testAccessWithViewAccess()
-        throws AuthenticationException,
-            Exception
+        throws AuthenticationException, Exception
     {
         this.getItem( "alltest", "test", "/spoof/simple.txt" );
     }
 
     private StorageItem getItem( String username, String repositoryId, String path )
-        throws AccessDeniedException,
-            Exception
+        throws AccessDeniedException, Exception
     {
         WebSecurityUtil.setupWebContext( username + "-" + repositoryId + "-" + path );
 
@@ -189,8 +183,11 @@ public class ViewAccessTest
         WebSecurityUtil.setupWebContext( username + "-feed" );
         Subject subject = securitySystem.login( new UsernamePasswordToken( username, "" ) );
 
-        List<NexusArtifactEvent> events = this.feedRecorder.getNexusArtifactEvents( new HashSet<String>( Arrays
-            .asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ), 0l, 1, null );
+        List<NexusArtifactEvent> events =
+            this.feedRecorder.getNexusArtifactEvents(
+                                                      new HashSet<String>(
+                                                                           Arrays.asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ),
+                                                      0l, 1, null );
 
         // logout
         securitySystem.logout( subject.getPrincipals() );
@@ -206,9 +203,7 @@ public class ViewAccessTest
 
     // search tests!
     public void testSearch()
-        throws NoSuchRepositoryException,
-            IOException,
-            AuthenticationException
+        throws NoSuchRepositoryException, IOException, AuthenticationException
     {
         String repoId = "test";
         String artifactId = "foo";
@@ -218,20 +213,10 @@ public class ViewAccessTest
         String extention = "jar";
 
         ArtifactInfo artifactInfo = new ArtifactInfo( repoId, groupId, artifactId, version, classifier );
-        ArtifactContext artifactContext = new ArtifactContext( null, null, null, artifactInfo, new Gav(
-            groupId,
-            artifactId,
-            version,
-            classifier,
-            extention,
-            null,
-            null,
-            null,
-            false,
-            false,
-            null,
-            false,
-            null ) );
+        ArtifactContext artifactContext =
+            new ArtifactContext( null, null, null, artifactInfo, new Gav( groupId, artifactId, version, classifier,
+                                                                          extention, null, null, null, false, false,
+                                                                          null, false, null ) );
 
         this.indexerManager.addRepositoryIndexContext( repoId );
         IndexingContext context = this.indexerManager.getRepositoryLocalIndexContext( repoId );
@@ -253,18 +238,14 @@ public class ViewAccessTest
     }
 
     private ArtifactInfo searchForSingleArtifact( String username, String artifactId, String repositoryId )
-        throws AuthenticationException,
-            NoSuchRepositoryException
+        throws AuthenticationException, NoSuchRepositoryException
     {
         // login
         WebSecurityUtil.setupWebContext( username + "-" + repositoryId );
         Subject subject = securitySystem.login( new UsernamePasswordToken( username, "" ) );
 
-        FlatSearchResponse searchResult = indexerManager.searchArtifactFlat(
-            artifactId,
-            repositoryId,
-            new Integer( 0 ),
-            new Integer( 1 ) );
+        FlatSearchResponse searchResult =
+            indexerManager.searchArtifactFlat( artifactId, repositoryId, new Integer( 0 ), new Integer( 1 ) );
 
         searchResult.getResults();
 
@@ -278,5 +259,16 @@ public class ViewAccessTest
 
         return null;
 
+    }
+
+    @Override
+    public void tearDown()
+        throws Exception
+    {
+        this.indexerManager.shutdown( true );
+
+        super.tearDown();
+
+        FileUtils.forceDelete( PLEXUS_HOME );
     }
 }

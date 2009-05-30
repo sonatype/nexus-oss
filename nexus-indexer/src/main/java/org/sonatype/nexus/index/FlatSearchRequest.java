@@ -13,7 +13,7 @@ import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
  * A flat search request.
- * 
+ *
  * @see NexusIndexer#searchFlat(FlatSearchRequest)
  */
 public class FlatSearchRequest
@@ -24,7 +24,7 @@ public class FlatSearchRequest
 
     private Comparator<ArtifactInfo> artifactInfoComparator;
 
-    private IndexingContext context;
+    private IndexingContext[] contexts;
 
     private int start;
 
@@ -38,7 +38,7 @@ public class FlatSearchRequest
 
         this.artifactInfoComparator = ArtifactInfo.VERSION_COMPARATOR;
 
-        this.context = null;
+        this.contexts = null;
 
         this.start = UNDEFINED;
 
@@ -52,18 +52,18 @@ public class FlatSearchRequest
         this.artifactInfoComparator = artifactInfoComparator;
     }
 
-    public FlatSearchRequest( Query query, IndexingContext context )
+    public FlatSearchRequest( Query query, IndexingContext... context )
     {
         this( query );
 
-        this.context = context;
+        this.contexts = context;
     }
 
-    public FlatSearchRequest( Query query, Comparator<ArtifactInfo> artifactInfoComparator, IndexingContext context )
+    public FlatSearchRequest( Query query, Comparator<ArtifactInfo> artifactInfoComparator, IndexingContext... context )
     {
         this( query, artifactInfoComparator );
 
-        this.context = context;
+        this.contexts = context;
     }
 
     public Query getQuery()
@@ -76,9 +76,9 @@ public class FlatSearchRequest
         return artifactInfoComparator;
     }
 
-    public IndexingContext getContext()
+    public IndexingContext[] getContexts()
     {
-        return context;
+        return contexts;
     }
 
     public int getStart()

@@ -18,6 +18,7 @@ import java.io.IOException;
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 public interface IndexerManager
 {
@@ -31,16 +32,13 @@ public interface IndexerManager
     void resetConfiguration();
 
     void addRepositoryIndexContext( String repositoryId )
-        throws IOException,
-            NoSuchRepositoryException;
+        throws IOException, NoSuchRepositoryException;
 
     void removeRepositoryIndexContext( String repositoryId, boolean deleteFiles )
-        throws IOException,
-            NoSuchRepositoryException;
+        throws IOException, NoSuchRepositoryException;
 
     void updateRepositoryIndexContext( String repositoryId )
-        throws IOException,
-            NoSuchRepositoryException;
+        throws IOException, NoSuchRepositoryException;
 
     /**
      * Returns the local index (the true index for hosted ones, and the true cacheds index for proxy reposes). Every
@@ -54,6 +52,15 @@ public interface IndexerManager
         throws NoSuchRepositoryException;
 
     /**
+     * Returns the local index (the true index for hosted ones, and the true cacheds index for proxy reposes). Every
+     * repo has local index.
+     *
+     * @param repository
+     * @return
+     */
+    IndexingContext getRepositoryLocalIndexContext( Repository repository );
+
+    /**
      * Returns the remote index. Only proxy repositories have remote index, otherwise null is returnded.
      *
      * @param repositoryId
@@ -64,15 +71,33 @@ public interface IndexerManager
         throws NoSuchRepositoryException;
 
     /**
-     * Returns the "best" indexing context. If it has remoteIndex, and it is bigger then local, remote is considered
-     * "best", otherwise local.
+     * Returns the remote index. Only proxy repositories have remote index, otherwise null is returnded.
+     *
+     * @param repository
+     * @return
+     */
+    IndexingContext getRepositoryRemoteIndexContext( Repository repository );
+
+    /**
+     * Returns the combined content of remote context and local context
      *
      * @param repositoryId
      * @return
      * @throws NoSuchRepositoryException
+     * @throws IOException
      */
-    IndexingContext getRepositoryBestIndexContext( String repositoryId )
-        throws NoSuchRepositoryException;
+    IndexingContext getRepositoryIndexContext( String repositoryId )
+        throws NoSuchRepositoryException, IOException;
+
+    /**
+     * Returns the combined content of remote context and local context
+     *
+     * @param repository
+     * @return
+     * @throws IOException
+     */
+    IndexingContext getRepositoryIndexContext( Repository repository )
+        throws IOException;
 
     /**
      * Flags an indexing context should be searched in global searches or not.
@@ -83,8 +108,7 @@ public interface IndexerManager
      * @throws NoSuchRepositoryException
      */
     void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
-        throws IOException,
-            NoSuchRepositoryException;
+        throws IOException, NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------
     // Publish the used NexusIndexer
@@ -100,12 +124,10 @@ public interface IndexerManager
         throws IOException;
 
     void reindexRepository( String path, String repositoryId, boolean fullReindex )
-        throws NoSuchRepositoryException,
-            IOException;
+        throws NoSuchRepositoryException, IOException;
 
     void reindexRepositoryGroup( String path, String repositoryGroupId, boolean fullReindex )
-        throws NoSuchRepositoryException,
-            IOException;
+        throws NoSuchRepositoryException, IOException;
 
     void resetGroupIndex( String groupId )
         throws NoSuchRepositoryException, IOException;
@@ -118,12 +140,10 @@ public interface IndexerManager
         throws IOException;
 
     void downloadRepositoryIndex( String repositoryId )
-        throws IOException,
-            NoSuchRepositoryException;
+        throws IOException, NoSuchRepositoryException;
 
     void downloadRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException,
-            NoSuchRepositoryException;
+        throws IOException, NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------
     // Publishing index (will do publish only)
@@ -133,12 +153,10 @@ public interface IndexerManager
         throws IOException;
 
     void publishRepositoryIndex( String repositoryId )
-        throws IOException,
-            NoSuchRepositoryException;
+        throws IOException, NoSuchRepositoryException;
 
     void publishRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException,
-            NoSuchRepositoryException;
+        throws IOException, NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------
     // Identify
@@ -158,7 +176,7 @@ public interface IndexerManager
         throws NoSuchRepositoryException;
 
     FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
-        String repositoryId, Integer from, Integer count )
+                                           String repositoryId, Integer from, Integer count )
         throws NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------
