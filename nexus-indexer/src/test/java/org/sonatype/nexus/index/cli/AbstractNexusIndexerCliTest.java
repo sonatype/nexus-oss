@@ -86,7 +86,7 @@ public abstract class AbstractNexusIndexerCliTest
         assertIndexFiles();
     }
 
-    public void testMissingArgs()
+    public void /*test*/MissingArgs()
         throws IOException
     {
         String usage = "Unable to parse command line options: no argument for:";
