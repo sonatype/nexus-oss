@@ -26,6 +26,18 @@ public class DefaultNexusTimeline
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
+    private String dirName;
+
+    public DefaultNexusTimeline()
+    {
+        this.dirName = "timeline";
+    }
+
+    public DefaultNexusTimeline( String dirName )
+    {
+        this.dirName = dirName;
+    }
+
     public void initialize()
         throws InitializationException
     {
@@ -42,7 +54,7 @@ public class DefaultNexusTimeline
     private void updateConfiguration()
         throws TimelineException
     {
-        File timelineDir = new File( applicationConfiguration.getWorkingDirectory(), "timeline" );
+        File timelineDir = applicationConfiguration.getWorkingDirectory( dirName );
 
         TimelineConfiguration config = new TimelineConfiguration( new File( timelineDir, "persist" ), new File(
             timelineDir,
