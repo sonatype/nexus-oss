@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Request;
 import org.sonatype.nexus.proxy.repository.Mirror;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -86,6 +87,15 @@ public abstract class AbstractRepositoryMirrorPlexusResource
     protected void setMirrors( Repository repository, List<Mirror> mirrors )
         throws IOException
     {
+        //populate ids if not set
+        for ( Mirror mirror : mirrors )
+        {
+            if ( StringUtils.isEmpty( mirror.getId() ) )
+            {
+                mirror.setId( mirror.getUrl() );
+            }
+        }
+        
         if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
             repository.adaptToFacet( ProxyRepository.class ).getDownloadMirrors().setMirrors( mirrors );
