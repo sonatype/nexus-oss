@@ -79,27 +79,6 @@ public interface IndexerManager
     IndexingContext getRepositoryRemoteIndexContext( Repository repository );
 
     /**
-     * Returns the combined content of remote context and local context
-     *
-     * @param repositoryId
-     * @return
-     * @throws NoSuchRepositoryException
-     * @throws IOException
-     */
-    IndexingContext getRepositoryIndexContext( String repositoryId )
-        throws NoSuchRepositoryException, IOException;
-
-    /**
-     * Returns the combined content of remote context and local context
-     *
-     * @param repository
-     * @return
-     * @throws IOException
-     */
-    IndexingContext getRepositoryIndexContext( Repository repository )
-        throws IOException;
-
-    /**
      * Flags an indexing context should be searched in global searches or not.
      *
      * @param repositoryId

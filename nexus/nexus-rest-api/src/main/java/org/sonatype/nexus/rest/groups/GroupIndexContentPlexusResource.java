@@ -13,8 +13,6 @@
  */
 package org.sonatype.nexus.rest.groups;
 
-import java.io.IOException;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Reference;
@@ -28,6 +26,7 @@ import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractIndexContentPlexusResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -59,29 +58,6 @@ public class GroupIndexContentPlexusResource
         return new PathProtectionDescriptor( "/repo_groups/*/index_content/**", "authcBasic,tgiperms" );
     }
 
-    @Override
-    protected IndexingContext getIndexingContext( Request request )
-        throws ResourceException
-    {
-        try
-        {
-            String groupId = String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
-
-            // just to test availability, this will throw NoSuchRepository if there is none found
-            getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
-
-            return indexerManager.getRepositoryIndexContext( groupId );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e );
-        }
-        catch ( IOException e )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
-        }
-    }
-
     /**
      * Convert from ArtifactInfo to a NexusArtifact. Limited functionality, just enough to make index browsing work.
      */
@@ -102,7 +78,7 @@ public class GroupIndexContentPlexusResource
             // just to test availability, this will throw NoSuchRepository if there is none found
             getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
 
-            IndexingContext indexingContext = indexerManager.getRepositoryIndexContext( groupId );
+            IndexingContext indexingContext = indexerManager.getRepositoryLocalIndexContext( groupId );
 
             Gav gav =
                 new Gav( ai.groupId, ai.artifactId, ai.version, ai.classifier,
@@ -118,10 +94,6 @@ public class GroupIndexContentPlexusResource
         {
             return null;
         }
-        catch ( IOException e )
-        {
-            return null;
-        }
 
         a.setGroupId( ai.groupId );
         a.setArtifactId( ai.artifactId );
@@ -132,6 +104,21 @@ public class GroupIndexContentPlexusResource
         a.setContextId( ai.context );
 
         return a;
+    }
+
+    @Override
+    protected Repository getRepository( Request request ) throws ResourceException
+    {
+        String groupId = String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
+
+        try
+        {
+            return getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e );
+        }
     }
 
 }

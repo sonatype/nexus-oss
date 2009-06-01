@@ -13,14 +13,12 @@
  */
 package org.sonatype.nexus.rest.repositories;
 
-import java.io.IOException;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractIndexContentPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -49,22 +47,18 @@ public class RepositoryIndexContentPlexusResource
     }
 
     @Override
-    protected IndexingContext getIndexingContext( Request request )
+    protected Repository getRepository( Request request )
         throws ResourceException
     {
+        String repositoryId = String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
+
         try
         {
-            String repositoryId = String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
-
-            return indexerManager.getRepositoryIndexContext( repositoryId );
+            return getRepositoryRegistry().getRepository( repositoryId );
         }
         catch ( NoSuchRepositoryException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e );
-        }
-        catch ( IOException e )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
         }
     }
 }

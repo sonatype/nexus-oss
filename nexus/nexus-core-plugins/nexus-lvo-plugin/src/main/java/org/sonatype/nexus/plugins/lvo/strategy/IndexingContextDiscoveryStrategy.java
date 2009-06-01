@@ -36,14 +36,15 @@ public class IndexingContextDiscoveryStrategy
     {
         CLvoKey info = req.getLvoKey();
 
-        IndexingContext ctx = indexerManager.getRepositoryIndexContext( info.getRepositoryId() );
+        IndexingContext localContext = indexerManager.getRepositoryLocalIndexContext( info.getRepositoryId() );
+        IndexingContext remoteContext = indexerManager.getRepositoryRemoteIndexContext( info.getRepositoryId() );
 
         BooleanQuery bq = new BooleanQuery();
         bq.add( indexerManager.constructQuery( ArtifactInfo.GROUP_ID, info.getGroupId() ), Occur.MUST );
         bq.add( indexerManager.constructQuery( ArtifactInfo.ARTIFACT_ID, info.getArtifactId() ), Occur.MUST );
 
         // to have sorted results by version in descending order
-        FlatSearchRequest sreq = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, ctx );
+        FlatSearchRequest sreq = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, localContext, remoteContext);
 
         FlatSearchResponse hits = indexerManager.getNexusIndexer().searchFlat( sreq );
 
