@@ -1546,7 +1546,8 @@ public class DefaultIndexerManager
         }
         catch ( UnsupportedExistingLuceneIndexException e )
         {
-            throw new IOException( e.getMessage(), e );
+            getLogger().error( e.getMessage(), e );
+            throw new IOException( e.getMessage() );
         }
 
         return tmpContext;
