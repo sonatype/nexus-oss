@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
+import org.sonatype.plexus.plugin.ExtensionPoint;
 
 /**
  * Repository interface used by Proximity. It is an extension of ResourceStore iface, allowing to make direct
@@ -41,6 +42,7 @@ import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
  * 
  * @author cstamas
  */
+@ExtensionPoint
 public interface Repository
     extends ResourceStore, ValidatingConfigurable
 {

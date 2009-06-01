@@ -24,13 +24,12 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-api</artifactId>
+      <artifactId>nexus-plugin-host-api</artifactId>
     </dependency>
+    
     <dependency>
-      <groupId>com.google.code.atinject</groupId>
-      <artifactId>atinject</artifactId>
-      <version>1.0.0-rev3</version>
-      <scope>compile</scope>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-api</artifactId>
     </dependency>
 
     <!-- Plexus -->

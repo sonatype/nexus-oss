@@ -13,13 +13,16 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
-import org.sonatype.nexus.plugins.ExtensionPoint;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.plexus.plugin.ExtensionPoint;
 
 /**
  * The Interface StorageItemInspector.
  */
 @ExtensionPoint
+@Singleton
 public interface StorageItemInspector
 {
     /**

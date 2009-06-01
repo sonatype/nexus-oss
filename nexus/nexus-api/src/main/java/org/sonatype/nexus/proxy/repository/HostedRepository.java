@@ -13,14 +13,11 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import org.sonatype.nexus.plugins.ExtensionPoint;
-
 /**
  * A hosted repository marker interface.
  * 
  * @author cstamas
  */
-@ExtensionPoint
 public interface HostedRepository
     extends Repository
 {

@@ -2,7 +2,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.List;
 
-import org.sonatype.nexus.plugins.ExtensionPoint;
+import org.sonatype.plexus.plugin.ExtensionPoint;
 
 /**
  * A hosted repository that serves up "web" content (static HTML files). Default behaviour: If a request results in

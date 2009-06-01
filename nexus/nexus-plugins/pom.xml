@@ -21,6 +21,7 @@
 	<name>Nexus Plugins</name>
 
     <modules>
+      <module>nexus-plugin-host-api</module>
       <module>nexus-plugin-api</module>
       <module>nexus-plugin-manager</module>
       <module>nexuspd-maven-plugin</module>

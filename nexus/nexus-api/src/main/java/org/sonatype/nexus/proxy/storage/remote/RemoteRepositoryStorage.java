@@ -15,7 +15,8 @@ package org.sonatype.nexus.proxy.storage.remote;
 
 import java.net.URL;
 
-import org.sonatype.nexus.plugins.ExtensionPoint;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -24,6 +25,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.plexus.plugin.ExtensionPoint;
 
 /**
  * Remote storage.
@@ -31,6 +33,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  * @author cstamas
  */
 @ExtensionPoint
+@Singleton
 public interface RemoteRepositoryStorage
 {
     /**

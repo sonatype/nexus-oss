@@ -1,5 +1,7 @@
 package org.sonatype.nexus.plugins;
 
+import org.sonatype.plexus.plugin.ExtensionPoint;
+
 /**
  * Extension point for Nexus "plugin entry point". A Nexus plugin bundle does not have to contain this, but if it needs
  * some special lifecycle tasks, then it should.

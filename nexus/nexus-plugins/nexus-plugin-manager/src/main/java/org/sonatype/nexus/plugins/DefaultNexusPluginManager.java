@@ -12,8 +12,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.plugins.plexus.NexusPluginCollector;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.plugin.manager.PlexusPluginManager;
-import org.sonatype.plexus.plugin.manager.PluginMetadata;
-import org.sonatype.plexus.plugin.manager.PluginResolutionRequest;
 
 /**
  * We have multiple showstoppers here (mercury, shane's model, transitive hull, etc), so we are going for simple stuff:
@@ -81,7 +79,7 @@ public class DefaultNexusPluginManager
 
     public PluginManagerResponse activateInstalledPlugins()
     {
-        File[] pluginDirs = getNexusPluginsDirectory().listFiles();
+        /*File[] pluginDirs = getNexusPluginsDirectory().listFiles();
 
         if ( pluginDirs != null )
         {
@@ -112,7 +110,7 @@ public class DefaultNexusPluginManager
                 }
             }
         }
-
+*/
         return new PluginManagerResponse( RequestResult.COMPLETELY_EXECUTED );
     }
 

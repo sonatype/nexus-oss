@@ -26,7 +26,6 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.util.EnhancedProperties;
 
 /**
@@ -37,7 +36,6 @@ import org.sonatype.nexus.util.EnhancedProperties;
  */
 @Component( role = LogManager.class )
 public class Log4jLogManager
-    extends AbstractLogEnabled
     implements LogManager
 {
     @Requirement

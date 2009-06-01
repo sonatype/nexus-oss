@@ -2,7 +2,7 @@ package org.sample.plugin;
 
 import java.io.InputStream;
 
-import org.sonatype.nexus.plugins.Managed;
+import org.sonatype.plexus.plugin.Managed;
 
 @Managed
 public interface VirusScanner

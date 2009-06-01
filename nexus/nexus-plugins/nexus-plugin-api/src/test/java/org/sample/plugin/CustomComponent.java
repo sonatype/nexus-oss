@@ -1,6 +1,6 @@
 package org.sample.plugin;
 
-import org.sonatype.nexus.plugins.Managed;
+import org.sonatype.plexus.plugin.Managed;
 
 @Managed
 public interface CustomComponent

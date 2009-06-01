@@ -113,6 +113,7 @@
     </pluginRepository>
   </pluginRepositories>
   <modules>
+    <module>nexus-plugins</module>
     <module>nexus-mock</module>
     <module>nexus-utils</module>
     <module>nexus-api</module>
@@ -650,6 +651,24 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-rest-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Plugins -->
+      
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-host-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-manager</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>

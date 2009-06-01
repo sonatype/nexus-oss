@@ -17,6 +17,7 @@ import java.io.File;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
@@ -27,6 +28,7 @@ import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
@@ -46,10 +48,18 @@ public class RepositoryItemEventInspector
     extends AbstractFeedRecorderEventInspector
 {
     @Requirement
+    private Logger logger;
+    
+    @Requirement
     private IndexerManager indexerManager;
 
     @Requirement
     private ArtifactContextProducer artifactContextProducer;
+    
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 
     protected IndexerManager getIndexerManager()
     {

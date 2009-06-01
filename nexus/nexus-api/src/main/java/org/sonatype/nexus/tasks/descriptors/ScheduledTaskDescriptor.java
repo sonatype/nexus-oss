@@ -15,10 +15,13 @@ package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.List;
 
-import org.sonatype.nexus.plugins.ExtensionPoint;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
+import org.sonatype.plexus.plugin.ExtensionPoint;
 
 @ExtensionPoint
+@Singleton
 public interface ScheduledTaskDescriptor
 {
     String getId();

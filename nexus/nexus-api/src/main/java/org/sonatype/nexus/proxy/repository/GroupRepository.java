@@ -15,11 +15,11 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.List;
 
-import org.sonatype.nexus.plugins.ExtensionPoint;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.plexus.plugin.ExtensionPoint;
 
 /**
  * A group repository is simply as it's name says, a repository that is backed by a group of other repositories. There

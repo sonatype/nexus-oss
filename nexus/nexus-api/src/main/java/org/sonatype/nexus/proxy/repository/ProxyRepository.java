@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.Map;
 
-import org.sonatype.nexus.plugins.ExtensionPoint;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
@@ -27,7 +26,6 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
  * 
  * @author cstamas
  */
-@ExtensionPoint
 public interface ProxyRepository
     extends Repository
 {

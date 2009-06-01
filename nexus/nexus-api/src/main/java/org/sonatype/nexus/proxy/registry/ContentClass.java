@@ -13,9 +13,12 @@
  */
 package org.sonatype.nexus.proxy.registry;
 
-import org.sonatype.nexus.plugins.ExtensionPoint;
+import javax.inject.Singleton;
+
+import org.sonatype.plexus.plugin.ExtensionPoint;
 
 @ExtensionPoint
+@Singleton
 public interface ContentClass
 {
     String getId();
