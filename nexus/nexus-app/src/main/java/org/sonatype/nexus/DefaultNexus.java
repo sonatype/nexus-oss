@@ -86,10 +86,10 @@ import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.tasks.RemoveRepoFolderTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.nexus.timeline.RepositoryIdTimelineFilter;
-import org.sonatype.nexus.timeline.TimelineFilter;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.timeline.TimelineFilter;
 
 /**
  * The default Nexus implementation.

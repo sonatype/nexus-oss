@@ -28,8 +28,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.artifact.NexusItemInfo;
-import org.sonatype.nexus.timeline.Timeline;
-import org.sonatype.nexus.timeline.TimelineFilter;
+import org.sonatype.nexus.timeline.NexusTimeline;
+import org.sonatype.timeline.TimelineFilter;
 
 /**
  * A feed recorder that uses DefaultNexus to record feeds.
@@ -96,7 +96,7 @@ public class DefaultFeedRecorder
      * The timeline for persistent events and feeds.
      */
     @Requirement
-    private Timeline timeline;
+    private NexusTimeline nexusTimeline;
     
     /**
      * The Feed filter (will checks for user access )
@@ -239,11 +239,11 @@ public class DefaultFeedRecorder
 
         if ( from != null )
         {
-            return timeline.retrieve( from, cnt, types, subtypes, filter );
+            return nexusTimeline.retrieve( from, cnt, types, subtypes, filter );
         }
         else
         {
-            return timeline.retrieveNewest( cnt, types, subtypes, filter );
+            return nexusTimeline.retrieveNewest( cnt, types, subtypes, filter );
         }
     }
     
@@ -254,11 +254,11 @@ public class DefaultFeedRecorder
         
         if ( ts == null )
         {
-            return timeline.retrieveNewest( cnt, types, subtypes, filter );
+            return nexusTimeline.retrieveNewest( cnt, types, subtypes, filter );
         }
         else
         {
-            return timeline.retrieve( ts, cnt, types, subtypes, filter );
+            return nexusTimeline.retrieve( ts, cnt, types, subtypes, filter );
         }
     }
 
@@ -406,7 +406,7 @@ public class DefaultFeedRecorder
 
     protected void addToTimeline( Map<String, String> map, String t1, String t2 )
     {
-        timeline.add( System.currentTimeMillis(), t1, t2, map );
+        nexusTimeline.add( System.currentTimeMillis(), t1, t2, map );
     }
 
 }

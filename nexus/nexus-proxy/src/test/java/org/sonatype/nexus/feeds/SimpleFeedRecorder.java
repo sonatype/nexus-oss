@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.sonatype.nexus.timeline.TimelineFilter;
+import org.sonatype.timeline.TimelineFilter;
 
 public class SimpleFeedRecorder
     implements FeedRecorder

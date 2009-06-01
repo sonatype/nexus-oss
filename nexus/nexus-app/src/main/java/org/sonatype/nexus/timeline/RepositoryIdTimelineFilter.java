@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sonatype.nexus.feeds.DefaultFeedRecorder;
+import org.sonatype.timeline.TimelineFilter;
 
 public class RepositoryIdTimelineFilter
     implements TimelineFilter

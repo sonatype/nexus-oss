@@ -24,7 +24,7 @@ import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.tasks.descriptors.PurgeTimelineTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.PurgeOlderThanDaysPropertyDescriptor;
-import org.sonatype.nexus.timeline.Timeline;
+import org.sonatype.nexus.timeline.NexusTimeline;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
@@ -40,8 +40,8 @@ public class PurgeTimeline
 
     public static final String SUBTYPES_KEY = "subTypes";
 
-    @Requirement( role = Timeline.class )
-    private Timeline timeline;
+    @Requirement
+    private NexusTimeline timeline;
 
     public int getPurgeOlderThan()
     {

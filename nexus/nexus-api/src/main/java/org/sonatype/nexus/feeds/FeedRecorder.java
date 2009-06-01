@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.nexus.timeline.TimelineFilter;
+import org.sonatype.timeline.TimelineFilter;
 
 /**
  * A recorder for events for later retrieval. The Actions are "generic" Nexus event related. For specific (Maven, P2)
