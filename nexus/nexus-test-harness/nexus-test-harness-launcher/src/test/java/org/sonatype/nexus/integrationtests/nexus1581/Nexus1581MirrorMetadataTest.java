@@ -9,27 +9,37 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMirrorMetadata;
 import org.sonatype.nexus.repository.metadata.model.io.xpp3.RepositoryMetadataXpp3Reader;
 import org.sonatype.nexus.repository.metadata.model.io.xpp3.RepositoryMetadataXpp3Writer;
 import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
+import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.test.utils.MirrorMessageUtils;
+import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
 public class Nexus1581MirrorMetadataTest
     extends AbstractNexusIntegrationTest
 {    
     private MirrorMessageUtils mirrorUtils;
     
+    private static final String PROXY_REPO_ID = "nexus1581-proxy";
+    
     public Nexus1581MirrorMetadataTest()
     {
         mirrorUtils = new MirrorMessageUtils( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
+
     @Test
     public void testMetadata()
         throws Exception
     {
+        createProxyRepository();
+        
         File metadata = new File( AbstractNexusIntegrationTest.nexusWorkDir + "/storage/nexus-test-harness-repo/.meta/repository-metadata.xml" );
         
         RepositoryMetadataXpp3Reader reader = new RepositoryMetadataXpp3Reader();
@@ -82,7 +92,7 @@ public class Nexus1581MirrorMetadataTest
             fw.close();
         }
         
-        MirrorResourceListResponse response = mirrorUtils.getPredefinedMirrors( "nexus-test-harness-repo" );
+        MirrorResourceListResponse response = mirrorUtils.getPredefinedMirrors( PROXY_REPO_ID );
         
         Assert.assertEquals( 3, response.getData().size() );
         Assert.assertEquals( "id1", ( ( MirrorResource ) response.getData().get(0) ).getId() );
@@ -91,5 +101,31 @@ public class Nexus1581MirrorMetadataTest
         Assert.assertEquals( "http://localhost:8086/somemirror2", ( ( MirrorResource ) response.getData().get(1) ).getUrl() );
         Assert.assertEquals( "id3", ( ( MirrorResource ) response.getData().get(2) ).getId() );
         Assert.assertEquals( "http://localhost:8086/somemirror3", ( ( MirrorResource ) response.getData().get(2) ).getUrl() );
+    }
+    
+    protected void createProxyRepository()
+        throws Exception
+    {
+        RepositoryResource resource = new RepositoryResource();
+    
+        resource.setProvider( "maven2" );
+        resource.setFormat( "maven2" );
+        resource.setRepoPolicy( "release" );
+        resource.setChecksumPolicy( "ignore" );
+        resource.setBrowseable( false );
+        resource.setIndexable( false );
+        
+        resource.setId( PROXY_REPO_ID );
+        resource.setName( PROXY_REPO_ID );
+        resource.setRepoType( "proxy" );
+        resource.setAllowWrite( false );
+        resource.setDownloadRemoteIndexes( true );
+        RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
+        remoteStorage.setRemoteStorageUrl( getBaseNexusUrl() + "content/repositories/nexus-test-harness-repo" );
+        resource.setRemoteStorage( remoteStorage );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+        resource.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );
+        new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() )
+            .createRepository( resource );
     }
 }
