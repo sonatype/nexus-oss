@@ -361,8 +361,10 @@ public class MavenRepositoryMetadataLocator
     {
         Metadata result = null;
 
+        String storedPath = request.getRequestPath();
+        
         try
-        {
+        {            
             request.setRequestPath( uid.getPath() );
 
             StorageItem item = uid.getRepository().retrieveItem( false, request );
@@ -392,6 +394,10 @@ public class MavenRepositoryMetadataLocator
         catch ( ItemNotFoundException e )
         {
             result = new Metadata();
+        }
+        finally
+        {
+            request.setRequestPath( storedPath );
         }
 
         return result;
@@ -521,10 +527,10 @@ public class MavenRepositoryMetadataLocator
 
         // GAV
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
-
+        
         // GA
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
-
+        
         RepositoryItemUid uid = request.getMavenRepository().createUid( mdPath );
 
         writeMetadata( uid, request.getRequestContext(), md );
@@ -543,7 +549,7 @@ public class MavenRepositoryMetadataLocator
 
         // GA
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) );
-
+        
         // G
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
 

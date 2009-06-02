@@ -69,36 +69,6 @@ public class Nexus1646DeployArtifactsTest
     }
 
     @Test
-    public void deployPluginArtifactUsingWagon()
-        throws Exception
-    {
-        Gav gav = GavUtil.newGav( "nexus1646", "dummy-maven-plugin", "2.0-beta-1", "maven-plugin" );
-
-        File artifact = getTestFile( "changelog-maven-plugin-2.0-beta-1.jar" );
-        File pom = getTestFile( "changelog-maven-plugin-2.0-beta-1.pom" );
-
-        DeployUtils.deployWithWagon( this.container, "http", this.getNexusTestRepoUrl(), pom,
-                                     this.getRelitiveArtifactPath( gav ) );
-        DeployUtils.deployWithWagon( this.container, "http", this.getNexusTestRepoUrl(), artifact,
-                                     this.getRelitiveArtifactPath( gav ) );
-
-        File metadataFile =
-            new File( nexusWorkDir, "storage/" + testRepositoryId + "/nexus1646/dummy-maven-plugin/maven-metadata.xml" );
-        Assert.assertTrue( "Metadata file not found " + metadataFile.getAbsolutePath(), metadataFile.isFile() );
-
-        FileInputStream input = new FileInputStream( metadataFile );
-        Metadata md = MetadataBuilder.read( input );
-        IOUtil.close( input );
-
-        System.out.println( new XStream().toXML( md ) );
-
-        Assert.assertEquals( gav.getVersion(), md.getVersioning().getLatest() );
-        Assert.assertEquals( gav.getVersion(), md.getVersioning().getRelease() );
-        Assert.assertEquals( 1, md.getVersioning().getVersions().size() );
-        Assert.assertEquals( gav.getVersion(), md.getVersioning().getVersions().get( 0 ) );
-    }
-
-    @Test
     public void deployPluginArtifactUsingRest()
         throws Exception
     {
@@ -108,7 +78,14 @@ public class Nexus1646DeployArtifactsTest
         int code = DeployUtils.deployUsingPomWithRest( REPO_TEST_HARNESS_RELEASE_REPO, artifact, pom, null, null );
         Assert.assertTrue( "Unable to deploy artifact " + code, Status.isSuccess( code ) );
 
+        // validate group metadata
         File metadataFile =
+            new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_RELEASE_REPO
+                + "/org/codehaus/mojo/maven-metadata.xml" );
+        Assert.assertTrue( "Metadata file not found " + metadataFile.getAbsolutePath(), metadataFile.isFile() );
+        
+        // validate artifact metadata
+        metadataFile =
             new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_RELEASE_REPO
                 + "/org/codehaus/mojo/changelog-maven-plugin/maven-metadata.xml" );
         Assert.assertTrue( "Metadata file not found " + metadataFile.getAbsolutePath(), metadataFile.isFile() );
