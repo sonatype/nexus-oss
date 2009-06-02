@@ -88,7 +88,7 @@ import org.sonatype.plexus.appevents.EventListener;
  * remote peer is publishing index). In case of group reposes, the things are little different: their local context
  * contains the index of GroupRepository local storage, and remote context contains the merged indexes of it's member
  * repositories.
- *
+ * 
  * @author Tamas Cservenak
  */
 @Component( role = IndexerManager.class )
@@ -413,7 +413,7 @@ public class DefaultIndexerManager
 
     /**
      * Extracts the repo root on local FS as File. It may return null!
-     *
+     * 
      * @param repository
      * @return
      * @throws MalformedURLException
@@ -491,7 +491,8 @@ public class DefaultIndexerManager
         throws NoSuchRepositoryException, IOException
     {
         List<Repository> group =
-            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
+            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class )
+                .getMemberRepositories();
 
         for ( Repository repository : group )
         {
@@ -642,7 +643,8 @@ public class DefaultIndexerManager
         throws IOException, NoSuchRepositoryException
     {
         List<Repository> group =
-            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
+            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class )
+                .getMemberRepositories();
 
         for ( Repository repository : group )
         {
@@ -1212,8 +1214,11 @@ public class DefaultIndexerManager
             }
             else
             {
-                req =
-                    new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, localContext, remoteContext );
+                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+
+                req.getContexts().add( localContext );
+
+                req.getContexts().add( remoteContext );
             }
 
             if ( from != null )
@@ -1293,8 +1298,11 @@ public class DefaultIndexerManager
             }
             else
             {
-                req =
-                    new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, localContext, remoteContext );
+                req = new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+
+                req.getContexts().add( localContext );
+
+                req.getContexts().add( remoteContext );
             }
 
             if ( from != null )
@@ -1399,8 +1407,11 @@ public class DefaultIndexerManager
             }
             else
             {
-                req =
-                    new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, localContext, remoteContext );
+                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+
+                req.getContexts().add( localContext );
+
+                req.getContexts().add( remoteContext );
             }
 
             if ( from != null )
