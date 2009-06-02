@@ -32,6 +32,8 @@ public class DefaultIndexerManagerTest
         st.get();
 
         searchFor( "org.sonatype.nexus", 9 );
+
+        assertTemporatyContexts( releases );
     }
 
 }

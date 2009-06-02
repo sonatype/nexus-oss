@@ -938,6 +938,7 @@ public class DefaultIndexerManager
         boolean repositoryIndexable = repository.isIndexable();
 
         File targetDir = null;
+        IndexingContext mergedContext = null;
 
         try
         {
@@ -946,7 +947,7 @@ public class DefaultIndexerManager
             getLogger().info( "Publishing best index for repository " + repository.getId() );
 
             // publish index update, publish the best context we have downstream
-            IndexingContext mergedContext = getRepositoryIndexContext( repository );
+            mergedContext = getRepositoryIndexContext( repository );
 
             targetDir = new File( getTempDirectory(), "nx-index" + System.currentTimeMillis() );
 
@@ -990,7 +991,15 @@ public class DefaultIndexerManager
 
                 FileUtils.deleteDirectory( targetDir );
             }
+
             repository.setIndexable( repositoryIndexable );
+
+            if ( mergedContext != null )
+            {
+                mergedContext.close( true );
+
+                FileUtils.forceDelete( mergedContext.getIndexDirectoryFile() );
+            }
         }
     }
 
@@ -1529,6 +1538,8 @@ public class DefaultIndexerManager
         {
             throw new IOException( "Cannot create temporary directory: " + tmpDir );
         }
+
+        FileUtils.forceDelete( tmpFile );
 
         IndexingContext tmpContext = null;
         FSDirectory directory = FSDirectory.getDirectory( tmpDir );
