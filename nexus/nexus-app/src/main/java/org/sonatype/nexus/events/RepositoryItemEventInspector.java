@@ -28,6 +28,7 @@ import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -36,6 +37,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.plexus.appevents.Event;
@@ -49,13 +51,13 @@ public class RepositoryItemEventInspector
 {
     @Requirement
     private Logger logger;
-    
+
     @Requirement
     private IndexerManager indexerManager;
 
     @Requirement
     private ArtifactContextProducer artifactContextProducer;
-    
+
     protected Logger getLogger()
     {
         return logger;
@@ -136,7 +138,7 @@ public class RepositoryItemEventInspector
         }
     }
 
-    private void inspectForIndexerManager(Event evt )
+    private void inspectForIndexerManager( Event evt )
     {
         try
         {
@@ -160,12 +162,14 @@ public class RepositoryItemEventInspector
                     || RepositoryItemEventCache.class.isAssignableFrom( ievt.getClass() ) || RepositoryItemEventDelete.class
                     .isAssignableFrom( ievt.getClass() ) ) )
             {
-                IndexingContext context = getIndexerManager().getRepositoryLocalIndexContext(
-                    ievt.getRepository().getId() );
+                IndexingContext context =
+                    getIndexerManager().getRepositoryLocalIndexContext( ievt.getRepository().getId() );
 
                 // by calculating GAV we check wether the request is against a repo artifact at all
-                Gav gav = ( (MavenRepository) ievt.getRepository() ).getGavCalculator().pathToGav(
-                    ievt.getItemUid().getPath() );
+                Gav gav =
+                    ( (MavenRepository) ievt.getRepository() ).getGavCalculator().pathToGav(
+                                                                                             ievt.getItemUid()
+                                                                                                 .getPath() );
 
                 // signatures and hashes are not considered for processing
                 // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
@@ -173,11 +177,12 @@ public class RepositoryItemEventInspector
                 if ( context != null && gav != null && !gav.isSignature() && !gav.isHash() )
                 {
                     // if we have a valid indexing context and have access to a File
-                    if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( ievt
-                        .getItemUid().getRepository().getLocalStorage().getClass() ) )
+                    if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( ievt.getItemUid().getRepository()
+                        .getLocalStorage().getClass() ) )
                     {
-                        File file = ( (DefaultFSLocalRepositoryStorage) ievt.getRepository().getLocalStorage() )
-                            .getFileFromBase( ievt.getRepository(), new ResourceStoreRequest( ievt.getItem() ) );
+                        File file =
+                            ( (DefaultFSLocalRepositoryStorage) ievt.getRepository().getLocalStorage() )
+                                .getFileFromBase( ievt.getRepository(), new ResourceStoreRequest( ievt.getItem() ) );
 
                         if ( file.exists() )
                         {
@@ -192,14 +197,21 @@ public class RepositoryItemEventInspector
 
                                 ArtifactInfo ai = ac.getArtifactInfo();
 
+                                if ( ai.sha1 == null )
+                                {
+                                    // if repo has no sha1 checksum, odd nexus one
+                                    ai.sha1 =
+                                        ievt.getItem().getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+                                }
+
                                 if ( ievt instanceof RepositoryItemEventCache )
                                 {
                                     // add file to index
                                     if ( getLogger().isDebugEnabled() )
                                     {
                                         getLogger().debug(
-                                            "Adding artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
-                                                + " to index (CACHE)." );
+                                                           "Adding artifact " + ai.groupId + ":" + ai.artifactId + ":"
+                                                               + ai.version + " to index (CACHE)." );
                                     }
 
                                     getIndexerManager().getNexusIndexer().addArtifactToIndex( ac, context );
@@ -210,8 +222,8 @@ public class RepositoryItemEventInspector
                                     if ( getLogger().isDebugEnabled() )
                                     {
                                         getLogger().debug(
-                                            "Adding artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
-                                                + " to index (STORE)." );
+                                                           "Adding artifact " + ai.groupId + ":" + ai.artifactId + ":"
+                                                               + ai.version + " to index (STORE)." );
                                     }
 
                                     getIndexerManager().getNexusIndexer().addArtifactToIndex( ac, context );
@@ -219,15 +231,15 @@ public class RepositoryItemEventInspector
                                 else if ( ievt instanceof RepositoryItemEventDelete )
                                 {
                                     // NEXUS-814: we should not delete always
-                                    if ( !ievt.getItem().getItemContext().containsKey(
-                                        SnapshotRemover.MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV ) )
+                                    if ( !ievt.getItem().getItemContext()
+                                        .containsKey( SnapshotRemover.MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV ) )
                                     {
                                         // remove file from index
                                         if ( getLogger().isDebugEnabled() )
                                         {
                                             getLogger().debug(
-                                                "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":"
-                                                    + ai.version + " from index (DELETE)." );
+                                                               "Deleting artifact " + ai.groupId + ":" + ai.artifactId
+                                                                   + ":" + ai.version + " from index (DELETE)." );
                                         }
 
                                         getIndexerManager().getNexusIndexer().deleteArtifactFromIndex( ac, context );
@@ -239,13 +251,13 @@ public class RepositoryItemEventInspector
                                         {
                                             getLogger()
                                                 .debug(
-                                                    "NOT deleting artifact "
-                                                        + ai.groupId
-                                                        + ":"
-                                                        + ai.artifactId
-                                                        + ":"
-                                                        + ai.version
-                                                        + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
+                                                        "NOT deleting artifact "
+                                                            + ai.groupId
+                                                            + ":"
+                                                            + ai.artifactId
+                                                            + ":"
+                                                            + ai.version
+                                                            + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
                                         }
                                     }
                                 }
@@ -257,8 +269,8 @@ public class RepositoryItemEventInspector
                         if ( ievt instanceof RepositoryItemEventDelete )
                         {
                             // NEXUS-814: we should not delete always
-                            if ( !ievt.getItem().getItemContext().containsKey(
-                                SnapshotRemover.MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV ) )
+                            if ( !ievt.getItem().getItemContext()
+                                .containsKey( SnapshotRemover.MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV ) )
                             {
                                 ArtifactInfo ai = new ArtifactInfo();
 
@@ -276,8 +288,8 @@ public class RepositoryItemEventInspector
                                 if ( getLogger().isDebugEnabled() )
                                 {
                                     getLogger().debug(
-                                        "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
-                                            + " from index (DELETE)." );
+                                                       "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":"
+                                                           + ai.version + " from index (DELETE)." );
                                 }
 
                                 getIndexerManager().getNexusIndexer().deleteArtifactFromIndex( ac, context );
@@ -289,13 +301,13 @@ public class RepositoryItemEventInspector
                                 {
                                     getLogger()
                                         .debug(
-                                            "NOT deleting artifact "
-                                                + gav.getGroupId()
-                                                + ":"
-                                                + gav.getArtifactId()
-                                                + ":"
-                                                + gav.getVersion()
-                                                + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
+                                                "NOT deleting artifact "
+                                                    + gav.getGroupId()
+                                                    + ":"
+                                                    + gav.getArtifactId()
+                                                    + ":"
+                                                    + gav.getVersion()
+                                                    + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
                                 }
                             }
                         }
