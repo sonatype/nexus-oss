@@ -20,7 +20,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 /**
  * This is a "local" strategy, uses Nexus index contents for calculation. Since Nexus index is updated on-the-fly, as
  * soon as something gets deployed to Nexus, it will appear on the index too, and hence, will be published.
- *
+ * 
  * @author cstamas
  */
 @Component( role = DiscoveryStrategy.class, hint = "index" )
@@ -31,8 +31,7 @@ public class IndexingContextDiscoveryStrategy
     private IndexerManager indexerManager;
 
     public DiscoveryResponse discoverLatestVersion( DiscoveryRequest req )
-        throws NoSuchRepositoryException,
-            IOException
+        throws NoSuchRepositoryException, IOException
     {
         CLvoKey info = req.getLvoKey();
 
@@ -44,7 +43,11 @@ public class IndexingContextDiscoveryStrategy
         bq.add( indexerManager.constructQuery( ArtifactInfo.ARTIFACT_ID, info.getArtifactId() ), Occur.MUST );
 
         // to have sorted results by version in descending order
-        FlatSearchRequest sreq = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, localContext, remoteContext);
+        FlatSearchRequest sreq = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+
+        sreq.getContexts().add( localContext );
+
+        sreq.getContexts().add( remoteContext );
 
         FlatSearchResponse hits = indexerManager.getNexusIndexer().searchFlat( sreq );
 
