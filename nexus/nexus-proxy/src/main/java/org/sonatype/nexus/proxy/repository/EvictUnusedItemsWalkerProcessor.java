@@ -30,6 +30,10 @@ import org.sonatype.nexus.proxy.walker.WalkerContext;
 public class EvictUnusedItemsWalkerProcessor
     extends AbstractFileWalkerProcessor
 {
+    public static final String REQUIRED_FACET_KEY = "repository.facet";
+
+    public static final Class<? extends Repository> DEFAULT_REQUIRED_FACET = ProxyRepository.class;
+
     private final long timestamp;
 
     private final ArrayList<String> files;
@@ -39,6 +43,18 @@ public class EvictUnusedItemsWalkerProcessor
         this.timestamp = timestamp;
 
         this.files = new ArrayList<String>();
+    }
+
+    protected Class<? extends Repository> getRequiredFacet( WalkerContext context )
+    {
+        if ( context.getContext().containsKey( REQUIRED_FACET_KEY ) )
+        {
+            return (Class<? extends Repository>) context.getContext().get( REQUIRED_FACET_KEY );
+        }
+        else
+        {
+            return DEFAULT_REQUIRED_FACET;
+        }
     }
 
     protected Repository getRepository( WalkerContext ctx )
@@ -54,6 +70,18 @@ public class EvictUnusedItemsWalkerProcessor
     public List<String> getFiles()
     {
         return files;
+    }
+
+    @Override
+    public void beforeWalk( WalkerContext context )
+        throws Exception
+    {
+        Class<? extends Repository> requiredFacet = getRequiredFacet( context );
+
+        if ( !getRepository( context ).getRepositoryKind().isFacetAvailable( requiredFacet ) )
+        {
+            context.stop( null );
+        }
     }
 
     @Override
@@ -87,10 +115,7 @@ public class EvictUnusedItemsWalkerProcessor
     }
 
     protected void doDelete( WalkerContext ctx, StorageFileItem item )
-        throws StorageException,
-            UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException
+        throws StorageException, UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException
     {
         getRepository( ctx ).deleteItem( false, new ResourceStoreRequest( item ) );
     }
