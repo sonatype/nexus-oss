@@ -14,11 +14,14 @@
 package org.sonatype.nexus.integrationtests.nexus383;
 
 import java.io.File;
+import java.io.FileReader;
 import java.util.Date;
 import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
@@ -191,6 +194,8 @@ public class Nexus383SearchTest
 
         // All searchs should run ok
         searchFor();
+        
+        messageUtil.allowDeploying( NEXUS_TEST_HARNESS_REPO, true );
     }
 
     @Test
@@ -198,28 +203,41 @@ public class Nexus383SearchTest
     public void crossRepositorySearch()
         throws Exception
     {
-        Gav gav =
-            new Gav( this.getTestId(), "crossArtifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "A Cross Repository Deploy Artifact", false, false, null, false, null );
-
         // file to deploy
-        File fileToDeploy = this.getTestFile( gav.getArtifactId() + ".jar" );
-        File pomFile = this.getTestFile( gav.getArtifactId() + ".pom" );
+        File fileToDeploy = this.getTestFile( "crossArtifact.jar" );
+        File pomFile = this.getTestFile( "crossArtifact.pom" );
 
-        // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
-
-        // Multi repository deploy
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_REPO, fileToDeploy, pomFile, null, null );
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_REPO2, fileToDeploy, pomFile, null, null );
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, fileToDeploy, pomFile, null,
-                                            null );
+        MavenXpp3Reader reader = new MavenXpp3Reader();
+        Model model = reader.read( new FileReader( pomFile ) );
+        
+        String deployUrl = model.getDistributionManagement().getRepository().getUrl();
+        
+        Gav gav = new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model
+            .getPackaging(), 0, new Date().getTime(), model.getName(), false, false, null, false, null );
+        
+        //Multi repository deploy
+        DeployUtils.deployWithWagon( this.container, "http", deployUrl, fileToDeploy, 
+            this.getRelitiveArtifactPath( gav ) );
+        DeployUtils.deployWithWagon( this.container, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2 ), fileToDeploy, 
+            this.getRelitiveArtifactPath( gav ) );
+        DeployUtils.deployWithWagon( this.container, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy, 
+            this.getRelitiveArtifactPath( gav ) );
+        DeployUtils.deployWithWagon( this.container, "http", deployUrl, pomFile, 
+            this.getRelitivePomPath( gav ) );
+        DeployUtils.deployWithWagon( this.container, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2 ), pomFile, 
+            this.getRelitivePomPath( gav ) );
+        DeployUtils.deployWithWagon( this.container, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile, 
+            this.getRelitivePomPath( gav ) );
 
         // if you deploy the same item multiple times to the same repo, that is only a single item
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, fileToDeploy, pomFile, null,
-                                            null );
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, fileToDeploy, pomFile, null,
-                                            null );
+        DeployUtils.deployWithWagon( this.container, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy, 
+            this.getRelitiveArtifactPath( gav ) );
+        DeployUtils.deployWithWagon( this.container, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile, 
+            this.getRelitivePomPath( gav ) );
+        DeployUtils.deployWithWagon( this.container, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy, 
+            this.getRelitiveArtifactPath( gav ) );
+        DeployUtils.deployWithWagon( this.container, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile, 
+            this.getRelitivePomPath( gav ) );
 
         RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,
                                              NEXUS_TEST_HARNESS_RELEASE_REPO );

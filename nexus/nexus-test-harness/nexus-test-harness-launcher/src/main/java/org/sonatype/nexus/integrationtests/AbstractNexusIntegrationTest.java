@@ -324,22 +324,47 @@ public class AbstractNexusIntegrationTest
                 {
                     throw new FileNotFoundException( "File " + artifactFile.getAbsolutePath() + " doesn't exists!" );
                 }
+                
+                File artifactSha1 = new File( artifactFile.getAbsolutePath() + ".sha1" );
+                File artifactMd5 = new File( artifactFile.getAbsolutePath() + ".md5" );
+                
+                File pomSha1 = new File( pom.getAbsolutePath() + ".sha1" );
+                File pomMd5 = new File( pom.getAbsolutePath() + ".md5" );
 
                 try
-                {
+                {                    
+                    if ( artifactSha1.exists() )
+                    {
+                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactSha1, this
+                            .getRelitiveArtifactPath( gav ) + ".sha1" );
+                    }
+                    if ( artifactMd5.exists() )
+                    {
+                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactMd5, this
+                            .getRelitiveArtifactPath( gav ) + ".md5" );
+                    }
                     DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile, this
                         .getRelitiveArtifactPath( gav ) );
+                    
+                    if ( pomSha1.exists() )
+                    {
+                        DeployUtils
+                        .deployWithWagon( this.container, "http", deployUrl, pomSha1, this.getRelitivePomPath( gav ) + ".sha1" );
+                    }
+                    if ( pomMd5.exists() )
+                    {
+                        DeployUtils
+                        .deployWithWagon( this.container, "http", deployUrl, pomMd5, this.getRelitivePomPath( gav ) + "md5" );
+                    }
                     DeployUtils
-                        .deployWithWagon( this.container, "http", deployUrl, pom, this.getRelitivePomPath( gav ) );
+                    .deployWithWagon( this.container, "http", deployUrl, pom, this.getRelitivePomPath( gav ) );
                 }
                 catch ( Exception e )
                 {
                     log.error( getTestId() + " Unable to deploy " + artifactFileName, e );
                     throw e;
                 }
-
             }
-
         }
     }
 
