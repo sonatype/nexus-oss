@@ -58,6 +58,7 @@
           </includes>-->
           <excludes>
             <exclude>**Suite*</exclude>
+            <exclude>**/org/sonatype/nexus/integrationtests/client/nexus758/Nexus758ServiceStabilityTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
