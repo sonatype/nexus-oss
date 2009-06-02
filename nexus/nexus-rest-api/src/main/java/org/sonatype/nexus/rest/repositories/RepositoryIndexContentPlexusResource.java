@@ -17,15 +17,15 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractIndexContentPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * Repository index content resource.
- *
+ * 
  * @author dip
  */
 @Component( role = PlexusResource.class, hint = "repoIndexResource" )
@@ -46,15 +46,14 @@ public class RepositoryIndexContentPlexusResource
         return new PathProtectionDescriptor( "/repositories/*/index_content/**", "authcBasic,tiperms" );
     }
 
-    @Override
-    protected Repository getRepository( Request request )
+    protected IndexingContext getIndexingContext( Request request )
         throws ResourceException
     {
-        String repositoryId = String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
-
         try
         {
-            return getRepositoryRegistry().getRepository( repositoryId );
+            String repositoryId = String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
+
+            return indexerManager.getRepositoryBestIndexContext( repositoryId );
         }
         catch ( NoSuchRepositoryException e )
         {

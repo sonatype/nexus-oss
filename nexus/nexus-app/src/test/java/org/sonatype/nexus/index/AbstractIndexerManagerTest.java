@@ -68,9 +68,9 @@ public abstract class AbstractIndexerManagerTest
         assertEquals( result.toString(), expected, result.size() );
     }
 
-    protected void assertTemporatyContexts( final Repository repo )
+    protected void assertTemporatyContexts( final Repository repo ) throws Exception
     {
-        IndexingContext context = indexerManager.getRepositoryLocalIndexContext( repo );
+        IndexingContext context = indexerManager.getRepositoryLocalIndexContext( repo.getId() );
         File dir = context.getIndexDirectoryFile().getParentFile();
 
         File[] contextDirs = dir.listFiles( new FilenameFilter()

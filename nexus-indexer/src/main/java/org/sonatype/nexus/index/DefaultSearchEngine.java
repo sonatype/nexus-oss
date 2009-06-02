@@ -68,13 +68,27 @@ public class DefaultSearchEngine
     public FlatSearchResponse searchFlatPaged( FlatSearchRequest request, Collection<IndexingContext> indexingContexts )
         throws IOException
     {
+        return searchFlatPaged( request, indexingContexts, false );
+    }
+
+    public FlatSearchResponse forceSearchFlatPaged( FlatSearchRequest request,
+                                                    Collection<IndexingContext> indexingContexts )
+        throws IOException
+    {
+        return searchFlatPaged( request, indexingContexts, true );
+    }
+
+    private FlatSearchResponse searchFlatPaged( FlatSearchRequest request,
+                                                Collection<IndexingContext> indexingContexts, boolean ignoreContext )
+        throws IOException
+    {
         TreeSet<ArtifactInfo> result = new TreeSet<ArtifactInfo>( request.getArtifactInfoComparator() );
 
         int totalHits = 0;
 
         for ( IndexingContext ctx : indexingContexts )
         {
-            if ( ctx.isSearchable() )
+            if ( ignoreContext || ctx.isSearchable() )
             {
                 totalHits += searchFlat( result, ctx, request.getQuery(), request.getStart(), request.getAiCount() );
             }
@@ -87,6 +101,20 @@ public class DefaultSearchEngine
                                                 Collection<IndexingContext> indexingContexts )
         throws IOException
     {
+        return searchGrouped( request, indexingContexts, false );
+    }
+
+    public GroupedSearchResponse forceSearchGrouped( GroupedSearchRequest request,
+                                                     Collection<IndexingContext> indexingContexts )
+        throws IOException
+    {
+        return searchGrouped( request, indexingContexts, true );
+    }
+
+    private GroupedSearchResponse searchGrouped( GroupedSearchRequest request,
+                                                 Collection<IndexingContext> indexingContexts, boolean ignoreContext )
+        throws IOException
+    {
         TreeMap<String, ArtifactInfoGroup> result =
             new TreeMap<String, ArtifactInfoGroup>( request.getGroupKeyComparator() );
 
@@ -94,7 +122,7 @@ public class DefaultSearchEngine
 
         for ( IndexingContext ctx : indexingContexts )
         {
-            if ( ctx.isSearchable() )
+            if ( ignoreContext || ctx.isSearchable() )
             {
                 totalHits += searchGrouped( result, request.getGrouping(), ctx, request.getQuery() );
             }

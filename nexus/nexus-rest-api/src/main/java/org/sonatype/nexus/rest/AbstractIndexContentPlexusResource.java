@@ -38,7 +38,6 @@ import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -60,7 +59,7 @@ public abstract class AbstractIndexContentPlexusResource
         return null;
     }
 
-    protected abstract Repository getRepository( Request request )
+    protected abstract IndexingContext getIndexingContext( Request request )
         throws ResourceException;
 
     @Override
@@ -74,7 +73,7 @@ public abstract class AbstractIndexContentPlexusResource
             return null;
         }
 
-        ContentListResourceResponse resourceResponse = createResponse( request, getRepository( request ) );
+        ContentListResourceResponse resourceResponse = createResponse( request, getIndexingContext( request ) );
 
         if ( resourceResponse.getData().size() == 0 )
         {
@@ -84,15 +83,37 @@ public abstract class AbstractIndexContentPlexusResource
         return resourceResponse;
     }
 
-    protected ContentListResourceResponse createResponse( Request request, Repository repo )
+    protected ContentListResourceResponse createResponse( Request request, IndexingContext indexingContext )
         throws ResourceException
     {
+        NexusIndexer indexer = indexerManager.getNexusIndexer();
+        String path = parsePathFromUri( request.getResourceRef().getRemainingPart() );
+
         ContentListResourceResponse response = new ContentListResourceResponse();
 
         try
         {
-            addResult( response, request, indexerManager.getRepositoryLocalIndexContext( repo ) );
-            addResult( response, request, indexerManager.getRepositoryRemoteIndexContext( repo ) );
+            if ( "/".equals( path ) )
+            {
+                // get root groups and finish
+                Set<String> rootGroups = indexingContext.getRootGroups();
+                for ( String group : rootGroups )
+                {
+                    if ( group.length() > 0 )
+                    {
+                        response.addData( createGroupResource( request, path, group ) );
+                    }
+                }
+            }
+            else
+            {
+                Set<String> allGroups = indexingContext.getAllGroups();
+
+                ContentListResource rootResource = new ContentListResource();
+                rootResource.setRelativePath( path );
+                loadChildren( request, rootResource, indexingContext, allGroups );
+                response.setData( rootResource.getChildren() );
+            }
         }
         catch ( IOException e )
         {
@@ -102,35 +123,6 @@ public abstract class AbstractIndexContentPlexusResource
         return response;
     }
 
-    @SuppressWarnings( "unchecked" )
-    private void addResult( ContentListResourceResponse response, Request request, IndexingContext indexingContext )
-        throws IOException, ResourceException
-    {
-        String path = parsePathFromUri( request.getResourceRef().getRemainingPart() );
-        if ( "/".equals( path ) )
-        {
-            // get root groups and finish
-            Set<String> rootGroups = indexingContext.getRootGroups();
-            for ( String group : rootGroups )
-            {
-                if ( group.length() > 0 )
-                {
-                    response.addData( createGroupResource( request, path, group ) );
-                }
-            }
-        }
-        else
-        {
-            Set<String> allGroups = indexingContext.getAllGroups();
-
-            ContentListResource rootResource = new ContentListResource();
-            rootResource.setRelativePath( path );
-            loadChildren( request, rootResource, indexingContext, allGroups );
-            response.getData().addAll( rootResource.getChildren() );
-        }
-    }
-
-    @SuppressWarnings( "unchecked" )
     protected void loadChildren( Request request, ContentListResource rootResource, IndexingContext indexingContext,
                                  Set<String> allGroups )
         throws ResourceException

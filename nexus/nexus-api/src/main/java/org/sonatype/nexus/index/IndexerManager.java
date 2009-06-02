@@ -18,7 +18,6 @@ import java.io.IOException;
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 public interface IndexerManager
 {
@@ -43,7 +42,7 @@ public interface IndexerManager
     /**
      * Returns the local index (the true index for hosted ones, and the true cacheds index for proxy reposes). Every
      * repo has local index.
-     *
+     * 
      * @param repositoryId
      * @return
      * @throws NoSuchRepositoryException
@@ -52,17 +51,8 @@ public interface IndexerManager
         throws NoSuchRepositoryException;
 
     /**
-     * Returns the local index (the true index for hosted ones, and the true cacheds index for proxy reposes). Every
-     * repo has local index.
-     *
-     * @param repository
-     * @return
-     */
-    IndexingContext getRepositoryLocalIndexContext( Repository repository );
-
-    /**
      * Returns the remote index. Only proxy repositories have remote index, otherwise null is returnded.
-     *
+     * 
      * @param repositoryId
      * @return
      * @throws NoSuchRepositoryException
@@ -71,16 +61,19 @@ public interface IndexerManager
         throws NoSuchRepositoryException;
 
     /**
-     * Returns the remote index. Only proxy repositories have remote index, otherwise null is returnded.
-     *
-     * @param repository
+     * Returns the "best" indexing context. If it has remoteIndex, and it is bigger then local, remote is considered
+     * "best", otherwise local.
+     * 
+     * @param repositoryId
      * @return
+     * @throws NoSuchRepositoryException
      */
-    IndexingContext getRepositoryRemoteIndexContext( Repository repository );
+    IndexingContext getRepositoryBestIndexContext( String repositoryId )
+        throws NoSuchRepositoryException;
 
     /**
      * Flags an indexing context should be searched in global searches or not.
-     *
+     * 
      * @param repositoryId
      * @param searchable
      * @throws IOException

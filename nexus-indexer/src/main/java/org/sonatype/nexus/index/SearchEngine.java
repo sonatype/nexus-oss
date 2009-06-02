@@ -16,7 +16,7 @@ import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
  * A search engine used to perform searches trough repository indexes.
- *  
+ *
  * @author Eugene Kuleshov
  * @author Jason van Zyl
  * @author Tamas Cservenak
@@ -25,18 +25,38 @@ public interface SearchEngine
 {
     @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
-        IndexingContext indexingContext, Query query )
+                                         IndexingContext indexingContext, Query query )
         throws IOException;
 
     @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
-        Collection<IndexingContext> indexingContexts, Query query )
+                                         Collection<IndexingContext> indexingContexts, Query query )
         throws IOException;
 
+    /**
+     * Do the search only on searchable contexts
+     */
     public FlatSearchResponse searchFlatPaged( FlatSearchRequest request, Collection<IndexingContext> indexingContexts )
         throws IOException;
 
+    /**
+     * Do the search only on searchable contexts
+     */
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request,
-        Collection<IndexingContext> indexingContexts )
+                                                Collection<IndexingContext> indexingContexts )
+        throws IOException;
+
+    /**
+     * Do the search in all contexts, no matter if the context is searchable or not
+     */
+    public FlatSearchResponse forceSearchFlatPaged( FlatSearchRequest request,
+                                                    Collection<IndexingContext> indexingContexts )
+        throws IOException;
+
+    /**
+     * Do the search in all contexts, no matter if the context is searchable or not
+     */
+    public GroupedSearchResponse forceSearchGrouped( GroupedSearchRequest request,
+                                                     Collection<IndexingContext> indexingContexts )
         throws IOException;
 }

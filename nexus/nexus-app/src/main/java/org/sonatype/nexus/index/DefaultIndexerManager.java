@@ -88,7 +88,7 @@ import org.sonatype.plexus.appevents.EventListener;
  * remote peer is publishing index). In case of group reposes, the things are little different: their local context
  * contains the index of GroupRepository local storage, and remote context contains the merged indexes of it's member
  * repositories.
- * 
+ *
  * @author Tamas Cservenak
  */
 @Component( role = IndexerManager.class )
@@ -313,15 +313,7 @@ public class DefaultIndexerManager
         setRepositoryIndexContextSearchable( repositoryId, repository.isIndexable() );
     }
 
-    public IndexingContext getRepositoryIndexContext( String repositoryId )
-        throws NoSuchRepositoryException, IOException
-    {
-        Repository repository = repositoryRegistry.getRepository( repositoryId );
-
-        return getRepositoryIndexContext( repository );
-    }
-
-    public IndexingContext getRepositoryIndexContext( Repository repository )
+    private IndexingContext getRepositoryIndexContext( Repository repository )
         throws IOException
     {
         String repoId = repository.getId();
@@ -359,7 +351,7 @@ public class DefaultIndexerManager
         return getRepositoryRemoteIndexContext( repository );
     }
 
-    public IndexingContext getRepositoryLocalIndexContext( Repository repository )
+    protected IndexingContext getRepositoryLocalIndexContext( Repository repository )
     {
         // get context for repository
         IndexingContext ctx = nexusIndexer.getIndexingContexts().get( repository.getId() + CTX_LOCAL_SUFIX );
@@ -367,12 +359,38 @@ public class DefaultIndexerManager
         return ctx;
     }
 
-    public IndexingContext getRepositoryRemoteIndexContext( Repository repository )
+    protected IndexingContext getRepositoryRemoteIndexContext( Repository repository )
     {
         // get context for repository
         IndexingContext ctx = nexusIndexer.getIndexingContexts().get( repository.getId() + CTX_REMOTE_SUFIX );
 
         return ctx;
+    }
+
+    public IndexingContext getRepositoryBestIndexContext( String repositoryId )
+        throws NoSuchRepositoryException
+    {
+        IndexingContext bestContext = getRepositoryLocalIndexContext( repositoryId );
+
+        IndexingContext remoteContext = getRepositoryRemoteIndexContext( repositoryId );
+
+        if ( remoteContext != null )
+        {
+            try
+            {
+                // if remote is here and is downloaded, it is the best (it is always the superset of local cache)
+                if ( bestContext.getIndexReader().numDocs() < remoteContext.getIndexReader().numDocs() )
+                {
+                    bestContext = remoteContext;
+                }
+            }
+            catch ( IOException e )
+            {
+                // silent
+            }
+        }
+
+        return bestContext;
     }
 
     public void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
@@ -413,7 +431,7 @@ public class DefaultIndexerManager
 
     /**
      * Extracts the repo root on local FS as File. It may return null!
-     * 
+     *
      * @param repository
      * @return
      * @throws MalformedURLException

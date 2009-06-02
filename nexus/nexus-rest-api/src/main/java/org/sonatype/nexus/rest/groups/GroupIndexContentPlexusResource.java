@@ -26,7 +26,6 @@ import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractIndexContentPlexusResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -34,7 +33,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * Group index content resource.
- *
+ * 
  * @author dip
  */
 @Component( role = PlexusResource.class, hint = "groupIndexResource" )
@@ -58,10 +57,27 @@ public class GroupIndexContentPlexusResource
         return new PathProtectionDescriptor( "/repo_groups/*/index_content/**", "authcBasic,tgiperms" );
     }
 
+    protected IndexingContext getIndexingContext( Request request )
+        throws ResourceException
+    {
+        try
+        {
+            String groupId = String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
+
+            // just to test availability, this will throw NoSuchRepository if there is none found
+            getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
+
+            return indexerManager.getRepositoryBestIndexContext( groupId );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e );
+        }
+    }
+
     /**
      * Convert from ArtifactInfo to a NexusArtifact. Limited functionality, just enough to make index browsing work.
      */
-    @Override
     protected NexusArtifact ai2Na( Request request, ArtifactInfo ai )
     {
         if ( ai == null )
@@ -78,15 +94,25 @@ public class GroupIndexContentPlexusResource
             // just to test availability, this will throw NoSuchRepository if there is none found
             getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
 
-            IndexingContext indexingContext = indexerManager.getRepositoryLocalIndexContext( groupId );
+            IndexingContext indexingContext = indexerManager.getRepositoryBestIndexContext( groupId );
 
-            Gav gav =
-                new Gav( ai.groupId, ai.artifactId, ai.version, ai.classifier,
-                         artifactPackagingMapper.getExtensionForPackaging( ai.packaging ), null, null, null,
-                         VersionUtils.isSnapshot( ai.version ), false, null, false, null );
+            Gav gav = new Gav(
+                ai.groupId,
+                ai.artifactId,
+                ai.version,
+                ai.classifier,
+                artifactPackagingMapper.getExtensionForPackaging( ai.packaging ),
+                null,
+                null,
+                null,
+                VersionUtils.isSnapshot( ai.version ),
+                false,
+                null,
+                false,
+                null );
 
-            Reference repoRoot =
-                createRepositoryGroupReference( request, groupId, indexingContext.getGavCalculator().gavToPath( gav ) );
+            Reference repoRoot = createRepositoryGroupReference( request, groupId, indexingContext
+                .getGavCalculator().gavToPath( gav ) );
 
             a.setResourceURI( repoRoot.toString() );
         }
@@ -104,21 +130,6 @@ public class GroupIndexContentPlexusResource
         a.setContextId( ai.context );
 
         return a;
-    }
-
-    @Override
-    protected Repository getRepository( Request request ) throws ResourceException
-    {
-        String groupId = String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
-
-        try
-        {
-            return getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e );
-        }
     }
 
 }

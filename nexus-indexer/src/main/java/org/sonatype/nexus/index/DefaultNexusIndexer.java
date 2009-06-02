@@ -37,7 +37,7 @@ import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
 
 /**
  * A default {@link NexusIndexer} implementation.
- * 
+ *
  * @author Tamas Cservenak
  * @author Eugene Kuleshov
  */
@@ -216,7 +216,7 @@ public class DefaultNexusIndexer
      * Uses {@link Scanner} to scan repository content. A {@link ArtifactScanningListener} is used to process found
      * artifacts and to add them to the index using
      * {@link NexusIndexer#artifactDiscovered(ArtifactContext, IndexingContext)}.
-     * 
+     *
      * @see DefaultScannerListener
      * @see #artifactDiscovered(ArtifactContext, IndexingContext)
      */
@@ -259,7 +259,7 @@ public class DefaultNexusIndexer
                                                      context.getRepositoryId(), //
                                                      context.getRepository(), //
                                                      directory, //
-                                                     context.getRepositoryUrl(), // 
+                                                     context.getRepositoryUrl(), //
                                                      context.getIndexUpdateUrl(), //
                                                      context.getIndexCreators(), //
                                                      true );
@@ -342,6 +342,7 @@ public class DefaultNexusIndexer
     /**
      * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead
      */
+    @Deprecated
     public Collection<ArtifactInfo> searchFlat( Query query )
         throws IOException
     {
@@ -351,6 +352,7 @@ public class DefaultNexusIndexer
     /**
      * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead
      */
+    @Deprecated
     public Collection<ArtifactInfo> searchFlat( Query query, IndexingContext context )
         throws IOException
     {
@@ -360,6 +362,7 @@ public class DefaultNexusIndexer
     /**
      * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead
      */
+    @Deprecated
     public Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query )
         throws IOException
     {
@@ -369,6 +372,7 @@ public class DefaultNexusIndexer
     /**
      * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead
      */
+    @Deprecated
     public Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query,
                                                 IndexingContext context )
         throws IOException
@@ -385,7 +389,7 @@ public class DefaultNexusIndexer
         }
         else
         {
-            return searcher.searchFlatPaged( request, request.getContexts() );
+            return searcher.forceSearchFlatPaged( request, request.getContexts() );
         }
     }
 
@@ -393,6 +397,7 @@ public class DefaultNexusIndexer
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
 
      */
+    @Deprecated
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query )
         throws IOException
     {
@@ -403,6 +408,7 @@ public class DefaultNexusIndexer
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
 
      */
+    @Deprecated
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query, IndexingContext context )
         throws IOException
     {
@@ -413,6 +419,7 @@ public class DefaultNexusIndexer
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
 
      */
+    @Deprecated
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
                                                          Query query )
         throws IOException
@@ -425,6 +432,7 @@ public class DefaultNexusIndexer
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
 
      */
+    @Deprecated
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
                                                          Query query, IndexingContext context )
         throws IOException
@@ -444,7 +452,7 @@ public class DefaultNexusIndexer
         else
         {
             // search targeted
-            return searcher.searchGrouped( request, request.getContexts() );
+            return searcher.forceSearchGrouped( request, request.getContexts() );
         }
     }
 
