@@ -94,6 +94,16 @@
       <artifactId>nexus-indexer</artifactId>
     </dependency>
 
+	<!-- these 3 deps are excluded in nexus-api, but is useful -->
+	<dependency>
+	  <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+	</dependency>
+	<dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact-manager</artifactId>	
+	</dependency>
+
     <dependency>
       <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-xml-realm</artifactId>
