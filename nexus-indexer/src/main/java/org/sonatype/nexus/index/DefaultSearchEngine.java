@@ -83,17 +83,6 @@ public class DefaultSearchEngine
         return new FlatSearchResponse( request.getQuery(), totalHits, result );
     }
 
-    public GroupedSearchResponse searchGrouped( GroupedSearchRequest request )
-        throws IOException
-    {
-        TreeMap<String, ArtifactInfoGroup> result =
-            new TreeMap<String, ArtifactInfoGroup>( request.getGroupKeyComparator() );
-
-        int totalHits = searchGrouped( result, request.getGrouping(), request.getContext(), request.getQuery() );
-
-        return new GroupedSearchResponse( request.getQuery(), totalHits, result );
-    }
-
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request,
                                                 Collection<IndexingContext> indexingContexts )
         throws IOException

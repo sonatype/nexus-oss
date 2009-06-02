@@ -6,7 +6,9 @@
  */
 package org.sonatype.nexus.index;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -24,7 +26,7 @@ public class GroupedSearchRequest
 
     private Comparator<String> groupKeyComparator;
 
-    private IndexingContext context;
+    private List<IndexingContext> contexts;
 
     public GroupedSearchRequest( Query query, Grouping grouping )
     {
@@ -36,7 +38,7 @@ public class GroupedSearchRequest
 
         this.groupKeyComparator = String.CASE_INSENSITIVE_ORDER;
 
-        this.context = null;
+        this.contexts = null;
     }
 
     public GroupedSearchRequest( Query query, Grouping grouping, Comparator<String> groupKeyComparator )
@@ -49,16 +51,16 @@ public class GroupedSearchRequest
     public GroupedSearchRequest( Query query, Grouping grouping, IndexingContext context )
     {
         this( query, grouping );
-
-        this.context = context;
+        
+        getContexts().add( context );
     }
 
     public GroupedSearchRequest( Query query, Grouping grouping, Comparator<String> groupKeyComparator,
-        IndexingContext context )
+                                 IndexingContext context )
     {
         this( query, grouping, groupKeyComparator );
 
-        this.context = context;
+        getContexts().add( context );
     }
 
     public Query getQuery()
@@ -76,8 +78,13 @@ public class GroupedSearchRequest
         return groupKeyComparator;
     }
 
-    public IndexingContext getContext()
+    public List<IndexingContext> getContexts()
     {
-        return context;
+        if ( contexts == null )
+        {
+            contexts = new ArrayList<IndexingContext>();
+        }
+
+        return contexts;
     }
 }

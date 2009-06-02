@@ -6,14 +6,16 @@
  */
 package org.sonatype.nexus.index;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
  * A flat search request.
- *
+ * 
  * @see NexusIndexer#searchFlat(FlatSearchRequest)
  */
 public class FlatSearchRequest
@@ -24,7 +26,7 @@ public class FlatSearchRequest
 
     private Comparator<ArtifactInfo> artifactInfoComparator;
 
-    private IndexingContext[] contexts;
+    private List<IndexingContext> contexts;
 
     private int start;
 
@@ -52,18 +54,18 @@ public class FlatSearchRequest
         this.artifactInfoComparator = artifactInfoComparator;
     }
 
-    public FlatSearchRequest( Query query, IndexingContext... context )
+    public FlatSearchRequest( Query query, IndexingContext context )
     {
         this( query );
 
-        this.contexts = context;
+        getContexts().add( context );
     }
 
-    public FlatSearchRequest( Query query, Comparator<ArtifactInfo> artifactInfoComparator, IndexingContext... context )
+    public FlatSearchRequest( Query query, Comparator<ArtifactInfo> artifactInfoComparator, IndexingContext context )
     {
         this( query, artifactInfoComparator );
 
-        this.contexts = context;
+        getContexts().add( context );
     }
 
     public Query getQuery()
@@ -76,8 +78,13 @@ public class FlatSearchRequest
         return artifactInfoComparator;
     }
 
-    public IndexingContext[] getContexts()
+    public List<IndexingContext> getContexts()
     {
+        if ( contexts == null )
+        {
+            contexts = new ArrayList<IndexingContext>();
+        }
+
         return contexts;
     }
 

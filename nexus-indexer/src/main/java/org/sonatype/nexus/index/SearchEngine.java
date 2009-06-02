@@ -33,13 +33,7 @@ public interface SearchEngine
         Collection<IndexingContext> indexingContexts, Query query )
         throws IOException;
 
-    public FlatSearchResponse searchFlatPaged( FlatSearchRequest request )
-        throws IOException;
-
     public FlatSearchResponse searchFlatPaged( FlatSearchRequest request, Collection<IndexingContext> indexingContexts )
-        throws IOException;
-
-    public GroupedSearchResponse searchGrouped( GroupedSearchRequest request )
         throws IOException;
 
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request,
