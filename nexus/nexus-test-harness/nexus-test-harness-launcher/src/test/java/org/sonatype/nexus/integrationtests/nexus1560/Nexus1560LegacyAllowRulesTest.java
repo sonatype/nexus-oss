@@ -25,6 +25,9 @@ public class Nexus1560LegacyAllowRulesTest
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         addPriv( TEST_USER_NAME, REPO_TEST_HARNESS_REPO + "-priv", TargetPrivilegeDescriptor.TYPE, "1",
                  REPO_TEST_HARNESS_REPO, null, "read" );
+        
+        // Now need the view priv as well
+        addPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
     }
 
     @Test
