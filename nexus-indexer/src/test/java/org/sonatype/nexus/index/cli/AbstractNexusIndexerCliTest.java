@@ -123,7 +123,7 @@ public abstract class AbstractNexusIndexerCliTest
         assertIndexFiles();
     }
 
-    public void /* test */LogginLevel()
+    public void testLogginLevel()
         throws Exception
     {
         int code = execute( "-r", TEST_REPO, "-i", INDEX_DIR, "-d", DEST_DIR );
