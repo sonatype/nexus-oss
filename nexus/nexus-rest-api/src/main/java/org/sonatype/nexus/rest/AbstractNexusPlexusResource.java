@@ -364,6 +364,10 @@ public abstract class AbstractNexusPlexusResource
                 a.setResourceURI( createRepositoryReference( request, ai.repository, req.getRequestPath() ).toString() );
             }
         }
+        catch ( NoSuchRepositoryAccessException e )
+        {
+            this.getLogger().debug( "Ignoring NoSuchRepositoryAccessException, but hiding the urls for the artifact: "+ a.getGroupId() + ":"+ a.getArtifactId() +":"+ a.getVersion() +" - in repository: "+ ai.repository );
+        }
         catch ( NoSuchRepositoryException e )
         {
             return null;

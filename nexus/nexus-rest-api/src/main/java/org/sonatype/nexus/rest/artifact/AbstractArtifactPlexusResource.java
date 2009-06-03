@@ -55,6 +55,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.StorageFileItemRepresentation;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 
@@ -621,6 +622,10 @@ public abstract class AbstractArtifactPlexusResource
             }
 
             return repository.adaptToFacet( MavenRepository.class );
+        }
+        catch ( NoSuchRepositoryAccessException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to repository: "+ id );
         }
         catch ( NoSuchRepositoryException e )
         {
