@@ -24,6 +24,7 @@ import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -40,6 +41,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.mirror.DefaultDownloadMirrors;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrorSelector;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -69,9 +71,6 @@ public abstract class AbstractProxyRepository
     @Requirement
     private FeedRecorder feedRecorder;
 
-    @Requirement
-    private DownloadMirrors dMirrors;
-
     /** The proxy remote status */
     private volatile RemoteStatus remoteStatus = RemoteStatus.UNKNOWN;
 
@@ -86,6 +85,9 @@ public abstract class AbstractProxyRepository
 
     /** Proxy selector, if set */
     private ProxySelector proxySelector;
+
+    /** Download mirrors */
+    private DownloadMirrors dMirrors;
 
     /** Item content validators */
     private Map<String, ItemContentValidator> itemContentValidators;
@@ -427,6 +429,11 @@ public abstract class AbstractProxyRepository
 
     public DownloadMirrors getDownloadMirrors()
     {
+        if ( dMirrors == null )
+        {
+            dMirrors = new DefaultDownloadMirrors( (CRepositoryCoreConfiguration) getCurrentCoreConfiguration() );
+        }
+
         return dMirrors;
     }
 

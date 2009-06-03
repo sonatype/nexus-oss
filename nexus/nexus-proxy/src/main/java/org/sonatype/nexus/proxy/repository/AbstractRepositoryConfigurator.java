@@ -2,8 +2,6 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.PlexusContainer;
@@ -17,7 +15,6 @@ import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
-import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
@@ -112,29 +109,10 @@ public abstract class AbstractRepositoryConfigurator
 
     }
 
-    @SuppressWarnings( "unchecked" )
     protected void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
                                          CRepository repo, ExternalConfiguration externalConfiguration )
         throws ConfigurationException
     {
-        List<CMirror> mirrors = (List<CMirror>) repo.getMirrors();
-
-        if ( mirrors != null && mirrors.size() > 0 )
-        {
-            List<Mirror> runtimeMirrors = new ArrayList<Mirror>();
-
-            for ( CMirror mirror : mirrors )
-            {
-                runtimeMirrors.add( new Mirror( mirror.getId(), mirror.getUrl() ) );
-            }
-
-            repository.getPublishedMirrors().setMirrors( runtimeMirrors );
-        }
-        else
-        {
-            repository.getPublishedMirrors().setMirrors( null );
-        }
-
         // Setting common things on a repository
 
         // NX-198: filling up the default variable to store the "default" local URL
@@ -212,28 +190,6 @@ public abstract class AbstractRepositoryConfigurator
     protected void doPrepareForSave( Repository repository, ApplicationConfiguration configuration,
                                      CRepository repoConfig, ExternalConfiguration externalConfiguration )
     {
-        List<Mirror> mirrors = (List<Mirror>) repository.getPublishedMirrors().getMirrors();
-
-        if ( mirrors != null && mirrors.size() > 0 )
-        {
-            List<CMirror> runtimeMirrors = new ArrayList<CMirror>();
-
-            for ( Mirror mirror : mirrors )
-            {
-                CMirror cmirror = new CMirror();
-
-                cmirror.setId( mirror.getId() );
-                cmirror.setUrl( mirror.getUrl() );
-                runtimeMirrors.add( cmirror );
-            }
-
-            repoConfig.setMirrors( runtimeMirrors );
-        }
-        else
-        {
-            repoConfig.getMirrors().clear();
-        }
-
         // Setting common things on a repository
 
         repoConfig.getLocalStorage().setUrl( repository.getLocalUrl() );

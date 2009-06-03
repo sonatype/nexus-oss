@@ -14,35 +14,40 @@
 package org.sonatype.nexus.proxy.mirror;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.configuration.model.CMirror;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.Mirror;
 
-@Component( role = DownloadMirrors.class, instantiationStrategy = "per-lookup" )
 public class DefaultDownloadMirrors
     implements DownloadMirrors
 {
     private static final long NO_EXPIRATION = -1;
-    
+
     private static final long DEFAULT_EXPIRATION = 30 * 60 * 1000L; // 30 minutes
 
-    private LinkedHashSet<Mirror> mirrors = new LinkedHashSet<Mirror>();
+    private final CRepositoryCoreConfiguration configuration;
 
     private Map<String, BlaclistEntry> blacklist = new HashMap<String, BlaclistEntry>();
 
     private long blacklistExpiration = DEFAULT_EXPIRATION;
 
+    public DefaultDownloadMirrors( CRepositoryCoreConfiguration configuration )
+    {
+        this.configuration = configuration;
+    }
+
     /**
-     * Maximum number of mirror url to consider before operation falls back to
-     * canonical url.
+     * Maximum number of mirror url to consider before operation falls back to canonical url.
      * 
      * @see AbstractProxyRepository#doRetrieveRemoteItem
      */
@@ -81,20 +86,35 @@ public class DefaultDownloadMirrors
     {
         if ( mirrors == null || mirrors.isEmpty() )
         {
-            this.mirrors.clear();
-            this.blacklist.clear();
+            getConfiguration( true ).getRemoteStorage().getMirrors().clear();
+
+            blacklist.clear();
         }
         else
         {
-            this.mirrors = new LinkedHashSet<Mirror>( mirrors );
+            ArrayList<CMirror> modelMirrors = new ArrayList<CMirror>( mirrors.size() );
 
+            for ( Mirror mirror : mirrors )
+            {
+                CMirror model = new CMirror();
+
+                model.setId( mirror.getId() );
+
+                model.setUrl( mirror.getUrl() );
+
+                modelMirrors.add( model );
+            }
+
+            getConfiguration( true ).getRemoteStorage().setMirrors( modelMirrors );
+
+            // remove blacklist entries for removed mirrors, but retain others
             Iterator<Entry<String, BlaclistEntry>> i = blacklist.entrySet().iterator();
 
             while ( i.hasNext() )
             {
                 String id = i.next().getKey();
-                
-                if ( getMirror( id ) == null )
+
+                if ( !existsMirrorWithId( true, id ) )
                 {
                     i.remove();
                 }
@@ -102,9 +122,21 @@ public class DefaultDownloadMirrors
         }
     }
 
+    @SuppressWarnings( "unchecked" )
     public List<Mirror> getMirrors()
     {
-        return new ArrayList<Mirror>( mirrors );
+        List<CMirror> modelMirrors = getConfiguration( false ).getRemoteStorage().getMirrors();
+
+        ArrayList<Mirror> mirrors = new ArrayList<Mirror>( modelMirrors.size() );
+
+        for ( CMirror model : modelMirrors )
+        {
+            Mirror mirror = new Mirror( model.getId(), model.getUrl() );
+
+            mirrors.add( mirror );
+        }
+
+        return Collections.unmodifiableList( mirrors );
     }
 
     public boolean isBlacklisted( Mirror mirror )
@@ -140,7 +172,7 @@ public class DefaultDownloadMirrors
         {
             blacklist.remove( mirror.getId() );
 
-            if ( this.mirrors.contains( mirror ) )
+            if ( existsMirrorWithId( false, mirror.getId() ) )
             {
                 blacklist.put( mirror.getId(), new BlaclistEntry( mirror.getId(), System.currentTimeMillis() ) );
             }
@@ -161,26 +193,33 @@ public class DefaultDownloadMirrors
     {
         return maxMirrors;
     }
-    
+
     public void setMaxMirrors( int maxMirrors )
     {
         this.maxMirrors = maxMirrors;
     }
-    
-    private Mirror getMirror( String id )
+
+    // ==
+
+    protected CRepository getConfiguration( boolean forWrite )
     {
-        if ( this.mirrors != null )
+        return (CRepository) configuration.getConfiguration( forWrite );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    protected boolean existsMirrorWithId( boolean forWrite, String id )
+    {
+        List<CMirror> modelMirrors = getConfiguration( forWrite ).getRemoteStorage().getMirrors();
+
+        for ( CMirror modelMirror : modelMirrors )
         {
-            for ( Mirror mirror : this.mirrors )
+            if ( modelMirror.getId().equals( id ) )
             {
-                if ( mirror.getId().equals( id ) )
-                {
-                    return mirror;
-                }
+                return true;
             }
         }
-        
-        return null;
+
+        return false;
     }
 
 }

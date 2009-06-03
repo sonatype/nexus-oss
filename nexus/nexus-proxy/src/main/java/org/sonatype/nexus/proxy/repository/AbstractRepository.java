@@ -62,6 +62,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.mirror.DefaultPublishedMirrors;
 import org.sonatype.nexus.proxy.mirror.PublishedMirrors;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
@@ -123,11 +124,10 @@ public abstract class AbstractRepository
     @Requirement
     private Walker walker;
 
-    @Requirement
-    private PublishedMirrors pMirrors;
-
     @Requirement( role = ContentGenerator.class )
     private Map<String, ContentGenerator> contentGenerators;
+
+    private PublishedMirrors pMirrors;
 
     /** The local storage. */
     private LocalRepositoryStorage localStorage;
@@ -420,6 +420,11 @@ public abstract class AbstractRepository
 
     public PublishedMirrors getPublishedMirrors()
     {
+        if ( pMirrors == null )
+        {
+            pMirrors = new DefaultPublishedMirrors( (CRepositoryCoreConfiguration) getCurrentCoreConfiguration() );
+        }
+
         return pMirrors;
     }
 
@@ -465,7 +470,7 @@ public abstract class AbstractRepository
         {
             request.setRequestPath( RepositoryItemUid.PATH_ROOT );
         }
-        
+
         request.setRequestLocalOnly( true );
 
         getLogger().info(
@@ -535,7 +540,7 @@ public abstract class AbstractRepository
     {
         getLogger()
             .info( "Evicting unused items from repository " + getId() + " from path " + request.getRequestPath() );
-        
+
         request.setRequestLocalOnly( true );
 
         EvictUnusedItemsWalkerProcessor walkerProcessor = new EvictUnusedItemsWalkerProcessor( timestamp );

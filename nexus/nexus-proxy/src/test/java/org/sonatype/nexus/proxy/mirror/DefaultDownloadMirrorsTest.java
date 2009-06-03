@@ -13,11 +13,16 @@
  */
 package org.sonatype.nexus.proxy.mirror;
 
+import java.lang.instrument.ClassDefinition;
 import java.util.Arrays;
 import java.util.List;
 
+import org.sonatype.nexus.configuration.model.CRemoteStorage;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.repository.Mirror;
+import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 
 public class DefaultDownloadMirrorsTest
     extends AbstractNexusTestCase
@@ -44,7 +49,14 @@ public class DefaultDownloadMirrorsTest
 
     private DefaultDownloadMirrors newDefaultDownloadMirrors( Mirror[] mirrors )
     {
-        DefaultDownloadMirrors dMirrors = new DefaultDownloadMirrors();
+        DefaultCRepository conf = new DefaultCRepository();
+        conf.setRemoteStorage( new CRemoteStorage() );
+        conf.getRemoteStorage().setProvider( CommonsHttpClientRemoteStorage.PROVIDER_STRING );
+        conf.getRemoteStorage().setUrl( "http://repo1.maven.org/maven2/" );
+
+        CRepositoryCoreConfiguration coreConfig = new CRepositoryCoreConfiguration( conf );
+
+        DefaultDownloadMirrors dMirrors = new DefaultDownloadMirrors( coreConfig );
 
         if ( mirrors != null )
         {
@@ -61,7 +73,7 @@ public class DefaultDownloadMirrorsTest
         int maxMirrors = 2;
 
         DefaultDownloadMirrors dMirrors = newDefaultDownloadMirrors( mirrors );
-        
+
         dMirrors.setMaxMirrors( maxMirrors );
 
         assertEquals( mirrors.length, dMirrors.getMirrors().size() );
@@ -71,7 +83,7 @@ public class DefaultDownloadMirrorsTest
         List<Mirror> _mirrors = selector.getMirrors();
 
         assertEquals( maxMirrors, _mirrors.size() );
-        assertEquals( mirrors[0], _mirrors.get( 0 ) );
+        assertEquals( mirrors[0], _mirrors.get( 0 ));
         assertEquals( mirrors[1], _mirrors.get( 1 ) );
 
         selector.close();
@@ -142,9 +154,8 @@ public class DefaultDownloadMirrorsTest
 
         assertEquals( true, dMirrors.isBlacklisted( mirrors[0] ) );
 
-        dMirrors.setMirrors( Arrays.asList( new Mirror( "3", "another-mirror" ), 
-            new Mirror( "4", "one-more-mirror" ), 
-            mirrors[0] ) );
+        dMirrors.setMirrors( Arrays.asList( new Mirror( "3", "another-mirror" ), new Mirror( "4", "one-more-mirror" ),
+                                            mirrors[0] ) );
 
         assertEquals( true, dMirrors.isBlacklisted( mirrors[0] ) );
     }

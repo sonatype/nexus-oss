@@ -14,32 +14,70 @@
 package org.sonatype.nexus.proxy.mirror;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.Collections;
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.configuration.model.CMirror;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.repository.Mirror;
 
-@Component( role = PublishedMirrors.class, instantiationStrategy = "per-lookup" )
 public class DefaultPublishedMirrors
     implements PublishedMirrors
 {
-    private LinkedHashSet<Mirror> mirrors = new LinkedHashSet<Mirror>();
+    private final CRepositoryCoreConfiguration configuration;
+
+    public DefaultPublishedMirrors( CRepositoryCoreConfiguration configuration )
+    {
+        this.configuration = configuration;
+    }
 
     public void setMirrors( List<Mirror> mirrors )
     {
         if ( mirrors == null || mirrors.isEmpty() )
         {
-            this.mirrors.clear();
+            getConfiguration( true ).getMirrors().clear();
         }
         else
         {
-            this.mirrors = new LinkedHashSet<Mirror>( mirrors );
+            ArrayList<CMirror> modelMirrors = new ArrayList<CMirror>( mirrors.size() );
+
+            for ( Mirror mirror : mirrors )
+            {
+                CMirror model = new CMirror();
+
+                model.setId( mirror.getId() );
+
+                model.setUrl( mirror.getUrl() );
+
+                modelMirrors.add( model );
+            }
+
+            getConfiguration( true ).setMirrors( modelMirrors );
         }
     }
 
+    @SuppressWarnings( "unchecked" )
     public List<Mirror> getMirrors()
     {
-        return new ArrayList<Mirror>( mirrors );
+        List<CMirror> modelMirrors = getConfiguration( false ).getMirrors();
+
+        ArrayList<Mirror> mirrors = new ArrayList<Mirror>( modelMirrors.size() );
+
+        for ( CMirror model : modelMirrors )
+        {
+            Mirror mirror = new Mirror( model.getId(), model.getUrl() );
+
+            mirrors.add( mirror );
+        }
+
+        return Collections.unmodifiableList( mirrors );
+    }
+
+    // ==
+
+    protected CRepository getConfiguration( boolean forWrite )
+    {
+        return (CRepository) configuration.getConfiguration( forWrite );
     }
 }

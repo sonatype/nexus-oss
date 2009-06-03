@@ -1,13 +1,9 @@
 package org.sonatype.nexus.proxy.repository;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.RemoteSettingsUtil;
@@ -48,24 +44,6 @@ public abstract class AbstractProxyRepositoryConfigurator
 
                     prepository.setRemoteStorage( rs );
 
-                    List<CMirror> mirrors = (List<CMirror>) repo.getRemoteStorage().getMirrors();
-
-                    if ( mirrors != null && mirrors.size() > 0 )
-                    {
-                        List<Mirror> runtimeMirrors = new ArrayList<Mirror>();
-
-                        for ( CMirror mirror : mirrors )
-                        {
-                            runtimeMirrors.add( new Mirror( mirror.getId(), mirror.getUrl() ) );
-                        }
-
-                        prepository.getDownloadMirrors().setMirrors( runtimeMirrors );
-                    }
-                    else
-                    {
-                        prepository.getDownloadMirrors().setMirrors( null );
-                    }
-
                     if ( repo.getRemoteStorage().getAuthentication() != null )
                     {
                         prepository.setRemoteAuthenticationSettings( RemoteSettingsUtil.convertFromModel( repo
@@ -74,8 +52,8 @@ public abstract class AbstractProxyRepositoryConfigurator
 
                     if ( repo.getRemoteStorage().getConnectionSettings() != null )
                     {
-                        prepository.setRemoteConnectionSettings( RemoteSettingsUtil.convertFromModel( repo.getRemoteStorage()
-                            .getConnectionSettings() ) );
+                        prepository.setRemoteConnectionSettings( RemoteSettingsUtil.convertFromModel( repo
+                            .getRemoteStorage().getConnectionSettings() ) );
                     }
 
                     if ( repo.getRemoteStorage().getHttpProxySettings() != null )
@@ -86,8 +64,8 @@ public abstract class AbstractProxyRepositoryConfigurator
                         }
                         else
                         {
-                            prepository.setRemoteProxySettings( RemoteSettingsUtil.convertFromModel( repo.getRemoteStorage()
-                                .getHttpProxySettings() ) );
+                            prepository.setRemoteProxySettings( RemoteSettingsUtil.convertFromModel( repo
+                                .getRemoteStorage().getHttpProxySettings() ) );
                         }
                     }
                 }
@@ -122,28 +100,6 @@ public abstract class AbstractProxyRepositoryConfigurator
 
             if ( repoConfig.getRemoteStorage() != null )
             {
-                List<Mirror> mirrors = (List<Mirror>) prepository.getDownloadMirrors().getMirrors();
-
-                if ( mirrors != null && mirrors.size() > 0 )
-                {
-                    List<CMirror> runtimeMirrors = new ArrayList<CMirror>();
-
-                    for ( Mirror mirror : mirrors )
-                    {
-                        CMirror cmirror = new CMirror();
-
-                        cmirror.setId( mirror.getId() );
-                        cmirror.setUrl( mirror.getUrl() );
-                        runtimeMirrors.add( cmirror );
-                    }
-
-                    repoConfig.getRemoteStorage().setMirrors( runtimeMirrors );
-                }
-                else
-                {
-                    repoConfig.getRemoteStorage().getMirrors().clear();
-                }
-
                 RemoteStorageContext rsc = prepository.getRemoteStorageContext();
 
                 if ( rsc.hasRemoteAuthenticationSettings() )
