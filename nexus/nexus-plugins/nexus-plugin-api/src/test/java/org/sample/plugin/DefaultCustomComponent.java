@@ -12,6 +12,7 @@ public class DefaultCustomComponent
 
     public String sayHello()
     {
-        return "default hello!";
+        return "default hello! RepositoryRegistry has " + repositoryRegistry.getRepositories().size()
+            + " registered repositories!";
     }
 }

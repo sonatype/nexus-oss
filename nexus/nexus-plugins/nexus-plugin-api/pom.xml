@@ -18,32 +18,13 @@
   <packaging>jar</packaging>
 
   <!-- a short but descriptive name for the project -->
-  <name>Nexus Plugin API</name>
+  <name>Nexus Plugins : Plugin API</name>
 
   <dependencies>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-host-api</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-api</artifactId>
-    </dependency>
-
-    <!-- Plexus -->
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
     </dependency>
 
     <!-- Testing -->
@@ -69,7 +50,6 @@
             <id>plugin.xml</id>
             <goals>
               <goal>java</goal>
-              <goal>xsd</goal>
               <goal>xpp3-reader</goal>
               <goal>xpp3-writer</goal>
             </goals>

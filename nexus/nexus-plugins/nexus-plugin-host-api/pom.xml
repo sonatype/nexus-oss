@@ -18,7 +18,7 @@
   <packaging>jar</packaging>
 
   <!-- a short but descriptive name for the project -->
-  <name>Nexus Plugin Host API</name>
+  <name>Nexus Plugins : Host API</name>
 
   <dependencies>
 

@@ -1,9 +1,10 @@
 package org.sonatype.nexus;
 
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.context.Context;
 import org.sonatype.appbooter.PlexusAppBooter;
-import org.sonatype.nexus.plugins.plexus.NexusPluginCollector;
-import org.sonatype.nexus.plugins.plexus.NexusPluginDiscoverer;
+import org.sonatype.nexus.plugins.NexusPluginManager;
 
 /**
  * The Nexus specific AppBooter.
@@ -14,10 +15,22 @@ public class NexusAppBooter
     extends PlexusAppBooter
 {
     @Override
+    protected void customizeContext( Context context )
+    {
+        super.customizeContext( context );
+    }
+
+    @Override
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
     {
-        containerConfiguration.addComponentDiscoverer( new NexusPluginDiscoverer() );
+        super.customizeContainerConfiguration( containerConfiguration );
+        
+        containerConfiguration.addComponentDiscoverer( NexusPluginManager.class )
+            .addComponentDiscoveryListener( NexusPluginManager.class );
+    }
 
-        containerConfiguration.addComponentDiscoveryListener( new NexusPluginCollector() );
+    protected void customizeContainer( PlexusContainer plexusContainer )
+    {
+        super.customizeContainer( plexusContainer );
     }
 }

@@ -56,6 +56,7 @@ import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
+import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -104,6 +105,9 @@ public class DefaultNexus
 {
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
+    
+    @Requirement
+    private NexusPluginManager nexusPluginManager;
 
     /**
      * The nexus configuration.
@@ -822,7 +826,6 @@ public class DefaultNexus
     public void initialize()
         throws InitializationException
     {
-
         StringBuffer sysInfoLog = new StringBuffer();
 
         sysInfoLog.append( "\n" );
@@ -835,6 +838,9 @@ public class DefaultNexus
         sysInfoLog.append( "-------------------------------------------------" );
 
         getLogger().info( sysInfoLog.toString() );
+        
+        // load locally present plugins
+        nexusPluginManager.activateInstalledPlugins();
 
         // EventInspectorHost
         applicationEventMulticaster.addEventListener( eventInspectorHost );

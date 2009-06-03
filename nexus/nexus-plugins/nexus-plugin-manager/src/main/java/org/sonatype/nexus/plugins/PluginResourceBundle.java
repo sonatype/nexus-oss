@@ -8,8 +8,7 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.plugins.PluginStaticResource.PluginStaticResourceModel;
-import org.sonatype.nexus.plugins.model.Resource;
-import org.sonatype.nexus.plugins.plexus.NexusPluginCollector;
+import org.sonatype.nexus.plugins.model.PluginResource;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 
@@ -23,7 +22,7 @@ public class PluginResourceBundle
     implements NexusResourceBundle
 {
     @Requirement
-    private NexusPluginCollector nexusPluginCollector;
+    private NexusPluginManager nexusPluginManager;
 
     @Configuration( "pluginKey" )
     private String pluginKey;
@@ -35,7 +34,7 @@ public class PluginResourceBundle
 
         if ( !pd.getPluginMetadata().getResources().isEmpty() )
         {
-            for ( Resource res : (List<Resource>) pd.getPluginMetadata().getResources() )
+            for ( PluginResource res : (List<PluginResource>) pd.getPluginMetadata().getResources() )
             {
                 PluginStaticResourceModel model =
                     new PluginStaticResourceModel( res.getResourcePath(), res.getPublishedPath(), res.getContentType() );
@@ -49,7 +48,7 @@ public class PluginResourceBundle
 
     public List<StaticResource> getContributedResouces()
     {
-        PluginDescriptor pd = nexusPluginCollector.getPluginDescriptor( pluginKey );
+        PluginDescriptor pd = nexusPluginManager.getInstalledPlugins().get( pluginKey );
 
         List<PluginStaticResourceModel> models = getStaticResourceModels( pd );
 

@@ -108,18 +108,29 @@
           <version>1.0.0+</version>
           <description>Plugin extension point implementation.</description>
           <association>
-            <type>Plugin</type>
+            <type>PluginComponent</type>
             <multiplicity>1</multiplicity>
           </association>
           <required>false</required>
         </field>
-        
+
+        <field>
+          <name>repositoryTypes</name>
+          <version>1.0.0+</version>
+          <description>Plugin contributed Repository types.</description>
+          <association>
+            <type>RepositoryType</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+
         <field>
           <name>extensions</name>
           <version>1.0.0+</version>
           <description>Plugin contributed extension point implementations.</description>
           <association>
-            <type>Extension</type>
+            <type>ExtensionComponent</type>
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
@@ -130,7 +141,7 @@
           <version>1.0.0+</version>
           <description>Plugin contributed managed components..</description>
           <association>
-            <type>Component</type>
+            <type>UserComponent</type>
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
@@ -141,7 +152,7 @@
           <version>1.0.0+</version>
           <description>Plugin contributed static resources.</description>
           <association>
-            <type>Resource</type>
+            <type>PluginResource</type>
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
@@ -159,7 +170,7 @@
     </class>
 
     <class>
-      <name>Plugin</name>
+      <name>PluginComponent</name>
       <version>1.0.0+</version>
       <description>The Plugin implementation within this plugin.</description>
       <fields>
@@ -179,16 +190,42 @@
             The (optional) requirements of the component.
           </description>
           <association>
-            <type>Requirement</type>
+            <type>ComponentRequirement</type>
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
         </field>
       </fields>
     </class>
-    
+
     <class>
-      <name>Extension</name>
+      <name>RepositoryType</name>
+      <version>1.0.0+</version>
+      <description>The repository type contributed by this plugin.</description>
+      <fields>
+        <field>
+          <name>componentContract</name>
+          <version>1.0.0+</version>
+          <description>
+            The repository interface.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>pathPrefix</name>
+          <version>1.0.0+</version>
+          <description>
+            The pathPrefix to mount these repository types.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>ExtensionComponent</name>
       <version>1.0.0+</version>
       <description>The extensions within this plugin.</description>
       <fields>
@@ -236,7 +273,7 @@
             The (optional) requirements of the component.
           </description>
           <association>
-            <type>Requirement</type>
+            <type>ComponentRequirement</type>
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
@@ -245,7 +282,7 @@
     </class>
 
     <class>
-      <name>Component</name>
+      <name>UserComponent</name>
       <version>1.0.0+</version>
       <description>Managed components.</description>
       <fields>
@@ -293,7 +330,7 @@
             The (optional) requirements of the component.
           </description>
           <association>
-            <type>Requirement</type>
+            <type>ComponentRequirement</type>
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
@@ -301,7 +338,7 @@
       </fields>
     </class>
     <class>
-      <name>Requirement</name>
+      <name>ComponentRequirement</name>
       <version>1.0.0+</version>
       <description>The requirements of managed component.</description>
       <fields>
@@ -336,7 +373,7 @@
     </class>
 
     <class>
-      <name>Resource</name>
+      <name>PluginResource</name>
       <version>1.0.0+</version>
       <description>The static resources in this plugin.</description>
       <fields>

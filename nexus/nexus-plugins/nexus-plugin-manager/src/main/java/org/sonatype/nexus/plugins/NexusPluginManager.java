@@ -2,12 +2,16 @@ package org.sonatype.nexus.plugins;
 
 import java.util.Map;
 
+import org.codehaus.plexus.component.discovery.ComponentDiscoverer;
+import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
+
 /**
  * A high level interface for plugin manager.
  * 
  * @author cstamas
  */
 public interface NexusPluginManager
+    extends ComponentDiscoverer, ComponentDiscoveryListener
 {
     /**
      * Returns the unmodifiable Map of installed plugins.
