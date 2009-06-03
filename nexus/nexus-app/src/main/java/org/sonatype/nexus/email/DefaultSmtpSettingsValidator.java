@@ -63,7 +63,7 @@ public class DefaultSmtpSettingsValidator
 
         MailRequestStatus status = emailer.sendMail( request );
 
-        for ( int i = 0; i < 1000; i++ )
+        for ( int i = 0; i < 3000; i++ )
         {
             Thread.yield();
             try

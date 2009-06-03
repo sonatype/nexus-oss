@@ -62,6 +62,47 @@ public class Nexus1806ValidateSmtpConfiguration
         run( EmailUtil.EMAIL_SERVER_PORT, originalServer );
     }
 
+    @Test
+    public void invalidServer()
+        throws Exception
+    {
+        SmtpSettingsResource smtpSettings = new SmtpSettingsResource();
+        smtpSettings.setHost( "someremote.localhost.com.zh" );
+        smtpSettings.setPort( 1234 );
+        smtpSettings.setUsername( EmailUtil.USER_USERNAME );
+        smtpSettings.setPassword( EmailUtil.USER_PASSWORD );
+        smtpSettings.setSystemEmailAddress( EmailUtil.USER_EMAIL );
+        smtpSettings.setTestEmail( "test_user@sonatype.org" );
+        Status status = SettingsMessageUtil.validateSmtp( smtpSettings );
+        Assert.assertEquals( "Unable to validate e-mail " + status, 400, status.getCode() );
+    }
+
+    @Test
+    public void invalidUsername()
+        throws Exception
+    {
+        if ( true )
+        {
+            // greenmail doesn't allow authentication
+            printKnownErrorButDoNotFail( getClass(), "invalidUsername()" );
+            return;
+        }
+
+        String login = "invaliduser_test";
+        String email = "invaliduser_test@sonatype.org";
+        changedServer.setUser( email, login, "%^$@invalidUserPW**" );
+
+        SmtpSettingsResource smtpSettings = new SmtpSettingsResource();
+        smtpSettings.setHost( "localhost" );
+        smtpSettings.setPort( port );
+        smtpSettings.setUsername( login );
+        smtpSettings.setPassword( USER_PASSWORD );
+        smtpSettings.setSystemEmailAddress( email );
+        smtpSettings.setTestEmail( "test_user@sonatype.org" );
+        Status status = SettingsMessageUtil.validateSmtp( smtpSettings );
+        Assert.assertEquals( "Unable to validate e-mail " + status, 400, status.getCode() );
+    }
+
     private void run( int port, GreenMail server )
         throws IOException, InterruptedException
     {
