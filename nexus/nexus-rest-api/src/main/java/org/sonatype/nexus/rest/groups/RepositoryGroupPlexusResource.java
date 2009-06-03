@@ -27,6 +27,7 @@ import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.rest.NexusCompat;
+import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
@@ -88,6 +89,13 @@ public class RepositoryGroupPlexusResource
             groupRepo = getRepositoryRegistry().getRepositoryWithFacet( getGroupId( request ), GroupRepository.class );
 
         }
+        catch ( NoSuchRepositoryAccessException e)
+        {
+            // access denied 403
+            getLogger().debug( "Blocking access to all repository groups, based on permissions." );
+            
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to Repository Group" );
+        }
         catch ( NoSuchRepositoryException e )
         {
             getLogger().warn( "Repository Group not found, id=" + getGroupId( request ) );
@@ -122,6 +130,7 @@ public class RepositoryGroupPlexusResource
 
                 member.setId( repoId );
 
+                // NOTE: we must hit the registry each time and NOT call groupRepo.getMemberRepositories, that doesn't block access
                 member.setName( getRepositoryRegistry().getRepository( repoId ).getName() );
 
                 member.setResourceURI( createChildReference( request, this, repoId ).toString() );
@@ -130,6 +139,13 @@ public class RepositoryGroupPlexusResource
             }
 
             result.setData( resource );
+        }
+        catch ( NoSuchRepositoryAccessException e)
+        {
+            // access denied 403
+            getLogger().debug( "Blocking access to repository group, based on permissions." );
+            
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -187,6 +203,12 @@ public class RepositoryGroupPlexusResource
             getRepositoryRegistry().getRepositoryWithFacet( getGroupId( request ), GroupRepository.class );
 
             getNexus().deleteRepository( getGroupId( request ) );
+        }
+        catch ( NoSuchRepositoryAccessException e )
+        {
+            getLogger().warn( "Repository group Access Denied, id=" + getGroupId( request ) );
+
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to Repository Group" );
         }
         catch ( NoSuchRepositoryException e )
         {

@@ -34,6 +34,8 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -73,6 +75,9 @@ public class DefaultRepositoryRouter
 
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
+    
+    @Requirement
+    private NexusItemAuthorizer itemAuthorizer;
 
     /** Should links be resolved? */
     private boolean followLinks;
@@ -614,7 +619,7 @@ public class DefaultRepositoryRouter
                         kind = (Class<Repository>) Class.forName( rtd.getRole() );
 
                         repositories = repositoryRegistry.getRepositoriesWithFacet( kind );
-
+                        
                         break;
                     }
                 }
@@ -626,13 +631,17 @@ public class DefaultRepositoryRouter
                         e );
                 }
             }
-
+            
             // if no prefix matched, Item not found
             if ( repositories == null || repositories.isEmpty() )
             {
                 throw new ItemNotFoundException( request.getRequestPath() );
             }
-
+            
+            // filter access to the repositories
+            // NOTE: do this AFTER the null/empty check so we return an empty list vs. an ItemNotFound
+            repositories = this.filterAccessToRepositories( repositories );
+            
             ArrayList<StorageItem> result = new ArrayList<StorageItem>( repositories.size() );
 
             for ( Repository repository : repositories )
@@ -668,5 +677,52 @@ public class DefaultRepositoryRouter
         {
             throw new ItemNotFoundException( request.getRequestPath() );
         }
+    }
+    
+    private List<Repository> filterAccessToRepositories( Collection<Repository> repositories )
+    {
+        if( repositories == null)
+        {
+            return null;
+        }
+        
+        List<Repository> filteredRepositories = new ArrayList<Repository>();
+        
+        for ( Repository repository : repositories )
+        {
+            if( this.itemAuthorizer.isViewable( repository.getId() ) )
+            {
+                filteredRepositories.add( repository );
+            }
+        }
+
+        return filteredRepositories;
+
+    }
+
+    public boolean authorizePath( ResourceStoreRequest request, Action action )
+    {
+        TargetSet matched = this.getTargetsForRequest( request );
+
+        try
+        {
+            RequestRoute route = this.getRequestRouteForRequest( request );
+
+            if ( route.getTargetedRepository() != null )
+            {
+                // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
+                request.pushRequestPath( route.getOriginalRequestPath() );
+
+                matched.addTargetSet( this.itemAuthorizer.getGroupsTargetSet( route.getTargetedRepository(), request ) );
+
+                request.popRequestPath();
+            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore it, do nothing
+        }
+
+        return this.itemAuthorizer.authorizePath( matched, action );
     }
 }

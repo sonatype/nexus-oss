@@ -46,35 +46,13 @@ public class DefaultNexusItemAuthorizer
 
     @Requirement
     private RepositoryRegistry repoRegistry;
+    
+    
+    //toby: got it. filter should call router (does make sense, since filter does not know nothing about where the request is "routing"), not the authorizer directly. we need a new method on router iface, that will call authorizer, with all calculated params (TargetSet matched, RequestRoute route plus the standard ResourceStoreRequest requno, again, filktest, Action action) since all those are coming from router anyway
+    
+    
+    
 
-    @Requirement
-    private RepositoryRouter repositoryRouter;
-
-    public boolean authorizePath( ResourceStoreRequest request, Action action )
-    {
-        TargetSet matched = repositoryRouter.getTargetsForRequest( request );
-
-        try
-        {
-            RequestRoute route = repositoryRouter.getRequestRouteForRequest( request );
-
-            if ( route.getTargetedRepository() != null )
-            {
-                // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
-                request.pushRequestPath( route.getOriginalRequestPath() );
-
-                matched.addTargetSet( getGroupsTargetSet( route.getTargetedRepository(), request ) );
-
-                request.popRequestPath();
-            }
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore it, do nothing
-        }
-
-        return authorizePath( matched, action );
-    }
 
     public boolean authorizePath( Repository repository, ResourceStoreRequest request, Action action )
     {
@@ -93,7 +71,7 @@ public class DefaultNexusItemAuthorizer
 
     // ===
 
-    protected TargetSet getGroupsTargetSet( Repository repository, ResourceStoreRequest request )
+    public TargetSet getGroupsTargetSet( Repository repository, ResourceStoreRequest request )
     {
         TargetSet targetSet = new TargetSet();
 
@@ -133,7 +111,7 @@ public class DefaultNexusItemAuthorizer
         return groups;
     }
 
-    protected boolean authorizePath( TargetSet matched, Action action )
+    public boolean authorizePath( TargetSet matched, Action action )
     {
         // did we hit repositories at all?
         if ( matched.getMatchedRepositoryIds().size() > 0 )
@@ -212,8 +190,8 @@ public class DefaultNexusItemAuthorizer
         }
     }
 
-    public boolean isViewable( Repository repository )
+    public boolean isViewable( String repositoryId )
     {
-        return authorizePermission( "nexus:repoview:" + repository.getId() );
+        return authorizePermission( "nexus:repoview:" + repositoryId );
     }
 }

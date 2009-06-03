@@ -63,11 +63,8 @@ public abstract class AbstractNexusPlexusResource
     @Requirement
     private NexusConfiguration nexusConfiguration;
 
-    @Requirement
+    @Requirement( hint = "protected" )
     private RepositoryRegistry repositoryRegistry;
-
-    @Requirement
-    private NexusItemAuthorizer nexusItemAuthorizer;
     
     @Requirement
     private ReferenceFactory referenceFactory;

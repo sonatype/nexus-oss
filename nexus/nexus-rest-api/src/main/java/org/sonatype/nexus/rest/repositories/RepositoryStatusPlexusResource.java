@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryDependentStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
@@ -98,6 +99,12 @@ public class RepositoryStatusPlexusResource
 
             result.setData( resource );
 
+        }
+        catch ( NoSuchRepositoryAccessException e )
+        {
+            getLogger().warn( "Repository access denied, id=" + repoId );
+
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to Repository" );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -186,6 +193,12 @@ public class RepositoryStatusPlexusResource
                 }
 
                 getNexusConfiguration().saveConfiguration();
+            }
+            catch ( NoSuchRepositoryAccessException e )
+            {
+                getLogger().warn( "Repository access denied, id=" + repoId );
+
+                throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to Repository" );
             }
             catch ( NoSuchRepositoryException e )
             {

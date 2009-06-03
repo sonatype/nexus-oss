@@ -919,15 +919,6 @@
           <type>String</type>
           <required>true</required>
         </field>
-        <field>
-          <name>repositories</name>
-          <version>1.0.0+</version>
-          <association>
-            <type>RepositoryGroupMemberRepository</type>
-            <multiplicity>*</multiplicity>
-          </association>
-          <required>true</required>
-        </field>
       </fields>
     </class>
 

@@ -31,6 +31,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
@@ -113,6 +114,12 @@ public class RepositoryPlexusResource
 
                         getNexusConfiguration().saveConfiguration();
                     }
+                    catch ( NoSuchRepositoryAccessException e )
+                    {
+                        getLogger().warn( "Repository access denied, id=" + repoId );
+
+                        throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to Repository" );
+                    }
                     catch ( NoSuchRepositoryException e )
                     {
                         getLogger().warn( "Virtual repository not found, id=" + repoId );
@@ -168,6 +175,12 @@ public class RepositoryPlexusResource
 
                         getNexusConfiguration().saveConfiguration();
                     }
+                    catch ( NoSuchRepositoryAccessException e )
+                    {
+                        getLogger().warn( "Repository access denied, id=" + repoId );
+
+                        throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to Repository" );
+                    }
                     catch ( NoSuchRepositoryException e )
                     {
                         getLogger().warn( "Repository not found, id=" + repoId );
@@ -215,6 +228,12 @@ public class RepositoryPlexusResource
 
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
                                          "Repository is not deletable, it has dependants." );
+        }
+        catch ( NoSuchRepositoryAccessException e )
+        {
+            getLogger().warn( "Repository access denied, id=" + repoId );
+
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to Repository" );
         }
         catch ( NoSuchRepositoryException e )
         {

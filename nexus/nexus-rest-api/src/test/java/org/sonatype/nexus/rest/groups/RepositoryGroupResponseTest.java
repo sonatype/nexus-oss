@@ -25,7 +25,7 @@ public class RepositoryGroupResponseTest
     public void testRepoGroup()
         throws Exception
     {
-        String jsonString = "{\"data\":[{\"id\":\"public-releases\",\"name\":\"public-releases11\",\"repositories\":[{\"id\":\"extFree\",\"name\":\"Modified OSS\",\"resourceURI\":\"/nexus/service/local/repo_groups//repositories/extFree\"},{\"id\":\"extNonFree\",\"name\":\"Commerical\",\"resourceURI\":\"/nexus/service/local/repo_groups//repositories/extNonFree\"},{\"id\":\"central\",\"name\":\"Maven Central\",\"resourceURI\":\"/nexus/service/local/repo_groups//repositories/central\"},{\"id\":\"codehaus\",\"name\":\"Codehaus\",\"resourceURI\":\"/nexus/service/local/repo_groups//repositories/codehaus\"},{\"id\":\"maven2-repository.dev.java.net\",\"name\":\"Java dot NET\",\"resourceURI\":\"/nexus/service/local/repo_groups//repositories/maven2-repository.dev.java.net\"}]}]}";
+        String jsonString = "{\"data\":[{\"id\":\"public-releases\",\"name\":\"public-releases11\"}]}";
 
         XStreamRepresentation representation = new XStreamRepresentation(
             xstream,

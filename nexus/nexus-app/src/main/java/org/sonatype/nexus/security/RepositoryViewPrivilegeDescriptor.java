@@ -50,7 +50,7 @@ public class RepositoryViewPrivilegeDescriptor
             return null;
         }
 
-        String repoId = getProperty( privilege, TargetPrivilegeRepositoryPropertyDescriptor.ID );
+        String repoId = getProperty( privilege, RepositoryPropertyDescriptor.ID );
 
         if ( StringUtils.isEmpty( repoId ) )
         {

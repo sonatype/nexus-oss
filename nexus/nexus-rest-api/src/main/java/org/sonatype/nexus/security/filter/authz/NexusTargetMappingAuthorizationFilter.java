@@ -15,21 +15,16 @@ package org.sonatype.nexus.security.filter.authz;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.web.WebUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 
 /**
  * A filter that maps the targetId from the Request.
@@ -37,30 +32,10 @@ import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
  * @author cstamas
  */
 public class NexusTargetMappingAuthorizationFilter
-    extends HttpVerbMappingAuthorizationFilter
+    extends AbstractNexusAuthorizationFilter
 {
-    private Pattern pathPrefixPattern;
-
-    private String pathPrefix;
 
     private String pathReplacement;
-
-    private NexusItemAuthorizer nexusItemAuthorizer;
-
-    public String getPathPrefix()
-    {
-        return pathPrefix;
-    }
-
-    public void setPathPrefix( String pathPrefix )
-    {
-        this.pathPrefix = pathPrefix;
-
-        if ( pathPrefix != null )
-        {
-            pathPrefixPattern = Pattern.compile( pathPrefix );
-        }
-    }
 
     public String getPathReplacement()
     {
@@ -83,7 +58,7 @@ public class NexusTargetMappingAuthorizationFilter
 
         if ( getPathPrefix() != null )
         {
-            Matcher m = pathPrefixPattern.matcher( path );
+            Matcher m = this.getPathPrefixPattern().matcher( path );
 
             if ( m.matches() )
             {
@@ -172,20 +147,6 @@ public class NexusTargetMappingAuthorizationFilter
             }
         }
 
-        if ( nexusItemAuthorizer == null )
-        {
-            PlexusContainer plexus = (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
-
-            try
-            {
-                nexusItemAuthorizer = plexus.lookup( NexusItemAuthorizer.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new IllegalStateException( "Cannot lookup NexusArtifactAuthorizer!", e );
-            }
-        }
-
-        return nexusItemAuthorizer.authorizePath( getResourceStoreRequest( request, false ), getActionFromHttpVerb( request ) ) ;
+        return this.getRepositoryRouter().authorizePath( getResourceStoreRequest( request, false ), getActionFromHttpVerb( request ) ) ;
     }
 }

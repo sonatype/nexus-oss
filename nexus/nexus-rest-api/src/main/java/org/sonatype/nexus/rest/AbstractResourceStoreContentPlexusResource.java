@@ -517,6 +517,10 @@ public abstract class AbstractResourceStoreContentPlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
         }
+        else if ( t instanceof NoSuchRepositoryAccessException )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, t.getMessage() );
+        }
         else if ( t instanceof NoSuchRepositoryException )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );

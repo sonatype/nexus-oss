@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -71,6 +72,19 @@ public abstract class AbstractRepositoryGroupPlexusResource
             group.setMemberRepositoryIds( members );
 
             getNexusConfiguration().saveConfiguration();
+        }
+        catch ( NoSuchRepositoryAccessException e)
+        {
+            // access denied 403
+            getLogger().warn( "Repository referenced by Repository Group Access Eenied, ID=" + model.getId(), e );
+            
+            throw new PlexusResourceException(
+                Status.CLIENT_ERROR_BAD_REQUEST,
+                "Repository referenced by Repository Group Access Denied, GroupId="
+                    + model.getId(),
+                e,
+                getNexusErrorResponse( "repositories",
+                                       "Repository referenced by Repository Group Access Denied" ) );
         }
         catch ( NoSuchRepositoryException e )
         {

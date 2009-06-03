@@ -44,6 +44,8 @@ import com.thoughtworks.xstream.XStream;
 public class RepositoryMessageUtil
 {
 
+    public static final String SERVICE_PART = RequestFacade.SERVICE_LOCAL + "repositories";
+    
     private XStream xstream;
 
     private MediaType mediaType;
@@ -51,7 +53,7 @@ public class RepositoryMessageUtil
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
     private static final Logger LOG = Logger.getLogger( RepositoryMessageUtil.class );
-
+    
     public RepositoryMessageUtil( XStream xstream, MediaType mediaType, RepositoryTypeRegistry registry )
     {
         super();
@@ -151,7 +153,7 @@ public class RepositoryMessageUtil
     {
 
         String responseText =
-            RequestFacade.doGetRequest( "service/local/repositories/" + repoId ).getEntity().getText();
+            RequestFacade.doGetRequest( SERVICE_PART + "/" + repoId ).getEntity().getText();
         LOG.debug( "responseText: \n" + responseText );
 
         // this should use call to: getResourceFromResponse
@@ -194,7 +196,7 @@ public class RepositoryMessageUtil
 
         String idPart = ( method == Method.POST ) ? "" : "/" + id;
 
-        String serviceURI = "service/local/repositories" + idPart;
+        String serviceURI = SERVICE_PART + idPart;
 
         RepositoryResourceResponse repoResponseRequest = new RepositoryResourceResponse();
         repoResponseRequest.setData( resource );
@@ -223,7 +225,7 @@ public class RepositoryMessageUtil
     public List<RepositoryListResource> getList()
         throws IOException
     {
-        String responseText = RequestFacade.doGetRequest( "service/local/repositories" ).getEntity().getText();
+        String responseText = RequestFacade.doGetRequest( SERVICE_PART ).getEntity().getText();
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
@@ -348,7 +350,7 @@ public class RepositoryMessageUtil
     {
 
         Response response =
-            RequestFacade.sendMessage( RequestFacade.SERVICE_LOCAL + "repositories/" + repoId + "/status", Method.GET );
+            RequestFacade.sendMessage( SERVICE_PART + "/" + repoId + "/status", Method.GET );
         Status status = response.getStatus();
         Assert.assertTrue( "Fail to getStatus for '" + repoId + "' repository" + status, status.isSuccess() );
 
@@ -364,7 +366,7 @@ public class RepositoryMessageUtil
     public void updateStatus( RepositoryStatusResource repoStatus )
         throws IOException
     {
-        String uriPart = RequestFacade.SERVICE_LOCAL + "repositories/" + repoStatus.getId() + "/status";
+        String uriPart = SERVICE_PART + "/" + repoStatus.getId() + "/status";
 
         XStreamRepresentation representation = new XStreamRepresentation( this.xstream, "", MediaType.APPLICATION_XML );
         RepositoryStatusResourceResponse resourceResponse = new RepositoryStatusResourceResponse();

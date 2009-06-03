@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.access;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.target.TargetSet;
 
 /**
  * Authorizes the Repository requests against permissions.
@@ -23,15 +24,17 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public interface NexusItemAuthorizer
 {
-    /**
-     * Authorizes a TargetSet against an action. Used by authz filter to check the incoming request, that is obviously
-     * addressed to content root.
-     * 
-     * @param repository
-     * @param path
-     * @return
-     */
-    boolean authorizePath( ResourceStoreRequest request, Action action );
+//    /**
+//     * Authorizes a TargetSet against an action. Used by authz filter to check the incoming request, that is obviously
+//     * addressed to content root.
+//     * 
+//     * @param repository
+//     * @param path
+//     * @return
+//     */
+//    boolean authorizePath( ResourceStoreRequest request, Action action );
+    public boolean authorizePath( TargetSet matched, Action action );
+    public TargetSet getGroupsTargetSet( Repository repository, ResourceStoreRequest request );
 
     /**
      * Authorizes a repository level path against an action. Use when you have a repositoy path, ie. filtering of search
@@ -49,7 +52,7 @@ public interface NexusItemAuthorizer
      * @param repository
      * @return
      */
-    boolean isViewable( Repository repository );
+    boolean isViewable( String repositoryId );
 
     
     /**

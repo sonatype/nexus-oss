@@ -1,0 +1,22 @@
+<plexus>
+  <components>
+      
+      <component>
+      <role>org.sonatype.nexus.configuration.application.ApplicationConfiguration</role>
+      <implementation>org.sonatype.nexus.configuration.SimpleSecureApplicationConfiguration</implementation>
+    </component>
+
+    <component>
+        <role>org.jsecurity.realm.Realm</role>
+        <implementation>org.sonatype.nexus.proxy.security.PlexusConfiguredRealm</implementation>
+        <configuration>
+          <userPrivilageMap>
+            <repo1user>nexus:target:*:repo1:*,nexus:repoview:repo1</repo1user>
+            <repo1userNoView>nexus:target:*:repo1:*</repo1userNoView>
+            <repoall>nexus:target:*:*:*,nexus:repoview:*</repoall>
+          </userPrivilageMap>
+        </configuration>
+    </component>
+
+  </components>
+</plexus>

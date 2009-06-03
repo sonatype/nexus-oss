@@ -25,6 +25,8 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
@@ -92,25 +94,15 @@ public class RepositoryGroupListPlexusResource
 
                 resource.setName( group.getName() );
 
-                // just to trigger list creation, and not stay null coz of XStream serialization
-                resource.getRepositories();
-
-                for ( String repoId : (List<String>) group.getMemberRepositoryIds() )
-                {
-                    RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
-
-                    member.setId( repoId );
-
-                    member.setName( getRepositoryRegistry().getRepository( repoId ).getName() );
-
-                    member.setResourceURI( createRepositoryReference( request, repoId ).toString() );
-
-                    resource.addRepository( member );
-                }
-
                 result.addData( resource );
-
             }
+        }
+        catch ( NoSuchRepositoryAccessException e)
+        {
+            // access denied 403
+            getLogger().debug( "Blocking access to all repository groups, based on permissions." );
+            
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN );
         }
         catch ( NoSuchRepositoryException e )
         {

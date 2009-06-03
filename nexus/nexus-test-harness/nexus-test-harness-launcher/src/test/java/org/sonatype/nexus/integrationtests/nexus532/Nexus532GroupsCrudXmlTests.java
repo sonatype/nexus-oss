@@ -194,8 +194,6 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
             M2GroupRepositoryConfiguration cGroup = NexusConfigUtil.getGroup( group.getId() );
 
             Assert.assertNotNull( "CRepositoryGroup", cGroup );
-
-            this.messageUtil.validateRepoLists( group.getRepositories(), cGroup.getMemberRepositoryIds() );
         }
     }
 }

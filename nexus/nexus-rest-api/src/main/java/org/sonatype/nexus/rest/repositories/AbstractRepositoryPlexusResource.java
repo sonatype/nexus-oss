@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.NexusCompat;
+import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
@@ -210,6 +211,12 @@ public abstract class AbstractRepositoryPlexusResource
             resource = getRepositoryRestModel( repository );
 
             result.setData( resource );
+        }
+        catch ( NoSuchRepositoryAccessException e )
+        {
+            getLogger().warn( "Repository access denied, id=" + repoId );
+
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to Repository" );
         }
         catch ( NoSuchRepositoryException e )
         {

@@ -19,7 +19,9 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractIndexContentPlexusResource;
+import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -49,11 +51,19 @@ public class RepositoryIndexContentPlexusResource
     protected IndexingContext getIndexingContext( Request request )
         throws ResourceException
     {
+        String repositoryId = String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
+        
         try
         {
-            String repositoryId = String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
+            // make sure the repo exists and we have access to it.
+            Repository repository = this.getRepositoryRegistry().getRepository( repositoryId );
+            return indexerManager.getRepositoryBestIndexContext( repository.getId() );
+        }
+        catch ( NoSuchRepositoryAccessException e )
+        {
+            getLogger().warn( "Repository access denied, id=" + repositoryId );
 
-            return indexerManager.getRepositoryBestIndexContext( repositoryId );
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to Repository" );
         }
         catch ( NoSuchRepositoryException e )
         {

@@ -20,6 +20,7 @@ import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -65,4 +66,15 @@ public interface RepositoryRouter
      */
     RequestRoute getRequestRouteForRequest( ResourceStoreRequest request )
         throws ItemNotFoundException;
+    
+    /**
+     * Authorizes a TargetSet against an action. Used by authz filter to check the incoming request, that is obviously
+     * addressed to content root.
+     * 
+     * @param repository
+     * @param path
+     * @return
+     */
+    boolean authorizePath( ResourceStoreRequest request, Action action );
+    
 }

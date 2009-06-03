@@ -34,7 +34,7 @@ public class DefaultAccessManager
     public void decide( Repository repository, ResourceStoreRequest request, Action action )
         throws AccessDeniedException
     {
-        if ( !nexusItemAuthorizer.isViewable( repository )
+        if ( !nexusItemAuthorizer.isViewable( repository.getId() )
             || !nexusItemAuthorizer.authorizePath( repository, request, action ) )
         {
             // deny the access

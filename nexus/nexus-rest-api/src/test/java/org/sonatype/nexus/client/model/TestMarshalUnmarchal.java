@@ -418,29 +418,11 @@ public class TestMarshalUnmarchal
         listItem1.setName( "name" );
         listItem1.setResourceURI( "resourceURI" );
 
-        RepositoryGroupMemberRepository memberRepo1 = new RepositoryGroupMemberRepository();
-        memberRepo1.setId( "memberRepo1" );
-        memberRepo1.setName( "memberRepo1" );
-        memberRepo1.setResourceURI( "memberRepoURI1" );
-        listItem1.addRepository( memberRepo1 );
-
-        RepositoryGroupMemberRepository memberRepo2 = new RepositoryGroupMemberRepository();
-        memberRepo2.setId( "memberRepo2" );
-        memberRepo2.setName( "memberRepo2" );
-        memberRepo2.setResourceURI( "memberRepoURI2" );
-        listItem1.addRepository( memberRepo2 );
-
         RepositoryGroupListResource listItem2 = new RepositoryGroupListResource();
         listItem2.setFormat( "format2" );
         listItem2.setId( "id2" );
         listItem2.setName( "name2" );
         listItem2.setResourceURI( "resourceURI2" );
-
-        RepositoryGroupMemberRepository memberRepo3 = new RepositoryGroupMemberRepository();
-        memberRepo3.setId( "memberRepo3" );
-        memberRepo3.setName( "memberRepo3" );
-        memberRepo3.setResourceURI( "memberRepoURI3" );
-        listItem2.addRepository( memberRepo3 );
 
         resourceResponse.addData( listItem1 );
         resourceResponse.addData( listItem2 );

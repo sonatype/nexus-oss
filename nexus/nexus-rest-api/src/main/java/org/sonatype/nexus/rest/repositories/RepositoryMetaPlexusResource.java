@@ -24,6 +24,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.cache.CacheStatistics;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryMetaResource;
 import org.sonatype.nexus.rest.model.RepositoryMetaResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -102,6 +103,12 @@ public class RepositoryMetaPlexusResource
             result.setData( resource );
 
             return result;
+        }
+        catch ( NoSuchRepositoryAccessException e )
+        {
+            getLogger().warn( "Repository access denied, id=" + repoId );
+
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to Repository" );
         }
         catch ( NoSuchRepositoryException e )
         {
