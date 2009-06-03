@@ -341,36 +341,6 @@ Sonatype.repoServer.RepositoryBrowsePanel = function( config ) {
   this.oldSearchText = '';
   this.searchTask = new Ext.util.DelayedTask( this.startSearch, this, [this]);
   this.nodeContextMenuEvent = 'repositoryContentMenuInit';
-
-  this.browseSelector = new Ext.Toolbar.Button(          
-    {
-      text: 'Browse Local Storage',
-      icon: Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
-      value: 0,
-      cls: 'x-btn-text-icon',
-      menu: {
-        items: [
-          {
-            text: 'Browse Local Storage',
-            value: 0,
-            checked: true,
-            group: 'repo-browse-selector-group',
-            checkHandler: this.browseSelectorHandler,
-            scope: this
-          },
-          {
-            text: 'Browse Index',
-            value: 1,
-            checked: false,
-            group: 'repo-browse-selector-group',
-            checkHandler: this.browseSelectorHandler,
-            scope: this,
-            disabled: this.payload.data.repoType == 'virtual'
-          }
-        ]
-      }
-    }
-  );
   
   Sonatype.repoServer.RepositoryBrowsePanel.superclass.constructor.call( this, {
     anchor: '0 -2',
@@ -413,9 +383,7 @@ Sonatype.repoServer.RepositoryBrowsePanel = function( config ) {
             });
           }
         }
-      },
-      ' ',
-      this.browseSelector
+      }
     ],
     loader: new Ext.tree.SonatypeTreeLoader( {
       url: '',
@@ -445,17 +413,6 @@ Sonatype.repoServer.RepositoryBrowsePanel = function( config ) {
 };
 
 Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
-
-  browseSelectorHandler: function( item, e ) {
-    if ( this.browseSelector.value != item.value ) {
-      this.browseSelector.value = item.value;
-      this.browseSelector.setText( item.text );
-      this.browseIndex = item.value == 1;
-
-      this.refreshHandler( item, e );
-    }
-  },
-
   getBrowsePath: function( baseUrl ) {
     return baseUrl + this.getBrowsePathSnippet() + '/'; 
   },
@@ -669,7 +626,14 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
   if ( rec.data.resourceURI ) {
     cardPanel.add( new Sonatype.repoServer.RepositoryBrowsePanel( { 
       payload: rec,
-      tabTitle: 'Browse'
+      tabTitle: 'Browse Storage'
     } ) );
+    if ( rec.data.repoType != 'virtual' ) {
+      cardPanel.add( new Sonatype.repoServer.RepositoryBrowsePanel( { 
+        payload: rec,
+        tabTitle: 'Browse Index',
+        browseIndex: true
+      } ) );
+    }
   }
 } );
