@@ -23,7 +23,7 @@ public abstract class AbstractNexusIndexerCliTest
 
     private static final String INDEX_DIR = new File( "target/clitest/index" ).getAbsolutePath();
 
-    private static final String TEST_REPO = new File( "target/test/repo" ).getAbsolutePath();
+    private static final String TEST_REPO = new File( "src/test/repo" ).getAbsolutePath();
 
     protected OutputStream out;
 
@@ -73,11 +73,11 @@ public abstract class AbstractNexusIndexerCliTest
     {
         int code = execute();
         String output = out.toString();
-        assertEquals( output, 0, code );
+        assertEquals( output, 1, code );
         assertTrue( "Should print usage", output.contains( "usage: nexus-indexer [options]" ) );
     }
 
-    public void /* test */RequiredArgs()
+    public void testRequiredArgs()
         throws Exception
     {
         int code = execute( "--repository", TEST_REPO, "--index", INDEX_DIR, "-d", DEST_DIR );
@@ -86,10 +86,10 @@ public abstract class AbstractNexusIndexerCliTest
         assertIndexFiles();
     }
 
-    public void /*test*/MissingArgs()
+    public void testMissingArgs()
         throws IOException
     {
-        String usage = "Unable to parse command line options: no argument for:";
+        String usage = "usage: nexus-indexer";
 
         int code = execute( "--repository", "--index", INDEX_DIR, "-d", DEST_DIR );
         String output = out.toString();
@@ -114,7 +114,7 @@ public abstract class AbstractNexusIndexerCliTest
         assertFalse( "No index file was generated", new File( INDEX_DIR ).exists() );
     }
 
-    public void /* test */AbrvsRequiredArgs()
+    public void testAbrvsRequiredArgs()
         throws Exception
     {
         int code = execute( "-r", TEST_REPO, "-i", INDEX_DIR, "-d", DEST_DIR );
@@ -156,7 +156,7 @@ public abstract class AbstractNexusIndexerCliTest
         assertIndexFiles();
     }
 
-    public void /* test */InvalidRepo()
+    public void testInvalidRepo()
         throws Exception
     {
         int code =
@@ -164,7 +164,6 @@ public abstract class AbstractNexusIndexerCliTest
                      INDEX_DIR, "-d", DEST_DIR );
         String output = out.toString();
         assertEquals( output, 1, code );
-        assertIndexFiles();
     }
 
     private void assertIndexFiles()

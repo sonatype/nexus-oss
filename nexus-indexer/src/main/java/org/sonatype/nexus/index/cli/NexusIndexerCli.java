@@ -16,7 +16,9 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.tools.cli.AbstractCli;
 import org.sonatype.nexus.index.ArtifactContext;
@@ -78,11 +80,72 @@ public class NexusIndexerCli
     private static final long MB = 1024 * 1024;
 
     private Options options;
+    
+    private int status = 0;
 
     public static void main( String[] args )
         throws Exception
     {
-        new NexusIndexerCli().execute( args );
+        NexusIndexerCli cli = new NexusIndexerCli();
+     
+        cli.execute( args );
+        
+        System.exit( cli.status );        
+    }
+    
+    @Override
+    public int execute( String[] arg0, ClassWorld arg1 )
+    {
+        int value = super.execute( arg0, arg1 );
+        
+        if ( status == 0 )
+        {
+            status = value;
+        }
+        
+        return status;
+    }
+    
+    @Override
+    public int execute( String[] args )
+    {
+        int value = super.execute( args );
+        
+        if ( status == 0 )
+        {
+            status = value;
+        }
+        
+        return status;
+    }
+    
+    @Override
+    protected void showError( String message, Exception e, boolean show )
+    {
+        status = 1;
+        super.showError( message, e, show );
+    }
+    
+    @Override
+    protected int showFatalError( String message, Exception e, boolean show )
+    {
+        status = 1;
+        return super.showFatalError( message, e, show );
+    }
+    
+    @Override
+    public CommandLine parse( String[] args )
+        throws ParseException
+    {
+        try
+        {
+            return super.parse( args );
+        }
+        catch ( ParseException e )
+        {
+            status = 1;
+            throw e;
+        }
     }
 
     @Override
@@ -147,6 +210,7 @@ public class NexusIndexerCli
         }
         else
         {
+            status = 1;
             displayHelp();
         }
     }
