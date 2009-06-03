@@ -19,11 +19,11 @@ public abstract class AbstractNexusIndexerCliTest
     extends PlexusTestCase
 {
 
-    private static final String DEST_DIR = new File( "target/clitest/output" ).getAbsolutePath();
+    private static final String DEST_DIR = new File( getBasedir(), "target/clitest/output" ).getAbsolutePath();
 
-    private static final String INDEX_DIR = new File( "target/clitest/index" ).getAbsolutePath();
+    private static final String INDEX_DIR = new File( getBasedir(), "target/clitest/index" ).getAbsolutePath();
 
-    private static final String TEST_REPO = new File( "src/test/repo" ).getAbsolutePath();
+    private static final String TEST_REPO = new File( getBasedir(), "src/test/repo" ).getAbsolutePath();
 
     protected OutputStream out;
 
