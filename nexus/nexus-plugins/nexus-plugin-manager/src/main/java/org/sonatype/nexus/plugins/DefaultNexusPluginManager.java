@@ -27,6 +27,7 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextMapAdapter;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -75,6 +76,9 @@ public class DefaultNexusPluginManager
     private static final String DESCRIPTOR_PATH = "META-INF/nexus/plugin.xml";
 
     @Requirement
+    private Logger logger;
+
+    @Requirement
     private PlexusContainer plexusContainer;
 
     @Requirement( hint = "file" )
@@ -87,6 +91,11 @@ public class DefaultNexusPluginManager
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
     private final Map<String, PluginDescriptor> pluginDescriptors = new HashMap<String, PluginDescriptor>();
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 
     public Map<String, PluginDescriptor> getInstalledPlugins()
     {
@@ -441,13 +450,8 @@ public class DefaultNexusPluginManager
 
             NexusPluginValidator validator = context.getNexusPluginValidator();
 
-            validator.validate( pluginDescriptor );
-
             if ( !validator.validate( pluginDescriptor ) )
             {
-                // emit an event
-                applicationEventMulticaster.notifyEventListeners( new PluginRejectedEvent( this, pluginDescriptor ) );
-
                 // drop it
                 try
                 {
@@ -455,9 +459,12 @@ public class DefaultNexusPluginManager
                 }
                 catch ( PlexusContainerException e )
                 {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    getLogger().debug( "Could not remove plugin realm!", e );
                 }
+
+                // emit an event
+                applicationEventMulticaster.notifyEventListeners( new PluginRejectedEvent( this, pluginDescriptor,
+                                                                                           validator ) );
 
                 // and return like nothing happened
                 return;
