@@ -134,23 +134,30 @@ public class DefaultWalker
     {
         if ( context.isStopped() )
         {
-            // we have a cause, report any non-ItemNotFounds with stack trace
-            if ( context.getStopCause() instanceof ItemNotFoundException )
+            if ( context.getStopCause() == null )
             {
-                getLogger().info(
-                    "Aborted walking on repository ID='" + context.getRepository().getId() + "' from path='"
-                        + fromPath + "', cause: " + context.getStopCause().getMessage() );
+                getLogger().debug( "Walker was stopped programatically, not because of error." );
             }
             else
             {
-                getLogger().info(
-                    "Aborted walking on repository ID='" + context.getRepository().getId() + "' from path='" + fromPath
-                        + "', cause:",
-                    context.getStopCause() );
+                // we have a cause, report any non-ItemNotFounds with stack trace
+                if ( context.getStopCause() instanceof ItemNotFoundException )
+                {
+                    getLogger().info(
+                        "Aborted walking on repository ID='" + context.getRepository().getId() + "' from path='"
+                            + fromPath + "', cause: " + context.getStopCause().getMessage() );
+                }
+                else
+                {
+                    getLogger().info(
+                        "Aborted walking on repository ID='" + context.getRepository().getId() + "' from path='" + fromPath
+                            + "', cause:",
+                        context.getStopCause() );
+                }
+    
+                throw new WalkerException( context, "Aborted walking on repository ID='" + context.getRepository().getId()
+                    + "' from path='" + fromPath + "'." );
             }
-
-            throw new WalkerException( context, "Aborted walking on repository ID='" + context.getRepository().getId()
-                + "' from path='" + fromPath + "'." );
         }
         else
         {
