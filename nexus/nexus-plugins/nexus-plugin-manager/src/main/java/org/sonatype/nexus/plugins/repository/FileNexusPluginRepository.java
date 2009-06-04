@@ -1,7 +1,6 @@
 package org.sonatype.nexus.plugins.repository;
 
 import java.io.File;
-import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.Collection;
 

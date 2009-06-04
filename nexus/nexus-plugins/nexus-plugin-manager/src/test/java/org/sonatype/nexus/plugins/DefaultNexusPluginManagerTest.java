@@ -10,18 +10,18 @@ public class DefaultNexusPluginManagerTest
 {
     protected DefaultNexusPluginManager nexusPluginManager;
 
+    @Override
+    protected void customizeContext( Context context )
+    {
+        context.put( "nexus.work", getTestFile( "src/test " ).getAbsoluteFile() );
+    }
+
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
         nexusPluginManager = (DefaultNexusPluginManager) lookup( NexusPluginManager.class );
-    }
-
-    @Override
-    protected void customizeContext( Context context )
-    {
-        context.put( "nexus-work", new File( getBasedir() + "src/test " ) );
     }
 
     public void testSimple()
@@ -34,7 +34,10 @@ public class DefaultNexusPluginManagerTest
         int processorsPre = mc.getProcessors().size();
 
         // do discovery, both recorded value should be +1
-        PluginManagerResponse response = nexusPluginManager.activateInstalledPlugins();
+        PluginManagerResponse pmresponse = nexusPluginManager.activateInstalledPlugins();
+
+        assertEquals( "One plugin should be discovered!", 1, pmresponse.getProcessedPluginResponses().size() );
+        assertEquals( "Should be okay!", RequestResult.COMPLETELY_EXECUTED, pmresponse.getResult() );
 
         // record post-discovery state
         int customizersPost = mc.getCustomizers().size();
@@ -45,7 +48,10 @@ public class DefaultNexusPluginManagerTest
         assertTrue( "The map should grow!", processorsPre < processorsPost );
 
         // now destroy
-        nexusPluginManager.deactivatePlugin( response.getProcessedPluginCoordinates().get( 0 ) );
+        PluginResponse presponse =
+            nexusPluginManager.deactivatePlugin( pmresponse.getProcessedPluginCoordinates().get( 0 ) );
+
+        assertEquals( "Should be succesful!", true, presponse.isSuccesful() );
 
         // record post-destroy state
         int customizersDestroy = mc.getCustomizers().size();
