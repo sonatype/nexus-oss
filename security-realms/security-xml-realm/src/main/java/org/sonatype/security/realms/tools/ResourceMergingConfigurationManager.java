@@ -442,21 +442,29 @@ public class ResourceMergingConfigurationManager
 
     private Configuration getConfiguration()
     {
-        for ( StaticSecurityResource resource : staticResources )
+        lock.lock();
+        try
         {
-            if ( resource.isDirty() )
+            for ( StaticSecurityResource resource : staticResources )
             {
-                configuration = null;
-                break;
+                if ( resource.isDirty() )
+                {
+                    configuration = null;
+                    break;
+                }
             }
-        }
 
-        if ( configuration != null )
+            if ( configuration != null )
+            {
+                return configuration;
+            }
+
+            return initializeStaticConfiguration();
+        }
+        finally
         {
-            return configuration;
+            lock.unlock();
         }
-
-        return initializeStaticConfiguration();
     }
 
     public void save()

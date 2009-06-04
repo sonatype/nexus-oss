@@ -53,5 +53,12 @@
             <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
         </dependency>
+        
+        <dependency>
+          <groupId>edu.umd.cs.mtc</groupId>
+          <artifactId>multithreadedtc</artifactId>
+          <version>1.01</version>
+          <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
