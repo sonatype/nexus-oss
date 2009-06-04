@@ -125,8 +125,18 @@ public class DefaultSampleApp
         throws IOException
     {
         // Build a query that will search the documents for the field set to the supplied value
+        // This uses predefined logic to define the query
+        // See http://svn.sonatype.org/nexus/trunk/nexus-indexer/src/main/java/org/sonatype/nexus/index/DefaultQueryCreator.java
+        // for details
         Query query = indexer.constructQuery( field, value );
         
+        return searchIndex( query );
+    }
+    
+    // search for artifacts using pre-built query
+    public Set<ArtifactInfo> searchIndex( Query query )
+        throws IOException
+    {
         // Build the request
         FlatSearchRequest request = new FlatSearchRequest( query );
         
