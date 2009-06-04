@@ -58,6 +58,11 @@ public class DefaultNexusItemAuthorizer
     {
         TargetSet matched = repository.getTargetsForRequest( request );
 
+        if ( matched == null )
+        {
+            matched = new TargetSet();
+        }
+
         // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
         matched.addTargetSet( this.getGroupsTargetSet( repository, request ) );
 

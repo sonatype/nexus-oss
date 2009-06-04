@@ -47,6 +47,11 @@ public class TargetSet
 
     public void addTargetSet( TargetSet ts )
     {
+        if ( ts == null )
+        {
+            return;
+        }
+
         for ( TargetMatch tm : ts.getMatches() )
         {
             addTargetMatch( tm );
