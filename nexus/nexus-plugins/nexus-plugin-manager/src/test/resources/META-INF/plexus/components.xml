@@ -1,0 +1,24 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
+      </role>
+      <implementation>org.sonatype.nexus.plugins.MockRepositoryTypeRegistry
+      </implementation>
+    </component>
+    <component>
+      <role>org.sonatype.nexus.plugins.MockComponent</role>
+      <implementation>org.sonatype.nexus.plugins.MockComponent</implementation>
+      <requirements>
+        <requirement>
+          <field-name>customizers</field-name>
+          <role>org.sonatype.nexus.plugins.RepositoryCustomizer</role>
+        </requirement>
+        <requirement>
+          <field-name>processors</field-name>
+          <role>org.sonatype.nexus.proxy.repository.RequestProcessor</role>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>

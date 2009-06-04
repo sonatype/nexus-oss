@@ -309,6 +309,8 @@ public class DefaultNexusPluginManager
 
             result.setSource( source );
 
+            // =
+            
             result.setPluginKey( pd.getGroupId() + ":" + pd.getArtifactId() );
 
             result.setPluginMetadata( pd );
