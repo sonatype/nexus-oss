@@ -110,6 +110,8 @@ public class DefaultNexusPluginManager
 
     public PluginManagerResponse activateInstalledPlugins()
     {
+        getLogger().info( "Activating locally installed plugins..." );
+
         PluginManagerResponse result = new PluginManagerResponse();
 
         Collection<PluginCoordinates> availablePlugins = nexusPluginRepository.findAvailablePlugins();
@@ -150,6 +152,8 @@ public class DefaultNexusPluginManager
 
     protected PluginResponse activatePlugin( PluginCoordinates pluginCoordinates, List<URL> constituents )
     {
+        getLogger().info( "... activating plugin " + pluginCoordinates.toString() );
+
         PluginResponse result = new PluginResponse( pluginCoordinates );
 
         try
@@ -165,6 +169,8 @@ public class DefaultNexusPluginManager
         }
         catch ( Exception e )
         {
+            getLogger().warn( "Was not able to activate Nexus plugin " + pluginCoordinates.toString() + "!", e );
+
             result.setThrowable( e );
         }
 
@@ -183,6 +189,8 @@ public class DefaultNexusPluginManager
         }
         catch ( Exception e )
         {
+            getLogger().warn( "Was not able to deactivate Nexus plugin " + pluginCoordinates.toString() + "!", e );
+
             result.setThrowable( e );
         }
 

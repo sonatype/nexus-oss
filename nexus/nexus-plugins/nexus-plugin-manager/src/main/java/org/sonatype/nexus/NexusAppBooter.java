@@ -3,7 +3,7 @@ package org.sonatype.nexus;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
-import org.sonatype.appbooter.PlexusAppBooter;
+import org.sonatype.appbooter.jsw.PlexusAppBooterJSWListener;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 
 /**
@@ -12,7 +12,7 @@ import org.sonatype.nexus.plugins.NexusPluginManager;
  * @author cstamas
  */
 public class NexusAppBooter
-    extends PlexusAppBooter
+    extends PlexusAppBooterJSWListener
 {
     @Override
     protected void customizeContext( Context context )
