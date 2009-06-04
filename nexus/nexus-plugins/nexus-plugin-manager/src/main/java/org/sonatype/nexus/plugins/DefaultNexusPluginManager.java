@@ -14,12 +14,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.discovery.ComponentDiscoverer;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
+import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
@@ -28,6 +31,8 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextMapAdapter;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -71,7 +76,7 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
  */
 @Component( role = NexusPluginManager.class )
 public class DefaultNexusPluginManager
-    implements NexusPluginManager
+    implements NexusPluginManager, ComponentDiscoverer, ComponentDiscoveryListener, Initializable
 {
     private static final String DESCRIPTOR_PATH = "META-INF/nexus/plugin.xml";
 
@@ -95,6 +100,16 @@ public class DefaultNexusPluginManager
     protected Logger getLogger()
     {
         return logger;
+    }
+
+    public void initialize()
+        throws InitializationException
+    {
+        // DIRTY HACK FOLLOWS!
+        ( (MutablePlexusContainer) plexusContainer ).getComponentDiscovererManager().addComponentDiscoverer( this );
+
+        ( (MutablePlexusContainer) plexusContainer ).getComponentDiscovererManager()
+            .registerComponentDiscoveryListener( this );
     }
 
     public Map<String, PluginDescriptor> getInstalledPlugins()
@@ -165,7 +180,9 @@ public class DefaultNexusPluginManager
                 pluginRealm.addURL( constituent );
             }
 
-            plexusContainer.discoverComponents( pluginRealm );
+            plexusContainer.discoverComponents( pluginRealm,
+                                                new PluginDiscoveryContext( pluginRealm,
+                                                                            new DefaultNexusPluginValidator() ) );
         }
         catch ( Exception e )
         {
@@ -320,6 +337,8 @@ public class DefaultNexusPluginManager
         // plugin entry point, if any
         if ( pd.getPlugin() != null )
         {
+            getLogger().debug( "... ... adding NexusPlugin: " + pd.getPlugin().getImplementation() );
+
             ComponentDescriptor<NexusPlugin> plugin = new ComponentDescriptor<NexusPlugin>();
 
             plugin.setRole( NexusPlugin.class.getName() );
@@ -330,7 +349,7 @@ public class DefaultNexusPluginManager
 
             plugin.setImplementation( pd.getPlugin().getImplementation() );
 
-            plugin.addRequirements( getRequirements( pd.getPlugin().getRequirements() ) );
+            addRequirementsIfNeeded( plugin, pd.getPlugin().getRequirements() );
 
             csd.addComponentDescriptor( plugin );
         }
@@ -340,6 +359,10 @@ public class DefaultNexusPluginManager
         {
             for ( ExtensionComponent ext : (List<ExtensionComponent>) pd.getExtensions() )
             {
+                getLogger().debug(
+                                   "... ... adding ExtensionPoint (role='" + ext.getExtensionPoint() + "'): "
+                                       + ext.getImplementation() );
+
                 // TEMPLATES! This is not good
                 ComponentDescriptor<Object> extd = new ComponentDescriptor<Object>();
 
@@ -361,7 +384,7 @@ public class DefaultNexusPluginManager
                     extd.setInstantiationStrategy( "per-lookup" );
                 }
 
-                extd.addRequirements( getRequirements( ext.getRequirements() ) );
+                addRequirementsIfNeeded( extd, ext.getRequirements() );
 
                 csd.addComponentDescriptor( extd );
             }
@@ -372,6 +395,10 @@ public class DefaultNexusPluginManager
         {
             for ( UserComponent cmp : (List<UserComponent>) pd.getComponents() )
             {
+                getLogger().debug(
+                                   "... ... adding user component (role='" + cmp.getComponentContract() + "'): "
+                                       + cmp.getImplementation() );
+
                 ComponentDescriptor<Object> cmpd = new ComponentDescriptor<Object>();
 
                 cmpd.setRole( cmp.getComponentContract() );
@@ -388,7 +415,7 @@ public class DefaultNexusPluginManager
                     cmpd.setInstantiationStrategy( "per-lookup" );
                 }
 
-                cmpd.addRequirements( getRequirements( cmp.getRequirements() ) );
+                addRequirementsIfNeeded( cmpd, cmp.getRequirements() );
 
                 csd.addComponentDescriptor( cmpd );
             }
@@ -415,14 +442,10 @@ public class DefaultNexusPluginManager
         }
     }
 
-    protected List<ComponentRequirement> getRequirements(
-                                                          List<org.sonatype.nexus.plugins.model.ComponentRequirement> reqs )
+    protected void addRequirementsIfNeeded( ComponentDescriptor<?> component,
+                                            List<org.sonatype.nexus.plugins.model.ComponentRequirement> reqs )
     {
-        if ( reqs == null || reqs.isEmpty() )
-        {
-            return null;
-        }
-        else
+        if ( reqs != null && !reqs.isEmpty() )
         {
             ArrayList<ComponentRequirement> result = new ArrayList<ComponentRequirement>( reqs.size() );
 
@@ -437,7 +460,7 @@ public class DefaultNexusPluginManager
                 reqd.setRoleHint( req.getQualifier() );
             }
 
-            return result;
+            component.addRequirements( result );
         }
     }
 
