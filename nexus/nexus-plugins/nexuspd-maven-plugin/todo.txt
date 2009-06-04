@@ -1,0 +1,9 @@
+NexusPD Maven Plugin
+====================
+
+1. This plugin will define new packaging: "nexus-plugin"
+2. It will "glean" the classes in build in very similar way like plexus-component-metadata does (we could steal some code from there)
+
+The result for build is -- again -- very similar to that of Plexus jars:
+
+a simple JAR. with META-INF/nexus/plugin.xml embedded into it.
