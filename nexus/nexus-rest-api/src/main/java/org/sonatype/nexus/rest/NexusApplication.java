@@ -27,8 +27,6 @@ import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.nexus.rest.model.AuthenticationLoginResource;
-import org.sonatype.nexus.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.ConfigurationsListResource;
 import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
@@ -127,6 +125,8 @@ import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 import org.sonatype.security.rest.model.AuthenticationClientPermissions;
+import org.sonatype.security.rest.model.AuthenticationLoginResource;
+import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.security.rest.model.ClientPermission;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
 import org.sonatype.security.rest.model.ExternalRoleMappingResourceResponse;
@@ -252,6 +252,7 @@ public class NexusApplication
         xstream.registerConverter( new ScheduledServiceResourceResponseConverter( xstream.getMapper(),
                                                                                   xstream.getReflectionProvider() ),
                                    XStream.PRIORITY_VERY_HIGH ); // strips the class="class.name" attribute from
+       
         // data
 
         // Maven POM
@@ -400,7 +401,18 @@ public class NexusApplication
         xstream.omitField( AuthenticationLoginResource.class, "modelEncoding" );
         xstream.omitField( AuthenticationClientPermissions.class, "modelEncoding" );
         xstream.omitField( NexusAuthenticationClientPermissions.class, "modelEncoding" );
-        xstream.alias( "authentication-login", AuthenticationLoginResourceResponse.class );
+        xstream.alias( "authentication-login", AuthenticationLoginResourceResponse.class ); // Look at
+                                                                                            // NexusAuthenticationLoginResourceConverter,
+                                                                                            // we are only converting
+                                                                                            // the clientPermissions
+                                                                                            // field
+        
+        
+        
+        xstream.registerLocalConverter( AuthenticationClientPermissions.class, "permissions",
+            new AliasingListConverter( ClientPermission.class, "permission" ) );
+        
+      xstream.omitField( ClientPermission.class, "modelEncoding" );
 
         xstream.omitField( StatusResource.class, "modelEncoding" );
         xstream.omitField( StatusResourceResponse.class, "modelEncoding" );
@@ -542,11 +554,6 @@ public class NexusApplication
         xstream.alias( "component", PlexusComponentListResource.class );
         xstream.registerLocalConverter( PlexusComponentListResourceResponse.class, "data",
                                         new AliasingListConverter( PlexusComponentListResource.class, "component" ) );
-
-        xstream.registerLocalConverter( AuthenticationClientPermissions.class, "permissions",
-                                        new AliasingListConverter( ClientPermission.class, "permission" ) );
-
-        xstream.omitField( ClientPermission.class, "modelEncoding" );
 
         xstream.omitField( UserToRoleResourceRequest.class, "modelEncoding" );
         xstream.omitField( UserToRoleResource.class, "modelEncoding" );

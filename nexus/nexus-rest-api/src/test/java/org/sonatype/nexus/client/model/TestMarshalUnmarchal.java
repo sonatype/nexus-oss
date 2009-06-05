@@ -32,8 +32,6 @@ import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDesc
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.NexusApplication;
-import org.sonatype.nexus.rest.model.AuthenticationLoginResource;
-import org.sonatype.nexus.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.ConfigurationsListResource;
 import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
@@ -112,6 +110,8 @@ import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeD
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
 import org.sonatype.security.rest.model.AuthenticationClientPermissions;
+import org.sonatype.security.rest.model.AuthenticationLoginResource;
+import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.security.rest.model.ClientPermission;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
 import org.sonatype.security.rest.model.ExternalRoleMappingResourceResponse;
@@ -725,7 +725,7 @@ public class TestMarshalUnmarchal
     {
         AuthenticationLoginResourceResponse resourceResponse = new AuthenticationLoginResourceResponse();
         AuthenticationLoginResource loginResource = new AuthenticationLoginResource();
-        NexusAuthenticationClientPermissions perms = new NexusAuthenticationClientPermissions();
+        AuthenticationClientPermissions perms = new AuthenticationClientPermissions();
         ClientPermission permission = new ClientPermission();
         permission.setId( "id" );
         permission.setValue( 5 );

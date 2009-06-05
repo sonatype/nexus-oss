@@ -96,9 +96,12 @@ public class RepositoryRoutePlexusResource
 
             resource.setId( getRouteId( request ) );
 
-            GroupRepository group = this.getRepositoryRegistry().getRepositoryWithFacet( route.getGroupId(), GroupRepository.class ); 
-            // added to check access to group
-            resource.setGroupId( group.getId() );
+            if ( !route.getGroupId().equals( "*" ) )
+            {
+                // XXX: added to check access to group
+                this.getRepositoryRegistry().getRepositoryWithFacet( route.getGroupId(), GroupRepository.class );
+            }
+            resource.setGroupId( route.getGroupId() );
 
             resource.setRuleType( config2resourceType( route.getRouteType() ) );
 

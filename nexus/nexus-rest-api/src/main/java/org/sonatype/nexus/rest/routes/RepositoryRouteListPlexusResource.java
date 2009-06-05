@@ -90,12 +90,14 @@ public class RepositoryRouteListPlexusResource
             {
                 try
                 {
-                
                     resource = new RepositoryRouteListResource();
     
-                    GroupRepository group = this.getRepositoryRegistry().getRepositoryWithFacet( item.getGroupId(), GroupRepository.class ); 
-                    // added to check access to group
-                    resource.setGroupId( group.getId() );
+                    if ( !item.getGroupId().equals( "*" ) )
+                    {
+                        // XXX: added to check access to group
+                        this.getRepositoryRegistry().getRepositoryWithFacet( item.getGroupId(), GroupRepository.class );
+                    }
+                    resource.setGroupId( item.getGroupId() );
     
                     resource.setResourceURI( createChildReference( request, this, item.getId() ).toString() );
     

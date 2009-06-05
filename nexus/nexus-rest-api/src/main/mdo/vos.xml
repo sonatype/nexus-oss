@@ -1848,41 +1848,10 @@
     </class>
 
     <!-- Authentication -->
-    <class>
-      <name>AuthenticationLoginResourceResponse</name>
-      <version>1.0.0+</version>
-      <superClass>NexusResponse</superClass>
-      <fields>
-        <field>
-          <name>data</name>
-          <version>1.0.0+</version>
-          <association>
-            <type>AuthenticationLoginResource</type>
-          </association>
-          <required>true</required>
-        </field>
-      </fields>
-    </class>
-
 	<class>
 	  <name>NexusAuthenticationClientPermissions</name>
       <version>1.0.0+</version>
       <superClass>org.sonatype.security.rest.model.AuthenticationClientPermissions</superClass>
-    </class>
-
-    <class>
-      <name>AuthenticationLoginResource</name>
-      <version>1.0.0+</version>
-      <fields>
-        <field>
-          <name>clientPermissions</name>
-          <version>1.0.0+</version>
-          <association>
-            <type>NexusAuthenticationClientPermissions</type>
-          </association>
-          <required>true</required>
-        </field>
-      </fields>
     </class>
     
     <!-- NFCs -->
