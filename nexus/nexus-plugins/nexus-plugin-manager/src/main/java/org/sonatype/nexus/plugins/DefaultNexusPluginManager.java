@@ -133,27 +133,7 @@ public class DefaultNexusPluginManager
 
         for ( PluginCoordinates pluginCoordinate : availablePlugins )
         {
-            File pluginFile = nexusPluginRepository.resolvePlugin( pluginCoordinate );
-
-            Collection<File> dependencies = nexusPluginRepository.resolvePluginDependencies( pluginCoordinate );
-
-            ArrayList<URL> constituents = new ArrayList<URL>( 1 + dependencies.size() );
-
-            try
-            {
-                constituents.add( pluginFile.toURI().toURL() );
-
-                for ( File dependency : dependencies )
-                {
-                    constituents.add( dependency.toURI().toURL() );
-                }
-            }
-            catch ( MalformedURLException e )
-            {
-                // will not happen
-            }
-
-            result.addPluginResponse( activatePlugin( pluginCoordinate, constituents ) );
+            result.addPluginResponse( activatePlugin( pluginCoordinate ) );
         }
 
         return result;
@@ -163,6 +143,32 @@ public class DefaultNexusPluginManager
     {
         // TODO
         return new PluginManagerResponse( RequestResult.FAILED );
+    }
+
+    public PluginResponse activatePlugin( PluginCoordinates pluginCoordinate )
+    {
+        File pluginFile = nexusPluginRepository.resolvePlugin( pluginCoordinate );
+
+        Collection<File> dependencies = nexusPluginRepository.resolvePluginDependencies( pluginCoordinate );
+
+        ArrayList<URL> constituents = new ArrayList<URL>( 1 + dependencies.size() );
+
+        try
+        {
+            constituents.add( pluginFile.toURI().toURL() );
+
+            for ( File dependency : dependencies )
+            {
+                constituents.add( dependency.toURI().toURL() );
+            }
+        }
+        catch ( MalformedURLException e )
+        {
+            // will not happen
+        }
+
+        return activatePlugin( pluginCoordinate, constituents );
+
     }
 
     protected PluginResponse activatePlugin( PluginCoordinates pluginCoordinates, List<URL> constituents )
@@ -197,9 +203,7 @@ public class DefaultNexusPluginManager
                 {
                     getLogger().debug( "Could not remove plugin realm!", e );
                 }
-
             }
-
         }
         catch ( Exception e )
         {
@@ -211,7 +215,7 @@ public class DefaultNexusPluginManager
         return result;
     }
 
-    protected PluginResponse deactivatePlugin( PluginCoordinates pluginCoordinates )
+    public PluginResponse deactivatePlugin( PluginCoordinates pluginCoordinates )
     {
         PluginResponse result = new PluginResponse( pluginCoordinates );
 

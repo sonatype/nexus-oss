@@ -1,30 +1,13 @@
 package org.sonatype.nexus.plugins;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.context.Context;
-
 public class DefaultNexusPluginManagerTest
-    extends PlexusTestCase
+    extends AbstractNexusPluginManagerTest
 {
-    protected DefaultNexusPluginManager nexusPluginManager;
-
-    @Override
-    protected void customizeContext( Context context )
-    {
-        context.put( "nexus-work", getTestFile( "src/test" ).getAbsolutePath() );
-    }
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        nexusPluginManager = (DefaultNexusPluginManager) lookup( NexusPluginManager.class );
-    }
-
     public void testSimple()
         throws Exception
     {
+        nexusPluginManager = (DefaultNexusPluginManager) lookup( NexusPluginManager.class );
+
         MockComponent mc = getContainer().lookup( MockComponent.class );
 
         // record pre-discovery state
@@ -61,5 +44,4 @@ public class DefaultNexusPluginManagerTest
         assertTrue( "The map should shrink!", customizersDestroy == customizersPre );
         assertTrue( "The map should shrink!", processorsDestroy == processorsPre );
     }
-
 }
