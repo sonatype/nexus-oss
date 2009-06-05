@@ -180,9 +180,26 @@ public class DefaultNexusPluginManager
                 pluginRealm.addURL( constituent );
             }
 
-            plexusContainer.discoverComponents( pluginRealm,
-                                                new PluginDiscoveryContext( pluginRealm,
-                                                                            new DefaultNexusPluginValidator() ) );
+            NexusPluginValidator validator = new DefaultNexusPluginValidator();
+
+            PluginDiscoveryContext discoveryContext = new PluginDiscoveryContext( pluginRealm, validator );
+
+            plexusContainer.discoverComponents( pluginRealm, discoveryContext );
+
+            if ( !discoveryContext.isPluginRegistered() )
+            {
+                // drop it
+                try
+                {
+                    plexusContainer.removeComponentRealm( pluginRealm );
+                }
+                catch ( PlexusContainerException e )
+                {
+                    getLogger().debug( "Could not remove plugin realm!", e );
+                }
+
+            }
+
         }
         catch ( Exception e )
         {
@@ -266,6 +283,8 @@ public class DefaultNexusPluginManager
                 PluginDescriptor pluginDescriptor =
                     createComponentDescriptors( realm, interpolationFilterReader, url.toString() );
 
+                pluginDescriptor.setClassRealm( realm );
+
                 if ( pluginDescriptor.getComponents() != null )
                 {
                     for ( ComponentDescriptor<?> cd : pluginDescriptor.getComponents() )
@@ -310,7 +329,7 @@ public class DefaultNexusPluginManager
             result.setSource( source );
 
             // =
-            
+
             result.setPluginKey( pd.getGroupId() + ":" + pd.getArtifactId() );
 
             result.setPluginMetadata( pd );
@@ -485,15 +504,7 @@ public class DefaultNexusPluginManager
 
             if ( !validator.validate( pluginDescriptor ) )
             {
-                // drop it
-                try
-                {
-                    plexusContainer.removeComponentRealm( context.getClassRealm() );
-                }
-                catch ( PlexusContainerException e )
-                {
-                    getLogger().debug( "Could not remove plugin realm!", e );
-                }
+                context.setPluginRegistered( false );
 
                 // emit an event
                 applicationEventMulticaster.notifyEventListeners( new PluginRejectedEvent( this, pluginDescriptor,
@@ -521,6 +532,8 @@ public class DefaultNexusPluginManager
             {
                 pluginDescriptors.put( pluginDescriptor.getPluginKey(), pluginDescriptor );
             }
+
+            context.setPluginRegistered( true );
 
             // emit an event
             applicationEventMulticaster.notifyEventListeners( new PluginDiscoveredEvent( this, pluginDescriptor ) );

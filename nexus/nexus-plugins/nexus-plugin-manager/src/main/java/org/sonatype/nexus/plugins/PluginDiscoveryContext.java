@@ -8,6 +8,8 @@ public class PluginDiscoveryContext
 
     private final NexusPluginValidator nexusPluginValidator;
 
+    private boolean pluginRegistered = false;
+
     public PluginDiscoveryContext( ClassRealm classRealm, NexusPluginValidator nexusPluginValidator )
     {
         this.classRealm = classRealm;
@@ -23,5 +25,15 @@ public class PluginDiscoveryContext
     public NexusPluginValidator getNexusPluginValidator()
     {
         return nexusPluginValidator;
+    }
+
+    public boolean isPluginRegistered()
+    {
+        return pluginRegistered;
+    }
+
+    public void setPluginRegistered( boolean pluginRegistered )
+    {
+        this.pluginRegistered = pluginRegistered;
     }
 }
