@@ -62,6 +62,15 @@ public abstract class AbstractRepositoryConfigurator
 
         doApplyConfiguration( (Repository) target, configuration, (CRepository) config.getConfiguration( false ),
                               config.getExternalConfiguration() );
+        
+        // config done, apply customizations
+        for ( RepositoryCustomizer configurator : pluginRepositoryConfigurators.values() )
+        {
+            if ( configurator.isHandledRepository( (Repository) target ) )
+            {
+                configurator.configureRepository( (Repository) target );
+            }
+        }
     }
 
     public final void prepareForSave( Object target, ApplicationConfiguration configuration, CoreConfiguration config )
@@ -170,14 +179,6 @@ public abstract class AbstractRepositoryConfigurator
             response.addValidationError( error );
 
             throw new InvalidConfigurationException( response );
-        }
-
-        for ( RepositoryCustomizer configurator : pluginRepositoryConfigurators.values() )
-        {
-            if ( configurator.isHandledRepository( repository ) )
-            {
-                configurator.configureRepository( repository );
-            }
         }
 
         // clear the NotFoundCache
