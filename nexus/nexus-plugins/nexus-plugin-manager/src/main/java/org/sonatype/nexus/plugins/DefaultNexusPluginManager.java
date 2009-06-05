@@ -179,9 +179,7 @@ public class DefaultNexusPluginManager
 
         try
         {
-            ClassRealm pluginRealm =
-                plexusContainer.createChildRealm( plexusContainer.getContainerRealm().getId() + "."
-                    + String.valueOf( System.currentTimeMillis() ) + "-" + pluginCoordinates.getArtifactId() );
+            ClassRealm pluginRealm = plexusContainer.createChildRealm( pluginCoordinates.toString() );
 
             for ( URL constituent : constituents )
             {
