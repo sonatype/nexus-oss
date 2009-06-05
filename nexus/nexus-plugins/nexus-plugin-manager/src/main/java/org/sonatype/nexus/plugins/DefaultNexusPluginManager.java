@@ -179,7 +179,9 @@ public class DefaultNexusPluginManager
 
         try
         {
-            ClassRealm pluginRealm = plexusContainer.createChildRealm( pluginCoordinates.toString() );
+            ClassRealm pluginRealm =
+                plexusContainer.createChildRealm( plexusContainer.getContainerRealm().getId() + "."
+                    + String.valueOf( System.currentTimeMillis() ) + "-" + pluginCoordinates.getArtifactId() );
 
             for ( URL constituent : constituents )
             {
@@ -535,12 +537,12 @@ public class DefaultNexusPluginManager
             if ( !pluginDescriptors.containsKey( pluginDescriptor.getPluginKey() ) )
             {
                 pluginDescriptors.put( pluginDescriptor.getPluginKey(), pluginDescriptor );
+
+                context.setPluginRegistered( true );
+
+                // emit an event
+                applicationEventMulticaster.notifyEventListeners( new PluginActivatedEvent( this, pluginDescriptor ) );
             }
-
-            context.setPluginRegistered( true );
-
-            // emit an event
-            applicationEventMulticaster.notifyEventListeners( new PluginActivatedEvent( this, pluginDescriptor ) );
         }
     }
 }
