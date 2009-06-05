@@ -11,6 +11,10 @@ public class ViewsPanel extends SidePanel {
         return isLinkAvailable("Repositories");
     }
 
+    public void repositoriesClick() {
+        clickLink("Repositories");
+    }
+
     public boolean systemFeedsAvailable() {
         return isLinkAvailable("System Feeds");
     }

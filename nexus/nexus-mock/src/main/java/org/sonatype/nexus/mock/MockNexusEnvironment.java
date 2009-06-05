@@ -118,11 +118,7 @@ public class MockNexusEnvironment
         containerContext.put( "application-conf", new File( "target/nexus-work/conf/" ).getAbsolutePath() );
         containerContext.put( "security-xml-file", new File( "target/nexus-work/conf/security.xml" ).getAbsolutePath() );
 
-        File webappRoot = new File( "../nexus-webapp/src/main/webapp" );
-        if ( webappRoot.exists() )
-        {
-            containerContext.put( "index.template.file", "templates/index-debug.vm" );
-        }
+        containerContext.put( "index.template.file", "templates/index-debug.vm" );
 
         // for EHCache component
         System.setProperty( "nexus.home", new File( "target/nexus-work" ).getAbsolutePath() );
