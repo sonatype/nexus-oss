@@ -28,6 +28,8 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
@@ -94,7 +96,9 @@ public class RepositoryRoutePlexusResource
 
             resource.setId( getRouteId( request ) );
 
-            resource.setGroupId( route.getGroupId() );
+            GroupRepository group = this.getRepositoryRegistry().getRepositoryWithFacet( route.getGroupId(), GroupRepository.class ); 
+            // added to check access to group
+            resource.setGroupId( group.getId() );
 
             resource.setRuleType( config2resourceType( route.getRouteType() ) );
 
@@ -109,6 +113,12 @@ public class RepositoryRoutePlexusResource
             result = new RepositoryRouteResourceResponse();
 
             result.setData( resource );
+        }
+        catch ( NoSuchRepositoryAccessException e )
+        {
+            getLogger().debug( "Access Denied to a repository declared within a group!", e );
+
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -201,6 +211,12 @@ public class RepositoryRoutePlexusResource
                 {
                     handleConfigurationException( e );
                 }
+            }
+            catch ( NoSuchRepositoryAccessException e )
+            {
+                getLogger().debug( "Access Denied to a repository referenced within a route!", e );
+
+                throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN );
             }
             catch ( NoSuchRepositoryException e )
             {

@@ -42,6 +42,8 @@ import com.thoughtworks.xstream.XStream;
 
 public class RoutesMessageUtil
 {
+    public static final String SERVICE_PART = RequestFacade.SERVICE_LOCAL + "repo_routes";
+    
     private XStream xstream;
 
     private MediaType mediaType;
@@ -53,6 +55,14 @@ public class RoutesMessageUtil
         super();
         this.xstream = xstream;
         this.mediaType = mediaType;
+    }
+    
+    public RepositoryRouteResource getRoute( String routeId )
+        throws IOException
+    {
+        Response response = RequestFacade.doGetRequest( "service/local/repo_routes" + routeId );
+
+        return this.getResourceFromResponse( response );
     }
 
     public Response sendMessage( Method method, RepositoryRouteResource resource )
