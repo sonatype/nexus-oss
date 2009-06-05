@@ -13,6 +13,7 @@ public class QuasiNexusPluginManagerTest
     public void testQuasiNexus()
         throws Exception
     {
-        QuasiNexus qn = lookup( QuasiNexus.class );
+        // all happens in initialize() method, look at QuasiNexus
+        lookup( QuasiNexus.class );
     }
 }

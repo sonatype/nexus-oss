@@ -38,7 +38,7 @@ import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.plugins.events.PluginDiscoveredEvent;
+import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
 import org.sonatype.nexus.plugins.model.ExtensionComponent;
 import org.sonatype.nexus.plugins.model.PluginMetadata;
@@ -540,7 +540,7 @@ public class DefaultNexusPluginManager
             context.setPluginRegistered( true );
 
             // emit an event
-            applicationEventMulticaster.notifyEventListeners( new PluginDiscoveredEvent( this, pluginDescriptor ) );
+            applicationEventMulticaster.notifyEventListeners( new PluginActivatedEvent( this, pluginDescriptor ) );
         }
     }
 }
