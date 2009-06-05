@@ -1,7 +1,5 @@
 package org.sonatype.nexus.plugins;
 
-import java.io.File;
-
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 
@@ -13,7 +11,7 @@ public class DefaultNexusPluginManagerTest
     @Override
     protected void customizeContext( Context context )
     {
-        context.put( "nexus.work", getTestFile( "src/test " ).getAbsoluteFile() );
+        context.put( "nexus-work", getTestFile( "src/test" ).getAbsolutePath() );
     }
 
     protected void setUp()
