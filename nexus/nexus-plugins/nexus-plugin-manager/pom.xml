@@ -22,6 +22,20 @@
 
   <dependencies>
 
+    <!-- These two are here as hack, we need to modify the plexus configuration -->
+    <dependency>
+      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+      <artifactId>plexus-app-booter</artifactId>
+      <version>${plexus.appbooter.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+      <artifactId>plexus-jsw-app-booter</artifactId>
+      <version>${plexus.appbooter.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>

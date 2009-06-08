@@ -483,6 +483,8 @@ public class DefaultNexusPluginManager
                 reqd.setRole( req.getComponentContract() );
 
                 reqd.setRoleHint( req.getQualifier() );
+                
+                result.add( reqd );
             }
 
             component.addRequirements( result );
