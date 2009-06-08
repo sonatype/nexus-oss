@@ -38,11 +38,6 @@ public class PluginCoordinates
         this.version = version;
     }
     
-    public String getPluginKey()
-    {
-        return getGroupId() + ":" + getArtifactId();
-    }
-
     public String toString()
     {
         return getGroupId() + ":" + getArtifactId() + ":" + getVersion();

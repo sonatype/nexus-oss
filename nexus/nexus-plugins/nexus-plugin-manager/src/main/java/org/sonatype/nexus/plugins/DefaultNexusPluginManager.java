@@ -221,9 +221,21 @@ public class DefaultNexusPluginManager
 
         try
         {
-            ClassRealm pluginRealm = getInstalledPlugins().get( pluginCoordinates.getPluginKey() ).getClassRealm();
+            String pluginKey =
+                getPluginKey( pluginCoordinates.getGroupId(), pluginCoordinates.getArtifactId(), pluginCoordinates
+                    .getVersion() );
 
-            plexusContainer.removeComponentRealm( pluginRealm );
+            if ( getInstalledPlugins().containsKey( pluginKey ) )
+            {
+                ClassRealm pluginRealm = getInstalledPlugins().get( pluginKey ).getClassRealm();
+
+                plexusContainer.removeComponentRealm( pluginRealm );
+            }
+            else
+            {
+                // TODO:?
+                result.setThrowable( new IllegalArgumentException( "No such plugin!" ) );
+            }
         }
         catch ( Exception e )
         {
@@ -233,6 +245,11 @@ public class DefaultNexusPluginManager
         }
 
         return result;
+    }
+
+    protected String getPluginKey( String g, String a, String v )
+    {
+        return g + ":" + a + ":" + v;
     }
 
     // ==
@@ -334,7 +351,7 @@ public class DefaultNexusPluginManager
 
             // =
 
-            result.setPluginKey( pd.getGroupId() + ":" + pd.getArtifactId() );
+            result.setPluginKey( getPluginKey( pd.getGroupId(), pd.getArtifactId(), pd.getVersion() ) );
 
             result.setPluginMetadata( pd );
 
@@ -362,8 +379,6 @@ public class DefaultNexusPluginManager
         // plugin entry point, if any
         if ( pd.getPlugin() != null )
         {
-            getLogger().debug( "... ... adding NexusPlugin: " + pd.getPlugin().getImplementation() );
-
             ComponentDescriptor<NexusPlugin> plugin = new ComponentDescriptor<NexusPlugin>();
 
             plugin.setRole( NexusPlugin.class.getName() );
@@ -377,6 +392,8 @@ public class DefaultNexusPluginManager
             addRequirementsIfNeeded( plugin, pd.getPlugin().getRequirements() );
 
             csd.addComponentDescriptor( plugin );
+
+            getLogger().debug( "... ... adding NexusPlugin: " + plugin.getImplementation() );
         }
 
         // extension points, if any
@@ -384,10 +401,6 @@ public class DefaultNexusPluginManager
         {
             for ( ExtensionComponent ext : (List<ExtensionComponent>) pd.getExtensions() )
             {
-                getLogger().debug(
-                                   "... ... adding ExtensionPoint (role='" + ext.getExtensionPoint() + "'): "
-                                       + ext.getImplementation() );
-
                 // TEMPLATES! This is not good
                 ComponentDescriptor<Object> extd = new ComponentDescriptor<Object>();
 
@@ -412,6 +425,10 @@ public class DefaultNexusPluginManager
                 addRequirementsIfNeeded( extd, ext.getRequirements() );
 
                 csd.addComponentDescriptor( extd );
+
+                getLogger().debug(
+                                   "... ... adding ExtensionPoint (role='" + extd.getRole() + "', hint='"
+                                       + extd.getRoleHint() + "'): " + ext.getImplementation() );
             }
         }
 
@@ -420,10 +437,6 @@ public class DefaultNexusPluginManager
         {
             for ( UserComponent cmp : (List<UserComponent>) pd.getComponents() )
             {
-                getLogger().debug(
-                                   "... ... adding user component (role='" + cmp.getComponentContract() + "'): "
-                                       + cmp.getImplementation() );
-
                 ComponentDescriptor<Object> cmpd = new ComponentDescriptor<Object>();
 
                 cmpd.setRole( cmp.getComponentContract() );
@@ -443,6 +456,10 @@ public class DefaultNexusPluginManager
                 addRequirementsIfNeeded( cmpd, cmp.getRequirements() );
 
                 csd.addComponentDescriptor( cmpd );
+
+                getLogger().debug(
+                                   "... ... adding user component (role='" + cmpd.getRole() + "', hint='"
+                                       + cmpd.getRoleHint() + "'): " + cmpd.getImplementation() );
             }
         }
 
@@ -483,7 +500,7 @@ public class DefaultNexusPluginManager
                 reqd.setRole( req.getComponentContract() );
 
                 reqd.setRoleHint( req.getQualifier() );
-                
+
                 result.add( reqd );
             }
 
