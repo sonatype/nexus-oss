@@ -25,28 +25,42 @@
         <compressed-dir>${project.build.directory}/ui-compressed</compressed-dir>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>httpunit</groupId>
-            <artifactId>httpunit</artifactId>
-            <version>1.6.2</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.sonatype.nexus.plugins</groupId>
             <artifactId>nexus-lvo-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
+    
+        <!-- The bundle -->
         <dependency>
-            <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
-            <artifactId>plexus-platform-jsw</artifactId>
+            <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+            <artifactId>plexus-app-booter</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+            <artifactId>plexus-jsw-app-booter</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-classworlds</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tanukisoft</groupId>
+            <artifactId>wrapper</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-rest-api</artifactId>
@@ -62,6 +76,13 @@
             <artifactId>jsw-binaries</artifactId>
             <type>tar.gz</type>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>httpunit</groupId>
+            <artifactId>httpunit</artifactId>
+            <version>1.6.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>

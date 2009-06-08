@@ -29,10 +29,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-      <artifactId>plexus-jsw-app-booter</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.plexus.appevents</groupId>
       <artifactId>plexus-app-events-api</artifactId>
     </dependency>

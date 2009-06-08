@@ -5,6 +5,7 @@
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
     <version>4</version>
+    <relativePath></relativePath>
   </parent>
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-parent</artifactId>
@@ -20,7 +21,10 @@
 
   <properties>
     <jetty.version>6.1.12</jetty.version>
-    <plexus.version>1.0-beta-3.0.8-SNAPSHOT</plexus.version>
+    <plexus-utils.version>1.5.5</plexus-utils.version>
+    <plexus-container.version>1.0-beta-3.0.8-SNAPSHOT</plexus-container.version>
+    <!-- The plugin 1.0-beta-3.0.8-SNAPSHOT has a bug! -->
+    <plexus-plugin.version>1.0-beta-3.0.5</plexus-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -28,12 +32,8 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-container-default</artifactId>
-        <version>${plexus.version}</version>
+        <version>${plexus-container.version}</version>
         <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging-api</artifactId>
@@ -46,14 +46,21 @@
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-classworlds</artifactId>
+        <version>1.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-annotations</artifactId>
-        <version>${plexus.version}</version>
+        <version>${plexus-container.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>1.5.5</version>
+        <version>${plexus-utils.version}</version>
       </dependency>
+
+      <!-- Jetty -->
       <dependency>
         <groupId>org.mortbay.jetty</groupId>
         <artifactId>jetty</artifactId>
@@ -83,20 +90,18 @@
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
-          <!--
-            Plexus' plexus-component-metadata plugin version
-            1.0-beta-3.0.8-SNAPSHOT seems broken
-          -->
-          <!--
-            It generates broken metadata, so I am freezing this plugin
-            version to last good one
-          -->
-          <version>1.0-beta-3.0.5</version>
-          <!-- version>${plexus.version}</version -->
+          <version>${plexus-plugin.version}</version>
           <executions>
             <execution>
+              <id>process-classes</id>
               <goals>
                 <goal>generate-metadata</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>process-test-classes</id>
+              <goals>
+                <goal>generate-test-metadata</goal>
               </goals>
             </execution>
           </executions>

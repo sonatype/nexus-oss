@@ -21,29 +21,9 @@
 			<implementation>org.sonatype.plexus.jetty.DefaultServletContainer</implementation>
 			<configuration>
 			  <jettyXml>${jetty.xml}</jettyXml>
-			  
-				<!-- To host multiple webapps, add root -->
-				<!-- webapps>${webapp}</webapps -->
-				<connectorInfos>
-					<connectorInfo>
-						<clazz>org.mortbay.jetty.nio.SelectChannelConnector</clazz>
-						<host>${application-host}</host>
-						<port>${application-port}</port>
-					</connectorInfo>
-				</connectorInfos>
-				<webappInfos>
-					<webappInfo>
-						<warPath>${webapp}</warPath>
-						<contextPath>${webapp-context-path}</contextPath>
-					</webappInfo>
-				</webappInfos>
-        <lifecycleListenerInfos>
-            <lifecycleListenerInfo>
-                <clazz>org.sonatype.plexus.jetty.custom.DisableTagLibsListener</clazz>
-            </lifecycleListenerInfo>
-        </lifecycleListenerInfos>
 			</configuration>
 		</component>
 
 	</components>
+
 </plexus>

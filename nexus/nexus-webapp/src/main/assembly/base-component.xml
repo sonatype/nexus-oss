@@ -4,7 +4,8 @@
       <outputDirectory>/${pom.build.finalName}/lib</outputDirectory>
       <fileMode>0644</fileMode>
       <includes>
-        <include>org.sonatype.appbooter.plexus-platforms:plexus-platform-jsw</include>
+        <include>tanukisoft:wrapper</include>
+        <include>org.codehaus.plexus:plexus-classworlds</include>
       </includes>
     </dependencySet>
   </dependencySets>

@@ -48,10 +48,6 @@
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-classworlds</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>aspectj</groupId>
-          <artifactId>aspectjrt</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -79,10 +75,6 @@
       <artifactId>lucene-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-classworlds</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
@@ -93,10 +85,6 @@
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-task-scheduler</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-indexer</artifactId>
     </dependency>
 
 	<!-- these 3 deps are excluded in nexus-api, but is useful -->
@@ -172,10 +160,12 @@
     <dependency>
       <groupId>org.restlet</groupId>
       <artifactId>org.restlet</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.noelios.restlet</groupId>
       <artifactId>com.noelios.restlet</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

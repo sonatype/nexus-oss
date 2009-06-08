@@ -46,8 +46,12 @@
       <artifactId>velocity</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.sonatype.plexus.appevents</groupId>
-        <artifactId>simple-event-multicaster</artifactId>
+      <groupId>org.sonatype.plexus.appevents</groupId>
+      <artifactId>plexus-app-events-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plexus.appevents</groupId>
+      <artifactId>simple-event-multicaster</artifactId>
     </dependency>
     <!-- Logging -->
     <dependency>
