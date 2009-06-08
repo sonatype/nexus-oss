@@ -23,13 +23,10 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.subject.Subject;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.proxy.router.RequestRoute;
 import org.sonatype.nexus.proxy.target.TargetMatch;
 import org.sonatype.nexus.proxy.target.TargetSet;
 
@@ -47,13 +44,6 @@ public class DefaultNexusItemAuthorizer
     @Requirement
     private RepositoryRegistry repoRegistry;
     
-    
-    //toby: got it. filter should call router (does make sense, since filter does not know nothing about where the request is "routing"), not the authorizer directly. we need a new method on router iface, that will call authorizer, with all calculated params (TargetSet matched, RequestRoute route plus the standard ResourceStoreRequest requno, again, filktest, Action action) since all those are coming from router anyway
-    
-    
-    
-
-
     public boolean authorizePath( Repository repository, ResourceStoreRequest request, Action action )
     {
         TargetSet matched = repository.getTargetsForRequest( request );
@@ -195,8 +185,8 @@ public class DefaultNexusItemAuthorizer
         }
     }
 
-    public boolean isViewable( String repositoryId )
+    public boolean isViewable( String objectType, String objectId )
     {
-        return authorizePermission( "nexus:repoview:" + repositoryId );
+        return authorizePermission( "nexus:view:" + objectType + ":" + objectId );
     }
 }

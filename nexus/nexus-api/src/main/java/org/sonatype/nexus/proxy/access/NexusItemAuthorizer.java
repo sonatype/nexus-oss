@@ -24,16 +24,22 @@ import org.sonatype.nexus.proxy.target.TargetSet;
  */
 public interface NexusItemAuthorizer
 {
-//    /**
-//     * Authorizes a TargetSet against an action. Used by authz filter to check the incoming request, that is obviously
-//     * addressed to content root.
-//     * 
-//     * @param repository
-//     * @param path
-//     * @return
-//     */
-//    boolean authorizePath( ResourceStoreRequest request, Action action );
+    public static final String VIEW_REPOSITORY_KEY = "repository";
+
+    /**
+     * Authorizes TargetSet.
+     * @param matched
+     * @param action
+     * @return
+     */
     public boolean authorizePath( TargetSet matched, Action action );
+
+    /**
+     * Returns groups for target set.
+     * @param repository
+     * @param request
+     * @return
+     */
     public TargetSet getGroupsTargetSet( Repository repository, ResourceStoreRequest request );
 
     /**
@@ -49,10 +55,11 @@ public interface NexusItemAuthorizer
     /**
      * A shorthand for "view" permission.
      * 
-     * @param repository
+     * @param objectType
+     * @param objectId
      * @return
      */
-    boolean isViewable( String repositoryId );
+    boolean isViewable( String objectType, String objectId );
 
     
     /**

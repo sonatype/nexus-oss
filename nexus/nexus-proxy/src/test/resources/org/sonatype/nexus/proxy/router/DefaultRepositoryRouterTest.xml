@@ -11,7 +11,7 @@
         <implementation>org.sonatype.nexus.proxy.security.PlexusConfiguredRealm</implementation>
         <configuration>
           <userPrivilageMap>
-            <repo1user>nexus:target:*:repo1:*,nexus:repoview:repo1</repo1user>
+            <repo1user>nexus:target:*:repo1:*,nexus:view:repository:repo1</repo1user>
             <repo1userNoView>nexus:target:*:repo1:*</repo1userNoView>
           </userPrivilageMap>
         </configuration>

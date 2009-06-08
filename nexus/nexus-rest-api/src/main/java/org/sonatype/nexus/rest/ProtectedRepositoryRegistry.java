@@ -114,7 +114,7 @@ public class ProtectedRepositoryRegistry
 
         for ( Repository repository : repositories )
         {
-            if ( this.nexusItemAuthorizer.isViewable( repository.getId() ) )
+            if ( this.nexusItemAuthorizer.isViewable( NexusItemAuthorizer.VIEW_REPOSITORY_KEY, repository.getId() ) )
             {
                 filteredRepositories.add( repository );
             }
@@ -126,7 +126,7 @@ public class ProtectedRepositoryRegistry
     private void checkAccessToRepository( String repositoryId )
         throws NoSuchRepositoryAccessException
     {
-        if ( !this.nexusItemAuthorizer.isViewable( repositoryId ) )
+        if ( !this.nexusItemAuthorizer.isViewable( NexusItemAuthorizer.VIEW_REPOSITORY_KEY, repositoryId ) )
         {
             throw new NoSuchRepositoryAccessException( repositoryId );
         }

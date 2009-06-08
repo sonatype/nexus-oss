@@ -690,7 +690,7 @@ public class DefaultRepositoryRouter
         
         for ( Repository repository : repositories )
         {
-            if( this.itemAuthorizer.isViewable( repository.getId() ) )
+            if( this.itemAuthorizer.isViewable( NexusItemAuthorizer.VIEW_REPOSITORY_KEY, repository.getId() ) )
             {
                 filteredRepositories.add( repository );
             }

@@ -7,7 +7,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
+import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.realms.privileges.AbstractPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
@@ -57,7 +57,7 @@ public class RepositoryViewPrivilegeDescriptor
             repoId = "*";
         }
 
-        return "nexus:repoview:" + repoId;
+        return buildPermission( NexusItemAuthorizer.VIEW_REPOSITORY_KEY, repoId );
     }
 
     @Override
@@ -74,8 +74,8 @@ public class RepositoryViewPrivilegeDescriptor
         return response;
     }
 
-    public static String buildPermission( String repoId )
+    public static String buildPermission( String objectType, String objectId )
     {
-        return "nexus:repoview:" + repoId;
+        return "nexus:view:" + objectType + ":" + objectId;
     }
 }
