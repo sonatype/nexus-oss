@@ -57,4 +57,11 @@ public class ScheduleGrid
         return this;
     }
 
+    public MessageBox deleteTask()
+    {
+        getDeleteButton().click();
+
+        return new MessageBox(selenium);
+    }
+
 }

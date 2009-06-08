@@ -30,8 +30,8 @@ public class Grid
 
     public int getStoreDataLength()
     {
-        String eval = getEval( ".getStore().totalLength" );
-        if ( eval == null )
+        String eval = getEval( ".getStore().data.length" );
+        if ( eval == null || eval.equals( "null" ))
         {
             return 0;
         }

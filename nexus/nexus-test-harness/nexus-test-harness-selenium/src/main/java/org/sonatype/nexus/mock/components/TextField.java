@@ -25,7 +25,7 @@ public class TextField
 
     public boolean hasErrorText( String err )
     {
-        String text = selenium.getText( getXPath() + "/../div[@class='x-form-invalid-msg']" );
+        String text = selenium.getText( getXPath() + "/../..//div[@class='x-form-invalid-msg']" );
 
         return err.equals( text );
     }
