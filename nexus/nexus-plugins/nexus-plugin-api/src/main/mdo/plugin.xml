@@ -104,6 +104,17 @@
         </field>
 
         <field>
+          <name>dependencies</name>
+          <version>1.0.0+</version>
+          <description>Plugin required features, that must be present in system. Gathered from POM: all deps that has type "nexus-plugin"</description>
+          <association>
+            <type>PluginDependency</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+
+        <field>
           <name>plugin</name>
           <version>1.0.0+</version>
           <description>Plugin extension point implementation.</description>
@@ -161,6 +172,12 @@
       </fields>
       <codeSegments>
         <codeSegment>
+          <version>1.0.0+</version>
+          <code><![CDATA[
+    public transient java.net.URL sourceUrl;
+]]></code>
+        </codeSegment>
+        <codeSegment>
           <version>1.0.0</version>
           <code><![CDATA[
     public static final String MODEL_VERSION = "1.0.0";
@@ -169,6 +186,41 @@
       </codeSegments>
     </class>
 
+    <class>
+      <name>PluginDependency</name>
+      <version>1.0.0+</version>
+      <description>The Plugin dependency.</description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>1.0.0+</version>
+          <description>
+            The group id.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>1.0.0+</version>
+          <description>
+            The artifact id.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>version</name>
+          <version>1.0.0+</version>
+          <description>
+            The version.
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+    
     <class>
       <name>PluginComponent</name>
       <version>1.0.0+</version>
