@@ -3,6 +3,7 @@ package org.sonatype.nexus.plugins;
 import static org.codehaus.plexus.component.CastUtils.isAssignableFrom;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -18,7 +19,6 @@ import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphEx
 import org.codehaus.plexus.component.composition.DefaultCompositionResolver;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.ComponentRepository;
-import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import com.google.common.collect.Multimap;
@@ -55,6 +55,28 @@ public class NexusPluginsComponentRepository
         // determine realms to search
         LinkedHashSet<ClassRealm> realms = new LinkedHashSet<ClassRealm>();
 
+        // Solution: load all components from current realm and 1st level siblings only
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+        if ( classLoader != null && classLoader instanceof ClassRealm )
+        {
+            ClassRealm realm = (ClassRealm) classLoader;
+
+            realms.add( realm );
+
+            // find all 1st level sibling for this realm above
+            Collection<ClassRealm> allRealms = realm.getWorld().getRealms();
+
+            for ( ClassRealm aRealm : allRealms )
+            {
+                if ( aRealm.getParent() != null && aRealm.getParent().equals( realm ) )
+                {
+                    realms.add( aRealm );
+                }
+            }
+        }
+        
+        
         // cstamas:
         // to be able to load _all_ registered plugin components, which are all in child realms of container realm,
         // we must scrape all registered realms instead to target them one-by-one with

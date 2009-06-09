@@ -7,30 +7,42 @@ import org.sonatype.nexus.plugins.model.PluginMetadata;
 public class PluginDescriptor
     extends ComponentSetDescriptor
 {
-    private String pluginKey;
+    private PluginCoordinates pluginCoordinates;
 
     private PluginMetadata pluginMetadata;
 
-    private ClassRealm classRealm;
+    private ClassRealm pluginRealm;
 
-    public String getPluginKey()
+    private ClassRealm dependencyRealm;
+
+    public PluginCoordinates getPluginCoordinates()
     {
-        return pluginKey;
+        return pluginCoordinates;
     }
 
-    public void setPluginKey( String pluginKey )
+    public void setPluginCoordinates( PluginCoordinates pluginCoordinates )
     {
-        this.pluginKey = pluginKey;
+        this.pluginCoordinates = pluginCoordinates;
     }
 
-    public ClassRealm getClassRealm()
+    public ClassRealm getPluginRealm()
     {
-        return classRealm;
+        return pluginRealm;
     }
 
-    public void setClassRealm( ClassRealm classRealm )
+    public void setPluginRealm( ClassRealm pluginRealm )
     {
-        this.classRealm = classRealm;
+        this.pluginRealm = pluginRealm;
+    }
+
+    public ClassRealm getDependencyRealm()
+    {
+        return dependencyRealm;
+    }
+
+    public void setDependencyRealm( ClassRealm dependencyRealm )
+    {
+        this.dependencyRealm = dependencyRealm;
     }
 
     public PluginMetadata getPluginMetadata()

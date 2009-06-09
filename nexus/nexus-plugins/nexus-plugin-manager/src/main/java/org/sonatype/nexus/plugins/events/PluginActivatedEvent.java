@@ -18,7 +18,7 @@ public class PluginActivatedEvent
 
     public String getPluginKey()
     {
-        return getPluginDescriptor().getPluginKey();
+        return getPluginDescriptor().getPluginCoordinates().getPluginKey();
     }
 
     public PluginDescriptor getPluginDescriptor()

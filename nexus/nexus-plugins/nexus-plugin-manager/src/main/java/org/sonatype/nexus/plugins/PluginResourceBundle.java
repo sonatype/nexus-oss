@@ -62,7 +62,7 @@ public class PluginResourceBundle
 
             for ( PluginStaticResourceModel model : models )
             {
-                PluginStaticResource res = new PluginStaticResource( pd.getClassRealm(), model );
+                PluginStaticResource res = new PluginStaticResource( pd.getPluginRealm(), model );
 
                 result.add( res );
             }
