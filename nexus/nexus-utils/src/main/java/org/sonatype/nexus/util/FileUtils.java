@@ -137,4 +137,30 @@ public class FileUtils
     {
         return System.getProperty( "os.name" ).indexOf( "Windows" ) != -1;
     }
+    
+    public static File getFileFromUrl( String urlPath )
+    {
+        if ( validFileUrl( urlPath ) )
+        {
+            try
+            {
+                URL url = new URL( urlPath );
+                try
+                {
+                    return new File( url.toURI() );
+                }
+                catch ( Throwable t )
+                {
+                    return new File( url.getPath() );
+                }
+            }
+            catch ( MalformedURLException e )
+            {
+                // Try just a regular file
+                return new File( urlPath );
+            }
+        }
+        
+        return null;
+    }
 }

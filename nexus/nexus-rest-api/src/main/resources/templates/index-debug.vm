@@ -88,6 +88,7 @@
   <script src="js/repoServer/repoServer.MirrorConfigPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.UserBrowserPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.UserPrivilegeBrowserPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.RepoSummaryPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
   <!-- Plugin post HEAD contributions start here -->
   #foreach( $pluginPostHeadContribution in $pluginPostHeadContributions )

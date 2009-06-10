@@ -871,6 +871,15 @@
           <type>int</type>
           <required>true</required>
         </field>
+        <field>
+          <name>groups</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+        </field>
       </fields>
     </class>
     <!-- RepositoryGroup Resource -->

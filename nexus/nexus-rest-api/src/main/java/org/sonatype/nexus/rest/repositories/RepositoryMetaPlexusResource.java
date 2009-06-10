@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.rest.repositories;
 
+import java.io.File;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.FileUtils;
 import org.restlet.Context;
@@ -23,6 +25,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.cache.CacheStatistics;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryMetaResource;
@@ -61,8 +64,8 @@ public class RepositoryMetaPlexusResource
         try
         {
             Repository repository = getRepositoryRegistry().getRepository( repoId );
-
-            String localPath = repository.getLocalUrl().substring( repository.getLocalUrl().indexOf( "file:" ) + 1 );
+            
+            File localPath = org.sonatype.nexus.util.FileUtils.getFileFromUrl( repository.getLocalUrl() );
 
             RepositoryMetaResource resource = new RepositoryMetaResource();
 
@@ -71,6 +74,11 @@ public class RepositoryMetaPlexusResource
             resource.setRepoType( getRestRepoType( repository ) );
 
             resource.setFormat( repository.getRepositoryContentClass().getId() );
+            
+            for ( GroupRepository group : getRepositoryRegistry().getGroupsOfRepository( repository ) )
+            {
+                resource.addGroup( group.getId() );
+            }
 
             try
             {

@@ -823,3 +823,15 @@ Ext.extend( Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
     }
   }
 } );
+
+String.prototype.replaceAll = function ( strTarget, strSubString ) {
+  var strText = this;
+  var intIndexOfMatch = strText.indexOf( strTarget );
+
+  while (intIndexOfMatch != -1) {
+    strText = strText.replace( strTarget, strSubString )
+    intIndexOfMatch = strText.indexOf( strTarget );
+  }
+ 
+  return( strText );
+};
