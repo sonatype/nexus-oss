@@ -11,8 +11,8 @@ import org.sonatype.nexus.plugins.model.PluginMetadata;
 public class DefaultInterPluginDependencyResolver
     implements InterPluginDependencyResolver
 {
-    public List<PluginCoordinates> resolveDependencyRealms( NexusPluginManager nexusPluginManager,
-                                                            PluginMetadata pluginMetadata  )
+    public List<PluginCoordinates> resolveDependencyPlugins( NexusPluginManager nexusPluginManager,
+                                                             PluginMetadata pluginMetadata )
         throws NoSuchPluginException
     {
         ArrayList<PluginCoordinates> result =
@@ -38,7 +38,17 @@ public class DefaultInterPluginDependencyResolver
             }
             else
             {
-                throw new NoSuchPluginException( depCoord );
+                // RECURSION, SOLVE THIS IN MORE ELGANT WAY
+                PluginResponse response = nexusPluginManager.activatePlugin( depCoord );
+
+                if ( !response.isSuccesful() )
+                {
+                    throw new NoSuchPluginException( depCoord );
+                }
+                else
+                {
+                    result.add( depCoord );
+                }
             }
         }
 

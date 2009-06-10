@@ -1,5 +1,8 @@
 package org.sonatype.nexus.plugins;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.sonatype.nexus.plugins.model.PluginMetadata;
 
@@ -7,9 +10,9 @@ public class PluginDiscoveryContext
 {
     private final PluginCoordinates pluginCoordinates;
 
-    private final ClassRealm pluginRealm;
+    private final List<String> exports;
 
-    private final ClassRealm dependencyRealm;
+    private final ClassRealm pluginRealm;
 
     private final PluginMetadata pluginMetadata;
 
@@ -19,15 +22,16 @@ public class PluginDiscoveryContext
 
     private PluginDescriptor pluginDescriptor;
 
-    public PluginDiscoveryContext( PluginCoordinates pluginCoordinates, ClassRealm pluginRealm,
-                                   ClassRealm dependencyRealm, PluginMetadata pluginMetadata,
-                                   NexusPluginValidator nexusPluginValidator )
+    private List<PluginDescriptor> importedPlugins;
+
+    public PluginDiscoveryContext( PluginCoordinates pluginCoordinates, List<String> exports, ClassRealm pluginRealm,
+                                   PluginMetadata pluginMetadata, NexusPluginValidator nexusPluginValidator )
     {
         this.pluginCoordinates = pluginCoordinates;
 
-        this.pluginRealm = pluginRealm;
+        this.exports = exports;
 
-        this.dependencyRealm = dependencyRealm;
+        this.pluginRealm = pluginRealm;
 
         this.pluginMetadata = pluginMetadata;
 
@@ -39,14 +43,14 @@ public class PluginDiscoveryContext
         return pluginCoordinates;
     }
 
+    public List<String> getExports()
+    {
+        return exports;
+    }
+
     public ClassRealm getPluginRealm()
     {
         return pluginRealm;
-    }
-
-    public ClassRealm getDependencyRealm()
-    {
-        return dependencyRealm;
     }
 
     public PluginMetadata getPluginMetadata()
@@ -77,5 +81,15 @@ public class PluginDiscoveryContext
     public void setPluginDescriptor( PluginDescriptor pluginDescriptor )
     {
         this.pluginDescriptor = pluginDescriptor;
+    }
+
+    public List<PluginDescriptor> getImportedPlugins()
+    {
+        if ( importedPlugins == null )
+        {
+            importedPlugins = new ArrayList<PluginDescriptor>();
+        }
+
+        return importedPlugins;
     }
 }

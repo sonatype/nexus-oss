@@ -1,5 +1,8 @@
 package org.sonatype.nexus.plugins;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.sonatype.nexus.plugins.model.PluginMetadata;
@@ -13,7 +16,9 @@ public class PluginDescriptor
 
     private ClassRealm pluginRealm;
 
-    private ClassRealm dependencyRealm;
+    private List<String> exports;
+
+    private List<PluginDescriptor> importedPlugins;
 
     public PluginCoordinates getPluginCoordinates()
     {
@@ -35,16 +40,6 @@ public class PluginDescriptor
         this.pluginRealm = pluginRealm;
     }
 
-    public ClassRealm getDependencyRealm()
-    {
-        return dependencyRealm;
-    }
-
-    public void setDependencyRealm( ClassRealm dependencyRealm )
-    {
-        this.dependencyRealm = dependencyRealm;
-    }
-
     public PluginMetadata getPluginMetadata()
     {
         return pluginMetadata;
@@ -53,5 +48,25 @@ public class PluginDescriptor
     public void setPluginMetadata( PluginMetadata pluginMetadata )
     {
         this.pluginMetadata = pluginMetadata;
+    }
+
+    public List<String> getExports()
+    {
+        if ( exports == null )
+        {
+            exports = new ArrayList<String>();
+        }
+
+        return exports;
+    }
+
+    public List<PluginDescriptor> getImportedPlugins()
+    {
+        if ( importedPlugins == null )
+        {
+            importedPlugins = new ArrayList<PluginDescriptor>();
+        }
+
+        return importedPlugins;
     }
 }

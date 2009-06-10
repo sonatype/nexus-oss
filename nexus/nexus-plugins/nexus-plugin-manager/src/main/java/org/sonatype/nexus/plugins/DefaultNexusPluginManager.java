@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,12 +22,16 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.component.repository.ComponentRepository;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.context.ContextMapAdapter;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -74,7 +76,7 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
  */
 @Component( role = NexusPluginManager.class )
 public class DefaultNexusPluginManager
-    implements NexusPluginManager
+    implements NexusPluginManager, Initializable
 {
     private static final String DESCRIPTOR_PATH = "META-INF/nexus/plugin.xml";
 
@@ -101,6 +103,34 @@ public class DefaultNexusPluginManager
     protected Logger getLogger()
     {
         return logger;
+    }
+
+    public void initialize()
+        throws InitializationException
+    {
+        try
+        {
+            ComponentRepository componentRepository =
+                (ComponentRepository) plexusContainer.getContext().get( ComponentRepository.class.getName() );
+
+            if ( componentRepository instanceof NexusPluginsComponentRepository )
+            {
+                ( (NexusPluginsComponentRepository) componentRepository ).setNexusPluginManager( this );
+            }
+        }
+        catch ( ContextException e )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger()
+                    .debug( "Cannot find ComponentRepository in plexus context! Are we running in a PlexusTestCase?", e );
+            }
+            else
+            {
+                getLogger()
+                    .info( "Cannot find ComponentRepository in plexus context! Are we running in a PlexusTestCase?" );
+            }
+        }
     }
 
     public Map<String, PluginDescriptor> getInstalledPlugins()
@@ -160,36 +190,55 @@ public class DefaultNexusPluginManager
 
             ClassRealm pluginRealm = null;
 
-            ClassRealm dependencyRealm = null;
-
             PluginMetadata pluginMetadata = null;
+
+            List<String> pluginExports = null;
+
+            List<PluginCoordinates> dependencyPlugins = null;
+
+            NexusPluginValidator validator = new DefaultNexusPluginValidator();
+
+            PluginDiscoveryContext discoveryContext = null;
 
             try
             {
+                // load plugin md from it
+                pluginMetadata = loadPluginMetadata( pluginFile );
+
+                // create exports
+                pluginExports = createExports( pluginFile );
+
                 // create plugin realm as container child
                 pluginRealm = plexusContainer.createChildRealm( pluginCoordinates.getPluginKey() );
 
                 // add plugin jar to it
                 pluginRealm.addURL( pluginFile.toURI().toURL() );
 
-                // load plugin md from it
-                pluginMetadata = loadPluginMetadata( pluginRealm );
+                // create context
+                validator = new DefaultNexusPluginValidator();
+
+                discoveryContext =
+                    new PluginDiscoveryContext( pluginCoordinates, pluginExports, pluginRealm, pluginMetadata,
+                                                validator );
 
                 // extract imports
-                List<PluginCoordinates> imports =
-                    interPluginDependencyResolver.resolveDependencyRealms( this, pluginMetadata );
+                dependencyPlugins = interPluginDependencyResolver.resolveDependencyPlugins( this, pluginMetadata );
 
                 // add imports
-                for ( PluginCoordinates coord : imports )
+                for ( PluginCoordinates coord : dependencyPlugins )
                 {
-                    // import ALL
-                    pluginRealm.importFrom( getInstalledPlugins().get( coord.getPluginKey() ).getPluginRealm().getId(),
-                                            "" );
-                }
+                    PluginDescriptor importPlugin = getInstalledPlugins().get( coord.getPluginKey() );
 
-                // create a dependencyRealm as child of plugin realm
-                dependencyRealm = pluginRealm.createChildRealm( pluginRealm.getId() + "-dependencies" );
-                // dependencyRealm = pluginRealm.getWorld().newRealm( pluginRealm.getId() + "-dependencies" );
+                    List<String> exports = importPlugin.getExports();
+
+                    for ( String export : exports )
+                    {
+                        // import ALL
+                        pluginRealm.importFrom( importPlugin.getPluginRealm().getId(), export );
+                    }
+
+                    discoveryContext.getImportedPlugins().add( importPlugin );
+                }
 
                 // get plugin dependecies (not inter-plugin but other libs, jars)
                 Collection<File> dependencies = nexusPluginRepository.resolvePluginDependencies( pluginCoordinates );
@@ -197,38 +246,22 @@ public class DefaultNexusPluginManager
                 // file the realm
                 for ( File dependency : dependencies )
                 {
-                    dependencyRealm.addURL( dependency.toURI().toURL() );
+                    pluginRealm.addURL( dependency.toURI().toURL() );
                 }
-
-                // pluginRealm.importFrom( dependencyRealm.getId(), "" );
             }
             catch ( MalformedURLException e )
             {
                 // will not happen
             }
 
-            NexusPluginValidator validator = new DefaultNexusPluginValidator();
-
-            PluginDiscoveryContext discoveryContext =
-                new PluginDiscoveryContext( pluginCoordinates, pluginRealm, dependencyRealm, pluginMetadata, validator );
-
             discoverComponents( discoveryContext );
 
             // discover plexus components in dependencies too
-            plexusContainer.discoverComponents( dependencyRealm, discoveryContext );
+            plexusContainer.discoverComponents( pluginRealm, discoveryContext );
 
             if ( !discoveryContext.isPluginRegistered() )
             {
                 // drop it
-                try
-                {
-                    plexusContainer.removeComponentRealm( dependencyRealm );
-                }
-                catch ( PlexusContainerException e )
-                {
-                    getLogger().debug( "Could not remove plugin dependency realm!", e );
-                }
-
                 try
                 {
                     plexusContainer.removeComponentRealm( pluginRealm );
@@ -259,12 +292,9 @@ public class DefaultNexusPluginManager
 
             if ( getInstalledPlugins().containsKey( pluginKey ) )
             {
-                ClassRealm dependencyRealm = getInstalledPlugins().get( pluginKey ).getDependencyRealm();
-
                 ClassRealm pluginRealm = getInstalledPlugins().get( pluginKey ).getPluginRealm();
 
-                plexusContainer.removeComponentRealm( dependencyRealm );
-
+                // TODO: dependencies?
                 plexusContainer.removeComponentRealm( pluginRealm );
             }
             else
@@ -283,24 +313,22 @@ public class DefaultNexusPluginManager
         return result;
     }
 
-    protected PluginMetadata loadPluginMetadata( ClassRealm pluginRealm )
+    protected PluginMetadata loadPluginMetadata( File pluginJar )
         throws IOException
     {
-        Enumeration<URL> resources = pluginRealm.findRealmResources( DESCRIPTOR_PATH );
+        ZipFile jar = null;
 
-        for ( URL url : Collections.list( resources ) )
+        try
         {
+            jar = new ZipFile( pluginJar );
+
+            ZipEntry entry = jar.getEntry( DESCRIPTOR_PATH );
+
             Reader reader = null;
 
             try
             {
-                URLConnection conn = url.openConnection();
-
-                conn.setUseCaches( false );
-
-                conn.connect();
-
-                reader = ReaderFactory.newXmlReader( conn.getInputStream() );
+                reader = ReaderFactory.newXmlReader( jar.getInputStream( entry ) );
 
                 InterpolationFilterReader interpolationFilterReader =
                     new InterpolationFilterReader( reader, new ContextMapAdapter( plexusContainer.getContext() ) );
@@ -309,7 +337,7 @@ public class DefaultNexusPluginManager
 
                 PluginMetadata md = pdreader.read( interpolationFilterReader );
 
-                md.sourceUrl = url;
+                md.sourceUrl = pluginJar.toURI().toURL();
 
                 return md;
             }
@@ -326,8 +354,20 @@ public class DefaultNexusPluginManager
                 IOUtil.close( reader );
             }
         }
-
-        throw new IOException( "No Nexus plugin metadata found!" );
+        finally
+        {
+            if ( jar != null )
+            {
+                try
+                {
+                    jar.close();
+                }
+                catch ( Exception e )
+                {
+                    getLogger().error( "Could not close jar file properly.", e );
+                }
+            }
+        }
     }
 
     protected List<String> createExports( File pluginJar )
@@ -349,24 +389,29 @@ public class DefaultNexusPluginManager
 
                 ZipEntry e = (ZipEntry) en.nextElement();
 
-                String name = e.getName();
-
-                if ( name.charAt( 0 ) != '/' )
+                if ( !e.isDirectory() )
                 {
-                    sb.append( '/' );
-                }
+                    String name = e.getName();
 
-                // class name without ".class"
-                if ( name.endsWith( ".class" ) )
-                {
-                    sb.append( name.substring( 0, name.length() - 6 ) );
-                }
-                else
-                {
-                    sb.append( name );
-                }
+                    // for now, only classes are in, and META-INF is filted out
+                    // class name without ".class"
+                    if ( name.startsWith( "META-INF" ) )
+                    {
+                        // skip it
+                    }
+                    else if ( name.endsWith( ".class" ) )
+                    {
+                        sb.append( name.substring( 0, name.length() - 6 ).replace( "/", "." ) );
 
-                result.add( sb.toString() );
+                        result.add( sb.toString() );
+                    }
+                    else
+                    {
+                        sb.append( name );
+
+                        result.add( sb.toString() );
+                    }
+                }
             }
 
             return result;
@@ -399,10 +444,6 @@ public class DefaultNexusPluginManager
         PluginDescriptor pluginDescriptor = createComponentDescriptors( pluginDiscoveryContext );
 
         pluginDiscoveryContext.setPluginDescriptor( pluginDescriptor );
-
-        pluginDescriptor.setPluginRealm( pluginDiscoveryContext.getPluginRealm() );
-
-        pluginDescriptor.setDependencyRealm( pluginDiscoveryContext.getDependencyRealm() );
 
         if ( pluginDescriptor.getComponents() != null )
         {
@@ -451,7 +492,9 @@ public class DefaultNexusPluginManager
 
         result.setPluginRealm( pluginDiscoveryContext.getPluginRealm() );
 
-        result.setDependencyRealm( pluginDiscoveryContext.getDependencyRealm() );
+        result.getExports().addAll( pluginDiscoveryContext.getExports() );
+
+        result.getImportedPlugins().addAll( pluginDiscoveryContext.getImportedPlugins() );
 
         // and do conversion
         convertPluginMetadata( result, pluginDiscoveryContext.getPluginMetadata() );

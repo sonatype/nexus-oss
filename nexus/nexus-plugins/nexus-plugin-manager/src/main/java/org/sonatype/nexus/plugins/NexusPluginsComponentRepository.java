@@ -5,6 +5,7 @@ import static org.codehaus.plexus.component.CastUtils.isAssignableFrom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -36,6 +37,8 @@ public class NexusPluginsComponentRepository
 
     private final CompositionResolver compositionResolver = new DefaultCompositionResolver();
 
+    private NexusPluginManager nexusPluginManager;
+
     public NexusPluginsComponentRepository()
     {
     }
@@ -43,6 +46,16 @@ public class NexusPluginsComponentRepository
     // ----------------------------------------------------------------------
     // Accessors
     // ----------------------------------------------------------------------
+
+    public NexusPluginManager getNexusPluginManager()
+    {
+        return nexusPluginManager;
+    }
+
+    public void setNexusPluginManager( NexusPluginManager nexusPluginManager )
+    {
+        this.nexusPluginManager = nexusPluginManager;
+    }
 
     private Multimap<String, ComponentDescriptor<?>> getComponentDescriptors( String role )
     {
@@ -58,32 +71,69 @@ public class NexusPluginsComponentRepository
         // Solution: load all components from current realm and 1st level siblings only
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
+        PluginDescriptor pluginDescriptor = null;
+
         if ( classLoader != null && classLoader instanceof ClassRealm )
         {
             ClassRealm realm = (ClassRealm) classLoader;
 
             realms.add( realm );
 
-            // find all 1st level sibling for this realm above
-            Collection<ClassRealm> allRealms = realm.getWorld().getRealms();
-
-            for ( ClassRealm aRealm : allRealms )
+            if ( realm.getParentRealm() == null )
             {
-                if ( aRealm.getParent() != null && aRealm.getParent().equals( realm ) )
+                // we are most probably in core plexus realm ("plexus.core")
+                // so, to find all extension points coming from plugins (which are in child realms of this realm)
+                // we need to extend component search to all 1st level siblings too
+
+                // find all 1st level sibling for this realm above
+                Collection<ClassRealm> allRealms = realm.getWorld().getRealms();
+
+                for ( ClassRealm aRealm : allRealms )
                 {
-                    realms.add( aRealm );
+                    if ( aRealm.getParent() != null && aRealm.getParent().equals( realm ) )
+                    {
+                        realms.add( aRealm );
+                    }
                 }
             }
-
-            // and add parents too
-            realm = realm.getParentRealm();
-
-            while ( realm != null )
+            else
             {
-                realms.add( realm );
+                // we are most probably in a plugin realm,
+                // so we must extend the search to the parent too (to find components from plexus.core like Nexus core
+                // stuff
+                // and add parents too
+                ClassRealm aRealm = realm.getParentRealm();
 
-                realm = realm.getParentRealm();
+                while ( aRealm != null )
+                {
+                    realms.add( aRealm );
+
+                    aRealm = aRealm.getParentRealm();
+                }
+
+                // and NOW, the imports!
+                // but only when we are able to get to the plugin manager
+                if ( getNexusPluginManager() != null )
+                {
+                    // WE ASSUME HERE that realm uses the same coord.getPluginKey()!!!!
+                    // FIX THIS
+                    pluginDescriptor = getNexusPluginManager().getInstalledPlugins().get( realm.getId() );
+
+                    if ( pluginDescriptor != null )
+                    {
+                        for ( PluginDescriptor importedPlugin : pluginDescriptor.getImportedPlugins() )
+                        {
+                            realms.add( importedPlugin.getPluginRealm() );
+                        }
+                    }
+                }
             }
+        }
+        else
+        {
+            // this is not classrealm, add _all_ realms to discover components
+            // usually the case in PlexusTestCase if context classloader is not set explicitly
+            realms.addAll( index.keySet() );
         }
 
         // cstamas:
@@ -121,10 +171,31 @@ public class NexusPluginsComponentRepository
                 Multimap<String, ComponentDescriptor<?>> descriptors = roleIndex.get( role );
                 if ( descriptors != null )
                 {
+                    // Filter out non-exported components, if we had contributions from plugin
+                    if ( pluginDescriptor != null )
+                    {
+                        for ( PluginDescriptor importedPlugin : pluginDescriptor.getImportedPlugins() )
+                        {
+                            if ( realm.equals( importedPlugin.getPluginRealm() ) )
+                            {
+                                for ( Iterator<ComponentDescriptor<?>> i = descriptors.values().iterator(); i.hasNext(); )
+                                {
+                                    ComponentDescriptor<?> cd = i.next();
+
+                                    if ( !importedPlugin.getExports().contains( cd.getImplementation() ) )
+                                    {
+                                        i.remove();
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     roleHintIndex.putAll( descriptors );
                 }
             }
         }
+
         return Multimaps.unmodifiableMultimap( roleHintIndex );
     }
 

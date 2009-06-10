@@ -6,6 +6,6 @@ import org.sonatype.nexus.plugins.model.PluginMetadata;
 
 public interface InterPluginDependencyResolver
 {
-    List<PluginCoordinates> resolveDependencyRealms( NexusPluginManager nexusPluginManager, PluginMetadata pluginMetadata )
+    List<PluginCoordinates> resolveDependencyPlugins( NexusPluginManager nexusPluginManager, PluginMetadata pluginMetadata )
         throws NoSuchPluginException;
 }
