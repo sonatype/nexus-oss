@@ -18,72 +18,19 @@ Sonatype.repoServer.AbstractRepositorySummaryPanel = function( config ) {
   
   Ext.apply( this, config, defaultConfig );
   
-  var abstractConfigItems = [
+  var abstractItems = [
     {
       xtype: 'textfield',
-      name: 'idField',
-      fieldLabel: 'Repository ID',
-      width: '95%',
-      readOnly: true,
-      helpText: 'ID of this repository.'
+      fieldLabel: 'Repository Information',
+      hidden: true
     },
     {
-      xtype: 'textfield',
-      name: 'nameField',
-      fieldLabel: 'Repository Name',
-      width: '95%',
+      xtype: 'textarea',
+      name: 'informationField',
+      anchor: Sonatype.view.FIELD_OFFSET,
       readOnly: true,
-      helpText: 'Name of this repository.'
-    },
-    {
-      xtype: 'textfield',
-      name: 'typeField',
-      fieldLabel: 'Repository Type',
-      width: '95%',
-      readOnly: true,
-      helpText: 'Type of this repository.'
-    },
-    {
-      xtype: 'textfield',
-      name: 'policyField',
-      fieldLabel: 'Repository Policy',
-      width: '95%',
-      readOnly: true,
-      helpText: 'Policy of this repository.'
-    },
-    {
-      xtype: 'textfield',
-      name: 'formatField',
-      fieldLabel: 'Repository Format',
-      width: '95%',
-      readOnly: true,
-      helpText: 'Format of this repository.'
-    }
-  ];
-  var abstractMetaItems = [
-    {
-      xtype: 'textfield',
-      name: 'groupField',
-      fieldLabel: 'Contained in Group(s)',
-      width: '95%',
-      readOnly: true,
-      helpText: 'Repository Groups that contain this Repository.'
-    },
-    {
-      xtype: 'textfield',
-      name: 'sizeOnDiskField',
-      fieldLabel: 'Size on disk (bytes)',
-      width: '95%',
-      readOnly: true,
-      helpText: 'Space consumed on disk by this repository.'
-    },
-    {
-      xtype: 'textfield',
-      name: 'fileCountField',
-      fieldLabel: 'Number of files',
-      width: '95%',
-      readOnly: true,
-      helpText: 'Number of files contained in this repository.'
+      hideLabel: true,
+      height: 150
     }
   ];
   
@@ -96,7 +43,7 @@ Sonatype.repoServer.AbstractRepositorySummaryPanel = function( config ) {
       },
       save: {}    
     },
-    items: abstractConfigItems.concat( this.configItems ).concat( abstractMetaItems ).concat( this.metaItems ) 
+    items: abstractItems.concat( this.items ) 
   } );
 };
 
@@ -105,18 +52,22 @@ Ext.extend( Sonatype.repoServer.AbstractRepositorySummaryPanel, Sonatype.ext.For
     return this.uri;
   },
   populateFields : function(arr, srcObj, fpanel) {
-    this.populateGroupField( srcObj.groups );
-    this.populateIdField( srcObj.id );
-    this.populateNameField( this.payload.data.name );
-    this.populateTypeField( this.payload.data.repoType );
-    this.populateFormatField( this.payload.data.format );
-    this.populatePolicyField( this.payload.data.repoPolicy );
-    this.populateSizeOnDiskField( srcObj.sizeOnDisk );
-    this.populateFileCountField( srcObj.fileCountInRepository );
+    this.populateInformationField( 'Repository ID: ' + srcObj.id + '\n' );
+    this.populateInformationField( 'Repository Name: ' + this.payload.data.name + '\n' );
+    this.populateInformationField( 'Repository Type: ' + this.payload.data.repoType + '\n' );
+    this.populateInformationField( 'Repository Policy: ' + this.payload.data.repoPolicy + '\n' );
+    this.populateInformationField( 'Repository Format: ' + this.payload.data.format + '\n' );
+    this.populateInformationField( 'Contained in groups: ' + '\n' + this.combineGroups( srcObj.groups ) + '\n' );
+    this.populateInformationField( 'Size on Disk: ' + this.getDiskSize( parseInt( srcObj.sizeOnDisk ) ) + '\n' );
   },
-  populateGroupField : function( groups ) {
+  populateInformationField : function( text ) {
+    var infoText = this.find( 'name', 'informationField' )[0].getValue();
+    infoText += text;
+    this.find( 'name', 'informationField' )[0].setRawValue( infoText );
+  },
+  combineGroups : function( groups ) {
+    var combinedGroups = '';
     if ( groups != undefined && groups.length > 0 ) {
-      var combinedGroups = '';
       for ( var i = 0 ; i < groups.length ; i++ ){
         var group = this.groupStore.getAt( this.groupStore.findBy( 
             function( rec, recid ) {
@@ -125,35 +76,29 @@ Ext.extend( Sonatype.repoServer.AbstractRepositorySummaryPanel, Sonatype.ext.For
         
         if ( group ){
           if ( combinedGroups.length > 0 ) {
-            combinedGroups += ', ';
+            combinedGroups += '\n';
           }
           
-          combinedGroups += group.data.name;
+          combinedGroups += '   ' + group.data.name;
         }
       }
-      this.find( 'name', 'groupField' )[0].setValue( combinedGroups );
     }
+    
+    return combinedGroups;
   },
-  populateIdField : function( id ) {
-    this.find( 'name', 'idField' )[0].setValue( id );
-  },
-  populateNameField : function( name ) {
-    this.find( 'name', 'nameField' )[0].setValue( name );
-  },
-  populateTypeField : function( type ) {
-    this.find( 'name', 'typeField' )[0].setValue( type );
-  },
-  populateFormatField : function( format ) {
-    this.find( 'name', 'formatField' )[0].setValue( format );
-  },
-  populatePolicyField : function( policy ) {
-    this.find( 'name', 'policyField' )[0].setValue( policy );
-  },
-  populateSizeOnDiskField : function( policy ) {
-    this.find( 'name', 'sizeOnDiskField' )[0].setValue( policy );
-  },
-  populateFileCountField : function( policy ) {
-    this.find( 'name', 'fileCountField' )[0].setValue( policy );
+  getDiskSize : function( bytes ) {
+    if ( bytes < 1024 ) {
+      return bytes + ' Bytes';
+    }
+    else if ( bytes < 1048576 ) {
+      return bytes / 1024 + ' KB';
+    }
+    else if ( bytes < 1073741824 ) {
+      return bytes / 1048576 + ' MB'; 
+    }
+    else {
+      return bytes / 1073741824 + ' GB';
+    }
   }
 } );
 
@@ -163,13 +108,10 @@ Sonatype.repoServer.HostedRepositorySummaryPanel = function( config ) {
   Ext.apply( this, config, defaultConfig );
 
   Sonatype.repoServer.HostedRepositorySummaryPanel.superclass.constructor.call( this, {
-    configItems: [
-    ],
-    metaItems: [
+    items: [
       {
         xtype: 'textfield',
         fieldLabel: 'Distribution Management',
-        helpText: 'Distribution Management section that can be placed in your pom.xml file.',
         hidden: true
       },
       {
@@ -214,17 +156,7 @@ Sonatype.repoServer.ProxyRepositorySummaryPanel = function( config ) {
   Ext.apply( this, config, defaultConfig );
 
   Sonatype.repoServer.ProxyRepositorySummaryPanel.superclass.constructor.call( this, {
-    configItems: [
-      {
-        xtype: 'textfield',
-        name: 'remoteUrlField',
-        fieldLabel: 'Remote URL',
-        width: '95%',
-        readOnly: true,
-        helpText: 'Remote URL of this repository.'
-      }
-    ],
-    metaItems: [
+    items: [
     ]
   } );
 };
@@ -237,10 +169,7 @@ Ext.extend( Sonatype.repoServer.ProxyRepositorySummaryPanel, Sonatype.repoServer
       srcObj,
       fpanel );
     
-    this.populateRemoteUrlField( this.payload.data.remoteUri );
-  },
-  populateRemoteUrlField : function( url ) {
-    this.find( 'name', 'remoteUrlField' )[0].setValue( url );
+    this.populateInformationField( 'Remote URL: ' + this.payload.data.remoteUri + '\n' );
   }
 } );
 
@@ -250,9 +179,7 @@ Sonatype.repoServer.VirtualRepositorySummaryPanel = function( config ) {
   Ext.apply( this, config, defaultConfig );
 
   Sonatype.repoServer.VirtualRepositorySummaryPanel.superclass.constructor.call( this, {
-    configItems: [
-    ],
-    metaItems: [
+    items: [
     ]
   } );
 };
