@@ -74,9 +74,18 @@ public class NexusPluginsComponentRepository
                     realms.add( aRealm );
                 }
             }
+
+            // and add parents too
+            realm = realm.getParentRealm();
+
+            while ( realm != null )
+            {
+                realms.add( realm );
+
+                realm = realm.getParentRealm();
+            }
         }
-        
-        
+
         // cstamas:
         // to be able to load _all_ registered plugin components, which are all in child realms of container realm,
         // we must scrape all registered realms instead to target them one-by-one with

@@ -13,6 +13,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -187,6 +189,7 @@ public class DefaultNexusPluginManager
 
                 // create a dependencyRealm as child of plugin realm
                 dependencyRealm = pluginRealm.createChildRealm( pluginRealm.getId() + "-dependencies" );
+                // dependencyRealm = pluginRealm.getWorld().newRealm( pluginRealm.getId() + "-dependencies" );
 
                 // get plugin dependecies (not inter-plugin but other libs, jars)
                 Collection<File> dependencies = nexusPluginRepository.resolvePluginDependencies( pluginCoordinates );
@@ -197,6 +200,7 @@ public class DefaultNexusPluginManager
                     dependencyRealm.addURL( dependency.toURI().toURL() );
                 }
 
+                // pluginRealm.importFrom( dependencyRealm.getId(), "" );
             }
             catch ( MalformedURLException e )
             {
@@ -306,7 +310,7 @@ public class DefaultNexusPluginManager
                 PluginMetadata md = pdreader.read( interpolationFilterReader );
 
                 md.sourceUrl = url;
-                
+
                 return md;
             }
             catch ( XmlPullParserException e )
@@ -323,7 +327,64 @@ public class DefaultNexusPluginManager
             }
         }
 
-        return null;
+        throw new IOException( "No Nexus plugin metadata found!" );
+    }
+
+    protected List<String> createExports( File pluginJar )
+        throws IOException
+    {
+        ZipFile jar = null;
+
+        try
+        {
+            jar = new ZipFile( pluginJar );
+
+            ArrayList<String> result = new ArrayList<String>( jar.size() );
+
+            @SuppressWarnings( "unchecked" )
+            Enumeration en = jar.entries();
+            while ( en.hasMoreElements() )
+            {
+                StringBuilder sb = new StringBuilder();
+
+                ZipEntry e = (ZipEntry) en.nextElement();
+
+                String name = e.getName();
+
+                if ( name.charAt( 0 ) != '/' )
+                {
+                    sb.append( '/' );
+                }
+
+                // class name without ".class"
+                if ( name.endsWith( ".class" ) )
+                {
+                    sb.append( name.substring( 0, name.length() - 6 ) );
+                }
+                else
+                {
+                    sb.append( name );
+                }
+
+                result.add( sb.toString() );
+            }
+
+            return result;
+        }
+        finally
+        {
+            if ( jar != null )
+            {
+                try
+                {
+                    jar.close();
+                }
+                catch ( Exception e )
+                {
+                    getLogger().error( "Could not close jar file properly.", e );
+                }
+            }
+        }
     }
 
     // ==
@@ -336,7 +397,7 @@ public class DefaultNexusPluginManager
         List<ComponentSetDescriptor> componentSetDescriptors = new ArrayList<ComponentSetDescriptor>();
 
         PluginDescriptor pluginDescriptor = createComponentDescriptors( pluginDiscoveryContext );
-        
+
         pluginDiscoveryContext.setPluginDescriptor( pluginDescriptor );
 
         pluginDescriptor.setPluginRealm( pluginDiscoveryContext.getPluginRealm() );
