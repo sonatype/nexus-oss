@@ -22,53 +22,52 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.nexus.rest.NexusCompat;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
-import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
-import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
+import org.sonatype.nexus.template.RepositoryTemplateStore;
 
 public abstract class AbstractRepositoryPlexusResource
     extends AbstractNexusPlexusResource
 {
-    /** Key to store Repo with which we work against. */
-    public static final String REPOSITORY_ID_KEY = "repositoryId";
 
     /** Repo type hosted. */
-    public static final String REPO_TYPE_HOSTED = "hosted";
+    public static final String REPO_TYPE_HOSTED = RepositoryTemplateStore.REPO_TYPE_HOSTED;
 
     /** Repo type proxied. */
-    public static final String REPO_TYPE_PROXIED = "proxy";
+    public static final String REPO_TYPE_PROXIED = RepositoryTemplateStore.REPO_TYPE_PROXIED;
 
     /** Repo type virtual (shadow in nexus). */
-    public static final String REPO_TYPE_VIRTUAL = "virtual";
+    public static final String REPO_TYPE_VIRTUAL = RepositoryTemplateStore.REPO_TYPE_VIRTUAL;
 
     /** Repo type group. */
-    public static final String REPO_TYPE_GROUP = "group";
+    public static final String REPO_TYPE_GROUP = RepositoryTemplateStore.REPO_TYPE_GROUP;
+
+    /** Key to store Repo with which we work against. */
+    public static final String REPOSITORY_ID_KEY = "repositoryId";
 
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
+    @Requirement
+    private RepositoryTemplateStore repoTemplateStore;
+
     /**
      * Pull the repository Id out of the Request.
-     * 
+     *
      * @param request
      * @return
      */
@@ -114,27 +113,7 @@ public abstract class AbstractRepositoryPlexusResource
     // clean
     public String getRestRepoType( Repository repository )
     {
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            return REPO_TYPE_PROXIED;
-        }
-        else if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
-        {
-            return REPO_TYPE_HOSTED;
-        }
-        else if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
-        {
-            return REPO_TYPE_VIRTUAL;
-        }
-        else if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
-        {
-            return REPO_TYPE_GROUP;
-        }
-        else
-        {
-            throw new IllegalArgumentException( "The passed model with class" + repository.getClass().getName()
-                + " is not recognized!" );
-        }
+        return this.repoTemplateStore.getRestRepositoryType( repository );
     }
 
     protected RepositoryListResourceResponse listRepositories( Request request, boolean allReposes )
@@ -180,8 +159,7 @@ public abstract class AbstractRepositoryPlexusResource
 
                 if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
                 {
-                    repoRes.setRepoPolicy( repository.adaptToFacet( MavenRepository.class ).getRepositoryPolicy()
-                        .toString() );
+                    repoRes.setRepoPolicy( repository.adaptToFacet( MavenRepository.class ).getRepositoryPolicy().toString() );
                 }
 
                 if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
@@ -227,122 +205,19 @@ public abstract class AbstractRepositoryPlexusResource
         return result;
     }
 
-    /**
-     * Converting App model to REST DTO.
-     */
     public RepositoryBaseResource getRepositoryRestModel( Repository repository )
     {
-        RepositoryResource resource = null;
-
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            resource = getRepositoryProxyRestModel( repository.adaptToFacet( ProxyRepository.class ) );
-        }
-        else if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
-        {
-            return getRepositoryShadowRestModel( repository.adaptToFacet( ShadowRepository.class ) );
-        }
-        else
-        {
-            resource = new RepositoryResource();
-        }
-
-        resource.setProvider( NexusCompat.getRepositoryProviderHint( repository ) );
-
-        resource.setFormat( repository.getRepositoryContentClass().getId() );
-
-        resource.setRepoType( getRestRepoType( repository ) );
-
-        resource.setId( repository.getId() );
-
-        resource.setName( repository.getName() );
-
-        resource.setAllowWrite( repository.isAllowWrite() );
-
-        resource.setBrowseable( repository.isBrowseable() );
-
-        resource.setIndexable( repository.isIndexable() );
-
-        resource.setNotFoundCacheTTL( repository.getNotFoundCacheTimeToLive() );
-
-        resource.setDefaultLocalStorageUrl( repository.getLocalUrl() );
-
-        resource.setOverrideLocalStorageUrl( repository.getLocalUrl() );
-
-        if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
-        {
-            resource.setRepoPolicy( repository.adaptToFacet( MavenRepository.class ).getRepositoryPolicy().toString() );
-
-            if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
-            {
-                resource.setChecksumPolicy( repository.adaptToFacet( MavenProxyRepository.class ).getChecksumPolicy()
-                    .toString() );
-
-                resource.setDownloadRemoteIndexes( repository.adaptToFacet( MavenProxyRepository.class )
-                    .isDownloadRemoteIndexes() );
-            }
-        }
-
-        return resource;
-
+        return this.repoTemplateStore.getRepositoryTemplate( repository );
     }
 
-    /**
-     * Converting App model to REST DTO.
-     */
     public RepositoryProxyResource getRepositoryProxyRestModel( ProxyRepository repository )
     {
-        RepositoryProxyResource resource = new RepositoryProxyResource();
-
-        resource.setRemoteStorage( new RepositoryResourceRemoteStorage() );
-
-        resource.getRemoteStorage().setRemoteStorageUrl( repository.getRemoteUrl() );
-
-        resource.getRemoteStorage().setAuthentication(
-                                                       AbstractGlobalConfigurationPlexusResource.convert( NexusCompat
-                                                           .getRepositoryRawConfiguration( repository )
-                                                           .getRemoteStorage().getAuthentication() ) );
-
-        resource.getRemoteStorage().setConnectionSettings(
-                                                           AbstractGlobalConfigurationPlexusResource
-                                                               .convert( NexusCompat
-                                                                   .getRepositoryRawConfiguration( repository )
-                                                                   .getRemoteStorage().getConnectionSettings() ) );
-
-        resource.getRemoteStorage().setHttpProxySettings(
-                                                          AbstractGlobalConfigurationPlexusResource
-                                                              .convert( NexusCompat
-                                                                  .getRepositoryRawConfiguration( repository )
-                                                                  .getRemoteStorage().getHttpProxySettings() ) );
-
-        if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
-        {
-            resource.setArtifactMaxAge( repository.adaptToFacet( MavenProxyRepository.class ).getArtifactMaxAge() );
-
-            resource.setMetadataMaxAge( repository.adaptToFacet( MavenProxyRepository.class ).getMetadataMaxAge() );
-        }
-
-        return resource;
+        return this.repoTemplateStore.getProxyRepositoryTemplate( repository );
     }
 
-    public RepositoryShadowResource getRepositoryShadowRestModel( ShadowRepository shadow )
+    public RepositoryShadowResource getRepositoryShadowRestModel( ShadowRepository repository )
     {
-        RepositoryShadowResource resource = new RepositoryShadowResource();
-
-        resource.setId( shadow.getId() );
-
-        resource.setName( shadow.getName() );
-
-        resource.setProvider( NexusCompat.getRepositoryProviderHint( shadow ) );
-
-        resource.setRepoType( REPO_TYPE_VIRTUAL );
-
-        resource.setFormat( shadow.getRepositoryContentClass().getId() );
-
-        resource.setShadowOf( shadow.getMasterRepositoryId() );
-
-        resource.setSyncAtStartup( shadow.isSynchronizeAtStartup() );
-
-        return resource;
+        return this.repoTemplateStore.getShadowRepositoryTemplate( repository );
     }
+
 }

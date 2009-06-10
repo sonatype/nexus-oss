@@ -47,7 +47,7 @@ import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 /**
  * The main Nexus application interface.
- * 
+ *
  * @author Jason van Zyl
  * @author cstamas
  */
@@ -121,7 +121,7 @@ public interface Nexus
 
     /**
      * Get the content of configuration file based on the key
-     * 
+     *
      * @param key index in configuration file name list
      * @return
      * @throws IOException
@@ -197,22 +197,4 @@ public interface Nexus
 
     CRouting readDefaultRouting();
 
-    // ----------------------------------------------------------------------------
-    // Repo templates, CRUD
-    // ----------------------------------------------------------------------------
-
-    Collection<CRepository> listRepositoryTemplates()
-        throws IOException;
-
-    void createRepositoryTemplate( CRepository settings )
-        throws IOException;
-
-    CRepository readRepositoryTemplate( String id )
-        throws IOException;
-
-    void updateRepositoryTemplate( CRepository settings )
-        throws IOException;
-
-    void deleteRepositoryTemplate( String id )
-        throws IOException;
 }

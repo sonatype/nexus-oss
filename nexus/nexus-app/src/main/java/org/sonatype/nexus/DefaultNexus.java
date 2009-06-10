@@ -33,17 +33,14 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
-import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
@@ -71,8 +68,6 @@ import org.sonatype.nexus.proxy.http.HttpProxyService;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -80,9 +75,6 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.store.DefaultEntry;
-import org.sonatype.nexus.store.Entry;
-import org.sonatype.nexus.store.Store;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.tasks.RemoveRepoFolderTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
@@ -94,7 +86,7 @@ import org.sonatype.timeline.TimelineFilter;
 
 /**
  * The default Nexus implementation.
- * 
+ *
  * @author Jason van Zyl
  * @author cstamas
  */
@@ -105,7 +97,7 @@ public class DefaultNexus
 {
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
-    
+
     @Requirement
     private NexusPluginManager nexusPluginManager;
 
@@ -129,12 +121,6 @@ public class DefaultNexus
      */
     @Requirement
     private RepositoryRegistry repositoryRegistry;
-
-    /**
-     * The store for templates.
-     */
-    @Requirement( hint = "file" )
-    private Store templatesStore;
 
     /**
      * The http proxy device.
@@ -201,24 +187,6 @@ public class DefaultNexus
      */
     @Requirement
     private SecuritySystem securitySystem;
-
-    // ----------------------------------------------------------------------------------------------------------
-    // Template names and prefixes, not allowed to go out of this class
-    // ----------------------------------------------------------------------------------------------------------
-
-    private static final String TEMPLATE_REPOSITORY_PREFIX = "repository-";
-
-    private static final String TEMPLATE_REPOSITORY_SHADOW_PREFIX = "repositoryShadow-";
-
-    private static final String TEMPLATE_DEFAULT_PROXY_RELEASE = "default_proxy_release";
-
-    private static final String TEMPLATE_DEFAULT_PROXY_SNAPSHOT = "default_proxy_snapshot";
-
-    private static final String TEMPLATE_DEFAULT_HOSTED_RELEASE = "default_hosted_release";
-
-    private static final String TEMPLATE_DEFAULT_HOSTED_SNAPSHOT = "default_hosted_snapshot";
-
-    private static final String TEMPLATE_DEFAULT_VIRTUAL = "default_virtual";
 
     // ----------------------------------------------------------------------------------------------------------
     // SystemStatus
@@ -402,7 +370,7 @@ public class DefaultNexus
     /**
      * Retrieves a stream to the requested log file. This method ensures that the file is rooted in the log folder to
      * prevent browsing of the file system.
-     * 
+     *
      * @param logFile path of the file to retrieve
      * @returns InputStream to the file or null if the file is not allowed or doesn't exist.
      */
@@ -549,95 +517,6 @@ public class DefaultNexus
     // Repo templates, CRUD
     // ----------------------------------------------------------------------------
 
-    protected Collection<Entry> filterOnPrefix( Collection<Entry> entries, String prefix )
-    {
-        if ( prefix == null )
-        {
-            return entries;
-        }
-
-        Collection<Entry> result = new ArrayList<Entry>();
-
-        for ( Entry e : entries )
-        {
-            if ( e.getId().startsWith( prefix ) )
-            {
-                result.add( e );
-            }
-        }
-
-        return result;
-    }
-
-    public Collection<CRepository> listRepositoryTemplates()
-        throws IOException
-    {
-        Collection<Entry> entries = filterOnPrefix( templatesStore.getEntries(), TEMPLATE_REPOSITORY_PREFIX );
-
-        ArrayList<CRepository> result = new ArrayList<CRepository>( entries.size() );
-
-        for ( Entry entry : entries )
-        {
-            result.add( (CRepository) entry.getContent() );
-        }
-
-        return result;
-    }
-
-    public void createRepositoryTemplate( CRepository settings )
-        throws IOException
-    {
-        createRepositoryTemplate( settings, true );
-    }
-
-    protected void createRepositoryTemplate( CRepository settings, boolean replace )
-        throws IOException
-    {
-        DefaultEntry entry = new DefaultEntry( TEMPLATE_REPOSITORY_PREFIX + settings.getId(), settings );
-
-        if ( replace || templatesStore.getEntry( entry.getId() ) == null )
-        {
-            templatesStore.addEntry( entry );
-        }
-    }
-
-    public CRepository readRepositoryTemplate( String id )
-        throws IOException
-    {
-        Entry entry = templatesStore.getEntry( TEMPLATE_REPOSITORY_PREFIX + id );
-
-        if ( entry != null )
-        {
-            return (CRepository) entry.getContent();
-        }
-        else
-        {
-            // check for default
-            if ( TEMPLATE_DEFAULT_HOSTED_RELEASE.equals( id ) || TEMPLATE_DEFAULT_HOSTED_SNAPSHOT.equals( id )
-                || TEMPLATE_DEFAULT_PROXY_RELEASE.equals( id ) || TEMPLATE_DEFAULT_PROXY_SNAPSHOT.equals( id ) )
-            {
-                createDefaultTemplate( id, false );
-
-                return readRepositoryTemplate( id );
-            }
-
-            return null;
-        }
-    }
-
-    public void updateRepositoryTemplate( CRepository settings )
-        throws IOException
-    {
-        deleteRepositoryTemplate( settings.getId() );
-
-        createRepositoryTemplate( settings );
-    }
-
-    public void deleteRepositoryTemplate( String id )
-        throws IOException
-    {
-        templatesStore.removeEntry( TEMPLATE_REPOSITORY_PREFIX + id );
-    }
 
     // ----------------------------------------------------------------------------
     // Default Configuration
@@ -838,7 +717,7 @@ public class DefaultNexus
         sysInfoLog.append( "-------------------------------------------------" );
 
         getLogger().info( sysInfoLog.toString() );
-        
+
         // load locally present plugins
         nexusPluginManager.activateInstalledPlugins();
 
@@ -912,22 +791,6 @@ public class DefaultNexus
 
             applicationStatusSource.getSystemStatus().setConfigurationUpgraded(
                 nexusConfiguration.isConfigurationUpgraded() );
-
-            // creating default templates if needed
-            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_RELEASE, applicationStatusSource
-                .getSystemStatus().isInstanceUpgraded() );
-
-            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_SNAPSHOT, applicationStatusSource
-                .getSystemStatus().isInstanceUpgraded() );
-
-            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_RELEASE, applicationStatusSource
-                .getSystemStatus().isInstanceUpgraded() );
-
-            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_SNAPSHOT, applicationStatusSource
-                .getSystemStatus().isInstanceUpgraded() );
-
-            createDefaultTemplate( TEMPLATE_DEFAULT_VIRTUAL, applicationStatusSource
-                .getSystemStatus().isInstanceUpgraded() );
 
             if ( applicationStatusSource.getSystemStatus().isFirstStart() )
             {
@@ -1029,166 +892,4 @@ public class DefaultNexus
         }
     }
 
-    private void createDefaultTemplate( String id, boolean shouldRecreate )
-        throws IOException
-    {
-        if ( TEMPLATE_DEFAULT_HOSTED_RELEASE.equals( id ) )
-        {
-            getLogger().info( "Creating default hosted release repository template..." );
-
-            CRepository hostedTemplate = new DefaultCRepository();
-
-            hostedTemplate.setProviderRole( Repository.class.getName() );
-
-            hostedTemplate.setProviderHint( "maven2" );
-
-            hostedTemplate.setId( TEMPLATE_DEFAULT_HOSTED_RELEASE );
-
-            hostedTemplate.setName( "Default Release Hosted Repository Template" );
-
-            hostedTemplate.setAllowWrite( true );
-
-            Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
-
-            hostedTemplate.setExternalConfiguration( ex );
-
-            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
-
-            exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-
-            exConf.setItemMaxAge( 1440 );
-
-            exConf.setArtifactMaxAge( -1 );
-
-            exConf.setMetadataMaxAge( 1440 );
-
-            exConf.applyChanges();
-
-            createRepositoryTemplate( hostedTemplate, shouldRecreate );
-        }
-        else if ( TEMPLATE_DEFAULT_HOSTED_SNAPSHOT.equals( id ) )
-        {
-            getLogger().info( "Creating default hosted snapshot repository template..." );
-
-            CRepository hostedTemplate = new DefaultCRepository();
-
-            hostedTemplate.setProviderRole( Repository.class.getName() );
-
-            hostedTemplate.setProviderHint( "maven2" );
-
-            hostedTemplate.setId( TEMPLATE_DEFAULT_HOSTED_SNAPSHOT );
-
-            hostedTemplate.setName( "Default Snapshot Hosted Repository Template" );
-
-            hostedTemplate.setAllowWrite( true );
-
-            Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
-
-            hostedTemplate.setExternalConfiguration( ex );
-
-            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
-
-            exConf.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
-
-            exConf.setItemMaxAge( 1440 );
-
-            exConf.setArtifactMaxAge( 1440 );
-
-            exConf.setMetadataMaxAge( 1440 );
-
-            exConf.applyChanges();
-
-            createRepositoryTemplate( hostedTemplate, shouldRecreate );
-        }
-        else if ( TEMPLATE_DEFAULT_PROXY_RELEASE.equals( id ) )
-        {
-            getLogger().info( "Creating default proxied release repository template..." );
-
-            CRepository proxiedTemplate = new DefaultCRepository();
-
-            proxiedTemplate.setProviderRole( Repository.class.getName() );
-
-            proxiedTemplate.setProviderHint( "maven2" );
-
-            proxiedTemplate.setId( TEMPLATE_DEFAULT_PROXY_RELEASE );
-
-            proxiedTemplate.setName( "Default Release Proxy Repository Template" );
-
-            proxiedTemplate.setAllowWrite( false );
-
-            proxiedTemplate.setRemoteStorage( new CRemoteStorage() );
-
-            proxiedTemplate.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
-
-            Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
-
-            proxiedTemplate.setExternalConfiguration( ex );
-
-            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
-
-            exConf.setItemMaxAge( 1440 );
-
-            exConf.setArtifactMaxAge( -1 );
-
-            exConf.setMetadataMaxAge( 1440 );
-
-            exConf.applyChanges();
-
-            createRepositoryTemplate( proxiedTemplate, shouldRecreate );
-        }
-        else if ( TEMPLATE_DEFAULT_PROXY_SNAPSHOT.equals( id ) )
-        {
-            getLogger().info( "Creating default proxied snapshot repository template..." );
-
-            CRepository proxiedTemplate = new DefaultCRepository();
-
-            proxiedTemplate.setProviderRole( Repository.class.getName() );
-
-            proxiedTemplate.setProviderHint( "maven2" );
-
-            proxiedTemplate.setId( TEMPLATE_DEFAULT_PROXY_SNAPSHOT );
-
-            proxiedTemplate.setName( "Default Snapshot Proxy Repository Template" );
-
-            proxiedTemplate.setAllowWrite( false );
-
-            proxiedTemplate.setRemoteStorage( new CRemoteStorage() );
-
-            proxiedTemplate.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
-
-            Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
-
-            proxiedTemplate.setExternalConfiguration( ex );
-
-            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
-
-            exConf.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
-
-            exConf.setItemMaxAge( 1440 );
-
-            exConf.setArtifactMaxAge( 1440 );
-
-            exConf.setMetadataMaxAge( 1440 );
-
-            exConf.applyChanges();
-
-            createRepositoryTemplate( proxiedTemplate, shouldRecreate );
-        }
-        else if ( TEMPLATE_DEFAULT_VIRTUAL.equals( id ) )
-        {
-            getLogger().info( "Creating default virtual repository template..." );
-
-            CRepository shadowTemplate = new DefaultCRepository();
-
-            shadowTemplate.setProviderRole( ShadowRepository.class.getName() );
-
-            shadowTemplate.setProviderHint( "m1-m2-shadow" );
-
-            shadowTemplate.setId( TEMPLATE_DEFAULT_VIRTUAL );
-
-            shadowTemplate.setName( "Default Virtual Repository Template" );
-
-            createRepositoryTemplate( shadowTemplate, shouldRecreate );
-        }
-    }
 }

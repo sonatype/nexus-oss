@@ -13,11 +13,9 @@
  */
 package org.sonatype.nexus;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 
@@ -25,7 +23,7 @@ public class DefaultNexusTest
     extends AbstractNexusTestCase
 {
     private DefaultNexus defaultNexus;
-    
+
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
     public DefaultNexus getDefaultNexus()
@@ -33,44 +31,21 @@ public class DefaultNexusTest
         return defaultNexus;
     }
 
+    @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
         defaultNexus = (DefaultNexus) lookup( Nexus.class );
-        
+
         repositoryTypeRegistry = lookup( RepositoryTypeRegistry.class );
     }
 
+    @Override
     protected boolean loadConfigurationAtSetUp()
     {
         return false;
-    }
-
-    public void testRepositoryTemplates()
-        throws IOException
-    {
-        CRepository template = new CRepository();
-        template.setId( "aTemplate" );
-        template.setName( "This is a longish name" );
-
-        getDefaultNexus().createRepositoryTemplate( template );
-
-        Collection<CRepository> templates = getDefaultNexus().listRepositoryTemplates();
-
-        assertEquals( 6, templates.size() );
-
-        CRepository t1 = getDefaultNexus().readRepositoryTemplate( "aTemplate" );
-
-        assertEquals( "aTemplate", t1.getId() );
-        assertEquals( "This is a longish name", t1.getName() );
-
-        getDefaultNexus().deleteRepositoryTemplate( "aTemplate" );
-
-        templates = getDefaultNexus().listRepositoryTemplates();
-
-        assertEquals( 5, templates.size() );
     }
 
     public void testListRepositoryContentClasses()

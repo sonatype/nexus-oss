@@ -13,19 +13,18 @@
  */
 package org.sonatype.nexus.rest.templates.repositories;
 
-import java.io.IOException;
-
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
-import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
+import org.sonatype.nexus.template.RepositoryTemplateStore;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -34,8 +33,13 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  */
 @Component( role = PlexusResource.class, hint = "RepositoryTemplatePlexusResource" )
 public class RepositoryTemplatePlexusResource
-    extends AbstractRepositoryTemplatePlexusResource
+    extends AbstractNexusPlexusResource
 {
+    private static final String TEMPLATE_ID_KEY = "templateId";
+
+    @Requirement
+    private RepositoryTemplateStore repoTemplateStore;
+
     @Override
     public Object getPayloadInstance()
     {
@@ -45,7 +49,7 @@ public class RepositoryTemplatePlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/templates/repositories/{" + REPOSITORY_ID_KEY + "}";
+        return "/templates/repositories/{" + TEMPLATE_ID_KEY + "}";
     }
 
     @Override
@@ -54,9 +58,9 @@ public class RepositoryTemplatePlexusResource
         return new PathProtectionDescriptor( "/templates/repositories/*", "authcBasic,perms[nexus:repotemplates]" );
     }
 
-    protected String getRepositoryId( Request request )
+    protected String getTemplateId( Request request )
     {
-        return request.getAttributes().get( REPOSITORY_ID_KEY ).toString();
+        return request.getAttributes().get( TEMPLATE_ID_KEY ).toString();
     }
 
     @Override
@@ -64,90 +68,18 @@ public class RepositoryTemplatePlexusResource
         throws ResourceException
     {
         RepositoryResourceResponse result = new RepositoryResourceResponse();
-        ;
-        try
+
+        String templateId = getTemplateId( request );
+        RepositoryBaseResource template = repoTemplateStore.retrieveTemplate( templateId );
+
+        if ( template == null )
         {
-            CRepository model = getNexus().readRepositoryTemplate( getRepositoryId( request ) );
-
-            if ( model == null )
-            {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository template not found" );
-            }
-            else
-            {
-                result.setData( getRepositoryRestModel( model ) );
-            }
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository template not found: " );
         }
-        catch ( IOException e )
-        {
-            getLogger().warn( "Got IO Exception", e );
 
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-        }
-        return result;
-    }
-
-    @Override
-    public Object put( Context context, Request request, Response response, Object payload )
-        throws ResourceException
-    {
-        RepositoryResourceResponse repoRequest = (RepositoryResourceResponse) payload;
-        RepositoryResourceResponse result = null;
-
-        if ( repoRequest != null )
-        {
-            try
-            {
-                RepositoryBaseResource resource = repoRequest.getData();
-
-                CRepository normal = getNexus().readRepositoryTemplate( getRepositoryId( request ) );
-
-                if ( normal == null )
-                {
-                    throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository template with ID="
-                        + resource.getId() + " not found" );
-                }
-                else
-                {
-                    normal = getRepositoryAppModel( (RepositoryResource) resource, normal );
-
-                    getNexus().updateRepositoryTemplate( normal );
-
-                    result = new RepositoryResourceResponse();
-                    result.setData( getRepositoryRestModel( normal ) );
-                }
-            }
-            catch ( IOException e )
-            {
-                getLogger().warn( "Got IO Exception!", e );
-
-                throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-            }
-        }
+        result.setData( template );
 
         return result;
     }
 
-    @Override
-    public void delete( Context context, Request request, Response response )
-        throws ResourceException
-    {
-        try
-        {
-            CRepository model = getNexus().readRepositoryTemplate( getRepositoryId( request ) );
-
-            if ( model == null )
-            {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository template not found" );
-            }
-
-            getNexus().deleteRepositoryTemplate( getRepositoryId( request ) );
-        }
-        catch ( IOException e )
-        {
-            getLogger().warn( "Got IO Exception!", e );
-
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-        }
-    }
 }
