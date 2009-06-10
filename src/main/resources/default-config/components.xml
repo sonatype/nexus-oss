@@ -19,7 +19,8 @@
         <basedir>${nexus-base-dir}</basedir>
         <temp-dir>${project.build.directory}/appbooter.tmp/</temp-dir>
         <control-port>${nexus-control-port}</control-port>
-        <platform-file>${nexus-base-dir}/lib/plexus-platform-jsw-*.jar</platform-file>
+        <classworldsJar>${nexus-base-dir}/lib/plexus-classworlds-1.4.jar</classworldsJar>
+        <classworldsConf>${nexus-base-dir}/conf/classworlds.conf</classworldsConf>
         <class-path-elements>${nexus-base-dir}/runtime/apps/nexus/conf, ${nexus-base-dir}/runtime/apps/nexus/lib/*.jar</class-path-elements>
         <sleep-after-start>6000</sleep-after-start>
         <systemProperties>
