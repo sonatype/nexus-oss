@@ -51,6 +51,25 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>failsafe-maven-plugin</artifactId>
+        <version>2.4.3-alpha-1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
           <systemProperties>
             <property>
               <name>jettyPort</name>
@@ -130,7 +149,11 @@
 
   <profiles>
     <profile>
-      <id>local-selenium</id>
+      <activation>
+        <property>
+          <name>!use-remote-selenium</name>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>
@@ -144,14 +167,14 @@
             <executions>
               <execution>
                 <id>start-server</id>
-                <phase>process-test-classes</phase>
+                <phase>pre-integration-test</phase>
                 <goals>
                   <goal>start-server</goal>
                 </goals>
               </execution>
               <execution>
                 <id>stop-server</id>
-                <phase>package</phase>
+                <phase>post-integration-test</phase>
                 <goals>
                   <goal>stop-server</goal>
                 </goals>

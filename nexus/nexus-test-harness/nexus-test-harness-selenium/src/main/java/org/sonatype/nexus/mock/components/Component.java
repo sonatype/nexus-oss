@@ -14,6 +14,8 @@ public class Component
 
     protected String expression;
 
+    public String idFunction = ".getId()";
+
     public Component( Selenium selenium )
     {
         this.selenium = selenium;
@@ -47,7 +49,7 @@ public class Component
      */
     public String getId()
     {
-        return selenium.getEval( this.getExpression() + ".getId()" );
+        return selenium.getEval( this.getExpression() + idFunction );
     }
 
     /**
@@ -107,15 +109,11 @@ public class Component
         return selenium.getEval( fullExpr );
     }
 
-    protected void eval( String expr )
+    protected void runScript( String expr )
     {
-        try
-        {
-            getEval( expr );
-        }
-        catch ( Exception e )
-        {
-        }
+        String fullExpr = expression + expr;
+
+        selenium.runScript( fullExpr );
     }
 
     protected boolean evalTrue( String expr )

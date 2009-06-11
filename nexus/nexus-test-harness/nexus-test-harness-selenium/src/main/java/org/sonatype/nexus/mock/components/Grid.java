@@ -18,9 +18,46 @@ public class Grid
 
     public Grid select( int index )
     {
-        eval( ".getSelectionModel().selectRow(" + index + ")" );
+        runScript( ".getSelectionModel().selectRow(" + index + ")" );
 
         return this;
+    }
+
+    public Grid select( String key )
+    {
+        // Didn't worked!
+        // String eval = getEval( ".getStore().data.indexOfKey('" + key + "')" );
+
+        String[] keys = getEval( ".getStore().data.keys" ).split( "," );
+        for ( int i = 0; i < keys.length; i++ )
+        {
+            if ( key.equals( keys[i] ) )
+            {
+                select( i );
+
+                return this;
+            }
+
+        }
+
+        throw new IllegalArgumentException( "Unable to select" + key );
+
+    }
+
+    public boolean contains( String key )
+    {
+        String[] keys = getEval( ".getStore().data.keys" ).split( "," );
+        for ( int i = 0; i < keys.length; i++ )
+        {
+            if ( key.equals( keys[i] ) )
+            {
+                return true;
+            }
+
+        }
+
+        return false;
+
     }
 
     public boolean isSelected( int index )
@@ -31,7 +68,7 @@ public class Grid
     public int getStoreDataLength()
     {
         String eval = getEval( ".getStore().data.length" );
-        if ( eval == null || eval.equals( "null" ))
+        if ( eval == null || eval.equals( "null" ) )
         {
             return 0;
         }

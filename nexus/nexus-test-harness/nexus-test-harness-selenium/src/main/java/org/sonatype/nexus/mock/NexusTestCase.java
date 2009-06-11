@@ -14,6 +14,8 @@ public abstract class NexusTestCase
 {
     private static MockNexusEnvironment env;
 
+    public static String nexusBaseURL;
+
     @BeforeClass
     public synchronized static void startNexus()
         throws Exception
@@ -35,7 +37,10 @@ public abstract class NexusTestCase
                 }
             }
 
-            env = new MockNexusEnvironment( PropUtil.get( "jettyPort", 12345 ), "/nexus", webappRoot );
+            int port = PropUtil.get( "jettyPort", 12345 );
+            nexusBaseURL = "http://localhost:" + port + "/nexus";
+
+            env = new MockNexusEnvironment( port, "/nexus", webappRoot );
             env.start();
 
             Runtime.getRuntime().addShutdownHook( new Thread( new Runnable()
