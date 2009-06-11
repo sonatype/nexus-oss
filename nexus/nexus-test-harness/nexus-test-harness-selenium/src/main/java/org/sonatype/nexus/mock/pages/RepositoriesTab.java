@@ -26,6 +26,8 @@ public class RepositoriesTab
 
     private Button addHostedButton;
 
+    private Button addVirtualButton;
+
     public RepositoriesTab( Selenium selenium, MainPage mainPage )
     {
         super( selenium, REPOSITORIES_ST );
@@ -40,6 +42,8 @@ public class RepositoriesTab
         this.addButton = new Button( selenium, expression + ".toolbarAddButton" );
         this.addHostedButton = new Button( selenium, addButton.getExpression() + ".menu.items.items[0].el" );
         this.addHostedButton.idFunction = ".id";
+        this.addVirtualButton = new Button( selenium, addButton.getExpression() + ".menu.items.items[2].el" );
+        this.addVirtualButton.idFunction = ".id";
     }
 
     public RepositoriesConfigurationForm addHostedRepo()
@@ -47,6 +51,15 @@ public class RepositoriesTab
         addButton.click();
 
         addHostedButton.clickNoWait();
+
+        return new RepositoriesConfigurationForm( selenium, expression + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
+    }
+
+    public RepositoriesConfigurationForm addVirtualRepo()
+    {
+        addButton.click();
+
+        addVirtualButton.clickNoWait();
 
         return new RepositoriesConfigurationForm( selenium, expression + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
     }

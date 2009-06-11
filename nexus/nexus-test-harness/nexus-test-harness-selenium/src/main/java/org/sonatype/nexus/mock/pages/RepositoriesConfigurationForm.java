@@ -39,6 +39,8 @@ public class RepositoriesConfigurationForm
 
     private Button cancelButton;
 
+    private Combobox shadowOf;
+
     public RepositoriesConfigurationForm( Selenium selenium, String expression )
     {
         super( selenium, expression );
@@ -51,6 +53,8 @@ public class RepositoriesConfigurationForm
         repoPolicy = new Combobox( selenium, expression + ".find('name', 'repoPolicy')[0]" );
         defaultLocalStorage = new TextField( selenium, expression + ".find('name', 'defaultLocalStorageUrl')[0]" );
         overrideLocalStorage = new TextField( selenium, expression + ".find('name', 'overrideLocalStorageUrl')[0]" );
+
+        shadowOf = new Combobox( selenium, expression + ".find('name', 'shadowOf')[0]" );
 
         allowWrite = new Combobox( selenium, expression + ".find('name', 'allowWrite')[0]" );
         allowBrowsing = new Combobox( selenium, expression + ".find('name', 'browseable')[0]" );
@@ -136,6 +140,11 @@ public class RepositoriesConfigurationForm
     public TextField getNotFoundCache()
     {
         return notFoundCache;
+    }
+
+    public Combobox getShadowOf()
+    {
+        return shadowOf;
     }
 
 }

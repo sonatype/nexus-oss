@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.mock.pages.RepositoriesConfigurationForm;
 import org.sonatype.nexus.mock.pages.RepositoriesTab;
+import org.sonatype.nexus.mock.pages.RepositoriesEditTabs.RepoKind;
 
 public class RepositoryTest
     extends SeleniumTest
@@ -36,7 +37,7 @@ public class RepositoryTest
         repositories.refresh();
 
         // read
-        RepositoriesConfigurationForm config = repositories.select( repoId ).selectConfiguration();
+        RepositoriesConfigurationForm config = repositories.select( repoId ).selectConfiguration( RepoKind.HOSTED );
 
         Assert.assertEquals( repoId, config.getIdField().getValue() );
         Assert.assertEquals( name, config.getName().getValue() );
@@ -45,7 +46,7 @@ public class RepositoryTest
         repositories.refresh();
 
         // update
-        config = repositories.select( repoId ).selectConfiguration();
+        config = repositories.select( repoId ).selectConfiguration( RepoKind.HOSTED );
 
         String newName = "new selenium repo name";
         config.getName().type( newName );
@@ -53,7 +54,54 @@ public class RepositoryTest
 
         repositories.refresh();
 
-        config = repositories.select( repoId ).selectConfiguration();
+        config = repositories.select( repoId ).selectConfiguration( RepoKind.HOSTED );
+        Assert.assertEquals( newName, config.getName().getValue() );
+
+        repositories.refresh();
+
+        // delete
+        repositories.select( repoId );
+        repositories.delete().clickYes();
+        repositories.refresh();
+
+        Assert.assertFalse( repositories.contains( repoId ) );
+    }
+
+    @Test
+    public void crudVirtual()
+        throws InterruptedException
+    {
+        LoginTest.doLogin( main );
+
+        // Create
+        RepositoriesTab repositories = main.openRepositories();
+        String repoId = "selenium-virtual-repo";
+        String name = "Selenium Virtual repository";
+        RepositoriesConfigurationForm virtualRepo = repositories.addVirtualRepo().populate( repoId, name );
+        virtualRepo.getProvider().setValue( "m2-m1-shadow" );
+        virtualRepo.getShadowOf().setValue( "releases" );
+        virtualRepo.save();
+        repositories.refresh();
+
+        // read
+        RepositoriesConfigurationForm config = repositories.select( repoId ).selectConfiguration( RepoKind.VIRTUAL );
+
+        Assert.assertEquals( repoId, config.getIdField().getValue() );
+        Assert.assertEquals( name, config.getName().getValue() );
+        Assert.assertEquals( "virtual", config.getType().getValue() );
+        Assert.assertEquals( "maven1", config.getFormat().getValue() );
+        repositories.refresh();
+
+        // update
+        config = repositories.select( repoId ).selectConfiguration( RepoKind.VIRTUAL );
+
+        String newName = "new selenium virtual repo name";
+        config.getName().type( newName );
+        config.save();
+
+        repositories.refresh();
+
+        config = repositories.select( repoId ).selectConfiguration( RepoKind.VIRTUAL );
         Assert.assertEquals( newName, config.getName().getValue() );
 
         repositories.refresh();
