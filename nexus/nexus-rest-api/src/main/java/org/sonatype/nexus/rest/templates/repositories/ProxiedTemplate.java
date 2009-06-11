@@ -19,7 +19,8 @@ public class ProxiedTemplate
         RepositoryProxyResource repo = new RepositoryProxyResource();
 
         repo.setProvider( "maven2" );
-        repo.setRepoType( "maven2" );
+        repo.setRepoType( "proxy" );
+        repo.setFormat( "maven2" );
         repo.setId( ID );
         repo.setName( "Default Release Hosted Repository Template" );
         repo.setAllowWrite( true );

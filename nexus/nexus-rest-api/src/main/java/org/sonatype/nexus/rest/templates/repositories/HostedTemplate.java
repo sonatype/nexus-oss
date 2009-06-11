@@ -17,7 +17,8 @@ public class HostedTemplate
         RepositoryResource repo = new RepositoryResource();
 
         repo.setProvider( "maven2" );
-        repo.setRepoType( "maven2" );
+        repo.setRepoType( "hosted" );
+        repo.setFormat( "maven2" );
         repo.setId( ID );
         repo.setName( "Default Release Hosted Repository Template" );
         repo.setAllowWrite( true );
