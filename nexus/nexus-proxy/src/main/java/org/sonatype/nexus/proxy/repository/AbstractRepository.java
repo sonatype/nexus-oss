@@ -24,13 +24,9 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.ConfigurationRollbackEvent;
-import org.sonatype.nexus.configuration.Configurator;
-import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -62,8 +58,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.mirror.DefaultPublishedMirrors;
-import org.sonatype.nexus.proxy.mirror.PublishedMirrors;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
@@ -96,7 +90,7 @@ import org.sonatype.plexus.appevents.EventListener;
  * @author cstamas
  */
 public abstract class AbstractRepository
-    extends AbstractConfigurable
+    extends ConfigurableRepository
     implements Repository, EventListener, Initializable, Disposable
 {
     /**
@@ -105,6 +99,9 @@ public abstract class AbstractRepository
      */
     public static final String CTX_TRANSITIVE_ITEM =
         AbstractRepository.class.getCanonicalName() + ".CTX_TRANSITIVE_ITEM";
+
+    @Requirement
+    private ApplicationConfiguration applicationConfiguration;
 
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
@@ -127,8 +124,6 @@ public abstract class AbstractRepository
     @Requirement( role = ContentGenerator.class )
     private Map<String, ContentGenerator> contentGenerators;
 
-    private PublishedMirrors pMirrors;
-
     /** The local storage. */
     private LocalRepositoryStorage localStorage;
 
@@ -137,23 +132,6 @@ public abstract class AbstractRepository
 
     /** Request processors list */
     private Map<String, RequestProcessor> requestProcessors;
-
-    // Configurable iface
-
-    @Override
-    protected CRepository getCurrentConfiguration( boolean forWrite )
-    {
-        return (CRepository) super.getCurrentConfiguration( forWrite );
-    }
-
-    @Override
-    protected abstract Configurator getConfigurator();
-
-    @Override
-    protected CoreConfiguration wrapConfiguration( Object configuration )
-    {
-        return new CRepositoryCoreConfiguration( (CRepository) configuration );
-    }
 
     // --
 
@@ -196,6 +174,12 @@ public abstract class AbstractRepository
                 getCurrentCoreConfiguration().rollbackChanges();
             }
         }
+    }
+
+    @Override
+    protected ApplicationConfiguration getApplicationConfiguration()
+    {
+        return applicationConfiguration;
     }
 
     protected ApplicationEventMulticaster getApplicationEventMulticaster()
@@ -268,63 +252,7 @@ public abstract class AbstractRepository
         this.notFoundCache = notFoundcache;
     }
 
-    public String getId()
-    {
-        return getCurrentConfiguration( false ).getId();
-    }
-
-    public void setId( String id )
-    {
-        getCurrentConfiguration( true ).setId( id );
-    }
-
-    public String getName()
-    {
-        return getCurrentConfiguration( false ).getName();
-    }
-
-    public void setName( String name )
-    {
-        getCurrentConfiguration( true ).setName( name );
-    }
-
-    public String getPathPrefix()
-    {
-        // a "fallback" mechanism: id's must be unique now across nexus,
-        // but some older systems may have groups/reposes with same ID. To clear out the ID-clash, we will need to
-        // change IDs, but we must _not_ change the published URLs on those systems.
-        String pathPrefix = getCurrentConfiguration( false ).getPathPrefix();
-
-        if ( !StringUtils.isBlank( pathPrefix ) )
-        {
-            return pathPrefix;
-        }
-        else
-        {
-            return getId();
-        }
-    }
-
-    public void setPathPrefix( String prefix )
-    {
-        getCurrentConfiguration( true ).setPathPrefix( prefix );
-    }
-
-    public boolean isIndexable()
-    {
-        return getCurrentConfiguration( false ).isIndexable();
-    }
-
-    public void setIndexable( boolean indexable )
-    {
-        getCurrentConfiguration( true ).setIndexable( indexable );
-    }
-
-    public String getLocalUrl()
-    {
-        return getCurrentConfiguration( false ).getLocalStorage().getUrl();
-    }
-
+    @Override
     public void setLocalUrl( String localUrl )
         throws StorageException
     {
@@ -337,95 +265,21 @@ public abstract class AbstractRepository
 
         getLocalStorage().validateStorageUrl( trstr );
 
-        getCurrentConfiguration( true ).getLocalStorage().setUrl( trstr );
+        super.setLocalUrl( localUrl );
     }
 
-    public LocalStatus getLocalStatus()
-    {
-        return LocalStatus.valueOf( getCurrentConfiguration( false ).getLocalStatus() );
-    }
-
+    @Override
     public void setLocalStatus( LocalStatus localStatus )
     {
         if ( !localStatus.equals( getLocalStatus() ) )
         {
             LocalStatus oldLocalStatus = getLocalStatus();
 
-            getCurrentConfiguration( true ).setLocalStatus( localStatus.toString() );
+            super.setLocalStatus( localStatus );
 
             getApplicationEventMulticaster()
                 .notifyEventListeners( new RepositoryEventLocalStatusChanged( this, oldLocalStatus, localStatus ) );
         }
-    }
-
-    public boolean isAllowWrite()
-    {
-        return getCurrentConfiguration( false ).isAllowWrite();
-    }
-
-    public void setAllowWrite( boolean allowWrite )
-    {
-        getCurrentConfiguration( true ).setAllowWrite( allowWrite );
-    }
-
-    public boolean isBrowseable()
-    {
-        return getCurrentConfiguration( false ).isBrowseable();
-    }
-
-    public void setBrowseable( boolean browseable )
-    {
-        getCurrentConfiguration( true ).setBrowseable( browseable );
-    }
-
-    public boolean isUserManaged()
-    {
-        return getCurrentConfiguration( false ).isUserManaged();
-    }
-
-    public void setUserManaged( boolean userManaged )
-    {
-        getCurrentConfiguration( true ).setUserManaged( userManaged );
-    }
-
-    public boolean isExposed()
-    {
-        return getCurrentConfiguration( false ).isExposed();
-    }
-
-    public void setExposed( boolean exposed )
-    {
-        getCurrentConfiguration( true ).setExposed( exposed );
-    }
-
-    public int getNotFoundCacheTimeToLive()
-    {
-        return getCurrentConfiguration( false ).getNotFoundCacheTTL();
-    }
-
-    public void setNotFoundCacheTimeToLive( int notFoundCacheTimeToLive )
-    {
-        getCurrentConfiguration( true ).setNotFoundCacheTTL( notFoundCacheTimeToLive );
-    }
-
-    public boolean isNotFoundCacheActive()
-    {
-        return getCurrentConfiguration( false ).isNotFoundCacheActive();
-    }
-
-    public void setNotFoundCacheActive( boolean notFoundCacheActive )
-    {
-        getCurrentConfiguration( true ).setNotFoundCacheActive( notFoundCacheActive );
-    }
-
-    public PublishedMirrors getPublishedMirrors()
-    {
-        if ( pMirrors == null )
-        {
-            pMirrors = new DefaultPublishedMirrors( (CRepositoryCoreConfiguration) getCurrentCoreConfiguration() );
-        }
-
-        return pMirrors;
     }
 
     @SuppressWarnings( "unchecked" )
