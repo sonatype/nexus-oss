@@ -42,5 +42,4 @@ public class Maven2HostedRepositoryTemplate
 
         return new CRepositoryCoreConfiguration( repo );
     }
-
 }
