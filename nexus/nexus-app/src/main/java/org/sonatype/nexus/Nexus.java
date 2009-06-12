@@ -197,4 +197,40 @@ public interface Nexus
 
     CRouting readDefaultRouting();
 
+    // ----------------------------------------------------------------------------
+    // Repo templates
+    // ----------------------------------------------------------------------------
+
+    public enum RepositoryTemplate
+    {
+        DEFAULT_PROXY_RELEASE( "default_proxy_release", true, false ),
+        DEFAULT_PROXY_SNAPSHOT( "default_proxy_snapshot", true, true ),
+        DEFAULT_HOSTED_RELEASE( "default_hosted_release", false, false ),
+        DEFAULT_HOSTED_SNAPSHOT( "default_hosted_snapshot", false, true ),
+        DEFAULT_VIRTUAL( "default_virtual" );
+
+        protected String templateId;
+
+        protected boolean isRemote;
+
+        protected boolean isSnapshot;
+
+        private RepositoryTemplate( String id )
+        {
+            this.templateId = id;
+        }
+
+        private RepositoryTemplate( String templateId, boolean isRemote, boolean isSnapshot )
+        {
+            this.templateId = templateId;
+            this.isRemote = isRemote;
+            this.isSnapshot = isSnapshot;
+        }
+    }
+
+    Repository createFromTemplate( RepositoryTemplate template )
+        throws ConfigurationException;
+
+    Repository createFromTemplate( String templateId )
+        throws ConfigurationException;
 }

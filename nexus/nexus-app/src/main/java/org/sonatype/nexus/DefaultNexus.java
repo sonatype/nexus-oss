@@ -33,14 +33,18 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
@@ -68,6 +72,9 @@ import org.sonatype.nexus.proxy.http.HttpProxyService;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepositoryConfiguration;
+import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -188,6 +195,9 @@ public class DefaultNexus
     @Requirement
     private SecuritySystem securitySystem;
 
+    @Requirement
+    private ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder;
+
     // ----------------------------------------------------------------------------------------------------------
     // SystemStatus
     // ----------------------------------------------------------------------------------------------------------
@@ -255,11 +265,8 @@ public class DefaultNexus
     // ----------------------------------------------------------------------------------------------------------
 
     public StorageItem dereferenceLinkItem( StorageLinkItem item )
-        throws NoSuchResourceStoreException,
-            ItemNotFoundException,
-            AccessDeniedException,
-            IllegalOperationException,
-            StorageException
+        throws NoSuchResourceStoreException, ItemNotFoundException, AccessDeniedException, IllegalOperationException,
+        StorageException
 
     {
         return getRootRouter().dereferenceLink( item );
@@ -275,8 +282,7 @@ public class DefaultNexus
     // ----------------------------------------------------------------------------
 
     public Repository createRepository( CRepository settings )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         Repository repository = nexusConfiguration.createRepository( settings );
 
@@ -302,9 +308,7 @@ public class DefaultNexus
     }
 
     public void deleteRepository( String id )
-        throws NoSuchRepositoryException,
-            IOException,
-            ConfigurationException
+        throws NoSuchRepositoryException, IOException, ConfigurationException
     {
         Repository repository = repositoryRegistry.getRepository( id );
 
@@ -482,8 +486,7 @@ public class DefaultNexus
     }
 
     public SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
-        throws NoSuchRepositoryException,
-            IllegalArgumentException
+        throws NoSuchRepositoryException, IllegalArgumentException
     {
         return snapshotRemover.removeSnapshots( request );
     }
@@ -516,7 +519,6 @@ public class DefaultNexus
     // ----------------------------------------------------------------------------
     // Repo templates, CRUD
     // ----------------------------------------------------------------------------
-
 
     // ----------------------------------------------------------------------------
     // Default Configuration
@@ -559,22 +561,19 @@ public class DefaultNexus
         // TODO:
         response.setSize( 0 );
 
-        response.setInputStream( nexusConfiguration
-            .getConfigurationSource().getDefaultsSource().getConfigurationAsStream() );
+        response.setInputStream( nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfigurationAsStream() );
 
         return response;
     }
 
     public CRemoteConnectionSettings readDefaultGlobalRemoteConnectionSettings()
     {
-        return nexusConfiguration
-            .getConfigurationSource().getDefaultsSource().getConfiguration().getGlobalConnectionSettings();
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getGlobalConnectionSettings();
     }
 
     public CRemoteHttpProxySettings readDefaultGlobalRemoteHttpProxySettings()
     {
-        return nexusConfiguration
-            .getConfigurationSource().getDefaultsSource().getConfiguration().getGlobalHttpProxySettings();
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getGlobalHttpProxySettings();
     }
 
     public CRouting readDefaultRouting()
@@ -584,8 +583,7 @@ public class DefaultNexus
 
     public CSmtpConfiguration readDefaultSmtpConfiguration()
     {
-        return nexusConfiguration
-            .getConfigurationSource().getDefaultsSource().getConfiguration().getSmtpConfiguration();
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSmtpConfiguration();
     }
 
     // ----------------------------------------------------------------------------
@@ -628,64 +626,67 @@ public class DefaultNexus
 
     public List<NexusArtifactEvent> getRecentlyStorageChanges( Integer from, Integer count, Set<String> repositoryIds )
     {
-        TimelineFilter filter = ( repositoryIds == null || repositoryIds.isEmpty() )
-            ? null
-            : new RepositoryIdTimelineFilter( repositoryIds );
+        TimelineFilter filter =
+            ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
+                            : new RepositoryIdTimelineFilter( repositoryIds );
 
-        return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
-            NexusArtifactEvent.ACTION_CACHED,
-            NexusArtifactEvent.ACTION_DEPLOYED,
-            NexusArtifactEvent.ACTION_DELETED } ) ), from, count, filter );
+        return feedRecorder.getNexusArtifectEvents(
+                                                    new HashSet<String>( Arrays.asList( new String[] {
+                                                        NexusArtifactEvent.ACTION_CACHED,
+                                                        NexusArtifactEvent.ACTION_DEPLOYED,
+                                                        NexusArtifactEvent.ACTION_DELETED } ) ), from, count, filter );
     }
 
     public List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Integer from, Integer count,
-        Set<String> repositoryIds )
+                                                                          Set<String> repositoryIds )
     {
-        TimelineFilter filter = ( repositoryIds == null || repositoryIds.isEmpty() )
-            ? null
-            : new RepositoryIdTimelineFilter( repositoryIds );
+        TimelineFilter filter =
+            ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
+                            : new RepositoryIdTimelineFilter( repositoryIds );
 
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
-            NexusArtifactEvent.ACTION_CACHED,
-            NexusArtifactEvent.ACTION_DEPLOYED } ) ), from, count, filter );
+            NexusArtifactEvent.ACTION_CACHED, NexusArtifactEvent.ACTION_DEPLOYED } ) ), from, count, filter );
     }
 
     public List<NexusArtifactEvent> getRecentlyCachedArtifacts( Integer from, Integer count, Set<String> repositoryIds )
     {
-        TimelineFilter filter = ( repositoryIds == null || repositoryIds.isEmpty() )
-            ? null
-            : new RepositoryIdTimelineFilter( repositoryIds );
+        TimelineFilter filter =
+            ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
+                            : new RepositoryIdTimelineFilter( repositoryIds );
 
-        return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays
-            .asList( new String[] { NexusArtifactEvent.ACTION_CACHED } ) ), from, count, filter );
+        return feedRecorder.getNexusArtifectEvents(
+                                                    new HashSet<String>(
+                                                                         Arrays.asList( new String[] { NexusArtifactEvent.ACTION_CACHED } ) ),
+                                                    from, count, filter );
     }
 
     public List<NexusArtifactEvent> getRecentlyDeployedArtifacts( Integer from, Integer count, Set<String> repositoryIds )
     {
-        TimelineFilter filter = ( repositoryIds == null || repositoryIds.isEmpty() )
-            ? null
-            : new RepositoryIdTimelineFilter( repositoryIds );
+        TimelineFilter filter =
+            ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
+                            : new RepositoryIdTimelineFilter( repositoryIds );
 
-        return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays
-            .asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ), from, count, filter );
+        return feedRecorder.getNexusArtifectEvents(
+                                                    new HashSet<String>(
+                                                                         Arrays.asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ),
+                                                    from, count, filter );
     }
 
     public List<NexusArtifactEvent> getBrokenArtifacts( Integer from, Integer count, Set<String> repositoryIds )
     {
-        TimelineFilter filter = ( repositoryIds == null || repositoryIds.isEmpty() )
-            ? null
-            : new RepositoryIdTimelineFilter( repositoryIds );
+        TimelineFilter filter =
+            ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
+                            : new RepositoryIdTimelineFilter( repositoryIds );
 
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
-            NexusArtifactEvent.ACTION_BROKEN,
-            NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM } ) ), from, count, filter );
+            NexusArtifactEvent.ACTION_BROKEN, NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM } ) ), from,
+                                                    count, filter );
     }
 
     public List<SystemEvent> getRepositoryStatusChanges( Integer from, Integer count )
     {
         return feedRecorder.getSystemEvents( new HashSet<String>( Arrays.asList( new String[] {
-            FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION,
-            FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION,
+            FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION, FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION,
             FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION } ) ), from, count, null );
     }
 
@@ -710,9 +711,10 @@ public class DefaultNexus
         sysInfoLog.append( "\n" );
         sysInfoLog.append( "-------------------------------------------------\n" );
         sysInfoLog.append( "\n" );
-        sysInfoLog
-            .append( "Initializing Nexus (" ).append( applicationStatusSource.getSystemStatus().getEditionShort() )
-            .append( "), Version " ).append( applicationStatusSource.getSystemStatus().getVersion() ).append( "\n" );
+        sysInfoLog.append( "Initializing Nexus (" ).append( applicationStatusSource.getSystemStatus().getEditionShort() ).append(
+                                                                                                                                  "), Version " ).append(
+                                                                                                                                                          applicationStatusSource.getSystemStatus().getVersion() ).append(
+                                                                                                                                                                                                                           "\n" );
         sysInfoLog.append( "\n" );
         sysInfoLog.append( "-------------------------------------------------" );
 
@@ -790,7 +792,7 @@ public class DefaultNexus
             applicationStatusSource.getSystemStatus().setInstanceUpgraded( nexusConfiguration.isInstanceUpgraded() );
 
             applicationStatusSource.getSystemStatus().setConfigurationUpgraded(
-                nexusConfiguration.isConfigurationUpgraded() );
+                                                                                nexusConfiguration.isConfigurationUpgraded() );
 
             if ( applicationStatusSource.getSystemStatus().isFirstStart() )
             {
@@ -814,11 +816,12 @@ public class DefaultNexus
             applicationStatusSource.getSystemStatus().setStartedAt( new Date() );
 
             getLogger().info(
-                "Nexus Work Directory : " + nexusConfiguration.getWorkingDirectory().getAbsolutePath().toString() );
+                              "Nexus Work Directory : "
+                                  + nexusConfiguration.getWorkingDirectory().getAbsolutePath().toString() );
 
             getLogger().info(
-                "Started Nexus (version " + getSystemStatus().getVersion() + " " + getSystemStatus().getEditionShort()
-                    + ")" );
+                              "Started Nexus (version " + getSystemStatus().getVersion() + " "
+                                  + getSystemStatus().getEditionShort() + ")" );
 
             applicationEventMulticaster.notifyEventListeners( new NexusStartedEvent( this ) );
         }
@@ -870,8 +873,8 @@ public class DefaultNexus
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPED );
 
         getLogger().info(
-            "Stopped Nexus (version " + getSystemStatus().getVersion() + " " + getSystemStatus().getEditionShort()
-                + ")" );
+                          "Stopped Nexus (version " + getSystemStatus().getVersion() + " "
+                              + getSystemStatus().getEditionShort() + ")" );
     }
 
     private void synchronizeShadowsAtStartup()
@@ -890,6 +893,86 @@ public class DefaultNexus
                 nexusScheduler.submit( "Shadow Sync (" + shadow.getId() + ")", task );
             }
         }
+    }
+
+    // ----------------------------------------------------------------------------
+    // Repo templates
+    // ----------------------------------------------------------------------------
+
+    public Repository createFromTemplate( String templateId )
+        throws ConfigurationException
+    {
+        if ( templateId == null )
+        {
+            return null;
+        }
+
+        for ( RepositoryTemplate template : RepositoryTemplate.values() )
+        {
+            if ( templateId.equals( template.templateId ) )
+            {
+                return createFromTemplate( template );
+            }
+        }
+
+        return null;
+    }
+
+    public Repository createFromTemplate( RepositoryTemplate template )
+        throws ConfigurationException
+    {
+
+        CRepository repo = new DefaultCRepository();
+        repo.setId( template.name() );
+        repo.setName( template.name().replace( '_', ' ' ) + " Repository Template" );
+
+        Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
+        repo.setExternalConfiguration( ex );
+
+        if ( RepositoryTemplate.DEFAULT_VIRTUAL.equals( template ) )
+        {
+            repo.setProviderRole( ShadowRepository.class.getName() );
+            repo.setProviderHint( "m1-m2-shadow" );
+
+            M1LayoutedM2ShadowRepositoryConfiguration exConf = new M1LayoutedM2ShadowRepositoryConfiguration( ex );
+            exConf.setMasterRepositoryId( "" );
+            exConf.applyChanges();
+        }
+        else
+        {
+            repo.setProviderRole( Repository.class.getName() );
+            repo.setProviderHint( "maven2" );
+
+            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
+            exConf.setItemMaxAge( 1440 );
+            exConf.setArtifactMaxAge( -1 );
+            exConf.setMetadataMaxAge( 1440 );
+
+            if ( template.isSnapshot )
+            {
+                exConf.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
+            }
+            else
+            {
+                exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+            }
+
+            if ( template.isRemote )
+            {
+                repo.setAllowWrite( false );
+                repo.setRemoteStorage( new CRemoteStorage() );
+                repo.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
+                repo.getRemoteStorage().setProvider( "apacheHttpClient3x" );
+            }
+            else
+            {
+                repo.setAllowWrite( true );
+            }
+
+            exConf.applyChanges();
+        }
+
+        return runtimeConfigurationBuilder.createRepositoryFromModel( null, repo );
     }
 
 }

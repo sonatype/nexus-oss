@@ -24,7 +24,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
-import org.sonatype.nexus.template.RepositoryTemplateStore;
+import org.sonatype.nexus.template.RepositoryTemplateProvider;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -38,7 +38,7 @@ public class RepositoryTemplatePlexusResource
     private static final String TEMPLATE_ID_KEY = "templateId";
 
     @Requirement
-    private RepositoryTemplateStore repoTemplateStore;
+    private RepositoryTemplateProvider templateStore;
 
     @Override
     public Object getPayloadInstance()
@@ -70,7 +70,7 @@ public class RepositoryTemplatePlexusResource
         RepositoryResourceResponse result = new RepositoryResourceResponse();
 
         String templateId = getTemplateId( request );
-        RepositoryBaseResource template = repoTemplateStore.retrieveTemplate( templateId );
+        RepositoryBaseResource template = templateStore.retrieveTemplate( templateId );
 
         if ( template == null )
         {

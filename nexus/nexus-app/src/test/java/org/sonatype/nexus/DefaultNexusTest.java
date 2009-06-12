@@ -16,6 +16,8 @@ package org.sonatype.nexus;
 import java.util.Collection;
 import java.util.Map;
 
+import org.sonatype.nexus.Nexus.RepositoryTemplate;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 
@@ -48,12 +50,23 @@ public class DefaultNexusTest
         return false;
     }
 
+    public void testRepositoryTemplates()
+        throws ConfigurationException
+    {
+        assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_HOSTED_RELEASE ) );
+        assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_HOSTED_SNAPSHOT ) );
+        assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_PROXY_RELEASE ) );
+        assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_PROXY_SNAPSHOT ) );
+        // FIXME tamas here you go
+        // assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_VIRTUAL ) );
+    }
+
     public void testListRepositoryContentClasses()
         throws Exception
     {
         Map<String, ContentClass> plexusContentClasses = getContainer().lookupMap( ContentClass.class );
 
-        Collection<ContentClass> contentClasses =  repositoryTypeRegistry.getContentClasses();
+        Collection<ContentClass> contentClasses = repositoryTypeRegistry.getContentClasses();
 
         assertEquals( plexusContentClasses.size(), contentClasses.size() );
 

@@ -3,12 +3,13 @@ package org.sonatype.nexus.template;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
+import org.sonatype.nexus.rest.model.RepositoryResource;
 
 public class RepositoryTemplateStoreTest
     extends AbstractNexusTestCase
 {
 
-    private RepositoryTemplateStore templateStore;
+    private RepositoryTemplateProvider templateProvider;
 
     @Override
     protected void setUp()
@@ -18,20 +19,21 @@ public class RepositoryTemplateStoreTest
 
         lookup( Nexus.class );
 
-        templateStore = lookup( RepositoryTemplateStore.class );
+        templateProvider = lookup( RepositoryTemplateProvider.class );
     }
 
     public void testDefaultHosted()
     {
-        RepositoryBaseResource template = templateStore.retrieveTemplate( "default_hosted_release" );
+        RepositoryBaseResource template = templateProvider.retrieveTemplate( "default_hosted_release" );
         assertNotNull( template );
     }
 
     public void testRepositoryTemplate()
     {
-        RepositoryBaseResource template =
-            templateStore.retrieveTemplate( RepositoryTemplateStore.TEMPLATE_REPOSITORY_PREFIX + "central" );
-        assertNotNull( template );
+        RepositoryResource template = new RepositoryResource();
+        templateProvider.addTempate( "custom_template", template );
+        RepositoryBaseResource retrieveTemplate = templateProvider.retrieveTemplate( "custom_template" );
+        assertEquals( template, retrieveTemplate );
     }
 
 }
