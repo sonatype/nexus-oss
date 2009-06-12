@@ -1,6 +1,5 @@
 package org.sonatype.nexus.configuration;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
@@ -14,16 +13,10 @@ public abstract class AbstractConfigurable
     extends AbstractLogEnabled
     implements Configurable
 {
-    @Requirement
-    private ApplicationConfiguration applicationConfiguration;
-
     /** The configuration */
     private CoreConfiguration repositoryConfiguration;
 
-    protected ApplicationConfiguration getApplicationConfiguration()
-    {
-        return applicationConfiguration;
-    }
+    protected abstract ApplicationConfiguration getApplicationConfiguration();
 
     // Configurable iface
 
@@ -80,7 +73,7 @@ public abstract class AbstractConfigurable
     {
         if ( getConfigurator() != null )
         {
-            getConfigurator().validate( applicationConfiguration, config );
+            getConfigurator().validate( getApplicationConfiguration(), config );
         }
     }
 
@@ -92,7 +85,12 @@ public abstract class AbstractConfigurable
             doValidateConfiguration( getCurrentConfiguration( false ) );
         }
 
-        getConfigurator().applyConfiguration( this, applicationConfiguration, getCurrentCoreConfiguration() );
+        if ( getConfigurator() != null )
+        {
+            getConfigurator().applyConfiguration( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
+        }
+        
+        getCurrentCoreConfiguration().applyChanges();
     }
 
     protected abstract Configurator getConfigurator();
