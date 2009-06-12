@@ -327,9 +327,11 @@ public class AbstractNexusIntegrationTest
                 
                 File artifactSha1 = new File( artifactFile.getAbsolutePath() + ".sha1" );
                 File artifactMd5 = new File( artifactFile.getAbsolutePath() + ".md5" );
-                
+                File artifactAsc = new File( artifactFile.getAbsolutePath() + ".asc" );
+
                 File pomSha1 = new File( pom.getAbsolutePath() + ".sha1" );
                 File pomMd5 = new File( pom.getAbsolutePath() + ".md5" );
+                File pomAsc = new File( pom.getAbsolutePath() + ".asc" );
 
                 try
                 {                    
@@ -343,6 +345,12 @@ public class AbstractNexusIntegrationTest
                         DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactMd5, this
                             .getRelitiveArtifactPath( gav ) + ".md5" );
                     }
+                    if ( artifactAsc.exists() )
+                    {
+                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactAsc, this
+                            .getRelitiveArtifactPath( gav ) + ".asc" );
+                    }
+                    
                     DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile, this
                         .getRelitiveArtifactPath( gav ) );
                     
@@ -354,8 +362,14 @@ public class AbstractNexusIntegrationTest
                     if ( pomMd5.exists() )
                     {
                         DeployUtils
-                        .deployWithWagon( this.container, "http", deployUrl, pomMd5, this.getRelitivePomPath( gav ) + "md5" );
+                        .deployWithWagon( this.container, "http", deployUrl, pomMd5, this.getRelitivePomPath( gav ) + ".md5" );
                     }
+                    if ( pomAsc.exists() )
+                    {
+                        DeployUtils
+                        .deployWithWagon( this.container, "http", deployUrl, pomAsc, this.getRelitivePomPath( gav ) + ".asc" );
+                    }
+                    
                     DeployUtils
                     .deployWithWagon( this.container, "http", deployUrl, pom, this.getRelitivePomPath( gav ) );
                 }
