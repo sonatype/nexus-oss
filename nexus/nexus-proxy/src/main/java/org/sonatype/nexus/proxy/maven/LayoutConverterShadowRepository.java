@@ -40,7 +40,6 @@ import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.IncompatibleMasterRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -50,7 +49,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  */
 public abstract class LayoutConverterShadowRepository
     extends AbstractShadowRepository
-    implements MavenRepository
+    implements MavenShadowRepository
 {
     /**
      * The GAV Calculator.
@@ -79,7 +78,7 @@ public abstract class LayoutConverterShadowRepository
     /**
      * Repository kind.
      */
-    private RepositoryKind repositoryKind = new DefaultRepositoryKind( ShadowRepository.class, Arrays
+    private RepositoryKind repositoryKind = new DefaultRepositoryKind( MavenShadowRepository.class, Arrays
         .asList( new Class<?>[] { MavenRepository.class } ) );
 
     /**
