@@ -1,16 +1,33 @@
 package org.sonatype.nexus.templates.repository;
 
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.templates.Template;
+import org.sonatype.nexus.templates.AbstractTemplate;
 
-public interface RepositoryTemplate
-    extends Template<Repository>
+public abstract class RepositoryTemplate
+    extends AbstractTemplate<Repository>
 {
-    Class<?> getMainFacet();
+    private final AbstractRepositoryTemplateHolder templateHolder;
 
-    RepositoryPolicy getRepositoryPolicy();
+    public RepositoryTemplate( String id, String description, AbstractRepositoryTemplateHolder templateHolder )
+    {
+        super( id, description );
 
-    ContentClass getContentClass();
+        this.templateHolder = templateHolder;
+    }
+
+    public AbstractRepositoryTemplateHolder getTemplateHolder()
+    {
+        return templateHolder;
+    }
+
+    public ContentClass getContentClass()
+    {
+        return getTemplateHolder().getContentClass();
+    }
+
+    public Class<?> getMainFacet()
+    {
+        return getTemplateHolder().getMainFacet();
+    }
 }

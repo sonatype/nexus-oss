@@ -38,5 +38,4 @@ public abstract class AbstractTemplate<I>
     {
         return getTemplateHolder().create();
     }
-
 }
