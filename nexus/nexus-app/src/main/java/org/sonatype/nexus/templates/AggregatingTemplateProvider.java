@@ -3,8 +3,6 @@ package org.sonatype.nexus.templates;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
-
 /**
  * An aggregating provider used to aggregate multiple TemplateProvider into one.
  * 
@@ -13,7 +11,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @param <I>
  */
 public class AggregatingTemplateProvider<I>
-    implements TemplateProvider<I>
+    extends AbstractTemplateProvider<I>
 {
     private final Class<I> implementationClass;
 
@@ -42,23 +40,4 @@ public class AggregatingTemplateProvider<I>
 
         return result;
     }
-
-    public Template<I> getTemplateById( String id )
-        throws NoSuchTemplateIdException
-    {
-        // TODO: some other selection that simple iteration?
-        List<Template<I>> templates = getTemplates();
-
-        for ( Template<I> template : templates )
-        {
-            if ( StringUtils.equals( id, template.getId() ) )
-            {
-                return template;
-            }
-        }
-
-        throw new NoSuchTemplateIdException( "Template for implementationClass='" + getImplementationClass().getName()
-            + "' with Id='" + id + "' not found!" );
-    }
-
 }
