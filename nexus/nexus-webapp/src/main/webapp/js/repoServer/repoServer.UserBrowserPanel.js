@@ -256,3 +256,12 @@ Sonatype.Events.addListener( 'userViewInit', function( cardPanel, rec, gridPanel
               tabTitle: 'Role Tree'} ) );
   }
 } );
+
+Sonatype.Events.addListener( 'roleViewInit', function( cardPanel, rec, gridPanel ) {
+  if ( rec.data.resourceURI ) {
+    cardPanel.add( 
+        new Sonatype.repoServer.UserBrowsePanel( 
+            { payload: rec,
+              tabTitle: 'Role Tree'} ) );
+  }
+} );
