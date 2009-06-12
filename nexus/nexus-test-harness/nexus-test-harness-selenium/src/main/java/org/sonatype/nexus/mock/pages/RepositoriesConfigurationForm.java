@@ -41,6 +41,12 @@ public class RepositoriesConfigurationForm
 
     private Combobox shadowOf;
 
+    private TextField remoteStorageUrl;
+
+    private Combobox downloadRemoteIndexes;
+
+    private Combobox checksumPolicy;
+
     public RepositoriesConfigurationForm( Selenium selenium, String expression )
     {
         super( selenium, expression );
@@ -55,6 +61,10 @@ public class RepositoriesConfigurationForm
         overrideLocalStorage = new TextField( selenium, expression + ".find('name', 'overrideLocalStorageUrl')[0]" );
 
         shadowOf = new Combobox( selenium, expression + ".find('name', 'shadowOf')[0]" );
+
+        remoteStorageUrl = new TextField( selenium, expression + ".find('name', 'remoteStorage.remoteStorageUrl')[0]" );
+        downloadRemoteIndexes = new Combobox( selenium, expression + ".find('name', 'downloadRemoteIndexes')[0]" );
+        checksumPolicy = new Combobox( selenium, expression + ".find('name', 'checksumPolicy')[0]" );
 
         allowWrite = new Combobox( selenium, expression + ".find('name', 'allowWrite')[0]" );
         allowBrowsing = new Combobox( selenium, expression + ".find('name', 'browseable')[0]" );
@@ -145,6 +155,20 @@ public class RepositoriesConfigurationForm
     public Combobox getShadowOf()
     {
         return shadowOf;
+    }
+
+    public RepositoriesConfigurationForm populateVirtual( String repoId, String name, String provider, String shadowOf )
+    {
+        this.provider.setValue( provider );
+        this.shadowOf.setValue( shadowOf );
+        return populate( repoId, name );
+    }
+
+    public RepositoriesConfigurationForm populateProxy( String repoId, String name, String remoteStorageUrl )
+    {
+        this.remoteStorageUrl.type( remoteStorageUrl );
+        this.checksumPolicy.setValue( "IGNORE" );
+        return populate( repoId, name );
     }
 
 }

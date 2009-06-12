@@ -7,6 +7,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
@@ -70,6 +71,7 @@ public class DefaultRepositoryTemplateProvider
         proxy.setBrowseable( true );
         proxy.setIndexable( true );
         proxy.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+        proxy.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );
         proxy.setNotFoundCacheTTL( 1440 );
         proxy.setArtifactMaxAge( -1 );
         proxy.setMetadataMaxAge( 1440 );

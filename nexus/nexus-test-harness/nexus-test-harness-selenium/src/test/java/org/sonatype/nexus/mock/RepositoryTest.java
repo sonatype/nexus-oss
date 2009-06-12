@@ -77,9 +77,8 @@ public class RepositoryTest
         RepositoriesTab repositories = main.openRepositories();
         String repoId = "selenium-virtual-repo";
         String name = "Selenium Virtual repository";
-        RepositoriesConfigurationForm virtualRepo = repositories.addVirtualRepo().populate( repoId, name );
-        virtualRepo.getProvider().setValue( "m2-m1-shadow" );
-        virtualRepo.getShadowOf().setValue( "releases" );
+        RepositoriesConfigurationForm virtualRepo =
+            repositories.addVirtualRepo().populateVirtual( repoId, name, "m2-m1-shadow", "releases" );
         virtualRepo.save();
         repositories.refresh();
 
@@ -114,4 +113,48 @@ public class RepositoryTest
         Assert.assertFalse( repositories.contains( repoId ) );
     }
 
+    @Test
+    public void crudProxy()
+        throws InterruptedException
+    {
+        LoginTest.doLogin( main );
+
+        // Create
+        RepositoriesTab repositories = main.openRepositories();
+        String repoId = "selenium-proxy-repo";
+        String name = "Selenium Proxy repository";
+        repositories.addProxyRepo().populateProxy( repoId, name,
+                                                   "http://repository.sonatype.org/content/groups/public/" ).save();
+        repositories.refresh();
+
+        // read
+        RepositoriesConfigurationForm config = repositories.select( repoId ).selectConfiguration( RepoKind.PROXY );
+
+        Assert.assertEquals( repoId, config.getIdField().getValue() );
+        Assert.assertEquals( name, config.getName().getValue() );
+        Assert.assertEquals( "proxy", config.getType().getValue() );
+        Assert.assertEquals( "maven2", config.getFormat().getValue() );
+        repositories.refresh();
+
+        // update
+        config = repositories.select( repoId ).selectConfiguration( RepoKind.PROXY );
+
+        String newName = "new selenium proxy repo name";
+        config.getName().type( newName );
+        config.save();
+
+        repositories.refresh();
+
+        config = repositories.select( repoId ).selectConfiguration( RepoKind.PROXY );
+        Assert.assertEquals( newName, config.getName().getValue() );
+
+        repositories.refresh();
+
+        // delete
+        repositories.select( repoId );
+        repositories.delete().clickYes();
+        repositories.refresh();
+
+        Assert.assertFalse( repositories.contains( repoId ) );
+    }
 }

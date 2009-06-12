@@ -28,6 +28,8 @@ public class RepositoriesTab
 
     private Button addVirtualButton;
 
+    private Button addProxyButton;
+
     public RepositoriesTab( Selenium selenium, MainPage mainPage )
     {
         super( selenium, REPOSITORIES_ST );
@@ -42,6 +44,8 @@ public class RepositoriesTab
         this.addButton = new Button( selenium, expression + ".toolbarAddButton" );
         this.addHostedButton = new Button( selenium, addButton.getExpression() + ".menu.items.items[0].el" );
         this.addHostedButton.idFunction = ".id";
+        this.addProxyButton = new Button( selenium, addButton.getExpression() + ".menu.items.items[1].el" );
+        this.addProxyButton.idFunction = ".id";
         this.addVirtualButton = new Button( selenium, addButton.getExpression() + ".menu.items.items[2].el" );
         this.addVirtualButton.idFunction = ".id";
     }
@@ -54,6 +58,16 @@ public class RepositoriesTab
 
         return new RepositoriesConfigurationForm( selenium, expression + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
     }
+
+    public RepositoriesConfigurationForm addProxyRepo()
+    {
+        addButton.click();
+
+        addProxyButton.clickNoWait();
+
+        return new RepositoriesConfigurationForm( selenium, expression + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
+    }
+
 
     public RepositoriesConfigurationForm addVirtualRepo()
     {
@@ -74,6 +88,15 @@ public class RepositoriesTab
     public RepositoriesEditTabs select( String repoId )
     {
         this.repositoriesGrid.select( NexusTestCase.nexusBaseURL + "/service/local/repositories/" + repoId );
+
+        try
+        {
+            Thread.sleep( 2000 );
+        }
+        catch ( InterruptedException e )
+        {
+            //
+        }
 
         return new RepositoriesEditTabs( selenium );
     }
