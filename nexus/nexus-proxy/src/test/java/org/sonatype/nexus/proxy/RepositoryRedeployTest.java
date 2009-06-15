@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.proxy;
 
+import java.io.IOException;
+
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -34,11 +36,13 @@ public class RepositoryRedeployTest
     }
 
     protected Repository getRepository()
-        throws NoSuchResourceStoreException
+        throws NoSuchResourceStoreException, IOException
     {
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
 
         repo1.setAllowWrite( true );
+        
+        getApplicationConfiguration().saveConfiguration();
 
         return repo1;
     }

@@ -34,6 +34,8 @@ public class RouterTest
 
         repo1.setAllowWrite( true );
         
+        getApplicationConfiguration().saveConfiguration();
+        
         return repo1;
     }
 

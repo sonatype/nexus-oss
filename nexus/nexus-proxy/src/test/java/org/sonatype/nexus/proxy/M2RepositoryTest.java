@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,11 +47,13 @@ public class M2RepositoryTest
 
     @Override
     protected ResourceStore getResourceStore()
-        throws NoSuchRepositoryException
+        throws NoSuchRepositoryException, IOException
     {
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
 
         repo1.setAllowWrite( true );
+        
+        getApplicationConfiguration().saveConfiguration();
 
         return repo1;
     }

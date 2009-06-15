@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.proxy;
 
+import java.io.IOException;
+
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -48,11 +50,13 @@ public class M1RepositoryTest
 
     @Override
     protected ResourceStore getResourceStore()
-        throws NoSuchRepositoryException
+        throws NoSuchRepositoryException, IOException
     {
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1-m1" );
 
         repo1.setAllowWrite( true );
+        
+        getApplicationConfiguration().saveConfiguration();
 
         return repo1;
     }
