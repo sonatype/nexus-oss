@@ -1,9 +1,5 @@
 package org.sonatype.nexus.templates;
 
-import java.io.IOException;
-
-import org.sonatype.nexus.configuration.ConfigurationException;
-
 public abstract class AbstractTemplate<I>
     implements Template<I>
 {
@@ -26,16 +22,5 @@ public abstract class AbstractTemplate<I>
     public String getDescription()
     {
         return description;
-    }
-
-    public Class<I> getImplementationClass()
-    {
-        return getTemplateHolder().getImplementationClass();
-    }
-
-    public I create()
-        throws ConfigurationException, IOException
-    {
-        return getTemplateHolder().create();
     }
 }

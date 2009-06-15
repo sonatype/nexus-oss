@@ -19,7 +19,7 @@ public interface TemplateProvider<I>
      * 
      * @return
      */
-    Class<I> getImplementationClass();
+    Class<I> getTargetClass();
 
     /**
      * Lists the templates.

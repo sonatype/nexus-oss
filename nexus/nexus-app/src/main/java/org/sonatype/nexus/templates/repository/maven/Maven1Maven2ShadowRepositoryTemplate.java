@@ -4,48 +4,45 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
-import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
+import org.sonatype.nexus.proxy.maven.MavenShadowRepository;
+import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 
-public class Maven2HostedRepositoryTemplate
+public class Maven1Maven2ShadowRepositoryTemplate
     extends RepositoryTemplate
 {
-    public Maven2HostedRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
-                                           RepositoryPolicy repositoryPolicy )
+    public Maven1Maven2ShadowRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id,
+                                                 String description )
         throws ConfigurationException
     {
         super( provider, id, description, new DefaultCRepository(), new Maven2ContentClass(),
-               MavenHostedRepository.class );
+               MavenShadowRepository.class );
 
-        initConfiguration( repositoryPolicy );
+        initConfiguration();
     }
 
     @Override
-    public M2RepositoryConfiguration getExternalConfiguration()
+    public M2LayoutedM1ShadowRepositoryConfiguration getExternalConfiguration()
     {
-        return (M2RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration();
+        return (M2LayoutedM1ShadowRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration();
     }
 
-    protected void initConfiguration( RepositoryPolicy repositoryPolicy )
+    protected void initConfiguration()
     {
         CRepository repo = (CRepository) getCoreConfiguration().getConfiguration( true );
         repo.setId( "" );
         repo.setName( "" );
 
-        repo.setProviderRole( Repository.class.getName() );
-        repo.setProviderHint( "maven2" );
+        repo.setProviderRole( ShadowRepository.class.getName() );
+        repo.setProviderHint( "m1-m2-shadow" );
 
         Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
         repo.setExternalConfiguration( ex );
 
-        M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
-        exConf.setRepositoryPolicy( repositoryPolicy );
-        exConf.applyChanges();
+        M2LayoutedM1ShadowRepositoryConfiguration exConf = new M2LayoutedM1ShadowRepositoryConfiguration( ex );
         repo.externalConfigurationImple = exConf;
 
         repo.setAllowWrite( true );

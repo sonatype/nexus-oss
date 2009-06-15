@@ -28,21 +28,14 @@ public interface Template<I>
     String getDescription();
 
     /**
-     * Returns the template holder.
+     * The implementation that this template will create.
      * 
      * @return
      */
-    TemplateHolder<I> getTemplateHolder();
+    Class<I> getTargetClass();
 
     /**
-     * A shortcut for getTemplateHolder().getImplementationClass() call.
-     * 
-     * @return
-     */
-    Class<I> getImplementationClass();
-
-    /**
-     * A shortcut for getTemplateHolder().create() call.
+     * Instantianates this template.
      * 
      * @return
      * @throws ConfigurationException

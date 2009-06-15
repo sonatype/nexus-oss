@@ -21,7 +21,7 @@ public abstract class AbstractTemplateProvider<I>
             }
         }
 
-        throw new NoSuchTemplateIdException( "Template for implementationClass='" + getImplementationClass().getName()
+        throw new NoSuchTemplateIdException( "Template for implementationClass='" + getTargetClass().getName()
             + "' with Id='" + id + "' not found!" );
     }
 }

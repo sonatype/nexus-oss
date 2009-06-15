@@ -26,13 +26,13 @@ public class DefaultTemplateManager
     }
 
     @SuppressWarnings( "unchecked" )
-    public <I> TemplateProvider<I> getTemplateProviderForImplementations( Class<I> clazz )
+    public <I> TemplateProvider<I> getTemplateProviderForTarget( Class<I> clazz )
     {
         ArrayList<TemplateProvider<I>> selectedProviders = new ArrayList<TemplateProvider<I>>();
 
         for ( TemplateProvider<?> provider : providers )
         {
-            if ( provider.getImplementationClass().equals( clazz ) )
+            if ( provider.getTargetClass().equals( clazz ) )
             {
                 selectedProviders.add( (TemplateProvider<I>) provider );
             }
@@ -44,7 +44,7 @@ public class DefaultTemplateManager
     public <I> Template<I> getTemplate( Class<I> clazz, String id )
         throws NoSuchTemplateIdException
     {
-        return getTemplateProviderForImplementations( clazz ).getTemplateById( id );
+        return getTemplateProviderForTarget( clazz ).getTemplateById( id );
     }
 
 }

@@ -13,20 +13,20 @@ import java.util.List;
 public class AggregatingTemplateProvider<I>
     extends AbstractTemplateProvider<I>
 {
-    private final Class<I> implementationClass;
+    private final Class<I> targetClass;
 
     private final List<TemplateProvider<I>> providers;
 
-    public AggregatingTemplateProvider( Class<I> implementationClass, List<TemplateProvider<I>> providers )
+    public AggregatingTemplateProvider( Class<I> targetClass, List<TemplateProvider<I>> providers )
     {
-        this.implementationClass = implementationClass;
+        this.targetClass = targetClass;
 
         this.providers = providers;
     }
 
-    public Class<I> getImplementationClass()
+    public Class<I> getTargetClass()
     {
-        return implementationClass;
+        return targetClass;
     }
 
     public List<Template<I>> getTemplates()

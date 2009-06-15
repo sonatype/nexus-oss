@@ -7,10 +7,15 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.templates.AbstractTemplateProvider;
 import org.sonatype.nexus.templates.Template;
 import org.sonatype.nexus.templates.TemplateProvider;
+import org.sonatype.nexus.templates.repository.maven.Maven1Maven2ShadowRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven2GroupRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 
 @Component( role = TemplateProvider.class, hint = "default-repository" )
 public class DefaultRepositoryTemplateProvider
@@ -33,7 +38,12 @@ public class DefaultRepositoryTemplateProvider
 
     private List<Template<Repository>> templates;
 
-    public Class<Repository> getImplementationClass()
+    protected Nexus getNexus()
+    {
+        return nexus;
+    }
+
+    public Class<Repository> getTargetClass()
     {
         return Repository.class;
     }
@@ -43,27 +53,36 @@ public class DefaultRepositoryTemplateProvider
         if ( templates == null )
         {
             templates = new ArrayList<Template<Repository>>( 6 );
-/*
-            Maven2HostedRepositoryTemplate dhr =
-                new Maven2HostedRepositoryTemplate( nexus, DEFAULT_HOSTED_RELEASE, "Maven2 Hosted Release Repository" );
 
-            dhr.getTemplateHolder().getConfiguration().getExternalConfiguration()
-                .setRepositoryPolicy( RepositoryPolicy.RELEASE );
+            try
+            {
+                templates.add( new Maven2HostedRepositoryTemplate( this, DEFAULT_HOSTED_RELEASE,
+                                                                   "Maven2 Hosted Release Repository",
+                                                                   RepositoryPolicy.RELEASE ) );
 
-            templates.add( new Maven2HostedRepositoryTemplate( nexus, DEFAULT_HOSTED_SNAPSHOT,
-                                                               "Maven2 Hosted Snapshot Repository" ) );
-            templates.add( new Maven2HostedRepositoryTemplate( nexus, DEFAULT_PROXY_RELEASE,
-                                                               "Maven2 Proxy Release Repository" ) );
+                templates.add( new Maven2HostedRepositoryTemplate( this, DEFAULT_HOSTED_SNAPSHOT,
+                                                                   "Maven2 Hosted Snapshot Repository",
+                                                                   RepositoryPolicy.SNAPSHOT ) );
 
-            templates.add( new Maven2HostedRepositoryTemplate( nexus, DEFAULT_PROXY_SNAPSHOT,
-                                                               "Maven2 Proxy Snapshot Repository" ) );
+                templates.add( new Maven2ProxyRepositoryTemplate( this, DEFAULT_PROXY_RELEASE,
+                                                                  "Maven2 Proxy Release Repository",
+                                                                  RepositoryPolicy.RELEASE ) );
 
-            templates.add( new Maven2HostedRepositoryTemplate( nexus, DEFAULT_VIRTUAL,
-                                                               "MAven1-to-Maven2 Virtual Repository" ) );
+                templates.add( new Maven2ProxyRepositoryTemplate( this, DEFAULT_PROXY_SNAPSHOT,
+                                                                  "Maven2 Proxy Snapshot Repository",
+                                                                  RepositoryPolicy.SNAPSHOT ) );
 
-            templates.add( new Maven2GroupRepositoryTemplate( nexus, DEFAULT_GROUP, "Maven2 Group Repository" ) );
-            */
+                templates.add( new Maven1Maven2ShadowRepositoryTemplate( this, DEFAULT_VIRTUAL,
+                                                                         "MAven1-to-Maven2 Virtual Repository" ) );
+
+                templates.add( new Maven2GroupRepositoryTemplate( this, DEFAULT_GROUP, "Maven2 Group Repository" ) );
+            }
+            catch ( Exception e )
+            {
+                // will not happen
+            }
         }
+
         return Collections.unmodifiableList( templates );
     }
 }

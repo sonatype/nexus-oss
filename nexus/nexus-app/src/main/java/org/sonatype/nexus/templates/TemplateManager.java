@@ -23,7 +23,7 @@ public interface TemplateManager
      * @param clazz
      * @return
      */
-    <I> TemplateProvider<I> getTemplateProviderForImplementations( Class<I> clazz );
+    <I> TemplateProvider<I> getTemplateProviderForTarget( Class<I> clazz );
 
     /**
      * Get one specific template that is ablt to create instance of supplied class with given id.
