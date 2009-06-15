@@ -5,6 +5,8 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 public class DefaultCRepository
     extends CRepository
 {
+    public static final String EXTERNAL_CONFIGURATION_NODE_NAME = "externalConfiguration";
+
     public DefaultCRepository()
     {
         // id
