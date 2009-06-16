@@ -57,7 +57,7 @@ public class DefaultHttpProxyService
     @Configuration( value = "10" )
     private int poolSize;
 
-    private int port;
+    private int port = -1;
 
     private ServerSocket serverSocket;
 
@@ -79,18 +79,31 @@ public class DefaultHttpProxyService
     {
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {
-            httpProxyPolicy = HttpProxyPolicy.fromModel( applicationConfiguration
-                .getConfiguration().getHttpProxy().getProxyPolicy() );
-
-            if ( port != applicationConfiguration.getConfiguration().getHttpProxy().getPort() )
+            if ( applicationConfiguration.getConfiguration().getHttpProxy().isEnabled() )
             {
-                port = applicationConfiguration.getConfiguration().getHttpProxy().getPort();
+                httpProxyPolicy =
+                    HttpProxyPolicy.fromModel( applicationConfiguration.getConfiguration().getHttpProxy()
+                        .getProxyPolicy() );
+
+                if ( port != applicationConfiguration.getConfiguration().getHttpProxy().getPort() )
+                {
+                    port = applicationConfiguration.getConfiguration().getHttpProxy().getPort();
+
+                    if ( running )
+                    {
+                        stop();
+
+                        start();
+                    }
+                }
+            }
+            else
+            {
+                port = -1;
 
                 if ( running )
                 {
                     stop();
-
-                    start();
                 }
             }
         }
@@ -98,7 +111,7 @@ public class DefaultHttpProxyService
 
     public void start()
     {
-        if ( running )
+        if ( running || port == -1 )
         {
             return;
         }
