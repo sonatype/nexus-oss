@@ -92,7 +92,7 @@ public class EnvironmentMojo
      * @required
      */
     private File destination;
-    
+
     /**
      * Artifact file containing nexus bundle
      *
@@ -194,10 +194,10 @@ public class EnvironmentMojo
         File nexusBaseDir = new File( destination, bundle.getArtifactId() + "-" + bundle.getBaseVersion() );
         project.getProperties().put( "nexus-base-dir", getPath( nexusBaseDir ) );
         project.getProperties().put( "nexus-work-dir", getPath( new File( destination, "nexus-work-dir" ) ) );
-        
+
         // conf dir
         project.getProperties().put( "application-conf", getPath( new File( destination, "nexus-work-dir/conf" ) ) );
-        
+
 
         copyUrl( "/default-config/plexus.properties", new File( nexusBaseDir, "conf/plexus.properties" ) );
         project.getProperties().put( "nexus-plexus-config-file", getPath( new File( nexusBaseDir, "conf/plexus.xml" ) ) );
@@ -230,7 +230,7 @@ public class EnvironmentMojo
             {
                 copyDirectory( fakeRepository, fakeRepoDest );
             }
-            
+
             try
             {
                 deleteHiddenFolders( fakeRepoDest, true );
@@ -283,15 +283,15 @@ public class EnvironmentMojo
             copyAndInterpolate( componentsXml.getParentFile(), destinationComponents.getParentFile() );
         }
     }
-    
-    private void deleteHiddenFolders( File directory, boolean recursive ) 
+
+    private void deleteHiddenFolders( File directory, boolean recursive )
         throws IOException
     {
-        if ( directory != null 
+        if ( directory != null
             && directory.isDirectory()
             && directory.exists() )
         {
-            File[] files = directory.listFiles( 
+            File[] files = directory.listFiles(
                 new FileFilter() {
                     public boolean accept( File pathname )
                     {
@@ -299,12 +299,12 @@ public class EnvironmentMojo
                         {
                             return true;
                         }
-                        
+
                         return false;
                     }
                 }
             );
-            
+
             for ( File file : files )
             {
                 if ( file.getName().startsWith( "." ) )
@@ -358,6 +358,7 @@ public class EnvironmentMojo
         portsList.add( new Port( "proxy-repo-port" ) );
         portsList.add( new Port( "proxy-repo-control-port" ) );
         portsList.add( new Port( "nexus-application-port" ) );
+        portsList.add( new Port( "nexus-proxy-port" ) );
         portsList.add( new Port( "nexus-control-port" ) );
         portsList.add( new Port( "email-server-port" ) );
         portsList.add( new Port( "webproxy-server-port" ) );
@@ -536,13 +537,13 @@ public class EnvironmentMojo
         throws MojoExecutionException, MojoFailureException
     {
         Artifact artifact = getMavenArtifact( mavenArtifact );
-        
+
         if( !this.markerExist(  "maven" ))
         {
             unpack( artifact.getFile(), mavenLocation, artifact.getType() );
             this.createMarkerFile( "maven" );
         }
-        
+
         return artifact;
     }
 
@@ -725,13 +726,13 @@ public class EnvironmentMojo
     {
         plexus = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
-    
+
     private boolean markerExist( String markerName )
     {
         File marker = new File( project.getBuild().getDirectory(), markerName +".marker");
         return marker.exists();
     }
-    
+
     private void createMarkerFile( String markerName )
     {
         File marker = new File( project.getBuild().getDirectory(), markerName +".marker");
