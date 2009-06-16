@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ServerSocket;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -27,7 +28,7 @@ import org.codehaus.plexus.util.IOUtil;
 
 /**
  * Abstract test case for nexus tests. It is customizing the context and helps with nexus configurations.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractNexusTestCase
@@ -36,7 +37,7 @@ public abstract class AbstractNexusTestCase
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
 
     public static final String APPS_CONFIGURATION_KEY = "apps";
-    
+
     public static final String APPLICAION_CONFIG_DIR_KEY = "application-conf";
 
     public static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
@@ -45,11 +46,37 @@ public abstract class AbstractNexusTestCase
 
     public static final File CONF_HOME = new File( WORK_HOME, "conf" );
 
+    @Override
     protected void customizeContext( Context ctx )
     {
         ctx.put( WORK_CONFIGURATION_KEY, WORK_HOME.getAbsolutePath() );
         ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
         ctx.put( APPLICAION_CONFIG_DIR_KEY, CONF_HOME.getAbsolutePath() );
+        ctx.put( "proxy.server.port", String.valueOf( allocatePort() ) );
+    }
+
+    private int allocatePort()
+    {
+        ServerSocket ss;
+        try
+        {
+            ss = new ServerSocket( 0 );
+        }
+        catch ( IOException e )
+        {
+            return 0;
+        }
+        int port = ss.getLocalPort();
+        try
+        {
+            ss.close();
+        }
+        catch ( IOException e )
+        {
+            // does it matter?
+            fail( "Error allocating port " + e.getMessage() );
+        }
+        return port;
     }
 
     protected String getNexusConfiguration()
@@ -86,7 +113,8 @@ public abstract class AbstractNexusTestCase
         return getContainer().lookup( LoggerManager.class );
     }
 
-    protected boolean contentEquals( File f1, File f2 ) throws IOException
+    protected boolean contentEquals( File f1, File f2 )
+        throws IOException
     {
         return contentEquals( new FileInputStream( f1 ), new FileInputStream( f2 ) );
     }
@@ -94,7 +122,8 @@ public abstract class AbstractNexusTestCase
     /**
      * Both s1 and s2 will be closed.
      */
-    protected boolean contentEquals( InputStream s1, InputStream s2 ) throws IOException
+    protected boolean contentEquals( InputStream s1, InputStream s2 )
+        throws IOException
     {
         try
         {

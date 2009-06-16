@@ -10,7 +10,7 @@
 					${basedir}/target/apache-ds/
 				</workingDirectory>
 				<doDelete>true</doDelete>
-				<port>12345</port>
+				<port>${proxy.server.port}</port>
 				<partitions>
 					<partition>
 						<name>sonatype</name>
