@@ -51,7 +51,14 @@ public abstract class AbstractConfigurable
     {
         validateConfiguration( config );
 
-        this.repositoryConfiguration = wrapConfiguration( config );
+        if ( config instanceof CoreConfiguration )
+        {
+            this.repositoryConfiguration = (CoreConfiguration) config;
+        }
+        else
+        {
+            this.repositoryConfiguration = wrapConfiguration( config );
+        }
 
         doConfigure( false );
     }
@@ -89,7 +96,7 @@ public abstract class AbstractConfigurable
         {
             getConfigurator().applyConfiguration( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
         }
-        
+
         getCurrentCoreConfiguration().applyChanges();
     }
 

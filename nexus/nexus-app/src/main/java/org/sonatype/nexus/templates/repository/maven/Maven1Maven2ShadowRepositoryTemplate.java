@@ -45,7 +45,7 @@ public class Maven1Maven2ShadowRepositoryTemplate
         M2LayoutedM1ShadowRepositoryConfiguration exConf = new M2LayoutedM1ShadowRepositoryConfiguration( ex );
         repo.externalConfigurationImple = exConf;
 
-        repo.setAllowWrite( true );
+        repo.setAllowWrite( false );
 
         getCoreConfiguration().applyChanges();
     }

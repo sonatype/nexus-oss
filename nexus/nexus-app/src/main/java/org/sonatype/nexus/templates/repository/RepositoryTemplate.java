@@ -49,7 +49,7 @@ public class RepositoryTemplate
 
         this.configurableRepository = new ConfigurableRepository();
 
-        this.configurableRepository.configure( (CRepository) getCoreConfiguration().getConfiguration( false ) );
+        this.configurableRepository.configure( getCoreConfiguration() );
     }
 
     public ContentClass getContentClass()

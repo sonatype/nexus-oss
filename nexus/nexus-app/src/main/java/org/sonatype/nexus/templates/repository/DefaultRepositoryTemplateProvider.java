@@ -73,13 +73,14 @@ public class DefaultRepositoryTemplateProvider
                                                                   RepositoryPolicy.SNAPSHOT ) );
 
                 templates.add( new Maven1Maven2ShadowRepositoryTemplate( this, DEFAULT_VIRTUAL,
-                                                                         "MAven1-to-Maven2 Virtual Repository" ) );
+                                                                         "Maven1-to-Maven2 Virtual Repository" ) );
 
                 templates.add( new Maven2GroupRepositoryTemplate( this, DEFAULT_GROUP, "Maven2 Group Repository" ) );
             }
             catch ( Exception e )
             {
                 // will not happen
+                e.printStackTrace();
             }
         }
 

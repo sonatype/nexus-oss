@@ -14,12 +14,17 @@
 package org.sonatype.nexus;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
-import org.sonatype.nexus.Nexus.RepositoryTemplate;
-import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.templates.Template;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 
 public class DefaultNexusTest
     extends AbstractNexusTestCase
@@ -27,6 +32,8 @@ public class DefaultNexusTest
     private DefaultNexus defaultNexus;
 
     private RepositoryTypeRegistry repositoryTypeRegistry;
+
+    private RepositoryRegistry repositoryRegistry;
 
     public DefaultNexus getDefaultNexus()
     {
@@ -42,6 +49,8 @@ public class DefaultNexusTest
         defaultNexus = (DefaultNexus) lookup( Nexus.class );
 
         repositoryTypeRegistry = lookup( RepositoryTypeRegistry.class );
+
+        repositoryRegistry = lookup( RepositoryRegistry.class );
     }
 
     @Override
@@ -51,12 +60,43 @@ public class DefaultNexusTest
     }
 
     public void testRepositoryTemplates()
-        throws ConfigurationException
+        throws Exception
     {
-        assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_HOSTED_RELEASE ) );
-        assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_HOSTED_SNAPSHOT ) );
-        assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_PROXY_RELEASE ) );
-        assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_PROXY_SNAPSHOT ) );
+        List<Template<Repository>> repoTemplates = getDefaultNexus().getRepositoryTemplates();
+
+        assertNotNull( "template list is null", repoTemplates );
+        assertEquals( "there should be 6 templates", 6, repoTemplates.size() );
+
+        Template<Repository> template =
+            (RepositoryTemplate) getDefaultNexus().getRepositoryTemplateById( "default_hosted_release" );
+
+        assertNotNull( "template should exist", template );
+        assertTrue( "it should be RepositoryTemplate", template instanceof RepositoryTemplate );
+
+        // just adjust some params on template
+        {
+            // FIXME: how to handle this gracefully and in general way?
+            RepositoryTemplate repoTemplate = (RepositoryTemplate) template;
+
+            repoTemplate.getConfigurableRepository().setId( "created-from-template" );
+            repoTemplate.getConfigurableRepository().setName( "Repository created from template" );
+        }
+
+        Repository repository = template.create();
+
+        // this call will throw NoSuchRepositoryException if repo is not registered with registry
+        assertTrue( "it should be registered with registry",
+                    repositoryRegistry.getRepository( "created-from-template" ) != null );
+
+        assertTrue( "it should be plain hosted release", repository.getRepositoryKind()
+            .isFacetAvailable( HostedRepository.class ) );
+        assertFalse( "it should be plain hosted release", repository.getRepositoryKind()
+            .isFacetAvailable( ProxyRepository.class ) );
+
+        // assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_HOSTED_RELEASE ) );
+        // assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_HOSTED_SNAPSHOT ) );
+        // assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_PROXY_RELEASE ) );
+        // assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_PROXY_SNAPSHOT ) );
         // FIXME tamas here you go
         // assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_VIRTUAL ) );
     }

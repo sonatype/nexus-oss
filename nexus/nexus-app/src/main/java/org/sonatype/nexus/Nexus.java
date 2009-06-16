@@ -44,10 +44,12 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.templates.NoSuchTemplateIdException;
+import org.sonatype.nexus.templates.Template;
 
 /**
  * The main Nexus application interface.
- *
+ * 
  * @author Jason van Zyl
  * @author cstamas
  */
@@ -121,7 +123,7 @@ public interface Nexus
 
     /**
      * Get the content of configuration file based on the key
-     *
+     * 
      * @param key index in configuration file name list
      * @return
      * @throws IOException
@@ -201,36 +203,8 @@ public interface Nexus
     // Repo templates
     // ----------------------------------------------------------------------------
 
-    public enum RepositoryTemplate
-    {
-        DEFAULT_PROXY_RELEASE( "default_proxy_release", true, false ),
-        DEFAULT_PROXY_SNAPSHOT( "default_proxy_snapshot", true, true ),
-        DEFAULT_HOSTED_RELEASE( "default_hosted_release", false, false ),
-        DEFAULT_HOSTED_SNAPSHOT( "default_hosted_snapshot", false, true ),
-        DEFAULT_VIRTUAL( "default_virtual" );
+    List<Template<Repository>> getRepositoryTemplates();
 
-        protected String templateId;
-
-        protected boolean isRemote;
-
-        protected boolean isSnapshot;
-
-        private RepositoryTemplate( String id )
-        {
-            this.templateId = id;
-        }
-
-        private RepositoryTemplate( String templateId, boolean isRemote, boolean isSnapshot )
-        {
-            this.templateId = templateId;
-            this.isRemote = isRemote;
-            this.isSnapshot = isSnapshot;
-        }
-    }
-
-    Repository createFromTemplate( RepositoryTemplate template )
-        throws ConfigurationException;
-
-    Repository createFromTemplate( String templateId )
-        throws ConfigurationException;
+    Template<Repository> getRepositoryTemplateById( String id )
+        throws NoSuchTemplateIdException;;
 }
