@@ -39,4 +39,9 @@ public class AdministrationPanel
     {
         return isLinkAvailable( "Log" );
     }
+
+    public void serverClick()
+    {
+        clickLink( "Server" );
+    }
 }

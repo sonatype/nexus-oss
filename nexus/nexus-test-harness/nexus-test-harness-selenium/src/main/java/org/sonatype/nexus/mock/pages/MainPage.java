@@ -62,5 +62,11 @@ public class MainPage
         return new RepositoriesTab( selenium, this );
     }
 
+    public ServerTab openServer()
+    {
+        adminPanel().serverClick();
+
+        return new ServerTab( selenium );
+    }
 
 }
