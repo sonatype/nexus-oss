@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,8 @@ import org.sonatype.nexus.index.context.IndexCreator;
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
+    protected static final String PROXY_SERVER_PORT = "proxy.server.port";
+
     public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
 
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
@@ -52,7 +55,9 @@ public abstract class AbstractNexusTestCase
     protected NexusConfiguration nexusConfiguration;
 
     public List<IndexCreator> DEFAULT_CREATORS;
+
     public List<IndexCreator> FULL_CREATORS;
+
     public List<IndexCreator> MIN_CREATORS;
 
     @Override
@@ -67,6 +72,32 @@ public abstract class AbstractNexusTestCase
         ctx.put( SECURITY_CONFIG_KEY, CONF_HOME.getAbsolutePath() + "/security.xml" );
 
         ctx.put( APPLICATION_CONF_KEY, CONF_HOME.getAbsolutePath() );
+
+        ctx.put( PROXY_SERVER_PORT, String.valueOf( allocatePort() ) );
+    }
+
+    private int allocatePort()
+    {
+        ServerSocket ss;
+        try
+        {
+            ss = new ServerSocket( 0 );
+        }
+        catch ( IOException e )
+        {
+            return 0;
+        }
+        int port = ss.getLocalPort();
+        try
+        {
+            ss.close();
+        }
+        catch ( IOException e )
+        {
+            // does it matter?
+            fail( "Error allocating port " + e.getMessage() );
+        }
+        return port;
     }
 
     protected String getNexusConfiguration()
@@ -91,7 +122,8 @@ public abstract class AbstractNexusTestCase
         this.copyResource( "/META-INF/security/security.xml", getNexusSecurityConfiguration() );
     }
 
-    protected void copyResource(String resource, String dest ) throws IOException
+    protected void copyResource( String resource, String dest )
+        throws IOException
     {
         InputStream stream = null;
         try
@@ -139,7 +171,7 @@ public abstract class AbstractNexusTestCase
         if ( loadConfigurationAtSetUp() )
         {
             System.out.println( "== Shutting down SECURITY!" );
-            
+
             nexusConfiguration = this.lookup( NexusConfiguration.class );
 
             nexusConfiguration.loadConfiguration( false );
@@ -162,12 +194,14 @@ public abstract class AbstractNexusTestCase
         FileUtils.deleteDirectory( PLEXUS_HOME );
     }
 
-    protected LoggerManager getLoggerManager() throws ComponentLookupException
+    protected LoggerManager getLoggerManager()
+        throws ComponentLookupException
     {
         return getContainer().lookup( LoggerManager.class );
     }
 
-    protected boolean contentEquals( File f1, File f2 ) throws IOException
+    protected boolean contentEquals( File f1, File f2 )
+        throws IOException
     {
         return contentEquals( new FileInputStream( f1 ), new FileInputStream( f2 ) );
     }
@@ -175,7 +209,8 @@ public abstract class AbstractNexusTestCase
     /**
      * Both s1 and s2 will be closed.
      */
-    protected boolean contentEquals( InputStream s1, InputStream s2 ) throws IOException
+    protected boolean contentEquals( InputStream s1, InputStream s2 )
+        throws IOException
     {
         try
         {

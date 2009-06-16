@@ -126,7 +126,8 @@ public abstract class AbstractMavenRepoContentTests
         apacheSnapshots.expireCaches( root );
 
         // make apache-snapshots point to local fake repo
-        ( (MavenProxyRepository) apacheSnapshots ).setRemoteUrl( "http://localhost:12345/apache-snapshots/" );
+        ( (MavenProxyRepository) apacheSnapshots ).setRemoteUrl( "http://localhost:" +
+                super.getContainer().getContext().get( PROXY_SERVER_PORT )+"/apache-snapshots/" );
         ( (MavenProxyRepository) apacheSnapshots ).setDownloadRemoteIndexes( false );
         nexusConfiguration.saveConfiguration();
     }

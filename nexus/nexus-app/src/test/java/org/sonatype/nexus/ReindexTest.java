@@ -36,7 +36,7 @@ public class ReindexTest
     extends AbstractMavenRepoContentTests
 {
     public static final long A_DAY_MILLIS = 24 * 60 * 60 * 1000;
-    
+
     private IndexerManager indexerManager;
 
     private ServletServer servletServer;
@@ -45,13 +45,14 @@ public class ReindexTest
 
     private IndexPacker indexPacker;
 
+    @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
         indexerManager = lookup( IndexerManager.class );
-        
+
         nexusIndexer = lookup( NexusIndexer.class );
 
         indexPacker = lookup( IndexPacker.class );
@@ -61,6 +62,7 @@ public class ReindexTest
         servletServer.start();
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
@@ -149,7 +151,7 @@ public class ReindexTest
 
     /**
      * Will reindex, shift if needed and publish indexes for a "remote" repository (published over jetty component).
-     * 
+     *
      * @param repositoryRoot
      * @param repositoryId
      * @param deleteIndexFiles
@@ -228,7 +230,8 @@ public class ReindexTest
 
         reindexRemoteRepositoryAndPublish( getRemoteRepositoryRoot( "central" ), "central", true, 0 );
 
-        makeCentralPointTo( "http://localhost:12345/central/" );
+        makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
+            + "/central/" );
 
         indexerManager.reindexRepository( null, "central", true );
 
@@ -242,7 +245,8 @@ public class ReindexTest
 
         reindexRemoteRepositoryAndPublish( getRemoteRepositoryRoot( "central" ), "central", true, 0 );
 
-        makeCentralPointTo( "http://localhost:12345/central/" );
+        makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
+            + "/central/" );
 
         // central is member of public group
         indexerManager.reindexRepositoryGroup( null, "public", true );
@@ -256,7 +260,8 @@ public class ReindexTest
         // day 1
         reindexRemoteRepositoryAndPublish( getRemoteRepositoryRoot( "central-inc1" ), "central", false, 0 );
 
-        makeCentralPointTo( "http://localhost:12345/central-inc1/" );
+        makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
+            + "/central-inc1/" );
 
         indexerManager.reindexRepository( null, "central", true );
 
@@ -272,7 +277,8 @@ public class ReindexTest
         reindexRemoteRepositoryAndPublish( getRemoteRepositoryRoot( "central-inc2" ), "central", false, -1 );
         shiftContextInTime( indexerManager.getRepositoryRemoteIndexContext( "central" ), -1 );
 
-        makeCentralPointTo( "http://localhost:12345/central-inc2/" );
+        makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
+            + "/central-inc2/" );
 
         indexerManager.reindexRepository( null, "central", true );
 
@@ -288,7 +294,8 @@ public class ReindexTest
         reindexRemoteRepositoryAndPublish( getRemoteRepositoryRoot( "central-inc3" ), "central", false, -1 );
         shiftContextInTime( indexerManager.getRepositoryRemoteIndexContext( "central" ), -1 );
 
-        makeCentralPointTo( "http://localhost:12345/central-inc3/" );
+        makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
+            + "/central-inc3/" );
 
         indexerManager.reindexRepository( null, "central", true );
 
@@ -305,7 +312,8 @@ public class ReindexTest
         throws Exception
     {
         // day 1
-        makeCentralPointTo( "http://localhost:12345/central-inc1-v1/" );
+        makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
+            + "/central-inc1-v1/" );
 
         indexerManager.reindexRepository( null, "central", true );
 
@@ -318,7 +326,8 @@ public class ReindexTest
         validateIndexWithIdentify( false, "f0a0d2e29ed910808c33135a3a5a51bba6358f7b", "log4j", "log4j", "1.2.15" );
 
         // day 2
-        makeCentralPointTo( "http://localhost:12345/central-inc2-v1/" );
+        makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
+            + "/central-inc2-v1/" );
 
         indexerManager.reindexRepository( null, "central", true );
 
@@ -331,7 +340,8 @@ public class ReindexTest
         validateIndexWithIdentify( false, "f0a0d2e29ed910808c33135a3a5a51bba6358f7b", "log4j", "log4j", "1.2.15" );
 
         // day 3
-        makeCentralPointTo( "http://localhost:12345/central-inc3-v1/" );
+        makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
+            + "/central-inc3-v1/" );
 
         indexerManager.reindexRepository( null, "central", true );
 

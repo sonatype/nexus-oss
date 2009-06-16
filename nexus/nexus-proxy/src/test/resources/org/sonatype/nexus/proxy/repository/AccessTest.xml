@@ -27,7 +27,7 @@
 				org.sonatype.jettytestsuite.ServletServer
 			</implementation>
 			<configuration>
-				<port>12345</port>
+				<port>${proxy.server.port}</port>
 				<webappContexts>
 					<webappContext>
 						<name>repo1</name>
