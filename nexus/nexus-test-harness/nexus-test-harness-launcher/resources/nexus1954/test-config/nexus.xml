@@ -27,7 +27,7 @@
    <restApi>
     <baseUrl>http://localhost:${nexus-application-port}/nexus</baseUrl>
   </restApi>
-  <httpProxy />
+  <httpProxy><port>${nexus-proxy-port}</port><proxyPolicy>strict</proxyPolicy></httpProxy>
   <routing>
     <groups />
   </routing>
