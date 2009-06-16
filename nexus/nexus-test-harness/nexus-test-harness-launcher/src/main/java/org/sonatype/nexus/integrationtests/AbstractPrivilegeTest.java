@@ -20,6 +20,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.After;
 import org.junit.Before;
@@ -43,6 +44,7 @@ import com.thoughtworks.xstream.XStream;
 public abstract class AbstractPrivilegeTest
     extends AbstractNexusIntegrationTest
 {
+    protected static Logger LOG = Logger.getLogger( AbstractPrivilegeTest.class );
 
     protected static final String TEST_USER_NAME = "test-user";
 
@@ -148,11 +150,11 @@ public abstract class AbstractPrivilegeTest
             }
         }
 
-        System.out.println( "User: " + userId );
+        LOG.info( "User: " + userId );
         for ( Iterator iter = privs.iterator(); iter.hasNext(); )
         {
             String privName = (String) iter.next();
-            System.out.println( "\t" + privName );
+            LOG.info( "\t" + privName );
         }
     }
 

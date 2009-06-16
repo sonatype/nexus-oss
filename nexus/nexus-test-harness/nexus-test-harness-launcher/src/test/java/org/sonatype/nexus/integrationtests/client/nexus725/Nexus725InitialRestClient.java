@@ -19,6 +19,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.client.NexusConnectionException;
@@ -38,6 +39,8 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 public class Nexus725InitialRestClient
     extends AbstractPrivilegeTest
 {
+    
+    protected static Logger logger = Logger.getLogger( Nexus725InitialRestClient.class );
 
     private NexusClient getConnectedNexusClient()
         throws Exception
@@ -175,7 +178,7 @@ public class Nexus725InitialRestClient
         NexusClient client = this.getConnectedNexusClient();
 
         NexusArtifact artifact = client.searchBySHA1( sha1 );
-        System.out.println( "artifact: " + artifact );
+        logger.info( "artifact: " + artifact );
 
         // don't assert anything yet, because this is some junky artfact I uploaded manually...
 

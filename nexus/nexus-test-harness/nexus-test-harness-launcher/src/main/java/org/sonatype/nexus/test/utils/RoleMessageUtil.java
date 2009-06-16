@@ -243,7 +243,7 @@ public class RoleMessageUtil
         Assert.assertTrue( "Status: " + response.getStatus() + "\nResponse:\n" + responseString,
                            response.getStatus().isSuccess() );
 
-        System.out.println( "response: " + responseString );
+        LOG.debug( "response: " + responseString );
 
         PlexusRoleListResourceResponse result =
             (PlexusRoleListResourceResponse) this.parseResponseText( responseString,

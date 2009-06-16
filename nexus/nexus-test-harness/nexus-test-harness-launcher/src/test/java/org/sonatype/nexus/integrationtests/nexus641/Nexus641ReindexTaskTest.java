@@ -20,6 +20,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -36,6 +37,7 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public class Nexus641ReindexTaskTest
     extends AbstractNexusIntegrationTest
 {
+    protected static Logger logger = Logger.getLogger( Nexus641ReindexTaskTest.class );
 
     private SearchMessageUtil messageUtil = new SearchMessageUtil();
 
@@ -54,7 +56,7 @@ public class Nexus641ReindexTaskTest
     {
 
         this.repositoryPath = new File( nexusWorkDir, "storage/"+ this.getTestRepositoryId() );
-        System.out.println( "path: "+ repositoryPath );
+        logger.info( "path: "+ repositoryPath );
         File oldSnapshot = getTestFile( "repo" );
 
         // Copy artifact to avoid indexing

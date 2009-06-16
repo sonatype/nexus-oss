@@ -168,8 +168,6 @@ public class AbstractNexusIntegrationTest
             log.debug( "oncePerClassSetUp is init: " + NEEDS_INIT );
             if ( NEEDS_INIT )
             {
-                System.out.println( "Running Test: " + this.getClass().getSimpleName() );
-
                 // tell the console what we are doing, now that there is no output its
                 log.info( "Running Test: " + this.getClass().getSimpleName() );
 
@@ -859,7 +857,7 @@ public class AbstractNexusIntegrationTest
         }
         error.append( "\n**********************************************************************************" );
 
-        System.out.println( error.toString() );
+        log.info( error.toString() );
 
         return true;
     }

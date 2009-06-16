@@ -70,6 +70,7 @@ public class Nexus639PurgeTaskTest
 
 //        for ( SyndEntry syndEntry : entries )
 //        {
+        // ! should use logger
 //            System.out.println( "entry: "+ syndEntry.getTitle() );
 //        }
 //

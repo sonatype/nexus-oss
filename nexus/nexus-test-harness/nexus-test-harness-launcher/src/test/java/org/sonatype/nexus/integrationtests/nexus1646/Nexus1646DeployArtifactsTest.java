@@ -3,6 +3,7 @@ package org.sonatype.nexus.integrationtests.nexus1646;
 import java.io.File;
 import java.io.FileInputStream;
 
+import org.apache.log4j.Logger;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.codehaus.plexus.util.IOUtil;
@@ -19,6 +20,7 @@ import com.thoughtworks.xstream.XStream;
 public class Nexus1646DeployArtifactsTest
     extends AbstractNexusIntegrationTest
 {
+    protected static Logger logger = Logger.getLogger( Nexus1646DeployArtifactsTest.class );
 
     @Test
     public void deployPlainArtifact()
@@ -94,7 +96,7 @@ public class Nexus1646DeployArtifactsTest
         Metadata md = MetadataBuilder.read( input );
         IOUtil.close( input );
 
-        System.out.println( new XStream().toXML( md ) );
+        logger.info( new XStream().toXML( md ) );
 
         Assert.assertEquals( "2.0-beta-1", md.getVersioning().getLatest() );
         Assert.assertEquals( "2.0-beta-1", md.getVersioning().getRelease() );

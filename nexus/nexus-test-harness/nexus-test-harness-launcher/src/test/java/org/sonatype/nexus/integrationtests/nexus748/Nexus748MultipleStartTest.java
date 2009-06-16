@@ -19,6 +19,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -30,6 +31,8 @@ import org.sonatype.nexus.test.utils.NexusStatusUtil;
 public class Nexus748MultipleStartTest
 {
 
+    protected static Logger logger = Logger.getLogger( Nexus748MultipleStartTest.class );
+    
     @Test
     public void multipleStartTest()
         throws Exception
@@ -67,13 +70,13 @@ public class Nexus748MultipleStartTest
             startTimes.add( stopWatch.getTime() );
         }
 
-        System.out.println( "\n\n**************\n Start times: \n**************" );
+        logger.info( "\n\n**************\n Start times: \n**************" );
 
-        System.out.println( "Iter\tTime" );
+        logger.info( "Iter\tTime" );
         for ( int ii = 0; ii < startTimes.size(); ii++ )
         {
             Long startTime = startTimes.get( ii );
-            System.out.println( " " + ( ii + 1 ) + "\t " + ( startTime / 1000.0 ) + "sec." );
+            logger.info( " " + ( ii + 1 ) + "\t " + ( startTime / 1000.0 ) + "sec." );
 
         }
 

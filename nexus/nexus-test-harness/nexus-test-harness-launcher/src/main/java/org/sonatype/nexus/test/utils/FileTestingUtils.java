@@ -182,19 +182,18 @@ public class FileTestingUtils
 
         if ( args == null || args.length != 1 )
         {
-            System.out.println( usage );
+            LOG.info( usage );
             return;
         }
 
         try
         {
             URL url = new URL( args[0] );
-            System.out.println( createSHA1FromURL( url ) );
+            LOG.info( createSHA1FromURL( url ) );
         }
         catch ( Exception e )
         {
-            System.out.println( usage );
-            e.printStackTrace( System.out );
+            LOG.warn( usage, e );
         }
 
     }
