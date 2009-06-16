@@ -51,7 +51,7 @@ public class CachePlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/data_index/*/*/content**", "authcBasic,perms[nexus:cache]" );
+        return new PathProtectionDescriptor( "/data_cache/*/*/content**", "authcBasic,perms[nexus:cache]" );
     }
 
     @Override
