@@ -1907,6 +1907,14 @@
           <required>true</required>
         </field>
         <field>
+          <name>nfcStats</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>NFCStats</type>
+          </association>
+          <required>true</required>
+        </field>
+        <field>
           <name>nfcPaths</name>
           <version>1.0.0+</version>
           <association>
@@ -1914,6 +1922,31 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>NFCStats</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>size</name>
+          <version>1.0.0+</version>
+          <type>long</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>hits</name>
+          <version>1.0.0+</version>
+          <type>long</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>misses</name>
+          <version>1.0.0+</version>
+          <type>long</type>
+          <required>true</required>
         </field>
       </fields>
     </class>

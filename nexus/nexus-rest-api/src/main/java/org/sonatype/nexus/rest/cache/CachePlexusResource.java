@@ -21,11 +21,13 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.cache.CacheStatistics;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.NFCRepositoryResource;
 import org.sonatype.nexus.rest.model.NFCResource;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
+import org.sonatype.nexus.rest.model.NFCStats;
 import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
 import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -65,15 +67,11 @@ public class CachePlexusResource
             // check reposes
             if ( getRepositoryGroupId( request ) != null )
             {
-                for ( Repository repository : getRepositoryRegistry().getRepositoryWithFacet(
-                    getRepositoryGroupId( request ),
-                    GroupRepository.class ).getMemberRepositories() )
+                for ( Repository repository : getRepositoryRegistry()
+                    .getRepositoryWithFacet( getRepositoryGroupId( request ), GroupRepository.class )
+                    .getMemberRepositories() )
                 {
-                    NFCRepositoryResource repoNfc = new NFCRepositoryResource();
-
-                    repoNfc.setRepositoryId( repository.getId() );
-
-                    repoNfc.getNfcPaths().addAll( repository.getNotFoundCache().listKeysInCache() );
+                    NFCRepositoryResource repoNfc = createNFCRepositoryResource( repository );
 
                     resource.addNfcContent( repoNfc );
                 }
@@ -82,11 +80,7 @@ public class CachePlexusResource
             {
                 Repository repository = getRepositoryRegistry().getRepository( getRepositoryId( request ) );
 
-                NFCRepositoryResource repoNfc = new NFCRepositoryResource();
-
-                repoNfc.setRepositoryId( repository.getId() );
-
-                repoNfc.getNfcPaths().addAll( repository.getNotFoundCache().listKeysInCache() );
+                NFCRepositoryResource repoNfc = createNFCRepositoryResource( repository );
 
                 resource.addNfcContent( repoNfc );
             }
@@ -101,6 +95,29 @@ public class CachePlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
         }
+    }
+
+    protected NFCRepositoryResource createNFCRepositoryResource( Repository repository )
+    {
+        NFCRepositoryResource repoNfc = new NFCRepositoryResource();
+
+        repoNfc.setRepositoryId( repository.getId() );
+
+        CacheStatistics stats = repository.getNotFoundCache().getStatistics();
+
+        NFCStats restStats = new NFCStats();
+
+        restStats.setSize( stats.getSize() );
+
+        restStats.setHits( stats.getHits() );
+
+        restStats.setMisses( stats.getMisses() );
+
+        repoNfc.setNfcStats( restStats );
+
+        repoNfc.getNfcPaths().addAll( repository.getNotFoundCache().listKeysInCache() );
+
+        return repoNfc;
     }
 
     @Override
