@@ -760,21 +760,22 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
       });
       return;
     }
-    Sonatype.MessageBox.wait( 'Uploading...' );
     
-  if (hasArtifacts){
-    for ( var i = 0 ; i < treePanel.root.childNodes.length; i++ ){
-      this.createUploadForm( treePanel.root.childNodes[i].attributes.payload.fileInput,
-          treePanel.root.childNodes[i].attributes.payload.classifier,
-          treePanel.root.childNodes[i].attributes.payload.extension,
-          i == treePanel.root.childNodes.length - 1 );
+    Sonatype.MessageBox.wait( 'Uploading ...' );
+    
+    if (hasArtifacts){
+      this.currentChildNode = 0;
+        this.createUploadForm( treePanel,
+            treePanel.root.childNodes[this.currentChildNode].attributes.payload.fileInput,
+            treePanel.root.childNodes[this.currentChildNode].attributes.payload.classifier,
+            treePanel.root.childNodes[this.currentChildNode].attributes.payload.extension,
+            this.currentChildNode == ( treePanel.root.childNodes.length - 1 ) );
     }
-  }
-  else if (this.pomInput != null) {
-    this.createUploadForm( null, null, null, true );
-  }
+    else if (this.pomInput != null) {
+      this.createUploadForm( treePanel, null, null, null, true );
+    }
   },
-  createUploadForm: function( fileInput, classifier, extension, lastItem ) {
+  createUploadForm: function( treePanel, fileInput, classifier, extension, lastItem ) {
     var repoId = this.payload.id;
     repoId = repoId.substring( repoId.lastIndexOf( '/' ) + 1 );
     var pomMode = this.find( 'name', 'gavDefinition' )[0].getValue() == 'pom';
@@ -866,6 +867,9 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
       url: Sonatype.config.repos.urls.upload,
       form : tmpForm,
       isUpload : true,
+      cbPassThru : {
+        treePanel: treePanel
+      },
       callback: function( options, success, response ) {
         tmpForm.remove();
 
@@ -879,7 +883,18 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
               buttons: Sonatype.MessageBox.OK,
               icon: Sonatype.MessageBox.INFO
             });
-      this.resetFields();
+            this.resetFields();
+          }
+          else {
+            this.currentChildNode++;
+            var treePanel = options.cbPassThru.treePanel;
+            if ( this.currentChildNode < treePanel.root.childNodes.length ) {
+              this.createUploadForm( treePanel,
+                  treePanel.root.childNodes[this.currentChildNode].attributes.payload.fileInput,
+                  treePanel.root.childNodes[this.currentChildNode].attributes.payload.classifier,
+                  treePanel.root.childNodes[this.currentChildNode].attributes.payload.extension,
+                  this.currentChildNode == treePanel.root.childNodes.length - 1 );
+            }
           }
         }
         else {
