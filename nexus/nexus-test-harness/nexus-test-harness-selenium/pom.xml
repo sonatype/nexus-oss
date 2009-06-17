@@ -12,6 +12,10 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+      <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <version>2.0</version>
         <executions>
@@ -90,6 +94,30 @@
           </systemProperties>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>jscoverage-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>instrument</id>
+            <goals>
+              <goal>instrument</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <source>${basedir}/target/nexus-ui/js</source>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
@@ -143,6 +171,18 @@
       <artifactId>junit</artifactId>
       <version>4.5</version>
       <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>jscoverage-component</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 

@@ -14,7 +14,7 @@ import org.sonatype.security.rest.model.UserChangePasswordRequest;
 public class ChangePasswordTest extends SeleniumTest {
     @Test
     public void changePasswordSuccess() {
-        main.clickLogin().populate(User.ADMIN).loginExpectingSuccess();
+        main.clickLogin().populate(User.ROLE_ADMIN).loginExpectingSuccess();
 
         ChangePasswordWindow window = main.securityPanel().clickChangePassword();
 

@@ -2,6 +2,7 @@ package org.sonatype.nexus.mock;
 
 import java.io.File;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -70,5 +71,17 @@ public abstract class NexusTestCase
     public void mockCleanup()
     {
         MockHelper.checkAssertions();
+    }
+
+    public <E> E lookup( Class<E> role )
+        throws ComponentLookupException
+    {
+        return env.getPlexusContainer().lookup( role );
+    }
+
+    public <E> E lookup( Class<E> role, String hint )
+        throws ComponentLookupException
+    {
+        return env.getPlexusContainer().lookup( role, hint );
     }
 }

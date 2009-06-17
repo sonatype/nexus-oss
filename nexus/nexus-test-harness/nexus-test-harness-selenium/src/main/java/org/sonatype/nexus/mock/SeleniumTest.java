@@ -13,6 +13,7 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 import org.apache.commons.codec.binary.Base64;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -23,6 +24,7 @@ import org.sonatype.nexus.mock.pages.MainPage;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
 import org.sonatype.nexus.mock.util.SocketTestWaitCondition;
+import org.sonatype.spice.jscoverage.JsonReportHandler;
 
 import ch.ethz.ssh2.Connection;
 
@@ -140,6 +142,8 @@ public abstract class SeleniumTest extends NexusTestCase {
 
     @After
     public void seleniumCleanup() throws Exception {
+        getCoverage();
+
         selenium.stop();
     }
 
@@ -196,5 +200,13 @@ public abstract class SeleniumTest extends NexusTestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    protected void getCoverage()
+        throws ComponentLookupException, IOException
+    {
+        JsonReportHandler handler = lookup( JsonReportHandler.class );
+        handler.appendResults( selenium.getEval( "window.jscoverage_serializeCoverageToJSON()" ) );
+        handler.persist();
     }
 }
