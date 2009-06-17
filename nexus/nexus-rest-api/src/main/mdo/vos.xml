@@ -326,6 +326,39 @@
           </association>
           <required>false</required>
         </field>
+        <field>
+          <name>errorReportingSettings</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>ErrorReportingSettings</type>
+          </association>
+          <required>false</required>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>ErrorReportingSettings</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>jiraUrl</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>jiraUsername</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>jiraPassword</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
       </fields>
     </class>
 

@@ -33,6 +33,7 @@ import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
+import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -1121,6 +1122,20 @@ public class DefaultNexusConfiguration
         getConfiguration().setSmtpConfiguration( settings );
 
         applyAndSaveConfiguration();
+    }
+    
+    public CErrorReporting readErrorReporting()
+    {
+        return getConfiguration().getErrorReporting();
+    }
+    
+    public void updateErrorReporting( CErrorReporting errorReporting )
+        throws ConfigurationException,
+            IOException
+    {
+        getConfiguration().setErrorReporting( errorReporting );
+        
+        saveConfiguration();
     }
 
     public Map<String, String> getConfigurationFiles()

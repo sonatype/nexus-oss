@@ -15,6 +15,7 @@ package org.sonatype.nexus.configuration.validator;
 
 import java.util.List;
 
+import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
@@ -162,4 +163,12 @@ public interface ApplicationConfigurationValidator
      * @return
      */
     ValidationResponse validateRepositoryMirrors( ApplicationValidationContext ctx, List<CMirror> mirrors );
+    
+    /**
+     * Validates error reporting
+     * 
+     * @param settings
+     * @return
+     */
+    ValidationResponse validateErrorReporting( ApplicationValidationContext ctx, CErrorReporting settings );
 }

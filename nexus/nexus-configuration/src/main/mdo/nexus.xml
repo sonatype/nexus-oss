@@ -153,6 +153,15 @@
           <required>true</required>
         </field>
         <field>
+          <name>errorReporting</name>
+          <version>1.4.0+</version>
+          <description>Error Reporting Parameters</description>
+          <association>
+            <type>CErrorReporting</type>
+          </association>
+          <required>true</required>
+        </field>
+        <field>
           <name>plugins</name>
           <version>1.4.0+</version>
           <description>Plugins and their configuration</description>
@@ -1074,6 +1083,42 @@
           <type>String</type>
           <description>Email addresses that Nexus will use to send emails from.</description>
           <required>true</required>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>CErrorReporting</name>
+      <version>1.4.0+</version>
+      <description>Configuration for automatic error reporting</description>
+      <fields>
+        <field>
+          <name>enabled</name>
+          <version>1.4.0+</version>
+          <type>boolean</type>
+          <description>Flag that determines if automatic error reporting will be enabled</description>
+          <required>true</required>
+        </field>
+        <field>
+          <name>jiraUrl</name>
+          <version>1.4.0+</version>
+          <type>String</type>
+          <description>URL of the jira server to report problems to</description>
+          <required>false</required>
+        </field>
+        <field>
+          <name>jiraUsername</name>
+          <version>1.4.0+</version>
+          <type>String</type>
+          <description>Username of an account in the jira server</description>
+          <required>false</required>
+        </field>
+        <field>
+          <name>jiraPassword</name>
+          <version>1.4.0+</version>
+          <type>String</type>
+          <description>Password of an account in the jira server</description>
+          <required>false</required>
         </field>
       </fields>
     </class>

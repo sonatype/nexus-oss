@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -191,6 +192,13 @@ public interface MutableConfiguration
     CSmtpConfiguration readSmtpConfiguration();
 
     void updateSmtpConfiguration( CSmtpConfiguration settings )
+        throws ConfigurationException,
+            IOException;
+    
+    // Error reporting    
+    CErrorReporting readErrorReporting();
+    
+    void updateErrorReporting( CErrorReporting errorReporting )
         throws ConfigurationException,
             IOException;
 }

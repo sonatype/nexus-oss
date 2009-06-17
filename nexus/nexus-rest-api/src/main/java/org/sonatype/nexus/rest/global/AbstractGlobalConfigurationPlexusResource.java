@@ -13,12 +13,14 @@
  */
 package org.sonatype.nexus.rest.global;
 
+import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
+import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.SmtpSettings;
@@ -59,6 +61,22 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         result.setTlsEnabled( settings.isTlsEnabled() );
         
         result.setUsername( settings.getUsername() );
+        
+        return result;
+    }
+    
+    public static ErrorReportingSettings convert( CErrorReporting settings )
+    {
+        if ( settings == null || settings.isEnabled() == false )
+        {
+            return null;
+        }
+        
+        ErrorReportingSettings result = new ErrorReportingSettings();
+       
+        result.setJiraUrl( settings.getJiraUrl() );
+        result.setJiraUsername( settings.getJiraUsername() );
+        result.setJiraPassword( settings.getJiraPassword() );
         
         return result;
     }

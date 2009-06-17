@@ -27,6 +27,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
+import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
@@ -714,6 +715,39 @@ public class DefaultApplicationConfigurationValidator
         {
             ValidationMessage msg = new ValidationMessage( "systemEmailAddress", "System Email Address is empty." );
             response.addValidationError( msg );
+        }
+
+        return response;
+    }
+    
+    public ValidationResponse validateErrorReporting( ApplicationValidationContext ctx, CErrorReporting settings )
+    {
+        ValidationResponse response = new ApplicationValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+        
+        if ( settings.isEnabled() )
+        {
+            if ( StringUtils.isEmpty( settings.getJiraUrl() ) )
+            {
+                ValidationMessage msg = new ValidationMessage( "jiraUrl", "JIRA URL is empty." );
+                response.addValidationError( msg );
+            }
+            
+            if ( StringUtils.isEmpty( settings.getJiraUsername() ) )
+            {
+                ValidationMessage msg = new ValidationMessage( "jiraUsername", "JIRA Username is empty." );
+                response.addValidationError( msg );
+            }
+            
+            if ( StringUtils.isEmpty( settings.getJiraPassword() ) )
+            {
+                ValidationMessage msg = new ValidationMessage( "jiraPassword", "JIRA Password is empty." );
+                response.addValidationError( msg );
+            }
         }
 
         return response;

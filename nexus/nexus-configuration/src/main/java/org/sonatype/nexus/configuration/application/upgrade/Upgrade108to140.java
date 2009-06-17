@@ -26,6 +26,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CMirror;
@@ -234,6 +235,12 @@ public class Upgrade108to140
 
             newc.setRepositories( repositories );
         }
+        
+        // initialize automatic error reporting
+        CErrorReporting errorReporting = new CErrorReporting();
+        errorReporting.setEnabled( false );
+        
+        newc.setErrorReporting( errorReporting );
 
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );

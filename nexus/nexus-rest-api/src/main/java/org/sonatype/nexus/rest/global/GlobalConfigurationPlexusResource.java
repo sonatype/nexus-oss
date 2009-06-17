@@ -29,10 +29,12 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
@@ -167,6 +169,28 @@ public class GlobalConfigurationPlexusResource
                         
                         getNexusConfiguration().updateSmtpConfiguration( config );
                     }
+                    
+                    ErrorReportingSettings settings = resource.getErrorReportingSettings();
+                    CErrorReporting reporting = getNexusConfiguration().readErrorReporting();
+                    
+                    if ( reporting == null )
+                    {
+                        reporting = new CErrorReporting();
+                    }
+                    
+                    if ( settings != null )
+                    {                           
+                        reporting.setEnabled( true );
+                        reporting.setJiraUrl( settings.getJiraUrl() );
+                        reporting.setJiraUsername( settings.getJiraUsername() );
+                        reporting.setJiraPassword( settings.getJiraPassword() );
+                    }
+                    else
+                    {
+                        reporting.setEnabled( false );
+                    }
+                    
+                    getNexusConfiguration().updateErrorReporting( reporting );
 
                     if ( resource.getGlobalConnectionSettings() != null )
                     {
@@ -385,6 +409,8 @@ public class GlobalConfigurationPlexusResource
         resource.setForceBaseUrl( getNexusConfiguration().isForceBaseUrl() );
 
         resource.setSmtpSettings( convert( getNexusConfiguration().readSmtpConfiguration() ) );
+        
+        resource.setErrorReportingSettings( convert( getNexusConfiguration().readErrorReporting() ) );
     }
 
     protected String getSecurityConfiguration( boolean enabled, String authSourceType )
