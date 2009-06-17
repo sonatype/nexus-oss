@@ -1,28 +1,34 @@
 package org.sonatype.nexus.templates;
 
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.ExternalConfiguration;
 
 public abstract class AbstractConfigurableTemplate<I>
     extends AbstractTemplate<I>
     implements ConfigurableTemplate<I>
 {
-    private final CoreConfiguration coreConfiguration;
+    private CoreConfiguration coreConfiguration;
 
-    public AbstractConfigurableTemplate( String id, String description, CoreConfiguration coreConfiguration )
+    public AbstractConfigurableTemplate( String id, String description )
     {
         super( id, description );
-
-        this.coreConfiguration = coreConfiguration;
     }
 
     public CoreConfiguration getCoreConfiguration()
     {
+        if ( coreConfiguration == null )
+        {
+            coreConfiguration = initCoreConfiguration();
+        }
+
         return coreConfiguration;
     }
 
-    public ExternalConfiguration getExternalConfiguration()
+    public void setCoreConfiguration( CoreConfiguration coreConfiguration )
     {
-        return getCoreConfiguration().getExternalConfiguration();
+        this.coreConfiguration = coreConfiguration;
     }
+
+    // ==
+
+    protected abstract CoreConfiguration initCoreConfiguration();
 }

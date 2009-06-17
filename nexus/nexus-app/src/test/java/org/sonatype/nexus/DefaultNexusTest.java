@@ -24,7 +24,7 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.templates.Template;
-import org.sonatype.nexus.templates.repository.RepositoryTemplate;
+import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 
 public class DefaultNexusTest
     extends AbstractNexusTestCase
@@ -68,15 +68,15 @@ public class DefaultNexusTest
         assertEquals( "there should be 6 templates", 6, repoTemplates.size() );
 
         Template<Repository> template =
-            (RepositoryTemplate) getDefaultNexus().getRepositoryTemplateById( "default_hosted_release" );
+            (AbstractRepositoryTemplate) getDefaultNexus().getRepositoryTemplateById( "default_hosted_release" );
 
         assertNotNull( "template should exist", template );
-        assertTrue( "it should be RepositoryTemplate", template instanceof RepositoryTemplate );
+        assertTrue( "it should be RepositoryTemplate", template instanceof AbstractRepositoryTemplate );
 
         // just adjust some params on template
         {
             // FIXME: how to handle this gracefully and in general way?
-            RepositoryTemplate repoTemplate = (RepositoryTemplate) template;
+            AbstractRepositoryTemplate repoTemplate = (AbstractRepositoryTemplate) template;
 
             repoTemplate.getConfigurableRepository().setId( "created-from-template" );
             repoTemplate.getConfigurableRepository().setName( "Repository created from template" );

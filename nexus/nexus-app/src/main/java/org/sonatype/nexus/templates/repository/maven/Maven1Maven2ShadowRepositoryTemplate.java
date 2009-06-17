@@ -1,38 +1,30 @@
 package org.sonatype.nexus.templates.repository.maven;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.maven.MavenShadowRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
-import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 
 public class Maven1Maven2ShadowRepositoryTemplate
-    extends RepositoryTemplate
+    extends AbstractMavenRepositoryTemplate
 {
     public Maven1Maven2ShadowRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id,
                                                  String description )
-        throws ConfigurationException
     {
-        super( provider, id, description, new DefaultCRepository(), new Maven2ContentClass(),
-               MavenShadowRepository.class );
-
-        initConfiguration();
+        super( provider, id, description, new Maven2ContentClass(),
+               MavenShadowRepository.class, null );
     }
 
-    @Override
-    public M2LayoutedM1ShadowRepositoryConfiguration getExternalConfiguration()
+    protected CoreConfiguration initCoreConfiguration()
     {
-        return (M2LayoutedM1ShadowRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration();
-    }
+        CRepository repo = new DefaultCRepository();
 
-    protected void initConfiguration()
-    {
-        CRepository repo = (CRepository) getCoreConfiguration().getConfiguration( true );
         repo.setId( "" );
         repo.setName( "" );
 
@@ -47,6 +39,8 @@ public class Maven1Maven2ShadowRepositoryTemplate
 
         repo.setAllowWrite( false );
 
-        getCoreConfiguration().applyChanges();
+        CRepositoryCoreConfiguration result = new CRepositoryCoreConfiguration( repo );
+
+        return result;
     }
 }

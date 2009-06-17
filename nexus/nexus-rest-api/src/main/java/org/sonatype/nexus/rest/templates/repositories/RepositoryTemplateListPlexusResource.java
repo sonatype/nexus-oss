@@ -32,7 +32,7 @@ import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.templates.Template;
-import org.sonatype.nexus.templates.repository.RepositoryTemplate;
+import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -74,7 +74,7 @@ public class RepositoryTemplateListPlexusResource
         for ( Template<Repository> genTemplate : repoTemplates )
         {
             // TODO: a hack, fix it
-            RepositoryTemplate template = (RepositoryTemplate) genTemplate;
+            AbstractRepositoryTemplate template = (AbstractRepositoryTemplate) genTemplate;
 
             repoRes = new RepositoryListResource();
 
@@ -108,9 +108,9 @@ public class RepositoryTemplateListPlexusResource
 
             // policy
             // another hack
-            if ( template.getExternalConfiguration() instanceof AbstractMavenRepositoryConfiguration )
+            if ( template.getCoreConfiguration().getExternalConfiguration() instanceof AbstractMavenRepositoryConfiguration )
             {
-                repoRes.setRepoPolicy( ( (AbstractMavenRepositoryConfiguration) template.getExternalConfiguration() )
+                repoRes.setRepoPolicy( ( (AbstractMavenRepositoryConfiguration) template.getCoreConfiguration().getExternalConfiguration() )
                     .getRepositoryPolicy().toString() );
             }
 

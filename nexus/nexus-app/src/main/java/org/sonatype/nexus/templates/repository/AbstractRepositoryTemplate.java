@@ -4,13 +4,12 @@ import java.io.IOException;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.templates.AbstractConfigurableTemplate;
 
-public class RepositoryTemplate
+public abstract class AbstractRepositoryTemplate
     extends AbstractConfigurableTemplate<Repository>
 {
     private final DefaultRepositoryTemplateProvider provider;
@@ -19,20 +18,10 @@ public class RepositoryTemplate
 
     private final Class<?> mainFacet;
 
-    private final ConfigurableRepository configurableRepository;
-
-    public RepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
-                               CRepository config, ContentClass contentClass )
-        throws ConfigurationException
+    public AbstractRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
+                               ContentClass contentClass, Class<?> mainFacet )
     {
-        this( provider, id, description, config, contentClass, null );
-    }
-
-    public RepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
-                               CRepository config, ContentClass contentClass, Class<?> mainFacet )
-        throws ConfigurationException
-    {
-        super( id, description, new CRepositoryCoreConfiguration( config ) );
+        super( id, description );
 
         this.provider = provider;
 
@@ -46,10 +35,6 @@ public class RepositoryTemplate
         {
             this.mainFacet = Repository.class;
         }
-
-        this.configurableRepository = new ConfigurableRepository();
-
-        this.configurableRepository.configure( getCoreConfiguration() );
     }
 
     public ContentClass getContentClass()
@@ -64,9 +49,21 @@ public class RepositoryTemplate
 
     public ConfigurableRepository getConfigurableRepository()
     {
+        ConfigurableRepository configurableRepository = new ConfigurableRepository();
+
+        try
+        {
+            configurableRepository.configure( getCoreConfiguration() );
+        }
+        catch ( ConfigurationException e )
+        {
+            // will not happen, since ConfigurableRepository will not validate!
+            // TODO: get rid of this exception from here
+        }
+
         return configurableRepository;
     }
-    
+
     public Class<Repository> getTargetClass()
     {
         return provider.getTargetClass();
@@ -75,8 +72,17 @@ public class RepositoryTemplate
     public Repository create()
         throws ConfigurationException, IOException
     {
+        // to merge in user changes to CoreConfiguration
         getCoreConfiguration().applyChanges();
 
-        return provider.getNexus().createRepository( (CRepository) getCoreConfiguration().getConfiguration( false ) );
+        // create a repository
+        Repository result =
+            provider.getNexus().createRepository( (CRepository) getCoreConfiguration().getConfiguration( false ) );
+
+        // reset the template
+        setCoreConfiguration( null );
+
+        // return the result
+        return result;
     }
 }

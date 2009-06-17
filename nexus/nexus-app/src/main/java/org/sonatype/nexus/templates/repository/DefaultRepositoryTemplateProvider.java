@@ -36,8 +36,6 @@ public class DefaultRepositoryTemplateProvider
     @Requirement
     private Nexus nexus;
 
-    private List<Template<Repository>> templates;
-
     protected Nexus getNexus()
     {
         return nexus;
@@ -50,38 +48,34 @@ public class DefaultRepositoryTemplateProvider
 
     public List<Template<Repository>> getTemplates()
     {
-        if ( templates == null )
+        ArrayList<Template<Repository>> templates = new ArrayList<Template<Repository>>( 6 );
+
+        try
         {
-            templates = new ArrayList<Template<Repository>>( 6 );
+            templates.add( new Maven2HostedRepositoryTemplate( this, DEFAULT_HOSTED_RELEASE,
+                                                               "Maven2 Hosted Release Repository",
+                                                               RepositoryPolicy.RELEASE ) );
 
-            try
-            {
-                templates.add( new Maven2HostedRepositoryTemplate( this, DEFAULT_HOSTED_RELEASE,
-                                                                   "Maven2 Hosted Release Repository",
-                                                                   RepositoryPolicy.RELEASE ) );
+            templates.add( new Maven2HostedRepositoryTemplate( this, DEFAULT_HOSTED_SNAPSHOT,
+                                                               "Maven2 Hosted Snapshot Repository",
+                                                               RepositoryPolicy.SNAPSHOT ) );
 
-                templates.add( new Maven2HostedRepositoryTemplate( this, DEFAULT_HOSTED_SNAPSHOT,
-                                                                   "Maven2 Hosted Snapshot Repository",
-                                                                   RepositoryPolicy.SNAPSHOT ) );
+            templates.add( new Maven2ProxyRepositoryTemplate( this, DEFAULT_PROXY_RELEASE,
+                                                              "Maven2 Proxy Release Repository",
+                                                              RepositoryPolicy.RELEASE ) );
 
-                templates.add( new Maven2ProxyRepositoryTemplate( this, DEFAULT_PROXY_RELEASE,
-                                                                  "Maven2 Proxy Release Repository",
-                                                                  RepositoryPolicy.RELEASE ) );
+            templates.add( new Maven2ProxyRepositoryTemplate( this, DEFAULT_PROXY_SNAPSHOT,
+                                                              "Maven2 Proxy Snapshot Repository",
+                                                              RepositoryPolicy.SNAPSHOT ) );
 
-                templates.add( new Maven2ProxyRepositoryTemplate( this, DEFAULT_PROXY_SNAPSHOT,
-                                                                  "Maven2 Proxy Snapshot Repository",
-                                                                  RepositoryPolicy.SNAPSHOT ) );
+            templates.add( new Maven1Maven2ShadowRepositoryTemplate( this, DEFAULT_VIRTUAL,
+                                                                     "Maven1-to-Maven2 Virtual Repository" ) );
 
-                templates.add( new Maven1Maven2ShadowRepositoryTemplate( this, DEFAULT_VIRTUAL,
-                                                                         "Maven1-to-Maven2 Virtual Repository" ) );
-
-                templates.add( new Maven2GroupRepositoryTemplate( this, DEFAULT_GROUP, "Maven2 Group Repository" ) );
-            }
-            catch ( Exception e )
-            {
-                // will not happen
-                e.printStackTrace();
-            }
+            templates.add( new Maven2GroupRepositoryTemplate( this, DEFAULT_GROUP, "Maven2 Group Repository" ) );
+        }
+        catch ( Exception e )
+        {
+            // will not happen
         }
 
         return Collections.unmodifiableList( templates );
