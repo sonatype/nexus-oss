@@ -38,8 +38,7 @@ public class IntegrationTestSuite
         FileUtils.copyFile( testConfigFile, outputFile );
 
         NexusStatusUtil.doHardStart();
-        
-        NexusStatusUtil.doSoftStop();
+
     }
 
     @AfterClass

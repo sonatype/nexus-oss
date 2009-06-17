@@ -130,87 +130,6 @@ public class NexusStatusUtil
         return status;
     }
 
-    public static void doSoftStop()
-        throws NexusIllegalStateException
-    {
-        if ( !isNexusAlive() )
-        {
-            throw new NexusIllegalStateException( "Unable to doSoftStop(), nexus is not running" );
-        }
-
-        if ( isNexusStopped() )
-        {
-            log.warn( "Nexus is already stopped" );
-
-        }
-        else
-        {
-            sendNexusStatusCommand( "STOP" );
-
-            if ( !waitForStop( getClient() ) )
-            {
-                log.warn( "Soft stop didn't worked, going extreme!" );
-                killNexus();
-                doHardStart();
-                waitForStart( getClient() );
-                sendNexusStatusCommand( "STOP" );
-
-                if ( !waitForStop( getClient() ) )
-                {
-                    throw new NexusIllegalStateException( "Unable to doSoftStop(), nexus still running" );
-                }
-            }
-        }
-
-        disconnect();
-    }
-
-    public static void doSoftStart()
-        throws NexusIllegalStateException
-    {
-        if ( !isNexusAlive() )
-        {
-            throw new NexusIllegalStateException( "Unable to doSoftStart(), nexus is not running" );
-        }
-
-        if ( isNexusRunning() )
-        {
-            log.warn( "Nexus is already running" );
-        }
-        else
-        {
-            sendNexusStatusCommand( "START" );
-
-            if ( !waitForStart( getClient() ) )
-            {
-                throw new NexusIllegalStateException( "Unable to doSoftStart(), nexus still stopped" );
-            }
-        }
-    }
-
-    public static void doSoftRestart()
-        throws NexusIllegalStateException
-    {
-        if ( !isNexusAlive() )
-        {
-            throw new NexusIllegalStateException( "Unable to doSoftRestart(), nexus is not running" );
-        }
-
-        if ( isNexusRunning() )
-        {
-            sendNexusStatusCommand( "RESTART" );
-        }
-        else
-        {
-            sendNexusStatusCommand( "START" );
-        }
-
-        if ( !waitForStart( getClient() ) )
-        {
-            throw new NexusIllegalStateException( "Unable to doSoftStart(), nexus still stopped" );
-        }
-    }
-
     public static void doClientStart()
         throws NexusIllegalStateException
     {
@@ -276,7 +195,7 @@ public class NexusStatusUtil
             log.warn( "Nexus is already started" );
             if ( !isNexusRunning() )
             {
-                doSoftStart();
+                throw new NexusIllegalStateException( "Nexus is no longer active, but still using HTTP ports" );
             }
         }
         else
@@ -364,32 +283,40 @@ public class NexusStatusUtil
 
     public static boolean isNexusAlive()
     {
-        ServerSocket ss = null;
-        try
-        {
-            ss = new ServerSocket( AbstractNexusIntegrationTest.nexusApplicationPort );
+        int[] ports =
+            new int[] { AbstractNexusIntegrationTest.nexusControlPort,
+                AbstractNexusIntegrationTest.nexusApplicationPort };
 
-            return false;
-        }
-        catch ( IOException e )
+        ServerSocket ss = null;
+        for ( int i = 0; i < ports.length; i++ )
         {
-            // ok, port in use, means nexus is active
-            return true;
-        }
-        finally
-        {
+            int port = ports[i];
             try
             {
-                if ( ss != null )
-                {
-                    ss.close();
-                }
+                ss = new ServerSocket( port );
             }
             catch ( IOException e )
             {
-                // just closing
+                // ok, port in use, means nexus is active
+                return true;
+            }
+            finally
+            {
+                try
+                {
+                    if ( ss != null )
+                    {
+                        ss.close();
+                    }
+                }
+                catch ( IOException e )
+                {
+                    // just closing
+                }
             }
         }
+
+        return false;
     }
 
     public static boolean isNexusRunning()

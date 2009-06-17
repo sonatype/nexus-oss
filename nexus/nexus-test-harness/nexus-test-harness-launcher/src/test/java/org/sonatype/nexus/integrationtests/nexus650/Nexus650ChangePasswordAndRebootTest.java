@@ -48,7 +48,8 @@ public class Nexus650ChangePasswordAndRebootTest
         context.setPassword( newPassword );
 
         // reboot
-        NexusStatusUtil.doSoftRestart();
+        NexusStatusUtil.doHardStop();
+        NexusStatusUtil.doHardStart();
 
         // now we can verify everything worked out
         Assert.assertTrue( "Nexus is not running", NexusStatusUtil.isNexusRunning() );

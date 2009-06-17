@@ -40,8 +40,6 @@ public abstract class AbstractNexusTestSuite
 
        NexusStatusUtil.doHardStart();
 
-        NexusStatusUtil.doSoftStop();
-
         // enable security
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }

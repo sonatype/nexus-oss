@@ -46,7 +46,8 @@ public class Nexus538SystemFeeds
 
         // restart and look for event in feed
 
-        NexusStatusUtil.doSoftRestart();
+        NexusStatusUtil.doHardStop();
+        NexusStatusUtil.doHardStart();
 
         SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
         List<SyndEntry> entries = feed.getEntries();

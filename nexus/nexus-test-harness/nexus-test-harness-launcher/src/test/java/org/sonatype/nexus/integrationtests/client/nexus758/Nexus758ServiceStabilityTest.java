@@ -17,8 +17,6 @@ import static org.sonatype.nexus.test.utils.NexusStatusUtil.doClientStart;
 import static org.sonatype.nexus.test.utils.NexusStatusUtil.doClientStop;
 import static org.sonatype.nexus.test.utils.NexusStatusUtil.doHardStart;
 import static org.sonatype.nexus.test.utils.NexusStatusUtil.doHardStop;
-import static org.sonatype.nexus.test.utils.NexusStatusUtil.doSoftStart;
-import static org.sonatype.nexus.test.utils.NexusStatusUtil.doSoftStop;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -90,58 +88,6 @@ public class Nexus758ServiceStabilityTest
         doHardStart();
         doHardStop();
 
-    }
-
-    @Test
-    public void softRestarts()
-        throws Exception
-    {
-        doHardStart();
-
-        doSoftStop();
-
-        // 1
-        doSoftStart();
-        doSoftStop();
-
-        // 2
-        doSoftStart();
-        doSoftStop();
-
-        // 3
-        doSoftStart();
-        doSoftStop();
-
-        // 4
-        doSoftStart();
-        doSoftStop();
-
-        // 5
-        doSoftStart();
-        doSoftStop();
-
-        // 6
-        doSoftStart();
-        doSoftStop();
-
-        // 7
-        doSoftStart();
-        doSoftStop();
-
-        // 8
-        doSoftStart();
-        doSoftStop();
-
-        // 9
-        doSoftStart();
-        doSoftStop();
-
-        // 10
-        doSoftStart();
-        doSoftStop();
-
-        doSoftStart();
-        doHardStop();
     }
 
     @Test

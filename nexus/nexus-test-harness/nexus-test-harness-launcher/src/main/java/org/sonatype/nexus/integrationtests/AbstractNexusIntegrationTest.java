@@ -43,14 +43,12 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.integrationtests.runner.ConsoleLoggingRunner;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
@@ -66,7 +64,7 @@ import com.thoughtworks.xstream.XStream;
  * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code>
  * issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
-//@RunWith(ConsoleLoggingRunner.class)
+// @RunWith(ConsoleLoggingRunner.class)
 public class AbstractNexusIntegrationTest
 {
 
@@ -87,8 +85,6 @@ public class AbstractNexusIntegrationTest
     private Map<Object, Object> context;
 
     private static boolean NEEDS_INIT = false;
-
-    private static boolean NEEDS_HARD_STOP = false;
 
     public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
 
@@ -113,6 +109,8 @@ public class AbstractNexusIntegrationTest
 
     protected static Logger log = Logger.getLogger( AbstractNexusIntegrationTest.class );
 
+    public static final Integer nexusControlPort;
+
     public static final int nexusApplicationPort;
 
     /**
@@ -123,6 +121,7 @@ public class AbstractNexusIntegrationTest
     static
     {
         nexusApplicationPort = TestProperties.getInteger( "nexus.application.port" );
+        nexusControlPort = TestProperties.getInteger( "nexus.control.port" );
         nexusBaseDir = TestProperties.getString( "nexus.base.dir" );
         nexusWorkDir = TestProperties.getString( "nexus.work.dir" );
         WORK_CONF_DIR = nexusWorkDir + "/conf";
@@ -156,7 +155,7 @@ public class AbstractNexusIntegrationTest
      * static, so we don't have access to the package name of the running tests. We are going to use the package name to
      * find resources for additional setup. NOTE: With this setup running multiple Test at the same time is not
      * possible.
-     * 
+     *
      * @throws Exception
      */
     @Before
@@ -186,9 +185,9 @@ public class AbstractNexusIntegrationTest
                 {
                     NexusConfigUtil.validateConfig();
                 }
-                
+
                 // the validation needs to happen before we enable security it triggers an upgrade.
-                
+
                 NexusConfigUtil.enableSecurity( TestContainer.getInstance().getTestContext().isSecureTest()
                     || Boolean.valueOf( System.getProperty( "secure.test" ) ) );
 
@@ -277,9 +276,8 @@ public class AbstractNexusIntegrationTest
 
                 public boolean accept( File pathname )
                 {
-                    return ( !pathname.getName().endsWith( ".svn" ) && pathname.isDirectory() && new File(
-                        pathname,
-                        "pom.xml" ).exists() );
+                    return ( !pathname.getName().endsWith( ".svn" ) && pathname.isDirectory() && new File( pathname,
+                                                                                                           "pom.xml" ).exists() );
                 }
             } );
 
@@ -299,8 +297,7 @@ public class AbstractNexusIntegrationTest
                 if ( model.getDistributionManagement() == null
                     || model.getDistributionManagement().getRepository() == null )
                 {
-                    Assert
-                        .fail( "The test artifact is either missing or has an invalid Distribution Management section." );
+                    Assert.fail( "The test artifact is either missing or has an invalid Distribution Management section." );
                 }
                 String deployUrl = model.getDistributionManagement().getRepository().getUrl();
 
@@ -310,8 +307,9 @@ public class AbstractNexusIntegrationTest
 
                 log.debug( "wow, this is working: " + artifactFile.getName() );
 
-                Gav gav = new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model
-                    .getPackaging(), 0, new Date().getTime(), model.getName(), false, false, null, false, null );
+                Gav gav =
+                    new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(),
+                             0, new Date().getTime(), model.getName(), false, false, null, false, null );
 
                 // the Restlet Client does not support multipart forms:
                 // http://restlet.tigris.org/issues/show_bug.cgi?id=71
@@ -322,7 +320,7 @@ public class AbstractNexusIntegrationTest
                 {
                     throw new FileNotFoundException( "File " + artifactFile.getAbsolutePath() + " doesn't exists!" );
                 }
-                
+
                 File artifactSha1 = new File( artifactFile.getAbsolutePath() + ".sha1" );
                 File artifactMd5 = new File( artifactFile.getAbsolutePath() + ".md5" );
                 File artifactAsc = new File( artifactFile.getAbsolutePath() + ".asc" );
@@ -332,44 +330,43 @@ public class AbstractNexusIntegrationTest
                 File pomAsc = new File( pom.getAbsolutePath() + ".asc" );
 
                 try
-                {                    
+                {
                     if ( artifactSha1.exists() )
                     {
-                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactSha1, this
-                            .getRelitiveArtifactPath( gav ) + ".sha1" );
+                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactSha1,
+                                                     this.getRelitiveArtifactPath( gav ) + ".sha1" );
                     }
                     if ( artifactMd5.exists() )
                     {
-                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactMd5, this
-                            .getRelitiveArtifactPath( gav ) + ".md5" );
+                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactMd5,
+                                                     this.getRelitiveArtifactPath( gav ) + ".md5" );
                     }
                     if ( artifactAsc.exists() )
                     {
-                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactAsc, this
-                            .getRelitiveArtifactPath( gav ) + ".asc" );
+                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactAsc,
+                                                     this.getRelitiveArtifactPath( gav ) + ".asc" );
                     }
-                    
-                    DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile, this
-                        .getRelitiveArtifactPath( gav ) );
-                    
+
+                    DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile,
+                                                 this.getRelitiveArtifactPath( gav ) );
+
                     if ( pomSha1.exists() )
                     {
-                        DeployUtils
-                        .deployWithWagon( this.container, "http", deployUrl, pomSha1, this.getRelitivePomPath( gav ) + ".sha1" );
+                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, pomSha1,
+                                                     this.getRelitivePomPath( gav ) + ".sha1" );
                     }
                     if ( pomMd5.exists() )
                     {
-                        DeployUtils
-                        .deployWithWagon( this.container, "http", deployUrl, pomMd5, this.getRelitivePomPath( gav ) + ".md5" );
+                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, pomMd5,
+                                                     this.getRelitivePomPath( gav ) + ".md5" );
                     }
                     if ( pomAsc.exists() )
                     {
-                        DeployUtils
-                        .deployWithWagon( this.container, "http", deployUrl, pomAsc, this.getRelitivePomPath( gav ) + ".asc" );
+                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, pomAsc,
+                                                     this.getRelitivePomPath( gav ) + ".asc" );
                     }
-                    
-                    DeployUtils
-                    .deployWithWagon( this.container, "http", deployUrl, pom, this.getRelitivePomPath( gav ) );
+
+                    DeployUtils.deployWithWagon( this.container, "http", deployUrl, pom, this.getRelitivePomPath( gav ) );
                 }
                 catch ( Exception e )
                 {
@@ -397,35 +394,13 @@ public class AbstractNexusIntegrationTest
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        // if nexus is running but stopped we only want to do a softstart
-        // and we don't want to start if it is already running.
+        log.info( "***************************" );
+        log.info( "*\n*" );
+        log.info( "*  DOING A HARD START OF NEXUS." );
+        log.info( "*\n*" );
+        log.info( "***************************" );
 
-        if ( NexusStatusUtil.isNexusRunning() )
-        {
-            // we have nothing to do if its running
-            return;
-        }
-        else if ( NexusStatusUtil.isNexusAlive() )
-        {
-            NexusStatusUtil.doSoftStart();
-        }
-        else
-        {
-            // nexus is not running....
-            // that is ok, most likely someone ran a single test from eclipse
-
-            // we need a hard start
-            NEEDS_HARD_STOP = true;
-
-            log.info( "***************************" );
-            log.info( "*\n*" );
-            log.info( "*  DOING A HARD START OF NEXUS." );
-            log.info( "*  If your not running a single test manually, then something bad happened" );
-            log.info( "*\n*" );
-            log.info( "***************************" );
-
-            NexusStatusUtil.doHardStart();
-        }
+        NexusStatusUtil.doHardStart();
     }
 
     private void stopNexus()
@@ -433,20 +408,7 @@ public class AbstractNexusIntegrationTest
     {
         log.info( "stopping Nexus" );
 
-        // craptastic state machine
-        if ( !NEEDS_HARD_STOP )
-        {
-            // normal flow is to soft stop
-            NexusStatusUtil.doSoftStop();
-        }
-        else
-        {
-            // must reset
-            NEEDS_HARD_STOP = false;
-
-            NexusStatusUtil.doHardStop();
-        }
-
+        NexusStatusUtil.doHardStop();
     }
 
     protected File getOverridableFile( String file )
@@ -504,7 +466,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     * 
+     *
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -523,7 +485,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     * 
+     *
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -598,9 +560,12 @@ public class AbstractNexusIntegrationTest
         // Configuration
         // ----------------------------------------------------------------------------
 
-        ContainerConfiguration containerConfiguration = new DefaultContainerConfiguration()
-            .setName( "test" ).setContext( context ).setContainerConfiguration(
-                getClass().getName().replace( '.', '/' ) + ".xml" );
+        ContainerConfiguration containerConfiguration =
+            new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration(
+                                                                                                                   getClass().getName().replace(
+                                                                                                                                                 '.',
+                                                                                                                                                 '/' )
+                                                                                                                       + ".xml" );
 
         try
         {
@@ -646,12 +611,12 @@ public class AbstractNexusIntegrationTest
     protected String getRelitiveArtifactPath( Gav gav )
         throws FileNotFoundException
     {
-        return this.getRelitiveArtifactPath( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav
-            .getExtension(), gav.getClassifier() );
+        return this.getRelitiveArtifactPath( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
+                                             gav.getExtension(), gav.getClassifier() );
     }
 
     protected String getRelitiveArtifactPath( String groupId, String artifactId, String version, String extension,
-        String classifier )
+                                              String classifier )
         throws FileNotFoundException
     {
         String classifierPart = StringUtils.isEmpty( classifier ) ? "" : "-" + classifier;
@@ -671,13 +636,14 @@ public class AbstractNexusIntegrationTest
         // p=<packaging> -- optional, jar is taken as default
         // http://localhost:8087/nexus/service/local/artifact/maven/redirect?r=tasks-snapshot-repo&g=nexus&a=artifact&
         // v=1.0-SNAPSHOT
-        String serviceURI = "service/local/artifact/maven/redirect?r=" + repository + "&g=" + gav.getGroupId() + "&a="
-            + gav.getArtifactId() + "&v=" + gav.getVersion();
+        String serviceURI =
+            "service/local/artifact/maven/redirect?r=" + repository + "&g=" + gav.getGroupId() + "&a="
+                + gav.getArtifactId() + "&v=" + gav.getVersion();
         Response response = RequestFacade.doGetRequest( serviceURI );
         Status status = response.getStatus();
         Assert.assertEquals( "Snapshot download should redirect to a new file\n "
-            + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription(), 301, status
-            .getCode() );
+            + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription(), 301,
+                             status.getCode() );
 
         Reference redirectRef = response.getRedirectRef();
         Assert.assertNotNull( "Snapshot download should redirect to a new file "
@@ -694,47 +660,36 @@ public class AbstractNexusIntegrationTest
     protected File downloadArtifact( Gav gav, String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav
-            .getClassifier(), targetDirectory );
+        return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+                                      gav.getClassifier(), targetDirectory );
     }
 
     protected File downloadArtifact( String groupId, String artifact, String version, String type, String classifier,
-        String targetDirectory )
+                                     String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact(
-            this.getNexusTestRepoUrl(),
-            groupId,
-            artifact,
-            version,
-            type,
-            classifier,
-            targetDirectory );
+        return this.downloadArtifact( this.getNexusTestRepoUrl(), groupId, artifact, version, type, classifier,
+                                      targetDirectory );
     }
 
     protected File downloadArtifactFromRepository( String repoId, Gav gav, String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact(
-            AbstractNexusIntegrationTest.baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId + "/",
-            gav.getGroupId(),
-            gav.getArtifactId(),
-            gav.getVersion(),
-            gav.getExtension(),
-            gav.getClassifier(),
-            targetDirectory );
+        return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId
+            + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
+                                      targetDirectory );
     }
 
     protected File downloadArtifactFromGroup( String groupId, Gav gav, String targetDirectory )
         throws IOException
     {
         return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL
-            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav
-            .getClassifier(), targetDirectory );
+            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+                                      gav.getClassifier(), targetDirectory );
     }
 
     protected File downloadArtifact( String baseUrl, String groupId, String artifact, String version, String type,
-        String classifier, String targetDirectory )
+                                     String classifier, String targetDirectory )
         throws IOException
     {
         URL url = new URL( baseUrl + this.getRelitiveArtifactPath( groupId, artifact, version, type, classifier ) );
@@ -844,8 +799,8 @@ public class AbstractNexusIntegrationTest
 
     protected boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz, String... tests )
     {
-        StringBuffer error = new StringBuffer(
-            "*********************************************************************************" );
+        StringBuffer error =
+            new StringBuffer( "*********************************************************************************" );
         error.append( "\n* This test is being skipped because its known to fail," );
         error.append( "\n* It is a very minor error, and is only a problem if you start sending in " );
         error.append( "\n* raw REST request to Nexus. (it is not a security problem)" );
