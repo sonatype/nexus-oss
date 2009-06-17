@@ -660,4 +660,5 @@
     <password>smtp-password</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
+  <errorReporting />
 </nexusConfiguration>

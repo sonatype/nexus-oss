@@ -1696,4 +1696,5 @@
     <port>25</port>
     <systemEmailAddress>nexus@repository.sonatype.org</systemEmailAddress>
   </smtpConfiguration>
+  <errorReporting />
 </nexusConfiguration>
