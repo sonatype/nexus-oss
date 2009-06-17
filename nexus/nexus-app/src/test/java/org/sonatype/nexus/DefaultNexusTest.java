@@ -23,8 +23,8 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.templates.Template;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 
 public class DefaultNexusTest
     extends AbstractNexusTestCase
@@ -62,12 +62,12 @@ public class DefaultNexusTest
     public void testRepositoryTemplates()
         throws Exception
     {
-        List<Template<Repository>> repoTemplates = getDefaultNexus().getRepositoryTemplates();
+        List<RepositoryTemplate> repoTemplates = getDefaultNexus().getRepositoryTemplates();
 
         assertNotNull( "template list is null", repoTemplates );
         assertEquals( "there should be 6 templates", 6, repoTemplates.size() );
 
-        Template<Repository> template =
+        RepositoryTemplate template =
             (AbstractRepositoryTemplate) getDefaultNexus().getRepositoryTemplateById( "default_hosted_release" );
 
         assertNotNull( "template should exist", template );

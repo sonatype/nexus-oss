@@ -8,10 +8,8 @@ import org.sonatype.nexus.configuration.ConfigurationException;
  * A template for creation of various objects.
  * 
  * @author cstamas
- * @param <C>
- * @param <I>
  */
-public interface Template<I>
+public interface Template
 {
     /**
      * The ID of this template.
@@ -28,19 +26,12 @@ public interface Template<I>
     String getDescription();
 
     /**
-     * The implementation that this template will create.
-     * 
-     * @return
-     */
-    Class<I> getTargetClass();
-
-    /**
      * Instantianates this template.
      * 
      * @return
      * @throws ConfigurationException
      * @throws IOException
      */
-    I create()
+    Object create()
         throws ConfigurationException, IOException;
 }

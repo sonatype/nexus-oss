@@ -10,30 +10,30 @@ import java.util.List;
  * @param <C>
  * @param <I>
  */
-public class AggregatingTemplateProvider<I>
-    extends AbstractTemplateProvider<I>
+public class AggregatingTemplateProvider<T extends Template>
+    extends AbstractTemplateProvider<T>
 {
-    private final Class<I> targetClass;
+    private final Class<T> templateClass;
 
-    private final List<TemplateProvider<I>> providers;
+    private final List<TemplateProvider<T>> providers;
 
-    public AggregatingTemplateProvider( Class<I> targetClass, List<TemplateProvider<I>> providers )
+    public AggregatingTemplateProvider( Class<T> templateClass, List<TemplateProvider<T>> providers )
     {
-        this.targetClass = targetClass;
+        this.templateClass = templateClass;
 
         this.providers = providers;
     }
 
-    public Class<I> getTargetClass()
+    public Class<T> getTemplateClass()
     {
-        return targetClass;
+        return templateClass;
     }
 
-    public List<Template<I>> getTemplates()
+    public List<T> getTemplates()
     {
-        ArrayList<Template<I>> result = new ArrayList<Template<I>>();
+        ArrayList<T> result = new ArrayList<T>();
 
-        for ( TemplateProvider<I> provider : providers )
+        for ( TemplateProvider<T> provider : providers )
         {
             result.addAll( provider.getTemplates() );
         }

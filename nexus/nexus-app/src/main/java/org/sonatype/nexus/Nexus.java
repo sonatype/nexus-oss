@@ -45,7 +45,7 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
-import org.sonatype.nexus.templates.Template;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 
 /**
  * The main Nexus application interface.
@@ -203,8 +203,8 @@ public interface Nexus
     // Repo templates
     // ----------------------------------------------------------------------------
 
-    List<Template<Repository>> getRepositoryTemplates();
+    List<RepositoryTemplate> getRepositoryTemplates();
 
-    Template<Repository> getRepositoryTemplateById( String id )
+    RepositoryTemplate getRepositoryTemplateById( String id )
         throws NoSuchTemplateIdException;;
 }

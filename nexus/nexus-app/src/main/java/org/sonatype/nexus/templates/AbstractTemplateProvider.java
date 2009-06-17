@@ -4,16 +4,16 @@ import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
 
-public abstract class AbstractTemplateProvider<I>
-    implements TemplateProvider<I>
+public abstract class AbstractTemplateProvider<T extends Template>
+    implements TemplateProvider<T>
 {
-    public Template<I> getTemplateById( String id )
+    public T getTemplateById( String id )
         throws NoSuchTemplateIdException
     {
         // TODO: some other selection that simple iteration?
-        List<Template<I>> templates = getTemplates();
+        List<T> templates = getTemplates();
 
-        for ( Template<I> template : templates )
+        for ( T template : templates )
         {
             if ( StringUtils.equals( id, template.getId() ) )
             {
@@ -21,7 +21,7 @@ public abstract class AbstractTemplateProvider<I>
             }
         }
 
-        throw new NoSuchTemplateIdException( "Template for implementationClass='" + getTargetClass().getName()
-            + "' with Id='" + id + "' not found!" );
+        throw new NoSuchTemplateIdException( "Template for class='" + getTemplateClass().getName() + "' with Id='" + id
+            + "' not found!" );
     }
 }

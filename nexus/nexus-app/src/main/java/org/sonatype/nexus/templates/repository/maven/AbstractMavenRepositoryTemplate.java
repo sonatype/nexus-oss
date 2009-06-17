@@ -2,8 +2,8 @@ package org.sonatype.nexus.templates.repository.maven;
 
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
 public abstract class AbstractMavenRepositoryTemplate
     extends AbstractRepositoryTemplate
@@ -15,8 +15,8 @@ public abstract class AbstractMavenRepositoryTemplate
                                             RepositoryPolicy repositoryPolicy )
     {
         super( provider, id, description, contentClass, mainFacet );
-
-        this.repositoryPolicy = repositoryPolicy;
+        
+        setRepositoryPolicy( repositoryPolicy );
     }
 
     protected RepositoryPolicy getRepositoryPolicy()

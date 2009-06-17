@@ -79,8 +79,8 @@ import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.tasks.RemoveRepoFolderTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
-import org.sonatype.nexus.templates.Template;
 import org.sonatype.nexus.templates.TemplateManager;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.nexus.timeline.RepositoryIdTimelineFilter;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
@@ -898,14 +898,14 @@ public class DefaultNexus
     // Repo templates
     // ----------------------------------------------------------------------------
 
-    public List<Template<Repository>> getRepositoryTemplates()
+    public List<RepositoryTemplate> getRepositoryTemplates()
     {
-        return templateManager.getTemplateProviderForTarget( Repository.class ).getTemplates();
+        return templateManager.getTemplateProviderForTarget( RepositoryTemplate.class ).getTemplates();
     }
 
-    public Template<Repository> getRepositoryTemplateById( String id )
+    public RepositoryTemplate getRepositoryTemplateById( String id )
         throws NoSuchTemplateIdException
     {
-        return templateManager.getTemplate( Repository.class, id );
+        return templateManager.getTemplate( RepositoryTemplate.class, id );
     }
 }

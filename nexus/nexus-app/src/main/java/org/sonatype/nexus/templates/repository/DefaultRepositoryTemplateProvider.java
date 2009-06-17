@@ -8,9 +8,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.templates.AbstractTemplateProvider;
-import org.sonatype.nexus.templates.Template;
 import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.repository.maven.Maven1Maven2ShadowRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2GroupRepositoryTemplate;
@@ -19,7 +17,7 @@ import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTempla
 
 @Component( role = TemplateProvider.class, hint = "default-repository" )
 public class DefaultRepositoryTemplateProvider
-    extends AbstractTemplateProvider<Repository>
+    extends AbstractTemplateProvider<RepositoryTemplate>
 {
     private static final String DEFAULT_HOSTED_RELEASE = "default_hosted_release";
 
@@ -41,14 +39,14 @@ public class DefaultRepositoryTemplateProvider
         return nexus;
     }
 
-    public Class<Repository> getTargetClass()
+    public Class<RepositoryTemplate> getTemplateClass()
     {
-        return Repository.class;
+        return RepositoryTemplate.class;
     }
 
-    public List<Template<Repository>> getTemplates()
+    public List<RepositoryTemplate> getTemplates()
     {
-        ArrayList<Template<Repository>> templates = new ArrayList<Template<Repository>>( 6 );
+        ArrayList<RepositoryTemplate> templates = new ArrayList<RepositoryTemplate>( 6 );
 
         try
         {

@@ -10,7 +10,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.templates.AbstractConfigurableTemplate;
 
 public abstract class AbstractRepositoryTemplate
-    extends AbstractConfigurableTemplate<Repository>
+    extends AbstractConfigurableTemplate
+    implements RepositoryTemplate
 {
     private final DefaultRepositoryTemplateProvider provider;
 
@@ -19,7 +20,7 @@ public abstract class AbstractRepositoryTemplate
     private final Class<?> mainFacet;
 
     public AbstractRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
-                               ContentClass contentClass, Class<?> mainFacet )
+                                       ContentClass contentClass, Class<?> mainFacet )
     {
         super( id, description );
 
@@ -62,11 +63,6 @@ public abstract class AbstractRepositoryTemplate
         }
 
         return configurableRepository;
-    }
-
-    public Class<Repository> getTargetClass()
-    {
-        return provider.getTargetClass();
     }
 
     public Repository create()

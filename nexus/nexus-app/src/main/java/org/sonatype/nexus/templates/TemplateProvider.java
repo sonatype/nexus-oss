@@ -8,25 +8,23 @@ import org.sonatype.plexus.plugin.ExtensionPoint;
  * A template provider provides a set of templates for one implementation.
  * 
  * @author cstamas
- * @param <C>
- * @param <I>
  */
 @ExtensionPoint
-public interface TemplateProvider<I>
+public interface TemplateProvider<T extends Template>
 {
     /**
-     * Returns the implementation class for which this provider provides templates.
+     * Returns the template class for which this provider provides templates.
      * 
      * @return
      */
-    Class<I> getTargetClass();
+    Class<T> getTemplateClass();
 
     /**
      * Lists the templates.
      * 
      * @return
      */
-    List<Template<I>> getTemplates();
+    List<T> getTemplates();
 
     /**
      * Search a template by it's ID.
@@ -35,6 +33,6 @@ public interface TemplateProvider<I>
      * @return
      * @throws NoSuchTemplateIdException
      */
-    Template<I> getTemplateById( String id )
+    T getTemplateById( String id )
         throws NoSuchTemplateIdException;
 }

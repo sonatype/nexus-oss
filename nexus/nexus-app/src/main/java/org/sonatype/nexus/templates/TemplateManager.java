@@ -14,7 +14,7 @@ public interface TemplateManager
      * 
      * @return
      */
-    List<Template<?>> getTemplates();
+    <T extends Template> List<T> getTemplates();
 
     /**
      * Get templates that are able to create instances of suplied class.
@@ -23,7 +23,7 @@ public interface TemplateManager
      * @param clazz
      * @return
      */
-    <I> TemplateProvider<I> getTemplateProviderForTarget( Class<I> clazz );
+    <I extends Template> TemplateProvider<I> getTemplateProviderForTarget( Class<I> clazz );
 
     /**
      * Get one specific template that is ablt to create instance of supplied class with given id.
@@ -34,6 +34,6 @@ public interface TemplateManager
      * @return
      * @throws NoSuchTemplateIdException
      */
-    <I> Template<I> getTemplate( Class<I> clazz, String id )
+    <I extends Template> I getTemplate( Class<I> clazz, String id )
         throws NoSuchTemplateIdException;
 }

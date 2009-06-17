@@ -24,7 +24,6 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
@@ -34,8 +33,7 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
-import org.sonatype.nexus.templates.Template;
-import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -80,10 +78,7 @@ public class RepositoryTemplatePlexusResource
 
         try
         {
-            Template<Repository> genTemplate = getNexus().getRepositoryTemplateById( getRepositoryId( request ) );
-
-            // TODO: a hack, fix it
-            AbstractRepositoryTemplate template = (AbstractRepositoryTemplate) genTemplate;
+            RepositoryTemplate template = getNexus().getRepositoryTemplateById( getRepositoryId( request ) );
 
             RepositoryBaseResource repoRes = null;
 

@@ -13,9 +13,9 @@ public class DefaultTemplateManager
     @Requirement( role = TemplateProvider.class )
     private List<TemplateProvider<?>> providers;
 
-    public List<Template<?>> getTemplates()
+    public List<Template> getTemplates()
     {
-        ArrayList<Template<?>> result = new ArrayList<Template<?>>();
+        ArrayList<Template> result = new ArrayList<Template>();
 
         for ( TemplateProvider<?> provider : providers )
         {
@@ -26,22 +26,22 @@ public class DefaultTemplateManager
     }
 
     @SuppressWarnings( "unchecked" )
-    public <I> TemplateProvider<I> getTemplateProviderForTarget( Class<I> clazz )
+    public <T extends Template> TemplateProvider<T> getTemplateProviderForTarget( Class<T> clazz )
     {
-        ArrayList<TemplateProvider<I>> selectedProviders = new ArrayList<TemplateProvider<I>>();
+        ArrayList<TemplateProvider<T>> selectedProviders = new ArrayList<TemplateProvider<T>>();
 
         for ( TemplateProvider<?> provider : providers )
         {
-            if ( provider.getTargetClass().equals( clazz ) )
+            if ( provider.getTemplateClass().equals( clazz ) )
             {
-                selectedProviders.add( (TemplateProvider<I>) provider );
+                selectedProviders.add( (TemplateProvider<T>) provider );
             }
         }
 
-        return new AggregatingTemplateProvider<I>( clazz, selectedProviders );
+        return new AggregatingTemplateProvider<T>( clazz, selectedProviders );
     }
 
-    public <I> Template<I> getTemplate( Class<I> clazz, String id )
+    public <T extends Template> T getTemplate( Class<T> clazz, String id )
         throws NoSuchTemplateIdException
     {
         return getTemplateProviderForTarget( clazz ).getTemplateById( id );

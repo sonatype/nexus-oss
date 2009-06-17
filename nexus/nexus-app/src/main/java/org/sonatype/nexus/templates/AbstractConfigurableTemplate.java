@@ -2,9 +2,9 @@ package org.sonatype.nexus.templates;
 
 import org.sonatype.nexus.configuration.CoreConfiguration;
 
-public abstract class AbstractConfigurableTemplate<I>
-    extends AbstractTemplate<I>
-    implements ConfigurableTemplate<I>
+public abstract class AbstractConfigurableTemplate
+    extends AbstractTemplate
+    implements ConfigurableTemplate
 {
     private CoreConfiguration coreConfiguration;
 

@@ -1,7 +1,7 @@
 package org.sonatype.nexus.templates;
 
-public abstract class AbstractTemplate<I>
-    implements Template<I>
+public abstract class AbstractTemplate
+    implements Template
 {
     private final String id;
 

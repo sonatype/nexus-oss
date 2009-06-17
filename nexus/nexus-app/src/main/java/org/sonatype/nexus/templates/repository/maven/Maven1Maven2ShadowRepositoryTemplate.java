@@ -17,8 +17,12 @@ public class Maven1Maven2ShadowRepositoryTemplate
     public Maven1Maven2ShadowRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id,
                                                  String description )
     {
-        super( provider, id, description, new Maven2ContentClass(),
-               MavenShadowRepository.class, null );
+        super( provider, id, description, new Maven2ContentClass(), MavenShadowRepository.class, null );
+    }
+
+    public M2LayoutedM1ShadowRepositoryConfiguration getExternalConfiguration()
+    {
+        return (M2LayoutedM1ShadowRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration();
     }
 
     protected CoreConfiguration initCoreConfiguration()

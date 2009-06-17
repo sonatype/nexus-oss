@@ -25,14 +25,12 @@ import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
-import org.sonatype.nexus.templates.Template;
-import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -69,13 +67,10 @@ public class RepositoryTemplateListPlexusResource
 
         RepositoryListResource repoRes;
 
-        List<Template<Repository>> repoTemplates = getNexus().getRepositoryTemplates();
+        List<RepositoryTemplate> repoTemplates = getNexus().getRepositoryTemplates();
 
-        for ( Template<Repository> genTemplate : repoTemplates )
+        for ( RepositoryTemplate template : repoTemplates )
         {
-            // TODO: a hack, fix it
-            AbstractRepositoryTemplate template = (AbstractRepositoryTemplate) genTemplate;
-
             repoRes = new RepositoryListResource();
 
             repoRes.setResourceURI( createChildReference( request, this, template.getId() ).toString() );
