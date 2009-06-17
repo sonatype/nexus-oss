@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-//
-// $Id: validate.groovy 8178 2009-05-12 19:21:54Z bentmann $
-//
-def basedir = "/Users/demers/dev/source/nexus/trunk/nexus/nexus-plugins/nexuspd-maven-plugin/target/it/plugin-1";
+ 
+//def basedir = "/Users/demers/dev/source/nexus/trunk/nexus/nexus-plugins/nexuspd-maven-plugin/target/it/plugin-1";
 
 def outputFile = new File(basedir, 'target/classes/META-INF/plugin.xml');
 def pomFile = new File(basedir, "pom.xml");
@@ -44,8 +41,8 @@ assert components.contains("org.sonatype.plugin.test.ComponentManaged") : "compo
 
 assert 3 == pluginModel.components.component.size();
 
-
-// dependencies
-assert 11 == pluginModel.classpathDependencies.classpathDependency.size() : "actual: "+ pluginModel.classpathDependencies.classpathDependency.size();
+//dependencies
+def expectedDepCount = pomModel.dependencies.dependency.findAll{ it.scope.text().equals("") || it.scope.text().equals("compile") || it.scope.text().equals("runtime") }.size();
+assert expectedDepCount == pluginModel.classpathDependencies.classpathDependency.size() : "actual: "+ pluginModel.classpathDependencies.classpathDependency.size() +", expected: "+ expectedDepCount;
 
 return true;
