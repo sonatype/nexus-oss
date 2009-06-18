@@ -262,6 +262,8 @@ public abstract class AbstractRepositoryPlexusResource
         resource.setBrowseable( repository.isBrowseable() );
 
         resource.setIndexable( repository.isIndexable() );
+        
+        resource.setExposed( repository.isExposed() );
 
         resource.setNotFoundCacheTTL( repository.getNotFoundCacheTimeToLive() );
 
@@ -342,6 +344,8 @@ public abstract class AbstractRepositoryPlexusResource
         resource.setShadowOf( shadow.getMasterRepositoryId() );
 
         resource.setSyncAtStartup( shadow.isSynchronizeAtStartup() );
+        
+        resource.setExposed( shadow.isExposed() );
 
         return resource;
     }

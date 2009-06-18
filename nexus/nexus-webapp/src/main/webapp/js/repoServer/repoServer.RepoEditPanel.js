@@ -184,13 +184,15 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
         repoPolicy: Sonatype.utils.upperFirstCharLowerRest,
         allowWrite: Sonatype.utils.capitalize,
         browseable: Sonatype.utils.capitalize,
-        indexable: Sonatype.utils.capitalize
+        indexable: Sonatype.utils.capitalize,
+        exposed: Sonatype.utils.capitalize
       },
       submit: { 
         repoPolicy: Sonatype.utils.uppercase,
         allowWrite: Sonatype.utils.convert.stringContextToBool,
         browseable: Sonatype.utils.convert.stringContextToBool,
         indexable: Sonatype.utils.convert.stringContextToBool,
+        exposed: Sonatype.utils.convert.stringContextToBool,
         downloadRemoteIndexes: function() { return false; },
         checksumPolicy: function() { return 'IGNORE'; }
       }
@@ -370,6 +372,11 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
             fieldLabel: 'Include in Search',
             helpText: ht.indexable,
             name: 'indexable'
+          },
+          {
+              fieldLabel: 'Publish URL',
+              helpText: ht.exposed,
+              name: 'exposed'
           }
         ]
       },
@@ -420,6 +427,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
         allowWrite: Sonatype.utils.capitalize,
         browseable: Sonatype.utils.capitalize,
         indexable: Sonatype.utils.capitalize,
+        exposed: Sonatype.utils.capitalize,
         downloadRemoteIndexes: Sonatype.utils.capitalize,
         checksumPolicy: Sonatype.utils.upperFirstCharLowerRest
       },
@@ -428,6 +436,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
         allowWrite: Sonatype.utils.convert.stringContextToBool,
         browseable: Sonatype.utils.convert.stringContextToBool,
         indexable: Sonatype.utils.convert.stringContextToBool,
+        exposed: Sonatype.utils.convert.stringContextToBool,
         downloadRemoteIndexes: Sonatype.utils.convert.stringContextToBool,
         checksumPolicy: Sonatype.utils.uppercase
       }
@@ -735,6 +744,11 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
             fieldLabel: 'Include in Search',
             helpText: ht.indexable,
             name: 'indexable'
+          },
+          {
+              fieldLabel: 'Publish URL',
+              helpText: ht.exposed,
+              name: 'exposed'
           }
         ]
       },
@@ -1217,7 +1231,7 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
 
   var editor = repoEditors[rec.data.repoType];
   
-  if ( editor && rec.data.exposed && rec.data.userManaged && sp.checkPermission( 'nexus:repositories', sp.READ ) &&
+  if ( editor && rec.data.userManaged && sp.checkPermission( 'nexus:repositories', sp.READ ) &&
       ( sp.checkPermission( 'nexus:repositories', sp.CREATE ) ||
         sp.checkPermission( 'nexus:repositories', sp.DELETE ) ||
         sp.checkPermission( 'nexus:repositories', sp.EDIT ) ) ) {

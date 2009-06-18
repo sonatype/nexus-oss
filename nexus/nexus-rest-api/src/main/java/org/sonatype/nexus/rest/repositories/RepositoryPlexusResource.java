@@ -107,6 +107,8 @@ public class RepositoryPlexusResource
                             getRepositoryRegistry().getRepositoryWithFacet( repoId, ShadowRepository.class );
 
                         shadow.setName( model.getName() );
+                        
+                        shadow.setExposed( resource.isExposed() );
 
                         shadow.setMasterRepositoryId( model.getShadowOf() );
 
@@ -136,6 +138,8 @@ public class RepositoryPlexusResource
                         Repository repository = getRepositoryRegistry().getRepository( repoId );
 
                         repository.setName( model.getName() );
+                        
+                        repository.setExposed( resource.isExposed() );
 
                         repository.setAllowWrite( model.isAllowWrite() );
 

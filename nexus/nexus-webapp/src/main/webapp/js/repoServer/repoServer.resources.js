@@ -77,7 +77,8 @@ Sonatype.repoServer.resources.help = {
   // Groups Config help text
   groups : {
     id : 'The unique id for the group. This id will become part of the url so it should not contain spaces.',
-    name : 'The Group Name which is referenced in the UI and Logs.'
+    name : 'The Group Name which is referenced in the UI and Logs.',
+    exposed : 'This controls if the group is published on a URL, if this field is false you will not be able to access this group remotely.'
   },
 
   // Routes Config help text
@@ -140,6 +141,7 @@ Sonatype.repoServer.resources.help = {
     allowWrite : 'This controls if users are allowed to deploy artifacts to this repository. (Hosted repositories only)',
     browseable : 'This controls if users can browse the contents of the repository via their web browser.',
     indexable : 'This controls if the artifacts contained by this repository are indexed and thus searchable.',
+    exposed : 'This controls if the repository is published on a URL, if this field is false you will not be able to access this repository remotely.',
     notFoundCacheTTL : 'This controls how long to cache the fact that a file was not found in the repository.',
     artifactMaxAge : 'This controls how long to cache the artifacts in the repository before rechecking the remote repository. In a release repository, this value should be -1 (infinite) as release artifacts shouldn\'t change.',
     metadataMaxAge : 'This controls how long to cache the metadata in the repository before rechecking the remote repository. Unlike artifact max age, this value should not be infinite or Maven won\'t discover new artifact releases.',

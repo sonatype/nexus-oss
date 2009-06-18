@@ -63,6 +63,7 @@ public class Nexus642SynchShadowTaskTest
         repo.setRepoType( "virtual" );
         repo.setShadowOf( this.getTestRepositoryId() );
         repo.setSyncAtStartup( false );
+        repo.setExposed( true );
         repoUtil.createRepository( repo );
 
         // create Sync Repo Task

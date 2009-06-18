@@ -13,6 +13,7 @@
           <userPrivilageMap>
             <repo1user>nexus:target:*:repo1:*,nexus:view:repository:repo1</repo1user>
             <repo1userNoView>nexus:target:*:repo1:*</repo1userNoView>
+            <admin>nexus:target:*:*:*,nexus:view:repository:*</admin>
           </userPrivilageMap>
         </configuration>
     </component>

@@ -632,6 +632,8 @@ public class DefaultRepositoryRouter
                 }
             }
             
+            repositories.get( 0 ).isExposed();
+            
             // if no prefix matched, Item not found
             if ( repositories == null || repositories.isEmpty() )
             {

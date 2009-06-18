@@ -84,7 +84,7 @@ public class QuickRestClientTest extends PlexusTestCase
         repoResoruce.setId( "testCreate" );
         repoResoruce.setRepoType( "hosted" ); // [hosted, proxy, virtual]
         repoResoruce.setName( "Create Test Repo" );
-        // repoResoruce.setRepoType( ? )
+        repoResoruce.setProvider( "maven2" );
         repoResoruce.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
         repoResoruce.setAllowWrite( true );
         repoResoruce.setBrowseable( true );

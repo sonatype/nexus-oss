@@ -2,7 +2,9 @@ package org.sonatype.nexus.proxy.router;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -62,14 +64,17 @@ public class DefaultRepositoryRouterTest
         this.router = this.lookup( RepositoryRouter.class );
         this.repositoryRegistry = this.lookup( RepositoryRegistry.class );
 
-        this.buildRepository( "repo1" );
-        this.buildRepository( "repo2" );
+        this.buildRepository( "repo1", true );
+        this.buildRepository( "repo2", true );
+        this.buildRepository( "repo3-notexposed", false );
 
-        this.buildGroupRepository( "group1" );
-        this.buildGroupRepository( "group2" );
+        this.buildGroupRepository( "group1", true );
+        this.buildGroupRepository( "group2", true );
+        this.buildGroupRepository( "group3-notexposed", false );
 
-        this.buildShadowRepository( "repo3" );
-        this.buildShadowRepository( "repo4" );
+        this.buildShadowRepository( "repo3", true );
+        this.buildShadowRepository( "repo4", true );
+        this.buildShadowRepository( "repo5-notexposed", false );
 
         // copy the security-configuration
         String resource = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security-configuration.xml";
@@ -81,7 +86,7 @@ public class DefaultRepositoryRouterTest
         Target t1 = new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays
             .asList( new String[] { ".*" } ) );
         targetRegistry.addRepositoryTarget( t1 );
-        
+
         // setup security
         this.securitySystem = this.lookup( SecuritySystem.class );
         securitySystem.setSecurityEnabled( true );
@@ -102,22 +107,22 @@ public class DefaultRepositoryRouterTest
         // this user only has access to repo1, that is all they should see
         Assert.assertEquals( "User should only have access to 'repo1'", 1, collectionItem.list().size() );
         Assert.assertEquals( "repo1", collectionItem.list().iterator().next().getName() );
-        
+
         // logout user
         this.securitySystem.logout( subject.getPrincipals() );
     }
-    
+
     public void testRouterWithNoViewAccess()
-    throws Exception
+        throws Exception
     {
         Subject subject = this.loginUser( "repo1userNoView" );
-    
+
         ResourceStoreRequest request = new ResourceStoreRequest( "/repositories/" );
-    
+
         StorageItem item = router.retrieveItem( request );
-    
+
         StorageCollectionItem collectionItem = (StorageCollectionItem) item;
-    
+
         // this user only has access to repo1, that is all they should see
         Assert.assertEquals( "User should not have access to any repos", 0, collectionItem.list().size() );
 
@@ -125,36 +130,134 @@ public class DefaultRepositoryRouterTest
         this.securitySystem.logout( subject.getPrincipals() );
     }
 
-    private Repository buildRepository( String repoId )
+    public void testFilterOutNonExposedRepositories()
+        throws Exception
+    {
+        Subject subject = this.loginUser( "admin" );
+
+        ResourceStoreRequest request = new ResourceStoreRequest( "/repositories/" );
+
+        StorageItem item = router.retrieveItem( request );
+
+        StorageCollectionItem collectionItem = (StorageCollectionItem) item;
+        Assert.assertEquals( "User should see 8 repositories", 8, collectionItem.list().size() ); // we create a new
+        // repo for each
+        // shadow
+
+        List<String> repoIds = new ArrayList<String>();
+        for ( StorageItem tmpItem : collectionItem.list() )
+        {
+            repoIds.add( tmpItem.getName() );
+        }
+
+        // now check them all
+        Assert.assertTrue( repoIds.contains( "repo1" ) );
+        Assert.assertTrue( repoIds.contains( "repo2" ) );
+        Assert.assertFalse( repoIds.contains( "repo3-notexposed" ) );
+
+        Assert.assertTrue( repoIds.contains( "group1" ) );
+        Assert.assertTrue( repoIds.contains( "group2" ) );
+        Assert.assertFalse( repoIds.contains( "group3-notexposed" ) );
+
+        Assert.assertTrue( repoIds.contains( "repo3" ) );
+        Assert.assertTrue( repoIds.contains( "repo4" ) );
+        Assert.assertFalse( repoIds.contains( "repo5-notexposed" ) );
+
+        Assert.assertTrue( repoIds.contains( "repo3-shadow" ) );
+        Assert.assertTrue( repoIds.contains( "repo4-shadow" ) );
+        Assert.assertFalse( repoIds.contains( "repo5-notexposed-shadow" ) );
+
+        // logout user
+        this.securitySystem.logout( subject.getPrincipals() );
+    }
+
+    public void testFilterOutNonExposedGroups()
+        throws Exception
+    {
+        Subject subject = this.loginUser( "admin" );
+
+        ResourceStoreRequest request = new ResourceStoreRequest( "/shadows/" );
+
+        StorageItem item = router.retrieveItem( request );
+
+        StorageCollectionItem collectionItem = (StorageCollectionItem) item;
+        Assert.assertEquals( "User should see 2 groups", 2, collectionItem.list().size() );
+
+        List<String> repoIds = new ArrayList<String>();
+        for ( StorageItem tmpItem : collectionItem.list() )
+        {
+            repoIds.add( tmpItem.getName() );
+        }
+
+        // now check them all
+        Assert.assertTrue( repoIds.contains( "repo3-shadow" ) );
+        Assert.assertTrue( repoIds.contains( "repo4-shadow" ) );
+        Assert.assertFalse( repoIds.contains( "repo5-notexposed-shadow" ) );
+
+        // logout user
+        this.securitySystem.logout( subject.getPrincipals() );
+    }
+
+    public void testFilterOutNonExposedShadows()
+        throws Exception
+    {
+        Subject subject = this.loginUser( "admin" );
+
+        ResourceStoreRequest request = new ResourceStoreRequest( "/groups/" );
+
+        StorageItem item = router.retrieveItem( request );
+
+        StorageCollectionItem collectionItem = (StorageCollectionItem) item;
+        Assert.assertEquals( "User should see 2 groups", 2, collectionItem.list().size() );
+
+        List<String> repoIds = new ArrayList<String>();
+        for ( StorageItem tmpItem : collectionItem.list() )
+        {
+            repoIds.add( tmpItem.getName() );
+        }
+
+        // now check them all
+        Assert.assertTrue( repoIds.contains( "group1" ) );
+        Assert.assertTrue( repoIds.contains( "group2" ) );
+        Assert.assertFalse( repoIds.contains( "group3-notexposed" ) );
+
+        // logout user
+        this.securitySystem.logout( subject.getPrincipals() );
+    }
+
+    private Repository buildRepository( String repoId, boolean exposed )
         throws Exception
     {
         M2Repository repo = (M2Repository) this.lookup( Repository.class, "maven2" );
         CRepository repoConfig = new DefaultCRepository();
         repoConfig.setId( repoId );
+        repoConfig.setExposed( exposed );
         repo.configure( repoConfig );
         this.repositoryRegistry.addRepository( repo );
 
         return repo;
     }
 
-    private Repository buildGroupRepository( String repoId )
+    private Repository buildGroupRepository( String repoId, boolean exposed )
         throws Exception
     {
         M2GroupRepository repo = (M2GroupRepository) this.lookup( GroupRepository.class, "maven2" );
         CRepository repoConfig = new DefaultCRepository();
         repoConfig.setId( repoId );
+        repoConfig.setExposed( exposed );
         repo.configure( repoConfig );
         this.repositoryRegistry.addRepository( repo );
 
         return repo;
     }
 
-    private Repository buildShadowRepository( String repoId )
+    private Repository buildShadowRepository( String repoId, boolean exposed )
         throws Exception
     {
         M1Repository repo = (M1Repository) this.lookup( Repository.class, "maven1" );
         CRepository repoConfig = new DefaultCRepository();
         repoConfig.setId( repoId );
+        repoConfig.setExposed( exposed );
         repo.configure( repoConfig );
         this.repositoryRegistry.addRepository( repo );
 
@@ -164,6 +267,7 @@ public class DefaultRepositoryRouterTest
             "m1-m2-shadow" );
         CRepository shadowConfig = new DefaultCRepository();
         shadowConfig.setId( repoId + "-shadow" );
+        shadowConfig.setExposed( exposed );
         shadowConfig.setProviderRole( ShadowRepository.class.getName() );
         shadowConfig.setProviderHint( "m2-m1-shadow" );
 

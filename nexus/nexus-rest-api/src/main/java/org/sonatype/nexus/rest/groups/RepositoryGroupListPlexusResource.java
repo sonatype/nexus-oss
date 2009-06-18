@@ -88,6 +88,8 @@ public class RepositoryGroupListPlexusResource
 
                 resource.setId( group.getId() );
 
+                resource.setExposed( group.isExposed() );
+
                 resource.setFormat( getRepositoryRegistry()
                     .getRepositoryWithFacet( group.getId(), GroupRepository.class ).getRepositoryContentClass()
                     .getId() );

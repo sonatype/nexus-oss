@@ -118,6 +118,8 @@ public class RepositoryGroupPlexusResource
         resource.setRepoType( AbstractRepositoryPlexusResource.REPO_TYPE_GROUP );
 
         resource.setFormat( groupRepo.getRepositoryContentClass().getId() );
+        
+        resource.setExposed( groupRepo.isExposed() );
 
         try
         {

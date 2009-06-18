@@ -1738,13 +1738,13 @@ public class TestMarshalUnmarchal
         // do xml
         String xml = this.xstreamXML.toXML( obj );
 
-//        System.out.println( "xml: \n"+  xml);
+        System.out.println( "xml: \n"+  xml);
         this.compareObjects( obj, xstreamXML.fromXML( xml ) );
 
         // do json
         String json = new StringBuffer( "{ \"" ).append( obj.getClass().getName() ).append( "\" : " ).append(
             this.xstreamJSON.toXML( obj ) ).append( " }" ).toString();
-//        System.out.println( "json:\n "+ json );
+        System.out.println( "json:\n "+ json );
         try
         {
             this.compareObjects( obj, xstreamJSON.fromXML( json, obj.getClass().newInstance() ) );

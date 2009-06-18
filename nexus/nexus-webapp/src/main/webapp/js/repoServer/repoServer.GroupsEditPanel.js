@@ -20,10 +20,12 @@ Sonatype.repoServer.RepositoryGroupEditor = function( config ) {
   var defaultConfig = {
     dataModifiers: {
       load: {
-        repositories: this.loadRepositories.createDelegate( this )
+        repositories: this.loadRepositories.createDelegate( this ),
+        exposed: Sonatype.utils.capitalize
       },
       submit: { 
-        repositories: this.saveRepositories.createDelegate( this )
+        repositories: this.saveRepositories.createDelegate( this ),
+        exposed: Sonatype.utils.convert.stringContextToBool
       }
     },
     referenceData: Sonatype.repoServer.referenceData.group,
@@ -32,6 +34,11 @@ Sonatype.repoServer.RepositoryGroupEditor = function( config ) {
   Ext.apply( this, config, defaultConfig );
 
   var ht = Sonatype.repoServer.resources.help.groups;
+  
+  this.tfStore = new Ext.data.SimpleStore( {
+	    fields: ['value'],
+	    data: [['True'], ['False']] 
+	  } );
 
   this.providerStore = new Ext.data.JsonStore( {
     root: 'data',
@@ -117,6 +124,23 @@ Sonatype.repoServer.RepositoryGroupEditor = function( config ) {
         allowBlank: false
       },
       {
+    	  xtype: 'combo',
+          fieldLabel: 'Publish URL',
+          itemCls: 'required-field',
+          helpText: ht.exposed,
+          name: 'exposed',
+          width: 75,
+          store: this.tfStore,
+          displayField: 'value',
+          editable: false,
+          forceSelection: true,
+          mode: 'local',
+          triggerAction: 'all',
+          emptyText: 'Select...',
+          selectOnFocus: true,
+          allowBlank: false
+      },
+      {
         xtype: 'twinpanelchooser',
         titleLeft: 'Ordered Group Repositories',
         titleRight: 'Available Repositories',
@@ -181,9 +205,9 @@ Ext.extend( Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
         receivedData.id = action.output.data.id;
         receivedData.name = action.output.data.name;
         receivedData.format = action.output.data.format;
+        receivedData.exposed = action.output.data.exposed;
         receivedData.displayStatus = Sonatype.utils.joinArrayObject( action.output.data.repositories, 'name' );
         receivedData.repoType = 'group';
-        receivedData.exposed = true;
         receivedData.userManaged = true;
         receivedData.resourceURI =
           Sonatype.config.host + Sonatype.config.repos.urls.groups + '/' + action.output.data.id;
@@ -196,6 +220,7 @@ Ext.extend( Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
     rec.beginEdit();
     rec.set( 'name', action.output.data.name );
     rec.set( 'format', action.output.data.format );
+    rec.set( 'exposed', action.output.data.exposed );
     rec.set( 'displayStatus', Sonatype.utils.joinArrayObject( action.output.data.repositories, 'name' ) ); 
     rec.commit();
     rec.endEdit();

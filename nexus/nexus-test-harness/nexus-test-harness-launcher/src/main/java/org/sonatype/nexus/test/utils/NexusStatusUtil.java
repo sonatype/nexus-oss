@@ -68,7 +68,7 @@ public class NexusStatusUtil
             try
             {
                 throw new NexusIllegalStateException( "Could not " + command + " Nexus: (" + response.getStatus() + ")"
-                    + response.getEntity().getText() + " nexus state was: " + originalState + " and now is: "
+                    + ((response.getEntity() != null)  ? response.getEntity().getText() : "no response") + " nexus state was: " + originalState + " and now is: "
                     + getNexusStatus().getData().getState() );
             }
             catch ( IOException e )

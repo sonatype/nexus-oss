@@ -62,6 +62,8 @@ public abstract class AbstractRepositoryGroupPlexusResource
 
             group.setName( model.getName() );
 
+            group.setExposed( model.isExposed() );
+            
             ArrayList<String> members = new ArrayList<String>();
 
             for ( RepositoryGroupMemberRepository member : (List<RepositoryGroupMemberRepository>) model.getRepositories() )
@@ -127,6 +129,8 @@ public abstract class AbstractRepositoryGroupPlexusResource
             group.setId( model.getId() );
 
             group.setName( model.getName() );
+            
+            group.setExposed( model.isExposed() );
 
             group.setProviderRole( GroupRepository.class.getName() );
 

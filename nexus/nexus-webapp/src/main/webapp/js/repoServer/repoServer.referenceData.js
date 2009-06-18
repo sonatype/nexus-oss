@@ -138,6 +138,7 @@ Sonatype.repoServer.referenceData = {
     id : "",
     name: "",
     format: "",
+    exposed: "",
     provider: "",
     repositories:[]
       //note: internal record structure is the responsibility of data modifier func

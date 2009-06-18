@@ -157,6 +157,8 @@ public class RepositoryListPlexusResource
         appModel.setId( resource.getId() );
 
         appModel.setName( resource.getName() );
+        
+        appModel.setExposed( resource.isExposed() );
 
         if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
         {
