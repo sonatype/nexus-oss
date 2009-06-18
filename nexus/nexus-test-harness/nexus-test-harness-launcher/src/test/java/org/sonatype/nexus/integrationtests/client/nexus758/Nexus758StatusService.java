@@ -49,11 +49,11 @@ public class Nexus758StatusService
 
         // stop Nexus
         client.stopNexus(); // blocking
-        Assert.assertTrue( "Expected Nexus to be Stopped", NexusStatusUtil.waitForStop( client ) );
+        Assert.assertTrue( "Expected Nexus to be Stopped", NexusStatusUtil.waitForStop() );
 
         // start Nexus
         client.startNexus(); // blocking
-        Assert.assertTrue( "Expected Nexus to be Started", NexusStatusUtil.waitForStart( client ) );
+        Assert.assertTrue( "Expected Nexus to be Started", NexusStatusUtil.waitForStart() );
 
         client.disconnect();
     }
@@ -71,34 +71,34 @@ public class Nexus758StatusService
         client.disconnect();
     }
 
-//    @Test
-//    public void waitForStartTest()
-//        throws Exception
-//    {
-//        NexusClient client = null;
-//
-//        try
-//        {
-//            appBooter.stop();
-//
-//            client = this.getConnectedNexusClient();
-//            // turn down the timeout to speed up the tests
-//
-//            Assert.assertTrue( "Wait for start, timed out.", NexusStatusUtil.waitForStop( client ) );
-//
-//            appBooter.setSleepAfterStart( 0 );
-//            appBooter.start();
-//            // set the timeout back to 16 sec
-//            Assert.assertTrue( "Wait for start, timed out.", NexusStatusUtil.waitForStart( client ) );
-//
-//        }
-//        finally
-//        {
-//            // hack, but we needed to be able to test the timeout
-//            appBooter.setSleepAfterStart( 6000 );
-//        }
-//
-//        client.disconnect();
-//    }
+    // @Test
+    // public void waitForStartTest()
+    // throws Exception
+    // {
+    // NexusClient client = null;
+    //
+    // try
+    // {
+    // appBooter.stop();
+    //
+    // client = this.getConnectedNexusClient();
+    // // turn down the timeout to speed up the tests
+    //
+    // Assert.assertTrue( "Wait for start, timed out.", NexusStatusUtil.waitForStop( client ) );
+    //
+    // appBooter.setSleepAfterStart( 0 );
+    // appBooter.start();
+    // // set the timeout back to 16 sec
+    // Assert.assertTrue( "Wait for start, timed out.", NexusStatusUtil.waitForStart( client ) );
+    //
+    // }
+    // finally
+    // {
+    // // hack, but we needed to be able to test the timeout
+    // appBooter.setSleepAfterStart( 6000 );
+    // }
+    //
+    // client.disconnect();
+    // }
 
 }

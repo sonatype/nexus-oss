@@ -147,7 +147,7 @@ public class NexusStatusUtil
             throw new NexusIllegalStateException( "Unable to doClientStart(), nexus still stopped", e );
         }
 
-        if ( !waitForStart( getClient() ) )
+        if ( !waitForStart() )
         {
             throw new NexusIllegalStateException( "Unable to doClientStart(), nexus still stopped" );
         }
@@ -178,7 +178,7 @@ public class NexusStatusUtil
                 throw new NexusIllegalStateException( "Unable to doClientStop(), nexus still running", e );
             }
 
-            if ( !waitForStop( getClient() ) )
+            if ( !waitForStop() )
             {
                 throw new NexusIllegalStateException( "Unable to doClientStop(), nexus still running" );
             }
@@ -217,7 +217,7 @@ public class NexusStatusUtil
 
         }
 
-        if ( !waitForStart( getClient() ) )
+        if ( !waitForStart() )
         {
             throw new NexusIllegalStateException( "Unable to doHardStart(), nexus still stopped" );
         }
@@ -248,13 +248,18 @@ public class NexusStatusUtil
             }
         }
 
-        if ( !waitForStop( getClient() ) )
+        if ( !waitForStop() )
         {
             killNexus();
-            if ( !waitForStop( getClient() ) )
+            if ( !waitForStop() )
             {
                 throw new NexusIllegalStateException( "Unable to doHardStop(), nexus still running" );
             }
+        }
+
+        if ( isNexusAlive() )
+        {
+            throw new NexusIllegalStateException( "Unable to doHardStop(), still using HTTP ports" );
         }
 
         disconnect();
@@ -331,53 +336,71 @@ public class NexusStatusUtil
         return !isNexusAlive() || ( STATUS_STOPPED.equals( getNexusStatus().getData().getState() ) );
     }
 
-    public static boolean waitForStart( NexusClient client )
+    public static boolean waitForStart()
         throws NexusIllegalStateException
     {
         log.info( "wait for Nexus start" );
-        System.setProperty( NexusRestClient.WAIT_FOR_START_TIMEOUT_KEY, "1000" );
         for ( int i = 0; i < 80; i++ )
         {
             log.debug( "wait for Nexus start, attempt: " + i );
             try
             {
-                if ( client.isNexusStarted( true ) )
+                if ( isNexusRunning() )
                 {
+                    // nexus started
                     return true;
                 }
             }
-            catch ( Exception e )
+            catch ( NexusIllegalStateException e )
             {
-                log.error( "Unable to retrieve nexus status using client, attempt: " + i, e );
+                // let's give it more time
+            }
+
+            try
+            {
+                Thread.sleep( 1000 );
+            }
+            catch ( InterruptedException e )
+            {
+                // no problem
             }
         }
 
-        return isNexusRunning();
+        // Didn't start
+        return false;
     }
 
-    public static boolean waitForStop( NexusClient client )
+    public static boolean waitForStop()
         throws NexusIllegalStateException
-
     {
         log.info( "wait for Nexus stop" );
-        System.setProperty( NexusRestClient.WAIT_FOR_START_TIMEOUT_KEY, "1000" );
+
         for ( int i = 0; i < 80; i++ )
         {
             log.debug( "wait for Nexus stop, attempt: " + i );
+            if ( !isNexusAlive() )
+            {
+                // nexus stopped!
+                return true;
+            }
+
             try
             {
-                if ( !client.isNexusStarted( true ) )
-                {
-                    return true;
-                }
+                Thread.sleep( 1000 );
             }
-            catch ( Exception e )
+            catch ( InterruptedException e )
             {
-                log.error( "Unable to retrieve nexus status using client, attempt: " + i, e );
+                // no problem
+            }
+
+            if ( isNexusAlive() && !isNexusRunning() )
+            {
+                throw new NexusIllegalStateException( "Nexus is no longer running, but still using HTTP ports!" );
             }
         }
 
-        return isNexusStopped();
+        // didn't stopped!
+        return false;
     }
 
     private static void killNexus()
