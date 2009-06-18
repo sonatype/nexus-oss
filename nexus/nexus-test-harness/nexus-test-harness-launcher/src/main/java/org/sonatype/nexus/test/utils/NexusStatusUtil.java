@@ -340,7 +340,7 @@ public class NexusStatusUtil
         throws NexusIllegalStateException
     {
         log.info( "wait for Nexus start" );
-        for ( int i = 0; i < 30; i++ )
+        for ( int i = 0; i < 80; i++ )
         {
             log.debug( "wait for Nexus start, attempt: " + i );
             try
@@ -375,7 +375,7 @@ public class NexusStatusUtil
     {
         log.info( "wait for Nexus stop" );
 
-        for ( int i = 0; i < 30; i++ )
+        for ( int i = 0; i < 80; i++ )
         {
             log.debug( "wait for Nexus stop, attempt: " + i );
             if ( !isNexusAlive() )
