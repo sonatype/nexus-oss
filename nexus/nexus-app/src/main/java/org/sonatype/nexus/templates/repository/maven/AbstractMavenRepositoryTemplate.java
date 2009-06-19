@@ -15,16 +15,16 @@ public abstract class AbstractMavenRepositoryTemplate
                                             RepositoryPolicy repositoryPolicy )
     {
         super( provider, id, description, contentClass, mainFacet );
-        
+
         setRepositoryPolicy( repositoryPolicy );
     }
 
-    protected RepositoryPolicy getRepositoryPolicy()
+    public RepositoryPolicy getRepositoryPolicy()
     {
         return repositoryPolicy;
     }
 
-    protected void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
+    public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
     {
         this.repositoryPolicy = repositoryPolicy;
     }

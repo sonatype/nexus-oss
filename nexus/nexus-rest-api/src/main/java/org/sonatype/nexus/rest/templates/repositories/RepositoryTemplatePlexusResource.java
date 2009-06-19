@@ -21,6 +21,9 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfiguration;
+import org.sonatype.nexus.proxy.repository.AbstractShadowRepositoryConfiguration;
+import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -34,6 +37,7 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.AbstractMavenRepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -44,7 +48,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class RepositoryTemplatePlexusResource
     extends AbstractNexusPlexusResource
 {
-    /* * Key to store Repo with which we work against. */
+    /* Key to store Repo with which we work against. */
     public static final String REPOSITORY_ID_KEY = "repositoryId";
 
     @Override
@@ -84,21 +88,15 @@ public class RepositoryTemplatePlexusResource
 
             if ( ProxyRepository.class.isAssignableFrom( template.getMainFacet() ) )
             {
-                repoRes = new RepositoryProxyResource();
-
-                repoRes.setRepoType( "proxy" );
+                repoRes = createProxy( template );
             }
             else if ( HostedRepository.class.isAssignableFrom( template.getMainFacet() ) )
             {
-                repoRes = new RepositoryResource();
-
-                repoRes.setRepoType( "hosted" );
+                repoRes = createHosted( template );
             }
             else if ( ShadowRepository.class.isAssignableFrom( template.getMainFacet() ) )
             {
-                repoRes = new RepositoryShadowResource();
-
-                repoRes.setRepoType( "virtual" );
+                repoRes = createShadow( template );
             }
             else if ( GroupRepository.class.isAssignableFrom( template.getMainFacet() ) )
             {
@@ -117,8 +115,7 @@ public class RepositoryTemplatePlexusResource
 
             repoRes.setName( template.getDescription() );
 
-            repoRes.setProvider( ( (CRepository) template.getCoreConfiguration().getConfiguration( false ) )
-                .getProviderHint() );
+            repoRes.setProvider( ( (CRepository) template.getCoreConfiguration().getConfiguration( false ) ).getProviderHint() );
 
             repoRes.setFormat( template.getContentClass().getId() );
 
@@ -130,5 +127,65 @@ public class RepositoryTemplatePlexusResource
         }
 
         return result;
+    }
+
+    private RepositoryBaseResource createShadow( RepositoryTemplate template )
+    {
+        RepositoryShadowResource repoRes = new RepositoryShadowResource();
+
+        repoRes.setRepoType( "virtual" );
+
+        AbstractShadowRepositoryConfiguration cfg =
+            (AbstractShadowRepositoryConfiguration) template.getConfigurableRepository().getCurrentCoreConfiguration().getExternalConfiguration();
+
+        repoRes.setSyncAtStartup( cfg.isSynchronizeAtStartup() );
+        repoRes.setShadowOf( cfg.getMasterRepositoryId() );
+
+        return repoRes;
+    }
+
+    private RepositoryBaseResource createProxy( RepositoryTemplate template )
+    {
+        RepositoryProxyResource repoRes = new RepositoryProxyResource();
+
+        repoRes.setRepoType( "proxy" );
+
+        AbstractMavenRepositoryTemplate m2Template = (AbstractMavenRepositoryTemplate) template;
+        repoRes.setRepoPolicy( m2Template.getRepositoryPolicy().name() );
+
+        ConfigurableRepository cfg = template.getConfigurableRepository();
+        repoRes.setAllowWrite( cfg.isAllowWrite() );
+        repoRes.setBrowseable( cfg.isBrowseable() );
+        repoRes.setIndexable( cfg.isIndexable() );
+        repoRes.setNotFoundCacheTTL( cfg.getNotFoundCacheTimeToLive() );
+
+        AbstractMavenRepositoryConfiguration repoCfg =
+            (AbstractMavenRepositoryConfiguration) template.getConfigurableRepository().getCurrentCoreConfiguration().getExternalConfiguration();
+
+
+        repoRes.setChecksumPolicy( repoCfg.getChecksumPolicy().name() );
+        repoRes.setDownloadRemoteIndexes( repoCfg.isDownloadRemoteIndex() );
+        repoRes.setArtifactMaxAge( repoCfg.getArtifactMaxAge() );
+        repoRes.setMetadataMaxAge( repoCfg.getMetadataMaxAge() );
+
+        return repoRes;
+    }
+
+    private RepositoryBaseResource createHosted( RepositoryTemplate template )
+    {
+        RepositoryResource repoRes = new RepositoryResource();
+
+        repoRes.setRepoType( "hosted" );
+
+        AbstractMavenRepositoryTemplate m2Template = (AbstractMavenRepositoryTemplate) template;
+        repoRes.setRepoPolicy( m2Template.getRepositoryPolicy().name() );
+
+        ConfigurableRepository cfg = template.getConfigurableRepository();
+        repoRes.setAllowWrite( cfg.isAllowWrite() );
+        repoRes.setBrowseable( cfg.isBrowseable() );
+        repoRes.setIndexable( cfg.isIndexable() );
+        repoRes.setNotFoundCacheTTL( cfg.getNotFoundCacheTimeToLive() );
+
+        return repoRes;
     }
 }
