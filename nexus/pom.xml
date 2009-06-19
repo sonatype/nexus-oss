@@ -157,6 +157,7 @@
     <plexus-jetty-testsuite.version>1.3</plexus-jetty-testsuite.version>
     <plexus-app-events.version>1.0.0-SNAPSHOT</plexus-app-events.version>
     <spice-timeline.version>1.0-SNAPSHOT</spice-timeline.version>
+    <plexus-swizzle.version>1.0-alpha-2</plexus-swizzle.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -662,6 +663,17 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-manager</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.spice</groupId>
+        <artifactId>plexus-swizzle</artifactId>
+        <version>${plexus-swizzle.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>velocity</groupId>
+            <artifactId>velocity</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -239,6 +239,8 @@ public class Upgrade108to140
         // initialize automatic error reporting
         CErrorReporting errorReporting = new CErrorReporting();
         errorReporting.setEnabled( false );
+        errorReporting.setJiraUrl( "https://issues.sonatype.org" );
+        errorReporting.setJiraProject( "NEXUS" );
         
         newc.setErrorReporting( errorReporting );
 

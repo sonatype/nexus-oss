@@ -74,7 +74,6 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         
         ErrorReportingSettings result = new ErrorReportingSettings();
        
-        result.setJiraUrl( settings.getJiraUrl() );
         result.setJiraUsername( settings.getJiraUsername() );
         result.setJiraPassword( settings.getJiraPassword() );
         

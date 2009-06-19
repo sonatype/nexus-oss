@@ -300,5 +300,7 @@
   </smtpConfiguration>
   <errorReporting>
     <enabled>false</enabled>
+    <jiraUrl>https://issues.sonatype.org</jiraUrl>
+    <jiraProject>NEXUS</jiraProject>
   </errorReporting>
 </nexusConfiguration>

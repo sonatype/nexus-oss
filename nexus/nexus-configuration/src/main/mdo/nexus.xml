@@ -1107,6 +1107,13 @@
           <required>false</required>
         </field>
         <field>
+          <name>jiraProject</name>
+          <version>1.4.0+</version>
+          <type>String</type>
+          <description>Name of the jira project</description>
+          <required>false</required>
+        </field>
+        <field>
           <name>jiraUsername</name>
           <version>1.4.0+</version>
           <type>String</type>

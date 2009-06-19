@@ -18,31 +18,22 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.PasswordHelper;
 import org.sonatype.nexus.configuration.application.upgrade.ApplicationConfigurationUpgrader;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.model.ConfigurationHelper;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationRequest;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.components.cipher.PlexusCipherException;
-import org.sonatype.security.events.AuthorizationConfigurationChangedEvent;
 import org.sonatype.security.events.SecurityConfigurationChangedEvent;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * The default configuration source powered by Modello. It will try to load configuration, upgrade if needed and
@@ -80,19 +71,13 @@ public class FileConfigurationSource
     private ApplicationConfigurationSource nexusDefaults;
 
     @Requirement
-    private PasswordHelper passwordHelper;
-
-    @Requirement
     private ApplicationEventMulticaster eventMulticaster;
+    
+    @Requirement
+    private ConfigurationHelper configHelper;
 
     /** Flag to mark defaulted config */
     private boolean configurationDefaulted;
-
-    
-    /**
-     * XStream is used for a deep clone (TODO: not sure if this is a great idea)
-     */
-    private XStream xstream = new XStream();
     
     /**
      * Gets the configuration validator.
@@ -276,7 +261,7 @@ public class FileConfigurationSource
             if( this.getConfiguration() != null )
             {
                 // decrypt the passwords
-                this.encryptDecryptPasswords( this.getConfiguration(), false );
+                configHelper.encryptDecryptPasswords( this.getConfiguration(), false );
             }
         }
         finally
@@ -324,10 +309,10 @@ public class FileConfigurationSource
             }
 
             // Clone the conf so we can encrypt the passwords
-            Configuration copyOfConfig = cloneConfiguration( this.getConfiguration() );
+            Configuration copyOfConfig = configHelper.clone( this.getConfiguration() );
 
             // encrypt the passwords
-            encryptDecryptPasswords( copyOfConfig, true );
+            configHelper.encryptDecryptPasswords( copyOfConfig, true );
 
             fos = new FileOutputStream( file );
 
@@ -344,77 +329,6 @@ public class FileConfigurationSource
         backupFile.delete();
     }
 
-    private void encryptDecryptPasswords(Configuration config, boolean encrypt )
-    {
-        // smtp
-        if ( config.getSmtpConfiguration() != null
-            && StringUtils.isNotEmpty( config.getSmtpConfiguration().getPassword() ) )
-        {
-            CSmtpConfiguration smtpConfig = config.getSmtpConfiguration();
-            smtpConfig.setPassword( this.encryptDecryptPassword( smtpConfig.getPassword(), encrypt ) );
-        }
-        
-        // global proxy
-        if ( config.getGlobalHttpProxySettings() != null &&
-            config.getGlobalHttpProxySettings().getAuthentication() != null &&
-            StringUtils.isNotEmpty( config.getGlobalHttpProxySettings().getAuthentication().getPassword() ) )
-        {
-            CRemoteAuthentication auth = config.getGlobalHttpProxySettings().getAuthentication();
-            auth.setPassword( this.encryptDecryptPassword( auth.getPassword(), encrypt ) );
-        }
-        
-        // each repo
-        for ( CRepository repo : (List<CRepository>)config.getRepositories() )
-        {   
-            // remote auth
-            if( repo.getRemoteStorage() != null && 
-                repo.getRemoteStorage().getAuthentication() != null && 
-                StringUtils.isNotEmpty( repo.getRemoteStorage().getAuthentication().getPassword() ) )
-            {
-                CRemoteAuthentication auth = repo.getRemoteStorage().getAuthentication();
-                auth.setPassword( this.encryptDecryptPassword( auth.getPassword(), encrypt ) );
-            }
-            
-            // proxy auth
-            if( repo.getRemoteStorage() != null && 
-                repo.getRemoteStorage().getHttpProxySettings() != null &&
-                repo.getRemoteStorage().getHttpProxySettings().getAuthentication() != null && 
-                StringUtils.isNotEmpty( repo.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassword() ) )
-            {
-                CRemoteAuthentication auth = repo.getRemoteStorage().getHttpProxySettings().getAuthentication();
-                auth.setPassword( this.encryptDecryptPassword( auth.getPassword(), encrypt ) );
-            }
-        }
-    }
-
-    private String encryptDecryptPassword( String password, boolean encrypt )
-    {
-        if ( encrypt )
-        {
-            try
-            {
-                return passwordHelper.encrypt( password );
-            }
-            catch ( PlexusCipherException e )
-            {
-                getLogger().error( "Failed to encrypt password in nexus.xml.", e );
-            }
-        }
-        else
-        {
-            try
-            {
-                return passwordHelper.decrypt( password );
-            }
-            catch ( PlexusCipherException e )
-            {
-                getLogger().error( "Failed to decrypt password in nexus.xml.", e );
-            }
-        }
-
-        return password;
-    }
-
     /**
      * Was the active configuration fetched from config file or from default source? True if it from default source.
      */
@@ -422,11 +336,4 @@ public class FileConfigurationSource
     {
         return configurationDefaulted;
     }
-    
-    private Configuration cloneConfiguration( Configuration config )
-    {
-        // use Xstream
-        return (Configuration) xstream.fromXML( xstream.toXML( config ));
-    }
-
 }

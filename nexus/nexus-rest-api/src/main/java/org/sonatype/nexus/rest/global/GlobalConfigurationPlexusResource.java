@@ -181,7 +181,6 @@ public class GlobalConfigurationPlexusResource
                     if ( settings != null )
                     {                           
                         reporting.setEnabled( true );
-                        reporting.setJiraUrl( settings.getJiraUrl() );
                         reporting.setJiraUsername( settings.getJiraUsername() );
                         reporting.setJiraPassword( settings.getJiraPassword() );
                     }
