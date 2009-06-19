@@ -1,10 +1,12 @@
-package org.sonatype.nexus.mock;
+package org.sonatype.nexus.selenium.nexus1815;
 
 import static org.junit.Assert.assertEquals;
 import junit.framework.AssertionFailedError;
 
 import org.junit.Test;
 import org.restlet.data.Status;
+import org.sonatype.nexus.mock.MockResponse;
+import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.models.User;
 import org.sonatype.nexus.mock.pages.ChangePasswordWindow;
 import org.sonatype.nexus.mock.pages.PasswordChangedWindow;
@@ -12,6 +14,7 @@ import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.security.rest.model.UserChangePasswordRequest;
 
 public class ChangePasswordTest extends SeleniumTest {
+
     @Test
     public void changePasswordSuccess() {
         main.clickLogin().populate(User.ROLE_ADMIN).loginExpectingSuccess();

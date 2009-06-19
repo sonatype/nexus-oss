@@ -1,11 +1,13 @@
-package org.sonatype.nexus.mock;
+package org.sonatype.nexus.selenium.nexus2165;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.components.TextField;
 import org.sonatype.nexus.mock.pages.ServerTab;
+import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 
-public class ServerConfigTest
+public class Nexus2165ServerConfigTest
     extends SeleniumTest
 {
 

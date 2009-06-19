@@ -24,6 +24,7 @@ import org.sonatype.nexus.mock.pages.MainPage;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
 import org.sonatype.nexus.mock.util.SocketTestWaitCondition;
+import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.spice.jscoverage.JsonReportHandler;
 
 import ch.ethz.ssh2.Connection;
@@ -66,7 +67,7 @@ public abstract class SeleniumTest extends NexusTestCase {
 
         if (!new SocketTestWaitCondition("localhost", 4444, 250).checkCondition(0)) {
             if (sshConn == null) {
-                int port = PropUtil.get("jettyPort", 12345);
+                int port = TestProperties.getInteger( "nexus.application.port" );
 
                 // spin up SSH connection
                 sshConn = new Connection("grid.sonatype.org", PropUtil.get("serverPort", 10023));
@@ -126,7 +127,7 @@ public abstract class SeleniumTest extends NexusTestCase {
         final String seleniumServer = PropUtil.get("seleniumServer", "localhost");
         final int seleniumPort = PropUtil.get("seleniumPort", 4444);
         final String seleniumBrowser = PropUtil.get("seleniumBrowser", "*firefox");
-        final Selenium original = new DefaultSelenium(seleniumServer, seleniumPort, seleniumBrowser, "http://localhost:" + PropUtil.get("jettyPort", 12345));
+        final Selenium original = new DefaultSelenium(seleniumServer, seleniumPort, seleniumBrowser, TestProperties.getString( "nexus.base.url" ));
 
         selenium = (Selenium) Proxy.newProxyInstance(Selenium.class.getClassLoader(), new Class<?>[] { Selenium.class }, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {

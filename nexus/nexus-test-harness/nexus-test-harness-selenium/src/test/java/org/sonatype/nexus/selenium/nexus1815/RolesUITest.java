@@ -1,5 +1,6 @@
-package org.sonatype.nexus.mock;
+package org.sonatype.nexus.selenium.nexus1815;
 
+import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.models.User;
 import org.sonatype.nexus.mock.pages.ViewsPanel;
 import org.sonatype.nexus.mock.pages.AdministrationPanel;

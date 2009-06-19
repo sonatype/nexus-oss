@@ -69,4 +69,9 @@ public class MainPage
         return new ServerTab( selenium );
     }
 
+    public SearchPanel searchPanel()
+    {
+        return new SearchPanel( selenium );
+    }
+
 }

@@ -1,11 +1,13 @@
-package org.sonatype.nexus.mock;
+package org.sonatype.nexus.selenium.nexus1962;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.ScheduleGrid;
 import org.sonatype.nexus.mock.pages.SchedulesConfigFormTab;
+import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 
-public class TaskTest
+public class Nexus1962TaskTest
     extends SeleniumTest
 {
 

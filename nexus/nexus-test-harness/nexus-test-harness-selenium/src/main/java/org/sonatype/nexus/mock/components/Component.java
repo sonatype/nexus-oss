@@ -170,4 +170,9 @@ public class Component
         }
     }
 
+
+    public void waitToLoad()
+    {
+        waitForEvalTrue(".disabled == false");
+    }
 }

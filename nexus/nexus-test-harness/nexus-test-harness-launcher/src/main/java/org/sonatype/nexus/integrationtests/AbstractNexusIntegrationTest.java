@@ -38,7 +38,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -52,6 +51,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
@@ -605,23 +605,20 @@ public class AbstractNexusIntegrationTest
     protected String getRelitivePomPath( Gav gav )
         throws FileNotFoundException
     {
-        return this.getRelitiveArtifactPath( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), "pom", null );
+        return GavUtil.getRelitivePomPath( gav );
     }
 
     protected String getRelitiveArtifactPath( Gav gav )
         throws FileNotFoundException
     {
-        return this.getRelitiveArtifactPath( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
-                                             gav.getExtension(), gav.getClassifier() );
+        return GavUtil.getRelitiveArtifactPath( gav );
     }
 
     protected String getRelitiveArtifactPath( String groupId, String artifactId, String version, String extension,
                                               String classifier )
         throws FileNotFoundException
     {
-        String classifierPart = StringUtils.isEmpty( classifier ) ? "" : "-" + classifier;
-        return groupId.replace( '.', '/' ) + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version
-            + classifierPart + "." + extension;
+        return GavUtil.getRelitiveArtifactPath( groupId, artifactId, version, extension, classifier );
     }
 
     protected File downloadSnapshotArtifact( String repository, Gav gav, File parentDir )
