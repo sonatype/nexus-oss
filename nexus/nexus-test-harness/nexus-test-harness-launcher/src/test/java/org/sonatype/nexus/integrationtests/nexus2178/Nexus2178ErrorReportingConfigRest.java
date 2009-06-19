@@ -24,6 +24,8 @@ public class Nexus2178ErrorReportingConfigRest
         ErrorReportingSettings settings = new ErrorReportingSettings();
         settings.setJiraUsername( "someusername" );
         settings.setJiraPassword( "somepassword" );
+        settings.setJiraUrl( "http://someurl" );
+        settings.setJiraProject( "project" );
         
         resource.setErrorReportingSettings( settings );
         
@@ -34,6 +36,8 @@ public class Nexus2178ErrorReportingConfigRest
         Assert.assertNotNull( "Error reporting should not be null", resource.getErrorReportingSettings() );
         Assert.assertEquals( "someusername", resource.getErrorReportingSettings().getJiraUsername() );
         Assert.assertEquals( "somepassword", resource.getErrorReportingSettings().getJiraPassword() );
+        Assert.assertEquals( "http://someurl", resource.getErrorReportingSettings().getJiraUrl() );
+        Assert.assertEquals( "project", resource.getErrorReportingSettings().getJiraProject() );
         
         // Clear them again
         resource.setErrorReportingSettings( null );
