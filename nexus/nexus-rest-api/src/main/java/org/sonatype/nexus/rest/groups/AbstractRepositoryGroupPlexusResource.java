@@ -22,6 +22,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -124,7 +125,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
     {
         try
         {
-            CRepository group = new CRepository();
+            CRepository group = new DefaultCRepository();
 
             group.setId( model.getId() );
 
