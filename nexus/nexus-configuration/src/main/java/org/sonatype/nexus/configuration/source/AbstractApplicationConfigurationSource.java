@@ -60,13 +60,13 @@ public abstract class AbstractApplicationConfigurationSource
     /**
      * Called by subclasses when loaded configuration is rejected for some reason.
      */
-    protected void rejectConfiguration( String message )
+    protected void rejectConfiguration( String message, Throwable e )
     {
         this.configuration = null;
 
         if ( message != null )
         {
-            getLogger().warn( message );
+            getLogger().warn( message, e );
         }
     }
 
@@ -97,7 +97,7 @@ public abstract class AbstractApplicationConfigurationSource
         }
         catch ( XmlPullParserException e )
         {
-            rejectConfiguration( "Nexus configuration file was not loaded, it has the wrong structure." );
+            rejectConfiguration( "Nexus configuration file was not loaded, it has the wrong structure.", e );
 
             if ( getLogger().isDebugEnabled() )
             {
@@ -115,7 +115,7 @@ public abstract class AbstractApplicationConfigurationSource
         // check the model version if loaded
         if ( configuration != null && !Configuration.MODEL_VERSION.equals( configuration.getVersion() ) )
         {
-            rejectConfiguration( "Nexus configuration file was loaded but discarded, it has the wrong version number." );
+            rejectConfiguration( "Nexus configuration file was loaded but discarded, it has the wrong version number.", null );
         }
 
         if ( getConfiguration() != null )

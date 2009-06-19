@@ -9,7 +9,8 @@
     program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
   -->
 
-<model xsd.namespace="http://www.sonatype.com/xsd/nexus-configuration-1.0.1" xsd.target-namespace="http://www.sonatype.com/xsd/nexus-configuration-1.0.1">
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd">
 
   <id>nexus</id>
 
@@ -27,6 +28,11 @@
       <value>org.sonatype.nexus.configuration.model</value>
     </default>
   </defaults>
+
+  <versionDefinition>
+    <type>field</type>
+    <value>version</value>
+  </versionDefinition>
 
   <classes>
 
@@ -1832,14 +1838,14 @@
           <required>true</required>
           <description>The current status of the task</description>
         </field>
-        <field>
+        <field xml.format="long">
           <name>lastRun</name>
           <type>Date</type>
           <version>1.0.3+</version>
           <required>true</required>
           <description>The date the task last ran</description>
         </field>
-        <field>
+        <field xml.format="long">
           <name>nextRun</name>
           <type>Date</type>
           <version>1.0.3+</version>
@@ -1889,14 +1895,14 @@
           <required>true</required>
           <description>The type of the schedule</description>
         </field>
-        <field>
+        <field xml.format="long">
           <name>startDate</name>
           <type>Date</type>
           <version>1.0.4+</version>
           <required>true</required>
           <description>The schedule that controls the time this task is run</description>
         </field>
-        <field>
+        <field xml.format="long">
           <name>endDate</name>
           <type>Date</type>
           <version>1.0.4+</version>
@@ -1993,7 +1999,7 @@
       <version>1.0.3</version>
       <description>A schedule, which will run a task once.</description>
       <fields>
-        <field>
+        <field xml.format="long">
           <name>startDate</name>
           <type>Date</type>
           <version>1.0.3</version>
@@ -2009,7 +2015,7 @@
       <version>1.0.3</version>
       <description>A schedule, which will run a task daily.</description>
       <fields>
-        <field>
+        <field xml.format="long">
           <name>endDate</name>
           <type>Date</type>
           <version>1.0.3</version>
