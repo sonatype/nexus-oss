@@ -44,6 +44,13 @@ public class DefaultConfigurationHelper
     
     private void handlePasswords( Configuration config, boolean encrypt, boolean mask)
     {
+        if ( config.getErrorReporting() != null 
+            && StringUtils.isNotEmpty( config.getErrorReporting().getJiraPassword() ) )
+        {
+            CErrorReporting errorConfig = config.getErrorReporting();
+            errorConfig.setJiraPassword( encryptDecryptPassword( errorConfig.getJiraPassword(), encrypt, mask ) );
+        }
+        
         if ( config.getSmtpConfiguration() != null
             && StringUtils.isNotEmpty( config.getSmtpConfiguration().getPassword() ) )
         {

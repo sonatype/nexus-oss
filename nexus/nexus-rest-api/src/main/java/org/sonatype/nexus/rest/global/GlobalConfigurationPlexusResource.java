@@ -173,16 +173,13 @@ public class GlobalConfigurationPlexusResource
                     ErrorReportingSettings settings = resource.getErrorReportingSettings();
                     CErrorReporting reporting = getNexusConfiguration().readErrorReporting();
                     
-                    if ( reporting == null )
-                    {
-                        reporting = new CErrorReporting();
-                    }
-                    
                     if ( settings != null )
                     {                           
                         reporting.setEnabled( true );
                         reporting.setJiraUsername( settings.getJiraUsername() );
                         reporting.setJiraPassword( settings.getJiraPassword() );
+                        reporting.setJiraUrl( settings.getJiraUrl() );
+                        reporting.setJiraProject( settings.getJiraProject() );
                     }
                     else
                     {

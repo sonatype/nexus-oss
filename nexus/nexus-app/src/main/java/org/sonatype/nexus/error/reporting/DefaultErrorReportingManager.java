@@ -14,9 +14,12 @@ import java.util.zip.ZipOutputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.swizzle.IssueSubmitter;
+import org.codehaus.plexus.swizzle.JiraIssueSubmitter;
+import org.codehaus.plexus.swizzle.jira.authentication.DefaultAuthenticationSource;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -27,10 +30,7 @@ import org.sonatype.nexus.util.StackTraceUtil;
 @Component( role = ErrorReportingManager.class )
 public class DefaultErrorReportingManager
     implements ErrorReportingManager
-{    
-    @Requirement( role = IssueSubmitter.class, hint = "jira" )
-    IssueSubmitter issueSubmitter;
-    
+{       
     @Requirement
     NexusConfiguration nexusConfig;
     
@@ -45,7 +45,7 @@ public class DefaultErrorReportingManager
         
         if ( errorConfig != null && errorConfig.isEnabled() )
         {
-            issueSubmitter.submitIssue( buildRequest( errorConfig, t ) );
+            getIssueSubmitter( errorConfig ).submitIssue( buildRequest( errorConfig, t ) );
         }
     }
     
@@ -62,6 +62,23 @@ public class DefaultErrorReportingManager
         request.setProblemReportBundle( assembleBundle() );
         
         return request;
+    }
+    
+    private IssueSubmitter getIssueSubmitter( CErrorReporting errorConfig )
+        throws IssueSubmissionException
+    {
+        try
+        {
+            return new JiraIssueSubmitter( 
+                errorConfig.getJiraUrl(), 
+                new DefaultAuthenticationSource(
+                    errorConfig.getJiraUsername(),
+                    errorConfig.getJiraPassword() ) );
+        }
+        catch ( InitializationException e )
+        {
+            throw new IssueSubmissionException( "Unable to initalized jira issue submitter", e );
+        }
     }
     
     private File assembleBundle()
@@ -81,10 +98,10 @@ public class DefaultErrorReportingManager
             
             for ( File confFile : confFiles )
             {
-                addFileToZip( confFile, zStream );
+                addFileToZip( confFile, zStream, null );
             }
             
-            addFileToZip( nexusXml, zStream );
+            addFileToZip( nexusXml, zStream, "nexus.xml" );
         }
         finally
         {
@@ -96,10 +113,10 @@ public class DefaultErrorReportingManager
             }
         }
         
-        return null;
+        return zipFile;
     }
     
-    private void addFileToZip( File file, ZipOutputStream zStream )
+    private void addFileToZip( File file, ZipOutputStream zStream, String filename )
         throws IOException
     {
         byte[] buffer = new byte[1024];
@@ -110,7 +127,7 @@ public class DefaultErrorReportingManager
         {
             inStream = new FileInputStream( file );
             
-            zStream.putNextEntry( new ZipEntry( file.getName() ) );
+            zStream.putNextEntry( new ZipEntry( filename != null ? filename : file.getName() ) );
             
             int len;
             while ( (len = inStream.read( buffer ) ) > 0) 
