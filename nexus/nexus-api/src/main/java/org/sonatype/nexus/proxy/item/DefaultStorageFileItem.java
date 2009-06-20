@@ -86,6 +86,7 @@ public class DefaultStorageFileItem
         this.contentLocator = contentLocator;
     }
 
+    @Deprecated
     public DefaultStorageFileItem( RepositoryRouter router, String path, boolean canRead, boolean canWrite,
         ContentLocator contentLocator )
     {
