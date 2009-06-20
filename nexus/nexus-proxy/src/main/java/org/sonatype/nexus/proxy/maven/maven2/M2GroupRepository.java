@@ -38,7 +38,11 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
+import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.proxy.item.DefaultStorageCompositeFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageCompositeFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -88,9 +92,7 @@ public class M2GroupRepository
 
     @Override
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() )
             && !M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
@@ -115,10 +117,7 @@ public class M2GroupRepository
      * Aggregates metadata from all member repositories
      */
     private StorageItem doRetrieveMetadata( ResourceStoreRequest request )
-        throws StorageException,
-            IllegalOperationException,
-            UnsupportedStorageOperationException,
-            ItemNotFoundException
+        throws StorageException, IllegalOperationException, UnsupportedStorageOperationException, ItemNotFoundException
     {
         List<StorageItem> listOfStorageItems = doRetrieveItems( request );
 
@@ -163,9 +162,8 @@ public class M2GroupRepository
             catch ( XmlPullParserException ex )
             {
                 getLogger().info(
-                    "Got Exception during parsing of M2 metadata: " + currentItem.getRepositoryItemUid()
-                        + ", skipping it!",
-                    ex );
+                                  "Got Exception during parsing of M2 metadata: " + currentItem.getRepositoryItemUid()
+                                      + ", skipping it!", ex );
             }
             catch ( IOException ex )
             {
@@ -203,27 +201,25 @@ public class M2GroupRepository
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             MessageDigest md5alg = MessageDigest.getInstance( "md5" );
             MessageDigest sha1alg = MessageDigest.getInstance( "sha1" );
-            OutputStreamWriter osw = new OutputStreamWriter( new DigestOutputStream( new DigestOutputStream(
-                bos,
-                md5alg ), sha1alg ) );
+            OutputStreamWriter osw =
+                new OutputStreamWriter( new DigestOutputStream( new DigestOutputStream( bos, md5alg ), sha1alg ) );
             metadataWriter.write( osw, mergedMetadata );
             osw.flush();
             osw.close();
+
+            // NEXUS-2188: lines below are causing this!
             storeDigest( request, md5alg );
             storeDigest( request, sha1alg );
+            // NEXUS-2188: lines above are causing this!
 
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Item for path " + request.toString() + " merged from "
-                        + Integer.toString( listOfStorageItems.size() ) + " found items." );
+                                   "Item for path " + request.toString() + " merged from "
+                                       + Integer.toString( listOfStorageItems.size() ) + " found items." );
             }
 
-            AbstractStorageItem item = createStorageItem( request, bos.toByteArray() );
-
-            item.getItemContext().put( CTX_TRANSITIVE_ITEM, Boolean.TRUE );
-
-            return item;
+            return createMergedMetadataItem( request, bos.toByteArray(), listOfStorageItems );
         }
         catch ( NoSuchAlgorithmException ex )
         {
@@ -236,19 +232,34 @@ public class M2GroupRepository
     }
 
     protected void storeDigest( ResourceStoreRequest request, MessageDigest digest )
-        throws IOException,
-            UnsupportedStorageOperationException,
-            IllegalOperationException
+        throws IOException, UnsupportedStorageOperationException, IllegalOperationException
     {
         byte[] bytes = ( new String( Hex.encodeHex( digest.digest() ) ) + "\n" ).getBytes();
 
-        ResourceStoreRequest req = new ResourceStoreRequest( request.getRequestPath() + "."
-            + digest.getAlgorithm().toLowerCase() );
+        ResourceStoreRequest req =
+            new ResourceStoreRequest( request.getRequestPath() + "." + digest.getAlgorithm().toLowerCase() );
 
         req.getRequestContext().setParentContext( request.getRequestContext() );
 
         AbstractStorageItem item = createStorageItem( req, bytes );
 
         storeItem( false, item );
+    }
+
+    protected StorageCompositeFileItem createMergedMetadataItem( ResourceStoreRequest request, byte[] content,
+                                                                 List<StorageItem> sources )
+    {
+        ContentLocator contentLocator = new ByteArrayContentLocator( content );
+
+        DefaultStorageCompositeFileItem result =
+            new DefaultStorageCompositeFileItem( this, request, true, false, contentLocator, sources );
+
+        result.setMimeType( "text/plain" );
+
+        result.setLength( content.length );
+
+        result.getItemContext().put( CTX_TRANSITIVE_ITEM, Boolean.TRUE );
+
+        return result;
     }
 }
