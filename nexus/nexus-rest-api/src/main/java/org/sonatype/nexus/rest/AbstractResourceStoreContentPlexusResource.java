@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -51,10 +52,15 @@ import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.item.StorageCompositeItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.rest.model.ContentListDescribeRequestResource;
+import org.sonatype.nexus.rest.model.ContentListDescribeResource;
+import org.sonatype.nexus.rest.model.ContentListDescribeResourceResponse;
+import org.sonatype.nexus.rest.model.ContentListDescribeResponseResource;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
@@ -72,6 +78,10 @@ public abstract class AbstractResourceStoreContentPlexusResource
     extends AbstractNexusPlexusResource
 {
     public static final String IS_LOCAL_PARAMETER = "isLocal";
+
+    public static final String IS_DESCRIBE_PARAMETER = "describe";
+
+    public static final String REQUEST_RECEIVED_KEY = "request.received.timestamp";
 
     public AbstractResourceStoreContentPlexusResource()
     {
@@ -102,22 +112,21 @@ public abstract class AbstractResourceStoreContentPlexusResource
         return isLocal;
     }
 
+    protected boolean isDescribe( Request request )
+    {
+        // check do we need describe
+        return request.getResourceRef().getQueryAsForm().getFirst( IS_DESCRIBE_PARAMETER ) != null;
+    }
+
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-
-        // get the path from request UIR
-        String resourceStorePath = getResourceStorePath( request );
-
-        // check do we need local access
-        boolean isLocal = isLocal( request, resourceStorePath );
-
         try
         {
             ResourceStore store = getResourceStore( request );
 
-            ResourceStoreRequest req = getResourceStoreRequest( request, resourceStorePath, isLocal );
+            ResourceStoreRequest req = getResourceStoreRequest( request );
 
             StorageItem item = store.retrieveItem( req );
 
@@ -137,10 +146,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         try
         {
-            String resourceStorePath = this.getResourceStorePath( request );
-            ResourceStoreRequest req = getResourceStoreRequest( request, resourceStorePath, this.isLocal(
-                request,
-                resourceStorePath ) );
+            ResourceStoreRequest req = getResourceStoreRequest( request );
 
             for ( FileItem fileItem : files )
             {
@@ -158,18 +164,11 @@ public abstract class AbstractResourceStoreContentPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-
-        // get the path from request UIR
-        String resourceStorePath = getResourceStorePath( request );
-
-        // check do we need local access
-        boolean isLocal = isLocal( request, resourceStorePath );
-
         try
         {
             ResourceStore store = getResourceStore( request );
 
-            ResourceStoreRequest req = getResourceStoreRequest( request, resourceStorePath, isLocal );
+            ResourceStoreRequest req = getResourceStoreRequest( request );
 
             store.deleteItem( req );
         }
@@ -211,8 +210,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
      * @throws NoSuchRepositoryRouterException
      */
     protected abstract ResourceStore getResourceStore( Request request )
-        throws NoSuchResourceStoreException,
-            ResourceException;
+        throws NoSuchResourceStoreException, ResourceException;
 
     /**
      * Centralized way to create ResourceStoreRequests, since we have to fill in various things in Request context, like
@@ -220,13 +218,34 @@ public abstract class AbstractResourceStoreContentPlexusResource
      * 
      * @return
      */
-    protected ResourceStoreRequest getResourceStoreRequest( Request request, String resourceStorePath, boolean isLocal )
+    protected ResourceStoreRequest getResourceStoreRequest( Request request )
     {
-        ResourceStoreRequest result = new ResourceStoreRequest( resourceStorePath, isLocal );
+        return getResourceStoreRequest( request, getResourceStorePath( request ) );
+    }
+
+    /**
+     * Centralized way to create ResourceStoreRequests, since we have to fill in various things in Request context, like
+     * authenticated username, etc.
+     * 
+     * @return
+     */
+    protected ResourceStoreRequest getResourceStoreRequest( Request request, String resourceStorePath )
+    {
+        ResourceStoreRequest result =
+            new ResourceStoreRequest( resourceStorePath, isLocal( request, resourceStorePath ) );
 
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "Created ResourceStore request for " + result.getRequestPath() );
+        }
+
+        // honor the local only
+        result.setRequestLocalOnly( isLocal( request, resourceStorePath ) );
+
+        // honor the describe, add timing
+        if ( isDescribe( request ) )
+        {
+            result.getRequestContext().put( REQUEST_RECEIVED_KEY, System.currentTimeMillis() );
         }
 
         // honor if-modified-since
@@ -273,14 +292,14 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     protected Object renderItem( Context context, Request req, Response res, Variant variant, StorageItem item )
-        throws IOException,
-            AccessDeniedException,
-            NoSuchResourceStoreException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException,
-            ResourceException
+        throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
+        ItemNotFoundException, StorageException, ResourceException
     {
+        if ( isDescribe( req ) )
+        {
+            return renderDescribeItem( context, req, res, variant, item );
+        }
+
         Representation result = null;
 
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
@@ -376,9 +395,10 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
                     resource.setLastModified( new Date( child.getModified() ) );
 
-                    resource.setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() )
-                        ? ( (StorageFileItem) child ).getLength()
-                        : -1 );
+                    resource
+                        .setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child )
+                            .getLength()
+                                        : -1 );
 
                     response.addData( resource );
 
@@ -419,15 +439,136 @@ public abstract class AbstractResourceStoreContentPlexusResource
             dataModel.put( "nexusRoot", req.getRootRef().toString() );
 
             // Load up the template, and pass in the data
-            VelocityRepresentation representation = new VelocityRepresentation(
-                context,
-                "/templates/repositoryContentHtml.vm",
-                dataModel,
-                variant.getMediaType() );
+            VelocityRepresentation representation =
+                new VelocityRepresentation( context, "/templates/repositoryContentHtml.vm", dataModel, variant
+                    .getMediaType() );
 
             return representation;
         }
+
         return null;
+    }
+
+    protected Object renderDescribeItem( Context context, Request req, Response res, Variant variant, StorageItem item )
+        throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
+        ItemNotFoundException, StorageException, ResourceException
+    {
+        ContentListDescribeResourceResponse result = new ContentListDescribeResourceResponse();
+
+        ContentListDescribeResource resource = new ContentListDescribeResource();
+
+        resource.setRequestUrl( req.getOriginalRef().toString() );
+
+        if ( item.getItemContext().containsKey( REQUEST_RECEIVED_KEY ) )
+        {
+            long received = (Long) item.getItemContext().get( REQUEST_RECEIVED_KEY );
+
+            resource.setProcessingTimeMillis( System.currentTimeMillis() - received );
+        }
+        else
+        {
+            resource.setProcessingTimeMillis( -1 );
+        }
+
+        resource.setRequest( describeRequest( context, req, res, variant, item ) );
+
+        resource.setResponse( describeResponse( context, req, res, variant, item ) );
+
+        result.setData( resource );
+
+        return result;
+    }
+
+    protected ContentListDescribeRequestResource describeRequest( Context context, Request req, Response res,
+                                                                  Variant variant, StorageItem item )
+    {
+        ContentListDescribeRequestResource result = new ContentListDescribeRequestResource();
+
+        result.setRequestUrl( item.getResourceStoreRequest().getRequestUrl() );
+
+        result.setRequestPath( item.getResourceStoreRequest().getRequestPath() );
+
+        for ( Map.Entry<String, Object> entry : item.getResourceStoreRequest().getRequestContext().entrySet() )
+        {
+            result.addRequestContext( entry.toString() );
+        }
+
+        return result;
+    }
+
+    protected ContentListDescribeResponseResource describeResponse( Context context, Request req, Response res,
+                                                                    Variant variant, StorageItem item )
+    {
+        ContentListDescribeResponseResource result = new ContentListDescribeResponseResource();
+
+        if ( item instanceof StorageFileItem )
+        {
+            result.setResponseType( "FILE" );
+
+        }
+        else if ( item instanceof StorageCollectionItem )
+        {
+            result.setResponseType( "COLL" );
+
+        }
+        else if ( item instanceof StorageLinkItem )
+        {
+            result.setResponseType( "LINK" );
+        }
+        else
+        {
+            result.setResponseType( item.getClass().getName() );
+        }
+
+        result.setResponseActualClass( item.getClass().getName() );
+
+        result.setResponsePath( item.getPath() );
+
+        if ( !item.isVirtual() )
+        {
+            result.setResponseUid( item.getRepositoryItemUid().toString() );
+
+            result.setOriginatingRepositoryId( item.getRepositoryItemUid().getRepository().getId() );
+
+            result.setOriginatingRepositoryName( item.getRepositoryItemUid().getRepository().getName() );
+
+            result.setOriginatingRepositoryMainFacet( item.getRepositoryItemUid().getRepository().getRepositoryKind().getMainFacet().getName() );
+        }
+        else
+        {
+            result.setResponseUid( "virtual" );
+        }
+
+        result.getProcessedRepositoriesList().addAll( item.getResourceStoreRequest().getProcessedRepositories() );
+
+        // applied mappings
+
+        // properties
+
+        // attributes
+        for ( Map.Entry<String, String> entry : item.getAttributes().entrySet() )
+        {
+            result.addAttribute( entry.toString() );
+        }
+
+        // sources
+        if ( item instanceof StorageCompositeItem )
+        {
+            StorageCompositeItem composite = (StorageCompositeItem) item;
+            for ( StorageItem source : composite.getSources() )
+            {
+                if ( !source.isVirtual() )
+                {
+                    result.addSource( source.getRepositoryItemUid().toString() );
+                }
+                else
+                {
+                    result.addSource( source.getPath() );
+                }
+            }
+        }
+
+        return result;
     }
 
     private List<ContentListResource> sortContentListResource( Collection<ContentListResource> list )
@@ -479,8 +620,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                "Got exception during processing " + req.getMethod() + " " + req.getResourceRef().toString(),
-                t );
+                               "Got exception during processing " + req.getMethod() + " "
+                                   + req.getResourceRef().toString(), t );
         }
 
         if ( t instanceof ResourceException )

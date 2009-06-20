@@ -43,7 +43,8 @@
       <name>AuthenticationSettings</name>
       <version>1.0.0+</version>
       <description>
-        Remote authentication tokens used in remote authentications against HTTP Proxies and/or protected remote
+        Remote authentication tokens used in remote authentications against HTTP Proxies and/or protected
+        remote
         repositories.
 			</description>
       <fields>
@@ -91,7 +92,7 @@
       <version>1.0.0+</version>
       <description>
         The connections settings defines common connection properties, like retries count and timeouts.
-			</description>
+      </description>
       <fields>
         <field>
           <name>connectionTimeout</name>
@@ -336,7 +337,7 @@
         </field>
       </fields>
     </class>
-    
+
     <class>
       <name>ErrorReportingSettings</name>
       <version>1.0.0+</version>
@@ -1615,7 +1616,7 @@
       </fields>
     </class>
 
-		<!-- Content -->
+    <!-- Content -->
     <class>
       <name>ContentListResourceResponse</name>
       <version>1.0.0+</version>
@@ -1681,6 +1682,179 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
+        </field>
+      </fields>
+    </class>
+
+    <!-- ContentDescribe -->
+    <class>
+      <name>ContentListDescribeResourceResponse</name>
+      <version>1.0.0+</version>
+      <superClass>NexusResponse</superClass>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>ContentListDescribeResource</type>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>ContentListDescribeResource</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>requestUrl</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>processingTimeMillis</name>
+          <version>1.0.0+</version>
+          <type>long</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>request</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>ContentListDescribeRequestResource</type>
+          </association>
+          <required>true</required>
+        </field>
+        <field>
+          <name>response</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>ContentListDescribeResponseResource</type>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>ContentListDescribeRequestResource</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>requestUrl</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>requestPath</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>requestContext</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ContentListDescribeResponseResource</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>responseType</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>responseActualClass</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>responsePath</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>responseUid</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>originatingRepositoryId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>originatingRepositoryName</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>originatingRepositoryMainFacet</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>processedRepositoriesList</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+        </field>
+        <field>
+          <name>appliedMappings</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+        </field>
+        <field>
+          <name>properties</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+        </field>
+        <field>
+          <name>attributes</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+        </field>
+        <field>
+          <name>sources</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
         </field>
       </fields>
     </class>
@@ -1908,12 +2082,13 @@
     </class>
 
     <!-- Authentication -->
-	<class>
-	  <name>NexusAuthenticationClientPermissions</name>
+    <class>
+      <name>NexusAuthenticationClientPermissions</name>
       <version>1.0.0+</version>
-      <superClass>org.sonatype.security.rest.model.AuthenticationClientPermissions</superClass>
+      <superClass>org.sonatype.security.rest.model.AuthenticationClientPermissions
+      </superClass>
     </class>
-    
+
     <!-- NFCs -->
     <class>
       <name>NFCResourceResponse</name>
@@ -1976,7 +2151,7 @@
         </field>
       </fields>
     </class>
-    
+
     <class>
       <name>NFCStats</name>
       <version>1.0.0+</version>
@@ -2388,7 +2563,7 @@
         </field>
       </fields>
     </class>
-    
+
     <class>
       <name>NexusRepositoryTypeListResource</name>
       <version>1.0.0+</version>
@@ -2430,9 +2605,9 @@
       </fields>
     </class>
 
-   
 
-    
+
+
     <class>
       <name>LogConfigResource</name>
       <version>1.0.0+</version>
@@ -2448,7 +2623,7 @@
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
-        </field>        
+        </field>
         <field>
           <name>fileAppenderLocation</name>
           <version>1.0.0+</version>
@@ -2574,7 +2749,7 @@
         </field>
       </fields>
     </class>
-    
+
     <class>
       <name>SmtpSettingsResource</name>
       <version>1.0.0+</version>
