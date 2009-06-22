@@ -19,6 +19,10 @@ public class ViewsPanel extends SidePanel {
         return isLinkAvailable("System Feeds");
     }
 
+    public void systemFeedsClick() {
+        clickLink("System Feeds");
+    }
+
     public boolean logsAndConfigFilesAvailable() {
         return isLinkAvailable("Logs and Config Files");
     }

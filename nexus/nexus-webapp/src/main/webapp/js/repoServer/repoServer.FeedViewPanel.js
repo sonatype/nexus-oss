@@ -99,20 +99,11 @@ Sonatype.repoServer.FeedViewPanel = function(config){
         menuDisabled:true }
     ],
     autoExpandColumn: 'feeds-url-col',
-    disableSelection: false,
-    listeners: {
-      'rowclick': {
-        fn: function( grid, rowIndex, e ) {
-          if ( e.target.nodeName.toUpperCase() == 'A' ) return; // no menu on links
-
-          var rec = grid.store.getAt( rowIndex );
-          this.grid.setFeed( rec.get( 'name' ), rec.get( 'resourceURI' ) );
-        },
-        scope: this
-      }
-    }
+    disableSelection: false
   });
-  
+
+  this.feedsGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
+
   var tmplTxt = [
     '<div class="post-data">',
       '<span class="post-date">{pubDate:date("M j, Y, g:i a")}</span>',
@@ -184,5 +175,9 @@ Sonatype.repoServer.FeedViewPanel = function(config){
 };
 
 Ext.extend(Sonatype.repoServer.FeedViewPanel, Ext.Panel, {
-  //extend here
+
+  rowSelect : function( selectionModel, index, rec ) {
+    this.grid.setFeed( rec.get( 'name' ), rec.get( 'resourceURI' ) );
+  }
+
 });

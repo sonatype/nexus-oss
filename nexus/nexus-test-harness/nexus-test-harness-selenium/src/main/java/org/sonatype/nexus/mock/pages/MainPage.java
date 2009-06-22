@@ -62,6 +62,13 @@ public class MainPage
         return new RepositoriesTab( selenium, this );
     }
 
+    public FeedsTab openFeeds()
+    {
+        viewsPanel().systemFeedsClick();
+
+        return new FeedsTab( selenium );
+    }
+
     public ServerTab openServer()
     {
         adminPanel().serverClick();
