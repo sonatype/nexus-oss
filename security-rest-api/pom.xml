@@ -68,7 +68,9 @@
             </goals>
             <configuration>
               <version>1.0.0</version>
-              <model>src/main/mdo/vos.xml</model>
+              <models>
+                <model>src/main/mdo/vos.xml</model>
+              </models>
             </configuration>
           </execution>
         </executions>

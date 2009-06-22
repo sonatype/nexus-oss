@@ -49,7 +49,9 @@
             </goals>
             <configuration>
               <version>2.0.2</version>
-              <model>src/main/mdo/security.xml</model>
+              <models>
+                <model>src/main/mdo/security.xml</model>
+              </models>
               <packagedVersions>
                 <packagedVersion>2.0.0</packagedVersion>
                 <packagedVersion>2.0.1</packagedVersion>
@@ -66,7 +68,9 @@
             </goals>
             <configuration>
               <version>1.0.0</version>
-              <model>src/main/mdo/security-old.xml</model>
+              <models>
+                <model>src/main/mdo/security-old.xml</model>
+              </models>
               <packageWithVersion>true</packageWithVersion>
               <!--
                 <packagedVersions>
