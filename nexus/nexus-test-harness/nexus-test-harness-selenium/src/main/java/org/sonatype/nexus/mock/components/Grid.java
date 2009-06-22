@@ -20,6 +20,8 @@ public class Grid
     {
         runScript( ".getSelectionModel().selectRow(" + index + ")" );
 
+        waitToLoad();
+
         return this;
     }
 
