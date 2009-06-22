@@ -9,7 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -24,17 +24,10 @@ import org.codehaus.plexus.swizzle.JiraIssueSubmitter;
 import org.codehaus.plexus.swizzle.jira.authentication.DefaultAuthenticationSource;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
-import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
-import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.nexus.util.StackTraceUtil;
-import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
-import org.sonatype.security.model.CUser;
-import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
-
-import com.thoughtworks.xstream.XStream;
 
 @Component( role = ErrorReportingManager.class )
 public class DefaultErrorReportingManager
@@ -44,24 +37,17 @@ public class DefaultErrorReportingManager
     NexusConfiguration nexusConfig;
     
     @Requirement( role = SecurityModelConfigurationSource.class, hint = "file" )
-    SecurityModelConfigurationSource securityXml;
+    SecurityModelConfigurationSource securityXmlSource;
     
     @Requirement( role = SecurityConfigurationSource.class, hint = "file" )
-    SecurityConfigurationSource securityConfigurationXml;
+    SecurityConfigurationSource securityConfigurationXmlSource;
     
     @Requirement
     ConfigurationHelper configHelper;
     
     private static final String ERROR_REPORT_DIR = "error-report-bundles";
     
-    /**
-     * XStream is used for a deep clone (TODO: not sure if this is a great idea)
-     */
-    private static XStream xstream = new XStream();
-    
-    private static final String PASSWORD_MASK = "*****";
-    
-    public void handleError( Throwable t ) 
+    public void handleError( ErrorReportRequest request ) 
         throws IssueSubmissionException,
             IOException
     {
@@ -69,23 +55,23 @@ public class DefaultErrorReportingManager
         
         if ( errorConfig != null && errorConfig.isEnabled() )
         {
-            getIssueSubmitter( errorConfig ).submitIssue( buildRequest( errorConfig, t ) );
+            getIssueSubmitter( errorConfig ).submitIssue( buildRequest( errorConfig, request ) );
         }
     }
     
-    protected IssueSubmissionRequest buildRequest( CErrorReporting errorConfig, Throwable t ) 
+    protected IssueSubmissionRequest buildRequest( CErrorReporting errorConfig, ErrorReportRequest request ) 
         throws IOException
     {
-        IssueSubmissionRequest request = new IssueSubmissionRequest();
+        IssueSubmissionRequest subRequest = new IssueSubmissionRequest();
         
-        request.setProjectId( errorConfig.getJiraProject() );
-        request.setSummary( "Automated Problem Report: " + t.getMessage() );
-        request.setDescription( "The following exception occurred: "
+        subRequest.setProjectId( errorConfig.getJiraProject() );
+        subRequest.setSummary( "Automated Problem Report: " + request.getThrowable().getMessage() );
+        subRequest.setDescription( "The following exception occurred: "
             + System.getProperty( "line.seperator" )
-            + StackTraceUtil.getStackTraceString( t ) );
-        request.setProblemReportBundle( assembleBundle() );
+            + StackTraceUtil.getStackTraceString( request.getThrowable() ) );
+        subRequest.setProblemReportBundle( assembleBundle( request ) );
         
-        return request;
+        return subRequest;
     }
     
     private IssueSubmitter getIssueSubmitter( CErrorReporting errorConfig )
@@ -105,13 +91,14 @@ public class DefaultErrorReportingManager
         }
     }
     
-    public File assembleBundle()
+    public File assembleBundle( ErrorReportRequest request )
         throws IOException
     {
-        File nexusXml = getNexusXml();
-        File securityXml = getSecurityXml();
-        File securityConfigurationXml = getSecurityConfigurationXml();
+        File nexusXml = new NexusXmlHandler().getFile( configHelper, nexusConfig );
+        File securityXml = new SecurityXmlHandler().getFile( securityXmlSource, nexusConfig );
+        File securityConfigurationXml = new SecurityConfigurationXmlHandler().getFile( securityConfigurationXmlSource, nexusConfig );
         File fileListing = getFileListing();
+        File contextListing = getContextListing( request.getContext() );
         
         File zipFile = getZipFile();
         
@@ -126,6 +113,7 @@ public class DefaultErrorReportingManager
             addFileToZip( securityXml, zStream, "security.xml" );
             addFileToZip( securityConfigurationXml, zStream, "security-configuration.xml" );
             addFileToZip( fileListing, zStream, "fileListing.txt" );
+            addFileToZip( contextListing, zStream, "contextListing.txt" );
             
             for ( File confFile : getConfigurationFiles() )
             {
@@ -139,25 +127,11 @@ public class DefaultErrorReportingManager
         }
         finally
         {
-            if ( nexusXml != null )
-            {
-                nexusXml.delete();
-            }
-            
-            if ( securityXml != null )
-            {
-                securityXml.delete();
-            }
-            
-            if ( securityConfigurationXml != null )
-            {
-                securityConfigurationXml.delete();
-            }
-            
-            if ( fileListing != null )
-            {
-                fileListing.delete();
-            }
+            deleteFile( nexusXml );
+            deleteFile( securityXml );
+            deleteFile( securityConfigurationXml );
+            deleteFile( fileListing );
+            deleteFile( contextListing );
             
             if ( zStream != null )
             {
@@ -231,132 +205,47 @@ public class DefaultErrorReportingManager
         return files;
     }
     
-    private File getNexusXml()
-        throws IOException
-    {
-        Configuration configuration = configHelper.clone( nexusConfig.getConfiguration() );
-        
-        // No config ?
-        if ( configuration == null )
-        {
-            return null;
-        }
-        
-        configHelper.maskPasswords( configuration );
-        
-        NexusConfigurationXpp3Writer writer = new NexusConfigurationXpp3Writer();
-        FileWriter fWriter = null;
-        File tempFile = null;
-        
-        try
-        {
-            tempFile = new File( nexusConfig.getTemporaryDirectory(), "nexus.xml." + System.currentTimeMillis() );
-            fWriter = new FileWriter( tempFile );
-            writer.write( fWriter, configuration );
-        }
-        finally
-        {
-            if ( fWriter != null )
-            {
-                fWriter.close();
-            }
-        }
-        
-        return tempFile;
-    }
-    
-    private File getSecurityXml()
-        throws IOException
-    {
-        org.sonatype.security.model.Configuration configuration = 
-            ( org.sonatype.security.model.Configuration )cloneViaXml( securityXml.getConfiguration() );
-        
-        // No config ?
-        if ( configuration == null )
-        {
-            return null;
-        }
-        
-        for ( CUser user : ( List<CUser> ) configuration.getUsers() )
-        {
-            user.setPassword( PASSWORD_MASK );
-            user.setEmail( PASSWORD_MASK );
-        }
-        
-        SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
-        FileWriter fWriter = null;
-        File tempFile = null;
-        
-        try
-        {
-            tempFile = new File( nexusConfig.getTemporaryDirectory(), "security.xml." + System.currentTimeMillis() );
-            fWriter = new FileWriter( tempFile );
-            writer.write( fWriter, configuration );
-        }
-        finally
-        {
-            if ( fWriter != null )
-            {
-                fWriter.close();
-            }
-        }
-        
-        return tempFile;
-    }
-    
-    private File getSecurityConfigurationXml()
-        throws IOException
-    {
-        SecurityConfiguration configuration = ( SecurityConfiguration )cloneViaXml( securityConfigurationXml.getConfiguration() );
-        
-        // No config ??
-        if ( configuration == null )
-        {
-            return null;
-        }
-        
-        configuration.setAnonymousPassword( PASSWORD_MASK );
-        
-        org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer writer = 
-            new org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer();
-        
-        FileWriter fWriter = null;
-        File tempFile = null;
-        
-        try
-        {
-            tempFile = new File( nexusConfig.getTemporaryDirectory(), "security-configuration.xml." + System.currentTimeMillis() );
-            fWriter = new FileWriter( tempFile );
-            writer.write( fWriter, configuration );
-        }
-        finally
-        {
-            if ( fWriter != null )
-            {
-                fWriter.close();
-            }
-        }
-        
-        return tempFile;
-    }
-    
     private File getFileListing() 
         throws IOException
     {
-        File tempFile = null;
+        return writeStringToTempFile( 
+            FileListingHelper.buildFileListing( nexusConfig.getWorkingDirectory() ), 
+            "fileListing.txt" );
+    }
+    
+    private File getContextListing( Map<String,Object> context )
+        throws IOException
+    {
+        StringBuffer sb = new StringBuffer();
         
-        String fileListing = FileListingHelper.buildFileListing( 
-            nexusConfig.getWorkingDirectory() );
+        for ( String key : context.keySet() )
+        {
+            sb.append( "key: " + key );
+            sb.append( FileListingHelper.LINE_SEPERATOR );
+            
+            Object o = context.get( key );
+            sb.append( "value: " + o == null ? "null" : o.toString() );
+            sb.append( FileListingHelper.LINE_SEPERATOR );
+            sb.append( FileListingHelper.LINE_SEPERATOR );
+        }
+        
+        return writeStringToTempFile( sb.toString(), "contextListing.txt" );
+    }
+    
+    private File writeStringToTempFile( String text, String name )
+        throws IOException
+    {
+        File tempFile = null;
         
         BufferedWriter bWriter = null;
         
         try
         {
-            tempFile = new File( nexusConfig.getTemporaryDirectory(), "filteListing.txt." + System.currentTimeMillis() );
+            tempFile = new File( nexusConfig.getTemporaryDirectory(), name + "." + System.currentTimeMillis() );
             
             bWriter = new BufferedWriter( new FileWriter( tempFile ) );
 
-            bWriter.write( fileListing );
+            bWriter.write( text );
         }
         finally
         {
@@ -369,16 +258,6 @@ public class DefaultErrorReportingManager
         return tempFile;
     }
     
-    private Object cloneViaXml( Object configuration )
-    {
-        if ( configuration == null )
-        {
-            return null;
-        }
-        
-        return xstream.fromXML( xstream.toXML( configuration ) );
-    }
-    
     private File getZipFile()
     {
         File zipDir = nexusConfig.getWorkingDirectory( ERROR_REPORT_DIR );
@@ -389,5 +268,13 @@ public class DefaultErrorReportingManager
         }
          
         return new File( zipDir, "nexus-error-bundle." + System.currentTimeMillis() + ".zip" );
+    }
+    
+    private void deleteFile( File file )
+    {
+        if ( file != null )
+        {
+            file.delete();
+        }
     }
 }

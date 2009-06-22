@@ -9,6 +9,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.error.reporting.ErrorReportRequest;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -52,7 +53,11 @@ public class ErrorReportingPlexusResource
     {
         try
         {
-            manager.assembleBundle();
+            ErrorReportRequest req = new ErrorReportRequest();
+            req.getContext().putAll( context.getAttributes() );
+            req.getContext().putAll( request.getAttributes() );
+            
+            manager.assembleBundle( req );
         }
         catch ( IOException e )
         {

@@ -4,7 +4,7 @@ import java.io.File;
 
 public class FileListingHelper
 {
-    private static final String LINE_SEPERATOR = System.getProperty("line.separator");
+    public static final String LINE_SEPERATOR = System.getProperty("line.separator");
     
     public static String buildFileListing( File directory )
     {

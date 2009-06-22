@@ -52,22 +52,25 @@ public class DefaultErrorReportingManagerTest
         config.setEnabled( true );
         config.setJiraProject( "NEXUS" );
         
-        IssueSubmissionRequest request = manager.buildRequest( config, exception );
+        ErrorReportRequest request = new ErrorReportRequest();
+        request.setThrowable( exception );
         
-        assertEquals( "NEXUS", request.getProjectId() );
-        assertEquals( "Automated Problem Report: Test exception", request.getSummary() );
+        IssueSubmissionRequest subRequest = manager.buildRequest( config, request );
+        
+        assertEquals( "NEXUS", subRequest.getProjectId() );
+        assertEquals( "Automated Problem Report: Test exception", subRequest.getSummary() );
         assertEquals( "The following exception occurred: " + System.getProperty( "line.seperator" )
-            + StackTraceUtil.getStackTraceString( exception ), request.getDescription() );
-        assertNotNull( request.getProblemReportBundle() );
+            + StackTraceUtil.getStackTraceString( exception ), subRequest.getDescription() );
+        assertNotNull( subRequest.getProblemReportBundle() );
         
-        extractZipFile( request.getProblemReportBundle(), unzipDir );
+        extractZipFile( subRequest.getProblemReportBundle(), unzipDir );
         
         assertTrue( unzipDir.exists() );
         
         File[] files = unzipDir.listFiles();
         
         assertNotNull( files );
-        assertEquals( 3, files.length );
+        assertEquals( 4, files.length );
     }
     
     private void addBackupFiles( File dir )

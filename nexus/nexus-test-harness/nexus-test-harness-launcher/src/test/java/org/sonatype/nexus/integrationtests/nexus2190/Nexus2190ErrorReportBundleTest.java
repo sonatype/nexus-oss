@@ -31,13 +31,14 @@ public class Nexus2190ErrorReportBundleTest
         Assert.assertTrue( files[0].getName().startsWith( "nexus-error-bundle." ) );
         Assert.assertTrue( files[0].getName().endsWith( ".zip" ) );
         
-        unzipAndValidate( files[0] );
+        validateZipContents( files[0] );
     }
     
-    private void unzipAndValidate( File file ) 
+    private void validateZipContents( File file ) 
         throws IOException
     {
         boolean foundFileList = false;
+        boolean foundContextList = false;
         boolean foundLog4j = false;
         boolean foundNexusXml = false;
         boolean foundSecurityXml = false;
@@ -55,6 +56,10 @@ public class Nexus2190ErrorReportBundleTest
             if ( entry.getName().equals( "fileListing.txt" ) )
             {
                 foundFileList = true;
+            }
+            else if ( entry.getName().equals( "contextListing.txt" ) )
+            {
+                foundContextList = true;
             }
             else if ( entry.getName().equals( "log4j.properties" ) )
             {
@@ -79,6 +84,7 @@ public class Nexus2190ErrorReportBundleTest
         }
         
         Assert.assertTrue( foundFileList );
+        Assert.assertTrue( foundContextList );
         Assert.assertTrue( foundLog4j );
         Assert.assertTrue( foundNexusXml );
         Assert.assertTrue( foundSecurityXml );

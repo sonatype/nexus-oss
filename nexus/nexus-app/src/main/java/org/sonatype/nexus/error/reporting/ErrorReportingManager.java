@@ -7,10 +7,10 @@ import org.codehaus.plexus.swizzle.IssueSubmissionException;
 
 public interface ErrorReportingManager
 {
-    void handleError( Throwable t )
+    void handleError( ErrorReportRequest request )
         throws IssueSubmissionException,
             IOException;
     
-    File assembleBundle()
+    File assembleBundle( ErrorReportRequest request )
         throws IOException;
 }
