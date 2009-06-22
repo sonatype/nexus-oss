@@ -87,7 +87,7 @@ public class RepositoriesTab
 
     public RepositoriesEditTabs select( String repoId )
     {
-        this.repositoriesGrid.select( NexusTestCase.nexusBaseURL + "/service/local/repositories/" + repoId );
+        this.repositoriesGrid.select( NexusTestCase.nexusBaseURL + "service/local/repositories/" + repoId );
 
         try
         {
