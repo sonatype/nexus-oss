@@ -33,15 +33,13 @@ public class FileListingHelper
         
         StringBuffer result = new StringBuffer();
         
-        appendLine( result, getRelativePath( root.getAbsolutePath(), directory.getAbsolutePath() ) );
-        
         File[] files = directory.listFiles();
         
         for ( int i = 0 ; i < files.length ; i++ )
         {
             if ( files[i].isDirectory() )
             {
-                appendLine( result, handleDirectory( root, files[i] ) );
+                result.append( handleDirectory( root, files[i] ) );
             }
             else
             {

@@ -1396,5 +1396,21 @@
             </property>
           </properties>
         </privilege>
+        <privilege>
+          <id>83</id>
+          <type>method</type>
+          <name>Error Reporting: Generate Bundle - (create,read)</name>
+          <description>Give permission to generate an error report bundle</description>
+          <properties>
+            <property>
+              <key>method</key>
+              <value>create,read</value>
+            </property>
+            <property>
+              <key>permission</key>
+              <value>nexus:errorreporting</value>
+            </property>
+          </properties>
+        </privilege>
     </privileges>
 </security>

@@ -52,6 +52,8 @@ public class DefaultErrorReportingManager
     @Requirement
     ConfigurationHelper configHelper;
     
+    private static final String ERROR_REPORT_DIR = "error-report-bundles";
+    
     /**
      * XStream is used for a deep clone (TODO: not sure if this is a great idea)
      */
@@ -103,7 +105,7 @@ public class DefaultErrorReportingManager
         }
     }
     
-    private File assembleBundle()
+    public File assembleBundle()
         throws IOException
     {
         File nexusXml = getNexusXml();
@@ -220,7 +222,7 @@ public class DefaultErrorReportingManager
                 return !pathname.getName().endsWith( ".bak" )
                     && !pathname.getName().endsWith( "nexus.xml" )
                     && !pathname.getName().endsWith( "security.xml" )
-                    && !pathname.getName().endsWith( "security-system.xml" );
+                    && !pathname.getName().endsWith( "security-configuration.xml" );
             }
         });
         
@@ -305,7 +307,7 @@ public class DefaultErrorReportingManager
     private File getSecurityConfigurationXml()
         throws IOException
     {
-        SecurityConfiguration configuration = ( SecurityConfiguration )cloneViaXml( securityXml.getConfiguration() );
+        SecurityConfiguration configuration = ( SecurityConfiguration )cloneViaXml( securityConfigurationXml.getConfiguration() );
         
         // No config ??
         if ( configuration == null )
@@ -343,7 +345,8 @@ public class DefaultErrorReportingManager
     {
         File tempFile = null;
         
-        String fileListing = FileListingHelper.buildFileListing( nexusConfig.getWorkingDirectory() );
+        String fileListing = FileListingHelper.buildFileListing( 
+            nexusConfig.getWorkingDirectory() );
         
         BufferedWriter bWriter = null;
         
@@ -378,7 +381,7 @@ public class DefaultErrorReportingManager
     
     private File getZipFile()
     {
-        File zipDir = nexusConfig.getWorkingDirectory( "error-report-bundles" );
+        File zipDir = nexusConfig.getWorkingDirectory( ERROR_REPORT_DIR );
         
         if ( !zipDir.exists() )
         {
