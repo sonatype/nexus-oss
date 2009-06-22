@@ -15,21 +15,20 @@ package org.sonatype.nexus.proxy.maven.maven2;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.security.DigestOutputStream;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
+import org.apache.maven.mercury.repository.metadata.Metadata;
+import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
+import org.apache.maven.mercury.repository.metadata.MetadataException;
+import org.apache.maven.mercury.repository.metadata.MetadataOperand;
+import org.apache.maven.mercury.repository.metadata.MetadataOperation;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.configuration.Configurator;
@@ -41,10 +40,11 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCompositeFileItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageCompositeFileItem;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
+import org.sonatype.nexus.proxy.maven.metadata.mercury.MergeOperation;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -112,122 +112,134 @@ public class M2GroupRepository
 
         return super.doRetrieveItem( request );
     }
+    
+    /**
+     * Parse a maven Metadata object from a storage file item
+     */
+    private Metadata parseMetadata( StorageFileItem fileItem )
+        throws IOException,
+            MetadataException
+    {
+        InputStream inputStream = null;
+
+        try
+        {
+            inputStream = fileItem.getInputStream();
+
+            return MetadataBuilder.read( inputStream );
+        }
+        finally
+        {
+            try
+            {
+                if ( inputStream != null )
+                {
+                    inputStream.close();
+                }
+            }
+            catch ( Exception e )
+            {
+            }
+        }
+    }
 
     /**
      * Aggregates metadata from all member repositories
      */
     private StorageItem doRetrieveMetadata( ResourceStoreRequest request )
-        throws StorageException, IllegalOperationException, UnsupportedStorageOperationException, ItemNotFoundException
+        throws StorageException,
+            IllegalOperationException,
+            UnsupportedStorageOperationException,
+            ItemNotFoundException
     {
-        List<StorageItem> listOfStorageItems = doRetrieveItems( request );
+        List<StorageItem> items = doRetrieveItems( request );
 
-        if ( listOfStorageItems.isEmpty() )
+        if ( items.isEmpty() )
         {
-            // empty: not found
             throw new ItemNotFoundException( request, this );
         }
 
         if ( !isMergeMetadata() )
         {
             // not merging: return the 1st and ciao
-            return listOfStorageItems.get( 0 );
+            return items.get( 0 );
         }
 
-        MetadataXpp3Reader metadataReader = new MetadataXpp3Reader();
-        MetadataXpp3Writer metadataWriter = new MetadataXpp3Writer();
-        InputStreamReader isr = null;
-
-        Metadata mergedMetadata = null;
-
-        // Reversing the result list, so that the most authoritative result
-        // will provide fields like lastVersiion
-        Collections.reverse( listOfStorageItems );
-
-        for ( StorageItem currentItem : listOfStorageItems )
-        {
-            try
-            {
-                DefaultStorageFileItem currentFileItem = (DefaultStorageFileItem) currentItem;
-                isr = new InputStreamReader( currentFileItem.getInputStream() );
-                Metadata imd = metadataReader.read( isr );
-                if ( mergedMetadata == null )
-                {
-                    mergedMetadata = imd;
-                }
-                else
-                {
-                    mergedMetadata.merge( imd );
-                }
-            }
-            catch ( XmlPullParserException ex )
-            {
-                getLogger().info(
-                                  "Got Exception during parsing of M2 metadata: " + currentItem.getRepositoryItemUid()
-                                      + ", skipping it!", ex );
-            }
-            catch ( IOException ex )
-            {
-                throw new StorageException( "Got IOException during merge of Maven2 metadata, UID='"
-                    + currentItem.getRepositoryItemUid() + "'", ex );
-            }
-            finally
-            {
-                if ( isr != null )
-                {
-                    try
-                    {
-                        isr.close();
-                    }
-                    catch ( IOException e )
-                    {
-                        getLogger().warn( "Got IO exception during close of InputStream.", e );
-                    }
-                }
-            }
-        }
-
-        if ( mergedMetadata == null )
-        {
-            // may happen if only one or all metadatas are unparseable
-            throw new ItemNotFoundException( request, this );
-        }
+        List<Metadata> existingMetadatas = new ArrayList<Metadata>();
 
         try
         {
-            // we are not saving the merged metadata, just calculating
-            // correct
-            // checksum for later retrieval
-            // and sending it back with in-memory stream
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            MessageDigest md5alg = MessageDigest.getInstance( "md5" );
-            MessageDigest sha1alg = MessageDigest.getInstance( "sha1" );
-            OutputStreamWriter osw =
-                new OutputStreamWriter( new DigestOutputStream( new DigestOutputStream( bos, md5alg ), sha1alg ) );
-            metadataWriter.write( osw, mergedMetadata );
-            osw.flush();
-            osw.close();
+            for ( StorageItem item : items )
+            {
+                if ( !( item instanceof StorageFileItem ) )
+                {
+                    break;
+                }
 
-            // NEXUS-2188: lines below are causing this!
-            storeDigest( request, md5alg );
-            storeDigest( request, sha1alg );
-            // NEXUS-2188: lines above are causing this!
+                StorageFileItem fileItem = (StorageFileItem) item;
+
+                existingMetadatas.add( parseMetadata( fileItem ) );
+            }
+
+            if ( existingMetadatas.isEmpty() )
+            {
+                throw new ItemNotFoundException( request, this );
+            }
+
+            Metadata result = new Metadata();
+
+            List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
+
+            for ( Metadata metadata : existingMetadatas )
+            {
+                ops.add( new MergeOperation( new MetadataOperand( metadata ) ) );
+            }
+
+            MetadataBuilder.changeMetadata( result, ops );
+
+            // build the result item
+            ByteArrayOutputStream resultOutputStream = new ByteArrayOutputStream();
+
+            MetadataBuilder.write( result, resultOutputStream );
+
+            StorageItem item = createMergedMetadataItem( request, resultOutputStream.toByteArray(), items );
+
+            // build checksum files
+            MessageDigest md5Digest = MessageDigest.getInstance( "md5" );
+
+            MessageDigest sha1Digest = MessageDigest.getInstance( "sha1" );
+
+            md5Digest.update( resultOutputStream.toByteArray() );
+
+            sha1Digest.update( resultOutputStream.toByteArray() );
+
+            storeDigest( request, md5Digest );
+
+            storeDigest( request, sha1Digest );
+
+            resultOutputStream.close();
 
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                                   "Item for path " + request.toString() + " merged from "
-                                       + Integer.toString( listOfStorageItems.size() ) + " found items." );
+                    "Item for path " + request.toString() + " merged from " + Integer.toString( items.size() )
+                        + " found items." );
             }
 
-            return createMergedMetadataItem( request, bos.toByteArray(), listOfStorageItems );
+            return item;
+
         }
-        catch ( NoSuchAlgorithmException ex )
+        catch ( IOException e )
         {
-            throw new StorageException( "Got NoSuchAlgorithmException during M2 metadata merging.", ex );
+            throw new StorageException( "Got IOException during M2 metadata merging.", e );
         }
-        catch ( IOException ex )
+        catch ( MetadataException e )
         {
-            throw new StorageException( "Got IOException during M2 metadata merging.", ex );
+            throw new StorageException( "Got MetadataException during M2 metadata merging.", e );
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            throw new StorageException( "Got NoSuchAlgorithmException during M2 metadata merging.", e );
         }
     }
 
