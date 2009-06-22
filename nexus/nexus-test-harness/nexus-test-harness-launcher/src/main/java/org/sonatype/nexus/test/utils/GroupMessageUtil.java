@@ -97,7 +97,7 @@ public class GroupMessageUtil
      * @param expected
      * @param actual a list of RepositoryGroupMemberRepository, or a list of repo Ids.
      */
-    public void validateRepoLists( List<RepositoryGroupMemberRepository> expected, List<String> actual )
+    public void validateRepoLists( List<RepositoryGroupMemberRepository> expected, List<?> actual )
     {
 
         Assert.assertEquals( "Size of groups repository list, \nexpected: " + this.repoListToStringList( expected )

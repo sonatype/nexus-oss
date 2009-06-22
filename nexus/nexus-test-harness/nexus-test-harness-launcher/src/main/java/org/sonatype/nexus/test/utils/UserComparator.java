@@ -41,13 +41,13 @@ public class UserComparator implements Comparator<CUser>
         }
         else if ( !user1.getEmail().equals( user2.getEmail() ) )
             return -1;
-        if ( user1.getModelEncoding() == null )
+        /*if ( user1.getModelEncoding() == null )
         {
             if ( user2.getModelEncoding() != null )
                 return -1;
         }
         else if ( !user1.getModelEncoding().equals( user2.getModelEncoding() ) )
-            return -1;
+            return -1;*/
         if ( user1.getName() == null )
         {
             if ( user2.getName() != null )
