@@ -57,13 +57,13 @@ public class RoleComparator
         }
         else if ( !role1.getId().equals( role2.getId() ) )
             return -1;
-        if ( role1.getModelEncoding() == null )
+        /*if ( role1.getModelEncoding() == null )
         {
             if ( role2.getModelEncoding() != null )
                 return -1;
         }
         else if ( !role1.getModelEncoding().equals( role2.getModelEncoding() ) )
-            return -1;
+            return -1;*/
         if ( role1.getName() == null )
         {
             if ( role2.getName() != null )
