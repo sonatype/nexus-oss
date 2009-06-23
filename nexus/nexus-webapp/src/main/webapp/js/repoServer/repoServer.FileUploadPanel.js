@@ -125,6 +125,7 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
                 items: [
                   {
                     hideLabel: true,
+                    name: 'uploadPomButton',
                     xtype: 'browsebutton',
                     text: 'Select POM to Upload...',
                     style :'margin-bottom: 5px;',
@@ -263,6 +264,7 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
             text: 'Select Artifact(s) to Upload...',
             style :'margin-bottom: 5px;',
             uploadPanel: this,
+            name: 'uploadArtifactButton',
             handler: function( b ) {
               b.uploadPanel.fileInput = b.detachInputFile(); 
               var filename = b.uploadPanel.fileInput.getValue();
