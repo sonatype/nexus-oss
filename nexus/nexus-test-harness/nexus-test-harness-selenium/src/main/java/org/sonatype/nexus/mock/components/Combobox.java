@@ -29,6 +29,7 @@ public class Combobox
     public void select( int i )
     {
         // workaround to select an item on combobox
+        focus();
 
         runScript( ".expand()" );
 
@@ -48,6 +49,8 @@ public class Combobox
         }
 
         selenium.click( "//*[@id='" + id + "']" );
+
+        blur();
     }
 
 }

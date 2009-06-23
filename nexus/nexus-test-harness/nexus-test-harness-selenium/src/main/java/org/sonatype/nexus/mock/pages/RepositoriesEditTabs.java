@@ -10,7 +10,7 @@ public class RepositoriesEditTabs
 
     public enum RepoKind
     {
-        HOSTED( 2 ), PROXY( 2 ), VIRTUAL( 1 );
+        HOSTED( 2 ), PROXY( 2 ), VIRTUAL( 1 ), GROUP( 2 );
 
         private int configPosition;
 
@@ -30,11 +30,18 @@ public class RepositoriesEditTabs
         runScript( ".activate(" + expression + ".items.items[" + i + "])" );
     }
 
-    public RepositoriesConfigurationForm selectConfiguration( RepoKind kind )
+    public Component selectConfiguration( RepoKind kind )
     {
         select( kind.configPosition );
 
-        return new RepositoriesConfigurationForm( selenium, expression + ".getLayout().activeItem" );
+        if ( RepoKind.GROUP.equals( kind ) )
+        {
+            return new GroupConfigurationForm( selenium, expression + ".getLayout().activeItem" );
+        }
+        else
+        {
+            return new RepositoriesConfigurationForm( selenium, expression + ".getLayout().activeItem" );
+        }
     }
 
     public RepositoriesArtifactUploadForm selectUpload( RepoKind kind )

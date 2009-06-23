@@ -109,8 +109,10 @@ Sonatype.repoServer.RepositoryGroupEditor = function( config ) {
         allowBlank: false,
         disabled: ! this.isNew,
         listeners: {
-          select: this.providerSelectHandler,
-          scope: this
+          select: {
+            fn:  this.providerSelectHandler,
+            scope: this
+          }
         }
       },
       {

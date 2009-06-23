@@ -3,6 +3,7 @@ package org.sonatype.nexus.mock.pages;
 import org.sonatype.nexus.mock.NexusTestCase;
 import org.sonatype.nexus.mock.components.Button;
 import org.sonatype.nexus.mock.components.Component;
+import org.sonatype.nexus.mock.pages.RepositoriesEditTabs.RepoKind;
 
 import com.thoughtworks.selenium.Selenium;
 
@@ -30,6 +31,8 @@ public class RepositoriesTab
 
     private Button addProxyButton;
 
+    private Button addGroupButton;
+
     public RepositoriesTab( Selenium selenium, MainPage mainPage )
     {
         super( selenium, REPOSITORIES_ST );
@@ -48,6 +51,8 @@ public class RepositoriesTab
         this.addProxyButton.idFunction = ".id";
         this.addVirtualButton = new Button( selenium, addButton.getExpression() + ".menu.items.items[2].el" );
         this.addVirtualButton.idFunction = ".id";
+        this.addGroupButton = new Button( selenium, addButton.getExpression() + ".menu.items.items[4].el" );
+        this.addGroupButton.idFunction = ".id";
     }
 
     public RepositoriesConfigurationForm addHostedRepo()
@@ -56,7 +61,8 @@ public class RepositoriesTab
 
         addHostedButton.clickNoWait();
 
-        return new RepositoriesConfigurationForm( selenium, expression + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
+        return new RepositoriesConfigurationForm( selenium, expression
+            + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
     }
 
     public RepositoriesConfigurationForm addProxyRepo()
@@ -65,9 +71,9 @@ public class RepositoriesTab
 
         addProxyButton.clickNoWait();
 
-        return new RepositoriesConfigurationForm( selenium, expression + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
+        return new RepositoriesConfigurationForm( selenium, expression
+            + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
     }
-
 
     public RepositoriesConfigurationForm addVirtualRepo()
     {
@@ -75,7 +81,8 @@ public class RepositoriesTab
 
         addVirtualButton.clickNoWait();
 
-        return new RepositoriesConfigurationForm( selenium, expression + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
+        return new RepositoriesConfigurationForm( selenium, expression
+            + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
     }
 
     public RepositoriesTab refresh()
@@ -85,9 +92,18 @@ public class RepositoriesTab
         return this;
     }
 
-    public RepositoriesEditTabs select( String repoId )
+    public RepositoriesEditTabs select( String repoId, RepoKind kind )
     {
-        this.repositoriesGrid.select( NexusTestCase.nexusBaseURL + "service/local/repositories/" + repoId );
+        this.repositoriesGrid.waitToLoad();
+
+        if ( RepoKind.GROUP.equals( kind ) )
+        {
+            this.repositoriesGrid.select( NexusTestCase.nexusBaseURL + "service/local/repo_groups/" + repoId );
+        }
+        else
+        {
+            this.repositoriesGrid.select( NexusTestCase.nexusBaseURL + "service/local/repositories/" + repoId );
+        }
 
         try
         {
@@ -140,12 +156,22 @@ public class RepositoriesTab
     {
         this.deleteButton.click();
 
-        return new MessageBox(selenium);
+        return new MessageBox( selenium );
     }
 
     public boolean contains( String repoId )
     {
         return this.repositoriesGrid.contains( NexusTestCase.nexusBaseURL + "/service/local/repositories/" + repoId );
+    }
+
+    public GroupConfigurationForm addGroup()
+    {
+        addButton.click();
+
+        addGroupButton.clickNoWait();
+
+        return new GroupConfigurationForm( selenium, expression
+            + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
     }
 
 }

@@ -39,7 +39,9 @@ public class Nexus2145RepositoryTest
         repositories.refresh();
 
         // read
-        RepositoriesConfigurationForm config = repositories.select( repoId ).selectConfiguration( RepoKind.HOSTED );
+        RepositoriesConfigurationForm config =
+            (RepositoriesConfigurationForm) repositories.select( repoId, RepoKind.HOSTED ).selectConfiguration(
+                                                                                                                RepoKind.HOSTED );
 
         Assert.assertEquals( repoId, config.getIdField().getValue() );
         Assert.assertEquals( name, config.getName().getValue() );
@@ -48,7 +50,9 @@ public class Nexus2145RepositoryTest
         repositories.refresh();
 
         // update
-        config = repositories.select( repoId ).selectConfiguration( RepoKind.HOSTED );
+        config =
+            (RepositoriesConfigurationForm) repositories.select( repoId, RepoKind.HOSTED ).selectConfiguration(
+                                                                                                                RepoKind.HOSTED );
 
         String newName = "new selenium repo name";
         config.getName().type( newName );
@@ -56,13 +60,15 @@ public class Nexus2145RepositoryTest
 
         repositories.refresh();
 
-        config = repositories.select( repoId ).selectConfiguration( RepoKind.HOSTED );
+        config =
+            (RepositoriesConfigurationForm) repositories.select( repoId, RepoKind.HOSTED ).selectConfiguration(
+                                                                                                                RepoKind.HOSTED );
         Assert.assertEquals( newName, config.getName().getValue() );
 
         repositories.refresh();
 
         // delete
-        repositories.select( repoId );
+        repositories.select( repoId, RepoKind.HOSTED );
         repositories.delete().clickYes();
         repositories.refresh();
 
@@ -85,7 +91,9 @@ public class Nexus2145RepositoryTest
         repositories.refresh();
 
         // read
-        RepositoriesConfigurationForm config = repositories.select( repoId ).selectConfiguration( RepoKind.VIRTUAL );
+        RepositoriesConfigurationForm config =
+            (RepositoriesConfigurationForm) repositories.select( repoId, RepoKind.VIRTUAL ).selectConfiguration(
+                                                                                                                 RepoKind.VIRTUAL );
 
         Assert.assertEquals( repoId, config.getIdField().getValue() );
         Assert.assertEquals( name, config.getName().getValue() );
@@ -94,7 +102,9 @@ public class Nexus2145RepositoryTest
         repositories.refresh();
 
         // update
-        config = repositories.select( repoId ).selectConfiguration( RepoKind.VIRTUAL );
+        config =
+            (RepositoriesConfigurationForm) repositories.select( repoId, RepoKind.VIRTUAL ).selectConfiguration(
+                                                                                                                 RepoKind.VIRTUAL );
 
         String newName = "new selenium virtual repo name";
         config.getName().type( newName );
@@ -102,13 +112,15 @@ public class Nexus2145RepositoryTest
 
         repositories.refresh();
 
-        config = repositories.select( repoId ).selectConfiguration( RepoKind.VIRTUAL );
+        config =
+            (RepositoriesConfigurationForm) repositories.select( repoId, RepoKind.VIRTUAL ).selectConfiguration(
+                                                                                                                 RepoKind.VIRTUAL );
         Assert.assertEquals( newName, config.getName().getValue() );
 
         repositories.refresh();
 
         // delete
-        repositories.select( repoId );
+        repositories.select( repoId, RepoKind.VIRTUAL );
         repositories.delete().clickYes();
         repositories.refresh();
 
@@ -130,7 +142,9 @@ public class Nexus2145RepositoryTest
         repositories.refresh();
 
         // read
-        RepositoriesConfigurationForm config = repositories.select( repoId ).selectConfiguration( RepoKind.PROXY );
+        RepositoriesConfigurationForm config =
+            (RepositoriesConfigurationForm) repositories.select( repoId, RepoKind.PROXY ).selectConfiguration(
+                                                                                                               RepoKind.PROXY );
 
         Assert.assertEquals( repoId, config.getIdField().getValue() );
         Assert.assertEquals( name, config.getName().getValue() );
@@ -139,7 +153,9 @@ public class Nexus2145RepositoryTest
         repositories.refresh();
 
         // update
-        config = repositories.select( repoId ).selectConfiguration( RepoKind.PROXY );
+        config =
+            (RepositoriesConfigurationForm) repositories.select( repoId, RepoKind.PROXY ).selectConfiguration(
+                                                                                                               RepoKind.PROXY );
 
         String newName = "new selenium proxy repo name";
         config.getName().type( newName );
@@ -147,13 +163,15 @@ public class Nexus2145RepositoryTest
 
         repositories.refresh();
 
-        config = repositories.select( repoId ).selectConfiguration( RepoKind.PROXY );
+        config =
+            (RepositoriesConfigurationForm) repositories.select( repoId, RepoKind.PROXY ).selectConfiguration(
+                                                                                                               RepoKind.PROXY );
         Assert.assertEquals( newName, config.getName().getValue() );
 
         repositories.refresh();
 
         // delete
-        repositories.select( repoId );
+        repositories.select( repoId, RepoKind.PROXY );
         repositories.delete().clickYes();
         repositories.refresh();
 
