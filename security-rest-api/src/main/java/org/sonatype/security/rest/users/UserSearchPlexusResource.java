@@ -25,6 +25,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResource;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResourceRequest;
@@ -85,7 +86,18 @@ public class UserSearchPlexusResource
         {
             Set<String> roleIds = new HashSet<String>();
 
-            for ( Role role : this.getSecuritySystem().listRoles() )
+            Set<Role> roles = null;
+            try
+            {
+                roles = this.getSecuritySystem().listRoles("default");
+            }
+            catch ( NoSuchAuthorizationManager e )
+            {
+                this.getLogger().error( "Cannot find default UserManager,  effective user search may not work properly.", e );
+                roles = this.getSecuritySystem().listRoles();
+            }
+            
+            for ( Role role : roles )
             {
                 roleIds.add( role.getRoleId() );
             }
