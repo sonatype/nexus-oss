@@ -447,8 +447,4 @@
     <password>smtp-password</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-  <errorReporting>
-    <jiraUrl>https://issues.sonatype.org</jiraUrl>
-    <jiraProject>NEXUS</jiraProject>
-  </errorReporting>
 </nexusConfiguration>

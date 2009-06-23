@@ -32,6 +32,7 @@ import org.sonatype.nexus.rest.model.ConfigurationsListResource;
 import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
+import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.FeedListResource;
 import org.sonatype.nexus.rest.model.FeedListResourceResponse;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
@@ -359,6 +360,7 @@ public class NexusApplication
         xstream.omitField( RemoteHttpProxySettings.class, "modelEncoding" );
         xstream.omitField( AuthenticationSettings.class, "modelEncoding" );
         xstream.omitField( SmtpSettings.class, "modelEncoding" );
+        xstream.omitField( ErrorReportingSettings.class, "modelEncoding" );
         xstream.alias( "global-settings", GlobalConfigurationResourceResponse.class );
 
         xstream.omitField( WastebasketResource.class, "modelEncoding" );

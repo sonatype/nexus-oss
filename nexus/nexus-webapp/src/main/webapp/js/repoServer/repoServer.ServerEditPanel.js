@@ -497,7 +497,77 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             ]
           } //end auth fieldset
         ]
-      } // end proxy settings
+      }, // end proxy settings
+      {
+        xtype: 'fieldset',
+        checkboxToggle:true,
+        collapsed: true,
+        id: formId + '_' + 'errorReportingSettings',
+        name: 'errorReportingSettings',
+        title: 'Automated Error Reporting Settings (optional)',
+        anchor: Sonatype.view.FIELDSET_OFFSET,
+        autoHeight:true,
+        layoutConfig: {
+          labelSeparator: ''
+        },
+        listeners: {
+          'expand' : {
+            fn: function ( panel ) {
+              this.optionalFieldsetExpandHandler( panel );
+              var field = this.find( 'name', 'errorReportingSettings.jiraUrl')[0];
+              if ( Ext.isEmpty( field.getValue() ) ){
+                field.setValue( 'https://issues.sonatype.org' );
+              }
+              field = this.find( 'name', 'errorReportingSettings.jiraProject')[0];
+              if ( Ext.isEmpty( field.getValue() ) ){
+                field.setValue( 'NEXUS' );
+              }
+            },
+            scope: this
+          },
+          'collapse' : {
+            fn: this.optionalFieldsetCollapseHandler,
+            scope: this,
+            delay: 100
+          }
+        },
+
+        items: [
+          {
+            xtype: 'textfield',
+            fieldLabel: 'JIRA URL',
+            helpText: ht.jiraUrl,
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'errorReportingSettings.jiraUrl',
+            allowBlank:true
+          },
+          {
+            xtype: 'textfield',
+            fieldLabel: 'JIRA Project',
+            helpText: ht.jiraProject,
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'errorReportingSettings.jiraProject',
+            allowBlank:true
+          },
+          {
+            xtype: 'textfield',
+            fieldLabel: 'JIRA Username',
+            helpText: ht.jiraUsername,
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'errorReportingSettings.jiraUsername',
+            allowBlank:true
+          },
+          {
+            xtype: 'textfield',
+            fieldLabel: 'JIRA Password',
+            helpText: ht.jiraPassword,
+            inputType:'password',
+            anchor: Sonatype.view.FIELD_OFFSET,
+            name: 'errorReportingSettings.jiraPassword',
+            allowBlank:true
+          }
+        ]
+      }
     ],
     buttons: [
       {

@@ -235,14 +235,6 @@ public class Upgrade108to140
 
             newc.setRepositories( repositories );
         }
-        
-        // initialize automatic error reporting
-        CErrorReporting errorReporting = new CErrorReporting();
-        errorReporting.setEnabled( false );
-        errorReporting.setJiraUrl( "https://issues.sonatype.org" );
-        errorReporting.setJiraProject( "NEXUS" );
-        
-        newc.setErrorReporting( errorReporting );
 
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );

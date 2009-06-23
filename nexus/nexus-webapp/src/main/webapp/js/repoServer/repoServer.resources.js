@@ -71,7 +71,11 @@ Sonatype.repoServer.resources.help = {
     smtppass : 'The password used to access the SMTP server.',
     smtpssl : 'Enable SSL.',
     smtptls : 'Enable TLS.',
-    smtpsysemail : 'Default System email address.  This is who the "From" address will be.'
+    smtpsysemail : 'Default System email address.  This is who the "From" address will be.',
+    jiraUrl : 'The URL of the Sonatype JIRA server for automated error reporting',
+    jiraProject : 'The JIRA project that will contain the automated error tickets',
+    jiraUsername : 'The Username of a JIRA account',
+    jiraPassword : 'The Password of a JIRA account'
   },
 
   // Groups Config help text

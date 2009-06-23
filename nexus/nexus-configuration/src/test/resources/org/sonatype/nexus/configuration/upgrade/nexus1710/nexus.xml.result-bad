@@ -1650,8 +1650,4 @@
     <port>25</port>
     <systemEmailAddress>nexus@repository.sonatype.org</systemEmailAddress>
   </smtpConfiguration>
-  <errorReporting>
-    <jiraUrl>https://issues.sonatype.org</jiraUrl>
-    <jiraProject>NEXUS</jiraProject>
-  </errorReporting>
 </nexusConfiguration>
