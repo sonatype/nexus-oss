@@ -26,4 +26,28 @@ public class Combobox
         evalTrue( ".setValue( '" + value + "' )" );
     }
 
+    public void select( int i )
+    {
+        // workaround to select an item on combobox
+
+        runScript( ".expand()" );
+
+        String id;
+        if ( i == 0 )
+        {
+            id = getEval( ".innerList.first().id" );
+        }
+        else
+        {
+            runScript( ".innerList.first()" );
+            for ( int j = 1; j < i; j++ )
+            {
+                runScript( ".innerList.next()" );
+            }
+            id = getEval( ".innerList.next().id" );
+        }
+
+        selenium.click( "//*[@id='" + id + "']" );
+    }
+
 }

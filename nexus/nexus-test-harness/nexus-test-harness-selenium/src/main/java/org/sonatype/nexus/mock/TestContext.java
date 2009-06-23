@@ -99,4 +99,15 @@ public class TestContext
         }
     }
 
+    @Deprecated
+    public static File getTestFile( String relativePath )
+    {
+        return getFile(relativePath);
+    }
+
+    public static File getFile( String relativePath )
+    {
+        return getTestResourceAsFile( "files/" + relativePath );
+    }
+
 }

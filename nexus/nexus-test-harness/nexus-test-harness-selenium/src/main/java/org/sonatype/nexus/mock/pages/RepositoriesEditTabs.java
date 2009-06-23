@@ -36,4 +36,16 @@ public class RepositoriesEditTabs
 
         return new RepositoriesConfigurationForm( selenium, expression + ".getLayout().activeItem" );
     }
+
+    public RepositoriesArtifactUploadForm selectUpload( RepoKind kind )
+    {
+        if ( !RepoKind.HOSTED.equals( kind ) )
+        {
+            return null;
+        }
+
+        select( 5 );
+
+        return new RepositoriesArtifactUploadForm( selenium, expression + ".getLayout().activeItem" );
+    }
 }
