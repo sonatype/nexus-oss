@@ -178,8 +178,6 @@ public class GlobalConfigurationPlexusResource
                         reporting.setEnabled( true );
                         reporting.setJiraUsername( settings.getJiraUsername() );
                         reporting.setJiraPassword( settings.getJiraPassword() );
-                        reporting.setJiraUrl( settings.getJiraUrl() );
-                        reporting.setJiraProject( settings.getJiraProject() );
                     }
                     else
                     {

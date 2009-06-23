@@ -39,8 +39,6 @@ Sonatype.repoServer.referenceData = {
       tlsEnabled: ""
     },
     errorReportingSettings: {
-      jiraUrl: "",
-      jiraProject: "",
       jiraUsername: "",
       jiraPassword: ""
     },

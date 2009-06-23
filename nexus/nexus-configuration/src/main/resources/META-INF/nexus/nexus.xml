@@ -288,5 +288,9 @@
     <password>smtp-password</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-  <errorReporting/>
+  <errorReporting>
+    <enabled>false</enabled>
+    <jiraUrl>https://issues.sonatype.org</jiraUrl>
+    <jiraProject>NEXUS</jiraProject>
+  </errorReporting>
 </nexusConfiguration>

@@ -512,17 +512,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
         },
         listeners: {
           'expand' : {
-            fn: function ( panel ) {
-              this.optionalFieldsetExpandHandler( panel );
-              var field = this.find( 'name', 'errorReportingSettings.jiraUrl')[0];
-              if ( Ext.isEmpty( field.getValue() ) ){
-                field.setValue( 'https://issues.sonatype.org' );
-              }
-              field = this.find( 'name', 'errorReportingSettings.jiraProject')[0];
-              if ( Ext.isEmpty( field.getValue() ) ){
-                field.setValue( 'NEXUS' );
-              }
-            },
+            fn: this.optionalFieldsetExpandHandler,
             scope: this
           },
           'collapse' : {
@@ -533,22 +523,6 @@ Sonatype.repoServer.ServerEditPanel = function(config){
         },
 
         items: [
-          {
-            xtype: 'textfield',
-            fieldLabel: 'JIRA URL',
-            helpText: ht.jiraUrl,
-            anchor: Sonatype.view.FIELD_OFFSET,
-            name: 'errorReportingSettings.jiraUrl',
-            allowBlank:true
-          },
-          {
-            xtype: 'textfield',
-            fieldLabel: 'JIRA Project',
-            helpText: ht.jiraProject,
-            anchor: Sonatype.view.FIELD_OFFSET,
-            name: 'errorReportingSettings.jiraProject',
-            allowBlank:true
-          },
           {
             xtype: 'textfield',
             fieldLabel: 'JIRA Username',

@@ -76,8 +76,6 @@ public abstract class AbstractGlobalConfigurationPlexusResource
        
         result.setJiraUsername( settings.getJiraUsername() );
         result.setJiraPassword( settings.getJiraPassword() );
-        result.setJiraUrl( settings.getJiraUrl() );
-        result.setJiraProject( settings.getJiraProject() );
         
         return result;
     }

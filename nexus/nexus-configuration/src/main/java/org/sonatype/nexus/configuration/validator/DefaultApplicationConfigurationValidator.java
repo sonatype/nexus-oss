@@ -742,18 +742,6 @@ public class DefaultApplicationConfigurationValidator
                 ValidationMessage msg = new ValidationMessage( "jiraProject", "JIRA Project is empty." );
                 response.addValidationError( msg );
             }
-            
-            if ( StringUtils.isEmpty( settings.getJiraUsername() ) )
-            {
-                ValidationMessage msg = new ValidationMessage( "jiraUsername", "JIRA Username is empty." );
-                response.addValidationError( msg );
-            }
-            
-            if ( StringUtils.isEmpty( settings.getJiraPassword() ) )
-            {
-                ValidationMessage msg = new ValidationMessage( "jiraPassword", "JIRA Password is empty." );
-                response.addValidationError( msg );
-            }
         }
 
         return response;
