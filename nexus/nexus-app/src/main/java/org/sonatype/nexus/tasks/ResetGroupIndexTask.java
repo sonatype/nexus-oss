@@ -32,6 +32,11 @@ public class ResetGroupIndexTask
     @Requirement
     private IndexerManager indexerManager;
 
+    @Override
+    public boolean isExposed()
+    {
+        return false;
+    }
 
     @Override
     public Object doRun()

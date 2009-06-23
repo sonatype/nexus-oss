@@ -88,6 +88,11 @@ public class ScheduledServiceListPlexusResource
             {
                 if ( task.isExposed() )
                 {
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug( "Building task '" + task.getName() + "' of type '" + task.getType() + "'." );
+                    }
+                    
                     String lastRunResult = "n/a";
 
                     if ( task.getLastRun() != null )
