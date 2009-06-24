@@ -690,12 +690,16 @@ public class DefaultNexusConfiguration
     {
         validateRepository( settings, true );
 
-        getConfiguration().addRepository( settings );
-
+        // create it, will do runtime validation
         Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfiguration(), settings );
 
+        // now add it to config, since it is validated and succesfully created
+        getConfiguration().addRepository( settings );
+
+        // register with repoRegistry
         repositoryRegistry.addRepository( repository );
 
+        // save
         saveConfiguration();
 
         return repository;
