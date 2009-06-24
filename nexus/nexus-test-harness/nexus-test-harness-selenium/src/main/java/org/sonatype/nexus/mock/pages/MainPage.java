@@ -55,6 +55,13 @@ public class MainPage
         return new SecurityPanel( selenium );
     }
 
+    public LogsViewTab openViewLogs()
+    {
+        viewsPanel().logsAndConfigFilesClick();
+
+        return new LogsViewTab( selenium );
+    }
+
     public RepositoriesTab openRepositories()
     {
         viewsPanel().repositoriesClick();
@@ -79,6 +86,13 @@ public class MainPage
     public SearchPanel searchPanel()
     {
         return new SearchPanel( selenium );
+    }
+
+    public LogConfigTab openLogsConfig()
+    {
+        adminPanel().logClick();
+
+        return new LogConfigTab(selenium);
     }
 
 }

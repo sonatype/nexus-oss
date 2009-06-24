@@ -44,4 +44,9 @@ public class AdministrationPanel
     {
         clickLink( "Server" );
     }
+
+    public void logClick()
+    {
+        clickLink( "Log" );
+    }
 }

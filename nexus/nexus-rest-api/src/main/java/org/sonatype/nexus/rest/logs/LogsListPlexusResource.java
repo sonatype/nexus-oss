@@ -32,7 +32,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 /**
  * The log file list resource handler. This handles the GET method only and simply returns the list of existing nexus
  * application log files.
- * 
+ *
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "logsList" )
@@ -63,6 +63,7 @@ public class LogsListPlexusResource
         throws ResourceException
     {
         LogsListResourceResponse result = new LogsListResourceResponse();
+        result.getData(); //just to load the data, prevent problem on js side
 
         try
         {
