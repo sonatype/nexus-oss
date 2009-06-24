@@ -37,6 +37,7 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
+import org.sonatype.appbooter.ctl.ControllerClient;
 
 @Component( role = ForkedAppBooter.class, hint = "TestUnforkedAppBooter", instantiationStrategy = "per-lookup" )
 public class UnforkedAppBooter
@@ -278,6 +279,12 @@ public class UnforkedAppBooter
         {
             throw new AppBooterServiceException( e );
         }
+    }
+
+    public ControllerClient getControllerClient()
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

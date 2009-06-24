@@ -46,7 +46,7 @@ public class NexusStatusUtil
 
     private static NexusClient client;
 
-    public static void sendNexusStatusCommand( String command )
+    private static void sendNexusStatusCommand( String command )
         throws NexusIllegalStateException
     {
         String originalState = getNexusStatus().getData().getState();
@@ -68,8 +68,8 @@ public class NexusStatusUtil
             try
             {
                 throw new NexusIllegalStateException( "Could not " + command + " Nexus: (" + response.getStatus() + ")"
-                    + ((response.getEntity() != null)  ? response.getEntity().getText() : "no response") + " nexus state was: " + originalState + " and now is: "
-                    + getNexusStatus().getData().getState() );
+                    + ( ( response.getEntity() != null ) ? response.getEntity().getText() : "no response" )
+                    + " nexus state was: " + originalState + " and now is: " + getNexusStatus().getData().getState() );
             }
             catch ( IOException e )
             {
@@ -130,7 +130,7 @@ public class NexusStatusUtil
         return status;
     }
 
-    public static void doClientStart()
+    private static void doClientStart()
         throws NexusIllegalStateException
     {
         if ( !isNexusAlive() )
@@ -153,7 +153,7 @@ public class NexusStatusUtil
         }
     }
 
-    public static void doClientStop()
+    private static void doClientStop()
         throws NexusIllegalStateException
     {
         if ( !isNexusAlive() )
@@ -184,6 +184,50 @@ public class NexusStatusUtil
             }
 
             disconnect();
+        }
+    }
+
+    public static void doSoftStart()
+        throws NexusIllegalStateException
+    {
+        try
+        {
+            ForkedAppBooter appBooter = getAppBooter();
+
+            if ( isNexusControllerPortAlive() && appBooter.getControllerClient() != null )
+            {
+                getAppBooter().getControllerClient().start();
+            }
+            else
+            {
+                doHardStart();
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new NexusIllegalStateException( "Cannot soft start nexus!", e );
+        }
+    }
+
+    public static void doSoftStop()
+        throws NexusIllegalStateException
+    {
+        try
+        {
+            ForkedAppBooter appBooter = getAppBooter();
+
+            if ( isNexusControllerPortAlive() && appBooter.getControllerClient() != null )
+            {
+                getAppBooter().getControllerClient().stop();
+            }
+            else
+            {
+                doHardStop();
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new NexusIllegalStateException( "Cannot soft stop nexus!", e );
         }
     }
 
@@ -244,6 +288,8 @@ public class NexusStatusUtil
             }
             catch ( Exception e )
             {
+                log.warn( "Cannot stop Nexus!", e );
+
                 killNexus();
             }
         }
@@ -265,7 +311,7 @@ public class NexusStatusUtil
         disconnect();
     }
 
-    public static NexusClient getClient()
+    private static NexusClient getClient()
         throws NexusIllegalStateException
     {
         if ( client == null )
@@ -274,8 +320,8 @@ public class NexusStatusUtil
             // at this point security should not be turned on, but you never know...
             try
             {
-                client.connect( AbstractNexusIntegrationTest.nexusBaseUrl,
-                                TestContainer.getInstance().getTestContext().getAdminUsername(),
+                client.connect( AbstractNexusIntegrationTest.nexusBaseUrl, TestContainer.getInstance().getTestContext()
+                                                                                        .getAdminUsername(),
                                 TestContainer.getInstance().getTestContext().getAdminPassword() );
             }
             catch ( Exception e )
@@ -288,10 +334,17 @@ public class NexusStatusUtil
 
     public static boolean isNexusAlive()
     {
-        int[] ports =
-            new int[] { AbstractNexusIntegrationTest.nexusControlPort,
-                AbstractNexusIntegrationTest.nexusApplicationPort };
+        return isNexusAlive( new int[] { AbstractNexusIntegrationTest.nexusControlPort,
+            AbstractNexusIntegrationTest.nexusApplicationPort } );
+    }
 
+    public static boolean isNexusControllerPortAlive()
+    {
+        return isNexusAlive( new int[] { AbstractNexusIntegrationTest.nexusControlPort } );
+    }
+
+    public static boolean isNexusAlive( int[] ports )
+    {
         ServerSocket ss = null;
         for ( int i = 0; i < ports.length; i++ )
         {

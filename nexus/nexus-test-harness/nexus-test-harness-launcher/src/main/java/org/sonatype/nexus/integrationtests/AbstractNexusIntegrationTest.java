@@ -400,7 +400,7 @@ public class AbstractNexusIntegrationTest
         log.info( "*\n*" );
         log.info( "***************************" );
 
-        NexusStatusUtil.doHardStart();
+        NexusStatusUtil.doSoftStart();
     }
 
     private void stopNexus()
@@ -408,7 +408,7 @@ public class AbstractNexusIntegrationTest
     {
         log.info( "stopping Nexus" );
 
-        NexusStatusUtil.doHardStop();
+        NexusStatusUtil.doSoftStop();
     }
 
     protected File getOverridableFile( String file )
