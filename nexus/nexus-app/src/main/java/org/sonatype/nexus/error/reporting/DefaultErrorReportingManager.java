@@ -61,7 +61,7 @@ public class DefaultErrorReportingManager
     {
         CErrorReporting errorConfig = nexusConfig.readErrorReporting();
 
-        if ( errorConfig != null && errorConfig.isEnabled() )
+        if ( isEnabled() )
         {
             IssueSubmissionRequest subRequest = buildRequest( errorConfig, request );
             
@@ -89,7 +89,7 @@ public class DefaultErrorReportingManager
             
             List<Issue> issues = ( List<Issue> ) jira.getIssuesFromTextSearchWithProject( 
                 Arrays.asList( errorConfig.getJiraProject() ), 
-                description,
+                "\"" + description + "\"",
                 20 );
             
             if ( !issues.isEmpty() )
@@ -116,6 +116,18 @@ public class DefaultErrorReportingManager
         }
         
         return null;
+    }
+    
+    public boolean isEnabled()
+    {
+        CErrorReporting errorConfig = nexusConfig.readErrorReporting();
+
+        if ( errorConfig != null && errorConfig.isEnabled() )
+        {
+            return true;
+        }
+        
+        return false;
     }
 
     protected IssueSubmissionRequest buildRequest( CErrorReporting errorConfig, ErrorReportRequest request )

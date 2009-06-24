@@ -22,6 +22,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.error.reporting.ErrorReportRequest;
+import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskExecutionException;
@@ -35,6 +37,9 @@ public abstract class AbstractNexusTask<T>
 
     @Requirement
     private PlexusContainer plexusContainer;
+    
+    @Requirement
+    private ErrorReportingManager errorManager;
 
     // DO NOT, EVER AGAIN ADD @REQ here, since you will introduce a cycle
     // Look below, nexus is looked up "lazily"
@@ -147,6 +152,16 @@ public abstract class AbstractNexusTask<T>
         catch ( Throwable e )
         {
             getNexus().systemProcessBroken( prc, e );
+            
+            if ( errorManager.isEnabled() )
+            {
+                ErrorReportRequest request = new ErrorReportRequest();
+                request.setThrowable( e );
+                request.getContext().put( "taskClass", getClass().getName() );
+                request.getContext().putAll( getParameters() );
+                
+                errorManager.handleError( request );
+            }
 
             if ( Exception.class.isAssignableFrom( e.getClass() ) )
             {

@@ -18,4 +18,6 @@ public interface ErrorReportingManager
         throws IOException;
     
     List<Issue> retrieveIssues( CErrorReporting errorConfig, String description );
+    
+    boolean isEnabled();
 }
