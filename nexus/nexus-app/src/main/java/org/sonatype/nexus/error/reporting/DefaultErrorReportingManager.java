@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -16,6 +17,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
@@ -23,6 +25,8 @@ import org.codehaus.plexus.swizzle.IssueSubmitter;
 import org.codehaus.plexus.swizzle.JiraIssueSubmitter;
 import org.codehaus.plexus.swizzle.jira.authentication.DefaultAuthenticationSource;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.swizzle.jira.Issue;
+import org.codehaus.swizzle.jira.Jira;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
@@ -32,6 +36,7 @@ import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 
 @Component( role = ErrorReportingManager.class )
 public class DefaultErrorReportingManager
+    extends AbstractLogEnabled
     implements ErrorReportingManager
 {
     @Requirement
@@ -58,8 +63,59 @@ public class DefaultErrorReportingManager
 
         if ( errorConfig != null && errorConfig.isEnabled() )
         {
-            getIssueSubmitter( errorConfig ).submitIssue( buildRequest( errorConfig, request ) );
+            IssueSubmissionRequest subRequest = buildRequest( errorConfig, request );
+            
+            List<Issue> existingIssues = retrieveIssues( errorConfig, subRequest.getSummary() );
+            
+            if ( existingIssues == null )
+            {
+                getIssueSubmitter( errorConfig ).submitIssue( subRequest );
+            }
+            else
+            {
+                getLogger().info( "Not reporting problem as it already exists in database: " + existingIssues.iterator().next().getLink() );
+            }
         }
+    }
+    
+    public List<Issue> retrieveIssues( CErrorReporting errorConfig, String description )
+    {
+        Jira jira = null;
+        
+        try
+        {
+            jira = new Jira( errorConfig.getJiraUrl() + "/rpc/xmlrpc" );
+            jira.login( errorConfig.getJiraUsername(), errorConfig.getJiraPassword() );
+            
+            List<Issue> issues = ( List<Issue> ) jira.getIssuesFromTextSearchWithProject( 
+                Arrays.asList( errorConfig.getJiraProject() ), 
+                description,
+                20 );
+            
+            if ( !issues.isEmpty() )
+            {
+                return issues;
+            }
+        }
+        catch ( Exception e )
+        {
+            getLogger().error( "Unable to query JIRA server to find if error report already exists", e );
+        }
+        finally
+        {
+            if ( jira != null )
+            {
+                try
+                {
+                    jira.logout();
+                }
+                catch ( Exception e )
+                {
+                }
+            }
+        }
+        
+        return null;
     }
 
     protected IssueSubmissionRequest buildRequest( CErrorReporting errorConfig, ErrorReportRequest request )
@@ -72,6 +128,8 @@ public class DefaultErrorReportingManager
         subRequest.setDescription( "The following exception occurred: " + System.getProperty( "line.seperator" )
             + StackTraceUtil.getStackTraceString( request.getThrowable() ) );
         subRequest.setProblemReportBundle( assembleBundle( request ) );
+        subRequest.setReporter( errorConfig.getJiraUsername() );
+        subRequest.setAssignee( errorConfig.getJiraUsername() );
 
         return subRequest;
     }

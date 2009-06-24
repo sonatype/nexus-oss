@@ -5,12 +5,17 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import junit.framework.Assert;
+
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.swizzle.jira.Issue;
 import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.util.StackTraceUtil;
 
@@ -18,6 +23,7 @@ public class DefaultErrorReportingManagerTest
     extends AbstractNexusTestCase
 {
     private DefaultErrorReportingManager manager;
+    private NexusConfiguration nexusConfig;
     
     private File unzipDir = new File( getBasedir(), "target/unzipdir" );
     
@@ -29,7 +35,50 @@ public class DefaultErrorReportingManagerTest
         
         FileUtils.deleteDirectory( unzipDir );
         
+        nexusConfig = ( NexusConfiguration ) lookup( NexusConfiguration.class );
+        
         manager = ( DefaultErrorReportingManager ) lookup( ErrorReportingManager.class );
+    }
+    
+    public void donttestJiraAccess()
+        throws Exception
+    {
+        CErrorReporting config = new CErrorReporting();
+        config.setEnabled( true );
+        config.setJiraUrl( "https://issues.sonatype.org" );
+        config.setJiraProject( "*****" );
+        config.setJiraUsername( "*****" );
+        config.setJiraPassword( "*****" );
+        
+        nexusConfig.updateErrorReporting( config );
+        
+        ErrorReportRequest request = new ErrorReportRequest();
+
+        try
+        {
+            throw new Exception( "Test exception" );
+        }
+        catch ( Exception e )
+        {
+            request.setThrowable( e );
+        }
+        
+        //First make sure item doesn't already exist
+        List<Issue> issues = manager.retrieveIssues( config, "Automated Problem Report: " + request.getThrowable().getMessage() );
+        
+        Assert.assertNull( issues );
+        
+        manager.handleError( request );
+        
+        issues = manager.retrieveIssues( config, "Automated Problem Report: " + request.getThrowable().getMessage() );
+        
+        Assert.assertEquals( 1, issues.size() );
+        
+        manager.handleError( request );
+        
+        issues = manager.retrieveIssues( config, "Automated Problem Report: " + request.getThrowable().getMessage() );
+        
+        Assert.assertEquals( 1, issues.size() );
     }
     
     public void testPackageFiles()

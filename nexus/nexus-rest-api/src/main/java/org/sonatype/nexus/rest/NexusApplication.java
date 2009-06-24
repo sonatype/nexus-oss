@@ -23,6 +23,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
 import org.restlet.Directory;
 import org.restlet.Router;
+import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
@@ -116,7 +117,6 @@ import org.sonatype.nexus.rest.schedules.ScheduledServiceResourceResponseConvert
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
-import org.sonatype.plexus.rest.PlexusResourceFinder;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.RetargetableRestlet;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
@@ -204,6 +204,9 @@ public class NexusApplication
 
     @Requirement( role = NexusApplicationCustomizer.class )
     private List<NexusApplicationCustomizer> customizers;
+    
+    @Requirement( role = ErrorReportingManager.class )
+    private ErrorReportingManager errorManager;
 
     /**
      * Listener.
@@ -653,6 +656,9 @@ public class NexusApplication
     @Override
     protected void doCreateRoot( Router root, boolean isStarted )
     {
+        // Add error manager to context
+        getContext().getAttributes().put( ErrorReportingManager.class.getName(), errorManager );
+        
         // SERVICE (two always connected, unrelated to isStarted)
 
         attach( getApplicationRouter(), false, statusPlexusResource );
@@ -667,8 +673,8 @@ public class NexusApplication
         // ==========
         // INDEX.HTML and WAR contents
         // To redirect "uncaught" requests to indexTemplateResource
-        attach( root, true, "", new PlexusResourceFinder( getContext(), indexRedirectingResource ) );
-        attach( root, true, "/", new PlexusResourceFinder( getContext(), indexRedirectingResource ) );
+        attach( root, true, "", new NexusPlexusResourceFinder( getContext(), indexRedirectingResource ) );
+        attach( root, true, "/", new NexusPlexusResourceFinder( getContext(), indexRedirectingResource ) );
 
         // the indexTemplateResource
         attach( root, true, indexTemplateResource );
@@ -707,7 +713,7 @@ public class NexusApplication
         // mounting it
         attach( root, false, "/content", bsf );
 
-        bsf.setNext( new PlexusResourceFinder( getContext(), contentResource ) );
+        bsf.setNext( new NexusPlexusResourceFinder( getContext(), contentResource ) );
 
         // protecting the content service manually
         if ( PlexusMutableWebConfiguration.class.isAssignableFrom( plexusWebConfiguration.getClass() ) )
@@ -768,5 +774,13 @@ public class NexusApplication
                     + resource.getResourceUri() + " of class " + resource.getClass().getName(), e );
             }
         }
+    }
+    
+    @Override
+    protected void attach( Router router, boolean strict, PlexusResource resource )
+    {
+        attach( router, strict, resource.getResourceUri(), new NexusPlexusResourceFinder( getContext(), resource ) );
+
+        handlePlexusResourceSecurity( resource );
     }
 }
