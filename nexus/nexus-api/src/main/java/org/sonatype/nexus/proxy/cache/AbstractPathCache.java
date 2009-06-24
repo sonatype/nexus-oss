@@ -88,14 +88,14 @@ public abstract class AbstractPathCache
         return path;
     }
 
-    public abstract boolean doContains( String key );
+    protected abstract boolean doContains( String key );
 
-    public abstract boolean doIsExpired( String key );
+    protected abstract boolean doIsExpired( String key );
 
-    public abstract void doPut( String key, Object element, int expiration );
+    protected abstract void doPut( String key, Object element, int expiration );
 
-    public abstract boolean doRemove( String key );
+    protected abstract boolean doRemove( String key );
 
-    public abstract void doPurge();
+    protected abstract void doPurge();
 
 }

@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.cache;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,6 +29,8 @@ import net.sf.ehcache.Statistics;
 public class EhCachePathCache
     extends AbstractPathCache
 {
+    private String repositoryId;
+    
     /** The ec. */
     private Ehcache ec;
 
@@ -36,9 +39,10 @@ public class EhCachePathCache
      * 
      * @param cache the cache
      */
-    public EhCachePathCache( Ehcache cache )
+    public EhCachePathCache( String repositoryId, Ehcache cache )
     {
         super();
+        this.repositoryId = repositoryId;
         this.ec = cache;
     }
 
@@ -112,14 +116,36 @@ public class EhCachePathCache
         return new CacheStatistics( stats.getObjectCount(), stats.getCacheMisses(), stats.getCacheHits() );
     }
 
+    @SuppressWarnings("unchecked")
     public Collection<String> listKeysInCache()
     {
         ec.evictExpiredElements();
 
-        @SuppressWarnings("unchecked")
-        List<String> keys = ec.getKeys();
+        
+        List<String> keys = new ArrayList<String>();
+        
+        // this is going to be slow (if we have lots of items) but if you are concerned about speed you shouldn't call
+        // this method anyway, this should only be used for information purposes
 
+        String startsWithString = this.repositoryId + ":";
+        
+        for ( String key : (List<String>) ec.getKeys() )
+        {
+            if( key.startsWith( startsWithString ))
+            {
+                keys.add( key.replaceFirst( startsWithString, "" ) );
+            }
+        }
+        
         return keys;
+    }
+    
+    @Override
+    protected String makeKeyFromPath( String path )
+    {
+        path = super.makeKeyFromPath( path );
+        
+        return this.repositoryId +":"+ path;
     }
 
 }

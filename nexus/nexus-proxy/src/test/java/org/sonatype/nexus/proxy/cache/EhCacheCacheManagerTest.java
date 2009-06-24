@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.proxy.cache;
 
+import java.util.Collection;
+
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 
 public class EhCacheCacheManagerTest
@@ -23,9 +25,9 @@ public class EhCacheCacheManagerTest
         throws Exception
     {
         CacheManager cm = lookup( CacheManager.class );
-        
+
         PathCache c = cm.getPathCache( "test" );
-        
+
         assertEquals( true, null != c );
     }
 
@@ -33,7 +35,7 @@ public class EhCacheCacheManagerTest
         throws Exception
     {
         CacheManager cm = lookup( CacheManager.class );
-        
+
         PathCache c = cm.getPathCache( "test" );
 
         c.put( "/com", Boolean.TRUE );
@@ -58,7 +60,7 @@ public class EhCacheCacheManagerTest
         throws Exception
     {
         CacheManager cm = lookup( CacheManager.class );
-        
+
         PathCache c = cm.getPathCache( "test" );
 
         c.put( "/com/", Boolean.TRUE );
@@ -78,6 +80,28 @@ public class EhCacheCacheManagerTest
         assertFalse( c.contains( "/com/sonatype" ) );
         assertFalse( c.contains( "/com/" ) );
         assertFalse( c.contains( "/com" ) );
+    }
+
+    public void testListKeys() throws Exception
+    {
+
+        CacheManager cm = lookup( CacheManager.class );
+
+        PathCache c = cm.getPathCache( "test" );
+
+        c.put( "/com/", Boolean.TRUE );
+        c.put( "/com/sonatype", Boolean.TRUE );
+        c.put( "/com/sonatype/nexus", Boolean.TRUE );
+
+        
+        Collection<String> keys = c.listKeysInCache();
+
+        // NOTE keys are stored with the front and end '/' removed
+        assertTrue( "expected key not found, keys are: "+ keys, keys.contains( "com" ) );
+        assertTrue( "expected key not found, keys are: "+ keys, keys.contains( "com/sonatype" ) );
+        assertTrue( "expected key not found, keys are: "+ keys, keys.contains( "com/sonatype/nexus" ) );
+        
+        
     }
 
 }

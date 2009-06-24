@@ -37,16 +37,18 @@ public class EhCacheCacheManager
 {
     @Requirement
     private PlexusEhCacheWrapper cacheManager;
+    
+    public static final String SINGLE_PATH_CACHE_NAME = "path-cache";
 
     public PathCache getPathCache( String cache )
     {
         net.sf.ehcache.CacheManager ehCacheManager = this.cacheManager.getEhCacheManager();
 
-        if ( !ehCacheManager.cacheExists( cache ) )
+        if ( !ehCacheManager.cacheExists( SINGLE_PATH_CACHE_NAME ) )
         {
-            ehCacheManager.addCache( cache );
+            ehCacheManager.addCache( SINGLE_PATH_CACHE_NAME );
         }
 
-        return new EhCachePathCache( ehCacheManager.getEhcache( cache ) );
+        return new EhCachePathCache( cache, ehCacheManager.getEhcache( SINGLE_PATH_CACHE_NAME ) );
     }
 }
