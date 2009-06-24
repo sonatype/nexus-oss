@@ -50,9 +50,9 @@ public class DefaultErrorReportingManagerTest
         CErrorReporting config = new CErrorReporting();
         config.setEnabled( true );
         config.setJiraUrl( "https://issues.sonatype.org" );
-        config.setJiraProject( "SBOX" );
-        config.setJiraUsername( "dbradicich" );
-        config.setJiraPassword( "grudgeholder1" );
+        config.setJiraProject( "******" );
+        config.setJiraUsername( "*****" );
+        config.setJiraPassword( "*****" );
         
         nexusConfig.updateErrorReporting( config );
         
