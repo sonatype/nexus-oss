@@ -20,13 +20,8 @@ public class DefaultInterPluginDependencyResolver
 
         for ( PluginDependency dependency : (List<PluginDependency>) pluginMetadata.getDependencies() )
         {
-            PluginCoordinates depCoord = new PluginCoordinates();
-
-            depCoord.setGroupId( dependency.getGroupId() );
-
-            depCoord.setArtifactId( dependency.getArtifactId() );
-
-            depCoord.setVersion( dependency.getVersion() );
+            PluginCoordinates depCoord =
+                new PluginCoordinates( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
 
             // check for existence
             PluginDescriptor dependencyDescriptor =

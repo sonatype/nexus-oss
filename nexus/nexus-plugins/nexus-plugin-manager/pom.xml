@@ -22,6 +22,7 @@
 
   <dependencies>
 
+    <!-- General dependencies for plugin support -->
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-api</artifactId>
@@ -34,25 +35,24 @@
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-model-api</artifactId>
     </dependency>
-    
-    <!-- These two are here as hack, we need to modify the plexus configuration -->
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-gleaner</artifactId>
+    </dependency>
+
+    <!-- Nexus, out target -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Need a BooterCustomizer -->
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
       <artifactId>plexus-app-booter</artifactId>
       <version>${plexus.appbooter.version}</version>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-      <artifactId>plexus-jsw-app-booter</artifactId>
-      <version>${plexus.appbooter.version}</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>

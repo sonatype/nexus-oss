@@ -1,51 +1,29 @@
 package org.sonatype.nexus.plugins;
 
+import org.sonatype.plugin.metadata.GAVCoordinate;
+
 public class PluginCoordinates
+    extends GAVCoordinate
 {
-    private String groupId;
-
-    private String artifactId;
-
-    private String version;
-
-    public String getGroupId()
+    public PluginCoordinates()
     {
-        return groupId;
+        super();
     }
 
-    public void setGroupId( String groupId )
+    public PluginCoordinates( String groupId, String artifactId, String version )
     {
-        this.groupId = groupId;
+        super( groupId, artifactId, version );
     }
 
-    public String getArtifactId()
+    public PluginCoordinates( String composite )
+        throws IllegalArgumentException
     {
-        return artifactId;
-    }
-
-    public void setArtifactId( String artifactId )
-    {
-        this.artifactId = artifactId;
-    }
-
-    public String getVersion()
-    {
-        return version;
-    }
-
-    public void setVersion( String version )
-    {
-        this.version = version;
+        super( composite );
     }
 
     public String getPluginKey()
     {
         // for now, it is enuf
         return toString();
-    }
-
-    public String toString()
-    {
-        return getGroupId() + ":" + getArtifactId() + ":" + getVersion();
     }
 }

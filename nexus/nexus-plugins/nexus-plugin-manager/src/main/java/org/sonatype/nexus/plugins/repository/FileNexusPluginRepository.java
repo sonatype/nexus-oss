@@ -73,13 +73,9 @@ public class FileNexusPluginRepository
                                         {
                                             if ( version.isDirectory() )
                                             {
-                                                PluginCoordinates coord = new PluginCoordinates();
-
-                                                coord.setGroupId( groupId.getName() );
-
-                                                coord.setArtifactId( artifactId.getName() );
-
-                                                coord.setVersion( version.getName() );
+                                                PluginCoordinates coord =
+                                                    new PluginCoordinates( groupId.getName(), artifactId.getName(),
+                                                                           version.getName() );
 
                                                 File pluginFile = new File( version, getPluginFileName( coord ) );
 
