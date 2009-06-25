@@ -1,6 +1,5 @@
 package org.sonatype.nexus.mock.components;
 
-
 import com.thoughtworks.selenium.Selenium;
 
 public class TwinPanel
@@ -14,7 +13,7 @@ public class TwinPanel
 
     public TwinPanel add( String id )
     {
-        selectLeftSide( id );
+        selectRightSide( id );
 
         runScript( ".items.items[1].addOne()" );
 
@@ -30,7 +29,7 @@ public class TwinPanel
 
     public TwinPanel remove( String id )
     {
-        selectRightSide( id );
+        selectLeftSide( id );
 
         runScript( ".items.items[1].removeOne()" );
 
@@ -44,25 +43,42 @@ public class TwinPanel
         return this;
     }
 
-    public TwinPanel selectLeftSide( String id )
+    public TwinPanel selectRightSide( String id )
     {
-        runScript( ".items.items[2].getSelectionModel().select(" + expression + ".items.items[2].nodeHash." + id + ")" );
+        return select( 2, id );
+    }
+
+    private TwinPanel select( int i, String id )
+    {
+        runScript( ".items.items[" + i + "].getSelectionModel().select(" //
+            + expression + ".items.items[" + i + "].nodeHash['" + id + "']" + //
+            ")" );
 
         return this;
     }
 
-    public TwinPanel selectRightSide( String id )
+    public TwinPanel selectLeftSide( String id )
     {
-        runScript( ".items.items[0].getSelectionModel().select(" + expression + ".items.items[0].nodeHash." + id + ")" );
-
-        return this;
+        return select( 0, id );
     }
 
     public boolean hasErrorText( String err )
     {
-        String text = selenium.getText( getXPath() + "//div[@class='x-form-invalid-msg']" );
+        String text = getErrorText();
 
         return err.equals( text );
+    }
+
+    public String getErrorText()
+    {
+        String text = selenium.getText( getXPath() + "//div[@class='x-form-invalid-msg']" );
+        return text;
+    }
+
+    public boolean containsLeftSide( String id )
+    {
+        String eval = getEval( ".items.items[0].nodeHash['" + id + "'] != null" );
+        return Boolean.parseBoolean( eval );
     }
 
 }

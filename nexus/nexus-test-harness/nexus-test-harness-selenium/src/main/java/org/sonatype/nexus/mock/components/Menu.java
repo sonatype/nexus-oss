@@ -26,4 +26,10 @@ public class Menu
         String id = getEval( ".items.items[" + expression + ".items.indexOfKey('" + itemKey + "')].el.id" );
         selenium.click( "//*[@id='" + id + "']" );
     }
+
+    public void click( String propName, String propValue )
+    {
+        String id = getEval( ".items.items[" + expression + ".items.findIndex('" + propName + "', '" + propValue + "')].el.id" );
+        selenium.click( "//*[@id='" + id + "']" );
+    }
 }

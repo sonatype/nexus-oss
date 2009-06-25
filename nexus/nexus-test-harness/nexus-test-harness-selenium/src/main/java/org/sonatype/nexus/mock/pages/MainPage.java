@@ -95,4 +95,11 @@ public class MainPage
         return new LogConfigTab(selenium);
     }
 
+    public UsersTab openUsers()
+    {
+        securityPanel().usersClick();
+
+        return new UsersTab( selenium );
+    }
+
 }

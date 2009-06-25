@@ -32,4 +32,9 @@ public class SecurityPanel extends SidePanel {
 
         return window;
     }
+
+    public void usersClick()
+    {
+        clickLink("Users");
+    }
 }

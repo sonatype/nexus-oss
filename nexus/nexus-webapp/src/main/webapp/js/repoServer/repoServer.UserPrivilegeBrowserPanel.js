@@ -246,6 +246,10 @@ Ext.extend( Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
           return rec.id == roleId;
         }, this ) );
     
+    if(role == null || role.data == null) {
+    	return false;
+    }
+    
     if ( role.data.privileges ){
       for ( var i = 0 ; i < role.data.privileges.length ; i++ ){
         if ( role.data.privileges[i] == privId ){
