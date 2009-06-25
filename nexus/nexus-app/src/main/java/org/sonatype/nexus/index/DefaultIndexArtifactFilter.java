@@ -8,6 +8,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -54,26 +55,35 @@ public class DefaultIndexArtifactFilter
 
             if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {
-                MavenRepository mr = (MavenRepository) repository;
+                try
+                {
+                    MavenRepository mr = (MavenRepository) repository;
 
-                Gav gav = new Gav(
-                    artifactInfo.groupId,
-                    artifactInfo.artifactId,
-                    artifactInfo.version,
-                    artifactInfo.classifier,
-                    mr.getArtifactPackagingMapper().getExtensionForPackaging( artifactInfo.packaging ),
-                    null,
-                    null,
-                    null,
-                    VersionUtils.isSnapshot( artifactInfo.version ),
-                    false,
-                    null,
-                    false,
-                    null );
+                    Gav gav = new Gav(
+                        artifactInfo.groupId,
+                        artifactInfo.artifactId,
+                        artifactInfo.version,
+                        artifactInfo.classifier,
+                        mr.getArtifactPackagingMapper().getExtensionForPackaging( artifactInfo.packaging ),
+                        null,
+                        null,
+                        null,
+                        VersionUtils.isSnapshot( artifactInfo.version ),
+                        false,
+                        null,
+                        false,
+                        null );
 
-                ResourceStoreRequest req = new ResourceStoreRequest( mr.getGavCalculator().gavToPath( gav ) );
+                    ResourceStoreRequest req = new ResourceStoreRequest( mr.getGavCalculator().gavToPath( gav ) );
 
-                return this.nexusItemAuthorizer.authorizePath( mr, req, Action.read );
+                    return this.nexusItemAuthorizer.authorizePath( mr, req, Action.read );
+                }
+                catch ( IllegalArtifactCoordinateException e )
+                {
+                    getLogger().info( "Illegal artifact coordinate, filter it anyway.\n" + e.getMessage() );
+
+                    return false;
+                }
             }
             else
             {

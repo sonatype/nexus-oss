@@ -48,7 +48,7 @@ public class Nexus258ReleaseDeployTest
 
     @Test
     public void deploywithGavUsingRest()
-        throws HttpException, IOException
+        throws Exception
     {
 
         Gav gav =
@@ -84,7 +84,7 @@ public class Nexus258ReleaseDeployTest
     
     @Test
     public void deployWithPomUsingRest()
-        throws HttpException, IOException
+        throws Exception
     {
 
         Gav gav =

@@ -32,17 +32,35 @@ public class Nexus602SearchSnapshotArtifactTest
     extends AbstractNexusIntegrationTest
 {
 
-    private static final Gav SNAPSHOT_ARTIFACT =
-        new Gav( "nexus602", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, false, false, null, false, null );
+    private Gav gav;
 
+    public Nexus602SearchSnapshotArtifactTest()
+        throws Exception
+    {
+        gav = new Gav(
+            "nexus602",
+            "artifact",
+            "1.0-SNAPSHOT",
+            null,
+            "jar",
+            0,
+            0L,
+            null,
+            false,
+            false,
+            null,
+            false,
+            null );
+    }
+    
     @Test
     public void searchSnapshot()
         throws Exception
     {
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + REPO_TEST_HARNESS_SNAPSHOT_REPO + "&g="
-                + SNAPSHOT_ARTIFACT.getGroupId() + "&a=" + SNAPSHOT_ARTIFACT.getArtifactId() + "&v="
-                + SNAPSHOT_ARTIFACT.getVersion();
+                + gav.getGroupId() + "&a=" + gav.getArtifactId() + "&v="
+                + gav.getVersion();
         Response response = RequestFacade.doGetRequest( serviceURI );
         Assert.assertEquals( "Snapshot download should redirect to a new file "
             + response.getRequest().getResourceRef().toString(), 301, response.getStatus().getCode() );

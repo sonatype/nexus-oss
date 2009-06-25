@@ -44,7 +44,7 @@ public class Nexus782UploadWithClassifier
         null,
         false,
         null );
-    
+
     private Gav artifactClassifierGav = new Gav(
         this.getTestId(),
         "same-pom",
@@ -59,6 +59,11 @@ public class Nexus782UploadWithClassifier
         null,
         false,
         null );
+
+    public Nexus782UploadWithClassifier()
+        throws Exception
+    {
+    }
 
     @Test
     public void withSamePomNoExtention()

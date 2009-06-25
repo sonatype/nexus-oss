@@ -37,8 +37,20 @@ public class Nexus635ExpireCacheTaskTest
     extends AbstractNexusProxyIntegrationTest
 {
 
-    private static final Gav GAV =
-        new Gav( "nexus635", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, true, false, null, false, null );
+    private Gav GAV = new Gav(
+        "nexus635",
+        "artifact",
+        "1.0-SNAPSHOT",
+        null,
+        "jar",
+        0,
+        0L,
+        null,
+        true,
+        false,
+        null,
+        false,
+        null );
 
     @BeforeClass
     public static void cleanEnv()
@@ -48,6 +60,7 @@ public class Nexus635ExpireCacheTaskTest
     }
 
     public Nexus635ExpireCacheTaskTest()
+        throws Exception
     {
         super( "tasks-snapshot-repo" );
     }

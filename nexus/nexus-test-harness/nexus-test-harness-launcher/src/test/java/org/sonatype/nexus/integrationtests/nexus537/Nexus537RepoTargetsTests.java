@@ -96,6 +96,7 @@ public class Nexus537RepoTargetsTests
     private static final String GROUP_ID = "test-group";
 
     public Nexus537RepoTargetsTests()
+        throws Exception
     {
         repo1BarArtifact =
             new Gav( this.getTestId(), "repo1-bar-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),

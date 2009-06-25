@@ -25,6 +25,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.VersionUtils;
 
 /**
@@ -44,19 +45,22 @@ public class DefaultMetadataManager
     private MetadataLocator metadataLocator;
 
     public void deployArtifact( ArtifactStoreRequest request )
-        throws IOException
+        throws IOException,
+            IllegalArtifactCoordinateException
     {
         metadataUpdater.deployArtifact( request );
     }
 
     public void undeployArtifact( ArtifactStoreRequest request )
-        throws IOException
+        throws IOException,
+            IllegalArtifactCoordinateException
     {
         metadataUpdater.undeployArtifact( request );
     }
 
     public Gav resolveArtifact( ArtifactStoreRequest gavRequest )
-        throws IOException
+        throws IOException,
+            IllegalArtifactCoordinateException
     {
         MavenRepository repository = gavRequest.getMavenRepository();
 
@@ -255,7 +259,8 @@ public class DefaultMetadataManager
     }
 
     public Gav resolveSnapshot( ArtifactStoreRequest gavRequest, Gav gav )
-        throws IOException
+        throws IOException,
+            IllegalArtifactCoordinateException
     {
         MavenRepository repository = gavRequest.getMavenRepository();
 

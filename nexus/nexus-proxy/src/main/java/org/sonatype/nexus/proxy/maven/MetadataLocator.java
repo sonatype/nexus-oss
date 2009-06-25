@@ -19,6 +19,7 @@ import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 
 /**
  * An adapter in charge for doing the IO against the storage, hiding the fact where it runs.
@@ -33,7 +34,8 @@ public interface MetadataLocator
      * @param request
      * @return
      */
-    Gav getGavForRequest( ArtifactStoreRequest request );
+    Gav getGavForRequest( ArtifactStoreRequest request )
+        throws IllegalArtifactCoordinateException;
 
     /**
      * Constructs a Plugin elem for given request. It returns null if the artifacts's POM pointed out by request is not

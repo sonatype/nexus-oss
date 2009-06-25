@@ -42,7 +42,7 @@ public class Nexus177OutOfServiceTest
 
     @Test
     public void outOfServiceTest()
-        throws IOException
+        throws Exception
     {
 
         // get an artifact

@@ -17,6 +17,7 @@ import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.subject.Subject;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
@@ -203,7 +204,7 @@ public class ViewAccessTest
 
     // search tests!
     public void testSearch()
-        throws NoSuchRepositoryException, IOException, AuthenticationException
+        throws NoSuchRepositoryException, IOException, AuthenticationException, IllegalArtifactCoordinateException
     {
         String repoId = "test";
         String artifactId = "foo";

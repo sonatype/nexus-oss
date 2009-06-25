@@ -35,7 +35,7 @@ public class Nexus261NexusGroupDownloadTest
 
     @Test
     public void downloadArtifact()
-        throws IOException
+        throws Exception
     {
         Gav gav =
             new Gav( this.getTestId(), "release-jar", "1", null, "jar", 0, new Date().getTime(),

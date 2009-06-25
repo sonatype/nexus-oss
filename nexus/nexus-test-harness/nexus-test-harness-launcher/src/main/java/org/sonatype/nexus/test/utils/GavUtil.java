@@ -4,16 +4,19 @@ import java.io.FileNotFoundException;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 
 public class GavUtil
 {
 
     public static Gav newGav( String groupId, String artifactId, String version )
+        throws IllegalArtifactCoordinateException
     {
         return newGav( groupId, artifactId, version, "jar" );
     }
 
     public static Gav newGav( String groupId, String artifactId, String version, String packging )
+        throws IllegalArtifactCoordinateException
     {
         return new Gav( groupId, artifactId, version, null, packging, null, null, null, false, false, null, false, null );
     }

@@ -44,7 +44,7 @@ public class Nexus178BlockProxyDownloadTest
 
     @Test
     public void blockProxy()
-        throws IOException
+        throws Exception
     {
 
         Gav gav =

@@ -34,6 +34,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 
@@ -46,7 +47,7 @@ public class DefaultMetadataUpdater
     private MetadataLocator locator;
 
     public void deployArtifact( ArtifactStoreRequest request )
-        throws IOException
+        throws IOException, IllegalArtifactCoordinateException
     {
         if ( request.getGav().isHash() || request.getGav().isSignature()
             || StringUtils.isNotBlank( request.getGav().getClassifier() ) )
@@ -126,7 +127,7 @@ public class DefaultMetadataUpdater
     }
 
     public void undeployArtifact( ArtifactStoreRequest request )
-        throws IOException
+        throws IOException, IllegalArtifactCoordinateException
     {
         if ( request.getGav().isHash() || request.getGav().isSignature()
             || StringUtils.isNotBlank( request.getGav().getClassifier() ) )

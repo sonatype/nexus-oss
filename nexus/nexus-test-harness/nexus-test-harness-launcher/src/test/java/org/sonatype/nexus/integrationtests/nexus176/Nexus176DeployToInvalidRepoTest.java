@@ -89,7 +89,7 @@ public class Nexus176DeployToInvalidRepoTest
 
     @Test
     public void deploywithGavUsingRest()
-        throws HttpException, IOException
+        throws Exception
     {
 
         Gav gav =
@@ -135,7 +135,7 @@ public class Nexus176DeployToInvalidRepoTest
 
     @Test
     public void deploywithPomUsingRest()
-        throws HttpException, IOException
+        throws Exception
     {
 
         Gav gav =
@@ -223,7 +223,7 @@ public class Nexus176DeployToInvalidRepoTest
 
     @Test
     public void deploySnapshotWithGavUsingRest()
-        throws HttpException, IOException
+        throws Exception
     {
 
         Gav gav =
@@ -269,7 +269,7 @@ public class Nexus176DeployToInvalidRepoTest
 
     @Test
     public void deploySnapshotWithPomUsingRest()
-        throws HttpException, IOException
+        throws Exception
     {
 
         Gav gav =

@@ -37,6 +37,7 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -98,8 +99,17 @@ public abstract class AbstractArtifactPlexusResource
             c = null;
         }
 
-        Gav gav = new Gav( g, a, v, c, e, null, null, null, VersionUtils.isSnapshot( v ), false, null, false, null );
-
+        Gav gav = null; 
+            
+        try
+        {
+            gav = new Gav( g, a, v, c, e, null, null, null, VersionUtils.isSnapshot( v ), false, null, false, null );
+        }
+        catch ( IllegalArtifactCoordinateException ex )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Illegal artifact coordinate.", ex );
+        }
+            
         ArtifactStoreRequest result = new ArtifactStoreRequest( mavenRepository, gav, localOnly );
 
         if ( getLogger().isDebugEnabled() )

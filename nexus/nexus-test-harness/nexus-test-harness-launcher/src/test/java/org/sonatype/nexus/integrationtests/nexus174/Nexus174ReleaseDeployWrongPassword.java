@@ -40,7 +40,7 @@ public class Nexus174ReleaseDeployWrongPassword
     }
 
     @Test
-    public void deployWithMaven() throws IOException, InterruptedException, CommandLineException
+    public void deployWithMaven() throws Exception
     {
 
         // GAV

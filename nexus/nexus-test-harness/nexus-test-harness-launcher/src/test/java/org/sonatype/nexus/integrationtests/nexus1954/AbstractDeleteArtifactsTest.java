@@ -13,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
@@ -44,7 +45,7 @@ public abstract class AbstractDeleteArtifactsTest
     }
 
     @Before
-    public void init()
+    public void init() throws IllegalArtifactCoordinateException
     {
         artifact = getTestFile( "artifact.jar" );
         artifact1v1 = GavUtil.newGav( "nexus1954", "artifact1", "1.0" );

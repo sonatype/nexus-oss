@@ -28,6 +28,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -370,6 +371,12 @@ public abstract class AbstractNexusPlexusResource
         }
         catch ( NoSuchRepositoryException e )
         {
+            return null;
+        }
+        catch ( IllegalArtifactCoordinateException e )
+        {
+            getLogger().warn( "Illegal artifact coordinate.", e );
+
             return null;
         }
 

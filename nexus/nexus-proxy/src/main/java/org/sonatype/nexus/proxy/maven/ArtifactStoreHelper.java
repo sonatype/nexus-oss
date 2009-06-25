@@ -25,6 +25,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -290,7 +291,8 @@ public class ArtifactStoreHelper
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException,
-            AccessDeniedException
+            AccessDeniedException,
+            IllegalArtifactCoordinateException
     {
         Gav pomGav = new Gav( gavRequest.getGav().getGroupId(), gavRequest.getGav().getArtifactId(), gavRequest
             .getGav().getVersion(), null, // gavRequest.getGav().getClassifier(),
@@ -314,7 +316,8 @@ public class ArtifactStoreHelper
         throws IllegalOperationException,
             ItemNotFoundException,
             StorageException,
-            AccessDeniedException
+            AccessDeniedException,
+            IllegalArtifactCoordinateException
     {
         checkRequest( gavRequest );
 
@@ -352,7 +355,8 @@ public class ArtifactStoreHelper
             IllegalOperationException,
             ItemNotFoundException,
             StorageException,
-            AccessDeniedException
+            AccessDeniedException,
+            IllegalArtifactCoordinateException
     {
         checkRequest( gavRequest );
 
@@ -379,7 +383,8 @@ public class ArtifactStoreHelper
             IllegalOperationException,
             ItemNotFoundException,
             StorageException,
-            AccessDeniedException
+            AccessDeniedException,
+            IllegalArtifactCoordinateException
     {
         checkRequest( gavRequest );
 
@@ -398,7 +403,8 @@ public class ArtifactStoreHelper
             IllegalOperationException,
             ItemNotFoundException,
             StorageException,
-            AccessDeniedException
+            AccessDeniedException,
+            IllegalArtifactCoordinateException
     {
         checkRequest( gavRequest );
 
@@ -500,7 +506,8 @@ public class ArtifactStoreHelper
             IllegalOperationException,
             ItemNotFoundException,
             StorageException,
-            AccessDeniedException
+            AccessDeniedException,
+            IllegalArtifactCoordinateException
     {
         // This is just so we can get teh gavToPath functionallity, to give us a path to work with
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
@@ -531,7 +538,8 @@ public class ArtifactStoreHelper
             IllegalOperationException,
             ItemNotFoundException,
             StorageException,
-            AccessDeniedException
+            AccessDeniedException,
+            IllegalArtifactCoordinateException
     {
         // delete the artifact
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
@@ -549,7 +557,8 @@ public class ArtifactStoreHelper
             UnsupportedStorageOperationException,
             IllegalOperationException,
             AccessDeniedException,
-            ItemNotFoundException
+            ItemNotFoundException,
+            IllegalArtifactCoordinateException
     {
         try
         {
@@ -594,7 +603,8 @@ public class ArtifactStoreHelper
         throws UnsupportedStorageOperationException,
             IllegalOperationException,
             StorageException,
-            AccessDeniedException
+            AccessDeniedException,
+            IllegalArtifactCoordinateException
     {
         // delete all "below", meaning: classifiers of the GAV
         // watch for subdirs

@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.IOException;
 
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 
 public interface MetadataManager
 {
@@ -25,7 +26,8 @@ public interface MetadataManager
      * @param req
      */
     void deployArtifact( ArtifactStoreRequest request )
-        throws IOException;
+        throws IOException,
+            IllegalArtifactCoordinateException;
 
     /**
      * Calling this method updates the GAV, GA and G metadatas accordingly. It senses whether it is a snapshot or not.
@@ -33,7 +35,8 @@ public interface MetadataManager
      * @param req
      */
     void undeployArtifact( ArtifactStoreRequest request )
-        throws IOException;
+        throws IOException,
+            IllegalArtifactCoordinateException;
 
     /**
      * Resolves the artifact, honoring LATEST and RELEASE as version. In case of snapshots, it will try to resolve the
@@ -41,16 +44,20 @@ public interface MetadataManager
      * 
      * @return
      * @throws IOException
+     * @throws IllegalArtifactCoordinateException
      */
     Gav resolveArtifact( ArtifactStoreRequest gavRequest )
-        throws IOException;
+        throws IOException,
+            IllegalArtifactCoordinateException;
 
     /**
      * Resolves the snapshot base version to a timestamped version if possible. Only when a repo is snapshot.
      * 
      * @return
      * @throws IOException
+     * @throws IllegalArtifactCoordinateException
      */
     Gav resolveSnapshot( ArtifactStoreRequest gavRequest, Gav gav )
-        throws IOException;
+        throws IOException,
+            IllegalArtifactCoordinateException;
 }

@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 
 /**
@@ -35,7 +36,7 @@ public interface MetadataUpdater
      * @param req
      */
     void deployArtifact( ArtifactStoreRequest request )
-        throws IOException;
+        throws IOException, IllegalArtifactCoordinateException;
 
     /**
      * Calling this method updates the GAV, GA and G metadatas accordingly. It senses whether it is a snapshot or not.
@@ -43,7 +44,7 @@ public interface MetadataUpdater
      * @param req
      */
     void undeployArtifact( ArtifactStoreRequest request )
-        throws IOException;
+        throws IOException, IllegalArtifactCoordinateException;
 
     //
     // "Multi shot" methods, used from Nexus/CLI tools to maintain metadata in batch/scanning mode

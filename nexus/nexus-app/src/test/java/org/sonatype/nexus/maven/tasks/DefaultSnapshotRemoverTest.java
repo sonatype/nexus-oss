@@ -498,6 +498,26 @@ public class DefaultSnapshotRemoverTest
         validateResults( snapshots, expecting );
     }
     
+    public void testContinueOnException()
+        throws Exception
+    {
+        fillInRepo();
+
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 0, -1, false );
+
+        assertTrue( defaultNexus.removeSnapshots( request ).isSuccessful() );
+        
+        HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
+        expecting.put( "/org/myorg/very.very.long.project.id/1.1-SNAPSHOT/very.very.long.project.id-1.1-20070807.081844-1.jar", Boolean.FALSE );
+        expecting.put( "/org/myorg/very.very.long.project.id/1.0.0-SNAPSHOT/1.0.0-SNAPSHOT/very.very.long.project.id-1.0.0-20070807.081844-1.jar", Boolean.FALSE );
+        validateResults( snapshots, expecting );
+        
+        // we could not retrieve the illegal artifact, but we can check the file system
+        File snapshotsStorageBase = new File( WORK_HOME, "storage/" + snapshots.getId() );
+        File illegalArtifact = new File(snapshotsStorageBase, "org/myorg/very.very.long.project.id/1.0.0-SNAPSHOT/1.0.0-SNAPSHOT/very.very.long.project.id-1.0.0-20070807.081844-1.jar" );
+        assertTrue( illegalArtifact.exists() );
+    }
+    
     private Metadata readMavenMetadata( File mdFle )
         throws FileNotFoundException,
             MetadataException

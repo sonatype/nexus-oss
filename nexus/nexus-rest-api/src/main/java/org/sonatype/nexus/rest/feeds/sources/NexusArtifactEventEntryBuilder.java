@@ -16,6 +16,7 @@ package org.sonatype.nexus.rest.feeds.sources;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -77,6 +78,13 @@ public class NexusArtifactEventEntryBuilder
             getLogger().debug(
                 "Feed entry contained invalid repository id " + event.getNexusItemInfo().getRepositoryId(),
                 e );
+
+            return null;
+        }
+        catch ( IllegalArtifactCoordinateException e )
+        {
+            getLogger().debug( "Illegal artifact coordinate: '" + event.getNexusItemInfo().getPath() + "'.", e );
+
             return null;
         }
     }

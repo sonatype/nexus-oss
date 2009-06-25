@@ -22,6 +22,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -381,6 +382,7 @@ public abstract class LayoutConverterShadowRepository
      * @return
      */
     protected String transformM1toM2( String path )
+        throws IllegalArtifactCoordinateException
     {
         Gav gav = getM1GavCalculator().pathToGav( path );
 
@@ -413,6 +415,7 @@ public abstract class LayoutConverterShadowRepository
      * @return
      */
     protected String transformM2toM1( String path )
+        throws IllegalArtifactCoordinateException
     {
         Gav gav = getM2GavCalculator().pathToGav( path );
 
@@ -441,7 +444,16 @@ public abstract class LayoutConverterShadowRepository
             ItemNotFoundException,
             StorageException
     {
-        String shadowPath = transformMaster2Shadow( item.getPath() );
+        String shadowPath = null;
+
+        try
+        {
+            shadowPath = transformMaster2Shadow( item.getPath() );
+        }
+        catch ( IllegalArtifactCoordinateException e )
+        {
+            getLogger().info( "Illegal artifact path: '" + item.getPath() + "'" + e.getMessage() );
+        }
 
         if ( shadowPath != null )
         {
@@ -457,7 +469,16 @@ public abstract class LayoutConverterShadowRepository
             IllegalOperationException,
             StorageException
     {
-        String shadowPath = transformMaster2Shadow( item.getPath() );
+        String shadowPath = null;
+
+        try
+        {
+            shadowPath = transformMaster2Shadow( item.getPath() );
+        }
+        catch ( IllegalArtifactCoordinateException e )
+        {
+            getLogger().info( "Illegal artifact path: '" + item.getPath() + "'" + e.getMessage() );
+        }
 
         if ( shadowPath != null )
         {
@@ -478,7 +499,8 @@ public abstract class LayoutConverterShadowRepository
      * @param path the path
      * @return the shadow path
      */
-    protected abstract String transformMaster2Shadow( String path );
+    protected abstract String transformMaster2Shadow( String path )
+        throws IllegalArtifactCoordinateException;
 
     @Override
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
@@ -497,7 +519,16 @@ public abstract class LayoutConverterShadowRepository
         catch ( ItemNotFoundException e )
         {
             // if it is thrown by super.doRetrieveItem()
-            String transformedPath = transformShadow2Master( request.getRequestPath() );
+            String transformedPath = null;
+            
+            try
+            {
+                transformedPath = transformShadow2Master( request.getRequestPath() );
+            }
+            catch ( IllegalArtifactCoordinateException e1 )
+            {
+                getLogger().info( "Illegal artifact path: '" + request.getRequestPath() + "'" + e.getMessage() );
+            }
 
             if ( transformedPath == null )
             {
@@ -526,6 +557,7 @@ public abstract class LayoutConverterShadowRepository
      * @param path the path
      * @return the master path
      */
-    protected abstract String transformShadow2Master( String path );
+    protected abstract String transformShadow2Master( String path )
+        throws IllegalArtifactCoordinateException;
 
 }

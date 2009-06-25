@@ -41,7 +41,7 @@ public class Nexus429UploadArtifactPrivilegeTest
 
     @Test
     public void deployPrivWithPom()
-        throws IOException
+        throws Exception
     {
         // GAV
         Gav gav =
@@ -80,7 +80,7 @@ public class Nexus429UploadArtifactPrivilegeTest
     
     @Test
     public void deployPrivWithGav()
-        throws IOException
+        throws Exception
     {
         // GAV
         Gav gav =

@@ -46,6 +46,7 @@ public class Nexus526FeedsTests
     }
 
     public Nexus526FeedsTests()
+        throws Exception
     {
         super( "nexus-test-harness-repo" );
         this.gav =

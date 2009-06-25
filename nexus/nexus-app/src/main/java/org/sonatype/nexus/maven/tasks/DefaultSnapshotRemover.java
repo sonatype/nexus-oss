@@ -280,9 +280,23 @@ public class DefaultSnapshotRemover
             throws Exception
         {
         }
-
+        
         @Override
         public void onCollectionExit( WalkerContext context, StorageCollectionItem coll )
+        {
+            try
+            {
+                doOnCollectionExit( context, coll );
+            }
+            catch ( Exception e )
+            {
+                // we always simply log the exception and continue
+                getLogger().warn( "SnapshotRemover is failed to process path: '" + coll.getPath() + "'.", e );
+            }
+        }
+
+        public void doOnCollectionExit( WalkerContext context, StorageCollectionItem coll )
+            throws Exception
         {
             if ( getLogger().isDebugEnabled() )
             {
@@ -291,233 +305,213 @@ public class DefaultSnapshotRemover
 
             shouldProcessCollection = coll.getPath().endsWith( "-SNAPSHOT" );
 
-            if ( shouldProcessCollection )
+            if ( !shouldProcessCollection )
             {
-                deletableSnapshotsAndFiles.clear();
+                return;
+            }
 
-                remainingSnapshotsAndFiles.clear();
+            deletableSnapshotsAndFiles.clear();
 
-                removeWholeGAV = false;
+            remainingSnapshotsAndFiles.clear();
 
-                Gav gav = null;
+            removeWholeGAV = false;
 
-                Collection<StorageItem> items;
+            Gav gav = null;
 
-                try
+            Collection<StorageItem> items;
+
+
+            items = repository.list( false, coll );
+
+
+            HashSet<Long> versionsToRemove = new HashSet<Long>();
+
+            // gathering the facts
+            for ( StorageItem item : items )
+            {
+                if ( !item.isVirtual() && !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
                 {
-                    items = repository.list( false, coll );
-                }
-                catch ( Exception e )
-                {
-                    // stop the crawling
-                    context.stop( e );
+                    gav = ( (MavenRepository) coll.getRepositoryItemUid().getRepository() )
+                        .getGavCalculator().pathToGav( item.getPath() );
 
-                    return;
-                }
-
-                HashSet<Long> versionsToRemove = new HashSet<Long>();
-
-                // gathering the facts
-                for ( StorageItem item : items )
-                {
-                    if ( !item.isVirtual() && !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+                    if ( gav != null )
                     {
-                        gav =
-                            ( (MavenRepository) coll.getRepositoryItemUid().getRepository() ).getGavCalculator().pathToGav(
-                                                                                                                            item.getPath() );
-
-                        if ( gav != null )
+                        // if we find a pom, check for delete on release
+                        if ( !gav.isHash() && !gav.isSignature() && gav.getExtension().equals( "pom" ) )
                         {
-                            // if we find a pom, check for delete on release
-                            if ( !gav.isHash() && !gav.isSignature() && gav.getExtension().equals( "pom" ) )
+                            if ( request.isRemoveIfReleaseExists()
+                                && releaseExistsForSnapshot( gav, item.getItemContext() ) )
                             {
-                                if ( request.isRemoveIfReleaseExists()
-                                    && releaseExistsForSnapshot( gav, item.getItemContext() ) )
-                                {
-                                    getLogger().debug( "Found POM and release exists, removing whole gav." );
+                                getLogger().debug( "Found POM and release exists, removing whole gav." );
 
-                                    removeWholeGAV = true;
+                                removeWholeGAV = true;
 
-                                    // Will break out and junk whole gav
-                                    break;
-                                }
+                                // Will break out and junk whole gav
+                                break;
                             }
+                        }
 
-                            item.getItemContext().put( Gav.class.getName(), gav );
+                        item.getItemContext().put( Gav.class.getName(), gav );
 
-                            long itemTimestamp = System.currentTimeMillis();
+                        long itemTimestamp = System.currentTimeMillis();
 
-                            getLogger().debug( "NOW is " + itemTimestamp );
+                        getLogger().debug( "NOW is " + itemTimestamp );
 
-                            if ( gav.getSnapshotTimeStamp() != null )
+                        if ( gav.getSnapshotTimeStamp() != null )
+                        {
+                            getLogger().debug( "Using GAV snapshot timestamp" );
+
+                            itemTimestamp = gav.getSnapshotTimeStamp().longValue();
+                        }
+                        else
+                        {
+                            getLogger().debug( "GAV Snapshot timestamp not available, using item.getCreated()" );
+
+                            itemTimestamp = item.getCreated();
+                        }
+
+                        // If this timestamp is already marked to be removed, junk it
+                        if ( versionsToRemove.contains( new Long( itemTimestamp ) ) )
+                        {
+                            addStorageFileItemToMap( deletableSnapshotsAndFiles, gav, (StorageFileItem) item );
+                        }
+                        else
+                        {
+                            getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateTreshold=" + dateThreshold );
+
+                            // if dateTreshold is not used (zero days) OR
+                            // if itemTimestamp is less then dateTreshold (NB: both are positive!)
+                            // below will the retentionCount overrule if needed this
+                            if ( -1 == dateThreshold || itemTimestamp < dateThreshold )
                             {
-                                getLogger().debug( "Using GAV snapshot timestamp" );
-
-                                itemTimestamp = gav.getSnapshotTimeStamp().longValue();
-                            }
-                            else
-                            {
-                                getLogger().debug( "GAV Snapshot timestamp not available, using item.getCreated()" );
-
-                                itemTimestamp = item.getCreated();
-                            }
-
-                            // If this timestamp is already marked to be removed, junk it
-                            if ( versionsToRemove.contains( new Long( itemTimestamp ) ) )
-                            {
+                                versionsToRemove.add( new Long( itemTimestamp ) );
                                 addStorageFileItemToMap( deletableSnapshotsAndFiles, gav, (StorageFileItem) item );
                             }
                             else
                             {
-                                getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateTreshold=" + dateThreshold );
-
-                                // if dateTreshold is not used (zero days) OR
-                                // if itemTimestamp is less then dateTreshold (NB: both are positive!)
-                                // below will the retentionCount overrule if needed this
-                                if ( -1 == dateThreshold || itemTimestamp < dateThreshold )
-                                {
-                                    versionsToRemove.add( new Long( itemTimestamp ) );
-                                    addStorageFileItemToMap( deletableSnapshotsAndFiles, gav, (StorageFileItem) item );
-                                }
-                                else
-                                {
-                                    addStorageFileItemToMap( remainingSnapshotsAndFiles, gav, (StorageFileItem) item );
-                                }
+                                addStorageFileItemToMap( remainingSnapshotsAndFiles, gav, (StorageFileItem) item );
                             }
                         }
                     }
-                }
-
-                // and doing the work here
-                if ( removeWholeGAV )
-                {
-                    try
-                    {
-                        for ( StorageItem item : items )
-                        {
-                            try
-                            {
-                                // preserve possible subdirs
-                                if ( !( item instanceof StorageCollectionItem ) )
-                                {
-                                    repository.deleteItem( false, new ResourceStoreRequest( item ) );
-                                }
-                            }
-                            catch ( ItemNotFoundException e )
-                            {
-                                if ( getLogger().isDebugEnabled() )
-                                {
-                                    getLogger().debug(
-                                                       "Could not delete whole GAV "
-                                                           + coll.getRepositoryItemUid().toString(), e );
-                                }
-                            }
-                        }
-                    }
-                    catch ( Exception e )
-                    {
-                        getLogger().warn( "Could not delete whole GAV " + coll.getRepositoryItemUid().toString(), e );
-                    }
-                }
-                else
-                {
-                    // and now check some things
-                    if ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
-                    {
-                        // do something
-                        if ( remainingSnapshotsAndFiles.size() + deletableSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
-                        {
-                            // delete nothing, since there is less snapshots in total as allowed
-                            deletableSnapshotsAndFiles.clear();
-                        }
-                        else
-                        {
-                            TreeSet<ArtifactVersion> keys =
-                                new TreeSet<ArtifactVersion>( deletableSnapshotsAndFiles.keySet() );
-
-                            while ( !keys.isEmpty()
-                                && remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
-                            {
-                                ArtifactVersion keyToMove = keys.last();
-
-                                if ( remainingSnapshotsAndFiles.containsKey( keyToMove ) )
-                                {
-                                    remainingSnapshotsAndFiles.get( keyToMove ).addAll(
-                                                                                        deletableSnapshotsAndFiles.get( keyToMove ) );
-                                }
-                                else
-                                {
-                                    remainingSnapshotsAndFiles.put( keyToMove,
-                                                                    deletableSnapshotsAndFiles.get( keyToMove ) );
-                                }
-
-                                deletableSnapshotsAndFiles.remove( keyToMove );
-
-                                keys.remove( keyToMove );
-                            }
-
-                        }
-                    }
-
-                    // NEXUS-814: is this GAV have remaining artifacts?
-                    boolean gavHasMoreTimestampedSnapshots = remainingSnapshotsAndFiles.size() > 0;
-
-                    for ( ArtifactVersion key : deletableSnapshotsAndFiles.keySet() )
-                    {
-
-                        List<StorageFileItem> files = deletableSnapshotsAndFiles.get( key );
-                        deletedSnapshots++;
-
-                        for ( StorageFileItem file : files )
-                        {
-                            try
-                            {
-                                // NEXUS-814: mark that we are deleting a TS snapshot, but there are still remaining
-                                // ones in repository.
-                                if ( gavHasMoreTimestampedSnapshots )
-                                {
-                                    file.getItemContext().put( MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV, Boolean.TRUE );
-                                }
-
-                                gav = (Gav) file.getItemContext().get( Gav.class.getName() );
-
-                                repository.deleteItem( false, new ResourceStoreRequest( file ) );
-
-                                deletedFiles++;
-                            }
-                            catch ( ItemNotFoundException e )
-                            {
-                                if ( getLogger().isDebugEnabled() )
-                                {
-                                    getLogger().debug( "Could not delete file:", e );
-                                }
-                            }
-                            catch ( Exception e )
-                            {
-                                getLogger().info( "Could not delete file:", e );
-                            }
-                        }
-                    }
-                }
-
-                try
-                {
-                    removeDirectoryIfEmpty( coll );
-
-                    updateMetadataIfNecessary( context, coll );
-                }
-                catch ( Throwable t )
-                {
-                    context.stop( t );
-
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug( "Snapshot remover aborted abnormally!", t );
-                    }
-
-                    return;
                 }
             }
+
+            // and doing the work here
+            if ( removeWholeGAV )
+            {
+                try
+                {
+                    for ( StorageItem item : items )
+                    {
+                        try
+                        {
+                            // preserve possible subdirs
+                            if ( !( item instanceof StorageCollectionItem ) )
+                            {
+                                repository.deleteItem( false, new ResourceStoreRequest( item ) );
+                            }
+                        }
+                        catch ( ItemNotFoundException e )
+                        {
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug(
+                                    "Could not delete whole GAV " + coll.getRepositoryItemUid().toString(),
+                                    e );
+                            }
+                        }
+                    }
+                }
+                catch ( Exception e )
+                {
+                    getLogger().warn( "Could not delete whole GAV " + coll.getRepositoryItemUid().toString(), e );
+                }
+            }
+            else
+            {
+                // and now check some things
+                if ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
+                {
+                    // do something
+                    if ( remainingSnapshotsAndFiles.size() + deletableSnapshotsAndFiles.size() < request
+                        .getMinCountOfSnapshotsToKeep() )
+                    {
+                        // delete nothing, since there is less snapshots in total as allowed
+                        deletableSnapshotsAndFiles.clear();
+                    }
+                    else
+                    {
+                        TreeSet<ArtifactVersion> keys = new TreeSet<ArtifactVersion>( deletableSnapshotsAndFiles
+                            .keySet() );
+
+                        while ( !keys.isEmpty()
+                            && remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
+                        {
+                            ArtifactVersion keyToMove = keys.last();
+
+                            if ( remainingSnapshotsAndFiles.containsKey( keyToMove ) )
+                            {
+                                remainingSnapshotsAndFiles.get( keyToMove ).addAll(
+                                    deletableSnapshotsAndFiles.get( keyToMove ) );
+                            }
+                            else
+                            {
+                                remainingSnapshotsAndFiles.put( keyToMove, deletableSnapshotsAndFiles.get( keyToMove ) );
+                            }
+
+                            deletableSnapshotsAndFiles.remove( keyToMove );
+
+                            keys.remove( keyToMove );
+                        }
+
+                    }
+                }
+
+                // NEXUS-814: is this GAV have remaining artifacts?
+                boolean gavHasMoreTimestampedSnapshots = remainingSnapshotsAndFiles.size() > 0;
+
+                for ( ArtifactVersion key : deletableSnapshotsAndFiles.keySet() )
+                {
+
+                    List<StorageFileItem> files = deletableSnapshotsAndFiles.get( key );
+                    deletedSnapshots++;
+
+                    for ( StorageFileItem file : files )
+                    {
+                        try
+                        {
+                            // NEXUS-814: mark that we are deleting a TS snapshot, but there are still remaining
+                            // ones in repository.
+                            if ( gavHasMoreTimestampedSnapshots )
+                            {
+                                file.getItemContext().put( MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV, Boolean.TRUE );
+                            }
+
+                            gav = (Gav) file.getItemContext().get( Gav.class.getName() );
+
+                            repository.deleteItem( false, new ResourceStoreRequest( file ) );
+
+                            deletedFiles++;
+                        }
+                        catch ( ItemNotFoundException e )
+                        {
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug( "Could not delete file:", e );
+                            }
+                        }
+                        catch ( Exception e )
+                        {
+                            getLogger().info( "Could not delete file:", e );
+                        }
+                    }
+                }
+            }
+
+            removeDirectoryIfEmpty( coll );
+
+            updateMetadataIfNecessary( context, coll );
+ 
 
         }
 

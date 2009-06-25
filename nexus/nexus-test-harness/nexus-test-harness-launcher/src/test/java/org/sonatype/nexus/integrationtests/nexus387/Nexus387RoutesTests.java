@@ -34,7 +34,7 @@ public class Nexus387RoutesTests
 
     @Test
     public void testExclusive()
-        throws IOException
+        throws Exception
     {
 
         Gav gav =
@@ -68,7 +68,7 @@ public class Nexus387RoutesTests
 
     @Test
     public void testInclusive()
-        throws IOException
+        throws Exception
     {
 
         Gav gav =
@@ -97,7 +97,7 @@ public class Nexus387RoutesTests
 
     @Test
     public void testBlocking()
-        throws IOException
+        throws Exception
     {
 
         Gav gav =

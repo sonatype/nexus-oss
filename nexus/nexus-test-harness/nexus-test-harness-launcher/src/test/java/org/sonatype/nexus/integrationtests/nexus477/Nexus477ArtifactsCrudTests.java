@@ -75,7 +75,7 @@ public class Nexus477ArtifactsCrudTests
 
     @Test
     public void deleteTest()
-        throws IOException
+        throws Exception
     {
         Gav gav =
             new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,

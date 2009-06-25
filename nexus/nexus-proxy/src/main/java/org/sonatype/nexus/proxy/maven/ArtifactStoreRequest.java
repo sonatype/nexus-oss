@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 
 public class ArtifactStoreRequest
@@ -24,6 +25,7 @@ public class ArtifactStoreRequest
     private final Gav gav;
 
     public ArtifactStoreRequest( MavenRepository repository, String path, boolean localOnly )
+        throws IllegalArtifactCoordinateException
     {
         super( path, localOnly );
 

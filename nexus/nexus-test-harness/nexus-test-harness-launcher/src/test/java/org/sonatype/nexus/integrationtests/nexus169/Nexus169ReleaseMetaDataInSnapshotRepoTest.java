@@ -48,7 +48,7 @@ public class Nexus169ReleaseMetaDataInSnapshotRepoTest
 
     @Test
     public void releaseMetaDataInSnapshotRepo()
-        throws IOException
+        throws Exception
     {
 
         Gav gav =
