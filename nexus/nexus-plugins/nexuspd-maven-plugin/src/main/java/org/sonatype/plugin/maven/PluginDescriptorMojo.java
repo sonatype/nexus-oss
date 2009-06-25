@@ -11,7 +11,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.sonatype.plexus.plugin.ExtensionPoint;
-import org.sonatype.plexus.plugin.Managed;
+import org.sonatype.plugin.Managed;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugin.metadata.PluginMetadataGenerationRequest;
 import org.sonatype.plugin.metadata.PluginMetadataGenerator;
@@ -27,7 +27,6 @@ import org.sonatype.plugin.metadata.gleaner.GleanerException;
 public class PluginDescriptorMojo
     extends AbstractMojo
 {
-
     /**
      * The output location for the generated plugin descriptor.
      * 
