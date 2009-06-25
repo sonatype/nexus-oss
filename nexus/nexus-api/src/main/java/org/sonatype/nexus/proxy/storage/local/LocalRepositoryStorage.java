@@ -26,7 +26,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.plexus.plugin.ExtensionPoint;
+import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * Local storage.

@@ -17,7 +17,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plexus.plugin.ExtensionPoint;
+import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * A component interface that may be implemented by plugins that wants to have some extra configuration capabilities on

@@ -13,7 +13,7 @@
  */
 package org.sonatype.nexus.scheduling;
 
-import org.sonatype.plexus.plugin.ExtensionPoint;
+import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**

@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.plexus.plugin.ExtensionPoint;
+import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * The Interface StorageFileItemInspector.

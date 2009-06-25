@@ -2,7 +2,9 @@ package org.sonatype.nexus.templates;
 
 import java.util.List;
 
-import org.sonatype.plexus.plugin.ExtensionPoint;
+import javax.inject.Singleton;
+
+import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * A template provider provides a set of templates for one implementation.
@@ -10,6 +12,7 @@ import org.sonatype.plexus.plugin.ExtensionPoint;
  * @author cstamas
  */
 @ExtensionPoint
+@Singleton
 public interface TemplateProvider<T extends Template>
 {
     /**

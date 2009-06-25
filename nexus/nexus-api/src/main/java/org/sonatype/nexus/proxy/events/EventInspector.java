@@ -14,7 +14,7 @@
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.plugin.ExtensionPoint;
+import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * A simple event inspector, a component that receives events emitted by Nexus and processes them in way they want.

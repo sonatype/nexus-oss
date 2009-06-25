@@ -15,7 +15,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.plexus.plugin.ExtensionPoint;
+import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * A Shadow Repository is a special repository type that usually points to a master repository and transforms it in some

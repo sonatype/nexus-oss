@@ -15,7 +15,7 @@ package org.sonatype.nexus.proxy.registry;
 
 import javax.inject.Singleton;
 
-import org.sonatype.plexus.plugin.ExtensionPoint;
+import org.sonatype.plugin.ExtensionPoint;
 
 @ExtensionPoint
 @Singleton

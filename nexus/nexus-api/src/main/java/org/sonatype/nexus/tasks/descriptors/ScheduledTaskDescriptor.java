@@ -18,7 +18,7 @@ import java.util.List;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
-import org.sonatype.plexus.plugin.ExtensionPoint;
+import org.sonatype.plugin.ExtensionPoint;
 
 @ExtensionPoint
 @Singleton
