@@ -25,11 +25,16 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-api</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.plugin</groupId>
+          <artifactId>plugin-host-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-api</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
     </dependency>
 
     <!-- Testing -->

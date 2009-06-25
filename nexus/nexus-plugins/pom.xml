@@ -1,29 +1,49 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<!-- Parent POM -->
-	<parent>
-		<groupId>org.sonatype.nexus</groupId>
-		<artifactId>nexus</artifactId>
-		<version>1.4.0-SNAPSHOT</version>
-	</parent>
+  <!-- Parent POM -->
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus</artifactId>
+    <version>1.4.0-SNAPSHOT</version>
+  </parent>
 
-	<!-- the version of maven's project object model -->
-	<modelVersion>4.0.0</modelVersion>
+  <!-- the version of maven's project object model -->
+  <modelVersion>4.0.0</modelVersion>
 
-	<!-- a unique name for this project -->
-	<artifactId>nexus-plugins</artifactId>
+  <!-- a unique name for this project -->
+  <artifactId>nexus-plugins</artifactId>
 
-	<!-- POM packaging -->
-	<packaging>pom</packaging>
+  <!-- POM packaging -->
+  <packaging>pom</packaging>
 
-	<!-- a short but descriptive name for the project -->
-	<name>Nexus Plugins</name>
+  <!-- a short but descriptive name for the project -->
+  <name>Nexus Plugins</name>
 
-    <modules>
-      <module>nexus-plugin-api</module>
-      <module>nexus-plugin-manager</module>
-      <module>nexuspd-maven-plugin</module>
-    </modules>
+  <modules>
+    <module>nexus-plugin-api</module>
+    <module>nexus-plugin-manager</module>
+    <module>nexuspd-maven-plugin</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.plugin</groupId>
+        <artifactId>plugin-api</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plugin</groupId>
+        <artifactId>plugin-host-api</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plugin</groupId>
+        <artifactId>plugin-model-api</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
 </project>

@@ -22,6 +22,19 @@
 
   <dependencies>
 
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-host-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-model-api</artifactId>
+    </dependency>
+    
     <!-- These two are here as hack, we need to modify the plexus configuration -->
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
