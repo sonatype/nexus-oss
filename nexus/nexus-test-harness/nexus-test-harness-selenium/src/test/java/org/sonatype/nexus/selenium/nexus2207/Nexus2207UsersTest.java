@@ -1,4 +1,4 @@
-package org.sonatype.nexus.selenium.nexus2205;
+package org.sonatype.nexus.selenium.nexus2207;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
