@@ -83,28 +83,27 @@ public class PluginDescriptorMojo
     private PluginMetadataGenerator metadataGenerator;
 
     public void execute()
-        throws MojoExecutionException,
-            MojoFailureException
+        throws MojoExecutionException, MojoFailureException
     {
         PluginMetadataGenerationRequest request = new PluginMetadataGenerationRequest();
-        request.groupId = this.mavenProject.getGroupId();
-        request.artifactId = this.mavenProject.getArtifactId();
-        request.version = this.mavenProject.getVersion();
-        request.name = this.mavenProject.getName();
-        request.description = this.mavenProject.getDescription();
-        request.pluginSiteURL = this.mavenProject.getUrl();
+        request.setGroupId( this.mavenProject.getGroupId() );
+        request.setArtifactId( this.mavenProject.getArtifactId() );
+        request.setVersion( this.mavenProject.getVersion() );
+        request.setName( this.mavenProject.getName() );
+        request.setDescription( this.mavenProject.getDescription() );
+        request.setPluginSiteURL( this.mavenProject.getUrl() );
 
-        request.applicationId = this.applicationId;
-        request.applicationEdition = this.applicationEdition;
-        request.applicationMinVersion = this.applicationMinVersion;
-        request.applicationMaxVersion = this.applicationMaxVersion;
+        request.setApplicationId( this.applicationId );
+        request.setApplicationEdition( this.applicationEdition );
+        request.setApplicationMinVersion( this.applicationMinVersion );
+        request.setApplicationMaxVersion( this.applicationMaxVersion );
 
         // licenses
         if ( this.mavenProject.getLicenses() != null )
         {
             for ( License mavenLicenseModel : (List<License>) this.mavenProject.getLicenses() )
             {
-                request.licenses.put( mavenLicenseModel.getName(), mavenLicenseModel.getUrl() );
+                request.addLicense( mavenLicenseModel.getName(), mavenLicenseModel.getUrl() );
             }
         }
 
@@ -115,20 +114,21 @@ public class PluginDescriptorMojo
             {
                 if ( mavenDependency.getScope().equals( "compile" ) || mavenDependency.getScope().equals( "runtime" ) )
                 {
-                    request.classpathDependencies.add( this.toSimpleDependency( mavenDependency ) );
+                    request.addClasspathDependency( mavenDependency.getGroupId(), mavenDependency.getArtifactId(),
+                                                    mavenDependency.getVersion() );
                 }
             }
         }
 
-        request.outputFile = this.generatedPluginMetadata;
-        request.classesDirectory = new File( mavenProject.getBuild().getOutputDirectory() );
+        request.setOutputFile( this.generatedPluginMetadata );
+        request.setClassesDirectory( new File( mavenProject.getBuild().getOutputDirectory() ) );
         try
         {
             if ( mavenProject.getCompileClasspathElements() != null )
             {
                 for ( String classpathElement : (List<String>) mavenProject.getCompileClasspathElements() )
                 {
-                    request.classpath.add( new File( classpathElement ) );
+                    request.getClasspath().add( new File( classpathElement ) );
                 }
             }
         }
@@ -175,14 +175,14 @@ public class PluginDescriptorMojo
                 {
                     throw new MojoFailureException( "Dependency: " + gavString + ", must have scope 'provided'" );
                 }
-                
+
                 // finally now just set the plugin dependency on the request
-                request.pluginDependencies.add( this.toSimpleDependency( otherPlugin ) );
+                request.addPluginDependency( otherPlugin.getGroupId() );
             }
         }
 
-        request.annotationClasses.add( ExtensionPoint.class );
-        request.annotationClasses.add( Managed.class );
+        request.getAnnotationClasses().add( ExtensionPoint.class );
+        request.getAnnotationClasses().add( Managed.class );
 
         // do the work
         try
@@ -193,14 +193,5 @@ public class PluginDescriptorMojo
         {
             throw new MojoFailureException( "Failed to generante plugin xml file: " + e.getMessage(), e );
         }
-    }
-
-    private Dependency toSimpleDependency( Dependency mavenDependency )
-    {
-        Dependency dependency = new Dependency();
-        dependency.setGroupId( mavenDependency.getGroupId() );
-        dependency.setArtifactId( mavenDependency.getArtifactId() );
-        dependency.setVersion( mavenDependency.getVersion() );
-        return dependency;
     }
 }
