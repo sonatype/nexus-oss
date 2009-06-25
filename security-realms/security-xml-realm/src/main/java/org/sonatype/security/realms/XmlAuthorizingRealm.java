@@ -46,7 +46,7 @@ import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
-@Component( role = Realm.class, hint = "XmlAuthorizingRealm" )
+@Component( role = Realm.class, hint = "XmlAuthorizingRealm", description = "Xml Authorizing Realm" )
 public class XmlAuthorizingRealm
     extends AuthorizingRealm
     implements Realm
