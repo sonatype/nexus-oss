@@ -23,8 +23,9 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-host-api</artifactId>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-host-api</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -35,6 +36,20 @@
     <dependency>
       <groupId>org.sonatype.plexus.appevents</groupId>
       <artifactId>plexus-app-events-api</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-utils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
