@@ -12,6 +12,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.sonatype.plexus.plugin.ExtensionPoint;
 import org.sonatype.plexus.plugin.Managed;
+import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugin.metadata.PluginMetadataGenerationRequest;
 import org.sonatype.plugin.metadata.PluginMetadataGenerator;
 import org.sonatype.plugin.metadata.gleaner.GleanerException;
@@ -46,7 +47,7 @@ public class PluginDescriptorMojo
      * The ID of the target application. For example if this plugin was for the Nexus Repository Manager, the ID would
      * be, 'nexus'.
      * 
-     * @parameter
+     * @parameter expression="nexus"
      * @required
      */
     private String applicationId;
@@ -54,14 +55,14 @@ public class PluginDescriptorMojo
     /**
      * The edition of the target application. Some applications come in multiple flavors, OSS, PRO, Free, light, etc.
      * 
-     * @parameter
+     * @parameter expression="OSS"
      */
     private String applicationEdition;
 
     /**
      * The minimum product version of the target application.
      * 
-     * @parameter
+     * @parameter expression="1.4.0"
      */
     private String applicationMinVersion;
 
@@ -141,43 +142,38 @@ public class PluginDescriptorMojo
         {
             for ( String gavString : this.pluginDependencies )
             {
-                String[] split = gavString.split( ":" );
-                if ( split.length != 3 )
+                GAVCoordinate pluginGav = null;
+
+                try
+                {
+                    pluginGav = new GAVCoordinate( gavString );
+                }
+                catch ( IllegalArgumentException e )
                 {
                     throw new MojoFailureException( "Invalid entry in pluginDependencies: " + gavString
-                        + ", the string must be in the format of 'groupId:artifactId:version'" );
+                        + ", the string must be in the format of 'groupId:artifactId:version'", e );
                 }
 
-                String groupId = split[0];
-                String artifactId = split[1];
-                String version = split[2];
-
-                // make sure it is a real dependency
-                Dependency otherPlugin = null;
+                // make sure it is a real dependency, enlisted in POM/dependencies
                 for ( Dependency mavenDependency : (List<Dependency>) this.mavenProject.getDependencies() )
                 {
-                    if ( mavenDependency.getGroupId().equals( groupId )
-                        && mavenDependency.getArtifactId().equals( artifactId )
-                        && mavenDependency.getVersion().equals( version ) )
+                    GAVCoordinate enlistedGav =
+                        new GAVCoordinate( mavenDependency.getGroupId(), mavenDependency.getArtifactId(),
+                                           mavenDependency.getVersion() );
+
+                    if ( pluginGav.equals( enlistedGav ) )
                     {
-                        // this dep should be marked 'provied'
-                        otherPlugin = mavenDependency;
+                        // the dep needs to be provided
+                        if ( !mavenDependency.getScope().equals( "provided" ) )
+                        {
+                            throw new MojoFailureException( "Dependency: " + enlistedGav.toString()
+                                + ", must have scope 'provided'" );
+                        }
                     }
                 }
 
-                if ( otherPlugin == null )
-                {
-                    throw new MojoFailureException( "GAV: " + gavString + ", must be defined as a dependency." );
-                }
-
-                // the dep needs to be provided
-                if ( !otherPlugin.getScope().equals( "provided" ) )
-                {
-                    throw new MojoFailureException( "Dependency: " + gavString + ", must have scope 'provided'" );
-                }
-
                 // finally now just set the plugin dependency on the request
-                request.addPluginDependency( otherPlugin.getGroupId() );
+                request.addPluginDependency( pluginGav );
             }
         }
 
