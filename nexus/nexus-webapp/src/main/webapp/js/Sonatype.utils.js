@@ -678,6 +678,7 @@ Sonatype.utils = {
         Sonatype.utils.loadNexusStatus( respObj.data.clientPermissions.loggedInUserSource );
       },
       failure: function(response, options){
+      Sonatype.utils.clearCookie('JSESSIONID');
       Sonatype.utils.authToken = null;
         activeWindow.getEl().unmask();
         if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
