@@ -11,6 +11,7 @@ import java.io.File;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.locator.ArtifactLocator;
 import org.sonatype.nexus.index.locator.GavHelpedLocator;
@@ -36,6 +37,7 @@ public class DefaultArtifactContextProducer
      * Get ArtifactContext for given pom or artifact (jar, war, etc). A file can be
      */
     public ArtifactContext getArtifactContext( IndexingContext context, File file )
+        throws IllegalArtifactCoordinateException
     {
         // TODO shouldn't this use repository layout instead?
 
@@ -132,9 +134,10 @@ public class DefaultArtifactContextProducer
     }
     
     private Gav getGavFromPath( IndexingContext context, String repositoryPath, String artifactPath )
+        throws IllegalArtifactCoordinateException
     {
         String path = artifactPath.substring( repositoryPath.length() + 1 ).replace( '\\', '/' );
-        
+
         return context.getGavCalculator().pathToGav( path );
     }
 

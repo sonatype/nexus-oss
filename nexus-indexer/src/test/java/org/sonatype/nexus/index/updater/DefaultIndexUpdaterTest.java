@@ -27,6 +27,7 @@ import org.jmock.api.Invocation;
 import org.jmock.lib.action.ReturnValueAction;
 import org.jmock.lib.action.VoidAction;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.index.AbstractIndexCreatorHelper;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
@@ -867,7 +868,7 @@ public class DefaultIndexUpdaterTest
     }
 
     private ArtifactContext createArtifactContext( String repositoryId, String groupId, String artifactId,
-        String version, String classifier )
+        String version, String classifier ) throws IllegalArtifactCoordinateException
     {
         String path = createPath( groupId, artifactId, version, classifier );
         File pomFile = new File( path + ".pom" );

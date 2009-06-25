@@ -19,6 +19,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.VersionUtils;
 
 /**
@@ -254,7 +255,8 @@ public class ArtifactInfo
         return groupId;
     }
     
-    public Gav calculateGav() 
+    public Gav calculateGav()
+        throws IllegalArtifactCoordinateException
     {
         return new Gav( 
             groupId, 

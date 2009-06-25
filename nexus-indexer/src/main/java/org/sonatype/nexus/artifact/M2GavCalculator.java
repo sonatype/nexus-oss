@@ -22,6 +22,7 @@ public class M2GavCalculator
     extends AbstractGavCalculator
 {
     public Gav pathToGav( String str )
+        throws IllegalArtifactCoordinateException
     {
         try
         {
@@ -105,10 +106,9 @@ public class M2GavCalculator
         }
     }
 
-    private Gav getReleaseGav(String s, int vEndPos, String groupId,
-        String artifactId, String version, String fileName, boolean checksum,
-        boolean signature, Gav.HashType checksumType,
-        Gav.SignatureType signatureType) 
+    private Gav getReleaseGav( String s, int vEndPos, String groupId, String artifactId, String version,
+        String fileName, boolean checksum, boolean signature, Gav.HashType checksumType, Gav.SignatureType signatureType )
+        throws IllegalArtifactCoordinateException
     {
         if ( !fileName.startsWith( artifactId + "-" + version + "." )
             && !fileName.startsWith( artifactId + "-" + version + "-" ) )
@@ -148,9 +148,9 @@ public class M2GavCalculator
             signatureType );
     }
 
-    private Gav getSnapshotGav(String s, int vEndPos, String groupId,
-        String artifactId, String version, String fileName, boolean checksum,
-        boolean signature, Gav.HashType checksumType, Gav.SignatureType signatureType) 
+    private Gav getSnapshotGav( String s, int vEndPos, String groupId, String artifactId, String version,
+        String fileName, boolean checksum, boolean signature, Gav.HashType checksumType, Gav.SignatureType signatureType )
+        throws IllegalArtifactCoordinateException
     {
       
       Integer snapshotBuildNo = null;

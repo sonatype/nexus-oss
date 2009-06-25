@@ -8,6 +8,7 @@ package org.sonatype.nexus.index;
 
 import java.io.File;
 
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
@@ -19,6 +20,7 @@ public interface ArtifactContextProducer
 {
     String ROLE = ArtifactContextProducer.class.getName();
 
-    public ArtifactContext getArtifactContext( IndexingContext context, File file );
+    public ArtifactContext getArtifactContext( IndexingContext context, File file )
+        throws IllegalArtifactCoordinateException;
 
 }

@@ -18,6 +18,8 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.TermQuery;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
@@ -25,8 +27,9 @@ import org.sonatype.nexus.index.context.IndexingContext;
  * 
  * @author Eugene Kuleshov
  */
-class DefaultScannerListener implements
-    ArtifactScanningListener 
+class DefaultScannerListener
+    extends AbstractLogEnabled
+    implements ArtifactScanningListener 
 {
     private final IndexingContext context;
     private final IndexerEngine indexerEngine;
@@ -237,13 +240,20 @@ class DefaultScannerListener implements
                 }
             
                 // minimal ArtifactContext for removal
-                ArtifactContext ac = new ArtifactContext( null, null, null, ai, ai.calculateGav() );
-                
-                for ( int i = 0; i < hits.length(); i++ )
+                try
                 {
-                    indexerEngine.remove( context, ac );
-                    
-                    deleted++;
+                    ArtifactContext ac = new ArtifactContext( null, null, null, ai, ai.calculateGav() );
+
+                    for ( int i = 0; i < hits.length(); i++ )
+                    {
+                        indexerEngine.remove( context, ac );
+
+                        deleted++;
+                    }
+                }
+                catch ( IllegalArtifactCoordinateException e )
+                {
+                    getLogger().warn( "Failed to remove deleted artifact from Search Engine.", e );
                 }
             }
         }

@@ -76,6 +76,7 @@ public class Gav
     public Gav( String groupId, String artifactId, String version, String classifier, String extension,
         Integer snapshotBuildNumber, Long snapshotTimeStamp, String name, boolean snapshot, boolean hash,
         HashType hashType, boolean signature, SignatureType signatureType )
+        throws IllegalArtifactCoordinateException
     {
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -89,7 +90,7 @@ public class Gav
         {
             if ( !VersionUtils.isSnapshot( version ) )
             {
-                throw new IllegalArgumentException( "GAV marked as snapshot but the supplied version '" + version
+                throw new IllegalArtifactCoordinateException( "GAV marked as snapshot but the supplied version '" + version
                     + "' is not!" );
             }
 

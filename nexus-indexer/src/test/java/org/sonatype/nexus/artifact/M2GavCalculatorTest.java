@@ -559,6 +559,7 @@ public class M2GavCalculatorTest
     }
 
     public void testIssueNexus57()
+        throws Exception
     {
         Gav gav;
         // broken path, baseVersion and version mismatch (2.0-SNAPSHOT vs 2.0-alpha-1...)

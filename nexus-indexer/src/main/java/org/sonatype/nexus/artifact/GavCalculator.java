@@ -14,7 +14,13 @@ package org.sonatype.nexus.artifact;
  */
 public interface GavCalculator
 {
-    Gav pathToGav( String path );
+    /**
+     * @param path
+     * @return a Gav based on the path
+     * @throws IllegalArtifactCoordinateException if the path is illegal
+     */
+    Gav pathToGav( String path )
+        throws IllegalArtifactCoordinateException;
 
     String gavToPath( Gav gav );
 }

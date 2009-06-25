@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
@@ -83,11 +84,20 @@ public class DefaultScanner
     {
         IndexingContext context = request.getIndexingContext();
 
-        ArtifactContext ac = artifactContextProducer.getArtifactContext( context, file );
-
-        if ( ac != null )
+        try
         {
-            request.getArtifactScanningListener().artifactDiscovered( ac );
+            ArtifactContext ac = artifactContextProducer.getArtifactContext( context, file );
+
+            if ( ac != null )
+            {
+                request.getArtifactScanningListener().artifactDiscovered( ac );
+            }
+        }
+        catch ( IllegalArtifactCoordinateException e )
+        {
+            getLogger().warn(
+                "Failed to process file: '" + file.getAbsolutePath() + "' while scanning a maven 2 directory.",
+                e );
         }
     }
 }
