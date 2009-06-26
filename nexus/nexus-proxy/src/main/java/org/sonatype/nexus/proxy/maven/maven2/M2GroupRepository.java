@@ -95,7 +95,7 @@ public class M2GroupRepository
     }
 
     @Override
-    protected Validator getValidator()
+    public Validator getValidator()
     {
         return m2GroupRepositoryValidator;
     }

@@ -122,7 +122,6 @@ public class DefaultDownloadMirrors
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     public List<Mirror> getMirrors()
     {
         List<CMirror> modelMirrors = getConfiguration( false ).getRemoteStorage().getMirrors();
@@ -206,7 +205,6 @@ public class DefaultDownloadMirrors
         return (CRepository) configuration.getConfiguration( forWrite );
     }
 
-    @SuppressWarnings( "unchecked" )
     protected boolean existsMirrorWithId( boolean forWrite, String id )
     {
         List<CMirror> modelMirrors = getConfiguration( forWrite ).getRemoteStorage().getMirrors();

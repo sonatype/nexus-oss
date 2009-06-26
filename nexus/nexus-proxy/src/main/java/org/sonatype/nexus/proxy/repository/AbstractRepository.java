@@ -141,7 +141,7 @@ public abstract class AbstractRepository
     protected abstract Configurator getConfigurator();
 
     @Override
-    protected abstract Validator getValidator();
+    public abstract Validator getValidator();
 
     public void initialize()
         throws InitializationException

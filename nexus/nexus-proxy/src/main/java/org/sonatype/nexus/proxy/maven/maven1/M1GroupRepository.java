@@ -61,7 +61,7 @@ public class M1GroupRepository
     }
 
     @Override
-    protected Validator getValidator()
+    public Validator getValidator()
     {
         return m1GroupRepositoryValidator;
     }

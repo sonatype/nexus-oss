@@ -72,7 +72,7 @@ public class M1LayoutedM2ShadowRepository
     }
 
     @Override
-    protected Validator getValidator()
+    public Validator getValidator()
     {
         return m1LayoutedM2ShadowRepositoryValidator;
     }

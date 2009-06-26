@@ -77,7 +77,7 @@ public class PathBasedRequestRepositoryMapper
         applicationEventMulticaster.addEventListener( this );
     }
 
-    public void onEvent( Event evt )
+    public void onEvent( Event<?> evt )
     {
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {

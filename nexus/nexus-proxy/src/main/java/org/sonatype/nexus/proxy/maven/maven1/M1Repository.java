@@ -76,7 +76,7 @@ public class M1Repository
     }
 
     @Override
-    protected Validator getValidator()
+    public Validator getValidator()
     {
         return m1RepositoryValidator;
     }

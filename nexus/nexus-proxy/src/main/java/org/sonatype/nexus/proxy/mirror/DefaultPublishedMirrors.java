@@ -57,7 +57,6 @@ public class DefaultPublishedMirrors
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     public List<Mirror> getMirrors()
     {
         List<CMirror> modelMirrors = getConfiguration( false ).getMirrors();
