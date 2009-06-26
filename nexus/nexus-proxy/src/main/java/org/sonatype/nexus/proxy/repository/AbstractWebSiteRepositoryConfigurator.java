@@ -16,5 +16,4 @@ package org.sonatype.nexus.proxy.repository;
 public abstract class AbstractWebSiteRepositoryConfigurator
     extends AbstractRepositoryConfigurator
 {
-
 }

@@ -8,7 +8,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
@@ -46,8 +45,6 @@ public abstract class AbstractRepositoryConfigurator
                                           CoreConfiguration config )
         throws ConfigurationException
     {
-        prepareExternalConfiguration( (CRepository) config.getConfiguration( false ) );
-
         doApplyConfiguration( (Repository) target, configuration, (CRepository) config.getConfiguration( false ),
                               config.getExternalConfiguration() );
         
@@ -63,8 +60,6 @@ public abstract class AbstractRepositoryConfigurator
 
     public final void prepareForSave( Object target, ApplicationConfiguration configuration, CoreConfiguration config )
     {
-        prepareExternalConfiguration( (CRepository) config.getConfiguration( true ) );
-
         // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
         // later we will see about it
         doPrepareForSave( (Repository) target, configuration, (CRepository) config.getConfiguration( true ),
@@ -73,25 +68,6 @@ public abstract class AbstractRepositoryConfigurator
         // commit, since doPrepareForSave() potentially modifies coreConfig or externalConfig
         config.applyChanges();
     }
-
-    protected void prepareExternalConfiguration( CRepository repoConfig )
-    {
-        if ( repoConfig.getExternalConfiguration() == null )
-        {
-            // just put an elephant in South Africa to find it for sure ;)
-            repoConfig.setExternalConfiguration( new Xpp3Dom( "externalConfiguration" ) );
-        }
-
-        if ( repoConfig.externalConfigurationImple == null )
-        {
-            // in 1st round, i intentionally choosed to make our lives bitter, and handle config manually
-            // later we will see about it
-            repoConfig.externalConfigurationImple =
-                createExternalConfiguration( (Xpp3Dom) repoConfig.getExternalConfiguration() );
-        }
-    }
-
-    protected abstract ExternalConfiguration createExternalConfiguration( Xpp3Dom dom );
 
     public ExternalConfiguration getExternalConfiguration( Repository repository )
     {
