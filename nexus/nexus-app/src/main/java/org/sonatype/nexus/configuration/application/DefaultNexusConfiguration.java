@@ -56,6 +56,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
@@ -439,11 +440,25 @@ public class DefaultNexusConfiguration
     {
         List<CRepository> reposes = getConfiguration().getRepositories();
 
+        // we first create non-group repositories because groups have refs to non-group
         for ( CRepository repo : reposes )
         {
-            Repository repository = createRepositoryFromModel( getConfiguration(), repo );
+            if ( !repo.getProviderRole().equals( GroupRepository.class.getName() ) )
+            {
+                Repository repository = createRepositoryFromModel( getConfiguration(), repo );
 
-            repositoryRegistry.addRepository( repository );
+                repositoryRegistry.addRepository( repository );
+            }
+        }
+
+        for ( CRepository repo : reposes )
+        {
+            if ( repo.getProviderRole().equals( GroupRepository.class.getName() ) )
+            {
+                Repository repository = createRepositoryFromModel( getConfiguration(), repo );
+
+                repositoryRegistry.addRepository( repository );
+            }
         }
     }
 
