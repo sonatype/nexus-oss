@@ -20,6 +20,7 @@ import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.M1ArtifactRecognizer;
 import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
@@ -49,6 +50,9 @@ public class M1Repository
     @Requirement
     private M1RepositoryConfigurator m1RepositoryConfigurator;
 
+    @Requirement
+    private M1RepositoryValidator m1RepositoryValidator;
+
     @Override
     public M1RepositoryConfiguration getExternalConfiguration()
     {
@@ -66,9 +70,15 @@ public class M1Repository
     }
 
     @Override
-    public Configurator getConfigurator()
+    protected Configurator getConfigurator()
     {
         return m1RepositoryConfigurator;
+    }
+
+    @Override
+    protected Validator getValidator()
+    {
+        return m1RepositoryValidator;
     }
 
     /**
@@ -94,7 +104,7 @@ public class M1Repository
 
         // we are using Gav to test the path
         Gav gav = null;
-        
+
         try
         {
             gav = getGavCalculator().pathToGav( request.getRequestPath() );
@@ -102,7 +112,7 @@ public class M1Repository
         catch ( IllegalArtifactCoordinateException e )
         {
             getLogger().info( "Illegal artifact path: '" + request.getRequestPath() + "'" + e.getMessage() );
-            
+
             return false;
         }
 
@@ -137,8 +147,8 @@ public class M1Repository
         }
 
         // we are using Gav to test the path
-        Gav gav = null; 
-            
+        Gav gav = null;
+
         try
         {
             gavCalculator.pathToGav( item.getPath() );

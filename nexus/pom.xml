@@ -294,6 +294,11 @@
         <artifactId>spice-timeline</artifactId>
         <version>${spice-timeline.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.sonatype.configuration</groupId>
+        <artifactId>base-configuration</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+      </dependency>
       <!-- JSecurity -->
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>

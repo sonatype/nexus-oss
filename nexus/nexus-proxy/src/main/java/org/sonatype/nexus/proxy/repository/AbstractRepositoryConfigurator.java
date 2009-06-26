@@ -42,18 +42,6 @@ public abstract class AbstractRepositoryConfigurator
     @Requirement( role = RepositoryCustomizer.class )
     private Map<String, RepositoryCustomizer> pluginRepositoryConfigurators;
 
-    public final void validate( ApplicationConfiguration configuration, Object repoConfig )
-        throws ConfigurationException
-    {
-        if ( repoConfig instanceof CRepository )
-        {
-            prepareExternalConfiguration( (CRepository) repoConfig );
-
-            doValidate( configuration, (CRepository) repoConfig,
-                        ( (CRepository) repoConfig ).externalConfigurationImple );
-        }
-    }
-
     public final void applyConfiguration( Object target, ApplicationConfiguration configuration,
                                           CoreConfiguration config )
         throws ConfigurationException
@@ -108,14 +96,6 @@ public abstract class AbstractRepositoryConfigurator
     public ExternalConfiguration getExternalConfiguration( Repository repository )
     {
         return repository.getCurrentCoreConfiguration().getExternalConfiguration();
-    }
-
-    protected void doValidate( ApplicationConfiguration configuration, CRepository repo,
-                               ExternalConfiguration externalConfiguration )
-        throws ConfigurationException
-    {
-        // TODO:
-
     }
 
     protected void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,

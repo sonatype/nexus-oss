@@ -17,6 +17,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -33,6 +34,9 @@ public class M1GroupRepository
 
     @Requirement
     private M1GroupRepositoryConfigurator m1GroupRepositoryConfigurator;
+
+    @Requirement
+    private M1GroupRepositoryValidator m1GroupRepositoryValidator;
 
     @Override
     protected M1GroupRepositoryConfiguration getExternalConfiguration()
@@ -51,8 +55,14 @@ public class M1GroupRepository
     }
 
     @Override
-    public Configurator getConfigurator()
+    protected Configurator getConfigurator()
     {
         return m1GroupRepositoryConfigurator;
+    }
+
+    @Override
+    protected Validator getValidator()
+    {
+        return m1GroupRepositoryValidator;
     }
 }

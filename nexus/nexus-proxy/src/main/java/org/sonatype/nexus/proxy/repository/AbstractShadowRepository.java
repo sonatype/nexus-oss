@@ -119,7 +119,7 @@ public abstract class AbstractShadowRepository
     }
 
     @Override
-    public void onEvent( Event evt )
+    public void onEvent( Event<?> evt )
     {
         super.onEvent( evt );
 

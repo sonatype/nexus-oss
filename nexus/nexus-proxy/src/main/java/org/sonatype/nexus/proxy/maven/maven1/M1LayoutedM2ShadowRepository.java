@@ -17,6 +17,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -40,6 +41,9 @@ public class M1LayoutedM2ShadowRepository
     @Requirement
     private M1LayoutedM2ShadowRepositoryConfigurator m1LayoutedM2ShadowRepositoryConfigurator;
 
+    @Requirement
+    private M1LayoutedM2ShadowRepositoryValidator m1LayoutedM2ShadowRepositoryValidator;
+
     @Override
     public M1LayoutedM2ShadowRepositoryConfiguration getExternalConfiguration()
     {
@@ -62,9 +66,15 @@ public class M1LayoutedM2ShadowRepository
     }
 
     @Override
-    public Configurator getConfigurator()
+    protected Configurator getConfigurator()
     {
         return m1LayoutedM2ShadowRepositoryConfigurator;
+    }
+
+    @Override
+    protected Validator getValidator()
+    {
+        return m1LayoutedM2ShadowRepositoryValidator;
     }
 
     protected String transformMaster2Shadow( String path )

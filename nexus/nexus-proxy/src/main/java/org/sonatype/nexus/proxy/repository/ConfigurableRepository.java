@@ -4,6 +4,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
@@ -28,7 +29,13 @@ public class ConfigurableRepository
     {
         return null;
     }
-    
+
+    @Override
+    protected Validator getValidator()
+    {
+        return null;
+    }
+
     @Override
     protected ApplicationConfiguration getApplicationConfiguration()
     {

@@ -32,6 +32,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -68,6 +69,9 @@ public class M2GroupRepository
     @Requirement
     private M2GroupRepositoryConfigurator m2GroupRepositoryConfigurator;
 
+    @Requirement
+    private M2GroupRepositoryValidator m2GroupRepositoryValidator;
+
     @Override
     protected M2GroupRepositoryConfiguration getExternalConfiguration()
     {
@@ -85,9 +89,15 @@ public class M2GroupRepository
     }
 
     @Override
-    public Configurator getConfigurator()
+    protected Configurator getConfigurator()
     {
         return m2GroupRepositoryConfigurator;
+    }
+
+    @Override
+    protected Validator getValidator()
+    {
+        return m2GroupRepositoryValidator;
     }
 
     @Override
@@ -112,13 +122,12 @@ public class M2GroupRepository
 
         return super.doRetrieveItem( request );
     }
-    
+
     /**
      * Parse a maven Metadata object from a storage file item
      */
     private Metadata parseMetadata( StorageFileItem fileItem )
-        throws IOException,
-            MetadataException
+        throws IOException, MetadataException
     {
         InputStream inputStream = null;
 
@@ -147,10 +156,7 @@ public class M2GroupRepository
      * Aggregates metadata from all member repositories
      */
     private StorageItem doRetrieveMetadata( ResourceStoreRequest request )
-        throws StorageException,
-            IllegalOperationException,
-            UnsupportedStorageOperationException,
-            ItemNotFoundException
+        throws StorageException, IllegalOperationException, UnsupportedStorageOperationException, ItemNotFoundException
     {
         List<StorageItem> items = doRetrieveItems( request );
 
@@ -222,8 +228,8 @@ public class M2GroupRepository
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Item for path " + request.toString() + " merged from " + Integer.toString( items.size() )
-                        + " found items." );
+                                   "Item for path " + request.toString() + " merged from "
+                                       + Integer.toString( items.size() ) + " found items." );
             }
 
             return item;

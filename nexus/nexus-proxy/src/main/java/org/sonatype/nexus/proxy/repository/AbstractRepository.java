@@ -26,6 +26,8 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.ConfigurationRollbackEvent;
+import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -134,6 +136,12 @@ public abstract class AbstractRepository
     private Map<String, RequestProcessor> requestProcessors;
 
     // --
+
+    @Override
+    protected abstract Configurator getConfigurator();
+
+    @Override
+    protected abstract Validator getValidator();
 
     public void initialize()
         throws InitializationException

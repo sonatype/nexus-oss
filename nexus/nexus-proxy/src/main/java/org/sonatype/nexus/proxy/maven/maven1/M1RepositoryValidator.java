@@ -11,25 +11,13 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.configuration;
+package org.sonatype.nexus.proxy.maven.maven1;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryValidator;
 
-/**
- * A component responsible for "apply" (config -> repo) and "prepare" (repo -> config) steps.
- * 
- * @author cstamas
- */
-public interface Configurator
+@Component( role = M1RepositoryValidator.class )
+public class M1RepositoryValidator
+    extends AbstractMavenRepositoryValidator
 {
-    /**
-     * Will apply the configuration parameters from repo model to the repository.
-     */
-    void applyConfiguration( Object target, ApplicationConfiguration configuration, CoreConfiguration coreConfiguration )
-        throws ConfigurationException;
-
-    /**
-     * Will prepare repo model for save, by syncing it with repository state (if needed).
-     */
-    void prepareForSave( Object repository, ApplicationConfiguration configuration, CoreConfiguration coreConfiguration );
 }

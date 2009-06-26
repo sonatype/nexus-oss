@@ -78,9 +78,9 @@ public abstract class AbstractConfigurable
     protected void doValidateConfiguration( Object config )
         throws ConfigurationException
     {
-        if ( getConfigurator() != null )
+        if ( getValidator() != null )
         {
-            getConfigurator().validate( getApplicationConfiguration(), config );
+            getValidator().validate( getApplicationConfiguration(), config );
         }
     }
 
@@ -101,6 +101,8 @@ public abstract class AbstractConfigurable
     }
 
     protected abstract Configurator getConfigurator();
+    
+    protected abstract Validator getValidator();
 
     protected abstract CoreConfiguration wrapConfiguration( Object configuration );
 }

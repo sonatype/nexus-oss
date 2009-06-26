@@ -34,6 +34,7 @@ import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -67,6 +68,9 @@ public class M2Repository
 
     @Requirement
     private M2RepositoryConfigurator m2RepositoryConfigurator;
+    
+    @Requirement
+    private M2RepositoryValidator m2RepositoryValidator;
 
     @Override
     protected M2RepositoryConfiguration getExternalConfiguration()
@@ -85,9 +89,15 @@ public class M2Repository
     }
 
     @Override
-    public Configurator getConfigurator()
+    protected Configurator getConfigurator()
     {
         return m2RepositoryConfigurator;
+    }
+    
+    @Override
+    protected Validator getValidator()
+    {
+        return m2RepositoryValidator;
     }
 
     /**
