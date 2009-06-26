@@ -48,11 +48,13 @@ public class RepositoryEventLocalStatusChangedInspector
 
         sb.append( "' (ID='" ).append( revt.getRepository().getId() ).append( "') was put " );
 
-        if ( LocalStatus.IN_SERVICE.equals( revt.getRepository().getLocalStatus() ) )
+        LocalStatus newStatus = revt.getNewLocalStatus();
+        
+        if ( LocalStatus.IN_SERVICE.equals( newStatus ) )
         {
             sb.append( "IN SERVICE." );
         }
-        else if ( LocalStatus.OUT_OF_SERVICE.equals( revt.getRepository().getLocalStatus() ) )
+        else if ( LocalStatus.OUT_OF_SERVICE.equals( newStatus ) )
         {
             sb.append( "OUT OF SERVICE." );
         }
