@@ -109,4 +109,11 @@ public class MainPage
         return new RolesTab( selenium );
     }
 
+    public PrivilegesTab openPrivileges()
+    {
+        securityPanel().privilegesClick();
+
+        return new PrivilegesTab(selenium);
+    }
+
 }

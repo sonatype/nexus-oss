@@ -17,7 +17,8 @@ public class TextField
 
     public void type( String text )
     {
-        waitForEvalTrue( ".disabled == false" );
+        waitToLoad();
+
         focus();
         selenium.type( getId(), text );
         blur();
@@ -25,7 +26,7 @@ public class TextField
 
     public boolean hasErrorText( String err )
     {
-        String text = selenium.getText( getXPath() + "/../..//div[@class='x-form-invalid-msg']" );
+        String text = getErrorText();
 
         return err.equals( text );
     }
@@ -48,5 +49,10 @@ public class TextField
     public String getValue()
     {
         return getEval( ".value" );
+    }
+
+    public String getErrorText()
+    {
+        return selenium.getText( getXPath() + "/../..//div[@class='x-form-invalid-msg']" );
     }
 }

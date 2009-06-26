@@ -50,4 +50,9 @@ public class SecurityPanel
     {
         clickLink( "Roles" );
     }
+
+    public void privilegesClick()
+    {
+        clickLink( "Privileges" );
+    }
 }

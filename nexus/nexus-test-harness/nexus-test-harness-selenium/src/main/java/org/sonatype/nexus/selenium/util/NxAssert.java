@@ -11,20 +11,22 @@ import org.sonatype.nexus.mock.components.TwinPanel;
 
 public class NxAssert
 {
+    public static final String THIS_FIELD_IS_REQUIRED = "This field is required";
+
     public static void requiredField( Combobox cb, String validText )
     {
         cb.setValue( "" );
-        Assert.assertTrue( "Expected validation", cb.hasErrorText( "This field is required" ) );
+        hasErrorText( cb, THIS_FIELD_IS_REQUIRED );
         cb.setValue( validText );
-        Assert.assertFalse( "Should pass validation", cb.hasErrorText( "This field is required" ) );
+        noErrorText( cb );
     }
 
     public static void requiredField( TextField tf, String validText )
     {
         tf.type( "" );
-        Assert.assertTrue( "Expected validation", tf.hasErrorText( "This field is required" ) );
+        hasErrorText( tf, THIS_FIELD_IS_REQUIRED );
         tf.type( validText );
-        Assert.assertFalse( "Should pass validation", tf.hasErrorText( "This field is required" ) );
+        noErrorText( tf );
     }
 
     public static void hasErrorText( TwinPanel panel, String errorText )
@@ -46,6 +48,17 @@ public class NxAssert
     public static void contains( TwinPanel twinPanel, String value )
     {
         Assert.assertTrue( twinPanel.containsLeftSide( value ) );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    public static void noErrorText( TextField tf )
+    {
+        Assert.assertThat( tf.getErrorText(), anyOf( equalTo( "null" ), equalTo( "" ), nullValue() ) );
+    }
+
+    public static void hasErrorText( TextField tf, String errorText )
+    {
+        Assert.assertThat( tf.getErrorText(), equalTo( errorText ) );
     }
 
 }
