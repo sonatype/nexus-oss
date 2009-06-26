@@ -217,6 +217,8 @@ public class DefaultNexusConfiguration
     public void saveConfiguration()
         throws IOException
     {
+        // TODO: when NEXUS-2215 is fixed, this should be remove/moved/cleaned
+        
         // validate before we do anything
         ValidationRequest request = new ValidationRequest( configurationSource.getConfiguration() );
         ValidationResponse response = configurationValidator.validateModel( request );
