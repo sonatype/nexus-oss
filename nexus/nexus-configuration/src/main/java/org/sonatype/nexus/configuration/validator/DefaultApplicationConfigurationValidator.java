@@ -752,7 +752,7 @@ public class DefaultApplicationConfigurationValidator
 
     protected boolean validateLocalStatus( String ls )
     {
-        return LocalStatus.IN_SERVICE.toString().equals( ls ) || LocalStatus.OUT_OF_SERVICE.equals( ls );
+        return LocalStatus.IN_SERVICE.name().equals( ls ) || LocalStatus.OUT_OF_SERVICE.name().equals( ls );
     }
 
     protected boolean validateRepositoryType( String type )

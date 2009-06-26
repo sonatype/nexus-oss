@@ -50,6 +50,7 @@ import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
+import org.sonatype.nexus.configuration.validator.ValidationRequest;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -216,6 +217,15 @@ public class DefaultNexusConfiguration
     public void saveConfiguration()
         throws IOException
     {
+        // validate before we do anything
+        ValidationRequest request = new ValidationRequest( configurationSource.getConfiguration() );
+        ValidationResponse response = configurationValidator.validateModel( request );
+        if ( !response.isValid() )
+        {
+            this.getLogger().error( "Saving nexus configuration caused unexpected error:\n" + response.toString() );
+            throw new IOException( "Saving nexus configuration caused unexpected error:\n" + response.toString() );
+        }
+
         applyConfiguration();
 
         configurationSource.storeConfiguration();

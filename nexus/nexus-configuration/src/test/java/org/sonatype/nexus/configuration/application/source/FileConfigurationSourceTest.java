@@ -13,10 +13,16 @@
  */
 package org.sonatype.nexus.configuration.application.source;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
+import org.sonatype.nexus.configuration.source.FileConfigurationSource;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.util.FileUtils;
 
 public class FileConfigurationSourceTest
     extends AbstractApplicationConfigurationSourceTest
@@ -91,5 +97,19 @@ public class FileConfigurationSourceTest
         configurationSource = getConfigurationSource();
 
         assertFalse( configurationSource.getDefaultsSource() == null );
+    }
+    
+    public void testNEXUS2212LoadValidConfig()
+        throws Exception
+    {
+        
+        // copy the config into place
+        File nexusConfigFile = FileUtils.getFileFromUrl( ClassLoader.getSystemClassLoader().getResource( "nexus-NEXUS-2212.xml" ).toString() );
+        org.codehaus.plexus.util.FileUtils.copyFile( nexusConfigFile, new File( WORK_HOME, "conf/nexus.xml") );
+        
+        configurationSource = (FileConfigurationSource) getConfigurationSource();
+        configurationSource.loadConfiguration();
+        assertTrue( configurationSource.getValidationResponse().isValid()) ;
+        
     }
 }

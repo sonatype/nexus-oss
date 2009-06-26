@@ -24,8 +24,11 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.io.InputStreamFacade;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.source.FileConfigurationSource;
 
+import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.security.SecuritySystem;
 
@@ -233,4 +236,29 @@ public class DefaultNexusConfigurationTest
         FileUtils.forceDelete( testConfFile );
 
     }
+    
+    
+    public void testNEXUS2212SaveInvalidConfig()
+    throws Exception
+    {
+        nexusConfiguration.loadConfiguration();
+        Configuration nexusConfig  = nexusConfiguration.getConfiguration();
+        
+        CRepository centralCRepo = null;
+        
+        for ( CRepository cRepo : nexusConfig.getRepositories() )
+        {
+            if( cRepo.getId().equals( "central" ))
+            {
+                centralCRepo = cRepo;
+                break;
+            }
+        }
+        
+        assertNotNull( centralCRepo );
+        
+        centralCRepo.setLocalStatus( LocalStatus.OUT_OF_SERVICE.name() );
+        nexusConfiguration.saveConfiguration();
+    }
+    
 }
