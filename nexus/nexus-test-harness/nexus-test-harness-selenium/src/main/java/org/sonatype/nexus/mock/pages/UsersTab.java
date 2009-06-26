@@ -23,15 +23,6 @@ public class UsersTab
             + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
     }
 
-    public UsersTab refresh()
-    {
-        refreshButton.click();
-
-        grid.waitToLoad();
-
-        return this;
-    }
-
     public UserEditTabs select( String userId )
     {
         grid.select( userId );

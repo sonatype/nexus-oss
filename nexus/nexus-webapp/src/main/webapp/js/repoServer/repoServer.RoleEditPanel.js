@@ -465,6 +465,7 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
       layout: 'column',
       autoHeight: true,
       style: 'padding: 10px 0 0 0',
+      name: 'privileges',
       
       items: [
         {

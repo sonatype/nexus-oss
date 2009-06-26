@@ -54,13 +54,6 @@ public class RepositoriesTab
             + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
     }
 
-    public RepositoriesTab refresh()
-    {
-        refreshButton.click();
-
-        return this;
-    }
-
     public RepositoriesEditTabs select( String repoId, RepoKind kind )
     {
         this.grid.waitToLoad();

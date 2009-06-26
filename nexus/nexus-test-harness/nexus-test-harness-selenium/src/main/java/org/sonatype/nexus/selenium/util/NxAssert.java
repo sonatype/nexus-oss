@@ -29,13 +29,23 @@ public class NxAssert
 
     public static void hasErrorText( TwinPanel panel, String errorText )
     {
-        Assert.assertTrue( "TwinPanel should have error: " + errorText, panel.hasErrorText( errorText ) );
+        Assert.assertThat( panel.getErrorText(), equalTo( errorText ) );
     }
 
     @SuppressWarnings( "unchecked" )
     public static void noErrorText( TwinPanel panel )
     {
         Assert.assertThat( panel.getErrorText(), anyOf( equalTo( "null" ), equalTo( "" ), nullValue() ) );
+    }
+
+    public static void valueEqualsTo( TextField field, String value )
+    {
+        Assert.assertThat( field.getValue(), equalTo( value ) );
+    }
+
+    public static void contains( TwinPanel twinPanel, String value )
+    {
+        Assert.assertTrue( twinPanel.containsLeftSide( value ) );
     }
 
 }

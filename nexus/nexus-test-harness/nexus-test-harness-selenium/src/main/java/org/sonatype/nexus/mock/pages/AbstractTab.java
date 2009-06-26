@@ -41,6 +41,12 @@ public class AbstractTab
         return new MessageBox( selenium );
     }
 
+    public void refresh()
+    {
+        this.refreshButton.click();
+
+        this.grid.waitToLoad();
+    }
 
     public Grid getGrid()
     {

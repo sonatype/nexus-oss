@@ -102,4 +102,11 @@ public class MainPage
         return new UsersTab( selenium );
     }
 
+    public RolesTab openRoles()
+    {
+        securityPanel().rolesClick();
+
+        return new RolesTab( selenium );
+    }
+
 }

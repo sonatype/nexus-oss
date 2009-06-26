@@ -120,7 +120,7 @@
     <dependency>
       <groupId>org.seleniumhq.selenium.client-drivers</groupId>
       <artifactId>selenium-java-client-driver</artifactId>
-      <version>1.0</version>
+      <version>1.0.1</version>
       <exclusions>
         <exclusion>
           <groupId>org.seleniumhq.selenium.server</groupId>
@@ -218,7 +218,7 @@
               <dependency>
                 <groupId>org.seleniumhq.selenium.server</groupId>
                 <artifactId>selenium-server</artifactId>
-                <version>1.0</version>
+                <version>1.0.1</version>
                 <classifier>standalone</classifier>
               </dependency>
             </dependencies>
