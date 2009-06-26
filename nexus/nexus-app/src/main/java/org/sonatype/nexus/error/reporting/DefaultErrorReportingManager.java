@@ -24,6 +24,7 @@ import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.swizzle.IssueSubmitter;
 import org.codehaus.plexus.swizzle.JiraIssueSubmitter;
 import org.codehaus.plexus.swizzle.jira.authentication.DefaultAuthenticationSource;
+import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.swizzle.jira.Issue;
 import org.codehaus.swizzle.jira.Jira;
@@ -182,6 +183,7 @@ public class DefaultErrorReportingManager
             nexusConfig );
         File fileListing = getFileListing();
         File contextListing = getContextListing( request.getContext() );
+        File exceptionListing = getExceptionListing( request.getThrowable() );
 
         File zipFile = getZipFile();
 
@@ -197,6 +199,7 @@ public class DefaultErrorReportingManager
             addFileToZip( securityConfigurationXml, zStream, "security-configuration.xml" );
             addFileToZip( fileListing, zStream, "fileListing.txt" );
             addFileToZip( contextListing, zStream, "contextListing.txt" );
+            addFileToZip( exceptionListing, zStream, "exception.txt" );
 
             for ( File confFile : getConfigurationFiles() )
             {
@@ -215,6 +218,7 @@ public class DefaultErrorReportingManager
             deleteFile( securityConfigurationXml );
             deleteFile( fileListing );
             deleteFile( contextListing );
+            deleteFile( exceptionListing );
 
             if ( zStream != null )
             {
@@ -294,6 +298,12 @@ public class DefaultErrorReportingManager
         return writeStringToTempFile(
             FileListingHelper.buildFileListing( nexusConfig.getWorkingDirectory() ),
             "fileListing.txt" );
+    }
+    
+    private File getExceptionListing( Throwable t )
+        throws IOException
+    {
+        return writeStringToTempFile( ExceptionUtils.getFullStackTrace( t ), "exceptionListing.txt" );
     }
 
     private File getContextListing( Map<String, Object> context )

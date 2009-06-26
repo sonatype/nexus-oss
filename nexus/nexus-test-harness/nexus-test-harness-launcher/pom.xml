@@ -41,6 +41,10 @@
               <groupId>${project.groupId}</groupId>
               <artifactId>nexus-simple-memory-realm</artifactId>
             </plugin>
+            <plugin>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>nexus-exception-plugin</artifactId>
+            </plugin>
           </nexusPluginsArtifacts>
         </configuration>
       </plugin>
@@ -258,6 +262,12 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-simple-memory-realm</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-exception-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
 

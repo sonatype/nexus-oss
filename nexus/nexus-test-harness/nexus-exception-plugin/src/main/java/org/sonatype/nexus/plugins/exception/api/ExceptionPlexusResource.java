@@ -1,31 +1,32 @@
-package org.sonatype.nexus.rest.error.reporting;
+package org.sonatype.nexus.plugins.exception.api;
 
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
+import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.sonatype.nexus.error.reporting.ErrorReportRequest;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = PlexusResource.class, hint = "ErrorReportingPlexusResource" )
-public class ErrorReportingPlexusResource
-    extends AbstractNexusPlexusResource
+@Component( role = PlexusResource.class, hint = "ExceptionPlexusResource" )
+public class ExceptionPlexusResource
+    extends AbstractPlexusResource
 {
     @Requirement
     private ErrorReportingManager manager;
     
-    public ErrorReportingPlexusResource()
+    public ExceptionPlexusResource()
     {
-        setReadable( false );
-        setModifiable( true );
+        this.setModifiable( true );
     }
     
     @Override
@@ -38,13 +39,13 @@ public class ErrorReportingPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/error_reporting", "authcBasic,perms[nexus:errorreporting]" );
+        return null;
     }
 
     @Override
     public String getResourceUri()
     {
-        return "/error_reporting";
+        return "/exception";
     }
     
     @Override
@@ -63,9 +64,20 @@ public class ErrorReportingPlexusResource
         {
             getLogger().error( "Unable to assemble bundle.", e );
             
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
         }
         
         return null;
+    }
+    
+    @Override
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
+    {
+        Form form = request.getResourceRef().getQueryAsForm();
+        
+        int requestedStatus = Integer.parseInt( form.getFirstValue( "status" ) );
+        
+        throw new ResourceException( requestedStatus );
     }
 }

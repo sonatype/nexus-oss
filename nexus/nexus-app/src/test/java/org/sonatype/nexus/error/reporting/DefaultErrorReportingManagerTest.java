@@ -131,7 +131,7 @@ public class DefaultErrorReportingManagerTest
         File[] files = unzipDir.listFiles();
         
         assertNotNull( files );
-        assertEquals( 4, files.length );
+        assertEquals( 5, files.length );
     }
     
     private void addBackupFiles( File dir )
