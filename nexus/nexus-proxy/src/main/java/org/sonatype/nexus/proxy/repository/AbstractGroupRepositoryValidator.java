@@ -37,12 +37,13 @@ public abstract class AbstractGroupRepositoryValidator
                     ValidationResponse response = new ApplicationValidationResponse();
 
                     ValidationMessage error =
-                        new ValidationMessage( "repositories", "Repository has incompatible content type",
+                        new ValidationMessage( "repositories", "Repository has incompatible content type (needed='"
+                            + myContentClass + "', got='" + member.getRepositoryContentClass() + "')",
                                                "Invalid content type" );
 
                     response.addValidationError( error );
 
-                    throw new InvalidGroupingException( myContentClass, member.getRepositoryContentClass() );
+                    throw new InvalidConfigurationException( response );
                 }
             }
             catch ( NoSuchRepositoryException e )
