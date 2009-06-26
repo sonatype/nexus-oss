@@ -21,17 +21,18 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
+import org.codehaus.plexus.swizzle.IssueSubmissionResult;
 import org.codehaus.plexus.swizzle.IssueSubmitter;
 import org.codehaus.plexus.swizzle.JiraIssueSubmitter;
 import org.codehaus.plexus.swizzle.jira.authentication.DefaultAuthenticationSource;
 import org.codehaus.plexus.util.ExceptionUtils;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.swizzle.jira.Issue;
 import org.codehaus.swizzle.jira.Jira;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
-import org.sonatype.nexus.util.StackTraceUtil;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 
@@ -53,6 +54,8 @@ public class DefaultErrorReportingManager
     ConfigurationHelper configHelper;
 
     private static final String DEFAULT_USERNAME = "sonatype_problem_reporting";
+    
+    private static final String COMPONENT = "Nexus";
 
     private static final String ERROR_REPORT_DIR = "error-report-bundles";
 
@@ -70,10 +73,13 @@ public class DefaultErrorReportingManager
             
             if ( existingIssues == null )
             {
-                getIssueSubmitter( errorConfig ).submitIssue( subRequest );
+                IssueSubmissionResult result = getIssueSubmitter( errorConfig ).submitIssue( subRequest );
+                renameBundle( subRequest.getProblemReportBundle(), result.getKey() );
+                getLogger().info( "Generated problem report, ticket " + result.getKey() + " was created." );
             }
             else
             {
+                renameBundle( subRequest.getProblemReportBundle(), existingIssues.iterator().next().getKey() );
                 getLogger().info( "Not reporting problem as it already exists in database: " + existingIssues.iterator().next().getLink() );
             }
         }
@@ -130,6 +136,19 @@ public class DefaultErrorReportingManager
         
         return false;
     }
+    
+    protected void renameBundle( File bundle, String jiraTicket ) 
+        throws IOException
+    {
+        if ( StringUtils.isNotEmpty( jiraTicket ) )
+        {
+            String filename = bundle.getAbsolutePath();
+            
+            String newfilename = filename.replace( "nexus-error-bundle", "nexus-error-bundle-" + jiraTicket );
+            
+            FileUtils.rename( bundle, new File( newfilename ) );
+        }
+    }
 
     protected IssueSubmissionRequest buildRequest( CErrorReporting errorConfig, ErrorReportRequest request )
         throws IOException
@@ -139,10 +158,10 @@ public class DefaultErrorReportingManager
         subRequest.setProjectId( errorConfig.getJiraProject() );
         subRequest.setSummary( "Automated Problem Report: " + request.getThrowable().getMessage() );
         subRequest.setDescription( "The following exception occurred: " + System.getProperty( "line.seperator" )
-            + StackTraceUtil.getStackTraceString( request.getThrowable() ) );
+            + ExceptionUtils.getFullStackTrace( request.getThrowable() ) );
         subRequest.setProblemReportBundle( assembleBundle( request ) );
-        subRequest.setReporter( errorConfig.getJiraUsername() );
-        subRequest.setAssignee( errorConfig.getJiraUsername() );
+        subRequest.setReporter( StringUtils.isNotEmpty( errorConfig.getJiraUsername() ) ? errorConfig.getJiraUsername() : DEFAULT_USERNAME );
+        subRequest.setComponent( COMPONENT );
 
         return subRequest;
     }

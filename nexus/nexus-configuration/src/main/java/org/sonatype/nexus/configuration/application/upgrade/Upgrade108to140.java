@@ -240,7 +240,7 @@ public class Upgrade108to140
         CErrorReporting errorReporting = new CErrorReporting();
         errorReporting.setEnabled( false );
         errorReporting.setJiraUrl( "https://issues.sonatype.org" );
-        errorReporting.setJiraProject( "NEXUS" );
+        errorReporting.setJiraProject( "PR" );
         
         newc.setErrorReporting( errorReporting );
 

@@ -359,6 +359,6 @@
   </smtpConfiguration>
   <errorReporting>
     <jiraUrl>https://issues.sonatype.org</jiraUrl>
-    <jiraProject>NEXUS</jiraProject>
+    <jiraProject>PR</jiraProject>
   </errorReporting>
 </nexusConfiguration>

@@ -13,6 +13,7 @@ import java.util.zip.ZipInputStream;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
+import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.swizzle.jira.Issue;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -20,7 +21,6 @@ import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.scheduling.NexusTask;
-import org.sonatype.nexus.util.StackTraceUtil;
 import org.sonatype.scheduling.SchedulerTask;
 
 public class DefaultErrorReportingManagerTest
@@ -50,7 +50,7 @@ public class DefaultErrorReportingManagerTest
         CErrorReporting config = new CErrorReporting();
         config.setEnabled( true );
         config.setJiraUrl( "https://issues.sonatype.org" );
-        config.setJiraProject( "******" );
+        config.setJiraProject( "*****" );
         config.setJiraUsername( "*****" );
         config.setJiraPassword( "*****" );
         
@@ -121,7 +121,7 @@ public class DefaultErrorReportingManagerTest
         assertEquals( "NEXUS", subRequest.getProjectId() );
         assertEquals( "Automated Problem Report: Test exception", subRequest.getSummary() );
         assertEquals( "The following exception occurred: " + System.getProperty( "line.seperator" )
-            + StackTraceUtil.getStackTraceString( exception ), subRequest.getDescription() );
+            + ExceptionUtils.getFullStackTrace( exception ), subRequest.getDescription() );
         assertNotNull( subRequest.getProblemReportBundle() );
         
         extractZipFile( subRequest.getProblemReportBundle(), unzipDir );
