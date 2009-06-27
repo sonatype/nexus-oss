@@ -46,14 +46,22 @@
       <artifactId>plugin-gleaner</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-host-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-model-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-host-api</artifactId>
     </dependency>
 
 

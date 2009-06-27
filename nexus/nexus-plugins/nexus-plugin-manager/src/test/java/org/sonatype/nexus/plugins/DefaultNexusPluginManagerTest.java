@@ -28,6 +28,12 @@ public class DefaultNexusPluginManagerTest
         assertTrue( "The map should grow!", customizersPre < customizersPost );
         assertTrue( "The map should grow!", processorsPre < processorsPost );
 
+        // lookup the virus customizer from plugin
+        //Object virusScanner =
+        //    lookup( "org.sonatype.nexus.plugins.RepositoryCustomizer",
+        //            "org.sonatype.nexus.plugins.sample.virusscanner.VirusScannerRepositoryCustomizer" );
+        //assertNotNull( virusScanner );
+
         // now destroy
         PluginResponse presponse =
             nexusPluginManager.deactivatePlugin( pmresponse.getProcessedPluginCoordinates().get( 0 ) );

@@ -2,7 +2,7 @@ package org.sonatype.nexus.plugins;
 
 import java.util.List;
 
-import org.sonatype.nexus.plugins.model.PluginMetadata;
+import org.sonatype.plugins.model.PluginMetadata;
 
 public interface InterPluginDependencyResolver
 {

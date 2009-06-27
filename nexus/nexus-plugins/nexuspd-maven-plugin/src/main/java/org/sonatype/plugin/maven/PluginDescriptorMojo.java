@@ -10,7 +10,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.sonatype.plexus.plugin.ExtensionPoint;
+import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.plugin.Managed;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugin.metadata.PluginMetadataGenerationRequest;
@@ -30,7 +30,7 @@ public class PluginDescriptorMojo
     /**
      * The output location for the generated plugin descriptor.
      * 
-     * @parameter default-value="${project.build.outputDirectory}/META-INF/plugin.xml"
+     * @parameter default-value="${project.build.outputDirectory}/META-INF/nexus/plugin.xml"
      * @required
      */
     private File generatedPluginMetadata;

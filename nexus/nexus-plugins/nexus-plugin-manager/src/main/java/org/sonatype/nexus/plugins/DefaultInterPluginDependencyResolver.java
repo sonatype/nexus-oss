@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.plugins.model.PluginDependency;
-import org.sonatype.nexus.plugins.model.PluginMetadata;
+import org.sonatype.plugins.model.PluginDependency;
+import org.sonatype.plugins.model.PluginMetadata;
 
 @Component( role = InterPluginDependencyResolver.class )
 public class DefaultInterPluginDependencyResolver
@@ -16,9 +16,9 @@ public class DefaultInterPluginDependencyResolver
         throws NoSuchPluginException
     {
         ArrayList<PluginCoordinates> result =
-            new ArrayList<PluginCoordinates>( pluginMetadata.getDependencies().size() );
+            new ArrayList<PluginCoordinates>( pluginMetadata.getPluginDependencies().size() );
 
-        for ( PluginDependency dependency : (List<PluginDependency>) pluginMetadata.getDependencies() )
+        for ( PluginDependency dependency : (List<PluginDependency>) pluginMetadata.getPluginDependencies() )
         {
             PluginCoordinates depCoord =
                 new PluginCoordinates( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
@@ -33,7 +33,7 @@ public class DefaultInterPluginDependencyResolver
             }
             else
             {
-                // RECURSION, SOLVE THIS IN MORE ELGANT WAY
+                // RECURSION, SOLVE THIS IN MORE ELEGANT WAY
                 PluginResponse response = nexusPluginManager.activatePlugin( depCoord );
 
                 if ( !response.isSuccesful() )

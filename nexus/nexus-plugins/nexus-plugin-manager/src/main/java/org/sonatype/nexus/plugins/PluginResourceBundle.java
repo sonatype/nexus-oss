@@ -7,8 +7,6 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.plugins.PluginStaticResource.PluginStaticResourceModel;
-import org.sonatype.nexus.plugins.model.PluginResource;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 
@@ -32,15 +30,9 @@ public class PluginResourceBundle
     {
         ArrayList<PluginStaticResourceModel> models = new ArrayList<PluginStaticResourceModel>();
 
-        if ( !pd.getPluginMetadata().getResources().isEmpty() )
+        if ( !pd.getPluginStaticResourceModels().isEmpty() )
         {
-            for ( PluginResource res : (List<PluginResource>) pd.getPluginMetadata().getResources() )
-            {
-                PluginStaticResourceModel model =
-                    new PluginStaticResourceModel( res.getResourcePath(), res.getPublishedPath(), res.getContentType() );
-
-                models.add( model );
-            }
+            models.addAll( pd.getPluginStaticResourceModels() );
         }
 
         return models;

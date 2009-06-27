@@ -23,10 +23,8 @@ import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphEx
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.ComponentRepository;
-import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.context.ContextMapAdapter;
 import org.codehaus.plexus.logging.Logger;
@@ -35,21 +33,17 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
-import org.sonatype.nexus.plugins.model.ExtensionComponent;
-import org.sonatype.nexus.plugins.model.PluginDependency;
-import org.sonatype.nexus.plugins.model.PluginMetadata;
-import org.sonatype.nexus.plugins.model.RepositoryType;
-import org.sonatype.nexus.plugins.model.UserComponent;
-import org.sonatype.nexus.plugins.model.io.xpp3.NexusPluginXpp3Reader;
 import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plugin.metadata.plexus.PlexusComponentGleaner;
+import org.sonatype.plugin.metadata.plexus.PlexusComponentGleanerRequest;
+import org.sonatype.plugins.model.PluginDependency;
+import org.sonatype.plugins.model.PluginMetadata;
+import org.sonatype.plugins.model.io.xpp3.PluginModelXpp3Reader;
 
 /**
  * We have multiple showstoppers here (mercury, shane's model, transitive hull, etc), so we are going for simple stuff:
@@ -98,6 +92,9 @@ public class DefaultNexusPluginManager
     @Requirement
     private InterPluginDependencyResolver interPluginDependencyResolver;
 
+    @Requirement
+    private PlexusComponentGleaner plexusComponentGleaner;
+
     private final Map<String, PluginDescriptor> pluginDescriptors = new HashMap<String, PluginDescriptor>();
 
     protected Logger getLogger()
@@ -123,12 +120,15 @@ public class DefaultNexusPluginManager
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger()
-                    .debug( "Cannot find ComponentRepository in plexus context! Are we running in a PlexusTestCase?", e );
+                           .debug(
+                                   "Cannot find ComponentRepository in plexus context! Are we running in a PlexusTestCase?",
+                                   e );
             }
             else
             {
                 getLogger()
-                    .info( "Cannot find ComponentRepository in plexus context! Are we running in a PlexusTestCase?" );
+                           .info(
+                                  "Cannot find ComponentRepository in plexus context! Are we running in a PlexusTestCase?" );
             }
         }
     }
@@ -333,7 +333,7 @@ public class DefaultNexusPluginManager
                 InterpolationFilterReader interpolationFilterReader =
                     new InterpolationFilterReader( reader, new ContextMapAdapter( plexusContainer.getContext() ) );
 
-                NexusPluginXpp3Reader pdreader = new NexusPluginXpp3Reader();
+                PluginModelXpp3Reader pdreader = new PluginModelXpp3Reader();
 
                 PluginMetadata md = pdreader.read( interpolationFilterReader );
 
@@ -467,7 +467,7 @@ public class DefaultNexusPluginManager
 
         // add inter-plugin dependencies
         for ( PluginDependency dep : (List<PluginDependency>) pluginDiscoveryContext.getPluginMetadata()
-            .getDependencies() )
+                                                                                    .getPluginDependencies() )
         {
             ComponentDependency cd = new ComponentDependency();
 
@@ -497,144 +497,49 @@ public class DefaultNexusPluginManager
         result.getImportedPlugins().addAll( pluginDiscoveryContext.getImportedPlugins() );
 
         // and do conversion
-        convertPluginMetadata( result, pluginDiscoveryContext.getPluginMetadata() );
+        convertPluginMetadata( result, pluginDiscoveryContext );
 
         return result;
     }
 
-    @SuppressWarnings( "unchecked" )
-    protected void convertPluginMetadata( PluginDescriptor csd, PluginMetadata pd )
+    protected void convertPluginMetadata( PluginDescriptor csd, PluginDiscoveryContext pluginDiscoveryContext )
+        throws PlexusConfigurationException
     {
-        // plugin entry point, if any
-        if ( pd.getPlugin() != null )
+        try
         {
-            ComponentDescriptor<NexusPlugin> plugin = new ComponentDescriptor<NexusPlugin>();
+            ComponentDescriptor<?> componentDescriptor = null;
 
-            plugin.setRole( NexusPlugin.class.getName() );
-
-            plugin.setRoleHint( csd.getPluginCoordinates().getPluginKey() );
-
-            plugin.setDescription( pd.getDescription() );
-
-            plugin.setImplementation( pd.getPlugin().getImplementation() );
-
-            addRequirementsIfNeeded( plugin, pd.getPlugin().getRequirements() );
-
-            csd.addComponentDescriptor( plugin );
-
-            getLogger().debug( "... ... adding NexusPlugin: " + plugin.getImplementation() );
-        }
-
-        // extension points, if any
-        if ( !pd.getExtensions().isEmpty() )
-        {
-            for ( ExtensionComponent ext : (List<ExtensionComponent>) pd.getExtensions() )
+            for ( String className : pluginDiscoveryContext.getExports() )
             {
-                // TEMPLATES! This is not good
-                ComponentDescriptor<Object> extd = new ComponentDescriptor<Object>();
+                PlexusComponentGleanerRequest request =
+                    new PlexusComponentGleanerRequest( className, pluginDiscoveryContext.getPluginRealm() );
 
-                extd.setRole( ext.getExtensionPoint() );
+                componentDescriptor = plexusComponentGleaner.glean( request );
 
-                if ( StringUtils.isNotBlank( ext.getQualifier() ) )
+                if ( componentDescriptor != null )
                 {
-                    extd.setRoleHint( ext.getQualifier() );
+                    getLogger().debug(
+                                       "... ... adding component role=\"" + componentDescriptor.getRole()
+                                           + "\", hint=\"" + componentDescriptor.getRoleHint() + "\"" );
+
+                    csd.addComponentDescriptor( componentDescriptor );
                 }
-                else
-                {
-                    extd.setRoleHint( ext.getImplementation() );
-                }
-
-                extd.setImplementation( ext.getImplementation() );
-
-                if ( !ext.isIsSingleton() )
-                {
-                    extd.setInstantiationStrategy( "per-lookup" );
-                }
-
-                addRequirementsIfNeeded( extd, ext.getRequirements() );
-
-                csd.addComponentDescriptor( extd );
-
-                getLogger().debug(
-                                   "... ... adding ExtensionPoint (role='" + extd.getRole() + "', hint='"
-                                       + extd.getRoleHint() + "'): " + ext.getImplementation() );
             }
         }
-
-        // managed user components, if any
-        if ( !pd.getComponents().isEmpty() )
+        catch ( Exception e )
         {
-            for ( UserComponent cmp : (List<UserComponent>) pd.getComponents() )
-            {
-                ComponentDescriptor<Object> cmpd = new ComponentDescriptor<Object>();
-
-                cmpd.setRole( cmp.getComponentContract() );
-
-                if ( StringUtils.isNotBlank( cmp.getQualifier() ) )
-                {
-                    cmpd.setRoleHint( cmp.getQualifier() );
-                }
-
-                cmpd.setImplementation( cmp.getImplementation() );
-
-                if ( !cmp.isIsSingleton() )
-                {
-                    cmpd.setInstantiationStrategy( "per-lookup" );
-                }
-
-                addRequirementsIfNeeded( cmpd, cmp.getRequirements() );
-
-                csd.addComponentDescriptor( cmpd );
-
-                getLogger().debug(
-                                   "... ... adding user component (role='" + cmpd.getRole() + "', hint='"
-                                       + cmpd.getRoleHint() + "'): " + cmpd.getImplementation() );
-            }
+            throw new PlexusConfigurationException( "Unable to discover components!", e );
         }
 
-        // resources, if any
-        if ( !pd.getResources().isEmpty() )
-        {
-            ComponentDescriptor<Object> resd = new ComponentDescriptor<Object>();
-
-            resd.setRole( NexusResourceBundle.class.getName() );
-
-            resd.setRoleHint( csd.getPluginCoordinates().getPluginKey() );
-
-            resd.setImplementation( PluginResourceBundle.class.getName() );
-
-            XmlPlexusConfiguration config = new XmlPlexusConfiguration();
-
-            config.addChild( "pluginKey" ).setValue( csd.getPluginCoordinates().getPluginKey() );
-
-            resd.setConfiguration( config );
-
-            csd.addComponentDescriptor( resd );
-        }
-    }
-
-    protected void addRequirementsIfNeeded( ComponentDescriptor<?> component,
-                                            List<org.sonatype.nexus.plugins.model.ComponentRequirement> reqs )
-    {
-        if ( reqs != null && !reqs.isEmpty() )
-        {
-            ArrayList<ComponentRequirement> result = new ArrayList<ComponentRequirement>( reqs.size() );
-
-            for ( org.sonatype.nexus.plugins.model.ComponentRequirement req : reqs )
-            {
-                ComponentRequirement reqd = new ComponentRequirement();
-
-                reqd.setFieldName( req.getFieldName() );
-
-                reqd.setRole( req.getComponentContract() );
-
-                reqd.setRoleHint( req.getQualifier() );
-
-                result.add( reqd );
-            }
-
-            component.addRequirements( result );
-        }
+        // FIXME: resolve resources
+        /*
+         * // resources, if any if ( !pd.getResources().isEmpty() ) { ComponentDescriptor<Object> resd = new
+         * ComponentDescriptor<Object>(); resd.setRole( NexusResourceBundle.class.getName() ); resd.setRoleHint(
+         * csd.getPluginCoordinates().getPluginKey() ); resd.setImplementation( PluginResourceBundle.class.getName() );
+         * XmlPlexusConfiguration config = new XmlPlexusConfiguration(); config.addChild( "pluginKey" ).setValue(
+         * csd.getPluginCoordinates().getPluginKey() ); resd.setConfiguration( config ); csd.addComponentDescriptor(
+         * resd ); }
+         */
     }
 
     // ==
@@ -661,17 +566,14 @@ public class DefaultNexusPluginManager
         }
 
         // register new repo types
-        for ( RepositoryType repoType : (List<RepositoryType>) pluginDescriptor.getPluginMetadata()
-            .getRepositoryTypes() )
-        {
-            RepositoryTypeDescriptor repoTypeDescriptor = new RepositoryTypeDescriptor();
-
-            repoTypeDescriptor.setRole( repoType.getComponentContract() );
-
-            repoTypeDescriptor.setPrefix( repoType.getPathPrefix() );
-
-            repositoryTypeRegistry.getRepositoryTypeDescriptors().add( repoTypeDescriptor );
-        }
+        // FIXME: implement this
+        /*
+         * for ( RepositoryType repoType : (List<RepositoryType>) pluginDescriptor.getPluginMetadata()
+         * .getRepositoryTypes() ) { RepositoryTypeDescriptor repoTypeDescriptor = new RepositoryTypeDescriptor();
+         * repoTypeDescriptor.setRole( repoType.getComponentContract() ); repoTypeDescriptor.setPrefix(
+         * repoType.getPathPrefix() ); repositoryTypeRegistry.getRepositoryTypeDescriptors().add( repoTypeDescriptor );
+         * }
+         */
 
         // add it to "known" plugins
         if ( !pluginDescriptors.containsKey( pluginDescriptor.getPluginCoordinates().getPluginKey() ) )

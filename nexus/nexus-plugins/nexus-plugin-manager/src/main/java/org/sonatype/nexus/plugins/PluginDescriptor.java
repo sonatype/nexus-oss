@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
-import org.sonatype.nexus.plugins.model.PluginMetadata;
+import org.sonatype.plugins.model.PluginMetadata;
 
 public class PluginDescriptor
     extends ComponentSetDescriptor
@@ -19,6 +19,8 @@ public class PluginDescriptor
     private List<String> exports;
 
     private List<PluginDescriptor> importedPlugins;
+
+    private List<PluginStaticResourceModel> pluginStaticResourceModels;
 
     public PluginCoordinates getPluginCoordinates()
     {
@@ -68,5 +70,15 @@ public class PluginDescriptor
         }
 
         return importedPlugins;
+    }
+
+    public List<PluginStaticResourceModel> getPluginStaticResourceModels()
+    {
+        if ( pluginStaticResourceModels == null )
+        {
+            pluginStaticResourceModels = new ArrayList<PluginStaticResourceModel>();
+        }
+        
+        return pluginStaticResourceModels;
     }
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.sonatype.nexus.plugins.model.PluginMetadata;
+import org.sonatype.plugins.model.PluginMetadata;
 
 public class PluginDiscoveryContext
 {

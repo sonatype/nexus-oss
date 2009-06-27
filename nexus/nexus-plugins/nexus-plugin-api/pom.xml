@@ -46,44 +46,4 @@
 
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>plugin.xml</id>
-            <goals>
-              <goal>java</goal>
-              <goal>xpp3-reader</goal>
-              <goal>xpp3-writer</goal>
-            </goals>
-            <configuration>
-              <useJava5>true</useJava5>
-              <version>1.0.0</version>
-              <models>
-                <model>src/main/mdo/plugin.xml</model>
-              </models>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

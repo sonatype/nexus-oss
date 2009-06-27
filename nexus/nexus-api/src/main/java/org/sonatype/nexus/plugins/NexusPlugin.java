@@ -1,5 +1,7 @@
 package org.sonatype.nexus.plugins;
 
+import javax.inject.Singleton;
+
 import org.sonatype.plugin.ExtensionPoint;
 
 /**
@@ -9,6 +11,7 @@ import org.sonatype.plugin.ExtensionPoint;
  * @author cstamas
  */
 @ExtensionPoint
+@Singleton
 public interface NexusPlugin
 {
     /**
