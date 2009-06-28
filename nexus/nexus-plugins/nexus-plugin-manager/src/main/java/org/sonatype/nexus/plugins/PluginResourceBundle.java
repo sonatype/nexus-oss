@@ -25,7 +25,6 @@ public class PluginResourceBundle
     @Configuration( "pluginKey" )
     private String pluginKey;
 
-    @SuppressWarnings( "unchecked" )
     protected List<PluginStaticResourceModel> getStaticResourceModels( PluginDescriptor pd )
     {
         ArrayList<PluginStaticResourceModel> models = new ArrayList<PluginStaticResourceModel>();

@@ -79,6 +79,13 @@ public class PluginDescriptorMojo
      */
     private List<String> pluginDependencies;
 
+    /**
+     * The list of user defined MIME types
+     * 
+     * @parameter
+     */
+    private List<String> userMimeTypes;
+
     /** @component */
     private PluginMetadataGenerator metadataGenerator;
 

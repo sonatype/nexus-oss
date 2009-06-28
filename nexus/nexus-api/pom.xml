@@ -135,6 +135,11 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome</artifactId>
+    </dependency>
+
     <!-- Testing -->
     <dependency>
       <groupId>junit</groupId>
