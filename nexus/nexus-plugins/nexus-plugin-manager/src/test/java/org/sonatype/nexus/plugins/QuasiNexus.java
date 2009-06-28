@@ -30,7 +30,7 @@ public class QuasiNexus
         PluginManagerResponse pmresponse = nexusPluginManager.activateInstalledPlugins();
 
         
-        TestCase.assertEquals( "One plugin should be discovered!", 1, pmresponse.getProcessedPluginResponses().size() );
+        TestCase.assertEquals( "One plugin should be discovered!", 2, pmresponse.getProcessedPluginResponses().size() );
         TestCase.assertEquals( "Should be okay!", RequestResult.COMPLETELY_EXECUTED, pmresponse.getResult() );
 
         // record post-discovery state

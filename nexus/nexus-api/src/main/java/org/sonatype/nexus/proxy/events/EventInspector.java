@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import javax.inject.Singleton;
+
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plugin.ExtensionPoint;
 
@@ -22,6 +24,7 @@ import org.sonatype.plugin.ExtensionPoint;
  * @author cstamas
  */
 @ExtensionPoint
+@Singleton
 public interface EventInspector
 {
     boolean accepts( Event<?> evt );

@@ -39,7 +39,8 @@ public class DefaultNexusPluginManagerTest
         // lookup the collector from other plugin
         Object infectedFilesCollectorFeedSource =
             lookup( "org.sonatype.nexus.rest.feeds.sources.FeedSource",
-                    "org.sonatype.nexus.plugin.samples.interdep.InfectedItemsFeedSource" );
+                    "infectedItems" );
+        assertNotNull( infectedFilesCollectorFeedSource );
 
         // now destroy
         PluginResponse presponse1 =
