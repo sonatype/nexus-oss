@@ -41,6 +41,7 @@ public abstract class AbstractIndexPlexusResource
     @Requirement
     private IndexerManager indexerManager;
 
+    protected static final int MAX_RESULTS = 500; 
     @Override
     public Object getPayloadInstance()
     {
@@ -96,6 +97,12 @@ public abstract class AbstractIndexPlexusResource
                 count = null;
             }
         }
+        
+        // Don't allow queries to generate more that MAX_RESULTS results
+        if ( count == null || count > MAX_RESULTS )
+        {
+            count = MAX_RESULTS;
+        }
 
         FlatSearchResponse searchResult = null;
 
@@ -143,9 +150,11 @@ public abstract class AbstractIndexPlexusResource
         SearchResponse result = new SearchResponse();
 
         if ( searchResult != null )
-        {
+        {            
             // non-identify search happened
-            result.setTooManyResults( searchResult.getTotalHits() == -1 );
+            boolean tooManyResults = searchResult.getTotalHits() == -1 || searchResult.getResults().size() >= MAX_RESULTS;
+            
+            result.setTooManyResults( tooManyResults );
 
             result.setTotalCount( searchResult.getTotalHits() );
 
@@ -153,7 +162,14 @@ public abstract class AbstractIndexPlexusResource
 
             result.setCount( count == null ? -1 : count.intValue() );
 
-            result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
+            if ( tooManyResults )
+            {
+                result.setData( new ArrayList<NexusArtifact>() );
+            }
+            else
+            {
+                result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
+            }
         }
         else if ( na != null )
         {
