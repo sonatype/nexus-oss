@@ -14,7 +14,6 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.thoughtworks.xstream.XStream;
-import junit.framework.AssertionFailedError;
 
 public class ProxyPlexusResource
     implements ManagedPlexusResource
@@ -52,9 +51,6 @@ public class ProxyPlexusResource
         else
         {
             response.setStatus( mr.getStatus() );
-
-            // delete neglects payload to return
-            // return mr.getResponse();
         }
     }
 
@@ -69,10 +65,13 @@ public class ProxyPlexusResource
         }
         else
         {
-            try {
-                mr.setPayload(payload);
-            } catch (AssertionFailedError assertionFailedError) {
-                mr.setAssertionFailure(assertionFailedError);
+            try
+            {
+                mr.setPayload( payload );
+            }
+            catch ( AssertionError assertionFailedError )
+            {
+                mr.setAssertionFailure( assertionFailedError );
             }
             response.setStatus( mr.getStatus() );
 
@@ -91,6 +90,14 @@ public class ProxyPlexusResource
         }
         else
         {
+            try
+            {
+                mr.setPayload( payload );
+            }
+            catch ( AssertionError assertionFailedError )
+            {
+                mr.setAssertionFailure( assertionFailedError );
+            }
             response.setStatus( mr.getStatus() );
 
             return mr.getResponse();
@@ -165,4 +172,5 @@ public class ProxyPlexusResource
     {
         return plexusResource.isReadable();
     }
+
 }

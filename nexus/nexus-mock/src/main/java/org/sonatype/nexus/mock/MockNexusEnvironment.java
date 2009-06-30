@@ -95,11 +95,11 @@ public class MockNexusEnvironment
             realm.setParentRealm( cw.getRealm( "default" ) );
 
             // create one
-            ContainerConfiguration cc =
-                new DefaultContainerConfiguration().setClassWorld( cw ).setContainerConfigurationURL(
-                                                                                                      Class.class.getResource( "/plexus/plexus.xml" ) ).setContext(
-                                                                                                                                                                    createContainerContext() ).addComponentDiscoveryListener(
-                                                                                                                                                                                                                              new InhibitingComponentDiscovererListener() );
+            ContainerConfiguration cc = new DefaultContainerConfiguration();
+            cc.setClassWorld( cw );
+            cc.setContainerConfigurationURL( Class.class.getResource( "/plexus/plexus.xml" ) );
+            cc.setContext( createContainerContext() );
+            cc.addComponentDiscoveryListener( new InhibitingComponentDiscovererListener() );
 
             plexusContainer = new DefaultPlexusContainer( cc );
         }
@@ -120,10 +120,10 @@ public class MockNexusEnvironment
 
         containerContext.put( "index.template.file", "templates/index-debug.vm" );
 
-
         // for EHCache component
         System.setProperty( "nexus.home", new File( "target/nexus-work" ).getAbsolutePath() );
-        System.setProperty( "plexus.log4j-prop-file", new File( "target/test-classes/log4j.properties" ).getAbsolutePath() );
+        System.setProperty( "plexus.log4j-prop-file",
+                            new File( "target/test-classes/log4j.properties" ).getAbsolutePath() );
 
         return containerContext;
     }

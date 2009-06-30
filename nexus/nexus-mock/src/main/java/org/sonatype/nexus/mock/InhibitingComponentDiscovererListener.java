@@ -13,12 +13,13 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * Rude listener implementation that: inhibits Nexus and all PlexusResource components from nexus-rest-api
- * 
+ *
  * @author cstamas
  */
 public class InhibitingComponentDiscovererListener
     implements ComponentDiscoveryListener
 {
+    @SuppressWarnings("unchecked")
     public void componentDiscovered( ComponentDiscoveryEvent event )
     {
         ComponentSetDescriptor set = event.getComponentSetDescriptor();
