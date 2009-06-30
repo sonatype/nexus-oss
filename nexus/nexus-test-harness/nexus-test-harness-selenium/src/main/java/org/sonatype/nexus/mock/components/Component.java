@@ -72,6 +72,11 @@ public class Component
     {
         String fullExpr = getExpression() + expr;
 
+        waitEvalTrue( fullExpr );
+    }
+
+    protected void waitEvalTrue( String fullExpr )
+    {
         for ( int second = 0;; second++ )
         {
             if ( second >= 15 )

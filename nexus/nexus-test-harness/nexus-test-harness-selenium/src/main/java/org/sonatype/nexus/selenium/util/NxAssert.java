@@ -61,4 +61,12 @@ public class NxAssert
         Assert.assertThat( tf.getErrorText(), equalTo( errorText ) );
     }
 
+    public static void requiredField( Combobox cb, int i )
+    {
+        cb.setValue( "" );
+        hasErrorText( cb, THIS_FIELD_IS_REQUIRED );
+        cb.select( i );
+        noErrorText( cb );
+    }
+
 }

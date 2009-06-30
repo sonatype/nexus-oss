@@ -45,14 +45,18 @@ public class ScheduleGrid
 
     public SchedulesConfigFormTab newTask()
     {
+        schedulesConfigTab.getScheduleGrid().waitToLoad();
+
         addButton.click();
 
         return new SchedulesConfigFormTab( selenium );
     }
 
-    public ScheduleGrid getRefresh()
+    public ScheduleGrid refresh()
     {
         getRefreshButton().click();
+
+        waitToLoad();
 
         return this;
     }

@@ -51,6 +51,8 @@ public class SchedulesConfigFormTab
     {
         saveButton.click();
 
+        waitEvalTrue( "window.Ext.Msg.isVisible() == false" );
+
         return this;
     }
 
@@ -82,6 +84,11 @@ public class SchedulesConfigFormTab
     public Button getCancelButton()
     {
         return cancelButton;
+    }
+
+    public void cancel()
+    {
+        this.cancelButton.click();
     }
 
 }
