@@ -53,6 +53,7 @@ public class EnvironmentMojo
 {
 
     /** @component */
+    @SuppressWarnings("unused")
     private org.apache.maven.artifact.factory.ArtifactFactory artifactFactory;
 
     /** @component */
@@ -185,7 +186,7 @@ public class EnvironmentMojo
 
         Artifact bundle = getMavenArtifact( nexusBundleArtifact );
 
-        if( !this.markerExist( "bundle" ) )
+        if ( !this.markerExist( "bundle" ) )
         {
             unpack( bundle.getFile(), destination, bundle.getType() );
             this.createMarkerFile( "bundle" );
@@ -197,7 +198,6 @@ public class EnvironmentMojo
 
         // conf dir
         project.getProperties().put( "application-conf", getPath( new File( destination, "nexus-work-dir/conf" ) ) );
-
 
         copyUrl( "/default-config/plexus.properties", new File( nexusBaseDir, "conf/plexus.properties" ) );
         project.getProperties().put( "nexus-plexus-config-file", getPath( new File( nexusBaseDir, "conf/plexus.xml" ) ) );
@@ -245,7 +245,8 @@ public class EnvironmentMojo
 
             copyUrl( "/default-config/nexus.xml", new File( defaultConfig, "nexus.xml" ) );
             copyUrl( "/default-config/security.xml", new File( defaultConfig, "security.xml" ) );
-            copyUrl( "/default-config/security-configuration.xml", new File( defaultConfig, "security-configuration.xml" ) );
+            copyUrl( "/default-config/security-configuration.xml", new File( defaultConfig,
+                                                                             "security-configuration.xml" ) );
             copyUrl( "/default-config/settings.xml", new File( defaultConfig, "settings.xml" ) );
             copyUrl( "/default-config/log4j.properties", new File( defaultConfig, "log4j.properties" ) );
 
@@ -254,19 +255,20 @@ public class EnvironmentMojo
             {
                 copyAndInterpolate( sourceDefaultConfig, defaultConfig );
             }
-
-            File baseTestProperties = new File( project.getBuild().getTestOutputDirectory(), "baseTest.properties" );
-            copyUrl( "/default-config/baseTest.properties", baseTestProperties );
-
-            File testSuiteProperties = new File( resourcesSourceLocation, "baseTest.properties" );
-            if ( testSuiteProperties.isFile() )
-            {
-                merge( baseTestProperties, testSuiteProperties, "properties" );
-            }
-
-            addProjectProperties( baseTestProperties );
-
         }
+
+        // start baseTest.properties
+        File baseTestProperties = new File( project.getBuild().getTestOutputDirectory(), "baseTest.properties" );
+        copyUrl( "/default-config/baseTest.properties", baseTestProperties );
+
+        File testSuiteProperties = new File( resourcesSourceLocation, "baseTest.properties" );
+        if ( testSuiteProperties.isFile() )
+        {
+            merge( baseTestProperties, testSuiteProperties, "properties" );
+        }
+
+        addProjectProperties( baseTestProperties );
+        // end baseTest.properties
 
         if ( extraResourcesArtifacts != null )
         {
@@ -287,23 +289,20 @@ public class EnvironmentMojo
     private void deleteHiddenFolders( File directory, boolean recursive )
         throws IOException
     {
-        if ( directory != null
-            && directory.isDirectory()
-            && directory.exists() )
+        if ( directory != null && directory.isDirectory() && directory.exists() )
         {
-            File[] files = directory.listFiles(
-                new FileFilter() {
-                    public boolean accept( File pathname )
+            File[] files = directory.listFiles( new FileFilter()
+            {
+                public boolean accept( File pathname )
+                {
+                    if ( pathname.isDirectory() )
                     {
-                        if ( pathname.isDirectory() )
-                        {
-                            return true;
-                        }
-
-                        return false;
+                        return true;
                     }
+
+                    return false;
                 }
-            );
+            } );
 
             for ( File file : files )
             {
@@ -538,7 +537,7 @@ public class EnvironmentMojo
     {
         Artifact artifact = getMavenArtifact( mavenArtifact );
 
-        if( !this.markerExist(  "maven" ))
+        if ( !this.markerExist( "maven" ) )
         {
             unpack( artifact.getFile(), mavenLocation, artifact.getType() );
             this.createMarkerFile( "maven" );
@@ -729,27 +728,27 @@ public class EnvironmentMojo
 
     private boolean markerExist( String markerName )
     {
-        File marker = new File( project.getBuild().getDirectory(), markerName +".marker");
+        File marker = new File( project.getBuild().getDirectory(), markerName + ".marker" );
         return marker.exists();
     }
 
     private void createMarkerFile( String markerName )
     {
-        File marker = new File( project.getBuild().getDirectory(), markerName +".marker");
-            try
+        File marker = new File( project.getBuild().getDirectory(), markerName + ".marker" );
+        try
         {
             if ( !marker.createNewFile() )
             {
                 this.getLog().warn(
-                    "Failed to create marker file: " + marker.getAbsolutePath()
-                        + " bundle will be extracted every time you run the build." );
+                                    "Failed to create marker file: " + marker.getAbsolutePath()
+                                        + " bundle will be extracted every time you run the build." );
             }
         }
         catch ( IOException e )
         {
             this.getLog().warn(
-                "Failed to create marker file: " + marker.getAbsolutePath()
-                    + " bundle will be extracted every time you run the build." );
+                                "Failed to create marker file: " + marker.getAbsolutePath()
+                                    + " bundle will be extracted every time you run the build." );
         }
     }
 
