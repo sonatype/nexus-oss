@@ -196,7 +196,7 @@ public class DefaultSnapshotRemover
         repository.expireCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
 
         RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor = new RecreateMavenMetadataWalkerProcessor( getLogger() );
-
+        
         for ( String path : request.getMetadataRebuildPaths() )
         {
             DefaultWalkerContext ctxMd =
@@ -353,44 +353,44 @@ public class DefaultSnapshotRemover
 
                         item.getItemContext().put( Gav.class.getName(), gav );
 
-                        long itemTimestamp = System.currentTimeMillis();
-
-                        getLogger().debug( "NOW is " + itemTimestamp );
-
                         if ( gav.getSnapshotTimeStamp() != null )
                         {
                             getLogger().debug( "Using GAV snapshot timestamp" );
 
-                            itemTimestamp = gav.getSnapshotTimeStamp().longValue();
-                        }
-                        else
-                        {
-                            getLogger().debug( "GAV Snapshot timestamp not available, using item.getCreated()" );
-
-                            itemTimestamp = item.getCreated();
-                        }
-
-                        // If this timestamp is already marked to be removed, junk it
-                        if ( versionsToRemove.contains( new Long( itemTimestamp ) ) )
-                        {
-                            addStorageFileItemToMap( deletableSnapshotsAndFiles, gav, (StorageFileItem) item );
-                        }
-                        else
-                        {
-                            getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateTreshold=" + dateThreshold );
-
-                            // if dateTreshold is not used (zero days) OR
-                            // if itemTimestamp is less then dateTreshold (NB: both are positive!)
-                            // below will the retentionCount overrule if needed this
-                            if ( -1 == dateThreshold || itemTimestamp < dateThreshold )
+                            long itemTimestamp = gav.getSnapshotTimeStamp().longValue();
+                            
+                            getLogger().debug( "NOW is " + itemTimestamp );
+                            
+                            // If this timestamp is already marked to be removed, junk it
+                            if ( versionsToRemove.contains( new Long( itemTimestamp ) ) )
                             {
-                                versionsToRemove.add( new Long( itemTimestamp ) );
                                 addStorageFileItemToMap( deletableSnapshotsAndFiles, gav, (StorageFileItem) item );
                             }
                             else
                             {
-                                addStorageFileItemToMap( remainingSnapshotsAndFiles, gav, (StorageFileItem) item );
+                                getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateTreshold=" + dateThreshold );
+    
+                                // if dateTreshold is not used (zero days) OR
+                                // if itemTimestamp is less then dateTreshold (NB: both are positive!)
+                                // below will the retentionCount overrule if needed this
+                                if ( -1 == dateThreshold || itemTimestamp < dateThreshold )
+                                {
+                                    versionsToRemove.add( new Long( itemTimestamp ) );
+                                    addStorageFileItemToMap( deletableSnapshotsAndFiles, gav, (StorageFileItem) item );
+                                }
+                                else
+                                {
+                                    addStorageFileItemToMap( remainingSnapshotsAndFiles, gav, (StorageFileItem) item );
+                                }
                             }
+                        }
+                        else
+                        {
+                            // If no timestamp on gav, then it is a non-unique snapshot
+                            // and should _not_ be removed
+                            getLogger().debug( "GAV Snapshot timestamp not available, skipping non-unique snapshot" );
+                            
+                            addStorageFileItemToMap( remainingSnapshotsAndFiles, gav, (StorageFileItem) item );
                         }
                     }
                 }

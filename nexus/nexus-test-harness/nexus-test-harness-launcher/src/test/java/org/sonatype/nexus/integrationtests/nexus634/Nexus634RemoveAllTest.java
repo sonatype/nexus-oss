@@ -13,6 +13,9 @@
  */
 package org.sonatype.nexus.integrationtests.nexus634;
 
+import java.io.File;
+import java.util.Collection;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -33,6 +36,9 @@ public class Nexus634RemoveAllTest
         // This is THE important part
         runSnapshotRemover( "nexus-test-harness-snapshot-repo", 0, 0, true );
 
+        /*
+         * This IT is now very wrong, as snapshot remover will no longer remove -SNAPSHOT artifacts,
+         * only timestamped snapshot artifacts (unless there is a release version and remove when released is set)
         // this IT is wrong: nexus will remove the parent folder too, if the GAV folder is emptied completely
         // Collection<File> jars = listFiles( artifactFolder, new String[] { "jar" }, false );
         // Assert.assertTrue( "All artifacts should be deleted by SnapshotRemoverTask. Found: " + jars, jars.isEmpty()
@@ -42,6 +48,10 @@ public class Nexus634RemoveAllTest
         Assert.assertFalse(
             "The folder should be removed since all artifacts should be gone, instead there are files left!",
             artifactFolder.exists() );
+        */
+        
+        Collection<File> jars = listFiles( artifactFolder, new String[] { "jar" }, false );
+        Assert.assertEquals( 1, jars.size() );
     }
 
 }

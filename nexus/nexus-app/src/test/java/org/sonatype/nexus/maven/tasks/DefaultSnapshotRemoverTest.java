@@ -62,6 +62,34 @@ public class DefaultSnapshotRemoverTest
             }
         }
     }
+    
+    public void testNexus2234()
+        throws Exception
+    {
+        fillInRepo();
+        
+        long tenDaysAgo = System.currentTimeMillis() - 10 * 86400000L;
+        
+        final URL snapshotsRootUrl = new URL( snapshots.getLocalUrl() );
+
+        final File snapshotsRoot = new File( snapshotsRootUrl.toURI() ).getAbsoluteFile();
+
+        File itemFile = new File(
+            snapshotsRoot,
+            "/org/nonuniquesnapgroup/nonuniquesnap/1.1-SNAPSHOT/nonuniquesnap-1.1-SNAPSHOT.jar" );
+
+        itemFile.setLastModified( tenDaysAgo );
+        
+        SnapshotRemovalRequest snapshotRemovalRequest = new SnapshotRemovalRequest( snapshots.getId(), null, 1, 10, true );
+
+        assertTrue( itemFile.exists() );
+        
+        SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
+
+        assertTrue( result.isSuccessful() );
+        
+        assertTrue( itemFile.exists() );
+    }
 
     /**
      * @see <a href='https://issues.sonatype.org/browse/NEXUS-1331'>https://issues.sonatype.org/browse/NEXUS-1331</a>
@@ -376,8 +404,12 @@ public class DefaultSnapshotRemoverTest
         HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
         // whole version folder was removed, including version metadata
         expecting.put( "org/sonatype/nexus/nexus/1.3.0-SNAPSHOT", Boolean.FALSE );
-        expecting.put( "org/sonatype/nexus/nexus/1.2.2-SNAPSHOT", Boolean.FALSE );
-        expecting.put( "org/sonatype/nexus/nexus/maven-metadata.xml", Boolean.FALSE );
+        
+        // This is no longer valid, since we will NEVER remove non-timestamped artifacts
+        // Unless a release version is found, and remove if released is in effect
+        // so changed from FALSE to TRUE
+        expecting.put( "org/sonatype/nexus/nexus/1.2.2-SNAPSHOT", Boolean.TRUE );
+        expecting.put( "org/sonatype/nexus/nexus/maven-metadata.xml", Boolean.TRUE );
 
         validateResults( snapshots, expecting );
     }
