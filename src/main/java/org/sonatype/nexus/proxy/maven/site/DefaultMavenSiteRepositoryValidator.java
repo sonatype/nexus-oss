@@ -14,10 +14,17 @@
 package org.sonatype.nexus.proxy.maven.site;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryConfigurator;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.configuration.ExternalConfiguration;
+import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryValidator;
 
-@Component( role = DefaultMavenSiteRepositoryConfigurator.class )
-public class DefaultMavenSiteRepositoryConfigurator
-    extends AbstractWebSiteRepositoryConfigurator
+@Component( role = DefaultMavenSiteRepositoryValidator.class )
+public class DefaultMavenSiteRepositoryValidator
+    extends AbstractWebSiteRepositoryValidator
 {
+    @Override
+    protected ExternalConfiguration createExternalConfiguration( Xpp3Dom dom )
+    {
+        return new DefaultMavenSiteRepositoryConfiguration( dom );
+    }
 }

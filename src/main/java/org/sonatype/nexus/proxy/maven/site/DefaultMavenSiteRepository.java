@@ -19,6 +19,7 @@ import java.io.InputStream;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
@@ -40,6 +41,9 @@ public class DefaultMavenSiteRepository
 
     @Requirement
     private DefaultMavenSiteRepositoryConfigurator repositoryConfigurator;
+
+    @Requirement
+    private DefaultMavenSiteRepositoryValidator repositoryValidator;
 
     private RepositoryKind repositoryKind;
 
@@ -69,5 +73,10 @@ public class DefaultMavenSiteRepository
     {
         return repositoryConfigurator;
     }
-
+    
+    @Override
+    public Validator getValidator()
+    {
+        return repositoryValidator;
+    }
 }
