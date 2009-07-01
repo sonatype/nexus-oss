@@ -170,7 +170,10 @@ public abstract class SeleniumTest
                                                    }
                                                } );
         selenium.start( "captureNetworkTraffic=true" );
-        selenium.setSpeed( "500" );
+        if ( !seleniumBrowser.contains( "iexplore" ) )
+        {
+            selenium.setSpeed( "500" );
+        }
         selenium.getEval( "window.moveTo(1,1); window.resizeTo(1021,737);" );
         main = new MainPage( selenium );
     }
