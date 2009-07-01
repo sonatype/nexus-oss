@@ -5,7 +5,6 @@ import org.sonatype.nexus.mock.components.Checkbox;
 import org.sonatype.nexus.mock.components.Component;
 import org.sonatype.nexus.mock.components.Menu;
 import org.sonatype.nexus.mock.components.TextArea;
-import org.sonatype.nexus.mock.components.TextField;
 
 import com.thoughtworks.selenium.Selenium;
 
@@ -101,9 +100,11 @@ public class LogsViewTab
         }
 
         documents.click( fileName );
+
+        logContent.waitToLoad();
     }
 
-    public TextField getLogContent()
+    public TextArea getLogContent()
     {
         return logContent;
     }
