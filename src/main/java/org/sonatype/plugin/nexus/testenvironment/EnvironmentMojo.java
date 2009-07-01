@@ -53,7 +53,7 @@ public class EnvironmentMojo
 {
 
     /** @component */
-    @SuppressWarnings("unused")
+    @SuppressWarnings( "unused" )
     private org.apache.maven.artifact.factory.ArtifactFactory artifactFactory;
 
     /** @component */
@@ -216,12 +216,6 @@ public class EnvironmentMojo
             project.getProperties().put( "maven-version", mavenVersion );
             project.getProperties().put( "maven-basedir",
                                          getPath( new File( mavenLocation, "apache-maven-" + mavenVersion ) ) );
-        }
-
-        if ( resourcesSourceLocation.isDirectory() )
-        {
-            project.getProperties().put( "test-resources-source-folder", getPath( resourcesSourceLocation ) );
-            project.getProperties().put( "test-resources-folder", getPath( resourcesDestinationLocation ) );
 
             File fakeRepository = new File( resourcesSourceLocation, "fake-central" );
             File fakeRepoDest = new File( mavenLocation, "fake-repo" );
@@ -229,6 +223,10 @@ public class EnvironmentMojo
             if ( fakeRepository.isDirectory() )
             {
                 copyDirectory( fakeRepository, fakeRepoDest );
+            }
+            else
+            {
+                fakeRepoDest.mkdirs();
             }
 
             try
@@ -239,23 +237,35 @@ public class EnvironmentMojo
             {
                 getLog().error( "Unable to delete hidden folders from " + fakeRepoDest.getPath() );
             }
-
-            File defaultConfig = new File( resourcesDestinationLocation, "default-configs" );
-            project.getProperties().put( "default-configs", getPath( defaultConfig ) );
-
-            copyUrl( "/default-config/nexus.xml", new File( defaultConfig, "nexus.xml" ) );
-            copyUrl( "/default-config/security.xml", new File( defaultConfig, "security.xml" ) );
-            copyUrl( "/default-config/security-configuration.xml", new File( defaultConfig,
-                                                                             "security-configuration.xml" ) );
-            copyUrl( "/default-config/settings.xml", new File( defaultConfig, "settings.xml" ) );
-            copyUrl( "/default-config/log4j.properties", new File( defaultConfig, "log4j.properties" ) );
-
-            File sourceDefaultConfig = new File( resourcesSourceLocation, "default-config" );
-            if ( sourceDefaultConfig.isDirectory() )
-            {
-                copyAndInterpolate( sourceDefaultConfig, defaultConfig );
-            }
         }
+
+        if ( !resourcesDestinationLocation.isDirectory() )
+        {
+            resourcesDestinationLocation.mkdirs();
+        }
+        project.getProperties().put( "test-resources-folder", getPath( resourcesDestinationLocation ) );
+
+        if ( resourcesSourceLocation.isDirectory() )
+        {
+            project.getProperties().put( "test-resources-source-folder", getPath( resourcesSourceLocation ) );
+        }
+
+        // start default configs
+        File defaultConfig = new File( resourcesDestinationLocation, "default-configs" );
+        project.getProperties().put( "default-configs", getPath( defaultConfig ) );
+
+        copyUrl( "/default-config/nexus.xml", new File( defaultConfig, "nexus.xml" ) );
+        copyUrl( "/default-config/security.xml", new File( defaultConfig, "security.xml" ) );
+        copyUrl( "/default-config/security-configuration.xml", new File( defaultConfig, "security-configuration.xml" ) );
+        copyUrl( "/default-config/settings.xml", new File( defaultConfig, "settings.xml" ) );
+        copyUrl( "/default-config/log4j.properties", new File( defaultConfig, "log4j.properties" ) );
+
+        File sourceDefaultConfig = new File( resourcesSourceLocation, "default-config" );
+        if ( sourceDefaultConfig.isDirectory() )
+        {
+            copyAndInterpolate( sourceDefaultConfig, defaultConfig );
+        }
+        // end default configs
 
         // start baseTest.properties
         File baseTestProperties = new File( project.getBuild().getTestOutputDirectory(), "baseTest.properties" );
