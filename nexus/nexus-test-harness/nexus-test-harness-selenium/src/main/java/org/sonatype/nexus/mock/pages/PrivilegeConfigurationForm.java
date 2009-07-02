@@ -82,6 +82,8 @@ public class PrivilegeConfigurationForm
     public void save()
     {
         saveButton.click();
+
+        waitEvalTrue( "window.Ext.Msg.isVisible() == false" );
     }
 
     public PrivilegeConfigurationForm populate( String name, String description, int target )

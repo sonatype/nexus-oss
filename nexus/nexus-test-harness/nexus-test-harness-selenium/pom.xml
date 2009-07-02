@@ -59,6 +59,9 @@
           <includes>
             <include>**/*Test.java</include>
           </includes>
+          <excludes>
+            <exclude>**/*$*.java</exclude>
+          </excludes>
           <systemProperties>
             <property>
               <name>seleniumPort</name>
