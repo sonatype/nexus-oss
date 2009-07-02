@@ -116,4 +116,11 @@ public class MainPage
         return new PrivilegesTab(selenium);
     }
 
+    public RepoTargetTab openRepoTargets()
+    {
+        adminPanel().repositoryTargetsClick();
+
+        return new RepoTargetTab(selenium);
+    }
+
 }

@@ -177,6 +177,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
           {
             xtype: 'treepanel',
             id: 'repoTargets-pattern-list', //note: unique ID is assinged before instantiation
+            name: 'repoTargets-pattern-list',
             title: 'Patterns',
             cls: 'required-field',
             border: true, //note: this seem to have no effect w/in form panel

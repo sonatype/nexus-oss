@@ -7,6 +7,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import org.junit.Assert;
 import org.sonatype.nexus.mock.components.Combobox;
 import org.sonatype.nexus.mock.components.TextField;
+import org.sonatype.nexus.mock.components.Tree;
 import org.sonatype.nexus.mock.components.TwinPanel;
 
 public class NxAssert
@@ -45,9 +46,28 @@ public class NxAssert
         Assert.assertThat( field.getValue(), equalTo( value ) );
     }
 
-    public static void contains( TwinPanel twinPanel, String value )
+    public static void contains( TwinPanel twinPanel, String... values )
     {
-        Assert.assertTrue( twinPanel.containsLeftSide( value ) );
+        for ( String value : values )
+        {
+            Assert.assertTrue( twinPanel.containsLeftSide( value ) );
+        }
+    }
+
+    public static void contains( Tree tree, String... values )
+    {
+        for ( String value : values )
+        {
+            Assert.assertTrue( "Tree does not contains " + value, tree.contains( value ) );
+        }
+    }
+
+    public static void notContains( Tree tree, String... values )
+    {
+        for ( String value : values )
+        {
+            Assert.assertFalse( "Tree does contains " + value, tree.contains( value ) );
+        }
     }
 
     @SuppressWarnings( "unchecked" )

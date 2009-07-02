@@ -2,12 +2,28 @@ package org.sonatype.nexus.mock.components;
 
 import com.thoughtworks.selenium.Selenium;
 
-public class Window extends Component {
-    public Window(Selenium selenium, String expression) {
-        super(selenium, expression);
+public class Window
+    extends Component
+{
+    public Window( Selenium selenium )
+    {
+        super( selenium );
     }
 
-    public void close() {
-        selenium.click(getXPath() + "//div[contains(@class, 'x-tool-close')]");
+    public Window( Selenium selenium, String expression )
+    {
+        super( selenium, expression );
+    }
+
+    public void close()
+    {
+        selenium.click( getXPath() + "//div[contains(@class, 'x-tool-close')]" );
+    }
+
+    public void waitFor()
+    {
+        selenium.runScript( "window.Ext.Msg.getDialog()" );
+
+        waitEvalTrue( "window.Ext.Msg.isVisible() == false" );
     }
 }

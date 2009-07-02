@@ -4,6 +4,7 @@ import org.sonatype.nexus.mock.components.Button;
 import org.sonatype.nexus.mock.components.Combobox;
 import org.sonatype.nexus.mock.components.Component;
 import org.sonatype.nexus.mock.components.TextField;
+import org.sonatype.nexus.mock.components.Window;
 
 import com.thoughtworks.selenium.Selenium;
 
@@ -79,11 +80,13 @@ public class PrivilegeConfigurationForm
         cancelButton.click();
     }
 
-    public void save()
+    public PrivilegeConfigurationForm save()
     {
         saveButton.click();
 
-        waitEvalTrue( "window.Ext.Msg.isVisible() == false" );
+        new Window( selenium ).waitFor();
+
+        return this;
     }
 
     public PrivilegeConfigurationForm populate( String name, String description, int target )

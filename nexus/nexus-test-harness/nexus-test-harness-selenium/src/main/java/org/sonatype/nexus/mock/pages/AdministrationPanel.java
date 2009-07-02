@@ -49,4 +49,9 @@ public class AdministrationPanel
     {
         clickLink( "Log" );
     }
+
+    public void repositoryTargetsClick()
+    {
+        clickLink( "Repository Targets" );
+    }
 }
