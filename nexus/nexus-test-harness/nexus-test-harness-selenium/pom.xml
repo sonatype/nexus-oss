@@ -34,6 +34,13 @@
               <artifactId>nexus-simple-memory-realm</artifactId>
             </plugin>
           </nexusPluginsArtifacts>
+          <extraResourcesArtifacts>
+            <artifact>
+              <groupId>com.getfirebug</groupId>
+              <artifactId>firebug-lite</artifactId>
+              <outputDirectory>${basedir}/target/nexus/nexus-webapp-${project.version}/runtime/apps/nexus/webapp</outputDirectory>
+            </artifact>
+          </extraResourcesArtifacts>
         </configuration>
       </plugin>
       <plugin>
@@ -102,6 +109,7 @@
           <source>${basedir}/target/nexus/nexus-webapp-${project.version}/runtime/apps/nexus/webapp</source>
           <doNotInstrument>
             <js>ext-2.2</js>
+            <js>firebug-lite-1.2-compressed.js</js>
           </doNotInstrument>
           <exclude>
             <js>js/sonatype-all.js</js>
@@ -242,6 +250,14 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.getfirebug</groupId>
+      <artifactId>firebug-lite</artifactId>
+      <version>1.2</version>
+      <type>js</type>
+      <classifier>compressed</classifier>
     </dependency>
   </dependencies>
 
