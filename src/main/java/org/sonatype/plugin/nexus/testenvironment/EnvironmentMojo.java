@@ -660,22 +660,32 @@ public class EnvironmentMojo
         try
         {
             unarchiver = (UnArchiver) plexus.lookup( UnArchiver.ROLE, type );
+
+            unarchiver.setSourceFile( sourceFile );
+            unarchiver.setDestDirectory( destDirectory );
+            try
+            {
+                unarchiver.extract();
+            }
+            catch ( Exception e )
+            {
+                throw new MojoExecutionException( "Unable to unpack " + sourceFile, e );
+            }
         }
-        catch ( ComponentLookupException e )
+        catch ( ComponentLookupException ce )
         {
-            throw new MojoExecutionException( "Unable to lookup for unarchiver", e );
+            getLog().warn( "Invalid packaging type " + type );
+
+            try
+            {
+                FileUtils.copyFileToDirectory( sourceFile, destDirectory );
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Unable to copy " + sourceFile, e );
+            }
         }
 
-        unarchiver.setSourceFile( sourceFile );
-        unarchiver.setDestDirectory( destDirectory );
-        try
-        {
-            unarchiver.extract();
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( "Unable to unpack " + sourceFile, e );
-        }
     }
 
     @SuppressWarnings( "unchecked" )
