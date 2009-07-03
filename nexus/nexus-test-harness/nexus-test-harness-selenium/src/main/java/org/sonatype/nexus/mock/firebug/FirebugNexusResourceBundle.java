@@ -15,7 +15,8 @@ public class FirebugNexusResourceBundle
     @Override
     public String getPreHeadContribution( Map<String, Object> context )
     {
-        return "<script src=\"firebug-lite-1.2-compressed.js?\" type=\"text/javascript\" charset=\"utf-8\"></script>";
+        return "<script src=\"firebug-lite-1.2-compressed.js?\" type=\"text/javascript\" charset=\"utf-8\"></script>\n"
+            + "  <script type=\"text/javascript\">" + "firebug.env.debug = false;" + "</script>";
     }
 
 }
