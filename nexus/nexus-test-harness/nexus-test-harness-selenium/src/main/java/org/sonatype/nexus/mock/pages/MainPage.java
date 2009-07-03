@@ -92,7 +92,7 @@ public class MainPage
     {
         adminPanel().logClick();
 
-        return new LogConfigTab(selenium);
+        return new LogConfigTab( selenium );
     }
 
     public UsersTab openUsers()
@@ -113,14 +113,21 @@ public class MainPage
     {
         securityPanel().privilegesClick();
 
-        return new PrivilegesTab(selenium);
+        return new PrivilegesTab( selenium );
     }
 
     public RepoTargetTab openRepoTargets()
     {
         adminPanel().repositoryTargetsClick();
 
-        return new RepoTargetTab(selenium);
+        return new RepoTargetTab( selenium );
+    }
+
+    public RotesTab openRoutes()
+    {
+        adminPanel().routingClick();
+
+        return new RotesTab( selenium );
     }
 
 }

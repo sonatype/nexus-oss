@@ -54,4 +54,9 @@ public class AdministrationPanel
     {
         clickLink( "Repository Targets" );
     }
+
+    public void routingClick()
+    {
+        clickLink( "Routing" );
+    }
 }

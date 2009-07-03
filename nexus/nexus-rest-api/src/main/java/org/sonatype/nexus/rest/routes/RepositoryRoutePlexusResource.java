@@ -15,6 +15,7 @@ package org.sonatype.nexus.rest.routes;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
@@ -39,7 +40,7 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * Handles GET, PUT, DELETE for Repository route resources.
- * 
+ *
  * @author cstamas
  * @author tstevens
  */
@@ -183,13 +184,13 @@ public class RepositoryRoutePlexusResource
 
                 route.setGroupId( resource.getGroupId() );
 
-                route.addRoutePattern( resource.getPattern() );
+                route.setRoutePatterns( Collections.singletonList( resource.getPattern() ) );
 
                 route.setRouteType( resource2configType( resource.getRuleType() ) );
 
                 List<String> repositories = new ArrayList<String>( resource.getRepositories().size() );
 
-                for ( RepositoryRouteMemberRepository repo : (List<RepositoryRouteMemberRepository>) resource
+                for ( RepositoryRouteMemberRepository repo : resource
                     .getRepositories() )
                 {
                     repositories.add( repo.getId() );

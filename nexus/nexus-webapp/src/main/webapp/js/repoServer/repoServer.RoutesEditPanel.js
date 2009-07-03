@@ -169,6 +169,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
         layout: 'column',
         autoHeight: true,
         style: 'padding: 10px 0 0 0',
+        name: 'repositoriesOrder',
         
         items: [
           {
@@ -373,7 +374,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
       emptyText: 'Click "Add" to create a Repository Route'
     }
   });
-  this.routesGridPanel.on('rowclick', this.rowClick, this);
+  this.routesGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
   // END: Repo List ******************************************************
   // *********************************************************************
 
@@ -533,7 +534,6 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
       },
       id); //use "new_route_" id instead of resourceURI like the reader does
     this.routesDataStore.insert(0, [newRec]);
-    this.routesGridPanel.getSelectionModel().selectRow(0);
 
     //load available repos tree list.  note: this is kind of awkward to reuse the data mod function
     this.loadRepoListHelper([], {}, formPanel);
@@ -544,6 +544,8 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     //always set active and re-layout
     this.formCards.getLayout().setActiveItem(formPanel);
     formPanel.doLayout();
+
+    this.routesGridPanel.getSelectionModel().selectRow(0);
   },
 
   afterLayoutFormHandler : function(formPanel, fLayout){
@@ -787,8 +789,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
   },
 
-  rowClick : function(grid, rowIndex, e){
-    var rec = grid.store.getAt(rowIndex);
+  rowSelect : function( selectionModel, index, rec ){
     var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
     var formPanel = this.formCards.findById(id);
 

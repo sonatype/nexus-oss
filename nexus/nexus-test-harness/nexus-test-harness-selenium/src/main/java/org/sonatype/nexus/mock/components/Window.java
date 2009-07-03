@@ -24,6 +24,13 @@ public class Window
     {
         selenium.runScript( "window.Ext.Msg.getDialog()" );
 
-        waitEvalTrue( "window.Ext.Msg.isVisible() == false" );
+        try
+        {
+            waitEvalTrue( "window.Ext.Msg.isVisible() == false" );
+        }
+        catch ( RuntimeException e )
+        {
+            // ok no problem window is not present, go go go
+        }
     }
 }
