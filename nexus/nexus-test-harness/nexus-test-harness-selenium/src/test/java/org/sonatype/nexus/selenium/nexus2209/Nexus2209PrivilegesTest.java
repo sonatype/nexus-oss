@@ -66,7 +66,7 @@ public class Nexus2209PrivilegesTest
         for ( int i = 0; i < ids.length; i++ )
         {
             PrivilegeStatusResource p = result.getData().get( i );
-            ids[i] = NexusTestCase.nexusBaseURL + "/service/local/privileges/" + p.getId();
+            ids[i] = NexusTestCase.nexusBaseURL + "service/local/privileges/" + p.getId();
         }
 
         privs.refresh();
