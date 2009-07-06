@@ -20,6 +20,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
+import org.codehaus.plexus.component.discovery.DefaultComponentDiscoverer;
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.ComponentRepository;
@@ -118,15 +119,12 @@ public class DefaultNexusPluginManager
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger()
-                           .debug(
-                                   "Cannot find ComponentRepository in plexus context! Are we running in a PlexusTestCase?",
-                                   e );
+                    .debug( "Cannot find ComponentRepository in plexus context! Are we running in a PlexusTestCase?", e );
             }
             else
             {
                 getLogger()
-                           .info(
-                                  "Cannot find ComponentRepository in plexus context! Are we running in a PlexusTestCase?" );
+                    .info( "Cannot find ComponentRepository in plexus context! Are we running in a PlexusTestCase?" );
             }
         }
     }
@@ -200,8 +198,17 @@ public class DefaultNexusPluginManager
 
             try
             {
-                // load plugin md from it
+                // load plugin md from it, will return null if not found
                 pluginMetadata = loadPluginMetadata( pluginFile );
+
+                if ( pluginMetadata == null )
+                {
+                    // this is not a nexus plugin!
+                    result.setThrowable( new IllegalArgumentException( "The file \"" + pluginFile.getAbsolutePath()
+                        + "\" is not a nexus plugin, it does not have plugin metadata!" ) );
+
+                    return result;
+                }
 
                 // create exports
                 pluginExports = createExports( pluginFile );
@@ -268,6 +275,9 @@ public class DefaultNexusPluginManager
                 {
                     getLogger().debug( "Could not remove plugin realm!", e );
                 }
+
+                // TODO: fix this! Why is it not registered?
+                result.setThrowable( new IllegalArgumentException( "Plugin is not registered!" ) );
             }
         }
         catch ( Exception e )
@@ -326,6 +336,11 @@ public class DefaultNexusPluginManager
 
             try
             {
+                if ( entry == null )
+                {
+                    return null;
+                }
+
                 reader = ReaderFactory.newXmlReader( jar.getInputStream( entry ) );
 
                 InterpolationFilterReader interpolationFilterReader =
@@ -465,7 +480,7 @@ public class DefaultNexusPluginManager
 
         // add inter-plugin dependencies
         for ( PluginDependency dep : (List<PluginDependency>) pluginDiscoveryContext.getPluginMetadata()
-                                                                                    .getPluginDependencies() )
+            .getPluginDependencies() )
         {
             ComponentDependency cd = new ComponentDependency();
 
@@ -510,20 +525,20 @@ public class DefaultNexusPluginManager
             for ( String className : pluginDiscoveryContext.getExports() )
             {
                 String resourceName = className.replaceAll( "\\.", "/" ) + ".class";
-                
-                if( pluginDiscoveryContext.getPluginRealm().getResource( resourceName ) != null)
-                {   
+
+                if ( pluginDiscoveryContext.getPluginRealm().getResource( resourceName ) != null )
+                {
                     PlexusComponentGleanerRequest request =
                         new PlexusComponentGleanerRequest( className, pluginDiscoveryContext.getPluginRealm() );
-    
+
                     componentDescriptor = plexusComponentGleaner.glean( request );
-    
+
                     if ( componentDescriptor != null )
                     {
                         getLogger().debug(
                                            "... ... adding component role=\"" + componentDescriptor.getRole()
                                                + "\", hint=\"" + componentDescriptor.getRoleHint() + "\"" );
-    
+
                         csd.addComponentDescriptor( componentDescriptor );
                     }
                 }
@@ -549,7 +564,6 @@ public class DefaultNexusPluginManager
     // ComponentDiscoveryListener
     // ==
 
-    @SuppressWarnings( "unchecked" )
     public void componentDiscovered( PluginDiscoveryContext pluginDiscoveryContext )
     {
         PluginDescriptor pluginDescriptor = pluginDiscoveryContext.getPluginDescriptor();
@@ -599,7 +613,30 @@ public class DefaultNexusPluginManager
     {
         List<ComponentDescriptor<?>> discoveredComponentDescriptors = new ArrayList<ComponentDescriptor<?>>();
 
-        for ( ComponentSetDescriptor componentSetDescriptor : findComponents( pluginDiscoveryContext ) )
+        List<ComponentSetDescriptor> disvoveredSets = findComponents( pluginDiscoveryContext );
+
+        // HACK -- START
+        // to enable "backward compatibility, nexus plugins that are written plexus-way", but circumvent the plexus bug
+        // about component descriptor duplication with Realms having parent
+
+        // remember the parent
+        ClassRealm parent = pluginDiscoveryContext.getPluginRealm().getParentRealm();
+
+        // make it parentless
+        pluginDiscoveryContext.getPluginRealm().setParentRealm( null );
+
+        // discover components from plexus' components.xml
+        DefaultComponentDiscoverer defaultDiscoverer = new DefaultComponentDiscoverer();
+
+        disvoveredSets.addAll( defaultDiscoverer.findComponents( plexusContainer.getContext(), pluginDiscoveryContext
+            .getPluginRealm() ) );
+
+        // restore original parent
+        pluginDiscoveryContext.getPluginRealm().setParentRealm( parent );
+        // HACK -- END
+
+        // registering them with plexus
+        for ( ComponentSetDescriptor componentSetDescriptor : disvoveredSets )
         {
             // Here we should collect all the urls
             // do the interpolation against the context
@@ -615,6 +652,7 @@ public class DefaultNexusPluginManager
 
             componentDiscovered( pluginDiscoveryContext );
         }
+
     }
 
 }
