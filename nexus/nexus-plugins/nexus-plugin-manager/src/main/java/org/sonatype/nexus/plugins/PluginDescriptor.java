@@ -1,7 +1,9 @@
 package org.sonatype.nexus.plugins;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
@@ -21,6 +23,8 @@ public class PluginDescriptor
     private List<PluginDescriptor> importedPlugins;
 
     private List<PluginStaticResourceModel> pluginStaticResourceModels;
+
+    private Map<String, PluginRepositoryType> pluginRepositoryTypes;
 
     public PluginCoordinates getPluginCoordinates()
     {
@@ -78,7 +82,17 @@ public class PluginDescriptor
         {
             pluginStaticResourceModels = new ArrayList<PluginStaticResourceModel>();
         }
-        
+
         return pluginStaticResourceModels;
+    }
+
+    public Map<String, PluginRepositoryType> getPluginRepositoryTypes()
+    {
+        if ( pluginRepositoryTypes == null )
+        {
+            pluginRepositoryTypes = new HashMap<String, PluginRepositoryType>();
+        }
+
+        return pluginRepositoryTypes;
     }
 }

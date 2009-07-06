@@ -38,10 +38,12 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
 import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plugin.metadata.plexus.PlexusComponentGleaner;
 import org.sonatype.plugin.metadata.plexus.PlexusComponentGleanerRequest;
+import org.sonatype.plugin.metadata.plexus.PlexusComponentGleanerResponse;
 import org.sonatype.plugins.model.PluginDependency;
 import org.sonatype.plugins.model.PluginMetadata;
 import org.sonatype.plugins.model.io.xpp3.PluginModelXpp3Reader;
@@ -242,7 +244,7 @@ public class DefaultNexusPluginManager
                         pluginRealm.importFrom( importPlugin.getPluginRealm().getId(), export );
                     }
 
-                    discoveryContext.getImportedPlugins().add( importPlugin );
+                    discoveryContext.getPluginDescriptor().getImportedPlugins().add( importPlugin );
                 }
 
                 // get plugin dependecies (not inter-plugin but other libs, jars)
@@ -456,15 +458,13 @@ public class DefaultNexusPluginManager
 
         PluginDescriptor pluginDescriptor = createComponentDescriptors( pluginDiscoveryContext );
 
-        pluginDiscoveryContext.setPluginDescriptor( pluginDescriptor );
-
         if ( pluginDescriptor.getComponents() != null )
         {
             for ( ComponentDescriptor<?> cd : pluginDescriptor.getComponents() )
             {
                 cd.setComponentSetDescriptor( pluginDescriptor );
 
-                cd.setRealm( pluginDiscoveryContext.getPluginRealm() );
+                cd.setRealm( pluginDiscoveryContext.getPluginDescriptor().getPluginRealm() );
             }
         }
 
@@ -476,10 +476,10 @@ public class DefaultNexusPluginManager
     protected PluginDescriptor createComponentDescriptors( PluginDiscoveryContext pluginDiscoveryContext )
         throws PlexusConfigurationException
     {
-        PluginDescriptor result = new PluginDescriptor();
+        PluginDescriptor result = pluginDiscoveryContext.getPluginDescriptor();
 
         // add inter-plugin dependencies
-        for ( PluginDependency dep : (List<PluginDependency>) pluginDiscoveryContext.getPluginMetadata()
+        for ( PluginDependency dep : (List<PluginDependency>) pluginDiscoveryContext.getPluginDescriptor().getPluginMetadata()
             .getPluginDependencies() )
         {
             ComponentDependency cd = new ComponentDependency();
@@ -494,52 +494,63 @@ public class DefaultNexusPluginManager
         }
 
         // set basics
-        result.setId( pluginDiscoveryContext.getPluginMetadata().getArtifactId() );
+        result.setId( pluginDiscoveryContext.getPluginDescriptor().getPluginMetadata().getArtifactId() );
 
-        result.setSource( pluginDiscoveryContext.getPluginMetadata().sourceUrl.toString() );
-
-        // set PluginDescriptor specifics
-        result.setPluginCoordinates( pluginDiscoveryContext.getPluginCoordinates() );
-
-        result.setPluginMetadata( pluginDiscoveryContext.getPluginMetadata() );
-
-        result.setPluginRealm( pluginDiscoveryContext.getPluginRealm() );
-
-        result.getExports().addAll( pluginDiscoveryContext.getExports() );
-
-        result.getImportedPlugins().addAll( pluginDiscoveryContext.getImportedPlugins() );
+        result.setSource( pluginDiscoveryContext.getPluginDescriptor().getPluginMetadata().sourceUrl.toString() );
 
         // and do conversion
-        convertPluginMetadata( result, pluginDiscoveryContext );
+        convertPluginMetadata( pluginDiscoveryContext );
 
         return result;
     }
 
-    protected void convertPluginMetadata( PluginDescriptor csd, PluginDiscoveryContext pluginDiscoveryContext )
+    protected void convertPluginMetadata( PluginDiscoveryContext pluginDiscoveryContext )
         throws PlexusConfigurationException
     {
         try
         {
-            ComponentDescriptor<?> componentDescriptor = null;
-
-            for ( String className : pluginDiscoveryContext.getExports() )
+            for ( String className : pluginDiscoveryContext.getPluginDescriptor().getExports() )
             {
                 String resourceName = className.replaceAll( "\\.", "/" ) + ".class";
 
-                if ( pluginDiscoveryContext.getPluginRealm().getResource( resourceName ) != null )
+                if ( pluginDiscoveryContext.getPluginDescriptor().getPluginRealm().getResource( resourceName ) != null )
                 {
                     PlexusComponentGleanerRequest request =
-                        new PlexusComponentGleanerRequest( className, pluginDiscoveryContext.getPluginRealm() );
+                        new PlexusComponentGleanerRequest( className, pluginDiscoveryContext.getPluginDescriptor()
+                            .getPluginRealm() );
 
-                    componentDescriptor = plexusComponentGleaner.glean( request );
+                    // listen for repository types
+                    request.getMarkerAnnotations().add( RepositoryType.class );
 
-                    if ( componentDescriptor != null )
+                    PlexusComponentGleanerResponse response = plexusComponentGleaner.glean( request );
+
+                    if ( response != null )
                     {
-                        getLogger().debug(
-                                           "... ... adding component role=\"" + componentDescriptor.getRole()
-                                               + "\", hint=\"" + componentDescriptor.getRoleHint() + "\"" );
+                        if ( response.getMarkerAnnotations().containsKey( RepositoryType.class ) )
+                        {
+                            RepositoryType repositoryTypeAnno =
+                                (RepositoryType) response.getMarkerAnnotations().get( RepositoryType.class );
 
-                        csd.addComponentDescriptor( componentDescriptor );
+                            PluginRepositoryType pluginRepositoryType =
+                                new PluginRepositoryType( response.getComponentDescriptor().getRole(),
+                                                          repositoryTypeAnno.pathPrefix() );
+
+                            pluginDiscoveryContext.getPluginDescriptor().getPluginRepositoryTypes()
+                                .put( pluginRepositoryType.getComponentContract(), pluginRepositoryType );
+
+                            getLogger().debug(
+                                               "... ... adding RepositoryType role=\""
+                                                   + pluginRepositoryType.getComponentContract() + "\", pathPrefix=\""
+                                                   + pluginRepositoryType.getPathPrefix() + "\"" );
+                        }
+
+                        getLogger().debug(
+                                           "... ... adding component role=\""
+                                               + response.getComponentDescriptor().getRole() + "\", hint=\""
+                                               + response.getComponentDescriptor().getRoleHint() + "\"" );
+
+                        pluginDiscoveryContext.getPluginDescriptor()
+                            .addComponentDescriptor( response.getComponentDescriptor() );
                     }
                 }
             }
@@ -582,19 +593,21 @@ public class DefaultNexusPluginManager
             return;
         }
 
-        // register new repo types
-        // FIXME: implement this
-        /*
-         * for ( RepositoryType repoType : (List<RepositoryType>) pluginDescriptor.getPluginMetadata()
-         * .getRepositoryTypes() ) { RepositoryTypeDescriptor repoTypeDescriptor = new RepositoryTypeDescriptor();
-         * repoTypeDescriptor.setRole( repoType.getComponentContract() ); repoTypeDescriptor.setPrefix(
-         * repoType.getPathPrefix() ); repositoryTypeRegistry.getRepositoryTypeDescriptors().add( repoTypeDescriptor );
-         * }
-         */
-
         // add it to "known" plugins
         if ( !pluginDescriptors.containsKey( pluginDescriptor.getPluginCoordinates().getPluginKey() ) )
         {
+            // register newly discovered repo types
+            for ( PluginRepositoryType repoType : pluginDescriptor.getPluginRepositoryTypes().values() )
+            {
+                RepositoryTypeDescriptor repoTypeDescriptor = new RepositoryTypeDescriptor();
+
+                repoTypeDescriptor.setRole( repoType.getComponentContract() );
+
+                repoTypeDescriptor.setPrefix( repoType.getPathPrefix() );
+
+                repositoryTypeRegistry.getRepositoryTypeDescriptors().add( repoTypeDescriptor );
+            }
+
             pluginDescriptors.put( pluginDescriptor.getPluginCoordinates().getPluginKey(), pluginDescriptor );
 
             pluginDiscoveryContext.setPluginRegistered( true );
@@ -620,19 +633,19 @@ public class DefaultNexusPluginManager
         // about component descriptor duplication with Realms having parent
 
         // remember the parent
-        ClassRealm parent = pluginDiscoveryContext.getPluginRealm().getParentRealm();
+        ClassRealm parent = pluginDiscoveryContext.getPluginDescriptor().getPluginRealm().getParentRealm();
 
         // make it parentless
-        pluginDiscoveryContext.getPluginRealm().setParentRealm( null );
+        pluginDiscoveryContext.getPluginDescriptor().getPluginRealm().setParentRealm( null );
 
         // discover components from plexus' components.xml
         DefaultComponentDiscoverer defaultDiscoverer = new DefaultComponentDiscoverer();
 
         disvoveredSets.addAll( defaultDiscoverer.findComponents( plexusContainer.getContext(), pluginDiscoveryContext
-            .getPluginRealm() ) );
+            .getPluginDescriptor().getPluginRealm() ) );
 
         // restore original parent
-        pluginDiscoveryContext.getPluginRealm().setParentRealm( parent );
+        pluginDiscoveryContext.getPluginDescriptor().getPluginRealm().setParentRealm( parent );
         // HACK -- END
 
         // registering them with plexus

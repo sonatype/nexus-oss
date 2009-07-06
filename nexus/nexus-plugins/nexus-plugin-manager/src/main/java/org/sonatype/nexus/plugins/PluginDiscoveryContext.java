@@ -1,6 +1,5 @@
 package org.sonatype.nexus.plugins;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -8,54 +7,31 @@ import org.sonatype.plugins.model.PluginMetadata;
 
 public class PluginDiscoveryContext
 {
-    private final PluginCoordinates pluginCoordinates;
-
-    private final List<String> exports;
-
-    private final ClassRealm pluginRealm;
-
-    private final PluginMetadata pluginMetadata;
-
     private final NexusPluginValidator nexusPluginValidator;
 
+    private final PluginDescriptor pluginDescriptor;
+
     private boolean pluginRegistered = false;
-
-    private PluginDescriptor pluginDescriptor;
-
-    private List<PluginDescriptor> importedPlugins;
 
     public PluginDiscoveryContext( PluginCoordinates pluginCoordinates, List<String> exports, ClassRealm pluginRealm,
                                    PluginMetadata pluginMetadata, NexusPluginValidator nexusPluginValidator )
     {
-        this.pluginCoordinates = pluginCoordinates;
-
-        this.exports = exports;
-
-        this.pluginRealm = pluginRealm;
-
-        this.pluginMetadata = pluginMetadata;
-
         this.nexusPluginValidator = nexusPluginValidator;
-    }
 
-    public PluginCoordinates getPluginCoordinates()
-    {
-        return pluginCoordinates;
-    }
+        this.pluginDescriptor = new PluginDescriptor();
 
-    public List<String> getExports()
-    {
-        return exports;
-    }
+        this.pluginDescriptor.setPluginCoordinates( pluginCoordinates );
 
-    public ClassRealm getPluginRealm()
-    {
-        return pluginRealm;
-    }
+        if ( exports != null && exports.size() > 0 )
+        {
+            this.pluginDescriptor.getExports().addAll( exports );
+        }
 
-    public PluginMetadata getPluginMetadata()
-    {
-        return pluginMetadata;
+        this.pluginDescriptor.setPluginRealm( pluginRealm );
+
+        this.pluginDescriptor.setPluginMetadata( pluginMetadata );
+
+        this.pluginRegistered = false;
     }
 
     public NexusPluginValidator getNexusPluginValidator()
@@ -76,20 +52,5 @@ public class PluginDiscoveryContext
     public PluginDescriptor getPluginDescriptor()
     {
         return pluginDescriptor;
-    }
-
-    public void setPluginDescriptor( PluginDescriptor pluginDescriptor )
-    {
-        this.pluginDescriptor = pluginDescriptor;
-    }
-
-    public List<PluginDescriptor> getImportedPlugins()
-    {
-        if ( importedPlugins == null )
-        {
-            importedPlugins = new ArrayList<PluginDescriptor>();
-        }
-
-        return importedPlugins;
     }
 }
