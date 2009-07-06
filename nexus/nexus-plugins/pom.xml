@@ -24,6 +24,7 @@
     <module>nexus-plugin-api</module>
     <module>nexus-plugin-manager</module>
     <module>nexuspd-maven-plugin</module>
+    <module>nexus-plugin-packaging</module>
   </modules>
 
   <dependencyManagement>

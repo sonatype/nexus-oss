@@ -92,9 +92,9 @@ public class PluginDescriptorMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        if( !this.mavenProject.getPackaging().equals( "jar" ))
+        if( !this.mavenProject.getPackaging().equals( "nexus-plugin" ))
         {
-            this.getLog().info( "Project is not of packaging type 'jar'." );
+            this.getLog().info( "Project is not of packaging type 'nexus-plugin'." );
             return;
         }
         
