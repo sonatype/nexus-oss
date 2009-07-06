@@ -82,10 +82,8 @@ public class AllPermissionsAreDefinedTest
 
         // now we have a list of permissions, we need to make sure all of these are in the static security xml.
 
-        SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-        String staticSecurityPath = new SecurityRestStaticSecurityResource().getResourcePath();
-        InputStream configStream = this.getClass().getResourceAsStream( staticSecurityPath );
-        Configuration staticConfig = reader.read( configStream );
+        StaticSecurityResource restResource = this.lookup( StaticSecurityResource.class, "SecurityRestStaticSecurityResource" );
+        Configuration staticConfig = restResource.getConfiguration();
 
         List<CPrivilege> privs = staticConfig.getPrivileges();
         for ( CPrivilege privilege : privs )
@@ -96,7 +94,7 @@ public class AllPermissionsAreDefinedTest
         // make sure everything in the restPerms is in the staticPerms
         for ( String perm : restPerms )
         {
-            Assert.assertTrue( "Permission: " + perm + " is missing from " + staticSecurityPath, staticPerms
+            Assert.assertTrue( "Permission: " + perm + " is missing from SecurityRestStaticSecurityResource", staticPerms
                 .contains( perm ) );
         }
 

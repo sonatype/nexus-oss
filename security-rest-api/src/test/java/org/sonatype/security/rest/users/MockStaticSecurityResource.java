@@ -13,7 +13,6 @@
 package org.sonatype.security.rest.users;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
@@ -22,13 +21,8 @@ public class MockStaticSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
-    public String getResourcePath()
+    protected String getResourcePath()
     {
         return "/META-INF/security/static-security-mock.xml";
-    }
-
-    public Configuration getConfiguration()
-    {
-        return null;
     }
 }

@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.locators;
 
-import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
@@ -20,13 +19,8 @@ public class MockStaticSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
-    public String getResourcePath()
+    protected String getResourcePath()
     {
         return "/org/sonatype/security/locators/static-security.xml";
-    }
-    
-    public Configuration getConfiguration()
-    {
-        return null;
     }
 }

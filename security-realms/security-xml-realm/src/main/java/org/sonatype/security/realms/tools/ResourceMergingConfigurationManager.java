@@ -349,57 +349,6 @@ public class ResourceMergingConfigurationManager
                 {
                     appendConfig( config );
                 }
-
-                if ( resource.getResourcePath() != null )
-                {
-                    Reader fr = null;
-                    InputStream is = null;
-
-                    try
-                    {
-                        getLogger().debug( "Loading static security config from " + resource.getResourcePath() );
-                        is = getClass().getResourceAsStream( resource.getResourcePath() );
-                        SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-
-                        fr = new InputStreamReader( is );
-
-                        appendConfig( reader.read( fr ) );
-                    }
-                    catch ( IOException e )
-                    {
-                        getLogger().error( "IOException while retrieving configuration file", e );
-                    }
-                    catch ( XmlPullParserException e )
-                    {
-                        getLogger().error( "Invalid XML Configuration", e );
-                    }
-                    finally
-                    {
-                        if ( fr != null )
-                        {
-                            try
-                            {
-                                fr.close();
-                            }
-                            catch ( IOException e )
-                            {
-                                // just closing if open
-                            }
-                        }
-
-                        if ( is != null )
-                        {
-                            try
-                            {
-                                is.close();
-                            }
-                            catch ( IOException e )
-                            {
-                                // just closing if open
-                            }
-                        }
-                    }
-                }
             }
         }
         finally

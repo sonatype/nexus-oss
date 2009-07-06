@@ -6,6 +6,13 @@
       <implementation>org.sonatype.security.realms.tools.UnitTestSecurityResource</implementation>
       <description>UnitTestSecurityResource</description>
       <isolated-realm>false</isolated-realm>
+      <requirements>
+        <requirement>
+          <role>org.codehaus.plexus.logging.Logger</role>
+          <role-hint>default</role-hint>
+          <field-name>logger</field-name>
+        </requirement>
+      </requirements>
     </component>
   </components>
 </component-set>

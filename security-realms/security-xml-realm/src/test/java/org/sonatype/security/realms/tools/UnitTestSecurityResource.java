@@ -12,21 +12,13 @@
  */
 package org.sonatype.security.realms.tools;
 
-import org.sonatype.security.model.Configuration;
-import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
-import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 public class UnitTestSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
-    public String getResourcePath()
+    protected String getResourcePath()
     {
         return "/org/sonatype/security/configuration/static-merging/static-security.xml";
-    }
-    
-    public Configuration getConfiguration()
-    {
-        return null;
     }
 }

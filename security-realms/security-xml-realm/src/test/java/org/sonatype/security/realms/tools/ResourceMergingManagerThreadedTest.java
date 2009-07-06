@@ -7,7 +7,9 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.logging.Logger;
 
 import edu.umd.cs.mtc.MultithreadedTestCase;
 import edu.umd.cs.mtc.TestFramework;
@@ -44,6 +46,8 @@ public class ResourceMergingManagerThreadedTest
             UnitTestSecurityResource resource = (UnitTestSecurityResource) this.lookup( StaticSecurityResource.class, "UnitTestSecurityResource" );
             this.securityResources.add( resource );
             
+            ComponentDescriptor templateDescriptor = this.getContainer().getComponentDescriptor( StaticSecurityResource.class.getName(), "UnitTestSecurityResource" );
+            
             // now add it to the container
             this.getContainer().addComponent( resource, StaticSecurityResource.class.getName() );
             
@@ -52,6 +56,7 @@ public class ResourceMergingManagerThreadedTest
             descriptor.setRoleHint( "test-"+ii );
             descriptor.setImplementationClass( UnitTestSecurityResource.class);
             descriptor.setIsolatedRealm( false );
+            descriptor.addRequirement( (ComponentRequirement) templateDescriptor.getRequirements().get( 0 ) );
             
             this.getContainer().addComponentDescriptor( descriptor );
         }

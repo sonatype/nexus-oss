@@ -12,11 +12,14 @@
  */
 package org.sonatype.security.realms.tools;
 
+import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.security.model.Configuration;
 
+@ExtensionPoint
 public interface StaticSecurityResource
 {
-    String getResourcePath();
+
+//    String getResourcePath();
     
     Configuration getConfiguration();
     
