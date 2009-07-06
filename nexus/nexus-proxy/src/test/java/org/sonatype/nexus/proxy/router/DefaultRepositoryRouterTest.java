@@ -89,7 +89,7 @@ public class DefaultRepositoryRouterTest
 
         // setup security
         this.securitySystem = this.lookup( SecuritySystem.class );
-        securitySystem.setSecurityEnabled( true );
+        this.securitySystem.start();
 
     }
 

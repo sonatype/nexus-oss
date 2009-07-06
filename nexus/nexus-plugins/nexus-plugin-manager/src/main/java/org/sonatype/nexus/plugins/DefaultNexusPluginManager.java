@@ -48,17 +48,15 @@ import org.sonatype.plugins.model.io.xpp3.PluginModelXpp3Reader;
 /**
  * We have multiple showstoppers here (mercury, shane's model, transitive hull, etc), so we are going for simple stuff:
  * <p>
- * A plugin directory looks like this:
+ * A plugin directory looks like this: THIS IS OUT OF DATE
  * 
  * <pre>
- *  ${nexus-work}/plugins
- *    aPluginDir/
- *      pluginJar.jar
- *      pluginDepA.jar
- *      pluginDepB.jar
+ *  ${nexus-work}/plugin-repository
+ *    aPluginDir.g/aPluginDir.a/aPluginDir.v/
+ *      aPluginJar.jar
  *      ...
- *    anotherPluginDir/
- *      anotherPlugin.jar
+ *    bPluginDir.g/bPluginDir.a/bPluginDir.v/
+ *      bPluginJar.jar
  *      ...
  *    ...
  * </pre>
@@ -511,18 +509,23 @@ public class DefaultNexusPluginManager
 
             for ( String className : pluginDiscoveryContext.getExports() )
             {
-                PlexusComponentGleanerRequest request =
-                    new PlexusComponentGleanerRequest( className, pluginDiscoveryContext.getPluginRealm() );
-
-                componentDescriptor = plexusComponentGleaner.glean( request );
-
-                if ( componentDescriptor != null )
-                {
-                    getLogger().debug(
-                                       "... ... adding component role=\"" + componentDescriptor.getRole()
-                                           + "\", hint=\"" + componentDescriptor.getRoleHint() + "\"" );
-
-                    csd.addComponentDescriptor( componentDescriptor );
+                String resourceName = className.replaceAll( "\\.", "/" ) + ".class";
+                
+                if( pluginDiscoveryContext.getPluginRealm().getResource( resourceName ) != null)
+                {   
+                    PlexusComponentGleanerRequest request =
+                        new PlexusComponentGleanerRequest( className, pluginDiscoveryContext.getPluginRealm() );
+    
+                    componentDescriptor = plexusComponentGleaner.glean( request );
+    
+                    if ( componentDescriptor != null )
+                    {
+                        getLogger().debug(
+                                           "... ... adding component role=\"" + componentDescriptor.getRole()
+                                               + "\", hint=\"" + componentDescriptor.getRoleHint() + "\"" );
+    
+                        csd.addComponentDescriptor( componentDescriptor );
+                    }
                 }
             }
         }

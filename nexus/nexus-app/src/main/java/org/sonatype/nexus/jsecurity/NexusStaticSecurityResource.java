@@ -27,9 +27,4 @@ public class NexusStaticSecurityResource
     {
         return "/META-INF/nexus/static-security.xml";
     }
-
-    public Configuration getConfiguration()
-    {
-        return null;
-    }
 }

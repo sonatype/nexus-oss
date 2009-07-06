@@ -30,7 +30,39 @@ public class AccessTest
     extends AbstractProxyTestEnvironment
 {
     private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
+    
 
+    @Override
+    public void setUp()
+        throws Exception
+    {
+        ApplicationConfiguration applicationConfiguration = this.lookup( ApplicationConfiguration.class );
+        applicationConfiguration.saveConfiguration();
+
+        super.setUp();
+
+        String resource = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security-configuration.xml";
+        URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
+        FileUtils.copyURLToFile( url, new File( CONF_HOME, "security-configuration.xml" ) );
+
+        TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
+
+        Target t1 = new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays
+            .asList( new String[] { ".*" } ) );
+
+        targetRegistry.addRepositoryTarget( t1 );
+
+        // setup security
+        this.lookup( SecuritySystem.class ).start(); // need to call start to clear caches
+    }
+
+    @Override
+    protected void customizeContext( Context ctx )
+    {
+        super.customizeContext( ctx );
+        ctx.put( "security-xml-file", new File( CONF_HOME, "security.xml" ).getAbsolutePath() );
+    }
+    
     @Override
     protected EnvironmentBuilder getEnvironmentBuilder()
         throws Exception
@@ -138,34 +170,4 @@ public class AccessTest
         return buffer.toString();
     }
 
-    @Override
-    public void setUp()
-        throws Exception
-    {
-        ApplicationConfiguration applicationConfiguration = this.lookup( ApplicationConfiguration.class );
-        applicationConfiguration.saveConfiguration();
-
-        super.setUp();
-
-        String resource = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security-configuration.xml";
-        URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
-        FileUtils.copyURLToFile( url, new File( CONF_HOME, "security-configuration.xml" ) );
-
-        TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
-
-        Target t1 = new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays
-            .asList( new String[] { ".*" } ) );
-
-        targetRegistry.addRepositoryTarget( t1 );
-
-        // setup security
-        this.lookup( SecuritySystem.class );
-    }
-
-    @Override
-    protected void customizeContext( Context ctx )
-    {
-        super.customizeContext( ctx );
-        ctx.put( "security-xml-file", new File( CONF_HOME, "security.xml" ).getAbsolutePath() );
-    }
 }

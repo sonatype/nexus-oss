@@ -22,13 +22,13 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.subject.Subject;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.target.TargetMatch;
 import org.sonatype.nexus.proxy.target.TargetSet;
+import org.sonatype.security.SecuritySystem;
 
 /**
  * Default implementation of Nexus Authorizer, that relies onto JSecurity.
@@ -39,7 +39,7 @@ public class DefaultNexusItemAuthorizer
     implements NexusItemAuthorizer
 {
     @Requirement
-    private ApplicationConfiguration applicationConfiguration;
+    private SecuritySystem securitySystem;
 
     @Requirement
     private RepositoryRegistry repoRegistry;
@@ -141,7 +141,7 @@ public class DefaultNexusItemAuthorizer
         // Get the current user
         Subject subject = SecurityUtils.getSubject();
 
-        if ( applicationConfiguration.isSecurityEnabled() )
+        if ( this.securitySystem.isSecurityEnabled() )
         {
             if ( subject != null )
             {

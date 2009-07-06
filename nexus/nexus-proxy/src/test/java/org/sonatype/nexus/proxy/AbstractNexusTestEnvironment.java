@@ -17,6 +17,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.scheduling.Scheduler;
+import org.sonatype.security.SecuritySystem;
 
 public abstract class AbstractNexusTestEnvironment
     extends AbstractNexusTestCase
@@ -44,6 +45,8 @@ public abstract class AbstractNexusTestEnvironment
         cacheManager = lookup( CacheManager.class );
 
         repositoryItemUidFactory = lookup( RepositoryItemUidFactory.class );
+        
+        this.lookup( SecuritySystem.class ).setSecurityEnabled( false );
     }
 
     /**

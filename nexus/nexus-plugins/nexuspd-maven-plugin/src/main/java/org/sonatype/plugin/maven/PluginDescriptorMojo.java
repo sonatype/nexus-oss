@@ -92,6 +92,12 @@ public class PluginDescriptorMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
+        if( !this.mavenProject.getPackaging().equals( "jar" ))
+        {
+            this.getLog().info( "Project is not of packaging type 'jar'." );
+            return;
+        }
+        
         PluginMetadataGenerationRequest request = new PluginMetadataGenerationRequest();
         request.setGroupId( this.mavenProject.getGroupId() );
         request.setArtifactId( this.mavenProject.getArtifactId() );
@@ -193,7 +199,7 @@ public class PluginDescriptorMojo
         }
         catch ( GleanerException e )
         {
-            throw new MojoFailureException( "Failed to generante plugin xml file: " + e.getMessage(), e );
+            throw new MojoFailureException( "Failed to generate plugin xml file: " + e.getMessage(), e );
         }
     }
 }

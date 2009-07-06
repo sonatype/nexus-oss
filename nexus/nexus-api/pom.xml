@@ -22,11 +22,6 @@
 
   <dependencies>
 
-    <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-host-api</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -147,6 +142,11 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+    	<groupId>org.sonatype.plugin</groupId>
+    	<artifactId>plugin-host-api</artifactId>
+    	<version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>

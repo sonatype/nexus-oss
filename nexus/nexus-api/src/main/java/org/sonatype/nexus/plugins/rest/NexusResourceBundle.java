@@ -16,6 +16,8 @@ package org.sonatype.nexus.plugins.rest;
 import java.util.List;
 import java.util.Map;
 
+import org.sonatype.plugin.ExtensionPoint;
+
 /**
  * A Resource bundle meant for extending/contributing/spoofing existing resources (JS, CSS, Images, etc) of the Nexus
  * Web Application. This component is able only to contribute static resources, if you want to extends REST API, please
@@ -40,6 +42,7 @@ import java.util.Map;
  * 
  * @author cstamas
  */
+@ExtensionPoint
 public interface NexusResourceBundle
 {
     /**

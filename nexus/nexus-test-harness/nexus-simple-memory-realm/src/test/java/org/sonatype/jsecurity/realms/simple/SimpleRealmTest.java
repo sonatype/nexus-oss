@@ -33,6 +33,7 @@ import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.realms.tools.ConfigurationManager;
 
 public class SimpleRealmTest
     extends AbstractNexusTestCase
@@ -161,6 +162,10 @@ public class SimpleRealmTest
 
             nexusConfiguration.saveConfiguration();
         }
+        
+        // restart security
+        this.lookup( ConfigurationManager.class ).clearCache();
+        this.lookup( SecuritySystem.class ).start();
     }
     
 

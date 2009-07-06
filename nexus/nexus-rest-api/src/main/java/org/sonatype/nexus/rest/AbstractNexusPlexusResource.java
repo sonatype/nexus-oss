@@ -17,11 +17,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.commons.fileupload.FileItemFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -38,8 +39,6 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -58,15 +57,19 @@ public abstract class AbstractNexusPlexusResource
 {
     public static final String NEXUS_INSTANCE_LOCAL = "local";
 
+    @Inject
     @Requirement
     private Nexus nexus;
 
+    @Inject
     @Requirement
     private NexusConfiguration nexusConfiguration;
 
+    @Inject
     @Requirement( hint = "protected" )
     private RepositoryRegistry repositoryRegistry;
     
+    @Inject
     @Requirement
     private ReferenceFactory referenceFactory;
 
