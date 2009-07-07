@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.apache.commons.fileupload.FileItemFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -57,19 +55,15 @@ public abstract class AbstractNexusPlexusResource
 {
     public static final String NEXUS_INSTANCE_LOCAL = "local";
 
-    @Inject
     @Requirement
     private Nexus nexus;
 
-    @Inject
     @Requirement
     private NexusConfiguration nexusConfiguration;
 
-    @Inject
     @Requirement( hint = "protected" )
     private RepositoryRegistry repositoryRegistry;
     
-    @Inject
     @Requirement
     private ReferenceFactory referenceFactory;
 
