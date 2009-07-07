@@ -37,7 +37,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginDeactivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
-import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
+import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
@@ -79,8 +79,8 @@ public class DefaultNexusPluginManager
     @Requirement
     private PlexusContainer plexusContainer;
 
-    @Requirement( hint = "file" )
-    private NexusPluginRepository nexusPluginRepository;
+    @Requirement
+    private PluginRepositoryManager pluginRepositoryManager;
 
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
@@ -131,7 +131,7 @@ public class DefaultNexusPluginManager
     {
         PluginManagerResponse result = new PluginManagerResponse();
 
-        Collection<PluginCoordinates> availablePlugins = nexusPluginRepository.findAvailablePlugins();
+        Collection<PluginCoordinates> availablePlugins = pluginRepositoryManager.findAvailablePlugins();
 
         for ( PluginCoordinates pluginCoordinate : availablePlugins )
         {
@@ -169,7 +169,7 @@ public class DefaultNexusPluginManager
 
         try
         {
-            File pluginFile = nexusPluginRepository.resolvePlugin( pluginCoordinates );
+            File pluginFile = pluginRepositoryManager.resolvePlugin( pluginCoordinates );
 
             PluginMetadata pluginMetadata = null;
 
@@ -185,8 +185,8 @@ public class DefaultNexusPluginManager
             if ( pluginMetadata == null )
             {
                 // this is not a nexus plugin!
-                result.setThrowable( new IllegalArgumentException( "The file \"" + pluginFile.getAbsolutePath()
-                    + "\" is not a nexus plugin, it does not have plugin metadata!" ) );
+                result.setThrowable( new InvalidPluginException( pluginCoordinates, "The file \""
+                    + pluginFile.getAbsolutePath() + "\" is not a nexus plugin, it does not have plugin metadata!" ) );
 
                 return result;
             }
@@ -233,7 +233,7 @@ public class DefaultNexusPluginManager
             }
 
             // get plugin dependecies (not inter-plugin but other libs, jars)
-            Collection<File> dependencies = nexusPluginRepository.resolvePluginDependencies( pluginCoordinates );
+            Collection<File> dependencies = pluginRepositoryManager.resolvePluginDependencies( pluginCoordinates );
 
             // file the realm
             for ( File dependencyFile : dependencies )
@@ -252,7 +252,7 @@ public class DefaultNexusPluginManager
 
             // register it
             registerPlugin( discoveryContext );
-            
+
             // stuff the result
             result.setPluginDescriptor( discoveryContext.getPluginDescriptor() );
         }

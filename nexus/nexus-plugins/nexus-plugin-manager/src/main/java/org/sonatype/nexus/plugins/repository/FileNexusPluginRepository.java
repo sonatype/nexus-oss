@@ -24,10 +24,12 @@ import org.sonatype.nexus.plugins.PluginCoordinates;
  * 
  * @author cstamas
  */
-@Component( role = NexusPluginRepository.class, hint = "file" )
+@Component( role = NexusPluginRepository.class, hint = FileNexusPluginRepository.REPO_TYPE )
 public class FileNexusPluginRepository
     implements NexusPluginRepository
 {
+    protected static final String REPO_TYPE = "file";
+
     @Configuration( value = "${nexus-work}/plugin-repository" )
     private File nexusPluginsDirectory;
 
@@ -39,6 +41,11 @@ public class FileNexusPluginRepository
         }
 
         return nexusPluginsDirectory;
+    }
+
+    public String getId()
+    {
+        return REPO_TYPE;
     }
 
     public Collection<PluginCoordinates> findAvailablePlugins()
@@ -101,7 +108,14 @@ public class FileNexusPluginRepository
     {
         File pluginFile = new File( getPluginFolder( coordinates ), getPluginFileName( coordinates ) );
 
-        return pluginFile;
+        if ( pluginFile.isFile() )
+        {
+            return pluginFile;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public Collection<File> resolvePluginDependencies( PluginCoordinates coordinates )
@@ -118,7 +132,10 @@ public class FileNexusPluginRepository
             {
                 for ( File dep : deps )
                 {
-                    result.add( dep );
+                    if ( dep.isFile() )
+                    {
+                        result.add( dep );
+                    }
                 }
             }
         }
