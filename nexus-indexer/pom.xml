@@ -38,6 +38,7 @@
   </dependencyManagement>
 
   <dependencies>
+  
     <!-- Maven -->
     <dependency>
       <groupId>org.apache.maven</groupId>
