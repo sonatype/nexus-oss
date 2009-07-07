@@ -1127,6 +1127,13 @@
           <description>Password of an account in the jira server</description>
           <required>false</required>
         </field>
+        <field>
+          <name>useGlobalProxy</name>
+          <version>1.4.0+</version>
+          <type>boolean</type>
+          <description>whether to use the global proxy config for requests sent to jira</description>
+          <required>false</required>
+        </field>
       </fields>
     </class>
 

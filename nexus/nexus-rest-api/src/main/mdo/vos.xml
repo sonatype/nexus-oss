@@ -354,6 +354,12 @@
           <type>String</type>
           <required>true</required>
         </field>
+        <field>
+          <name>useGlobalProxy</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>false</required>
+        </field>
       </fields>
     </class>
 

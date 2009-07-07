@@ -162,6 +162,14 @@ public class DefaultErrorReportingManager
         subRequest.setProblemReportBundle( assembleBundle( request ) );
         subRequest.setReporter( StringUtils.isNotEmpty( errorConfig.getJiraUsername() ) ? errorConfig.getJiraUsername() : DEFAULT_USERNAME );
         subRequest.setComponent( COMPONENT );
+        
+        if ( errorConfig.isUseGlobalProxy() )
+        {
+            subRequest.setProxyConfigurator( 
+                new NexusProxyServerConfigurator( 
+                    nexusConfig.getGlobalRemoteStorageContext(), 
+                    getLogger() ) );
+        }
 
         return subRequest;
     }

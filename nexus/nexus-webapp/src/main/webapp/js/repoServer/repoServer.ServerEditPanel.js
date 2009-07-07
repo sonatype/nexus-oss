@@ -539,6 +539,14 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             anchor: Sonatype.view.FIELD_OFFSET,
             name: 'errorReportingSettings.jiraPassword',
             allowBlank:true
+          },
+          {
+            xtype: 'checkbox',
+            fieldLabel: 'Use Default HTTP Proxy Settings',
+            helpText: 'Apply the default HTTP Proxy Settings to the jira connection',
+            name: 'errorReportingSettings.useGlobalProxy',
+            anchor: Sonatype.view.FIELD_OFFSET,
+            allowBlank: true
           }
         ]
       }

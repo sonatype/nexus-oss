@@ -40,7 +40,8 @@ Sonatype.repoServer.referenceData = {
     },
     errorReportingSettings: {
       jiraUsername: "",
-      jiraPassword: ""
+      jiraPassword: "",
+      useGlobalProxy: false
     },
     globalConnectionSettings: {
       connectionTimeout: 0,

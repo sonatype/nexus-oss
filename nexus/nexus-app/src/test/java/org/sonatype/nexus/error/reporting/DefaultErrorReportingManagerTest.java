@@ -20,6 +20,8 @@ import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.scheduling.SchedulerTask;
 
@@ -44,7 +46,7 @@ public class DefaultErrorReportingManagerTest
         manager = ( DefaultErrorReportingManager ) lookup( ErrorReportingManager.class );
     }
     
-    private CErrorReporting enableErrorReports() 
+    private CErrorReporting enableErrorReports( boolean useProxy ) 
         throws ConfigurationException, IOException
     {
         CErrorReporting config = new CErrorReporting();
@@ -53,16 +55,35 @@ public class DefaultErrorReportingManagerTest
         config.setJiraProject( "*****" );
         config.setJiraUsername( "*****" );
         config.setJiraPassword( "*****" );
+        config.setUseGlobalProxy( useProxy );
         
         nexusConfig.updateErrorReporting( config );
         
         return config;
     }
     
+    private void enableProxy() 
+        throws ConfigurationException, IOException
+    {
+        CRemoteHttpProxySettings settings = new CRemoteHttpProxySettings();
+        settings.setProxyHostname( "localhost" );
+        settings.setProxyPort( 8111 );
+        
+        CRemoteAuthentication auth = new CRemoteAuthentication();
+        auth.setUsername( "*****" );
+        auth.setPassword( "*****" );
+        
+        settings.setAuthentication( auth );
+        
+        nexusConfig.updateGlobalRemoteHttpProxySettings( settings );
+    }
+    
     public void donttestJiraAccess()
         throws Exception
     {
-        CErrorReporting config = enableErrorReports();
+        CErrorReporting config = enableErrorReports( true );
+        
+        enableProxy();
         
         ErrorReportRequest request = new ErrorReportRequest();
 
@@ -193,7 +214,7 @@ public class DefaultErrorReportingManagerTest
     public void donttestTaskFailure()
         throws Exception
     {
-        CErrorReporting config = enableErrorReports();
+        CErrorReporting config = enableErrorReports( false );
         
         NexusTask<?> task = ( NexusTask<?> ) lookup( SchedulerTask.class, "ExceptionTask" );
 

@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.httpclient.Header;
@@ -29,11 +27,7 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthPolicy;
-import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
@@ -56,12 +50,7 @@ import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
-import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
-import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
-import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -300,7 +289,7 @@ public class CommonsHttpClientRemoteStorage
     {
         HttpClient httpClient = null;
 
-        HostConfiguration httpConfiguration = null;
+        
 
         getLogger().info( "Remote storage settings change detected, updating HttpClient..." );
 
@@ -315,131 +304,10 @@ public class CommonsHttpClientRemoteStorage
         connManager.setParams( connManagerParams );
 
         httpClient = new HttpClient( connManager );
-        httpClient.getParams().setConnectionManagerTimeout( timeout );
-        httpClient.getParams().setSoTimeout( timeout );
 
-        httpConfiguration = httpClient.getHostConfiguration();
-
-        // BASIC and DIGEST auth only
-        RemoteAuthenticationSettings ras = ctx.getRemoteAuthenticationSettings();
-
-        if ( ras != null )
-        {
-            // we have authentication, let's do it preemptive
-            httpClient.getParams().setAuthenticationPreemptive( true );
-
-            List<String> authPrefs = new ArrayList<String>( 2 );
-            authPrefs.add( AuthPolicy.DIGEST );
-            authPrefs.add( AuthPolicy.BASIC );
-
-            if ( ras instanceof ClientSSLRemoteAuthenticationSettings )
-            {
-                // ClientSSLRemoteAuthenticationSettings cras = (ClientSSLRemoteAuthenticationSettings) ras;
-
-                // TODO - implement this
-            }
-            else if ( ras instanceof NtlmRemoteAuthenticationSettings )
-            {
-                NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
-
-                // Using NTLM auth, adding it as first in policies
-                authPrefs.add( 0, AuthPolicy.NTLM );
-
-                getLogger().info( "... authentication setup for NTLM domain {}" + nras.getNtlmDomain() );
-
-                httpConfiguration.setHost( nras.getNtlmHost() );
-
-                httpClient.getState().setCredentials(
-                                                      AuthScope.ANY,
-                                                      new NTCredentials( nras.getUsername(), nras.getPassword(), nras
-                                                          .getNtlmHost(), nras.getNtlmDomain() ) );
-            }
-            else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
-            {
-                UsernamePasswordRemoteAuthenticationSettings uras = (UsernamePasswordRemoteAuthenticationSettings) ras;
-
-                // Using Username/Pwd auth, will not add NTLM
-                getLogger().info( "... authentication setup for remote storage with username " + uras.getUsername() );
-
-                httpClient.getState().setCredentials(
-                                                      AuthScope.ANY,
-                                                      new UsernamePasswordCredentials( uras.getUsername(), uras
-                                                          .getPassword() ) );
-            }
-
-            httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
-        }
-
-        RemoteProxySettings rps = ctx.getRemoteProxySettings();
-
-        if ( rps != null )
-        {
-            getLogger().info( "... proxy setup with host " + rps.getHostname() );
-
-            httpConfiguration.setProxy( rps.getHostname(), rps.getPort() );
-
-            if ( rps.getProxyAuthentication() != null )
-            {
-                ras = rps.getProxyAuthentication();
-                
-                List<String> authPrefs = new ArrayList<String>( 2 );
-                authPrefs.add( AuthPolicy.DIGEST );
-                authPrefs.add( AuthPolicy.BASIC );
-
-                if ( ras instanceof ClientSSLRemoteAuthenticationSettings )
-                {
-                    // ClientSSLRemoteAuthenticationSettings cras = (ClientSSLRemoteAuthenticationSettings) ras;
-
-                    // TODO - implement this
-                }
-                else if ( ras instanceof NtlmRemoteAuthenticationSettings )
-                {
-                    NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
-
-                    // Using NTLM auth, adding it as first in policies
-                    authPrefs.add( 0, AuthPolicy.NTLM );
-
-                    if ( ctx.getRemoteAuthenticationSettings() != null
-                        && ( ctx.getRemoteAuthenticationSettings() instanceof NtlmRemoteAuthenticationSettings ) )
-                    {
-                        getLogger().warn(
-                                          "... Apache Commons HttpClient 3.x is unable to use NTLM auth scheme\n"
-                                              + " for BOTH server side and proxy side authentication!\n"
-                                              + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
-                                              + " if you have to use NTLM proxy, otherwise it will not work!\n"
-                                              + " *** SERVER SIDE AUTH OVERRIDDEN" );
-                    }
-
-                    getLogger().info( "... proxy authentication setup for NTLM domain " + nras.getNtlmDomain() );
-
-                    httpConfiguration.setHost( nras.getNtlmHost() );
-
-                    httpClient.getState().setProxyCredentials(
-                                                               AuthScope.ANY,
-                                                               new NTCredentials( nras.getUsername(), nras
-                                                                   .getPassword(), nras.getNtlmHost(), nras
-                                                                   .getNtlmDomain() ) );
-                }
-                else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
-                {
-                    UsernamePasswordRemoteAuthenticationSettings uras =
-                        (UsernamePasswordRemoteAuthenticationSettings) ras;
-
-                    // Using Username/Pwd auth, will not add NTLM
-                    getLogger().info(
-                                      "... proxy authentication setup for remote storage with username "
-                                          + uras.getUsername() );
-
-                    httpClient.getState().setProxyCredentials(
-                                                               AuthScope.ANY,
-                                                               new UsernamePasswordCredentials( uras.getUsername(),
-                                                                                                uras.getPassword() ) );
-                }
-
-                httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
-            }
-
-        }
+        HostConfiguration httpConfiguration = httpClient.getHostConfiguration();
+        
+        HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, getLogger() );
 
         ctx.putRemoteConnectionContextObject( CTX_KEY_CLIENT, httpClient );
 
