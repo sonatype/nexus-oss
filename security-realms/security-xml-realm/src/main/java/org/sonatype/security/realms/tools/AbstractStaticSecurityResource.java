@@ -17,8 +17,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import javax.inject.Inject;
-
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
@@ -30,7 +28,6 @@ import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 public abstract class AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
-    @Inject
     @Requirement
     private Logger logger;
 
