@@ -29,14 +29,6 @@ public class DefaultStaticResource
     
     private String contentType;
     
-    @Deprecated
-    public DefaultStaticResource( URL url, String path )
-    {
-        this.resourceURL = url;
-
-        this.path = path;
-    }
-
     public DefaultStaticResource( URL url, String path, String contentType )
     {
         this.resourceURL = url;

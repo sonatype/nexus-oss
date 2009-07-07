@@ -3,7 +3,6 @@ package org.sonatype.nexus.plugins;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -61,29 +60,4 @@ public class PluginResourceBundle
             return result;
         }
     }
-
-    public String getPostBodyContribution( Map<String, Object> context )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public String getPostHeadContribution( Map<String, Object> context )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public String getPreBodyContribution( Map<String, Object> context )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public String getPreHeadContribution( Map<String, Object> context )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

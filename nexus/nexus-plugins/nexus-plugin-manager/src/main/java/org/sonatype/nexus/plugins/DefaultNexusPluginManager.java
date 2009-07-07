@@ -590,15 +590,16 @@ public class DefaultNexusPluginManager
     protected void convertPluginMetadata( PluginDiscoveryContext pluginDiscoveryContext )
         throws GleanerException, IOException
     {
-        for ( String className : pluginDiscoveryContext.getPluginDescriptor().getExports() )
+        PluginDescriptor pd = pluginDiscoveryContext.getPluginDescriptor();
+
+        for ( String className : pd.getExports() )
         {
             String resourceName = className.replaceAll( "\\.", "/" ) + ".class";
 
-            if ( pluginDiscoveryContext.getPluginDescriptor().getPluginRealm().getResource( resourceName ) != null )
+            if ( pd.getPluginRealm().getRealmResource( resourceName ) != null )
             {
                 PlexusComponentGleanerRequest request =
-                    new PlexusComponentGleanerRequest( className, pluginDiscoveryContext.getPluginDescriptor()
-                        .getPluginRealm() );
+                    new PlexusComponentGleanerRequest( className, pd.getPluginRealm() );
 
                 // listen for repository types
                 request.getMarkerAnnotations().add( RepositoryType.class );
@@ -616,13 +617,21 @@ public class DefaultNexusPluginManager
                             new PluginRepositoryType( response.getComponentDescriptor().getRole(), repositoryTypeAnno
                                 .pathPrefix() );
 
-                        pluginDiscoveryContext.getPluginDescriptor().getPluginRepositoryTypes()
-                            .put( pluginRepositoryType.getComponentContract(), pluginRepositoryType );
+                        pd.getPluginRepositoryTypes().put( pluginRepositoryType.getComponentContract(),
+                                                           pluginRepositoryType );
                     }
 
-                    pluginDiscoveryContext.getPluginDescriptor().addComponentDescriptor(
-                                                                                         response
-                                                                                             .getComponentDescriptor() );
+                    pd.addComponentDescriptor( response.getComponentDescriptor() );
+                }
+                else
+                {
+                    // is it some static resource?
+                    if ( className.startsWith( "static/" ) )
+                    {
+                        pd.getPluginStaticResourceModels().add(
+                                                                new PluginStaticResourceModel( className, className,
+                                                                                               "text/plain" ) );
+                    }
                 }
             }
         }

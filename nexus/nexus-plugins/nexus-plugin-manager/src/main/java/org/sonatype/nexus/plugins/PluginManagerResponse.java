@@ -154,7 +154,20 @@ public class PluginManagerResponse
                             + "\", to be published at path \"" + repoType.getPathPrefix() + "\"\n" );
                     }
                 }
-                
+
+                if ( !pluginDescriptor.getPluginStaticResourceModels().isEmpty() )
+                {
+                    sb.append( "\n" );
+                    sb.append( "         Plugin contributed these static resources:\n" );
+
+                    for ( PluginStaticResourceModel model : pluginDescriptor.getPluginStaticResourceModels() )
+                    {
+                        sb.append( "         * Resource path \"" + model.getResourcePath()
+                            + "\", to be published at path \"" + model.getPublishedPath() + "\", content type \""
+                            + model.getContentType() + "\"\n" );
+                    }
+                }
+
                 sb.append( "\n" );
             }
         }

@@ -40,7 +40,7 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
+import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
@@ -55,8 +55,8 @@ public class IndexTemplatePlexusResource
     @Requirement
     private Nexus nexus;
 
-    @Requirement( role = NexusResourceBundle.class )
-    private Map<String, NexusResourceBundle> bundles;
+    @Requirement( role = NexusIndexHtmlCustomizer.class )
+    private Map<String, NexusIndexHtmlCustomizer> bundles;
     
     @Configuration( value = "${index.template.file}" )
     String templateFilename;
@@ -141,7 +141,7 @@ public class IndexTemplatePlexusResource
         {
             pluginContext = new HashMap<String, Object>( topContext );
 
-            NexusResourceBundle bundle = bundles.get( key );
+            NexusIndexHtmlCustomizer bundle = bundles.get( key );
 
             pluginContext.put( "bundle", bundle );
 
