@@ -20,7 +20,6 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.plugin.ExtensionPoint;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -29,7 +28,6 @@ import com.thoughtworks.xstream.XStream;
  * 
  * @author cstamas
  */
-@ExtensionPoint
 public interface PlexusResource
 {
     /**
