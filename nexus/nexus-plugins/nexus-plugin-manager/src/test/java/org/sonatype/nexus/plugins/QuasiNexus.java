@@ -1,9 +1,11 @@
 package org.sonatype.nexus.plugins;
 
-import junit.framework.TestCase;
+import junit.framework.Assert;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 
@@ -12,7 +14,10 @@ public class QuasiNexus
     implements Initializable
 {
     @Requirement
-    private NexusPluginManager nexusPluginManager;
+    private PlexusContainer plexusContainer;
+
+    @Requirement( role = NexusPluginManager.class )
+    private DefaultNexusPluginManager nexusPluginManager;
 
     @Requirement
     private MockComponent mc;
@@ -21,41 +26,66 @@ public class QuasiNexus
         throws InitializationException
     {
         // within Nexus, all is happening in initialize() method
-        
-        // record pre-discovery state
-        int customizersPre = mc.getCustomizers().size();
-        int processorsPre = mc.getProcessors().size();
 
-        // do discovery, both recorded value should be +1
-        PluginManagerResponse pmresponse = nexusPluginManager.activateInstalledPlugins();
+        try
+        {
+            // record pre-discovery state
+            int customizersPre = mc.getCustomizers().size();
+            int processorsPre = mc.getProcessors().size();
 
-        
-        TestCase.assertEquals( "One plugin should be discovered!", 2, pmresponse.getProcessedPluginResponses().size() );
-        TestCase.assertEquals( "Should be okay!", RequestResult.COMPLETELY_EXECUTED, pmresponse.getResult() );
+            // do discovery, both recorded value should be +1
+            PluginManagerResponse pmresponse = nexusPluginManager.activateInstalledPlugins();
 
-        // record post-discovery state
-        int customizersPost = mc.getCustomizers().size();
-        int processorsPost = mc.getProcessors().size();
+            Assert.assertEquals( "Two plugins should be discovered!", 2, pmresponse.getProcessedPluginResponses()
+                .size() );
+            Assert.assertEquals( "Should be okay!", RequestResult.COMPLETELY_EXECUTED, pmresponse.getResult() );
 
-        // we had discovered some?
-        TestCase.assertTrue( "The map should grow!", customizersPre < customizersPost );
-        TestCase.assertTrue( "The map should grow!", processorsPre < processorsPost );
+            // record post-discovery state
+            int customizersPost = mc.getCustomizers().size();
+            int processorsPost = mc.getProcessors().size();
 
-        // now destroy
-        PluginResponse presponse =
-            nexusPluginManager.deactivatePlugin( pmresponse.getProcessedPluginCoordinates().get( 0 ) );
+            // we had discovered some?
+            Assert.assertTrue( "The map should grow!", customizersPre < customizersPost );
+            Assert.assertTrue( "The map should grow!", processorsPre < processorsPost );
 
-        TestCase.assertEquals( "Should be succesful!", true, presponse.isSuccesful() );
+            // lookup the virus customizer from plugin
+            Object virusScanner =
+                plexusContainer.lookup( "org.sonatype.nexus.plugin.samples.kungfu.VirusScanner", "XY" );
+            Assert.assertNotNull( virusScanner );
 
-        // record post-destroy state
-        int customizersDestroy = mc.getCustomizers().size();
-        int processorsDestroy = mc.getProcessors().size();
+            // lookup the collector from other plugin
+            Object infectedFilesCollector =
+                plexusContainer.lookup( "org.sonatype.nexus.plugin.samples.interdep.InfectedFilesCollector" );
+            Assert.assertNotNull( infectedFilesCollector );
 
-        // we had destroyed some?
-        TestCase.assertTrue( "The map should shrink!", customizersDestroy < customizersPost );
-        TestCase.assertTrue( "The map should shrink!", processorsDestroy < processorsPost );
-        TestCase.assertTrue( "The map should shrink!", customizersDestroy == customizersPre );
-        TestCase.assertTrue( "The map should shrink!", processorsDestroy == processorsPre );
+            // lookup the collector from other plugin
+            Object infectedFilesCollectorFeedSource =
+                plexusContainer.lookup( "org.sonatype.nexus.rest.feeds.sources.FeedSource", "infectedItems" );
+            Assert.assertNotNull( infectedFilesCollectorFeedSource );
+
+            // now destroy
+            PluginResponse presponse1 =
+                nexusPluginManager.deactivatePlugin( pmresponse.getProcessedPluginCoordinates().get( 0 ) );
+            PluginResponse presponse2 =
+                nexusPluginManager.deactivatePlugin( pmresponse.getProcessedPluginCoordinates().get( 1 ) );
+
+            Assert.assertEquals( "Should be succesful!", true, presponse1.isSuccesful() );
+            Assert.assertEquals( "Should be succesful!", true, presponse2.isSuccesful() );
+
+            // record post-destroy state
+            int customizersDestroy = mc.getCustomizers().size();
+            int processorsDestroy = mc.getProcessors().size();
+
+            // we had destroyed some?
+            Assert.assertTrue( "The map should shrink!", customizersDestroy < customizersPost );
+            Assert.assertTrue( "The map should shrink!", processorsDestroy < processorsPost );
+            Assert.assertTrue( "The map should shrink!", customizersDestroy == customizersPre );
+            Assert.assertTrue( "The map should shrink!", processorsDestroy == processorsPre );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new InitializationException( "Bad!", e );
+        }
     }
 
 }

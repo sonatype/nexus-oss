@@ -1,40 +1,33 @@
 package org.sonatype.nexus.plugins.events;
 
 import org.sonatype.nexus.plugins.NexusPluginManager;
-import org.sonatype.nexus.plugins.NexusPluginValidator;
-import org.sonatype.nexus.plugins.PluginDescriptor;
+import org.sonatype.nexus.plugins.PluginCoordinates;
 import org.sonatype.plexus.appevents.AbstractEvent;
 
 public class PluginRejectedEvent
     extends AbstractEvent<NexusPluginManager>
 {
-    private final PluginDescriptor pluginDescriptor;
+    private final PluginCoordinates pluginCoordinates;
 
-    private final NexusPluginValidator validator;
+    private final Throwable reason;
 
-    public PluginRejectedEvent( NexusPluginManager component, PluginDescriptor pluginDescriptor,
-                                NexusPluginValidator validator )
+    public PluginRejectedEvent( NexusPluginManager component, PluginCoordinates pluginCoordinates, Throwable reason )
     {
         super( component );
 
-        this.pluginDescriptor = pluginDescriptor;
+        this.pluginCoordinates = pluginCoordinates;
 
-        this.validator = validator;
+        this.reason = reason;
     }
 
-    public String getPluginKey()
+    public PluginCoordinates getPluginCoordinates()
     {
-        return getPluginDescriptor().getPluginCoordinates().getPluginKey();
+        return pluginCoordinates;
     }
 
-    public PluginDescriptor getPluginDescriptor()
+    public Throwable getReason()
     {
-        return pluginDescriptor;
-    }
-
-    public NexusPluginValidator getNexusPluginValidator()
-    {
-        return validator;
+        return reason;
     }
 
     public NexusPluginManager getNexusPluginManager()

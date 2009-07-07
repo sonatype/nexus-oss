@@ -34,7 +34,8 @@ public class DefaultInterPluginDependencyResolver
             else
             {
                 // RECURSION, SOLVE THIS IN MORE ELEGANT WAY
-                PluginResponse response = nexusPluginManager.activatePlugin( depCoord );
+                // TODO: this must be solved in DefaultNexusPluginManager, this is s-t-u-p-i-d
+                PluginResponse response = ( (DefaultNexusPluginManager) nexusPluginManager ).activatePlugin( depCoord );
 
                 if ( !response.isSuccesful() )
                 {

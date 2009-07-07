@@ -3,8 +3,9 @@ package org.sonatype.nexus.plugins;
 public class DefaultNexusPluginValidator
     implements NexusPluginValidator
 {
-    public boolean validate( PluginDescriptor plugin )
+    public void validate( PluginDescriptor plugin )
+        throws InvalidPluginException
     {
-        return true;
+        // DO NOTHING YET
     }
 }

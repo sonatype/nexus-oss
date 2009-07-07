@@ -35,8 +35,4 @@ public interface NexusPluginManager
      * @param coords
      */
     PluginManagerResponse uninstallPlugin( PluginCoordinates coords );
-
-    PluginResponse activatePlugin( PluginCoordinates pluginCoordinates );
-
-    PluginResponse deactivatePlugin( PluginCoordinates pluginCoordinates );
 }

@@ -7,6 +7,6 @@ public class QuasiNexusPluginManagerTest
         throws Exception
     {
         // all happens in initialize() method, look at QuasiNexus
-        // lookup( QuasiNexus.class );
+        lookup( QuasiNexus.class );
     }
 }
