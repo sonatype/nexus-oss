@@ -1,8 +1,13 @@
 package org.sonatype.nexus.plugins;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.util.StringUtils;
 
 public class PluginManagerResponse
 {
@@ -12,7 +17,7 @@ public class PluginManagerResponse
 
     public PluginManagerResponse()
     {
-        result = RequestResult.COMPLETELY_EXECUTED;
+        result = RequestResult.COMPLETED;
     }
 
     public PluginManagerResponse( RequestResult result )
@@ -24,7 +29,7 @@ public class PluginManagerResponse
 
     public boolean isSuccessful()
     {
-        return getResult().equals( RequestResult.COMPLETELY_EXECUTED );
+        return getResult().equals( RequestResult.COMPLETED );
     }
 
     public RequestResult getResult()
@@ -56,7 +61,7 @@ public class PluginManagerResponse
 
         if ( !response.isSuccesful() )
         {
-            setResult( RequestResult.PARTIALLY_EXECUTED );
+            setResult( RequestResult.PARTIAL );
         }
     }
 
@@ -82,5 +87,78 @@ public class PluginManagerResponse
         }
 
         return processedPlugins;
+    }
+
+    // ==
+
+    public String formatAsString( boolean detailed )
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append( "Plugin manager action execution was: " ).append( getResult().toString() ).append( "\n" );
+        sb.append( "\n" );
+        sb.append( "Following plugins were processed:\n" );
+
+        for ( PluginResponse response : getProcessedPluginResponses() )
+        {
+            sb.append( "... " ).append( response.getPluginCoordinates().toString() ).append( " :: " )
+                .append( response.isSuccesful() ? "Activated" : "FAILED!" ).append( "\n" );
+
+            if ( !response.isSuccesful() )
+            {
+                sb.append( "       Reason:" ).append( response.getThrowable().getLocalizedMessage() );
+
+                if ( detailed )
+                {
+                    StringWriter sw = new StringWriter();
+
+                    response.getThrowable().printStackTrace( new PrintWriter( sw ) );
+
+                    sb.append( "\nStack trace:\n" ).append( sw.toString() );
+                }
+            }
+
+            if ( detailed && response.getPluginDescriptor() != null )
+            {
+                PluginDescriptor pluginDescriptor = response.getPluginDescriptor();
+
+                sb.append( "       Detailed report about the plugin \"" ).append(
+                                                                                  pluginDescriptor
+                                                                                      .getPluginCoordinates()
+                                                                                      .toString() ).append( "\":\n\n" );
+
+                sb.append( "         Source: \"" ).append( pluginDescriptor.getSource() ).append( "\":\n" );
+
+                sb.append( "         Plugin defined these components:\n" );
+
+                for ( ComponentDescriptor<?> component : pluginDescriptor.getComponents() )
+                {
+                    sb.append( "         * FQN of Type \"" ).append( component.getRole() );
+
+                    if ( StringUtils.isNotBlank( component.getRoleHint() ) )
+                    {
+                        sb.append( "\", named as \"" ).append( component.getRoleHint() );
+                    }
+
+                    sb.append( "\", with implementation \"" ).append( component.getImplementation() ).append( "\"\n" );
+                }
+
+                if ( !pluginDescriptor.getPluginRepositoryTypes().isEmpty() )
+                {
+                    sb.append( "\n" );
+                    sb.append( "         Plugin defined these custom Repository Types:\n" );
+
+                    for ( PluginRepositoryType repoType : pluginDescriptor.getPluginRepositoryTypes().values() )
+                    {
+                        sb.append( "         * FQN of Type \"" + repoType.getComponentContract()
+                            + "\", to be published at path \"" + repoType.getPathPrefix() + "\"\n" );
+                    }
+                }
+                
+                sb.append( "\n" );
+            }
+        }
+
+        return sb.toString();
     }
 }

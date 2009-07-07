@@ -16,9 +16,11 @@ public class DefaultNexusPluginManagerTest
 
         // do discovery, both recorded value should be +1
         PluginManagerResponse pmresponse = nexusPluginManager.activateInstalledPlugins();
+        
+        System.out.println( pmresponse.formatAsString( true ) );
 
         assertEquals( "Two plugins should be discovered!", 2, pmresponse.getProcessedPluginResponses().size() );
-        assertEquals( "Should be okay!", RequestResult.COMPLETELY_EXECUTED, pmresponse.getResult() );
+        assertEquals( "Should be okay!", RequestResult.COMPLETED, pmresponse.getResult() );
 
         // record post-discovery state
         int customizersPost = mc.getCustomizers().size();

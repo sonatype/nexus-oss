@@ -2,9 +2,9 @@ package org.sonatype.nexus.plugins;
 
 public enum RequestResult
 {
-    COMPLETELY_EXECUTED,
+    COMPLETED,
 
-    PARTIALLY_EXECUTED,
+    PARTIAL,
 
     FAILED;
 }

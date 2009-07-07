@@ -38,7 +38,7 @@ public class QuasiNexus
 
             Assert.assertEquals( "Two plugins should be discovered!", 2, pmresponse.getProcessedPluginResponses()
                 .size() );
-            Assert.assertEquals( "Should be okay!", RequestResult.COMPLETELY_EXECUTED, pmresponse.getResult() );
+            Assert.assertEquals( "Should be okay!", RequestResult.COMPLETED, pmresponse.getResult() );
 
             // record post-discovery state
             int customizersPost = mc.getCustomizers().size();

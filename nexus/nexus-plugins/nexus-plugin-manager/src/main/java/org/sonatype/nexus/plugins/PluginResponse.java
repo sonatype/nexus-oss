@@ -6,6 +6,8 @@ public class PluginResponse
 
     private Throwable throwable;
 
+    private PluginDescriptor pluginDescriptor;
+
     public PluginResponse( PluginCoordinates pluginCoordinates )
     {
         this.pluginCoordinates = pluginCoordinates;
@@ -29,5 +31,15 @@ public class PluginResponse
     public void setThrowable( Throwable throwable )
     {
         this.throwable = throwable;
+    }
+
+    public PluginDescriptor getPluginDescriptor()
+    {
+        return pluginDescriptor;
+    }
+
+    public void setPluginDescriptor( PluginDescriptor pluginDescriptor )
+    {
+        this.pluginDescriptor = pluginDescriptor;
     }
 }

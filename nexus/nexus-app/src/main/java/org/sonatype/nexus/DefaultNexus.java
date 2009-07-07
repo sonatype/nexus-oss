@@ -54,6 +54,7 @@ import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.plugins.NexusPluginManager;
+import org.sonatype.nexus.plugins.PluginManagerResponse;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -719,7 +720,18 @@ public class DefaultNexus
         getLogger().info( sysInfoLog.toString() );
 
         // load locally present plugins
-        nexusPluginManager.activateInstalledPlugins();
+        getLogger().info( "Activating locally installed plugins..." );
+
+        PluginManagerResponse response = nexusPluginManager.activateInstalledPlugins();
+
+        if ( response.isSuccessful() )
+        {
+            getLogger().info( response.formatAsString( getLogger().isDebugEnabled() ) );
+        }
+        else
+        {
+            getLogger().warn( response.formatAsString( getLogger().isDebugEnabled() ) );
+        }
 
         // EventInspectorHost
         applicationEventMulticaster.addEventListener( eventInspectorHost );
