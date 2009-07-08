@@ -76,7 +76,7 @@ public class RepositoriesTab
             //
         }
 
-        return new RepositoriesEditTabs( selenium );
+        return new RepositoriesEditTabs( selenium, kind );
     }
 
     public MainPage getMainPage()

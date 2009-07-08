@@ -10,19 +10,25 @@ public class RepositoriesEditTabs
 
     public enum RepoKind
     {
-        HOSTED( 2 ), PROXY( 2 ), VIRTUAL( 1 ), GROUP( 2 );
+        HOSTED( 2, 4 ), PROXY( 2, 4 ), VIRTUAL( 1, 2 ), GROUP( 2, -1 );
 
         private int configPosition;
 
-        private RepoKind( int configPosition )
+        private int summaryPosition;
+
+        private RepoKind( int configPosition, int summaryPosition )
         {
             this.configPosition = configPosition;
+            this.summaryPosition = summaryPosition;
         }
     }
 
-    public RepositoriesEditTabs( Selenium selenium )
+    private RepoKind kind;
+
+    public RepositoriesEditTabs( Selenium selenium, RepoKind kind )
     {
         super( selenium, RepositoriesTab.REPOSITORIES_ST + ".cardPanel.getLayout().activeItem.tabPanel" );
+        this.kind = kind;
     }
 
     public void select( int i )
@@ -30,7 +36,7 @@ public class RepositoriesEditTabs
         runScript( ".activate(" + expression + ".items.items[" + i + "])" );
     }
 
-    public Component selectConfiguration( RepoKind kind )
+    public Component selectConfiguration()
     {
         select( kind.configPosition );
 
@@ -44,7 +50,7 @@ public class RepositoriesEditTabs
         }
     }
 
-    public RepositoriesArtifactUploadForm selectUpload( RepoKind kind )
+    public RepositoriesArtifactUploadForm selectUpload()
     {
         if ( !RepoKind.HOSTED.equals( kind ) )
         {
@@ -54,5 +60,17 @@ public class RepositoriesEditTabs
         select( 5 );
 
         return new RepositoriesArtifactUploadForm( selenium, expression + ".getLayout().activeItem" );
+    }
+
+    public RepositorySummary selectSummary()
+    {
+        if ( RepoKind.GROUP.equals( kind ) )
+        {
+            return null;
+        }
+
+        select( kind.summaryPosition );
+
+        return new RepositorySummary( selenium, expression + ".getLayout().activeItem" );
     }
 }

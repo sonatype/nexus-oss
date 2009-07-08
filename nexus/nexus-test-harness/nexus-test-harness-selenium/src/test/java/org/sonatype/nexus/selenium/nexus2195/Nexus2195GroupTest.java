@@ -75,7 +75,7 @@ public class Nexus2195GroupTest
 
         // read
         GroupConfigurationForm config =
-            (GroupConfigurationForm) repositories.select( groupId, RepoKind.GROUP ).selectConfiguration( RepoKind.GROUP );
+            (GroupConfigurationForm) repositories.select( groupId, RepoKind.GROUP ).selectConfiguration( );
 
         Assert.assertEquals( groupId, config.getIdField().getValue() );
         Assert.assertEquals( name, config.getName().getValue() );
@@ -84,7 +84,7 @@ public class Nexus2195GroupTest
 
         // update
         config =
-            (GroupConfigurationForm) repositories.select( groupId, RepoKind.GROUP ).selectConfiguration( RepoKind.GROUP );
+            (GroupConfigurationForm) repositories.select( groupId, RepoKind.GROUP ).selectConfiguration( );
 
         String newName = "new selenium group name";
         config.getName().type( newName );
@@ -93,7 +93,7 @@ public class Nexus2195GroupTest
         repositories.refresh();
 
         config =
-            (GroupConfigurationForm) repositories.select( groupId, RepoKind.GROUP ).selectConfiguration( RepoKind.GROUP );
+            (GroupConfigurationForm) repositories.select( groupId, RepoKind.GROUP ).selectConfiguration( );
         Assert.assertEquals( newName, config.getName().getValue() );
 
         repositories.refresh();

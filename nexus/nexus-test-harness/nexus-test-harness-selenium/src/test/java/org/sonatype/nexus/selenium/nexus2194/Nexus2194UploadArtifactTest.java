@@ -19,7 +19,7 @@ public class Nexus2194UploadArtifactTest
         LoginTest.doLogin( main );
 
         RepositoriesArtifactUploadForm uploadTab =
-            main.openRepositories().select( "thirdparty", RepoKind.HOSTED ).selectUpload( RepoKind.HOSTED );
+            main.openRepositories().select( "thirdparty", RepoKind.HOSTED ).selectUpload( );
         uploadTab.selectDefinition( Definition.POM );
         if ( true )
         {
