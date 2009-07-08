@@ -106,7 +106,7 @@ public class SimpleFeedRecorder
     {
     }
 
-    public void addErrorWarningEvent( String action, String message, Exception exception )
+    public void addErrorWarningEvent( String action, String message, Throwable throwable )
     {
     }
 

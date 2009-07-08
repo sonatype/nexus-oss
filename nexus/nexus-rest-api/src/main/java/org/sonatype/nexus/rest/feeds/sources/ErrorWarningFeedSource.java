@@ -93,7 +93,7 @@ public class ErrorWarningFeedSource
 
             if ( StringUtils.isNotEmpty( item.getStackTrace() ) )
             {
-                contentValue.append( item.getStackTrace() );
+                contentValue.append( "\n" ).append( item.getStackTrace() );
             }
 
             content.setType( MediaType.TEXT_PLAIN.toString() );

@@ -116,7 +116,7 @@ public interface FeedRecorder
 
     void addErrorWarningEvent( String action, String message);
     
-    void addErrorWarningEvent( String action, String message, Exception exception);
+    void addErrorWarningEvent( String action, String message, Throwable throwable);
     
     void addNexusArtifactEvent( NexusArtifactEvent nae );
 

@@ -472,11 +472,11 @@ public class DefaultFeedRecorder
         addErrorWarningEvent( new ErrorWarningEvent( action, message ) );
     }
 
-    public void addErrorWarningEvent( String action, String message, Exception exception )
+    public void addErrorWarningEvent( String action, String message, Throwable throwable )
     {
         StringWriter stringWriter = new StringWriter();
 
-        exception.printStackTrace( new PrintWriter( stringWriter ) );
+        throwable.printStackTrace( new PrintWriter( stringWriter ) );
 
         String stackTrace = stringWriter.toString();
 
@@ -489,6 +489,8 @@ public class DefaultFeedRecorder
 
         putContext( map, errorEvt.getEventContext() );
 
+        map.put( ACTION, errorEvt.getAction() );
+        
         map.put( DATE, getDateFormat().format( errorEvt.getEventDate() ) );
 
         map.put( MESSAGE, errorEvt.getMessage() );
