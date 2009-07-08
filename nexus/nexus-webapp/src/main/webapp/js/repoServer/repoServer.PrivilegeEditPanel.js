@@ -269,7 +269,9 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
         r.sTarget = this.convertTarget( r.repositoryTargetId, r );
         r.sType = this.convertType( r.type, r );
         r.sRepository = this.convertRepository( r.repositoryId, r );
-      }
+        r.sResourceURI = r.resourceURI;
+        r.resourceURI = Sonatype.config.host + Sonatype.config.repos.urls.privileges + '/' + r.id;
+      } 
     }
   }
 } );
