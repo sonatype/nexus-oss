@@ -114,6 +114,10 @@ public interface FeedRecorder
 
     // creating
 
+    void addErrorWarningEvent( String action, String message);
+    
+    void addErrorWarningEvent( String action, String message, Exception exception);
+    
     void addNexusArtifactEvent( NexusArtifactEvent nae );
 
     void addSystemEvent( String action, String message );
@@ -142,4 +146,8 @@ public interface FeedRecorder
     List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter );
     
     List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Long ts, Integer count, TimelineFilter filter );
+    
+    List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter );
+
+    List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Long ts, Integer count, TimelineFilter filter );
 }

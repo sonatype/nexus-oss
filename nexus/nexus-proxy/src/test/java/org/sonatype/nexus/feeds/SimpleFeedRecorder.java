@@ -78,7 +78,7 @@ public class SimpleFeedRecorder
     {
         return Collections.emptyList();
     }
-    
+
     public List<NexusArtifactEvent> getNexusArtifactEvents( Set<String> subtypes, Long ts, Integer count,
         TimelineFilter filter )
     {
@@ -95,9 +95,27 @@ public class SimpleFeedRecorder
     {
         return Collections.emptyList();
     }
-    
+
     public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Long ts, Integer count,
         TimelineFilter filter )
+    {
+        return Collections.emptyList();
+    }
+
+    public void addErrorWarningEvent( String action, String message )
+    {
+    }
+
+    public void addErrorWarningEvent( String action, String message, Exception exception )
+    {
+    }
+
+    public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter )
+    {
+        return Collections.emptyList();
+    }
+
+    public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Long ts, Integer count, TimelineFilter filter )
     {
         return Collections.emptyList();
     }

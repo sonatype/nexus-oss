@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.feeds;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,6 +29,7 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.timeline.NexusTimeline;
 import org.sonatype.timeline.TimelineFilter;
@@ -56,6 +59,8 @@ public class DefaultFeedRecorder
     public static final String MESSAGE = "message";
 
     public static final String DATE = "date";
+
+    public static final String STACK_TRACE = "strace";
 
     /**
      * Event type: repository
@@ -88,6 +93,16 @@ public class DefaultFeedRecorder
     }
 
     /**
+     * Event type: error
+     */
+    private static final String ERROR_WARNING_EVENT_TYPE = "ERROR_WARNING";
+
+    private static final Set<String> ERROR_WARNING_EVENT_TYPE_SET = new HashSet<String>( 1 );
+    {
+        ERROR_WARNING_EVENT_TYPE_SET.add( ERROR_WARNING_EVENT_TYPE );
+    }
+
+    /**
      * The time format used in events.
      */
     private static final String EVENT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSZ";
@@ -97,13 +112,12 @@ public class DefaultFeedRecorder
      */
     @Requirement
     private NexusTimeline nexusTimeline;
-    
+
     /**
      * The Feed filter (will checks for user access )
      */
     @Requirement
     private FeedArtifactEventFilter feedArtifactEventFilter;
-
 
     protected DateFormat getDateFormat()
     {
@@ -232,6 +246,50 @@ public class DefaultFeedRecorder
         return result;
     }
 
+    protected List<ErrorWarningEvent> getEwesFromMaps( List<Map<String, String>> data )
+    {
+        List<ErrorWarningEvent> result = new ArrayList<ErrorWarningEvent>( data.size() );
+
+        for ( Map<String, String> map : data )
+        {
+            ErrorWarningEvent evt = null;
+
+            if ( StringUtils.isEmpty( map.get( STACK_TRACE ) ) )
+            {
+                evt = new ErrorWarningEvent( map.get( ACTION ), map.get( MESSAGE ) );
+            }
+            else
+            {
+                evt = new ErrorWarningEvent( map.get( ACTION ), map.get( MESSAGE ), map.get( STACK_TRACE ) );
+            }
+
+            try
+            {
+                evt.setEventDate( getDateFormat().parse( map.get( DATE ) ) );
+            }
+            catch ( ParseException e )
+            {
+                getLogger().warn( "Could not format event date!", e );
+            }
+
+            HashMap<String, Object> ctx = new HashMap<String, Object>();
+
+            for ( String key : map.keySet() )
+            {
+                if ( key.startsWith( CTX_PREFIX ) )
+                {
+                    ctx.put( key.substring( 4 ), map.get( key ) );
+                }
+            }
+
+            evt.getEventContext().putAll( ctx );
+
+            result.add( evt );
+        }
+
+        return result;
+    }
+
     public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
         TimelineFilter filter )
     {
@@ -246,12 +304,12 @@ public class DefaultFeedRecorder
             return nexusTimeline.retrieveNewest( cnt, types, subtypes, filter );
         }
     }
-    
+
     public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Long ts, Integer count,
         TimelineFilter filter )
     {
         int cnt = count != null ? count : DEFAULT_PAGE_SIZE;
-        
+
         if ( ts == null )
         {
             return nexusTimeline.retrieveNewest( cnt, types, subtypes, filter );
@@ -267,7 +325,7 @@ public class DefaultFeedRecorder
     {
         return getAisFromMaps( getEvents( REPO_EVENT_TYPE_SET, subtypes, from, count, filter ) );
     }
-    
+
     public List<NexusArtifactEvent> getNexusArtifactEvents( Set<String> subtypes, Long ts, Integer count,
         TimelineFilter filter )
     {
@@ -284,11 +342,11 @@ public class DefaultFeedRecorder
     {
         return getAaesFromMaps( getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, from, count, filter ) );
     }
-    
+
     public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Long ts, Integer count,
         TimelineFilter filter )
     {
-        return getAaesFromMaps( getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, ts, count, filter) );
+        return getAaesFromMaps( getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, ts, count, filter ) );
     }
 
     public void addSystemEvent( String action, String message )
@@ -407,6 +465,49 @@ public class DefaultFeedRecorder
     protected void addToTimeline( Map<String, String> map, String t1, String t2 )
     {
         nexusTimeline.add( System.currentTimeMillis(), t1, t2, map );
+    }
+
+    public void addErrorWarningEvent( String action, String message )
+    {
+        addErrorWarningEvent( new ErrorWarningEvent( action, message ) );
+    }
+
+    public void addErrorWarningEvent( String action, String message, Exception exception )
+    {
+        StringWriter stringWriter = new StringWriter();
+
+        exception.printStackTrace( new PrintWriter( stringWriter ) );
+
+        String stackTrace = stringWriter.toString();
+
+        addErrorWarningEvent( new ErrorWarningEvent( action, message, stackTrace ) );
+    }
+
+    protected void addErrorWarningEvent( ErrorWarningEvent errorEvt )
+    {
+        Map<String, String> map = new HashMap<String, String>();
+
+        putContext( map, errorEvt.getEventContext() );
+
+        map.put( DATE, getDateFormat().format( errorEvt.getEventDate() ) );
+
+        map.put( MESSAGE, errorEvt.getMessage() );
+
+        map.put( STACK_TRACE, errorEvt.getStackTrace() );
+
+        addToTimeline( map, ERROR_WARNING_EVENT_TYPE, errorEvt.getAction() );
+    }
+
+    public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count,
+        TimelineFilter filter )
+    {
+        return getEwesFromMaps( getEvents( ERROR_WARNING_EVENT_TYPE_SET, subtypes, from, count, filter ) );
+    }
+
+    public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Long ts, Integer count,
+        TimelineFilter filter )
+    {
+        return getEwesFromMaps( getEvents( ERROR_WARNING_EVENT_TYPE_SET, subtypes, ts, count, filter ) );
     }
 
 }

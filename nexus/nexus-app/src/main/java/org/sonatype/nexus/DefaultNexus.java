@@ -43,6 +43,7 @@ import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
+import org.sonatype.nexus.feeds.ErrorWarningEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
@@ -698,6 +699,11 @@ public class DefaultNexus
     public List<AuthcAuthzEvent> getAuthcAuthzEvents( Integer from, Integer count )
     {
         return feedRecorder.getAuthcAuthzEvents( null, from, count, null );
+    }
+    
+    public List<ErrorWarningEvent> getErrorWarningEvents( Integer from, Integer count )
+    {
+        return feedRecorder.getErrorWarningEvents( null, from, count, null );
     }
 
     // ===========================

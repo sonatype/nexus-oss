@@ -27,6 +27,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
+import org.sonatype.nexus.feeds.ErrorWarningEvent;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
@@ -173,6 +174,8 @@ public interface Nexus
     List<SystemEvent> getSystemEvents( Integer from, Integer count );
 
     List<AuthcAuthzEvent> getAuthcAuthzEvents( Integer from, Integer count );
+    
+    List<ErrorWarningEvent> getErrorWarningEvents( Integer from, Integer count);
 
     // ----------------------------------------------------------------------------
     // Default Configuration
