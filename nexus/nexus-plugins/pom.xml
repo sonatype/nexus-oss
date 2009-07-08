@@ -26,6 +26,7 @@
     <module>nexuspd-maven-plugin</module>
     <module>nexus-plugin-packaging</module>
     <module>nexus-buildhelper-maven-plugin</module>
+    <module>nexus-bundle-maven-plugin</module>
   </modules>
 
   <dependencyManagement>

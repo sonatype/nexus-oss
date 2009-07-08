@@ -21,8 +21,9 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.DefaultArtifactHandlerManager;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -39,7 +40,7 @@ import java.util.Set;
  * @phase initialize
  */
 public class InjectExtensionArtifactHandlerMojo
-    extends AbstractMojo
+    implements Mojo
 {
     /**
      * The current project instance.
@@ -64,6 +65,8 @@ public class InjectExtensionArtifactHandlerMojo
      * @readonly
      */
     private MavenSession session;
+
+    private Log log;
 
     @SuppressWarnings( "unchecked" )
     public void execute()
@@ -125,4 +128,15 @@ public class InjectExtensionArtifactHandlerMojo
 
         getLog().info( "...done." );
     }
+
+    public Log getLog()
+    {
+        return log;
+    }
+
+    public void setLog( final Log log )
+    {
+        this.log = log;
+    }
+
 }
