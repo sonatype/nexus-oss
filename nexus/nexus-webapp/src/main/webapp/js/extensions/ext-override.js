@@ -139,7 +139,13 @@ Ext.override(Ext.data.Connection, {
 
         var enctype = form.getAttribute("enctype");
         if(o.isUpload || (enctype && enctype.toLowerCase() == 'multipart/form-data')){
-          return this.doFormUpload(o, p, url);
+		  if ( Sonatype.utils.authToken ) {
+	        // Add auth header to each request
+			return this.doFormUpload(o, p, Sonatype.utils.appendAuth( url ) );
+	      }
+		  else {
+		    return this.doFormUpload(o, p, url);
+		  }
         }
         var f = Ext.lib.Ajax.serializeForm(form);
         p = p ? (p + '&' + f) : f;

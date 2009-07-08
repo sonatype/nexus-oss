@@ -47,7 +47,7 @@ Sonatype.repoServer.ConfigViewPanel = function(config){
         cls: 'x-btn-text-icon',
         scope:this,
         handler: function(){
-          window.open(Sonatype.config.repos.urls.configCurrent);
+          Sonatype.utils.openWindow(Sonatype.config.repos.urls.configCurrent);
         }
       }
     ],

@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.ExpiredCredentialsException;
@@ -386,5 +387,36 @@ public class NexusHttpAuthenticationFilter
         HttpServletResponse httpResponse = WebUtils.toHttp( response );
 
         httpResponse.setStatus( HttpServletResponse.SC_FORBIDDEN );
+    }
+    
+    // Will retrieve authz header.  if missing from header, will try
+    // to retrieve from request params instead
+    @Override
+    protected String getAuthzHeader( ServletRequest request )
+    {
+        String authzHeader = super.getAuthzHeader( request );
+        
+        //If in header use it
+        if ( !StringUtils.isEmpty( authzHeader ) )
+        {
+            getLogger().debug( "Using authorization header from request" );
+            return authzHeader;
+        }
+        //otherwise check request params for it
+        else
+        {
+            authzHeader = request.getParameter( "authorization" );
+            
+            if ( !StringUtils.isEmpty( authzHeader ) )
+            {
+                getLogger().debug( "Using authorization from request parameter" );
+            }
+            else
+            {
+                getLogger().debug( "No authorization found (header or request parameter)" );
+            }
+            
+            return authzHeader;
+        }
     }
 }

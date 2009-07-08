@@ -179,7 +179,7 @@ Sonatype.repoServer.LogsViewPanel = function(config){
         scope:this,
         handler: function(){
           if ( this.currentLogUrl ) {
-            window.open(this.currentLogUrl);
+            Sonatype.utils.openWindow(this.currentLogUrl);
           }
         }
       },

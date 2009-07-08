@@ -339,7 +339,7 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
   
   downloadHandler: function( node, item, event) {
 	  event.stopEvent();
-	  window.open( item.targetUrl );
+	  Sonatype.utils.openWindow( item.targetUrl );
   },  
   
   rowContextMenuHandler: function( grid, rowIndex, e ) {

@@ -153,7 +153,7 @@ Ext.extend( Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
     if ( p ) {
       url += '&p=' + p;
     }
-    return String.format( '<a target="_blank" href="{0}">{1}</a>', url, title );
+    return String.format( '<a target="_blank" href="{0}">{1}</a>', Sonatype.utils.appendAuth( url ), title );
   },
 
   showArtifact: function( data, collapse ) {

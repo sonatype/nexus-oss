@@ -39,7 +39,7 @@ Sonatype.repoServer.SearchPanel = function(config){
           'click': function(e, t){ // if they tab + enter a link, need to do it old fashioned way
             if(String(t.target).toLowerCase() != '_blank'){
               e.stopEvent();
-              window.open(t.href);
+              Sonatype.utils.openWindow(t.href);
             }
           },
           delegate:'a'

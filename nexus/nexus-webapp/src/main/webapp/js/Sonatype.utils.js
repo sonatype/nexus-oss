@@ -855,6 +855,20 @@ Sonatype.utils = {
     if ( bookmark != oldBookmark ) {
       Ext.History.add( bookmark );
     }
+  },
+  
+  openWindow: function( url ){
+    window.open( Sonatype.utils.appendAuth( url ) );
+  },
+  
+  appendAuth: function( url ){
+    if ( url.indexOf('?') >= 0 ){
+      return url + '&authorization=Basic ' + Sonatype.utils.authToken;
+    }
+    else {
+      return url + '?authorization=Basic ' + Sonatype.utils.authToken;
+    }
+    
   }
 };
 

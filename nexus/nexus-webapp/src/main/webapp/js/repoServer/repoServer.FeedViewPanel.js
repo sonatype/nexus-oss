@@ -79,7 +79,7 @@ Sonatype.repoServer.FeedViewPanel = function(config){
         handler: function() {
           if ( this.feedsGridPanel.getSelectionModel().hasSelection() ) {
             var rec = this.feedsGridPanel.getSelectionModel().getSelected();
-            window.open( rec.get( 'resourceURI' ) );
+            Sonatype.utils.openWindow( rec.get( 'resourceURI' ) );
           }
         }
       }
@@ -94,7 +94,7 @@ Sonatype.repoServer.FeedViewPanel = function(config){
       { header: 'Feed', dataIndex: 'name', width: 300 },
       { header: 'URL', dataIndex: 'resourceURI', width: 300, id: 'feeds-url-col',
         renderer: function( s ) {
-          return '<a href="' + s + '" target="_blank">' + s + '</a>';
+          return '<a href="' + Sonatype.utils.appendAuth( s ) + '" target="_blank">' + s + '</a>';
         },
         menuDisabled:true }
     ],
@@ -130,7 +130,7 @@ Sonatype.repoServer.FeedViewPanel = function(config){
           'click': function(e, t){ // if they tab + enter a link, need to do it old fashioned way
             if(String(t.target).toLowerCase() != '_blank'){
               e.stopEvent();
-              window.open(t.href);
+              Sonatype.utils.openWindow(t.href);
             }
           },
           delegate:'a'
