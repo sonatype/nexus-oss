@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
@@ -59,6 +60,9 @@ public class PlexusRestletApplicationBridge
     /** Key to store the flag should plexus discover resource or no */
     public static final String PLEXUS_DISCOVER_RESOURCES = "plexus.discoverResources";
 
+    @Requirement
+    private PlexusContainer plexusContainer;
+
     @Requirement( role = PlexusResource.class )
     private Map<String, PlexusResource> plexusResources;
 
@@ -96,6 +100,16 @@ public class PlexusRestletApplicationBridge
         this.createdOn = new Date();
 
         setAutoDescribed( true );
+    }
+
+    /**
+     * Gets you the plexus container.
+     * 
+     * @return
+     */
+    protected PlexusContainer getPlexusContainer()
+    {
+        return plexusContainer;
     }
 
     /**
@@ -154,8 +168,8 @@ public class PlexusRestletApplicationBridge
     {
         // sorting out the resources, collecting them
         boolean shouldCollectPlexusResources =
-            getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null ? Boolean.parseBoolean( (String) getContext().getParameters().getFirstValue(
-                                                                                                                                                                         PLEXUS_DISCOVER_RESOURCES ) )
+            getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null ? Boolean
+                .parseBoolean( (String) getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) )
                             : true; // the default if not set
 
         if ( shouldCollectPlexusResources )
@@ -230,6 +244,8 @@ public class PlexusRestletApplicationBridge
     protected final XStream createAndConfigureXstream( HierarchicalStreamDriver driver )
     {
         XStream xstream = new XStream( driver );
+
+        xstream.setClassLoader( new WholeWorldClassloader( getPlexusContainer().getContainerRealm().getWorld() ) );
 
         // let the application configure the XStream
         xstream = doConfigureXstream( xstream );
