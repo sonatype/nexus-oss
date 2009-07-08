@@ -10,6 +10,9 @@
             <id>default</id>
             <!-- START SNIPPET: nexus-plugin-lifecycle -->
             <phases>
+              <!-- Nexus-specific step: inject the nexus-plugin ArtifactHandler into the project's artifact instance -->
+              <initialize>org.sonatype.nexus:nexus-buildhelper-maven-plugin:${project.version}:inject-artifact-handler</initialize>
+              
               <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
               <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
               

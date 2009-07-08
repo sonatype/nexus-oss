@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <!-- Parent POM -->
   <parent>
@@ -25,6 +25,7 @@
     <module>nexus-plugin-manager</module>
     <module>nexuspd-maven-plugin</module>
     <module>nexus-plugin-packaging</module>
+    <module>nexus-buildhelper-maven-plugin</module>
   </modules>
 
   <dependencyManagement>
