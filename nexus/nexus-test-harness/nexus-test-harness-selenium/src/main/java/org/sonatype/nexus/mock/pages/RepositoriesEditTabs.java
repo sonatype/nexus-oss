@@ -10,16 +10,19 @@ public class RepositoriesEditTabs
 
     public enum RepoKind
     {
-        HOSTED( 2, 4 ), PROXY( 2, 4 ), VIRTUAL( 1, 2 ), GROUP( 2, -1 );
+        HOSTED( 2, 4, 3 ), PROXY( 2, 4, 3 ), VIRTUAL( 1, 2, -1 ), GROUP( 2, -1, -1 );
 
         private int configPosition;
 
         private int summaryPosition;
 
-        private RepoKind( int configPosition, int summaryPosition )
+        private int mirrorPosition;
+
+        private RepoKind( int configPosition, int summaryPosition, int mirrorPosition )
         {
             this.configPosition = configPosition;
             this.summaryPosition = summaryPosition;
+            this.mirrorPosition = mirrorPosition;
         }
     }
 
@@ -72,5 +75,17 @@ public class RepositoriesEditTabs
         select( kind.summaryPosition );
 
         return new RepositorySummary( selenium, expression + ".getLayout().activeItem" );
+    }
+
+    public RepositoryMirror selectMirror()
+    {
+        if ( !( RepoKind.PROXY.equals( kind ) || RepoKind.HOSTED.equals( kind ) ) )
+        {
+            return null;
+        }
+
+        select( kind.mirrorPosition );
+
+        return new RepositoryMirror( selenium, expression + ".getLayout().activeItem" );
     }
 }
