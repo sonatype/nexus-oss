@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -220,6 +221,8 @@ public class RestletResource
                 }
                 catch ( XStreamException e )
                 {
+                    this.getLogger().log(Level.WARNING, "Invalid XML, unable to parse using XStream", e );
+                    
                     throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
                                                  "Invalid XML, unable to parse using XStream", e );
                 }
