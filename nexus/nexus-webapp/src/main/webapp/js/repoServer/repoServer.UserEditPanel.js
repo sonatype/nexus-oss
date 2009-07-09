@@ -461,7 +461,7 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
       data: {
         name: 'User Role Mapping'
       }
-    } );
+    },true );
   },
 
   deleteRecord: function( rec ) {
