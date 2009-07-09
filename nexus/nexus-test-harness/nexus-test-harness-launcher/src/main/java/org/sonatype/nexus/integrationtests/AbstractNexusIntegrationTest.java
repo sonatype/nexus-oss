@@ -20,6 +20,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
@@ -28,6 +29,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.log4j.Logger;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -245,15 +247,33 @@ public class AbstractNexusIntegrationTest
     protected static void cleanWorkDir()
         throws IOException
     {
-        File workDir = new File( AbstractNexusIntegrationTest.nexusWorkDir );
+        final File workDir = new File( AbstractNexusIntegrationTest.nexusWorkDir );
 
         // to make sure I don't delete all my MP3's and pictures, or totally screw anyone.
         // check for 'target' and not allow any '..'
         if ( workDir.getAbsolutePath().lastIndexOf( "target" ) != -1
             && workDir.getAbsolutePath().lastIndexOf( ".." ) == -1 )
         {
-            // delete work dir
-            FileUtils.deleteDirectory( workDir );
+            // we cannot delete the plugin-repository or the tests will fail
+            
+           File[] filesToDelete = workDir.listFiles( new FilenameFilter(){
+            public boolean accept( File dir, String name )
+            {
+                // anything but the plugin-repository directory
+                if( dir.getName().equals( "plugin-repository" ) && dir.getParentFile().equals( workDir ) )
+                {
+                  return false;   
+                }
+                return true;
+            }
+        });
+           
+           for ( File fileToDelete : filesToDelete )
+            {
+                // delete work dir
+                   FileUtils.deleteDirectory( fileToDelete );
+            }  
+            
         }
     }
 
