@@ -35,6 +35,7 @@ public class DefaultInterPluginDependencyResolver
             {
                 // RECURSION, SOLVE THIS IN MORE ELEGANT WAY
                 // TODO: this must be solved in DefaultNexusPluginManager, this is s-t-u-p-i-d
+                // Move this out of here, and make PM load stuff in ordered fashion
                 PluginResponse response = ( (DefaultNexusPluginManager) nexusPluginManager ).activatePlugin( depCoord );
 
                 if ( !response.isSuccesful() )

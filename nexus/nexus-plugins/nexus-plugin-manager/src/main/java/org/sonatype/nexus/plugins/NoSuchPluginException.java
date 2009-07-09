@@ -9,7 +9,12 @@ public class NoSuchPluginException
 
     public NoSuchPluginException( PluginCoordinates pluginCoordinates )
     {
-        super( "No plugin found: " + pluginCoordinates.toString() );
+        this( pluginCoordinates, "Plugin \"" + pluginCoordinates.toString() + "\" not found." );
+    }
+
+    public NoSuchPluginException( PluginCoordinates pluginCoordinates, String message )
+    {
+        super( message );
 
         this.pluginCoordinates = pluginCoordinates;
     }

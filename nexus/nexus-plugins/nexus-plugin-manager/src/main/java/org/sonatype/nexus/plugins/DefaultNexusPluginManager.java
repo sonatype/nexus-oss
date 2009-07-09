@@ -171,16 +171,18 @@ public class DefaultNexusPluginManager
         {
             File pluginFile = pluginRepositoryManager.resolvePlugin( pluginCoordinates );
 
-            PluginMetadata pluginMetadata = null;
+            if ( pluginFile == null || !pluginFile.isFile() )
+            {
+                // this is not a nexus plugin!
+                result.setThrowable( new NoSuchPluginException( pluginCoordinates ) );
 
-            List<String> pluginExports = null;
-
-            List<PluginCoordinates> dependencyPlugins = null;
+                return result;
+            }
 
             NexusPluginValidator validator = new DefaultNexusPluginValidator();
 
             // load plugin md from it, will return null if not found
-            pluginMetadata = loadPluginMetadata( pluginFile );
+            PluginMetadata pluginMetadata = loadPluginMetadata( pluginFile );
 
             if ( pluginMetadata == null )
             {
@@ -192,7 +194,7 @@ public class DefaultNexusPluginManager
             }
 
             // create exports
-            pluginExports = createExports( pluginFile );
+            List<String> pluginExports = createExports( pluginFile );
 
             // create plugin realm as container child
             pluginRealm = plexusContainer.createChildRealm( pluginCoordinates.getPluginKey() );
@@ -207,7 +209,8 @@ public class DefaultNexusPluginManager
                 new PluginDiscoveryContext( pluginCoordinates, pluginExports, pluginRealm, pluginMetadata, validator );
 
             // extract imports
-            dependencyPlugins = interPluginDependencyResolver.resolveDependencyPlugins( this, pluginMetadata );
+            List<PluginCoordinates> dependencyPlugins =
+                interPluginDependencyResolver.resolveDependencyPlugins( this, pluginMetadata );
 
             // add imports
             for ( PluginCoordinates coord : dependencyPlugins )
@@ -238,6 +241,7 @@ public class DefaultNexusPluginManager
             // file the realm
             for ( File dependencyFile : dependencies )
             {
+                // TODO: check dependency clashes
                 pluginRealm.addURL( toUrl( dependencyFile ) );
             }
 
