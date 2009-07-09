@@ -83,7 +83,12 @@ public class CreateBundleMojo
         ds.setScope( Artifact.SCOPE_RUNTIME );
         ds.setOutputDirectory( project.getGroupId() + "/" + project.getArtifactId() + "/" + project.getVersion()
             + "/dependencies" );
+
         ds.setUseProjectArtifact( false );
+
+        ds.addExclude( "org.sonatype.nexus*" );
+        ds.addExclude( "com.sonatype.nexus*" );
+        ds.addExclude( "*:nexus-plugin:*" );
 
         assembly.addDependencySet( ds );
 
@@ -101,6 +106,8 @@ public class CreateBundleMojo
         {
             bundle.initDefaults( project, session );
         }
+
+        bundle.configureAssembly( assembly );
 
         try
         {

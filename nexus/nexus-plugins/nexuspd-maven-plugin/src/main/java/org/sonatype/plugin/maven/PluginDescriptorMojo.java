@@ -1,8 +1,5 @@
 package org.sonatype.plugin.maven;
 
-import java.io.File;
-import java.util.List;
-
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.License;
@@ -16,6 +13,9 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugin.metadata.PluginMetadataGenerationRequest;
 import org.sonatype.plugin.metadata.PluginMetadataGenerator;
 import org.sonatype.plugin.metadata.gleaner.GleanerException;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * Generates a plugin's <tt>plugin.xml</tt> descriptor file based on the project's pom and class annotations.
@@ -84,11 +84,13 @@ public class PluginDescriptorMojo
      * 
      * @parameter
      */
+    @SuppressWarnings( "unused" )
     private List<String> userMimeTypes;
 
     /** @component */
     private PluginMetadataGenerator metadataGenerator;
 
+    @SuppressWarnings( "unchecked" )
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -167,6 +169,7 @@ public class PluginDescriptorMojo
                 }
 
                 // make sure it is a real dependency, enlisted in POM/dependencies
+                boolean found = false;
                 for ( Dependency mavenDependency : (List<Dependency>) this.mavenProject.getDependencies() )
                 {
                     GAVCoordinate enlistedGav =
@@ -175,13 +178,15 @@ public class PluginDescriptorMojo
 
                     if ( pluginGav.equals( enlistedGav ) )
                     {
-                        // the dep needs to be provided
-                        if ( !mavenDependency.getScope().equals( "provided" ) )
-                        {
-                            throw new MojoFailureException( "Dependency: " + enlistedGav.toString()
-                                + ", must have scope 'provided'" );
-                        }
+                        found = true;
+                        break;
                     }
+                }
+
+                if ( !found )
+                {
+                    throw new MojoFailureException( "Nexus plugin: " + pluginGav
+                        + " must be included in the dependencies list." );
                 }
 
                 // finally now just set the plugin dependency on the request
