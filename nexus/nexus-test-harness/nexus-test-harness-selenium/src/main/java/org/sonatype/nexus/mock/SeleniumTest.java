@@ -182,9 +182,14 @@ public abstract class SeleniumTest
     public void seleniumCleanup()
         throws Exception
     {
-        getCoverage();
-
-        selenium.stop();
+        try
+        {
+            getCoverage();
+        }
+        finally
+        {
+            selenium.stop();
+        }
     }
 
     /**

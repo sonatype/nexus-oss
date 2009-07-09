@@ -347,7 +347,10 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
 
   convertDataValue: function( value, store, idProperty, nameProperty ) {
     if ( value ) {
-      var rec = store.getAt( store.find( idProperty, value ) );
+      var rec = store.getAt( store.data.indexOfKey( value ) );
+      if(!rec) {
+      	rec = store.getAt( store.find( idProperty, value ) );
+      }
       if ( rec ) {
         return rec.data[nameProperty];
       }

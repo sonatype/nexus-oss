@@ -1,5 +1,7 @@
 package org.sonatype.nexus.selenium.nexus2209;
 
+import static org.junit.internal.matchers.StringContains.containsString;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.mock.MockListener;
@@ -16,6 +18,10 @@ import org.sonatype.security.rest.model.PrivilegeStatusResource;
 public class Nexus2209PrivilegesTest
     extends SeleniumTest
 {
+
+    private static final String NAME = "privName";
+
+    private static final String DESCRIPTION = "privDescription";
 
     @Test
     public void errorMessages()
@@ -69,26 +75,146 @@ public class Nexus2209PrivilegesTest
             ids[i] = NexusTestCase.nexusBaseURL + "service/local/privileges/" + p.getId();
         }
 
-        privs.refresh();
-
-        for ( String id : ids )
-        {
-            Assert.assertTrue( "id: " + id + " is not present ", privs.getGrid().contains( id ) );
-        }
-        privs.refresh();
-
-        if ( true )
-        {
-            return;
-        }
-
         // read
-        PrivilegeConfigurationForm priv = privs.select( name ).selectConfiguration();
-        NxAssert.valueEqualsTo( priv.getName(), name );
-        NxAssert.valueEqualsTo( priv.getDescription(), description );
-        NxAssert.valueEqualsTo( priv.getRepoTarget(), String.valueOf( 0 ) );
+        for ( int i = 0; i < ids.length; i++ )
+        {
+            privs.refresh();
+            String id = ids[i];
 
+            Assert.assertTrue( "id: " + id + " is not present ", privs.getGrid().contains( id ) );
+
+            PrivilegeConfigurationForm priv = privs.select( id );
+
+            PrivilegeStatusResource data = result.getData().get( i );
+
+            Assert.assertThat( data.getName(), containsString( name ) );
+            NxAssert.valueEqualsTo( priv.getName(), data.getName() );
+            NxAssert.valueEqualsTo( priv.getDescription(), description );
+        }
         privs.refresh();
 
+        // no update
+
+        // delete
+        for ( int i = 0; i < ids.length; i++ )
+        {
+            privs.refresh();
+            String id = ids[i];
+            privs.select( id );
+            privs.delete().clickYes();
+
+            privs.refresh();
+
+            Assert.assertFalse( "id: " + id + " is present ", privs.getGrid().contains( id ) );
+        }
+    }
+
+    @Test
+    public void privsRepo()
+        throws InterruptedException
+    {
+        LoginTest.doLogin( main );
+
+        PrivilegesTab privs = main.openPrivileges();
+
+        MockListener ml = MockHelper.listen( "/privileges_target", new MockListener()
+        {
+            @Override
+            public void onPayload( Object payload )
+            {
+                Assert.assertNotNull( payload );
+            }
+        } );
+
+        // create
+        String name = "privName";
+        String description = "privDescription";
+        PrivilegeConfigurationForm priv =
+            privs.addPrivilege().populate( name, description, "repo_central", "1" ).save();
+
+        PrivilegeListResourceResponse result = (PrivilegeListResourceResponse) ml.getResult();
+
+        for ( PrivilegeStatusResource p : result.getData() )
+        {
+            String id = getId( p );
+            privs.select( id );
+
+            NxAssert.valueEqualsTo( priv.getRepositoryId(), "Maven Central" );
+            NxAssert.valueNull( priv.getRepositoryGroupId() );
+
+            privs.delete().clickYes();
+
+            Assert.assertFalse( "id: " + id + " still present ", privs.getGrid().contains( id ) );
+        }
+    }
+
+    @Test
+    public void privsGroup()
+        throws InterruptedException
+    {
+        LoginTest.doLogin( main );
+
+        PrivilegesTab privs = main.openPrivileges();
+
+        MockListener ml = listen();
+
+        PrivilegeConfigurationForm priv =
+            privs.addPrivilege().populate( NAME, DESCRIPTION, "group_public", "1" ).save();
+
+        PrivilegeListResourceResponse result = (PrivilegeListResourceResponse) ml.getResult();
+
+        for ( PrivilegeStatusResource p : result.getData() )
+        {
+            String id = getId( p );
+            privs.select( id );
+
+            NxAssert.valueEqualsTo( priv.getRepositoryGroupId(), "Public Repositories" );
+            NxAssert.valueNull( priv.getRepositoryId() );
+
+            privs.delete().clickYes();
+
+            Assert.assertFalse( "id: " + id + " still present ", privs.getGrid().contains( id ) );
+        }
+
+    }
+
+    @Test
+    public void targetFiltering()
+        throws InterruptedException
+    {
+        LoginTest.doLogin( main );
+
+        PrivilegesTab privs = main.openPrivileges();
+
+        PrivilegeConfigurationForm priv = privs.addPrivilege();
+
+        priv.getRepositoryOrGroup().select( 0 );
+        Assert.assertEquals( new Integer( 4 ), priv.getRepoTarget().getCount() );
+        priv.getRepositoryOrGroup().setValue( "repo_central" );
+        Assert.assertEquals( new Integer( 3 ), priv.getRepoTarget().getCount() );
+        priv.getRepositoryOrGroup().setValue( "repo_central-m1" );
+        Assert.assertEquals( new Integer( 1 ), priv.getRepoTarget().getCount() );
+
+        priv.cancel();
+    }
+
+    private String getId( PrivilegeStatusResource p )
+    {
+        String id = NexusTestCase.nexusBaseURL + "service/local/privileges/" + p.getId();
+        return id;
+    }
+
+    private MockListener listen()
+    {
+        MockListener ml = MockHelper.listen( "/privileges_target", new MockListener()
+        {
+            @Override
+            public void onPayload( Object payload )
+            {
+                System.out.println( payload );
+                Assert.assertNotNull( payload );
+            }
+        } );
+        return ml;
     }
 }

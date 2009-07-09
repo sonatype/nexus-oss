@@ -23,11 +23,12 @@ public class PrivilegesTab
             + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
     }
 
-    public PrivilegeEditTabs select( String privId )
+    public PrivilegeConfigurationForm select( String privId )
     {
         grid.select( privId );
 
-        return new PrivilegeEditTabs( selenium, expression + ".cardPanel.getLayout().activeItem.tabPanel" );
+        return new PrivilegeConfigurationForm( selenium, expression + ".cardPanel.getLayout().activeItem" );
+        //return new PrivilegeEditTabs( selenium, expression + ".cardPanel.getLayout().activeItem.tabPanel" );
     }
 
 }

@@ -12,19 +12,25 @@ public class PrivilegeConfigurationForm
     extends Component
 {
 
-    private TextField name;
+    private Button cancelButton;
 
     private TextField description;
 
-    private Combobox type;
+    private TextField method;
 
-    private Combobox repository;
+    private TextField name;
+
+    private TextField repositoryGroupId;
+
+    private TextField repositoryId;
+
+    private Combobox repositoryOrGroup;
 
     private Combobox repoTarget;
 
     private Button saveButton;
 
-    private Button cancelButton;
+    private Combobox type;
 
     public PrivilegeConfigurationForm( Selenium selenium, String expression )
     {
@@ -33,16 +39,25 @@ public class PrivilegeConfigurationForm
         name = new TextField( selenium, expression + ".find('name', 'name')[0]" );
         description = new TextField( selenium, expression + ".find('name', 'description')[0]" );
         type = new Combobox( selenium, expression + ".find('name', 'type')[0]" );
-        repository = new Combobox( selenium, expression + ".find('name', 'repositoryOrGroup')[0]" );
+        repositoryOrGroup = new Combobox( selenium, expression + ".find('name', 'repositoryOrGroup')[0]" );
         repoTarget = new Combobox( selenium, expression + ".find('name', 'repositoryTargetId')[0]" );
 
         saveButton = new Button( selenium, expression + ".buttons[0]" );
         cancelButton = new Button( selenium, expression + ".buttons[1]" );
+
+        repositoryId = new TextField( selenium, expression + ".find('name', 'repositoryId')[0]" );
+        repositoryGroupId = new TextField( selenium, expression + ".find('name', 'repositoryGroupId')[0]" );
+        method = new TextField( selenium, expression + ".find('name', 'method')[0]" );
     }
 
-    public final TextField getName()
+    public void cancel()
     {
-        return name;
+        cancelButton.click();
+    }
+
+    public final Button getCancelButton()
+    {
+        return cancelButton;
     }
 
     public final TextField getDescription()
@@ -50,14 +65,29 @@ public class PrivilegeConfigurationForm
         return description;
     }
 
-    public final Combobox getType()
+    public final TextField getMethod()
     {
-        return type;
+        return method;
     }
 
-    public final Combobox getRepository()
+    public final TextField getName()
     {
-        return repository;
+        return name;
+    }
+
+    public final TextField getRepositoryGroupId()
+    {
+        return repositoryGroupId;
+    }
+
+    public final TextField getRepositoryId()
+    {
+        return repositoryId;
+    }
+
+    public final Combobox getRepositoryOrGroup()
+    {
+        return repositoryOrGroup;
     }
 
     public final Combobox getRepoTarget()
@@ -70,14 +100,30 @@ public class PrivilegeConfigurationForm
         return saveButton;
     }
 
-    public final Button getCancelButton()
+    public final Combobox getType()
     {
-        return cancelButton;
+        return type;
     }
 
-    public void cancel()
+    public PrivilegeConfigurationForm populate( String name, String description, int target )
     {
-        cancelButton.click();
+        this.name.type( name );
+        this.description.type( description );
+        if ( target != -1 )
+        {
+            this.repoTarget.select( target );
+        }
+
+        return this;
+    }
+
+    public PrivilegeConfigurationForm populate( String name, String description, String repoId, String targetId )
+    {
+        populate( name, description, -1 );
+        this.repoTarget.setValue( targetId );
+        this.repositoryOrGroup.setValue( String.valueOf( repoId ) );
+
+        return this;
     }
 
     public PrivilegeConfigurationForm save()
@@ -85,15 +131,6 @@ public class PrivilegeConfigurationForm
         saveButton.click();
 
         new Window( selenium ).waitFor();
-
-        return this;
-    }
-
-    public PrivilegeConfigurationForm populate( String name, String description, int target )
-    {
-        this.name.type( name );
-        this.description.type( description );
-        this.repoTarget.select( target );
 
         return this;
     }

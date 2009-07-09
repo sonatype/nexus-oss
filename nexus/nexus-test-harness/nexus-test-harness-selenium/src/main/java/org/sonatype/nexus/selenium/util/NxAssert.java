@@ -4,14 +4,22 @@ import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.sonatype.nexus.mock.components.Combobox;
 import org.sonatype.nexus.mock.components.TextField;
 import org.sonatype.nexus.mock.components.Tree;
 import org.sonatype.nexus.mock.components.TwinPanel;
 
+@SuppressWarnings( "unchecked" )
 public class NxAssert
 {
+
+    private static Matcher NULL()
+    {
+        return anyOf( equalTo( "null" ), equalTo( "" ), nullValue() );
+    }
+
     public static final String THIS_FIELD_IS_REQUIRED = "This field is required";
 
     public static void requiredField( Combobox cb, String validText )
@@ -35,10 +43,9 @@ public class NxAssert
         Assert.assertThat( panel.getErrorText(), equalTo( errorText ) );
     }
 
-    @SuppressWarnings( "unchecked" )
     public static void noErrorText( TwinPanel panel )
     {
-        Assert.assertThat( panel.getErrorText(), anyOf( equalTo( "null" ), equalTo( "" ), nullValue() ) );
+        Assert.assertThat( panel.getErrorText(), NULL() );
     }
 
     public static void valueEqualsTo( TextField field, String value )
@@ -70,10 +77,9 @@ public class NxAssert
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     public static void noErrorText( TextField tf )
     {
-        Assert.assertThat( tf.getErrorText(), anyOf( equalTo( "null" ), equalTo( "" ), nullValue() ) );
+        Assert.assertThat( tf.getErrorText(), NULL() );
     }
 
     public static void hasErrorText( TextField tf, String errorText )
@@ -87,6 +93,11 @@ public class NxAssert
         hasErrorText( cb, THIS_FIELD_IS_REQUIRED );
         cb.select( i );
         noErrorText( cb );
+    }
+
+    public static void valueNull( TextField tf )
+    {
+        Assert.assertThat( tf.getValue(), NULL() );
     }
 
 }
