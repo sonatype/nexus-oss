@@ -13,13 +13,18 @@
  */
 package org.sonatype.nexus.configuration;
 
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * A component responsible for "apply" (config -> repo) and "prepare" (repo -> config) steps.
  * 
  * @author cstamas
  */
+@ExtensionPoint
+@Singleton
 public interface Configurator
 {
     /**

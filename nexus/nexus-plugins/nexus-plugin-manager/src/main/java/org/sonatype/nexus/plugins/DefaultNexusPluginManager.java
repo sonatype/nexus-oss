@@ -605,6 +605,9 @@ public class DefaultNexusPluginManager
                 PlexusComponentGleanerRequest request =
                     new PlexusComponentGleanerRequest( className, pd.getPluginRealm() );
 
+                // repository type is one more shot
+                request.getPluralComponentAnnotations().add( RepositoryType.class );
+
                 // listen for repository types
                 request.getMarkerAnnotations().add( RepositoryType.class );
 

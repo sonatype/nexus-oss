@@ -1,5 +1,7 @@
 package org.sonatype.nexus.proxy.item;
 
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.StorageException;
@@ -13,6 +15,7 @@ import org.sonatype.plugin.ExtensionPoint;
  * @author cstamas
  */
 @ExtensionPoint
+@Singleton
 public interface ContentGenerator
 {
     public static final String CONTENT_GENERATOR_ID = "contentGenerator";
