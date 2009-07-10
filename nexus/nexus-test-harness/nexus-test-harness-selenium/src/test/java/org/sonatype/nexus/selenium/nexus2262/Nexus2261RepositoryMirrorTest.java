@@ -104,12 +104,36 @@ public class Nexus2261RepositoryMirrorTest
     }
 
     @Test
-    public void fieldValidation()
+    public void fieldValidationProxy()
         throws Exception
     {
         LoginTest.doLogin( main );
 
         RepositoryMirror mirror = main.openRepositories().select( proxyRepo.getId(), RepoKind.PROXY ).selectMirror();
+
+        // invalid mirror format
+        mirror.addMirror( "mock-mirror" );
+        NxAssert.hasErrorText( mirror.getMirrorUrl(), "Protocol must be http:// or https://" );
+        mirror.addMirror( "http://www.sonatype.org" );
+        NxAssert.noErrorText( mirror.getMirrorUrl() );
+
+        // duplicated validation
+        mirror.addMirror( "http://www.sonatype.org" );
+        NxAssert.hasErrorText( mirror.getMirrorUrl(), "This URL already exists" );
+
+        mirror.addMirror( "https://www.sonatype.org" );
+        NxAssert.noErrorText( mirror.getMirrorUrl() );
+
+        mirror.cancel();
+    }
+
+    @Test
+    public void fieldValidationHosted()
+    throws Exception
+    {
+        LoginTest.doLogin( main );
+
+        RepositoryMirror mirror = main.openRepositories().select( hostedRepo.getId(), RepoKind.HOSTED ).selectMirror();
 
         // invalid mirror format
         mirror.addMirror( "mock-mirror" );
