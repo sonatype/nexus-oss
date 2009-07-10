@@ -572,14 +572,16 @@ Sonatype.utils = {
               inputType: 'password',
               name: 'currentPassword',
               width: 200,
-              allowBlank: false 
+              allowBlank: false,
+              validateOnBlur: false 
             },
             { 
               fieldLabel: 'New Password', 
               inputType: 'password',
               name: 'newPassword',
               width: 200,
-              allowBlank: false 
+              allowBlank: false,
+              validateOnBlur: false 
             },
             { 
               fieldLabel: 'Confirm Password', 
@@ -587,6 +589,7 @@ Sonatype.utils = {
               name: 'confirmPassword',
               width: 200,
               allowBlank: false,
+              validateOnBlur: false,
               validator: function( s ) {
                 var firstField = this.ownerCt.find( 'name', 'newPassword' )[0];
                 if ( firstField && firstField.getRawValue() != s ) {
