@@ -15,16 +15,6 @@ public class MavenArtifact
 
     private String outputProperty;
 
-    public String getOutputProperty()
-    {
-        return outputProperty;
-    }
-
-    public void setOutputProperty( String outputProperty )
-    {
-        this.outputProperty = outputProperty;
-    }
-
     private String type;
 
     public MavenArtifact()
@@ -46,6 +36,18 @@ public class MavenArtifact
         this.type = type;
     }
 
+
+    public String getOutputProperty()
+    {
+        return outputProperty;
+    }
+
+    public void setOutputProperty( String outputProperty )
+    {
+        this.outputProperty = outputProperty;
+    }
+
+    
     public String getArtifactId()
     {
         return artifactId;

@@ -38,6 +38,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.plugins.portallocator.Port;
 import org.sonatype.plugins.portallocator.PortAllocatorMojo;
 
@@ -607,10 +608,19 @@ public class EnvironmentMojo
             {
                 destination = pluginsFolder;
             }
-
+            
             String type = pluginArtifact.getType();
+            
+//          nexus plugins will have a classifier of bundle, and and type of zip
+            if( "bundle".equals( plugin.getClassifier()) && "zip".equals( type ) ) 
+            {
+                destination = new File( (String) this.project.getProperties().get( "nexus-work-dir" ), "plugin-repository/" );    
+                System.out.println( "setting destination to "+ destination );
+            }
+            
             if ( "jar".equals( type ) )
             {
+                //System.out.println( "copying jar: "+ pluginArtifact.getFile().getAbsolutePath() + " to: "+  destination.getAbsolutePath() );
                 copy( pluginArtifact.getFile(), destination );
             }
             else if ( "zip".equals( type ) || "tar.gz".equals( type ) )
