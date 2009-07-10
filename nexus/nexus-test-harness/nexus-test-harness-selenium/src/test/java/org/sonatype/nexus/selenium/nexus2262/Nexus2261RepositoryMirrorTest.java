@@ -18,7 +18,6 @@ import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
@@ -31,18 +30,17 @@ public class Nexus2261RepositoryMirrorTest
     extends SeleniumTest
 {
 
-    private M2Repository repo;
+    private M2Repository proxyRepo;
 
     private Nexus nexus;
 
-    private RepositoryRegistry repositoryRegistry;
+    private M2Repository hostedRepo;
 
     @Before
     public void createRepo()
         throws Exception
     {
         nexus = lookup( Nexus.class );
-        repositoryRegistry = lookup( RepositoryRegistry.class );
         CRepository cRepo = new CRepository();
         cRepo.setId( "nexus2261" );
         cRepo.setName( "nexus2261" );
@@ -69,14 +67,40 @@ public class Nexus2261RepositoryMirrorTest
         cRepo.setIndexable( true );
         cRepo.setBrowseable( true );
 
-        repo = (M2Repository) nexus.createRepository( cRepo );
+        proxyRepo = (M2Repository) nexus.createRepository( cRepo );
+
+        cRepo = new CRepository();
+        cRepo.setId( "hosted-nexus2261" );
+        cRepo.setName( "hosted-nexus2261" );
+        cRepo.setProviderRole( Repository.class.getName() );
+        cRepo.setProviderHint( "maven2" );
+
+        cRepo.setLocalStatus( LocalStatus.IN_SERVICE.name() );
+
+        ex = new Xpp3Dom( "externalConfiguration" );
+        cRepo.setExternalConfiguration( ex );
+        exConf = new M2RepositoryConfiguration( ex );
+        exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        exConf.applyChanges();
+
+        cRepo.setLocalStorage( new CLocalStorage() );
+        cRepo.getLocalStorage().setUrl( cRepo.defaultLocalStorageUrl );
+        cRepo.getLocalStorage().setProvider( "file" );
+
+        cRepo.setExposed( true );
+        cRepo.setUserManaged( true );
+        cRepo.setIndexable( true );
+        cRepo.setBrowseable( true );
+
+        hostedRepo = (M2Repository) nexus.createRepository( cRepo );
     }
 
     @After
     public void deleteRepo()
         throws Exception
     {
-        nexus.deleteRepository( repo.getId() );
+        nexus.deleteRepository( proxyRepo.getId() );
+        nexus.deleteRepository( hostedRepo.getId() );
     }
 
     @Test
@@ -85,7 +109,7 @@ public class Nexus2261RepositoryMirrorTest
     {
         LoginTest.doLogin( main );
 
-        RepositoryMirror mirror = main.openRepositories().select( repo.getId(), RepoKind.PROXY ).selectMirror();
+        RepositoryMirror mirror = main.openRepositories().select( proxyRepo.getId(), RepoKind.PROXY ).selectMirror();
 
         // invalid mirror format
         mirror.addMirror( "mock-mirror" );
@@ -117,19 +141,36 @@ public class Nexus2261RepositoryMirrorTest
 
         MockHelper.expect( "/repository_predefined_mirrors/{repositoryId}", new MockResponse( Status.SUCCESS_OK,
                                                                                               mirrors ) );
-        RepositoryMirror mirror = main.openRepositories().select( repo.getId(), RepoKind.PROXY ).selectMirror();
+        RepositoryMirror mirror = main.openRepositories().select( proxyRepo.getId(), RepoKind.PROXY ).selectMirror();
 
         mirror.addMirror( "mock-mirror" ).addMirror( "http://www.sonatype.org" ).save();
 
-        Assert.assertNotNull( repo.getDownloadMirrors() );
-        Assert.assertNotNull( repo.getDownloadMirrors().getMirrors() );
-        Assert.assertEquals( 2, repo.getDownloadMirrors().getMirrors().size() );
+        Assert.assertNotNull( proxyRepo.getDownloadMirrors() );
+        Assert.assertNotNull( proxyRepo.getDownloadMirrors().getMirrors() );
+        Assert.assertEquals( 2, proxyRepo.getDownloadMirrors().getMirrors().size() );
 
         mirror.removeMirror( "http://www.sonatype.org" ).save();
-        Assert.assertEquals( 1, repo.getDownloadMirrors().getMirrors().size() );
+        Assert.assertEquals( 1, proxyRepo.getDownloadMirrors().getMirrors().size() );
 
         mirror.removeAllMirrors().save();
-        Assert.assertEquals( 0, repo.getDownloadMirrors().getMirrors().size() );
+        Assert.assertEquals( 0, proxyRepo.getDownloadMirrors().getMirrors().size() );
+    }
+
+    @Test
+    public void mirrorHosted()
+        throws Exception
+    {
+        LoginTest.doLogin( main );
+
+        RepositoryMirror mirror = main.openRepositories().select( hostedRepo.getId(), RepoKind.HOSTED ).selectMirror();
+
+        mirror.addMirror( "http://www.sonatype.org" ).save();
+        Assert.assertNotNull( hostedRepo.getPublishedMirrors() );
+        Assert.assertNotNull( hostedRepo.getPublishedMirrors().getMirrors() );
+        Assert.assertEquals( 1, hostedRepo.getPublishedMirrors().getMirrors().size() );
+
+        mirror.removeAllMirrors().save();
+        Assert.assertEquals( 0, hostedRepo.getPublishedMirrors().getMirrors().size() );
     }
 
 }
