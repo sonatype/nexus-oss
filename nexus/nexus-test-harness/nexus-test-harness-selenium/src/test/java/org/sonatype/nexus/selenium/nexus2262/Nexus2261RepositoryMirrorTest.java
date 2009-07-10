@@ -195,6 +195,7 @@ public class Nexus2261RepositoryMirrorTest
 
         mirror.removeAllMirrors().save();
         Assert.assertEquals( 0, hostedRepo.getPublishedMirrors().getMirrors().size() );
+
     }
 
 }
