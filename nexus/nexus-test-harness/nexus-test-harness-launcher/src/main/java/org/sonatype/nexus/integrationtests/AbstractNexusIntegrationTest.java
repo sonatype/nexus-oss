@@ -259,11 +259,15 @@ public class AbstractNexusIntegrationTest
            File[] filesToDelete = workDir.listFiles( new FilenameFilter(){
             public boolean accept( File dir, String name )
             {
+                System.out.print( "dirname: "+ dir.getAbsolutePath()  +": ");
+                
                 // anything but the plugin-repository directory
-                if( dir.getName().equals( "plugin-repository" ) && dir.getParentFile().equals( workDir ) )
+                if( name.contains( "plugin-repository" ) )
                 {
+                    System.out.println( "false" );
                   return false;   
                 }
+                System.out.println( "true" );
                 return true;
             }
         });
