@@ -102,7 +102,7 @@ public class PluginManagerResponse
         for ( PluginResponse response : getProcessedPluginResponses() )
         {
             sb.append( "... " ).append( response.getPluginCoordinates().toString() ).append( " :: " )
-                .append( response.isSuccesful() ? "Activated" : "FAILED!" ).append( "\n" );
+                .append( response.isSuccesful() ? "ACTIVATED" : "FAILED" ).append( "\n" );
 
             if ( !response.isSuccesful() )
             {
