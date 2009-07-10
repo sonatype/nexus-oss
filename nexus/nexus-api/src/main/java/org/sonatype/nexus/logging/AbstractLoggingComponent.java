@@ -18,7 +18,7 @@ public abstract class AbstractLoggingComponent
     {
         if ( logger == null )
         {
-            logger = loggerProvider.get();
+            logger = loggerProvider.getLogger( this.getClass().getName() );
         }
 
         return logger;

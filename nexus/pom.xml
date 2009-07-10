@@ -336,7 +336,7 @@
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
         <type>jar</type>
-        <scope>runtime</scope>
+        <scope>compile</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>

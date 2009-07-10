@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
@@ -51,6 +50,7 @@ import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.log.LogConfig;
 import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
@@ -97,7 +97,7 @@ import org.sonatype.timeline.TimelineFilter;
  */
 @Component( role = Nexus.class )
 public class DefaultNexus
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements Nexus, Initializable, Startable
 {
     @Requirement
@@ -156,12 +156,6 @@ public class DefaultNexus
      */
     @Requirement
     private Wastebasket wastebasket;
-
-    /**
-     * The CacheManager component.
-     */
-    @Requirement
-    private CacheManager cacheManager;
 
     /**
      * The SecurityConfiguration component.
