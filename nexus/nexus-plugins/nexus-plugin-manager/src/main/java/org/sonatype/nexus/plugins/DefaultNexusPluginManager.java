@@ -25,7 +25,9 @@ import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphEx
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.ComponentRepository;
+import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.context.ContextMapAdapter;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -38,6 +40,7 @@ import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginDeactivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
+import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
@@ -630,28 +633,37 @@ public class DefaultNexusPluginManager
 
                     pd.addComponentDescriptor( response.getComponentDescriptor() );
                 }
-                else
-                {
-                    // is it some static resource?
-                    if ( className.startsWith( "static/" ) )
-                    {
-                        pd.getPluginStaticResourceModels().add(
-                                                                new PluginStaticResourceModel( className, className,
-                                                                                               "text/plain" ) );
-                    }
-                }
+            }
+            else if ( className.startsWith( "static/" ) )
+            {
+                // is it some static resource?
+                pd.getPluginStaticResourceModels().add(
+                                                        new PluginStaticResourceModel( className, "/" + className,
+                                                                                       "text/plain" ) );
             }
         }
 
-        // FIXME: resolve resources
-        /*
-         * // resources, if any if ( !pd.getResources().isEmpty() ) { ComponentDescriptor<Object> resd = new
-         * ComponentDescriptor<Object>(); resd.setRole( NexusResourceBundle.class.getName() ); resd.setRoleHint(
-         * csd.getPluginCoordinates().getPluginKey() ); resd.setImplementation( PluginResourceBundle.class.getName() );
-         * XmlPlexusConfiguration config = new XmlPlexusConfiguration(); config.addChild( "pluginKey" ).setValue(
-         * csd.getPluginCoordinates().getPluginKey() ); resd.setConfiguration( config ); csd.addComponentDescriptor(
-         * resd ); }
-         */
+        // register NexusResourceBundle if needed
+        if ( !pd.getPluginStaticResourceModels().isEmpty() )
+        {
+            // if we have static resources, register a NexusResourceBundle with this plugin too
+            ComponentDescriptor<NexusResourceBundle> pluginBundle = new ComponentDescriptor<NexusResourceBundle>();
+
+            pluginBundle.setRole( NexusResourceBundle.class.getName() );
+            pluginBundle.setRoleHint( pd.getPluginCoordinates().getPluginKey() );
+            pluginBundle.setImplementation( PluginResourceBundle.class.getName() );
+
+            ComponentRequirement pluginManagerRequirement = new ComponentRequirement();
+            pluginManagerRequirement.setRole( NexusPluginManager.class.getName() );
+            pluginManagerRequirement.setFieldName( "nexusPluginManager" );
+            pluginBundle.addRequirement( pluginManagerRequirement );
+
+            XmlPlexusConfiguration pluginBundleConfiguration = new XmlPlexusConfiguration();
+            pluginBundleConfiguration.addChild( "pluginKey", pd.getPluginCoordinates().getPluginKey() );
+            pluginBundle.setConfiguration( pluginBundleConfiguration );
+
+            pd.addComponentDescriptor( pluginBundle );
+        }
     }
 
     // ==

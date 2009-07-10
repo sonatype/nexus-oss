@@ -7,6 +7,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.plugin.Managed;
 import org.sonatype.plugin.metadata.GAVCoordinate;
@@ -15,7 +16,10 @@ import org.sonatype.plugin.metadata.PluginMetadataGenerator;
 import org.sonatype.plugin.metadata.gleaner.GleanerException;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Generates a plugin's <tt>plugin.xml</tt> descriptor file based on the project's pom and class annotations.
@@ -87,6 +91,15 @@ public class PluginDescriptorMojo
     @SuppressWarnings( "unused" )
     private List<String> userMimeTypes;
 
+    /**
+     * The output location for the generated plugin descriptor.
+     * 
+     * @parameter default-value="${project.build.outputDirectory}/META-INF/nexus/userMimeTypes.properties"
+     * @required
+     * @readonly
+     */
+    private File userMimeTypesFile;
+
     /** @component */
     private PluginMetadataGenerator metadataGenerator;
 
@@ -94,12 +107,35 @@ public class PluginDescriptorMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        if( !this.mavenProject.getPackaging().equals( "nexus-plugin" ))
+        if ( !this.mavenProject.getPackaging().equals( "nexus-plugin" ) )
         {
             this.getLog().info( "Project is not of packaging type 'nexus-plugin'." );
             return;
         }
-        
+
+        // get the user customization
+        Properties userMimeTypes = null;
+
+        if ( userMimeTypes != null && !userMimeTypes.isEmpty() )
+        {
+            FileOutputStream fos = null;
+
+            try
+            {
+                fos = new FileOutputStream( userMimeTypesFile );
+
+                userMimeTypes.store( fos, "User MIME types" );
+            }
+            catch ( IOException e )
+            {
+                throw new MojoFailureException( "Cannot write the User MIME types file!", e );
+            }
+            finally
+            {
+                IOUtil.close( fos );
+            }
+        }
+
         PluginMetadataGenerationRequest request = new PluginMetadataGenerationRequest();
         request.setGroupId( this.mavenProject.getGroupId() );
         request.setArtifactId( this.mavenProject.getArtifactId() );
