@@ -106,6 +106,7 @@
           </execution>
         </executions>
         <configuration>
+          <skipCoverage>${maven.test.skip}</skipCoverage>
           <source>${basedir}/target/nexus/nexus-webapp-${project.version}/runtime/apps/nexus/webapp</source>
           <doNotInstrument>
             <js>ext-2.2</js>
@@ -246,6 +247,7 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
@@ -260,7 +262,6 @@
       <classifier>compressed</classifier>
     </dependency>
   </dependencies>
-
 
   <profiles>
     <profile>

@@ -57,7 +57,7 @@ public abstract class NexusTestCase
                 webappRoot = new File( "../nexus-webapp/src/main/webapp" );
                 if ( !webappRoot.exists() )
                 {
-                    webappRoot = new File( "target/nexus/nexus-webapp-1.4.0-SNAPSHOT/runtime/apps/nexus/webapp" );
+                    webappRoot = new File( TestProperties.getString( "nexus.base.dir" ), "runtime/apps/nexus/webapp" );
                 }
             }
 
