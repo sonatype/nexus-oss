@@ -40,8 +40,7 @@ public abstract class AbstractIndexPlexusResource
 {
     @Requirement
     private IndexerManager indexerManager;
-
-    protected static final int MAX_RESULTS = 500; 
+    
     @Override
     public Object getPayloadInstance()
     {
@@ -97,9 +96,6 @@ public abstract class AbstractIndexPlexusResource
                 count = null;
             }
         }
-        
-        // Don't allow queries to generate more that MAX_RESULTS results        
-        int recordCount = ( count == null || count > MAX_RESULTS ) ? MAX_RESULTS + 1 : count.intValue();
 
         FlatSearchResponse searchResult = null;
 
@@ -121,16 +117,16 @@ public abstract class AbstractIndexPlexusResource
             }
             else if ( !StringUtils.isEmpty( query ) )
             {
-                searchResult = indexerManager.searchArtifactFlat( query, getRepositoryId( request ), from, recordCount );
+                searchResult = indexerManager.searchArtifactFlat( query, getRepositoryId( request ), from, count );
             }
             else if ( !StringUtils.isEmpty( className ) )
             {
-                searchResult = indexerManager.searchArtifactClassFlat( className, getRepositoryId( request ), from, recordCount );
+                searchResult = indexerManager.searchArtifactClassFlat( className, getRepositoryId( request ), from, count );
             }
             else if ( !StringUtils.isEmpty( g ) || !StringUtils.isEmpty( a ) || !StringUtils.isEmpty( v )
                 || !StringUtils.isEmpty( p ) || !StringUtils.isEmpty( c ) )
             {
-                searchResult = indexerManager.searchArtifactFlat( g, a, v, p, c, getRepositoryId( request ), from, recordCount );
+                searchResult = indexerManager.searchArtifactFlat( g, a, v, p, c, getRepositoryId( request ), from, count );
             }
             else
             {
@@ -149,7 +145,7 @@ public abstract class AbstractIndexPlexusResource
         if ( searchResult != null )
         {            
             // non-identify search happened
-            boolean tooManyResults = searchResult.getTotalHits() == -1 || searchResult.getResults().size() > MAX_RESULTS;
+            boolean tooManyResults = searchResult.getTotalHits() == -1;
             
             result.setTooManyResults( tooManyResults );
 
@@ -157,7 +153,7 @@ public abstract class AbstractIndexPlexusResource
 
             result.setFrom( from == null ? -1 : from.intValue() );
 
-            result.setCount( count == null ? -1 : ( count > MAX_RESULTS ? MAX_RESULTS : count ) );
+            result.setCount( count == null ? -1 : count );
 
             if ( tooManyResults )
             {

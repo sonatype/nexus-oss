@@ -198,8 +198,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
   this.fetchMoreBar = new Ext.Toolbar({
     ctCls: 'search-all-tbar',
     items: [ 
-      'Displaying 0 of 0 records',
-      this.fetchMoreButton,
+      'Displaying 0 records',
       { xtype: 'tbspacer' },
       this.clearButton
     ]
@@ -294,7 +293,7 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     
     p.fetchMoreBar.items.items[0].destroy();
     p.fetchMoreBar.items.removeAt( 0 );
-    p.fetchMoreBar.insertButton( 0, new Ext.Toolbar.TextItem( 'Displaying ' + count + ' of ' + p.totalRecords + ' records' ) );
+    p.fetchMoreBar.insertButton( 0, new Ext.Toolbar.TextItem( 'Displaying ' + count + ' records' ) );
 
     p.fetchMoreButton.setDisabled( count >= p.totalRecords );
   },

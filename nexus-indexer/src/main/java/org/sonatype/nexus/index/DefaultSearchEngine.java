@@ -35,6 +35,7 @@ public class DefaultSearchEngine
     extends AbstractLogEnabled
     implements SearchEngine
 {
+    private static final int MAX_HITS = 500;
     @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
                                          IndexingContext indexingContext, Query query )
@@ -142,10 +143,15 @@ public class DefaultSearchEngine
         {
             return 0;
         }
+        
+        if ( hits.length() > MAX_HITS )
+        {
+            return -1;
+        }
 
         int hitCount = hits.length();
 
-        int start = from == FlatSearchRequest.UNDEFINED ? 0 : from;
+        int start = 0; //from == FlatSearchRequest.UNDEFINED ? 0 : from;
 
         int found = 0;
 
@@ -167,13 +173,8 @@ public class DefaultSearchEngine
                     // increase the founds
                     found++;
                 }
-                else
-                {
-                    // fix the total hitCount accordingly
-                    hitCount--;
-                }
 
-                if ( found == aiCount )
+                if ( found >= MAX_HITS )
                 {
                     // escape then
                     break;

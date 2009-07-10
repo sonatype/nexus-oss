@@ -349,7 +349,8 @@ public abstract class AbstractRepoNexusIndexerTest
         assertEquals( "1.5", ai.version );
     }
 
-    public void testPaging()
+    // Paging is currently disabled
+    public void donttestPaging()
         throws Exception
     {
         // we have 22 artifact for this search
