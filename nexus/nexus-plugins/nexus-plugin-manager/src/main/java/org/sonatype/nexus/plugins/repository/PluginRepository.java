@@ -1,11 +1,15 @@
 package org.sonatype.nexus.plugins.repository;
 
-import java.io.File;
 import java.util.Collection;
 
-import org.sonatype.nexus.plugins.PluginCoordinates;
+import org.sonatype.plugin.metadata.GAVCoordinate;
 
-// TODO: swap File with URL?
+/**
+ * This is a very high level abstraction for Nexus Plugin Repository. The implementation behind may be something like
+ * Local Maven Repository, or even Nexus Repository.
+ * 
+ * @author cstamas
+ */
 public interface PluginRepository
 {
     /**
@@ -13,21 +17,13 @@ public interface PluginRepository
      * 
      * @return
      */
-    Collection<PluginCoordinates> findAvailablePlugins();
+    Collection<PluginRepositoryArtifact> findAvailablePlugins();
 
     /**
-     * Returns the file corresponding to supplied coordinates, or null otherwise.
-     * 
-     * @param coordinates
-     * @return the plugin file or null
-     */
-    File resolvePlugin( PluginCoordinates coordinates );
-
-    /**
-     * Result all the dependencies.
+     * Returns the artifaft for the given coordinates.
      * 
      * @param coordinates
      * @return
      */
-    Collection<File> resolvePluginDependencies( PluginCoordinates coordinates );
+    PluginRepositoryArtifact resolveArtifact( GAVCoordinate coordinates );
 }

@@ -39,11 +39,13 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginDeactivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
+import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugin.metadata.gleaner.GleanerException;
 import org.sonatype.plugin.metadata.plexus.PlexusComponentGleaner;
 import org.sonatype.plugin.metadata.plexus.PlexusComponentGleanerRequest;
@@ -134,11 +136,11 @@ public class DefaultNexusPluginManager
     {
         PluginManagerResponse result = new PluginManagerResponse();
 
-        Collection<PluginCoordinates> availablePlugins = pluginRepositoryManager.findAvailablePlugins();
+        Collection<PluginRepositoryArtifact> availablePlugins = pluginRepositoryManager.findAvailablePlugins();
 
-        for ( PluginCoordinates pluginCoordinate : availablePlugins )
+        for ( PluginRepositoryArtifact artifact : availablePlugins )
         {
-            result.addPluginResponse( activatePlugin( pluginCoordinate ) );
+            result.addPluginResponse( doActivatePlugin( artifact ) );
         }
 
         return result;
@@ -150,8 +152,10 @@ public class DefaultNexusPluginManager
         return new PluginManagerResponse( RequestResult.FAILED );
     }
 
-    public PluginResponse activatePlugin( PluginCoordinates pluginCoordinate )
+    public PluginResponse activatePlugin( GAVCoordinate coordinate )
     {
+        PluginCoordinates pluginCoordinate = new PluginCoordinates( coordinate );
+
         if ( getInstalledPlugins().containsKey( pluginCoordinate.getPluginKey() ) )
         {
             PluginResponse result = new PluginResponse( pluginCoordinate );
@@ -159,11 +163,24 @@ public class DefaultNexusPluginManager
             return result;
         }
 
-        return doActivatePlugin( pluginCoordinate );
+        PluginRepositoryArtifact pluginArtifact = pluginRepositoryManager.resolveArtifact( pluginCoordinate );
+
+        if ( pluginArtifact == null )
+        {
+            PluginResponse result = new PluginResponse( pluginCoordinate );
+
+            result.setThrowable( new NoSuchPluginException( pluginCoordinate ) );
+
+            return result;
+        }
+
+        return doActivatePlugin( pluginArtifact );
     }
 
-    protected PluginResponse doActivatePlugin( PluginCoordinates pluginCoordinates )
+    protected PluginResponse doActivatePlugin( PluginRepositoryArtifact pluginArtifact )
     {
+        PluginCoordinates pluginCoordinates = new PluginCoordinates( pluginArtifact.getCoordinate() );
+
         PluginResponse result = new PluginResponse( pluginCoordinates );
 
         ClassRealm pluginRealm = null;
@@ -172,7 +189,7 @@ public class DefaultNexusPluginManager
 
         try
         {
-            File pluginFile = pluginRepositoryManager.resolvePlugin( pluginCoordinates );
+            File pluginFile = pluginArtifact.getFile();
 
             if ( pluginFile == null || !pluginFile.isFile() )
             {
@@ -239,7 +256,18 @@ public class DefaultNexusPluginManager
             }
 
             // get plugin dependecies (not inter-plugin but other libs, jars)
-            Collection<File> dependencies = pluginRepositoryManager.resolvePluginDependencies( pluginCoordinates );
+            List<File> dependencies = new ArrayList<File>( pluginMetadata.getPluginDependencies().size() );
+
+            for ( PluginDependency dependency : pluginMetadata.getPluginDependencies() )
+            {
+                PluginCoordinates coordinates =
+                    new PluginCoordinates( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+
+                PluginRepositoryArtifact dependencyArtifact =
+                    pluginArtifact.getNexusPluginRepository().resolveArtifact( coordinates );
+
+                dependencies.add( dependencyArtifact.getFile() );
+            }
 
             // file the realm
             for ( File dependencyFile : dependencies )

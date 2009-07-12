@@ -1,7 +1,5 @@
 package org.sonatype.nexus.plugins.repository;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,7 +7,7 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.plugins.PluginCoordinates;
+import org.sonatype.plugin.metadata.GAVCoordinate;
 
 @Component( role = PluginRepositoryManager.class )
 public class DefaultPluginRepositoryManager
@@ -62,9 +60,9 @@ public class DefaultPluginRepositoryManager
         getCustomRepositories().remove( id );
     }
 
-    public Collection<PluginCoordinates> findAvailablePlugins()
+    public Collection<PluginRepositoryArtifact> findAvailablePlugins()
     {
-        HashSet<PluginCoordinates> result = new HashSet<PluginCoordinates>();
+        HashSet<PluginRepositoryArtifact> result = new HashSet<PluginRepositoryArtifact>();
 
         for ( NexusPluginRepository repository : getRepositories().values() )
         {
@@ -74,12 +72,14 @@ public class DefaultPluginRepositoryManager
         return result;
     }
 
-    public File resolvePlugin( PluginCoordinates coordinates )
+    public PluginRepositoryArtifact resolveArtifact( GAVCoordinate coordinates )
     {
         // iterate as long as you get something non-null
+        PluginRepositoryArtifact result = null;
+
         for ( NexusPluginRepository repository : getRepositories().values() )
         {
-            File result = repository.resolvePlugin( coordinates );
+            result = repository.resolveArtifact( coordinates );
 
             if ( result != null )
             {
@@ -89,17 +89,5 @@ public class DefaultPluginRepositoryManager
 
         // nobody has it
         return null;
-    }
-
-    public Collection<File> resolvePluginDependencies( PluginCoordinates coordinates )
-    {
-        ArrayList<File> result = new ArrayList<File>();
-
-        for ( NexusPluginRepository repository : getRepositories().values() )
-        {
-            result.addAll( repository.resolvePluginDependencies( coordinates ) );
-        }
-
-        return result;
     }
 }

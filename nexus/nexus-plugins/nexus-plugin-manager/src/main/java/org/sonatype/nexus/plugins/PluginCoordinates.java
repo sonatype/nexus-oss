@@ -21,6 +21,11 @@ public class PluginCoordinates
         super( composite );
     }
 
+    public PluginCoordinates( GAVCoordinate coordinate )
+    {
+        this( coordinate.toCompositeForm() );
+    }
+
     public String getPluginKey()
     {
         // for now, it is enuf

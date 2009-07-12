@@ -4,9 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Configuration;
 import org.sonatype.nexus.plugins.PluginCoordinates;
+import org.sonatype.plugin.metadata.GAVCoordinate;
 
 /**
  * A very trivial "local" repository implementation for Nexus plugins. The layout is:
@@ -24,33 +23,14 @@ import org.sonatype.nexus.plugins.PluginCoordinates;
  * 
  * @author cstamas
  */
-@Component( role = NexusPluginRepository.class, hint = FileNexusPluginRepository.REPO_TYPE )
-public class FileNexusPluginRepository
+public abstract class AbstractFileNexusPluginRepository
     implements NexusPluginRepository
 {
-    protected static final String REPO_TYPE = "file";
+    protected abstract File getNexusPluginsDirectory();
 
-    @Configuration( value = "${nexus-work}/plugin-repository" )
-    private File nexusPluginsDirectory;
-
-    protected File getNexusPluginsDirectory()
+    public Collection<PluginRepositoryArtifact> findAvailablePlugins()
     {
-        if ( !nexusPluginsDirectory.exists() )
-        {
-            nexusPluginsDirectory.mkdirs();
-        }
-
-        return nexusPluginsDirectory;
-    }
-
-    public String getId()
-    {
-        return REPO_TYPE;
-    }
-
-    public Collection<PluginCoordinates> findAvailablePlugins()
-    {
-        ArrayList<PluginCoordinates> result = new ArrayList<PluginCoordinates>();
+        ArrayList<PluginRepositoryArtifact> result = new ArrayList<PluginRepositoryArtifact>();
 
         File root = getNexusPluginsDirectory();
 
@@ -88,7 +68,15 @@ public class FileNexusPluginRepository
 
                                                 if ( pluginFile.isFile() )
                                                 {
-                                                    result.add( coord );
+                                                    PluginRepositoryArtifact art = new PluginRepositoryArtifact();
+
+                                                    art.setNexusPluginRepository( this );
+
+                                                    art.setCoordinate( coord );
+
+                                                    art.setFile( pluginFile );
+
+                                                    result.add( art );
                                                 }
                                             }
                                         }
@@ -104,13 +92,21 @@ public class FileNexusPluginRepository
         return result;
     }
 
-    public File resolvePlugin( PluginCoordinates coordinates )
+    public PluginRepositoryArtifact resolveArtifact( GAVCoordinate coordinates )
     {
         File pluginFile = new File( getPluginFolder( coordinates ), getPluginFileName( coordinates ) );
 
         if ( pluginFile.isFile() )
         {
-            return pluginFile;
+            PluginRepositoryArtifact art = new PluginRepositoryArtifact();
+
+            art.setNexusPluginRepository( this );
+
+            art.setCoordinate( coordinates );
+
+            art.setFile( pluginFile );
+
+            return art;
         }
         else
         {
@@ -118,47 +114,22 @@ public class FileNexusPluginRepository
         }
     }
 
-    public Collection<File> resolvePluginDependencies( PluginCoordinates coordinates )
-    {
-        ArrayList<File> result = new ArrayList<File>();
-
-        File depsFolder = getPluginDependenciesFolder( coordinates );
-
-        if ( depsFolder.isDirectory() )
-        {
-            File[] deps = depsFolder.listFiles();
-
-            if ( deps != null )
-            {
-                for ( File dep : deps )
-                {
-                    if ( dep.isFile() )
-                    {
-                        result.add( dep );
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
-
     // ==
 
-    protected File getPluginFolder( PluginCoordinates coordinates )
+    protected File getPluginFolder( GAVCoordinate coordinates )
     {
         return new File( getNexusPluginsDirectory(), coordinates.getGroupId() + "/" + coordinates.getArtifactId() + "/"
             + coordinates.getVersion() );
     }
 
-    protected File getPluginDependenciesFolder( PluginCoordinates coordinates )
+    protected File getPluginDependenciesFolder( GAVCoordinate coordinates )
     {
         File depsFolder = new File( getPluginFolder( coordinates ), "dependencies" );
 
         return depsFolder;
     }
 
-    protected String getPluginFileName( PluginCoordinates coordinates )
+    protected String getPluginFileName( GAVCoordinate coordinates )
     {
         return coordinates.getArtifactId() + "-" + coordinates.getVersion() + ".jar";
     }
