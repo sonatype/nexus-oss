@@ -55,23 +55,7 @@ import org.sonatype.plugins.model.PluginMetadata;
 import org.sonatype.plugins.model.io.xpp3.PluginModelXpp3Reader;
 
 /**
- * We have multiple showstoppers here (mercury, shane's model, transitive hull, etc), so we are going for simple stuff:
- * <p>
- * A plugin directory looks like this: THIS IS OUT OF DATE
- * 
- * <pre>
- *  ${nexus-work}/plugin-repository
- *    aPluginDir.g/aPluginDir.a/aPluginDir.v/
- *      aPluginJar.jar
- *      ...
- *    bPluginDir.g/bPluginDir.a/bPluginDir.v/
- *      bPluginJar.jar
- *      ...
- *    ...
- * </pre>
- * 
- * So, "installing" should be done by a) creating a plugin directory b) copying the plugin and it's deps there (kinda it
- * was before).
+ * Plugin Manager implementation.
  * 
  * @author cstamas
  */
@@ -263,8 +247,7 @@ public class DefaultNexusPluginManager
                 PluginCoordinates coordinates =
                     new PluginCoordinates( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
 
-                PluginRepositoryArtifact dependencyArtifact =
-                    pluginArtifact.getNexusPluginRepository().resolveArtifact( coordinates );
+                PluginRepositoryArtifact dependencyArtifact = pluginRepositoryManager.resolveArtifact( coordinates );
 
                 dependencies.add( dependencyArtifact.getFile() );
             }

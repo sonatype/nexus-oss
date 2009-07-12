@@ -2,8 +2,8 @@ package org.sonatype.nexus.plugins.repository;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -62,22 +62,44 @@ public class DefaultPluginRepositoryManager
 
     public Collection<PluginRepositoryArtifact> findAvailablePlugins()
     {
-        HashSet<PluginRepositoryArtifact> result = new HashSet<PluginRepositoryArtifact>();
+        // we collect and order repositories into _descending_ order
+        // to make system plugins stomp over the user added ones if
+        // collision occurs
+        TreeSet<NexusPluginRepository> repositories =
+            new TreeSet<NexusPluginRepository>( new NexusPluginRepositoryComparator( true ) );
 
-        for ( NexusPluginRepository repository : getRepositories().values() )
+        repositories.addAll( getRepositories().values() );
+
+        HashMap<GAVCoordinate, PluginRepositoryArtifact> result =
+            new HashMap<GAVCoordinate, PluginRepositoryArtifact>();
+
+        for ( NexusPluginRepository repository : repositories )
         {
-            result.addAll( repository.findAvailablePlugins() );
+            Collection<PluginRepositoryArtifact> artifacts = repository.findAvailablePlugins();
+
+            for ( PluginRepositoryArtifact artifact : artifacts )
+            {
+                result.put( artifact.getCoordinate(), artifact );
+            }
         }
 
-        return result;
+        return result.values();
     }
 
     public PluginRepositoryArtifact resolveArtifact( GAVCoordinate coordinates )
     {
+        // we collect and order repositories into _asceding_ order
+        // to make  dependencies be found in system repo before user repo if
+        // collision occurs
+        TreeSet<NexusPluginRepository> repositories =
+            new TreeSet<NexusPluginRepository>( new NexusPluginRepositoryComparator( false ) );
+
+        repositories.addAll( getRepositories().values() );
+
         // iterate as long as you get something non-null
         PluginRepositoryArtifact result = null;
 
-        for ( NexusPluginRepository repository : getRepositories().values() )
+        for ( NexusPluginRepository repository : repositories )
         {
             result = repository.resolveArtifact( coordinates );
 

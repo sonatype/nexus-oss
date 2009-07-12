@@ -21,6 +21,8 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
  *       ...
  * </pre>
  * 
+ * TODO: make this proper M2 layout and not "make up" some 3rd kind!
+ * 
  * @author cstamas
  */
 public abstract class AbstractFileNexusPluginRepository
