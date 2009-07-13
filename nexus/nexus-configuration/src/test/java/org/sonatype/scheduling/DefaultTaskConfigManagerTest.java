@@ -215,8 +215,7 @@ public class DefaultTaskConfigManagerTest
             //TODO this is only use for testing, but we are expecting that the TaskHint matches the Classname.
             defaultScheduler,
             callable,
-            schedule,
-            null );
+            schedule );
     }
 
     private List<CScheduledTask> getTaskConfiguration()

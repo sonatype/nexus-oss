@@ -99,8 +99,7 @@ public class DefaultTaskConfigManager
                         task.getName(),
                         task.getType(),
                         nexusTask,
-                        translateFrom( task.getSchedule(), new Date( task.getNextRun() ) ),
-                        translateFrom( task.getProperties() ) ).setEnabled( task.isEnabled() );
+                        translateFrom( task.getSchedule(), new Date( task.getNextRun() ) ) ).setEnabled( task.isEnabled() );
                 }
                 catch ( IllegalArgumentException e )
                 {
@@ -334,10 +333,12 @@ public class DefaultTaskConfigManager
         storeableTask.setName( task.getName() );
         storeableTask.setType( task.getType() );
         storeableTask.setStatus( task.getTaskState().name() );
+        
         if( task.getLastRun() != null )
         {
             storeableTask.setLastRun( task.getLastRun().getTime() );
         }
+        
         if( task.getNextRun() != null )
         {
             storeableTask.setNextRun( task.getNextRun().getTime() );

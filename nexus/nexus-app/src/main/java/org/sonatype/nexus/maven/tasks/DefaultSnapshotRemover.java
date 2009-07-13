@@ -85,11 +85,11 @@ public class DefaultSnapshotRemover
         throws NoSuchRepositoryException, IllegalArgumentException
     {
         SnapshotRemovalResult result = new SnapshotRemovalResult();
+        
+        logDetails( request );
 
         if ( request.getRepositoryId() != null )
         {
-            getLogger().info( "Removing old SNAPSHOT deployments from " + request.getRepositoryId() + " repository." );
-
             Repository repository = getRepositoryRegistry().getRepository( request.getRepositoryId() );
 
             if ( MavenRepository.class.isAssignableFrom( repository.getClass() )
@@ -105,10 +105,6 @@ public class DefaultSnapshotRemover
         }
         else if ( request.getRepositoryGroupId() != null )
         {
-            getLogger().info(
-                              "Removing old SNAPSHOT deployments from " + request.getRepositoryGroupId()
-                                  + " repository group." );
-
             for ( Repository repository : getRepositoryRegistry().getRepositoryWithFacet(
                                                                                           request.getRepositoryGroupId(),
                                                                                           GroupRepository.class ).getMemberRepositories() )
@@ -123,8 +119,6 @@ public class DefaultSnapshotRemover
         }
         else
         {
-            getLogger().info( "Removing old SNAPSHOT deployments from all repositories." );
-
             for ( Repository repository : getRepositoryRegistry().getRepositories() )
             {
                 // only from maven repositories, stay silent for others and simply skip
@@ -219,6 +213,33 @@ public class DefaultSnapshotRemover
         }
 
         return result;
+    }
+    
+    private void logDetails( SnapshotRemovalRequest request )
+    {
+        if ( request.getRepositoryId() != null )
+        {
+            getLogger().info( "Removing old SNAPSHOT deployments from " + request.getRepositoryId() + " repository." );
+        }
+        else if ( request.getRepositoryGroupId() != null )
+        {
+            getLogger().info(
+                "Removing old SNAPSHOT deployments from " 
+                + request.getRepositoryGroupId()
+                + " repository group." );
+        }
+        else
+        {
+            getLogger().info( "Removing old SNAPSHOT deployments from all repositories." );
+        }
+        
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "With parameters: " );
+            getLogger().debug( "    MinCountOfSnapshotsToKeep: " + request.getMinCountOfSnapshotsToKeep() );
+            getLogger().debug( "    RemoveSnapshotsOlderThanDays: " + request.getRemoveSnapshotsOlderThanDays() );
+            getLogger().debug( "    RemoveIfReleaseExists: " + request.isRemoveIfReleaseExists() );
+        }
     }
 
     private class SnapshotRemoverWalkerProcessor
