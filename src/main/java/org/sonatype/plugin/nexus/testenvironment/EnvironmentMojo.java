@@ -9,9 +9,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
@@ -38,7 +42,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.plugins.portallocator.Port;
 import org.sonatype.plugins.portallocator.PortAllocatorMojo;
 
@@ -160,6 +163,11 @@ public class EnvironmentMojo
      * @parameter expression="${maven.test.skip}"
      */
     private boolean testSkip;
+
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean extractNexusPluginsJavascript;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -294,6 +302,70 @@ public class EnvironmentMojo
         if ( componentsXml.exists() )
         {
             copyAndInterpolate( componentsXml.getParentFile(), destinationComponents.getParentFile() );
+        }
+
+        if ( extractNexusPluginsJavascript )
+        {
+            extractPluginJs();
+        }
+    }
+
+    private void extractPluginJs()
+        throws MojoExecutionException
+    {
+        Collection<Artifact> plugins = getNexusPlugins();
+
+        File outputDir = new File( project.getProperties().getProperty( "nexus.webapp" ), "static" );
+        outputDir.mkdirs();
+
+        for ( Artifact plugin : plugins )
+        {
+            ZipFile file;
+            try
+            {
+                file = new ZipFile( plugin.getFile() );
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( e.getMessage(), e );
+            }
+
+            getLog().debug( "Processing " + plugin );
+
+            Enumeration<? extends ZipEntry> entries = file.entries();
+            while ( entries.hasMoreElements() )
+            {
+                ZipEntry entry = entries.nextElement();
+
+                String name = entry.getName();
+                if ( !( name.startsWith( "static/js/" ) && name.endsWith( ".js" ) ) )
+                {
+                    continue;
+                }
+
+                File outFile = new File( outputDir, name.substring( 10 ) );
+                getLog().debug( "Extracting " + name + " to " + outFile );
+
+                InputStream in = null;
+                FileOutputStream out = null;
+
+                try
+                {
+                    in = file.getInputStream( entry );
+                    out = new FileOutputStream( outFile );
+
+                    IOUtil.copy( in, out );
+                }
+                catch ( IOException e )
+                {
+                    throw new MojoExecutionException( e.getMessage(), e );
+                }
+                finally
+                {
+                    IOUtil.close( out );
+                    IOUtil.close( in );
+                }
+            }
         }
     }
 
@@ -608,19 +680,21 @@ public class EnvironmentMojo
             {
                 destination = pluginsFolder;
             }
-            
+
             String type = pluginArtifact.getType();
-            
-//          nexus plugins will have a classifier of bundle, and and type of zip
-            if( "bundle".equals( plugin.getClassifier()) && "zip".equals( type ) ) 
+
+            // nexus plugins will have a classifier of bundle, and and type of zip
+            if ( "bundle".equals( plugin.getClassifier() ) && "zip".equals( type ) )
             {
-                destination = new File( (String) this.project.getProperties().get( "nexus-work-dir" ), "plugin-repository/" );    
-                System.out.println( "setting destination to "+ destination );
+                destination =
+                    new File( (String) this.project.getProperties().get( "nexus-work-dir" ), "plugin-repository/" );
+                System.out.println( "setting destination to " + destination );
             }
-            
+
             if ( "jar".equals( type ) )
             {
-                //System.out.println( "copying jar: "+ pluginArtifact.getFile().getAbsolutePath() + " to: "+  destination.getAbsolutePath() );
+                // System.out.println( "copying jar: "+ pluginArtifact.getFile().getAbsolutePath() + " to: "+
+                // destination.getAbsolutePath() );
                 copy( pluginArtifact.getFile(), destination );
             }
             else if ( "zip".equals( type ) || "tar.gz".equals( type ) )
@@ -748,6 +822,54 @@ public class EnvironmentMojo
         }
 
         return artifact;
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private Collection<Artifact> getNexusPlugins()
+        throws MojoExecutionException
+    {
+        // add filters in well known order, least specific to most specific
+        FilterArtifacts filter = new FilterArtifacts();
+
+        filter.addFilter( new TypeFilter( "zip", null ) );
+        filter.addFilter( new ClassifierFilter( "bundle", null ) );
+
+        Set<Artifact> projectArtifacts = project.getArtifacts();
+
+        // perform filtering
+        try
+        {
+            projectArtifacts = filter.filter( projectArtifacts );
+        }
+        catch ( ArtifactFilterException e )
+        {
+            throw new MojoExecutionException( "Error filtering artifacts", e );
+        }
+
+        List<Artifact> resolvedArtifacts = new ArrayList<Artifact>();
+
+        for ( Artifact artifact : projectArtifacts )
+        {
+            Artifact ra =
+                artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
+                                                "compile", "jar" );
+            if ( !ra.isResolved() )
+            {
+                try
+                {
+                    resolver.resolve( ra, remoteRepositories, localRepository );
+                }
+                catch ( AbstractArtifactResolutionException e )
+                {
+                    getLog().warn( "Unable to resolve artifact: " + ra );
+                    continue;
+                }
+
+                resolvedArtifacts.add( ra );
+            }
+        }
+
+        return resolvedArtifacts;
     }
 
     public void contextualize( Context context )
