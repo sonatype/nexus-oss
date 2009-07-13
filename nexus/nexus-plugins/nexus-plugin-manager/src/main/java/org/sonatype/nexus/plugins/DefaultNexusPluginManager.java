@@ -244,12 +244,21 @@ public class DefaultNexusPluginManager
 
             for ( PluginDependency dependency : pluginMetadata.getClasspathDependencies() )
             {
-                PluginCoordinates coordinates =
-                    new PluginCoordinates( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+                GAVCoordinate coordinates =
+                    new GAVCoordinate( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
 
                 PluginRepositoryArtifact dependencyArtifact = pluginRepositoryManager.resolveArtifact( coordinates );
 
-                dependencies.add( dependencyArtifact.getFile() );
+                if ( dependencyArtifact != null )
+                {
+                    dependencies.add( dependencyArtifact.getFile() );
+                }
+                else
+                {
+                    result.setThrowable( new DependencyNotFoundException( pluginCoordinates, coordinates ) );
+                    
+                    return result;
+                }
             }
 
             // file the realm
