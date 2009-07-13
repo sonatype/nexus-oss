@@ -29,13 +29,14 @@ import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.ExpiredCredentialsException;
 import org.jsecurity.authc.UsernamePasswordToken;
+import org.jsecurity.codec.Base64;
 import org.jsecurity.subject.Subject;
 import org.jsecurity.web.WebUtils;
 import org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.auth.AuthenticationItem;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.access.AccessManager;
@@ -418,5 +419,15 @@ public class NexusHttpAuthenticationFilter
             
             return authzHeader;
         }
+    }
+    
+    // work around to accept password with ':' character
+    @Override
+    protected String[] getPrincipalsAndCredentials(String scheme, String encoded) {
+        String decoded = Base64.decodeToString(encoded);
+        
+        String[] parts = decoded.split( ":" );
+        
+        return new String[] { parts[0], decoded.substring( parts[0].length() + 1 ) };
     }
 }
