@@ -18,6 +18,7 @@ import org.apache.maven.mercury.repository.metadata.SnapshotOperand;
 import org.apache.maven.mercury.repository.metadata.StringOperand;
 import org.codehaus.plexus.lang.DefaultLanguage;
 import org.codehaus.plexus.lang.Language;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Actually it's a fixed version of org.apache.maven.mercury.repository.metadata.MergeOperation
@@ -52,39 +53,46 @@ public class MergeOperation
         // we first record the versioning.lastUpdated since it might be changed by MetadataOpersions
         String lastUpdated = null;
 
-        if ( sourceMetadata.getVersioning() == null && targetMetadata.getVersioning() != null )
+        if ( !hasLastUpdatedSet( sourceMetadata ) && !hasLastUpdatedSet( targetMetadata ) )
+        {
+            // neither has set, set it to now
+            lastUpdated = Long.toString( System.currentTimeMillis() );
+        }
+        else if ( !hasLastUpdatedSet( sourceMetadata ) && hasLastUpdatedSet( targetMetadata ) )
         {
             lastUpdated = targetMetadata.getVersioning().getLastUpdated();
         }
-        else if ( targetMetadata.getVersioning() == null && sourceMetadata.getVersioning() != null )
+        else if ( !hasLastUpdatedSet( targetMetadata ) && hasLastUpdatedSet( sourceMetadata ) )
         {
             lastUpdated = sourceMetadata.getVersioning().getLastUpdated();
         }
-        else if ( targetMetadata.getVersioning() != null && sourceMetadata.getVersioning() != null )
+        else if ( hasLastUpdatedSet( targetMetadata ) && hasLastUpdatedSet( sourceMetadata ) )
         {
+            long sourceLU = -1;
+
+            long targetLU = -1;
+
             try
             {
-                long sourceLU = sourceMetadata.getVersioning().getLastUpdated() == null ? -1 : Long.parseLong( sourceMetadata.getVersioning().getLastUpdated() );
-
-                long targetLU = targetMetadata.getVersioning().getLastUpdated() == null ? -1 : Long.parseLong( targetMetadata.getVersioning().getLastUpdated() );
-                
-                if ( sourceLU != -1 && targetLU != -1 )
-                {
-                    lastUpdated = sourceLU >= targetLU ? Long.toString( sourceLU ) : Long.toString( targetLU );
-                }
-                else if ( sourceLU != -1 && targetLU == -1 )
-                {
-                    lastUpdated = Long.toString( sourceLU );
-                }
-                else if ( sourceLU == -1 && targetLU != -1 )
-                {
-                    lastUpdated = Long.toString( targetLU );
-                }
+                sourceLU = Long.parseLong( sourceMetadata.getVersioning().getLastUpdated() );
             }
             catch ( NumberFormatException e )
             {
-                throw new MetadataException( "Could not parst lastUpdate value from metadata.", e );
+                // nothing, bad metadata
+                // TODO: we should do something here, but surely not die
             }
+
+            try
+            {
+                targetLU = Long.parseLong( targetMetadata.getVersioning().getLastUpdated() );
+            }
+            catch ( NumberFormatException e )
+            {
+                // nothing, bad metadata
+                // TODO: we should do something here, but surely not die
+            }
+
+            lastUpdated = sourceLU >= targetLU ? Long.toString( sourceLU ) : Long.toString( targetLU );
         }
 
         List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
@@ -170,11 +178,17 @@ public class MergeOperation
     {
         if ( data == null || !( data instanceof MetadataOperand ) )
         {
-            throw new MetadataException( LANG.getMessage( "bad.operand", "MetadataOperand", data == null
-                ? "null"
-                : data.getClass().getName() ) );
+            throw new MetadataException( LANG.getMessage( "bad.operand", "MetadataOperand", data == null ? "null"
+                            : data.getClass().getName() ) );
         }
 
         sourceMetadata = ( (MetadataOperand) data ).getOperand();
+    }
+
+    // ==
+
+    protected boolean hasLastUpdatedSet( Metadata md )
+    {
+        return md.getVersioning() != null && StringUtils.isNotBlank( md.getVersioning().getLastUpdated() );
     }
 }
