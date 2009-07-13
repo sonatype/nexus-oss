@@ -64,11 +64,22 @@ public class MergeOperation
         {
             try
             {
-                long sourceLU = Long.parseLong( sourceMetadata.getVersioning().getLastUpdated() );
+                long sourceLU = sourceMetadata.getVersioning().getLastUpdated() == null ? -1 : Long.parseLong( sourceMetadata.getVersioning().getLastUpdated() );
 
-                long targetLU = Long.parseLong( targetMetadata.getVersioning().getLastUpdated() );
-
-                lastUpdated = sourceLU >= targetLU ? Long.toString( sourceLU ) : Long.toString( targetLU );
+                long targetLU = targetMetadata.getVersioning().getLastUpdated() == null ? -1 : Long.parseLong( targetMetadata.getVersioning().getLastUpdated() );
+                
+                if ( sourceLU != -1 && targetLU != -1 )
+                {
+                    lastUpdated = sourceLU >= targetLU ? Long.toString( sourceLU ) : Long.toString( targetLU );
+                }
+                else if ( sourceLU != -1 && targetLU == -1 )
+                {
+                    lastUpdated = Long.toString( sourceLU );
+                }
+                else if ( sourceLU == -1 && targetLU != -1 )
+                {
+                    lastUpdated = Long.toString( targetLU );
+                }
             }
             catch ( NumberFormatException e )
             {
@@ -146,7 +157,7 @@ public class MergeOperation
 
         // versioning.lastUpdate
         // choose the latest
-        if ( targetMetadata.getVersioning() != null )
+        if ( targetMetadata.getVersioning() != null && lastUpdated != null )
         {
             targetMetadata.getVersioning().setLastUpdated( lastUpdated );
         }
