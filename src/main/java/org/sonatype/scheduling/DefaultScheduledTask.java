@@ -13,6 +13,7 @@
 package org.sonatype.scheduling;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,12 +60,10 @@ public class DefaultScheduledTask<T>
 
     private SchedulerIterator scheduleIterator;
 
-    private Map<String, String> taskParams;
-
     boolean manualRun;
 
     public DefaultScheduledTask( String id, String name, String type, DefaultScheduler scheduler,
-        Callable<T> callable, Schedule schedule, Map<String, String> taskParams )
+        Callable<T> callable, Schedule schedule )
     {
         super();
 
@@ -87,8 +86,6 @@ public class DefaultScheduledTask<T>
         this.schedule = schedule;
 
         this.scheduleIterator = null;
-
-        this.taskParams = taskParams;
 
         this.nextRun = null;
 
@@ -471,10 +468,11 @@ public class DefaultScheduledTask<T>
 
     public Map<String, String> getTaskParams()
     {
-        if ( taskParams == null )
+        if ( SchedulerTask.class.isAssignableFrom( getCallable().getClass() ) )
         {
-            taskParams = new HashMap<String, String>();
+            return ( ( SchedulerTask<?> ) getCallable() ).getParameters();
         }
-        return taskParams;
+        
+        return Collections.emptyMap();
     }
 }

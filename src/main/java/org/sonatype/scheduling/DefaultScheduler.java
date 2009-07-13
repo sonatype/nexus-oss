@@ -214,49 +214,45 @@ public class DefaultScheduler
     }
 
     public <T> ScheduledTask<T> initialize( String id, String name, String type, Callable<T> callable,
-        Schedule schedule, Map<String, String> taskParams )
+        Schedule schedule )
     {
-        return schedule( id, name, type, callable, schedule, taskParams, false );
+        return schedule( id, name, type, callable, schedule, false );
     }
 
-    public ScheduledTask<Object> submit( String name, Runnable runnable, Map<String, String> taskParams )
+    public ScheduledTask<Object> submit( String name, Runnable runnable )
     {
-        return schedule( name, runnable, new RunNowSchedule(), taskParams );
+        return schedule( name, runnable, new RunNowSchedule() );
     }
 
-    public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule,
-        Map<String, String> taskParams )
+    public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule )
     {
         // use the name of the class as the type.
         return schedule(
             name,
             runnable.getClass().getSimpleName(),
             Executors.callable( runnable ),
-            schedule,
-            taskParams );
+            schedule );
     }
 
-    public <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String, String> taskParams )
+    public <T> ScheduledTask<T> submit( String name, Callable<T> callable )
     {
-        return schedule( name, callable, new RunNowSchedule(), taskParams );
+        return schedule( name, callable, new RunNowSchedule() );
     }
 
-    public <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule,
-        Map<String, String> taskParams )
+    public <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule )
     {
-        return schedule( name, callable.getClass().getSimpleName(), callable, schedule, taskParams );
+        return schedule( name, callable.getClass().getSimpleName(), callable, schedule );
     }
 
-    protected <T> ScheduledTask<T> schedule( String name, String type, Callable<T> callable, Schedule schedule,
-        Map<String, String> taskParams )
+    protected <T> ScheduledTask<T> schedule( String name, String type, Callable<T> callable, Schedule schedule )
     {
-        return schedule( generateId(), name, type, callable, schedule, taskParams, true );
+        return schedule( generateId(), name, type, callable, schedule, true );
     }
 
     protected <T> ScheduledTask<T> schedule( String id, String name, String type, Callable<T> callable,
-        Schedule schedule, Map<String, String> taskParams, boolean store )
+        Schedule schedule, boolean store )
     {
-        DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>( id, name, type, this, callable, schedule, taskParams );
+        DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>( id, name, type, this, callable, schedule );
 
         addToTasksMap( dct, store );
 

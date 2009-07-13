@@ -43,7 +43,7 @@ public class DefaultSchedulerTest
 
         tr = new TestRunnable();
 
-        ScheduledTask<Object> st = defaultScheduler.submit( "default", tr, null );
+        ScheduledTask<Object> st = defaultScheduler.submit( "default", tr );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -66,7 +66,7 @@ public class DefaultSchedulerTest
 
         tr = new TestCallable();
 
-        ScheduledTask<Integer> st = defaultScheduler.submit( "default", tr, null );
+        ScheduledTask<Integer> st = defaultScheduler.submit( "default", tr );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -89,7 +89,7 @@ public class DefaultSchedulerTest
     {
         TestCallable tr = new TestCallable();
 
-        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, new ManualRunSchedule(), null );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, new ManualRunSchedule() );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -134,7 +134,7 @@ public class DefaultSchedulerTest
 
         Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule, null );
+        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -161,7 +161,7 @@ public class DefaultSchedulerTest
 
         Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule, null );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -200,7 +200,7 @@ public class DefaultSchedulerTest
 
         Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule, null );
+        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -226,7 +226,7 @@ public class DefaultSchedulerTest
 
         Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule, null );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -250,7 +250,7 @@ public class DefaultSchedulerTest
 
         Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 1200 ) );
 
-        ScheduledTask<Integer> task = defaultScheduler.schedule( "default", callable, schedule, null );
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "default", callable, schedule );
 
         Thread.sleep( 700 );
 

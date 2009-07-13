@@ -24,7 +24,7 @@ public class DisabledScheduledTaskTest
     public void testRunDisabledTaske()
         throws Exception
     {
-         ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this.getTestSchedule( 0 ), null );
+         ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this.getTestSchedule( 0 ) );
        task.setEnabled( false );
          
         // manually run the task
@@ -51,7 +51,7 @@ public class DisabledScheduledTaskTest
     public void testDisabledTaskOnSchedule()
         throws Exception
     {
-        ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this.getTestSchedule( 200 ), null );
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this.getTestSchedule( 200 ) );
         task.setEnabled( false );
         
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
@@ -91,8 +91,7 @@ public class DisabledScheduledTaskTest
             "Type",
             defaultScheduler,
             new TestIntegerCallable(),
-            new DailySchedule(startDate, endDate),
-            null );
+            new DailySchedule(startDate, endDate) );
 
         return task;
     }
