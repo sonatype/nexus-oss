@@ -239,10 +239,10 @@ public class DefaultNexusPluginManager
                 discoveryContext.getPluginDescriptor().getImportedPlugins().add( importPlugin );
             }
 
-            // get plugin dependecies (not inter-plugin but other libs, jars)
-            List<File> dependencies = new ArrayList<File>( pluginMetadata.getPluginDependencies().size() );
+            // get classpath dependecies (not inter-plugin but other libs, jars)
+            List<File> dependencies = new ArrayList<File>( pluginMetadata.getClasspathDependencies().size() );
 
-            for ( PluginDependency dependency : pluginMetadata.getPluginDependencies() )
+            for ( PluginDependency dependency : pluginMetadata.getClasspathDependencies() )
             {
                 PluginCoordinates coordinates =
                     new PluginCoordinates( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
