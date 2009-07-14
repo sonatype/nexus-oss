@@ -34,7 +34,8 @@ Sonatype.repoServer.AbstractRepoPanel = function(config){
   this.repoActions = {
     clearCache: {
       text: 'Expire Cache',
-      handler: this.clearCacheHandler
+      handler: this.clearCacheHandler,
+      scope: this
     },
     reIndex: {
       text: 'ReIndex',
@@ -48,7 +49,8 @@ Sonatype.repoServer.AbstractRepoPanel = function(config){
     },
     rebuildMetadata: {
       text: 'Rebuild Metadata',
-      handler: this.rebuildMetadataHandler
+      handler: this.rebuildMetadataHandler,
+      scope:this
     },
     putInService : {
       text: 'Put in Service',
