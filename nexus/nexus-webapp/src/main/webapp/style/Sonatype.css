@@ -39,16 +39,6 @@ body {
   background-color: #F0F0F0;
 }
 
-#username {
-  text-align: right;
-}
-
-#login-link {
-  color: #15428B;
-  text-align: right;
-  cursor: pointer;
-}
-
 #version { 
   color: black;
   font-size: 10px;

@@ -18,11 +18,19 @@ Sonatype.view = {
   FIELDSET_OFFSET_WITH_SCROLL : (3 + 18 + 3 + 30)*(-1) + '', // (extra room between border and scrollbar) + (scrollbar) + margin + (scrollbar)
   HISTORY_DELIMITER: ';',
   
+  headLinks : new Sonatype.headLinks(),
+  
   init : function(){
     var dq = Ext.DomQuery;
     
-    Ext.get('login-link').on('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
-    this.updateLoginLinkText();
+    Sonatype.Events.addListener('initHeadLinks', function() {
+			Sonatype.view.headLinks.updateLinks();
+    });
+    
+    Sonatype.Events.fireEvent('initHeadLinks');
+    
+    //Ext.get('login-link').on('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
+    //this.updateLoginLinkText();
     
     Ext.get('header').show();
     Ext.get('welcome-tab').show();
@@ -139,21 +147,23 @@ Sonatype.view = {
     Sonatype.view.mainTabPanel.addListener( 'tabchange', function( panel, tab ) {
       Sonatype.utils.updateHistory( tab );
     } );
-  },
-  
-  updateLoginLinkText : function(){
-    var loginEl = Ext.get('login-link');
-    var usernameEl = Ext.get('username');
-    
-    if (Sonatype.user.curr.isLoggedIn){ 
-      usernameEl.update(Sonatype.user.curr.username + ' | ').show();
-      loginEl.update('Log Out');
-    }
-    else {
-      loginEl.update('Log In');
-      usernameEl.update('');
-    }
   }
+  
+  
+  
+//  updateLoginLinkText : function(){
+//    var loginEl = Ext.get('login-link');
+//    var usernameEl = Ext.get('username');
+//    
+//    if (Sonatype.user.curr.isLoggedIn){ 
+//      usernameEl.update(Sonatype.user.curr.username + ' | ').show();
+//      loginEl.update('Log Out');
+//    }
+//    else {
+//      loginEl.update('Log In');
+//      usernameEl.update('');
+//    }
+//  }
 };
 
 Sonatype.view.MainTabPanel = Ext.extend(Ext.TabPanel, {

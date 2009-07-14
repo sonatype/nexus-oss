@@ -184,6 +184,7 @@
                                         <include>${compressed-dir}/js/Sonatype.config.js</include>
                                         <include>${compressed-dir}/js/Sonatype.lib.js</include>
                                         <include>${compressed-dir}/js/Sonatype.resources.js</include>
+                                        <include>${compressed-dir}/js/Sonatype.headLinks.js</include>
                                         <include>${compressed-dir}/js/Sonatype.view.js</include>
                                         <include>${compressed-dir}/js/repoServer/repoServer.referenceData.js</include>
                                         <include>${compressed-dir}/js/repoServer/repoServer.resources.js</include>

@@ -755,7 +755,8 @@ Sonatype.utils = {
         Ext.get('version').update(Sonatype.utils.version);
         if ( !versionOnly ){
 
-          Sonatype.view.updateLoginLinkText();
+          Sonatype.Events.fireEvent('initHeadLinks');
+          
           Sonatype.view.serverTabPanel.doLayout();
   
           if ( baseUrlMismatch && Sonatype.lib.Permissions.checkPermission(
