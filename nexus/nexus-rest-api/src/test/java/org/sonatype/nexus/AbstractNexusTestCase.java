@@ -31,6 +31,8 @@ public abstract class AbstractNexusTestCase
 
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
 
+    public static final String APP_CONFIGURATION_KEY = "nexus-app";
+
     public static final String APPS_CONFIGURATION_KEY = "apps";
     
     public static final String APPLICATION_CONFIG_KEY = "application-conf";
@@ -41,6 +43,8 @@ public abstract class AbstractNexusTestCase
 
     protected static final File WORK_HOME = new File( PLEXUS_HOME, "nexus-work" );
 
+    protected static final File APP_HOME = new File( PLEXUS_HOME, "nexus-app" );
+
     protected static final File CONF_HOME = new File( WORK_HOME, "conf" );
 
     protected NexusConfiguration nexusConfiguration;
@@ -50,6 +54,8 @@ public abstract class AbstractNexusTestCase
         ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
 
         ctx.put( WORK_CONFIGURATION_KEY, WORK_HOME.getAbsolutePath() );
+
+        ctx.put( APP_CONFIGURATION_KEY, APP_HOME.getAbsolutePath() );
 
         ctx.put( RUNTIME_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
         
