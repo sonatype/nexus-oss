@@ -79,10 +79,6 @@
 			<artifactId>spice-timeline</artifactId>
 			<exclusions>
 				<exclusion>
-					<groupId>com.google.protobuf</groupId>
-					<artifactId>protobuf-java</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.codehaus.plexus</groupId>
 					<artifactId>plexus-component-annotations</artifactId>
 				</exclusion>
