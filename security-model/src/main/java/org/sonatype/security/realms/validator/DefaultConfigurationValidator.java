@@ -203,6 +203,18 @@ public class DefaultConfigurationValidator
         }
         return false;
     }
+    
+    private String getRoleTextForDisplay( String roleId, SecurityValidationContext ctx )
+    {
+        String name = ctx.getExistingRoleNameMap().get( roleId );
+        
+        if ( StringUtils.isEmpty( name ) )
+        {
+            return roleId;
+        }
+        
+        return name;
+    }
 
     private ValidationResponse<SecurityValidationContext> isRecursive( String baseRoleId, String roleId, SecurityValidationContext ctx )
     {
@@ -216,9 +228,9 @@ public class DefaultConfigurationValidator
             if ( baseRoleId.equals( roleId ) )
             {
                 if ( !ctx.getExistingRoleIds().contains( roleId ) )
-                {
-                    ValidationMessage message = new ValidationMessage( "roles", "Role ID '" + baseRoleId
-                        + "' contains an invalid role", "Role cannot contain invalid role ID '" + roleId + "'." );
+                {                    
+                    ValidationMessage message = new ValidationMessage( "roles", "Role '" + getRoleTextForDisplay( baseRoleId, ctx )
+                        + "' contains an invalid role", "Role cannot contain invalid role '" + getRoleTextForDisplay( roleId, ctx ) + "'." );
 
                     response.addValidationError( message );
                 }
@@ -228,9 +240,9 @@ public class DefaultConfigurationValidator
             {
                 ValidationMessage message = new ValidationMessage(
                     "roles",
-                    "Role ID '" + baseRoleId + "' contains itself through Role ID '" + roleId
+                    "Role '" + getRoleTextForDisplay( baseRoleId, ctx ) + "' contains itself through Role '" + getRoleTextForDisplay( roleId, ctx )
                         + "'.  This is not valid.",
-                    "Role cannot contain itself recursively (via role ID '" + roleId + "')." );
+                    "Role cannot contain itself recursively (via role '" + getRoleTextForDisplay( roleId, ctx ) + "')." );
 
                 response.addValidationError( message );
 
@@ -246,8 +258,8 @@ public class DefaultConfigurationValidator
             {
                 ValidationMessage message = new ValidationMessage(
                     "roles",
-                    "Role ID '" + roleId + "' contains an invalid role ID '" + containedRoleId + "'.",
-                    "Role cannot contain invalid role ID '" + containedRoleId + "'." );
+                    "Role '" + getRoleTextForDisplay( roleId, ctx ) + "' contains an invalid role '" + getRoleTextForDisplay( containedRoleId, ctx ) + "'.",
+                    "Role cannot contain invalid role '" + getRoleTextForDisplay( containedRoleId, ctx ) + "'." );
 
                 response.addValidationError( message );
             }
