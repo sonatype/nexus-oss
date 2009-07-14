@@ -664,19 +664,21 @@ Ext.extend( Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
   
   initializeRolesTreeHelper : function( allTree ){    
     this.roleDataStore.each(function(item, i, len){
-      allTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: item.data.id,
-          text: item.data.name,
-          payload: item.data.id, //sonatype added attribute
-          allowChildren: false,
-          draggable: true,
-          leaf: true,
-          qtip: item.data.description,
-          nodeType: 'role',
-          icon: Sonatype.config.extPath + '/resources/images/default/tree/folder.gif'
-        })
-      );
+      if ( this.payload.data.id != item.data.id ){
+        allTree.root.appendChild(
+          new Ext.tree.TreeNode({
+            id: item.data.id,
+            text: item.data.name,
+            payload: item.data.id, //sonatype added attribute
+            allowChildren: false,
+            draggable: true,
+            leaf: true,
+            qtip: item.data.description,
+            nodeType: 'role',
+            icon: Sonatype.config.extPath + '/resources/images/default/tree/folder.gif'
+          })
+        );
+      }
     }, this);    
   },
   
