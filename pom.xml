@@ -32,14 +32,16 @@
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.2</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
