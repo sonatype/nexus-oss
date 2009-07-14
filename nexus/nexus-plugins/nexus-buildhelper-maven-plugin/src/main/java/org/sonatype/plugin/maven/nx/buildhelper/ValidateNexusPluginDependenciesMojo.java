@@ -52,6 +52,13 @@ public class ValidateNexusPluginDependenciesMojo
                                        + "; ignoring" );
                     continue;
                 }
+                else if ( Artifact.SCOPE_TEST.equals( dep.getScope() ) )
+                {
+                    getLog().info(
+                                   "Found dependency with 'test' scope: " + dep.getDependencyConflictId()
+                                       + "; ignoring" );
+                    continue;
+                }
 
                 if ( dep.getGroupId().startsWith( NX_GID )
                     || NX_PLUGIN_PACKAGING.equals( dep.getArtifactHandler().getPackaging() ) )

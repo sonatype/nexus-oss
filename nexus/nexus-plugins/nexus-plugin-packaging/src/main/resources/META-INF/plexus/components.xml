@@ -13,19 +13,19 @@
               <!-- Nexus-specific steps: 
                |
                |     1. inject the nexus-plugin ArtifactHandler into the project's artifact instance
-               |     # 2. verify that all nexus dependencies in this project have their scope set to 'provided'
+               |     2. verify that all nexus dependencies in this project have their scope set to 'provided'
                |
                |  NOTE: Banning non-provided nexus dependencies didn't work, since marking nexus
                |        dependencies as 'provided' scope cuts off transitive dependency resolution
                |        for those deps, even for the project that declares them. 
                -->
-              <initialize>
+              <!-- <initialize>
                 org.sonatype.nexus:nexus-buildhelper-maven-plugin:${project.version}:inject-artifact-handler
-              </initialize>
-              <!-- initialize>
+              </initialize> -->
+              <initialize>
                 org.sonatype.nexus:nexus-buildhelper-maven-plugin:${project.version}:inject-artifact-handler,
                 org.sonatype.nexus:nexus-buildhelper-maven-plugin:${project.version}:check-nexus-dependencies
-              </initialize -->
+              </initialize>
               
               <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
               <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
