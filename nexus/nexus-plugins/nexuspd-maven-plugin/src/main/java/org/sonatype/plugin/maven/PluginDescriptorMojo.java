@@ -163,7 +163,8 @@ public class PluginDescriptorMojo
         {
             for ( Dependency mavenDependency : (List<Dependency>) this.mavenProject.getDependencies() )
             {
-                if ( mavenDependency.getScope().equals( "compile" ) || mavenDependency.getScope().equals( "runtime" ) )
+                if ( (mavenDependency.getScope().equals( "compile" ) || mavenDependency.getScope().equals( "runtime" )) &&
+                    ( !mavenDependency.getGroupId().equals( "org.sonatype.nexus" ) ))
                 {
                     request.addClasspathDependency( mavenDependency.getGroupId(), mavenDependency.getArtifactId(),
                                                     mavenDependency.getVersion() );
