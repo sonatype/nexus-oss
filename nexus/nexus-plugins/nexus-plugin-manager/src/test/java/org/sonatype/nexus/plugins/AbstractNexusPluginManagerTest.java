@@ -24,6 +24,8 @@ public abstract class AbstractNexusPluginManagerTest
     {
         context.put( "nexus-work", getTestFile( "src/test" ).getAbsolutePath() );
 
+        context.put( "nexus-app", getTestFile( "target/nexus-app" ).getAbsolutePath() );
+
         context.put( ComponentRepository.class.getName(), new NexusPluginsComponentRepository() );
     }
 

@@ -11,7 +11,7 @@ public class SystemNexusPluginRepository
 {
     public static final String ID = "system";
 
-    @Configuration( value = "${basedir}/runtime/apps/nexus/plugin-repository" )
+    @Configuration( value = "${nexus-app}/plugin-repository" )
     private File nexusPluginsDirectory;
 
     public String getId()

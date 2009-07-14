@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- Parent POM -->
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-plugins</artifactId>
+    <version>1.4.0-SNAPSHOT</version>
+  </parent>
+
+  <!-- the version of maven's project object model -->
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- a unique name for this project -->
+  <artifactId>nexus-plugin-test-api</artifactId>
+
+  <!-- POM packaging -->
+  <packaging>jar</packaging>
+
+  <!-- a short but descriptive name for the project -->
+  <name>Nexus Plugins : Plugin Test API</name>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api</artifactId>
+    </dependency>
+
+    <!-- Testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+</project>
