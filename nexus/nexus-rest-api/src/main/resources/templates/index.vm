@@ -68,7 +68,7 @@
     </span>
   </div>
   <div class="right-side">
-    <div><span id="username"></span><span id="login-link"></span></div>
+    <div><span id="head-link-l"></span><span id="head-link-m"></span><span id="head-link-r"></span></div>
     <div id="version"></div>
   </div>
 </div>

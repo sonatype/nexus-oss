@@ -60,6 +60,7 @@
   <script src="js/Sonatype.config.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/Sonatype.lib.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/Sonatype.resources.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/Sonatype.headLinks.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/Sonatype.view.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
   <script src="js/repoServer/repoServer.referenceData.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
@@ -118,7 +119,7 @@
     </span>
   </div>
   <div class="right-side">
-    <div><span id="username"></span><span id="login-link"></span></div>
+    <div><span id="head-link-l"></span><span id="head-link-m"></span><span id="head-link-r"></span></div>
     <div id="version"></div>
   </div>
 </div>
