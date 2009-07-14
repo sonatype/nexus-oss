@@ -114,12 +114,14 @@ public class PluginManagerResponse
 
                     response.getThrowable().printStackTrace( new PrintWriter( sw ) );
 
-                    sb.append( "\nStack trace:\n" ).append( sw.toString() );
+                    sb.append( "\nStack trace:\n" ).append( sw.toString() ).append( "\n" );
                 }
             }
 
             if ( detailed && response.getPluginDescriptor() != null )
             {
+                sb.append( "\n" );
+
                 PluginDescriptor pluginDescriptor = response.getPluginDescriptor();
 
                 sb.append( "       Detailed report about the plugin \"" ).append(
