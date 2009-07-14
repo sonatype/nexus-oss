@@ -26,7 +26,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   //None removed for the time being
   this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Manual'],['Once'],['Hourly'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
   //List of weekdays
-  this.weekdaysList = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  this.weekdaysStore = new Ext.data.SimpleStore({fields:['name','id'], data:[['Sunday','sunday'],['Monday','monday'],['Tuesday','tuesday'],['Wednesday','wednesday'],['Thursday','thursday'],['Friday','friday'],['Saturday','saturday']]});
   
   this.actions = {
     refresh : new Ext.Action({
@@ -514,114 +514,16 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 format:'H:i'
               },
               {
-                xtype: 'panel',
-                layout: 'column',
-                autoHeight: true,
-                id: '_weekdays_tree_panel',
-                style: 'padding: 10px 0 0 0',
-                
-                items: [
-                  {
-                    xtype: 'treepanel',
-                    id: '_weekdays_tree',
-                    title: 'Selected Days',
-                    cls: 'required-field',
-                    border: true, //note: this seem to have no effect w/in form panel
-                    bodyBorder: true, //note: this seem to have no effect w/in form panel
-                    //note: this style matches the expected behavior
-                    bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-                    style: 'padding: 0 20px 0 0',
-                    width: 225,
-                    height: 150,
-                    animate:true,
-                    lines: false,
-                    autoScroll:true,
-                    containerScroll: true,
-                    //@note: root node must be instantiated uniquely for each instance of treepanel
-                    //@ext: can TreeNode be registerd as a component with an xtype so this new root node
-                    //      may be instantiated uniquely for each form panel that uses this config?
-                    rootVisible: false,
-
-                    enableDD: true,
-                    ddScroll: true,
-                    dropConfig: {
-                      allowContainerDrop: true,
-                      onContainerDrop: function(source, e, data){
-                        this.tree.root.appendChild(data.node);
-                        return true;
-                      },
-                      onContainerOver:function(source, e, data){return this.dropAllowed;},
-                      // passign padding to make whole treePanel the drop zone.  This is dependent
-                      // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
-                      // because treepanel.dropZone.setPadding is never available in time to be useful.
-                      padding: [0,0,274,0]
-                    },
-                    // added Field values to simulate form field validation
-                    invalidText: 'One or more days are required',
-                    validate: function(){
-                      return (this.root.childNodes.length > 0);
-                    },
-                    invalid: false,
-                    listeners: {
-                      'append' : {
-                        fn: function(tree, parentNode, insertedNode, i) {
-                          if (tree.invalid) {
-                            //remove error messaging
-                            tree.getEl().child('.x-panel-body').setStyle({
-                              'background-color' : '#FFFFFF',
-                              border : '1px solid #B5B8C8'
-                            });
-                            Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
-                          }
-                        },
-                        scope: this
-                      },
-                      'remove' : {
-                        fn: function(tree, parentNode, removedNode) {
-                          if(tree.root.childNodes.length < 1) {
-                            this.markTreeInvalid(tree);
-                          }
-                        },
-                        scope: this
-                      }
-                    }
-                  },
-                  {
-                    xtype: 'treepanel',
-                    id: '_all_weekdays_tree', 
-                    title: 'Available Days',
-                    border: true, //note: this seem to have no effect w/in form panel
-                    bodyBorder: true, //note: this seem to have no effect w/in form panel
-                    //note: this style matches the expected behavior
-                    bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-                    width: 225,
-                    height: Ext.isGecko ? 165 : 150,
-                    animate:true,
-                    lines: false,
-                    autoScroll:true,
-                    containerScroll: true,
-                    //@note: root node must be instantiated uniquely for each instance of treepanel
-                    //@ext: can TreeNode be registerd as a component with an xtype so this new root node
-                    //      may be instantiated uniquely for each form panel that uses this config?
-                    rootVisible: false,
-
-                    enableDD: true,
-                    ddScroll: true,
-                    dropConfig: {
-                      allowContainerDrop: true,
-                      onContainerDrop: function(source, e, data){
-                        this.tree.root.appendChild(data.node);
-                        return true;
-                      },
-                      onContainerOver:function(source, e, data){return this.dropAllowed;},
-                      // passign padding to make whole treePanel the drop zone.  This is dependent
-                      // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
-                      // because treepanel.dropZone.setPadding is never available in time to be useful.
-                      padding: [0,0,274,0]
-                    }
-                  }
-                ]
-              }
+                xtype: 'twinpanelchooser',
+                titleLeft: 'Selected Days',
+                titleRight: 'Available Days',
+                name: 'weekdays',
+                displayField: 'name',
+                valueField: 'id',
+                store: this.weekdaysStore,
+                required: true,
+                halfSize: true
+		      }
             ]
           },
           {
@@ -1282,12 +1184,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 	  var scheduleWeekConfig = Ext.getCmp(formInfoObj.formPanel.id + '_schedule-config-card-panel').items.itemAt(4);
 
 	  if ( scheduleWeekConfig.isVisible() ){
-		  var selectedTree = Ext.getCmp(formInfoObj.formPanel.id + '_weekdays_tree');
-		  var treeValid = selectedTree.validate.call(selectedTree);
-	      if (!treeValid) {
-	    	  this.markTreeInvalid(selectedTree);
-	      }
-	      allValid = ( allValid && treeValid);
+	      allValid = ( allValid && formInfoObj.formPanel.find( 'name', 'weekdays' )[0].validate());
 	  }
 
 	  if ( allValid) {
@@ -1373,7 +1270,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         formPanel.buttons[0].disabled = false;
     }
     
-    this.loadWeekdayListHelper([], {}, formPanel);
+    this.importRecurringDayHelper([], {}, formPanel);
     
     //add new form
     this.formCards.add(formPanel);
@@ -1742,7 +1639,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           formPanel.buttons[0].disabled = false;
       }
       
-      this.loadWeekdayListHelper([], {}, formPanel);
+      this.importRecurringDayHelper([], {}, formPanel);
 
       this.formDataLoader(formPanel, rec.data.resourceURI, this.loadDataModFuncs[rec.data.schedule]);
       
@@ -1866,12 +1763,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var newConfig = config;
     
     this.assignItemIds( id, newConfig.items );
-    
-    newConfig.items[6].items[4].items[2].id = id + '_weekdays_tree_panel';
-    newConfig.items[6].items[4].items[2].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[6].items[4].items[2].items[0].id = id + '_weekdays_tree';
-    newConfig.items[6].items[4].items[2].items[1].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[6].items[4].items[2].items[1].id = id + '_all_weekdays_tree';
 
     return newConfig;
   },
@@ -1891,50 +1782,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 	}
   },
 
-  loadWeekdayListHelper : function(arr, srcObj, fpanel){
-    var selectedTree = Ext.getCmp(fpanel.id + '_weekdays_tree');
-    var allTree = Ext.getCmp(fpanel.id + '_all_weekdays_tree');
-
-    var weekday;
-
-    for(var i=0; i<arr.length; i++){
-      weekday = arr[i];
-      selectedTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: weekday,
-          text: weekday,
-          payload: weekday, //sonatype added attribute
-          allowChildren: false,
-          draggable: true,
-          leaf: true
-        })
-      );
-    }
-
-    if(this.weekdaysList){
-      for(var i=0; i<this.weekdaysList.length; i++){
-        weekday = this.weekdaysList[i];
-
-        if(typeof(selectedTree.getNodeById(weekday)) == 'undefined'){
-          allTree.root.appendChild(
-            new Ext.tree.TreeNode({
-              id: weekday,
-              text: weekday,
-              payload: weekday, //sonatype added attribute
-              allowChildren: false,
-              draggable: true,
-              leaf: true
-            })
-          );
-        }
-      }
-    }
-    else {
-      //@todo: race condition or error retrieving repos list
-    }
-    
-    return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
-  },
   exportStartDateHelper : function(val, fpanel){
     //as there is no Date transfer in json, i pass the long representation of the date.
     var selectedStartDate = "";
@@ -1987,18 +1834,15 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     return hours + ':' + minutes;
   },
   exportRecurringDayHelper : function(val, fpanel){
-    var selectedTree = Ext.getCmp(fpanel.id + '_weekdays_tree');
+    var weekdaysBox = fpanel.find( 'name', 'weekdays' )[0];
+    var weekdaysIds = weekdaysBox.getValue();
 
-    var outputArr = [];
-    var nodes = selectedTree.root.childNodes;
-
-    //Pretty simple here, just go through the weekdays selected and output the payload
-    //which is just the name of the weekday (monday, tuesday, etc.)
-    for(var i = 0; i < nodes.length; i++){
-      outputArr[i] = Sonatype.utils.lowercase(nodes[i].attributes.payload);
+    var response = [];
+    for ( var i = 0; i < weekdaysIds.length; i++ ) {
+      response[i] = Sonatype.utils.lowercase(weekdaysIds[i]);
     }
 
-    return outputArr;
+    return response;
   },
   exportMonthlyRecurringDayHelper : function(val, fpanel){
     var outputArr = [];
@@ -2107,32 +1951,10 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     return importedTime;
   },
   importRecurringDayHelper : function(arr, srcObj, fpanel){
-    var selectedTree = Ext.getCmp(fpanel.id + '_weekdays_tree');
-    var allTree = Ext.getCmp(fpanel.id + '_all_weekdays_tree');
-
-    //Iterate through the list, and add any selected items to the selected tree
-    for(var i=0; i<arr.length; i++){
-      arr[i] = Sonatype.utils.capitalize(arr[i]);
-      selectedTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: arr[i],
-          text: arr[i],
-          payload: arr[i],
-          allowChildren: false,
-          draggable: true,
-          leaf: true
-        })
-      );
-    }
-    
-    //If not in the selected list, add to the available list
-    for(var i=0; i<this.weekdaysList.length; i++){
-      if(typeof(selectedTree.getNodeById(this.weekdaysList[i])) != 'undefined'){
-        allTree.root.removeChild(allTree.getNodeById(this.weekdaysList[i]));
-      }
-    }
-    
-    return arr;
+    var weekdayBox = fpanel.find( 'name', 'weekdays' )[0];    
+    weekdayBox.setValue( arr );
+        
+    return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
   },
   importMonthlyRecurringDayHelper : function(arr, srcObj, fpanel){
     //simply look at each item, and select the proper checkbox
