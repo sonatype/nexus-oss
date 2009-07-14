@@ -1,49 +1,86 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <!-- Parent POM -->
-  <parent>
-    <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-plugins</artifactId>
-    <version>1.4.0-SNAPSHOT</version>
-  </parent>
+	<!-- Parent POM -->
+	<parent>
+		<groupId>org.sonatype.nexus</groupId>
+		<artifactId>nexus-plugins</artifactId>
+		<version>1.4.0-SNAPSHOT</version>
+	</parent>
 
-  <!-- the version of maven's project object model -->
-  <modelVersion>4.0.0</modelVersion>
+	<!-- the version of maven's project object model -->
+	<modelVersion>4.0.0</modelVersion>
 
-  <!-- a unique name for this project -->
-  <artifactId>nexus-plugin-api</artifactId>
+	<!-- a unique name for this project -->
+	<artifactId>nexus-plugin-api</artifactId>
 
-  <!-- POM packaging -->
-  <packaging>jar</packaging>
+	<!-- POM packaging -->
+	<packaging>jar</packaging>
 
-  <!-- a short but descriptive name for the project -->
-  <name>Nexus Plugins : Plugin API</name>
+	<!-- a short but descriptive name for the project -->
+	<name>Nexus Plugins : Plugin API</name>
 
-  <dependencies>
+	<dependencies>
 
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-api</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.sonatype.plugin</groupId>
-          <artifactId>plugin-host-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-api</artifactId>
-    </dependency>
+		<dependency>
+			<groupId>org.sonatype.nexus</groupId>
+			<artifactId>nexus-api</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-component-annotations</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-container-default</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.sonatype.plugin</groupId>
+					<artifactId>plugin-host-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-cli</groupId>
+					<artifactId>commons-cli</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-cli</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.maven</groupId>
+					<artifactId>maven-artifact</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.maven</groupId>
+					<artifactId>maven-artifact-manager</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.maven</groupId>
+					<artifactId>maven-model</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.maven.archetype</groupId>
+					<artifactId>archetype-common</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.maven.wagon</groupId>
+					<artifactId>wagon-provider-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.sonatype.plugin</groupId>
+			<artifactId>plugin-api</artifactId>
+		</dependency>
 
-    <!-- Testing -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
+		<!-- Testing -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-  </dependencies>
+	</dependencies>
 
 </project>
