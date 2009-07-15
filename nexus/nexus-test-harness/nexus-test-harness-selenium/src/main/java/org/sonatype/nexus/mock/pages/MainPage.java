@@ -4,7 +4,7 @@ import com.thoughtworks.selenium.Selenium;
 
 public class MainPage
 {
-    private Selenium selenium;
+    protected Selenium selenium;
 
     public MainPage( Selenium selenium )
     {

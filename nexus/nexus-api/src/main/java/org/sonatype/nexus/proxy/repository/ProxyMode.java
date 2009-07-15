@@ -24,7 +24,7 @@ public enum ProxyMode
 
     BLOCKED_AUTO,
 
-    BLOKED_MANUAL;
+    BLOCKED_MANUAL;
 
     public boolean shouldProxy()
     {

@@ -30,7 +30,7 @@ public class Grid
         // Didn't worked!
         // String eval = getEval( ".getStore().data.indexOfKey('" + key + "')" );
 
-        String[] keys = getEval( ".getStore().data.keys" ).split( "," );
+        String[] keys = getKeys();
         for ( int i = 0; i < keys.length; i++ )
         {
             if ( key.equals( keys[i] ) )
@@ -48,7 +48,7 @@ public class Grid
 
     public boolean contains( String key )
     {
-        String[] keys = getEval( ".getStore().data.keys" ).split( "," );
+        String[] keys = getKeys();
         for ( int i = 0; i < keys.length; i++ )
         {
             if ( key.equals( keys[i] ) )
@@ -90,6 +90,29 @@ public class Grid
         }
 
         return -1;
+    }
+
+    public Menu openContextMenu( String selectedKey, String menuId )
+    {
+        return openContextMenu( selectedKey, 1, menuId );
+    }
+
+    public Menu openContextMenu( String selectedKey, int colNumber, String menuId )
+    {
+        selenium.contextMenu( getId() + "_" + selectedKey + "_col" + colNumber );
+
+        return new Menu( selenium, "window.Ext.menu.MenuMgr.get('" + menuId + "')" );
+    }
+
+    public Menu openContextMenu( int rowNumber, int colNumber, String menuId )
+    {
+        String[] keys = getKeys();
+        return openContextMenu( keys[rowNumber], colNumber, menuId );
+    }
+
+    public String[] getKeys()
+    {
+        return getEval( ".getStore().data.keys" ).split( "," );
     }
 
 }

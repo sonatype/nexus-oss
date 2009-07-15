@@ -69,7 +69,7 @@ public class Upgrade108to140
 {
     @Requirement( hint="file")
     private SecurityConfigurationSource securityConfigurationSource;
-    
+
     private static final String EXTERNAL_CONFIG = "externalConfiguration";
 
     private static final String GROUP_MEMBERS_NODE = "memberRepositories";
@@ -99,7 +99,7 @@ public class Upgrade108to140
 
         this.proxyMode.put( "allow", "ALLOW" );
         this.proxyMode.put( "blockedAuto", "BLOCKED_AUTO" );
-        this.proxyMode.put( "blockedManual", "BLOKED_MANUAL" );
+        this.proxyMode.put( "blockedManual", "BLOCKED_MANUAL" );
 
         this.taskTypes.put( TASK_EXPIRE_CACHE_OLD, "ExpireCacheTask" );
     }
@@ -152,7 +152,7 @@ public class Upgrade108to140
         {
            throw new ConfigurationIsCorruptedException( "nexus.xml", e );
         }
-        
+
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         // SMTP info is the same
         newc.setSmtpConfiguration( copyCSmtpConfiguration1_0_8( oldc.getSmtpConfiguration() ) );
@@ -170,7 +170,7 @@ public class Upgrade108to140
         newc.setHttpProxy( copyCHttpProxySettings1_0_8( oldc.getHttpProxy() ) );
         // targets are the same
         List<CRepositoryTarget> targets = new ArrayList<CRepositoryTarget>( oldc.getRepositoryTargets().size() );
-        for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryTarget oldtargets : (List<org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryTarget>) oldc
+        for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryTarget oldtargets : oldc
             .getRepositoryTargets() )
         {
             targets.add( copyCRepositoryTarget1_0_8( oldtargets ) );
@@ -179,7 +179,7 @@ public class Upgrade108to140
 
         // tasks are the same, except the clear cache task
         List<CScheduledTask> tasks = new ArrayList<CScheduledTask>( oldc.getTasks().size() );
-        for ( org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask oldTask : (List<org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask>) oldc
+        for ( org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask oldTask : oldc
             .getTasks() )
         {
             upgradeTask( oldTask );
@@ -190,7 +190,7 @@ public class Upgrade108to140
 
         // FIXME: Repositories are NOT the same
         List<CRepository> repositories = new ArrayList<CRepository>();
-        for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepository oldrepos : (List<org.sonatype.nexus.configuration.model.v1_0_8.CRepository>) oldc
+        for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepository oldrepos : oldc
             .getRepositories() )
         {
             CRepository newrepos = copyCRepository1_0_8( oldrepos );
@@ -199,7 +199,7 @@ public class Upgrade108to140
         // shadows are repos
         if ( oldc.getRepositoryShadows() != null )
         {
-            for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow oldshadow : (List<org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow>) oldc
+            for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow oldshadow : oldc
                 .getRepositoryShadows() )
             {
                 repositories.add( copyCRepositoryShadow1_0_8( oldshadow ) );
@@ -211,7 +211,7 @@ public class Upgrade108to140
             CRepositoryGrouping repositoryGrouping = new CRepositoryGrouping();
             if ( oldc.getRepositoryGrouping().getPathMappings() != null )
             {
-                for ( org.sonatype.nexus.configuration.model.v1_0_8.CGroupsSettingPathMappingItem oldItem : (List<org.sonatype.nexus.configuration.model.v1_0_8.CGroupsSettingPathMappingItem>) oldc
+                for ( org.sonatype.nexus.configuration.model.v1_0_8.CGroupsSettingPathMappingItem oldItem : oldc
                     .getRepositoryGrouping().getPathMappings() )
                 {
                     repositoryGrouping.addPathMapping( copyCGroupsSettingPathMappingItem1_0_8( oldItem ) );
@@ -227,7 +227,7 @@ public class Upgrade108to140
                 mergeMetadata = oldc.getRouting().getGroups().isMergeMetadata();
             }
 
-            for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup oldgroup : (List<org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup>) oldc
+            for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup oldgroup : oldc
                 .getRepositoryGrouping().getRepositoryGroups() )
             {
                 repositories.add( copyCRepositoryGroup1_0_8( oldgroup, mergeMetadata ) );
@@ -235,19 +235,19 @@ public class Upgrade108to140
 
             newc.setRepositories( repositories );
         }
-        
+
         // initialize automatic error reporting
         CErrorReporting errorReporting = new CErrorReporting();
         errorReporting.setEnabled( false );
         errorReporting.setJiraUrl( "https://issues.sonatype.org" );
         errorReporting.setJiraProject( "PR" );
-        
+
         newc.setErrorReporting( errorReporting );
 
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
-    
+
     private void upgradeSecurity(org.sonatype.nexus.configuration.model.v1_0_8.CSecurity oldsecurity) throws IOException
     {
         // if the oldsecurity is null, we can just use the defaults at runtime
@@ -256,13 +256,13 @@ public class Upgrade108to140
             SecurityConfiguration securityConfig = new SecurityConfiguration();
             // set the version
             securityConfig.setVersion( SecurityConfiguration.MODEL_VERSION );
-            
+
             securityConfig.setAnonymousAccessEnabled( oldsecurity.isAnonymousAccessEnabled() );
             securityConfig.setAnonymousUsername( oldsecurity.getAnonymousUsername() );
             securityConfig.setAnonymousPassword( oldsecurity.getAnonymousPassword() );
             securityConfig.setEnabled( oldsecurity.isEnabled() );
             securityConfig.getRealms().addAll( oldsecurity.getRealms() );
-            
+
             securityConfigurationSource.setConfiguration( securityConfig );
             securityConfigurationSource.storeConfiguration();
         }

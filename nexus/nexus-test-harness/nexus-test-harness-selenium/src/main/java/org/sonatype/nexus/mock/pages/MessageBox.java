@@ -27,4 +27,11 @@ public class MessageBox
         return this;
     }
 
+    public MessageBox clickOk()
+    {
+        selenium.click( "OK" );
+
+        return this;
+    }
+
 }

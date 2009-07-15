@@ -227,6 +227,7 @@ public abstract class NexusTestCase
     public void mockCleanup()
     {
         MockHelper.checkAssertions();
+        MockHelper.checkExecutions();
     }
 
     public <E> E lookup( Class<E> role )

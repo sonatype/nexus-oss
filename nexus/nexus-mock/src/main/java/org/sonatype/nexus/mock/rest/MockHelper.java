@@ -1,9 +1,8 @@
 package org.sonatype.nexus.mock.rest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
+import org.junit.Assert;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
 
@@ -16,11 +15,7 @@ public class MockHelper
 {
     private static HashMap<String, MockResponse> mockResponses = new HashMap<String, MockResponse>();
 
-    private static ThreadLocal<List<MockResponse>> responses = new ThreadLocal<List<MockResponse>>();
-
     private static HashMap<String, MockListener> mockListeneres = new HashMap<String, MockListener>();;
-
-    private static ThreadLocal<List<MockListener>> listeners = new ThreadLocal<List<MockListener>>();
 
     public static HashMap<String, MockResponse> getResponseMap()
     {
@@ -51,63 +46,49 @@ public class MockHelper
         }
     }
 
-    public static void expect( String uri, MockResponse mockResponse )
+    public static MockResponse expect( String uri, MockResponse mockResponse )
     {
         mockResponses.put( uri, mockResponse );
 
-        List<MockResponse> list = responses.get();
-        if ( list == null )
-        {
-            list = new ArrayList<MockResponse>();
-        }
-
-        list.add( mockResponse );
-        responses.set( list );
+        return mockResponse;
     }
 
     public static MockListener listen( String uri, MockListener mockListener )
     {
         mockListeneres.put( uri, mockListener );
 
-        List<MockListener> list = listeners.get();
-        if ( list == null )
-        {
-            list = new ArrayList<MockListener>();
-        }
-
-        list.add( mockListener );
-        listeners.set( list );
-
         return mockListener;
     }
 
     public static void checkAssertions()
     {
-        List<MockResponse> resps = responses.get();
-        if ( resps != null )
+        for ( MockResponse mockResponse : mockResponses.values() )
         {
-            for ( MockResponse mockResponse : resps )
-            {
-                mockResponse.checkAssertion();
-            }
+            mockResponse.checkAssertion();
         }
 
-        List<MockListener> list = listeners.get();
-        if ( list != null )
+        for ( MockListener mockListener : mockListeneres.values() )
         {
-            for ( MockListener mockListeber : list )
-            {
-                mockListeber.checkAssertion();
-            }
+            mockListener.checkAssertion();
+        }
+    }
+
+    public static void checkExecutions()
+    {
+        for ( MockResponse mockResponse : mockResponses.values() )
+        {
+            Assert.assertTrue( "Mock was never executed", mockResponse.wasExecuted() );
+        }
+
+        for ( MockListener mockListener : mockListeneres.values() )
+        {
+            Assert.assertTrue( "Listener was never executed", mockListener.wasExecuted() );
         }
     }
 
     public static void clearMocks()
     {
-        List<MockResponse> list = responses.get();
-        if ( list != null )
-        {
-            list.clear();
-        }
+        mockResponses.clear();
+        mockListeneres.clear();
     }
 }

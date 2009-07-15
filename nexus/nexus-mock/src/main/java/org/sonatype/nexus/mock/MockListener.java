@@ -1,8 +1,9 @@
 package org.sonatype.nexus.mock;
 
+import org.junit.Assert;
 import org.restlet.resource.ResourceException;
 
-public abstract class MockListener
+public class MockListener
 {
 
     private AssertionError assertionFailedError;
@@ -12,6 +13,8 @@ public abstract class MockListener
     private Object payload;
 
     private Object result;
+
+    protected boolean executed = false;
 
     public final void checkAssertion()
     {
@@ -38,17 +41,18 @@ public abstract class MockListener
         return result;
     }
 
-    public void onError( ResourceException e )
+    protected void onError( ResourceException e )
+    {
+        // to be overwritten
+        Assert.fail( "Got an error: " + e.getMessage() );
+    }
+
+    protected void onPayload( Object payload )
     {
         // to be overwritten
     }
 
-    public void onPayload( Object payload )
-    {
-        // to be overwritten
-    }
-
-    public void onResult( Object result )
+    protected void onResult( Object result )
     {
         // to be overwritten
     }
@@ -95,4 +99,8 @@ public abstract class MockListener
         }
     }
 
+    public final boolean wasExecuted()
+    {
+        return executed;
+    }
 }

@@ -7,9 +7,14 @@ import org.restlet.data.Status;
 public class MockResponse
 {
     protected Status status;
+
     protected Object response;
+
     protected Object payload;
+
     private AssertionError assertionFailedError;
+
+    protected boolean executed = false;
 
     public MockResponse( Status status, Object payload )
     {
@@ -38,19 +43,29 @@ public class MockResponse
         this.response = response;
     }
 
-    public void setPayload(Object payload) throws AssertionFailedError {
+    public void setPayload( Object payload )
+        throws AssertionFailedError
+    {
         this.payload = payload;
     }
 
-    public void setAssertionFailure(AssertionError assertionFailedError) {
+    public void setAssertionFailure( AssertionError assertionFailedError )
+    {
         this.assertionFailedError = assertionFailedError;
     }
 
-    public void checkAssertion() {
-        if (assertionFailedError != null) {
+    public void checkAssertion()
+    {
+        if ( assertionFailedError != null )
+        {
             AssertionError error = assertionFailedError;
             assertionFailedError = null; // reset so we don't KEEP throwing it on future checks
             throw error;
         }
+    }
+
+    public final boolean wasExecuted()
+    {
+        return executed;
     }
 }

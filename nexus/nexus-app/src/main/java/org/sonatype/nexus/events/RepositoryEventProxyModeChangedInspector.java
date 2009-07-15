@@ -56,7 +56,7 @@ public class RepositoryEventProxyModeChangedInspector
         {
             sb.append( "Blocked (auto)." );
         }
-        else if ( ProxyMode.BLOKED_MANUAL.equals( revt.getRepository().getProxyMode() ) )
+        else if ( ProxyMode.BLOCKED_MANUAL.equals( revt.getRepository().getProxyMode() ) )
         {
             sb.append( "Blocked (by user)." );
         }
@@ -75,7 +75,7 @@ public class RepositoryEventProxyModeChangedInspector
         {
             sb.append( "Blocked (auto)." );
         }
-        else if ( ProxyMode.BLOKED_MANUAL.equals( revt.getOldProxyMode() ) )
+        else if ( ProxyMode.BLOCKED_MANUAL.equals( revt.getOldProxyMode() ) )
         {
             sb.append( "Blocked (by user)." );
         }

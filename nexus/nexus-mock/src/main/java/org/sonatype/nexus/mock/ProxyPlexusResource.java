@@ -36,6 +36,7 @@ public class ProxyPlexusResource
             }
             else
             {
+                ml.executed = true;
                 Object result;
                 try
                 {
@@ -53,6 +54,8 @@ public class ProxyPlexusResource
         }
         else
         {
+            mr.executed = true;
+
             response.setStatus( mr.getStatus() );
 
             return mr.getResponse();
@@ -73,6 +76,7 @@ public class ProxyPlexusResource
             }
             else
             {
+                ml.executed = true;
                 try
                 {
                     plexusResource.delete( context, request, response );
@@ -88,6 +92,8 @@ public class ProxyPlexusResource
         }
         else
         {
+            mr.executed = true;
+
             response.setStatus( mr.getStatus() );
         }
     }
@@ -106,6 +112,7 @@ public class ProxyPlexusResource
             }
             else
             {
+                ml.executed = true;
                 ml.setPayload( payload );
 
                 Object result;
@@ -125,6 +132,8 @@ public class ProxyPlexusResource
         }
         else
         {
+            mr.executed = true;
+
             try
             {
                 mr.setPayload( payload );
@@ -153,6 +162,7 @@ public class ProxyPlexusResource
             }
             else
             {
+                ml.executed = true;
                 ml.setPayload( payload );
 
                 Object result;
@@ -172,6 +182,8 @@ public class ProxyPlexusResource
         }
         else
         {
+            mr.executed = true;
+
             try
             {
                 mr.setPayload( payload );
@@ -200,6 +212,7 @@ public class ProxyPlexusResource
             }
             else
             {
+                ml.executed = true;
                 Object result;
                 try
                 {
@@ -217,6 +230,8 @@ public class ProxyPlexusResource
         }
         else
         {
+            mr.executed = true;
+
             response.setStatus( mr.getStatus() );
 
             return mr.getResponse();

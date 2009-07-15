@@ -145,6 +145,8 @@ public class RepositoryStatusPlexusResource
 
                     shadow.setLocalStatus( localStatus );
 
+                    getNexusConfiguration().saveConfiguration();
+
                     result = (RepositoryStatusResourceResponse) this.get( context, request, response, null );
                 }
                 else
@@ -170,6 +172,8 @@ public class RepositoryStatusPlexusResource
                         }
                     }
 
+                    getNexusConfiguration().saveConfiguration();
+
                     result = (RepositoryStatusResourceResponse) this.get( context, request, response, null );
 
                     for ( ShadowRepository shadow : getRepositoryRegistry().getRepositoriesWithFacet(
@@ -192,7 +196,6 @@ public class RepositoryStatusPlexusResource
                     }
                 }
 
-                getNexusConfiguration().saveConfiguration();
             }
             catch ( NoSuchRepositoryAccessException e )
             {

@@ -573,6 +573,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
       var rec = grid.store.getAt( index );
   
       var menu = new Sonatype.menu.Menu({
+      	id: 'grid-context-menu',
         payload: rec,
         scope: this,
         items: []
@@ -783,6 +784,7 @@ Ext.extend( Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
     if ( this.nodeContextMenuEvent ) { 
   
       var menu = new Sonatype.menu.Menu({
+      	id: 'tree-context-menu',
         payload: node,
         scope: this,
         items: []

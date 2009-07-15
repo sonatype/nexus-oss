@@ -98,7 +98,7 @@ public abstract class AbstractNexusProxyIntegrationTest
         if ( block )
         {
             status.setRemoteStatus( RemoteStatus.AVAILABLE.name() );
-            status.setProxyMode( ProxyMode.BLOKED_MANUAL.name() );
+            status.setProxyMode( ProxyMode.BLOCKED_MANUAL.name() );
         }
         else
         {

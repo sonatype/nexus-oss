@@ -2,6 +2,8 @@ package org.sonatype.nexus.mock.pages;
 
 import org.sonatype.nexus.mock.NexusTestCase;
 import org.sonatype.nexus.mock.components.Button;
+import org.sonatype.nexus.mock.components.Menu;
+import org.sonatype.nexus.mock.components.Window;
 import org.sonatype.nexus.mock.pages.RepositoriesEditTabs.RepoKind;
 
 import com.thoughtworks.selenium.Selenium;
@@ -28,7 +30,7 @@ public class RepositoriesTab
     {
         addButton.click();
 
-        addMenu.click("text", "Hosted Repository");
+        addMenu.click( "text", "Hosted Repository" );
 
         return new RepositoriesConfigurationForm( selenium, expression
             + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
@@ -38,7 +40,7 @@ public class RepositoriesTab
     {
         addButton.click();
 
-        addMenu.click("text", "Proxy Repository");
+        addMenu.click( "text", "Proxy Repository" );
 
         return new RepositoriesConfigurationForm( selenium, expression
             + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
@@ -48,7 +50,7 @@ public class RepositoriesTab
     {
         addButton.click();
 
-        addMenu.click("text", "Virtual Repository");
+        addMenu.click( "text", "Virtual Repository" );
 
         return new RepositoriesConfigurationForm( selenium, expression
             + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
@@ -91,17 +93,93 @@ public class RepositoriesTab
 
     public boolean contains( String repoId )
     {
-        return this.grid.contains( NexusTestCase.nexusBaseURL + "/service/local/repositories/" + repoId );
+        return this.grid.contains( getUiId( repoId ) );
+    }
+
+    private String getUiId( String repoId )
+    {
+        return NexusTestCase.nexusBaseURL + "service/local/repositories/" + repoId;
     }
 
     public GroupConfigurationForm addGroup()
     {
         addButton.click();
 
-        addMenu.click("text", "Repository Group");
+        addMenu.click( "text", "Repository Group" );
 
         return new GroupConfigurationForm( selenium, expression
             + ".cardPanel.getLayout().activeItem.getLayout().activeItem" );
+    }
+
+    public void contextMenuExpireCache( String id )
+    {
+        Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
+        menu.click( "text", "Expire Cache" );
+
+        new Window( selenium ).waitFor();
+    }
+
+    public void contextMenuReindex( String id )
+    {
+        Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
+        menu.click( "text", "ReIndex" );
+
+        new Window( selenium ).waitFor();
+    }
+
+    public void contextMenuIncrementalReindex( String id )
+    {
+        Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
+        menu.click( "text", "Incremental ReIndex" );
+
+        new Window( selenium ).waitFor();
+    }
+
+    public void contextMenuPutOutOfService( String id )
+    {
+        Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
+        menu.click( "text", "Put Out of Service" );
+
+        new Window( selenium ).waitFor();
+    }
+
+    public void contextMenuPutInService( String id )
+    {
+        Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
+        menu.click( "text", "Put In Service" );
+
+        new Window( selenium ).waitFor();
+    }
+
+    public String getStatus( String repoId )
+    {
+        String uiStatus =
+            selenium.getEval( grid.getExpression() + ".store.data.get( '" + getUiId( repoId ) + "' ).data.displayStatus" );
+        return uiStatus;
+    }
+
+    public void contextMenuRebuildMetadata( String id )
+    {
+        Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
+        menu.click( "text", "Rebuild Metadata" );
+
+        new Window( selenium ).waitFor();
+    }
+
+    public void contextMenuBlockProxy( String id )
+    {
+        Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
+        menu.click( "text", "Block Proxy" );
+
+        new Window( selenium ).waitFor();
+    }
+
+    public void contextMenuAllowProxy( String id )
+    {
+        Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
+        menu.click( "text", "Allow Proxy" );
+
+        new Window( selenium ).waitFor();
     }
 
 }

@@ -55,4 +55,14 @@ public class SecurityPanel
     {
         clickLink( "Privileges" );
     }
+
+    public boolean ldapConfigurationAvailable()
+    {
+        return isLinkAvailable( "LDAP Configuration" );
+    }
+
+    public void ldapConfigurationClick()
+    {
+        clickLink( "LDAP Configuration" );
+    }
 }
