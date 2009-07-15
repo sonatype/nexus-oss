@@ -106,7 +106,7 @@ public class PluginManagerResponse
 
             if ( !response.isSuccesful() )
             {
-                sb.append( "       Reason:" ).append( response.getThrowable().getLocalizedMessage() );
+                sb.append( "       Reason: " ).append( response.getThrowable().getLocalizedMessage() ).append( "\n" );
 
                 if ( detailed )
                 {
@@ -114,7 +114,7 @@ public class PluginManagerResponse
 
                     response.getThrowable().printStackTrace( new PrintWriter( sw ) );
 
-                    sb.append( "\nStack trace:\n" ).append( sw.toString() ).append( "\n" );
+                    sb.append( "Stack trace:\n" ).append( sw.toString() ).append( "\n" );
                 }
             }
 

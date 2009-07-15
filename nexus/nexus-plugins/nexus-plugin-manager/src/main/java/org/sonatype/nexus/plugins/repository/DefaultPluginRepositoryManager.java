@@ -89,7 +89,7 @@ public class DefaultPluginRepositoryManager
     public PluginRepositoryArtifact resolveArtifact( GAVCoordinate coordinates )
     {
         // we collect and order repositories into _asceding_ order
-        // to make  dependencies be found in system repo before user repo if
+        // to make dependencies be found in system repo before user repo if
         // collision occurs
         TreeSet<NexusPluginRepository> repositories =
             new TreeSet<NexusPluginRepository>( new NexusPluginRepositoryComparator( false ) );
@@ -102,6 +102,44 @@ public class DefaultPluginRepositoryManager
         for ( NexusPluginRepository repository : repositories )
         {
             result = repository.resolveArtifact( coordinates );
+
+            if ( result != null )
+            {
+                return result;
+            }
+        }
+
+        // nobody has it
+        return null;
+    }
+
+    public PluginRepositoryArtifact resolveDependencyArtifact( PluginRepositoryArtifact dependant,
+                                                               GAVCoordinate coordinates )
+    {
+        PluginRepositoryArtifact result = null;
+
+        // 1st try the originating repository
+        result = dependant.getNexusPluginRepository().resolveDependencyArtifact( dependant, coordinates );
+
+        if ( result != null )
+        {
+            return result;
+        }
+
+        // next, iterate over reposes and search it
+        // we collect and order repositories into _asceding_ order
+        // to make dependencies be found in system repo before user repo if
+        // collision occurs
+        TreeSet<NexusPluginRepository> repositories =
+            new TreeSet<NexusPluginRepository>( new NexusPluginRepositoryComparator( false ) );
+
+        repositories.addAll( getRepositories().values() );
+
+        // iterate as long as you get something non-null
+
+        for ( NexusPluginRepository repository : repositories )
+        {
+            result = repository.resolveDependencyArtifact( dependant, coordinates );
 
             if ( result != null )
             {

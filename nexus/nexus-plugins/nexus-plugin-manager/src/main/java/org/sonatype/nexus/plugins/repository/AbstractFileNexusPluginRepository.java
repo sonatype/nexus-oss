@@ -116,6 +116,30 @@ public abstract class AbstractFileNexusPluginRepository
         }
     }
 
+    public PluginRepositoryArtifact resolveDependencyArtifact( PluginRepositoryArtifact dependant,
+                                                               GAVCoordinate coordinates )
+    {
+        File pluginFile =
+            new File( getPluginDependenciesFolder( dependant.getCoordinate() ), getPluginFileName( coordinates ) );
+
+        if ( pluginFile.isFile() )
+        {
+            PluginRepositoryArtifact art = new PluginRepositoryArtifact();
+
+            art.setNexusPluginRepository( this );
+
+            art.setCoordinate( coordinates );
+
+            art.setFile( pluginFile );
+
+            return art;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     // ==
 
     protected File getPluginFolder( GAVCoordinate coordinates )

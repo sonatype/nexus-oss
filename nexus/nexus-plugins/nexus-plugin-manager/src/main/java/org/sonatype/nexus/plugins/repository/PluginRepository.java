@@ -26,4 +26,12 @@ public interface PluginRepository
      * @return
      */
     PluginRepositoryArtifact resolveArtifact( GAVCoordinate coordinates );
+
+    /**
+     * Returns the artifaft for the given coordinates.
+     * 
+     * @param coordinates
+     * @return
+     */
+    PluginRepositoryArtifact resolveDependencyArtifact( PluginRepositoryArtifact dependant, GAVCoordinate coordinates );
 }

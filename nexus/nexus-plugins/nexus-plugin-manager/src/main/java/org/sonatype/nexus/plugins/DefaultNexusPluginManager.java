@@ -244,10 +244,10 @@ public class DefaultNexusPluginManager
 
             for ( PluginDependency dependency : pluginMetadata.getClasspathDependencies() )
             {
-                GAVCoordinate coordinates =
+                GAVCoordinate dependencyCoordinates =
                     new GAVCoordinate( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
 
-                PluginRepositoryArtifact dependencyArtifact = pluginRepositoryManager.resolveArtifact( coordinates );
+                PluginRepositoryArtifact dependencyArtifact = pluginRepositoryManager.resolveDependencyArtifact( pluginArtifact, dependencyCoordinates );
 
                 if ( dependencyArtifact != null )
                 {
@@ -255,7 +255,7 @@ public class DefaultNexusPluginManager
                 }
                 else
                 {
-                    result.setThrowable( new DependencyNotFoundException( pluginCoordinates, coordinates ) );
+                    result.setThrowable( new DependencyNotFoundException( pluginCoordinates, dependencyCoordinates ) );
                     
                     return result;
                 }
