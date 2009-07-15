@@ -151,7 +151,7 @@ Sonatype.repoServer.RepoServer = function(){
       this.loginWindow = new Ext.Window({
         id: 'login-window',
         title:'Nexus Log In',
-        animateTarget: 'login-link',
+        animateTarget: 'head-link-r',
         closable: true,
         closeAction: 'hide',
         autoWidth: false,
