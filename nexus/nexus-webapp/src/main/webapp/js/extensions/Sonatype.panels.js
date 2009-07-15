@@ -639,6 +639,20 @@ Sonatype.panels.TreePanel = function( config ) {
     titleColumn: 'name'
   };
   Ext.apply( this, config, defaultConfig );
+  
+  this.tbar = [
+    {
+      text: 'Refresh',
+      icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+      cls: 'x-btn-text-icon',
+      scope: this,
+      handler: this.refreshHandler
+    }
+  ];
+  
+  if ( this.toolbarInitEvent ) {
+    Sonatype.Events.fireEvent( this.toolbarInitEvent, this, this.tbar );
+  }
 
   Sonatype.panels.TreePanel.superclass.constructor.call( this, {
     anchor: '0 -2',
@@ -649,15 +663,6 @@ Sonatype.panels.TreePanel = function( config ) {
     containerScroll: true,
     rootVisible: true,
     enableDD: false,
-    tbar: [
-      {
-        text: 'Refresh',
-        icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
-        cls: 'x-btn-text-icon',
-        scope: this,
-        handler: this.refreshHandler
-      }
-    ],
     loader : new Ext.tree.TreeLoader( {
       requestMethod: 'GET',
       url: this.url,
