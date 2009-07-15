@@ -1,6 +1,5 @@
 package org.sonatype.nexus.mock;
 
-import org.junit.Assert;
 import org.restlet.resource.ResourceException;
 
 public class MockListener
@@ -44,7 +43,6 @@ public class MockListener
     protected void onError( ResourceException e )
     {
         // to be overwritten
-        Assert.fail( "Got an error: " + e.getMessage() );
     }
 
     protected void onPayload( Object payload )

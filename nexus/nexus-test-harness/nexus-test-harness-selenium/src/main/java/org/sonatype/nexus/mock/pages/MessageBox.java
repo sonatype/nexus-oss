@@ -10,7 +10,7 @@ public class MessageBox
 
     public MessageBox( Selenium selenium )
     {
-        super( selenium, "Sonatype.MessageBox.getDialog()" );
+        super( selenium, "window.Sonatype.MessageBox.getDialog()" );
     }
 
     public MessageBox clickYes()
@@ -32,6 +32,13 @@ public class MessageBox
         selenium.click( "OK" );
 
         return this;
+    }
+
+    public String getTitle()
+    {
+        waitForVisible();
+
+        return getEval( ".title" );
     }
 
 }

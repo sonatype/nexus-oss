@@ -1,7 +1,5 @@
 package org.sonatype.nexus.mock;
 
-import junit.framework.AssertionFailedError;
-
 import org.restlet.data.Status;
 
 public class MockResponse
@@ -44,7 +42,7 @@ public class MockResponse
     }
 
     public void setPayload( Object payload )
-        throws AssertionFailedError
+        throws AssertionError
     {
         this.payload = payload;
     }

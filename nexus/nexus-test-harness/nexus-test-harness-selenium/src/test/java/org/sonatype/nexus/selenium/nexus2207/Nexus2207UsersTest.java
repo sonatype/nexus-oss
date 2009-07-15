@@ -2,13 +2,21 @@ package org.sonatype.nexus.selenium.nexus2207;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
+import org.restlet.data.Status;
+import org.sonatype.nexus.mock.MockResponse;
 import org.sonatype.nexus.mock.SeleniumTest;
+import org.sonatype.nexus.mock.pages.MessageBox;
+import org.sonatype.nexus.mock.pages.SetPasswordWindow;
 import org.sonatype.nexus.mock.pages.UsersConfigurationForm;
 import org.sonatype.nexus.mock.pages.UsersTab;
+import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
+import org.sonatype.security.rest.model.UserChangePasswordRequest;
+import org.sonatype.security.rest.model.UserChangePasswordResource;
 
 public class Nexus2207UsersTest
     extends SeleniumTest
@@ -20,25 +28,40 @@ public class Nexus2207UsersTest
     {
         LoginTest.doLogin( main );
 
-        UsersConfigurationForm users = main.openUsers().addUser();
+        UsersTab users = main.openUsers();
 
-        NxAssert.requiredField( users.getUserId(), "seluser" );
-        NxAssert.requiredField( users.getName(), "seluser" );
-        NxAssert.requiredField( users.getEmail(), "seluser@sonatype.org" );
-        NxAssert.requiredField( users.getStatus(), "Active" );
+        UsersConfigurationForm user = users.addUser();
 
-        users.save();
-        NxAssert.hasErrorText( users.getRoles(), "Select one or more items" );
-        users.getRoles().addAll();
-        NxAssert.noErrorText( users.getRoles() );
+        NxAssert.requiredField( user.getUserId(), "seluser" );
+        NxAssert.requiredField( user.getName(), "seluser" );
+        NxAssert.requiredField( user.getEmail(), "seluser@sonatype.org" );
+        NxAssert.requiredField( user.getStatus(), "Active" );
 
-        users.getPassword().type( "asd" );
-        users.getPasswordConfirm().type( "dsa" );
-        Assert.assertTrue( users.getPasswordConfirm().hasErrorText( "Passwords don't match" ) );
-        users.getPasswordConfirm().type( "asd" );
-        Assert.assertFalse( users.getPasswordConfirm().hasErrorText( "Passwords don't match" ) );
+        user.save();
+        NxAssert.hasErrorText( user.getRoles(), "Select one or more items" );
+        user.getRoles().addAll();
+        NxAssert.noErrorText( user.getRoles() );
 
-        users.cancel();
+        user.getPassword().type( "asd" );
+        user.getPasswordConfirm().type( "dsa" );
+        Assert.assertTrue( user.getPasswordConfirm().hasErrorText( "Passwords don't match" ) );
+        user.getPasswordConfirm().type( "asd" );
+        Assert.assertFalse( user.getPasswordConfirm().hasErrorText( "Passwords don't match" ) );
+
+        user.cancel();
+
+        SetPasswordWindow setPw = users.contextMenuSetPassword( "developer" );
+        NxAssert.requiredField( setPw.getNewPassword(), "newpw" );
+        NxAssert.requiredField( setPw.getConfirmPassword(), "newpw" );
+
+        setPw.getNewPassword().type( "asd" );
+        setPw.getConfirmPassword().type( "dsa" );
+        NxAssert.hasErrorText( setPw.getConfirmPassword(), "Passwords don't match" );
+        setPw.getConfirmPassword().type( "asd" );
+        NxAssert.noErrorText( setPw.getConfirmPassword() );
+
+        Assert.assertFalse( setPw.getOkButton().disabled() );
+        setPw.cancel();
     }
 
     @Test
@@ -94,6 +117,66 @@ public class Nexus2207UsersTest
         users.refresh();
 
         Assert.assertFalse( users.getGrid().contains( userId ) );
+    }
+
+    @Test
+    public void contextMenu()
+        throws InterruptedException
+    {
+        LoginTest.doLogin( main );
+
+        UsersTab users = main.openUsers();
+        final String userId = "developer";
+        MessageBox response;
+
+        // reset password
+        MockHelper.expect( "/users_reset/{userId}", new MockResponse( Status.SUCCESS_OK, null ) );
+        users.contextMenuResetPassword( userId ).clickYes();
+        response = new MessageBox( selenium );
+        Assert.assertThat( response.getTitle(), CoreMatchers.equalTo( "Password Reseted" ) );
+        response.clickOk();
+
+        MockHelper.checkExecutions();
+        MockHelper.clearMocks();
+
+        MockHelper.expect( "/users_reset/{userId}", new MockResponse( Status.SERVER_ERROR_VERSION_NOT_SUPPORTED, null ) );
+        users.contextMenuResetPassword( userId ).clickYes();
+        response = new MessageBox( selenium );
+        Assert.assertThat( response.getTitle(), CoreMatchers.equalTo( "Error" ) );
+        response.clickOk();
+
+        MockHelper.checkExecutions();
+        MockHelper.clearMocks();
+
+        // set password
+        final String newUserPw = "newUserPw";
+        MockHelper.expect( "/users_setpw", new MockResponse( Status.SUCCESS_OK, null )
+        {
+            @Override
+            public void setPayload( Object payload )
+                throws AssertionError
+            {
+                Assert.assertThat( payload, CoreMatchers.notNullValue() );
+                UserChangePasswordResource changePw = ( (UserChangePasswordRequest) payload ).getData();
+                Assert.assertThat( changePw.getUserId(), CoreMatchers.equalTo( userId ) );
+                Assert.assertThat( changePw.getNewPassword(), CoreMatchers.equalTo( newUserPw ) );
+            }
+        } );
+        response = users.contextMenuSetPassword( userId ).populate( newUserPw ).ok();
+        Assert.assertThat( response.getTitle(), CoreMatchers.equalTo( "Password Changed" ) );
+        response.clickOk();
+
+        MockHelper.checkExecutions();
+        MockHelper.checkAssertions();
+        MockHelper.clearMocks();
+
+        MockHelper.expect( "/users_setpw", new MockResponse( Status.SERVER_ERROR_VERSION_NOT_SUPPORTED, null ) );
+        response = users.contextMenuSetPassword( userId ).populate( "error" ).ok();
+        Assert.assertThat( response.getTitle(), CoreMatchers.equalTo( "Error" ) );
+        response.clickOk();
+
+        MockHelper.checkExecutions();
+        MockHelper.clearMocks();
     }
 
 }

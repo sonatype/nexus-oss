@@ -185,6 +185,7 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
     var userId = rec.get( 'userId' );
 
     var w = new Ext.Window({
+      id: 'set-password-window',
       title: 'Set Password',
       closable: true,
       autoWidth: false,
@@ -326,10 +327,10 @@ Ext.extend( Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
   
   resetPasswordCallback : function(options, isSuccess, response){
     if(isSuccess){
-      Sonatype.MessageBox.alert('The password has been reset.');
+      Sonatype.MessageBox.alert('Password Reseted', 'The password has been reset.');
     }
     else {
-      Sonatype.MessageBox.alert('The server did not reset the password.');
+      Sonatype.utils.connectionError( response, 'The server did not reset the password.');
     }
   },
   

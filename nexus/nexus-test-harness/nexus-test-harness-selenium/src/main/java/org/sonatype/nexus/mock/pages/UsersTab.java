@@ -1,5 +1,7 @@
 package org.sonatype.nexus.mock.pages;
 
+import org.sonatype.nexus.mock.components.Menu;
+
 import com.thoughtworks.selenium.Selenium;
 
 public class UsersTab
@@ -28,6 +30,22 @@ public class UsersTab
         grid.select( userId );
 
         return new UserEditTabs( selenium );
+    }
+
+    public MessageBox contextMenuResetPassword( String userId )
+    {
+        Menu menu = grid.openContextMenu( userId, 1, "grid-context-menu" );
+        menu.click( "text", "Reset Password" );
+
+        return new MessageBox( selenium );
+    }
+
+    public SetPasswordWindow contextMenuSetPassword( String userId )
+    {
+        Menu menu = grid.openContextMenu( userId, 1, "grid-context-menu" );
+        menu.click( "text", "Set Password" );
+
+        return new SetPasswordWindow( selenium );
     }
 
 }

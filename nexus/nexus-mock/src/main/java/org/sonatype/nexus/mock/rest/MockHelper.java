@@ -1,8 +1,8 @@
 package org.sonatype.nexus.mock.rest;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
-import org.junit.Assert;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
 
@@ -75,14 +75,20 @@ public class MockHelper
 
     public static void checkExecutions()
     {
-        for ( MockResponse mockResponse : mockResponses.values() )
+        for ( Entry<String, MockResponse> entry : mockResponses.entrySet() )
         {
-            Assert.assertTrue( "Mock was never executed", mockResponse.wasExecuted() );
+            if ( !entry.getValue().wasExecuted() )
+            {
+                throw new AssertionError( "Mock for '" + entry.getKey() + "' was never executed" );
+            }
         }
 
-        for ( MockListener mockListener : mockListeneres.values() )
+        for ( Entry<String, MockListener> entry : mockListeneres.entrySet() )
         {
-            Assert.assertTrue( "Listener was never executed", mockListener.wasExecuted() );
+            if ( !entry.getValue().wasExecuted() )
+            {
+                throw new AssertionError( "Listener for '" + entry.getKey() + "' was never executed" );
+            }
         }
     }
 
