@@ -1,13 +1,7 @@
 package org.sonatype.plugin.maven;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Properties;
-
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -20,12 +14,18 @@ import org.sonatype.plugin.metadata.PluginMetadataGenerationRequest;
 import org.sonatype.plugin.metadata.PluginMetadataGenerator;
 import org.sonatype.plugin.metadata.gleaner.GleanerException;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+
 /**
  * Generates a plugin's <tt>plugin.xml</tt> descriptor file based on the project's pom and class annotations.
  * 
  * @goal generate-metadata
  * @phase process-classes
- * @requiresDependencyResolution compile
+ * @requiresDependencyResolution test
  */
 public class PluginDescriptorMojo
     extends AbstractMojo
@@ -153,28 +153,28 @@ public class PluginDescriptorMojo
         }
 
         // dependencies
-        if ( this.mavenProject.getDependencies() != null )
+        List<Artifact> artifacts = mavenProject.getTestArtifacts();
+        if ( artifacts != null )
         {
-            for ( Dependency mavenDependency : (List<Dependency>) this.mavenProject.getDependencies() )
+            for ( Artifact artifact : artifacts )
             {
-                if ( mavenDependency.getType().equals( NXPLUGIN_PACKAGING ) )
+                if ( artifact.getType().equals( NXPLUGIN_PACKAGING ) )
                 {
-                    // enforce provided scope?
-                    if ( !mavenDependency.getScope().equals( "provided" ) )
+                    // NOTE: enforcing provided scope is critical here, since if a NX plugin is NOT provided, we may
+                    // wind up polluting the classpath dependency section below with transitive deps of NX plugins.
+                    if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
                     {
                         throw new MojoFailureException( "Nexus plugin dependency \""
-                            + mavenDependency.getManagementKey() + "\" must have the \"provided\" scope!" );
+                            + artifact.getDependencyConflictId() + "\" must have the \"provided\" scope!" );
                     }
                     
-                    request.addPluginDependency( mavenDependency.getGroupId(), mavenDependency.getArtifactId(),
-                                                 mavenDependency.getVersion() );
+                    request.addPluginDependency( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
                 }
-                else if ( ( mavenDependency.getScope().equals( "compile" ) || mavenDependency.getScope()
-                    .equals( "runtime" ) )
-                    && ( !mavenDependency.getGroupId().equals( "org.sonatype.nexus" ) ) )
+                else if ( ( Artifact.SCOPE_COMPILE.equals( artifact.getScope() ) || Artifact.SCOPE_RUNTIME.equals( artifact.getScope() ) )
+                    && ( !artifact.getGroupId().equals( "org.sonatype.nexus" ) ) )
                 {
-                    request.addClasspathDependency( mavenDependency.getGroupId(), mavenDependency.getArtifactId(),
-                                                    mavenDependency.getVersion() );
+                    request.addClasspathDependency( artifact.getGroupId(), artifact.getArtifactId(),
+                                                    artifact.getVersion() );
                 }
             }
         }
