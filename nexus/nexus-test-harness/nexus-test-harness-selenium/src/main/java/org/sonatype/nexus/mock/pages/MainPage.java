@@ -14,7 +14,7 @@ public class MainPage
 
     public boolean loginLinkAvailable()
     {
-        String text = selenium.getText( "login-link" );
+        String text = selenium.getText( "head-link-r" );
 
         return "Log In".equals( text );
     }
@@ -23,7 +23,7 @@ public class MainPage
     {
         if ( loginLinkAvailable() )
         {
-            selenium.click( "login-link" );
+            selenium.click( "head-link-r" );
         }
         else
         {
