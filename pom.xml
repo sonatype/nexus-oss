@@ -9,6 +9,7 @@
   </parent>
 
   <artifactId>nexus-maven-site-plugin</artifactId>
+  <packaging>nexus-plugin</packaging>
   <name>Nexus Enterprise Plugin :: Maven Site Plugin</name>
   <description>Nexus Maven Site Plugin (Extras).</description>
 
@@ -39,9 +40,14 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
     </dependency>
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
     </dependency>
   </dependencies>
 
