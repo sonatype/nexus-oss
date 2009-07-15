@@ -17,8 +17,10 @@ import org.sonatype.plugin.metadata.gleaner.GleanerException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Generates a plugin's <tt>plugin.xml</tt> descriptor file based on the project's pom and class annotations.
@@ -156,23 +158,47 @@ public class PluginDescriptorMojo
         List<Artifact> artifacts = mavenProject.getTestArtifacts();
         if ( artifacts != null )
         {
+            Set<String> excludedArtifactIds = new HashSet<String>();
+
+            artifactLoop:
             for ( Artifact artifact : artifacts )
             {
                 if ( artifact.getType().equals( NXPLUGIN_PACKAGING ) )
                 {
-                    // NOTE: enforcing provided scope is critical here, since if a NX plugin is NOT provided, we may
-                    // wind up polluting the classpath dependency section below with transitive deps of NX plugins.
                     if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
                     {
                         throw new MojoFailureException( "Nexus plugin dependency \""
                             + artifact.getDependencyConflictId() + "\" must have the \"provided\" scope!" );
                     }
                     
+                    excludedArtifactIds.add( artifact.getId() );
                     request.addPluginDependency( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
+                }
+                else if ( Artifact.SCOPE_PROVIDED.equals( artifact.getScope() )
+                    || Artifact.SCOPE_TEST.equals( artifact.getScope() ) )
+                {
+                    excludedArtifactIds.add( artifact.getId() );
                 }
                 else if ( ( Artifact.SCOPE_COMPILE.equals( artifact.getScope() ) || Artifact.SCOPE_RUNTIME.equals( artifact.getScope() ) )
                     && ( !artifact.getGroupId().equals( "org.sonatype.nexus" ) ) )
                 {
+                    if ( artifact.getDependencyTrail() != null )
+                    {
+                        for ( String trailId : (List<String>) artifact.getDependencyTrail() )
+                        {
+                            if ( excludedArtifactIds.contains( trailId ) )
+                            {
+                                getLog().debug(
+                                                "Dependency artifact: "
+                                                    + artifact.getId()
+                                                    + " is part of the transitive dependency set for a dependency with 'provided' or 'test' scope: "
+                                                    + trailId
+                                                    + "\nThis artifact will be excluded from the plugin classpath." );
+                                continue artifactLoop;
+                            }
+                        }
+                    }
+
                     request.addClasspathDependency( artifact.getGroupId(), artifact.getArtifactId(),
                                                     artifact.getVersion() );
                 }
