@@ -28,6 +28,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -120,11 +121,26 @@ public class InjectExtensionArtifactHandlerMojo
 
         getLog().info( "...done.\nSetting ArtifactHandler on project-artifact: " + project.getId() + "..." );
 
-        String packaging = project.getPackaging();
-        Artifact artifact = project.getArtifact();
+        Set<Artifact> artifacts = new HashSet<Artifact>();
+        artifacts.add( project.getArtifact() );
 
-        ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( packaging );
-        artifact.setArtifactHandler( handler );
+        Set<Artifact> dependencyArtifacts = project.getDependencyArtifacts();
+        if ( dependencyArtifacts != null && !dependencyArtifacts.isEmpty() )
+        {
+            artifacts.addAll( dependencyArtifacts );
+        }
+
+        for ( Artifact artifact : artifacts )
+        {
+            String type = artifact.getType();
+            ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( type );
+
+            getLog().info(
+                           "Artifact: " + artifact.getId() + "\nType: " + type + "\nArtifactHandler extension: "
+                               + handler.getExtension() );
+
+            artifact.setArtifactHandler( handler );
+        }
 
         getLog().info( "...done." );
     }
