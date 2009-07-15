@@ -1,5 +1,11 @@
 package org.sonatype.plugin.maven;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.License;
@@ -10,16 +16,9 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.plugin.Managed;
-import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugin.metadata.PluginMetadataGenerationRequest;
 import org.sonatype.plugin.metadata.PluginMetadataGenerator;
 import org.sonatype.plugin.metadata.gleaner.GleanerException;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * Generates a plugin's <tt>plugin.xml</tt> descriptor file based on the project's pom and class annotations.
@@ -31,6 +30,8 @@ import java.util.Properties;
 public class PluginDescriptorMojo
     extends AbstractMojo
 {
+    private static final String NXPLUGIN_PACKAGING = "nexus-plugin";
+
     /**
      * The output location for the generated plugin descriptor.
      * 
@@ -77,13 +78,6 @@ public class PluginDescriptorMojo
     private String applicationMaxVersion;
 
     /**
-     * The list of other plugins this plugin depends on
-     * 
-     * @parameter
-     */
-    private List<String> pluginDependencies;
-
-    /**
      * The list of user defined MIME types
      * 
      * @parameter
@@ -107,7 +101,7 @@ public class PluginDescriptorMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        if ( !this.mavenProject.getPackaging().equals( "nexus-plugin" ) )
+        if ( !this.mavenProject.getPackaging().equals( NXPLUGIN_PACKAGING ) )
         {
             this.getLog().info( "Project is not of packaging type 'nexus-plugin'." );
             return;
@@ -163,8 +157,21 @@ public class PluginDescriptorMojo
         {
             for ( Dependency mavenDependency : (List<Dependency>) this.mavenProject.getDependencies() )
             {
-                if ( (mavenDependency.getScope().equals( "compile" ) || mavenDependency.getScope().equals( "runtime" )) &&
-                    ( !mavenDependency.getGroupId().equals( "org.sonatype.nexus" ) ))
+                if ( mavenDependency.getType().equals( NXPLUGIN_PACKAGING ) )
+                {
+                    // enforce provided scope?
+                    if ( !mavenDependency.getScope().equals( "provided" ) )
+                    {
+                        throw new MojoFailureException( "Nexus plugin dependency \""
+                            + mavenDependency.getManagementKey() + "\" must have the \"provided\" scope!" );
+                    }
+                    
+                    request.addPluginDependency( mavenDependency.getGroupId(), mavenDependency.getArtifactId(),
+                                                 mavenDependency.getVersion() );
+                }
+                else if ( ( mavenDependency.getScope().equals( "compile" ) || mavenDependency.getScope()
+                    .equals( "runtime" ) )
+                    && ( !mavenDependency.getGroupId().equals( "org.sonatype.nexus" ) ) )
                 {
                     request.addClasspathDependency( mavenDependency.getGroupId(), mavenDependency.getArtifactId(),
                                                     mavenDependency.getVersion() );
@@ -187,48 +194,6 @@ public class PluginDescriptorMojo
         catch ( DependencyResolutionRequiredException e )
         {
             throw new MojoFailureException( "Plugin failed to resolve dependencies: " + e.getMessage(), e );
-        }
-
-        if ( this.pluginDependencies != null )
-        {
-            for ( String gavString : this.pluginDependencies )
-            {
-                GAVCoordinate pluginGav = null;
-
-                try
-                {
-                    pluginGav = new GAVCoordinate( gavString );
-                }
-                catch ( IllegalArgumentException e )
-                {
-                    throw new MojoFailureException( "Invalid entry in pluginDependencies: " + gavString
-                        + ", the string must be in the format of 'groupId:artifactId:version'", e );
-                }
-
-                // make sure it is a real dependency, enlisted in POM/dependencies
-                boolean found = false;
-                for ( Dependency mavenDependency : (List<Dependency>) this.mavenProject.getDependencies() )
-                {
-                    GAVCoordinate enlistedGav =
-                        new GAVCoordinate( mavenDependency.getGroupId(), mavenDependency.getArtifactId(),
-                                           mavenDependency.getVersion() );
-
-                    if ( pluginGav.equals( enlistedGav ) )
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if ( !found )
-                {
-                    throw new MojoFailureException( "Nexus plugin: " + pluginGav
-                        + " must be included in the dependencies list." );
-                }
-
-                // finally now just set the plugin dependency on the request
-                request.addPluginDependency( pluginGav );
-            }
         }
 
         request.getAnnotationClasses().add( ExtensionPoint.class );
