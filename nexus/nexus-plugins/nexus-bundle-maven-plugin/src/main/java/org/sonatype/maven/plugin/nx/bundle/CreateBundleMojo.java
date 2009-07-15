@@ -83,6 +83,7 @@ public class CreateBundleMojo
         ds.setScope( Artifact.SCOPE_RUNTIME );
         ds.setOutputDirectory( project.getGroupId() + "/" + project.getArtifactId() + "/" + project.getVersion()
             + "/dependencies" );
+        ds.setOutputFileNameMapping( "${artifact.artifactId}-${artifact.version}${dashClassifier?}.${artifact.extension}" );
 
         ds.setUseProjectArtifact( false );
 
