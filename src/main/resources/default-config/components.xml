@@ -29,6 +29,7 @@
           <plexus.runtime>${nexus-base-dir}/runtime</plexus.runtime>
           <plexus.apps>${nexus-base-dir}/runtime/apps</plexus.apps>
           <plexus.nexus-work>${nexus-work-dir}</plexus.nexus-work>
+          <plexus.nexus-app>${nexus-base-dir}/runtime/apps/nexus</plexus.nexus-app>
           <plexus.webapp>${nexus-base-dir}/runtime/apps/nexus/webapp</plexus.webapp>
           <plexus.webapp-context-path>/nexus</plexus.webapp-context-path>
           <plexus.application-conf>${nexus-work-dir}/conf</plexus.application-conf>
@@ -56,6 +57,7 @@
           <plexus.runtime>${nexus-base-dir}/runtime</plexus.runtime>
           <plexus.apps>${nexus-base-dir}/runtime/apps</plexus.apps>
           <plexus.nexus-work>${nexus-work-dir}</plexus.nexus-work>
+          <plexus.nexus-app>${nexus-base-dir}/runtime/apps/nexus</plexus.nexus-app>
           <plexus.webapp>${nexus-base-dir}/runtime/apps/nexus/webapp</plexus.webapp>
           <plexus.webapp-context-path>/nexus</plexus.webapp-context-path>
           <plexus.log4j-prop-file>${default-configs}/log4j.properties</plexus.log4j-prop-file>
