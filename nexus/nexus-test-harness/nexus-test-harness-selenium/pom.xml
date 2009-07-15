@@ -143,6 +143,7 @@
   
   <script src="js/repoServer/repoServer.referenceData.js" type="text/javascript" charset="utf-8"></script> 
   <script src="js/repoServer/repoServer.resources.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/Sonatype.headLinks.js" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.FeedViewPanel.js" type="text/javascript" charset="utf-8"></script> 
   <script src="js/repoServer/repoServer.ArtifactInformationPanel.js" type="text/javascript" charset="utf-8"></script> 
   <script src="js/repoServer/repoServer.SearchResultGrid.js" type="text/javascript" charset="utf-8"></script> 
