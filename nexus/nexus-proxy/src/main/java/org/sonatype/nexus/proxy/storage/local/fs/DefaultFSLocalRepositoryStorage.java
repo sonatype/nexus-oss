@@ -334,6 +334,11 @@ public class DefaultFSLocalRepositoryStorage
 
                     IOUtil.close( os );
                 }
+				
+				if ( target.exists() )
+				{
+				    target.delete();
+				}
 
                 if ( !hiddenTarget.renameTo( target ) )
                 {
