@@ -26,6 +26,7 @@ public class Maven2HostedRepositoryTemplate
         return (M2RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration();
     }
 
+    @Override
     protected CoreConfiguration initCoreConfiguration()
     {
         CRepository repo = new DefaultCRepository();
@@ -45,6 +46,7 @@ public class Maven2HostedRepositoryTemplate
         repo.externalConfigurationImple = exConf;
 
         repo.setAllowWrite( true );
+        repo.setNotFoundCacheTTL( 1440 );
 
         CRepositoryCoreConfiguration result = new CRepositoryCoreConfiguration( repo );
 

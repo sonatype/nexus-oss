@@ -596,6 +596,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
             fieldLabel: 'Remote Storage Location',
             itemCls: 'required-field',
             helpText: ht.remoteStorageUrl,
+            emptyText: 'http://some-remote-repository/repo-root',
             name: 'remoteStorage.remoteStorageUrl',
             anchor: Sonatype.view.FIELD_OFFSET,
             allowBlank: false,

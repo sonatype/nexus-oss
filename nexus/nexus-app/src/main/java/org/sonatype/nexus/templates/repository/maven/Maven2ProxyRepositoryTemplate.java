@@ -28,6 +28,7 @@ public class Maven2ProxyRepositoryTemplate
         return (M2RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration();
     }
 
+    @Override
     protected CoreConfiguration initCoreConfiguration()
     {
         CRepository repo = new DefaultCRepository();
@@ -51,6 +52,8 @@ public class Maven2ProxyRepositoryTemplate
         repo.externalConfigurationImple = exConf;
 
         repo.setAllowWrite( true );
+        repo.setNotFoundCacheTTL( 1440 );
+        exConf.setArtifactMaxAge( 1440 );
 
         CRepositoryCoreConfiguration result = new CRepositoryCoreConfiguration( repo );
 
