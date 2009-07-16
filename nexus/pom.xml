@@ -865,4 +865,22 @@
     <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus</developerConnection>
     <url>http://svn.sonatype.org/nexus/trunk/nexus</url>
   </scm>
+  
+  <profiles>
+    <profile>
+      <id>skipTests</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <skipTests>true</skipTests>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 </project>

@@ -5,7 +5,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.assembly.AssemblerConfigurationSource;
 import org.apache.maven.plugin.assembly.model.Assembly;
-import org.apache.maven.plugin.assembly.model.DependencySet;
+import org.apache.maven.plugin.assembly.model.FileSet;
 import org.apache.maven.plugin.assembly.utils.AssemblyFormatUtils;
 import org.apache.maven.project.MavenProject;
 
@@ -268,13 +268,13 @@ public class BundleConfiguration
 
     public void configureAssembly( final Assembly assembly )
     {
-        DependencySet ds = (DependencySet) assembly.getDependencySets().get( 0 );
+        FileSet fs = (FileSet) assembly.getFileSets().get( 0 );
 
         if ( includes != null && !includes.isEmpty() )
         {
             for ( String include : includes )
             {
-                ds.addInclude( include );
+                fs.addInclude( include );
             }
         }
 
@@ -282,7 +282,7 @@ public class BundleConfiguration
         {
             for ( String exclude : excludes )
             {
-                ds.addExclude( exclude );
+                fs.addExclude( exclude );
             }
         }
     }

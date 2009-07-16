@@ -16,7 +16,6 @@ package org.sonatype.maven.plugin.nx.bundle;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -25,8 +24,8 @@ import org.apache.maven.plugin.assembly.archive.ArchiveCreationException;
 import org.apache.maven.plugin.assembly.archive.AssemblyArchiver;
 import org.apache.maven.plugin.assembly.format.AssemblyFormattingException;
 import org.apache.maven.plugin.assembly.model.Assembly;
-import org.apache.maven.plugin.assembly.model.DependencySet;
 import org.apache.maven.plugin.assembly.model.FileItem;
+import org.apache.maven.plugin.assembly.model.FileSet;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 
@@ -70,6 +69,13 @@ public class CreateBundleMojo
      */
     private MavenProjectHelper projectHelper;
 
+    /**
+     * The temporary working directory for storing classpath artifacts that should be bundled with the plugin.
+     * 
+     * @parameter default-value="${project.build.directory}/bundle-classpath"
+     */
+    private File classpathWorkdir;
+
     public void execute()
         throws MojoExecutionException
     {
@@ -78,20 +84,12 @@ public class CreateBundleMojo
         assembly.setId( "bundle" );
         assembly.setIncludeBaseDirectory( false );
 
-        DependencySet ds = new DependencySet();
-
-        ds.setScope( Artifact.SCOPE_RUNTIME );
-        ds.setOutputDirectory( project.getGroupId() + "/" + project.getArtifactId() + "/" + project.getVersion()
+        FileSet fs = new FileSet();
+        fs.setDirectory( classpathWorkdir.getAbsolutePath() );
+        fs.setOutputDirectory( project.getGroupId() + "/" + project.getArtifactId() + "/" + project.getVersion()
             + "/dependencies" );
-        ds.setOutputFileNameMapping( "${artifact.artifactId}-${artifact.version}${dashClassifier?}.${artifact.extension}" );
 
-        ds.setUseProjectArtifact( false );
-
-        ds.addExclude( "org.sonatype.nexus*" );
-        ds.addExclude( "com.sonatype.nexus*" );
-        ds.addExclude( "*:nexus-plugin:*" );
-
-        assembly.addDependencySet( ds );
+        assembly.addFileSet( fs );
 
         FileItem fi = new FileItem();
         fi.setSource( project.getArtifact().getFile().getPath() );

@@ -1,4 +1,4 @@
-package org.sonatype.plugin.maven;
+package org.sonatype.maven.plugin.nx.descriptor;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -7,6 +7,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.plugin.Managed;
@@ -100,6 +101,13 @@ public class PluginDescriptorMojo
     /** @component */
     private PluginMetadataGenerator metadataGenerator;
 
+    /**
+     * The temporary working directory for storing classpath artifacts that should be bundled with the plugin.
+     * 
+     * @parameter default-value="${project.build.directory}/bundle-classpath"
+     */
+    private File classpathWorkdir;
+
     @SuppressWarnings( "unchecked" )
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -157,6 +165,7 @@ public class PluginDescriptorMojo
 
         // dependencies
         List<Artifact> artifacts = mavenProject.getTestArtifacts();
+        Set<Artifact> classpathArtifacts = new HashSet<Artifact>();
         if ( artifacts != null )
         {
             Set<String> excludedArtifactIds = new HashSet<String>();
@@ -207,6 +216,7 @@ public class PluginDescriptorMojo
                     }
 
                     request.addClasspathDependency( artifactCoordinate );
+                    classpathArtifacts.add( artifact );
                 }
             }
         }
@@ -239,6 +249,21 @@ public class PluginDescriptorMojo
         catch ( GleanerException e )
         {
             throw new MojoFailureException( "Failed to generate plugin xml file: " + e.getMessage(), e );
+        }
+
+        for ( Artifact artifact : classpathArtifacts )
+        {
+            File artifactFile = artifact.getFile();
+
+            try
+            {
+                FileUtils.copyFile( artifactFile, new File( classpathWorkdir, artifactFile.getName() ) );
+            }
+            catch ( IOException e )
+            {
+                throw new MojoFailureException( "Failed to copy classpath artifact: " + artifactFile
+                    + "\nto working directory: " + classpathWorkdir + "\nReason: " + e.getMessage(), e );
+            }
         }
     }
 }

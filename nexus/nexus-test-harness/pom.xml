@@ -21,6 +21,7 @@
     </profile>
 
     <profile>
+      <id>its</id>
       <activation>
         <property>
           <name>!maven.test.skip</name>
