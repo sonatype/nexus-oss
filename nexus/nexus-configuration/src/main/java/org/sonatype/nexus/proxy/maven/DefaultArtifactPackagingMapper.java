@@ -1,3 +1,4 @@
+package org.sonatype.nexus.proxy.maven;
 /**
  * Sonatype Nexus (TM) Open Source Version.
  * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
@@ -11,7 +12,7 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.maven;
+
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,6 +61,7 @@ public class DefaultArtifactPackagingMapper
         defaults.put( "eclipse-plugin", "jar" );
         defaults.put( "eclipse-feature", "jar" );
         defaults.put( "eclipse-application", "zip" );
+        defaults.put( "nexus-plugin", "jar" );
     }
 
     public Map<String, String> getPackaging2extensionMapping()

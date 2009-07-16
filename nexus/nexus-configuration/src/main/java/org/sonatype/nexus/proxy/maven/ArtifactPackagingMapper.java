@@ -1,3 +1,4 @@
+package org.sonatype.nexus.proxy.maven;
 /**
  * Sonatype Nexus (TM) Open Source Version.
  * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
@@ -11,7 +12,7 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.maven;
+
 
 /**
  * A utility component that resolves POM packaging to artifact extension. Different implementations may provide

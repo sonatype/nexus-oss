@@ -50,7 +50,6 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
     </dependency>
 
     <!-- Need a BooterCustomizer -->

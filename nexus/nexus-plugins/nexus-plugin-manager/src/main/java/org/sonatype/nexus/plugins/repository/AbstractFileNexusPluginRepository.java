@@ -4,7 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.plugins.PluginCoordinates;
+import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
 /**
@@ -29,6 +32,9 @@ public abstract class AbstractFileNexusPluginRepository
     implements NexusPluginRepository
 {
     protected abstract File getNexusPluginsDirectory();
+
+    @Requirement
+    private ArtifactPackagingMapper artifactPackagingMapper;
 
     public Collection<PluginRepositoryArtifact> findAvailablePlugins()
     {
@@ -157,6 +163,17 @@ public abstract class AbstractFileNexusPluginRepository
 
     protected String getPluginFileName( GAVCoordinate coordinates )
     {
-        return coordinates.getArtifactId() + "-" + coordinates.getVersion() + ".jar";
+        StringBuilder sb = new StringBuilder();
+
+        sb.append( coordinates.getArtifactId() ).append( "-" ).append( coordinates.getVersion() );
+
+        if ( StringUtils.isNotBlank( coordinates.getClassifier() ) )
+        {
+            sb.append( "-" ).append( coordinates.getClassifier() );
+        }
+
+        sb.append( "." ).append( artifactPackagingMapper.getExtensionForPackaging( coordinates.getType() ) );
+
+        return sb.toString();
     }
 }

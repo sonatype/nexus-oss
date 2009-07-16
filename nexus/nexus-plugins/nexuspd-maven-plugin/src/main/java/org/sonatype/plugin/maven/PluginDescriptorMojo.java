@@ -10,6 +10,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.plugin.Managed;
+import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugin.metadata.PluginMetadataGenerationRequest;
 import org.sonatype.plugin.metadata.PluginMetadataGenerator;
 import org.sonatype.plugin.metadata.gleaner.GleanerException;
@@ -160,9 +161,12 @@ public class PluginDescriptorMojo
         {
             Set<String> excludedArtifactIds = new HashSet<String>();
 
-            artifactLoop:
-            for ( Artifact artifact : artifacts )
+            artifactLoop: for ( Artifact artifact : artifacts )
             {
+                GAVCoordinate artifactCoordinate =
+                    new GAVCoordinate( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact
+                        .getClassifier(), artifact.getType() );
+
                 if ( artifact.getType().equals( NXPLUGIN_PACKAGING ) )
                 {
                     if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
@@ -170,16 +174,18 @@ public class PluginDescriptorMojo
                         throw new MojoFailureException( "Nexus plugin dependency \""
                             + artifact.getDependencyConflictId() + "\" must have the \"provided\" scope!" );
                     }
-                    
+
                     excludedArtifactIds.add( artifact.getId() );
-                    request.addPluginDependency( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
+
+                    request.addPluginDependency( artifactCoordinate );
                 }
                 else if ( Artifact.SCOPE_PROVIDED.equals( artifact.getScope() )
                     || Artifact.SCOPE_TEST.equals( artifact.getScope() ) )
                 {
                     excludedArtifactIds.add( artifact.getId() );
                 }
-                else if ( ( Artifact.SCOPE_COMPILE.equals( artifact.getScope() ) || Artifact.SCOPE_RUNTIME.equals( artifact.getScope() ) )
+                else if ( ( Artifact.SCOPE_COMPILE.equals( artifact.getScope() ) || Artifact.SCOPE_RUNTIME
+                    .equals( artifact.getScope() ) )
                     && ( !artifact.getGroupId().equals( "org.sonatype.nexus" ) ) )
                 {
                     if ( artifact.getDependencyTrail() != null )
@@ -188,19 +194,19 @@ public class PluginDescriptorMojo
                         {
                             if ( excludedArtifactIds.contains( trailId ) )
                             {
-                                getLog().debug(
-                                                "Dependency artifact: "
-                                                    + artifact.getId()
-                                                    + " is part of the transitive dependency set for a dependency with 'provided' or 'test' scope: "
-                                                    + trailId
-                                                    + "\nThis artifact will be excluded from the plugin classpath." );
+                                getLog()
+                                    .debug(
+                                            "Dependency artifact: "
+                                                + artifact.getId()
+                                                + " is part of the transitive dependency set for a dependency with 'provided' or 'test' scope: "
+                                                + trailId
+                                                + "\nThis artifact will be excluded from the plugin classpath." );
                                 continue artifactLoop;
                             }
                         }
                     }
 
-                    request.addClasspathDependency( artifact.getGroupId(), artifact.getArtifactId(),
-                                                    artifact.getVersion() );
+                    request.addClasspathDependency( artifactCoordinate );
                 }
             }
         }
