@@ -27,7 +27,7 @@ public class Nxcm970SimultaneousUploadDownloadTest
         ContinuousDeployer continuousDeployer = new ContinuousDeployer( targetUrl );
 
         // download the subjectArtifact -- should result in 404
-        downloadSubjectArtifact( false, baseUrl );
+        // downloadSubjectArtifact( false, baseUrl );
 
         // start deploying the subjectArtifact -- should work on it
         executor.execute( continuousDeployer );
