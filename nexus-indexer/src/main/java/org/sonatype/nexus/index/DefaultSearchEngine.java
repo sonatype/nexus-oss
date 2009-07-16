@@ -93,6 +93,13 @@ public class DefaultSearchEngine
             {
                 totalHits += searchFlat( result, ctx, request.getQuery(), request.getStart(), request.getAiCount() );
             }
+            
+            if ( totalHits > MAX_HITS )
+            {
+                totalHits = -1;
+                result = new TreeSet<ArtifactInfo>( request.getArtifactInfoComparator() );
+                break;
+            }
         }
 
         return new FlatSearchResponse( request.getQuery(), totalHits, result );
