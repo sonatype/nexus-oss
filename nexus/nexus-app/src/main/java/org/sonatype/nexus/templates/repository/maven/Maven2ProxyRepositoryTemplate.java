@@ -53,7 +53,7 @@ public class Maven2ProxyRepositoryTemplate
 
         repo.setAllowWrite( true );
         repo.setNotFoundCacheTTL( 1440 );
-        exConf.setArtifactMaxAge( 1440 );
+        exConf.setArtifactMaxAge( -1 );
 
         CRepositoryCoreConfiguration result = new CRepositoryCoreConfiguration( repo );
 
