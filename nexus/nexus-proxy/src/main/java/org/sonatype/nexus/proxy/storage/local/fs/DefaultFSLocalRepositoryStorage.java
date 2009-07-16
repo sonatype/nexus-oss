@@ -60,7 +60,7 @@ public class DefaultFSLocalRepositoryStorage
     extends AbstractLocalRepositoryStorage
 {
     public static final String PROVIDER_STRING = "file";
-    
+
     private static final String LINK_PREFIX = "LINK to ";
 
     /**
@@ -68,7 +68,7 @@ public class DefaultFSLocalRepositoryStorage
      */
     @Requirement
     private RepositoryItemUidFactory repositoryItemUidFactory;
-    
+
     public String getProviderId()
     {
         return PROVIDER_STRING;
@@ -186,8 +186,7 @@ public class DefaultFSLocalRepositoryStorage
      * @throws StorageException the storage exception
      */
     protected AbstractStorageItem retrieveItemFromFile( Repository repository, ResourceStoreRequest request, File target )
-        throws ItemNotFoundException,
-            StorageException
+        throws ItemNotFoundException, StorageException
     {
         String path = request.getRequestPath();
 
@@ -210,11 +209,8 @@ public class DefaultFSLocalRepositoryStorage
         {
             request.setRequestPath( path );
 
-            DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-                repository,
-                request,
-                target.canRead(),
-                target.canWrite() );
+            DefaultStorageCollectionItem coll =
+                new DefaultStorageCollectionItem( repository, request, target.canRead(), target.canWrite() );
             coll.setModified( target.lastModified() );
             coll.setCreated( target.lastModified() );
             getAttributesHandler().fetchAttributes( coll );
@@ -224,17 +220,14 @@ public class DefaultFSLocalRepositoryStorage
         else if ( target.exists() && target.isFile() && !mustBeACollection )
         {
             request.setRequestPath( path );
-            
+
             if ( checkBeginOfFile( LINK_PREFIX, target ) )
             {
                 try
                 {
-                    DefaultStorageLinkItem link = new DefaultStorageLinkItem(
-                        repository,
-                        request,
-                        target.canRead(),
-                        target.canWrite(),
-                        getLinkTarget( target ) );
+                    DefaultStorageLinkItem link =
+                        new DefaultStorageLinkItem( repository, request, target.canRead(), target.canWrite(),
+                                                    getLinkTarget( target ) );
                     getAttributesHandler().fetchAttributes( link );
                     link.setModified( target.lastModified() );
                     link.setCreated( target.lastModified() );
@@ -251,8 +244,9 @@ public class DefaultFSLocalRepositoryStorage
             }
             else
             {
-                DefaultStorageFileItem file = new DefaultStorageFileItem( repository, request, target.canRead(), target
-                    .canWrite(), new FileContentLocator( target ) );
+                DefaultStorageFileItem file =
+                    new DefaultStorageFileItem( repository, request, target.canRead(), target.canWrite(),
+                                                new FileContentLocator( target ) );
                 getAttributesHandler().fetchAttributes( file );
                 file.setModified( target.lastModified() );
                 file.setCreated( target.lastModified() );
@@ -283,8 +277,7 @@ public class DefaultFSLocalRepositoryStorage
     }
 
     public AbstractStorageItem retrieveItem( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            StorageException
+        throws ItemNotFoundException, StorageException
     {
         return retrieveItemFromFile( repository, request, getFileFromBase( repository, request ) );
     }
@@ -299,8 +292,7 @@ public class DefaultFSLocalRepositoryStorage
     }
 
     public void storeItem( Repository repository, StorageItem item )
-        throws UnsupportedStorageOperationException,
-            StorageException
+        throws UnsupportedStorageOperationException, StorageException
     {
         // set some sanity stuff
         item.setStoredLocally( System.currentTimeMillis() );
@@ -315,6 +307,9 @@ public class DefaultFSLocalRepositoryStorage
         {
             target = getFileFromBase( repository, request );
 
+            // NXCM-966, to be replaced with Tx!
+            File hiddenTarget = new File( target.getParentFile(), target.getName() + ".tmp" );
+
             try
             {
                 mkParentDirs( target );
@@ -327,7 +322,7 @@ public class DefaultFSLocalRepositoryStorage
                 {
                     is = ( (StorageFileItem) item ).getInputStream();
 
-                    os = new FileOutputStream( target );
+                    os = new FileOutputStream( hiddenTarget );
 
                     IOUtil.copy( is, os );
 
@@ -338,6 +333,12 @@ public class DefaultFSLocalRepositoryStorage
                     IOUtil.close( is );
 
                     IOUtil.close( os );
+                }
+
+                if ( !hiddenTarget.renameTo( target ) )
+                {
+                    throw new IOException( "Cannot rename file \"" + hiddenTarget.getAbsolutePath() + "\" to \""
+                        + target.getAbsolutePath() + "\"!" );
                 }
 
                 target.setLastModified( item.getModified() );
@@ -360,6 +361,11 @@ public class DefaultFSLocalRepositoryStorage
                 if ( target != null )
                 {
                     target.delete();
+                }
+
+                if ( hiddenTarget != null )
+                {
+                    hiddenTarget.delete();
                 }
 
                 throw new StorageException( "Got exception during storing on path "
@@ -408,9 +414,7 @@ public class DefaultFSLocalRepositoryStorage
     }
 
     public void shredItem( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
-            StorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, StorageException
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
@@ -446,8 +450,7 @@ public class DefaultFSLocalRepositoryStorage
     }
 
     public Collection<StorageItem> listItems( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            StorageException
+        throws ItemNotFoundException, StorageException
     {
         File target = getFileFromBase( repository, request );
 
