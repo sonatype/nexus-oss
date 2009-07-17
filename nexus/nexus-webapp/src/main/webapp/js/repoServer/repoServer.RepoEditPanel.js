@@ -57,7 +57,8 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
         method: 'GET',
         fpanel: this,
         dataModifiers: templateModifiers,
-        scope: this
+        scope: this,
+        success: this.templateLoadSuccess.createDelegate(this)
       } );
     }
     else {
@@ -69,6 +70,8 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
     this.form.findField( 'format' ).setValue( rec.data.format );
     this.afterProviderSelectHandler( combo, rec, index);
   },
+  
+  templateLoadSuccess: function( form, action ) {},
   
   afterProviderSelectHandler: function( combo, rec, index ) {},
 
@@ -1194,9 +1197,19 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
 
 Ext.extend( Sonatype.repoServer.VirtualRepositoryEditor, Sonatype.repoServer.AbstractRepositoryEditor, {
   
+  templateLoadSuccess: function( form, action ) {
+    var rec = {
+      data: {
+        provider: this.find( 'name', 'provider' )[0].getValue() 
+      }
+    };
+    
+    this.afterProviderSelectHandler( null, rec, null );
+  },
   afterProviderSelectHandler: function( combo, rec, index ) {
     var provider = rec.data.provider;
     var sourceRepoCombo = this.form.findField('shadowOf');
+    sourceRepoCombo.clearValue();
     sourceRepoCombo.focus();
     if ( provider == 'm1-m2-shadow'){
       sourceRepoCombo.store.filterBy( 
