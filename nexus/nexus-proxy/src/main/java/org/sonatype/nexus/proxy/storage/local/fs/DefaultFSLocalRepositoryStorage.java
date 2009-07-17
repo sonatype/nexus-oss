@@ -334,16 +334,21 @@ public class DefaultFSLocalRepositoryStorage
 
                     IOUtil.close( os );
                 }
-				
-				if ( target.exists() )
-				{
-				    target.delete();
-				}
 
                 if ( !hiddenTarget.renameTo( target ) )
                 {
-                    throw new IOException( "Cannot rename file \"" + hiddenTarget.getAbsolutePath() + "\" to \""
-                        + target.getAbsolutePath() + "\"!" );
+                    // try to clean up, maybe is already exists
+                    if ( target.exists() )
+                    {
+                        target.delete();
+                    }
+
+                    // and try again the move
+                    if ( !hiddenTarget.renameTo( target ) )
+                    {
+                        throw new IOException( "Cannot rename file \"" + hiddenTarget.getAbsolutePath() + "\" to \""
+                            + target.getAbsolutePath() + "\"!" );
+                    }
                 }
 
                 target.setLastModified( item.getModified() );

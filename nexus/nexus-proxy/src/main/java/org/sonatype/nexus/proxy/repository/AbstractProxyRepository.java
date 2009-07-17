@@ -470,7 +470,16 @@ public abstract class AbstractProxyRepository
                                        + " in local storage of repository." );
             }
 
-            getLocalStorage().storeItem( this, item );
+            getRepositoryItemUidFactory().lock( item.getRepositoryItemUid() );
+
+            try
+            {
+                getLocalStorage().storeItem( this, item );
+            }
+            finally
+            {
+                getRepositoryItemUidFactory().unlock( item.getRepositoryItemUid() );
+            }
 
             removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
 
@@ -499,10 +508,6 @@ public abstract class AbstractProxyRepository
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
-        AbstractStorageItem item = null;
-        AbstractStorageItem remoteItem = null;
-        AbstractStorageItem localItem = null;
-
         if ( getLogger().isDebugEnabled() )
         {
             StringBuffer db = new StringBuffer( request.toString() );
@@ -517,6 +522,27 @@ public abstract class AbstractProxyRepository
 
             getLogger().debug( db.toString() );
         }
+
+        RepositoryItemUid uid = createUid( request.getRequestPath() );
+
+        getRepositoryItemUidFactory().lock( uid );
+
+        try
+        {
+            return doRetrieveItem0( request );
+        }
+        finally
+        {
+            getRepositoryItemUidFactory().unlock( uid );
+        }
+    }
+
+    protected StorageItem doRetrieveItem0( ResourceStoreRequest request )
+        throws IllegalOperationException, ItemNotFoundException, StorageException
+    {
+        AbstractStorageItem item = null;
+        AbstractStorageItem remoteItem = null;
+        AbstractStorageItem localItem = null;
 
         if ( !request.isRequestRemoteOnly() )
         {
@@ -550,7 +576,6 @@ public abstract class AbstractProxyRepository
 
         if ( shouldProxy )
         {
-
             // we are able to go remote
             if ( localItem == null || isOld( localItem ) )
             {
