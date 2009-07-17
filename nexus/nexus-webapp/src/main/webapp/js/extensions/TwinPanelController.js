@@ -19,6 +19,42 @@ Sonatype.ext.TwinPanelController = function(config){
   var config = config || {};
   var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
+  
+  this.addOneButton = new Ext.Button({
+    xtype: 'button',
+    handler: this.addOne,
+    scope: this,
+    tooltip: 'Add',
+    icon: Sonatype.config.extPath + '/resources/images/default/grid/page-prev.gif',
+    cls: 'x-btn-icon'
+  });
+  
+  this.addAllButton = new Ext.Button({
+    xtype: 'button',
+    handler: this.addAll,
+    scope: this,
+    tooltip: 'Add All',
+    icon: Sonatype.config.extPath + '/resources/images/default/grid/page-first.gif',
+    cls: 'x-btn-icon'
+  });
+  
+  this.removeOneButton = new Ext.Button({
+    xtype: 'button',
+    handler: this.removeOne,
+    scope: this,
+    tooltip: 'Remove',
+    icon: Sonatype.config.extPath + '/resources/images/default/grid/page-next.gif',
+    cls: 'x-btn-icon'
+  });
+  
+  this.removeAllButton = new Ext.Button({
+    xtype: 'button',
+    handler: this.removeAll,
+    scope: this,
+    tooltip: 'Remove All',
+    icon: Sonatype.config.extPath + '/resources/images/default/grid/page-last.gif',
+    cls: 'x-btn-icon'
+  });
 
   Sonatype.ext.TwinPanelController.superclass.constructor.call(this, {
   	layout: 'table',
@@ -31,38 +67,10 @@ Sonatype.ext.TwinPanelController = function(config){
 	  columns: 1
     },
     items: [
-      {
-    	xtype: 'button',
-    	handler: this.addOne,
-    	scope: this,
-    	tooltip: 'Add',
-        icon: Sonatype.config.extPath + '/resources/images/default/grid/page-prev.gif',
-        cls: 'x-btn-icon'
-      },
-      {
-      	xtype: 'button',
-    	handler: this.addAll,
-    	scope: this,
-      	tooltip: 'Add All',
-        icon: Sonatype.config.extPath + '/resources/images/default/grid/page-first.gif',
-        cls: 'x-btn-icon'
-      },
-      {
-      	xtype: 'button',
-    	handler: this.removeOne,
-    	scope: this,
-      	tooltip: 'Remove',
-        icon: Sonatype.config.extPath + '/resources/images/default/grid/page-next.gif',
-        cls: 'x-btn-icon'
-      },
-      {
-    	xtype: 'button',
-    	handler: this.removeAll,
-    	scope: this,
-    	tooltip: 'Remove All',
-        icon: Sonatype.config.extPath + '/resources/images/default/grid/page-last.gif',
-        cls: 'x-btn-icon'
-      }
+      this.addOneButton,
+      this.addAllButton,
+      this.removeOneButton,
+      this.removeAllButton
     ]
   });
   
@@ -70,6 +78,18 @@ Sonatype.ext.TwinPanelController = function(config){
 
 
 Ext.extend(Sonatype.ext.TwinPanelController, Ext.Panel, {
+  disable : function() {
+    this.addOneButton.disable();
+    this.addAllButton.disable();
+    this.removeOneButton.disable();
+    this.removeAllButton.disable();
+  },
+  enable : function() {
+    this.addOneButton.enable();
+    this.addAllButton.enable();
+    this.removeOneButton.enable();
+    this.removeAllButton.enable();
+  },
   addOne : function() {
     this.moveItems( 2, 0, false );
   },
@@ -148,6 +168,7 @@ Sonatype.ext.TwinPanelChooser = function( config ){
     items: [
       {
         xtype: 'treepanel',
+        name: 'targettree',
 //        id: '_staging-profiles-target-groups-tree', //note: unique ID is assinged before instantiation
         title: this.titleLeft,
         cls: this.required ? 'required-field' : null,
@@ -210,10 +231,12 @@ Sonatype.ext.TwinPanelChooser = function( config ){
       },
       {
         xtype: 'twinpanelcontroller',
+        name: 'twinpanel',
         halfSize: this.halfSize
       },
       {
         xtype: 'treepanel',
+        name: 'sourcetree',
 //        id: id + '_staging-profiles-available-groups-tree', //note: unique ID is assinged before instantiation
         title: this.titleRight,
         border: true, //note: this seem to have no effect w/in form panel
@@ -256,6 +279,16 @@ Sonatype.ext.TwinPanelChooser = function( config ){
 };
 
 Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
+  disable: function(){
+    this.find( 'name', 'twinpanel' )[0].disable();
+    this.find( 'name', 'sourcetree' )[0].dragZone.lock();
+    this.find( 'name', 'targettree' )[0].dragZone.lock();
+  },
+  enable: function(){
+    this.find( 'name', 'twinpanel' )[0].enable();
+    this.find( 'name', 'sourcetree' )[0].dragZone.unlock();
+    this.find( 'name', 'targettree' )[0].dragZone.unlock();
+  },
   createNode: function( root, rec ) {
     root.appendChild( new Ext.tree.TreeNode( {
       id: rec.id,

@@ -541,7 +541,8 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
           }
         },
         {
-          xtype: 'twinpanelcontroller'
+          xtype: 'twinpanelcontroller',
+          name: 'twinpanel'
         },
         {
           xtype: 'treepanel',
@@ -588,6 +589,10 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
       submit: {
         fn: this.submitHandler,
         scope: this
+      },
+      load: {
+        fn: this.loadHandler,
+        scope: this
       }
     }
   } );
@@ -627,7 +632,22 @@ Ext.extend( Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
     
     this.el.unmask();
   },
-  loadData: function() {
+  loadHandler: function() {
+    if ( !this.payload.data.userManaged ) {
+      this.find('name', 'internalResourceHeader')[0].setVisible( true );
+      this.find('name', 'id')[0].disable();
+      this.find('name', 'name')[0].disable();
+      this.find('name', 'description')[0].disable();
+      this.find('name', 'sessionTimeout')[0].disable();
+      this.find('name', 'twinpanel')[0].disable();
+      this.find('name', 'roles-privs-tree')[0].dragZone.lock();
+      this.find('name', 'all-roles-privs-tree')[0].dragZone.lock();
+      for ( var i = 0 ; i < this.buttons.length ; i++ ){
+        this.buttons[i].disable();
+      }
+    }
+  },
+  loadData: function( form, action, receivedData ) {
     Sonatype.repoServer.DefaultRoleEditor.superclass.loadData.call(this);
     
     if ( this.presetData ) {

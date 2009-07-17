@@ -142,6 +142,11 @@ public class Component
     {
         return !hidden();
     }
+    
+    public boolean isDisabled()
+    {
+        return evalTrue( ".disabled" );
+    }
 
     public void waitForHidden()
     {
