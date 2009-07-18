@@ -289,9 +289,9 @@ public class CommonsHttpClientRemoteStorage
     {
         HttpClient httpClient = null;
 
-        
-
-        getLogger().info( "Remote storage settings change detected, updating HttpClient..." );
+        getLogger().info(
+                          "Remote storage settings change detected for ProxyRepository ID=\"" + repository.getId()
+                              + "\" (\"" + repository.getName() + "\"), updating HttpClient..." );
 
         int timeout = ctx.getRemoteConnectionSettings().getConnectionTimeout();
 
@@ -306,7 +306,7 @@ public class CommonsHttpClientRemoteStorage
         httpClient = new HttpClient( connManager );
 
         HostConfiguration httpConfiguration = httpClient.getHostConfiguration();
-        
+
         HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, getLogger() );
 
         ctx.putRemoteConnectionContextObject( CTX_KEY_CLIENT, httpClient );
