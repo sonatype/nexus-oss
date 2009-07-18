@@ -1,10 +1,10 @@
 package org.sonatype.nexus.selenium.nexus2207;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.mock.MockResponse;
 import org.sonatype.nexus.mock.SeleniumTest;
@@ -17,7 +17,10 @@ import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
 import org.sonatype.security.rest.model.UserChangePasswordRequest;
 import org.sonatype.security.rest.model.UserChangePasswordResource;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
+@Component( role = Nexus2207UsersTest.class )
 public class Nexus2207UsersTest
     extends SeleniumTest
 {
@@ -86,10 +89,10 @@ public class Nexus2207UsersTest
 
         // read
         UsersConfigurationForm user = users.select( userId ).selectConfiguration();
-        Assert.assertThat( user.getUserId().getValue(), equalTo( userId ) );
-        Assert.assertThat( user.getName().getValue(), equalTo( name ) );
-        Assert.assertThat( user.getEmail().getValue(), equalTo( email ) );
-        Assert.assertThat( user.getStatus().getValue(), equalTo( status ) );
+        assertThat( user.getUserId().getValue(), equalTo( userId ) );
+        assertThat( user.getName().getValue(), equalTo( name ) );
+        assertThat( user.getEmail().getValue(), equalTo( email ) );
+        assertThat( user.getStatus().getValue(), equalTo( status ) );
         Assert.assertTrue( user.getRoles().containsLeftSide( uiRole ) );
         Assert.assertFalse( user.getRoles().containsLeftSide( "admin" ) );
 
@@ -106,8 +109,8 @@ public class Nexus2207UsersTest
 
         users.refresh();
         user = users.select( userId ).selectConfiguration();
-        Assert.assertThat( user.getName().getValue(), equalTo( newName ) );
-        Assert.assertThat( user.getStatus().getValue(), equalTo( disable ) );
+        assertThat( user.getName().getValue(), equalTo( newName ) );
+        assertThat( user.getStatus().getValue(), equalTo( disable ) );
 
         users.refresh();
 
@@ -133,7 +136,7 @@ public class Nexus2207UsersTest
         MockHelper.expect( "/users_reset/{userId}", new MockResponse( Status.SUCCESS_OK, null ) );
         users.contextMenuResetPassword( userId ).clickYes();
         response = new MessageBox( selenium );
-        Assert.assertThat( response.getTitle(), CoreMatchers.equalTo( "Password Reseted" ) );
+        assertThat( response.getTitle(), CoreMatchers.equalTo( "Password Reseted" ) );
         response.clickOk();
 
         MockHelper.checkExecutions();
@@ -142,7 +145,7 @@ public class Nexus2207UsersTest
         MockHelper.expect( "/users_reset/{userId}", new MockResponse( Status.SERVER_ERROR_VERSION_NOT_SUPPORTED, null ) );
         users.contextMenuResetPassword( userId ).clickYes();
         response = new MessageBox( selenium );
-        Assert.assertThat( response.getTitle(), CoreMatchers.equalTo( "Error" ) );
+        assertThat( response.getTitle(), CoreMatchers.equalTo( "Error" ) );
         response.clickOk();
 
         MockHelper.checkExecutions();
@@ -156,14 +159,14 @@ public class Nexus2207UsersTest
             public void setPayload( Object payload )
                 throws AssertionError
             {
-                Assert.assertThat( payload, CoreMatchers.notNullValue() );
+                assertThat( payload, CoreMatchers.notNullValue() );
                 UserChangePasswordResource changePw = ( (UserChangePasswordRequest) payload ).getData();
-                Assert.assertThat( changePw.getUserId(), CoreMatchers.equalTo( userId ) );
-                Assert.assertThat( changePw.getNewPassword(), CoreMatchers.equalTo( newUserPw ) );
+                assertThat( changePw.getUserId(), CoreMatchers.equalTo( userId ) );
+                assertThat( changePw.getNewPassword(), CoreMatchers.equalTo( newUserPw ) );
             }
         } );
         response = users.contextMenuSetPassword( userId ).populate( newUserPw ).ok();
-        Assert.assertThat( response.getTitle(), CoreMatchers.equalTo( "Password Changed" ) );
+        assertThat( response.getTitle(), CoreMatchers.equalTo( "Password Changed" ) );
         response.clickOk();
 
         MockHelper.checkExecutions();
@@ -172,7 +175,7 @@ public class Nexus2207UsersTest
 
         MockHelper.expect( "/users_setpw", new MockResponse( Status.SERVER_ERROR_VERSION_NOT_SUPPORTED, null ) );
         response = users.contextMenuSetPassword( userId ).populate( "error" ).ok();
-        Assert.assertThat( response.getTitle(), CoreMatchers.equalTo( "Error" ) );
+        assertThat( response.getTitle(), CoreMatchers.equalTo( "Error" ) );
         response.clickOk();
 
         MockHelper.checkExecutions();

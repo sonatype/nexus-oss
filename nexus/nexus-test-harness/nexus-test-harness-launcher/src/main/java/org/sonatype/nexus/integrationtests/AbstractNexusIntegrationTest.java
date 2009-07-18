@@ -29,7 +29,6 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.log4j.Logger;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -255,29 +254,32 @@ public class AbstractNexusIntegrationTest
             && workDir.getAbsolutePath().lastIndexOf( ".." ) == -1 )
         {
             // we cannot delete the plugin-repository or the tests will fail
-            
-           File[] filesToDelete = workDir.listFiles( new FilenameFilter(){
-            public boolean accept( File dir, String name )
+
+            File[] filesToDelete = workDir.listFiles( new FilenameFilter()
             {
-                System.out.print( "dirname: "+ dir.getAbsolutePath()  +": ");
-                
-                // anything but the plugin-repository directory
-                if( name.contains( "plugin-repository" ) )
+                public boolean accept( File dir, String name )
                 {
-                    System.out.println( "false" );
-                  return false;   
+                    System.out.print( "dirname: " + dir.getAbsolutePath() + ": " );
+
+                    // anything but the plugin-repository directory
+                    if ( name.contains( "plugin-repository" ) )
+                    {
+                        System.out.println( "false" );
+                        return false;
+                    }
+                    System.out.println( "true" );
+                    return true;
                 }
-                System.out.println( "true" );
-                return true;
-            }
-        });
-           
-           for ( File fileToDelete : filesToDelete )
-            {
-                // delete work dir
-                   FileUtils.deleteDirectory( fileToDelete );
-            }  
-            
+            } );
+
+            if ( filesToDelete != null )
+                for ( File fileToDelete : filesToDelete )
+                {
+                    // delete work dir
+                    if ( fileToDelete != null )
+                        FileUtils.deleteDirectory( fileToDelete );
+                }
+
         }
     }
 

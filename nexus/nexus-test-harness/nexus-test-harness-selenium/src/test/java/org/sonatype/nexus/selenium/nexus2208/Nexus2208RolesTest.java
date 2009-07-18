@@ -1,13 +1,15 @@
 package org.sonatype.nexus.selenium.nexus2208;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.RolesConfigurationForm;
 import org.sonatype.nexus.mock.pages.RolesTab;
 import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
+@Component( role = Nexus2208RolesTest.class )
 public class Nexus2208RolesTest
     extends SeleniumTest
 {

@@ -1,20 +1,5 @@
 package org.sonatype.nexus.mock;
 
-import static org.sonatype.nexus.mock.TestContext.RESOURCES_DIR;
-import static org.sonatype.nexus.mock.TestContext.RESOURCES_SOURCE_DIR;
-
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
-import org.junit.internal.runners.statements.InvokeMethod;
-import org.junit.runner.notification.RunNotifier;
-import org.junit.runners.BlockJUnit4ClassRunner;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.InitializationError;
-import org.junit.runners.model.Statement;
-import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.sonatype.nexus.test.utils.TestProperties;
 
 /**
  * <p>
@@ -31,9 +16,9 @@ import org.sonatype.nexus.test.utils.TestProperties;
  * </p>
  */
 public class SeleniumJUnitRunner
-    extends BlockJUnit4ClassRunner
+    //extends BlockJUnit4ClassRunner
 {
-
+/*
     protected static Logger log = Logger.getLogger( SeleniumJUnitRunner.class );
 
     public SeleniumJUnitRunner( Class<?> klass )
@@ -65,53 +50,20 @@ public class SeleniumJUnitRunner
                 }
                 catch ( Throwable throwable )
                 {
+                //TODO
                     stc.takeScreenshot( "FAILURE" );
                     throw throwable;
                 }
                 finally
                 {
+                //TODO
                     stc.captureNetworkTraffic();
                 }
             }
         };
     }
+*/
 
-    @Override
-    public void run( RunNotifier notifier )
-    {
-        // org.sonatype.nexus.selenium.nexus1962.Nexus1962TaskTest
-        String testName = getDescription().getDisplayName();
 
-        String testId = testName.substring( 0, testName.lastIndexOf( '.' ) );
-        testId = testId.substring( testId.lastIndexOf( '.' ) + 1 );
-        TestContext.setTestId( testId );
-
-        try
-        {
-            copyTestResources();
-        }
-        catch ( Exception e )
-        {
-            throw new RuntimeException( e.getMessage(), e );
-        }
-
-        super.run( notifier );
-
-        TestContext.setTestId( null );
-    }
-
-    protected void copyTestResources()
-        throws IOException
-    {
-        File source = new File( RESOURCES_SOURCE_DIR, TestContext.getTestId() );
-        if ( !source.exists() )
-        {
-            return;
-        }
-
-        File destination = new File( RESOURCES_DIR, TestContext.getTestId() );
-
-        FileTestingUtils.interpolationDirectoryCopy( source, destination, TestProperties.getAll() );
-    }
 
 }

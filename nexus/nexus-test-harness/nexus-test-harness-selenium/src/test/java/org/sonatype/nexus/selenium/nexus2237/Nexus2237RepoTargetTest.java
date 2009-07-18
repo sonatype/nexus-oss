@@ -2,10 +2,10 @@ package org.sonatype.nexus.selenium.nexus2237;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.internal.matchers.IsCollectionContaining;
+import org.codehaus.plexus.component.annotations.Component;
+import org.hamcrest.collection.IsCollectionContaining;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.RepoTargetForm;
@@ -14,7 +14,10 @@ import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
 import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
+@Component( role = Nexus2237RepoTargetTest.class )
 public class Nexus2237RepoTargetTest
     extends SeleniumTest
 {
@@ -58,10 +61,10 @@ public class Nexus2237RepoTargetTest
             @Override
             public void onPayload( Object payload )
             {
-                Assert.assertThat( payload, not( nullValue() ) );
+                assertThat( payload, not( nullValue() ) );
                 RepositoryTargetResourceResponse result = (RepositoryTargetResourceResponse) payload;
 
-                Assert.assertThat( result.getData().getPatterns(), IsCollectionContaining.hasItems( pattern, pattern2 ) );
+                assertThat( result.getData().getPatterns(), IsCollectionContaining.hasItems( pattern, pattern2 ) );
             }
         } );
 

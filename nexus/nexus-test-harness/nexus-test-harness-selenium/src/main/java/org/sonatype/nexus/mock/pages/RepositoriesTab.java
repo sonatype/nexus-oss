@@ -115,8 +115,6 @@ public class RepositoriesTab
     {
         Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
         menu.click( "text", "Expire Cache" );
-
-        new Window( selenium ).waitFor();
     }
 
     public void contextMenuReindex( String id )
@@ -131,24 +129,18 @@ public class RepositoriesTab
     {
         Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
         menu.click( "text", "Incremental ReIndex" );
-
-        new Window( selenium ).waitFor();
     }
 
     public void contextMenuPutOutOfService( String id )
     {
         Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
         menu.click( "text", "Put Out of Service" );
-
-        new Window( selenium ).waitFor();
     }
 
     public void contextMenuPutInService( String id )
     {
         Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
         menu.click( "text", "Put In Service" );
-
-        new Window( selenium ).waitFor();
     }
 
     public String getStatus( String repoId )
@@ -162,24 +154,18 @@ public class RepositoriesTab
     {
         Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
         menu.click( "text", "Rebuild Metadata" );
-
-        new Window( selenium ).waitFor();
     }
 
     public void contextMenuBlockProxy( String id )
     {
         Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
         menu.click( "text", "Block Proxy" );
-
-        new Window( selenium ).waitFor();
     }
 
     public void contextMenuAllowProxy( String id )
     {
         Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
         menu.click( "text", "Allow Proxy" );
-
-        new Window( selenium ).waitFor();
     }
 
 }

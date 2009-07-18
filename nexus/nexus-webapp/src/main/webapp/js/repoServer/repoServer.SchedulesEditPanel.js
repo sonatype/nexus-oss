@@ -1420,7 +1420,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   
   runCallback : function(options, isSuccess, response){
     if(!isSuccess){
-      Sonatype.MessageBox.alert('The server did not run the scheduled task.');
+      Sonatype.utils.connectionError( response, 'The server did not run the scheduled task.' );
     }
     else if (!this.alreadyDeferred)
     {

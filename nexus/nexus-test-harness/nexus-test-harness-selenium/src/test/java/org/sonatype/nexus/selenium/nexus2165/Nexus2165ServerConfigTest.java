@@ -1,12 +1,17 @@
 package org.sonatype.nexus.selenium.nexus2165;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
+
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.components.TextField;
 import org.sonatype.nexus.mock.pages.ServerTab;
 import org.sonatype.nexus.selenium.nexus1815.LoginTest;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
+@Component( role = Nexus2165ServerConfigTest.class )
 public class Nexus2165ServerConfigTest
     extends SeleniumTest
 {
@@ -38,9 +43,9 @@ public class Nexus2165ServerConfigTest
     private void assertErrorText( TextField tf, String validText )
     {
         tf.type( "" );
-        Assert.assertTrue( "Expected validation", tf.hasErrorText( "This field is required" ) );
+        assertTrue( "Expected validation", tf.hasErrorText( "This field is required" ) );
         tf.type( validText );
-        Assert.assertFalse( "Should pass validation", tf.hasErrorText( "This field is required" ) );
+        assertFalse( "Should pass validation", tf.hasErrorText( "This field is required" ) );
     }
 
     private void assertErrorText( TextField tf, int validValue )

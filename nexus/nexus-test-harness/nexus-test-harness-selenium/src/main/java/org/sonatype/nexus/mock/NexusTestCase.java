@@ -1,5 +1,7 @@
 package org.sonatype.nexus.mock;
 
+import static org.sonatype.nexus.mock.TestContext.RESOURCES_DIR;
+import static org.sonatype.nexus.mock.TestContext.RESOURCES_SOURCE_DIR;
 import static org.sonatype.nexus.mock.TestContext.getTestResourceAsFile;
 
 import java.io.File;
@@ -7,6 +9,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -18,30 +21,40 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
+import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.WagonDeployer;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 
-@Ignore
 public abstract class NexusTestCase
+    implements Initializable
 {
     private static MockNexusEnvironment env;
 
     public static String nexusBaseURL;
 
+    protected String testId;
+
+    protected String testName;
+
     protected static Logger log = Logger.getLogger( NexusTestCase.class );
 
-    @BeforeClass
-    public synchronized static void startNexus()
+    @Requirement
+    private PlexusContainer container;
+
+    @BeforeSuite
+    public synchronized void startNexus()
         throws Exception
     {
         if ( env == null )
@@ -64,7 +77,7 @@ public abstract class NexusTestCase
             nexusBaseURL = TestProperties.getString( "nexus.base.url" );
 
             int port = TestProperties.getInteger( "nexus.application.port" );
-            env = new MockNexusEnvironment( port, "/nexus", webappRoot );
+            env = new MockNexusEnvironment( port, "/nexus", webappRoot, container );
             env.start();
 
             Runtime.getRuntime().addShutdownHook( new Thread( new Runnable()
@@ -83,12 +96,31 @@ public abstract class NexusTestCase
             } ) );
 
         }
-
-        deployArtifacts();
-
     }
 
-    protected static void deployArtifacts()
+    @BeforeClass
+    public void prepareEnv()
+        throws Exception
+    {
+        copyTestResources();
+        deployArtifacts();
+    }
+
+    protected void copyTestResources()
+        throws IOException
+    {
+        File source = new File( RESOURCES_SOURCE_DIR, TestContext.getTestId() );
+        if ( !source.exists() )
+        {
+            return;
+        }
+
+        File destination = new File( RESOURCES_DIR, TestContext.getTestId() );
+
+        FileTestingUtils.interpolationDirectoryCopy( source, destination, TestProperties.getAll() );
+    }
+
+    protected void deployArtifacts()
         throws Exception
     {
         // test the test directory
@@ -209,25 +241,18 @@ public abstract class NexusTestCase
         }
     }
 
-    private static void deployWithWagon( PlexusContainer container, String wagonHint, String deployUrl,
-                                         File fileToDeploy, String artifactPath )
+    private void deployWithWagon( PlexusContainer container, String wagonHint, String deployUrl, File fileToDeploy,
+                                  String artifactPath )
         throws ConnectionException, AuthenticationException, TransferFailedException, ResourceDoesNotExistException,
         AuthorizationException, ComponentLookupException
     {
         new WagonDeployer( wagonHint, "admin", "password", deployUrl, fileToDeploy, artifactPath ).deploy();
     }
 
-    @Before
+    @BeforeMethod
     public void mockSetup()
     {
         MockHelper.clearMocks();
-    }
-
-    @After
-    public void mockCleanup()
-    {
-        MockHelper.checkAssertions();
-        MockHelper.checkExecutions();
     }
 
     public <E> E lookup( Class<E> role )
@@ -241,4 +266,15 @@ public abstract class NexusTestCase
     {
         return env.getPlexusContainer().lookup( role, hint );
     }
+
+    public void initialize()
+        throws InitializationException
+    {
+        String packageName = this.getClass().getPackage().getName();
+        this.testId = packageName.substring( packageName.lastIndexOf( '.' ) + 1, packageName.length() );
+        TestContext.setTestId( testId );
+
+        this.testName = getClass().getSimpleName();
+    }
+
 }

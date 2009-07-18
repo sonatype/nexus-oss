@@ -6,6 +6,11 @@ public class MainPage
 {
     protected Selenium selenium;
 
+    public final Selenium getSelenium()
+    {
+        return selenium;
+    }
+
     public MainPage( Selenium selenium )
     {
         this.selenium = selenium;
@@ -17,6 +22,13 @@ public class MainPage
         String text = selenium.getText( "head-link-r" );
 
         return "Log In".equals( text );
+    }
+
+    public boolean logoutLinkAvailable()
+    {
+        String text = selenium.getText( "head-link-r" );
+
+        return "Log Out".equals( text );
     }
 
     public LoginWindow clickLogin()
@@ -128,6 +140,14 @@ public class MainPage
         adminPanel().routingClick();
 
         return new RotesTab( selenium );
+    }
+
+    public void clickLogout()
+    {
+        if ( logoutLinkAvailable() )
+        {
+            selenium.click( "head-link-r" );
+        }
     }
 
 }

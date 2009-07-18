@@ -1,13 +1,17 @@
 package org.sonatype.nexus.selenium.nexus1815;
 
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
+
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.models.User;
-import org.sonatype.nexus.mock.pages.ViewsPanel;
 import org.sonatype.nexus.mock.pages.AdministrationPanel;
 import org.sonatype.nexus.mock.pages.SecurityPanel;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import org.sonatype.nexus.mock.pages.ViewsPanel;
+import org.testng.annotations.Test;
 
+@Component( role = RolesUITest.class )
 public class RolesUITest extends SeleniumTest {
     @Test
     public void admin() {

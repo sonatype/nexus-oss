@@ -4,6 +4,9 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.restlet.Application;
 import org.restlet.Client;
 import org.restlet.data.Protocol;
@@ -11,6 +14,7 @@ import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.mock.rest.MockHelper;
+import org.sonatype.nexus.mock.util.ContainerUtil;
 import org.sonatype.nexus.rest.NexusApplication;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
@@ -31,7 +35,16 @@ public class SimpleTest
 
         super.setUp();
 
-        mockNexusEnvironment = new MockNexusEnvironment( 12345, "/nexus", new File( "target/nexus-ui" ) );
+
+            // create one
+            ContainerConfiguration cc = new DefaultContainerConfiguration();
+            cc.setContainerConfigurationURL( Class.class.getResource( "/plexus/plexus.xml" ) );
+            cc.setContext( ContainerUtil.createContainerContext() );
+            cc.addComponentDiscoveryListener( new InhibitingComponentDiscovererListener() );
+
+            DefaultPlexusContainer plexusContainer = new DefaultPlexusContainer( cc );
+
+        mockNexusEnvironment = new MockNexusEnvironment( 12345, "/nexus", new File( "target/nexus-ui" ), plexusContainer );
 
         mockNexusEnvironment.start();
     }

@@ -1,28 +1,41 @@
 package org.sonatype.nexus.selenium.nexus1815;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
 
-import org.junit.Test;
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.models.User;
 import org.sonatype.nexus.mock.pages.LoginWindow;
 import org.sonatype.nexus.mock.pages.MainPage;
+import org.testng.annotations.Test;
 
+@Component( role = LoginTest.class )
 public class LoginTest
     extends SeleniumTest
 {
+
     @Test
-    public void goodLogin()
+    public void doLoginTest()
     {
-        doLogin( main );
+        doLogin( User.ADMIN.getUsername(), User.ADMIN.getPassword() );
+
+        assertFalse( "Login link should not be available", main.loginLinkAvailable() );
     }
 
-    public static void doLogin( MainPage main )
+    @Test
+    public void goodLogin()
     {
         main.clickLogin().populate( User.ADMIN ).loginExpectingSuccess();
 
         assertFalse( "Login link should not be available", main.loginLinkAvailable() );
+    }
+
+    public static void doLogin( MainPage main )
+    {
+        main.getSelenium().runScript(
+                                      "window.Sonatype.utils.doLogin( null, '" + User.ADMIN.getUsername() + "', '"
+                                          + User.ADMIN.getPassword() + "');" );
     }
 
     @Test

@@ -1,10 +1,7 @@
 package org.sonatype.nexus.selenium.nexus2262;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
@@ -25,7 +22,12 @@ import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
+@Component( role = Nexus2261RepositoryMirrorTest.class )
 public class Nexus2261RepositoryMirrorTest
     extends SeleniumTest
 {
@@ -36,7 +38,7 @@ public class Nexus2261RepositoryMirrorTest
 
     private M2Repository hostedRepo;
 
-    @Before
+    @BeforeClass
     public void createRepo()
         throws Exception
     {
@@ -95,7 +97,7 @@ public class Nexus2261RepositoryMirrorTest
         hostedRepo = (M2Repository) nexus.createRepository( cRepo );
     }
 
-    @After
+    @AfterClass
     public void deleteRepo()
         throws Exception
     {

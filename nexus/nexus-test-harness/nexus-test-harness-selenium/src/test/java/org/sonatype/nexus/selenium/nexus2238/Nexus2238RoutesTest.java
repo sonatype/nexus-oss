@@ -2,9 +2,9 @@ package org.sonatype.nexus.selenium.nexus2238;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.RotesTab;
@@ -13,7 +13,10 @@ import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
 import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
+@Component( role = Nexus2238RoutesTest.class )
 public class Nexus2238RoutesTest
     extends SeleniumTest
 {
@@ -58,7 +61,7 @@ public class Nexus2238RoutesTest
             @Override
             public void onPayload( Object payload )
             {
-                Assert.assertThat( payload, not( nullValue() ) );
+                assertThat( payload, not( nullValue() ) );
             }
         } );
 

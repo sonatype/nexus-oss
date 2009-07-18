@@ -1,11 +1,13 @@
 package org.sonatype.nexus.selenium.nexus2191;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.FeedsTab;
 import org.sonatype.nexus.selenium.nexus1815.LoginTest;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
+@Component( role = Nexus2191FeedTest.class )
 public class Nexus2191FeedTest
     extends SeleniumTest
 {

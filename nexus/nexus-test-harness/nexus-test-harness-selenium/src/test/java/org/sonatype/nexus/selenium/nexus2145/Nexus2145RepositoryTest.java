@@ -2,12 +2,13 @@ package org.sonatype.nexus.selenium.nexus2145;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.AssertJUnit.assertTrue;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.hamcrest.CoreMatchers;
 import org.restlet.data.Status;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
@@ -16,21 +17,28 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
 import org.sonatype.nexus.mock.SeleniumTest;
+import org.sonatype.nexus.mock.components.Window;
 import org.sonatype.nexus.mock.pages.MessageBox;
 import org.sonatype.nexus.mock.pages.RepositoriesConfigurationForm;
 import org.sonatype.nexus.mock.pages.RepositoriesTab;
 import org.sonatype.nexus.mock.pages.RepositoriesEditTabs.RepoKind;
 import org.sonatype.nexus.mock.rest.MockHelper;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
-import org.sonatype.nexus.selenium.nexus1815.LoginTest;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
+@Component( role = Nexus2145RepositoryTest.class )
 public class Nexus2145RepositoryTest
     extends SeleniumTest
 {
@@ -43,7 +51,11 @@ public class Nexus2145RepositoryTest
 
     private static final String EXPIRE_CACHE_URI = "/data_cache/{domain}/{target}/content";
 
+    @Requirement
     private Nexus nexus;
+
+    @Requirement
+    private RepositoryRegistry config;
 
     private M2Repository proxyRepo;
 
@@ -53,20 +65,19 @@ public class Nexus2145RepositoryTest
     public void errorMessagesHosted()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         RepositoriesConfigurationForm newHosted = main.openRepositories().addHostedRepo().save();
 
-        Assert.assertTrue( "Task type is a required field",
-                           newHosted.getIdField().hasErrorText( "This field is required" ) );
-        Assert.assertTrue( "Name is a required field", newHosted.getName().hasErrorText( "This field is required" ) );
+        assertTrue( "Task type is a required field", newHosted.getIdField().hasErrorText( "This field is required" ) );
+        assertTrue( "Name is a required field", newHosted.getName().hasErrorText( "This field is required" ) );
     }
 
     @Test
     public void crudHosted()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         // Create
         RepositoriesTab repositories = main.openRepositories();
@@ -111,7 +122,7 @@ public class Nexus2145RepositoryTest
     public void crudVirtual()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         // Create
         RepositoriesTab repositories = main.openRepositories();
@@ -158,7 +169,7 @@ public class Nexus2145RepositoryTest
     public void crudProxy()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         // Create
         RepositoriesTab repositories = main.openRepositories();
@@ -200,11 +211,10 @@ public class Nexus2145RepositoryTest
         Assert.assertFalse( repositories.contains( repoId ) );
     }
 
-    @Before
+    @BeforeClass
     public void createRepo()
         throws Exception
     {
-        nexus = lookup( Nexus.class );
         CRepository cRepo = new CRepository();
         cRepo.setId( "nexus2145" );
         cRepo.setName( "nexus2145" );
@@ -259,7 +269,7 @@ public class Nexus2145RepositoryTest
         hostedRepo = (M2Repository) nexus.createRepository( cRepo );
     }
 
-    @After
+    @AfterClass
     public void deleteRepo()
         throws Exception
     {
@@ -267,18 +277,17 @@ public class Nexus2145RepositoryTest
         nexus.deleteRepository( hostedRepo.getId() );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
-    public void contextMenu()
-        throws InterruptedException
+    public void contextMenuExpireCache()
+        throws InterruptedException, NoSuchRepositoryException
     {
-        LoginTest.doLogin( main );
 
-        RepositoriesTab repositories = main.openRepositories();
+        RepositoriesTab repositories = startContextMenuTest();
 
         // expire cache
         MockHelper.expect( EXPIRE_CACHE_URI, new MockResponse( Status.SUCCESS_OK, new NFCResourceResponse() ) );
         repositories.contextMenuExpireCache( hostedRepo.getId() );
+        new Window( selenium ).waitFor();
 
         MockHelper.checkExecutions();
         MockHelper.clearMocks();
@@ -289,10 +298,31 @@ public class Nexus2145RepositoryTest
 
         MockHelper.checkExecutions();
         MockHelper.clearMocks();
+    }
+
+    private RepositoriesTab startContextMenuTest()
+        throws NoSuchRepositoryException
+    {
+        assertThat( config.getRepository( hostedRepo.getId() ), CoreMatchers.notNullValue() );
+        assertThat( config.getRepository( proxyRepo.getId() ), CoreMatchers.notNullValue() );
+
+        doLogin();
+
+        RepositoriesTab repositories = main.openRepositories();
+        return repositories;
+    }
+
+    @Test
+    public void contextMenuRebuildMetadata()
+        throws InterruptedException, NoSuchRepositoryException
+    {
+
+        RepositoriesTab repositories = startContextMenuTest();
 
         // rebuild metadata
         MockHelper.expect( REBUILD_URI, new MockResponse( Status.SUCCESS_OK, null ) );
         repositories.contextMenuRebuildMetadata( hostedRepo.getId() );
+        new Window( selenium ).waitFor();
 
         MockHelper.checkExecutions();
         MockHelper.clearMocks();
@@ -303,10 +333,19 @@ public class Nexus2145RepositoryTest
 
         MockHelper.checkExecutions();
         MockHelper.clearMocks();
+    }
+
+    @Test
+    public void contextMenuIndex()
+        throws InterruptedException, NoSuchRepositoryException
+    {
+
+        RepositoriesTab repositories = startContextMenuTest();
 
         // reindex
         MockHelper.expect( REINDEX_URI, new MockResponse( Status.SUCCESS_OK, null ) );
         repositories.contextMenuReindex( hostedRepo.getId() );
+        new Window( selenium ).waitFor();
 
         MockHelper.checkExecutions();
         MockHelper.clearMocks();
@@ -321,6 +360,7 @@ public class Nexus2145RepositoryTest
         // incremental reindex
         MockHelper.expect( INCREMENTAL_REINDEX_URI, new MockResponse( Status.SUCCESS_OK, null ) );
         repositories.contextMenuIncrementalReindex( hostedRepo.getId() );
+        new Window( selenium ).waitFor();
 
         MockHelper.checkExecutions();
         MockHelper.clearMocks();
@@ -331,6 +371,14 @@ public class Nexus2145RepositoryTest
 
         MockHelper.checkExecutions();
         MockHelper.clearMocks();
+    }
+
+    @Test
+    public void contextMenuOutofService()
+        throws InterruptedException, NoSuchRepositoryException
+    {
+
+        RepositoriesTab repositories = startContextMenuTest();
 
         // put out of service
         MockHelper.expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
@@ -342,13 +390,14 @@ public class Nexus2145RepositoryTest
 
         MockHelper.listen( "/repositories/{repositoryId}/status", new MockListener() );
         repositories.contextMenuPutOutOfService( hostedRepo.getId() );
+        new Window( selenium ).waitFor();
 
         MockHelper.checkExecutions();
         MockHelper.clearMocks();
         // check on server
-        Assert.assertThat( hostedRepo.getLocalStatus(), equalTo( LocalStatus.OUT_OF_SERVICE ) );
+        assertThat( hostedRepo.getLocalStatus(), equalTo( LocalStatus.OUT_OF_SERVICE ) );
         // check on UI
-        Assert.assertThat( repositories.getStatus( hostedRepo.getId() ), equalTo( "Out of Service" ) );
+        assertThat( repositories.getStatus( hostedRepo.getId() ), equalTo( "Out of Service" ) );
 
         // back to service
         MockHelper.expect( "/repositories/{repositoryId}/status", new MockResponse( Status.CLIENT_ERROR_BAD_REQUEST,
@@ -361,15 +410,25 @@ public class Nexus2145RepositoryTest
 
         MockHelper.listen( "/repositories/{repositoryId}/status", new MockListener() );
         repositories.contextMenuPutInService( hostedRepo.getId() );
+        new Window( selenium ).waitFor();
 
         MockHelper.checkExecutions();
         MockHelper.clearMocks();
         // check on server
-        Assert.assertThat( hostedRepo.getLocalStatus(), equalTo( LocalStatus.IN_SERVICE ) );
+        assertThat( hostedRepo.getLocalStatus(), equalTo( LocalStatus.IN_SERVICE ) );
         // check on UI
-        Assert.assertThat( repositories.getStatus( hostedRepo.getId() ), equalTo( "In Service" ) );
+        assertThat( repositories.getStatus( hostedRepo.getId() ), equalTo( "In Service" ) );
+    }
 
-        // put out of service
+    @SuppressWarnings( "unchecked" )
+    @Test
+    public void contextMenuBlockProxy()
+        throws InterruptedException, NoSuchRepositoryException
+    {
+
+        RepositoriesTab repositories = startContextMenuTest();
+
+        // block proxy
         MockHelper.expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
         repositories.contextMenuBlockProxy( proxyRepo.getId() );
         new MessageBox( selenium ).clickOk();
@@ -379,17 +438,18 @@ public class Nexus2145RepositoryTest
 
         MockHelper.listen( "/repositories/{repositoryId}/status", new MockListener() );
         repositories.contextMenuBlockProxy( proxyRepo.getId() );
+        new Window( selenium ).waitFor();
 
         MockHelper.checkExecutions();
         MockHelper.clearMocks();
         // check on server
-        Assert.assertThat( proxyRepo.getProxyMode(), equalTo( ProxyMode.BLOCKED_MANUAL ) );
+        assertThat( proxyRepo.getProxyMode(), equalTo( ProxyMode.BLOCKED_MANUAL ) );
         // check on UI
-        Assert.assertThat( repositories.getStatus( proxyRepo.getId() ),
-                           anyOf( equalTo( "In Service - Remote Manually Blocked and Available" ),
-                                  equalTo( "In Service - Remote Manually Blocked and Unavailable" ) ) );
+        assertThat( repositories.getStatus( proxyRepo.getId() ),
+                    anyOf( equalTo( "In Service - Remote Manually Blocked and Available" ),
+                           equalTo( "In Service - Remote Manually Blocked and Unavailable" ) ) );
 
-        // back to service
+        // allow proxy
         MockHelper.expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
         repositories.contextMenuAllowProxy( proxyRepo.getId() );
         new MessageBox( selenium ).clickOk();
@@ -399,13 +459,14 @@ public class Nexus2145RepositoryTest
 
         MockHelper.listen( "/repositories/{repositoryId}/status", new MockListener() );
         repositories.contextMenuAllowProxy( proxyRepo.getId() );
+        new Window( selenium ).waitFor();
 
         MockHelper.checkExecutions();
         MockHelper.clearMocks();
         // check on server
-        Assert.assertThat( proxyRepo.getProxyMode(), equalTo( ProxyMode.ALLOW ) );
+        assertThat( proxyRepo.getProxyMode(), equalTo( ProxyMode.ALLOW ) );
         // check on UI
-        Assert.assertThat( repositories.getStatus( proxyRepo.getId() ),
-                           anyOf( equalTo( "In Service" ), equalTo( "In Service - <I>checking remote...</I>" ) ) );
+        assertThat( repositories.getStatus( proxyRepo.getId() ),
+                    anyOf( equalTo( "In Service" ), equalTo( "In Service - <I>checking remote...</I>" ) ) );
     }
 }

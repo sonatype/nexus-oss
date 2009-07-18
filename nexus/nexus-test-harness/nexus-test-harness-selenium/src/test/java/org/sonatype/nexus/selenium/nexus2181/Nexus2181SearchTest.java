@@ -1,11 +1,13 @@
 package org.sonatype.nexus.selenium.nexus2181;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.ArtifactInformationPanel;
 import org.sonatype.nexus.mock.pages.SearchTab;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
+@Component( role = Nexus2181SearchTest.class )
 public class Nexus2181SearchTest
     extends SeleniumTest
 {

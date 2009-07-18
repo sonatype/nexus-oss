@@ -1,7 +1,6 @@
 package org.sonatype.nexus.mock;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -10,6 +9,7 @@ import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
+import org.sonatype.nexus.mock.util.ContainerUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 public class TestContext
@@ -75,7 +75,7 @@ public class TestContext
             f.mkdirs();
         }
 
-        Map<Object, Object> context = new HashMap<Object, Object>();
+        Map<Object, Object> context = ContainerUtil.createContainerContext();
         context.put( "plexus.home", f.getAbsolutePath() );
         context.putAll( TestProperties.getAll() );
 
@@ -83,15 +83,14 @@ public class TestContext
         // Configuration
         // ----------------------------------------------------------------------------
 
-        ContainerConfiguration containerConfiguration =
-            new DefaultContainerConfiguration().setName( "test" ).setContext( context );
-
-        containerConfiguration.setContainerConfigurationURL( TestContext.class.getClassLoader().getResource(
-                                                                                                             "PlexusTestContainerConfig.xml" ) );
+        ContainerConfiguration cc = new DefaultContainerConfiguration();
+        cc.setContainerConfigurationURL( Class.class.getResource( "/plexus/plexus.xml" ) );
+        cc.setContext( context );
+        cc.addComponentDiscoveryListener( new InhibitingComponentDiscovererListener() );
 
         try
         {
-            return new DefaultPlexusContainer( containerConfiguration );
+            return new DefaultPlexusContainer( cc );
         }
         catch ( PlexusContainerException e )
         {
@@ -102,7 +101,7 @@ public class TestContext
     @Deprecated
     public static File getTestFile( String relativePath )
     {
-        return getFile(relativePath);
+        return getFile( relativePath );
     }
 
     public static File getFile( String relativePath )

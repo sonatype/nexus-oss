@@ -1,9 +1,8 @@
 package org.sonatype.nexus.selenium.nexus1815;
 
-import static org.junit.Assert.assertEquals;
-import junit.framework.AssertionFailedError;
+import static org.testng.AssertJUnit.assertEquals;
 
-import org.junit.Test;
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Status;
 import org.sonatype.nexus.mock.MockResponse;
 import org.sonatype.nexus.mock.SeleniumTest;
@@ -12,25 +11,34 @@ import org.sonatype.nexus.mock.pages.ChangePasswordWindow;
 import org.sonatype.nexus.mock.pages.PasswordChangedWindow;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.security.rest.model.UserChangePasswordRequest;
+import org.testng.annotations.Test;
 
-public class ChangePasswordTest extends SeleniumTest {
+@Component( role = ChangePasswordTest.class )
+public class ChangePasswordTest
+    extends SeleniumTest
+{
 
     @Test
-    public void changePasswordSuccess() {
-        main.clickLogin().populate(User.ROLE_ADMIN).loginExpectingSuccess();
+    public void changePasswordSuccess()
+    {
+        main.clickLogin().populate( User.ROLE_ADMIN ).loginExpectingSuccess();
 
         ChangePasswordWindow window = main.securityPanel().clickChangePassword();
 
-        MockHelper.expect("/users_changepw", new MockResponse(Status.SUCCESS_NO_CONTENT, null) {
+        MockHelper.expect( "/users_changepw", new MockResponse( Status.SUCCESS_NO_CONTENT, null )
+        {
             @Override
-            public void setPayload(Object payload) throws AssertionFailedError {
+            public void setPayload( Object payload )
+                throws AssertionError
+            {
                 UserChangePasswordRequest r = (UserChangePasswordRequest) payload;
-                assertEquals("password", r.getData().getOldPassword());
-                assertEquals("newPassword", r.getData().getNewPassword());
+                assertEquals( "password", r.getData().getOldPassword() );
+                assertEquals( "newPassword", r.getData().getNewPassword() );
             }
-        });
+        } );
 
-        PasswordChangedWindow passwordChangedWindow = window.populate("password", "newPassword", "newPassword").changePasswordExpectingSuccess();
+        PasswordChangedWindow passwordChangedWindow =
+            window.populate( "password", "newPassword", "newPassword" ).changePasswordExpectingSuccess();
 
         passwordChangedWindow.clickOk();
     }

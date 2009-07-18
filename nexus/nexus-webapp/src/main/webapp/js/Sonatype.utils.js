@@ -659,7 +659,9 @@ Sonatype.utils = {
   },
   
   doLogin: function( activeWindow, username, password ) {
-    activeWindow.getEl().mask("Logging you in...");
+  	if(activeWindow) {
+      activeWindow.getEl().mask("Logging you in...");
+  	}
 
     Sonatype.utils.authToken = Sonatype.utils.base64.encode(username + ':' + password); 
     Ext.Ajax.request({
@@ -670,7 +672,10 @@ Sonatype.utils = {
       headers: {'Authorization' : 'Basic ' + Sonatype.utils.authToken}, //@todo: send HTTP basic auth data
       url: Sonatype.config.repos.urls.login,
       success: function(response, options){
-        activeWindow.getEl().unmask();
+        if(activeWindow) {
+          activeWindow.getEl().unmask();
+        }
+
         if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
           Sonatype.view.loginSuccessfulToken = Sonatype.view.afterLoginToken;
           Sonatype.repoServer.RepoServer.loginWindow.hide();
@@ -683,7 +688,10 @@ Sonatype.utils = {
       failure: function(response, options){
       Sonatype.utils.clearCookie('JSESSIONID');
       Sonatype.utils.authToken = null;
-        activeWindow.getEl().unmask();
+        if(activeWindow) {
+          activeWindow.getEl().unmask();
+        }
+
         if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
           Sonatype.repoServer.RepoServer.loginForm.find('name', 'password')[0].focus(true);
         }

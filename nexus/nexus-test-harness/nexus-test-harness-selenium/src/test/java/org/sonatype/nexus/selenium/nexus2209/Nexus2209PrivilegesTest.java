@@ -1,9 +1,11 @@
 package org.sonatype.nexus.selenium.nexus2209;
 
-import static org.junit.internal.matchers.StringContains.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.codehaus.plexus.component.annotations.Component;
+import org.hamcrest.text.StringContains;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.NexusTestCase;
 import org.sonatype.nexus.mock.SeleniumTest;
@@ -14,7 +16,10 @@ import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
 import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
+@Component( role = Nexus2209PrivilegesTest.class )
 public class Nexus2209PrivilegesTest
     extends SeleniumTest
 {
@@ -81,13 +86,13 @@ public class Nexus2209PrivilegesTest
             privs.refresh();
             String id = ids[i];
 
-            Assert.assertTrue( "id: " + id + " is not present ", privs.getGrid().contains( id ) );
+            assertTrue( "id: " + id + " is not present ", privs.getGrid().contains( id ) );
 
             PrivilegeConfigurationForm priv = privs.select( id );
 
             PrivilegeStatusResource data = result.getData().get( i );
 
-            Assert.assertThat( data.getName(), containsString( name ) );
+            assertThat( data.getName(), StringContains. containsString( name ) );
             NxAssert.valueEqualsTo( priv.getName(), data.getName() );
             NxAssert.valueEqualsTo( priv.getDescription(), description );
         }
@@ -105,7 +110,7 @@ public class Nexus2209PrivilegesTest
 
             privs.refresh();
 
-            Assert.assertFalse( "id: " + id + " is present ", privs.getGrid().contains( id ) );
+            assertFalse( "id: " + id + " is present ", privs.getGrid().contains( id ) );
         }
     }
 
@@ -144,7 +149,7 @@ public class Nexus2209PrivilegesTest
 
             privs.delete().clickYes();
 
-            Assert.assertFalse( "id: " + id + " still present ", privs.getGrid().contains( id ) );
+            assertFalse( "id: " + id + " still present ", privs.getGrid().contains( id ) );
         }
     }
 
@@ -173,7 +178,7 @@ public class Nexus2209PrivilegesTest
 
             privs.delete().clickYes();
 
-            Assert.assertFalse( "id: " + id + " still present ", privs.getGrid().contains( id ) );
+            assertFalse( "id: " + id + " still present ", privs.getGrid().contains( id ) );
         }
 
     }

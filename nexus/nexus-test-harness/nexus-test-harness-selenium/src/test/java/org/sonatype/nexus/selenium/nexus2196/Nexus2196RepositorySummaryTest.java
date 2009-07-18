@@ -1,10 +1,10 @@
 package org.sonatype.nexus.selenium.nexus2196;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.internal.matchers.StringContains.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.text.StringContains.containsString;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Status;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
@@ -16,7 +16,9 @@ import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.rest.model.RepositoryMetaResource;
 import org.sonatype.nexus.rest.model.RepositoryMetaResourceResponse;
 import org.sonatype.nexus.selenium.nexus1815.LoginTest;
+import org.testng.annotations.Test;
 
+@Component( role = Nexus2196RepositorySummaryTest.class )
 public class Nexus2196RepositorySummaryTest
     extends SeleniumTest
 {
@@ -66,7 +68,7 @@ public class Nexus2196RepositorySummaryTest
         throws InterruptedException
     {
         RepositorySummary repo = mockSize( 512 );
-        Assert.assertThat( repo.getRepositoryInformation().getValue(), containsString( "512 Bytes" ) );
+        assertThat( repo.getRepositoryInformation().getValue(), containsString( "512 Bytes" ) );
     }
 
     @Test
@@ -74,7 +76,7 @@ public class Nexus2196RepositorySummaryTest
     throws InterruptedException
     {
         RepositorySummary repo = mockSize( 524288 );
-        Assert.assertThat( repo.getRepositoryInformation().getValue(), containsString( "512 KB" ) );
+        assertThat( repo.getRepositoryInformation().getValue(), containsString( "512 KB" ) );
     }
 
     @Test
@@ -82,7 +84,7 @@ public class Nexus2196RepositorySummaryTest
     throws InterruptedException
     {
         RepositorySummary repo = mockSize( 536870912 );
-        Assert.assertThat( repo.getRepositoryInformation().getValue(), containsString( "512 MB" ) );
+        assertThat( repo.getRepositoryInformation().getValue(), containsString( "512 MB" ) );
     }
 
     @Test
@@ -90,7 +92,7 @@ public class Nexus2196RepositorySummaryTest
     throws InterruptedException
     {
         RepositorySummary repo = mockSize( 549755813888L );
-        Assert.assertThat( repo.getRepositoryInformation().getValue(), containsString( "512 GB" ) );
+        assertThat( repo.getRepositoryInformation().getValue(), containsString( "512 GB" ) );
     }
 
     private RepositorySummary mockSize( long size )
@@ -129,17 +131,17 @@ public class Nexus2196RepositorySummaryTest
     private void validateDistMngt( RepositorySummary repo, RepositoryMetaResource meta )
     {
         String distMgmt = repo.getDistributionManagement().getValue();
-        Assert.assertThat( distMgmt, notNullValue() );
-        Assert.assertThat( distMgmt, containsString( NexusTestCase.nexusBaseURL + "content/repositories/"
+        assertThat( distMgmt, notNullValue() );
+        assertThat( distMgmt, containsString( NexusTestCase.nexusBaseURL + "content/repositories/"
             + meta.getId() ) );
     }
 
     private void validateRepoInfo( RepositorySummary repo, RepositoryMetaResource meta )
     {
         String summary = repo.getRepositoryInformation().getValue();
-        Assert.assertThat( summary, notNullValue() );
-        Assert.assertThat( summary, containsString( meta.getId() ) );
-        Assert.assertThat( summary, containsString( meta.getRepoType() ) );
-        Assert.assertThat( summary, containsString( meta.getFormat() ) );
+        assertThat( summary, notNullValue() );
+        assertThat( summary, containsString( meta.getId() ) );
+        assertThat( summary, containsString( meta.getRepoType() ) );
+        assertThat( summary, containsString( meta.getFormat() ) );
     }
 }

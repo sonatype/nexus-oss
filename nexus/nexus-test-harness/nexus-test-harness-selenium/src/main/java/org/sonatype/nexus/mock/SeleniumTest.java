@@ -6,79 +6,40 @@ import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
 
 import org.apache.commons.codec.binary.Base64;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.runner.Description;
-import org.junit.runner.RunWith;
+import org.sonatype.nexus.mock.models.User;
 import org.sonatype.nexus.mock.pages.MainPage;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
 import org.sonatype.nexus.mock.util.SocketTestWaitCondition;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.spice.jscoverage.JsonReportHandler;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 
 import ch.ethz.ssh2.Connection;
 
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 
-@Ignore
-@RunWith( SeleniumJUnitRunner.class )
 public abstract class SeleniumTest
     extends NexusTestCase
+
 {
-    protected Selenium selenium;
+    protected static Selenium selenium;
 
-    protected MainPage main;
-
-    protected Description description;
+    protected static MainPage main;
 
     private static Connection sshConn;
 
-    private static String getLocalIp()
-        throws SocketException
-    {
-        Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
-        while ( e.hasMoreElements() )
-        {
-            NetworkInterface ni = e.nextElement();
-
-            if ( !ni.getDisplayName().startsWith( "vmnet" ) )
-            {
-                Enumeration<InetAddress> i = ni.getInetAddresses();
-                while ( i.hasMoreElements() )
-                {
-                    InetAddress ia = i.nextElement();
-                    if ( ia instanceof Inet4Address )
-                    {
-                        if ( !ia.getHostAddress().startsWith( "127.0." ) )
-                        {
-                            return ia.getHostAddress();
-                        }
-                    }
-                }
-            }
-        }
-
-        return "localhost";
-    }
-
-    @BeforeClass
-    public static void openTunnel()
+    @BeforeSuite
+    public void openTunnel()
         throws Exception
     {
-        NexusTestCase.startNexus();
-
         if ( !new SocketTestWaitCondition( "localhost", 4444, 250 ).checkCondition( 0 ) )
         {
             if ( sshConn == null )
@@ -145,11 +106,10 @@ public abstract class SeleniumTest
         }
     }
 
-    @Before
+    @BeforeSuite
     public void seleniumSetup()
         throws Exception
     {
-        final String ip = getLocalIp();
         final String seleniumServer = PropUtil.get( "seleniumServer", "localhost" );
         final int seleniumPort = PropUtil.get( "seleniumPort", 4444 );
         final String seleniumBrowser = PropUtil.get( "seleniumBrowser", "*firefox" );
@@ -178,29 +138,26 @@ public abstract class SeleniumTest
         main = new MainPage( selenium );
     }
 
-    @After
+    @BeforeMethod
+    public void loadUrl()
+    {
+        selenium.open( "/nexus" );
+    }
+
+    @AfterMethod( alwaysRun = true )
+    public void logout()
+        throws Exception
+    {
+        main.clickLogout();
+
+        getCoverage();
+    }
+
+    @AfterSuite( alwaysRun = true )
     public void seleniumCleanup()
         throws Exception
     {
-        try
-        {
-            getCoverage();
-        }
-        finally
-        {
-            selenium.stop();
-        }
-    }
-
-    /**
-     * Sets the JUnit description for the currently running test.
-     *
-     * @param description The JUnit description.
-     * @see SeleniumJUnitRunner
-     */
-    public void setDescription( Description description )
-    {
-        this.description = description;
+        selenium.stop();
     }
 
     /**
@@ -210,10 +167,9 @@ public abstract class SeleniumTest
      *
      * @throws java.io.IOException If the screenshot could not be taken.
      */
-    protected void takeScreenshot()
+    public void takeScreenshot()
         throws IOException
     {
-        @SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
         StackTraceElement ste = new Exception().getStackTrace()[1];
         takeScreenshot( "line-" + ste.getLineNumber() );
     }
@@ -226,18 +182,24 @@ public abstract class SeleniumTest
      * @param name A specific name to append to the screenshot file name.
      * @throws IOException If the screenshot could not be taken.
      */
-    protected void takeScreenshot( String name )
-        throws IOException
+    public void takeScreenshot( String name )
     {
         File parent = new File( "target/screenshots/" );
         // noinspection ResultOfMethodCallIgnored
         parent.mkdirs();
 
         String screen = selenium.captureScreenshotToString();
-        FileOutputStream fos =
-            new FileOutputStream( new File( parent, description.getDisplayName() + "-" + name + ".png" ) );
-        fos.write( Base64.decodeBase64( screen.getBytes() ) );
-        fos.close();
+        FileOutputStream fos;
+        try
+        {
+            fos = new FileOutputStream( new File( parent, testId + "-" + name + ".png" ) );
+            fos.write( Base64.decodeBase64( screen.getBytes() ) );
+            fos.close();
+        }
+        catch ( IOException e )
+        {
+            log.error( e.getMessage(), e );
+        }
     }
 
     public void captureNetworkTraffic()
@@ -248,12 +210,12 @@ public abstract class SeleniumTest
             // noinspection ResultOfMethodCallIgnored
             parent.mkdirs();
 
-            FileOutputStream fos = new FileOutputStream( new File( parent, description.getDisplayName() + ".txt" ) );
+            FileOutputStream fos = new FileOutputStream( new File( parent, testId + ".txt" ) );
             fos.write( selenium.captureNetworkTraffic( "TODO" ).getBytes( "UTF-8" ) );
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
+            log.error( e.getMessage(), e );
         }
     }
 
@@ -263,5 +225,15 @@ public abstract class SeleniumTest
         JsonReportHandler handler = lookup( JsonReportHandler.class );
         handler.appendResults( selenium.getEval( "window.jscoverage_serializeCoverageToJSON()" ) );
         handler.persist();
+    }
+
+    protected void doLogin()
+    {
+        doLogin( User.ADMIN.getUsername(), User.ADMIN.getPassword() );
+    }
+
+    protected void doLogin( String username, String password )
+    {
+        selenium.runScript( "window.Sonatype.utils.doLogin( null, '" + username + "', '" + password + "');" );
     }
 }

@@ -1,13 +1,18 @@
 package org.sonatype.nexus.selenium.nexus2195;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
+
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.GroupConfigurationForm;
 import org.sonatype.nexus.mock.pages.RepositoriesTab;
 import org.sonatype.nexus.mock.pages.RepositoriesEditTabs.RepoKind;
 import org.sonatype.nexus.selenium.nexus1815.LoginTest;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
+@Component( role = Nexus2195GroupTest.class )
 public class Nexus2195GroupTest
     extends SeleniumTest
 {
@@ -20,11 +25,11 @@ public class Nexus2195GroupTest
 
         GroupConfigurationForm newGroup = main.openRepositories().addGroup().save();
 
-        Assert.assertTrue( "Task type is a required field",
+        assertTrue( "Task type is a required field",
                            newGroup.getIdField().hasErrorText( "This field is required" ) );
-        Assert.assertTrue( "Name is a required field", newGroup.getName().hasErrorText( "This field is required" ) );
-        Assert.assertTrue( "Name is a required field", newGroup.getProvider().hasErrorText( "This field is required" ) );
-        Assert.assertTrue( "Name is a required field", newGroup.getPublishUrl().hasErrorText( "This field is required" ) );
+        assertTrue( "Name is a required field", newGroup.getName().hasErrorText( "This field is required" ) );
+        assertTrue( "Name is a required field", newGroup.getProvider().hasErrorText( "This field is required" ) );
+        assertTrue( "Name is a required field", newGroup.getPublishUrl().hasErrorText( "This field is required" ) );
     }
 
     @Test
@@ -36,14 +41,14 @@ public class Nexus2195GroupTest
         GroupConfigurationForm newGroup =
             main.openRepositories().addGroup().populate( "seleniumgroupid", "seleniumgroupname", "maven2", false ).save();
 
-        Assert.assertTrue( "Repositories: Select one or more items",
+        assertTrue( "Repositories: Select one or more items",
                            newGroup.getRepositories().hasErrorText( "Select one or more items" ) );
 
         newGroup.getRepositories().add( "thirdparty" );
         newGroup.getRepositories().add( "central" );
         newGroup.getRepositories().add( "releases" );
 
-        Assert.assertFalse( "Error message still there after the problem is fixed",
+        assertFalse( "Error message still there after the problem is fixed",
                            newGroup.getRepositories().hasErrorText( "Select one or more items" ) );
 
     }
