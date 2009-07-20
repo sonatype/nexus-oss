@@ -1,124 +1,119 @@
 package org.sonatype.nexus.mock;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.util.FileUtils;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.webapp.WebAppContext;
-import org.sonatype.nexus.mock.util.ContainerUtil;
+import org.codehaus.plexus.classworlds.launcher.Launcher;
+import org.sonatype.appbooter.PlexusAppBooter;
 
 public class MockNexusEnvironment
 {
-    private Server server;
+    private File bundleRoot;
 
-    private PlexusContainer container;
+    private PlexusAppBooter plexusAppBooter;
 
     public static void main( String[] args )
         throws Exception
     {
-        File webappRoot = new File( "../nexus-webapp/src/main/webapp" );
-        if ( !webappRoot.exists() )
-        {
-            webappRoot = new File( "target/nexus-ui" );
-        }
-
         System.setProperty( "plexus-index.template.file", "templates/index-debug.vm" );
 
-        // create one
-        ContainerConfiguration cc = new DefaultContainerConfiguration();
-        cc.setContainerConfigurationURL( Class.class.getResource( "/plexus/plexus.xml" ) );
-        cc.setContext( ContainerUtil.createContainerContext() );
-        cc.addComponentDiscoveryListener( new InhibitingComponentDiscovererListener() );
+        MockNexusEnvironment e = new MockNexusEnvironment();
 
-        DefaultPlexusContainer plexusContainer = new DefaultPlexusContainer( cc );
-
-        MockNexusEnvironment e = new MockNexusEnvironment( 12345, "/nexus", webappRoot, plexusContainer );
         e.start();
+
+        e.stop();
     }
 
-    public static Server createSimpleJettyServer( int port )
-    {
-        Server server = new Server();
-
-        SelectChannelConnector connector = new SelectChannelConnector();
-
-        connector.setHost( null );
-
-        connector.setPort( port );
-
-        server.addConnector( connector );
-
-        return server;
-    }
-
-    public MockNexusEnvironment( int port, String contextPath, File webappRoot, PlexusContainer container )
+    public MockNexusEnvironment()
         throws Exception
     {
-        this( createSimpleJettyServer( port ), contextPath, webappRoot, container );
+        this( getBundleRoot( new File( "target/nexus-ui" ) ) );
     }
 
-    public MockNexusEnvironment( Server server, String contextPath, File webappRoot, PlexusContainer container )
+    public MockNexusEnvironment( File bundleRoot )
         throws Exception
     {
-        this.server = server;
-        this.container = container;
-
-        addNexus( server, contextPath, webappRoot, container );
-    }
-
-    public Server getServer()
-    {
-        return server;
+        this.bundleRoot = bundleRoot;
     }
 
     public void start()
         throws Exception
     {
-        getServer().start();
+        System.setProperty( "basedir", bundleRoot.getAbsolutePath() );
+
+        System.setProperty( "plexus.appbooter.customizers", "org.sonatype.nexus.NexusBooterCustomizer,"
+            + MockAppBooterCustomizer.class.getName() );
+
+        File classworldsConf = new File( bundleRoot, "conf/classworlds.conf" );
+
+        if ( !classworldsConf.isFile() )
+        {
+            throw new IllegalStateException( "The bundle classworlds.conf file is not found (\""
+                + classworldsConf.getAbsolutePath() + "\")!" );
+        }
+
+        System.setProperty( "classworlds.conf", classworldsConf.getAbsolutePath() );
+
+        // this is non trivial here, since we are running Nexus in _same_ JVM as tests
+        // and the PlexusAppBooterJSWListener (actually theused WrapperManager in it) enforces then Nexus may be
+        // started only once in same JVM!
+        // So, we are _overrriding_ the in-bundle plexus app booter with the simplest one
+        // since we dont need all the bells-and-whistles in Service and JSW
+        // but we are still _reusing_ the whole bundle environment by tricking Classworlds Launcher
+
+        // Launcher trick -- begin
+        Launcher launcher = new Launcher();
+        launcher.setSystemClassLoader( Thread.currentThread().getContextClassLoader() );
+        launcher.configure( new FileInputStream( classworldsConf ) ); // launcher closes stream upon configuration
+        // Launcher trick -- end
+
+        plexusAppBooter = new PlexusAppBooter(); // set the preconfigured world
+
+        plexusAppBooter.setWorld( launcher.getWorld() );
+
+        plexusAppBooter.startContainer();
     }
 
     public void stop()
         throws Exception
     {
-        getServer().stop();
-    }
-
-    public void addNexus( Server server, String contextPath, File webappRoot, PlexusContainer container )
-        throws Exception
-    {
-        // prepare config
-        FileUtils.copyFile( new File( "src/test/resources/nexus-1.xml" ), new File( "target/nexus-work/conf/nexus.xml" ) );
-        FileUtils.copyFile( new File( "src/test/resources/security-1.xml" ),
-                            new File( "target/nexus-work/conf/security.xml" ) );
-
-        // add mock nexus
-        ContextHandlerCollection ctxHandler = new ContextHandlerCollection();
-
-        WebAppContext webapp = new WebAppContext( ctxHandler, webappRoot.getAbsolutePath(), contextPath );
-
-        // spoof in our simplified web.xml
-        webapp.setDescriptor( new File( "target/test-classes/nexus-ui/WEB-INF/web.xml" ).getAbsolutePath() );
-
-        // Put the container for the application into the servlet context
-
-        webapp.setAttribute( PlexusConstants.PLEXUS_KEY, container );
-
-        webapp.setClassLoader( container.getContainerRealm() );
-
-        ctxHandler.mapContexts();
-
-        getServer().addHandler( ctxHandler );
+        getPlexusAppBooter().stopContainer();
     }
 
     public PlexusContainer getPlexusContainer()
     {
-        return container;
+        return getPlexusAppBooter().getContainer();
+    }
+
+    public PlexusAppBooter getPlexusAppBooter()
+    {
+        return plexusAppBooter;
+    }
+
+    // ==
+
+    public static File getBundleRoot( File unpackDir )
+        throws IOException
+    {
+        return new File( unpackDir, "nexus-webapp-" + getTestNexusVersion() );
+    }
+
+    public static String getTestNexusVersion()
+        throws IOException
+    {
+        Properties props = new Properties();
+
+        InputStream is = Class.class.getResourceAsStream( "/nexus-info.properties" );
+
+        if ( is != null )
+        {
+            props.load( is );
+        }
+
+        return props.getProperty( "nexus.version" );
     }
 }

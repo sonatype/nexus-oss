@@ -1,12 +1,7 @@
 package org.sonatype.nexus.mock;
 
-import java.io.File;
-
 import junit.framework.TestCase;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
 import org.restlet.Application;
 import org.restlet.Client;
 import org.restlet.data.Protocol;
@@ -14,7 +9,6 @@ import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.mock.rest.MockHelper;
-import org.sonatype.nexus.mock.util.ContainerUtil;
 import org.sonatype.nexus.rest.NexusApplication;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
@@ -35,16 +29,7 @@ public class SimpleTest
 
         super.setUp();
 
-
-            // create one
-            ContainerConfiguration cc = new DefaultContainerConfiguration();
-            cc.setContainerConfigurationURL( Class.class.getResource( "/plexus/plexus.xml" ) );
-            cc.setContext( ContainerUtil.createContainerContext() );
-            cc.addComponentDiscoveryListener( new InhibitingComponentDiscovererListener() );
-
-            DefaultPlexusContainer plexusContainer = new DefaultPlexusContainer( cc );
-
-        mockNexusEnvironment = new MockNexusEnvironment( 12345, "/nexus", new File( "target/nexus-ui" ), plexusContainer );
+        mockNexusEnvironment = new MockNexusEnvironment();
 
         mockNexusEnvironment.start();
     }
@@ -60,7 +45,7 @@ public class SimpleTest
 
     /**
      * Here, we don't mock anything, we are relying on _real_ response from real Nexus
-     *
+     * 
      * @throws Exception
      */
     public void testStatusFine()
@@ -68,14 +53,14 @@ public class SimpleTest
     {
         Client client = new Client( Protocol.HTTP );
 
-        Response response = client.get( new Reference( "http://localhost:12345/nexus/service/local/status" ) );
+        Response response = client.get( new Reference( "http://localhost:8081/nexus/service/local/status" ) );
 
-        assertEquals( 200, response.getStatus().getCode() );
+        assertEquals( "We just started Nexus withount any tampering", 200, response.getStatus().getCode() );
     }
 
     /**
      * We mock the status resource to be unavailable.
-     *
+     * 
      * @throws Exception
      */
     public void testStatusUnavailable()
@@ -85,14 +70,15 @@ public class SimpleTest
 
         Client client = new Client( Protocol.HTTP );
 
-        Response response = client.get( new Reference( "http://localhost:12345/nexus/service/local/status" ) );
+        Response response = client.get( new Reference( "http://localhost:8081/nexus/service/local/status" ) );
 
-        assertEquals( Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(), response.getStatus().getCode() );
+        assertEquals( "The status resource should be mocked", Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+                      response.getStatus().getCode() );
     }
 
     /**
      * We mock status response.
-     *
+     * 
      * @throws Exception
      */
     public void testStatusCustomContent()
@@ -102,7 +88,7 @@ public class SimpleTest
 
         StatusResource data = new StatusResource();
 
-        data.setVersion( "DUMMY" );
+        data.setVersion( MockNexusEnvironment.getTestNexusVersion() );
 
         mockResponse.setData( data );
 
@@ -110,7 +96,7 @@ public class SimpleTest
 
         Client client = new Client( Protocol.HTTP );
 
-        Response response = client.get( new Reference( "http://localhost:12345/nexus/service/local/status" ) );
+        Response response = client.get( new Reference( "http://localhost:8081/nexus/service/local/status" ) );
 
         assertEquals( 200, response.getStatus().getCode() );
 
@@ -122,7 +108,8 @@ public class SimpleTest
         StatusResourceResponse responseUnmarshalled =
             (StatusResourceResponse) xmlXstream.fromXML( response.getEntity().getText(), new StatusResourceResponse() );
 
-        assertEquals( mockResponse.getData().getVersion(), responseUnmarshalled.getData().getVersion() );
+        assertEquals( "Versions should match", mockResponse.getData().getVersion(), responseUnmarshalled.getData()
+            .getVersion() );
     }
 
 }
