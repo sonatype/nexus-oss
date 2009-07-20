@@ -1,14 +1,57 @@
 package org.sonatype.nexus.testng;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.Map;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.sonatype.nexus.mock.TestContext;
+import org.sonatype.nexus.mock.InhibitingComponentDiscovererListener;
+import org.sonatype.nexus.mock.util.ContainerUtil;
+import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.IObjectFactory;
 
 public class PlexusObjectFactory
     implements IObjectFactory
 {
+
+    private static final PlexusContainer container = setupContainer();
+
+    private static synchronized PlexusContainer setupContainer()
+    {
+        File f = new File( "target/plexus-home" );
+
+        if ( !f.isDirectory() )
+        {
+            f.mkdirs();
+        }
+
+        Map<Object, Object> context = ContainerUtil.createContainerContext();
+        context.put( "plexus.home", f.getAbsolutePath() );
+        context.putAll( TestProperties.getAll() );
+
+        // ----------------------------------------------------------------------------
+        // Configuration
+        // ----------------------------------------------------------------------------
+
+        ContainerConfiguration cc = new DefaultContainerConfiguration();
+        cc.setContainerConfigurationURL( Class.class.getResource( "/plexus/plexus.xml" ) );
+        cc.setContext( context );
+        cc.addComponentDiscoveryListener( new InhibitingComponentDiscovererListener() );
+
+        try
+        {
+            return new DefaultPlexusContainer( cc );
+        }
+        catch ( PlexusContainerException e )
+        {
+            throw new RuntimeException( "Failed to create plexus container: " + e.getMessage(), e );
+        }
+    }
 
     private static final long serialVersionUID = -45456541236971L;
 
@@ -26,11 +69,11 @@ public class PlexusObjectFactory
         {
             if ( hint != null )
             {
-                return TestContext.getContainer().lookup( role, hint );
+                return container.lookup( role, hint );
             }
             else
             {
-                return TestContext.getContainer().lookup( role );
+                return container.lookup( role );
             }
         }
         catch ( ComponentLookupException e )
