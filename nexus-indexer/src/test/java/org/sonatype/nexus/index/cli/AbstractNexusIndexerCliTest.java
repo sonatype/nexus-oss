@@ -23,6 +23,8 @@ public abstract class AbstractNexusIndexerCliTest
 
     private static final String INDEX_DIR = new File( getBasedir(), "target/clitest/index" ).getAbsolutePath();
 
+    private static final String UNPACK_DIR = new File( getBasedir(), "target/clitest/unpack" ).getAbsolutePath();
+
     private static final String TEST_REPO = new File( getBasedir(), "src/test/repo" ).getAbsolutePath();
 
     protected OutputStream out;
@@ -58,6 +60,7 @@ public abstract class AbstractNexusIndexerCliTest
 
         FileUtils.deleteDirectory( INDEX_DIR );
         FileUtils.deleteDirectory( DEST_DIR );
+        FileUtils.deleteDirectory( UNPACK_DIR );
 
     }
 
@@ -84,6 +87,18 @@ public abstract class AbstractNexusIndexerCliTest
         String output = out.toString();
         assertEquals( output, 0, code );
         assertIndexFiles();
+    }
+
+    public void testUnpack()
+        throws Exception
+    {
+        // first create an index, in the destination dir
+        execute( "--repository", TEST_REPO, "--index", INDEX_DIR, "-d", DEST_DIR );
+        // then unpack it
+        int code = execute( "--unpack", "--index", DEST_DIR, "-d", UNPACK_DIR );
+        String output = out.toString();
+        assertEquals( output, 0, code );
+        assertIndexFiles( UNPACK_DIR );
     }
 
     public void testMissingArgs()
@@ -169,6 +184,12 @@ public abstract class AbstractNexusIndexerCliTest
     private void assertIndexFiles()
         throws Exception
     {
+        assertIndexFiles( INDEX_DIR );
+    }
+
+    private void assertIndexFiles( final String indexDir )
+        throws Exception
+    {
         IndexingContext context = null;
         try
         {
@@ -176,10 +197,10 @@ public abstract class AbstractNexusIndexerCliTest
 
             NexusIndexer indexer = lookup( NexusIndexer.class );
             context =
-                indexer.addIndexingContext( "index", "index", new File( TEST_REPO ), new File( INDEX_DIR ), null, null,
+                indexer.addIndexingContext( "index", "index", new File( TEST_REPO ), new File( indexDir ), null, null,
                                             indexCreators );
 
-            assertFalse( "No index file was generated", new File( INDEX_DIR ).list().length == 0 );
+            assertFalse( "No index file was generated", new File( indexDir ).list().length == 0 );
 
             Query query = indexer.constructQuery( ArtifactInfo.GROUP_ID, "ch.marcus-schulte.maven" );
 

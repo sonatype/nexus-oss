@@ -2,7 +2,6 @@ package org.sonatype.nexus.index.cli;
 
 import java.io.File;
 import java.io.IOException;
-
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
@@ -12,8 +11,6 @@ public class NexusIndexerCliIT
     extends AbstractNexusIndexerCliTest
 {
 
-    private Commandline cmd;
-
     private StreamConsumer sout;
 
     @Override
@@ -21,12 +18,6 @@ public class NexusIndexerCliIT
         throws Exception
     {
         super.setUp();
-
-        cmd = new Commandline();
-        cmd.setExecutable( "java" );
-        cmd.setWorkingDirectory( new File( "." ).getCanonicalFile() );
-        cmd.createArg().setValue( "-jar" );
-        cmd.createArg().setValue( new File( System.getProperty( "indexerJar" ) ).getCanonicalPath() );
 
         sout = new StreamConsumer()
         {
@@ -37,7 +28,7 @@ public class NexusIndexerCliIT
                     out.write( line.getBytes() );
                     out.write( "\n".getBytes() );
                 }
-                catch ( IOException e )
+                catch( IOException e )
                 {
                     throw new RuntimeException( e.getMessage(), e );
                 }
@@ -45,10 +36,28 @@ public class NexusIndexerCliIT
         };
     }
 
+    private Commandline createCommandLine()
+    {
+        try
+        {
+            Commandline cmd = new Commandline();
+            cmd.setExecutable( "java" );
+            cmd.setWorkingDirectory( new File( "." ).getCanonicalFile() );
+            cmd.createArg().setValue( "-jar" );
+            cmd.createArg().setValue( new File( System.getProperty( "indexerJar" ) ).getCanonicalPath() );
+            return cmd;
+        }
+        catch( IOException e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
     @Override
     protected int execute( String... args )
     {
-        for ( String arg : args )
+        Commandline cmd = createCommandLine();
+        for( String arg : args )
         {
             cmd.createArg().setValue( arg );
         }
@@ -56,7 +65,7 @@ public class NexusIndexerCliIT
         {
             return CommandLineUtils.executeCommandLine( cmd, sout, sout );
         }
-        catch ( CommandLineException e )
+        catch( CommandLineException e )
         {
             return -1;
         }
