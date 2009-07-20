@@ -471,6 +471,13 @@
         <type>jar</type>
         <scope>compile</scope>
       </dependency>
+      <dependency>
+        <groupId>eu.medsea.mimeutil</groupId>
+        <artifactId>mime-util</artifactId>
+        <version>2.1.2</version>
+        <type>jar</type>
+        <scope>compile</scope>
+      </dependency>
 
       <dependency>
         <groupId>org.sonatype.spice</groupId>
