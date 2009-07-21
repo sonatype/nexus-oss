@@ -10,55 +10,77 @@ import org.sonatype.nexus.mock.util.ThreadUtils;
 
 import com.thoughtworks.selenium.Selenium;
 
-public class LoginWindow extends Window {
+public class LoginWindow
+    extends Window
+{
     private TextField username;
+
     private TextField password;
+
     private Button loginButton;
+
     private MainPage mainPage;
 
-    public LoginWindow(Selenium selenium, MainPage mainPage) {
-        super(selenium, "window.Ext.getCmp('login-window')");
+    public LoginWindow( Selenium selenium, MainPage mainPage )
+    {
+        super( selenium, "window.Ext.getCmp('login-window')" );
         this.mainPage = mainPage;
 
-        username = new TextField(selenium, "window.Ext.getCmp('usernamefield')");
-        password = new TextField(selenium, "window.Ext.getCmp('passwordfield')");
-        loginButton = new Button(selenium, "window.Ext.getCmp('loginbutton')");
+        username = new TextField( selenium, "window.Ext.getCmp('usernamefield')" );
+        password = new TextField( selenium, "window.Ext.getCmp('passwordfield')" );
+        loginButton = new Button( selenium, "window.Ext.getCmp('loginbutton')" );
     }
 
-    public LoginWindow populate(User user) {
-        this.username.type(user.getUsername());
-        this.password.type(user.getPassword());
+    public LoginWindow populate( User user )
+    {
+        this.username.type( user.getUsername() );
+        this.password.type( user.getPassword() );
 
         return this;
     }
 
-    public LoginWindow login() {
+    public LoginWindow populate( String username, String password )
+    {
+        this.username.type( username );
+        this.password.type( password );
+
+        return this;
+    }
+
+    public LoginWindow login()
+    {
         loginButton.click();
 
         return this;
     }
 
-    public TextField getUsername() {
+    public TextField getUsername()
+    {
         return username;
     }
 
-    public TextField getPassword() {
+    public TextField getPassword()
+    {
         return password;
     }
 
-    public Button getLoginButton() {
+    public Button getLoginButton()
+    {
         return loginButton;
     }
 
-    public void loginExpectingSuccess() {
+    public void loginExpectingSuccess()
+    {
         login();
         waitForHidden();
 
         // wait for the login-link to change
-        ThreadUtils.waitFor(new ThreadUtils.WaitCondition() {
-            public boolean checkCondition(long elapsedTimeInMs) {
+        ThreadUtils.waitFor( new ThreadUtils.WaitCondition()
+        {
+            public boolean checkCondition( long elapsedTimeInMs )
+            {
                 return !mainPage.loginLinkAvailable();
             }
-        }, TimeUnit.SECONDS, 15);
+        }, TimeUnit.SECONDS, 15 );
     }
 }

@@ -97,4 +97,11 @@ public class MockHelper
         mockResponses.clear();
         mockListeneres.clear();
     }
+
+    public static void checkAndClean()
+    {
+        checkExecutions();
+        checkAssertions();
+        clearMocks();
+    }
 }

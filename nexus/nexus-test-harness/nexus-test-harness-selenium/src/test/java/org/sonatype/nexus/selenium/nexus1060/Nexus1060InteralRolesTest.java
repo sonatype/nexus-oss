@@ -1,11 +1,11 @@
 package org.sonatype.nexus.selenium.nexus1060;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.RolesConfigurationForm;
 import org.sonatype.nexus.mock.pages.RolesTab;
 import org.sonatype.nexus.selenium.nexus1815.LoginTest;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1060InteralRolesTest
     extends SeleniumTest
@@ -15,11 +15,11 @@ public class Nexus1060InteralRolesTest
         throws InterruptedException
     {
         LoginTest.doLogin( main );
-        
+
         RolesTab roles = main.openRoles();
-        
+
         RolesConfigurationForm role = roles.select( "anonymous" ).selectConfiguration();
-        
+
         Assert.assertTrue( role.getRoleId().isDisabled() );
         Assert.assertTrue( role.getName().isDisabled() );
         Assert.assertTrue( role.getDescription().isDisabled() );

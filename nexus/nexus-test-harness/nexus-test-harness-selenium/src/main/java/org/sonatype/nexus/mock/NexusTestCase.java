@@ -25,6 +25,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.sonatype.appbooter.PlexusAppBooter;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
@@ -61,6 +62,7 @@ public abstract class NexusTestCase
         {
             File webappRoot;
             String pathname = PropUtil.get( "webappRoot", null );
+            File root = new File( TestProperties.getString( "nexus.base.dir" ) );
             if ( pathname != null )
             {
                 webappRoot = new File( pathname ).getAbsoluteFile();
@@ -70,15 +72,14 @@ public abstract class NexusTestCase
                 webappRoot = new File( "../nexus-webapp/src/main/webapp" );
                 if ( !webappRoot.exists() )
                 {
-                    webappRoot = new File( TestProperties.getString( "nexus.base.dir" ), "runtime/apps/nexus/webapp" );
+                    webappRoot = new File( root, "runtime/apps/nexus/webapp" );
                 }
             }
 
             nexusBaseURL = TestProperties.getString( "nexus.base.url" );
 
-            int port = TestProperties.getInteger( "nexus.application.port" );
-            env = new MockNexusEnvironment( port, "/nexus", webappRoot, container );
-            env.start();
+            env = new MockNexusEnvironment( (PlexusAppBooter) container.getContext().get( "plexus.app.booter" ) );
+            //Don't do this env.start();
 
             Runtime.getRuntime().addShutdownHook( new Thread( new Runnable()
             {
@@ -196,41 +197,39 @@ public abstract class NexusTestCase
                 {
                     if ( artifactSha1.exists() )
                     {
-                        deployWithWagon( TestContext.getContainer(), "http", deployUrl, artifactSha1,
+                        deployWithWagon( container, "http", deployUrl, artifactSha1,
                                          GavUtil.getRelitiveArtifactPath( gav ) + ".sha1" );
                     }
                     if ( artifactMd5.exists() )
                     {
-                        deployWithWagon( TestContext.getContainer(), "http", deployUrl, artifactMd5,
+                        deployWithWagon( container, "http", deployUrl, artifactMd5,
                                          GavUtil.getRelitiveArtifactPath( gav ) + ".md5" );
                     }
                     if ( artifactAsc.exists() )
                     {
-                        deployWithWagon( TestContext.getContainer(), "http", deployUrl, artifactAsc,
+                        deployWithWagon( container, "http", deployUrl, artifactAsc,
                                          GavUtil.getRelitiveArtifactPath( gav ) + ".asc" );
                     }
 
-                    deployWithWagon( TestContext.getContainer(), "http", deployUrl, artifactFile,
-                                     GavUtil.getRelitiveArtifactPath( gav ) );
+                    deployWithWagon( container, "http", deployUrl, artifactFile, GavUtil.getRelitiveArtifactPath( gav ) );
 
                     if ( pomSha1.exists() )
                     {
-                        deployWithWagon( TestContext.getContainer(), "http", deployUrl, pomSha1,
-                                         GavUtil.getRelitivePomPath( gav ) + ".sha1" );
+                        deployWithWagon( container, "http", deployUrl, pomSha1, GavUtil.getRelitivePomPath( gav )
+                            + ".sha1" );
                     }
                     if ( pomMd5.exists() )
                     {
-                        deployWithWagon( TestContext.getContainer(), "http", deployUrl, pomMd5,
-                                         GavUtil.getRelitivePomPath( gav ) + ".md5" );
+                        deployWithWagon( container, "http", deployUrl, pomMd5, GavUtil.getRelitivePomPath( gav )
+                            + ".md5" );
                     }
                     if ( pomAsc.exists() )
                     {
-                        deployWithWagon( TestContext.getContainer(), "http", deployUrl, pomAsc,
-                                         GavUtil.getRelitivePomPath( gav ) + ".asc" );
+                        deployWithWagon( container, "http", deployUrl, pomAsc, GavUtil.getRelitivePomPath( gav )
+                            + ".asc" );
                     }
 
-                    deployWithWagon( TestContext.getContainer(), "http", deployUrl, pom,
-                                     GavUtil.getRelitivePomPath( gav ) );
+                    deployWithWagon( container, "http", deployUrl, pom, GavUtil.getRelitivePomPath( gav ) );
                 }
                 catch ( Exception e )
                 {
@@ -246,7 +245,7 @@ public abstract class NexusTestCase
         throws ConnectionException, AuthenticationException, TransferFailedException, ResourceDoesNotExistException,
         AuthorizationException, ComponentLookupException
     {
-        new WagonDeployer( wagonHint, "admin", "password", deployUrl, fileToDeploy, artifactPath ).deploy();
+        new WagonDeployer( wagonHint, "admin", "admin123", deployUrl, fileToDeploy, artifactPath ).deploy();
     }
 
     @BeforeMethod

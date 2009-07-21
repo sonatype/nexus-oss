@@ -39,8 +39,7 @@ public class Nexus2203LogViewTest
 
         logs.selectFile( "nexus.xml" );
         String nexusXmlContent = logs.getContent();
-        assertThat( nexusXmlContent, not( anyOf( nullValue(), equalTo( "" ), equalTo( "null" ),
-                                                        equalTo( content ) ) ) );
+        assertThat( nexusXmlContent, not( anyOf( nullValue(), equalTo( "" ), equalTo( "null" ), equalTo( content ) ) ) );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -75,12 +74,11 @@ public class Nexus2203LogViewTest
         LoginTest.doLogin( main );
 
         LogConfigTab logs = main.openLogsConfig();
-        assertThat( logs.getRootLoggerLevel().getValue(), equalTo( "DEBUG" ) );
-        assertThat( logs.getRootLoggerAppenders().getValue(), equalTo( "eelogfile" ) );
-        assertThat( logs.getFileAppenderPattern().getValue(), anyOf( nullValue(), equalTo( "" ),
-                                                                            equalTo( "null" ) ) );
-        assertThat( logs.getFileAppenderLocation().getValue(), anyOf( nullValue(), equalTo( "" ),
-                                                                             equalTo( "null" ) ) );
+        assertThat( logs.getRootLoggerLevel().getValue(), equalTo( "INFO" ) );
+        assertThat( logs.getRootLoggerAppenders().getValue(), equalTo( "console, logfile, record" ) );
+        assertThat( logs.getFileAppenderPattern().getValue(),
+                    equalTo( "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" ) );
+        assertThat( logs.getFileAppenderLocation().getValue(), anyOf( nullValue(), equalTo( "" ), equalTo( "null" ) ) );
 
         // TODO missing mock
 
