@@ -1,4 +1,5 @@
 /**
+
  * Sonatype Nexus (TM) Open Source Version.
  * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
  * Includes the third-party code listed at http://nexus.sonatype.org/dev/attributions.html
@@ -259,16 +260,8 @@ public class AbstractNexusIntegrationTest
             {
                 public boolean accept( File dir, String name )
                 {
-                    System.out.print( "dirname: " + dir.getAbsolutePath() + ": " );
-
                     // anything but the plugin-repository directory
-                    if ( name.contains( "plugin-repository" ) )
-                    {
-                        System.out.println( "false" );
-                        return false;
-                    }
-                    System.out.println( "true" );
-                    return true;
+                   return ( !name.contains( "plugin-repository" ) );
                 }
             } );
 
