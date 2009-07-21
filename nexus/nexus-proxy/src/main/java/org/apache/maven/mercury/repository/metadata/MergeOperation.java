@@ -1,30 +1,12 @@
-package org.sonatype.nexus.proxy.maven.metadata.mercury;
+package org.apache.maven.mercury.repository.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.mercury.repository.metadata.AddPluginOperation;
-import org.apache.maven.mercury.repository.metadata.AddVersionOperation;
-import org.apache.maven.mercury.repository.metadata.Metadata;
-import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
-import org.apache.maven.mercury.repository.metadata.MetadataException;
-import org.apache.maven.mercury.repository.metadata.MetadataOperand;
-import org.apache.maven.mercury.repository.metadata.MetadataOperation;
-import org.apache.maven.mercury.repository.metadata.Plugin;
-import org.apache.maven.mercury.repository.metadata.PluginOperand;
-import org.apache.maven.mercury.repository.metadata.SetSnapshotOperation;
-import org.apache.maven.mercury.repository.metadata.Snapshot;
-import org.apache.maven.mercury.repository.metadata.SnapshotOperand;
-import org.apache.maven.mercury.repository.metadata.StringOperand;
 import org.codehaus.plexus.lang.DefaultLanguage;
 import org.codehaus.plexus.lang.Language;
 import org.codehaus.plexus.util.StringUtils;
 
-/**
- * Actually it's a fixed version of org.apache.maven.mercury.repository.metadata.MergeOperation
- * 
- * @author juven
- */
 public class MergeOperation
     implements MetadataOperation
 {

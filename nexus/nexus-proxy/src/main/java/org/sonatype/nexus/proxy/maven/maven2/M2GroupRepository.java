@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.maven.mercury.repository.metadata.MergeOperation;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
@@ -45,7 +46,6 @@ import org.sonatype.nexus.proxy.item.StorageCompositeFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
-import org.sonatype.nexus.proxy.maven.metadata.mercury.MergeOperation;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;

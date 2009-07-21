@@ -2,6 +2,7 @@ package org.sonatype.nexus.proxy.maven.metadata.mercury;
 
 import java.util.Arrays;
 
+import org.apache.maven.mercury.repository.metadata.MergeOperation;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataOperand;
 import org.apache.maven.mercury.repository.metadata.Versioning;
