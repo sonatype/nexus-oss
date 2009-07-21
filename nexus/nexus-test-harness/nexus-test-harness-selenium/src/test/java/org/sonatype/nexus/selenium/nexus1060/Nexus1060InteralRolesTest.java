@@ -1,5 +1,6 @@
 package org.sonatype.nexus.selenium.nexus1060;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.RolesConfigurationForm;
 import org.sonatype.nexus.mock.pages.RolesTab;
@@ -7,6 +8,7 @@ import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+@Component( role = Nexus1060InteralRolesTest.class )
 public class Nexus1060InteralRolesTest
     extends SeleniumTest
 {
