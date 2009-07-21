@@ -4,6 +4,7 @@ import org.sonatype.nexus.mock.components.Button;
 import org.sonatype.nexus.mock.components.Combobox;
 import org.sonatype.nexus.mock.components.Component;
 import org.sonatype.nexus.mock.components.TextField;
+import org.sonatype.nexus.mock.components.Window;
 
 import com.thoughtworks.selenium.Selenium;
 
@@ -66,9 +67,13 @@ public class LogConfigTab
         return cancelbutton;
     }
 
-    public void save()
+    public LogConfigTab save()
     {
         savebutton.click();
+
+        new Window( selenium ).waitFor();
+
+        return this;
     }
 
     public void cancel()

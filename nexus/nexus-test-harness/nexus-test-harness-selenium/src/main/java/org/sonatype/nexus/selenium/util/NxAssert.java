@@ -2,6 +2,7 @@ package org.sonatype.nexus.selenium.util;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.AssertJUnit.assertFalse;
@@ -53,6 +54,11 @@ public class NxAssert
     public static void valueEqualsTo( TextField field, String value )
     {
         assertThat( field.getValue(), equalTo( value ) );
+    }
+
+    public static void disabled( TextField field )
+    {
+        assertThat( field.isDisabled(), is( true ) );
     }
 
     public static void contains( TwinPanel twinPanel, String... values )

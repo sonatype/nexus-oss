@@ -30,7 +30,7 @@ public class SimpleTest
     protected void setUp()
         throws Exception
     {
-        MockHelper.getResponseMap().clear();
+        MockHelper.clearMocks();
 
         super.setUp();
 
@@ -39,7 +39,8 @@ public class SimpleTest
         mockNexusEnvironment.start();
     }
 
-    private PlexusAppBooter getAppBooter() throws Exception
+    private PlexusAppBooter getAppBooter()
+        throws Exception
     {
         File bundleRoot = MockNexusEnvironment.getBundleRoot( new File( "target/nexus-ui" ) );
         System.setProperty( "basedir", bundleRoot.getAbsolutePath() );
@@ -109,7 +110,7 @@ public class SimpleTest
     public void testStatusUnavailable()
         throws Exception
     {
-        MockHelper.getResponseMap().put( "/status", new MockResponse( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, null ) );
+        MockHelper.expect( "/status", new MockResponse( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, null ) );
 
         Client client = new Client( Protocol.HTTP );
 
@@ -117,6 +118,8 @@ public class SimpleTest
 
         assertEquals( "The status resource should be mocked", Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
                       response.getStatus().getCode() );
+
+        MockHelper.checkAndClean();
     }
 
     /**
@@ -135,7 +138,7 @@ public class SimpleTest
 
         mockResponse.setData( data );
 
-        MockHelper.getResponseMap().put( "/status", new MockResponse( Status.SUCCESS_OK, mockResponse ) );
+        MockHelper.expect( "/status", new MockResponse( Status.SUCCESS_OK, mockResponse ) );
 
         Client client = new Client( Protocol.HTTP );
 
@@ -153,6 +156,61 @@ public class SimpleTest
 
         assertEquals( "Versions should match", mockResponse.getData().getVersion(),
                       responseUnmarshalled.getData().getVersion() );
+
+        MockHelper.checkAndClean();
     }
 
+    /**
+     * Here, we don't mock anything, we are just listening the _real_ response from real Nexus
+     *
+     * @throws Exception
+     */
+    public void testListenStatusFine()
+        throws Exception
+    {
+
+        MockHelper.listen( "/status", new MockListener() );
+
+        Client client = new Client( Protocol.HTTP );
+
+        Response response = client.get( new Reference( "http://localhost:8081/nexus/service/local/status" ) );
+
+        assertEquals( "We just started Nexus withount any tampering", 200, response.getStatus().getCode() );
+
+        MockHelper.checkAndClean();
+    }
+
+    public void testListenChecker()
+        throws Exception
+    {
+
+        MockHelper.listen( "/status", new MockListener() );
+
+        try
+        {
+            MockHelper.checkAndClean();
+            fail();
+        }
+        catch ( AssertionError e )
+        {
+            // expected
+        }
+    }
+
+    public void testMockChecker()
+        throws Exception
+    {
+
+        MockHelper.expect( "/status", new MockResponse( Status.SUCCESS_OK, null ) );
+
+        try
+        {
+            MockHelper.checkAndClean();
+            fail();
+        }
+        catch ( AssertionError e )
+        {
+            // expected
+        }
+    }
 }

@@ -17,11 +17,6 @@ public class MockHelper
 
     private static HashMap<String, MockListener> mockListeneres = new HashMap<String, MockListener>();;
 
-    public static HashMap<String, MockResponse> getResponseMap()
-    {
-        return mockResponses;
-    }
-
     public static MockResponse getMockContentFor( String uri )
     {
         if ( mockResponses.containsKey( uri ) )
