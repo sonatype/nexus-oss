@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-
   <!-- Parent POM -->
   <parent>
     <groupId>org.sonatype.nexus</groupId>
@@ -91,15 +90,15 @@
       <artifactId>plexus-task-scheduler</artifactId>
     </dependency>
 
-	<!-- these 3 deps are excluded in nexus-api, but is useful -->
-	<dependency>
-	  <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact</artifactId>
-	</dependency>
-	<dependency>
+    <!-- these 3 deps are excluded in nexus-api, but is useful -->
+    <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact-manager</artifactId>	
-	</dependency>
+      <artifactId>maven-artifact</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact-manager</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.security.realms</groupId>
