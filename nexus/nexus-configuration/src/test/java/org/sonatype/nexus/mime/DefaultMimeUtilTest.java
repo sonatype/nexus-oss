@@ -1,33 +1,57 @@
 package org.sonatype.nexus.mime;
 
+import java.io.File;
+import java.util.Collection;
+
 import org.codehaus.plexus.PlexusTestCase;
 
-import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
+import eu.medsea.mimeutil.MimeType;
+import eu.medsea.mimeutil.MimeUtil2;
+import eu.medsea.mimeutil.detector.ExtensionMimeDetector;
 
 public class DefaultMimeUtilTest
     extends PlexusTestCase
 {
-    protected DefaultMimeUtil defaultMimeUtil;
+    protected MimeUtil mimeUtil;
+
+    protected MimeUtil2 medseaMimeUtil;
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
-        defaultMimeUtil = (DefaultMimeUtil) lookup( MimeUtil.class );
-        
-        // this is platform dependant (linux vs win vs mac), so for tests we use extension detector only,
-        // to be sure about 100% same results on all platforms.
-        // defaultMimeUtil.getMimeUtil2().unregisterMimeDetector( MagicMimeMimeDetector.class.getName() );
+        mimeUtil = lookup( MimeUtil.class );
+
+        medseaMimeUtil = new MimeUtil2();
+
+        medseaMimeUtil.registerMimeDetector( ExtensionMimeDetector.class.getName() );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    protected String getMimeType( File file )
+    {
+        Collection<MimeType> mimeTypes = medseaMimeUtil.getMimeTypes( file );
+
+        return MimeUtil2.getMostSpecificMimeType( mimeTypes ).toString();
     }
 
     public void testSimple()
         throws Exception
     {
-        assertEquals( "application/xml", defaultMimeUtil.getMimeType( getTestFile( "pom.xml" ) ) );
-        assertEquals( "application/xml", defaultMimeUtil.getMimeType( getTestFile( "pom.xml" ).toURI().toURL() ) );
+        File testFile = null;
 
-        assertEquals( "text/plain", defaultMimeUtil.getMimeType( getTestFile( "src/test/java/org/sonatype/nexus/mime/DefaultMimeUtilTest.java" ) ) );
-        assertEquals( "application/x-java-class", defaultMimeUtil.getMimeType( getTestFile( "target/test-classes/org/sonatype/nexus/mime/DefaultMimeUtilTest.class" ) ) );
+        testFile = getTestFile( "pom.xml" );
+        assertEquals( getMimeType( testFile ), mimeUtil.getMimeType( testFile ) );
+
+        assertEquals( getMimeType( testFile ), mimeUtil.getMimeType( testFile.toURI().toURL() ) );
+
+        testFile = getTestFile( "src/test/java/org/sonatype/nexus/mime/DefaultMimeUtilTest.java" );
+
+        assertEquals( getMimeType( testFile ), mimeUtil.getMimeType( testFile ) );
+
+        testFile = getTestFile( "target/test-classes/org/sonatype/nexus/mime/DefaultMimeUtilTest.class" );
+
+        assertEquals( getMimeType( testFile ), mimeUtil.getMimeType( testFile ) );
     }
 }

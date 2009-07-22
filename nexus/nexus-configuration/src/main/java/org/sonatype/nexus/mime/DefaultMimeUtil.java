@@ -7,7 +7,6 @@ import org.codehaus.plexus.component.annotations.Component;
 
 import eu.medsea.mimeutil.MimeUtil2;
 import eu.medsea.mimeutil.detector.ExtensionMimeDetector;
-import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
 
 @Component( role = MimeUtil.class )
 public class DefaultMimeUtil
@@ -19,10 +18,8 @@ public class DefaultMimeUtil
     {
         mimeUtil = new MimeUtil2();
 
+        // use Extenaion only for now (speed but less accuracy)
         mimeUtil.registerMimeDetector( ExtensionMimeDetector.class.getName() );
-
-        // magic will make MIME types OS dependant
-        // mimeUtil.registerMimeDetector( MagicMimeMimeDetector.class.getName() );
     }
 
     public MimeUtil2 getMimeUtil2()
