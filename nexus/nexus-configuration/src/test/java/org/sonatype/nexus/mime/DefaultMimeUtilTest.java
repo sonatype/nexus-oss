@@ -2,6 +2,8 @@ package org.sonatype.nexus.mime;
 
 import org.codehaus.plexus.PlexusTestCase;
 
+import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
+
 public class DefaultMimeUtilTest
     extends PlexusTestCase
 {
@@ -13,6 +15,10 @@ public class DefaultMimeUtilTest
         super.setUp();
 
         defaultMimeUtil = (DefaultMimeUtil) lookup( MimeUtil.class );
+        
+        // this is platform dependant (linux vs win vs mac), so for tests we use extension detector only,
+        // to be sure about 100% same results on all platforms.
+        defaultMimeUtil.getMimeUtil2().unregisterMimeDetector( MagicMimeMimeDetector.class.getName() );
     }
 
     public void testSimple()
