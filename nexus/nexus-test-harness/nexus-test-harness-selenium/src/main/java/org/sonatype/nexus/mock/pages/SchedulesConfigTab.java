@@ -10,23 +10,20 @@ public class SchedulesConfigTab
     extends Component
 {
 
-    private MainPage mainPage;
-
     private ScheduleGrid scheduleGrid;
 
-    public SchedulesConfigTab( Selenium selenium, MainPage mainPage )
+    public SchedulesConfigTab( Selenium selenium )
     {
         super( selenium, "window.Ext.getCmp('schedules-config')" );
-        this.mainPage = mainPage;
 
         scheduleGrid = new ScheduleGrid( selenium, this );
     }
 
     // schedule-add-btn
 
-    public MainPage getMainPage()
+    public SchedulesConfigFormTab addNewTask()
     {
-        return mainPage;
+        return scheduleGrid.newTask();
     }
 
     public ScheduleGrid getScheduleGrid()

@@ -1,5 +1,9 @@
 package org.sonatype.nexus.mock.pages;
 
+import java.lang.reflect.Constructor;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.sonatype.nexus.mock.components.Button;
 import org.sonatype.nexus.mock.components.Checkbox;
 import org.sonatype.nexus.mock.components.Combobox;
@@ -90,6 +94,25 @@ public class SchedulesConfigFormTab
     public void cancel()
     {
         this.cancelButton.click();
+    }
+
+    private Map<String, Component> settings = new LinkedHashMap<String, Component>();
+
+    @SuppressWarnings( "unchecked" )
+    public <E extends Component> E getSetting( String fieldName, Class<E> clazz )
+        throws Exception
+    {
+        if ( settings.containsKey( fieldName ) )
+        {
+            return (E) settings.get( fieldName );
+        }
+
+        Constructor<E> constructor = clazz.getConstructor( Selenium.class, String.class );
+        E comp =
+            constructor.newInstance( selenium, expression + ".find('name', 'serviceProperties_" + fieldName + "')[0]" );
+        settings.put( fieldName, comp );
+
+        return comp;
     }
 
 }

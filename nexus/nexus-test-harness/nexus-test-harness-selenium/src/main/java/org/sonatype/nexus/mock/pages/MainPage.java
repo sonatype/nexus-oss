@@ -49,7 +49,7 @@ public class MainPage
     {
         adminPanel().clickScheduleTasks();
 
-        return new SchedulesConfigTab( selenium, this );
+        return new SchedulesConfigTab( selenium );
     }
 
     public ViewsPanel viewsPanel()

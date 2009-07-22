@@ -142,7 +142,7 @@ public class Component
     {
         return !hidden();
     }
-    
+
     public boolean isDisabled()
     {
         return evalTrue( ".disabled" );
@@ -164,7 +164,7 @@ public class Component
         }
     }
 
-    public void waitForVisible()
+    public boolean waitForVisible()
     {
         boolean success = ThreadUtils.waitFor( new ThreadUtils.WaitCondition()
         {
@@ -178,6 +178,8 @@ public class Component
         {
             throw new RuntimeException( "Timeout" );
         }
+
+        return success;
     }
 
 
