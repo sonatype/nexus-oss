@@ -157,6 +157,7 @@ public class RepositoryTemplatePlexusResource
         repoRes.setAllowWrite( cfg.isAllowWrite() );
         repoRes.setBrowseable( cfg.isBrowseable() );
         repoRes.setIndexable( cfg.isIndexable() );
+        repoRes.setExposed( cfg.isExposed() );
         repoRes.setNotFoundCacheTTL( cfg.getNotFoundCacheTimeToLive() );
 
         AbstractMavenRepositoryConfiguration repoCfg =
@@ -184,6 +185,7 @@ public class RepositoryTemplatePlexusResource
         repoRes.setAllowWrite( cfg.isAllowWrite() );
         repoRes.setBrowseable( cfg.isBrowseable() );
         repoRes.setIndexable( cfg.isIndexable() );
+        repoRes.setExposed( cfg.isExposed() );
         repoRes.setNotFoundCacheTTL( cfg.getNotFoundCacheTimeToLive() );
 
         return repoRes;

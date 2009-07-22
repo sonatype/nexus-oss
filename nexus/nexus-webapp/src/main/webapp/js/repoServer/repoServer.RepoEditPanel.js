@@ -1043,7 +1043,8 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
         syncAtStartup: Sonatype.utils.capitalize
       },
       submit: { 
-        syncAtStartup: Sonatype.utils.convert.stringContextToBool
+        syncAtStartup: Sonatype.utils.convert.stringContextToBool,
+        exposed: function() { return true; }
       }
     },
     referenceData: Sonatype.repoServer.referenceData.repositoryState.virtual
