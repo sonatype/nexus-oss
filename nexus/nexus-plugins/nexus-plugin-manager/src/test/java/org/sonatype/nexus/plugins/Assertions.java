@@ -35,7 +35,7 @@ public class Assertions
 
         System.out.println( pmresponse.formatAsString( true ) );
 
-        Assert.assertEquals( "Three plugins should be discovered!", 3, pmresponse.getProcessedPluginResponses().size() );
+        Assert.assertEquals( "Three plugins should be discovered!", 4, pmresponse.getProcessedPluginResponses().size() );
         Assert.assertEquals( "Should be okay!", RequestResult.COMPLETED, pmresponse.getResult() );
 
         // record post-discovery state

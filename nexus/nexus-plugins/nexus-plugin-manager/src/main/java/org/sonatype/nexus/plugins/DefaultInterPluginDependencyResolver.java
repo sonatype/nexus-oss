@@ -5,20 +5,20 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.plugins.model.PluginDependency;
-import org.sonatype.plugins.model.PluginMetadata;
 
 @Component( role = InterPluginDependencyResolver.class )
 public class DefaultInterPluginDependencyResolver
     implements InterPluginDependencyResolver
 {
     public List<PluginCoordinates> resolveDependencyPlugins( NexusPluginManager nexusPluginManager,
-                                                             PluginMetadata pluginMetadata )
+                                                             PluginDescriptor pluginDescriptor )
         throws NoSuchPluginException
     {
         ArrayList<PluginCoordinates> result =
-            new ArrayList<PluginCoordinates>( pluginMetadata.getPluginDependencies().size() );
+            new ArrayList<PluginCoordinates>( pluginDescriptor.getPluginMetadata().getPluginDependencies().size() );
 
-        for ( PluginDependency dependency : (List<PluginDependency>) pluginMetadata.getPluginDependencies() )
+        for ( PluginDependency dependency : (List<PluginDependency>) pluginDescriptor.getPluginMetadata()
+            .getPluginDependencies() )
         {
             PluginCoordinates depCoord =
                 new PluginCoordinates( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );

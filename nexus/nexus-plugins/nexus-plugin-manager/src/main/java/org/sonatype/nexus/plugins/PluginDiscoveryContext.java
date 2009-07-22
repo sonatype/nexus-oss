@@ -1,10 +1,5 @@
 package org.sonatype.nexus.plugins;
 
-import java.util.List;
-
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.sonatype.plugins.model.PluginMetadata;
-
 public class PluginDiscoveryContext
 {
     private final NexusPluginValidator nexusPluginValidator;
@@ -13,23 +8,11 @@ public class PluginDiscoveryContext
 
     private boolean pluginRegistered = false;
 
-    public PluginDiscoveryContext( PluginCoordinates pluginCoordinates, List<String> exports, ClassRealm pluginRealm,
-                                   PluginMetadata pluginMetadata, NexusPluginValidator nexusPluginValidator )
+    public PluginDiscoveryContext( PluginDescriptor pluginDescriptor, NexusPluginValidator nexusPluginValidator )
     {
         this.nexusPluginValidator = nexusPluginValidator;
 
-        this.pluginDescriptor = new PluginDescriptor();
-
-        this.pluginDescriptor.setPluginCoordinates( pluginCoordinates );
-
-        if ( exports != null && exports.size() > 0 )
-        {
-            this.pluginDescriptor.getExports().addAll( exports );
-        }
-
-        this.pluginDescriptor.setPluginRealm( pluginRealm );
-
-        this.pluginDescriptor.setPluginMetadata( pluginMetadata );
+        this.pluginDescriptor = pluginDescriptor;
 
         this.pluginRegistered = false;
     }

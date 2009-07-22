@@ -36,6 +36,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginDeactivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
@@ -73,6 +74,9 @@ public class DefaultNexusPluginManager
 
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
+
+    @Requirement
+    private MimeUtil mimeUtil;
 
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
@@ -167,7 +171,7 @@ public class DefaultNexusPluginManager
 
         PluginResponse result = new PluginResponse( pluginCoordinates );
 
-        ClassRealm pluginRealm = null;
+        PluginDescriptor pluginDescriptor = null;
 
         PluginDiscoveryContext discoveryContext = null;
 
@@ -183,38 +187,24 @@ public class DefaultNexusPluginManager
                 return result;
             }
 
+            // create validator
             NexusPluginValidator validator = new DefaultNexusPluginValidator();
 
-            // load plugin md from it, will return null if not found
-            PluginMetadata pluginMetadata = loadPluginMetadata( pluginFile );
-
-            if ( pluginMetadata == null )
-            {
-                // this is not a nexus plugin!
-                result.setThrowable( new InvalidPluginException( pluginCoordinates, "The file \""
-                    + pluginFile.getAbsolutePath() + "\" is not a nexus plugin, it does not have plugin metadata!" ) );
-
-                return result;
-            }
-
-            // create exports
-            List<String> pluginExports = createExports( pluginFile );
+            // scan the jar
+            pluginDescriptor = scanPluginJar( pluginCoordinates, pluginFile );
 
             // create plugin realm as container child
-            pluginRealm = plexusContainer.createChildRealm( pluginCoordinates.getPluginKey() );
+            pluginDescriptor.setPluginRealm( plexusContainer.createChildRealm( pluginCoordinates.getPluginKey() ) );
 
             // add plugin jar to it
-            pluginRealm.addURL( toUrl( pluginFile ) );
+            pluginDescriptor.getPluginRealm().addURL( toUrl( pluginFile ) );
 
-            // create context
-            validator = new DefaultNexusPluginValidator();
-
-            discoveryContext =
-                new PluginDiscoveryContext( pluginCoordinates, pluginExports, pluginRealm, pluginMetadata, validator );
+            // create discovery context
+            discoveryContext = new PluginDiscoveryContext( pluginDescriptor, validator );
 
             // extract imports
             List<PluginCoordinates> dependencyPlugins =
-                interPluginDependencyResolver.resolveDependencyPlugins( this, pluginMetadata );
+                interPluginDependencyResolver.resolveDependencyPlugins( this, pluginDescriptor );
 
             // add imports
             for ( PluginCoordinates coord : dependencyPlugins )
@@ -228,7 +218,7 @@ public class DefaultNexusPluginManager
                     // import ALL
                     try
                     {
-                        pluginRealm.importFrom( importPlugin.getPluginRealm().getId(), export );
+                        pluginDescriptor.getPluginRealm().importFrom( importPlugin.getPluginRealm().getId(), export );
                     }
                     catch ( NoSuchRealmException e )
                     {
@@ -240,9 +230,10 @@ public class DefaultNexusPluginManager
             }
 
             // get classpath dependecies (not inter-plugin but other libs, jars)
-            List<File> dependencies = new ArrayList<File>( pluginMetadata.getClasspathDependencies().size() );
+            List<File> dependencies =
+                new ArrayList<File>( pluginDescriptor.getPluginMetadata().getClasspathDependencies().size() );
 
-            for ( PluginDependency dependency : pluginMetadata.getClasspathDependencies() )
+            for ( PluginDependency dependency : pluginDescriptor.getPluginMetadata().getClasspathDependencies() )
             {
                 GAVCoordinate dependencyCoordinates =
                     new GAVCoordinate( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
@@ -267,7 +258,7 @@ public class DefaultNexusPluginManager
             for ( File dependencyFile : dependencies )
             {
                 // TODO: check dependency clashes
-                pluginRealm.addURL( toUrl( dependencyFile ) );
+                pluginDescriptor.getPluginRealm().addURL( toUrl( dependencyFile ) );
             }
 
             // ==
@@ -299,12 +290,12 @@ public class DefaultNexusPluginManager
         }
 
         // clean up if needed
-        if ( !result.isSuccesful() && pluginRealm != null )
+        if ( !result.isSuccesful() && pluginDescriptor != null && pluginDescriptor.getPluginRealm() != null )
         {
             // drop the realm
             try
             {
-                plexusContainer.removeComponentRealm( pluginRealm );
+                plexusContainer.removeComponentRealm( pluginDescriptor.getPluginRealm() );
             }
             catch ( PlexusContainerException e )
             {
@@ -382,7 +373,43 @@ public class DefaultNexusPluginManager
     // Plugin JAR mungling
     // ==
 
-    protected PluginMetadata loadPluginMetadata( File pluginJar )
+    protected PluginDescriptor scanPluginJar( PluginCoordinates pluginCoordinates, File pluginJar )
+        throws InvalidPluginException, IOException
+    {
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+
+        pluginDescriptor.setPluginCoordinates( pluginCoordinates );
+
+        PluginMetadata pluginMetadata = extractPluginMetadata( pluginJar );
+
+        if ( pluginMetadata != null )
+        {
+            pluginDescriptor.setPluginMetadata( pluginMetadata );
+        }
+        else
+        {
+            throw new InvalidPluginException( pluginCoordinates, "The file \"" + pluginJar.getAbsolutePath()
+                + "\" is not a Nexus Plugin, it does not have plugin metadata!" );
+        }
+
+        List<String> exports = extractExports( pluginJar );
+
+        if ( exports != null && exports.size() > 0 )
+        {
+            pluginDescriptor.getExports().addAll( exports );
+        }
+
+        List<PluginStaticResourceModel> staticResources = extractStaticResources( pluginJar );
+
+        if ( staticResources != null && staticResources.size() > 0 )
+        {
+            pluginDescriptor.getPluginStaticResourceModels().addAll( staticResources );
+        }
+
+        return pluginDescriptor;
+    }
+
+    protected PluginMetadata extractPluginMetadata( File pluginJar )
         throws IOException
     {
         ZipFile jar = null;
@@ -432,20 +459,12 @@ public class DefaultNexusPluginManager
         {
             if ( jar != null )
             {
-                try
-                {
-                    jar.close();
-                }
-                catch ( Exception e )
-                {
-                    // TODO: ?
-                    e.printStackTrace();
-                }
+                jar.close();
             }
         }
     }
 
-    protected List<String> createExports( File pluginJar )
+    protected List<String> extractExports( File pluginJar )
         throws IOException
     {
         ZipFile jar = null;
@@ -458,6 +477,7 @@ public class DefaultNexusPluginManager
 
             @SuppressWarnings( "unchecked" )
             Enumeration en = jar.entries();
+
             while ( en.hasMoreElements() )
             {
                 StringBuilder sb = new StringBuilder();
@@ -468,14 +488,14 @@ public class DefaultNexusPluginManager
                 {
                     String name = e.getName();
 
-                    // for now, only classes are in, and META-INF is filted out
-                    // class name without ".class"
+                    // for now, only classes are in, and META-INF is filtered out
                     if ( name.startsWith( "META-INF" ) )
                     {
                         // skip it
                     }
                     else if ( name.endsWith( ".class" ) )
                     {
+                        // class name without ".class"
                         sb.append( name.substring( 0, name.length() - 6 ).replace( "/", "." ) );
 
                         result.add( sb.toString() );
@@ -495,17 +515,62 @@ public class DefaultNexusPluginManager
         {
             if ( jar != null )
             {
-                try
-                {
-                    jar.close();
-                }
-                catch ( Exception e )
-                {
-                    // TODO: ?
-                    e.printStackTrace();
-                }
+                jar.close();
             }
         }
+    }
+
+    protected List<PluginStaticResourceModel> extractStaticResources( File pluginJar )
+        throws IOException
+    {
+        ZipFile jar = null;
+
+        try
+        {
+            jar = new ZipFile( pluginJar );
+
+            ArrayList<PluginStaticResourceModel> result = new ArrayList<PluginStaticResourceModel>();
+
+            @SuppressWarnings( "unchecked" )
+            Enumeration en = jar.entries();
+
+            while ( en.hasMoreElements() )
+            {
+                ZipEntry e = (ZipEntry) en.nextElement();
+
+                if ( !e.isDirectory() )
+                {
+                    String name = e.getName();
+
+                    if ( name.startsWith( "static/" ) )
+                    {
+                        PluginStaticResourceModel model =
+                            new PluginStaticResourceModel( name, "/" + name, mimeUtil
+                                .getMimeType( jarEntryToUrl( pluginJar, name ) ) );
+
+                        result.add( model );
+                    }
+                }
+            }
+
+            return result;
+        }
+        finally
+        {
+            if ( jar != null )
+            {
+                jar.close();
+            }
+        }
+    }
+
+    private URL jarEntryToUrl( File jar, String entryName )
+        throws IOException
+    {
+        // ugh, ugly
+        URL result = new URL( "jar:" + toUrl( jar ).toString() + "!/" + entryName );
+
+        return result;
     }
 
     // ==
@@ -655,13 +720,6 @@ public class DefaultNexusPluginManager
 
                     pd.addComponentDescriptor( response.getComponentDescriptor() );
                 }
-            }
-            else if ( className.startsWith( "static/" ) )
-            {
-                // is it some static resource?
-                pd.getPluginStaticResourceModels().add(
-                                                        new PluginStaticResourceModel( className, "/" + className,
-                                                                                       "text/plain" ) );
             }
         }
 
