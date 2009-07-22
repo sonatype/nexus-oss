@@ -17,8 +17,9 @@ public abstract class AbstractPropertyDescriptor
     implements ScheduledTaskPropertyDescriptor
 {
     private String helpText;
+
     private boolean required;
-    
+
     public String getHelpText()
     {
         return helpText;
@@ -38,4 +39,10 @@ public abstract class AbstractPropertyDescriptor
     {
         this.required = required;
     }
+
+    public String getRegexValidation()
+    {
+        return null;
+    }
+
 }

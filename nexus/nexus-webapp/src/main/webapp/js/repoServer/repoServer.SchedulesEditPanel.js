@@ -997,7 +997,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                 name: 'serviceProperties_' + curRec.id,
                 allowBlank:curRec.required ? false : true,
                 disabled:true,
-                width: this.COMBO_WIDTH
+                width: this.COMBO_WIDTH,
+                regex: curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
               };
             }
             else if(curRec.type == 'number'){
@@ -1010,7 +1011,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                 name: 'serviceProperties_' + curRec.id,
                 allowBlank:curRec.required ? false : true,
                 disabled:true,
-                width: this.COMBO_WIDTH
+                width: this.COMBO_WIDTH,
+                regex: curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
               };
             }
             else if(curRec.type == 'boolean'){

@@ -1607,6 +1607,12 @@
           <type>boolean</type>
           <required>true</required>
         </field>
+        <field>
+          <name>regexValidation</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+        </field>        
       </fields>
     </class>
 

@@ -16,10 +16,18 @@ package org.sonatype.nexus.tasks.descriptors.properties;
 public interface ScheduledTaskPropertyDescriptor
 {
     String getId();
+
     String getName();
+
     String getType();
+
     boolean isRequired();
+
     void setRequired( boolean required );
+
     String getHelpText();
+
     void setHelpText( String helpText );
+
+    String getRegexValidation();
 }

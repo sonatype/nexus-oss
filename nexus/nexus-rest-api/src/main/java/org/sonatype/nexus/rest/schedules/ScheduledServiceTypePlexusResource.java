@@ -79,6 +79,7 @@ public class ScheduledServiceTypePlexusResource
                     property.setName( propertyDescriptor.getName() );
                     property.setRequired( propertyDescriptor.isRequired() );
                     property.setType( propertyDescriptor.getType() );
+                    property.setRegexValidation( propertyDescriptor.getRegexValidation() );
 
                     type.addProperty( property );
                 }
