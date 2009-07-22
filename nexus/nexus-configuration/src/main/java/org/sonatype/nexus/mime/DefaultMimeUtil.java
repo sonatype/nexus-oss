@@ -1,7 +1,6 @@
 package org.sonatype.nexus.mime;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -22,7 +21,8 @@ public class DefaultMimeUtil
 
         mimeUtil.registerMimeDetector( ExtensionMimeDetector.class.getName() );
 
-        mimeUtil.registerMimeDetector( MagicMimeMimeDetector.class.getName() );
+        // magic will make MIME types OS dependant
+        // mimeUtil.registerMimeDetector( MagicMimeMimeDetector.class.getName() );
     }
 
     public MimeUtil2 getMimeUtil2()
@@ -32,15 +32,7 @@ public class DefaultMimeUtil
 
     public String getMimeType( File file )
     {
-        try
-        {
-            return getMimeType( file.toURI().toURL() );
-        }
-        catch ( MalformedURLException e )
-        {
-            // will not happen
-            return MimeUtil2.UNKNOWN_MIME_TYPE.toString();
-        }
+        return MimeUtil2.getMostSpecificMimeType( getMimeUtil2().getMimeTypes( file ) ).toString();
     }
 
     public String getMimeType( URL url )

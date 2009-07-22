@@ -18,7 +18,7 @@ public class DefaultMimeUtilTest
         
         // this is platform dependant (linux vs win vs mac), so for tests we use extension detector only,
         // to be sure about 100% same results on all platforms.
-        defaultMimeUtil.getMimeUtil2().unregisterMimeDetector( MagicMimeMimeDetector.class.getName() );
+        // defaultMimeUtil.getMimeUtil2().unregisterMimeDetector( MagicMimeMimeDetector.class.getName() );
     }
 
     public void testSimple()
