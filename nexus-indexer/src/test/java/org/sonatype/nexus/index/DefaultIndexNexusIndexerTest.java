@@ -436,7 +436,7 @@ public class DefaultIndexNexusIndexerTest
         assertEquals( "missingpom", ai.groupId );
         assertEquals( "missingpom", ai.artifactId );
         assertEquals( "1.0", ai.version );
-        // See Nexus 2318. It should be null for a POM
+        // See Nexus 2318. It should be null for a jar without classes
         assertNull( ai.classNames );
     }
     
