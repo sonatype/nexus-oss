@@ -7,7 +7,7 @@ import org.codehaus.plexus.component.annotations.Configuration;
 
 @Component( role = NexusPluginRepository.class, hint = UserNexusPluginRepository.ID )
 public class UserNexusPluginRepository
-    extends AbstractFileNexusPluginRepository
+    extends AbstractWritableFileNexusPluginRepository
 {
     public static final String ID = "user";
 

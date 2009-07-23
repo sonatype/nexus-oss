@@ -14,7 +14,8 @@ public class NoSuchPluginRepositoryArtifactException
     public NoSuchPluginRepositoryArtifactException( NexusPluginRepository nexusPluginRepository,
                                                     GAVCoordinate coordinate )
     {
-        super( "Plugin \"" + coordinate.toString() + "\" not found in repository \"" + nexusPluginRepository.getId()
+        super( "Plugin \"" + coordinate.toString() + "\" not found in "
+            + ( nexusPluginRepository == null ? "repositories." : "" + "repository \"" + nexusPluginRepository.getId() )
             + "\"!" );
 
         this.nexusPluginRepository = nexusPluginRepository;

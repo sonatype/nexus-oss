@@ -131,7 +131,7 @@ public class DefaultNexusPluginManager
 
         for ( PluginRepositoryArtifact artifact : availablePlugins )
         {
-            result.add( doActivatePlugin( artifact ) );
+            result.add( activatePlugin( artifact.getCoordinate() ) );
         }
 
         return result;

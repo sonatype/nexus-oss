@@ -1,13 +1,22 @@
 package org.sonatype.nexus.plugins.repository;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.plugin.metadata.GAVCoordinate;
+import org.sonatype.plugins.model.PluginMetadata;
+import org.sonatype.plugins.model.io.xpp3.PluginModelXpp3Reader;
 
 /**
  * A very trivial "local" repository implementation for Nexus plugins. The layout is:
@@ -43,52 +52,31 @@ public abstract class AbstractFileNexusPluginRepository
 
         if ( root.isDirectory() )
         {
-            File[] groupIds = root.listFiles();
+            File[] pluginFolders = root.listFiles();
 
-            if ( groupIds != null )
+            if ( pluginFolders != null )
             {
-                for ( File groupId : groupIds )
+                for ( File pluginFolder : pluginFolders )
                 {
-                    if ( groupId.isDirectory() )
+                    if ( pluginFolder.isDirectory() )
                     {
-                        File[] artifactIds = groupId.listFiles();
+                        File pluginFile = new File( pluginFolder, pluginFolder.getName() + ".jar" );
 
-                        if ( artifactIds != null )
+                        if ( pluginFile.isFile() )
                         {
-                            for ( File artifactId : artifactIds )
+                            GAVCoordinate coord = getCoordinatesForFile( pluginFile );
+
+                            if ( coord != null )
                             {
-                                if ( artifactId.isDirectory() )
-                                {
-                                    File[] versions = artifactId.listFiles();
+                                PluginRepositoryArtifact art = new PluginRepositoryArtifact();
 
-                                    if ( versions != null )
-                                    {
-                                        for ( File version : versions )
-                                        {
-                                            if ( version.isDirectory() )
-                                            {
-                                                GAVCoordinate coord =
-                                                    new GAVCoordinate( groupId.getName(), artifactId.getName(),
-                                                                           version.getName() );
+                                art.setNexusPluginRepository( this );
 
-                                                File pluginFile = new File( version, getPluginFileName( coord ) );
+                                art.setCoordinate( coord );
 
-                                                if ( pluginFile.isFile() )
-                                                {
-                                                    PluginRepositoryArtifact art = new PluginRepositoryArtifact();
+                                art.setFile( pluginFile );
 
-                                                    art.setNexusPluginRepository( this );
-
-                                                    art.setCoordinate( coord );
-
-                                                    art.setFile( pluginFile );
-
-                                                    result.add( art );
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                result.add( art );
                             }
                         }
                     }
@@ -100,6 +88,7 @@ public abstract class AbstractFileNexusPluginRepository
     }
 
     public PluginRepositoryArtifact resolveArtifact( GAVCoordinate coordinates )
+        throws NoSuchPluginRepositoryArtifactException
     {
         File pluginFile = new File( getPluginFolder( coordinates ), getPluginFileName( coordinates ) );
 
@@ -117,12 +106,13 @@ public abstract class AbstractFileNexusPluginRepository
         }
         else
         {
-            return null;
+            throw new NoSuchPluginRepositoryArtifactException( this, coordinates );
         }
     }
 
     public PluginRepositoryArtifact resolveDependencyArtifact( PluginRepositoryArtifact dependant,
                                                                GAVCoordinate coordinates )
+        throws NoSuchPluginRepositoryArtifactException
     {
         File pluginFile =
             new File( getPluginDependenciesFolder( dependant.getCoordinate() ), getPluginFileName( coordinates ) );
@@ -141,16 +131,78 @@ public abstract class AbstractFileNexusPluginRepository
         }
         else
         {
-            return null;
+            throw new NoSuchPluginRepositoryArtifactException( this, coordinates );
         }
     }
 
     // ==
 
+    protected GAVCoordinate getCoordinatesForFile( File pluginFile )
+    {
+        // STUPID
+        // This whole part is copy + paste from PM scanJar,
+        // will do it for now but we don't want to crank a jar just to read GAV
+        ZipFile jar = null;
+
+        try
+        {
+            jar = new ZipFile( pluginFile );
+
+            ZipEntry entry = jar.getEntry( "META-INF/nexus/plugin.xml" );
+
+            Reader reader = null;
+
+            try
+            {
+                if ( entry == null )
+                {
+                    return null;
+                }
+
+                reader = ReaderFactory.newXmlReader( jar.getInputStream( entry ) );
+
+                PluginModelXpp3Reader pdreader = new PluginModelXpp3Reader();
+
+                PluginMetadata md = pdreader.read( reader );
+
+                return new GAVCoordinate( md.getGroupId(), md.getArtifactId(), md.getVersion() );
+            }
+            catch ( XmlPullParserException e )
+            {
+                IOException ex = new IOException( e.getMessage() );
+
+                ex.initCause( e );
+
+                throw ex;
+            }
+            finally
+            {
+                IOUtil.close( reader );
+            }
+        }
+        catch ( IOException e )
+        {
+            return null;
+        }
+        finally
+        {
+            if ( jar != null )
+            {
+                try
+                {
+                    jar.close();
+                }
+                catch ( IOException e )
+                {
+                    // nothing
+                }
+            }
+        }
+    }
+
     protected File getPluginFolder( GAVCoordinate coordinates )
     {
-        return new File( getNexusPluginsDirectory(), coordinates.getGroupId() + "/" + coordinates.getArtifactId() + "/"
-            + coordinates.getVersion() );
+        return new File( getNexusPluginsDirectory(), coordinates.getArtifactId() + "-" + coordinates.getVersion() );
     }
 
     protected File getPluginDependenciesFolder( GAVCoordinate coordinates )
