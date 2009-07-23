@@ -63,7 +63,6 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.http.HttpProxyService;
@@ -694,7 +693,7 @@ public class DefaultNexus
     {
         return feedRecorder.getAuthcAuthzEvents( null, from, count, null );
     }
-    
+
     public List<ErrorWarningEvent> getErrorWarningEvents( Integer from, Integer count )
     {
         return feedRecorder.getErrorWarningEvents( null, from, count, null );
@@ -722,15 +721,18 @@ public class DefaultNexus
         // load locally present plugins
         getLogger().info( "Activating locally installed plugins..." );
 
-        PluginManagerResponse response = nexusPluginManager.activateInstalledPlugins();
+        Collection<PluginManagerResponse> activationResponse = nexusPluginManager.activateInstalledPlugins();
 
-        if ( response.isSuccessful() )
+        for ( PluginManagerResponse response : activationResponse )
         {
-            getLogger().info( response.formatAsString( getLogger().isDebugEnabled() ) );
-        }
-        else
-        {
-            getLogger().warn( response.formatAsString( getLogger().isDebugEnabled() ) );
+            if ( response.isSuccessful() )
+            {
+                getLogger().info( response.formatAsString( getLogger().isDebugEnabled() ) );
+            }
+            else
+            {
+                getLogger().warn( response.formatAsString( getLogger().isDebugEnabled() ) );
+            }
         }
 
         // EventInspectorHost

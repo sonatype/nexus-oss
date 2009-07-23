@@ -6,7 +6,6 @@ import java.util.Collection;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.plugins.PluginCoordinates;
 import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
@@ -68,8 +67,8 @@ public abstract class AbstractFileNexusPluginRepository
                                         {
                                             if ( version.isDirectory() )
                                             {
-                                                PluginCoordinates coord =
-                                                    new PluginCoordinates( groupId.getName(), artifactId.getName(),
+                                                GAVCoordinate coord =
+                                                    new GAVCoordinate( groupId.getName(), artifactId.getName(),
                                                                            version.getName() );
 
                                                 File pluginFile = new File( version, getPluginFileName( coord ) );

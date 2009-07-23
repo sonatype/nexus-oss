@@ -87,6 +87,7 @@ public class DefaultPluginRepositoryManager
     }
 
     public PluginRepositoryArtifact resolveArtifact( GAVCoordinate coordinates )
+        throws NoSuchPluginRepositoryArtifactException
     {
         // we collect and order repositories into _asceding_ order
         // to make dependencies be found in system repo before user repo if
@@ -96,58 +97,59 @@ public class DefaultPluginRepositoryManager
 
         repositories.addAll( getRepositories().values() );
 
-        // iterate as long as you get something non-null
-        PluginRepositoryArtifact result = null;
-
         for ( NexusPluginRepository repository : repositories )
         {
-            result = repository.resolveArtifact( coordinates );
-
-            if ( result != null )
+            try
             {
-                return result;
+                return repository.resolveArtifact( coordinates );
+            }
+            catch ( NoSuchPluginRepositoryArtifactException e )
+            {
+                // nothing
             }
         }
 
         // nobody has it
-        return null;
+        throw new NoSuchPluginRepositoryArtifactException( null, coordinates );
     }
 
     public PluginRepositoryArtifact resolveDependencyArtifact( PluginRepositoryArtifact dependant,
                                                                GAVCoordinate coordinates )
+        throws NoSuchPluginRepositoryArtifactException
     {
-        PluginRepositoryArtifact result = null;
-
         // 1st try the originating repository
-        result = dependant.getNexusPluginRepository().resolveDependencyArtifact( dependant, coordinates );
-
-        if ( result != null )
+        try
         {
-            return result;
+            return dependant.getNexusPluginRepository().resolveDependencyArtifact( dependant, coordinates );
         }
-
-        // next, iterate over reposes and search it
-        // we collect and order repositories into _asceding_ order
-        // to make dependencies be found in system repo before user repo if
-        // collision occurs
-        TreeSet<NexusPluginRepository> repositories =
-            new TreeSet<NexusPluginRepository>( new NexusPluginRepositoryComparator( false ) );
-
-        repositories.addAll( getRepositories().values() );
-
-        // iterate as long as you get something non-null
-
-        for ( NexusPluginRepository repository : repositories )
+        catch ( NoSuchPluginRepositoryArtifactException e )
         {
-            result = repository.resolveDependencyArtifact( dependant, coordinates );
+            // next, iterate over reposes and search it
+            // we collect and order repositories into _asceding_ order
+            // to make dependencies be found in system repo before user repo if
+            // collision occurs
+            TreeSet<NexusPluginRepository> repositories =
+                new TreeSet<NexusPluginRepository>( new NexusPluginRepositoryComparator( false ) );
 
-            if ( result != null )
+            repositories.addAll( getRepositories().values() );
+
+            // iterate as long as you get something non-null
+
+            for ( NexusPluginRepository repository : repositories )
             {
-                return result;
+                try
+                {
+                    return repository.resolveDependencyArtifact( dependant, coordinates );
+                }
+                catch ( NoSuchPluginRepositoryArtifactException e1 )
+                {
+                    // nothing
+                }
             }
+
+            // nobody has it
+            throw new NoSuchPluginRepositoryArtifactException( null, coordinates );
         }
 
-        // nobody has it
-        return null;
     }
 }

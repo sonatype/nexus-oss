@@ -40,6 +40,7 @@ import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginDeactivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
+import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactException;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
@@ -82,12 +83,9 @@ public class DefaultNexusPluginManager
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
     @Requirement
-    private InterPluginDependencyResolver interPluginDependencyResolver;
-
-    @Requirement
     private PlexusComponentGleaner plexusComponentGleaner;
 
-    private final Map<String, PluginDescriptor> pluginDescriptors = new HashMap<String, PluginDescriptor>();
+    private final Map<String, PluginDescriptor> activatedPlugins = new HashMap<String, PluginDescriptor>();
 
     public void initialize()
         throws InitializationException
@@ -109,65 +107,131 @@ public class DefaultNexusPluginManager
         }
     }
 
-    public Map<String, PluginDescriptor> getInstalledPlugins()
+    public String getPluginKey( GAVCoordinate coordinate )
     {
-        return Collections.unmodifiableMap( new HashMap<String, PluginDescriptor>( pluginDescriptors ) );
+        return coordinate.getGroupId() + ":" + coordinate.getArtifactId() + ":" + coordinate.getVersion();
     }
 
-    public PluginManagerResponse installPlugin( PluginCoordinates coords )
+    public Map<String, PluginDescriptor> getActivatedPlugins()
     {
-        // TODO
-        return new PluginManagerResponse( RequestResult.FAILED );
+        return Collections.unmodifiableMap( new HashMap<String, PluginDescriptor>( activatedPlugins ) );
     }
 
-    public PluginManagerResponse activateInstalledPlugins()
+    public Map<String, PluginDescriptor> getAvailablePlugins()
     {
-        PluginManagerResponse result = new PluginManagerResponse();
+        // TODO Auto-generated method stub
+        return null;
+    }
 
+    public Collection<PluginManagerResponse> activateInstalledPlugins()
+    {
         Collection<PluginRepositoryArtifact> availablePlugins = pluginRepositoryManager.findAvailablePlugins();
+
+        ArrayList<PluginManagerResponse> result = new ArrayList<PluginManagerResponse>( availablePlugins.size() );
 
         for ( PluginRepositoryArtifact artifact : availablePlugins )
         {
-            result.addPluginResponse( doActivatePlugin( artifact ) );
+            result.add( doActivatePlugin( artifact ) );
         }
 
         return result;
     }
 
-    public PluginManagerResponse uninstallPlugin( PluginCoordinates coords )
+    public boolean installPluginBundle( File bundle )
+        throws IOException
     {
         // TODO
-        return new PluginManagerResponse( RequestResult.FAILED );
+        return false;
     }
 
-    public PluginResponse activatePlugin( GAVCoordinate coordinate )
+    public boolean uninstallPluginBundle( GAVCoordinate coords )
+        throws IOException
     {
-        PluginCoordinates pluginCoordinate = new PluginCoordinates( coordinate );
+        // TODO
+        return false;
+    }
 
-        if ( getInstalledPlugins().containsKey( pluginCoordinate.getPluginKey() ) )
+    public PluginManagerResponse activatePlugin( GAVCoordinate pluginCoordinate )
+    {
+        if ( getActivatedPlugins().containsKey( getPluginKey( pluginCoordinate ) ) )
         {
-            PluginResponse result = new PluginResponse( pluginCoordinate );
+            PluginManagerResponse response = new PluginManagerResponse( pluginCoordinate );
 
-            return result;
+            return response;
         }
 
-        PluginRepositoryArtifact pluginArtifact = pluginRepositoryManager.resolveArtifact( pluginCoordinate );
+        try
+        {
+            PluginRepositoryArtifact pluginArtifact = pluginRepositoryManager.resolveArtifact( pluginCoordinate );
 
-        if ( pluginArtifact == null )
+            return doActivatePlugin( pluginArtifact );
+        }
+        catch ( NoSuchPluginRepositoryArtifactException e )
         {
             PluginResponse result = new PluginResponse( pluginCoordinate );
 
             result.setThrowable( new NoSuchPluginException( pluginCoordinate ) );
 
-            return result;
-        }
+            PluginManagerResponse response = new PluginManagerResponse( pluginCoordinate );
 
-        return doActivatePlugin( pluginArtifact );
+            response.addPluginResponse( result );
+
+            return response;
+        }
     }
 
-    protected PluginResponse doActivatePlugin( PluginRepositoryArtifact pluginArtifact )
+    public PluginManagerResponse deactivatePlugin( GAVCoordinate pluginCoordinates )
     {
-        PluginCoordinates pluginCoordinates = new PluginCoordinates( pluginArtifact.getCoordinate() );
+        PluginManagerResponse response = new PluginManagerResponse( pluginCoordinates );
+
+        PluginResponse result = new PluginResponse( pluginCoordinates );
+
+        try
+        {
+            String pluginKey = getPluginKey( pluginCoordinates );
+
+            if ( getActivatedPlugins().containsKey( pluginKey ) )
+            {
+                PluginDescriptor pluginDescriptor = getActivatedPlugins().get( pluginKey );
+
+                // scan all activated plugins and look if some points at us
+                for ( PluginDescriptor activePlugin : getActivatedPlugins().values() )
+                {
+                    if ( activePlugin.getImportedPlugins().contains( pluginDescriptor ) )
+                    {
+                        // this one points to us, so do a recursive call but save the results of it
+                        response.addPluginManagerResponse( deactivatePlugin( activePlugin.getPluginCoordinates() ) );
+                    }
+                }
+
+                // kill it
+                plexusContainer.removeComponentRealm( pluginDescriptor.getPluginRealm() );
+
+                // send notification
+                applicationEventMulticaster.notifyEventListeners( new PluginDeactivatedEvent( this, pluginDescriptor ) );
+            }
+            else
+            {
+                result.setThrowable( new NoSuchPluginException( pluginCoordinates ) );
+            }
+        }
+        catch ( PlexusContainerException e )
+        {
+            result.setThrowable( e );
+        }
+
+        response.addPluginResponse( result );
+
+        return response;
+    }
+
+    // ==
+
+    protected PluginManagerResponse doActivatePlugin( PluginRepositoryArtifact pluginArtifact )
+    {
+        PluginManagerResponse response = new PluginManagerResponse( pluginArtifact.getCoordinate() );
+
+        GAVCoordinate pluginCoordinates = pluginArtifact.getCoordinate();
 
         PluginResponse result = new PluginResponse( pluginCoordinates );
 
@@ -184,7 +248,9 @@ public class DefaultNexusPluginManager
                 // this is not a nexus plugin!
                 result.setThrowable( new NoSuchPluginException( pluginCoordinates ) );
 
-                return result;
+                response.addPluginResponse( result );
+
+                return response;
             }
 
             // create validator
@@ -194,7 +260,7 @@ public class DefaultNexusPluginManager
             pluginDescriptor = scanPluginJar( pluginCoordinates, pluginFile );
 
             // create plugin realm as container child
-            pluginDescriptor.setPluginRealm( plexusContainer.createChildRealm( pluginCoordinates.getPluginKey() ) );
+            pluginDescriptor.setPluginRealm( plexusContainer.createChildRealm( getPluginKey( pluginCoordinates ) ) );
 
             // add plugin jar to it
             pluginDescriptor.getPluginRealm().addURL( toUrl( pluginFile ) );
@@ -202,14 +268,33 @@ public class DefaultNexusPluginManager
             // create discovery context
             discoveryContext = new PluginDiscoveryContext( pluginDescriptor, validator );
 
-            // extract imports
-            List<PluginCoordinates> dependencyPlugins =
-                interPluginDependencyResolver.resolveDependencyPlugins( this, pluginDescriptor );
+            // resolve inter-plugin deps
+            List<GAVCoordinate> dependencyPlugins =
+                new ArrayList<GAVCoordinate>( pluginDescriptor.getPluginMetadata().getPluginDependencies().size() );
+
+            for ( PluginDependency dependency : pluginDescriptor.getPluginMetadata().getPluginDependencies() )
+            {
+                // we use GAV here only, neglecting CT
+                GAVCoordinate depCoord =
+                    new GAVCoordinate( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+
+                if ( !activatedPlugins.containsKey( depCoord ) )
+                {
+                    // try to activate it in recursion
+                    response.addPluginManagerResponse( activatePlugin( depCoord ) );
+                }
+            }
+
+            // before going further, we must ensure that we resolved all the dependencies
+            if ( !response.isSuccessful() )
+            {
+                return response;
+            }
 
             // add imports
-            for ( PluginCoordinates coord : dependencyPlugins )
+            for ( GAVCoordinate coord : dependencyPlugins )
             {
-                PluginDescriptor importPlugin = getInstalledPlugins().get( coord.getPluginKey() );
+                PluginDescriptor importPlugin = getActivatedPlugins().get( getPluginKey( coord ) );
 
                 List<String> exports = importPlugin.getExports();
 
@@ -239,18 +324,18 @@ public class DefaultNexusPluginManager
                     new GAVCoordinate( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
                                        dependency.getClassifier(), dependency.getType() );
 
-                PluginRepositoryArtifact dependencyArtifact =
-                    pluginRepositoryManager.resolveDependencyArtifact( pluginArtifact, dependencyCoordinates );
-
-                if ( dependencyArtifact != null )
+                try
                 {
+                    PluginRepositoryArtifact dependencyArtifact =
+                        pluginRepositoryManager.resolveDependencyArtifact( pluginArtifact, dependencyCoordinates );
+
                     dependencies.add( dependencyArtifact.getFile() );
                 }
-                else
+                catch ( NoSuchPluginRepositoryArtifactException e )
                 {
                     result.setThrowable( new DependencyNotFoundException( pluginCoordinates, dependencyCoordinates ) );
 
-                    return result;
+                    response.addPluginResponse( result );
                 }
             }
 
@@ -276,10 +361,6 @@ public class DefaultNexusPluginManager
             // stuff the result
             result.setPluginDescriptor( discoveryContext.getPluginDescriptor() );
         }
-        catch ( NoSuchPluginException e )
-        {
-            result.setThrowable( e );
-        }
         catch ( InvalidPluginException e )
         {
             result.setThrowable( e );
@@ -290,7 +371,7 @@ public class DefaultNexusPluginManager
         }
 
         // clean up if needed
-        if ( !result.isSuccesful() && pluginDescriptor != null && pluginDescriptor.getPluginRealm() != null )
+        if ( !result.isSuccessful() && pluginDescriptor != null && pluginDescriptor.getPluginRealm() != null )
         {
             // drop the realm
             try
@@ -305,7 +386,7 @@ public class DefaultNexusPluginManager
         }
 
         // notifications
-        if ( result.isSuccesful() )
+        if ( result.isSuccessful() )
         {
             applicationEventMulticaster.notifyEventListeners( new PluginActivatedEvent( this, discoveryContext
                 .getPluginDescriptor() ) );
@@ -316,7 +397,9 @@ public class DefaultNexusPluginManager
                 .getThrowable() ) );
         }
 
-        return result;
+        response.addPluginResponse( result );
+
+        return response;
     }
 
     /**
@@ -338,45 +421,16 @@ public class DefaultNexusPluginManager
         }
     }
 
-    public PluginResponse deactivatePlugin( PluginCoordinates pluginCoordinates )
-    {
-        // TODO: dependants on this plugin?
-        PluginResponse result = new PluginResponse( pluginCoordinates );
-
-        try
-        {
-            String pluginKey = pluginCoordinates.getPluginKey();
-
-            if ( getInstalledPlugins().containsKey( pluginKey ) )
-            {
-                PluginDescriptor pluginDescriptor = getInstalledPlugins().get( pluginKey );
-
-                plexusContainer.removeComponentRealm( pluginDescriptor.getPluginRealm() );
-
-                // send notification
-                applicationEventMulticaster.notifyEventListeners( new PluginDeactivatedEvent( this, pluginDescriptor ) );
-            }
-            else
-            {
-                result.setThrowable( new NoSuchPluginException( pluginCoordinates ) );
-            }
-        }
-        catch ( PlexusContainerException e )
-        {
-            result.setThrowable( e );
-        }
-
-        return result;
-    }
-
     // ==
     // Plugin JAR mungling
     // ==
 
-    protected PluginDescriptor scanPluginJar( PluginCoordinates pluginCoordinates, File pluginJar )
+    protected PluginDescriptor scanPluginJar( GAVCoordinate pluginCoordinates, File pluginJar )
         throws InvalidPluginException, IOException
     {
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
+
+        pluginDescriptor.setPluginKey( getPluginKey( pluginCoordinates ) );
 
         pluginDescriptor.setPluginCoordinates( pluginCoordinates );
 
@@ -730,7 +784,7 @@ public class DefaultNexusPluginManager
             ComponentDescriptor<NexusResourceBundle> pluginBundle = new ComponentDescriptor<NexusResourceBundle>();
 
             pluginBundle.setRole( NexusResourceBundle.class.getName() );
-            pluginBundle.setRoleHint( pd.getPluginCoordinates().getPluginKey() );
+            pluginBundle.setRoleHint( pd.getPluginKey() );
             pluginBundle.setImplementation( PluginResourceBundle.class.getName() );
 
             ComponentRequirement pluginManagerRequirement = new ComponentRequirement();
@@ -739,7 +793,7 @@ public class DefaultNexusPluginManager
             pluginBundle.addRequirement( pluginManagerRequirement );
 
             XmlPlexusConfiguration pluginBundleConfiguration = new XmlPlexusConfiguration();
-            pluginBundleConfiguration.addChild( "pluginKey", pd.getPluginCoordinates().getPluginKey() );
+            pluginBundleConfiguration.addChild( "pluginKey", pd.getPluginKey() );
             pluginBundle.setConfiguration( pluginBundleConfiguration );
 
             pd.addComponentDescriptor( pluginBundle );
@@ -756,7 +810,7 @@ public class DefaultNexusPluginManager
         PluginDescriptor pluginDescriptor = pluginDiscoveryContext.getPluginDescriptor();
 
         // add it to "known" plugins
-        if ( !pluginDescriptors.containsKey( pluginDescriptor.getPluginCoordinates().getPluginKey() ) )
+        if ( !activatedPlugins.containsKey( pluginDescriptor.getPluginKey() ) )
         {
             // register them to plexus
             for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
@@ -785,10 +839,11 @@ public class DefaultNexusPluginManager
             }
 
             // add it to map
-            pluginDescriptors.put( pluginDescriptor.getPluginCoordinates().getPluginKey(), pluginDescriptor );
+            activatedPlugins.put( pluginDescriptor.getPluginKey(), pluginDescriptor );
 
             // set is as registered
             pluginDiscoveryContext.setPluginRegistered( true );
         }
     }
+
 }

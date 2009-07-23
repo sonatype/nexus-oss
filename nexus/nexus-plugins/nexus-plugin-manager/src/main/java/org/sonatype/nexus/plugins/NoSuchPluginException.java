@@ -1,25 +1,27 @@
 package org.sonatype.nexus.plugins;
 
+import org.sonatype.plugin.metadata.GAVCoordinate;
+
 public class NoSuchPluginException
     extends Exception
 {
     private static final long serialVersionUID = 3012836542082458008L;
 
-    private final PluginCoordinates pluginCoordinates;
+    private final GAVCoordinate pluginCoordinates;
 
-    public NoSuchPluginException( PluginCoordinates pluginCoordinates )
+    public NoSuchPluginException( GAVCoordinate pluginCoordinates )
     {
         this( pluginCoordinates, "Plugin \"" + pluginCoordinates.toString() + "\" not found." );
     }
 
-    public NoSuchPluginException( PluginCoordinates pluginCoordinates, String message )
+    public NoSuchPluginException( GAVCoordinate pluginCoordinates, String message )
     {
         super( message );
 
         this.pluginCoordinates = pluginCoordinates;
     }
 
-    public PluginCoordinates getPluginCoordinates()
+    public GAVCoordinate getPluginCoordinates()
     {
         return pluginCoordinates;
     }

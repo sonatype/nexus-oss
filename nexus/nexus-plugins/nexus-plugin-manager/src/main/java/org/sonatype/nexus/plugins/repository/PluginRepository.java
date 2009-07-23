@@ -25,7 +25,8 @@ public interface PluginRepository
      * @param coordinates
      * @return
      */
-    PluginRepositoryArtifact resolveArtifact( GAVCoordinate coordinates );
+    PluginRepositoryArtifact resolveArtifact( GAVCoordinate coordinates )
+        throws NoSuchPluginRepositoryArtifactException;
 
     /**
      * Returns the artifaft for the given coordinates.
@@ -33,5 +34,6 @@ public interface PluginRepository
      * @param coordinates
      * @return
      */
-    PluginRepositoryArtifact resolveDependencyArtifact( PluginRepositoryArtifact dependant, GAVCoordinate coordinates );
+    PluginRepositoryArtifact resolveDependencyArtifact( PluginRepositoryArtifact dependant, GAVCoordinate coordinates )
+        throws NoSuchPluginRepositoryArtifactException;
 }

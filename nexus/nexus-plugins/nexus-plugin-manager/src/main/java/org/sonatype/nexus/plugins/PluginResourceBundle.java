@@ -38,7 +38,12 @@ public class PluginResourceBundle
 
     public List<StaticResource> getContributedResouces()
     {
-        PluginDescriptor pd = nexusPluginManager.getInstalledPlugins().get( pluginKey );
+        PluginDescriptor pd = nexusPluginManager.getActivatedPlugins().get( pluginKey );
+
+        if ( pd == null )
+        {
+            return Collections.emptyList();
+        }
 
         List<PluginStaticResourceModel> models = getStaticResourceModels( pd );
 

@@ -117,7 +117,7 @@ public class NexusPluginsComponentRepository
                 {
                     // WE ASSUME HERE that realm uses the same coord.getPluginKey()!!!!
                     // FIX THIS
-                    pluginDescriptor = getNexusPluginManager().getInstalledPlugins().get( realm.getId() );
+                    pluginDescriptor = getNexusPluginManager().getActivatedPlugins().get( realm.getId() );
 
                     if ( pluginDescriptor != null )
                     {

@@ -7,12 +7,15 @@ import java.util.Map;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.PluginMetadata;
 
 public class PluginDescriptor
     extends ComponentSetDescriptor
 {
-    private PluginCoordinates pluginCoordinates;
+    private String pluginKey;
+
+    private GAVCoordinate pluginCoordinates;
 
     private PluginMetadata pluginMetadata;
 
@@ -26,12 +29,22 @@ public class PluginDescriptor
 
     private Map<String, PluginRepositoryType> pluginRepositoryTypes;
 
-    public PluginCoordinates getPluginCoordinates()
+    public String getPluginKey()
+    {
+        return pluginKey;
+    }
+
+    public void setPluginKey( String pluginKey )
+    {
+        this.pluginKey = pluginKey;
+    }
+
+    public GAVCoordinate getPluginCoordinates()
     {
         return pluginCoordinates;
     }
 
-    public void setPluginCoordinates( PluginCoordinates pluginCoordinates )
+    public void setPluginCoordinates( GAVCoordinate pluginCoordinates )
     {
         this.pluginCoordinates = pluginCoordinates;
     }

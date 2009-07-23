@@ -1,5 +1,9 @@
 package org.sonatype.nexus.plugins;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusContainer;
@@ -31,12 +35,16 @@ public class Assertions
         int processorsPre = mc.getProcessors().size();
 
         // do discovery, both recorded value should be +1
-        PluginManagerResponse pmresponse = nexusPluginManager.activateInstalledPlugins();
+        Collection<PluginManagerResponse> activationResponses = nexusPluginManager.activateInstalledPlugins();
 
-        System.out.println( pmresponse.formatAsString( true ) );
+        Assert.assertEquals( "Three plugins should be discovered!", 4, activationResponses.size() );
 
-        Assert.assertEquals( "Three plugins should be discovered!", 4, pmresponse.getProcessedPluginResponses().size() );
-        Assert.assertEquals( "Should be okay!", RequestResult.COMPLETED, pmresponse.getResult() );
+        for ( PluginManagerResponse response : activationResponses )
+        {
+            System.out.println( response.formatAsString( true ) );
+
+            Assert.assertEquals( "Should be okay!", true, response.isSuccessful() );
+        }
 
         // record post-discovery state
         int customizersPost = mc.getCustomizers().size();
@@ -61,16 +69,15 @@ public class Assertions
         Assert.assertNotNull( infectedFilesCollectorFeedSource );
 
         // now destroy
-        PluginResponse presponse1 =
-            nexusPluginManager.deactivatePlugin( pmresponse.getProcessedPluginCoordinates().get( 0 ) );
-        PluginResponse presponse2 =
-            nexusPluginManager.deactivatePlugin( pmresponse.getProcessedPluginCoordinates().get( 1 ) );
-        PluginResponse presponse3 =
-            nexusPluginManager.deactivatePlugin( pmresponse.getProcessedPluginCoordinates().get( 2 ) );
+        List<PluginDescriptor> activePlugins =
+            new ArrayList<PluginDescriptor>( nexusPluginManager.getActivatedPlugins().values() );
 
-        Assert.assertEquals( "Should be succesful!", true, presponse1.isSuccesful() );
-        Assert.assertEquals( "Should be succesful!", true, presponse2.isSuccesful() );
-        Assert.assertEquals( "Should be succesful!", true, presponse3.isSuccesful() );
+        for ( PluginDescriptor pd : activePlugins )
+        {
+            PluginManagerResponse response = nexusPluginManager.deactivatePlugin( pd.getPluginCoordinates() );
+
+            Assert.assertEquals( "Should be succesful!", true, response.isSuccessful() );
+        }
 
         // record post-destroy state
         int customizersDestroy = mc.getCustomizers().size();

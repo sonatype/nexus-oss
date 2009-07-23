@@ -9,13 +9,13 @@ public class DependencyNotFoundException
 
     private final GAVCoordinate dependencyCoordinate;
 
-    public DependencyNotFoundException( PluginCoordinates pluginCoordinates, GAVCoordinate dependencyCoordinates )
+    public DependencyNotFoundException( GAVCoordinate pluginCoordinates, GAVCoordinate dependencyCoordinates )
     {
         this( pluginCoordinates, dependencyCoordinates, "Dependency \"" + dependencyCoordinates.toString()
             + "\" required by \"" + pluginCoordinates.toString() + "\" not found." );
     }
 
-    public DependencyNotFoundException( PluginCoordinates pluginCoordinates, GAVCoordinate dependencyCoordinates,
+    public DependencyNotFoundException( GAVCoordinate pluginCoordinates, GAVCoordinate dependencyCoordinates,
                                         String message )
     {
         super( pluginCoordinates, message );
