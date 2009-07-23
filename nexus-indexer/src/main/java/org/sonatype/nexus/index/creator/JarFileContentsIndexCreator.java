@@ -145,7 +145,14 @@ public class JarFileContentsIndexCreator
                 }
             }
 
-            ai.classNames = sb.toString();
+            if( sb.toString().trim().length() != 0 )
+            {
+                ai.classNames = sb.toString();
+            }
+            else
+            {
+                ai.classNames = null;
+            }
         }
         finally
         {
