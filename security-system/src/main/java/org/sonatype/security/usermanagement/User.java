@@ -1,10 +1,6 @@
 package org.sonatype.security.usermanagement;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import org.sonatype.security.authorization.Role;
 
 public interface User
 {
@@ -25,6 +21,8 @@ public interface User
     public void setSource( String source );
     
     public void addRole( RoleIdentifier roleIdentifier );
+    
+    public boolean removeRole( RoleIdentifier roleIdentifier );
     
     public void addAllRoles( Set<RoleIdentifier> roleIdentifiers );
     

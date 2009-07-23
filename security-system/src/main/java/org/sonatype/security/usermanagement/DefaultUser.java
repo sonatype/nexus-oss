@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.security.authorization.Role;
-
 public class DefaultUser
     implements User, Comparable<User>
 {
@@ -71,7 +69,12 @@ public class DefaultUser
 
     public void addRole( RoleIdentifier roleIdentifier )
     {
-        this.roleIdentifiers.add( roleIdentifier );
+        this.roleIdentifiers.add( roleIdentifier ); 
+    }
+    
+    public boolean removeRole( RoleIdentifier roleIdentifier )
+    {
+        return this.roleIdentifiers.remove( roleIdentifier );
     }
 
     public void addAllRoles( Set<RoleIdentifier> roleIdentifiers )
