@@ -144,25 +144,33 @@ public abstract class AbstractMavenRepository
             request.setRequestPath( RepositoryItemUid.PATH_ROOT );
         }
 
+        try
+        {
+            if ( !this.getLocalStorage().containsItem( this, request ) )
+            {
+                getLogger().info(
+                    "Skip rebuilding Maven2 Metadata in repository ID='" + getId()
+                        + "' because it does not contain path='" + request.getRequestPath() + "'." );
+
+                return false;
+            }
+        }
+        catch ( StorageException e )
+        {
+            getLogger().warn( "Skip rebuilding Maven2 Metadata in repository ID='" + getId() + "'.", e );
+
+            return false;
+        }
+
         getLogger().info(
-                          "Recreating Maven2 metadata in repository ID='" + getId() + "' from path='"
-                              + request.getRequestPath() + "'" );
+            "Recreating Maven2 metadata in repository ID='" + getId() + "' from path='" + request.getRequestPath()
+                + "'" );
 
         return doRecreateMavenMetadata( request );
     }
 
     protected boolean doRecreateMavenMetadata( ResourceStoreRequest request )
     {
-        if ( !getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
-        {
-            return false;
-        }
-
-        if ( StringUtils.isEmpty( request.getRequestPath() ) )
-        {
-            request.setRequestPath( RepositoryItemUid.PATH_ROOT );
-        }
-
         RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor( this.getLogger() );
 
         DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );

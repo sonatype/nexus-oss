@@ -14,6 +14,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -86,7 +87,17 @@ public abstract class AbstractMavenGroupRepository
 
     public boolean recreateMavenMetadata( ResourceStoreRequest request )
     {
-        return false;
+        boolean result = false;
+
+        for ( Repository repository : getMemberRepositories() )
+        {
+            if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
+            {
+                result |= ( (MavenRepository) repository ).recreateMavenMetadata( request );
+            }
+        }
+
+        return result;
     }
 
     public RepositoryPolicy getRepositoryPolicy()
