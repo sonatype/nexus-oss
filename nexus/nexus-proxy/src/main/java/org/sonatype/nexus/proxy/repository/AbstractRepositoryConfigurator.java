@@ -148,8 +148,6 @@ public abstract class AbstractRepositoryConfigurator
                                      CRepository repoConfig, ExternalConfiguration externalConfiguration )
     {
         // Setting common things on a repository
-
-        repoConfig.getLocalStorage().setUrl( repository.getLocalUrl() );
     }
 
     // ==

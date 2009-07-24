@@ -52,7 +52,7 @@ public class M2RepositoryTest
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
 
         repo1.setAllowWrite( true );
-        
+
         getApplicationConfiguration().saveConfiguration();
 
         return repo1;
@@ -112,19 +112,16 @@ public class M2RepositoryTest
         repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
         repository.getCurrentCoreConfiguration().applyChanges();
 
-        DefaultStorageFileItem item = new DefaultStorageFileItem(
-            repository,
-            SPOOF_RELEASE,
-            true,
-            true,
-            new StringContentLocator( SPOOF_RELEASE ) );
+        DefaultStorageFileItem item =
+            new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true, new StringContentLocator( SPOOF_RELEASE ) );
 
         repository.storeItem( false, item );
 
         try
         {
-            item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
-                SPOOF_SNAPSHOT ) );
+            item =
+                new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true,
+                                            new StringContentLocator( SPOOF_SNAPSHOT ) );
 
             repository.storeItem( false, item );
 
@@ -142,15 +139,17 @@ public class M2RepositoryTest
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
         repository.getCurrentCoreConfiguration().applyChanges();
 
-        item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
-            SPOOF_SNAPSHOT ) );
+        item =
+            new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true,
+                                        new StringContentLocator( SPOOF_SNAPSHOT ) );
 
         repository.storeItem( false, item );
 
         try
         {
-            item = new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true, new StringContentLocator(
-                SPOOF_RELEASE ) );
+            item =
+                new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true,
+                                            new StringContentLocator( SPOOF_RELEASE ) );
 
             repository.storeItem( false, item );
 
@@ -167,10 +166,14 @@ public class M2RepositoryTest
     {
         M2Repository repository = (M2Repository) getResourceStore();
 
-        String releasePom = "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/plexus-container-default-1.0-alpha-40.pom";
-        String releaseArtifact = "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/plexus-container-default-1.0-alpha-40.jar";
-        String snapshotPom = "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/plexus-container-default-1.0-alpha-41-20071205.190351-1.pom";
-        String snapshotArtifact = "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/plexus-container-default-1.0-alpha-41-20071205.190351-1.jar";
+        String releasePom =
+            "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/plexus-container-default-1.0-alpha-40.pom";
+        String releaseArtifact =
+            "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/plexus-container-default-1.0-alpha-40.jar";
+        String snapshotPom =
+            "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/plexus-container-default-1.0-alpha-41-20071205.190351-1.pom";
+        String snapshotArtifact =
+            "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/plexus-container-default-1.0-alpha-41-20071205.190351-1.jar";
         String metadata1 = "/org/codehaus/plexus/plexus-container-default/maven-metadata.xml";
         String metadataR = "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/maven-metadata.xml";
         String metadataS = "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/maven-metadata.xml";
@@ -347,6 +350,38 @@ public class M2RepositoryTest
         repository.retrieveItem( new ResourceStoreRequest( "/spoof/maven-metadata.xml", false ) );
 
         assertEquals( "Only one (1st) of the request should end up in server.", 1, ch.getRequestCount() );
+    }
+
+    public void testLocalStorageChanges()
+        throws Exception
+    {
+        M2Repository repository = (M2Repository) getResourceStore();
+
+        String changedUrl = repository.getLocalUrl() + "foo";
+
+        repository.setLocalUrl( changedUrl );
+
+        assertFalse( "Should not be the same!", changedUrl.equals( repository.getLocalUrl() ) );
+
+        repository.getCurrentCoreConfiguration().applyChanges();
+
+        assertTrue( "Should be the same!", changedUrl.equals( repository.getLocalUrl() ) );
+    }
+
+    public void testRemoteStorageChanges()
+        throws Exception
+    {
+        M2Repository repository = (M2Repository) getResourceStore();
+
+        String changedUrl = repository.getRemoteUrl() + "/foo";
+
+        repository.setRemoteUrl( changedUrl );
+
+        assertFalse( "Should not be the same!", changedUrl.equals( repository.getRemoteUrl() ) );
+
+        repository.getCurrentCoreConfiguration().applyChanges();
+
+        assertTrue( "Should be the same!", changedUrl.equals( repository.getRemoteUrl() ) );
     }
 
     // ==
