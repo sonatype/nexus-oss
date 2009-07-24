@@ -13,7 +13,6 @@
  */
 package org.sonatype.nexus.proxy.mirror;
 
-import java.lang.instrument.ClassDefinition;
 import java.util.Arrays;
 import java.util.List;
 
@@ -62,6 +61,9 @@ public class DefaultDownloadMirrorsTest
         {
             dMirrors.setMirrors( Arrays.asList( mirrors ) );
         }
+        
+        // to apply this
+        coreConfig.applyChanges();
 
         return dMirrors;
     }
