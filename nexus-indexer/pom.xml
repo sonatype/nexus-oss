@@ -307,5 +307,15 @@
       </roles>
       <timezone>-5</timezone>
     </developer>
+	<developer>
+      <id>dbradicich</id>
+      <name>Damian Bradicich</name>
+      <email>dbradicich@sonatype.com</email>
+      <organization>Sonatype</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>
   </developers>
 </project>
