@@ -1,5 +1,10 @@
 package org.sonatype.nexus.plugins;
 
+/**
+ * Plugin static resource model, upon which the static resource and PluginResourceBundle will be built.
+ * 
+ * @author cstamas
+ */
 public class PluginStaticResourceModel
 {
     private final String resourcePath;

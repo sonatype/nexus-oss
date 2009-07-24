@@ -9,6 +9,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.component.repository.ComponentRepository;
 import org.codehaus.plexus.context.Context;
+import org.sonatype.nexus.plugins.plexus.NexusPluginsComponentRepository;
 
 public abstract class AbstractNexusPluginManagerTest
     extends PlexusTestCase

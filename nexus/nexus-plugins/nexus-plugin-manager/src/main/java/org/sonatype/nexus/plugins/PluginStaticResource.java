@@ -8,6 +8,11 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 
+/**
+ * A plugin manager specific StaticResource implementation. It uses plugin's Class Realm to load up static resources.
+ * 
+ * @author cstamas
+ */
 public class PluginStaticResource
     implements StaticResource
 {

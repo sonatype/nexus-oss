@@ -11,13 +11,21 @@ public class PluginResponse
 {
     private final GAVCoordinate pluginCoordinates;
 
-    private Throwable throwable;
+    private final PluginActivationResult wantedGoal;
 
     private PluginDescriptor pluginDescriptor;
 
-    public PluginResponse( GAVCoordinate pluginCoordinates )
+    private Throwable throwable;
+
+    private PluginActivationResult achievedGoal;
+
+    public PluginResponse( GAVCoordinate pluginCoordinates, PluginActivationResult action )
     {
         this.pluginCoordinates = pluginCoordinates;
+
+        this.wantedGoal = action;
+
+        this.achievedGoal = action;
     }
 
     public GAVCoordinate getPluginCoordinates()
@@ -27,7 +35,7 @@ public class PluginResponse
 
     public boolean isSuccessful()
     {
-        return throwable == null;
+        return wantedGoal.equals( achievedGoal );
     }
 
     public Throwable getThrowable()
@@ -38,6 +46,8 @@ public class PluginResponse
     public void setThrowable( Throwable throwable )
     {
         this.throwable = throwable;
+
+        setAchievedGoal( PluginActivationResult.BROKEN );
     }
 
     public PluginDescriptor getPluginDescriptor()
@@ -50,14 +60,29 @@ public class PluginResponse
         this.pluginDescriptor = pluginDescriptor;
     }
 
+    public PluginActivationResult getWantedGoal()
+    {
+        return wantedGoal;
+    }
+
+    public PluginActivationResult getAchievedGoal()
+    {
+        return achievedGoal;
+    }
+
+    public void setAchievedGoal( PluginActivationResult achievedGoal )
+    {
+        this.achievedGoal = achievedGoal;
+    }
+
     // ==
 
     public String formatAsString( boolean detailed )
     {
         StringBuilder sb = new StringBuilder();
 
-        sb.append( "... " ).append( getPluginCoordinates().toString() ).append( " :: " )
-            .append( isSuccessful() ? "ACTIVATED" : "FAILED" ).append( "\n" );
+        sb.append( "... " ).append( getPluginCoordinates().toString() ).append( " :: action=" )
+            .append( wantedGoal.toString() ).append( " result=" ).append( achievedGoal.toString() ).append( "\n" );
 
         if ( !isSuccessful() )
         {

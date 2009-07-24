@@ -3,8 +3,8 @@ package org.sonatype.nexus.plugins.repository;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -44,9 +44,9 @@ public abstract class AbstractFileNexusPluginRepository
     @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
 
-    public Collection<PluginRepositoryArtifact> findAvailablePlugins()
+    public Map<GAVCoordinate, PluginMetadata> findAvailablePlugins()
     {
-        ArrayList<PluginRepositoryArtifact> result = new ArrayList<PluginRepositoryArtifact>();
+        HashMap<GAVCoordinate, PluginMetadata> result = new HashMap<GAVCoordinate, PluginMetadata>();
 
         File root = getNexusPluginsDirectory();
 
@@ -64,19 +64,14 @@ public abstract class AbstractFileNexusPluginRepository
 
                         if ( pluginFile.isFile() )
                         {
-                            GAVCoordinate coord = getCoordinatesForFile( pluginFile );
+                            PluginMetadata md = getMetadataFromFile( pluginFile );
 
-                            if ( coord != null )
+                            if ( md != null )
                             {
-                                PluginRepositoryArtifact art = new PluginRepositoryArtifact();
+                                GAVCoordinate coord =
+                                    new GAVCoordinate( md.getGroupId(), md.getArtifactId(), md.getVersion() );
 
-                                art.setNexusPluginRepository( this );
-
-                                art.setCoordinate( coord );
-
-                                art.setFile( pluginFile );
-
-                                result.add( art );
+                                result.put( coord, md );
                             }
                         }
                     }
@@ -137,11 +132,8 @@ public abstract class AbstractFileNexusPluginRepository
 
     // ==
 
-    protected GAVCoordinate getCoordinatesForFile( File pluginFile )
+    protected PluginMetadata getMetadataFromFile( File pluginFile )
     {
-        // STUPID
-        // This whole part is copy + paste from PM scanJar,
-        // will do it for now but we don't want to crank a jar just to read GAV
         ZipFile jar = null;
 
         try
@@ -165,7 +157,7 @@ public abstract class AbstractFileNexusPluginRepository
 
                 PluginMetadata md = pdreader.read( reader );
 
-                return new GAVCoordinate( md.getGroupId(), md.getArtifactId(), md.getVersion() );
+                return md;
             }
             catch ( XmlPullParserException e )
             {

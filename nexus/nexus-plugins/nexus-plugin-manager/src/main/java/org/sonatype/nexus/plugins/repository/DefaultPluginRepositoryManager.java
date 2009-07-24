@@ -1,6 +1,5 @@
 package org.sonatype.nexus.plugins.repository;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -8,6 +7,7 @@ import java.util.TreeSet;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.plugin.metadata.GAVCoordinate;
+import org.sonatype.plugins.model.PluginMetadata;
 
 @Component( role = PluginRepositoryManager.class )
 public class DefaultPluginRepositoryManager
@@ -60,7 +60,7 @@ public class DefaultPluginRepositoryManager
         getCustomRepositories().remove( id );
     }
 
-    public Collection<PluginRepositoryArtifact> findAvailablePlugins()
+    public Map<GAVCoordinate, PluginMetadata> findAvailablePlugins()
     {
         // we collect and order repositories into _descending_ order
         // to make system plugins stomp over the user added ones if
@@ -70,20 +70,14 @@ public class DefaultPluginRepositoryManager
 
         repositories.addAll( getRepositories().values() );
 
-        HashMap<GAVCoordinate, PluginRepositoryArtifact> result =
-            new HashMap<GAVCoordinate, PluginRepositoryArtifact>();
+        HashMap<GAVCoordinate, PluginMetadata> result = new HashMap<GAVCoordinate, PluginMetadata>();
 
         for ( NexusPluginRepository repository : repositories )
         {
-            Collection<PluginRepositoryArtifact> artifacts = repository.findAvailablePlugins();
-
-            for ( PluginRepositoryArtifact artifact : artifacts )
-            {
-                result.put( artifact.getCoordinate(), artifact );
-            }
+            result.putAll( repository.findAvailablePlugins() );
         }
 
-        return result.values();
+        return result;
     }
 
     public PluginRepositoryArtifact resolveArtifact( GAVCoordinate coordinates )

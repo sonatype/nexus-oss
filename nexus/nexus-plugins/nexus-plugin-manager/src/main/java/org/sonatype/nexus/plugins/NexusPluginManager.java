@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.sonatype.plugin.metadata.GAVCoordinate;
+import org.sonatype.plugins.model.PluginMetadata;
 
 /**
  * A high level interface for plugin manager.
@@ -15,26 +16,18 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 public interface NexusPluginManager
 {
     /**
-     * Creates a plugin key from coordinates.
-     * 
-     * @param coordinate
-     * @return
-     */
-    String getPluginKey( GAVCoordinate coordinate );
-
-    /**
      * Returns the unmodifiable Map of installed plugins.
      * 
      * @return
      */
-    Map<String, PluginDescriptor> getActivatedPlugins();
+    Map<GAVCoordinate, PluginDescriptor> getActivatedPlugins();
 
     /**
      * Returns the unmodifiable Map of available plugins.
      * 
      * @return
      */
-    Map<String, PluginDescriptor> getAvailablePlugins();
+    Map<GAVCoordinate, PluginMetadata> getAvailablePlugins();
 
     /**
      * Should be called even before boot process, simply to make plugin-contributed components available to Plexus,

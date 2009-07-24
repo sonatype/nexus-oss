@@ -40,6 +40,7 @@ import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginDeactivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
+import org.sonatype.nexus.plugins.plexus.NexusPluginsComponentRepository;
 import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactException;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
@@ -85,7 +86,8 @@ public class DefaultNexusPluginManager
     @Requirement
     private PlexusComponentGleaner plexusComponentGleaner;
 
-    private final Map<String, PluginDescriptor> activatedPlugins = new HashMap<String, PluginDescriptor>();
+    private final Map<GAVCoordinate, PluginDescriptor> activatedPlugins =
+        new HashMap<GAVCoordinate, PluginDescriptor>();
 
     public void initialize()
         throws InitializationException
@@ -107,31 +109,25 @@ public class DefaultNexusPluginManager
         }
     }
 
-    public String getPluginKey( GAVCoordinate coordinate )
+    public Map<GAVCoordinate, PluginDescriptor> getActivatedPlugins()
     {
-        return coordinate.getGroupId() + ":" + coordinate.getArtifactId() + ":" + coordinate.getVersion();
+        return Collections.unmodifiableMap( new HashMap<GAVCoordinate, PluginDescriptor>( activatedPlugins ) );
     }
 
-    public Map<String, PluginDescriptor> getActivatedPlugins()
+    public Map<GAVCoordinate, PluginMetadata> getAvailablePlugins()
     {
-        return Collections.unmodifiableMap( new HashMap<String, PluginDescriptor>( activatedPlugins ) );
-    }
-
-    public Map<String, PluginDescriptor> getAvailablePlugins()
-    {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.unmodifiableMap( pluginRepositoryManager.findAvailablePlugins() );
     }
 
     public Collection<PluginManagerResponse> activateInstalledPlugins()
     {
-        Collection<PluginRepositoryArtifact> availablePlugins = pluginRepositoryManager.findAvailablePlugins();
+        Map<GAVCoordinate, PluginMetadata> availablePlugins = pluginRepositoryManager.findAvailablePlugins();
 
         ArrayList<PluginManagerResponse> result = new ArrayList<PluginManagerResponse>( availablePlugins.size() );
 
-        for ( PluginRepositoryArtifact artifact : availablePlugins )
+        for ( GAVCoordinate pluginCoordinate : availablePlugins.keySet() )
         {
-            result.add( activatePlugin( artifact.getCoordinate() ) );
+            result.add( activatePlugin( pluginCoordinate ) );
         }
 
         return result;
@@ -153,7 +149,7 @@ public class DefaultNexusPluginManager
 
     public PluginManagerResponse activatePlugin( GAVCoordinate pluginCoordinate )
     {
-        if ( getActivatedPlugins().containsKey( getPluginKey( pluginCoordinate ) ) )
+        if ( getActivatedPlugins().containsKey( pluginCoordinate ) )
         {
             PluginManagerResponse response = new PluginManagerResponse( pluginCoordinate );
 
@@ -168,7 +164,7 @@ public class DefaultNexusPluginManager
         }
         catch ( NoSuchPluginRepositoryArtifactException e )
         {
-            PluginResponse result = new PluginResponse( pluginCoordinate );
+            PluginResponse result = new PluginResponse( pluginCoordinate, PluginActivationResult.ACTIVATED );
 
             result.setThrowable( new NoSuchPluginException( pluginCoordinate ) );
 
@@ -184,15 +180,13 @@ public class DefaultNexusPluginManager
     {
         PluginManagerResponse response = new PluginManagerResponse( pluginCoordinates );
 
-        PluginResponse result = new PluginResponse( pluginCoordinates );
+        PluginResponse result = new PluginResponse( pluginCoordinates, PluginActivationResult.DEACTIVATED );
 
         try
         {
-            String pluginKey = getPluginKey( pluginCoordinates );
-
-            if ( getActivatedPlugins().containsKey( pluginKey ) )
+            if ( getActivatedPlugins().containsKey( pluginCoordinates ) )
             {
-                PluginDescriptor pluginDescriptor = getActivatedPlugins().get( pluginKey );
+                PluginDescriptor pluginDescriptor = getActivatedPlugins().get( pluginCoordinates );
 
                 // scan all activated plugins and look if some points at us
                 for ( PluginDescriptor activePlugin : getActivatedPlugins().values() )
@@ -233,7 +227,7 @@ public class DefaultNexusPluginManager
 
         GAVCoordinate pluginCoordinates = pluginArtifact.getCoordinate();
 
-        PluginResponse result = new PluginResponse( pluginCoordinates );
+        PluginResponse result = new PluginResponse( pluginCoordinates, PluginActivationResult.ACTIVATED );
 
         PluginDescriptor pluginDescriptor = null;
 
@@ -260,7 +254,7 @@ public class DefaultNexusPluginManager
             pluginDescriptor = scanPluginJar( pluginCoordinates, pluginFile );
 
             // create plugin realm as container child
-            pluginDescriptor.setPluginRealm( plexusContainer.createChildRealm( getPluginKey( pluginCoordinates ) ) );
+            pluginDescriptor.setPluginRealm( plexusContainer.createChildRealm( pluginCoordinates.toCompositeForm() ) );
 
             // add plugin jar to it
             pluginDescriptor.getPluginRealm().addURL( toUrl( pluginFile ) );
@@ -294,7 +288,7 @@ public class DefaultNexusPluginManager
             // add imports
             for ( GAVCoordinate coord : dependencyPlugins )
             {
-                PluginDescriptor importPlugin = getActivatedPlugins().get( getPluginKey( coord ) );
+                PluginDescriptor importPlugin = getActivatedPlugins().get( coord );
 
                 List<String> exports = importPlugin.getExports();
 
@@ -429,8 +423,6 @@ public class DefaultNexusPluginManager
         throws InvalidPluginException, IOException
     {
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
-
-        pluginDescriptor.setPluginKey( getPluginKey( pluginCoordinates ) );
 
         pluginDescriptor.setPluginCoordinates( pluginCoordinates );
 
@@ -784,7 +776,7 @@ public class DefaultNexusPluginManager
             ComponentDescriptor<NexusResourceBundle> pluginBundle = new ComponentDescriptor<NexusResourceBundle>();
 
             pluginBundle.setRole( NexusResourceBundle.class.getName() );
-            pluginBundle.setRoleHint( pd.getPluginKey() );
+            pluginBundle.setRoleHint( pd.getPluginCoordinates().toCompositeForm() );
             pluginBundle.setImplementation( PluginResourceBundle.class.getName() );
 
             ComponentRequirement pluginManagerRequirement = new ComponentRequirement();
@@ -793,7 +785,7 @@ public class DefaultNexusPluginManager
             pluginBundle.addRequirement( pluginManagerRequirement );
 
             XmlPlexusConfiguration pluginBundleConfiguration = new XmlPlexusConfiguration();
-            pluginBundleConfiguration.addChild( "pluginKey", pd.getPluginKey() );
+            pluginBundleConfiguration.addChild( "pluginKey", pd.getPluginCoordinates().toCompositeForm() );
             pluginBundle.setConfiguration( pluginBundleConfiguration );
 
             pd.addComponentDescriptor( pluginBundle );
@@ -810,7 +802,7 @@ public class DefaultNexusPluginManager
         PluginDescriptor pluginDescriptor = pluginDiscoveryContext.getPluginDescriptor();
 
         // add it to "known" plugins
-        if ( !activatedPlugins.containsKey( pluginDescriptor.getPluginKey() ) )
+        if ( !activatedPlugins.containsKey( pluginDescriptor.getPluginCoordinates() ) )
         {
             // register them to plexus
             for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
@@ -839,7 +831,7 @@ public class DefaultNexusPluginManager
             }
 
             // add it to map
-            activatedPlugins.put( pluginDescriptor.getPluginKey(), pluginDescriptor );
+            activatedPlugins.put( pluginDescriptor.getPluginCoordinates(), pluginDescriptor );
 
             // set is as registered
             pluginDiscoveryContext.setPluginRegistered( true );

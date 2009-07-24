@@ -1,4 +1,4 @@
-package org.sonatype.nexus.plugins;
+package org.sonatype.nexus.plugins.plexus;
 
 import static org.codehaus.plexus.component.CastUtils.isAssignableFrom;
 
@@ -21,6 +21,9 @@ import org.codehaus.plexus.component.composition.DefaultCompositionResolver;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.ComponentRepository;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.plugins.NexusPluginManager;
+import org.sonatype.nexus.plugins.PluginDescriptor;
+import org.sonatype.plugin.metadata.GAVCoordinate;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -117,7 +120,9 @@ public class NexusPluginsComponentRepository
                 {
                     // WE ASSUME HERE that realm uses the same coord.getPluginKey()!!!!
                     // FIX THIS
-                    pluginDescriptor = getNexusPluginManager().getActivatedPlugins().get( realm.getId() );
+                    GAVCoordinate pluginCoord = new GAVCoordinate( realm.getId() );
+
+                    pluginDescriptor = getNexusPluginManager().getActivatedPlugins().get( pluginCoord );
 
                     if ( pluginDescriptor != null )
                     {

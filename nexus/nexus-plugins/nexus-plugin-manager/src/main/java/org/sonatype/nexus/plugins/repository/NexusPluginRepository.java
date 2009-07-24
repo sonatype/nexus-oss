@@ -1,8 +1,9 @@
 package org.sonatype.nexus.plugins.repository;
 
-import java.util.Collection;
+import java.util.Map;
 
 import org.sonatype.plugin.metadata.GAVCoordinate;
+import org.sonatype.plugins.model.PluginMetadata;
 
 public interface NexusPluginRepository
 {
@@ -25,7 +26,7 @@ public interface NexusPluginRepository
      * 
      * @return
      */
-    Collection<PluginRepositoryArtifact> findAvailablePlugins();
+    Map<GAVCoordinate, PluginMetadata> findAvailablePlugins();
 
     /**
      * Returns the artifaft for the given coordinates.

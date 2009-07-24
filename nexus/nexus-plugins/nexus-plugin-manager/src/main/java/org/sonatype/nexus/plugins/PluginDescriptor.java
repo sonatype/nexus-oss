@@ -13,8 +13,6 @@ import org.sonatype.plugins.model.PluginMetadata;
 public class PluginDescriptor
     extends ComponentSetDescriptor
 {
-    private String pluginKey;
-
     private GAVCoordinate pluginCoordinates;
 
     private PluginMetadata pluginMetadata;
@@ -28,16 +26,6 @@ public class PluginDescriptor
     private List<PluginStaticResourceModel> pluginStaticResourceModels;
 
     private Map<String, PluginRepositoryType> pluginRepositoryTypes;
-
-    public String getPluginKey()
-    {
-        return pluginKey;
-    }
-
-    public void setPluginKey( String pluginKey )
-    {
-        this.pluginKey = pluginKey;
-    }
 
     public GAVCoordinate getPluginCoordinates()
     {

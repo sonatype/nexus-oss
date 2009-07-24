@@ -16,11 +16,6 @@ public class PluginActivatedEvent
         this.pluginDescriptor = pluginDescriptor;
     }
 
-    public String getPluginKey()
-    {
-        return getPluginDescriptor().getPluginKey();
-    }
-
     public PluginDescriptor getPluginDescriptor()
     {
         return pluginDescriptor;

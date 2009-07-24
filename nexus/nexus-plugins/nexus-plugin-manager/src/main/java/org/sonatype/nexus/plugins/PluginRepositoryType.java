@@ -1,5 +1,10 @@
 package org.sonatype.nexus.plugins;
 
+/**
+ * Model describing what repository type did plugin contribute to Nexus core.
+ * 
+ * @author cstamas
+ */
 public class PluginRepositoryType
 {
     private String componentContract;

@@ -8,6 +8,7 @@ import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
+import org.sonatype.plugin.metadata.GAVCoordinate;
 
 /**
  * A PluginResourceBundle component. Even if this class is plexus annotated, the instances of this class are actually
@@ -38,7 +39,9 @@ public class PluginResourceBundle
 
     public List<StaticResource> getContributedResouces()
     {
-        PluginDescriptor pd = nexusPluginManager.getActivatedPlugins().get( pluginKey );
+        GAVCoordinate coord = new GAVCoordinate( pluginKey );
+
+        PluginDescriptor pd = nexusPluginManager.getActivatedPlugins().get( coord );
 
         if ( pd == null )
         {
