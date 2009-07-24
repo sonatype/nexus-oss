@@ -72,18 +72,6 @@
           <type>String</type>
           <required>false</required>
         </field>
-        <field>
-          <name>privateKey</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>false</required>
-        </field>
-        <field>
-          <name>passphrase</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>false</required>
-        </field>
       </fields>
     </class>
 

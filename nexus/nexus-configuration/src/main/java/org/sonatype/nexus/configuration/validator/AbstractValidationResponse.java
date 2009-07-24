@@ -212,5 +212,33 @@ public abstract class AbstractValidationResponse
         return context;
     }
     
+    public String toString()
+    {
+        StringBuffer buffer = new StringBuffer();
+        
+        // errors
+        if( this.getValidationErrors() != null && !this.getValidationErrors().isEmpty())
+        {
+            buffer.append( "errors:\n" );
+            
+            for ( ValidationMessage error : this.getValidationErrors() )
+            {
+                buffer.append( "\t" ).append( error.getKey() ).append( " - " ).append( error.getMessage() ).append( "\n" );   
+            }
+        }
+        
+        // warings
+        if( this.getValidationWarnings() != null && !this.getValidationWarnings().isEmpty())
+        {
+            buffer.append( "warnings:\n" );
+            
+            for ( ValidationMessage warning : this.getValidationWarnings() )
+            {
+                buffer.append( "\t" ).append( warning.getKey() ).append( " - " ).append( warning.getMessage() ).append( "\n" );   
+            }
+        }
+        return buffer.toString();
+    }
+    
     protected abstract ValidationContext doGetContext();
 }

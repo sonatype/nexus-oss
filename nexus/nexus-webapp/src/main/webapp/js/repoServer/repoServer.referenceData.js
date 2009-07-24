@@ -56,9 +56,7 @@ Sonatype.repoServer.referenceData = {
         username: "",
         password: "",
         ntlmHost: "",
-        ntlmDomain: "",
-        privateKey: "",
-        passphrase: ""
+        ntlmDomain: ""
       }
     }
   },
@@ -116,9 +114,7 @@ Sonatype.repoServer.referenceData = {
           username: "",
           password: "",
           ntlmHost: "",
-          ntlmDomain: "",
-          privateKey: "",
-          passphrase: ""
+          ntlmDomain: ""
         },
         connectionSettings: {
           connectionTimeout: 0,
@@ -133,9 +129,7 @@ Sonatype.repoServer.referenceData = {
             username: "",
             password: "",
             ntlmHost: "",
-            ntlmDomain: "",
-            privateKey: "",
-            passphrase: ""
+            ntlmDomain: ""
           }
         }
       }

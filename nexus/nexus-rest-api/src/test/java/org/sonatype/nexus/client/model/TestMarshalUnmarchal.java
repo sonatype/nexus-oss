@@ -570,9 +570,7 @@ public class TestMarshalUnmarchal
         AuthenticationSettings authSet = new AuthenticationSettings();
         authSet.setNtlmDomain( "ntlmDomain" );
         authSet.setNtlmHost( "ntlmHost" );
-        authSet.setPassphrase( "passphrase" );
         authSet.setPassword( "password" );
-        authSet.setPrivateKey( "privateKey" );
         authSet.setUsername( "username" );
         proxySet.setAuthentication( authSet );
         resource.setGlobalHttpProxySettings( proxySet );

@@ -677,22 +677,6 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
               },
               {
                 xtype: 'textfield',
-                fieldLabel: 'Private Key',
-                helpText: ht.remotePrivateKey,
-                name: 'remoteStorage.authentication.privateKey',
-                anchor: Sonatype.view.FIELD_OFFSET,
-                allowBlank:true
-              },
-              {
-                xtype: 'textfield',
-                fieldLabel: 'Key Passphrase',
-                helpText: ht.remotePassphrase,
-                name: 'remoteStorage.authentication.passphrase',
-                width: 100,
-                allowBlank:true
-              },
-              {
-                xtype: 'textfield',
                 fieldLabel: 'NT LAN Host',
                 helpText: ht.remoteNtlmHost,
                 name: 'remoteStorage.authentication.ntlmHost',
@@ -943,22 +927,6 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
                 helpText: ht.password,
                 inputType:'password',
                 name: 'remoteStorage.httpProxySettings.authentication.password',
-                width: 100,
-                allowBlank: true
-              },
-              {
-                xtype: 'textfield',
-                fieldLabel: 'Private Key',
-                helpText: ht.privateKey,
-                name: 'remoteStorage.httpProxySettings.authentication.privateKey',
-                anchor: Sonatype.view.FIELD_OFFSET,
-                allowBlank: true
-              },
-              {
-                xtype: 'textfield',
-                fieldLabel: 'Key Passphrase',
-                helpText: ht.passphrase,
-                name: 'remoteStorage.httpProxySettings.authentication.passphrase',
                 width: 100,
                 allowBlank: true
               },

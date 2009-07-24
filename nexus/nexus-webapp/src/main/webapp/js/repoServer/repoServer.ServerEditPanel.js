@@ -463,23 +463,6 @@ Sonatype.repoServer.ServerEditPanel = function(config){
               },
               {
                 xtype: 'textfield',
-                fieldLabel: 'Private Key',
-                helpText: ht.privateKey,
-                name: 'globalHttpProxySettings.authentication.privateKey',
-                anchor: Sonatype.view.FIELD_OFFSET,
-                allowBlank:true
-              },
-              {
-                xtype: 'textfield',
-                fieldLabel: 'Key Passphrase',
-                helpText: ht.passphrase,
-                inputType:'password',
-                name: 'globalHttpProxySettings.authentication.passphrase',
-                width: 100,
-                allowBlank:true
-              },
-              {
-                xtype: 'textfield',
                 fieldLabel: 'NT LAN Host',
                 helpText: ht.ntlmHost,
                 name: 'globalHttpProxySettings.authentication.ntlmHost',

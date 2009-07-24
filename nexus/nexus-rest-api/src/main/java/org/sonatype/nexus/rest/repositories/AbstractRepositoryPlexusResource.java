@@ -21,6 +21,9 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -36,6 +39,9 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.NexusCompat;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
+import org.sonatype.nexus.rest.model.AuthenticationSettings;
+import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
+import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
@@ -348,5 +354,60 @@ public abstract class AbstractRepositoryPlexusResource
         resource.setExposed( shadow.isExposed() );
 
         return resource;
+    }
+    
+    protected CRemoteAuthentication convertAuthentication( AuthenticationSettings authentication )
+    {
+        if ( authentication == null )
+        {
+            return null;
+        }
+
+        CRemoteAuthentication appModelSettings = new CRemoteAuthentication();
+
+        appModelSettings.setUsername( authentication.getUsername() );
+        appModelSettings.setPassword( authentication.getPassword() );
+        appModelSettings.setNtlmDomain( authentication.getNtlmDomain() );
+        appModelSettings.setNtlmHost( authentication.getNtlmHost() );
+
+        return appModelSettings;
+    }
+    
+    protected CRemoteHttpProxySettings convertHttpProxySettings( RemoteHttpProxySettings remoteHttpProxySettings )
+    {
+        if ( remoteHttpProxySettings == null )
+        {
+            return null;
+        }
+        
+        CRemoteHttpProxySettings httpProxySettings = new CRemoteHttpProxySettings();
+
+        httpProxySettings.setProxyHostname( remoteHttpProxySettings.getProxyHostname() );
+
+        httpProxySettings.setProxyPort( remoteHttpProxySettings.getProxyPort() );
+
+        httpProxySettings.setAuthentication( convertAuthentication( remoteHttpProxySettings.getAuthentication() ) );
+
+        return httpProxySettings;
+    }
+    
+    protected CRemoteConnectionSettings convertRemoteConnectionSettings( RemoteConnectionSettings remoteConnectionSettings )
+    {
+        if ( remoteConnectionSettings == null)
+        {
+            return null;
+        }
+        
+        CRemoteConnectionSettings cRemoteConnectionSettings = new CRemoteConnectionSettings();
+
+        cRemoteConnectionSettings.setConnectionTimeout( remoteConnectionSettings.getConnectionTimeout() * 1000 );
+
+        cRemoteConnectionSettings.setQueryString( remoteConnectionSettings.getQueryString() );
+
+        cRemoteConnectionSettings.setRetrievalRetryCount( remoteConnectionSettings.getRetrievalRetryCount() );
+
+        cRemoteConnectionSettings.setUserAgentCustomizationString( remoteConnectionSettings.getUserAgentString() );
+        
+        return cRemoteConnectionSettings;
     }
 }

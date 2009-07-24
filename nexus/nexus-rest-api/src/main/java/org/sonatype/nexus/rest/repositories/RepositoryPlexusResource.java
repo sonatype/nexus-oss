@@ -23,12 +23,19 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.model.CHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.RemoteSettingsUtil;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
@@ -159,10 +166,55 @@ public class RepositoryPlexusResource
                             {
                                 ChecksumPolicy checksum =
                                     EnumUtil.valueOf( model.getChecksumPolicy(), ChecksumPolicy.class );
-                                repository.adaptToFacet( MavenProxyRepository.class ).setChecksumPolicy( checksum );
+                                
+                                MavenProxyRepository pRepository = repository.adaptToFacet( MavenProxyRepository.class );
+                                pRepository.setChecksumPolicy( checksum );
 
-                                repository.adaptToFacet( MavenProxyRepository.class ).setDownloadRemoteIndexes(
-                                                                                                                model.isDownloadRemoteIndexes() );
+                                pRepository.setDownloadRemoteIndexes( model.isDownloadRemoteIndexes() );
+                                
+                                pRepository.setRemoteUrl( model.getRemoteStorage().getRemoteStorageUrl() );
+                                
+                                pRepository.setChecksumPolicy( EnumUtil.valueOf( model.getChecksumPolicy(), ChecksumPolicy.class ) );
+                                
+                                pRepository.setDownloadRemoteIndexes( model.isDownloadRemoteIndexes() );
+                                
+                                RepositoryProxyResource proxyModel = ( RepositoryProxyResource ) model;
+                                
+                                pRepository.setArtifactMaxAge( proxyModel.getArtifactMaxAge() );
+                                
+                                pRepository.setMetadataMaxAge( proxyModel.getMetadataMaxAge() );
+                                
+                                
+                                RemoteAuthenticationSettings remoteAuth = RemoteSettingsUtil.convertFromModel( this.convertAuthentication(  model.getRemoteStorage().getAuthentication() ));
+                                RemoteConnectionSettings remoteConnSettings = RemoteSettingsUtil.convertFromModel( this.convertRemoteConnectionSettings( model.getRemoteStorage().getConnectionSettings() ));
+                                RemoteProxySettings httpProxySettings = RemoteSettingsUtil.convertFromModel( this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings() ) );
+                                
+                                if( remoteAuth != null )
+                                {
+                                    pRepository.setRemoteAuthenticationSettings( remoteAuth );
+                                }
+                                else
+                                {
+                                    pRepository.getRemoteStorageContext().removeRemoteAuthenticationSettings();
+                                }
+                                
+                                if( remoteConnSettings != null )
+                                {
+                                    pRepository.setRemoteConnectionSettings( remoteConnSettings );
+                                }
+                                else
+                                {
+                                    pRepository.getRemoteStorageContext().removeRemoteConnectionSettings();
+                                }
+                                
+                                if( httpProxySettings != null)
+                                {
+                                    pRepository.setRemoteProxySettings( httpProxySettings );   
+                                }
+                                else
+                                {
+                                    pRepository.getRemoteStorageContext().removeRemoteProxySettings();
+                                }
                             }
                         }
 
@@ -173,6 +225,8 @@ public class RepositoryPlexusResource
 
                         if ( RepositoryProxyResource.class.isAssignableFrom( model.getClass() ) )
                         {
+                            
+                            
                             // XXX cstamas!
                             // appModel = getRepositoryProxyAppModel( (RepositoryProxyResource) model, appModel );
                         }
