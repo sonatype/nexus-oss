@@ -439,7 +439,7 @@ public class DefaultRepositoryRouter
         if ( explodedPath.length >= 1 )
         {
             // we have kind information ("repositories" vs "groups" etc)
-            for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRepositoryTypeDescriptors() )
+            for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRegisteredRepositoryTypeDescriptors() )
             {
                 try
                 {
@@ -571,7 +571,7 @@ public class DefaultRepositoryRouter
             // 1st level
             ArrayList<StorageItem> result = new ArrayList<StorageItem>();
 
-            for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRepositoryTypeDescriptors() )
+            for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRegisteredRepositoryTypeDescriptors() )
             {
                 try
                 {
@@ -610,7 +610,7 @@ public class DefaultRepositoryRouter
 
             Class<Repository> kind = null;
 
-            for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRepositoryTypeDescriptors() )
+            for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRegisteredRepositoryTypeDescriptors() )
             {
                 try
                 {

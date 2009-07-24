@@ -198,6 +198,18 @@ public class DefaultNexusPluginManager
                     }
                 }
 
+                // unregister discovered repo types
+                for ( PluginRepositoryType repoType : pluginDescriptor.getPluginRepositoryTypes().values() )
+                {
+                    RepositoryTypeDescriptor repoTypeDescriptor = new RepositoryTypeDescriptor();
+
+                    repoTypeDescriptor.setRole( repoType.getComponentContract() );
+
+                    repoTypeDescriptor.setPrefix( repoType.getPathPrefix() );
+
+                    repositoryTypeRegistry.unregisterRepositoryTypeDescriptors( repoTypeDescriptor );
+                }
+                
                 // kill it
                 plexusContainer.removeComponentRealm( pluginDescriptor.getPluginRealm() );
 
@@ -827,7 +839,7 @@ public class DefaultNexusPluginManager
 
                 repoTypeDescriptor.setPrefix( repoType.getPathPrefix() );
 
-                repositoryTypeRegistry.getRepositoryTypeDescriptors().add( repoTypeDescriptor );
+                repositoryTypeRegistry.registerRepositoryTypeDescriptors( repoTypeDescriptor );
             }
 
             // add it to map

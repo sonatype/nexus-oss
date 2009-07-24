@@ -46,27 +46,42 @@ public class DefaultRepositoryTypeRegistry
 
     private Map<String, ContentClass> repoCachedContentClasses = new HashMap<String, ContentClass>();
 
-    private Set<RepositoryTypeDescriptor> repositoryRoles;
+    private Set<RepositoryTypeDescriptor> repositoryTypeDescriptors;
 
-    public Set<RepositoryTypeDescriptor> getRepositoryTypeDescriptors()
+    protected Set<RepositoryTypeDescriptor> getRepositoryTypeDescriptors()
     {
-        if ( repositoryRoles == null )
+        if ( repositoryTypeDescriptors == null )
         {
-            repositoryRoles = new HashSet<RepositoryTypeDescriptor>();
+            repositoryTypeDescriptors = new HashSet<RepositoryTypeDescriptor>();
 
             // fill in the defaults
-            repositoryRoles.add( new RepositoryTypeDescriptor( Repository.class.getName(), "repositories" ) );
-            repositoryRoles.add( new RepositoryTypeDescriptor( ShadowRepository.class.getName(), "shadows" ) );
-            repositoryRoles.add( new RepositoryTypeDescriptor( GroupRepository.class.getName(), "groups" ) );
-            repositoryRoles.add( new RepositoryTypeDescriptor( WebSiteRepository.class.getName(), "sites" ) );
+            repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( Repository.class.getName(), "repositories" ) );
+            repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( ShadowRepository.class.getName(), "shadows" ) );
+            repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( GroupRepository.class.getName(), "groups" ) );
+            repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( WebSiteRepository.class.getName(), "sites" ) );
         }
 
-        return repositoryRoles;
+        return repositoryTypeDescriptors;
+    }
+
+    public Set<RepositoryTypeDescriptor> getRegisteredRepositoryTypeDescriptors()
+    {
+        return Collections.unmodifiableSet( getRepositoryTypeDescriptors() );
+    }
+
+    public boolean registerRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
+    {
+        return getRepositoryTypeDescriptors().add( d );
+    }
+
+    public boolean unregisterRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
+    {
+        return getRepositoryTypeDescriptors().remove( d );
     }
 
     public Set<String> getRepositoryRoles()
     {
-        Set<RepositoryTypeDescriptor> rtds = getRepositoryTypeDescriptors();
+        Set<RepositoryTypeDescriptor> rtds = getRegisteredRepositoryTypeDescriptors();
 
         HashSet<String> result = new HashSet<String>( rtds.size() );
 

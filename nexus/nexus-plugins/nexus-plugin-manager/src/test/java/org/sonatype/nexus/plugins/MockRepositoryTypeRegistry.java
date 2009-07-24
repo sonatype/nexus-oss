@@ -1,5 +1,6 @@
 package org.sonatype.nexus.plugins;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,9 +15,19 @@ public class MockRepositoryTypeRegistry
 {
     private HashSet<RepositoryTypeDescriptor> types = new HashSet<RepositoryTypeDescriptor>();
 
-    public Set<RepositoryTypeDescriptor> getRepositoryTypeDescriptors()
+    public Set<RepositoryTypeDescriptor> getRegisteredRepositoryTypeDescriptors()
     {
-        return types;
+        return Collections.unmodifiableSet( types );
+    }
+
+    public boolean registerRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
+    {
+        return types.add( d );
+    }
+
+    public boolean unregisterRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
+    {
+        return types.remove( d );
     }
 
     // == neglected all below
