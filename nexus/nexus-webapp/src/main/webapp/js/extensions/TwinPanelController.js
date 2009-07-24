@@ -145,7 +145,8 @@ Ext.reg( 'twinpanelcontroller', Sonatype.ext.TwinPanelController );
 Sonatype.ext.TwinPanelChooser = function( config ){
   var config = config || {};
   var defaultConfig = {
-    displayField: 'name'
+    displayField: 'name',
+    nodeIcon: Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif'
   };
   Ext.apply( this, config, defaultConfig );
 
@@ -297,7 +298,8 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
       allowChildren: false,
       draggable: true,
       leaf: true,
-      disabled: rec.data.readOnly
+      disabled: rec.data.readOnly,
+      icon: this.nodeIcon
     }));
   },
   
