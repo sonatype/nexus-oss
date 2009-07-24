@@ -41,9 +41,12 @@ import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginDeactivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
 import org.sonatype.nexus.plugins.plexus.NexusPluginsComponentRepository;
+import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
+import org.sonatype.nexus.plugins.repository.NexusWritablePluginRepository;
 import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactException;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
+import org.sonatype.nexus.plugins.repository.UserNexusPluginRepository;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
@@ -89,6 +92,9 @@ public class DefaultNexusPluginManager
     private final Map<GAVCoordinate, PluginDescriptor> activatedPlugins =
         new HashMap<GAVCoordinate, PluginDescriptor>();
 
+    private final Map<GAVCoordinate, PluginResponse> pluginActions =
+        new HashMap<GAVCoordinate, PluginResponse>();
+
     public void initialize()
         throws InitializationException
     {
@@ -114,9 +120,61 @@ public class DefaultNexusPluginManager
         return Collections.unmodifiableMap( new HashMap<GAVCoordinate, PluginDescriptor>( activatedPlugins ) );
     }
 
-    public Map<GAVCoordinate, PluginMetadata> getAvailablePlugins()
+    public Map<GAVCoordinate, PluginMetadata> getInstalledPlugins()
     {
         return Collections.unmodifiableMap( pluginRepositoryManager.findAvailablePlugins() );
+    }
+
+    public Map<GAVCoordinate, PluginResponse> getPluginResponses()
+    {
+        return Collections.unmodifiableMap( new HashMap<GAVCoordinate, PluginResponse>( pluginActions ) );
+    }
+
+    public boolean installPluginBundle( File bundle )
+        throws IOException
+    {
+        NexusPluginRepository userRepository =
+            pluginRepositoryManager.getNexusPluginRepository( UserNexusPluginRepository.ID );
+
+        if ( userRepository instanceof NexusWritablePluginRepository )
+        {
+            NexusWritablePluginRepository writableUserRepository = (NexusWritablePluginRepository) userRepository;
+
+            return writableUserRepository.installPluginBundle( bundle );
+        }
+
+        return false;
+    }
+
+    public boolean uninstallPluginBundle( GAVCoordinate coords )
+        throws IOException
+    {
+        if ( isActivatedPlugin( coords ) )
+        {
+            PluginManagerResponse result = deactivatePlugin( coords );
+
+            if ( !result.isSuccessful() )
+            {
+                return false;
+            }
+        }
+
+        NexusPluginRepository userRepository =
+            pluginRepositoryManager.getNexusPluginRepository( UserNexusPluginRepository.ID );
+
+        if ( userRepository instanceof NexusWritablePluginRepository )
+        {
+            NexusWritablePluginRepository writableUserRepository = (NexusWritablePluginRepository) userRepository;
+
+            return writableUserRepository.deletePluginBundle( coords );
+        }
+
+        return false;
+    }
+
+    public boolean isActivatedPlugin( GAVCoordinate coords )
+    {
+        return getActivatedPlugins().containsKey( coords );
     }
 
     public Collection<PluginManagerResponse> activateInstalledPlugins()
@@ -131,20 +189,6 @@ public class DefaultNexusPluginManager
         }
 
         return result;
-    }
-
-    public boolean installPluginBundle( File bundle )
-        throws IOException
-    {
-        // TODO
-        return false;
-    }
-
-    public boolean uninstallPluginBundle( GAVCoordinate coords )
-        throws IOException
-    {
-        // TODO
-        return false;
     }
 
     public PluginManagerResponse activatePlugin( GAVCoordinate pluginCoordinate )
@@ -209,7 +253,7 @@ public class DefaultNexusPluginManager
 
                     repositoryTypeRegistry.unregisterRepositoryTypeDescriptors( repoTypeDescriptor );
                 }
-                
+
                 // kill it
                 plexusContainer.removeComponentRealm( pluginDescriptor.getPluginRealm() );
 

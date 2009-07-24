@@ -16,24 +16,40 @@ import org.sonatype.plugins.model.PluginMetadata;
 public interface NexusPluginManager
 {
     /**
-     * Returns the unmodifiable Map of installed plugins.
+     * Returns the unmodifiable Map of activated plugins.
      * 
      * @return
      */
     Map<GAVCoordinate, PluginDescriptor> getActivatedPlugins();
 
     /**
-     * Returns the unmodifiable Map of available plugins.
+     * Returns the unmodifiable Map of installed plugins (includes activated ones too!).
      * 
      * @return
      */
-    Map<GAVCoordinate, PluginMetadata> getAvailablePlugins();
+    Map<GAVCoordinate, PluginMetadata> getInstalledPlugins();
+
+    /**
+     * Returns the unmodifiable Map of plugin actions that PM executed in during latest runtime.
+     * 
+     * @return
+     */
+    Map<GAVCoordinate, PluginResponse> getPluginResponses();
 
     /**
      * Should be called even before boot process, simply to make plugin-contributed components available to Plexus,
-     * since reading up Nexus config may already need those!
+     * since reading up Nexus config may already need those! It tries to activate all locally available (installed)
+     * plugins at once.
      */
     Collection<PluginManagerResponse> activateInstalledPlugins();
+
+    /**
+     * Queries is plugin activated.
+     * 
+     * @param coords
+     * @return
+     */
+    boolean isActivatedPlugin( GAVCoordinate coords );
 
     /**
      * Activates the given plugin.

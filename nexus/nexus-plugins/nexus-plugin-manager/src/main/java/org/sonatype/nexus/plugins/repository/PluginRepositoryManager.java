@@ -22,6 +22,14 @@ public interface PluginRepositoryManager
     void removeCustomNexusPluginRepository( String id );
 
     /**
+     * Gets the repository with ID.
+     * 
+     * @param id
+     * @return
+     */
+    NexusPluginRepository getNexusPluginRepository( String id );
+
+    /**
      * Returns a list of available plugin coordinates.
      * 
      * @return

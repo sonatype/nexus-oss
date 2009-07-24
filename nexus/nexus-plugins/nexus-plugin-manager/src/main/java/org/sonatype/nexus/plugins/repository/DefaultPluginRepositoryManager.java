@@ -60,6 +60,11 @@ public class DefaultPluginRepositoryManager
         getCustomRepositories().remove( id );
     }
 
+    public NexusPluginRepository getNexusPluginRepository( String id )
+    {
+        return getRepositories().get( id );
+    }
+
     public Map<GAVCoordinate, PluginMetadata> findAvailablePlugins()
     {
         // we collect and order repositories into _descending_ order
