@@ -4,10 +4,18 @@ import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.restlet.data.Status;
+import org.sonatype.nexus.mock.MockListener;
+import org.sonatype.nexus.mock.MockResponse;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.models.User;
 import org.sonatype.nexus.mock.pages.LoginWindow;
 import org.sonatype.nexus.mock.pages.MainPage;
+import org.sonatype.nexus.mock.rest.MockHelper;
+import org.sonatype.security.rest.model.AuthenticationClientPermissions;
+import org.sonatype.security.rest.model.AuthenticationLoginResource;
+import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
+import org.sonatype.security.rest.model.ClientPermission;
 import org.testng.annotations.Test;
 
 @Component( role = LoginTest.class )
@@ -47,4 +55,39 @@ public class LoginTest
         assertTrue( "Password field should have error message",
                     loginWindow.getPassword().hasErrorText( "This field is required" ) );
     }
+
+    @Test
+    public void doListenLoginTest()
+    {
+        MockHelper.listen( "/authentication/login", new MockListener() );
+
+        doLogin( User.ADMIN.getUsername(), User.ADMIN.getPassword() );
+
+        assertFalse( "Login link should not be available", main.loginLinkAvailable() );
+
+        MockHelper.checkAndClean();
+    }
+
+    @Test
+    public void doMockLoginTest()
+    {
+        AuthenticationLoginResourceResponse result = new AuthenticationLoginResourceResponse();
+        AuthenticationLoginResource data = new AuthenticationLoginResource();
+        AuthenticationClientPermissions permissions = new AuthenticationClientPermissions();
+        ClientPermission permission = new ClientPermission();
+        permission.setId( "nexus:*" );
+        permission.setValue( 0 );
+        permissions.addPermission( permission );
+        data.setClientPermissions( permissions );
+        result.setData( data );
+
+        MockHelper.expect( "/authentication/login", new MockResponse( Status.SUCCESS_OK, result ) );
+
+        doLogin( User.ADMIN.getUsername(), User.ADMIN.getPassword() );
+
+        assertFalse( "Login link should not be available", main.loginLinkAvailable() );
+
+        MockHelper.checkAndClean();
+    }
+
 }
