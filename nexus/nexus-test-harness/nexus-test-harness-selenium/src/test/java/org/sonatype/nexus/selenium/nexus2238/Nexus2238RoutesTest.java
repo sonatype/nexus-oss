@@ -34,7 +34,7 @@ public class Nexus2238RoutesTest
         NxAssert.requiredField( route.getRepositoriesGroup(), 0 );
 
         route.save();
-        NxAssert.hasErrorText( route.getRepositoriesOrder(), "One or more repository is required" );
+        NxAssert.hasErrorText( route.getRepositoriesOrder(), "Select one or more items" );
 
         route.getRepositoriesOrder().add( "central" );
         NxAssert.noErrorText( route.getRepositoriesOrder() );

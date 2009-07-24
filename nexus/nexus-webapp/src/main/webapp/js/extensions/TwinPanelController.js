@@ -130,9 +130,15 @@ Ext.extend(Sonatype.ext.TwinPanelController, Ext.Panel, {
         }
       }
       else {
-        var selectedNode = fromPanel.getSelectionModel().getSelectedNode();
-        if ( selectedNode && checkIfDragAllowed( selectedNode ) ) {
-          toRoot.appendChild( selectedNode );
+        var selectedNodes = fromPanel.getSelectionModel().getSelectedNodes();
+        if ( selectedNodes ){
+          for ( var i = 0; i < selectedNodes.length; i++ ) {
+            var node = selectedNodes[i];
+            if ( checkIfDragAllowed( node ) ) {
+              toRoot.appendChild( node );
+              i--;
+            }
+          }
         }
       }
     }

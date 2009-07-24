@@ -33,7 +33,7 @@ public class RouteForm
         this.ruleType = new Combobox( selenium, expression + ".find('name', 'ruleType')[0]" );
         this.repositoriesGroup = new Combobox( selenium, expression + ".find('name', 'groupId')[0]" );
 
-        this.repositoriesOrder = new TwinPanel( selenium, expression + ".find('name', 'repositoriesOrder')[0]" );
+        this.repositoriesOrder = new TwinPanel( selenium, expression + ".find('name', 'repositories')[0]" );
 
         this.save = new Button( selenium, "window.Ext.getCmp('savebutton')" );
         this.cancel = new Button( selenium, "window.Ext.getCmp('cancelbutton')" );
