@@ -7,6 +7,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusContainer;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 
 public class Assertions
 {
@@ -29,8 +30,11 @@ public class Assertions
             (DefaultNexusPluginManager) getContainer().lookup( NexusPluginManager.class );
 
         MockComponent mc = getContainer().lookup( MockComponent.class );
+        
+        RepositoryTypeRegistry repoTypeRegistry = getContainer().lookup( RepositoryTypeRegistry.class );
 
         // record pre-discovery state
+        int repoTypeCountPre = repoTypeRegistry.getRegisteredRepositoryTypeDescriptors().size();
         int customizersPre = mc.getCustomizers().size();
         int processorsPre = mc.getProcessors().size();
 
@@ -47,6 +51,7 @@ public class Assertions
         }
 
         // record post-discovery state
+        int repoTypeCountPost = repoTypeRegistry.getRegisteredRepositoryTypeDescriptors().size();
         int customizersPost = mc.getCustomizers().size();
         int processorsPost = mc.getProcessors().size();
 
@@ -80,10 +85,13 @@ public class Assertions
         }
 
         // record post-destroy state
+        int repoTypeCountDestroy = repoTypeRegistry.getRegisteredRepositoryTypeDescriptors().size();
         int customizersDestroy = mc.getCustomizers().size();
         int processorsDestroy = mc.getProcessors().size();
 
         // we had destroyed some?
+        Assert.assertTrue( "The repo types should be registered!", repoTypeCountPre < repoTypeCountPost );
+        Assert.assertTrue( "The repo types should be deregistered!", repoTypeCountDestroy < repoTypeCountPost );
         Assert.assertTrue( "The map should shrink!", customizersDestroy < customizersPost );
         Assert.assertTrue( "The map should shrink!", processorsDestroy < processorsPost );
         Assert.assertTrue( "The map should shrink!", customizersDestroy == customizersPre );
