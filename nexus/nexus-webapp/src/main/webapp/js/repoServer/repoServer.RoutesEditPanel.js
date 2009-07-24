@@ -20,29 +20,22 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
   var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
   
-  this.reposList = null;
-  
-  this.listeners = {
-      'beforerender' : {
-        fn : function(){
-          //note: this isn't pre-render dependent, we just need an early event to start this off
-          Ext.Ajax.request({
-            callback: this.processRepoList,
-            scope: this,
-            method: 'GET',
-            url: Sonatype.config.repos.urls.repositories
-          });
-          return true;
-        },
-        scoope: this
-      }
-    };
+  this.repoDataStore = new Ext.data.JsonStore( {
+    root: 'data',
+    id: 'id',
+    url: Sonatype.config.repos.urls.repositories,
+    sortInfo: { field: 'name', direction: 'ASC' },
+    fields: [
+      { name: 'id' },
+      { name: 'name', sortType:Ext.data.SortTypes.asUCString }
+    ],
+    autoLoad: true
+  } );
   
   var tfStore = new Ext.data.SimpleStore({fields:['value'], data:[['True'],['False']]});
   this.ruleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Blocking'],['Exclusive'],['Inclusive']]});
   this.BLOCKING_TYPE_INDEX = 0;
   this.BLOCKING = 'Blocking';
-  this.TREE_PANEL_ID_SUFFIX = '_route-tree-panel';
 
   //A record to hold the name and id of a repository group
   this.repositoryGroupRecordConstructor = Ext.data.Record.create([
@@ -163,118 +156,15 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
           selectOnFocus:true,
           allowBlank: false
         },
-      {
-        xtype: 'panel',
-        id: this.TREE_PANEL_ID_SUFFIX,
-        layout: 'column',
-        autoHeight: true,
-        style: 'padding: 10px 0 0 0',
-        name: 'repositoriesOrder',
-        
-        items: [
-          {
-            xtype: 'treepanel',
-            id: '_route-repos-tree', //note: unique ID is assinged before instantiation
-            title: 'Ordered Route Repositories',
-            cls: 'required-field',
-            border: true, //note: this seem to have no effect w/in form panel
-            bodyBorder: true, //note: this seem to have no effect w/in form panel
-            //note: this style matches the expected behavior
-            bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-            width: 225,
-            height: 300,
-            animate:true,
-            lines: false,
-            autoScroll:true,
-            containerScroll: true,
-            //@note: root node must be instantiated uniquely for each instance of treepanel
-            //@ext: can TreeNode be registerd as a component with an xtype so this new root node
-            //      may be instantiated uniquely for each form panel that uses this config?
-            rootVisible: false,
-
-            enableDD: true,
-            ddScroll: true,
-            dropConfig: {
-              allowContainerDrop: true,
-              onContainerDrop: function(source, e, data){
-                this.tree.root.appendChild(data.node);
-                return true;
-              },
-              onContainerOver:function(source, e, data){return this.dropAllowed;},
-              // passign padding to make whole treePanel the drop zone.  This is dependent
-              // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
-              // because treepanel.dropZone.setPadding is never available in time to be useful.
-              padding: [0,0,274,0]
-            },
-            // added Field values to simulate form field validation
-            invalidText: 'One or more repository is required',
-            validate: function(){
-              return (this.root.childNodes.length > 0);
-            },
-            invalid: false,
-            listeners: {
-              'append' : {
-                fn: function(tree, parentNode, insertedNode, i) {
-                  if (tree.invalid) {
-                    //remove error messaging
-                    tree.getEl().child('.x-panel-body').setStyle({
-                      'background-color' : '#FFFFFF',
-                      border : '1px solid #B5B8C8'
-                    });
-                    Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
-                  }
-                },
-                scope: this
-              },
-              'remove' : {
-                fn: function(tree, parentNode, removedNode) {
-                  if(tree.root.childNodes.length < 1) {
-                    this.markTreeInvalid(tree);
-                  }
-                },
-                scope: this
-              }
-            }
-          },
-          {
-        	xtype: 'twinpanelcontroller'
-          },
-          {
-            xtype: 'treepanel',
-            id: id + '_route_all-repos-tree', //note: unique ID is assinged before instantiation
-            title: 'Available Repositories',
-            border: true, //note: this seem to have no effect w/in form panel
-            bodyBorder: true, //note: this seem to have no effect w/in form panel
-            //note: this style matches the expected behavior
-            bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-            width: 225,
-            height: Ext.isGecko ? 315 : 300,
-            animate:true,
-            lines: false,
-            autoScroll:true,
-            containerScroll: true,
-            //@note: root node must be instantiated uniquely for each instance of treepanel
-             //@ext: can TreeNode be registerd as a component with an xtype so this new root node
-            //      may be instantiated uniquely for each form panel that uses this config?
-            rootVisible: false,
-
-            enableDD: true,
-            ddScroll: true,
-            dropConfig: {
-              allowContainerDrop: true,
-              onContainerDrop: function(source, e, data){
-                this.tree.root.appendChild(data.node);
-                return true;
-              },
-              onContainerOver:function(source, e, data){return this.dropAllowed;},
-              // passign padding to make whole treePanel the drop zone.  This is dependent
-              // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
-              // because treepanel.dropZone.setPadding is never available in time to be useful.
-              padding: [0,0,274,0]
-            }
-          }
-        ]
-      }
+        {
+          xtype: 'twinpanelchooser',
+          titleLeft: 'Ordered Route Repositories',
+          titleRight: 'Available Repositories',
+          name: 'repositories',
+          valueField: 'id',
+          store: this.repoDataStore,
+          required: true
+        }
     ],
     buttons: [
       {
@@ -413,12 +303,8 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
 
 Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
   reloadAll : function(){
-    Ext.Ajax.request({
-      callback: this.processRepoList,
-      scope: this,
-      method: 'GET',
-      url: Sonatype.config.repos.urls.repositories
-    });
+    this.repoDataStore.removeAll();
+    this.repoDataStore.reload();
     this.routesDataStore.removeAll();
     this.routesDataStore.reload();
     this.formCards.items.each(function(item, i, len){
@@ -428,36 +314,10 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     this.formCards.getLayout().setActiveItem(0);
   },
   
-  markTreeInvalid : function(tree) {
-    var elp = tree.getEl();
-    
-    if(!tree.errorEl){
-        tree.errorEl = elp.createChild({cls:'x-form-invalid-msg'});
-        tree.errorEl.setWidth(elp.getWidth(true)); //note removed -20 like on form fields
-    }
-    tree.invalid = true;
-    tree.errorEl.update(tree.invalidText);
-    elp.child('.x-panel-body').setStyle({
-      'background-color' : '#fee',
-      border : '1px solid #dd7870'
-    });
-    Ext.form.Field.msgFx['normal'].show(tree.errorEl, tree);  
-  },
-  
   // formInfoObj : {formPanel, isNew, [resourceURI]}
   saveHandler : function(formInfoObj){
     var allValid = false;
-    allValid = formInfoObj.formPanel.form.isValid()
-    
-    //form validation of repository treepanel
-    var rtTree = Ext.getCmp(formInfoObj.formPanel.id + '_route-repos-tree');
-    var rtTreeValid = rtTree.validate.call(rtTree);
-    
-    if (!rtTreeValid) {
-      this.markTreeInvalid(rtTree);
-    }
-    
-    allValid = (allValid && rtTreeValid);
+    allValid = formInfoObj.formPanel.form.isValid() && formInfoObj.formPanel.find( 'name', 'repositories' )[0].validate();
     
     if (allValid) {
       var isNew = formInfoObj.isNew;
@@ -507,7 +367,6 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     var id = 'new_route_' + new Date().getTime();
 
     var config = Ext.apply({}, this.formConfig.route, {id:id});
-    config = this.configUniqueIdHelper(id, config);
     var formPanel = new Ext.FormPanel(config);
 
     formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -534,9 +393,6 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
       },
       id); //use "new_route_" id instead of resourceURI like the reader does
     this.routesDataStore.insert(0, [newRec]);
-
-    //load available repos tree list.  note: this is kind of awkward to reuse the data mod function
-    this.loadRepoListHelper([], {}, formPanel);
 
     //add new form
     this.formCards.add(formPanel);
@@ -635,29 +491,6 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
           }
         });
       }
-    }
-  },
-
-  //loads the list of repos for populating the list in each form
-  processRepoList : function(options, isSuccess, response){
-    if(isSuccess){
-      var d = Ext.decode(response.responseText).data;
-      var rList = [];
-      
-      Ext.each(d, function(item, i, allArr){
-          rList[i] = {
-            id : item.resourceURI.slice(item.resourceURI.lastIndexOf('/')+1),
-            name : item.name,
-            resourceURI : item.resourceURI
-          };
-        },
-        this);
-      
-      this.reposList = rList;
-    }
-    else {
-      this.reposList = [];
-      Sonatype.MessageBox.alert('Could not receive the list of available repositories.');
     }
   },
 
@@ -796,7 +629,6 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     //assumption: new route forms already exist in formCards, so they won't get into this case
     if(!formPanel){ //create form and populate current data
       var config = Ext.apply({}, this.formConfig.route, {id:id});
-      config = this.configUniqueIdHelper(id, config);
 
       formPanel = new Ext.FormPanel(config);
       formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -824,100 +656,32 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     formPanel.doLayout();
   },
 
-  //creates a unique config object with specific IDs on the two tree items
-  configUniqueIdHelper : function(id, config){
-    //@note: there has to be a better way to do this.  Depending on offsets is very error prone
-
-    var newConfig = config;
-
-    var trees = [
-      {obj : newConfig.items[4].items[0], postpend : '_route-repos-tree'},
-      {obj : newConfig.items[4].items[2], postpend : '_route-all-repos-tree'}
-    ];
-
-    newConfig.items[4].id = id + this.TREE_PANEL_ID_SUFFIX;
-    for (var i = 0; i<trees.length; i++) {
-      trees[i].obj.id = id + trees[i].postpend;
-      trees[i].obj.root = new Ext.tree.TreeNode({text: 'root'});
-    }
-
-    return newConfig;
-  },
 
   // requires being scoped to RoutesConfigPanel to get shared reposList data
   loadRepoListHelper : function(arr, srcObj, fpanel){
-    //block until the list of repos becomes known
-    if (this.reposList === null){
-      return this.loadRepoListHelper.defer(300, this, arguments);
-    }
+    var tree = fpanel.find( 'name', 'repositories' )[0];
     
-    var rtTree = Ext.getCmp(fpanel.id + '_route-repos-tree');
-    var allTree = Ext.getCmp(fpanel.id + '_route-all-repos-tree');
-
-    var repo;
-
-    for(var i=0; i<arr.length; i++){
-      repo = arr[i];
-      rtTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: repo.id,
-          text: repo.name,
-          payload: repo, //sonatype added attribute
-
-          allowChildren: false,
-          draggable: true,
-          leaf: true
-        })
-      );
-    }
-    
-    var rList = this.reposList;
-
-    if(rList){
-      for(var i=0; i<rList.length; i++){
-        repo = rList[i];
-
-        if(typeof(rtTree.getNodeById(repo.id)) == 'undefined'){
-
-          allTree.root.appendChild(
-            new Ext.tree.TreeNode({
-              id: repo.id,
-              text: repo.name,
-              payload: repo, //sonatype added attribute
-
-              allowChildren: false,
-              draggable: true,
-              leaf: true
-            })
-          );
-        }
-      }
-    }
-    else {
-      //@todo: race condition or error retrieving repos list
-    }
+    tree.setValue( arr );
     
     return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
   },
 
   exportRepoListHelper : function(val, fpanel){
-    var rtTree = Ext.getCmp(fpanel.id + '_route-repos-tree');
+    var tree = fpanel.find( 'name', 'repositories' )[0];
 
     var outputArr = [];
-    var nodes = rtTree.root.childNodes;
+    var items = tree.getValue();
 
-    for(var i = 0; i < nodes.length; i++){
-      outputArr[i] = nodes[i].attributes.payload;
+    for(var i = 0; i < items.length; i++){
+      outputArr[i] = { id: items[i]};
     }
 
     return outputArr;
   },
   
   updateTreePanel: function( blockingType, id ) {
-    var p = this.findById( id + this.TREE_PANEL_ID_SUFFIX );
+    var p = this.formCards.getLayout().activeItem.find( 'name', 'repositories' )[0];
     p.setVisible( ! blockingType );
-    p.items.items[0].validate = blockingType ?
-      function() { return true; } :
-      function() { return (this.root.childNodes.length > 0); };
+    p.required = !blockingType;
   }
 });

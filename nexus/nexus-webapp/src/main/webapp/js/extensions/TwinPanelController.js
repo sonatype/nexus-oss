@@ -168,7 +168,7 @@ Sonatype.ext.TwinPanelChooser = function( config ){
     
     items: [
       {
-        xtype: 'treepanel',
+        xtype: 'multiselecttreepanel',
         name: 'targettree',
 //        id: '_staging-profiles-target-groups-tree', //note: unique ID is assinged before instantiation
         title: this.titleLeft,
@@ -193,7 +193,11 @@ Sonatype.ext.TwinPanelChooser = function( config ){
         dropConfig: {
           allowContainerDrop: true,
           onContainerDrop: function(source, e, data){
-            this.tree.root.appendChild(data.node);
+            if ( data.nodes ){
+              for ( var i = 0 ; i < data.nodes.length ; i++ ){
+                this.tree.root.appendChild(data.nodes[i]);
+              }
+            }
             return true;
           },
           onContainerOver:function(source, e, data){
@@ -236,7 +240,7 @@ Sonatype.ext.TwinPanelChooser = function( config ){
         halfSize: this.halfSize
       },
       {
-        xtype: 'treepanel',
+        xtype: 'multiselecttreepanel',
         name: 'sourcetree',
 //        id: id + '_staging-profiles-available-groups-tree', //note: unique ID is assinged before instantiation
         title: this.titleRight,
@@ -260,7 +264,11 @@ Sonatype.ext.TwinPanelChooser = function( config ){
         dropConfig: {
           allowContainerDrop: true,
           onContainerDrop: function(source, e, data){
-            this.tree.root.appendChild(data.node);
+            if ( data.nodes ){
+              for ( var i = 0 ; i < data.nodes.length ; i++ ){
+                this.tree.root.appendChild(data.nodes[i]);
+              }
+            }
             return true;
           },
           onContainerOver:function(source, e, data){return this.dropAllowed;},

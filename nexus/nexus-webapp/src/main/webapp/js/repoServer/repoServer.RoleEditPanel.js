@@ -469,7 +469,7 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
       
       items: [
         {
-          xtype: 'treepanel',
+          xtype: 'multiselecttreepanel',
           name: 'roles-privs-tree', //note: unique ID is assinged before instantiation
           title: 'Selected Roles / Privileges',
           cls: 'required-field',
@@ -493,7 +493,11 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
           dropConfig: {
             allowContainerDrop: true,
             onContainerDrop: function(source, e, data){
-              this.tree.root.appendChild(data.node);
+              if ( data.nodes ){
+                for ( var i = 0 ; i < data.nodes.length ; i++ ){
+                  this.tree.root.appendChild(data.nodes[i]);
+                }
+              }
               return true;
             },
             onContainerOver:function(source, e, data){return this.dropAllowed;},
@@ -545,7 +549,7 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
           name: 'twinpanel'
         },
         {
-          xtype: 'treepanel',
+          xtype: 'multiselecttreepanel',
           name: 'all-roles-privs-tree', //note: unique ID is assinged before instantiation
           title: 'Available Roles / Privileges',
           border: true, //note: this seem to have no effect w/in form panel
@@ -568,7 +572,11 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
           dropConfig: {
             allowContainerDrop: true,
             onContainerDrop: function(source, e, data){
-              this.tree.root.appendChild(data.node);
+              if ( data.nodes ){
+                for ( var i = 0 ; i < data.nodes.length ; i++ ){
+                  this.tree.root.appendChild(data.nodes[i]);
+                }
+              }
               return true;
             },
             onContainerOver:function(source, e, data){return this.dropAllowed;},

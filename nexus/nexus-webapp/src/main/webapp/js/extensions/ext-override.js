@@ -832,3 +832,32 @@ Ext.grid.CheckColumn.prototype ={
         return '<div class="x-grid3-check-col'+(v?'-on':'')+' x-grid3-cc-'+this.id+'">&#160;</div>';
     }
 };
+
+Ext.override(Ext.tree.TreeDropZone, {
+  completeDrop : function(de){
+    var ns = de.dropNode, p = de.point, t = de.target;
+    if(!Ext.isArray(ns)){
+      ns = [ns];
+    }
+    var n, node, ins = false;
+    if (p != 'append'){
+      ins = true;
+      node = (p == 'above') ? t : t.nextSibling;
+    }
+    for(var i = 0, len = ns.length; i < len; i++){
+      n = ns[i];
+      if (ins){
+        t.parentNode.insertBefore(n, node);
+      }else{
+        t.appendChild(n);
+      }
+      if(Ext.enableFx && this.tree.hlDrop){
+        n.ui.highlight();
+      }
+    }
+    ns[0].ui.focus();
+    t.ui.endDrop();
+    this.tree.fireEvent("nodedrop", de);
+  }
+  
+});
