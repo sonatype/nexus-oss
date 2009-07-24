@@ -20,12 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
-import org.sonatype.nexus.configuration.ConfigurationRollbackEvent;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -70,9 +66,7 @@ import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskActivityDescriptor;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * <p>
@@ -93,7 +87,7 @@ import org.sonatype.plexus.appevents.EventListener;
  */
 public abstract class AbstractRepository
     extends ConfigurableRepository
-    implements Repository, EventListener, Initializable, Disposable
+    implements Repository
 {
     /**
      * StorageItem context key. If value set to Boolean.TRUE, the item will not be stored locally. Useful to suppress
@@ -104,9 +98,6 @@ public abstract class AbstractRepository
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
-
-    @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
 
     @Requirement
     private CacheManager cacheManager;
@@ -143,43 +134,25 @@ public abstract class AbstractRepository
     @Override
     public abstract Validator getValidator();
 
-    public void initialize()
-        throws InitializationException
-    {
-        applicationEventMulticaster.addEventListener( this );
-    }
-
-    public void dispose()
-    {
-        applicationEventMulticaster.removeEventListener( this );
-    }
-
+    @Override
     public void onEvent( Event<?> evt )
     {
+        super.onEvent( evt );
+
         // act automatically on config events
         if ( evt instanceof ConfigurationPrepareForSaveEvent )
         {
-            if ( isDirty() )
+            ConfigurationPrepareForSaveEvent psevt = (ConfigurationPrepareForSaveEvent) evt;
+
+            // dirty is not more true, but we are in the set of changed objects
+            if ( psevt.getChanges().contains( this ) )
             {
-                getConfigurator().prepareForSave( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
-
-                ConfigurationPrepareForSaveEvent psevt = (ConfigurationPrepareForSaveEvent) evt;
-
-                psevt.getChanges().add( this );
-
                 // cstamas
                 // XXX: hrm, emitting an event in event handler?
                 // do something in plexus-app-events like "chainable" events? Let Event have something like
                 // evt.addPostFireEvent( evt1 ) which could be a list, and all events added to that list would invoke
                 // another round of notifyEventListeners call )and would be handled by plexus-app-events in generic way)
-                applicationEventMulticaster.notifyEventListeners( new RepositoryConfigurationUpdatedEvent( this ) );
-            }
-        }
-        else if ( evt instanceof ConfigurationRollbackEvent )
-        {
-            if ( isDirty() )
-            {
-                getCurrentCoreConfiguration().rollbackChanges();
+                getApplicationEventMulticaster().notifyEventListeners( new RepositoryConfigurationUpdatedEvent( this ) );
             }
         }
     }
@@ -188,11 +161,6 @@ public abstract class AbstractRepository
     protected ApplicationConfiguration getApplicationConfiguration()
     {
         return applicationConfiguration;
-    }
-
-    protected ApplicationEventMulticaster getApplicationEventMulticaster()
-    {
-        return applicationEventMulticaster;
     }
 
     public RepositoryTaskFilter getRepositoryTaskFilter()
@@ -784,12 +752,9 @@ public abstract class AbstractRepository
                 try
                 {
                     DefaultStorageFileItem target =
-                        new DefaultStorageFileItem(
-                                                    this,
-                                                    to,
-                                                    true,
-                                                    true,
-                                                    new PreparedContentLocator( ( (StorageFileItem) item ).getInputStream() ) );
+                        new DefaultStorageFileItem( this, to, true, true,
+                                                    new PreparedContentLocator( ( (StorageFileItem) item )
+                                                        .getInputStream() ) );
 
                     target.getItemContext().putAll( item.getItemContext() );
 
@@ -879,7 +844,8 @@ public abstract class AbstractRepository
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger()
-                        .debug( "We are deleting a collection, starting a walker to send delete notifications per-file." );
+                        .debug(
+                                "We are deleting a collection, starting a walker to send delete notifications per-file." );
                 }
 
                 // it is collection, walk it and below and fire events for all files

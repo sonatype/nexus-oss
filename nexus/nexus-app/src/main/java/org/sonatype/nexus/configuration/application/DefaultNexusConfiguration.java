@@ -32,6 +32,7 @@ import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
+import org.sonatype.nexus.configuration.ConfigurationRollbackEvent;
 import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
@@ -74,7 +75,7 @@ import org.sonatype.security.SecuritySystem;
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
  * state with p ersisted user configuration. All changes incoming thru its iface is reflect/maintained in Nexus current
  * state and Nexus user config.
- *
+ * 
  * @author cstamas
  */
 @Component( role = NexusConfiguration.class )
@@ -126,7 +127,7 @@ public class DefaultNexusConfiguration
 
     @Requirement
     private SecuritySystem securitySystem;
-    
+
     /** The global remote storage context. */
     private RemoteStorageContext remoteStorageContext;
 
@@ -212,6 +213,8 @@ public class DefaultNexusConfiguration
         else
         {
             getLogger().info( "... applying was vetoed by: " + prepare.getVetos() );
+
+            applicationEventMulticaster.notifyEventListeners( new ConfigurationRollbackEvent( this ) );
         }
     }
 
@@ -219,7 +222,7 @@ public class DefaultNexusConfiguration
         throws IOException
     {
         // TODO: when NEXUS-2215 is fixed, this should be remove/moved/cleaned
-        
+
         // validate before we do anything
         ValidationRequest request = new ValidationRequest( configurationSource.getConfiguration() );
         ValidationResponse response = configurationValidator.validateModel( request );
@@ -246,7 +249,7 @@ public class DefaultNexusConfiguration
     {
         return configurationSource.getConfiguration();
     }
-    
+
     public ApplicationConfigurationSource getConfigurationSource()
     {
         return configurationSource;
@@ -375,7 +378,7 @@ public class DefaultNexusConfiguration
     }
 
     public void setRealms( List<String> realms )
-    throws org.sonatype.configuration.validation.InvalidConfigurationException
+        throws org.sonatype.configuration.validation.InvalidConfigurationException
     {
         getSecuritySystem().setRealms( realms );
     }
@@ -395,7 +398,8 @@ public class DefaultNexusConfiguration
         return getSecuritySystem().getAnonymousUsername();
     }
 
-    public void setAnonymousUsername( String val ) throws org.sonatype.configuration.validation.InvalidConfigurationException
+    public void setAnonymousUsername( String val )
+        throws org.sonatype.configuration.validation.InvalidConfigurationException
     {
         getSecuritySystem().setAnonymousUsername( val );
     }
@@ -1154,18 +1158,17 @@ public class DefaultNexusConfiguration
 
         applyAndSaveConfiguration();
     }
-    
+
     public CErrorReporting readErrorReporting()
     {
         return getConfiguration().getErrorReporting();
     }
-    
+
     public void updateErrorReporting( CErrorReporting errorReporting )
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         getConfiguration().setErrorReporting( errorReporting );
-        
+
         saveConfiguration();
     }
 
@@ -1240,7 +1243,7 @@ public class DefaultNexusConfiguration
             return null;
         }
     }
-    
+
     protected SecuritySystem getSecuritySystem()
     {
         return this.securitySystem;
