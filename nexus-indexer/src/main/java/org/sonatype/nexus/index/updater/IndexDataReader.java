@@ -26,7 +26,7 @@ import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
  * An index data reader used to parse transfer index format.
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class IndexDataReader
@@ -237,6 +237,62 @@ public class IndexDataReader
         {
             return timestamp;
         }
+
+    }
+
+    /**
+     * Reads index content by using a visitor. <br>
+     * The visitor is called for each read documents after it has been populated with Lucene fields.
+     *
+     * @param visitor an index data visitor
+     * @param context indexing context
+     *
+     * @return statistics about read data
+     *
+     * @throws IOException in case of an IO exception during index file access
+     */
+    public IndexDataReadResult readIndex( final IndexDataReadVisitor visitor, final IndexingContext context )
+        throws IOException
+    {
+        dis.readByte(); // data format version
+
+        long timestamp = dis.readLong();
+
+        Date date = null;
+
+        if( timestamp != -1 )
+        {
+            date = new Date( timestamp );
+        }
+
+        int n = 0;
+
+        Document doc;
+        while( ( doc = readDocument() ) != null )
+        {
+            visitor.visitDocument( IndexUtils.updateDocument( doc, context, false ) );
+
+            n++;
+        }
+
+        IndexDataReadResult result = new IndexDataReadResult();
+        result.setDocumentCount( n );
+        result.setTimestamp( date );
+        return result;
+    }
+
+    /**
+     * Visitor of indexed Lucene documents.
+     */
+    public static interface IndexDataReadVisitor
+    {
+
+        /**
+         * Called on each read document. The document is already populated with fields.
+         *
+         * @param document read document
+         */
+        void visitDocument( Document document );
 
     }
 
