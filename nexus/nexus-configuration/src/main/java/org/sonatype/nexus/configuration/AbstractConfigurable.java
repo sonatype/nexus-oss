@@ -171,7 +171,7 @@ public abstract class AbstractConfigurable
             getConfigurator().applyConfiguration( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
         }
 
-        commitChanges();
+        getCurrentCoreConfiguration().commitChanges();
     }
 
     // ==
