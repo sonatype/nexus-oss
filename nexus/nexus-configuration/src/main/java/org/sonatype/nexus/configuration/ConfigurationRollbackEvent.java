@@ -16,8 +16,7 @@ package org.sonatype.nexus.configuration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 /**
- * An event fired on configuration prepare save, when configurable components should prepare configs for save. This is a
- * VetoableEvent, so, save may be vetoed.
+ * An event fired after unsuccesful configuration prepare4save, when configurable components should rollback configs.
  * 
  * @author cstamas
  */

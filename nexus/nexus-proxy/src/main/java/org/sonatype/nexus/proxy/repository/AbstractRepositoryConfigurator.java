@@ -15,6 +15,7 @@ import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
@@ -45,9 +46,9 @@ public abstract class AbstractRepositoryConfigurator
                                           CoreConfiguration config )
         throws ConfigurationException
     {
-        doApplyConfiguration( (Repository) target, configuration, (CRepository) config.getConfiguration( false ),
-                              config.getExternalConfiguration() );
-        
+        doApplyConfiguration( (Repository) target, configuration, ( (CRepositoryCoreConfiguration) config )
+            .getConfiguration( false ), config.getExternalConfiguration() );
+
         // config done, apply customizations
         for ( RepositoryCustomizer configurator : pluginRepositoryConfigurators.values() )
         {
@@ -62,11 +63,8 @@ public abstract class AbstractRepositoryConfigurator
     {
         // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
         // later we will see about it
-        doPrepareForSave( (Repository) target, configuration, (CRepository) config.getConfiguration( true ),
-                          config.getExternalConfiguration() );
-
-        // commit, since doPrepareForSave() potentially modifies coreConfig or externalConfig
-        config.applyChanges();
+        doPrepareForSave( (Repository) target, configuration, ( (CRepositoryCoreConfiguration) config )
+            .getConfiguration( true ), config.getExternalConfiguration() );
     }
 
     public ExternalConfiguration getExternalConfiguration( Repository repository )

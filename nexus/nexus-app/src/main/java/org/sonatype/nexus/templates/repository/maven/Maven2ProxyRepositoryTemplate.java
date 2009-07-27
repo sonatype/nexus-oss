@@ -1,7 +1,6 @@
 package org.sonatype.nexus.templates.repository.maven;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
@@ -29,7 +28,7 @@ public class Maven2ProxyRepositoryTemplate
     }
 
     @Override
-    protected CoreConfiguration initCoreConfiguration()
+    protected CRepositoryCoreConfiguration initCoreConfiguration()
     {
         CRepository repo = new DefaultCRepository();
 
@@ -48,7 +47,7 @@ public class Maven2ProxyRepositoryTemplate
 
         M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
         exConf.setRepositoryPolicy( getRepositoryPolicy() );
-        exConf.applyChanges();
+        exConf.commitChanges();
         repo.externalConfigurationImple = exConf;
 
         repo.setAllowWrite( true );

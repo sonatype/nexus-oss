@@ -13,37 +13,18 @@
  */
 package org.sonatype.nexus.configuration;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 /**
- * An event fired on configuration change (upon succesful save). This event is meant for component outside of
- * "configuration framework", for any other component interested in configuration change (like feed generators, mail
- * senders, etc).
+ * An event fired on configuration commit, when configurable components should commit config changes.
  * 
  * @author cstamas
  */
-public class ConfigurationChangeEvent
-    extends ConfigurationEvent
+public class ConfigurationCommitEvent
+    extends ConfigurationIOEvent
 {
-    private final Collection<Configurable> changes;
-
-    public ConfigurationChangeEvent( ApplicationConfiguration configuration, Collection<Configurable> changes )
+    public ConfigurationCommitEvent( ApplicationConfiguration configuration )
     {
         super( configuration );
-
-        if ( changes == null )
-        {
-            changes = Collections.emptyList();
-        }
-
-        this.changes = Collections.unmodifiableCollection( changes );
-    }
-
-    public Collection<Configurable> getChanges()
-    {
-        return changes;
     }
 }

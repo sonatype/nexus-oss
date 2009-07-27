@@ -74,14 +74,19 @@ public abstract class AbstractCoreConfiguration
 
     public abstract ExternalConfiguration getExternalConfiguration();
 
-    public boolean isDirty()
+    protected boolean isThisDirty()
     {
         return getChangedConfiguration() != null;
     }
 
-    public void applyChanges()
+    public boolean isDirty()
     {
-        if ( isDirty() )
+        return isThisDirty() || ( getExternalConfiguration() != null && getExternalConfiguration().isDirty() );
+    }
+
+    public void commitChanges()
+    {
+        if ( isThisDirty() )
         {
             // nice, isn't it?
             setOriginalConfiguration( getXStream().fromXML( getXStream().toXML( getChangedConfiguration() ),
@@ -94,13 +99,13 @@ public abstract class AbstractCoreConfiguration
 
         if ( getExternalConfiguration() != null && getExternalConfiguration().isDirty() )
         {
-            getExternalConfiguration().applyChanges();
+            getExternalConfiguration().commitChanges();
         }
     }
 
     public void rollbackChanges()
     {
-        if ( isDirty() )
+        if ( isThisDirty() )
         {
             setChangedConfiguration( null );
         }

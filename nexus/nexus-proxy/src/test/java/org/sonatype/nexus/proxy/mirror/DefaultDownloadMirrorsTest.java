@@ -63,7 +63,7 @@ public class DefaultDownloadMirrorsTest
         }
         
         // to apply this
-        coreConfig.applyChanges();
+        coreConfig.commitChanges();
 
         return dMirrors;
     }

@@ -1,7 +1,6 @@
 package org.sonatype.nexus.configuration;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
@@ -12,16 +11,15 @@ import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
 
 /**
- * Helper abstract class to implement configurable components to "click" them in into generic configuration environment.
+ * Abstract class to implement configurable components to "click" them in into generic configuration environment.
  * 
  * @author cstamas
  */
 public abstract class AbstractConfigurable
-    extends AbstractLogEnabled
     implements Configurable, EventListener, Initializable, Disposable
 {
     /** The configuration */
-    private CoreConfiguration repositoryConfiguration;
+    private CoreConfiguration coreConfiguration;
 
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
@@ -42,21 +40,24 @@ public abstract class AbstractConfigurable
         // act automatically on config events
         if ( evt instanceof ConfigurationPrepareForSaveEvent )
         {
-            if ( isDirty() )
+            if ( isDirty() && getConfigurator() != null )
             {
+                // prepare for save: transfer what we have in memory (if any) to model
                 getConfigurator().prepareForSave( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
 
+                // register ourselves as changed
                 ConfigurationPrepareForSaveEvent psevt = (ConfigurationPrepareForSaveEvent) evt;
 
                 psevt.getChanges().add( this );
             }
         }
+        else if ( evt instanceof ConfigurationCommitEvent )
+        {
+            commitChanges();
+        }
         else if ( evt instanceof ConfigurationRollbackEvent )
         {
-            if ( isDirty() )
-            {
-                getCurrentCoreConfiguration().rollbackChanges();
-            }
+            rollbackChanges();
         }
     }
 
@@ -71,28 +72,12 @@ public abstract class AbstractConfigurable
 
     public final CoreConfiguration getCurrentCoreConfiguration()
     {
-        return repositoryConfiguration;
-    }
-
-    protected Object getCurrentConfiguration( boolean forWrite )
-    {
-        return repositoryConfiguration.getConfiguration( forWrite );
+        return coreConfiguration;
     }
 
     protected ExternalConfiguration getExternalConfiguration()
     {
         return getCurrentCoreConfiguration().getExternalConfiguration();
-    }
-
-    public final void validateConfiguration( Object config )
-        throws ConfigurationException
-    {
-        if ( config == null )
-        {
-            throw new InvalidConfigurationException( "This configuration is null!" );
-        }
-
-        doValidateConfiguration( config );
     }
 
     public final void configure( Object config )
@@ -102,11 +87,11 @@ public abstract class AbstractConfigurable
 
         if ( config instanceof CoreConfiguration )
         {
-            this.repositoryConfiguration = (CoreConfiguration) config;
+            this.coreConfiguration = (CoreConfiguration) config;
         }
         else
         {
-            this.repositoryConfiguration = wrapConfiguration( config );
+            this.coreConfiguration = wrapConfiguration( config );
         }
 
         doConfigure( false );
@@ -120,8 +105,48 @@ public abstract class AbstractConfigurable
 
     public boolean isDirty()
     {
-        return getCurrentCoreConfiguration().isDirty()
-            || getCurrentCoreConfiguration().getExternalConfiguration().isDirty();
+        return getCurrentCoreConfiguration().isDirty();
+    }
+
+    public boolean commitChanges()
+    {
+        if ( isDirty() )
+        {
+            getCurrentCoreConfiguration().commitChanges();
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public boolean rollbackChanges()
+    {
+        if ( isDirty() )
+        {
+            getCurrentCoreConfiguration().rollbackChanges();
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    // ==
+
+    protected final void validateConfiguration( Object config )
+        throws ConfigurationException
+    {
+        if ( config == null )
+        {
+            throw new InvalidConfigurationException( "This configuration is null!" );
+        }
+
+        doValidateConfiguration( config );
     }
 
     protected void doValidateConfiguration( Object config )
@@ -146,12 +171,21 @@ public abstract class AbstractConfigurable
             getConfigurator().applyConfiguration( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
         }
 
-        getCurrentCoreConfiguration().applyChanges();
+        commitChanges();
+    }
+
+    // ==
+
+    protected Validator getValidator()
+    {
+        // by default we do not have Validator
+        return null;
     }
 
     protected abstract Configurator getConfigurator();
 
-    protected abstract Validator getValidator();
+    protected abstract Object getCurrentConfiguration( boolean forWrite );
 
-    protected abstract CoreConfiguration wrapConfiguration( Object configuration );
+    protected abstract CoreConfiguration wrapConfiguration( Object configuration )
+        throws ConfigurationException;
 }

@@ -154,7 +154,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
 
             exConf.setMemberRepositoryIds( members );
 
-            exConf.applyChanges();
+            exConf.commitChanges();
 
             getNexus().createRepository( group );
         }

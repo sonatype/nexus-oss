@@ -2,9 +2,9 @@ package org.sonatype.nexus.proxy.repository;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
@@ -21,17 +21,12 @@ public class ConfigurableRepository
     @Override
     protected CRepository getCurrentConfiguration( boolean forWrite )
     {
-        return (CRepository) super.getCurrentConfiguration( forWrite );
+        return (CRepository) ( (CRepositoryCoreConfiguration) getCurrentCoreConfiguration() )
+            .getConfiguration( forWrite );
     }
 
     @Override
     protected Configurator getConfigurator()
-    {
-        return null;
-    }
-
-    @Override
-    protected Validator getValidator()
     {
         return null;
     }
@@ -44,8 +39,18 @@ public class ConfigurableRepository
 
     @Override
     protected CoreConfiguration wrapConfiguration( Object configuration )
+        throws ConfigurationException
     {
-        return new CRepositoryCoreConfiguration( (CRepository) configuration );
+        if ( configuration instanceof CRepository )
+        {
+            return new CRepositoryCoreConfiguration( (CRepository) configuration );
+        }
+        else
+        {
+            throw new ConfigurationException( "The passed configuration object is of class \""
+                + configuration.getClass().getName() + "\" and not the required \"" + CRepository.class.getName()
+                + "\"!" );
+        }
     }
 
     public String getId()

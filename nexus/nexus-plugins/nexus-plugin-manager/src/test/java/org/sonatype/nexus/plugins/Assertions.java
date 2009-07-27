@@ -7,6 +7,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusContainer;
+import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 
 public class Assertions
@@ -30,7 +31,7 @@ public class Assertions
             (DefaultNexusPluginManager) getContainer().lookup( NexusPluginManager.class );
 
         MockComponent mc = getContainer().lookup( MockComponent.class );
-        
+
         RepositoryTypeRegistry repoTypeRegistry = getContainer().lookup( RepositoryTypeRegistry.class );
 
         // record pre-discovery state
@@ -65,7 +66,8 @@ public class Assertions
 
         // lookup the collector from other plugin
         Object infectedFilesCollector =
-            getContainer().lookup( "org.sonatype.nexus.plugin.samples.interdep.InfectedFilesCollector" );
+            getContainer().lookup( EventInspector.class,
+                                   "org.sonatype.nexus.plugin.samples.interdep.InfectedFilesCollectorEventInspector" );
         Assert.assertNotNull( infectedFilesCollector );
 
         // lookup the collector from other plugin

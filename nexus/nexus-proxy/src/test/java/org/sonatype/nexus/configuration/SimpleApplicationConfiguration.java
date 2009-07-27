@@ -96,6 +96,7 @@ public class SimpleApplicationConfiguration
     {
         // send events out, but nothing else
         applicationEventMulticaster.notifyEventListeners( new ConfigurationPrepareForSaveEvent( this ) );
+        applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
         applicationEventMulticaster.notifyEventListeners( new ConfigurationSaveEvent( this ) );
     }
 

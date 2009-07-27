@@ -20,8 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -67,7 +68,6 @@ import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskActivityDescriptor;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * <p>
@@ -88,7 +88,7 @@ import org.sonatype.plexus.appevents.Event;
  */
 public abstract class AbstractRepository
     extends ConfigurableRepository
-    implements Repository
+    implements Repository, LogEnabled
 {
     /**
      * StorageItem context key. If value set to Boolean.TRUE, the item will not be stored locally. Useful to suppress
@@ -96,6 +96,8 @@ public abstract class AbstractRepository
      */
     public static final String CTX_TRANSITIVE_ITEM =
         AbstractRepository.class.getCanonicalName() + ".CTX_TRANSITIVE_ITEM";
+
+    private Logger logger;
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -129,6 +131,18 @@ public abstract class AbstractRepository
 
     // --
 
+    public void enableLogging( Logger logger )
+    {
+        this.logger = logger;
+    }
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
+
+    // ==
+
     @Override
     protected abstract Configurator getConfigurator();
 
@@ -136,26 +150,16 @@ public abstract class AbstractRepository
     public abstract Validator getValidator();
 
     @Override
-    public void onEvent( Event<?> evt )
+    public boolean commitChanges()
     {
-        super.onEvent( evt );
+        boolean wasDirty = super.commitChanges();
 
-        // act automatically on config events
-        if ( evt instanceof ConfigurationPrepareForSaveEvent )
+        if ( wasDirty )
         {
-            ConfigurationPrepareForSaveEvent psevt = (ConfigurationPrepareForSaveEvent) evt;
-
-            // dirty is not more true, but we are in the set of changed objects
-            if ( psevt.getChanges().contains( this ) )
-            {
-                // cstamas
-                // XXX: hrm, emitting an event in event handler?
-                // do something in plexus-app-events like "chainable" events? Let Event have something like
-                // evt.addPostFireEvent( evt1 ) which could be a list, and all events added to that list would invoke
-                // another round of notifyEventListeners call )and would be handled by plexus-app-events in generic way)
-                getApplicationEventMulticaster().notifyEventListeners( new RepositoryConfigurationUpdatedEvent( this ) );
-            }
+            getApplicationEventMulticaster().notifyEventListeners( new RepositoryConfigurationUpdatedEvent( this ) );
         }
+
+        return wasDirty;
     }
 
     @Override
@@ -257,7 +261,8 @@ public abstract class AbstractRepository
         super.setLocalUrl( localUrl );
 
         getApplicationEventMulticaster().notifyEventListeners(
-            new RepositoryEventLocalUrlChanged( this, oldLocalUrl, newLocalUrl ) );
+                                                               new RepositoryEventLocalUrlChanged( this, oldLocalUrl,
+                                                                                                   newLocalUrl ) );
     }
 
     @Override

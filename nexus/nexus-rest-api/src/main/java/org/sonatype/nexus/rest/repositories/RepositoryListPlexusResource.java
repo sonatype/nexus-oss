@@ -174,7 +174,7 @@ public class RepositoryListPlexusResource
 
             exConf.setSynchronizeAtStartup( repoResource.isSyncAtStartup() );
 
-            exConf.applyChanges();
+            exConf.commitChanges();
 
         }
         else if ( REPO_TYPE_GROUP.equals( resource.getRepoType() ) )
@@ -225,7 +225,7 @@ public class RepositoryListPlexusResource
                 appModel.getRemoteStorage().setProvider( "apacheHttpClient3x" );
             }
 
-            exConf.applyChanges();
+            exConf.commitChanges();
 
         }
 
@@ -261,7 +261,7 @@ public class RepositoryListPlexusResource
 
         exConf.setMetadataMaxAge( model.getMetadataMaxAge() );
 
-        exConf.applyChanges();
+        exConf.commitChanges();
 
         if ( model.getRemoteStorage() != null )
         {

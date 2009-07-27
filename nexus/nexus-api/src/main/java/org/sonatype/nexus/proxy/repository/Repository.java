@@ -16,7 +16,7 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.Collection;
 import java.util.Map;
 
-import org.sonatype.nexus.configuration.ValidatingConfigurable;
+import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStore;
@@ -44,7 +44,7 @@ import org.sonatype.plugin.ExtensionPoint;
  */
 @ExtensionPoint
 public interface Repository
-    extends ResourceStore, ValidatingConfigurable
+    extends ResourceStore, Configurable
 {
     /**
      * Returns the ID of the resourceStore.

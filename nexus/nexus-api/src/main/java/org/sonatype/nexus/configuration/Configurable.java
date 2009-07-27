@@ -25,7 +25,7 @@ public interface Configurable
         throws ConfigurationException;
 
     /**
-     * Makes the component to configure itself, if you tampered with the config object.
+     * cstamas: not sure about this yet.
      * 
      * @throws ConfigurationException
      */
@@ -38,4 +38,14 @@ public interface Configurable
      * @return
      */
     boolean isDirty();
+
+    /**
+     * Commits the changes. Resets the state of config "back to normal" (saved).
+     */
+    boolean commitChanges();
+
+    /**
+     * Rollbacks the changes. Resets the state of config "back to normal" (saved).
+     */
+    boolean rollbackChanges();
 }

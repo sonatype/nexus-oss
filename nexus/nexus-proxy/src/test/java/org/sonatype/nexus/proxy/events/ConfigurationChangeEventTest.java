@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.configuration.ConfigurationCommitEvent;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
@@ -62,6 +63,9 @@ public class ConfigurationChangeEventTest
         // fire prepareForSave event
         ConfigurationPrepareForSaveEvent pevt = new ConfigurationPrepareForSaveEvent( getApplicationConfiguration() );
         getApplicationEventMulticaster().notifyEventListeners( pevt );
+
+        getApplicationEventMulticaster()
+            .notifyEventListeners( new ConfigurationCommitEvent( getApplicationConfiguration() ) );
 
         // changes are now applied!
         assertEquals( "Should be applied!", LocalStatus.OUT_OF_SERVICE, repo1.getLocalStatus() );

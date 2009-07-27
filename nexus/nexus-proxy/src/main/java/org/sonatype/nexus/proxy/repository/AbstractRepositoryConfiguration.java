@@ -32,7 +32,7 @@ public class AbstractRepositoryConfiguration
         return this.changedConfiguration != null;
     }
 
-    public void applyChanges()
+    public void commitChanges()
     {
         if ( changedConfiguration != null )
         {

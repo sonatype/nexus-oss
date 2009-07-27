@@ -328,7 +328,7 @@ public class ProtectedRepositoryRegistryTest
         shadowConfig.setExternalConfiguration( exRepo );
         M1LayoutedM2ShadowRepositoryConfiguration exRepoConf = new M1LayoutedM2ShadowRepositoryConfiguration( exRepo );
         exRepoConf.setMasterRepositoryId( repo.getId() );
-        exRepoConf.applyChanges();
+        exRepoConf.commitChanges();
 
         shadow.configure( shadowConfig );
         // shadow.

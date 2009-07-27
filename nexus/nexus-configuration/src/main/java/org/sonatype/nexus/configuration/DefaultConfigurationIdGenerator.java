@@ -17,6 +17,10 @@ import java.util.Random;
 
 import org.codehaus.plexus.component.annotations.Component;
 
+/**
+ * @author cstamas
+ *@deprecated this is just plain stupid
+ */
 @Component( role = ConfigurationIdGenerator.class )
 public class DefaultConfigurationIdGenerator
     implements ConfigurationIdGenerator

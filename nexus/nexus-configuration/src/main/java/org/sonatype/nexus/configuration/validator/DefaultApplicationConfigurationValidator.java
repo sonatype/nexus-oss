@@ -14,19 +14,18 @@
 package org.sonatype.nexus.configuration.validator;
 
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CMirror;
@@ -58,12 +57,15 @@ public class DefaultApplicationConfigurationValidator
     extends AbstractLogEnabled
     implements ApplicationConfigurationValidator, Contextualizable
 {
-    @Requirement
-    private ConfigurationIdGenerator idGenerator;
+    private Random rand = new Random( System.currentTimeMillis() );
 
     private PlexusContainer plexusContainer;
 
-    @SuppressWarnings( "unchecked" )
+    public String generateId()
+    {
+        return Long.toHexString( System.nanoTime() + rand.nextInt( 2008 ) );
+    }
+
     public ValidationResponse validateModel( ValidationRequest request )
     {
         ValidationResponse response = new ApplicationValidationResponse();
@@ -370,7 +372,7 @@ public class DefaultApplicationConfigurationValidator
             || ( context.getExistingPathMappingIds() != null && context.getExistingPathMappingIds().contains(
                 item.getId() ) ) )
         {
-            String newId = idGenerator.generateId();
+            String newId = generateId();
 
             item.setId( newId );
 
@@ -538,7 +540,7 @@ public class DefaultApplicationConfigurationValidator
         {
             if ( StringUtils.isEmpty( mirror.getId() ) )
             {
-                String newId = idGenerator.generateId();
+                String newId = generateId();
 
                 mirror.setId( newId );
 

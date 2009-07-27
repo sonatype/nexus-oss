@@ -65,7 +65,7 @@ public class M2RepositoryTest
 
         // a "release"
         repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-        repository.getCurrentCoreConfiguration().applyChanges();
+        repository.getCurrentCoreConfiguration().commitChanges();
 
         StorageItem item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_RELEASE, false ) );
         checkForFileAndMatchContents( item );
@@ -86,7 +86,7 @@ public class M2RepositoryTest
 
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
-        repository.getCurrentCoreConfiguration().applyChanges();
+        repository.getCurrentCoreConfiguration().commitChanges();
 
         item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_SNAPSHOT, false ) );
         checkForFileAndMatchContents( item );
@@ -110,7 +110,7 @@ public class M2RepositoryTest
 
         // a "release"
         repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-        repository.getCurrentCoreConfiguration().applyChanges();
+        repository.getCurrentCoreConfiguration().commitChanges();
 
         DefaultStorageFileItem item =
             new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true, new StringContentLocator( SPOOF_RELEASE ) );
@@ -137,7 +137,7 @@ public class M2RepositoryTest
 
         // a "snapshot"
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
-        repository.getCurrentCoreConfiguration().applyChanges();
+        repository.getCurrentCoreConfiguration().commitChanges();
 
         item =
             new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true,
@@ -184,7 +184,7 @@ public class M2RepositoryTest
 
         // it is equiv of repo type: RELEASE
         repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-        repository.getCurrentCoreConfiguration().applyChanges();
+        repository.getCurrentCoreConfiguration().commitChanges();
 
         request.setRequestPath( releasePom );
         assertEquals( true, repository.shouldServeByPolicies( request ) );
@@ -207,7 +207,7 @@ public class M2RepositoryTest
 
         // it is equiv of repo type: SNAPSHOT
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
-        repository.getCurrentCoreConfiguration().applyChanges();
+        repository.getCurrentCoreConfiguration().commitChanges();
 
         request.setRequestPath( releasePom );
         assertEquals( false, repository.shouldServeByPolicies( request ) );
@@ -293,7 +293,7 @@ public class M2RepositoryTest
         }
 
         repository.setMetadataMaxAge( 0 );
-        repository.getCurrentCoreConfiguration().applyChanges();
+        repository.getCurrentCoreConfiguration().commitChanges();
 
         mdFile.setLastModified( System.currentTimeMillis() - ( 3L * 24L * 60L * 60L * 1000L ) );
 
@@ -329,7 +329,7 @@ public class M2RepositoryTest
         }
 
         repository.setMetadataMaxAge( 5 );
-        repository.getCurrentCoreConfiguration().applyChanges();
+        repository.getCurrentCoreConfiguration().commitChanges();
 
         mdFile.setLastModified( System.currentTimeMillis() );
 
@@ -363,7 +363,7 @@ public class M2RepositoryTest
 
         assertFalse( "Should not be the same!", changedUrl.equals( repository.getLocalUrl() ) );
 
-        repository.getCurrentCoreConfiguration().applyChanges();
+        repository.getCurrentCoreConfiguration().commitChanges();
 
         assertTrue( "Should be the same!", changedUrl.equals( repository.getLocalUrl() ) );
     }
@@ -379,7 +379,7 @@ public class M2RepositoryTest
 
         assertFalse( "Should not be the same!", changedUrl.equals( repository.getRemoteUrl() ) );
 
-        repository.getCurrentCoreConfiguration().applyChanges();
+        repository.getCurrentCoreConfiguration().commitChanges();
 
         assertTrue( "Should be the same!", changedUrl.equals( repository.getRemoteUrl() ) );
     }

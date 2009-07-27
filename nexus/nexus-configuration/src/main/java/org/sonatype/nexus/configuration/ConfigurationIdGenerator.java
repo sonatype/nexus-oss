@@ -17,6 +17,7 @@ package org.sonatype.nexus.configuration;
  * A simple ID generator.
  * 
  * @author cstamas
+ * @deprecated this is just plain stupid
  */
 public interface ConfigurationIdGenerator
 {

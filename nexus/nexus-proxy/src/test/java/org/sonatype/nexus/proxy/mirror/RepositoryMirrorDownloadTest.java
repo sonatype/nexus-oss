@@ -279,7 +279,7 @@ public class RepositoryMirrorDownloadTest
 
         repo.setChecksumPolicy( ChecksumPolicy.STRICT );
 
-        repo.getCurrentCoreConfiguration().applyChanges();
+        repo.getCurrentCoreConfiguration().commitChanges();
 
         RepositoryItemUid uid = repo.createUid( ITEM_PATH );
 

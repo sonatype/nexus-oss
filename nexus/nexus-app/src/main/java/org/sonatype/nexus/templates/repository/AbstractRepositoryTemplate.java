@@ -3,7 +3,7 @@ package org.sonatype.nexus.templates.repository;
 import java.io.IOException;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -69,11 +69,13 @@ public abstract class AbstractRepositoryTemplate
         throws ConfigurationException, IOException
     {
         // to merge in user changes to CoreConfiguration
-        getCoreConfiguration().applyChanges();
+        getCoreConfiguration().commitChanges();
 
         // create a repository
         Repository result =
-            provider.getNexus().createRepository( (CRepository) getCoreConfiguration().getConfiguration( false ) );
+            provider.getNexus().createRepository(
+                                                  ( (CRepositoryCoreConfiguration) getCoreConfiguration() )
+                                                      .getConfiguration( false ) );
 
         // reset the template
         setCoreConfiguration( null );
@@ -81,4 +83,7 @@ public abstract class AbstractRepositoryTemplate
         // return the result
         return result;
     }
+
+    @Override
+    protected abstract CRepositoryCoreConfiguration initCoreConfiguration();
 }

@@ -68,7 +68,7 @@ public class M1LayoutedM2ShadowRepositoryTest
             M1LayoutedM2ShadowRepositoryConfiguration exRepoConf = new M1LayoutedM2ShadowRepositoryConfiguration(
                 exRepo );
             exRepoConf.setMasterRepositoryId( master.getId() );
-            exRepoConf.applyChanges();
+            exRepoConf.commitChanges();
 
             shadow.configure( repoConf );
 

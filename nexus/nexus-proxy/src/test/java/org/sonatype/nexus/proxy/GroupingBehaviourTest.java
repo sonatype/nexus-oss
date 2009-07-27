@@ -68,7 +68,7 @@ public class GroupingBehaviourTest
         // in group (repo1) should provide the file
         MavenGroupRepository mgr = getRepositoryRegistry().getRepositoryWithFacet( "test", MavenGroupRepository.class );
         mgr.setMergeMetadata( false );
-        mgr.getCurrentCoreConfiguration().applyChanges();
+        mgr.getCurrentCoreConfiguration().commitChanges();
         getApplicationEventMulticaster().notifyEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 
@@ -132,7 +132,7 @@ public class GroupingBehaviourTest
         // highest ranked repo in group (repo1) should provide the file
         MavenGroupRepository mgr = getRepositoryRegistry().getRepositoryWithFacet( "test", MavenGroupRepository.class );
         mgr.setMergeMetadata( false );
-        mgr.getCurrentCoreConfiguration().applyChanges();
+        mgr.getCurrentCoreConfiguration().commitChanges();
         getApplicationEventMulticaster().notifyEventListeners(
             new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
 

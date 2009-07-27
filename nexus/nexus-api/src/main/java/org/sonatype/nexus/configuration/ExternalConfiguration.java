@@ -8,5 +8,4 @@ package org.sonatype.nexus.configuration;
 public interface ExternalConfiguration
     extends RevertableConfiguration
 {
-    
 }

@@ -318,7 +318,7 @@ public class DefaultNexusPluginManager
             // create discovery context
             discoveryContext = new PluginDiscoveryContext( pluginDescriptor, validator );
 
-            // resolve inter-plugin deps
+            // resolve inter-plugin deps and gather them
             List<GAVCoordinate> dependencyPlugins =
                 new ArrayList<GAVCoordinate>( pluginDescriptor.getPluginMetadata().getPluginDependencies().size() );
 
@@ -333,6 +333,8 @@ public class DefaultNexusPluginManager
                     // try to activate it in recursion
                     response.addPluginManagerResponse( activatePlugin( depCoord ) );
                 }
+                
+                dependencyPlugins.add( depCoord );
             }
 
             // before going further, we must ensure that we resolved all the dependencies

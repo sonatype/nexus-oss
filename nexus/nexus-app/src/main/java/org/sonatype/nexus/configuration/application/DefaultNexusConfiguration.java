@@ -30,6 +30,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.configuration.ConfigurationCommitEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.ConfigurationRollbackEvent;
@@ -206,6 +207,8 @@ public class DefaultNexusConfiguration
             temporaryDirectory = null;
 
             wastebasketDirectory = null;
+            
+            applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
             applicationEventMulticaster
                 .notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges() ) );

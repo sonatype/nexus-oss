@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy;
 
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -87,12 +88,12 @@ public class RepoConversionTest
                       afterTreatment.getRemoteStorage().getProviderId() );
 
         assertEquals( "Config should state the same as object is", afterTreatment.getRemoteStorage().getProviderId(),
-                      ( (CRepository) afterTreatment.getCurrentCoreConfiguration().getConfiguration( false ) )
-                          .getRemoteStorage().getProvider() );
+                      ( ( (CRepositoryCoreConfiguration) afterTreatment.getCurrentCoreConfiguration() )
+                          .getConfiguration( false ) ).getRemoteStorage().getProvider() );
 
         assertEquals( "Config should state the same as object is", afterTreatment.getRemoteUrl(),
-                      ( (CRepository) afterTreatment.getCurrentCoreConfiguration().getConfiguration( false ) )
-                          .getRemoteStorage().getUrl() );
+                      ( ( (CRepositoryCoreConfiguration) afterTreatment.getCurrentCoreConfiguration() )
+                          .getConfiguration( false ) ).getRemoteStorage().getUrl() );
     }
 
     protected void convertProxy2Hosted( MavenProxyRepository patient )

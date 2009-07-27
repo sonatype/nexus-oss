@@ -158,7 +158,7 @@ public class PathBasedRequestRepositoryMapperTest
         M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
         exGroupRepoConf.setMemberRepositoryIds( testgroup );
         exGroupRepoConf.setMergeMetadata( true );
-        exGroupRepoConf.applyChanges();
+        exGroupRepoConf.commitChanges();
 
         groupRepo.configure( repoGroupConf );
 

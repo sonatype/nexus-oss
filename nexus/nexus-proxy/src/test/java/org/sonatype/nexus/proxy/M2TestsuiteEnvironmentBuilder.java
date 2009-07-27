@@ -81,7 +81,7 @@ public class M2TestsuiteEnvironmentBuilder
             M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
             exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
             exConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-            exConf.applyChanges();
+            exConf.commitChanges();
 
             repoConf.setRemoteStorage( new CRemoteStorage() );
             repoConf.getRemoteStorage().setProvider( "apacheHttpClient3x" );
@@ -114,7 +114,7 @@ public class M2TestsuiteEnvironmentBuilder
         M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration( exRepo );
         exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
         exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-        exRepoConf.applyChanges();
+        exRepoConf.commitChanges();
 
         repo.configure( repoConf );
 
@@ -143,7 +143,7 @@ public class M2TestsuiteEnvironmentBuilder
         M2RepositoryConfiguration exSnapRepoConf = new M2RepositoryConfiguration( exSnapRepo );
         exSnapRepoConf.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
         exSnapRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-        exSnapRepoConf.applyChanges();
+        exSnapRepoConf.commitChanges();
 
         repoSnapshot.configure( repoSnapshotConf );
 
@@ -170,7 +170,7 @@ public class M2TestsuiteEnvironmentBuilder
         M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
         exGroupRepoConf.setMemberRepositoryIds( reposes );
         exGroupRepoConf.setMergeMetadata( true );
-        exGroupRepoConf.applyChanges();
+        exGroupRepoConf.commitChanges();
 
         group.configure( repoGroupConf );
 

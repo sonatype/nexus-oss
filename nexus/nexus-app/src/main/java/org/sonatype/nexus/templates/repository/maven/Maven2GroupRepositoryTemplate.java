@@ -1,7 +1,6 @@
 package org.sonatype.nexus.templates.repository.maven;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -24,7 +23,8 @@ public class Maven2GroupRepositoryTemplate
         return (M2GroupRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration();
     }
 
-    protected CoreConfiguration initCoreConfiguration()
+    @Override
+    protected CRepositoryCoreConfiguration initCoreConfiguration()
     {
         CRepository repo = new DefaultCRepository();
 

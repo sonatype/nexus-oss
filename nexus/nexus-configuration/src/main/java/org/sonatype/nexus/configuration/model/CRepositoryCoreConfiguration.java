@@ -11,6 +11,12 @@ public class CRepositoryCoreConfiguration
     }
 
     @Override
+    public CRepository getConfiguration( boolean forWrite )
+    {
+        return (CRepository) super.getConfiguration( forWrite );
+    }
+
+    @Override
     protected void copyTransients( Object source, Object destination )
     {
         ( (CRepository) destination ).setExternalConfiguration( ( (CRepository) source ).getExternalConfiguration() );
