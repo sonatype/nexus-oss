@@ -27,7 +27,7 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 
 public abstract class SeleniumTest
-    extends NexusTestCase
+    extends NexusMockTestCase
 
 {
     protected static Selenium selenium;

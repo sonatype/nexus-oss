@@ -7,7 +7,7 @@ import static org.testng.AssertJUnit.assertTrue;
 import org.codehaus.plexus.component.annotations.Component;
 import org.hamcrest.text.StringContains;
 import org.sonatype.nexus.mock.MockListener;
-import org.sonatype.nexus.mock.NexusTestCase;
+import org.sonatype.nexus.mock.NexusMockTestCase;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.PrivilegeConfigurationForm;
 import org.sonatype.nexus.mock.pages.PrivilegesTab;
@@ -77,7 +77,7 @@ public class Nexus2209PrivilegesTest
         for ( int i = 0; i < ids.length; i++ )
         {
             PrivilegeStatusResource p = result.getData().get( i );
-            ids[i] = NexusTestCase.nexusBaseURL + "service/local/privileges/" + p.getId();
+            ids[i] = NexusMockTestCase.nexusBaseURL + "service/local/privileges/" + p.getId();
         }
 
         // read
@@ -205,7 +205,7 @@ public class Nexus2209PrivilegesTest
 
     private String getId( PrivilegeStatusResource p )
     {
-        String id = NexusTestCase.nexusBaseURL + "service/local/privileges/" + p.getId();
+        String id = NexusMockTestCase.nexusBaseURL + "service/local/privileges/" + p.getId();
         return id;
     }
 

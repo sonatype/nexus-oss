@@ -8,7 +8,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Status;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
-import org.sonatype.nexus.mock.NexusTestCase;
+import org.sonatype.nexus.mock.NexusMockTestCase;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.RepositorySummary;
 import org.sonatype.nexus.mock.pages.RepositoriesEditTabs.RepoKind;
@@ -132,7 +132,7 @@ public class Nexus2196RepositorySummaryTest
     {
         String distMgmt = repo.getDistributionManagement().getValue();
         assertThat( distMgmt, notNullValue() );
-        assertThat( distMgmt, containsString( NexusTestCase.nexusBaseURL + "content/repositories/"
+        assertThat( distMgmt, containsString( NexusMockTestCase.nexusBaseURL + "content/repositories/"
             + meta.getId() ) );
     }
 

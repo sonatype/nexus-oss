@@ -1,6 +1,6 @@
 package org.sonatype.nexus.mock.pages;
 
-import org.sonatype.nexus.mock.NexusTestCase;
+import org.sonatype.nexus.mock.NexusMockTestCase;
 import org.sonatype.nexus.mock.components.Button;
 import org.sonatype.nexus.mock.components.Menu;
 import org.sonatype.nexus.mock.components.Window;
@@ -62,11 +62,11 @@ public class RepositoriesTab
 
         if ( RepoKind.GROUP.equals( kind ) )
         {
-            this.grid.select( NexusTestCase.nexusBaseURL + "service/local/repo_groups/" + repoId );
+            this.grid.select( NexusMockTestCase.nexusBaseURL + "service/local/repo_groups/" + repoId );
         }
         else
         {
-            this.grid.select( NexusTestCase.nexusBaseURL + "service/local/repositories/" + repoId );
+            this.grid.select( NexusMockTestCase.nexusBaseURL + "service/local/repositories/" + repoId );
         }
 
         try
@@ -98,7 +98,7 @@ public class RepositoriesTab
 
     private String getUiId( String repoId )
     {
-        return NexusTestCase.nexusBaseURL + "service/local/repositories/" + repoId;
+        return NexusMockTestCase.nexusBaseURL + "service/local/repositories/" + repoId;
     }
 
     public GroupConfigurationForm addGroup()

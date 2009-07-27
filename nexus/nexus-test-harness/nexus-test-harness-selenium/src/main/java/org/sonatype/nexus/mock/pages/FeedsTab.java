@@ -1,6 +1,6 @@
 package org.sonatype.nexus.mock.pages;
 
-import org.sonatype.nexus.mock.NexusTestCase;
+import org.sonatype.nexus.mock.NexusMockTestCase;
 import org.sonatype.nexus.mock.components.Component;
 import org.sonatype.nexus.mock.components.Grid;
 
@@ -26,7 +26,7 @@ public class FeedsTab
     public FeedsTab selectCategory( String id )
     {
         // http://localhost:8084/nexus/service/local/feeds/authcAuthz
-        feedCategorySelectorGrid.select( NexusTestCase.nexusBaseURL + "service/local/feeds/" + id );
+        feedCategorySelectorGrid.select( NexusMockTestCase.nexusBaseURL + "service/local/feeds/" + id );
 
         feedCategorySelectorGrid.waitToLoad();
         feedsGrid.waitToLoad();
