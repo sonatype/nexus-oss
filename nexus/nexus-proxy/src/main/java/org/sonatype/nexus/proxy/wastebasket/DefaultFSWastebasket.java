@@ -228,34 +228,54 @@ public class DefaultFSWastebasket
     {
         // TODO Auto-generated method stub
     }
-
-    public void deleteRepositoryFolders( Repository repository )
+    
+    
+    public void deleteRepositoryFolders( Repository repository, boolean deleteForever )
         throws IOException
     {
-        File defaultRepoStorageFolder = new File(
+        deleteStorage( repository, deleteForever );
+
+        deleteProxyAttributes( repository, true );
+
+        deleteIndexer( repository, true );
+    }
+
+    private void deleteStorage( Repository repository, boolean deleteForever )
+        throws IOException
+    {
+        File defaultStorageFolder = new File(
             new File( applicationConfiguration.getWorkingDirectory(), "storage" ),
             repository.getId() );
 
-        // only remove the storage folder when in default storage case
-        if ( defaultRepoStorageFolder.toURI().toURL().toString().equals( repository.getLocalUrl() + "/" ) )
+        if ( defaultStorageFolder.toURI().toURL().toString().equals( repository.getLocalUrl() + "/" ) )
         {
-            delete( defaultRepoStorageFolder, false );
+            delete( defaultStorageFolder, deleteForever );
         }
+    }
 
-        File repoProxyAttributesFolder = new File( new File( new File(
+    private void deleteProxyAttributes( Repository repository, boolean deleteForever )
+        throws IOException
+    {
+        File proxyAttributesFolder = new File( new File( new File(
             applicationConfiguration.getWorkingDirectory(),
             "proxy" ), "attributes" ), repository.getId() );
 
-        delete( repoProxyAttributesFolder, true );
+        delete( proxyAttributesFolder, true );
+    }
 
-        if ( !repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+    private void deleteIndexer( Repository repository, boolean deleteForever )
+        throws IOException
+    {
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
         {
-            File indexerFolder = new File( applicationConfiguration.getWorkingDirectory(), "indexer" );
-
-            delete( new File( indexerFolder, repository.getId() + "-local" ), true );
-
-            delete( new File( indexerFolder, repository.getId() + "-remote" ), true );
+            return;
         }
+
+        File indexerFolder = new File( applicationConfiguration.getWorkingDirectory(), "indexer" );
+
+        delete( new File( indexerFolder, repository.getId() + "-local" ), deleteForever );
+
+        delete( new File( indexerFolder, repository.getId() + "-remote" ), deleteForever );
     }
 
     /**

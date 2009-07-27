@@ -22,17 +22,17 @@ import org.sonatype.nexus.AbstractMavenRepoContentTests;
  * 
  * @author juven
  */
-public class RemoveRepoFolderTaskTest
+public class DeleteRepositoryFoldersTaskTest
     extends AbstractMavenRepoContentTests
 {
-    public void testRemoveRepoFolder()
+    public void testTrashRepositoryFolders()
         throws Exception
     {
         fillInRepo();
 
         String repoId = snapshots.getId();
 
-        defaultNexus.removeRepositoryFolder( snapshots );
+        defaultNexus.deleteRepositoryFolders( snapshots, false );
 
         File workDir = defaultNexus.getNexusConfiguration().getWorkingDirectory();
         File trashDir = new File( workDir, "trash" );
@@ -43,6 +43,28 @@ public class RemoveRepoFolderTaskTest
         assertFalse( new File( new File( new File( workDir, "proxy" ), "attributes" ), repoId ).exists() );
 
         assertTrue( new File( trashDir, repoId ).exists() );
+        assertFalse( new File( trashDir, repoId + "-local" ).exists() );
+        assertFalse( new File( trashDir, repoId + "-remote" ).exists() );
+    }
+
+    public void testDeleteForeverRepositoryFolders()
+        throws Exception
+    {
+        fillInRepo();
+
+        String repoId = snapshots.getId();
+
+        defaultNexus.deleteRepositoryFolders( snapshots, true );
+
+        File workDir = defaultNexus.getNexusConfiguration().getWorkingDirectory();
+        File trashDir = new File( workDir, "trash" );
+
+        assertFalse( new File( new File( workDir, "storage" ), repoId ).exists() );
+        assertFalse( new File( new File( workDir, "indexer" ), repoId + "-local" ).exists() );
+        assertFalse( new File( new File( workDir, "indexer" ), repoId + "-remote" ).exists() );
+        assertFalse( new File( new File( new File( workDir, "proxy" ), "attributes" ), repoId ).exists() );
+
+        assertFalse( new File( trashDir, repoId ).exists() );
         assertFalse( new File( trashDir, repoId + "-local" ).exists() );
         assertFalse( new File( trashDir, repoId + "-remote" ).exists() );
     }

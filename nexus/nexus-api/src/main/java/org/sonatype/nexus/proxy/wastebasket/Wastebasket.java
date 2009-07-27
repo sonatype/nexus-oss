@@ -72,10 +72,12 @@ public interface Wastebasket
         throws StorageException;
 
     /**
-     * Move the repository's storage folder into trash, and 'rm -fr' proxy attributes folder and index folder 
+     * Trash or 'rm -fr' the storage folder,'rm -fr' proxy attributes folder and index folder
      * 
      * @param repository
+     * @param deleteForever 'rm -fr' the storage folder if it's true, else move the storage folder into trash
+     * @throws IOException
      */
-    public void deleteRepositoryFolders( Repository repository )
+    public void deleteRepositoryFolders( Repository repository, boolean deleteForever )
         throws IOException;
 }

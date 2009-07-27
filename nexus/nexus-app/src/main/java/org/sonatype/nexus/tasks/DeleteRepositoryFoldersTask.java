@@ -17,19 +17,20 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
-import org.sonatype.nexus.tasks.descriptors.RemoveRepoFolderTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
- * Remove repository folder
+ * Delete repository folders
  * 
  * @author Juven Xu
  */
-@Component( role = SchedulerTask.class, hint = RemoveRepoFolderTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
-public class RemoveRepoFolderTask
+@Component( role = SchedulerTask.class, hint = "DeleteRepositoryFoldersTask", instantiationStrategy = "per-lookup" )
+public class DeleteRepositoryFoldersTask
     extends AbstractNexusTask<Object>
 {
     private Repository repository;
+
+    private boolean deleteForever = false;
 
     public Repository getRepository()
     {
@@ -40,7 +41,17 @@ public class RemoveRepoFolderTask
     {
         this.repository = repository;
     }
-    
+
+    public boolean isDeleteForever()
+    {
+        return deleteForever;
+    }
+
+    public void setDeleteForever( boolean deleteForever )
+    {
+        this.deleteForever = deleteForever;
+    }
+
     @Override
     public boolean isExposed()
     {
@@ -53,7 +64,7 @@ public class RemoveRepoFolderTask
     {
         if ( repository != null )
         {
-            getNexus().removeRepositoryFolder( repository );
+            getNexus().deleteRepositoryFolders( repository, deleteForever );
         }
         return null;
     }
@@ -69,7 +80,7 @@ public class RemoveRepoFolderTask
     {
         if ( repository != null )
         {
-            return "Removing folder with repository ID: " + repository.getId();
+            return "Deleting folders with repository ID: " + repository.getId();
         }
         return null;
     }

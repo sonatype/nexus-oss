@@ -113,9 +113,12 @@ public interface Nexus
         throws NoSuchRepositoryException, IllegalArgumentException;
 
     /**
-     * Remove the repository's storage folder
+     * Delete the repository folders ( storage/, proxy/attributes/, indexer/ )
+     * 
+     * @param repository
+     * @param deleteForever move storge/ into trash if it's false, otherwise 'rm -fr' it
      */
-    void removeRepositoryFolder( Repository repository );
+    void deleteRepositoryFolders( Repository repository, boolean deleteForever );
 
     /**
      * List the names of files in nexus-work/conf

@@ -77,7 +77,7 @@ import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ReindexTask;
-import org.sonatype.nexus.tasks.RemoveRepoFolderTask;
+import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
 import org.sonatype.nexus.templates.TemplateManager;
@@ -307,7 +307,7 @@ public class DefaultNexus
         Repository repository = repositoryRegistry.getRepository( id );
 
         // remove the storage folders for the repository
-        RemoveRepoFolderTask task = nexusScheduler.createTaskInstance( RemoveRepoFolderTask.class );
+        DeleteRepositoryFoldersTask task = nexusScheduler.createTaskInstance( DeleteRepositoryFoldersTask.class );
 
         task.setRepository( repository );
 
@@ -485,17 +485,17 @@ public class DefaultNexus
         return snapshotRemover.removeSnapshots( request );
     }
 
-    public void removeRepositoryFolder( Repository repository )
+    public void deleteRepositoryFolders( Repository repository, boolean deleteForever )
     {
-        getLogger().info( "Removing storage folder of repository " + repository.getId() );
+        getLogger().info( "Deleting folders of repository '" + repository.getId() + "'." );
 
         try
         {
-            wastebasket.deleteRepositoryFolders( repository );
+            wastebasket.deleteRepositoryFolders( repository, deleteForever );
         }
         catch ( IOException e )
         {
-            getLogger().warn( "Error during deleting repository folders ", e );
+            getLogger().warn( "Unable to delete repository folders ", e );
         }
     }
 

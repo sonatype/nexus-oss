@@ -40,6 +40,7 @@ import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
+import org.sonatype.nexus.proxy.events.RepositoryEventLocalUrlChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
@@ -242,16 +243,21 @@ public abstract class AbstractRepository
     public void setLocalUrl( String localUrl )
         throws StorageException
     {
-        String trstr = localUrl.trim();
+        String oldLocalUrl = this.getLocalUrl();
 
-        if ( trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        String newLocalUrl = localUrl.trim();
+
+        if ( newLocalUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
-            trstr = trstr.substring( 0, trstr.length() - 1 );
+            newLocalUrl = newLocalUrl.substring( 0, newLocalUrl.length() - 1 );
         }
 
-        getLocalStorage().validateStorageUrl( trstr );
+        getLocalStorage().validateStorageUrl( newLocalUrl );
 
         super.setLocalUrl( localUrl );
+
+        getApplicationEventMulticaster().notifyEventListeners(
+            new RepositoryEventLocalUrlChanged( this, oldLocalUrl, newLocalUrl ) );
     }
 
     @Override

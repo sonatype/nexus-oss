@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
+import org.sonatype.nexus.proxy.events.RepositoryEventRemoteUrlChanged;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -187,16 +188,21 @@ public abstract class AbstractProxyRepository
     {
         if ( getRemoteStorage() != null )
         {
-            String trstr = remoteUrl.trim();
+            String newRemoteUrl = remoteUrl.trim();
 
-            if ( trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+            String oldRemoteUrl = getRemoteUrl();
+
+            if ( newRemoteUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
             {
-                trstr = trstr.substring( 0, trstr.length() - 1 );
+                newRemoteUrl = newRemoteUrl.substring( 0, newRemoteUrl.length() - 1 );
             }
 
-            getRemoteStorage().validateStorageUrl( trstr );
+            getRemoteStorage().validateStorageUrl( newRemoteUrl );
 
-            getCurrentConfiguration( true ).getRemoteStorage().setUrl( trstr );
+            getCurrentConfiguration( true ).getRemoteStorage().setUrl( newRemoteUrl );
+
+            getApplicationEventMulticaster().notifyEventListeners(
+                new RepositoryEventRemoteUrlChanged( this, oldRemoteUrl, newRemoteUrl ) );
         }
         else
         {
