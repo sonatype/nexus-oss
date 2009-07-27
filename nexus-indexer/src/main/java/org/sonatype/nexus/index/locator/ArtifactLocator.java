@@ -49,6 +49,14 @@ public class ArtifactLocator
             
             try
             {
+                if( context.getIndexSearcher() == null )
+                {
+                    return new File(
+                        source.getParentFile(),
+                        gavCalculator.gavToPath( gav )
+                    );
+                }
+                
                 TopDocs topdocs = context.getIndexSearcher().search( new TermQuery( term ), null, 1 );
                 
                 if ( topdocs != null
