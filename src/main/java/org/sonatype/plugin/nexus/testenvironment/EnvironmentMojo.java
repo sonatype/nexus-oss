@@ -211,12 +211,13 @@ public class EnvironmentMojo
         copyUrl( "/default-config/plexus.properties", new File( nexusBaseDir, "conf/plexus.properties" ) );
         project.getProperties().put( "nexus-plexus-config-file", getPath( new File( nexusBaseDir, "conf/plexus.xml" ) ) );
 
-        File pluginFolder = new File( nexusBaseDir, "runtime/apps/nexus/lib" );
-        copyEmma( pluginFolder );
+        File libFolder = new File( nexusBaseDir, "runtime/apps/nexus/lib" );
+        copyEmma( libFolder );
+        File pluginFolder = new File( nexusBaseDir, "runtime/apps/nexus/plugin-repository" );
 
         if ( nexusPluginsArtifacts != null )
         {
-            setupPlugins( nexusBaseDir, nexusPluginsArtifacts, pluginFolder );
+            setupPlugins( nexusBaseDir, nexusPluginsArtifacts, libFolder, pluginFolder );
         }
 
         if ( setupMaven )
@@ -659,7 +660,8 @@ public class EnvironmentMojo
         copy( artifact.getFile(), pluginFolder );
     }
 
-    private void setupPlugins( File nexusBaseDir, MavenArtifact[] nexusPluginsArtifacts, File pluginsFolder )
+    private void setupPlugins( File nexusBaseDir, MavenArtifact[] nexusPluginsArtifacts, File libsFolder,
+                               File pluginsFolder )
         throws MojoFailureException, MojoExecutionException
     {
 
@@ -676,20 +678,16 @@ public class EnvironmentMojo
             {
                 destination = new File( project.getProperties().getProperty( plugin.getOutputProperty() ) );
             }
-            else
+            else if ( "bundle".equals( plugin.getClassifier() ) && "zip".equals( plugin.getType() ) )
             {
                 destination = pluginsFolder;
             }
+            else
+            {
+                destination = libsFolder;
+            }
 
             String type = pluginArtifact.getType();
-
-            // nexus plugins will have a classifier of bundle, and and type of zip
-            if ( "bundle".equals( plugin.getClassifier() ) && "zip".equals( type ) )
-            {
-                destination =
-                    new File( (String) this.project.getProperties().get( "nexus-work-dir" ), "plugin-repository/" );
-                System.out.println( "setting destination to " + destination );
-            }
 
             if ( "jar".equals( type ) )
             {
