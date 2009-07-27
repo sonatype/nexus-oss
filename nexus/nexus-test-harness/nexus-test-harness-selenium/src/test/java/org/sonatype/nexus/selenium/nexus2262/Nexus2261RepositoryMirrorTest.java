@@ -55,7 +55,7 @@ public class Nexus2261RepositoryMirrorTest
         cRepo.setExternalConfiguration( ex );
         M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
         exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-        exConf.applyChanges();
+        exConf.commitChanges();
 
         cRepo.setLocalStorage( new CLocalStorage() );
         cRepo.getLocalStorage().setUrl( cRepo.defaultLocalStorageUrl );
@@ -83,7 +83,7 @@ public class Nexus2261RepositoryMirrorTest
         cRepo.setExternalConfiguration( ex );
         exConf = new M2RepositoryConfiguration( ex );
         exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-        exConf.applyChanges();
+        exConf.commitChanges();
 
         cRepo.setLocalStorage( new CLocalStorage() );
         cRepo.getLocalStorage().setUrl( cRepo.defaultLocalStorageUrl );
