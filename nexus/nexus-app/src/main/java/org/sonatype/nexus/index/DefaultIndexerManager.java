@@ -91,10 +91,10 @@ import org.sonatype.plexus.appevents.EventListener;
  *
  * @author Tamas Cservenak
  */
-@Component( role = IndexerManager.class )
+@Component( role = ComposableIndexerManager.class, hint = "lucene" )
 public class DefaultIndexerManager
     extends AbstractLogEnabled
-    implements IndexerManager, EventListener, Initializable
+    implements ComposableIndexerManager, EventListener, Initializable
 
 {
     /** Context id local suffix */
