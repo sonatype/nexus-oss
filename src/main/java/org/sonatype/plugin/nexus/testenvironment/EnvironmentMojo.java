@@ -208,7 +208,14 @@ public class EnvironmentMojo
         // conf dir
         project.getProperties().put( "application-conf", getPath( new File( destination, "nexus-work-dir/conf" ) ) );
 
-        copyUrl( "/default-config/plexus.properties", new File( nexusBaseDir, "conf/plexus.properties" ) );
+        final File plexusProps = new File( nexusBaseDir, "conf/plexus.properties" );
+        copyUrl( "/default-config/plexus.properties", plexusProps );
+
+        File extraPlexusProps = new File( project.getBasedir(), "src/test/resources/plexus.properties" );
+        if ( extraPlexusProps.exists() )
+        {
+            merge( plexusProps, extraPlexusProps, "properties" );
+        }
         project.getProperties().put( "nexus-plexus-config-file", getPath( new File( nexusBaseDir, "conf/plexus.xml" ) ) );
 
         File libFolder = new File( nexusBaseDir, "runtime/apps/nexus/lib" );
