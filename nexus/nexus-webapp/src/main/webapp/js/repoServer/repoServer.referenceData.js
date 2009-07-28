@@ -77,7 +77,7 @@ Sonatype.repoServer.referenceData = {
       repoType: "",
       id: "",
       name: "",
-      allowWrite: true,
+      writePolicy: "ALLOW_WRITE_ONCE",
       browseable: true,
       indexable: true,
       exposed: true,

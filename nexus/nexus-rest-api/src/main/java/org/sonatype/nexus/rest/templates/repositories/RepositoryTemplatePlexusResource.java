@@ -36,6 +36,7 @@ import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
+import org.sonatype.nexus.rest.repositories.RepositoryWritePolicy;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.AbstractMavenRepositoryTemplate;
@@ -154,8 +155,8 @@ public class RepositoryTemplatePlexusResource
         AbstractMavenRepositoryTemplate m2Template = (AbstractMavenRepositoryTemplate) template;
         repoRes.setRepoPolicy( m2Template.getRepositoryPolicy().name() );
 
-        ConfigurableRepository cfg = template.getConfigurableRepository();
-        repoRes.setAllowWrite( cfg.isAllowWrite() );
+        ConfigurableRepository cfg = template.getConfigurableRepository();       
+        repoRes.setWritePolicy( this.getAllowWrite( cfg.isAllowWrite() ) ); 
         repoRes.setBrowseable( cfg.isBrowseable() );
         repoRes.setIndexable( cfg.isIndexable() );
         repoRes.setExposed( cfg.isExposed() );
@@ -183,12 +184,25 @@ public class RepositoryTemplatePlexusResource
         repoRes.setRepoPolicy( m2Template.getRepositoryPolicy().name() );
 
         ConfigurableRepository cfg = template.getConfigurableRepository();
-        repoRes.setAllowWrite( cfg.isAllowWrite() );
+        repoRes.setWritePolicy( this.getAllowWrite( cfg.isAllowWrite() ) );
         repoRes.setBrowseable( cfg.isBrowseable() );
         repoRes.setIndexable( cfg.isIndexable() );
         repoRes.setExposed( cfg.isExposed() );
         repoRes.setNotFoundCacheTTL( cfg.getNotFoundCacheTimeToLive() );
 
         return repoRes;
+    }
+    
+    private String getAllowWrite( boolean allowWrite )
+    {
+        // FIXME: set ENUM correctly 
+        if( allowWrite )
+        {
+            return RepositoryWritePolicy.ALLOW_WRITE.name();
+        }
+        else 
+        {
+            return RepositoryWritePolicy.READ_ONLY.name();
+        }
     }
 }

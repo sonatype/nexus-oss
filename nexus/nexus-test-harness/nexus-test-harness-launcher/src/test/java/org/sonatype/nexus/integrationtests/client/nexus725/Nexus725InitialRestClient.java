@@ -32,6 +32,7 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.sonatype.nexus.rest.repositories.RepositoryWritePolicy;
 
 /**
  * Tests the Nexus java/REST client.
@@ -123,7 +124,7 @@ public class Nexus725InitialRestClient
         repoResoruce.setProvider( "maven2" );
         // format is neglected by server from now on, provider is the new guy in the town
         repoResoruce.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
-        repoResoruce.setAllowWrite( true );
+        repoResoruce.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         repoResoruce.setBrowseable( true );
         repoResoruce.setIndexable( true );
         // repoResoruce.setNotFoundCacheTTL( 1440 );

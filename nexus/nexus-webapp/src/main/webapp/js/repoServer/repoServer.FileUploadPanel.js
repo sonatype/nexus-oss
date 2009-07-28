@@ -937,7 +937,7 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
         if ( success ) {
           var statusResp = Ext.decode( response.responseText );
           if ( statusResp.data ) {
-            if ( statusResp.data.allowWrite ) {
+            if ( statusResp.data.writePolicy == 'ALLOW_WRITE' || statusResp.data.writePolicy == 'ALLOW_WRITE_ONCE' ) {
               var uploadPanel = new Sonatype.repoServer.ArtifactUploadPanel( { payload: rec } ); 
               var card = cardPanel.add( {
                 xtype: 'panel',

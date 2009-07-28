@@ -148,7 +148,7 @@ public class RepositoryPlexusResource
                         
                         repository.setExposed( resource.isExposed() );
 
-                        repository.setAllowWrite( model.isAllowWrite() );
+                        repository.setAllowWrite( this.isWriteAllowed( model.getWritePolicy() ) );
 
                         repository.setBrowseable( model.isBrowseable() );
 

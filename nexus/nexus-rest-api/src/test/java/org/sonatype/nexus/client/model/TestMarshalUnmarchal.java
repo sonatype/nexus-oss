@@ -102,6 +102,7 @@ import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
+import org.sonatype.nexus.rest.repositories.RepositoryWritePolicy;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
@@ -232,7 +233,7 @@ public class TestMarshalUnmarchal
         repo.setRepoType( "hosted" );
         repo.setName( "Create Test Repo" );
         repo.setFormat( "maven2" );
-        repo.setAllowWrite( true );
+        repo.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         repo.setBrowseable( true );
         repo.setIndexable( true );
         repo.setNotFoundCacheTTL( 1440 );
@@ -274,7 +275,7 @@ public class TestMarshalUnmarchal
         repo.setRepoType( "proxy" );
         repo.setName( "Create Test Repo" );
         repo.setFormat( "maven2" );
-        repo.setAllowWrite( true );
+        repo.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         repo.setBrowseable( true );
         repo.setIndexable( true );
         repo.setNotFoundCacheTTL( 1440 );

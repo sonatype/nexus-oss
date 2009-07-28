@@ -19,6 +19,7 @@ import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
+import org.sonatype.nexus.rest.repositories.RepositoryWritePolicy;
 import org.sonatype.nexus.test.utils.MirrorMessageUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
@@ -118,7 +119,7 @@ public class Nexus1581MirrorMetadataTest
         resource.setId( PROXY_REPO_ID );
         resource.setName( PROXY_REPO_ID );
         resource.setRepoType( "proxy" );
-        resource.setAllowWrite( false );
+        resource.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
         resource.setDownloadRemoteIndexes( true );
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
         remoteStorage.setRemoteStorageUrl( getBaseNexusUrl() + "content/repositories/nexus-test-harness-repo" );

@@ -140,7 +140,7 @@ Sonatype.repoServer.resources.help = {
     repoPolicy : 'Repositories can store either all Release artifacts or all Snapshot artifacts.',
     defaultLocalStorageUrl : 'This is the location on the file system used to host the artifacts. It is contained by the Working Directory set in the Server configuration.',
     overrideLocalStorageUrl : 'This is used to override the default local storage. Leave it blank to use the default. Note, file:/{drive-letter}:/ urls are supported in windows.  All other operating systems will use file:// .',
-    allowWrite : 'This controls if users are allowed to deploy artifacts to this repository. (Hosted repositories only)',
+    writePolicy : 'This controls if users are allowed to deploy and/or update artifacts in this repository. (Hosted repositories only)',
     browseable : 'This controls if users can browse the contents of the repository via their web browser.',
     indexable : 'This controls if the artifacts contained by this repository are indexed and thus searchable.',
     exposed : 'This controls if the repository is published on a URL, if this field is false you will not be able to access this repository remotely.',

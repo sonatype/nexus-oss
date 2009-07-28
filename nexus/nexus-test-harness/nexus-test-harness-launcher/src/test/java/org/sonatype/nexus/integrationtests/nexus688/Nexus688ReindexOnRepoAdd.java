@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
+import org.sonatype.nexus.rest.repositories.RepositoryWritePolicy;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -67,7 +68,7 @@ public class Nexus688ReindexOnRepoAdd
         // invalid for hosted repo resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( true );
-        resource.setAllowWrite( true );
+        resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
 
         // this also validates
         this.messageUtil.createRepository( resource );
@@ -100,7 +101,7 @@ public class Nexus688ReindexOnRepoAdd
         // invalid for hosted repo resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( false );
-        resource.setAllowWrite( true );
+        resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
 
         // this also validates
         this.messageUtil.createRepository( resource );
@@ -137,7 +138,7 @@ public class Nexus688ReindexOnRepoAdd
         resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( true );
-        resource.setAllowWrite( true );
+        resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
 
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
         remoteStorage.setRemoteStorageUrl( "http://INVALID-URL" );
@@ -174,7 +175,7 @@ public class Nexus688ReindexOnRepoAdd
         resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( true );
-        resource.setAllowWrite( true );
+        resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
 
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
         remoteStorage.setRemoteStorageUrl( "http://INVALID-URL" );
@@ -211,7 +212,7 @@ public class Nexus688ReindexOnRepoAdd
         resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( false );
-        resource.setAllowWrite( true );
+        resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
 
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
         remoteStorage.setRemoteStorageUrl( "http://INVALID-URL" );

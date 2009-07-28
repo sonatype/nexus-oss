@@ -186,7 +186,7 @@ public class RepositoryCreateUpdateTest
         repoRequest.setData( repositoryResource );
 
         repositoryResource.setId( "test-id" );
-        repositoryResource.setAllowWrite( true );
+        repositoryResource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         repositoryResource.setArtifactMaxAge( 2 );
         repositoryResource.setBrowseable( true );
         repositoryResource.setChecksumPolicy( ChecksumPolicy.STRICT.name() );
@@ -258,7 +258,7 @@ public class RepositoryCreateUpdateTest
         repoRequest.setData( repositoryResource );
 
         repositoryResource.setId( "test-id" );
-        repositoryResource.setAllowWrite( true );
+        repositoryResource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         repositoryResource.setArtifactMaxAge( 2 );
         repositoryResource.setBrowseable( true );
         repositoryResource.setChecksumPolicy( ChecksumPolicy.STRICT.name() );

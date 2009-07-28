@@ -185,14 +185,12 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
     dataModifiers: {
       load: {
         repoPolicy: Sonatype.utils.upperFirstCharLowerRest,
-        allowWrite: Sonatype.utils.capitalize,
         browseable: Sonatype.utils.capitalize,
         indexable: Sonatype.utils.capitalize,
         exposed: Sonatype.utils.capitalize
       },
       submit: { 
         repoPolicy: Sonatype.utils.uppercase,
-        allowWrite: Sonatype.utils.convert.stringContextToBool,
         browseable: Sonatype.utils.convert.stringContextToBool,
         indexable: Sonatype.utils.convert.stringContextToBool,
         exposed: Sonatype.utils.convert.stringContextToBool,
@@ -214,6 +212,15 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
   this.policyStore = new Ext.data.SimpleStore( {
     fields: ['value'], 
     data: [['Release'], ['Snapshot']]
+  } );
+  
+  this.writePolicyStore = new Ext.data.SimpleStore( {
+    fields:['value', 'display'], 
+    data:[
+      ['ALLOW_WRITE', 'Allow Redeploy'],
+      ['ALLOW_WRITE_ONCE', 'Disable Redeploy'],
+      ['READ_ONLY', 'Read Only']
+    ]
   } );
   
   this.providerStore = new Ext.data.JsonStore( {
@@ -362,9 +369,13 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
         },
         items: [
           {
-            fieldLabel: 'Allow Deployment',
-            helpText: ht.allowWrite,
-            name: 'allowWrite'
+            fieldLabel: 'Deployment Policy',
+            helpText: ht.writePolicy,
+            name: 'writePolicy',
+            store: this.writePolicyStore,
+            displayField: 'display',
+            valueField: 'value',
+            width: 100
           },
           {
             fieldLabel: 'Allow File Browsing',
@@ -427,7 +438,6 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
     dataModifiers: {
       load: {
         repoPolicy: Sonatype.utils.upperFirstCharLowerRest,
-        allowWrite: Sonatype.utils.capitalize,
         browseable: Sonatype.utils.capitalize,
         indexable: Sonatype.utils.capitalize,
         exposed: Sonatype.utils.capitalize,
@@ -436,7 +446,6 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
       },
       submit: { 
         repoPolicy: Sonatype.utils.uppercase,
-        allowWrite: Sonatype.utils.convert.stringContextToBool,
         browseable: Sonatype.utils.convert.stringContextToBool,
         indexable: Sonatype.utils.convert.stringContextToBool,
         exposed: Sonatype.utils.convert.stringContextToBool,

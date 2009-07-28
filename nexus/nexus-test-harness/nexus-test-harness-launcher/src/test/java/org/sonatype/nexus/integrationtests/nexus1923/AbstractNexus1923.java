@@ -25,6 +25,7 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.rest.repositories.RepositoryWritePolicy;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
@@ -101,7 +102,7 @@ public abstract class AbstractNexus1923
         resource.setId( HOSTED_REPO_ID );
         resource.setName( HOSTED_REPO_ID );
         resource.setRepoType( "hosted" );
-        resource.setAllowWrite( true );
+        resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         repoUtils.createRepository( resource );
     }
@@ -113,7 +114,7 @@ public abstract class AbstractNexus1923
         resource.setId( PROXY_REPO_ID );
         resource.setName( PROXY_REPO_ID );
         resource.setRepoType( "proxy" );
-        resource.setAllowWrite( false );
+        resource.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
         resource.setDownloadRemoteIndexes( true );
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
         remoteStorage.setRemoteStorageUrl( getBaseNexusUrl() + "content/repositories/" + HOSTED_REPO_ID );
@@ -130,7 +131,7 @@ public abstract class AbstractNexus1923
         resource.setId( SECOND_HOSTED_REPO_ID );
         resource.setName( SECOND_HOSTED_REPO_ID );
         resource.setRepoType( "hosted" );
-        resource.setAllowWrite( true );
+        resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         repoUtils.createRepository( resource );
     }
@@ -142,7 +143,7 @@ public abstract class AbstractNexus1923
         resource.setId( THIRD_HOSTED_REPO_ID );
         resource.setName( THIRD_HOSTED_REPO_ID );
         resource.setRepoType( "hosted" );
-        resource.setAllowWrite( true );
+        resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         repoUtils.createRepository( resource );
     }
 
