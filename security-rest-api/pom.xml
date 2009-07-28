@@ -8,8 +8,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-rest-api</artifactId>
-  <version>1.0.8-SNAPSHOT</version>
   <name>Security: REST API</name>
+  <description>Security CURD operations published over REST, using the plexus-restlet-bridge and PlexusResources.</description>
+  <version>1.0.8-SNAPSHOT</version>
 
   <properties>
     <plexus-restlet-bridge.version>1.9-SNAPSHOT</plexus-restlet-bridge.version>
