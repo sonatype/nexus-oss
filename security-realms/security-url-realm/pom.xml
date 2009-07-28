@@ -9,7 +9,7 @@
   <artifactId>security-url-realm</artifactId>
   <version>1.0.8-SNAPSHOT</version>
   <name>Plexus URL Realm</name>
-  <description>URL based Realm</description>
+  <description>A Realm that will access a remote URL to authenticate a user.</description>
 
   <properties>
     <jetty.version>6.1.12</jetty.version>

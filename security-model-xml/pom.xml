@@ -8,8 +8,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-model-xml</artifactId>
-  <version>1.0.8-SNAPSHOT</version>
   <name>Security: XML Model</name>
+  <description>Contains an xml implementation of the security-model.</description>
+  <version>1.0.8-SNAPSHOT</version>
 
   <build>
     <plugins>

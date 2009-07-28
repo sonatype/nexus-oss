@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>security-xml-realm</artifactId>
     <name>Plexus XML Realm</name>
-    <description>Security.xml based Realm</description>
+    <description>The security.xml based Realm, which stores users, roles, privileges, and user to role mappings using security-model-xml.</description>
     <build>
         <plugins>
             <plugin>

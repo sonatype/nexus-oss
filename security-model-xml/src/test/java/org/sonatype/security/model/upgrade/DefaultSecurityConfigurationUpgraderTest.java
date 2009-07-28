@@ -95,4 +95,19 @@ public class DefaultSecurityConfigurationUpgraderTest
 
         resultIsFine( "/org/sonatype/security/model/upgrade/security-100-2.xml", configuration );
     }
+    
+    public void testFrom202to203OrphanRoleMappings()
+    throws Exception
+    {
+        copyFromClasspathToFile(
+            "/org/sonatype/security/model/upgrade/security-202.xml",
+            getSecurityConfiguration() );
+    
+        Configuration configuration = configurationUpgrader
+            .loadOldConfiguration( new File( getSecurityConfiguration() ) );
+    
+        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
+    
+        resultIsFine( "/org/sonatype/security/model/upgrade/security-202.xml", configuration );
+    }
 }

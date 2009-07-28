@@ -133,7 +133,7 @@
 	<userRoleMappings>
 		<userRoleMapping>
 			<userId>other-user</userId>
-			<source>default</source>
+			<source>other-realm</source>
 			<roles>
 				<role>role2</role>
 				<role>role3</role>

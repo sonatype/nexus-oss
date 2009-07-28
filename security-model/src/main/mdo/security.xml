@@ -1,5 +1,5 @@
-<model xsd.namespace="http://www.sonatype.com/xsd/security-model-2.0.2"
-    xsd.target-namespace="http://www.sonatype.com/xsd/security-model-2.0.2">
+<model xsd.namespace="http://www.sonatype.com/xsd/security-model-2.0.3"
+    xsd.target-namespace="http://www.sonatype.com/xsd/security-model-2.0.3">
 
     <id>security</id>
 
@@ -103,6 +103,12 @@
                     <version>2.0.2</version>
                     <code><![CDATA[
     public static final String MODEL_VERSION = "2.0.2";
+]]></code>
+                </codeSegment>
+                <codeSegment>
+                    <version>2.0.3</version>
+                    <code><![CDATA[
+    public static final String MODEL_VERSION = "2.0.3";
 ]]></code>
                 </codeSegment>
             </codeSegments>

@@ -1,6 +1,7 @@
 package org.sonatype.security.usermanagement.xml;
 
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -9,8 +10,13 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.CUserRoleMapping;
+import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.usermanagement.DefaultUser;
@@ -133,7 +139,7 @@ public class UserManagerTest
 
         user.setName( "new Name" );
         user.setEmailAddress( "newemail@foo" );
-        
+
         Set<RoleIdentifier> roles = new HashSet<RoleIdentifier>();
         roles.add( new RoleIdentifier( "default", "role3" ) );
         user.setRoles( roles );
@@ -150,7 +156,7 @@ public class UserManagerTest
         Assert.assertEquals( secUser.getStatus(), user.getStatus().name() );
 
         Assert.assertTrue( secUser.getRoles().contains( "role3" ) );
-        Assert.assertEquals("roles: "+ user.getRoles(), 1, user.getRoles().size() );
+        Assert.assertEquals( "roles: " + user.getRoles(), 1, user.getRoles().size() );
     }
 
     public void testDeleteUser()
@@ -200,7 +206,59 @@ public class UserManagerTest
         {
             // expected
         }
+    }
 
+    public void testDeleteUserAndUserRoleMappings()
+        throws Exception
+    {
+
+        String userId = "testDeleteUserAndUserRoleMappings";
+        
+        UserManager userManager = this.getUserManager();
+
+        User user = new DefaultUser();
+        user.setUserId( userId );
+        user.setName( user.getUserId() + "-name" );
+        user.setSource( user.getUserId() + "default" );
+        user.setEmailAddress( "email@email" );
+        user.setStatus( UserStatus.active );
+        user.addRole( new RoleIdentifier( "default", "role1" ) );
+        user.addRole( new RoleIdentifier( "default", "role3" ) );
+
+        userManager.addUser( user, "my-password" );
+
+        // now delete the user
+        userManager.deleteUser( userId );
+
+        // now lets check the XML file for the user and the role mapping
+        SecurityConfigurationXpp3Reader secReader = new SecurityConfigurationXpp3Reader();
+        FileReader fileReader = null;
+        Configuration securityModel = null;
+        try
+        {
+            fileReader = new FileReader( new File( CONFIG_DIR, "security.xml" ) );
+            securityModel = secReader.read( fileReader );
+        }
+        finally
+        {
+            IOUtil.close( fileReader );
+        }
+        
+        for ( CUser tmpUser : securityModel.getUsers() )
+        {
+            if( userId.equals( tmpUser.getId() ))
+            {
+                Assert.fail( "User "+ userId +" was not removed." );
+            }
+        }
+        
+        for ( CUserRoleMapping userRoleMapping : securityModel.getUserRoleMappings() )
+        {
+            if( userId.equals( userRoleMapping.getUserId() ) && "default".equals( userRoleMapping.getSource() ))
+            {
+                Assert.fail( "User Role Mapping was not deleted when user: "+ userId +" was removed." );
+            }
+        }
     }
 
     private List<String> getRoleIds( User user )

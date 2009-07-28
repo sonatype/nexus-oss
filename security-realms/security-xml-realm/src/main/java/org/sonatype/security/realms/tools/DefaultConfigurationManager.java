@@ -323,7 +323,6 @@ public class DefaultConfigurationManager
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     public void deleteUser( String id )
         throws UserNotFoundException
     {
@@ -342,6 +341,16 @@ public class DefaultConfigurationManager
         if ( !found )
         {
             throw new UserNotFoundException( id );
+        }
+        
+        // delete the user role mapping for this user too
+        try
+        {
+            this.deleteUserRoleMapping( id, SecurityXmlUserManager.SOURCE );
+        }
+        catch ( NoSuchRoleMappingException e )
+        {
+            this.getLogger().debug( "User role mapping for user: "+ id +" source: "+ SecurityXmlUserManager.SOURCE + " could not be deleted because it does not exist." );
         }
     }
 

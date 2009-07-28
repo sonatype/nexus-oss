@@ -9,8 +9,10 @@
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-configuration</artifactId>
   <name>Security: Configuration</name>
+  <description>Defines how the security system is configured, which realms are used, the anonymous username/password, and if security is enabled or not.</description>
+  
   <version>1.0.8-SNAPSHOT</version>
-
+  
   <dependencies>
 
     <dependency>
