@@ -35,7 +35,7 @@ public class Nexus1439ImportMixedRepositoriesTest
     {
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
         commitMigration( migrationSummary );
-        
+
         checkRepository( "main-local-releases" );
         checkRepository( "main-local-snapshots" );
 
@@ -78,7 +78,7 @@ public class Nexus1439ImportMixedRepositoriesTest
     }
 
     protected void checkNotAvailable( String repositoryId, String groupId, String artifactId, String version )
-        throws IOException
+        throws Exception
     {
         Gav gav =
             new Gav( groupId, artifactId, version, null, "jar", null, null, null, false, false, null, false, null );

@@ -188,6 +188,10 @@ public class ArtifactoryRedirectorPlexusResource
         {
             String name = header.getName();
             String value = header.getValue();
+            if ( "Accept-Encoding".equals( name ) )
+            { // this do not accept gzip encoding
+                continue;
+            }
             urlConn.setRequestProperty( name, value );
         }
     }

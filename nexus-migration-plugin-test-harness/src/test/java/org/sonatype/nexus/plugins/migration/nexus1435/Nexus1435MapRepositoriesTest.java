@@ -77,7 +77,7 @@ public class Nexus1435MapRepositoriesTest
         File artifact = getTestFile( "artifact.jar" );
         URL url =
             new URL( "http://localhost:" + nexusApplicationPort
-                     + "/artifactory/main-local/nxcm255/snapshot/1.0-SNAPSHOT/snapshot-1.0.jar" );
+                     + "/artifactory/main-local/nxcm255/snapshot/1.0-SNAPSHOT/snapshot-1.0-SNAPSHOT.jar" );
         File downloaded;
         try
         {

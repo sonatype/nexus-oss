@@ -95,7 +95,7 @@ public abstract class AbstractMigrationIntegrationTest
     }
 
     protected void checkArtifact( String repositoryId, String groupId, String artifactId, String version )
-        throws IOException
+        throws Exception
     {
         File artifact = getTestFile( "artifact.jar" );
         Gav gav =
@@ -116,7 +116,7 @@ public abstract class AbstractMigrationIntegrationTest
     }
 
     protected void checkArtifactNotPresent( String repositoryId, String groupId, String artifactId, String version )
-    throws IOException
+    throws Exception
     {
         Gav gav =
             new Gav( groupId, artifactId, version, null, "jar", null, null, null, false, false, null, false, null );
@@ -132,7 +132,7 @@ public abstract class AbstractMigrationIntegrationTest
     }
 
     protected void checkArtifactOnGroup( String nexusGroupId, String groupId, String artifactId, String version )
-        throws IOException
+        throws Exception
     {
         File artifact = getTestFile( "artifact.jar" );
         Gav gav =

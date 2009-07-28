@@ -22,8 +22,8 @@
   </modules>
 
   <properties>
-    <nexus.version>1.4.0-SNAPSHOT</nexus.version>
-    <plexus.version>1.0-beta-3.0.5-SNAPSHOT</plexus.version>
+    <nexus.version>1.3.6</nexus.version>
+    <plexus.version>1.0-beta-3.0.5</plexus.version>
   </properties>
 
   <dependencyManagement>

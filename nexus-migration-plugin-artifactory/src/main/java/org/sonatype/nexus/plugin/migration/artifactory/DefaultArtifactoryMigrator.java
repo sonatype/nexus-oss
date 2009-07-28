@@ -848,7 +848,7 @@ public class DefaultArtifactoryMigrator
 
         try
         {
-            SimpleLog4jConfig logConfig = new MigrationLog4jConfig( nexus.getLogConfig(), migrationLog );
+            SimpleLog4jConfig logConfig = new MigrationLog4jConfig( (SimpleLog4jConfig) nexus.getLogConfig(), migrationLog );
             logManager.setLogConfig( logConfig );
         }
         catch ( IOException e )

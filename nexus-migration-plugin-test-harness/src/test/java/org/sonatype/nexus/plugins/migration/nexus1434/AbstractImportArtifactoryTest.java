@@ -64,7 +64,7 @@ public abstract class AbstractImportArtifactoryTest
     }
 
     protected void checkArtifact( String groupId, String artifactId, String version )
-        throws IOException
+        throws Exception
     {
         super.checkArtifact( artifactId, groupId, artifactId, version );
     }
