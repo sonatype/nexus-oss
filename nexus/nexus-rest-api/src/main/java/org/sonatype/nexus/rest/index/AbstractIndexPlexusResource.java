@@ -16,6 +16,11 @@ package org.sonatype.nexus.rest.index;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -24,11 +29,13 @@ import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.restlet.data.Parameter;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
+import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
@@ -38,9 +45,18 @@ import org.sonatype.nexus.tasks.ReindexTask;
 public abstract class AbstractIndexPlexusResource
     extends AbstractRestorePlexusResource
 {
+
+    /**
+     * Marker for too many results.
+     */
+    private static final int TOO_MANY_RESULTS = -1;
+
     @Requirement
     private IndexerManager indexerManager;
-    
+
+    @Requirement( role = Searcher.class )
+    private List<Searcher> m_searchers;
+
     @Override
     public Object getPayloadInstance()
     {
@@ -53,24 +69,15 @@ public abstract class AbstractIndexPlexusResource
     {
         Form form = request.getResourceRef().getQueryAsForm();
 
-        String query = form.getFirstValue( "q" );
-
-        String className = form.getFirstValue( "cn" );
+        final Map<String, String> terms = new HashMap<String, String>();
+        for( Parameter parameter : form )
+        {
+            terms.put( parameter.getName(), parameter.getValue() );
+        }
 
         String sha1 = form.getFirstValue( "sha1" );
 
-        String g = form.getFirstValue( "g" );
-
-        String a = form.getFirstValue( "a" );
-
-        String v = form.getFirstValue( "v" );
-
-        String p = form.getFirstValue( "p" );
-
-        String c = form.getFirstValue( "c" );
-
         Integer from = null;
-
         Integer count = null;
 
         if ( form.getFirstValue( "from" ) != null )
@@ -84,7 +91,7 @@ public abstract class AbstractIndexPlexusResource
                 from = null;
             }
         }
-        
+
         if ( form.getFirstValue( "count" ) != null )
         {
             try
@@ -115,23 +122,9 @@ public abstract class AbstractIndexPlexusResource
                                                  "IOException during configuration retrieval!", e );
                 }
             }
-            else if ( !StringUtils.isEmpty( query ) )
-            {
-                searchResult = indexerManager.searchArtifactFlat( query, getRepositoryId( request ), from, count );
-            }
-            else if ( !StringUtils.isEmpty( className ) )
-            {
-                searchResult = indexerManager.searchArtifactClassFlat( className, getRepositoryId( request ), from, count );
-            }
-            else if ( !StringUtils.isEmpty( g ) || !StringUtils.isEmpty( a ) || !StringUtils.isEmpty( v )
-                || !StringUtils.isEmpty( p ) || !StringUtils.isEmpty( c ) )
-            {
-                searchResult = indexerManager.searchArtifactFlat( g, a, v, p, c, getRepositoryId( request ), from, count );
-            }
             else
             {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
-                                             "Search query not found in request! (q OR cn OR g,a,v,p,c)" );
+                searchResult = searchByTerms( terms, getRepositoryId( request ), from, count );
             }
         }
         catch ( NoSuchRepositoryException e )
@@ -143,10 +136,10 @@ public abstract class AbstractIndexPlexusResource
         SearchResponse result = new SearchResponse();
 
         if ( searchResult != null )
-        {            
+        {
             // non-identify search happened
-            boolean tooManyResults = searchResult.getTotalHits() == -1;
-            
+            boolean tooManyResults = searchResult.getTotalHits() == TOO_MANY_RESULTS;
+
             result.setTooManyResults( tooManyResults );
 
             result.setTotalCount( searchResult.getTotalHits() );
@@ -189,6 +182,48 @@ public abstract class AbstractIndexPlexusResource
         // filtering
 
         return result;
+    }
+
+    private FlatSearchResponse searchByTerms( final Map<String, String> terms,
+                                              final String repositoryId,
+                                              final Integer from,
+                                              final Integer count )
+        throws NoSuchRepositoryException, ResourceException
+    {
+        FlatSearchResponse searchResult;
+        int totalHits = 0;
+        Set<ArtifactInfo> artifacts = null;
+        for( Searcher searcher : m_searchers )
+        {
+            if( searcher.canHandle( terms ) )
+            {
+                final FlatSearchResponse searchResponse = searcher.flatSearch(
+                    terms, repositoryId, from, count
+                );
+                if( searchResponse != null )
+                {
+                    if( searchResponse.getTotalHits() == TOO_MANY_RESULTS )
+                    {
+                        return new FlatSearchResponse( null, TOO_MANY_RESULTS, Collections.<ArtifactInfo>emptySet() );
+                    }
+                    if( artifacts == null )
+                    {
+                        artifacts = new HashSet<ArtifactInfo>();
+                    }
+                    artifacts.addAll( searchResponse.getResults() );
+                    totalHits += searchResponse.getTotalHits();
+                }
+            }
+        }
+        if( artifacts == null )
+        {
+            throw new ResourceException(
+                Status.CLIENT_ERROR_BAD_REQUEST,
+                "Requested search query is not supported"
+            );
+        }
+        searchResult = new FlatSearchResponse( null, totalHits, artifacts );
+        return searchResult;
     }
 
     @Override
