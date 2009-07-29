@@ -58,13 +58,13 @@ Sonatype.utils = {
   },
 
   validateId: function( value ) {
-    if ( value.indexOf( ' ' ) != -1 ) { 
-      return 'No spaces allowed in ID'; 
+  	var idPattern = /^[a-zA-Z0-9_\-\.]+$/;
+  	if ( idPattern.test(value) ) {
+      return true;
+  	}
+    else {
+      return 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed in ID';    	
     }
-    if ( value.indexOf( '/' ) != -1 ) { 
-      return 'No slashes allowed in ID'; 
-    }
-    return true;
   },
 
   convert : {
