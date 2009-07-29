@@ -133,7 +133,10 @@ public class ArtifactoryConfig
                 }
             }
 
-            List<String> repos = new ArrayList<String>( getRepositories().keySet() );
+            List<String> repos = new ArrayList<String>();
+            repos.addAll( getLocalRepositories().keySet() );
+            repos.addAll( getRemoteRepositories().keySet() );
+
             ArtifactoryDefaultVirtualRepository repo = new ArtifactoryDefaultVirtualRepository( repos );
             virtualRepositories.put( repo.getKey(), repo );
 
