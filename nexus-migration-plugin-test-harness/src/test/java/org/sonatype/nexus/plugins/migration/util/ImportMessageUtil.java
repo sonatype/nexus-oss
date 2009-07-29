@@ -65,7 +65,7 @@ public class ImportMessageUtil
 
         if ( 201 != response.getStatus().getCode() )
         {
-            Assert.fail( "Invalid response for server " + response.getEntity().getText() );
+            Assert.fail( "Invalid response for server " + response.getEntity().getText() + "\n" + response.getStatus() );
         }
 
         String responseString = response.getEntity().getText();

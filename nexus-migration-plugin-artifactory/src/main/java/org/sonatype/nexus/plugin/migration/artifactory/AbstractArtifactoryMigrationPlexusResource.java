@@ -13,7 +13,11 @@
 package org.sonatype.nexus.plugin.migration.artifactory;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
@@ -54,17 +58,15 @@ public abstract class AbstractArtifactoryMigrationPlexusResource
         xstream.processAnnotations( FileLocationRequestDTO.class );
         xstream.processAnnotations( FileLocationResource.class );
 
-        xstream.registerLocalConverter( MigrationSummaryDTO.class, "usersResolution", new AliasingListConverter(
-            UserResolutionDTO.class,
-            "userResolution" ) );
+        xstream.registerLocalConverter( MigrationSummaryDTO.class, "usersResolution",
+                                        new AliasingListConverter( UserResolutionDTO.class, "userResolution" ) );
 
-        xstream.registerLocalConverter( MigrationSummaryDTO.class, "repositoriesResolution", new AliasingListConverter(
-            RepositoryResolutionDTO.class,
-            "repositoryResolution" ) );
+        xstream.registerLocalConverter( MigrationSummaryDTO.class, "repositoriesResolution",
+                                        new AliasingListConverter( RepositoryResolutionDTO.class,
+                                                                   "repositoryResolution" ) );
 
-        xstream.registerLocalConverter( MigrationSummaryDTO.class, "groupsResolution", new AliasingListConverter(
-            GroupResolutionDTO.class,
-            "groupResolution" ) );
+        xstream.registerLocalConverter( MigrationSummaryDTO.class, "groupsResolution",
+                                        new AliasingListConverter( GroupResolutionDTO.class, "groupResolution" ) );
     }
 
     protected File validateBackupFileLocation( String fileLocation )
@@ -72,28 +74,95 @@ public abstract class AbstractArtifactoryMigrationPlexusResource
     {
         File file = new File( fileLocation );
 
-        if ( !file.exists() || !file.isFile() )
+        if ( !file.exists() )
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid File Location: "
                 + file.getAbsolutePath() );
         }
 
-        ZipFile zip;
-        try
+        if ( file.isFile() )
         {
-            zip = new ZipFile( file );
-            zip.close();
-        }
-        catch ( ZipException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid file format. Is not a Zip. "
-                + e.getMessage() );
-        }
-        catch ( IOException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Unable to read file. " + e.getMessage() );
+            ZipFile zip;
+            try
+            {
+                zip = new ZipFile( file );
+                zip.close();
+            }
+            catch ( ZipException e )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid file format. Is not a Zip. "
+                    + e.getMessage() );
+            }
+            catch ( IOException e )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Unable to read file. " + e.getMessage() );
+            }
         }
 
         return file;
     }
+
+    protected InputStream getConfigurationFile( File backup, String filename )
+        throws IOException, ZipException, FileNotFoundException, ResourceException
+    {
+        ZipFile zipFile = null;
+        try
+        {
+            if ( backup.isFile() )
+            {
+                zipFile = new ZipFile( backup );
+            }
+
+            final InputStream cfg;
+            if ( zipFile != null )
+            {
+                ZipEntry cfgEntry = zipFile.getEntry( filename );
+                if ( cfgEntry == null )
+                {
+                    cfg = null;
+                }
+                else
+                {
+                    cfg = zipFile.getInputStream( cfgEntry );
+                }
+            }
+            else
+            {
+                File cfgFile = new File( backup, filename );
+                if ( !cfgFile.exists() )
+                {
+                    cfg = null;
+                }
+                else
+                {
+                    cfg = new FileInputStream( cfgFile );
+                }
+            }
+
+            if ( cfg == null )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
+                                             "Artifactory backup is invalid, missing: '" + filename + "'" );
+            }
+            return cfg;
+        }
+        finally
+        {
+            try
+            {
+                if ( zipFile != null )
+                {
+                    zipFile.close();
+                }
+            }
+            catch ( IOException e )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Exception closing Artifactory zip file: " + e.getMessage(), e );
+                }
+            }
+        }
+    }
+
 }

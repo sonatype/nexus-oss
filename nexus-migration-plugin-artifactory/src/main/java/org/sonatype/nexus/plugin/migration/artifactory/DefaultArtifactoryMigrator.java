@@ -1,5 +1,8 @@
 package org.sonatype.nexus.plugin.migration.artifactory;
 
+import static org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryConfigFiles.ARTIFACTORY_CONF_FILE;
+import static org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryConfigFiles.SECURITY_FILE;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -130,51 +133,58 @@ public class DefaultArtifactoryMigrator
             + "'." );
 
         // need to resolve that on posts
-        File artifactoryBackupZip = new File( migrationSummary.getBackupLocation() );
-        File artifactoryBackupDir;
+        File backup = new File( migrationSummary.getBackupLocation() );
 
-        ArtifactoryConfig cfg = null;
 
-        ArtifactorySecurityConfig securityCfg = null;
 
         // this code now looks bad... but it will make the result object easier to read.
         // maybe we should do something like the ValidationException, but i think that
         // would be ugly here too.
 
+        File artifactoryBackupDir;
         // extract the zip
-        try
+        if ( backup.isFile() )
         {
-            artifactoryBackupDir = this.unzipArtifactoryBackup( result, artifactoryBackupZip );
-        }
-        catch ( Exception e )
-        {
-            result.addErrorMessage( "Failed to extract zipfile", e );
+            try
+            {
+                artifactoryBackupDir = this.unzipArtifactoryBackup( result, backup );
+            }
+            catch ( Exception e )
+            {
+                result.addErrorMessage( "Failed to extract zipfile", e );
 
-            return result;
+                return result;
+            }
+        }
+        else
+        {
+            artifactoryBackupDir = backup;
         }
 
         // parse artifactory.config.xml
+        ArtifactoryConfig cfg = null;
         try
         {
-            result.addInfoMessage( "Parsing artifactory.config.xml" );
+            result.addInfoMessage( "Parsing " + ARTIFACTORY_CONF_FILE );
 
-            cfg = ArtifactoryConfig.read( new File( artifactoryBackupDir, "artifactory.config.xml" ) );
+            cfg = ArtifactoryConfig.read( new File( artifactoryBackupDir, ARTIFACTORY_CONF_FILE ) );
         }
         catch ( Exception e )
         {
-            result.addErrorMessage( "Failed to read artifactory.config.xml from backup.", e );
+            result.addErrorMessage( "Failed to read " + ARTIFACTORY_CONF_FILE + " from backup.", e );
         }
 
         // parse security.xml
+        ArtifactorySecurityConfig securityCfg = null;
         try
         {
-            result.addInfoMessage( "Parsing security.xml" );
+            result.addInfoMessage( "Parsing " + SECURITY_FILE );
 
-            securityCfg = ArtifactorySecurityConfigBuilder.read( new File( artifactoryBackupDir, "security.xml" ) );
+            securityCfg = ArtifactorySecurityConfigBuilder.read( new File( artifactoryBackupDir, SECURITY_FILE ) );
         }
         catch ( Exception e )
         {
-            result.addErrorMessage( "Failed to read security.xml from backup.", e );
+            result.addErrorMessage( "Failed to read " + SECURITY_FILE + " from backup.", e );
         }
 
         try
@@ -848,7 +858,8 @@ public class DefaultArtifactoryMigrator
 
         try
         {
-            SimpleLog4jConfig logConfig = new MigrationLog4jConfig( (SimpleLog4jConfig) nexus.getLogConfig(), migrationLog );
+            SimpleLog4jConfig logConfig =
+                new MigrationLog4jConfig( (SimpleLog4jConfig) nexus.getLogConfig(), migrationLog );
             logManager.setLogConfig( logConfig );
         }
         catch ( IOException e )

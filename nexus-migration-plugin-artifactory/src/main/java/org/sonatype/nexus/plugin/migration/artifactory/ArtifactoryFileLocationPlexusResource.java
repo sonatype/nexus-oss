@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.plugin.migration.artifactory;
 
+import static org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryConfigFiles.ARTIFACTORY_CONF_FILE;
+import static org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryConfigFiles.SECURITY_FILE;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,10 +23,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.archiver.zip.ZipEntry;
-import org.codehaus.plexus.archiver.zip.ZipFile;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.restlet.Context;
@@ -58,9 +60,6 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class ArtifactoryFileLocationPlexusResource
     extends AbstractArtifactoryMigrationPlexusResource
 {
-    private static final String SECURITY_FILE = "security.xml";
-
-    private static final String ARTIFACTORY_CONF_FILE = "artifactory.config.xml";
 
     @Requirement
     private NexusSecurity nexusSecurity;
@@ -99,9 +98,10 @@ public class ArtifactoryFileLocationPlexusResource
     {
         String fileLocation = retrieveFileLocation( (FileLocationRequestDTO) payload );
 
-        File backupFile = validateBackupFileLocation( fileLocation );
+        File backup = validateBackupFileLocation( fileLocation );
 
-        ZipFile zipFile = null;
+        InputStream artifactoryConfig = null;
+        InputStream securityConfig = null;
 
         // the return payload
         MigrationSummaryResponseDTO result = new MigrationSummaryResponseDTO();
@@ -109,34 +109,19 @@ public class ArtifactoryFileLocationPlexusResource
         try
         {
             // stream files out of the zip, we don't have time to unzip the file first.
-            zipFile = new ZipFile( backupFile );
-
-            ZipEntry artifactoryConfEntry = zipFile.getEntry( ARTIFACTORY_CONF_FILE );
-            if ( artifactoryConfEntry == null )
-            {
-                throw new ResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Artifactory backup is invalid, missing: '" + ARTIFACTORY_CONF_FILE + "'" );
-            }
-
-            ZipEntry securityEntry = zipFile.getEntry( SECURITY_FILE );
-            if ( securityEntry == null )
-            {
-                throw new ResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Artifactory backup is invalid, missing: '" + SECURITY_FILE + "'" );
-            }
+            artifactoryConfig = getConfigurationFile( backup, ARTIFACTORY_CONF_FILE );
+            securityConfig = getConfigurationFile( backup, SECURITY_FILE );
 
             MigrationSummaryDTO data = new MigrationSummaryDTO();
             data.setId( Long.toHexString( System.nanoTime() ) );
 
             result.setData( data );
 
-            buildBackupLoaction( backupFile, data );
+            buildBackupLocation( backup, data );
 
-            buildArtifactoryConfig( zipFile.getInputStream( artifactoryConfEntry ), data );
+            buildArtifactoryConfig( artifactoryConfig, data );
 
-            buildSecurityConfig( zipFile.getInputStream( securityEntry ), data );
+            buildSecurityConfig( securityConfig, data );
         }
         catch ( IOException e )
         {
@@ -148,34 +133,27 @@ public class ArtifactoryFileLocationPlexusResource
         }
         finally
         {
-            try
-            {
-                if ( zipFile != null )
-                {
-                    zipFile.close();
-                }
-            }
-            catch ( IOException e )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Exception closing Artifactory zip file: " + e.getMessage(), e );
-                }
-            }
+            IOUtil.close( artifactoryConfig );
+            IOUtil.close( securityConfig );
         }
 
         return result;
     }
 
-    private void buildBackupLoaction( File backupFile, MigrationSummaryDTO data )
+    private void buildBackupLocation( File backupFile, MigrationSummaryDTO data )
     {
-        data.setBackupLocation( backupFile.getAbsolutePath() );
+        try
+        {
+            data.setBackupLocation( backupFile.getCanonicalPath() );
+        }
+        catch ( IOException e )
+        {
+            data.setBackupLocation( backupFile.getAbsolutePath() );
+        }
     }
 
     private void buildArtifactoryConfig( InputStream stream, MigrationSummaryDTO data )
-        throws ResourceException,
-            IOException,
-            XmlPullParserException
+        throws ResourceException, IOException, XmlPullParserException
     {
         // read artifactory.config.xml
         ArtifactoryConfig cfg = ArtifactoryConfig.read( stream );
@@ -192,8 +170,7 @@ public class ArtifactoryFileLocationPlexusResource
     }
 
     private void buildSecurityConfig( InputStream stream, MigrationSummaryDTO data )
-        throws IOException,
-            XmlPullParserException
+        throws IOException, XmlPullParserException
     {
         // read security.xml
         ArtifactorySecurityConfig securityCfg = ArtifactorySecurityConfigBuilder.read( stream );
@@ -229,7 +206,7 @@ public class ArtifactoryFileLocationPlexusResource
     }
 
     private List<GroupResolutionDTO> resolve( Map<String, ArtifactoryVirtualRepository> virtualRepos,
-        Map<String, ArtifactoryRepository> repositories )
+                                              Map<String, ArtifactoryRepository> repositories )
     {
         VirtualRepositoryUtil.resolveRepositories( virtualRepos );
 
