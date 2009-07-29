@@ -1,7 +1,9 @@
 package org.sonatype.security.usermanagement.xml;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +13,7 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.model.CUser;
@@ -18,6 +21,7 @@ import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.UserRoleMappingTest;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -213,7 +217,7 @@ public class UserManagerTest
     {
 
         String userId = "testDeleteUserAndUserRoleMappings";
-        
+
         UserManager userManager = this.getUserManager();
 
         User user = new DefaultUser();
@@ -230,35 +234,51 @@ public class UserManagerTest
         // now delete the user
         userManager.deleteUser( userId );
 
-        // now lets check the XML file for the user and the role mapping
-        SecurityConfigurationXpp3Reader secReader = new SecurityConfigurationXpp3Reader();
-        FileReader fileReader = null;
-        Configuration securityModel = null;
-        try
-        {
-            fileReader = new FileReader( new File( CONFIG_DIR, "security.xml" ) );
-            securityModel = secReader.read( fileReader );
-        }
-        finally
-        {
-            IOUtil.close( fileReader );
-        }
-        
+        Configuration securityModel = this.getSecurityConfiguration();
+
         for ( CUser tmpUser : securityModel.getUsers() )
         {
-            if( userId.equals( tmpUser.getId() ))
+            if ( userId.equals( tmpUser.getId() ) )
             {
-                Assert.fail( "User "+ userId +" was not removed." );
+                Assert.fail( "User " + userId + " was not removed." );
+            }
+        }
+
+        for ( CUserRoleMapping userRoleMapping : securityModel.getUserRoleMappings() )
+        {
+            if ( userId.equals( userRoleMapping.getUserId() ) && "default".equals( userRoleMapping.getSource() ) )
+            {
+                Assert.fail( "User Role Mapping was not deleted when user: " + userId + " was removed." );
+            }
+        }
+    }
+
+    public void testSetUsersRoles()
+        throws Exception
+    {
+        SecuritySystem securitySystem = this.getSecuritySystem();
+
+        Set<RoleIdentifier> roleIdentifiers = new HashSet<RoleIdentifier>();
+        RoleIdentifier roleIdentifier = new RoleIdentifier( "default", "role2" );
+        roleIdentifiers.add( roleIdentifier );
+
+        securitySystem.setUsersRoles( "admin", "default", roleIdentifiers );
+
+        Configuration securityModel = this.getSecurityConfiguration();
+
+        boolean found = false;
+        for ( CUserRoleMapping roleMapping : securityModel.getUserRoleMappings() )
+        {
+            if ( roleMapping.getUserId().equals( "admin" ) )
+            {
+                found = true;
+                
+                Assert.assertEquals( 1, roleMapping.getRoles().size() );
+                Assert.assertEquals( "role2", roleMapping.getRoles().get( 0 ) );
             }
         }
         
-        for ( CUserRoleMapping userRoleMapping : securityModel.getUserRoleMappings() )
-        {
-            if( userId.equals( userRoleMapping.getUserId() ) && "default".equals( userRoleMapping.getSource() ))
-            {
-                Assert.fail( "User Role Mapping was not deleted when user: "+ userId +" was removed." );
-            }
-        }
+        Assert.assertTrue( "did not find admin user in role mapping", found );
     }
 
     private List<String> getRoleIds( User user )
@@ -271,6 +291,25 @@ public class UserManagerTest
         }
 
         return roleIds;
+    }
+
+    private Configuration getSecurityConfiguration()
+        throws IOException,
+            XmlPullParserException
+    {
+        // now lets check the XML file for the user and the role mapping
+        SecurityConfigurationXpp3Reader secReader = new SecurityConfigurationXpp3Reader();
+        FileReader fileReader = null;
+        try
+        {
+            fileReader = new FileReader( new File( CONFIG_DIR, "security.xml" ) );
+            return secReader.read( fileReader );
+        }
+        finally
+        {
+            IOUtil.close( fileReader );
+        }
+
     }
 
 }

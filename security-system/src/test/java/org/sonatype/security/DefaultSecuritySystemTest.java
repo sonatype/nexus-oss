@@ -155,7 +155,6 @@ public class DefaultSecuritySystemTest
         user.addRole( new RoleIdentifier( "default", "test-role1" ) );
 
         Assert.assertNotNull( securitySystem.addUser( user ) );
-        
     }
 
 }

@@ -101,7 +101,7 @@ public class UserToRolePlexusResource
         {
             if ( this.getSecuritySystem().getUser( userId, sourceId ) == null )
             {
-
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "User with id '" + userId + "' not found." );
             }
         }
         catch ( UserNotFoundException e )

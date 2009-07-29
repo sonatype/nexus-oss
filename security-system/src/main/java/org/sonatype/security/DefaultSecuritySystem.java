@@ -396,22 +396,20 @@ public class DefaultSecuritySystem
             UserNotFoundException
     {
         // TODO: this is a bit sticky, what we really want to do is just expose the RoleMappingUserManagers this way (i
-        // think), maybe this is to generic
+        // think), maybe this is too generic
 
         boolean foundUser = false;
 
         for ( UserManager tmpUserManager : this.userManagerMap.values() )
         {
-            // skip the user manager that owns the user, we already did that
-            // these user managers will only have roles
-            if ( !tmpUserManager.getSource().equals( source )
-                && RoleMappingUserManager.class.isInstance( tmpUserManager ) )
+            if ( RoleMappingUserManager.class.isInstance( tmpUserManager ) )
             {
                 RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
                 try
                 {
                     foundUser = true;
-                    roleMappingUserManager.setUsersRoles( userId, source, roleIdentifiers );
+                    roleMappingUserManager.setUsersRoles( userId, source, RoleIdentifier
+                        .getRoleIdentifiersForSource( tmpUserManager.getSource(), roleIdentifiers ) );
                 }
                 catch ( UserNotFoundException e )
                 {

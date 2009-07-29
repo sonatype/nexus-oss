@@ -136,8 +136,8 @@ public class UserToRolePRTest
         requestRequest.setData( cdugasBefore );
         cdugasBefore.setUserId( "cdugas" );
         cdugasBefore.setSource( REALM_KEY );
-        cdugasBefore.addRole( "developer" );
-        cdugasBefore.addRole( "repomaintainer" );
+        cdugasBefore.addRole( "developerINVALID" );
+        cdugasBefore.addRole( "repomaintainerINVALID" );
 
         try
         {
