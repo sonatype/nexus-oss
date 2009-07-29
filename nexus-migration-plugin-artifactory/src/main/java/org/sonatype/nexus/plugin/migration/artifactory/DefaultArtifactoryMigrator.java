@@ -5,8 +5,8 @@ import static org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryConfigF
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -135,118 +135,127 @@ public class DefaultArtifactoryMigrator
         // need to resolve that on posts
         File backup = new File( migrationSummary.getBackupLocation() );
 
-
-
         // this code now looks bad... but it will make the result object easier to read.
         // maybe we should do something like the ValidationException, but i think that
         // would be ugly here too.
 
-        File artifactoryBackupDir;
-        // extract the zip
-        if ( backup.isFile() )
+        boolean deleteBackup = false;
+
+        File artifactoryBackupDir = null;
+        try
         {
+            // extract the zip
+            if ( backup.isFile() )
+            {
+                deleteBackup = true;
+                try
+                {
+                    artifactoryBackupDir = this.unzipArtifactoryBackup( result, backup );
+                }
+                catch ( Exception e )
+                {
+                    result.addErrorMessage( "Failed to extract zipfile", e );
+
+                    return result;
+                }
+            }
+            else
+            {
+                artifactoryBackupDir = backup;
+            }
+
+            // parse artifactory.config.xml
+            ArtifactoryConfig cfg = null;
             try
             {
-                artifactoryBackupDir = this.unzipArtifactoryBackup( result, backup );
+                result.addInfoMessage( "Parsing " + ARTIFACTORY_CONF_FILE );
+
+                cfg = ArtifactoryConfig.read( new File( artifactoryBackupDir, ARTIFACTORY_CONF_FILE ) );
             }
             catch ( Exception e )
             {
-                result.addErrorMessage( "Failed to extract zipfile", e );
+                result.addErrorMessage( "Failed to read " + ARTIFACTORY_CONF_FILE + " from backup.", e );
+            }
 
+            // parse security.xml
+            ArtifactorySecurityConfig securityCfg = null;
+            try
+            {
+                result.addInfoMessage( "Parsing " + SECURITY_FILE );
+
+                securityCfg = ArtifactorySecurityConfigBuilder.read( new File( artifactoryBackupDir, SECURITY_FILE ) );
+            }
+            catch ( Exception e )
+            {
+                result.addErrorMessage( "Failed to read " + SECURITY_FILE + " from backup.", e );
+            }
+
+            try
+            {
+                this.mappingConfiguration.setNexusContext( migrationSummary.getNexusContext() );
+            }
+            catch ( Exception e )
+            {
+                result.addErrorMessage( "Error updating nexus context.", e );
+            }
+
+            // if we have errors already, just return
+            if ( !result.getErrorMessages().isEmpty() )
+            {
                 return result;
             }
-        }
-        else
-        {
-            artifactoryBackupDir = backup;
-        }
 
-        // parse artifactory.config.xml
-        ArtifactoryConfig cfg = null;
-        try
-        {
-            result.addInfoMessage( "Parsing " + ARTIFACTORY_CONF_FILE );
+            try
+            {
+                importRepositories( result, cfg, artifactoryBackupDir );
+            }
+            catch ( Exception e )
+            {
+                result.addErrorMessage( "Error importing repositories.", e );
+            }
 
-            cfg = ArtifactoryConfig.read( new File( artifactoryBackupDir, ARTIFACTORY_CONF_FILE ) );
-        }
-        catch ( Exception e )
-        {
-            result.addErrorMessage( "Failed to read " + ARTIFACTORY_CONF_FILE + " from backup.", e );
-        }
+            try
+            {
+                importGroups( result, cfg );
+            }
+            catch ( Exception e )
+            {
+                result.addErrorMessage( "Error importing groups.", e );
+            }
 
-        // parse security.xml
-        ArtifactorySecurityConfig securityCfg = null;
-        try
-        {
-            result.addInfoMessage( "Parsing " + SECURITY_FILE );
+            try
+            {
+                importSecurity( result, securityCfg );
+            }
+            catch ( Exception e )
+            {
+                result.addErrorMessage( "Error importing security.", e );
+            }
 
-            securityCfg = ArtifactorySecurityConfigBuilder.read( new File( artifactoryBackupDir, SECURITY_FILE ) );
-        }
-        catch ( Exception e )
-        {
-            result.addErrorMessage( "Failed to read " + SECURITY_FILE + " from backup.", e );
-        }
+            // finally, recreate metadata for all migrated reposes
+            spawnAllMetadatas( result );
 
-        try
-        {
-            this.mappingConfiguration.setNexusContext( migrationSummary.getNexusContext() );
-        }
-        catch ( Exception e )
-        {
-            result.addErrorMessage( "Error updating nexus context.", e );
-        }
+            // if we have errors already, just return
+            if ( !result.getErrorMessages().isEmpty() )
+            {
+                result.addWarningMessage( "Migration finished with some errors." );
+            }
+            else
+            {
+                result.addInfoMessage( "Migration finished successfully." );
+            }
 
-        // if we have errors already, just return
-        if ( !result.getErrorMessages().isEmpty() )
-        {
+            result.setSuccessful( true );
+
             return result;
         }
-
-        try
+        finally
         {
-            importRepositories( result, cfg, artifactoryBackupDir );
+            if ( artifactoryBackupDir != null && deleteBackup )
+            {
+                cleanBackupDir( artifactoryBackupDir );
+            }
         }
-        catch ( Exception e )
-        {
-            result.addErrorMessage( "Error importing repositories.", e );
-        }
-
-        try
-        {
-            importGroups( result, cfg );
-        }
-        catch ( Exception e )
-        {
-            result.addErrorMessage( "Error importing groups.", e );
-        }
-
-        try
-        {
-            importSecurity( result, securityCfg );
-        }
-        catch ( Exception e )
-        {
-            result.addErrorMessage( "Error importing security.", e );
-        }
-
-        // finally, recreate metadata for all migrated reposes
-        spawnAllMetadatas( result );
-
-        cleanBackupDir( artifactoryBackupDir );
-
-        // if we have errors already, just return
-        if ( !result.getErrorMessages().isEmpty() )
-        {
-            result.addWarningMessage( "Migration finished with some errors." );
-        }
-        else
-        {
-            result.addInfoMessage( "Migration finished successfully." );
-        }
-
-        result.setSuccessful( true );
-
-        return result;
     }
 
     private void cleanBackupDir( File artifactoryBackupDir )
@@ -810,17 +819,18 @@ public class DefaultArtifactoryMigrator
             throw new MigrationException( "Local storage information not available!" );
         }
 
-        URI storageURI;
+        URL storageURI;
         try
         {
-            storageURI = new URI( localStorage );
+            storageURI = new URL( localStorage );
         }
-        catch ( URISyntaxException e )
+        catch ( MalformedURLException e )
         {
-            throw new MigrationException( "Invalid repository URI! " + localStorage );
+            throw new MigrationException( "Invalid repository URL! " + localStorage, e );
         }
 
-        File storage = new File( storageURI );
+        File storage = new File( storageURI.getFile() );
+
         if ( !storage.exists() )
         {
             throw new MigrationException( "Repository storage not found! " + storage.getAbsolutePath() );
