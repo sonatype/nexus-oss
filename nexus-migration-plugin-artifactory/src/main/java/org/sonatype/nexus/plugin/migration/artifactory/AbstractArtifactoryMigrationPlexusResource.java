@@ -106,63 +106,45 @@ public abstract class AbstractArtifactoryMigrationPlexusResource
         throws IOException, ZipException, FileNotFoundException, ResourceException
     {
         ZipFile zipFile = null;
-        try
-        {
-            if ( backup.isFile() )
-            {
-                zipFile = new ZipFile( backup );
-            }
 
-            final InputStream cfg;
-            if ( zipFile != null )
+        if ( backup.isFile() )
+        {
+            zipFile = new ZipFile( backup );
+        }
+
+        final InputStream cfg;
+        if ( zipFile != null )
+        {
+            ZipEntry cfgEntry = zipFile.getEntry( filename );
+            if ( cfgEntry == null )
             {
-                ZipEntry cfgEntry = zipFile.getEntry( filename );
-                if ( cfgEntry == null )
-                {
-                    cfg = null;
-                }
-                else
-                {
-                    cfg = zipFile.getInputStream( cfgEntry );
-                }
+                cfg = null;
             }
             else
             {
-                File cfgFile = new File( backup, filename );
-                if ( !cfgFile.exists() )
-                {
-                    cfg = null;
-                }
-                else
-                {
-                    cfg = new FileInputStream( cfgFile );
-                }
+                cfg = zipFile.getInputStream( cfgEntry );
             }
-
-            if ( cfg == null )
-            {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
-                                             "Artifactory backup is invalid, missing: '" + filename + "'" );
-            }
-            return cfg;
         }
-        finally
+        else
         {
-            try
+            File cfgFile = new File( backup, filename );
+            if ( !cfgFile.exists() )
             {
-                if ( zipFile != null )
-                {
-                    zipFile.close();
-                }
+                cfg = null;
             }
-            catch ( IOException e )
+            else
             {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Exception closing Artifactory zip file: " + e.getMessage(), e );
-                }
+                cfg = new FileInputStream( cfgFile );
             }
         }
+
+        if ( cfg == null )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Artifactory backup is invalid, missing: '"
+                + filename + "'" );
+        }
+        return cfg;
+
     }
 
 }
