@@ -75,7 +75,8 @@ public class ProxyIndexerManager
      */
     public Query constructQuery( String field, String query )
     {
-        return indexer().constructQuery( field, query );
+        // Query is only supported by Lucene Indexer
+        return m_lucene.constructQuery( field, query );
     }
 
     /**
@@ -110,7 +111,8 @@ public class ProxyIndexerManager
      */
     public NexusIndexer getNexusIndexer()
     {
-        return indexer().getNexusIndexer();
+        // Nexus Indexer is Lucene Indexer
+        return m_lucene.getNexusIndexer();
     }
 
     /**
@@ -119,7 +121,8 @@ public class ProxyIndexerManager
     public IndexingContext getRepositoryBestIndexContext( String repositoryId )
         throws NoSuchRepositoryException
     {
-        return indexer().getRepositoryBestIndexContext( repositoryId );
+        // getting first served does not work so force Lucene
+        return m_lucene.getRepositoryBestIndexContext( repositoryId );
     }
 
     /**
@@ -128,7 +131,8 @@ public class ProxyIndexerManager
     public IndexingContext getRepositoryLocalIndexContext( String repositoryId )
         throws NoSuchRepositoryException
     {
-        return indexer().getRepositoryLocalIndexContext( repositoryId );
+        // getting first served does not work so force Lucene
+        return m_lucene.getRepositoryLocalIndexContext( repositoryId );
     }
 
     /**
@@ -137,7 +141,8 @@ public class ProxyIndexerManager
     public IndexingContext getRepositoryRemoteIndexContext( String repositoryId )
         throws NoSuchRepositoryException
     {
-        return indexer().getRepositoryRemoteIndexContext( repositoryId );
+        // getting first served does not work so force Lucene
+        return m_lucene.getRepositoryRemoteIndexContext( repositoryId );
     }
 
     /**
@@ -146,7 +151,8 @@ public class ProxyIndexerManager
     public ArtifactInfo identifyArtifact( String type, String checksum )
         throws IOException
     {
-        return indexer().identifyArtifact( type, checksum );
+        // getting first served does not work so force Lucene
+        return m_lucene.identifyArtifact( type, checksum );
     }
 
     /**
