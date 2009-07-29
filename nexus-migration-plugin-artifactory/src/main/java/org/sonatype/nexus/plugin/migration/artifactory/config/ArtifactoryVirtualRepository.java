@@ -26,6 +26,8 @@ public class ArtifactoryVirtualRepository
 
     private List<String> resolvedRepositories;
 
+    private List<String> repositories;
+
     public ArtifactoryVirtualRepository( Xpp3Dom dom )
     {
         this.dom = dom;
@@ -38,18 +40,24 @@ public class ArtifactoryVirtualRepository
 
     public List<String> getRepositories()
     {
-        Xpp3Dom repositoriesDom = dom.getChild( "repositories" );
-        if ( repositoriesDom == null )
+        if ( repositories == null )
         {
-            return Collections.emptyList();
+            Xpp3Dom repositoriesDom = dom.getChild( "repositories" );
+            if ( repositoriesDom == null )
+            {
+                repositories = Collections.emptyList();
+            }
+            else
+            {
+                repositories = new ArrayList<String>();
+                for ( Xpp3Dom repoDom : repositoriesDom.getChildren( "repositoryRef" ) )
+                {
+                    repositories.add( repoDom.getValue() );
+                }
+                repositories = Collections.unmodifiableList( repositories );
+            }
         }
-
-        List<String> repos = new ArrayList<String>();
-        for ( Xpp3Dom repoDom : repositoriesDom.getChildren( "repositoryRef" ) )
-        {
-            repos.add( repoDom.getValue() );
-        }
-        return Collections.unmodifiableList( repos );
+        return repositories;
     }
 
     public List<String> getResolvedRepositories()

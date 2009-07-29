@@ -52,11 +52,12 @@ public abstract class AbstractMigrationIntegrationTest
     {
         try
         {
-            this.repositoryUtil = new RepositoryMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML, this.getRepositoryTypeRegistry() );
+            this.repositoryUtil =
+                new RepositoryMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML, this.getRepositoryTypeRegistry() );
         }
         catch ( ComponentLookupException e )
         {
-            Assert.fail( "Failed to lookup component: "+ e.getMessage() );
+            Assert.fail( "Failed to lookup component: " + e.getMessage() );
         }
         this.groupUtil = new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
         this.searchUtil = new SearchMessageUtil();
@@ -97,13 +98,27 @@ public abstract class AbstractMigrationIntegrationTest
     protected void checkArtifact( String repositoryId, String groupId, String artifactId, String version )
         throws Exception
     {
+        checkArtifact( repositoryId, groupId, artifactId, version, false );
+    }
+
+    protected void checkArtifact( String repositoryId, String groupId, String artifactId, String version,
+                                  boolean isGroup )
+        throws Exception
+    {
         File artifact = getTestFile( "artifact.jar" );
         Gav gav =
             new Gav( groupId, artifactId, version, null, "jar", null, null, null, false, false, null, false, null );
         File downloaded;
         try
         {
-            downloaded = downloadArtifactFromRepository( repositoryId, gav, "target/downloads/" + groupId );
+            if ( isGroup )
+            {
+                downloaded = downloadArtifactFromGroup( repositoryId, gav, "target/downloads/" + groupId );
+            }
+            else
+            {
+                downloaded = downloadArtifactFromRepository( repositoryId, gav, "target/downloads/" + groupId );
+            }
         }
         catch ( IOException e )
         {
@@ -116,7 +131,7 @@ public abstract class AbstractMigrationIntegrationTest
     }
 
     protected void checkArtifactNotPresent( String repositoryId, String groupId, String artifactId, String version )
-    throws Exception
+        throws Exception
     {
         Gav gav =
             new Gav( groupId, artifactId, version, null, "jar", null, null, null, false, false, null, false, null );
@@ -127,29 +142,14 @@ public abstract class AbstractMigrationIntegrationTest
         }
         catch ( FileNotFoundException e )
         {
-            //expected
+            // expected
         }
     }
 
     protected void checkArtifactOnGroup( String nexusGroupId, String groupId, String artifactId, String version )
         throws Exception
     {
-        File artifact = getTestFile( "artifact.jar" );
-        Gav gav =
-            new Gav( groupId, artifactId, version, null, "jar", null, null, null, false, false, null, false, null );
-        File downloaded;
-        try
-        {
-            downloaded = downloadArtifactFromGroup( nexusGroupId, gav, "target/downloads/" + groupId );
-        }
-        catch ( IOException e )
-        {
-            Assert.fail( "Unable to download artifact " + artifactId + " got:\n" + e.getMessage() );
-            throw e; // never happen
-        }
-
-        Assert.assertTrue( "Downloaded artifact was not right, checksum comparation fail " + artifactId,
-                           FileTestingUtils.compareFileSHA1s( artifact, downloaded ) );
+        checkArtifact( nexusGroupId, groupId, artifactId, version, true );
     }
 
     protected void checkIndex( String groupId, String artifactId, String version )
@@ -203,4 +203,20 @@ public abstract class AbstractMigrationIntegrationTest
         TaskScheduleUtil.waitForTasks( 40 );
     }
 
+    protected void checkNotAvailable( String repositoryId, String groupId, String artifactId, String version )
+        throws Exception
+    {
+        Gav gav =
+            new Gav( groupId, artifactId, version, null, "jar", null, null, null, false, false, null, false, null );
+        try
+        {
+            downloadArtifactFromRepository( repositoryId, gav, "target/downloads/nxcm259" );
+            Assert.fail( "Artifact available at wrong repository " + artifactId );
+        }
+        catch ( FileNotFoundException e )
+        {
+            // expected
+        }
+
+    }
 }

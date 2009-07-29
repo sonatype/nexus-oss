@@ -12,13 +12,11 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1439;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
@@ -75,23 +73,6 @@ public class Nexus1439ImportMixedRepositoriesTest
         }
         assertContains( reposIds, "main-local-releases" );
         assertContains( reposIds, "main-local-snapshots" );
-    }
-
-    protected void checkNotAvailable( String repositoryId, String groupId, String artifactId, String version )
-        throws Exception
-    {
-        Gav gav =
-            new Gav( groupId, artifactId, version, null, "jar", null, null, null, false, false, null, false, null );
-        try
-        {
-            downloadArtifactFromRepository( repositoryId, gav, "target/downloads/nxcm259" );
-            Assert.fail( "Artifact available at wrong repository " + artifactId );
-        }
-        catch ( FileNotFoundException e )
-        {
-            // expected
-        }
-
     }
 
 }

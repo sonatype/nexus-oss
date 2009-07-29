@@ -22,7 +22,7 @@ import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryProxy;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryRepository;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryVirtualRepository;
 
-public class PaserConfigTest
+public class ParserConfigTest
 {
 
     @Test
@@ -74,12 +74,17 @@ public class PaserConfigTest
         // validate virtual repos
         Map<String, ArtifactoryVirtualRepository> virtualRepositories = config.getVirtualRepositories();
         Assert.assertNotNull( virtualRepositories );
-        Assert.assertEquals( 1, virtualRepositories.size() );
+        Assert.assertEquals( 2, virtualRepositories.size() );
 
         ArtifactoryVirtualRepository snapshotsOnly = virtualRepositories.get( "snapshots-only" );
         Assert.assertEquals( "snapshots-only", snapshotsOnly.getKey() );
         Assert.assertEquals( 4, snapshotsOnly.getRepositories().size() );
         Assert.assertEquals( "plugins-snapshots", snapshotsOnly.getRepositories().get( 1 ) );
+
+        // validate Default Virtual Repository
+        ArtifactoryVirtualRepository repo = virtualRepositories.get( "repo" );
+        Assert.assertEquals( "repo", repo.getKey() );
+        Assert.assertEquals( config.getRepositories().size(), repo.getRepositories().size() );
 
         // validate proxies
         Map<String, ArtifactoryProxy> proxies = config.getProxies();
