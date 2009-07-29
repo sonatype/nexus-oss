@@ -152,8 +152,8 @@
 
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/branches/nexus-migration-plugin-1.1.x</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/branches/nexus-migration-plugin-1.1.x</developerConnection>
-    <url>http://svn.sonatype.org/nexus-plugins/branches/nexus-migration-plugin-1.1.x</url>
+    <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/trunk/nexus-migration-plugin</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-migration-plugin</developerConnection>
+    <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-migration-plugin</url>
   </scm>
 </project>
