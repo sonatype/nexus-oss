@@ -155,7 +155,7 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
     rec.set( 'name', receivedData.name );
     rec.set( 'repoType', receivedData.repoType );
     rec.set( 'format', receivedData.format );
-    rec.set( 'repoPolicy', receivedData.repoPolicy );
+    rec.set( 'repoPolicy', Sonatype.utils.upperFirstCharLowerRest( receivedData.repoPolicy ) );
     rec.commit();
     rec.endEdit();
     
