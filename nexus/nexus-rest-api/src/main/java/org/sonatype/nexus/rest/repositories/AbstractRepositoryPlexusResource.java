@@ -365,7 +365,7 @@ public abstract class AbstractRepositoryPlexusResource
         return resource;
     }
     
-    protected CRemoteAuthentication convertAuthentication( AuthenticationSettings authentication )
+    protected CRemoteAuthentication convertAuthentication( AuthenticationSettings authentication, String oldPassword )
     {
         if ( authentication == null )
         {
@@ -373,16 +373,15 @@ public abstract class AbstractRepositoryPlexusResource
         }
 
         CRemoteAuthentication appModelSettings = new CRemoteAuthentication();
-
         appModelSettings.setUsername( authentication.getUsername() );
-        appModelSettings.setPassword( authentication.getPassword() );
+        appModelSettings.setPassword( this.getActualPassword( authentication.getPassword(), oldPassword ) );
         appModelSettings.setNtlmDomain( authentication.getNtlmDomain() );
         appModelSettings.setNtlmHost( authentication.getNtlmHost() );
 
         return appModelSettings;
     }
     
-    protected CRemoteHttpProxySettings convertHttpProxySettings( RemoteHttpProxySettings remoteHttpProxySettings )
+    protected CRemoteHttpProxySettings convertHttpProxySettings( RemoteHttpProxySettings remoteHttpProxySettings, String oldPassword )
     {
         if ( remoteHttpProxySettings == null )
         {
@@ -395,7 +394,7 @@ public abstract class AbstractRepositoryPlexusResource
 
         httpProxySettings.setProxyPort( remoteHttpProxySettings.getProxyPort() );
 
-        httpProxySettings.setAuthentication( convertAuthentication( remoteHttpProxySettings.getAuthentication() ) );
+        httpProxySettings.setAuthentication( convertAuthentication( remoteHttpProxySettings.getAuthentication(), oldPassword ) );
 
         return httpProxySettings;
     }

@@ -55,6 +55,8 @@ public abstract class AbstractNexusPlexusResource
 {
     public static final String NEXUS_INSTANCE_LOCAL = "local";
 
+    public static final String PASSWORD_PLACE_HOLDER = "|$|N|E|X|U|S|$|";
+    
     @Requirement
     private Nexus nexus;
 
@@ -397,5 +399,15 @@ public abstract class AbstractNexusPlexusResource
     protected String getValidRemoteIPAddress( Request request )
     {
         return RemoteIPFinder.findIP( request );
+    }
+    
+    protected String getActualPassword( String newPassword, String oldPassword )
+    {
+        if( PASSWORD_PLACE_HOLDER.equals( newPassword ) )
+        {
+            return oldPassword;     
+        }
+        
+        return newPassword;
     }
 }

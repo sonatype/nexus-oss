@@ -274,13 +274,13 @@ public class RepositoryListPlexusResource
             target.getRemoteStorage().setUrl( model.getRemoteStorage().getRemoteStorageUrl() );
 
             // remote auth
-            target.getRemoteStorage().setAuthentication( this.convertAuthentication(  model.getRemoteStorage().getAuthentication() ) );
+            target.getRemoteStorage().setAuthentication( this.convertAuthentication(  model.getRemoteStorage().getAuthentication(), null ) );
 
             // connection settings
             target.getRemoteStorage().setConnectionSettings( this.convertRemoteConnectionSettings( model.getRemoteStorage().getConnectionSettings() ));
 
             // http proxy settings
-            target.getRemoteStorage().setHttpProxySettings( this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings() ) );
+            target.getRemoteStorage().setHttpProxySettings( this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings(), null ) );
         }
 
         return target;

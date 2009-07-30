@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
@@ -184,10 +185,24 @@ public class RepositoryPlexusResource
                                 
                                 pRepository.setMetadataMaxAge( proxyModel.getMetadataMaxAge() );
                                 
+                                String oldPasswordForRemoteStorage = null;
+                                if( pRepository.getRemoteAuthenticationSettings() != null && 
+                                    UsernamePasswordRemoteAuthenticationSettings.class.isInstance( pRepository.getRemoteAuthenticationSettings() ))
+                                {
+                                    oldPasswordForRemoteStorage = ((UsernamePasswordRemoteAuthenticationSettings) pRepository.getRemoteAuthenticationSettings() ).getPassword();
+                                }
                                 
-                                RemoteAuthenticationSettings remoteAuth = RemoteSettingsUtil.convertFromModel( this.convertAuthentication(  model.getRemoteStorage().getAuthentication() ));
+                                String oldPasswordForProxy = null;
+                                if( pRepository.getRemoteProxySettings() != null && 
+                                    pRepository.getRemoteProxySettings().getProxyAuthentication() != null &&
+                                    UsernamePasswordRemoteAuthenticationSettings.class.isInstance( pRepository.getRemoteAuthenticationSettings() ))
+                                {
+                                    oldPasswordForProxy = ((UsernamePasswordRemoteAuthenticationSettings) pRepository.getRemoteProxySettings().getProxyAuthentication() ).getPassword();
+                                }
+                                
+                                RemoteAuthenticationSettings remoteAuth = RemoteSettingsUtil.convertFromModel( this.convertAuthentication(  model.getRemoteStorage().getAuthentication(), oldPasswordForRemoteStorage ));
                                 RemoteConnectionSettings remoteConnSettings = RemoteSettingsUtil.convertFromModel( this.convertRemoteConnectionSettings( model.getRemoteStorage().getConnectionSettings() ));
-                                RemoteProxySettings httpProxySettings = RemoteSettingsUtil.convertFromModel( this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings() ) );
+                                RemoteProxySettings httpProxySettings = RemoteSettingsUtil.convertFromModel( this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings(), oldPasswordForProxy ) );
                                 
                                 if( remoteAuth != null )
                                 {

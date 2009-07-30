@@ -7,6 +7,7 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
@@ -52,7 +53,7 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( "ntlmDomain", resultAuth.getNtlmDomain() );
         Assert.assertEquals( "ntlmHost", resultAuth.getNtlmHost() );
         // Assert.assertEquals( "passphrase", resultAuth.getPassphrase() );
-        Assert.assertEquals( "password", resultAuth.getPassword() );
+        Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER, resultAuth.getPassword() );
         // Assert.assertEquals( "privateKey", resultAuth.getPrivateKey() );
         Assert.assertEquals( "username", resultAuth.getUsername() );
 
@@ -71,7 +72,7 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( "ntlmDomain2", resultAuth2.getNtlmDomain() );
         Assert.assertEquals( "ntlmHost2", resultAuth2.getNtlmHost() );
         // Assert.assertEquals( "passphrase2", resultAuth2.getPassphrase() );
-        Assert.assertEquals( "password2", resultAuth2.getPassword() );
+        Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER, resultAuth2.getPassword() );
         // Assert.assertEquals( "privateKey2", resultAuth2.getPrivateKey() );
         Assert.assertEquals( "username2", resultAuth2.getUsername() );
     }
@@ -153,7 +154,7 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( "ntlmDomain-new", resultAuth.getNtlmDomain() );
         Assert.assertEquals( "ntlmHost-new", resultAuth.getNtlmHost() );
         // Assert.assertEquals( "passphrase-new", resultAuth.getPassphrase() );
-        Assert.assertEquals( "password-new", resultAuth.getPassword() );
+        Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER, resultAuth.getPassword() );
         // Assert.assertEquals( "privateKey-new", resultAuth.getPrivateKey() );
         Assert.assertEquals( "username-new", resultAuth.getUsername() );
 
@@ -172,7 +173,7 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( "ntlmDomain2-new", resultAuth2.getNtlmDomain() );
         Assert.assertEquals( "ntlmHost2-new", resultAuth2.getNtlmHost() );
         // Assert.assertEquals( "passphrase2-new", resultAuth2.getPassphrase() );
-        Assert.assertEquals( "password2-new", resultAuth2.getPassword() );
+        Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER, resultAuth2.getPassword() );
         // Assert.assertEquals( "privateKey2-new", resultAuth2.getPrivateKey() );
         Assert.assertEquals( "username2-new", resultAuth2.getUsername() );
         

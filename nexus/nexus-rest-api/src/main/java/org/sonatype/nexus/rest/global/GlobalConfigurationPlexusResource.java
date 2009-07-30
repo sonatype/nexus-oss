@@ -155,7 +155,13 @@ public class GlobalConfigurationPlexusResource
 
                         config.setHostname( settings.getHost() );
 
-                        config.setPassword( settings.getPassword() );
+                        // lookup old password
+                        String oldPassword = null;
+                        if( getNexusConfiguration().readSmtpConfiguration() != null)
+                        {
+                            oldPassword = getNexusConfiguration().readSmtpConfiguration().getPassword();
+                        }
+                        config.setPassword( this.getActualPassword( settings.getPassword(), oldPassword ) );
 
                         config.setPort( settings.getPort() );
 
@@ -177,7 +183,9 @@ public class GlobalConfigurationPlexusResource
                     {                           
                         reporting.setEnabled( true );
                         reporting.setJiraUsername( settings.getJiraUsername() );
-                        reporting.setJiraPassword( settings.getJiraPassword() );
+                     
+                        // look up old password
+                        reporting.setJiraPassword( this.getActualPassword( settings.getJiraPassword(), reporting.getJiraPassword() ) );
                         reporting.setUseGlobalProxy( settings.isUseGlobalProxy() );
                     }
                     else
@@ -221,7 +229,14 @@ public class GlobalConfigurationPlexusResource
 
                             auth.setUsername( s.getAuthentication().getUsername() );
 
-                            auth.setPassword( s.getAuthentication().getPassword() );
+                            String oldPassword = null;
+                            if( this.getNexusConfiguration().readGlobalRemoteHttpProxySettings() != null && 
+                                this.getNexusConfiguration().readGlobalRemoteHttpProxySettings().getAuthentication() != null )
+                            {
+                                oldPassword = this.getNexusConfiguration().readGlobalRemoteHttpProxySettings().getAuthentication().getPassword(); 
+                            }
+                            
+                            auth.setPassword( this.getActualPassword( s.getAuthentication().getPassword(), oldPassword ) );
 
                             auth.setNtlmDomain( s.getAuthentication().getNtlmDomain() );
 
@@ -251,26 +266,21 @@ public class GlobalConfigurationPlexusResource
                         && !StringUtils.isEmpty( resource.getSecurityAnonymousUsername() )
                         && !StringUtils.isEmpty( resource.getSecurityAnonymousPassword() ) )
                     {
-                        if ( getNexusConfiguration().getAnonymousUsername().equals( resource.getSecurityAnonymousUsername() )
-                            && !getNexusConfiguration().getAnonymousPassword().equals( resource.getSecurityAnonymousPassword() ) )
-                        {
-                            // no user change, only password
-
-                            /*
-                             * TODO getNexusSecurityConfiguration().changePassword( getNexusInstance( request
-                             * ).getAnonymousUsername(), getNexusInstance( request ).getAnonymousPassword(),
-                             * resource.getSecurityAnonymousPassword() );
-                             */
-                        }
-                        else
-                        {
-                            // user changed too
+                        
+                        // check if the user/pass changed
+                        String oldPassword = getNexusConfiguration().getAnonymousPassword();
+                        String newPassword = this.getActualPassword( resource.getSecurityAnonymousPassword(), oldPassword );
+                        
+                        if ( !StringUtils.equals( getNexusConfiguration().getAnonymousUsername(),  resource.getSecurityAnonymousUsername() ) || 
+                            !StringUtils.equals( newPassword, oldPassword ) )
+                        {                           
+                            // test auth
                             try
                             {
                                 // try to "log in" with supplied credentials
                                 // the anon user a) should exists b) the pwd must work
                                 securitySystem.authenticate( new UsernamePasswordToken( resource
-                                    .getSecurityAnonymousUsername(), resource.getSecurityAnonymousPassword() ) );
+                                    .getSecurityAnonymousUsername(), newPassword ) );
                             }
                             catch ( AuthenticationException e )
                             {
@@ -289,7 +299,7 @@ public class GlobalConfigurationPlexusResource
 
                         getNexusConfiguration().setAnonymousUsername( resource.getSecurityAnonymousUsername() );
 
-                        getNexusConfiguration().setAnonymousPassword( resource.getSecurityAnonymousPassword() );
+                        getNexusConfiguration().setAnonymousPassword( newPassword );
                     }
                     else if ( resource.isSecurityAnonymousAccessEnabled() )
                     {
@@ -365,7 +375,7 @@ public class GlobalConfigurationPlexusResource
 
         resource.setSecurityAnonymousUsername( getNexus().getDefaultAnonymousUsername() );
 
-        resource.setSecurityAnonymousPassword( getNexus().getDefaultAnonymousPassword() );
+        resource.setSecurityAnonymousPassword( PASSWORD_PLACE_HOLDER );
 
         resource.setGlobalConnectionSettings( convert( getNexus().readDefaultGlobalRemoteConnectionSettings() ) );
 
@@ -393,7 +403,7 @@ public class GlobalConfigurationPlexusResource
 
         resource.setSecurityAnonymousUsername( getNexusConfiguration().getAnonymousUsername() );
 
-        resource.setSecurityAnonymousPassword( getNexusConfiguration().getAnonymousPassword() );
+        resource.setSecurityAnonymousPassword( PASSWORD_PLACE_HOLDER );
 
         resource.setGlobalConnectionSettings( convert( getNexusConfiguration().readGlobalRemoteConnectionSettings() ) );
 

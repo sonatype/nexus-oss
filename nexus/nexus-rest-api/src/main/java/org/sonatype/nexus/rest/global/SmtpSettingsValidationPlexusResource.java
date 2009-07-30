@@ -86,7 +86,13 @@ public class SmtpSettingsValidationPlexusResource
         CSmtpConfiguration config = new CSmtpConfiguration();
 
         config.setHostname( settings.getHost() );
-        config.setPassword( settings.getPassword() );
+        
+        String oldPassword = null;
+        if( getNexusConfiguration().readSmtpConfiguration() != null)
+        {
+            oldPassword = getNexusConfiguration().readSmtpConfiguration().getPassword();
+        }
+        config.setPassword( this.getActualPassword( settings.getPassword(), oldPassword ) );
         config.setPort( settings.getPort() );
         config.setSslEnabled( settings.isSslEnabled() );
         config.setTlsEnabled( settings.isTlsEnabled() );

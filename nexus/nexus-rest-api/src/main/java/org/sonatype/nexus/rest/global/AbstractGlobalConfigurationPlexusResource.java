@@ -50,7 +50,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         
         result.setHost( settings.getHostname() );
         
-        result.setPassword( settings.getPassword() );
+        result.setPassword( PASSWORD_PLACE_HOLDER );
         
         result.setPort( settings.getPort() );
         
@@ -75,7 +75,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         ErrorReportingSettings result = new ErrorReportingSettings();
        
         result.setJiraUsername( settings.getJiraUsername() );
-        result.setJiraPassword( settings.getJiraPassword() );
+        result.setJiraPassword( PASSWORD_PLACE_HOLDER );
         result.setUseGlobalProxy( settings.isUseGlobalProxy() );
         
         return result;
@@ -145,7 +145,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
         auth.setUsername( settings.getUsername() );
 
-        auth.setPassword( settings.getPassword() );
+        auth.setPassword( PASSWORD_PLACE_HOLDER );
 
         auth.setNtlmHost( settings.getNtlmHost() );
 
