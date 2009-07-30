@@ -1,7 +1,6 @@
 package org.sonatype.security.usermanagement.xml;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,7 +20,6 @@ import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.UserRoleMappingTest;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -279,6 +277,34 @@ public class UserManagerTest
         }
         
         Assert.assertTrue( "did not find admin user in role mapping", found );
+    }
+    
+    public void testSetUserRolesForAnonymous()
+        throws Exception
+    {
+        SecuritySystem securitySystem = this.getSecuritySystem();
+
+        User anon = securitySystem.getUser( securitySystem.getAnonymousUsername(), "default" );
+
+        Set<RoleIdentifier> roles = new HashSet<RoleIdentifier>();
+
+        roles.add( new RoleIdentifier( "default", "role3" ) );
+
+        securitySystem.setUsersRoles( anon.getUserId(), anon.getSource(), roles );
+
+        boolean found = false;
+        for ( CUserRoleMapping roleMapping : getSecurityConfiguration().getUserRoleMappings() )
+        {
+            if ( roleMapping.getUserId().equals( securitySystem.getAnonymousUsername() ) )
+            {
+                found = true;
+
+                Assert.assertEquals( 1, roleMapping.getRoles().size() );
+                Assert.assertEquals( "role3", roleMapping.getRoles().get( 0 ) );
+            }
+        }
+
+        Assert.assertTrue( "did not find anon user in role mapping", found );
     }
 
     private List<String> getRoleIds( User user )
