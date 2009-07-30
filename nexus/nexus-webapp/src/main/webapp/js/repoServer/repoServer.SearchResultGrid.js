@@ -89,54 +89,33 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       id: 'source',
       header: "Source Index",
       dataIndex: 'contextId',
-      width: 100,
       sortable:true
-    }/*,{
-      id: 'repository',
-      header: "Repository",
-      dataIndex: 'repoId',
-      width: 195,
-      sortable:true
-    }*/,{
+    },{
       id: 'group',
       header: "Group",
       dataIndex: 'groupId',
       sortable:true,
-      width: 145
     },{
       id: 'artifact',
       header: "Artifact",
       dataIndex: 'artifactId',
-      width: 160,
       sortable:true
     },{
       id: 'version',
       header: "Version",
       dataIndex: 'version',
-      width: 60,
       sortable:true
     },{
       id: 'packaging',
 	  header: "Packaging",
 	  dataIndex: 'packaging',
-	  width: 40,
 	  sortable:true
     },{
       id: 'classifier',
       header: "Classifier",
       dataIndex: 'classifier',
-      width: 40,
       sortable:true
     }
-//@note: NX-444 remove POM link functionality until it can work across browsers (firefix issue presently)
-//  ,{
-//    id: 'pom',
-//    header: "POM Dependecy",
-//    dataIndex: 'artifactId',
-//    width: 105,
-//    sortable:true,
-//    renderer: this.formatPomLink
-//  }
   ];
 
   this.fetchMoreButton = new Ext.SplitButton({
