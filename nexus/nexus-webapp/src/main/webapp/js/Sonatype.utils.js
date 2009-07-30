@@ -613,6 +613,9 @@ Sonatype.utils = {
                 Ext.Ajax.request({
                   scope: this,
                   method: 'POST',
+                  cbPassThru : {
+                    newPassword : newPassword
+                  },
                   jsonData: {
                     data: {
                       userId: expiredUsername ? expiredUsername : Sonatype.user.curr.username,
@@ -628,6 +631,7 @@ Sonatype.utils = {
                     }
                     else {
                       w.close();
+                      Sonatype.utils.updateAuthToken( Sonatype.user.curr.username, options.cbPassThru.newPassword );
                       Sonatype.MessageBox.show( {
                         title: 'Password Changed',
                         msg: 'Password change request completed successfully.',
@@ -659,12 +663,16 @@ Sonatype.utils = {
     w.show();
   },
   
+  updateAuthToken: function( username, password ) {
+    Sonatype.utils.authToken = Sonatype.utils.base64.encode(username + ':' + password);
+  },
+  
   doLogin: function( activeWindow, username, password ) {
   	if(activeWindow) {
       activeWindow.getEl().mask("Logging you in...");
   	}
 
-    Sonatype.utils.authToken = Sonatype.utils.base64.encode(username + ':' + password); 
+  	Sonatype.utils.updateAuthToken( username, password ); 
     Ext.Ajax.request({
       method: 'GET',
       cbPassThru : {
