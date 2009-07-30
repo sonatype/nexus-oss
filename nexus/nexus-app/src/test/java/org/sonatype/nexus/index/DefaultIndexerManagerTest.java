@@ -13,8 +13,6 @@
  */
 package org.sonatype.nexus.index;
 
-import org.sonatype.nexus.tasks.ReindexTask;
-import org.sonatype.scheduling.ScheduledTask;
 
 public class DefaultIndexerManagerTest
     extends AbstractIndexerManagerTest
@@ -23,13 +21,8 @@ public class DefaultIndexerManagerTest
         throws Exception
     {
         fillInRepo();
-
-        ReindexTask reindexTask = nexusScheduler.createTaskInstance( ReindexTask.class );
-
-        ScheduledTask<Object> st = nexusScheduler.submit( "reindexAll", reindexTask );
-
-        // make it block until finished
-        st.get();
+        
+        indexerManager.reindexAllRepositories( "/", false );
 
         searchFor( "org.sonatype.nexus", 9 );
 

@@ -1,7 +1,5 @@
 package org.sonatype.nexus.index;
 
-import org.sonatype.nexus.tasks.ReindexTask;
-import org.sonatype.scheduling.ScheduledTask;
 
 public class DisableIndexerManagerTest
     extends AbstractIndexerManagerTest
@@ -12,12 +10,7 @@ public class DisableIndexerManagerTest
     {
         fillInRepo();
 
-        ReindexTask reindexTask = nexusScheduler.createTaskInstance( ReindexTask.class );
-
-        ScheduledTask<Object> st = nexusScheduler.submit( "reindexAll", reindexTask );
-
-        // make it block until finished
-        st.get();
+        indexerManager.reindexRepository( "/", snapshots.getId(), false );
 
         searchFor( "org.sonatype.plexus", 1 );
 
