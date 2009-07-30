@@ -53,7 +53,7 @@ public class UserSearchPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/user_search/*", "authcBasic,perms[security:users]" );
+        return new PathProtectionDescriptor( "/user_search/**", "authcBasic,perms[security:users]" );
     }
 
     @Override
