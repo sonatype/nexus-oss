@@ -888,7 +888,8 @@ Sonatype.repoServer.UserMappingEditor = function( config ) {
         name: 'roles',
         valueField: 'id',
         store: this.roleDataStore,
-        required: true
+        required: true,
+        nodeIcon: Sonatype.config.extPath + '/resources/images/default/tree/folder.gif'
       }
     ],
     listeners: {
