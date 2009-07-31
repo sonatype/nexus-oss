@@ -4,15 +4,31 @@ import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 
 public class TestEvictUnusedProxiedItemsTask
     extends AbstractMavenRepoContentTests
 {
+    NexusScheduler scheduler;
+    
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+        
+        scheduler = ( NexusScheduler ) lookup( NexusScheduler.class );
+    }
 
     public void testDeleteEmptyFolder()
         throws Exception
     {
         fillInRepo();
+        
+        while ( scheduler.getActiveTasks().size() > 0 )
+        {
+            Thread.sleep( 100 );
+        }
 
         long tsDeleting = System.currentTimeMillis() - 10000L;
         long tsToBeKept = tsDeleting + 1000L;
