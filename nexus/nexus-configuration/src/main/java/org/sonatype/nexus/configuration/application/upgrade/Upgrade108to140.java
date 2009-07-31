@@ -672,6 +672,8 @@ public class Upgrade108to140
     private void upgradeShadowRepository( org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow shadowRepo )
     {
         shadowRepo.setId( upgradeSlashToHyphen( shadowRepo.getId(), true ) );
+
+        shadowRepo.setShadowOf( upgradeSlashToHyphen( shadowRepo.getShadowOf(), false ) );
     }
 
     private void upgradePathMapping(
