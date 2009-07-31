@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.plugin.migration.artifactory.MigrationResult;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
 import org.sonatype.nexus.plugin.migration.artifactory.security.DefaultSecurityConfigConvertor.TargetSuite;
+import org.sonatype.security.realms.tools.dao.SecurityUser;
 
 public class SecurityConfigConvertorRequest
 {

@@ -21,16 +21,16 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityProperty;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
 import org.sonatype.nexus.plugin.migration.artifactory.MigrationResult;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
+import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
+import org.sonatype.security.realms.tools.dao.SecurityProperty;
+import org.sonatype.security.realms.tools.dao.SecurityRole;
+import org.sonatype.security.realms.tools.dao.SecurityUser;
 
 public class SecurityConfigConvertorTest
 {

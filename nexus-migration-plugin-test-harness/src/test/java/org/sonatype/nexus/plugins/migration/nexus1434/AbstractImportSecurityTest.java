@@ -23,16 +23,16 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.plugins.migration.util.PlexusUserMessageUtil;
-import org.sonatype.nexus.rest.model.PlexusRoleResource;
-import org.sonatype.nexus.rest.model.PlexusUserResource;
-import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
-import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
+import org.sonatype.security.rest.model.PlexusRoleResource;
+import org.sonatype.security.rest.model.PlexusUserResource;
+import org.sonatype.security.rest.model.PrivilegeStatusResource;
+import org.sonatype.security.rest.model.RoleResource;
 
 public abstract class AbstractImportSecurityTest
     extends AbstractMigrationIntegrationTest

@@ -21,10 +21,10 @@ import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.rest.model.PlexusUserListResourceResponse;
-import org.sonatype.nexus.rest.model.PlexusUserResource;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
+import org.sonatype.security.rest.model.PlexusUserResource;
 
 public class PlexusUserMessageUtil
 {

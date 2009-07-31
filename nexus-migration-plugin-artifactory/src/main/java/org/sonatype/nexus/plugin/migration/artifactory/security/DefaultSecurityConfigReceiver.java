@@ -14,22 +14,23 @@ package org.sonatype.nexus.plugin.migration.artifactory.security;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
-import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
-import org.sonatype.nexus.Nexus;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
+import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
+import org.sonatype.security.realms.tools.dao.SecurityRole;
+import org.sonatype.security.realms.tools.dao.SecurityUser;
 
 @Component( role = SecurityConfigReceiver.class )
 public class DefaultSecurityConfigReceiver
     implements SecurityConfigReceiver
 {
+
     @Requirement
-    private Nexus nexus;
-    
+    private NexusConfiguration configuration;
+
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager manager;
 
@@ -38,7 +39,7 @@ public class DefaultSecurityConfigReceiver
     {
         try
         {
-            nexus.createRepositoryTarget( repoTarget );
+            configuration.createRepositoryTarget( repoTarget );
         }
         catch ( Exception e )
         {
@@ -52,10 +53,10 @@ public class DefaultSecurityConfigReceiver
     {
         try
         {
-            //nexusSecurity.createPrivilege( privilege );
-            
+            // nexusSecurity.createPrivilege( privilege );
+
             manager.createPrivilege( privilege );
-            
+
             manager.save();
         }
         catch ( InvalidConfigurationException e )
@@ -71,7 +72,7 @@ public class DefaultSecurityConfigReceiver
         try
         {
             manager.createRole( role );
-            
+
             manager.save();
         }
         catch ( InvalidConfigurationException e )
@@ -87,7 +88,7 @@ public class DefaultSecurityConfigReceiver
         try
         {
             manager.createUser( user );
-            
+
             manager.save();
         }
         catch ( InvalidConfigurationException e )

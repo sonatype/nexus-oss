@@ -13,6 +13,7 @@
 package org.sonatype.nexus.plugin.migration.artifactory;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -20,6 +21,7 @@ import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRequestDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.task.ArtifactoryMigrationTask;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -27,6 +29,9 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class ArtifactoryMigrationPlexusResource
     extends AbstractArtifactoryMigrationPlexusResource
 {
+    @Requirement
+    private NexusScheduler nexusScheduler;
+
     public ArtifactoryMigrationPlexusResource()
     {
         this.setReadable( false );
@@ -64,9 +69,9 @@ public class ArtifactoryMigrationPlexusResource
         migrationSummary.setNexusContext( nexusContext );
 
         // lookup task and run it
-        ArtifactoryMigrationTask migrationTask = this.getNexus().createTaskInstance( ArtifactoryMigrationTask.class );
+        ArtifactoryMigrationTask migrationTask = nexusScheduler.createTaskInstance( ArtifactoryMigrationTask.class );
         migrationTask.setMigrationSummary( migrationSummary );
-        this.getNexus().submit( "Importing Artifactory Backup.", migrationTask );
+        nexusScheduler.submit( "Importing Artifactory Backup.", migrationTask );
 
         return null;
     }

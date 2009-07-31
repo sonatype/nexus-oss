@@ -33,8 +33,6 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
-import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryRepository;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryVirtualRepository;
@@ -51,10 +49,13 @@ import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
 import org.sonatype.nexus.plugin.migration.artifactory.security.builder.ArtifactorySecurityConfigBuilder;
 import org.sonatype.nexus.plugin.migration.artifactory.util.VirtualRepositoryUtil;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.usermanagement.User;
 
 @Component( role = PlexusResource.class, hint = "artifactoryFileLocation" )
 public class ArtifactoryFileLocationPlexusResource
@@ -62,16 +63,14 @@ public class ArtifactoryFileLocationPlexusResource
 {
 
     @Requirement
-    private NexusSecurity nexusSecurity;
+    private SecuritySystem securitySystem;
+
+    @Requirement
+    private RepositoryRegistry repositoryRegistry;
 
     public ArtifactoryFileLocationPlexusResource()
     {
         this.setModifiable( true );
-    }
-
-    protected NexusSecurity getNexusSecurity()
-    {
-        return nexusSecurity;
     }
 
     @Override
@@ -287,7 +286,7 @@ public class ArtifactoryFileLocationPlexusResource
     {
         try
         {
-            return getNexus().getRepository( repoId );
+            return repositoryRegistry.getRepository( repoId );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -325,9 +324,9 @@ public class ArtifactoryFileLocationPlexusResource
      */
     private void validateUser( ArtifactoryUser artiUser )
     {
-        for ( SecurityUser user : getNexusSecurity().listUsers() )
+        for ( User user : securitySystem.listUsers() )
         {
-            if ( user.getId().equals( artiUser.getUsername() ) )
+            if ( user.getUserId().equals( artiUser.getUsername() ) )
             {
                 artiUser.setUsername( artiUser.getUsername() + "-artifactory" );
             }
@@ -341,7 +340,7 @@ public class ArtifactoryFileLocationPlexusResource
             return null;
         }
 
-        Collection<Repository> repositories = getNexus().getRepositories();
+        Collection<Repository> repositories = repositoryRegistry.getRepositories();
         for ( Repository repository : repositories )
         {
             if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )

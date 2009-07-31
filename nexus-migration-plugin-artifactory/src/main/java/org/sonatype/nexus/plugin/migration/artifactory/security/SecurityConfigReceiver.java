@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.plugin.migration.artifactory.security;
 
-import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
-import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
+import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
+import org.sonatype.security.realms.tools.dao.SecurityRole;
+import org.sonatype.security.realms.tools.dao.SecurityUser;
 
 public interface SecurityConfigReceiver
 {

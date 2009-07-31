@@ -19,7 +19,8 @@
         <basedir>${nexus-base-dir}</basedir>
         <temp-dir>${project.build.directory}/appbooter.tmp/</temp-dir>
         <control-port>${nexus-control-port}</control-port>
-        <platform-file>${nexus-base-dir}/lib/plexus-platform-jsw-*.jar</platform-file>
+        <classworldsJar>${nexus-base-dir}/lib/plexus-classworlds-1.4.jar</classworldsJar>
+        <classworldsConf>${nexus-base-dir}/conf/classworlds.conf</classworldsConf>
         <class-path-elements>${nexus-base-dir}/runtime/apps/nexus/conf, ${nexus-base-dir}/runtime/apps/nexus/lib/*.jar</class-path-elements>
         <sleep-after-start>6000</sleep-after-start>
         <systemProperties>
@@ -28,9 +29,12 @@
           <plexus.runtime>${nexus-base-dir}/runtime</plexus.runtime>
           <plexus.apps>${nexus-base-dir}/runtime/apps</plexus.apps>
           <plexus.nexus-work>${nexus-work-dir}</plexus.nexus-work>
+          <plexus.nexus-app>${nexus-base-dir}/runtime/apps/nexus</plexus.nexus-app>
           <plexus.webapp>${nexus-base-dir}/runtime/apps/nexus/webapp</plexus.webapp>
           <plexus.webapp-context-path>/nexus</plexus.webapp-context-path>
+          <plexus.application-conf>${nexus-work-dir}/conf</plexus.application-conf>
           <plexus.log4j-prop-file>${default-configs}/log4j.properties</plexus.log4j-prop-file>
+          <plexus.jetty.xml>${nexus-base-dir}/conf/jetty.xml</plexus.jetty.xml>
         </systemProperties>
       </configuration>
     </component>
@@ -53,6 +57,7 @@
           <plexus.runtime>${nexus-base-dir}/runtime</plexus.runtime>
           <plexus.apps>${nexus-base-dir}/runtime/apps</plexus.apps>
           <plexus.nexus-work>${nexus-work-dir}</plexus.nexus-work>
+          <plexus.nexus-app>${nexus-base-dir}/runtime/apps/nexus</plexus.nexus-app>
           <plexus.webapp>${nexus-base-dir}/runtime/apps/nexus/webapp</plexus.webapp>
           <plexus.webapp-context-path>/nexus</plexus.webapp-context-path>
           <plexus.log4j-prop-file>${default-configs}/log4j.properties</plexus.log4j-prop-file>

@@ -12,17 +12,16 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1434;
 
-import hidden.org.codehaus.plexus.util.StringUtils;
-
 import java.util.List;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
-import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
+import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
 public class Nexus1434ImportSecurity130RepoKeyValidateTest
     extends AbstractImportSecurityTest

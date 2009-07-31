@@ -17,10 +17,10 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
-import org.sonatype.nexus.rest.model.PlexusUserResource;
-import org.sonatype.nexus.rest.model.PrivilegeStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
-import org.sonatype.nexus.rest.model.RoleResource;
+import org.sonatype.security.rest.model.PlexusUserResource;
+import org.sonatype.security.rest.model.PrivilegeStatusResource;
+import org.sonatype.security.rest.model.RoleResource;
 
 public class Nexus1434ImportSecurity125DisablePermissionTest
     extends AbstractImportSecurityTest
