@@ -83,7 +83,7 @@ public class Log4jLogConfiguration
 
         try
         {
-            config.load( inputStream );
+            config.load( inputStream, "# " + NEXUS_REMARK );
         }
         finally
         {

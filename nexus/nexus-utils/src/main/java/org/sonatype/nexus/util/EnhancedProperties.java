@@ -40,7 +40,7 @@ public class EnhancedProperties
 
     public static final String BLANK_LINE_KEY_PREFIX = "#BLANK_LINE";
 
-    public void load( InputStream inStream )
+    public void load( InputStream inStream, String... filters )
         throws IOException
     {
         BufferedReader reader = new BufferedReader( new InputStreamReader( inStream ) );
@@ -52,30 +52,51 @@ public class EnhancedProperties
 
         while ( ( line = reader.readLine() ) != null )
         {
+            boolean skip = false;
+
+            if ( filters != null && filters.length > 0 )
+            {
+                for ( String filter : filters )
+                {
+                    if ( filter.equals( line ) )
+                    {
+                        skip = true;
+                    }
+                }
+            }
+
+            if ( skip )
+            {
+                continue;
+            }
+
             if ( line.length() == 0 )
             {
                 put( BLANK_LINE_KEY_PREFIX + blankLineCount, "" );
 
                 blankLineCount++;
+
+                continue;
             }
-            else if ( line.startsWith( "#" ) )
+
+            if ( line.startsWith( "#" ) )
             {
                 put( COMMENT_KEY_PREFIX + commentCount, line );
 
                 commentCount++;
+
+                continue;
             }
-            else
+
+            int delimiterIndex = line.indexOf( "=" );
+
+            if ( delimiterIndex != -1 )
             {
-                int delimiterIndex = line.indexOf( "=" );
+                String key = line.substring( 0, delimiterIndex );
 
-                if ( delimiterIndex != -1 )
-                {
-                    String key = line.substring( 0, delimiterIndex );
+                String value = line.substring( delimiterIndex + 1 );
 
-                    String value = line.substring( delimiterIndex + 1 );
-
-                    put( key, value );
-                }
+                put( key, value );
             }
         }
     }
@@ -94,10 +115,8 @@ public class EnhancedProperties
         if ( StringUtils.isNotBlank( comment ) )
         {
             writer.write( "# " );
-            
+
             writer.write( comment );
-            
-            writer.newLine();
 
             writer.newLine();
         }
