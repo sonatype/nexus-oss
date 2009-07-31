@@ -58,6 +58,8 @@ public class DefaultApplicationConfigurationValidator
     implements ApplicationConfigurationValidator, Contextualizable
 {
     private Random rand = new Random( System.currentTimeMillis() );
+    
+    public static final String REPOSITORY_ID_PATTERN = "^[a-zA-Z0-9_\\-\\.]+$";
 
     private PlexusContainer plexusContainer;
 
@@ -244,6 +246,12 @@ public class DefaultApplicationConfigurationValidator
         if ( StringUtils.isEmpty( repo.getId() ) )
         {
             response.addValidationError( "Repository ID's may not be empty!" );
+        }
+        
+        if ( !repo.getId().matches( REPOSITORY_ID_PATTERN ) )
+        {
+            response
+                .addValidationError( "Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed in Repository ID" );
         }
 
         if ( StringUtils.isEmpty( repo.getName() ) )

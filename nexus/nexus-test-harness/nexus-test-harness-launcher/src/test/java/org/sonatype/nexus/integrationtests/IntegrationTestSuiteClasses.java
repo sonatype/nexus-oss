@@ -45,6 +45,7 @@ import org.sonatype.nexus.integrationtests.nexus168.Nexus168SnapshotToReleaseTes
 import org.sonatype.nexus.integrationtests.nexus169.Nexus169ReleaseMetaDataInSnapshotRepoTest;
 import org.sonatype.nexus.integrationtests.nexus1696.Nexus1696ValidateBaseUrl;
 import org.sonatype.nexus.integrationtests.nexus176.Nexus176DeployToInvalidRepoTest;
+import org.sonatype.nexus.integrationtests.nexus2327.Nexus2327RepositoryIdValidationTest;
 import org.sonatype.nexus.integrationtests.nexus233.Nexus233PrivilegesCrudXMLTests;
 import org.sonatype.nexus.integrationtests.nexus233.Nexus233PrivilegesValidationTests;
 import org.sonatype.nexus.integrationtests.nexus258.Nexus258ReleaseDeployTest;
@@ -212,7 +213,8 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1116.Nexus1116InvalidPr
     Nexus1329UnavailableTest.class,
     Nexus1696ValidateBaseUrl.class,
     Nexus1563ExternalRealmsTest.class,
-    Nexus383SearchTest.class
+    Nexus383SearchTest.class,
+    Nexus2327RepositoryIdValidationTest.class
 
     // not in suites: Nexus1719OOSRepoEvictUnusedTaskTest.class,
 } )
