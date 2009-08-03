@@ -1383,6 +1383,12 @@
           <required>true</required>
         </field>
         <field>
+          <name>alertEmail</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
           <name>schedule</name>
           <version>1.0.0+</version>
           <type>String</type>

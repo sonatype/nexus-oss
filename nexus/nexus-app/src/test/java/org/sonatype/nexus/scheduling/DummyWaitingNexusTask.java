@@ -105,6 +105,21 @@ public class DummyWaitingNexusTask
         return "A Dummy task, waits for some time";
     }
 
+    public boolean shouldSendAlertEmail()
+    {
+        return false;
+    }
+
+    public String getAlertEmail()
+    {
+        return null;
+    }
+
+    public void setAlertEmail( String email )
+    {
+        // do nothing
+    }
+
     public TaskActivityDescriptor getTaskActivityDescriptor()
     {
         return null;

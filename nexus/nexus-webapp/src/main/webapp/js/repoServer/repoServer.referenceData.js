@@ -167,6 +167,7 @@ Sonatype.repoServer.referenceData = {
       name : "",
       enabled : "",
       typeId : "",
+      alertEmail: "",
       schedule : "",
       properties : [{
         id: "",
@@ -178,6 +179,7 @@ Sonatype.repoServer.referenceData = {
       name : "",
       enabled : "",
       typeId : "",
+      alertEmail: "",
       schedule : "",
       properties : [{
         id: "",
@@ -191,6 +193,7 @@ Sonatype.repoServer.referenceData = {
       name : "",
       enabled : "",
       typeId : "",
+      alertEmail: "",
       schedule : "",
       properties : [{
         id: "",
@@ -204,6 +207,7 @@ Sonatype.repoServer.referenceData = {
       name : "",
       enabled : "",
       typeId : "",
+      alertEmail: "",
       schedule : "",
       properties : [{
         id: "",
@@ -217,6 +221,7 @@ Sonatype.repoServer.referenceData = {
       name : "",
       enabled : "",
       typeId : "",
+      alertEmail: "",
       schedule : "",
       properties : [{
         id: "",
@@ -231,6 +236,7 @@ Sonatype.repoServer.referenceData = {
       name : "",
       enabled : "",
       typeId : "",
+      alertEmail: "",
       schedule : "",
       properties : [{
         id: "",
@@ -245,6 +251,7 @@ Sonatype.repoServer.referenceData = {
       name : "",
       enabled : "",
       typeId : "",
+      alertEmail: "",
       schedule : "",
       properties : [{
         id: "",

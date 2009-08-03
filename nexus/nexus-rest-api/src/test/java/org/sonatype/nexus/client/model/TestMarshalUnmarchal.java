@@ -828,6 +828,7 @@ public class TestMarshalUnmarchal
         resource.setSchedule( "manual" );
         resource.setTypeId( "TypeId" );
         resource.setName( "Name" );
+        resource.setAlertEmail( "foo@bar.org" );
         resource.setEnabled( true );
 
         ScheduledServicePropertyResource prop1 = new ScheduledServicePropertyResource();
@@ -856,6 +857,7 @@ public class TestMarshalUnmarchal
         resource.setId( "Id" );
         resource.setSchedule( "once" );
         resource.setTypeId( "TypeId" );
+        resource.setAlertEmail( "foo@bar.org" );
         resource.setName( "Name" );
         resource.setEnabled( true );
 
@@ -883,6 +885,7 @@ public class TestMarshalUnmarchal
         resource.setId( "Id" );
         resource.setSchedule( "daily" );
         resource.setTypeId( "TypeId" );
+        resource.setAlertEmail( "foo@bar.org" );
         resource.setName( "Name" );
         resource.setEnabled( true );
         resource.setRecurringTime( "recurringTime" );
@@ -910,6 +913,7 @@ public class TestMarshalUnmarchal
         resource.setId( "Id" );
         resource.setSchedule( "advanced" );
         resource.setTypeId( "TypeId" );
+        resource.setAlertEmail( "foo@bar.org" );
         resource.setName( "Name" );
         resource.setEnabled( true );
         resource.setCronCommand( "cronCommand" );
@@ -937,6 +941,7 @@ public class TestMarshalUnmarchal
         resource.setId( "Id" );
         resource.setSchedule( "monthly" );
         resource.setTypeId( "TypeId" );
+        resource.setAlertEmail( "foo@bar.org" );
         resource.setName( "Name" );
         resource.setEnabled( true );
         resource.setRecurringTime( "recurringTime" );
@@ -966,6 +971,7 @@ public class TestMarshalUnmarchal
         resource.setId( "Id" );
         resource.setSchedule( "weekly" );
         resource.setTypeId( "TypeId" );
+        resource.setAlertEmail( "foo@bar.org" );
         resource.setName( "Name" );
         resource.setEnabled( true );
         resource.setRecurringTime( "recurringTime" );
@@ -1538,6 +1544,7 @@ public class TestMarshalUnmarchal
         scheduledTask.addRecurringDay( "friday" );
 
         scheduledTask.setTypeId( "org.sonatype.nexus.tasks.ReindexTask" );
+        scheduledTask.setAlertEmail( "foo@bar.org" );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setId( "repositoryOrGroupId" );

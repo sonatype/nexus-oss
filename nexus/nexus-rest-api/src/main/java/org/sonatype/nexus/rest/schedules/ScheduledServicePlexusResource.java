@@ -136,6 +136,8 @@ public class ScheduledServicePlexusResource
                     task.getTaskParams().put( prop.getId(), prop.getValue() );
                 }
 
+                setAlertEmail( task, resource.getAlertEmail() );
+
                 task.reset();
 
                 // Store the changes

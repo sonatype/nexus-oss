@@ -28,6 +28,7 @@ import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskExecutionException;
 import org.sonatype.scheduling.TaskState;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 public abstract class AbstractNexusTask<T>
     extends AbstractLogEnabled
@@ -40,6 +41,9 @@ public abstract class AbstractNexusTask<T>
     
     @Requirement
     private ErrorReportingManager errorManager;
+
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
 
     // DO NOT, EVER AGAIN ADD @REQ here, since you will introduce a cycle
     // Look below, nexus is looked up "lazily"
@@ -103,6 +107,38 @@ public abstract class AbstractNexusTask<T>
         return parameters;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public boolean shouldSendAlertEmail()
+    {
+        final String alertEmail = getAlertEmail();
+        return alertEmail != null && alertEmail.trim().length() > 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getAlertEmail()
+    {
+        return getParameter( ALERT_EMAIL_KEY );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setAlertEmail( final String email )
+    {
+        if( email == null || email.trim().length() == 0 )
+        {
+            getParameters().remove( ALERT_EMAIL_KEY );
+        }
+        else
+        {
+            addParameter( ALERT_EMAIL_KEY, email );
+        }
+    }
+
     public boolean allowConcurrentSubmission( Map<String, List<ScheduledTask<?>>> activeTasks )
     {
         // concurrent execution will stop us if needed, but user may freely submit
@@ -152,7 +188,10 @@ public abstract class AbstractNexusTask<T>
         catch ( Throwable e )
         {
             getNexus().systemProcessBroken( prc, e );
-            
+
+            // notify that there was a failure
+            applicationEventMulticaster.notifyEventListeners( new NexusTaskFailureEvent<T>( this, e) );
+
             if ( errorManager.isEnabled() )
             {
                 ErrorReportRequest request = new ErrorReportRequest();

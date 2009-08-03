@@ -172,6 +172,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     {name:'typeName'},
     {name:'typeId'},
     {name:'status'},
+    {name:'alertEmail'},
     {name:'schedule'},
     {name:'nextRunTime'},
     {name:'lastRunTime'},
@@ -326,6 +327,15 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         autoScroll: false,
         frame: false,
         items: []
+      },
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Alert Email',
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        helpText: ht.alertEmail,
+        name: 'alertEmail',
+        width: this.COMBO_WIDTH,
+        allowBlank:true
       },
       {
         xtype: 'combo',
@@ -1465,6 +1475,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               })).data.name,
           typeId : receivedData.resource.typeId,
           status : receivedData.status,
+          alertEmail : receivedData.resource.alertEmail,
           schedule : receivedData.resource.schedule,
           nextRunTime : receivedData.nextRunTime,
           lastRunTime : receivedData.lastRunTime,
@@ -1534,6 +1545,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               }
               return false;
             })).data.name);
+        rec.set('alertEmail', receivedData.resource.alertEmail);
         rec.set('schedule', receivedData.resource.schedule);
         rec.set('status', receivedData.status);
         rec.set('nextRunTime', receivedData.nextRunTime);
