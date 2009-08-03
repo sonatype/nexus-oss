@@ -79,6 +79,10 @@ public class DefaultScheduler
         throws StoppingException
     {
         getScheduledExecutorService().shutdown();
+        
+        getScheduledExecutorService().setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
+        
+        getScheduledExecutorService().setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
 
         try
         {
