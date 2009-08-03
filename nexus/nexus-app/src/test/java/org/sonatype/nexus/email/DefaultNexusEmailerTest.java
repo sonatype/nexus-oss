@@ -15,7 +15,6 @@ package org.sonatype.nexus.email;
 
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
-import org.sonatype.security.email.SecurityEmailer;
 
 public class DefaultNexusEmailerTest
     extends AbstractNexusTestCase
@@ -28,7 +27,7 @@ public class DefaultNexusEmailerTest
     {
         super.setUp();
         
-        emailer = ( DefaultNexusEmailer ) lookup( SecurityEmailer.class );
+        emailer = (DefaultNexusEmailer) lookup( NexusEmailer.class );
     }
     
     public void testConfigChanged()
