@@ -36,6 +36,8 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
     public void testCreatePermission()
         throws IOException
     {
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
+        
         RepositoryResource repo = new RepositoryResource();
         repo.setId( "testCreatePermission" );
         repo.setName( "testCreatePermission" );
@@ -46,7 +48,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         repo.setRepoPolicy( RepositoryPolicy.SNAPSHOT.name() );
         repo.setChecksumPolicy( "IGNORE" );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         Response response = this.repoUtil.sendMessage( Method.POST, repo );
@@ -56,10 +58,10 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give create
-        this.giveUserPrivilege( "test-user", "5" );
+        this.giveUserPrivilege( TEST_USER_NAME, "5" );
 
         // now.... it should work...
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.repoUtil.sendMessage( Method.POST, repo );
@@ -86,6 +88,8 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
     {
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
 
         RepositoryResource repo = new RepositoryResource();
         repo.setId( "testUpdatePermission" );
@@ -101,7 +105,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         repo = (RepositoryResource) this.repoUtil.getRepository( repo.getId() );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // update repo
@@ -113,9 +117,9 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give update
-        this.giveUserPrivilege( "test-user", "7" );
+        this.giveUserPrivilege( TEST_USER_NAME, "7" );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // should work now...
@@ -142,6 +146,8 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
     {
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
 
         RepositoryResource repo = new RepositoryResource();
         repo.setId( "testReadPermission" );
@@ -157,7 +163,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         repo = (RepositoryResource) this.repoUtil.getRepository( repo.getId() );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // update repo
@@ -169,9 +175,9 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give read
-        this.giveUserPrivilege( "test-user", "6" );
+        this.giveUserPrivilege( TEST_USER_NAME, "6" );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // read should fail
@@ -199,6 +205,8 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
     {
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
 
         RepositoryResource repo = new RepositoryResource();
         repo.setId( "testDeletePermission" );
@@ -214,7 +222,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         repo = (RepositoryResource) this.repoUtil.getRepository( repo.getId() );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // update repo
@@ -226,9 +234,9 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give delete
-        this.giveUserPrivilege( "test-user", "8" );
+        this.giveUserPrivilege( TEST_USER_NAME, "8" );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // read should succeed (inherited)
