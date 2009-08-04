@@ -66,7 +66,7 @@ public class TargetPrivilegePlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:privileges]" );
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[security:privileges]" );
     }
 
     @Override
