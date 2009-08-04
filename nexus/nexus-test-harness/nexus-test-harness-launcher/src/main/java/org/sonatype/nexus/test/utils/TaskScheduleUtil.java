@@ -31,6 +31,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.scheduling.TaskState;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -103,6 +104,44 @@ public class TaskScheduleUtil
         throws Exception
     {
         waitForTasks( 40 );
+    }
+    
+    public static void waitForAllTasksToStop()
+        throws Exception
+    {
+        waitForAllTasksToStop( 40 );
+    }
+    
+    public static void waitForAllTasksToStop( int maxAttempts )
+        throws Exception
+    {
+        long sleep = 1000;
+
+        Thread.sleep( 500 ); // give an time to task start
+
+        for ( int attempt = 0; attempt < maxAttempts; attempt++ )
+        {
+            Thread.sleep( sleep );
+
+            List<ScheduledServiceListResource> tasks = getTasks();
+            
+            boolean running = false;
+
+            for ( ScheduledServiceListResource task : tasks )
+            {
+                if ( task.getStatus().equals( TaskState.RUNNING.name() ) 
+                    || task.getStatus().equals( TaskState.SLEEPING.name() ) )
+                {
+                    running = true;
+                    break;
+                }
+            }
+            
+            if ( !running )
+            {
+                return;
+            }
+        }
     }
 
     public static void waitForTasks( int maxAttempts )

@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1923HostedIncrementalIndex
     extends AbstractNexus1923
@@ -25,6 +26,8 @@ public class Nexus1923HostedIncrementalIndex
         //First create our repository
         createHostedRepository();
         
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
         //Create the reindex task
         String reindexId = createHostedReindexTask();
         
@@ -37,8 +40,9 @@ public class Nexus1923HostedIncrementalIndex
         
         //Now make sure there is an index file, and no incremental files
         Assert.assertTrue( getHostedRepositoryIndex().exists() );
-        Assert.assertFalse( getHostedRepositoryIndexIncrement( "1" ).exists() );
-        validateCurrentHostedIncrementalCounter( 0 );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "1" ).exists() );
+        Assert.assertFalse( getHostedRepositoryIndexIncrement( "2" ).exists() );
+        validateCurrentHostedIncrementalCounter( 1 );
         
         //Now make sure that the search is properly working
         searchForArtifactInHostedIndex( FIRST_ARTIFACT, true );
@@ -57,8 +61,9 @@ public class Nexus1923HostedIncrementalIndex
         //Now make sure there is an index file, and 1 incremental file
         Assert.assertTrue( getHostedRepositoryIndex().exists() );
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "1" ).exists() );
-        Assert.assertFalse( getHostedRepositoryIndexIncrement( "2" ).exists() );
-        validateCurrentHostedIncrementalCounter( 1 );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "2" ).exists() );
+        Assert.assertFalse( getHostedRepositoryIndexIncrement( "3" ).exists() );
+        validateCurrentHostedIncrementalCounter( 2 );
         
         //Now make sure that the search is properly working
         searchForArtifactInHostedIndex( FIRST_ARTIFACT, true );
@@ -78,8 +83,9 @@ public class Nexus1923HostedIncrementalIndex
         Assert.assertTrue( getHostedRepositoryIndex().exists() );
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "1" ).exists() );
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "2" ).exists() );
-        Assert.assertFalse( getHostedRepositoryIndexIncrement( "3" ).exists() );
-        validateCurrentHostedIncrementalCounter( 2 );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "3" ).exists() );
+        Assert.assertFalse( getHostedRepositoryIndexIncrement( "4" ).exists() );
+        validateCurrentHostedIncrementalCounter( 3 );
         
         //Now make sure that the search is properly working
         searchForArtifactInHostedIndex( FIRST_ARTIFACT, true );
@@ -100,8 +106,9 @@ public class Nexus1923HostedIncrementalIndex
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "1" ).exists() );
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "2" ).exists() );
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "3" ).exists() );
-        Assert.assertFalse( getHostedRepositoryIndexIncrement( "4" ).exists() );
-        validateCurrentHostedIncrementalCounter( 3 );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "4" ).exists() );
+        Assert.assertFalse( getHostedRepositoryIndexIncrement( "5" ).exists() );
+        validateCurrentHostedIncrementalCounter( 4 );
         
         //Now make sure that the search is properly working
         searchForArtifactInHostedIndex( FIRST_ARTIFACT, true );
@@ -123,8 +130,9 @@ public class Nexus1923HostedIncrementalIndex
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "2" ).exists() );
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "3" ).exists() );
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "4" ).exists() );
-        Assert.assertFalse( getHostedRepositoryIndexIncrement( "5" ).exists() );
-        validateCurrentHostedIncrementalCounter( 4 );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "5" ).exists() );
+        Assert.assertFalse( getHostedRepositoryIndexIncrement( "6" ).exists() );
+        validateCurrentHostedIncrementalCounter( 5 );
         
         //Now make sure that the search is properly working
         searchForArtifactInHostedIndex( FIRST_ARTIFACT, true );
@@ -142,8 +150,9 @@ public class Nexus1923HostedIncrementalIndex
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "2" ).exists() );
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "3" ).exists() );
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "4" ).exists() );
-        Assert.assertFalse( getHostedRepositoryIndexIncrement( "5" ).exists() );
-        validateCurrentHostedIncrementalCounter( 4 );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "5" ).exists() );
+        Assert.assertFalse( getHostedRepositoryIndexIncrement( "6" ).exists() );
+        validateCurrentHostedIncrementalCounter( 5 );
         
         //Now make sure that the search is properly working
         searchForArtifactInHostedIndex( FIRST_ARTIFACT, true );
@@ -169,8 +178,9 @@ public class Nexus1923HostedIncrementalIndex
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "3" ).exists() );
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "4" ).exists() );
         Assert.assertTrue( getHostedRepositoryIndexIncrement( "5" ).exists() );
-        Assert.assertFalse( getHostedRepositoryIndexIncrement( "6" ).exists() );
-        validateCurrentHostedIncrementalCounter( 5 );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "6" ).exists() );
+        Assert.assertFalse( getHostedRepositoryIndexIncrement( "7" ).exists() );
+        validateCurrentHostedIncrementalCounter( 6 );
         
         //Now make sure that the search is properly working
         searchForArtifactInHostedIndex( FIRST_ARTIFACT, true );

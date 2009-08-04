@@ -8,6 +8,7 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1923GroupIncrementalIndex
     extends AbstractNexus1923
@@ -27,6 +28,8 @@ public class Nexus1923GroupIncrementalIndex
         createThirdHostedRepository();
 
         createGroup( GROUP_ID, HOSTED_REPO_ID, SECOND_HOSTED_REPO_ID, THIRD_HOSTED_REPO_ID );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         String reindexId = createReindexTask( GROUP_ID, GROUP_REINDEX_TASK_NAME );
 
@@ -52,8 +55,9 @@ public class Nexus1923GroupIncrementalIndex
         // Group doesnt create index on creation, so reindex is first pass at creating, thus no
         // incremental piece
         Assert.assertTrue( getGroupIndex().exists() );
-        Assert.assertFalse( getGroupIndexIncrement( "1" ).exists() );
-        validateCurrentGroupIncrementalCounter( 0 );
+        Assert.assertTrue( getGroupIndexIncrement( "1" ).exists() );
+        Assert.assertFalse( getGroupIndexIncrement( "2" ).exists() );
+        validateCurrentGroupIncrementalCounter( 1 );
 
         searchFor( HOSTED_REPO_ID, FIRST_ARTIFACT );
 
@@ -73,12 +77,18 @@ public class Nexus1923GroupIncrementalIndex
         Assert.assertTrue( getSecondHostedRepositoryIndexIncrement( "1" ).exists() );
         Assert.assertFalse( getSecondHostedRepositoryIndexIncrement( "2" ).exists() );
         validateCurrentSecondHostedIncrementalCounter( 1 );
+        
+        // shouldn't change from first status
+        Assert.assertTrue( getThirdHostedRepositoryIndex().exists() );
+        Assert.assertFalse( getThirdHostedRepositoryIndexIncrement( "1" ).exists() );
+        validateCurrentThirdHostedIncrementalCounter( 0 );
 
         // group create index .1
         Assert.assertTrue( getGroupIndex().exists() );
         Assert.assertTrue( getGroupIndexIncrement( "1" ).exists() );
-        Assert.assertFalse( getGroupIndexIncrement( "2" ).exists() );
-        validateCurrentGroupIncrementalCounter( 1 );
+        Assert.assertTrue( getGroupIndexIncrement( "2" ).exists() );
+        Assert.assertFalse( getGroupIndexIncrement( "3" ).exists() );
+        validateCurrentGroupIncrementalCounter( 2 );
 
         searchFor( HOSTED_REPO_ID, FIRST_ARTIFACT );
         searchFor( SECOND_HOSTED_REPO_ID, SECOND_ARTIFACT );
@@ -109,8 +119,9 @@ public class Nexus1923GroupIncrementalIndex
         Assert.assertTrue( getGroupIndex().exists() );
         Assert.assertTrue( getGroupIndexIncrement( "1" ).exists() );
         Assert.assertTrue( getGroupIndexIncrement( "2" ).exists() );
-        Assert.assertFalse( getGroupIndexIncrement( "3" ).exists() );
-        validateCurrentGroupIncrementalCounter( 2 );
+        Assert.assertTrue( getGroupIndexIncrement( "3" ).exists() );
+        Assert.assertFalse( getGroupIndexIncrement( "4" ).exists() );
+        validateCurrentGroupIncrementalCounter( 3 );
 
         searchFor( HOSTED_REPO_ID, FIRST_ARTIFACT );
         searchFor( SECOND_HOSTED_REPO_ID, SECOND_ARTIFACT );
@@ -144,8 +155,9 @@ public class Nexus1923GroupIncrementalIndex
         Assert.assertTrue( getGroupIndexIncrement( "1" ).exists() );
         Assert.assertTrue( getGroupIndexIncrement( "2" ).exists() );
         Assert.assertTrue( getGroupIndexIncrement( "3" ).exists() );
-        Assert.assertFalse( getGroupIndexIncrement( "4" ).exists() );
-        validateCurrentGroupIncrementalCounter( 3 );
+        Assert.assertTrue( getGroupIndexIncrement( "4" ).exists() );
+        Assert.assertFalse( getGroupIndexIncrement( "5" ).exists() );
+        validateCurrentGroupIncrementalCounter( 4 );
 
         searchFor( HOSTED_REPO_ID, FIRST_ARTIFACT, FOURTH_ARTIFACT );
         searchFor( SECOND_HOSTED_REPO_ID, SECOND_ARTIFACT );

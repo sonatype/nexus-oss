@@ -27,16 +27,35 @@ public class Nexus1923ProxyIncrementalIndex
         createHostedRepository();
         //And hosted repository task
         String hostedReindexId = createHostedReindexTask();
-        //index hosted repo
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
         FileUtils.copyDirectoryStructure( getTestFile( FIRST_ARTIFACT ), 
             hostedRepoStorageDirectory );
+        
         reindexHostedRepository( hostedReindexId );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        //validate that after reindex is done we have an incremental chunk in the hosted repo
+        Assert.assertTrue( getHostedRepositoryIndex().exists() );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "1" ).exists() );
+        Assert.assertFalse( getHostedRepositoryIndexIncrement( "2" ).exists() );
         
         //Now create our proxy repository
         createProxyRepository();
         
         //will download the initial index because repo has download remote set to true
-        TaskScheduleUtil.waitForTasks();
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        String proxyReindexId = createProxyReindexTask();
+        
+        reindexProxyRepository( proxyReindexId );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        Assert.assertTrue( getProxyRepositoryIndex().exists() );
+        Assert.assertFalse( getProxyRepositoryIndexIncrement( "1" ).exists() );
         
         //Now make sure that the search is properly working
         searchForArtifactInProxyIndex( FIRST_ARTIFACT, true );
@@ -50,9 +69,18 @@ public class Nexus1923ProxyIncrementalIndex
             hostedRepoStorageDirectory );
         reindexHostedRepository( hostedReindexId );
         
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        //validate that after reindex is done we have an incremental chunk in the hosted repo
+        Assert.assertTrue( getHostedRepositoryIndex().exists() );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "1" ).exists() );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "2" ).exists() );
+        Assert.assertFalse( getHostedRepositoryIndexIncrement( "3" ).exists() );
+        
         //now download via the proxy repo
-        String proxyReindexId = createProxyReindexTask();
         reindexProxyRepository( proxyReindexId );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
         
         //validate that after reindex is done we have an incremental chunk of our own in the proxy repo
         Assert.assertTrue( getProxyRepositoryIndex().exists() );
@@ -71,11 +99,32 @@ public class Nexus1923ProxyIncrementalIndex
             hostedRepoStorageDirectory );
         reindexHostedRepository( hostedReindexId );
         
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        //validate that after reindex is done we have an incremental chunk in the hosted repo
+        Assert.assertTrue( getHostedRepositoryIndex().exists() );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "1" ).exists() );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "2" ).exists() );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "3" ).exists() );
+        Assert.assertFalse( getHostedRepositoryIndexIncrement( "4" ).exists() );
+        
         FileUtils.copyDirectoryStructure( getTestFile( FOURTH_ARTIFACT ), 
             hostedRepoStorageDirectory );
         reindexHostedRepository( hostedReindexId );
         
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        //validate that after reindex is done we have an incremental chunk in the hosted repo
+        Assert.assertTrue( getHostedRepositoryIndex().exists() );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "1" ).exists() );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "2" ).exists() );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "3" ).exists() );
+        Assert.assertTrue( getHostedRepositoryIndexIncrement( "4" ).exists() );
+        Assert.assertFalse( getHostedRepositoryIndexIncrement( "5" ).exists() );
+        
         reindexProxyRepository( proxyReindexId );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
         
         //validate that after reindex is done we have an incremental chunk of our own in the proxy repo
         //of course only 2 indexes, as these published indexes should NOT line up 1 to 1 with the hosted repo

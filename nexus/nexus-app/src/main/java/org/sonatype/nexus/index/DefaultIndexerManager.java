@@ -322,7 +322,7 @@ public class DefaultIndexerManager
         try
         {
             IndexingContext localContext = getRepositoryLocalIndexContext( repository );
-            IndexingContext remoteContext = getRepositoryLocalIndexContext( repository );
+            IndexingContext remoteContext = getRepositoryRemoteIndexContext( repository );
 
             IndexingContext mergedContext = getTempContext( localContext );
             mergedContext.merge( localContext.getIndexDirectory() );
@@ -559,7 +559,10 @@ public class DefaultIndexerManager
         {
             repository.setIndexable( false );
 
-            purgeCurrentIndex( repository );
+            if ( fullReindex )
+            {
+                purgeCurrentIndex( repository );
+            }
 
             IndexingContext context = getRepositoryLocalIndexContext( repository );
 
@@ -1102,7 +1105,7 @@ public class DefaultIndexerManager
 
             req.setRequestLocalOnly( true );
 
-            StorageFileItem item = (StorageFileItem) repository.retrieveItem( false, req );
+            StorageFileItem item = (StorageFileItem) repository.retrieveItem( true, req );
 
             // Hack to make sure that group properties isn't retrieved from child repo
             if ( repository.getId().equals( item.getRepositoryId() ) )

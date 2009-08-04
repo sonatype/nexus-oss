@@ -44,7 +44,7 @@ extends AbstractNexus1923
         createProxyRepository();
 
         //will download the initial index because repo has download remote set to true
-        TaskScheduleUtil.waitForTasks();
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         //Now make sure that the search is properly working
         searchForArtifactInProxyIndex( FIRST_ARTIFACT, true );

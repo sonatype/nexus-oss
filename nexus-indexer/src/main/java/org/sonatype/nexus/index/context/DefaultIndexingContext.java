@@ -547,7 +547,7 @@ public class DefaultIndexingContext
 
                         if ( hits.length() == 0 )
                         {
-                            w.addDocument( IndexUtils.updateDocument( d, this ) );
+                            w.addDocument( IndexUtils.updateDocument( d, this, false ) );
                         }
                     }
                     else
@@ -556,7 +556,11 @@ public class DefaultIndexingContext
 
                         if ( deleted != null )
                         {
+                            //Deleting the document loses history that it was delete, 
+                            //so incrementals wont work.  Therefore, put the delete 
+                            //document in as well
                             w.deleteDocuments( new Term( ArtifactInfo.UINFO, deleted ) );
+                            w.addDocument( d );
                         }
                     }
                 }

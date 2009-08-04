@@ -89,8 +89,7 @@ public class DefaultIndexUpdater
         {
             Date contextTimestamp = context.getTimestamp();
 
-            if ( contextTimestamp != null 
-                && !updateRequest.isForceFullUpdate() )
+            if ( !updateRequest.isForceFullUpdate() )
             {
                 Properties localProperties = loadLocallyStoredRemoteProperties( context );
                 
@@ -123,7 +122,9 @@ public class DefaultIndexUpdater
                 
                 // if incremental cant be done for whatever reason, simply use old logic of 
                 // checking the timestamp, if the same, nothing to do
-                if ( updateTimestamp != null && !updateTimestamp.after( contextTimestamp ) )
+                if ( updateTimestamp != null 
+                    && contextTimestamp != null 
+                    && !updateTimestamp.after( contextTimestamp ) )
                 {
                     return null; // index is up to date
                 }

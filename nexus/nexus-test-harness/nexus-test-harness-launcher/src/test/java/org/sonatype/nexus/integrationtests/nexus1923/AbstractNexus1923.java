@@ -87,10 +87,11 @@ public abstract class AbstractNexus1923
 
         resource.setProvider( "maven2" );
         resource.setFormat( "maven2" );
-        resource.setRepoPolicy( "release" );
-        resource.setChecksumPolicy( "ignore" );
+        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+        resource.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );
         resource.setBrowseable( true );
         resource.setIndexable( true );
+        resource.setExposed( true );
 
         return resource;
     }
@@ -104,6 +105,9 @@ public abstract class AbstractNexus1923
         resource.setRepoType( "hosted" );
         resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+        resource.setNotFoundCacheTTL( 1440 );
+        resource.setDownloadRemoteIndexes( false );
+        
         repoUtils.createRepository( resource );
     }
 
@@ -154,6 +158,8 @@ public abstract class AbstractNexus1923
         group.setId( groupId );
         group.setName( groupId );
         group.setFormat( "maven2" );
+        group.setExposed( true );
+        group.setProvider( "maven2" );
 
         for ( String repoId : repoIds )
         {
