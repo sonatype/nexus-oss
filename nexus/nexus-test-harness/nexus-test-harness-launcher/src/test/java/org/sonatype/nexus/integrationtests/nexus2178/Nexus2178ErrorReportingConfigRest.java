@@ -4,6 +4,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
@@ -33,7 +34,7 @@ public class Nexus2178ErrorReportingConfigRest
         
         Assert.assertNotNull( "Error reporting should not be null", resource.getErrorReportingSettings() );
         Assert.assertEquals( "someusername", resource.getErrorReportingSettings().getJiraUsername() );
-        Assert.assertEquals( "somepassword", resource.getErrorReportingSettings().getJiraPassword() );
+        Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER, resource.getErrorReportingSettings().getJiraPassword() );
         
         // Clear them again
         resource.setErrorReportingSettings( null );
