@@ -57,12 +57,13 @@
           <argLine>-Xmx512M</argLine>
           <skip>false</skip>
           <forkMode>always</forkMode>
-          <!--<includes>
-            <include>**/IntegrationTestSuite.java</include>
-          </includes>-->
+          <includes>
+            <include>**/Nexus*.java</include>
+          </includes>
           <excludes>
             <exclude>**Suite*</exclude>
             <exclude>**/org/sonatype/nexus/integrationtests/client/nexus758/Nexus758ServiceStabilityTest.java</exclude>
+            <exclude>**/org/sonatype/nexus/integrationtests/client/nexus758/Nexus758StatusService.java</exclude>
           </excludes>
         </configuration>
       </plugin>
