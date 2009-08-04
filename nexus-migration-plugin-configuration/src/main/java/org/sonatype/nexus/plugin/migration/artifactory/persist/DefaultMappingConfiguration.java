@@ -44,6 +44,8 @@ public class DefaultMappingConfiguration
 
     private Configuration configuration;
 
+    private long lastModified;
+
     public void addMapping( CMapping map )
         throws IOException
     {
@@ -107,7 +109,7 @@ public class DefaultMappingConfiguration
 
     private Configuration getConfiguration()
     {
-        if ( this.configuration != null )
+        if ( this.configuration != null && lastModified == configurationFile.lastModified() )
         {
             return this.configuration;
         }
@@ -118,6 +120,7 @@ public class DefaultMappingConfiguration
         FileLock fileLock = null;
         try
         {
+            lastModified = configurationFile.lastModified();
 
             in = new FileInputStream( configurationFile );
             channel = in.getChannel();

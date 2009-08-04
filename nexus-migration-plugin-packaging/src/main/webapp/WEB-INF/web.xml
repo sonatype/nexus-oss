@@ -12,6 +12,10 @@
 
     <display-name>Nexus/Artifactory Bridge</display-name>
 
+    <listener>
+      <listener-class>org.sonatype.nexus.web.LogConfigListener</listener-class>
+    </listener>
+
     <!--
     <servlet>
         <servlet-name>artifactory</servlet-name>
@@ -45,7 +49,7 @@
         </init-param>
         <init-param>
             <param-name>plexus.discoverResources</param-name>
-            <param-value>true</param-value>
+            <param-value>false</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

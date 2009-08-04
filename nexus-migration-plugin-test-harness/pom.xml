@@ -31,9 +31,10 @@
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>${project.groupId}</groupId>
-              <artifactId>nexus-migration-plugin-artifactory</artifactId>
-              <classifier>bundle</classifier>
+              <artifactId>nexus-migration-plugin-packaging</artifactId>
+              <classifier>webapp</classifier>
               <type>zip</type>
+              <outputProperty>nexus-base-dir</outputProperty>
             </plugin>
           </nexusPluginsArtifacts>
           <extraResourcesArtifacts>
@@ -90,10 +91,10 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-migration-plugin-artifactory</artifactId>
+      <artifactId>nexus-migration-plugin-packaging</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
-      <classifier>bundle</classifier>
+      <classifier>webapp</classifier>
     </dependency>
 
     <dependency>

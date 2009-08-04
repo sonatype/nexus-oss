@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
@@ -72,15 +73,14 @@ public abstract class AbstractImportArtifactoryTest
     private void checkIndexes()
         throws Exception
     {
-        checkIndex( "nxcm254", "ext-releases", "1.0" );
-        checkIndex( "nxcm254", "ext-snapshots", "1.0-SNAPSHOT" );
-        checkIndex( "nxcm254", "libs-releases", "1.0" );
-        checkIndex( "nxcm254", "libs-snapshots", "1.0-SNAPSHOT" );
-        checkIndex( "nxcm254", "plugins-releases", "1.0" );
-        checkIndex( "nxcm254", "plugins-snapshots", "1.0-SNAPSHOT" );
+        checkIndex( "ext-releases", "nxcm254", "ext-releases", "1.0" );
+        checkIndex( "ext-snapshots", "nxcm254", "ext-snapshots", "1.0-SNAPSHOT" );
+        checkIndex( "libs-releases", "nxcm254", "libs-releases", "1.0" );
+        checkIndex( "libs-snapshots", "nxcm254", "libs-snapshots", "1.0-SNAPSHOT" );
+        checkIndex( "plugins-releases", "nxcm254", "plugins-releases", "1.0" );
+        checkIndex( "plugins-snapshots", "nxcm254", "plugins-snapshots", "1.0-SNAPSHOT" );
     }
 
-    @SuppressWarnings( "unchecked" )
     private void checkVirtualRepo()
         throws IOException
     {
@@ -109,7 +109,7 @@ public abstract class AbstractImportArtifactoryTest
         RepositoryProxyResource repo1 = (RepositoryProxyResource) this.repositoryUtil.getRepository( "repo1" );
         Assert.assertNotNull( repo1 );
         Assert.assertEquals( "proxy", repo1.getRepoType() );
-        Assert.assertEquals( "release", repo1.getRepoPolicy() );
+        Assert.assertEquals( RepositoryPolicy.RELEASE.name(), repo1.getRepoPolicy() );
         Assert.assertEquals( "http://repo1.maven.org/maven2", repo1.getRemoteStorage().getRemoteStorageUrl() );
     }
 
@@ -119,7 +119,7 @@ public abstract class AbstractImportArtifactoryTest
         RepositoryResource libsReleases = (RepositoryResource) this.repositoryUtil.getRepository( "libs-releases" );
         Assert.assertNotNull( libsReleases );
         Assert.assertEquals( "hosted", libsReleases.getRepoType() );
-        Assert.assertEquals( "release", libsReleases.getRepoPolicy() );
+        Assert.assertEquals( RepositoryPolicy.RELEASE.name(), libsReleases.getRepoPolicy() );
         Assert.assertEquals( "Local repository for in-house libraries", libsReleases.getName() );
     }
 

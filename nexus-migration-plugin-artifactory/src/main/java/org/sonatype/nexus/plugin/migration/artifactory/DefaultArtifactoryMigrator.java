@@ -428,6 +428,7 @@ public class DefaultArtifactoryMigrator
         group.setProviderRole( GroupRepository.class.getName() );
         group.setProviderHint( repoType );
 
+        group.setUserManaged( true );
         group.setExposed( true );
         group.setLocalStatus( LocalStatus.IN_SERVICE.name() );
 
@@ -511,7 +512,7 @@ public class DefaultArtifactoryMigrator
 
         result.addInfoMessage( "Creating repository " + repoId );
 
-        CRepository nexusRepo = new CRepository();
+        CRepository nexusRepo = new DefaultCRepository();
 
         Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
 
@@ -528,6 +529,7 @@ public class DefaultArtifactoryMigrator
         }
         nexusRepo.setProviderHint( hint );
 
+        nexusRepo.setUserManaged( true );
         nexusRepo.setExposed( true );
         nexusRepo.setAllowWrite( true );
         nexusRepo.setBrowseable( true );
@@ -759,6 +761,7 @@ public class DefaultArtifactoryMigrator
         shadowRepo.setName( shadowId );
 
         shadowRepo.setExposed( true );
+        shadowRepo.setUserManaged( true );
 
         shadowRepo.setProviderRole( ShadowRepository.class.getName() );
 

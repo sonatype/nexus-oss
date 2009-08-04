@@ -44,8 +44,8 @@ public class Nexus1439ImportMixedRepositoriesTest
         TaskScheduleUtil.waitForTasks( 40 );
         Thread.sleep( 2000 );
 
-        checkIndex( "nxcm259", "released", "1.0" );
-        checkIndex( "nxcm259", "snapshot", "1.0-SNAPSHOT" );
+        checkIndex( "main-local", "nxcm259", "released", "1.0" );
+        checkIndex( "main-local", "nxcm259", "snapshot", "1.0-SNAPSHOT" );
 
         checkArtifact( "main-local-releases", "nxcm259", "released", "1.0" );
         checkArtifact( "main-local-snapshots", "nxcm259", "snapshot", "1.0-SNAPSHOT" );
@@ -57,7 +57,6 @@ public class Nexus1439ImportMixedRepositoriesTest
         checkArtifactOnGroup( "main-local", "nxcm259", "snapshot", "1.0-SNAPSHOT" );
     }
 
-    @SuppressWarnings( "unchecked" )
     private void checkGroupContent()
         throws IOException
     {

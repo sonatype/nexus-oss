@@ -152,10 +152,10 @@ public abstract class AbstractMigrationIntegrationTest
         checkArtifact( nexusGroupId, groupId, artifactId, version, true );
     }
 
-    protected void checkIndex( String groupId, String artifactId, String version )
+    protected void checkIndex(String repoId, String groupId, String artifactId, String version )
         throws Exception
     {
-        List<NexusArtifact> artifacts = searchUtil.searchFor( groupId, artifactId, version );
+        List<NexusArtifact> artifacts = SearchMessageUtil.searchFor( groupId, artifactId, version, repoId );
         Assert.assertEquals( "Expected to found only one artifact (" + artifactId + ") instead of " + artifacts.size()
             + "\n" + this.getXMLXStream().toXML( artifacts ), 1, artifacts.size() );
     }
