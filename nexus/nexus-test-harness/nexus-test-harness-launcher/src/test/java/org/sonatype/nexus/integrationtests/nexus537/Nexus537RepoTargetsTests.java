@@ -138,15 +138,24 @@ public class Nexus537RepoTargetsTests
         throws Exception
     {
         this.overwriteUserRole( TEST_USER_NAME, "doReadTest-noAccess", "17" );
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
         // "6", "14","19","44","54","55","57","58","64","70"
         this.printUserPrivs( TEST_USER_NAME );
-
+    }
+    
+    @Override
+    protected void overwriteUserRole( String userId, String newRoleName, String... permissions )
+        throws Exception
+    {
+        super.overwriteUserRole( userId, newRoleName, permissions );
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
     }
 
     @Test
     public void doReadTest()
         throws Exception
     {
+        
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
@@ -200,8 +209,7 @@ public class Nexus537RepoTargetsTests
     @Test
     public void doCreateRepoTargetTest()
         throws Exception
-    {
-
+    {        
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
@@ -249,7 +257,7 @@ public class Nexus537RepoTargetsTests
     @Test
     public void artifactUplaodTest()
         throws Exception
-    {
+    {        
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
@@ -299,8 +307,7 @@ public class Nexus537RepoTargetsTests
     @Test
     public void doDeleteTest()
         throws Exception
-    {
-
+    {        
         // deploy the artifacts first, we need to use different once because i have no idea how to order the tests with
         // JUnit
         DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1BarArtifactDelete,
@@ -332,7 +339,7 @@ public class Nexus537RepoTargetsTests
         this.delete( repo2FooArtifactDelete, REPO2_ID, false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "fooPrivDeleteId", this.barPrivDeleteId );
+        this.overwriteUserRole( TEST_USER_NAME, "barPrivDeleteId", this.barPrivDeleteId );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -341,6 +348,31 @@ public class Nexus537RepoTargetsTests
         this.delete( repo1FooArtifactDelete, REPO1_ID, false );
         this.delete( repo2BarArtifactDelete, REPO2_ID, false );
         this.delete( repo2FooArtifactDelete, REPO2_ID, false );
+        
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
+        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1BarArtifactDelete,
+            this.getTestFile( "repo1-bar-artifact.jar" ) );
+        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1FooArtifactDelete,
+                    this.getTestFile( "repo1-foo-artifact.jar" ) );
+        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2BarArtifactDelete,
+                    this.getTestFile( "repo2-bar-artifact.jar" ) );
+        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2FooArtifactDelete,
+                    this.getTestFile( "repo2-foo-artifact.jar" ) );
+        
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+        
+        // now give
+        this.overwriteUserRole( TEST_USER_NAME, "groupFooPrivDeleteId", this.groupFooPrivDeleteId );
+
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+
+        this.delete( repo1BarArtifactDelete, REPO1_ID, false );
+        this.delete( repo1FooArtifactDelete, REPO1_ID, true );
+        this.delete( repo2BarArtifactDelete, REPO2_ID, false );
+        this.delete( repo2FooArtifactDelete, REPO2_ID, true );
 
     }
 
