@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.Map;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
@@ -32,7 +33,7 @@ public interface ProxyRepository
     /**
      * Gets remote status.
      */
-    RemoteStatus getRemoteStatus( boolean forceCheck );
+    RemoteStatus getRemoteStatus( ResourceStoreRequest request, boolean forceCheck );
 
     /**
      * Gets proxy mode.

@@ -26,6 +26,8 @@ import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -92,7 +94,9 @@ public abstract class AbstractRepositoryPlexusResource
 
         boolean forceCheck = form.getFirst( "forceCheck" ) != null;
 
-        RemoteStatus rs = repository.getRemoteStatus( forceCheck );
+        RemoteStatus rs = repository.getRemoteStatus(
+            new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ),
+            forceCheck );
 
         if ( RemoteStatus.UNKNOWN.equals( rs ) )
         {

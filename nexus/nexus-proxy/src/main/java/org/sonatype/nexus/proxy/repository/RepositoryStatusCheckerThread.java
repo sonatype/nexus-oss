@@ -13,6 +13,9 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+
 public class RepositoryStatusCheckerThread
     extends Thread
 {
@@ -40,7 +43,8 @@ public class RepositoryStatusCheckerThread
                 {
                     if ( getRepository().getLocalStatus().shouldServiceRequest() )
                     {
-                        getRepository().getRemoteStatus( false );
+                        getRepository()
+                            .getRemoteStatus( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), false );
                     }
                 }
                 else if ( RepositoryStatusCheckMode.AUTO_BLOCKED_ONLY.equals( getRepository()
@@ -48,7 +52,8 @@ public class RepositoryStatusCheckerThread
                 {
                     if ( getRepository().getProxyMode().shouldAutoUnblock() )
                     {
-                        getRepository().getRemoteStatus( false );
+                        getRepository()
+                            .getRemoteStatus( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), false );
                     }
                 }
                 else if ( RepositoryStatusCheckMode.NEVER.equals( getRepository().getRepositoryStatusCheckMode() ) )

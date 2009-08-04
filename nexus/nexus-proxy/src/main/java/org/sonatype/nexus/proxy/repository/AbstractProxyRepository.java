@@ -235,23 +235,23 @@ public abstract class AbstractProxyRepository
         remoteStatusUpdated = 0;
     }
 
-    protected boolean isRemoteStorageReachable()
-        throws StorageException, RemoteAuthenticationNeededException, RemoteAccessDeniedException
+    protected boolean isRemoteStorageReachable( ResourceStoreRequest request )
+        throws StorageException,
+            RemoteAuthenticationNeededException,
+            RemoteAccessDeniedException
     {
         try
         {
-            // TODO: include context? from where?
-            return getRemoteStorage().isReachable( this, null );
+            return getRemoteStorage().isReachable( this, request );
         }
         catch ( RemoteAccessException ex )
         {
-            getLogger()
-                .warn(
-                       "RemoteStorage of repository "
-                           + getId()
-                           + " throws RemoteAccessException. Please set up authorization information for repository ID='"
-                           + this.getId()
-                           + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.", ex );
+            getLogger().warn(
+                "RemoteStorage of repository " + getId()
+                    + " throws RemoteAccessException. Please set up authorization information for repository ID='"
+                    + this.getId()
+                    + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
+                ex );
 
             autoBlockProxying( ex );
 
@@ -262,7 +262,7 @@ public abstract class AbstractProxyRepository
     /** Is checking in progress? */
     private volatile boolean _remoteStatusChecking = false;
 
-    public RemoteStatus getRemoteStatus( boolean forceCheck )
+    public RemoteStatus getRemoteStatus( ResourceStoreRequest request, boolean forceCheck )
     {
         // if the last known status is old, simply reset it
         if ( forceCheck || System.currentTimeMillis() - remoteStatusUpdated > REMOTE_STATUS_RETAIN_TIME )
@@ -276,37 +276,7 @@ public abstract class AbstractProxyRepository
             // check for thread and go check it
             _remoteStatusChecking = true;
 
-            exec.submit( new Callable<Object>()
-            {
-                public Object call()
-                    throws Exception
-                {
-                    try
-                    {
-                        try
-                        {
-                            if ( isRemoteStorageReachable() )
-                            {
-                                setRemoteStatus( RemoteStatus.AVAILABLE, null );
-                            }
-                            else
-                            {
-                                setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( "/" ) );
-                            }
-                        }
-                        catch ( StorageException e )
-                        {
-                            setRemoteStatus( RemoteStatus.UNAVAILABLE, e );
-                        }
-                    }
-                    finally
-                    {
-                        _remoteStatusChecking = false;
-                    }
-
-                    return null;
-                }
-            } );
+            exec.submit( new RemoteStatusUpdateCallable( request ) );
         }
         else if ( getProxyMode() != null && !getProxyMode().shouldCheckRemoteStatus()
             && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !_remoteStatusChecking )
@@ -1005,5 +975,46 @@ public abstract class AbstractProxyRepository
             return ( ( System.currentTimeMillis() - item.getRemoteChecked() ) > ( maxAge * 60L * 1000L ) );
         }
     }
+
+    private class RemoteStatusUpdateCallable
+        implements Callable<Object>
+    {
+        private ResourceStoreRequest request;
+
+        public RemoteStatusUpdateCallable( ResourceStoreRequest request )
+        {
+            this.request = request;
+        }
+
+        public Object call()
+            throws Exception
+        {
+            try
+            {
+                try
+                {
+                    if ( isRemoteStorageReachable( request ) )
+                    {
+                        setRemoteStatus( RemoteStatus.AVAILABLE, null );
+                    }
+                    else
+                    {
+                        setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( "/" ) );
+                    }
+                }
+                catch ( StorageException e )
+                {
+                    setRemoteStatus( RemoteStatus.UNAVAILABLE, e );
+                }
+            }
+            finally
+            {
+                _remoteStatusChecking = false;
+            }
+
+            return null;
+        }
+    }
+
 
 }

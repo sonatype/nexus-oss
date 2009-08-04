@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
@@ -117,8 +118,8 @@ public class SimpleRemoteLeakTest
 
         while ( RemoteStatus.UNKNOWN.equals( rs1 ) || RemoteStatus.UNKNOWN.equals( rs2 ) )
         {
-            rs1 = repo1.getRemoteStatus( false );
-            rs2 = repo2.getRemoteStatus( false );
+            rs1 = repo1.getRemoteStatus(new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), false );
+            rs2 = repo2.getRemoteStatus(new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), false );
 
             Thread.sleep( 1000 );
         }
