@@ -36,6 +36,8 @@ public class Nexus532GroupCrudPermissionTests
     public void testCreatePermission()
         throws IOException
     {
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
+        
         RepositoryGroupResource group = new RepositoryGroupResource();
         group.setId( "testCreatePermission" );
         group.setName( "testCreatePermission" );
@@ -84,8 +86,9 @@ public class Nexus532GroupCrudPermissionTests
     public void testUpdatePermission()
         throws IOException
     {
-
         TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
 
         RepositoryGroupResource group = new RepositoryGroupResource();
         group.setId( "testUpdatePermission" );
@@ -140,8 +143,9 @@ public class Nexus532GroupCrudPermissionTests
     public void testReadPermission()
         throws IOException
     {
-
         TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
 
         RepositoryGroupResource group = new RepositoryGroupResource();
         group.setId( "testReadPermission" );
@@ -196,8 +200,9 @@ public class Nexus532GroupCrudPermissionTests
     public void testDeletePermission()
         throws IOException
     {
-
         TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
 
         RepositoryGroupResource group = new RepositoryGroupResource();
         group.setId( "testDeletePermission" );
