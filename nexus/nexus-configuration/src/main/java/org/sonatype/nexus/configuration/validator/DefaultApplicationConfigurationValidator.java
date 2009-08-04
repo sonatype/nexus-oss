@@ -247,92 +247,94 @@ public class DefaultApplicationConfigurationValidator
         {
             response.addValidationError( "Repository ID's may not be empty!" );
         }
-        
-        if ( !repo.getId().matches( REPOSITORY_ID_PATTERN ) )
+        else if ( !repo.getId().matches( REPOSITORY_ID_PATTERN ) )
         {
             response
                 .addValidationError( "Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed in Repository ID" );
         }
-
-        if ( StringUtils.isEmpty( repo.getName() ) )
+        // if repo id isn't valid, nothing below here will validate properly
+        else
         {
-            repo.setName( repo.getId() );
-
-            response.addValidationWarning( "Repository with ID='" + repo.getId()
-                + "' has no name, defaulted to it's ID." );
-
-            response.setModified( true );
-        }
-
-        if ( !validateLocalStatus( repo.getLocalStatus() ) )
-        {
-            response.addValidationError( "LocalStatus of repository with ID='" + repo.getId() + "' is wrong " + repo.getLocalStatus() + "! (Allowed values are: '" + LocalStatus.IN_SERVICE + "' and '"
-                + LocalStatus.OUT_OF_SERVICE + "')" );
-        }
-/*
-        if ( !validateRepositoryType( repo.getType() ) )
-        {
-            response.addValidationError( "TYPE='" + repo.getType() + "' of repository with ID='" + repo.getId()
-                + "' is wrong!" );
-        }
-
-        if ( !CRepository.PROXY_MODE_ALLOW.equals( repo.getProxyMode() )
-            && !CRepository.PROXY_MODE_BLOCKED_MANUAL.equals( repo.getProxyMode() )
-            && !CRepository.PROXY_MODE_BLOCKED_AUTO.equals( repo.getProxyMode() ) )
-        {
-            response.addValidationError( "ProxyMode of repository with ID='" + repo.getId()
-                + "' is wrong! (Allowed values are: " + CRepository.PROXY_MODE_ALLOW + ", "
-                + CRepository.PROXY_MODE_BLOCKED_MANUAL + " and " + CRepository.PROXY_MODE_BLOCKED_AUTO + ")" );
-        }
-
-        if ( repo.getRepositoryPolicy() == null
-            || ( !CRepository.REPOSITORY_POLICY_RELEASE.equals( repo.getRepositoryPolicy() ) && !CRepository.REPOSITORY_POLICY_SNAPSHOT
-                .equals( repo.getRepositoryPolicy() ) ) )
-        {
-            response.addValidationError( "Repository " + repo.getId() + " have wrong repository policy: \""
-                + repo.getRepositoryPolicy() + "\". Repository policy may be \""
-                + CRepository.REPOSITORY_POLICY_RELEASE + "\" or \"" + CRepository.REPOSITORY_POLICY_SNAPSHOT
-                + "\" only." );
-        }
-
-        if ( repo.getChecksumPolicy() == null
-            || ( !CRepository.CHECKSUM_POLICY_IGNORE.equals( repo.getChecksumPolicy() )
-                && !CRepository.CHECKSUM_POLICY_WARN.equals( repo.getChecksumPolicy() )
-                && !CRepository.CHECKSUM_POLICY_STRICT.equals( repo.getChecksumPolicy() ) && !CRepository.CHECKSUM_POLICY_STRICT_IF_EXISTS
-                .equals( repo.getChecksumPolicy() ) ) )
-        {
-            response.addValidationError( "Repository " + repo.getId() + " have wrong checksum policy: \""
-                + repo.getChecksumPolicy() + "\". Repository checksum policy may be \""
-                + CRepository.CHECKSUM_POLICY_IGNORE + "\", \"" + CRepository.CHECKSUM_POLICY_WARN + "\", \""
-                + CRepository.CHECKSUM_POLICY_STRICT_IF_EXISTS + "\" or \"" + CRepository.CHECKSUM_POLICY_STRICT
-                + "\" only." );
-        }
-*/
-        if ( context.getExistingRepositoryIds() != null )
-        {
-            if ( context.getExistingRepositoryIds().contains( repo.getId() ) )
+            if ( StringUtils.isEmpty( repo.getName() ) )
             {
-                response.addValidationError( "Repository " + repo.getId() + " declared more than once!" );
+                repo.setName( repo.getId() );
+    
+                response.addValidationWarning( "Repository with ID='" + repo.getId()
+                    + "' has no name, defaulted to it's ID." );
+    
+                response.setModified( true );
             }
-
-            context.getExistingRepositoryIds().add( repo.getId() );
-        }
-
-        if ( context.getExistingRepositoryShadowIds() != null )
-        {
-            if ( context.getExistingRepositoryShadowIds().contains( repo.getId() ) )
+    
+            if ( !validateLocalStatus( repo.getLocalStatus() ) )
             {
-                response.addValidationError( "Repository " + repo.getId()
-                    + " conflicts woth existing Shadow with same ID='" + repo.getId() + "'!" );
+                response.addValidationError( "LocalStatus of repository with ID='" + repo.getId() + "' is wrong " + repo.getLocalStatus() + "! (Allowed values are: '" + LocalStatus.IN_SERVICE + "' and '"
+                    + LocalStatus.OUT_OF_SERVICE + "')" );
             }
-        }
-
-        if ( context.getExistingRepositoryGroupIds() != null )
-        {
-            if ( context.getExistingRepositoryGroupIds().contains( repo.getId() ) )
+    /*
+            if ( !validateRepositoryType( repo.getType() ) )
             {
-                response.addValidationError( "Repository " + repo.getId()
-                    + " conflicts woth existing Group with same ID='" + repo.getId() + "'!" );
+                response.addValidationError( "TYPE='" + repo.getType() + "' of repository with ID='" + repo.getId()
+                    + "' is wrong!" );
+            }
+    
+            if ( !CRepository.PROXY_MODE_ALLOW.equals( repo.getProxyMode() )
+                && !CRepository.PROXY_MODE_BLOCKED_MANUAL.equals( repo.getProxyMode() )
+                && !CRepository.PROXY_MODE_BLOCKED_AUTO.equals( repo.getProxyMode() ) )
+            {
+                response.addValidationError( "ProxyMode of repository with ID='" + repo.getId()
+                    + "' is wrong! (Allowed values are: " + CRepository.PROXY_MODE_ALLOW + ", "
+                    + CRepository.PROXY_MODE_BLOCKED_MANUAL + " and " + CRepository.PROXY_MODE_BLOCKED_AUTO + ")" );
+            }
+    
+            if ( repo.getRepositoryPolicy() == null
+                || ( !CRepository.REPOSITORY_POLICY_RELEASE.equals( repo.getRepositoryPolicy() ) && !CRepository.REPOSITORY_POLICY_SNAPSHOT
+                    .equals( repo.getRepositoryPolicy() ) ) )
+            {
+                response.addValidationError( "Repository " + repo.getId() + " have wrong repository policy: \""
+                    + repo.getRepositoryPolicy() + "\". Repository policy may be \""
+                    + CRepository.REPOSITORY_POLICY_RELEASE + "\" or \"" + CRepository.REPOSITORY_POLICY_SNAPSHOT
+                    + "\" only." );
+            }
+    
+            if ( repo.getChecksumPolicy() == null
+                || ( !CRepository.CHECKSUM_POLICY_IGNORE.equals( repo.getChecksumPolicy() )
+                    && !CRepository.CHECKSUM_POLICY_WARN.equals( repo.getChecksumPolicy() )
+                    && !CRepository.CHECKSUM_POLICY_STRICT.equals( repo.getChecksumPolicy() ) && !CRepository.CHECKSUM_POLICY_STRICT_IF_EXISTS
+                    .equals( repo.getChecksumPolicy() ) ) )
+            {
+                response.addValidationError( "Repository " + repo.getId() + " have wrong checksum policy: \""
+                    + repo.getChecksumPolicy() + "\". Repository checksum policy may be \""
+                    + CRepository.CHECKSUM_POLICY_IGNORE + "\", \"" + CRepository.CHECKSUM_POLICY_WARN + "\", \""
+                    + CRepository.CHECKSUM_POLICY_STRICT_IF_EXISTS + "\" or \"" + CRepository.CHECKSUM_POLICY_STRICT
+                    + "\" only." );
+            }
+    */
+            if ( context.getExistingRepositoryIds() != null )
+            {
+                if ( context.getExistingRepositoryIds().contains( repo.getId() ) )
+                {
+                    response.addValidationError( "Repository " + repo.getId() + " declared more than once!" );
+                }
+    
+                context.getExistingRepositoryIds().add( repo.getId() );
+            }
+    
+            if ( context.getExistingRepositoryShadowIds() != null )
+            {
+                if ( context.getExistingRepositoryShadowIds().contains( repo.getId() ) )
+                {
+                    response.addValidationError( "Repository " + repo.getId()
+                        + " conflicts woth existing Shadow with same ID='" + repo.getId() + "'!" );
+                }
+            }
+    
+            if ( context.getExistingRepositoryGroupIds() != null )
+            {
+                if ( context.getExistingRepositoryGroupIds().contains( repo.getId() ) )
+                {
+                    response.addValidationError( "Repository " + repo.getId()
+                        + " conflicts woth existing Group with same ID='" + repo.getId() + "'!" );
+                }
             }
         }
 
