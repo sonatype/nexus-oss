@@ -34,12 +34,14 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
     public void testCreatePermission()
         throws IOException
     {
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
+        
         RepositoryRouteResource route = new RepositoryRouteResource();
         route.setGroupId( "nexus-test" );
         route.setPattern( ".*testCreatePermission.*" );
         route.setRuleType( "blocking" );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         Response response = this.routeUtil.sendMessage( Method.POST, route );
@@ -50,11 +52,10 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // now give create
-        this.giveUserPrivilege( "test-user", "22" );
-        
+        this.giveUserPrivilege( TEST_USER_NAME, "22" );   
 
         // now.... it should work...
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.routeUtil.sendMessage( Method.POST, route );
@@ -82,6 +83,8 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
 
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+        
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
 
         RepositoryRouteResource route = new RepositoryRouteResource();
         route.setGroupId( "nexus-test" );
@@ -92,13 +95,13 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         route = this.routeUtil.getResourceFromResponse( response );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // update user
         route.setPattern( ".*testUpdatePermission2.*" );
         response = this.routeUtil.sendMessage( Method.PUT, route );
-//        log.debug( "PROBLEM: "+ this.userUtil.getUser( "test-user" ) );
+//        log.debug( "PROBLEM: "+ this.userUtil.getUser( TEST_USER_NAME ) );
         Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
 
         // use admin
@@ -106,9 +109,9 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // now give update
-        this.giveUserPrivilege( "test-user", "24" );
+        this.giveUserPrivilege( TEST_USER_NAME, "24" );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // should work now...
@@ -136,9 +139,10 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
     public void testReadPermission()
         throws IOException
     {
-
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+        
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
 
         RepositoryRouteResource route = new RepositoryRouteResource();
         route.setGroupId( "nexus-test" );
@@ -149,7 +153,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         route = this.routeUtil.getResourceFromResponse( response );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.routeUtil.sendMessage( Method.PUT, route );
@@ -160,9 +164,9 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // now give read
-        this.giveUserPrivilege( "test-user", "23" );
+        this.giveUserPrivilege( TEST_USER_NAME, "23" );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // should work now...
@@ -193,6 +197,8 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
 
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+        
+        this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
 
         RepositoryRouteResource route = new RepositoryRouteResource();
         route.setGroupId( "nexus-test" );
@@ -203,7 +209,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         route = this.routeUtil.getResourceFromResponse( response );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
 
@@ -215,9 +221,9 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // now give create
-        this.giveUserPrivilege( "test-user", "25" );
+        this.giveUserPrivilege( TEST_USER_NAME, "25" );
 
-        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // should work now...
