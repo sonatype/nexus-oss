@@ -94,7 +94,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       id: 'group',
       header: "Group",
       dataIndex: 'groupId',
-      sortable:true,
+      sortable:true
     },{
       id: 'artifact',
       header: "Artifact",
