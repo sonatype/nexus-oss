@@ -21,6 +21,7 @@ import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
+import org.sonatype.nexus.integrationtests.TestContainer;
 
 /**
  *
@@ -30,7 +31,11 @@ import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 public class Nexus1071DeployToRepoAnonCannotAccess
     extends AbstractMavenNexusIT
 {
-
+    public Nexus1071DeployToRepoAnonCannotAccess()
+    {
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+    
     @Test
     public void deployRepeatly()
         throws Exception
@@ -97,8 +102,7 @@ public class Nexus1071DeployToRepoAnonCannotAccess
     @Test
     public void deployToAnotherRepo()
         throws Exception
-    {
-
+    {   
         File mavenProject2 = getTestFile( "maven-project-2" );
 
         File settings2 = getTestFile( "settings2.xml" );
@@ -122,7 +126,7 @@ public class Nexus1071DeployToRepoAnonCannotAccess
     @Test
     public void anonDeploy()
         throws Exception
-    {
+    {   
         File mavenProjectAnon = getTestFile( "maven-project-anon" );
 
         File settingsAnon = getTestFile( "settings-anon.xml" );
