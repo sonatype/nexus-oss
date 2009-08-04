@@ -21,6 +21,8 @@ import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -62,8 +64,8 @@ public class Nexus412RemoteLeakTest
 
         while ( RemoteStatus.UNKNOWN.equals( rs1 ) || RemoteStatus.UNKNOWN.equals( rs2 ) )
         {
-            rs1 = repo1.getRemoteStatus( false );
-            rs2 = repo2.getRemoteStatus( false );
+            rs1 = repo1.getRemoteStatus( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), false );
+            rs2 = repo2.getRemoteStatus( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), false );
 
             Thread.sleep( 1000 );
         }
