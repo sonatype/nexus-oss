@@ -26,6 +26,8 @@ import java.security.NoSuchAlgorithmException;
  */
 public class StringDigester
 {
+    public static String LINE_SEPERATOR = System.getProperty( "line.separator" );
+    
     private static final char[] DIGITS = {
         '0',
         '1',

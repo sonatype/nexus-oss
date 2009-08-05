@@ -30,9 +30,11 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.swizzle.jira.Issue;
 import org.codehaus.swizzle.jira.Jira;
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
+import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 
@@ -49,6 +51,9 @@ public class DefaultErrorReportingManager
 
     @Requirement( role = SecurityConfigurationSource.class, hint = "file" )
     SecurityConfigurationSource securityConfigurationXmlSource;
+    
+    @Requirement( role = ApplicationStatusSource.class )
+    ApplicationStatusSource applicationStatus;
 
     @Requirement
     ConfigurationHelper configHelper;
@@ -157,11 +162,13 @@ public class DefaultErrorReportingManager
 
         subRequest.setProjectId( errorConfig.getJiraProject() );
         subRequest.setSummary( "Automated Problem Report: " + request.getThrowable().getMessage() );
-        subRequest.setDescription( "The following exception occurred: " + System.getProperty( "line.seperator" )
+        subRequest.setDescription( "The following exception occurred: " 
+            + StringDigester.LINE_SEPERATOR
             + ExceptionUtils.getFullStackTrace( request.getThrowable() ) );
         subRequest.setProblemReportBundle( assembleBundle( request ) );
         subRequest.setReporter( StringUtils.isNotEmpty( errorConfig.getJiraUsername() ) ? errorConfig.getJiraUsername() : DEFAULT_USERNAME );
         subRequest.setComponent( COMPONENT );
+        subRequest.setEnvironment( assembleEnvironment( request ) );
         
         if ( errorConfig.isUseGlobalProxy() )
         {
@@ -172,6 +179,39 @@ public class DefaultErrorReportingManager
         }
 
         return subRequest;
+    }
+    
+    private String assembleEnvironment( ErrorReportRequest request )
+    {
+        StringBuffer sb = new StringBuffer();
+        sb.append( "Nexus Version: " );
+        sb.append( applicationStatus.getSystemStatus().getVersion() );
+        sb.append( StringDigester.LINE_SEPERATOR );
+        
+        sb.append( "Nexus Edition: " );
+        sb.append( applicationStatus.getSystemStatus().getEditionLong() );
+        sb.append( StringDigester.LINE_SEPERATOR );
+        
+        sb.append( "java.vendor: " );
+        sb.append( System.getProperty( "java.vendor" ) );
+        sb.append( StringDigester.LINE_SEPERATOR );
+        
+        sb.append( "java.version: " );
+        sb.append( System.getProperty( "java.version" ) );
+        sb.append( StringDigester.LINE_SEPERATOR );
+        
+        sb.append( "os.name: " );
+        sb.append( System.getProperty( "os.name" ) );
+        sb.append( StringDigester.LINE_SEPERATOR );
+        
+        sb.append( "os.version: " );
+        sb.append( System.getProperty( "os.version" ) );
+        sb.append( StringDigester.LINE_SEPERATOR );
+        
+        sb.append( "os.arch: " );
+        sb.append( System.getProperty( "os.arch" ) );
+        
+        return sb.toString();
     }
 
     private IssueSubmitter getIssueSubmitter( CErrorReporting errorConfig )
