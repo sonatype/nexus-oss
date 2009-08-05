@@ -80,7 +80,7 @@ public class DefaultErrorReportingManager
             {
                 IssueSubmissionResult result = getIssueSubmitter( errorConfig ).submitIssue( subRequest );
                 renameBundle( subRequest.getProblemReportBundle(), result.getKey() );
-                getLogger().info( "Generated problem report, ticket " + result.getKey() + " was created." );
+                getLogger().info( "Generated problem report, ticket " + result.getIssueUrl() + " was created." );
             }
             else
             {
@@ -97,7 +97,8 @@ public class DefaultErrorReportingManager
         try
         {
             jira = new Jira( errorConfig.getJiraUrl() + "/rpc/xmlrpc" );
-            jira.login( errorConfig.getJiraUsername(), errorConfig.getJiraPassword() );
+            jira.login( getJiraUsername( errorConfig ),
+                getJiraPassword( errorConfig ) );
             
             List<Issue> issues = ( List<Issue> ) jira.getIssuesFromTextSearchWithProject( 
                 Arrays.asList( errorConfig.getJiraProject() ), 
@@ -158,10 +159,17 @@ public class DefaultErrorReportingManager
     protected IssueSubmissionRequest buildRequest( CErrorReporting errorConfig, ErrorReportRequest request )
         throws IOException
     {
+        String summary = "APR: " + request.getThrowable().getMessage();
+        
+        if ( summary.length() > 255 )
+        {
+            summary = summary.substring( 0, 254 );
+        }
+        
         IssueSubmissionRequest subRequest = new IssueSubmissionRequest();
 
         subRequest.setProjectId( errorConfig.getJiraProject() );
-        subRequest.setSummary( "Automated Problem Report: " + request.getThrowable().getMessage() );
+        subRequest.setSummary( summary );
         subRequest.setDescription( "The following exception occurred: " 
             + StringDigester.LINE_SEPERATOR
             + ExceptionUtils.getFullStackTrace( request.getThrowable() ) );
@@ -213,26 +221,41 @@ public class DefaultErrorReportingManager
         
         return sb.toString();
     }
+    
+    private String getJiraUsername( CErrorReporting errorConfig )
+    {
+        String username = DEFAULT_USERNAME;
+        
+        if ( StringUtils.isNotEmpty( errorConfig.getJiraUsername() ) )
+        {
+            username = errorConfig.getJiraUsername();
+        }
+        
+        return username;
+    }
+    
+    private String getJiraPassword( CErrorReporting errorConfig )
+    {
+        String password = DEFAULT_USERNAME;
+        
+        if ( StringUtils.isNotEmpty( errorConfig.getJiraPassword() ) )
+        {
+            password = errorConfig.getJiraPassword();
+        }
+        
+        return password;
+    }
 
     private IssueSubmitter getIssueSubmitter( CErrorReporting errorConfig )
         throws IssueSubmissionException
     {
         try
-        {
-        	String username = DEFAULT_USERNAME;
-        	String password = DEFAULT_USERNAME;
-        	
-        	if ( StringUtils.isNotEmpty( errorConfig.getJiraUsername() ) )
-        	{
-        	    username = errorConfig.getJiraUsername();
-        	    password = errorConfig.getJiraPassword();
-        	}
-        	
+        {        	
             return new JiraIssueSubmitter( 
                 errorConfig.getJiraUrl(), 
                 new DefaultAuthenticationSource(
-                    username,
-                    password ) );
+                    getJiraUsername( errorConfig ),
+                    getJiraPassword( errorConfig ) ) );
         }
         catch ( InitializationException e )
         {
