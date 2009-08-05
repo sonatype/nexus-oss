@@ -110,6 +110,22 @@ public abstract class AbstractNexusTask<T>
     /**
      * {@inheritDoc}
      */
+    public String getId()
+    {
+        return getParameter( ID_KEY );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getName()
+    {
+        return getParameter( NAME_KEY );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean shouldSendAlertEmail()
     {
         final String alertEmail = getAlertEmail();
@@ -122,21 +138,6 @@ public abstract class AbstractNexusTask<T>
     public String getAlertEmail()
     {
         return getParameter( ALERT_EMAIL_KEY );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setAlertEmail( final String email )
-    {
-        if( email == null || email.trim().length() == 0 )
-        {
-            getParameters().remove( ALERT_EMAIL_KEY );
-        }
-        else
-        {
-            addParameter( ALERT_EMAIL_KEY, email );
-        }
     }
 
     public boolean allowConcurrentSubmission( Map<String, List<ScheduledTask<?>>> activeTasks )

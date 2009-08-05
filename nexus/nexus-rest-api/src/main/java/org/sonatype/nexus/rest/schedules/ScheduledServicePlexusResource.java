@@ -30,6 +30,7 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
+import org.sonatype.nexus.scheduling.TaskUtils;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.scheduling.NoSuchTaskException;
@@ -136,7 +137,7 @@ public class ScheduledServicePlexusResource
                     task.getTaskParams().put( prop.getId(), prop.getValue() );
                 }
 
-                setAlertEmail( task, resource.getAlertEmail() );
+                TaskUtils.setAlertEmail( task, resource.getAlertEmail() );
 
                 task.reset();
 

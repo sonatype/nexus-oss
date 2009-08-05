@@ -28,14 +28,38 @@ public interface NexusTask<T>
 {
 
     /**
-     * Prefix for rpivate properties keys. *
+     * Prefix for rpivate properties keys.
      */
     static final String PRIVATE_PROP_PREFIX = ".";
 
     /**
-     * Key of alert email property (private) *
+     * Key of id property (private).
+     */
+    static final String ID_KEY = PRIVATE_PROP_PREFIX + "id";
+
+    /**
+     * Key of name property (private).
+     */
+    static final String NAME_KEY = PRIVATE_PROP_PREFIX + "name";
+
+    /**
+     * Key of alert email property (private).
      */
     static final String ALERT_EMAIL_KEY = PRIVATE_PROP_PREFIX + "alertEmail";
+
+    /**
+     * Returns a unique ID of the task.
+     *
+     * @return task id (or null if not available)
+     */
+    String getId();
+
+    /**
+     * Returns a name of the task.
+     *
+     * @return task name (or null if not available)
+     */
+    String getName();
 
     /**
      * Should an alert email be sent?
@@ -51,14 +75,6 @@ public interface NexusTask<T>
      * @return alert email
      */
     String getAlertEmail();
-
-    /**
-     * Sets the email address to which an email should be sent in case of task failure.<br/>
-     * If the alert email is not set (null or empty) no email should be sent.
-     *
-     * @param email alert email address
-     */
-    void setAlertEmail( String email );
 
     TaskActivityDescriptor getTaskActivityDescriptor();
 }

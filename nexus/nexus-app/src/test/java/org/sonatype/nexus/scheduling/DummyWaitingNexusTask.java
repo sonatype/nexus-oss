@@ -105,6 +105,16 @@ public class DummyWaitingNexusTask
         return "A Dummy task, waits for some time";
     }
 
+    public String getId()
+    {
+        return "dummyId";
+    }
+
+    public String getName()
+    {
+        return "dummyName";
+    }
+
     public boolean shouldSendAlertEmail()
     {
         return false;
@@ -113,11 +123,6 @@ public class DummyWaitingNexusTask
     public String getAlertEmail()
     {
         return null;
-    }
-
-    public void setAlertEmail( String email )
-    {
-        // do nothing
     }
 
     public TaskActivityDescriptor getTaskActivityDescriptor()

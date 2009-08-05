@@ -43,6 +43,7 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.scheduling.TaskUtils;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.iterators.MonthlySchedulerIterator;
 import org.sonatype.scheduling.schedules.CronSchedule;
@@ -54,6 +55,7 @@ import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
+
 
 public abstract class AbstractScheduledServicePlexusResource
     extends AbstractNexusPlexusResource
@@ -150,7 +152,7 @@ public abstract class AbstractScheduledServicePlexusResource
 
         for ( String key : map.keySet() )
         {
-            if( !isPrivateProperty( key ) )
+            if( !TaskUtils.isPrivateProperty( key ) )
             {
                 ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
                 prop.setId( key );
@@ -328,7 +330,7 @@ public abstract class AbstractScheduledServicePlexusResource
             task.addParameter( prop.getId(), prop.getValue() );
         }
 
-        task.setAlertEmail( model.getAlertEmail() );
+        TaskUtils.setAlertEmail( task, model.getAlertEmail() );
 
         return task;
     }
@@ -532,7 +534,7 @@ public abstract class AbstractScheduledServicePlexusResource
             resource.setSchedule( getScheduleShortName( task.getSchedule() ) );
             resource.setTypeId( task.getType() );
             resource.setProperties( formatServiceProperties( task.getTaskParams() ) );
-            resource.setAlertEmail( getAlertEmail( task) );
+            resource.setAlertEmail( TaskUtils.getAlertEmail( task) );
         }
 
         return resource;
@@ -549,57 +551,6 @@ public abstract class AbstractScheduledServicePlexusResource
         }
 
         return nextRunTime;
-    }
-
-    /**
-     * Checks if a property is a private property. Private properties are those properties that start with
-     * {@link NexusTask#PRIVATE_PROP_PREFIX}.
-     *
-     * @param key property key
-     *
-     * @return true if the key defines a private property
-     */
-    private boolean isPrivateProperty( final String key )
-    {
-        return key != null && key.startsWith( NexusTask.PRIVATE_PROP_PREFIX );
-    }
-
-    /**
-     * Returns the alert email for a task. The alert email is stored as a private task patamater.
-     *
-     * @param task a task
-     *
-     * @return alert email if present, null otherwise
-     */
-    protected String getAlertEmail( final ScheduledTask<?> task )
-    {
-        if( task != null && task.getTaskParams() != null )
-        {
-            return task.getTaskParams().get( NexusTask.ALERT_EMAIL_KEY );
-        }
-        return null;
-    }
-
-    /**
-     * Sets teh alert email for a scheduled task. The alert email is stored as a private task parameter.
-     *
-     * @param task       a scheduled task
-     * @param alertEmail alert email
-     */
-    protected void setAlertEmail( final ScheduledTask<?> task,
-                                  final String alertEmail )
-    {
-        if( task != null && task.getTaskParams() != null )
-        {
-            if( alertEmail != null )
-            {
-                task.getTaskParams().put( NexusTask.ALERT_EMAIL_KEY, alertEmail );
-            }
-            else
-            {
-                task.getTaskParams().remove( NexusTask.ALERT_EMAIL_KEY );
-            }
-        }
     }
 
 }

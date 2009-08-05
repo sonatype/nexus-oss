@@ -15,8 +15,8 @@ package org.sonatype.nexus.scheduling;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.email.NexusPostOffice;
+import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -58,8 +58,9 @@ public class NexusTaskFailureAlertEmailSender
         {
             return;
         }
-        // TODO how to get id and name
-        m_postOffice.sendNexusTaskFailure( failedTask.getAlertEmail(), null, null, failureEvent.getCause() );
+        m_postOffice.sendNexusTaskFailure(
+            failedTask.getAlertEmail(), failedTask.getId(), failedTask.getName(), failureEvent.getCause()
+        );
     }
-    
+
 }
