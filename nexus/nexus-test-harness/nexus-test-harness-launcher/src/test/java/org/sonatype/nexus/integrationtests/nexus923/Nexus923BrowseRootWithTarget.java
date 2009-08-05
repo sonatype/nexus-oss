@@ -44,7 +44,7 @@ public class Nexus923BrowseRootWithTarget
         RepositoryTargetResource target = new RepositoryTargetResource();
         target.setName( "browseRootTest" );
         target.setContentClass( "maven2" );
-        target.addPattern( "/|/nexus923/|/nexus923/group/*" );
+        target.addPattern( "/nexus923/group/*" );
 
         target = this.targetUtil.createTarget( target );
 
