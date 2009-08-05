@@ -67,6 +67,8 @@ public class DefaultMappingConfiguration
     {
         lock.lock();
 
+        Configuration cfg = getConfiguration();
+
         FileLock fileLock = null;
         FileChannel channel = null;
         FileOutputStream out = null;
@@ -84,7 +86,7 @@ public class DefaultMappingConfiguration
             channel = out.getChannel();
             fileLock = channel.lock( 0, Long.MAX_VALUE, false ); // exclusive lock on save
 
-            xs.toXML( getConfiguration(), out );
+            xs.toXML( cfg, out );
         }
         catch ( IOException e )
         {

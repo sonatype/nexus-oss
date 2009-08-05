@@ -13,6 +13,7 @@
 package org.sonatype.nexus.plugins.migration.nexus1434;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -64,17 +65,18 @@ public abstract class AbstractImportSecurityTest
     public AbstractImportSecurityTest()
     {
         // initialize the utils
-        userUtil = new PlexusUserMessageUtil( );
+        userUtil = new PlexusUserMessageUtil();
         repoTargetUtil = new TargetMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
         privilegeUtil = new PrivilegesMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
         roleUtil = new RoleMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
         try
         {
-            repoUtil = new RepositoryMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML, this.getRepositoryTypeRegistry() );
+            repoUtil =
+                new RepositoryMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML, this.getRepositoryTypeRegistry() );
         }
         catch ( ComponentLookupException e )
         {
-            Assert.fail( "Failed to lookup component: "+ e.getMessage() );
+            Assert.fail( "Failed to lookup component: " + e.getMessage() );
         }
         groupUtil = new GroupMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
     }
@@ -102,8 +104,8 @@ public abstract class AbstractImportSecurityTest
     {
         // load PREs
         preUserList = userUtil.getList();
-        prePrivilegeList = privilegeUtil
-            .getResourceListFromResponse( privilegeUtil.sendMessage( Method.GET, null, "" ) );
+        prePrivilegeList =
+            privilegeUtil.getResourceListFromResponse( privilegeUtil.sendMessage( Method.GET, null, "" ) );
         preRoleList = roleUtil.getList();
         preTargetList = repoTargetUtil.getList();
     }
@@ -143,11 +145,26 @@ public abstract class AbstractImportSecurityTest
         return addedList;
     }
 
+    protected List<PrivilegeStatusResource> getImportedTargetPrivilegesList()
+        throws Exception
+    {
+        List<PrivilegeStatusResource> newPrivs = getImportedPrivilegeList();
+        List<PrivilegeStatusResource> targetPrivs = new ArrayList<PrivilegeStatusResource>();
+        for ( PrivilegeStatusResource priv : newPrivs )
+        {
+            if ( "target".equals( priv.getType() ) )
+            {
+                targetPrivs.add( priv );
+            }
+        }
+        return targetPrivs;
+    }
+
     protected List<PrivilegeStatusResource> getImportedPrivilegeList()
         throws Exception
     {
-        List<PrivilegeStatusResource> privilegeList = privilegeUtil.getResourceListFromResponse( privilegeUtil
-            .sendMessage( Method.GET, null, "" ) );
+        List<PrivilegeStatusResource> privilegeList =
+            privilegeUtil.getResourceListFromResponse( privilegeUtil.sendMessage( Method.GET, null, "" ) );
 
         List<PrivilegeStatusResource> addedList = new ArrayList<PrivilegeStatusResource>();
 
@@ -158,7 +175,7 @@ public abstract class AbstractImportSecurityTest
                 addedList.add( privilege );
             }
         }
-        return addedList;
+        return Collections.unmodifiableList( addedList );
     }
 
     protected List<PlexusUserResource> getImportedUserList()

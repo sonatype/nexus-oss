@@ -764,6 +764,7 @@ public class DefaultArtifactoryMigrator
         shadowRepo.setUserManaged( true );
 
         shadowRepo.setProviderRole( ShadowRepository.class.getName() );
+        shadowRepo.setProviderHint( "m1-m2-shadow" );
 
         Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
         shadowRepo.setExternalConfiguration( ex );

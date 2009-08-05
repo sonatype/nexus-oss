@@ -63,7 +63,7 @@ public class ImportMessageUtil
 
         Response response = RequestFacade.sendMessage( serviceURI, Method.POST, requestRepresentation );
 
-        if ( 201 != response.getStatus().getCode() )
+        if ( !response.getStatus().isSuccess() )
         {
             Assert.fail( "Invalid response for server " + response.getEntity().getText() + "\n" + response.getStatus() );
         }

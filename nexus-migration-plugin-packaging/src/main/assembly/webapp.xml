@@ -19,7 +19,7 @@
 
   <dependencySets>
     <dependencySet>
-      <unpack>false</unpack>
+      <unpack>true</unpack>
       <outputDirectory>runtime/apps/nexus/plugin-repository</outputDirectory>
       <scope>provided</scope>
       <includes>
@@ -40,13 +40,6 @@
         <include>org.sonatype.nexus.plugins:nexus-migration-plugin-artifactory-bridge</include>
       </includes>
     </dependencySet>
-    <dependencySet>
-      <unpack>false</unpack>
-      <outputDirectory>runtime/apps/nexus/lib</outputDirectory>
-      <includes>
-        <include>org.sonatype.nexus.plugins:nexus-migration-plugin-artifactory-bridge</include>
-      </includes>
-    </dependencySet>    
   </dependencySets>
 
 </assembly>

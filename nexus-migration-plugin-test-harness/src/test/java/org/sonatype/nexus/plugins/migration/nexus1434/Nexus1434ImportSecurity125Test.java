@@ -48,7 +48,7 @@ public class Nexus1434ImportSecurity125Test
     {
         List<PlexusUserResource> userList = getImportedUserList();
         List<RepositoryTargetListResource> targetList = getImportedRepoTargetList();
-        List<PrivilegeStatusResource> privilegeList = getImportedPrivilegeList();
+        List<PrivilegeStatusResource> privilegeList = getImportedTargetPrivilegesList();
         List<RoleResource> roleList = getImportedRoleList();
 
         Assert.assertEquals( "4 users imported", 4, userList.size() );

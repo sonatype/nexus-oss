@@ -50,7 +50,7 @@ public class Nexus1434ImportSecurity125DisablePermissionTest
     {
         List<PlexusUserResource> userList = getImportedUserList();
         List<RepositoryTargetListResource> targetList = getImportedRepoTargetList();
-        List<PrivilegeStatusResource> privilegeList = getImportedPrivilegeList();
+        List<PrivilegeStatusResource> privilegeList = getImportedTargetPrivilegesList();
         List<RoleResource> roleList = getImportedRoleList();
 
         Assert.assertEquals( 4, userList.size() );

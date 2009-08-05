@@ -16,18 +16,6 @@
       <listener-class>org.sonatype.nexus.web.LogConfigListener</listener-class>
     </listener>
 
-    <!--
-    <servlet>
-        <servlet-name>artifactory</servlet-name>
-        <servlet-class>org.sonatype.nexus.artifactorybridge.RedirectorServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>artifactory</servlet-name>
-        <url-pattern>/*</url-pattern>
-    </servlet-mapping>
-    -->
-
     <!-- Artifactory bridge -->
     <servlet>
         <servlet-name>artifactory</servlet-name>

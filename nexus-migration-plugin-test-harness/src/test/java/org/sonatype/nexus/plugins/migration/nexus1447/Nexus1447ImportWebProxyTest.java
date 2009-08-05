@@ -33,7 +33,7 @@ public class Nexus1447ImportWebProxyTest
         Assert.assertEquals( "Proxy configuration do no match", 8080, proxy.getProxyPort() );
         Assert.assertNotNull( "Proxy configuration do no match", proxy.getAuthentication() );
         Assert.assertEquals( "Proxy configuration do no match", "un", proxy.getAuthentication().getUsername() );
-        Assert.assertEquals( "Proxy configuration do no match", "pw", proxy.getAuthentication().getPassword() );
+        Assert.assertEquals( "Proxy configuration do no match", "|$|N|E|X|U|S|$|", proxy.getAuthentication().getPassword() );
     }
 
 }

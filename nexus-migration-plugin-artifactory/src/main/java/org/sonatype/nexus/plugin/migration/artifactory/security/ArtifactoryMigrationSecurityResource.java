@@ -13,7 +13,6 @@
 package org.sonatype.nexus.plugin.migration.artifactory.security;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
@@ -28,9 +27,4 @@ public class ArtifactoryMigrationSecurityResource
         return "/META-INF/nexus-artifactory-migration-plugin-security.xml";
     }
 
-    @Override
-    public Configuration getConfiguration()
-    {
-        return null;
-    }
 }
