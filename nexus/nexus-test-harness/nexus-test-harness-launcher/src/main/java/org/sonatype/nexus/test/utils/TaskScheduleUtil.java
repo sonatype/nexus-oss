@@ -82,13 +82,11 @@ public class TaskScheduleUtil
     {
         String serviceURI = "service/local/schedules";
         Response response = RequestFacade.doGetRequest( serviceURI );
-        XStreamRepresentation representation = new XStreamRepresentation(
-            xstream,
-            response.getEntity().getText(),
-            MediaType.APPLICATION_XML );
+        XStreamRepresentation representation =
+            new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
 
-        ScheduledServiceListResourceResponse scheduleResponse = (ScheduledServiceListResourceResponse) representation
-            .getPayload( new ScheduledServiceListResourceResponse() );
+        ScheduledServiceListResourceResponse scheduleResponse =
+            (ScheduledServiceListResourceResponse) representation.getPayload( new ScheduledServiceListResourceResponse() );
 
         return scheduleResponse.getData();
     }
@@ -105,14 +103,26 @@ public class TaskScheduleUtil
     {
         waitForTasks( 40 );
     }
-    
+
     public static void waitForAllTasksToStop()
         throws Exception
     {
         waitForAllTasksToStop( 40 );
     }
-    
+
+    public static void waitForAllTasksToStop( String taskType )
+        throws Exception
+    {
+        waitForAllTasksToStop( 40, taskType );
+    }
+
     public static void waitForAllTasksToStop( int maxAttempts )
+        throws Exception
+    {
+        waitForAllTasksToStop( maxAttempts, null );
+    }
+
+    public static void waitForAllTasksToStop( int maxAttempts, String taskType )
         throws Exception
     {
         long sleep = 1000;
@@ -124,22 +134,29 @@ public class TaskScheduleUtil
             Thread.sleep( sleep );
 
             List<ScheduledServiceListResource> tasks = getTasks();
-            
+
             boolean running = false;
+            String runninTaskId = null;
 
             for ( ScheduledServiceListResource task : tasks )
             {
-                if ( task.getStatus().equals( TaskState.RUNNING.name() ) 
-                    || task.getStatus().equals( TaskState.SLEEPING.name() ) )
+                if ( ( task.getStatus().equals( TaskState.RUNNING.name() ) || task.getStatus().equals(
+                                                                                                       TaskState.SLEEPING.name() ) )
+                    && ( taskType == null || taskType.equals( task.getTypeId() ) ) )
                 {
+                    runninTaskId = task.getId();
                     running = true;
                     break;
                 }
             }
-            
+
             if ( !running )
             {
                 return;
+            }
+            else
+            {
+                LOG.debug( "Still running " + runninTaskId );
             }
         }
     }
@@ -246,7 +263,7 @@ public class TaskScheduleUtil
     }
 
     public static ScheduledServiceListResource runTask( String taskName, String typeId, int maxAttempts,
-        ScheduledServicePropertyResource... properties )
+                                                        ScheduledServicePropertyResource... properties )
         throws Exception
     {
         ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
@@ -272,7 +289,7 @@ public class TaskScheduleUtil
     }
 
     public static ScheduledServiceListResource runTask( String taskName, String typeId,
-        ScheduledServicePropertyResource... properties )
+                                                        ScheduledServicePropertyResource... properties )
         throws Exception
     {
         return runTask( taskName, typeId, 40, properties );
