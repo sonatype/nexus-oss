@@ -162,7 +162,7 @@ public class Nexus1696ValidateBaseUrl
         throws Exception
     {
         RepositoryRouteResource resource = new RepositoryRouteResource();
-        resource.setGroupId( "nexus1696-test" );
+        resource.setGroupId( "public" );
         resource.setPattern( ".*/org/.*" );
         resource.setRuleType( RepositoryRouteResource.INCLUSION_RULE_TYPE );
         RepositoryRouteMemberRepository memberRepo1 = new RepositoryRouteMemberRepository();
