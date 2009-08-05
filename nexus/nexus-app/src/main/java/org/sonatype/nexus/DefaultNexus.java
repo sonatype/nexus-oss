@@ -306,12 +306,6 @@ public class DefaultNexus
     {
         Repository repository = repositoryRegistry.getRepository( id );
 
-        // Can't mess with nexus-managed repos
-        if ( !repository.isUserManaged() )
-        {
-            throw new NoSuchRepositoryException( repository.getId() );
-        }
-
         // remove the storage folders for the repository
         DeleteRepositoryFoldersTask task = nexusScheduler.createTaskInstance( DeleteRepositoryFoldersTask.class );
 
