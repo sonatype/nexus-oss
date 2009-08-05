@@ -110,9 +110,9 @@ public class Nexus1170ReducePermissionChecking
         this.checkPermission( permissions, "nexus:cache", 0 );
         this.checkPermission( permissions, "nexus:routes", 0 );
         this.checkPermission( permissions, "nexus:tasks", 0 );
-        this.checkPermission( permissions, "nexus:privileges", 0 );
-        this.checkPermission( permissions, "nexus:roles", 0 );
-        this.checkPermission( permissions, "nexus:users", 0 );
+        this.checkPermission( permissions, "security:privileges", 0 );
+        this.checkPermission( permissions, "security:roles", 0 );
+        this.checkPermission( permissions, "security:users", 0 );
         this.checkPermission( permissions, "nexus:logs", 0 );
         this.checkPermission( permissions, "nexus:configuration", 0 );
         this.checkPermission( permissions, "nexus:feeds", 1 );
@@ -121,11 +121,10 @@ public class Nexus1170ReducePermissionChecking
         this.checkPermission( permissions, "nexus:wastebasket", 0 );
         this.checkPermission( permissions, "nexus:artifact", 1 );
         this.checkPermission( permissions, "nexus:repostatus", 1 );
-        this.checkPermission( permissions, "nexus:repocontentclasses", 1 );
-        this.checkPermission( permissions, "nexus:usersforgotpw", 9 );
-        this.checkPermission( permissions, "nexus:usersforgotid", 9 );
-        this.checkPermission( permissions, "nexus:usersreset", 0 );
-        this.checkPermission( permissions, "nexus:userschangepw", 9 );
+        this.checkPermission( permissions, "security:usersforgotpw", 9 );
+        this.checkPermission( permissions, "security:usersforgotid", 9 );
+        this.checkPermission( permissions, "security:usersreset", 0 );
+        this.checkPermission( permissions, "security:userschangepw", 9 );
 
         this.checkPermission( permissions, "nexus:command", 0 );
         this.checkPermission( permissions, "nexus:repometa", 0 );
@@ -133,10 +132,10 @@ public class Nexus1170ReducePermissionChecking
         this.checkPermission( permissions, "nexus:tasktypes", 0 );
         this.checkPermission( permissions, "nexus:componentscontentclasses", 1 );
         this.checkPermission( permissions, "nexus:componentscheduletypes", 0 );
-        this.checkPermission( permissions, "nexus:userssetpw", 0 );
+        this.checkPermission( permissions, "security:userssetpw", 0 );
         this.checkPermission( permissions, "nexus:componentrealmtypes", 0 );
         this.checkPermission( permissions, "nexus:componentsrepotypes", 1 );
-        this.checkPermission( permissions, "nexus:componentsuserlocatortypes", 0 );
+        this.checkPermission( permissions, "security:componentsuserlocatortypes", 0 );
 
         for ( ClientPermission outPermission : permissions )
         {
