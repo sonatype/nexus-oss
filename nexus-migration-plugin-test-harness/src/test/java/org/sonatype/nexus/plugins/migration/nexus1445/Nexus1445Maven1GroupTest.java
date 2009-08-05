@@ -20,7 +20,6 @@ import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1445Maven1GroupTest
     extends AbstractMigrationIntegrationTest
@@ -43,7 +42,6 @@ public class Nexus1445Maven1GroupTest
         group.setRepositoryTypeResolution( ERepositoryTypeResolution.VIRTUAL_BOTH );
 
         commitMigration( migrationSummary );
-        TaskScheduleUtil.waitForTasks( 40 );
 
         RepositoryBaseResource virtualRepo = repositoryUtil.getRepository( "java.net.m1-releases-virtual" );
         Assert.assertNotNull( "Virtual release repository was not created", virtualRepo );

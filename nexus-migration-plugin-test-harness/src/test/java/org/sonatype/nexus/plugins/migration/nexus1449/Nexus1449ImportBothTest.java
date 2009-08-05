@@ -20,7 +20,6 @@ import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1449ImportBothTest
     extends AbstractMigrationIntegrationTest
@@ -38,7 +37,6 @@ public class Nexus1449ImportBothTest
         group.setRepositoryTypeResolution( ERepositoryTypeResolution.VIRTUAL_BOTH );
 
         commitMigration( migrationSummary );
-        TaskScheduleUtil.waitForTasks( 40 );
 
         // just be sure if repos are there
         RepositoryBaseResource javaRepo = repositoryUtil.getRepository( "java.net.m2" );

@@ -21,7 +21,6 @@ import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractDeployBridgeTest
     extends AbstractMigrationIntegrationTest
@@ -35,9 +34,6 @@ public abstract class AbstractDeployBridgeTest
 
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
         commitMigration( migrationSummary );
-
-        TaskScheduleUtil.waitForTasks( 40 );
-        Thread.sleep( 2000 );
     }
 
     protected void deploy( Gav gav, String repositoryId, boolean useMavenDeployer, int numberOfFiles,

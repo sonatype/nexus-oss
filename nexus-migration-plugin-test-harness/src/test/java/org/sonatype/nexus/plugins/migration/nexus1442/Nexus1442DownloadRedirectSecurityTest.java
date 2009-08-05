@@ -23,7 +23,6 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1442DownloadRedirectSecurityTest
     extends AbstractMigrationIntegrationTest
@@ -41,9 +40,6 @@ public class Nexus1442DownloadRedirectSecurityTest
     {
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
         commitMigration( migrationSummary );
-
-        TaskScheduleUtil.waitForTasks( 40 );
-        Thread.sleep( 2000 );
     }
 
     @Test

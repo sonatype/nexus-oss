@@ -6,7 +6,6 @@ import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1447ImportWebProxyTest
     extends AbstractMigrationIntegrationTest
@@ -17,8 +16,6 @@ public class Nexus1447ImportWebProxyTest
     {
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
         commitMigration( migrationSummary );
-
-        TaskScheduleUtil.waitForTasks( 40 );
     }
 
     @Test

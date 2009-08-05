@@ -21,7 +21,6 @@ import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1449ImportMaven1OnlyTest
     extends AbstractMigrationIntegrationTest
@@ -39,7 +38,6 @@ public class Nexus1449ImportMaven1OnlyTest
         group.setRepositoryTypeResolution( ERepositoryTypeResolution.MAVEN_1_ONLY );
 
         commitMigration( migrationSummary );
-        TaskScheduleUtil.waitForTasks( 40 );
 
         // just be sure if repos are there
         RepositoryBaseResource javaRepo = repositoryUtil.getRepository( "java.net.m2" );
@@ -51,7 +49,7 @@ public class Nexus1449ImportMaven1OnlyTest
         Assert.assertEquals( "Only one repo should be included", 1, remoteGroup.getRepositories().size() );
 
         RepositoryGroupMemberRepository m2Repo =
-            (RepositoryGroupMemberRepository) remoteGroup.getRepositories().get( 0 );
+            remoteGroup.getRepositories().get( 0 );
         Assert.assertEquals( "m2 releases is not imported", "java.net.m1", m2Repo.getId() );
 
     }

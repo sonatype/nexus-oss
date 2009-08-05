@@ -8,7 +8,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1523ImportToAnExistingRepoTest
     extends AbstractMigrationIntegrationTest
@@ -20,8 +19,6 @@ public class Nexus1523ImportToAnExistingRepoTest
     {
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
         commitMigration( migrationSummary );
-        TaskScheduleUtil.waitForTasks( 40 );
-        Thread.sleep( 2000 );
 
         File logFile = new File( "./target/logs/migration.log" );
         Assert.assertTrue( "Migration log file not found", logFile.isFile() );

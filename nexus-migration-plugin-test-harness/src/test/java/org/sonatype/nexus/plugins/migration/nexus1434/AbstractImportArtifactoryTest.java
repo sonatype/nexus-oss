@@ -25,7 +25,6 @@ import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractImportArtifactoryTest
     extends AbstractMigrationIntegrationTest
@@ -42,10 +41,6 @@ public abstract class AbstractImportArtifactoryTest
         checkLocalRepo();
         checkRemoteRepo();
         checkVirtualRepo();
-
-        TaskScheduleUtil.waitForTasks( 40 );
-
-        Thread.sleep( 30000 );
 
         checkIndexes();
         checkDownloadArtifacts();

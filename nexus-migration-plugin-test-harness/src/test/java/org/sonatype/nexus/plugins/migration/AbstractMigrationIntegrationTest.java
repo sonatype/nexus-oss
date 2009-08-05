@@ -28,6 +28,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.task.ArtifactoryMigrationTaskDescriptor;
 import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
@@ -65,18 +66,11 @@ public abstract class AbstractMigrationIntegrationTest
 
     @BeforeClass
     public static void clean()
+        throws IOException
     {
         TestContainer.getInstance().getTestContext().setSecureTest( false );
 
-        try
-        {
-            cleanWorkDir();
-        }
-        catch ( IOException e )
-        {
-            // is not a good sign, but I can ignore it
-            log.error( "Error deleting work dir", e );
-        }
+        cleanWorkDir();
     }
 
     protected <E> void assertContains( ArrayList<E> collection, E item )
@@ -90,7 +84,7 @@ public abstract class AbstractMigrationIntegrationTest
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        TaskScheduleUtil.waitForTasks( 40 );
+        TaskScheduleUtil.waitForAllTasksToStop( ArtifactoryMigrationTaskDescriptor.ID );
 
         Thread.sleep( 2000 );
     }
@@ -152,7 +146,7 @@ public abstract class AbstractMigrationIntegrationTest
         checkArtifact( nexusGroupId, groupId, artifactId, version, true );
     }
 
-    protected void checkIndex(String repoId, String groupId, String artifactId, String version )
+    protected void checkIndex( String repoId, String groupId, String artifactId, String version )
         throws Exception
     {
         List<NexusArtifact> artifacts = SearchMessageUtil.searchFor( groupId, artifactId, version, repoId );
@@ -200,7 +194,9 @@ public abstract class AbstractMigrationIntegrationTest
         Assert.assertTrue( "Unable to commit import " + status, status.isSuccess() );
 
         // the import is scheduled task now, so we need to wait for it to finish
-        TaskScheduleUtil.waitForTasks( 40 );
+        TaskScheduleUtil.waitForAllTasksToStop( ArtifactoryMigrationTaskDescriptor.ID );
+
+        Thread.sleep( 1000 );
     }
 
     protected void checkNotAvailable( String repositoryId, String groupId, String artifactId, String version )
