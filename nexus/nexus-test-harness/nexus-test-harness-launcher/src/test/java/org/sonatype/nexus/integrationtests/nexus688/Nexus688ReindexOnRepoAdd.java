@@ -15,8 +15,6 @@ package org.sonatype.nexus.integrationtests.nexus688;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 
@@ -39,9 +37,9 @@ public class Nexus688ReindexOnRepoAdd
 {
     private RepositoryMessageUtil messageUtil;
 
-    private static final String INDEX_FILE = ".index/nexus-maven-repository-index.zip";
-
-    private static final int SLEEP_TIME = 200;
+    private static final String OLD_INDEX_FILE = ".index/nexus-maven-repository-index.zip";
+    private static final String NEW_INDEX_FILE = ".index/nexus-maven-repository-index.gz";
+    private static final String INDEX_PROPERTIES = ".index/nexus-maven-repository-index.properties";
 
     public Nexus688ReindexOnRepoAdd()
         throws ComponentLookupException
@@ -65,6 +63,7 @@ public class Nexus688ReindexOnRepoAdd
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+        resource.setExposed( true );
         // invalid for hosted repo resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( true );
@@ -73,14 +72,9 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForTasks();
-
-        // check to see if it has an index to download
-        File indexFile = this.downloadIndexFromRepository( resource.getId() );
-
-        // if the above line didn't throw a FileNotFound, we are good to go, but check anyway.
-        Assert.assertNotNull( "Downloaded index file was null.", indexFile );
-        Assert.assertTrue( "Downloaded index does not exists", indexFile.exists() );
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        this.downloadIndexFromRepository( resource.getId(), true );
     }
 
     @Test
@@ -98,6 +92,7 @@ public class Nexus688ReindexOnRepoAdd
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+        resource.setExposed( true );
         // invalid for hosted repo resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( false );
@@ -106,18 +101,9 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForTasks();
-
-        // check to see if it has an index to download
-        try
-        {
-            this.downloadIndexFromRepository( resource.getId() );
-            Assert.fail( "Expected a 404, FileNotFoundException." );
-        }
-        catch ( FileNotFoundException e )
-        {
-            // expected 404
-        }
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        this.downloadIndexFromRepository( resource.getId(), false );
     }
 
     @Test
@@ -135,6 +121,7 @@ public class Nexus688ReindexOnRepoAdd
         // format is neglected by server from now on, provider is the new guy in the town
         resource.setFormat( "maven2" );
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+        resource.setExposed( true );
         resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( true );
@@ -147,14 +134,9 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForTasks();
-
-        // check to see if it has an index to download
-        File indexFile = this.downloadIndexFromRepository( resource.getId() );
-
-        // if the above line didn't throw a FileNotFound, we are good to go, but check anyway.
-        Assert.assertNotNull( "Downloaded index file was null.", indexFile );
-        Assert.assertTrue( "Downloaded index does not exists", indexFile.exists() );
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        this.downloadIndexFromRepository( resource.getId(), true );
     }
 
     @Test
@@ -175,6 +157,7 @@ public class Nexus688ReindexOnRepoAdd
         resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( true );
+        resource.setExposed( true );
         resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
 
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
@@ -184,14 +167,9 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForTasks();
-
-        // check to see if it has an index to download
-        File indexFile = this.downloadIndexFromRepository( resource.getId() );
-
-        // if the above line didn't throw a FileNotFound, we are good to go, but check anyway.
-        Assert.assertNotNull( "Downloaded index file was null.", indexFile );
-        Assert.assertTrue( "Downloaded index does not exists", indexFile.exists() );
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        this.downloadIndexFromRepository( resource.getId(), true );
     }
 
     @Test
@@ -212,6 +190,7 @@ public class Nexus688ReindexOnRepoAdd
         resource.setChecksumPolicy( "IGNORE" );
         resource.setBrowseable( true );
         resource.setIndexable( false );
+        resource.setExposed( true );
         resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
 
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
@@ -221,35 +200,57 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForTasks();
-
-        // check to see if it has an index to download
-        try
-        {
-            this.downloadIndexFromRepository( resource.getId() );
-            Assert.fail( "Expected a 404, FileNotFoundException." );
-        }
-        catch ( FileNotFoundException e )
-        {
-            e.printStackTrace();
-            // expected 404
-        }
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        this.downloadIndexFromRepository( resource.getId(), false );
     }
 
-    private File downloadIndexFromRepository( String repoId )
-        throws MalformedURLException, IOException
+    private void downloadIndexFromRepository( String repoId, boolean shouldSucceed )
+        throws Exception
     {
         String repositoryUrl = this.getRepositoryUrl( repoId );
-        URL url = new URL( repositoryUrl + INDEX_FILE );
+        
+        URL url = new URL( repositoryUrl + OLD_INDEX_FILE );        
+        downloadFromRepository( url, "target/downloads/index.zip", repoId, shouldSucceed );
+        url = new URL( repositoryUrl + OLD_INDEX_FILE + ".sha1" );        
+        downloadFromRepository( url, "target/downloads/index.zip.sha1", repoId, shouldSucceed );
+        url = new URL( repositoryUrl + OLD_INDEX_FILE + ".md5" );        
+        downloadFromRepository( url, "target/downloads/index.zip.md5", repoId, shouldSucceed );
+        
+        url = new URL( repositoryUrl + NEW_INDEX_FILE );        
+        downloadFromRepository( url, "target/downloads/index.gz", repoId, shouldSucceed );
+        url = new URL( repositoryUrl + NEW_INDEX_FILE + ".sha1" );        
+        downloadFromRepository( url, "target/downloads/index.gz.sha1", repoId, shouldSucceed );
+        url = new URL( repositoryUrl + NEW_INDEX_FILE + ".md5" );        
+        downloadFromRepository( url, "target/downloads/index.gz.md5", repoId, shouldSucceed );
+        
+        url = new URL( repositoryUrl + INDEX_PROPERTIES );        
+        downloadFromRepository( url, "target/downloads/index.properties", repoId, shouldSucceed );
+        url = new URL( repositoryUrl + INDEX_PROPERTIES + ".sha1" );        
+        downloadFromRepository( url, "target/downloads/index.properties.sha1", repoId, shouldSucceed );
+        url = new URL( repositoryUrl + INDEX_PROPERTIES + ".md5" );        
+        downloadFromRepository( url, "target/downloads/index.properties.md5", repoId, shouldSucceed );
+    }
+    
+    private void downloadFromRepository( URL url, String target, String repoId, boolean shouldSucceed )
+        throws Exception
+    {
         try
         {
-            return this.downloadFile( url, "target/downloads/index.zip" );
+            this.downloadFile( url, target );
+            if ( !shouldSucceed )
+            {
+                Assert.fail( "Expected 404, but file was downloaded" );
+            }
         }
         catch ( FileNotFoundException e )
         {
-            throw new FileNotFoundException( e.getMessage() + "\n Found files:\n"
-                + Arrays.toString( new File( nexusWorkDir, "storage/" + repoId + "/.index" ).listFiles() ) );
-        }
+            if ( shouldSucceed )
+            {
+                Assert.fail( e.getMessage() + "\n Found files:\n"
+                    + Arrays.toString( new File( nexusWorkDir, "storage/" + repoId + "/.index" ).listFiles() ) );
+            }
+        }    
     }
 
 }
