@@ -32,11 +32,11 @@ public class ViewsPanel
 
     public boolean logsAndConfigFilesAvailable()
     {
-        return isLinkAvailable( "Logs and Config Files" );
+        return isLinkAvailable( "System Files" );
     }
 
     public void logsAndConfigFilesClick()
     {
-        clickLink( "Logs and Config Files" );
+        clickLink( "System Files" );
     }
 }

@@ -274,10 +274,10 @@ Sonatype.repoServer.RepoServer = function(){
           {
             enabled: sp.checkPermission( 'nexus:logs', sp.READ ) ||
               sp.checkPermission( 'nexus:configuration', sp.READ ),
-            title: 'Logs and Config Files',
+            title: 'System Files',
             tabId: 'view-logs',
             tabCode: Sonatype.repoServer.LogsViewPanel,
-            tabTitle: 'Logs and Configs'
+            tabTitle: 'System Files'
           }
         ]
       } );
@@ -335,7 +335,7 @@ Sonatype.repoServer.RepoServer = function(){
               ( sp.checkPermission('nexus:logconfig', sp.CREATE) ||
                 sp.checkPermission('nexus:logconfig', sp.DELETE) ||
                 sp.checkPermission('nexus:logconfig', sp.EDIT)),
-            title: 'Log',
+            title: 'Log Configuration',
             tabId: 'log-config',
             tabCode: Sonatype.repoServer.LogEditPanel
           }          
