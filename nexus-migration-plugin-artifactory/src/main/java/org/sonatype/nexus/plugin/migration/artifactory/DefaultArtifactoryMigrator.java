@@ -112,7 +112,7 @@ public class DefaultArtifactoryMigrator
     /**
      * Map of processed migrations.
      */
-    private HashMap<String, MigrationResult> migrationResults = new HashMap<String, MigrationResult>();
+    private static HashMap<String, MigrationResult> migrationResults = new HashMap<String, MigrationResult>();
 
     public MigrationResult getMigrationResultForId( String id )
     {
@@ -360,8 +360,10 @@ public class DefaultArtifactoryMigrator
                     else
                     // BOTH
                     {
-                        Repository nexusRepoReleases = createRepository( repo, artifactoryProxies, false, "releases" , result);
-                        Repository nexusRepoSnapshots = createRepository( repo, artifactoryProxies, true, "snapshots", result );
+                        Repository nexusRepoReleases =
+                            createRepository( repo, artifactoryProxies, false, "releases", result );
+                        Repository nexusRepoSnapshots =
+                            createRepository( repo, artifactoryProxies, true, "snapshots", result );
 
                         String repoType = repo.getType();
                         if ( repoType == null )
