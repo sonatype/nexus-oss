@@ -154,8 +154,6 @@ public abstract class AbstractRepositoryGroupPlexusResource
 
             exConf.setMemberRepositoryIds( members );
 
-            exConf.commitChanges();
-
             getNexus().createRepository( group );
         }
         catch ( InvalidGroupingException e )

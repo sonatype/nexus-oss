@@ -23,9 +23,10 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.Configurator;
-import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -147,10 +148,11 @@ public abstract class AbstractRepository
     protected abstract Configurator getConfigurator();
 
     @Override
-    public abstract Validator getValidator();
+    protected abstract CRepositoryExternalConfigurationHolderFactory<?> getExternalConfigurationHolderFactory();
 
     @Override
     public boolean commitChanges()
+        throws ConfigurationException
     {
         boolean wasDirty = super.commitChanges();
 
@@ -167,6 +169,14 @@ public abstract class AbstractRepository
     {
         return applicationConfiguration;
     }
+
+    protected AbstractRepositoryConfiguration getExternalConfiguration( boolean forModification )
+    {
+        return (AbstractRepositoryConfiguration) getCurrentCoreConfiguration().getExternalConfiguration()
+            .getConfiguration( forModification );
+    }
+
+    // ==
 
     public RepositoryTaskFilter getRepositoryTaskFilter()
     {

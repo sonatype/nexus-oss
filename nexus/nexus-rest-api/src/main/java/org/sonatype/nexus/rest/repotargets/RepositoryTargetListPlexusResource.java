@@ -15,6 +15,7 @@ package org.sonatype.nexus.rest.repotargets;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.regex.PatternSyntaxException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
@@ -24,13 +25,17 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CRepositoryTarget;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
+import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 /**
  * @author tstevens
@@ -69,11 +74,11 @@ public class RepositoryTargetListPlexusResource
     {
         RepositoryTargetListResourceResponse result = new RepositoryTargetListResourceResponse();
 
-        Collection<CRepositoryTarget> targets = getNexusConfiguration().listRepositoryTargets();
+        Collection<Target> targets = getTargetRegistry().getRepositoryTargets();
 
         RepositoryTargetListResource res = null;
 
-        for ( CRepositoryTarget target : targets )
+        for ( Target target : targets )
         {
             res = new RepositoryTargetListResource();
 
@@ -81,7 +86,7 @@ public class RepositoryTargetListPlexusResource
 
             res.setName( target.getName() );
 
-            res.setContentClass( target.getContentClass() );
+            res.setContentClass( target.getContentClass().getId() );
 
             res.setResourceURI( this.createChildReference( request, this, target.getId() ).toString() );
 
@@ -106,11 +111,13 @@ public class RepositoryTargetListPlexusResource
             {
                 try
                 {
-                    CRepositoryTarget target = getRestToNexusResource( resource );
-
                     // create
-                    getNexusConfiguration().createRepositoryTarget( target );
-
+                    Target target = getRestToNexusResource( resource );
+                    
+                    getTargetRegistry().addRepositoryTarget( target );
+                    
+                    getNexusConfiguration().saveConfiguration();
+                    
                     // response
                     resourceResponse = new RepositoryTargetResourceResponse();
 
@@ -120,6 +127,12 @@ public class RepositoryTargetListPlexusResource
                 {
                     // build an exception and throws it
                     handleConfigurationException( e );
+                }
+                catch ( PatternSyntaxException e )
+                {
+                    // TODO: fix because this happens before we validate, we need to fix the validation.
+                    ErrorResponse errorResponse = getNexusErrorResponse( "*", e.getMessage() );
+                    throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", errorResponse );
                 }
                 catch ( IOException e )
                 {

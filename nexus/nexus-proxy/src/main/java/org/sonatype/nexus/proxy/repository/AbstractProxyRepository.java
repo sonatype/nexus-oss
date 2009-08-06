@@ -94,9 +94,10 @@ public abstract class AbstractProxyRepository
     private Map<String, ItemContentValidator> itemContentValidators;
 
     @Override
-    protected AbstractProxyRepositoryConfiguration getExternalConfiguration()
+    protected AbstractProxyRepositoryConfiguration getExternalConfiguration( boolean forModification )
     {
-        return (AbstractProxyRepositoryConfiguration) super.getExternalConfiguration();
+        return (AbstractProxyRepositoryConfiguration) getCurrentCoreConfiguration().getExternalConfiguration()
+            .getConfiguration( forModification );
     }
 
     public Map<String, ItemContentValidator> getItemContentValidators()
@@ -113,7 +114,7 @@ public abstract class AbstractProxyRepository
     {
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
-            return getExternalConfiguration().getProxyMode();
+            return getExternalConfiguration(false ).getProxyMode();
         }
         else
         {
@@ -127,7 +128,7 @@ public abstract class AbstractProxyRepository
         {
             ProxyMode oldProxyMode = getProxyMode();
 
-            getExternalConfiguration().setProxyMode( proxyMode );
+            getExternalConfiguration(true ).setProxyMode( proxyMode );
 
             // if this is proxy
             // and was !shouldProxy() and the new is shouldProxy()
@@ -163,12 +164,12 @@ public abstract class AbstractProxyRepository
 
     public RepositoryStatusCheckMode getRepositoryStatusCheckMode()
     {
-        return getExternalConfiguration().getRepositoryStatusCheckMode();
+        return getExternalConfiguration( false ).getRepositoryStatusCheckMode();
     }
 
     public void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode )
     {
-        getExternalConfiguration().setRepositoryStatusCheckMode( mode );
+        getExternalConfiguration(true ).setRepositoryStatusCheckMode( mode );
     }
 
     public String getRemoteUrl()
@@ -217,7 +218,7 @@ public abstract class AbstractProxyRepository
      */
     public int getItemMaxAge()
     {
-        return getExternalConfiguration().getItemMaxAge();
+        return getExternalConfiguration( false ).getItemMaxAge();
     }
 
     /**
@@ -227,7 +228,7 @@ public abstract class AbstractProxyRepository
      */
     public void setItemMaxAge( int itemMaxAge )
     {
-        getExternalConfiguration().setItemMaxAge( itemMaxAge );
+        getExternalConfiguration( true ).setItemMaxAge( itemMaxAge );
     }
 
     protected void resetRemoteStatus()

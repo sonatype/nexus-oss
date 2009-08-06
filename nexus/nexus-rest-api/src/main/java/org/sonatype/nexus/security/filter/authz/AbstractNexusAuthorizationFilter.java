@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 public class AbstractNexusAuthorizationFilter

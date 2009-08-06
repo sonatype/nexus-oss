@@ -17,7 +17,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
@@ -31,8 +31,14 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.swizzle.jira.Issue;
 import org.codehaus.swizzle.jira.Jira;
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.configuration.AbstractConfigurable;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
+import org.sonatype.nexus.configuration.model.CErrorReportingCoreConfiguration;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
 import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
@@ -40,42 +46,164 @@ import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 
 @Component( role = ErrorReportingManager.class )
 public class DefaultErrorReportingManager
-    extends AbstractLogEnabled
+    extends AbstractConfigurable
     implements ErrorReportingManager
 {
     @Requirement
-    NexusConfiguration nexusConfig;
+    private Logger logger;
+
+    @Requirement
+    private NexusConfiguration nexusConfig;
 
     @Requirement( role = SecurityModelConfigurationSource.class, hint = "file" )
-    SecurityModelConfigurationSource securityXmlSource;
-
-    @Requirement( role = SecurityConfigurationSource.class, hint = "file" )
-    SecurityConfigurationSource securityConfigurationXmlSource;
+    private SecurityModelConfigurationSource securityXmlSource;
     
     @Requirement( role = ApplicationStatusSource.class )
     ApplicationStatusSource applicationStatus;
 
+    @Requirement( role = SecurityConfigurationSource.class, hint = "file" )
+    private SecurityConfigurationSource securityConfigurationXmlSource;
+
     @Requirement
-    ConfigurationHelper configHelper;
+    private ConfigurationHelper configHelper;
 
     private static final String DEFAULT_USERNAME = "sonatype_problem_reporting";
-    
+
     private static final String COMPONENT = "Nexus";
 
     private static final String ERROR_REPORT_DIR = "error-report-bundles";
+
+    // ==
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
+
+    // ==
+
+    @Override
+    protected void initializeConfiguration()
+        throws ConfigurationException
+    {
+        if ( getApplicationConfiguration().getConfigurationModel() != null )
+        {
+            configure( getApplicationConfiguration() );
+        }
+    }
+
+    @Override
+    protected ApplicationConfiguration getApplicationConfiguration()
+    {
+        return nexusConfig;
+    }
+
+    @Override
+    protected Configurator getConfigurator()
+    {
+        return null;
+    }
+
+    @Override
+    protected CErrorReporting getCurrentConfiguration( boolean forWrite )
+    {
+        return ( (CErrorReportingCoreConfiguration) getCurrentCoreConfiguration() ).getConfiguration( forWrite );
+    }
+
+    @Override
+    protected CoreConfiguration wrapConfiguration( Object configuration )
+        throws ConfigurationException
+    {
+        if ( configuration instanceof ApplicationConfiguration )
+        {
+            return new CErrorReportingCoreConfiguration( getApplicationConfiguration() );
+        }
+        else
+        {
+            throw new ConfigurationException( "The passed configuration object is of class \""
+                + configuration.getClass().getName() + "\" and not the required \""
+                + ApplicationConfiguration.class.getName() + "\"!" );
+        }
+    }
+
+    // ==
+
+    public boolean isEnabled()
+    {
+        return getCurrentConfiguration( false ).isEnabled();
+    }
+
+    public void setEnabled( boolean value )
+    {
+        getCurrentConfiguration( true ).setEnabled( value );
+    }
+
+    public String getJIRAUrl()
+    {
+        return getCurrentConfiguration( false ).getJiraUrl();
+    }
+
+    public void setJIRAUrl( String url )
+    {
+        getCurrentConfiguration( true ).setJiraUrl( url );
+    }
+
+    public String getJIRAUsername()
+    {
+        return getCurrentConfiguration( false ).getJiraUsername();
+    }
+
+    public void setJIRAUsername( String username )
+    {
+        getCurrentConfiguration( true ).setJiraUsername( username );
+    }
+
+    public String getJIRAPassword()
+    {
+        return getCurrentConfiguration( false ).getJiraPassword();
+    }
+
+    public void setJIRAPassword( String password )
+    {
+        getCurrentConfiguration( true ).setJiraPassword( password );
+    }
+
+    public String getJIRAProject()
+    {
+        return getCurrentConfiguration( false ).getJiraProject();
+    }
+
+    public void setJIRAProject( String pkey )
+    {
+        getCurrentConfiguration( true ).setJiraProject( pkey );
+    }
+
+    public boolean isUseGlobalProxy()
+    {
+        return getCurrentConfiguration( false ).isUseGlobalProxy();
+    }
+
+    public void setUseGlobalProxy( boolean val )
+    {
+        getCurrentConfiguration( true ).setUseGlobalProxy( val );
+    }
+
+    // ==
+
+    // FIXME: get rid of CErrorReporirting direct usages in general, use setter/getters!
 
     public void handleError( ErrorReportRequest request )
         throws IssueSubmissionException,
             IOException
     {
-        CErrorReporting errorConfig = nexusConfig.readErrorReporting();
+        CErrorReporting errorConfig = getCurrentConfiguration( false );
 
         if ( isEnabled() )
         {
             IssueSubmissionRequest subRequest = buildRequest( errorConfig, request );
-            
+
             List<Issue> existingIssues = retrieveIssues( errorConfig, subRequest.getSummary() );
-            
+
             if ( existingIssues == null )
             {
                 IssueSubmissionResult result = getIssueSubmitter( errorConfig ).submitIssue( subRequest );
@@ -85,26 +213,26 @@ public class DefaultErrorReportingManager
             else
             {
                 renameBundle( subRequest.getProblemReportBundle(), existingIssues.iterator().next().getKey() );
-                getLogger().info( "Not reporting problem as it already exists in database: " + existingIssues.iterator().next().getLink() );
+                getLogger().info(
+                    "Not reporting problem as it already exists in database: "
+                        + existingIssues.iterator().next().getLink() );
             }
         }
     }
-    
-    public List<Issue> retrieveIssues( CErrorReporting errorConfig, String description )
+
+    protected List<Issue> retrieveIssues( CErrorReporting errorConfig, String description )
     {
         Jira jira = null;
-        
+
         try
         {
             jira = new Jira( errorConfig.getJiraUrl() + "/rpc/xmlrpc" );
             jira.login( getJiraUsername( errorConfig ),
                 getJiraPassword( errorConfig ) );
-            
-            List<Issue> issues = ( List<Issue> ) jira.getIssuesFromTextSearchWithProject( 
-                Arrays.asList( errorConfig.getJiraProject() ), 
-                "\"" + description + "\"",
-                20 );
-            
+
+            List<Issue> issues = (List<Issue>) jira.getIssuesFromTextSearchWithProject( Arrays.asList( errorConfig
+                .getJiraProject() ), "\"" + description + "\"", 20 );
+
             if ( !issues.isEmpty() )
             {
                 return issues;
@@ -127,31 +255,19 @@ public class DefaultErrorReportingManager
                 }
             }
         }
-        
+
         return null;
     }
-    
-    public boolean isEnabled()
-    {
-        CErrorReporting errorConfig = nexusConfig.readErrorReporting();
 
-        if ( errorConfig != null && errorConfig.isEnabled() )
-        {
-            return true;
-        }
-        
-        return false;
-    }
-    
-    protected void renameBundle( File bundle, String jiraTicket ) 
+    protected void renameBundle( File bundle, String jiraTicket )
         throws IOException
     {
         if ( StringUtils.isNotEmpty( jiraTicket ) )
         {
             String filename = bundle.getAbsolutePath();
-            
+
             String newfilename = filename.replace( "nexus-error-bundle", "nexus-error-bundle-" + jiraTicket );
-            
+
             FileUtils.rename( bundle, new File( newfilename ) );
         }
     }
@@ -174,21 +290,46 @@ public class DefaultErrorReportingManager
             + StringDigester.LINE_SEPERATOR
             + ExceptionUtils.getFullStackTrace( request.getThrowable() ) );
         subRequest.setProblemReportBundle( assembleBundle( request ) );
-        subRequest.setReporter( StringUtils.isNotEmpty( errorConfig.getJiraUsername() ) ? errorConfig.getJiraUsername() : DEFAULT_USERNAME );
+        subRequest.setReporter( StringUtils.isNotEmpty( errorConfig.getJiraUsername() )
+            ? errorConfig.getJiraUsername()
+            : DEFAULT_USERNAME );
         subRequest.setComponent( COMPONENT );
         subRequest.setEnvironment( assembleEnvironment( request ) );
-        
+
         if ( errorConfig.isUseGlobalProxy() )
         {
-            subRequest.setProxyConfigurator( 
-                new NexusProxyServerConfigurator( 
-                    nexusConfig.getGlobalRemoteStorageContext(), 
-                    getLogger() ) );
+            subRequest.setProxyConfigurator( new NexusProxyServerConfigurator( nexusConfig
+                .getGlobalRemoteStorageContext(), getLogger() ) );
         }
 
         return subRequest;
     }
+
+    private String getJiraUsername( CErrorReporting errorConfig )
+    {
+        String username = DEFAULT_USERNAME;
+        
+        if ( StringUtils.isNotEmpty( errorConfig.getJiraUsername() ) )
+        {
+            username = errorConfig.getJiraUsername();
+        }
+        
+        return username;
+    }
     
+    private String getJiraPassword( CErrorReporting errorConfig )
+    {
+        String password = DEFAULT_USERNAME;
+        
+        if ( StringUtils.isNotEmpty( errorConfig.getJiraPassword() ) )
+        {
+            password = errorConfig.getJiraPassword();
+        }
+        
+        return password;
+    }
+    
+
     private String assembleEnvironment( ErrorReportRequest request )
     {
         StringBuffer sb = new StringBuffer();
@@ -222,35 +363,11 @@ public class DefaultErrorReportingManager
         return sb.toString();
     }
     
-    private String getJiraUsername( CErrorReporting errorConfig )
-    {
-        String username = DEFAULT_USERNAME;
-        
-        if ( StringUtils.isNotEmpty( errorConfig.getJiraUsername() ) )
-        {
-            username = errorConfig.getJiraUsername();
-        }
-        
-        return username;
-    }
-    
-    private String getJiraPassword( CErrorReporting errorConfig )
-    {
-        String password = DEFAULT_USERNAME;
-        
-        if ( StringUtils.isNotEmpty( errorConfig.getJiraPassword() ) )
-        {
-            password = errorConfig.getJiraPassword();
-        }
-        
-        return password;
-    }
-
     private IssueSubmitter getIssueSubmitter( CErrorReporting errorConfig )
         throws IssueSubmissionException
     {
         try
-        {        	
+        {           
             return new JiraIssueSubmitter( 
                 errorConfig.getJiraUrl(), 
                 new DefaultAuthenticationSource(
@@ -389,7 +506,7 @@ public class DefaultErrorReportingManager
             FileListingHelper.buildFileListing( nexusConfig.getWorkingDirectory() ),
             "fileListing.txt" );
     }
-    
+
     private File getExceptionListing( Throwable t )
         throws IOException
     {

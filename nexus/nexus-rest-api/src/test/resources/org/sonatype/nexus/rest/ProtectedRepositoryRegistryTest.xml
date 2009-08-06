@@ -1,10 +1,5 @@
 <plexus>
   <components>
-      
-      <component>
-      <role>org.sonatype.nexus.configuration.application.ApplicationConfiguration</role>
-      <implementation>org.sonatype.nexus.configuration.SimpleSecureApplicationConfiguration</implementation>
-    </component>
 
     <component>
         <role>org.jsecurity.realm.Realm</role>

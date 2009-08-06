@@ -45,6 +45,8 @@ public class DefaultRepositoryRouterTest
 
     private SecuritySystem securitySystem = null;
 
+    private ApplicationConfiguration applicationConfiguration;
+
     @Override
     protected void customizeContext( Context ctx )
     {
@@ -56,7 +58,7 @@ public class DefaultRepositoryRouterTest
     protected void setUp()
         throws Exception
     {
-        ApplicationConfiguration applicationConfiguration = this.lookup( ApplicationConfiguration.class );
+        applicationConfiguration = this.lookup( ApplicationConfiguration.class );
         applicationConfiguration.saveConfiguration();
 
         super.setUp();
@@ -64,7 +66,7 @@ public class DefaultRepositoryRouterTest
         this.router = this.lookup( RepositoryRouter.class );
         this.repositoryRegistry = this.lookup( RepositoryRegistry.class );
 
-        this.buildRepository( "repo1", true );
+        this.buildRepository( "repo1", true ).getCurrentCoreConfiguration();
         this.buildRepository( "repo2", true );
         this.buildRepository( "repo3-notexposed", false );
 
@@ -83,9 +85,12 @@ public class DefaultRepositoryRouterTest
 
         // create a target
         TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
-        Target t1 = new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays
-            .asList( new String[] { ".*" } ) );
+        Target t1 =
+            new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays.asList( new String[] { ".*" } ) );
         targetRegistry.addRepositoryTarget( t1 );
+
+        // flush changes
+        applicationConfiguration.saveConfiguration();
 
         // setup security
         this.securitySystem = this.lookup( SecuritySystem.class );
@@ -234,6 +239,7 @@ public class DefaultRepositoryRouterTest
         repoConfig.setExposed( exposed );
         repo.configure( repoConfig );
         this.repositoryRegistry.addRepository( repo );
+        this.applicationConfiguration.getConfigurationModel().addRepository( repoConfig );
 
         return repo;
     }
@@ -247,6 +253,7 @@ public class DefaultRepositoryRouterTest
         repoConfig.setExposed( exposed );
         repo.configure( repoConfig );
         this.repositoryRegistry.addRepository( repo );
+        this.applicationConfiguration.getConfigurationModel().addRepository( repoConfig );
 
         return repo;
     }
@@ -260,11 +267,11 @@ public class DefaultRepositoryRouterTest
         repoConfig.setExposed( exposed );
         repo.configure( repoConfig );
         this.repositoryRegistry.addRepository( repo );
+        this.applicationConfiguration.getConfigurationModel().addRepository( repoConfig );
 
         // now for the shadow
-        M2LayoutedM1ShadowRepository shadow = (M2LayoutedM1ShadowRepository) this.lookup(
-            ShadowRepository.class,
-            "m1-m2-shadow" );
+        M2LayoutedM1ShadowRepository shadow =
+            (M2LayoutedM1ShadowRepository) this.lookup( ShadowRepository.class, "m1-m2-shadow" );
         CRepository shadowConfig = new DefaultCRepository();
         shadowConfig.setId( repoId + "-shadow" );
         shadowConfig.setExposed( exposed );
@@ -275,11 +282,11 @@ public class DefaultRepositoryRouterTest
         shadowConfig.setExternalConfiguration( exRepo );
         M1LayoutedM2ShadowRepositoryConfiguration exRepoConf = new M1LayoutedM2ShadowRepositoryConfiguration( exRepo );
         exRepoConf.setMasterRepositoryId( repo.getId() );
-        exRepoConf.commitChanges();
 
         shadow.configure( shadowConfig );
         // shadow.
         this.repositoryRegistry.addRepository( shadow );
+        this.applicationConfiguration.getConfigurationModel().addRepository( shadowConfig );
 
         return repo;
 

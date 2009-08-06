@@ -19,15 +19,8 @@ import java.util.List;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CErrorReporting;
-import org.sonatype.nexus.configuration.model.CPathMappingItem;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryTarget;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
@@ -71,109 +64,15 @@ public interface MutableConfiguration
 
     ScheduledTaskDescriptor getScheduledTaskDescriptor( String id );
 
-    // ----------------------------------------------------------------------------------------------------------
-    // REST API
-    // ----------------------------------------------------------------------------------------------------------
-
-    String getBaseUrl();
-
-    void setBaseUrl( String baseUrl )
-        throws IOException;
-
-    boolean isForceBaseUrl();
-
-    void setForceBaseUrl( boolean force )
-        throws IOException;
-
-    int getSessionExpiration();
-
-    void setSessionExpiration( int value )
-        throws IOException;
-
-    // ------------------------------------------------------------------
-    // CRUD-like ops on config sections
-
-    // Globals are mandatory: RU
-
-    // CRemoteConnectionSettings are mandatory: RU
-
-    CRemoteConnectionSettings readGlobalRemoteConnectionSettings();
-
-    void updateGlobalRemoteConnectionSettings( CRemoteConnectionSettings settings )
-        throws ConfigurationException,
-            IOException;
-
-    // CRemoteHttpProxySettings are optional: CRUD
-
-    void createGlobalRemoteHttpProxySettings( CRemoteHttpProxySettings settings )
-        throws ConfigurationException,
-            IOException;
-
-    CRemoteHttpProxySettings readGlobalRemoteHttpProxySettings();
-
-    void updateGlobalRemoteHttpProxySettings( CRemoteHttpProxySettings settings )
-        throws ConfigurationException,
-            IOException;
-
-    void deleteGlobalRemoteHttpProxySettings()
-        throws IOException;
-
-    // CRouting are mandatory: RU
-
-    CRouting readRouting();
-
-    void updateRouting( CRouting settings )
-        throws ConfigurationException,
-            IOException;
-
     // CRepository: CRUD
 
     Repository createRepository( CRepository settings )
-        throws ConfigurationException,
-            IOException;
+        throws ConfigurationException, IOException;
 
     void deleteRepository( String id )
-        throws NoSuchRepositoryException,
-            IOException,
-            ConfigurationException;
+        throws NoSuchRepositoryException, IOException, ConfigurationException;
 
-    // CGroupsSettingPathMapping: CRUD
-
-    Collection<CPathMappingItem> listGroupsSettingPathMapping();
-
-    void createGroupsSettingPathMapping( CPathMappingItem settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException;
-
-    CPathMappingItem readGroupsSettingPathMapping( String id )
-        throws IOException;
-
-    void updateGroupsSettingPathMapping( CPathMappingItem settings )
-        throws NoSuchRepositoryException,
-            ConfigurationException,
-            IOException;
-
-    void deleteGroupsSettingPathMapping( String id )
-        throws IOException;
-
-    // CRepositoryTarget: CRUD
-
-    Collection<CRepositoryTarget> listRepositoryTargets();
-
-    void createRepositoryTarget( CRepositoryTarget settings )
-        throws ConfigurationException,
-            IOException;
-
-    CRepositoryTarget readRepositoryTarget( String id );
-
-    void updateRepositoryTarget( CRepositoryTarget settings )
-        throws ConfigurationException,
-            IOException;
-
-    void deleteRepositoryTarget( String id )
-        throws IOException;
-
+    // FIXME: This will be removed: NEXUS-2363 vvvvv
     // CRemoteNexusInstance
 
     Collection<CRemoteNexusInstance> listRemoteNexusInstances();
@@ -186,19 +85,6 @@ public interface MutableConfiguration
 
     void deleteRemoteNexusInstance( String alias )
         throws IOException;
+    // FIXME: This will be removed: NEXUS-2363 ^^^^^
 
-    // CSmtpConfiguration are mandatory: RU
-    // Smtp settings
-    CSmtpConfiguration readSmtpConfiguration();
-
-    void updateSmtpConfiguration( CSmtpConfiguration settings )
-        throws ConfigurationException,
-            IOException;
-    
-    // Error reporting    
-    CErrorReporting readErrorReporting();
-    
-    void updateErrorReporting( CErrorReporting errorReporting )
-        throws ConfigurationException,
-            IOException;
 }

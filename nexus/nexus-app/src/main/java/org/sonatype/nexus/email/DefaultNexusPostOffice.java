@@ -15,60 +15,55 @@ package org.sonatype.nexus.email;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.MailRequest;
-import org.sonatype.micromailer.imp.DefaultMailType;
 
 /**
  * The default nexus post office.
- *
+ * 
  * @author Alin Dreghiciu
  */
 @Component( role = NexusPostOffice.class )
 public class DefaultNexusPostOffice
     implements NexusPostOffice
 {
-
     @Requirement
-    private NexusEmailer m_emailer;
+    private NexusEmailer nexusEmailer;
 
     /**
      * {@inheritDoc}
      */
-    public void sendNexusTaskFailure( final String email,
-                                      final String taskId,
-                                      final String taskName,
+    public void sendNexusTaskFailure( final String email, final String taskId, final String taskName,
                                       final Throwable cause )
     {
-        final MailRequest request = new MailRequest( NexusEmailer.NEXUS_MAIL_ID, DefaultMailType.DEFAULT_TYPE_ID );
-        request.setFrom( new Address( m_emailer.getSystemEmailAddress(), "Nexus Repository Manager" ) );
-        request.getToAddresses().add( new Address( email ) );
-        request.getBodyContext().put( DefaultMailType.SUBJECT_KEY, "Nexus: Task execution failure" );
-
         final StringBuilder body = new StringBuilder();
-        if( taskId != null )
+        
+        if ( taskId != null )
         {
             body.append( String.format( "Task ID: %s", taskId ) ).append( "\n" );
         }
-        if( taskName != null )
+        
+        if ( taskName != null )
         {
             body.append( String.format( "Task Name: %s", taskName ) ).append( "\n" );
         }
-        if( cause != null )
+        
+        if ( cause != null )
         {
             final StringWriter sw = new StringWriter();
             final PrintWriter pw = new PrintWriter( sw );
             cause.printStackTrace( pw );
-            body.append( "Stack trace: " )
-                .append( "\n" )
-                .append( sw.toString() );
+            body.append( "Stack trace: " ).append( "\n" ).append( sw.toString() );
         }
 
-        request.getBodyContext().put( DefaultMailType.BODY_KEY, body.toString() );
+        MailRequest request = nexusEmailer.getDefaultMailRequest( "Nexus: Task execution failure", body.toString() );
 
-        m_emailer.sendMail( request );
+        request.getToAddresses().add( new Address( email ) );
+
+        nexusEmailer.sendMail( request );
     }
-    
+
 }

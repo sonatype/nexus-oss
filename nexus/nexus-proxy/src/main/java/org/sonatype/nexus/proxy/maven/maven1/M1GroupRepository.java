@@ -15,9 +15,11 @@ package org.sonatype.nexus.proxy.maven.maven1;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.configuration.Configurator;
-import org.sonatype.nexus.configuration.Validator;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -35,13 +37,22 @@ public class M1GroupRepository
     @Requirement
     private M1GroupRepositoryConfigurator m1GroupRepositoryConfigurator;
 
-    @Requirement
-    private M1GroupRepositoryValidator m1GroupRepositoryValidator;
+    @Override
+    protected M1GroupRepositoryConfiguration getExternalConfiguration( boolean forWrite )
+    {
+        return (M1GroupRepositoryConfiguration) super.getExternalConfiguration( forWrite );
+    }
 
     @Override
-    protected M1GroupRepositoryConfiguration getExternalConfiguration()
+    protected CRepositoryExternalConfigurationHolderFactory<M1GroupRepositoryConfiguration> getExternalConfigurationHolderFactory()
     {
-        return (M1GroupRepositoryConfiguration) super.getExternalConfiguration();
+        return new CRepositoryExternalConfigurationHolderFactory<M1GroupRepositoryConfiguration>()
+        {
+            public M1GroupRepositoryConfiguration createExternalConfigurationHolder( CRepository config )
+            {
+                return new M1GroupRepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
+            }
+        };
     }
 
     public ContentClass getRepositoryContentClass()
@@ -58,11 +69,5 @@ public class M1GroupRepository
     protected Configurator getConfigurator()
     {
         return m1GroupRepositoryConfigurator;
-    }
-
-    @Override
-    public Validator getValidator()
-    {
-        return m1GroupRepositoryValidator;
     }
 }

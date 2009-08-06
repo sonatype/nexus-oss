@@ -23,7 +23,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.RemoteSettingsUtil;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.StorageException;
@@ -191,16 +190,16 @@ public class RepositoryPlexusResource
                                 }
                                 
                                 String oldPasswordForProxy = null;
-                                if( pRepository.getRemoteProxySettings() != null && 
+                                if( pRepository.getRemoteProxySettings() != null && pRepository.getRemoteProxySettings().isEnabled() &&
                                     pRepository.getRemoteProxySettings().getProxyAuthentication() != null &&
                                     UsernamePasswordRemoteAuthenticationSettings.class.isInstance( pRepository.getRemoteAuthenticationSettings() ))
                                 {
                                     oldPasswordForProxy = ((UsernamePasswordRemoteAuthenticationSettings) pRepository.getRemoteProxySettings().getProxyAuthentication() ).getPassword();
                                 }
                                 
-                                RemoteAuthenticationSettings remoteAuth = RemoteSettingsUtil.convertFromModel( this.convertAuthentication(  model.getRemoteStorage().getAuthentication(), oldPasswordForRemoteStorage ));
-                                RemoteConnectionSettings remoteConnSettings = RemoteSettingsUtil.convertFromModel( this.convertRemoteConnectionSettings( model.getRemoteStorage().getConnectionSettings() ));
-                                RemoteProxySettings httpProxySettings = RemoteSettingsUtil.convertFromModel( this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings(), oldPasswordForProxy ) );
+                                RemoteAuthenticationSettings remoteAuth = getAuthenticationInfoConverter().convertAndValidateFromModel( this.convertAuthentication(  model.getRemoteStorage().getAuthentication(), oldPasswordForRemoteStorage ));
+                                RemoteConnectionSettings remoteConnSettings = getGlobalRemoteConnectionSettings().convertAndValidateFromModel( this.convertRemoteConnectionSettings( model.getRemoteStorage().getConnectionSettings() ));
+                                RemoteProxySettings httpProxySettings = getGlobalHttpProxySettings().convertAndValidateFromModel( this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings(), oldPasswordForProxy ) );
                                 
                                 if( remoteAuth != null )
                                 {
@@ -287,7 +286,6 @@ public class RepositoryPlexusResource
         throws ResourceException
     {
         String repoId = this.getRepositoryId( request );
-        
         try
         {
             getNexus().deleteRepository( repoId );

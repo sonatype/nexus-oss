@@ -7,6 +7,7 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.templates.AbstractTemplateProvider;
 import org.sonatype.nexus.templates.TemplateProvider;
@@ -37,6 +38,12 @@ public class DefaultRepositoryTemplateProvider
     protected Nexus getNexus()
     {
         return nexus;
+    }
+
+    @Override
+    public ApplicationConfiguration getApplicationConfiguration()
+    {
+        return super.getApplicationConfiguration();
     }
 
     public Class<RepositoryTemplate> getTemplateClass()

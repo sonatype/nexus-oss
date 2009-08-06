@@ -1,40 +1,22 @@
 package org.sonatype.nexus.proxy.repository;
 
-public class RemoteProxySettings
+public interface RemoteProxySettings
 {
-    private String hostname;
+    boolean isEnabled();
+    
+    boolean isBlockInheritance();
 
-    private int port;
+    void setBlockInheritance( boolean val );
 
-    private RemoteAuthenticationSettings proxyAuthentication;
+    String getHostname();
 
-    public String getHostname()
-    {
-        return hostname;
-    }
+    void setHostname( String hostname );
 
-    public void setHostname( String hostname )
-    {
-        this.hostname = hostname;
-    }
+    int getPort();
 
-    public int getPort()
-    {
-        return port;
-    }
+    void setPort( int port );
 
-    public void setPort( int port )
-    {
-        this.port = port;
-    }
+    RemoteAuthenticationSettings getProxyAuthentication();
 
-    public RemoteAuthenticationSettings getProxyAuthentication()
-    {
-        return proxyAuthentication;
-    }
-
-    public void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication )
-    {
-        this.proxyAuthentication = proxyAuthentication;
-    }
+    void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication );
 }

@@ -58,7 +58,7 @@ public class NexusConfigUtil
             Assert.fail( "Unable to load config " + e.getMessage() );
             config = null;
         }
-        return config.getConfiguration();
+        return config.getConfigurationModel();
     }
 
     public static File getNexusFile()

@@ -3,6 +3,8 @@ package org.sonatype.nexus.templates;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+
 /**
  * An aggregating provider used to aggregate multiple TemplateProvider into one.
  * 
@@ -17,8 +19,10 @@ public class AggregatingTemplateProvider<T extends Template>
 
     private final List<TemplateProvider<T>> providers;
 
-    public AggregatingTemplateProvider( Class<T> templateClass, List<TemplateProvider<T>> providers )
+    public AggregatingTemplateProvider( ApplicationConfiguration applicationConfiguration, Class<T> templateClass, List<TemplateProvider<T>> providers )
     {
+        setApplicationConfiguration( applicationConfiguration );
+        
         this.templateClass = templateClass;
 
         this.providers = providers;

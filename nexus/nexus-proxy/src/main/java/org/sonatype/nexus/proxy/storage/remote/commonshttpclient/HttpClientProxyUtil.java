@@ -78,7 +78,7 @@ public class HttpClientProxyUtil
 
         RemoteProxySettings rps = ctx.getRemoteProxySettings();
 
-        if ( rps != null )
+        if ( rps.isEnabled() )
         {
             logger.info( "... proxy setup with host " + rps.getHostname() );
 

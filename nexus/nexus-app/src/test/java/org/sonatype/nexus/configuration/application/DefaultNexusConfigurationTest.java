@@ -23,22 +23,22 @@ import java.util.Map;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.io.InputStreamFacade;
 import org.sonatype.nexus.AbstractNexusTestCase;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.source.FileConfigurationSource;
-
+import org.sonatype.nexus.email.NexusEmailer;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.security.SecuritySystem;
 
 public class DefaultNexusConfigurationTest
     extends AbstractNexusTestCase
 {
-
     protected DefaultNexusConfiguration nexusConfiguration;
-    
+
     protected SecuritySystem securitySystem;
+
+    protected NexusEmailer nexusEmailer;
+
+    protected GlobalHttpProxySettings globalHttpProxySettings;
 
     protected void setUp()
         throws Exception
@@ -46,8 +46,14 @@ public class DefaultNexusConfigurationTest
         super.setUp();
 
         nexusConfiguration = (DefaultNexusConfiguration) this.lookup( NexusConfiguration.class );
-        
+
+        nexusConfiguration.loadConfiguration();
+
         securitySystem = this.lookup( SecuritySystem.class );
+
+        nexusEmailer = lookup( NexusEmailer.class );
+
+        globalHttpProxySettings = lookup( GlobalHttpProxySettings.class );
     }
 
     protected void tearDown()
@@ -64,9 +70,7 @@ public class DefaultNexusConfigurationTest
     public void testSaveConfiguration()
         throws Exception
     {
-        nexusConfiguration.loadConfiguration();
-
-        Configuration config = nexusConfiguration.getConfiguration();
+        Configuration config = nexusConfiguration.getConfigurationModel();
 
         assertEquals( true, this.securitySystem.isSecurityEnabled() );
 
@@ -76,7 +80,7 @@ public class DefaultNexusConfigurationTest
 
         nexusConfiguration.loadConfiguration();
 
-        config = nexusConfiguration.getConfiguration();
+        config = nexusConfiguration.getConfigurationModel();
 
         assertEquals( false, this.securitySystem.isSecurityEnabled() );
     }
@@ -84,54 +88,44 @@ public class DefaultNexusConfigurationTest
     public void testSaveGlobalProxyConfiguration()
         throws Exception
     {
-        // default has no Global Proxy, we will set one
-        nexusConfiguration.loadConfiguration();
-
-        Configuration config = nexusConfiguration.getConfiguration();
+        Configuration config = nexusConfiguration.getConfigurationModel();
 
         assertEquals( null, config.getGlobalHttpProxySettings() );
+        assertTrue( !globalHttpProxySettings.isEnabled() );
 
-        CRemoteHttpProxySettings settings = new CRemoteHttpProxySettings();
-
-        settings.setProxyHostname( "testhost.proxy.com" );
-
-        settings.setProxyPort( 1234 );
-
-        nexusConfiguration.updateGlobalRemoteHttpProxySettings( settings );
+        globalHttpProxySettings.setHostname( "testhost.proxy.com" );
+        globalHttpProxySettings.setPort( 1234 );
 
         nexusConfiguration.saveConfiguration();
 
         // force reload
         nexusConfiguration.loadConfiguration( true );
 
-        config = nexusConfiguration.getConfiguration();
+        config = nexusConfiguration.getConfigurationModel();
 
         String proxyHostName =
             nexusConfiguration.getGlobalRemoteStorageContext().getRemoteProxySettings().getHostname();
 
         int proxyPort = nexusConfiguration.getGlobalRemoteStorageContext().getRemoteProxySettings().getPort();
 
-        assertEquals( nexusConfiguration.getConfiguration().getGlobalHttpProxySettings().getProxyHostname(),
+        assertEquals( nexusConfiguration.getConfigurationModel().getGlobalHttpProxySettings().getProxyHostname(),
                       proxyHostName );
 
-        assertEquals( nexusConfiguration.getConfiguration().getGlobalHttpProxySettings().getProxyPort(), proxyPort );
+        assertEquals( nexusConfiguration.getConfigurationModel().getGlobalHttpProxySettings().getProxyPort(), proxyPort );
 
     }
 
     public void testLoadConfiguration()
         throws Exception
     {
-        // this will create default config
-        nexusConfiguration.loadConfiguration();
-
         // get it
-        Configuration config = nexusConfiguration.getConfiguration();
+        Configuration config = nexusConfiguration.getConfigurationModel();
 
         // check it for default value
         assertEquals( "smtp-host", config.getSmtpConfiguration().getHostname() );
 
         // modify it
-        config.getSmtpConfiguration().setHostname( "NEW-HOST" );
+        nexusEmailer.setSMTPHostname( "NEW-HOST" );
 
         // save it
         nexusConfiguration.saveConfiguration();
@@ -153,61 +147,32 @@ public class DefaultNexusConfigurationTest
         nexusConfiguration.loadConfiguration( true );
 
         // get the config
-        config = nexusConfiguration.getConfiguration();
+        config = nexusConfiguration.getConfigurationModel();
 
         // it again contains default value, coz we overwritten it before
         assertEquals( "smtp-host", config.getSmtpConfiguration().getHostname() );
+        assertEquals( "smtp-host", nexusEmailer.getSMTPHostname() );
     }
 
     public void testGetConfiguration()
         throws Exception
     {
-        assertEquals( null, nexusConfiguration.getConfiguration() );
+        // well, this test has no meaning anymore, load happens in setUp()!
+        nexusConfiguration.loadConfiguration( true );
 
-        nexusConfiguration.loadConfiguration();
-
-        assertTrue( nexusConfiguration.getConfiguration() != null );
+        assertTrue( nexusConfiguration.getConfigurationModel() != null );
     }
 
     public void testGetDefaultConfigurationAsStream()
         throws Exception
     {
-        nexusConfiguration.loadConfiguration();
-
         contentEquals( getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" ), nexusConfiguration
             .getConfigurationSource().getDefaultsSource().getConfigurationAsStream() );
     }
 
-    // this test have no sense anymore, after config refactoring
-    // the config and repo "live object" are from now one
-    // public void testNX467()
-    // throws Exception
-    // {
-    // // load default config
-    // nexusConfiguration.loadConfiguration();
-    //
-    // M2GroupRepository groupRouter = (M2GroupRepository) lookup( GroupRepository.class, "maven2" );
-    //
-    // // runtime state should equal to config
-    // assertEquals( nexusConfiguration.getConfiguration().getRouting().isMergeMetadata(),
-    // groupRouter.isMergeMetadata() );
-    //
-    // // invert runtime state
-    // groupRouter.setMergeMetadata( !groupRouter.isMergeMetadata() );
-    //
-    // // force reloading of config
-    // nexusConfiguration.loadConfiguration( true );
-    //
-    // // runtime state should equal to config again
-    // assertEquals( nexusConfiguration.getConfiguration().getRouting().getGroups().isMergeMetadata(),
-    // groupRouter.isMergeMetadata() );
-    // }
-
     public void testGetAndReadConfigurationFiles()
         throws Exception
     {
-        nexusConfiguration.loadConfiguration();
-
         File testConfFile = new File( CONF_HOME, "test.xml" );
 
         FileUtils.fileWrite( testConfFile.getAbsolutePath(), "test" );
@@ -236,29 +201,27 @@ public class DefaultNexusConfigurationTest
         FileUtils.forceDelete( testConfFile );
 
     }
-    
-    
+
     public void testNEXUS2212SaveInvalidConfig()
-    throws Exception
+        throws Exception
     {
-        nexusConfiguration.loadConfiguration();
-        Configuration nexusConfig  = nexusConfiguration.getConfiguration();
-        
+        Configuration nexusConfig = nexusConfiguration.getConfigurationModel();
+
         CRepository centralCRepo = null;
-        
+
         for ( CRepository cRepo : nexusConfig.getRepositories() )
         {
-            if( cRepo.getId().equals( "central" ))
+            if ( cRepo.getId().equals( "central" ) )
             {
                 centralCRepo = cRepo;
                 break;
             }
         }
-        
+
         assertNotNull( centralCRepo );
-        
+
         centralCRepo.setLocalStatus( LocalStatus.OUT_OF_SERVICE.name() );
         nexusConfiguration.saveConfiguration();
     }
-    
+
 }

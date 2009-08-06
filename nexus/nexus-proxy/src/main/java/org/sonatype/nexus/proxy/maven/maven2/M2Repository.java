@@ -28,13 +28,15 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.configuration.Configurator;
-import org.sonatype.nexus.configuration.Validator;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -68,16 +70,25 @@ public class M2Repository
 
     @Requirement
     private M2RepositoryConfigurator m2RepositoryConfigurator;
-    
-    @Requirement
-    private M2RepositoryValidator m2RepositoryValidator;
 
     @Override
-    protected M2RepositoryConfiguration getExternalConfiguration()
+    protected M2RepositoryConfiguration getExternalConfiguration( boolean forWrite )
     {
-        return (M2RepositoryConfiguration) super.getExternalConfiguration();
+        return (M2RepositoryConfiguration) super.getExternalConfiguration( forWrite );
     }
-    
+
+    @Override
+    protected CRepositoryExternalConfigurationHolderFactory<?> getExternalConfigurationHolderFactory()
+    {
+        return new CRepositoryExternalConfigurationHolderFactory<M2RepositoryConfiguration>()
+        {
+            public M2RepositoryConfiguration createExternalConfigurationHolder( CRepository config )
+            {
+                return new M2RepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
+            }
+        };
+    }
+
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
@@ -92,12 +103,6 @@ public class M2Repository
     protected Configurator getConfigurator()
     {
         return m2RepositoryConfigurator;
-    }
-    
-    @Override
-    public Validator getValidator()
-    {
-        return m2RepositoryValidator;
     }
 
     /**
@@ -122,7 +127,7 @@ public class M2Repository
         }
         // we are using Gav to test the path
         Gav gav = null;
-        
+
         try
         {
             gav = getGavCalculator().pathToGav( request.getRequestPath() );
@@ -130,7 +135,7 @@ public class M2Repository
         catch ( IllegalArtifactCoordinateException e )
         {
             getLogger().info( "Illegal artifact path: '" + request.getRequestPath() + "'" + e.getMessage() );
-            
+
             return false;
         }
 
@@ -215,8 +220,8 @@ public class M2Repository
         }
 
         // we are using Gav to test the path
-        Gav gav = null; 
-            
+        Gav gav = null;
+
         try
         {
             gavCalculator.pathToGav( item.getPath() );

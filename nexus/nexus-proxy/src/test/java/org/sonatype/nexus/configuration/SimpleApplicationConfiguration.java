@@ -16,7 +16,13 @@ package org.sonatype.nexus.configuration;
 import java.io.File;
 import java.io.IOException;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
+import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRouting;
@@ -26,25 +32,50 @@ import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
+@Component( role = ApplicationConfiguration.class )
 public class SimpleApplicationConfiguration
-    implements ApplicationConfiguration
+    implements ApplicationConfiguration, Initializable
 {
+    @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
+
+    @Requirement
+    private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
+
+    @Requirement
+    private GlobalHttpProxySettings globalHttpProxySettings;
 
     private Configuration configuration;
 
-    private RemoteStorageContext remoteStorageContext = new DefaultRemoteStorageContext( null );
+    private RemoteStorageContext remoteStorageContext;
 
-    public SimpleApplicationConfiguration()
+    public void initialize()
+        throws InitializationException
     {
-        super();
-
         this.configuration = new Configuration();
 
         configuration.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
+        configuration.getGlobalConnectionSettings().setConnectionTimeout( 1000 );
+        configuration.getGlobalConnectionSettings().setRetrievalRetryCount( 3 );
         // configuration.setGlobalHttpProxySettings( new CRemoteHttpProxySettings() );
         configuration.setRouting( new CRouting() );
         configuration.setRepositoryGrouping( new CRepositoryGrouping() );
+
+        // remote storage context
+        remoteStorageContext = new DefaultRemoteStorageContext( null );
+
+        try
+        {
+            globalRemoteConnectionSettings.configure( this );
+            remoteStorageContext.setRemoteConnectionSettings( globalRemoteConnectionSettings );
+
+            globalHttpProxySettings.configure( this );
+            remoteStorageContext.setRemoteProxySettings( globalHttpProxySettings );
+        }
+        catch ( ConfigurationException e )
+        {
+            throw new InitializationException( "Test environment is broken!", e );
+        }
     }
 
     public RemoteStorageContext getGlobalRemoteStorageContext()
@@ -52,7 +83,7 @@ public class SimpleApplicationConfiguration
         return remoteStorageContext;
     }
 
-    public Configuration getConfiguration()
+    public Configuration getConfigurationModel()
     {
         return configuration;
     }

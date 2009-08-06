@@ -15,6 +15,7 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -43,9 +44,14 @@ public class SettingsMessageUtil
     {
         String serviceURI = "service/local/global_settings/current";
         Response response = RequestFacade.doGetRequest( serviceURI );
+        
+        String responseText = response.getEntity().getText(); 
+        
         XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
+            new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
 
+        Assert.assertTrue( "Error getting Settings: "+ response.getStatus() +"\n"+ responseText, response.getStatus().isSuccess() );
+        
         GlobalConfigurationResourceResponse configResponse =
             (GlobalConfigurationResourceResponse) representation.getPayload( new GlobalConfigurationResourceResponse() );
 

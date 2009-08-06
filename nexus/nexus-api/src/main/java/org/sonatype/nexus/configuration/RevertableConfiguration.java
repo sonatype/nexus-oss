@@ -16,9 +16,16 @@ public interface RevertableConfiguration
     boolean isDirty();
 
     /**
-     * Commits the changes. Resets the state of config "back to normal" (saved).
+     * Validatyes the changes, if any.
      */
-    void commitChanges();
+    void validateChanges()
+        throws ConfigurationException;
+    
+    /**
+     * Commits the changes. Resets the state of config "back to normal" (saved). Will call validateChanges() if needed.
+     */
+    void commitChanges()
+        throws ConfigurationException;
 
     /**
      * Rollbacks the changes. Resets the state of config "back to normal" (saved).

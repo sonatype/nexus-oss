@@ -13,12 +13,29 @@
  */
 package org.sonatype.nexus.proxy.http;
 
+import org.sonatype.nexus.configuration.Configurable;
+
 /**
  * The HTTP Proxy service component interface.
  * 
  * @author cstamas
  */
 public interface HttpProxyService
+    extends Configurable
 {
     NexusURLResolver getNexusURLResolver();
+
+    // ==
+
+    boolean isEnabled();
+
+    void setEnabled( boolean enabled );
+
+    int getPort();
+
+    void setPort( int port );
+
+    HttpProxyPolicy getHttpProxyPolicy();
+
+    void setHttpProxyPolicy( HttpProxyPolicy httpProxyPolicy );
 }

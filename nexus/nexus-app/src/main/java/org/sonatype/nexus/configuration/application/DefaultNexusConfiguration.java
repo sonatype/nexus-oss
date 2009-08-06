@@ -16,7 +16,6 @@ package org.sonatype.nexus.configuration.application;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,28 +25,22 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationCommitEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.ConfigurationLoadEvent;
+import org.sonatype.nexus.configuration.ConfigurationPrepareForLoadEvent;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.ConfigurationRollbackEvent;
+import org.sonatype.nexus.configuration.ConfigurationSaveEvent;
 import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
-import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
-import org.sonatype.nexus.configuration.model.CRepositoryTarget;
-import org.sonatype.nexus.configuration.model.CRestApiSettings;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.model.RemoteSettingsUtil;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
@@ -55,19 +48,13 @@ import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationRequest;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
-import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.target.Target;
-import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
@@ -81,17 +68,25 @@ import org.sonatype.security.SecuritySystem;
  */
 @Component( role = NexusConfiguration.class )
 public class DefaultNexusConfiguration
-    extends AbstractLogEnabled
     implements NexusConfiguration
 {
     @Requirement
+    private Logger logger;
+
+    @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
 
-    /**
-     * The configuration source.
-     */
     @Requirement( hint = "file" )
     private ApplicationConfigurationSource configurationSource;
+
+    /** The global remote storage context. */
+    private RemoteStorageContext globalRemoteStorageContext;
+
+    @Requirement
+    private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
+
+    @Requirement
+    private GlobalHttpProxySettings globalHttpProxySettings;
 
     /**
      * The config validator.
@@ -105,32 +100,14 @@ public class DefaultNexusConfiguration
     @Requirement
     private ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder;
 
-    /**
-     * The repository registry.
-     */
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    @Requirement
-    private RepositoryTypeRegistry repositoryTypeRegistry;
-
-    /**
-     * The target registry.
-     */
-    @Requirement
-    private TargetRegistry targetRegistry;
-
-    /**
-     * The available scheduled task descriptors
-     */
     @Requirement( role = ScheduledTaskDescriptor.class )
     private List<ScheduledTaskDescriptor> scheduledTaskDescriptors;
 
     @Requirement
     private SecuritySystem securitySystem;
-
-    /** The global remote storage context. */
-    private RemoteStorageContext remoteStorageContext;
 
     @org.codehaus.plexus.component.annotations.Configuration( value = "${nexus-work}" )
     private File workingDirectory;
@@ -146,6 +123,15 @@ public class DefaultNexusConfiguration
 
     /** Names of the conf files */
     private Map<String, String> configurationFiles;
+
+    // ==
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
+
+    // ==
 
     public void loadConfiguration()
         throws ConfigurationException, IOException
@@ -168,27 +154,33 @@ public class DefaultNexusConfiguration
 
             wastebasketDirectory = null;
 
-            // create shared remote ctx
+            // create global remote ctx
             // this one has no parent
-            remoteStorageContext = new DefaultRemoteStorageContext( null );
+            globalRemoteStorageContext = new DefaultRemoteStorageContext( null );
+            
+            globalRemoteConnectionSettings.configure( this );
 
-            if ( getConfiguration().getGlobalConnectionSettings() != null )
+            globalRemoteStorageContext.setRemoteConnectionSettings( globalRemoteConnectionSettings );
+            
+            globalHttpProxySettings.configure( this );
+
+            globalRemoteStorageContext.setRemoteProxySettings( globalHttpProxySettings );
+
+            ConfigurationPrepareForLoadEvent loadEvent = new ConfigurationPrepareForLoadEvent( this );
+
+            applicationEventMulticaster.notifyEventListeners( loadEvent );
+
+            if ( loadEvent.isVetoed() )
             {
-                RemoteConnectionSettings rcs =
-                    RemoteSettingsUtil.convertFromModel( getConfiguration().getGlobalConnectionSettings() );
+                // spit out the reason
 
-                remoteStorageContext.setRemoteConnectionSettings( rcs );
-            }
-
-            if ( getConfiguration().getGlobalHttpProxySettings() != null )
-            {
-                RemoteProxySettings rps =
-                    RemoteSettingsUtil.convertFromModel( getConfiguration().getGlobalHttpProxySettings() );
-
-                remoteStorageContext.setRemoteProxySettings( rps );
+                throw new ConfigurationException( "The Nexus configuration is invalid!" );
             }
 
             applyConfiguration();
+
+            // we succesfully loaded config
+            applicationEventMulticaster.notifyEventListeners( new ConfigurationLoadEvent( this ) );
         }
     }
 
@@ -207,7 +199,7 @@ public class DefaultNexusConfiguration
             temporaryDirectory = null;
 
             wastebasketDirectory = null;
-            
+
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
             applicationEventMulticaster
@@ -224,6 +216,7 @@ public class DefaultNexusConfiguration
     public void saveConfiguration()
         throws IOException
     {
+        applyConfiguration();
         // TODO: when NEXUS-2215 is fixed, this should be remove/moved/cleaned
 
         // validate before we do anything
@@ -235,9 +228,10 @@ public class DefaultNexusConfiguration
             throw new IOException( "Saving nexus configuration caused unexpected error:\n" + response.toString() );
         }
 
-        applyConfiguration();
-
         configurationSource.storeConfiguration();
+
+        // we succesfully saved config
+        applicationEventMulticaster.notifyEventListeners( new ConfigurationSaveEvent( this ) );
     }
 
     @Deprecated
@@ -248,7 +242,8 @@ public class DefaultNexusConfiguration
         saveConfiguration();
     }
 
-    public Configuration getConfiguration()
+    @Deprecated
+    public Configuration getConfigurationModel()
     {
         return configurationSource.getConfiguration();
     }
@@ -278,7 +273,7 @@ public class DefaultNexusConfiguration
 
     public RemoteStorageContext getGlobalRemoteStorageContext()
     {
-        return remoteStorageContext;
+        return globalRemoteStorageContext;
     }
 
     public File getWorkingDirectory()
@@ -342,10 +337,10 @@ public class DefaultNexusConfiguration
         return wastebasketDirectory;
     }
 
-    public Repository createRepositoryFromModel( Configuration configuration, CRepository repository )
+    public Repository createRepositoryFromModel( CRepository repository )
         throws ConfigurationException
     {
-        return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repository );
+        return runtimeConfigurationBuilder.createRepositoryFromModel( getConfigurationModel(), repository );
     }
 
     public List<ScheduledTaskDescriptor> listScheduledTaskDescriptors()
@@ -430,29 +425,24 @@ public class DefaultNexusConfiguration
         throws ConfigurationException
     {
         createRepositories();
-
-        createRepositoryTargets();
     }
 
     public void dropInternals()
     {
         dropRepositories();
-
-        dropRepositoryTargets();
     }
 
-    @SuppressWarnings( "unchecked" )
     protected void createRepositories()
         throws ConfigurationException
     {
-        List<CRepository> reposes = getConfiguration().getRepositories();
+        List<CRepository> reposes = getConfigurationModel().getRepositories();
 
         // we first create non-group repositories because groups have refs to non-group
         for ( CRepository repo : reposes )
         {
             if ( !repo.getProviderRole().equals( GroupRepository.class.getName() ) )
             {
-                Repository repository = createRepositoryFromModel( getConfiguration(), repo );
+                Repository repository = createRepositoryFromModel( repo );
 
                 repositoryRegistry.addRepository( repository );
             }
@@ -462,7 +452,7 @@ public class DefaultNexusConfiguration
         {
             if ( repo.getProviderRole().equals( GroupRepository.class.getName() ) )
             {
-                Repository repository = createRepositoryFromModel( getConfiguration(), repo );
+                Repository repository = createRepositoryFromModel( repo );
 
                 repositoryRegistry.addRepository( repository );
             }
@@ -484,193 +474,9 @@ public class DefaultNexusConfiguration
         }
     }
 
-    @SuppressWarnings( "unchecked" )
-    protected void createRepositoryTargets()
-        throws ConfigurationException
-    {
-        List<CRepositoryTarget> targets = getConfiguration().getRepositoryTargets();
-
-        if ( targets == null )
-        {
-            return;
-        }
-
-        for ( CRepositoryTarget settings : targets )
-        {
-            ContentClass contentClass = null;
-
-            for ( ContentClass cl : repositoryTypeRegistry.getContentClasses() )
-            {
-                if ( settings.getContentClass().equals( cl.getId() ) )
-                {
-                    contentClass = cl;
-
-                    break;
-                }
-            }
-
-            if ( contentClass == null )
-            {
-                throw new ConfigurationException( "Could not find ContentClass with ID='" + settings.getContentClass()
-                    + "'" );
-            }
-
-            targetRegistry.addRepositoryTarget( new Target( settings.getId(), settings.getName(), contentClass,
-                                                            settings.getPatterns() ) );
-        }
-    }
-
-    protected void dropRepositoryTargets()
-    {
-        // nothing?
-    }
-
-    // ------------------------------------------------------------------
-    // REST API
-
-    public String getBaseUrl()
-    {
-        if ( getConfiguration().getRestApi() != null )
-        {
-            return getConfiguration().getRestApi().getBaseUrl();
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    public void setBaseUrl( String baseUrl )
-        throws IOException
-    {
-        if ( getConfiguration().getRestApi() == null )
-        {
-            getConfiguration().setRestApi( new CRestApiSettings() );
-        }
-
-        getConfiguration().getRestApi().setBaseUrl( baseUrl );
-
-        applyAndSaveConfiguration();
-    }
-
-    public boolean isForceBaseUrl()
-    {
-        if ( getConfiguration().getRestApi() != null )
-        {
-            return getConfiguration().getRestApi().isForceBaseUrl();
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    public void setForceBaseUrl( boolean force )
-        throws IOException
-    {
-        if ( getConfiguration().getRestApi() == null )
-        {
-            getConfiguration().setRestApi( new CRestApiSettings() );
-        }
-
-        getConfiguration().getRestApi().setForceBaseUrl( force );
-
-        applyAndSaveConfiguration();
-    }
-
-    public int getSessionExpiration()
-    {
-        if ( getConfiguration().getRestApi() != null )
-        {
-            return getConfiguration().getRestApi().getSessionExpiration();
-        }
-        else
-        {
-            return -1;
-        }
-    }
-
-    public void setSessionExpiration( int value )
-        throws IOException
-    {
-        if ( getConfiguration().getRestApi() == null )
-        {
-            getConfiguration().setRestApi( new CRestApiSettings() );
-        }
-
-        getConfiguration().getRestApi().setSessionExpiration( value );
-
-        applyAndSaveConfiguration();
-    }
-
     // ------------------------------------------------------------------
     // CRUD-like ops on config sections
     // Globals are mandatory: RU
-
-    // CRemoteConnectionSettings are mandatory: RU
-
-    public CRemoteConnectionSettings readGlobalRemoteConnectionSettings()
-    {
-        return getConfiguration().getGlobalConnectionSettings();
-    }
-
-    public void updateGlobalRemoteConnectionSettings( CRemoteConnectionSettings settings )
-        throws ConfigurationException, IOException
-    {
-        remoteStorageContext.setRemoteConnectionSettings( RemoteSettingsUtil.convertFromModel( settings ) );
-
-        getConfiguration().setGlobalConnectionSettings( settings );
-
-        applyAndSaveConfiguration();
-    }
-
-    // CRemoteHttpProxySettings are optional: CRUD
-
-    public void createGlobalRemoteHttpProxySettings( CRemoteHttpProxySettings settings )
-        throws ConfigurationException, IOException
-    {
-        remoteStorageContext.setRemoteProxySettings( RemoteSettingsUtil.convertFromModel( settings ) );
-
-        getConfiguration().setGlobalHttpProxySettings( settings );
-
-        applyAndSaveConfiguration();
-    }
-
-    public CRemoteHttpProxySettings readGlobalRemoteHttpProxySettings()
-    {
-        return getConfiguration().getGlobalHttpProxySettings();
-    }
-
-    public void updateGlobalRemoteHttpProxySettings( CRemoteHttpProxySettings settings )
-        throws ConfigurationException, IOException
-    {
-        createGlobalRemoteHttpProxySettings( settings );
-    }
-
-    public void deleteGlobalRemoteHttpProxySettings()
-        throws IOException
-    {
-        remoteStorageContext.removeRemoteProxySettings();
-
-        getConfiguration().setGlobalHttpProxySettings( null );
-
-        applyAndSaveConfiguration();
-    }
-
-    // CRouting are mandatory: RU
-
-    public CRouting readRouting()
-    {
-        return getConfiguration().getRouting();
-    }
-
-    public void updateRouting( CRouting settings )
-        throws ConfigurationException, IOException
-    {
-        getConfiguration().setRouting( settings );
-
-        applyAndSaveConfiguration();
-    }
 
     // CRepository and CreposioryShadow helper
 
@@ -687,7 +493,7 @@ public class DefaultNexusConfiguration
     {
         context.addExistingRepositoryIds();
 
-        List<CRepository> repositories = getConfiguration().getRepositories();
+        List<CRepository> repositories = getConfigurationModel().getRepositories();
 
         if ( repositories != null )
         {
@@ -725,10 +531,11 @@ public class DefaultNexusConfiguration
         validateRepository( settings, true );
 
         // create it, will do runtime validation
-        Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfiguration(), settings );
+        Repository repository =
+            runtimeConfigurationBuilder.createRepositoryFromModel( getConfigurationModel(), settings );
 
         // now add it to config, since it is validated and succesfully created
-        getConfiguration().addRepository( settings );
+        getConfigurationModel().addRepository( settings );
 
         // register with repoRegistry
         repositoryRegistry.addRepository( repository );
@@ -773,7 +580,7 @@ public class DefaultNexusConfiguration
         // pahMappings
         // (correction, since registry is completely unaware of this component)
 
-        List<CPathMappingItem> pathMappings = getConfiguration().getRepositoryGrouping().getPathMappings();
+        List<CPathMappingItem> pathMappings = getConfigurationModel().getRepositoryGrouping().getPathMappings();
 
         for ( Iterator<CPathMappingItem> i = pathMappings.iterator(); i.hasNext(); )
         {
@@ -787,7 +594,7 @@ public class DefaultNexusConfiguration
         // this cleans it properly from the registry (from reposes and repo groups)
         repositoryRegistry.removeRepository( id );
 
-        List<CRepository> reposes = getConfiguration().getRepositories();
+        List<CRepository> reposes = getConfigurationModel().getRepositories();
 
         for ( Iterator<CRepository> i = reposes.iterator(); i.hasNext(); )
         {
@@ -806,124 +613,15 @@ public class DefaultNexusConfiguration
         throw new NoSuchRepositoryException( id );
     }
 
-    // CGroupsSettingPathMapping: CRUD
-
-    protected void validateRoutePattern( CPathMappingItem settings )
-        throws ConfigurationException
-    {
-        ValidationResponse res = configurationValidator.validateGroupsSettingPathMappingItem( null, settings );
-
-        if ( !res.isValid() )
-        {
-            throw new InvalidConfigurationException( res );
-        }
-    }
-
-    public Collection<CPathMappingItem> listGroupsSettingPathMapping()
-    {
-        if ( getConfiguration().getRepositoryGrouping() != null
-            && getConfiguration().getRepositoryGrouping().getPathMappings() != null )
-        {
-            return new ArrayList<CPathMappingItem>( getConfiguration().getRepositoryGrouping().getPathMappings() );
-        }
-        else
-        {
-            return Collections.emptyList();
-        }
-    }
-
-    public void createGroupsSettingPathMapping( CPathMappingItem settings )
-        throws NoSuchRepositoryException, ConfigurationException, IOException
-    {
-        validateRoutePattern( settings );
-
-        if ( getConfiguration().getRepositoryGrouping() == null )
-        {
-            getConfiguration().setRepositoryGrouping( new CRepositoryGrouping() );
-        }
-
-        getConfiguration().getRepositoryGrouping().addPathMapping( settings );
-
-        applyAndSaveConfiguration();
-    }
-
-    public CPathMappingItem readGroupsSettingPathMapping( String id )
-        throws IOException
-    {
-        List<CPathMappingItem> items = getConfiguration().getRepositoryGrouping().getPathMappings();
-
-        for ( Iterator<CPathMappingItem> i = items.iterator(); i.hasNext(); )
-        {
-            CPathMappingItem mapping = i.next();
-
-            if ( mapping.getId().equals( id ) )
-            {
-                return mapping;
-            }
-        }
-
-        return null;
-    }
-
-    public void updateGroupsSettingPathMapping( CPathMappingItem settings )
-        throws NoSuchRepositoryException, ConfigurationException, IOException
-    {
-        validateRoutePattern( settings );
-
-        List<CPathMappingItem> items = getConfiguration().getRepositoryGrouping().getPathMappings();
-
-        for ( Iterator<CPathMappingItem> i = items.iterator(); i.hasNext(); )
-        {
-            CPathMappingItem mapping = i.next();
-
-            if ( mapping.getId().equals( settings.getId() ) )
-            {
-                mapping.setRouteType( settings.getRouteType() );
-
-                mapping.setRoutePatterns( settings.getRoutePatterns() );
-
-                mapping.setRepositories( settings.getRepositories() );
-
-                break;
-            }
-        }
-
-        applyAndSaveConfiguration();
-    }
-
-    public void deleteGroupsSettingPathMapping( String id )
-        throws IOException
-    {
-        if ( getConfiguration().getRepositoryGrouping() == null
-            || getConfiguration().getRepositoryGrouping().getPathMappings() == null )
-        {
-            return;
-        }
-
-        List<CPathMappingItem> items = getConfiguration().getRepositoryGrouping().getPathMappings();
-
-        for ( Iterator<CPathMappingItem> i = items.iterator(); i.hasNext(); )
-        {
-            CPathMappingItem mapping = i.next();
-
-            if ( mapping.getId().equals( id ) )
-            {
-                i.remove();
-            }
-        }
-
-        applyAndSaveConfiguration();
-    }
-
     // ===
 
     public Collection<CRemoteNexusInstance> listRemoteNexusInstances()
     {
         List<CRemoteNexusInstance> result = null;
 
-        if ( getConfiguration().getRemoteNexusInstances() != null )
+        if ( getConfigurationModel().getRemoteNexusInstances() != null )
         {
-            result = Collections.unmodifiableList( getConfiguration().getRemoteNexusInstances() );
+            result = Collections.unmodifiableList( getConfigurationModel().getRemoteNexusInstances() );
         }
 
         return result;
@@ -932,7 +630,7 @@ public class DefaultNexusConfiguration
     public CRemoteNexusInstance readRemoteNexusInstance( String alias )
         throws IOException
     {
-        List<CRemoteNexusInstance> knownInstances = getConfiguration().getRemoteNexusInstances();
+        List<CRemoteNexusInstance> knownInstances = getConfigurationModel().getRemoteNexusInstances();
 
         for ( Iterator<CRemoteNexusInstance> i = knownInstances.iterator(); i.hasNext(); )
         {
@@ -950,7 +648,7 @@ public class DefaultNexusConfiguration
     public void createRemoteNexusInstance( CRemoteNexusInstance settings )
         throws IOException
     {
-        getConfiguration().addRemoteNexusInstance( settings );
+        getConfigurationModel().addRemoteNexusInstance( settings );
 
         applyAndSaveConfiguration();
     }
@@ -958,7 +656,7 @@ public class DefaultNexusConfiguration
     public void deleteRemoteNexusInstance( String alias )
         throws IOException
     {
-        List<CRemoteNexusInstance> knownInstances = getConfiguration().getRemoteNexusInstances();
+        List<CRemoteNexusInstance> knownInstances = getConfigurationModel().getRemoteNexusInstances();
 
         for ( Iterator<CRemoteNexusInstance> i = knownInstances.iterator(); i.hasNext(); )
         {
@@ -971,208 +669,6 @@ public class DefaultNexusConfiguration
         }
 
         applyAndSaveConfiguration();
-    }
-
-    // Repository Targets
-
-    protected void validateCRepositoryTarget( CRepositoryTarget settings, boolean create )
-        throws ConfigurationException
-    {
-        ApplicationValidationContext ctx = null;
-
-        // checking for uniqueness only on CREATE event
-        if ( create && getConfiguration().getRepositoryTargets() != null )
-        {
-            ctx = new ApplicationValidationContext();
-
-            ctx.addExistingRepositoryTargetIds();
-
-            List<CRepositoryTarget> targets = getConfiguration().getRepositoryTargets();
-
-            for ( CRepositoryTarget target : targets )
-            {
-                ctx.getExistingRepositoryTargetIds().add( target.getId() );
-            }
-        }
-
-        ValidationResponse res = configurationValidator.validateRepositoryTarget( ctx, settings );
-
-        if ( res.isValid() )
-        {
-            boolean contentClassExists = false;
-
-            for ( ContentClass cc : repositoryTypeRegistry.getContentClasses() )
-            {
-                if ( cc.getId().equals( settings.getContentClass() ) )
-                {
-                    contentClassExists = true;
-                    break;
-                }
-            }
-
-            if ( !contentClassExists )
-            {
-                throw new ConfigurationException(
-                                                  "The Repository Target 'ContentClass' must exists: there is no class with id='"
-                                                      + settings.getContentClass() + "'!" );
-            }
-        }
-        else
-        {
-            throw new InvalidConfigurationException( res );
-        }
-    }
-
-    public Collection<CRepositoryTarget> listRepositoryTargets()
-    {
-        List<CRepositoryTarget> result = null;
-
-        if ( getConfiguration().getRepositoryTargets() != null )
-        {
-            result = Collections.unmodifiableList( getConfiguration().getRepositoryTargets() );
-        }
-
-        return result;
-    }
-
-    public void createRepositoryTarget( CRepositoryTarget settings )
-        throws ConfigurationException, IOException
-    {
-        validateCRepositoryTarget( settings, true );
-
-        ContentClass contentClass = null;
-
-        for ( ContentClass cl : repositoryTypeRegistry.getContentClasses() )
-        {
-            if ( settings.getContentClass().equals( cl.getId() ) )
-            {
-                contentClass = cl;
-
-                break;
-            }
-        }
-
-        if ( contentClass == null )
-        {
-            throw new ConfigurationException( "Could not find ContentClass with ID='" + settings.getContentClass()
-                + "'" );
-        }
-
-        targetRegistry.addRepositoryTarget( new Target( settings.getId(), settings.getName(), contentClass, settings
-            .getPatterns() ) );
-
-        getConfiguration().addRepositoryTarget( settings );
-
-        applyAndSaveConfiguration();
-    }
-
-    public CRepositoryTarget readRepositoryTarget( String id )
-    {
-        List<CRepositoryTarget> targets = getConfiguration().getRepositoryTargets();
-
-        for ( Iterator<CRepositoryTarget> i = targets.iterator(); i.hasNext(); )
-        {
-            CRepositoryTarget target = i.next();
-
-            if ( target.getId().equals( id ) )
-            {
-                return target;
-            }
-        }
-
-        return null;
-    }
-
-    public void updateRepositoryTarget( CRepositoryTarget settings )
-        throws ConfigurationException, IOException
-    {
-        validateCRepositoryTarget( settings, false );
-
-        CRepositoryTarget oldTarget = readRepositoryTarget( settings.getId() );
-
-        if ( oldTarget != null )
-        {
-            oldTarget.setContentClass( settings.getContentClass() );
-
-            oldTarget.setName( settings.getName() );
-
-            oldTarget.getPatterns().clear();
-
-            oldTarget.getPatterns().addAll( settings.getPatterns() );
-
-            ContentClass contentClass = null;
-
-            for ( ContentClass cl : repositoryTypeRegistry.getContentClasses() )
-            {
-                if ( oldTarget.getContentClass().equals( cl.getId() ) )
-                {
-                    contentClass = cl;
-
-                    break;
-                }
-            }
-
-            if ( contentClass == null )
-            {
-                throw new ConfigurationException( "Could not find ContentClass with ID='" + oldTarget.getContentClass()
-                    + "'" );
-            }
-
-            targetRegistry.addRepositoryTarget( new Target( oldTarget.getId(), oldTarget.getName(), contentClass,
-                                                            oldTarget.getPatterns() ) );
-
-            applyAndSaveConfiguration();
-        }
-        else
-        {
-            throw new IllegalArgumentException( "Repository target with ID='" + settings.getId() + "' does not exists!" );
-        }
-    }
-
-    public void deleteRepositoryTarget( String id )
-        throws IOException
-    {
-        targetRegistry.removeRepositoryTarget( id );
-
-        List<CRepositoryTarget> targets = getConfiguration().getRepositoryTargets();
-
-        for ( Iterator<CRepositoryTarget> i = targets.iterator(); i.hasNext(); )
-        {
-            CRepositoryTarget target = i.next();
-
-            if ( target.getId().equals( id ) )
-            {
-                i.remove();
-            }
-        }
-
-        applyAndSaveConfiguration();
-    }
-
-    public CSmtpConfiguration readSmtpConfiguration()
-    {
-        return getConfiguration().getSmtpConfiguration();
-    }
-
-    public void updateSmtpConfiguration( CSmtpConfiguration settings )
-        throws ConfigurationException, IOException
-    {
-        getConfiguration().setSmtpConfiguration( settings );
-
-        applyAndSaveConfiguration();
-    }
-
-    public CErrorReporting readErrorReporting()
-    {
-        return getConfiguration().getErrorReporting();
-    }
-
-    public void updateErrorReporting( CErrorReporting errorReporting )
-        throws ConfigurationException, IOException
-    {
-        getConfiguration().setErrorReporting( errorReporting );
-
-        saveConfiguration();
     }
 
     public Map<String, String> getConfigurationFiles()

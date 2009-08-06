@@ -1,7 +1,10 @@
 package org.sonatype.nexus.proxy.target;
 
+import java.util.Collection;
 import java.util.Set;
 
+import org.sonatype.nexus.configuration.Configurable;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -11,11 +14,37 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @author cstamas
  */
 public interface TargetRegistry
+    extends Configurable
 {
+    /**
+     * Gets the existing targets.
+     * 
+     * @return
+     */
+    Collection<Target> getRepositoryTargets();
+
+    /**
+     * Gets target by id.
+     * 
+     * @param id
+     * @return
+     */
     Target getRepositoryTarget( String id );
 
-    void addRepositoryTarget( Target target );
+    /**
+     * Adds new target.
+     * 
+     * @param target
+     * @throws ConfigurationException 
+     */
+    boolean addRepositoryTarget( Target target ) throws ConfigurationException;
 
+    /**
+     * Removes target by id.
+     * 
+     * @param id
+     * @return
+     */
     boolean removeRepositoryTarget( String id );
 
     /**

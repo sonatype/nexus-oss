@@ -6,9 +6,11 @@ public interface Vetoable
 {
     boolean isVetoed();
 
-    void putVeto( Object veto );
+    void putVeto( Veto veto );
 
-    boolean removeVeto( Object veto );
+    void putVeto( Object vetoer, Throwable reason );
 
-    List<Object> getVetos();
+    boolean removeVeto( Veto veto );
+
+    List<Veto> getVetos();
 }

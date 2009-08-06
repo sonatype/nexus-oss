@@ -22,6 +22,9 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
+import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
+import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -75,9 +78,33 @@ public abstract class AbstractRepositoryPlexusResource
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
+    @Requirement
+    private AuthenticationInfoConverter authenticationInfoConverter;
+
+    @Requirement
+    private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
+
+    @Requirement
+    private GlobalHttpProxySettings globalHttpProxySettings;
+
+    protected AuthenticationInfoConverter getAuthenticationInfoConverter()
+    {
+        return authenticationInfoConverter;
+    }
+
+    protected GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings()
+    {
+        return globalRemoteConnectionSettings;
+    }
+
+    protected GlobalHttpProxySettings getGlobalHttpProxySettings()
+    {
+        return globalHttpProxySettings;
+    }
+
     /**
      * Pull the repository Id out of the Request.
-     *
+     * 
      * @param request
      * @return
      */
@@ -268,12 +295,12 @@ public abstract class AbstractRepositoryPlexusResource
 
         resource.setName( repository.getName() );
 
-        // FIXME: set ENUM correctly 
-        if( repository.isAllowWrite())
+        // FIXME: set ENUM correctly
+        if ( repository.isAllowWrite() )
         {
             resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         }
-        else 
+        else
         {
             resource.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
         }
@@ -281,7 +308,7 @@ public abstract class AbstractRepositoryPlexusResource
         resource.setBrowseable( repository.isBrowseable() );
 
         resource.setIndexable( repository.isIndexable() );
-        
+
         resource.setExposed( repository.isExposed() );
 
         resource.setNotFoundCacheTTL( repository.getNotFoundCacheTimeToLive() );
@@ -363,12 +390,12 @@ public abstract class AbstractRepositoryPlexusResource
         resource.setShadowOf( shadow.getMasterRepositoryId() );
 
         resource.setSyncAtStartup( shadow.isSynchronizeAtStartup() );
-        
+
         resource.setExposed( shadow.isExposed() );
 
         return resource;
     }
-    
+
     protected CRemoteAuthentication convertAuthentication( AuthenticationSettings authentication, String oldPassword )
     {
         if ( authentication == null )
@@ -384,32 +411,35 @@ public abstract class AbstractRepositoryPlexusResource
 
         return appModelSettings;
     }
-    
-    protected CRemoteHttpProxySettings convertHttpProxySettings( RemoteHttpProxySettings remoteHttpProxySettings, String oldPassword )
+
+    protected CRemoteHttpProxySettings convertHttpProxySettings( RemoteHttpProxySettings remoteHttpProxySettings,
+                                                                 String oldPassword )
     {
         if ( remoteHttpProxySettings == null )
         {
             return null;
         }
-        
+
         CRemoteHttpProxySettings httpProxySettings = new CRemoteHttpProxySettings();
 
         httpProxySettings.setProxyHostname( remoteHttpProxySettings.getProxyHostname() );
 
         httpProxySettings.setProxyPort( remoteHttpProxySettings.getProxyPort() );
 
-        httpProxySettings.setAuthentication( convertAuthentication( remoteHttpProxySettings.getAuthentication(), oldPassword ) );
+        httpProxySettings.setAuthentication( convertAuthentication( remoteHttpProxySettings.getAuthentication(),
+                                                                    oldPassword ) );
 
         return httpProxySettings;
     }
-    
-    protected CRemoteConnectionSettings convertRemoteConnectionSettings( RemoteConnectionSettings remoteConnectionSettings )
+
+    protected CRemoteConnectionSettings convertRemoteConnectionSettings(
+                                                                         RemoteConnectionSettings remoteConnectionSettings )
     {
-        if ( remoteConnectionSettings == null)
+        if ( remoteConnectionSettings == null )
         {
             return null;
         }
-        
+
         CRemoteConnectionSettings cRemoteConnectionSettings = new CRemoteConnectionSettings();
 
         cRemoteConnectionSettings.setConnectionTimeout( remoteConnectionSettings.getConnectionTimeout() * 1000 );
@@ -419,18 +449,18 @@ public abstract class AbstractRepositoryPlexusResource
         cRemoteConnectionSettings.setRetrievalRetryCount( remoteConnectionSettings.getRetrievalRetryCount() );
 
         cRemoteConnectionSettings.setUserAgentCustomizationString( remoteConnectionSettings.getUserAgentString() );
-        
+
         return cRemoteConnectionSettings;
     }
-    
+
     // temporary method to allow refactoring
     protected boolean isWriteAllowed( String writePolicy )
     {
-        if( StringUtils.isEmpty( writePolicy ))
+        if ( StringUtils.isEmpty( writePolicy ) )
         {
             return false;
         }
-        
+
         return RepositoryWritePolicy.ALLOW_WRITE.equals( RepositoryWritePolicy.valueOf( writePolicy ) );
     }
 }

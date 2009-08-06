@@ -1,52 +1,20 @@
 package org.sonatype.nexus.proxy.repository;
 
-public class RemoteConnectionSettings
+public interface RemoteConnectionSettings
 {
-    private int connectionTimeout = 1000;
+    int getConnectionTimeout();
 
-    private int retrievalRetryCount = 3;
+    void setConnectionTimeout( int connectionTimeout );
 
-    private String queryString;
+    int getRetrievalRetryCount();
 
-    private String userAgentCustomizationString;
+    void setRetrievalRetryCount( int retrievalRetryCount );
 
-    public int getConnectionTimeout()
-    {
-        return connectionTimeout;
-    }
+    String getQueryString();
 
-    public void setConnectionTimeout( int connectionTimeout )
-    {
-        this.connectionTimeout = connectionTimeout;
-    }
+    void setQueryString( String queryString );
 
-    public int getRetrievalRetryCount()
-    {
-        return retrievalRetryCount;
-    }
+    String getUserAgentCustomizationString();
 
-    public void setRetrievalRetryCount( int retrievalRetryCount )
-    {
-        this.retrievalRetryCount = retrievalRetryCount;
-    }
-
-    public String getQueryString()
-    {
-        return queryString;
-    }
-
-    public void setQueryString( String queryString )
-    {
-        this.queryString = queryString;
-    }
-
-    public String getUserAgentCustomizationString()
-    {
-        return userAgentCustomizationString;
-    }
-
-    public void setUserAgentCustomizationString( String userAgentCustomizationString )
-    {
-        this.userAgentCustomizationString = userAgentCustomizationString;
-    }
+    void setUserAgentCustomizationString( String userAgentCustomizationString );
 }

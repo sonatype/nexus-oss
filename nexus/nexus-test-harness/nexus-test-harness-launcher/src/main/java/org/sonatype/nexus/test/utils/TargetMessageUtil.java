@@ -15,6 +15,7 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -175,7 +176,8 @@ public class TargetMessageUtil
                     Assert.assertEquals( targetResource.getId(), repositoryTarget.getId() );
                     Assert.assertEquals( targetResource.getContentClass(), repositoryTarget.getContentClass() );
                     Assert.assertEquals( targetResource.getName(), repositoryTarget.getName() );
-                    Assert.assertEquals( targetResource.getPatterns(), repositoryTarget.getPatterns() );
+                    // order doesn't matter
+                    Assert.assertEquals( new HashSet<String>(targetResource.getPatterns()), new HashSet<String>( repositoryTarget.getPatterns()) );
 
                     break;
                 }

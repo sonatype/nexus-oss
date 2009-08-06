@@ -36,6 +36,7 @@ import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
  * The validator used to validate current configuration in boot-up sequence.
  * 
  * @author cstamas
+ * @deprecated see Configurable
  */
 public interface ApplicationConfigurationValidator
     extends ConfigurationValidator

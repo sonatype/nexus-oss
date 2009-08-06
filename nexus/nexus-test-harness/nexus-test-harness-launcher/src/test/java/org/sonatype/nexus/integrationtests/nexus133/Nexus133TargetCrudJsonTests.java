@@ -107,9 +107,8 @@ public class Nexus133TargetCrudJsonTests
         // get the Resource object
         responseResource = this.messageUtil.getResourceFromResponse( response );
 
-        Assert.assertEquals( resource.getContentClass(), responseResource.getContentClass() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
-        Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
+        // validate
+        this.messageUtil.verifyTargetsConfig( responseResource );
 
     }
 

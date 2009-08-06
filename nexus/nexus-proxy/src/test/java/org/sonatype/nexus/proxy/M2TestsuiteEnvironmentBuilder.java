@@ -81,7 +81,6 @@ public class M2TestsuiteEnvironmentBuilder
             M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
             exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
             exConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-            exConf.commitChanges();
 
             repoConf.setRemoteStorage( new CRemoteStorage() );
             repoConf.getRemoteStorage().setProvider( "apacheHttpClient3x" );
@@ -91,6 +90,8 @@ public class M2TestsuiteEnvironmentBuilder
 
             // repo.setCacheManager( env.getCacheManager() );
             reposes.add( repo.getId() );
+            
+            env.getApplicationConfiguration().getConfigurationModel().addRepository( repoConf );
 
             env.getRepositoryRegistry().addRepository( repo );
         }
@@ -114,11 +115,12 @@ public class M2TestsuiteEnvironmentBuilder
         M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration( exRepo );
         exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
         exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-        exRepoConf.commitChanges();
 
         repo.configure( repoConf );
 
         reposes.add( repo.getId() );
+
+        env.getApplicationConfiguration().getConfigurationModel().addRepository( repoConf );
 
         env.getRepositoryRegistry().addRepository( repo );
 
@@ -143,11 +145,12 @@ public class M2TestsuiteEnvironmentBuilder
         M2RepositoryConfiguration exSnapRepoConf = new M2RepositoryConfiguration( exSnapRepo );
         exSnapRepoConf.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
         exSnapRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-        exSnapRepoConf.commitChanges();
 
         repoSnapshot.configure( repoSnapshotConf );
 
         reposes.add( repoSnapshot.getId() );
+
+        env.getApplicationConfiguration().getConfigurationModel().addRepository( repoSnapshotConf );
 
         env.getRepositoryRegistry().addRepository( repoSnapshot );
 
@@ -170,9 +173,10 @@ public class M2TestsuiteEnvironmentBuilder
         M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
         exGroupRepoConf.setMemberRepositoryIds( reposes );
         exGroupRepoConf.setMergeMetadata( true );
-        exGroupRepoConf.commitChanges();
 
         group.configure( repoGroupConf );
+
+        env.getApplicationConfiguration().getConfigurationModel().addRepository( repoGroupConf );
 
         env.getRepositoryRegistry().addRepository( group );
     }

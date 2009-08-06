@@ -10,14 +10,14 @@ public class AbstractVetoableEvent<T>
     extends AbstractEvent<T>
     implements Vetoable
 {
-    private final ArrayList<Object> vetos = new ArrayList<Object>();
+    private final ArrayList<Veto> vetos = new ArrayList<Veto>();
 
     public AbstractVetoableEvent( T component )
     {
         super( component );
     }
 
-    public List<Object> getVetos()
+    public List<Veto> getVetos()
     {
         return Collections.unmodifiableList( vetos );
     }
@@ -27,13 +27,19 @@ public class AbstractVetoableEvent<T>
         return !vetos.isEmpty();
     }
 
-    public void putVeto( Object veto )
+    public void putVeto( Veto veto )
     {
         vetos.add( veto );
     }
 
-    public boolean removeVeto( Object veto )
+    public void putVeto( Object vetoer, Throwable reason )
+    {
+        vetos.add( new Veto( vetoer, reason ) );
+    }
+
+    public boolean removeVeto( Veto veto )
     {
         return vetos.remove( veto );
     }
+
 }

@@ -138,6 +138,8 @@ public abstract class AbstractNexusTestCase
         InputStream stream = null;
         try
         {
+            // make the directory
+            new File( dest ).getParentFile().mkdirs();
             stream = getClass().getResourceAsStream( resource );
             IOUtil.copy( stream, new FileOutputStream( dest ) );
         }

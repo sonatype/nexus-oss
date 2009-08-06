@@ -19,6 +19,7 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.NexusItemInfo;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.index.ArtifactContext;
@@ -52,6 +53,8 @@ public class ViewAccessTest
     private FeedRecorder feedRecorder;
 
     private IndexerManager indexerManager;
+    
+    private NexusConfiguration nexusConfiguration;
 
     @Override
     protected EnvironmentBuilder getEnvironmentBuilder()
@@ -69,8 +72,11 @@ public class ViewAccessTest
     public void setUp()
         throws Exception
     {
-        super.setUp();
+        nexusConfiguration = lookup( NexusConfiguration.class );
+        nexusConfiguration.loadConfiguration();
 
+        super.setUp();
+        
         TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
 
         Target t1 =

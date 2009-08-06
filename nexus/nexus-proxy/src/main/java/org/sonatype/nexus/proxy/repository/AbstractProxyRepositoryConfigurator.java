@@ -1,12 +1,15 @@
 package org.sonatype.nexus.proxy.repository;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
+import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
+import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.RemoteSettingsUtil;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
@@ -18,14 +21,26 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 public abstract class AbstractProxyRepositoryConfigurator
     extends AbstractRepositoryConfigurator
 {
+    @Requirement
+    private AuthenticationInfoConverter authenticationInfoConverter;
+
+    @Requirement
+    private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
+
+    @Requirement
+    private GlobalHttpProxySettings globalHttpProxySettings;
+
     @Override
-    public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration, CRepository repo,
-                                      ExternalConfiguration externalConfiguration )
+    public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
+                                      CRepositoryCoreConfiguration coreConfig )
         throws ConfigurationException
     {
-        super.doApplyConfiguration( repository, configuration, repo, externalConfiguration );
+        super.doApplyConfiguration( repository, configuration, coreConfig );
 
         // proxy stuff, but is optional!
+
+        // FIXME: hm, we are called when we are dirty, so....
+        CRepository repo = coreConfig.getConfiguration( true );
 
         if ( repo.getRemoteStorage() != null )
         {
@@ -46,14 +61,14 @@ public abstract class AbstractProxyRepositoryConfigurator
 
                     if ( repo.getRemoteStorage().getAuthentication() != null )
                     {
-                        prepository.setRemoteAuthenticationSettings( RemoteSettingsUtil.convertFromModel( repo
-                            .getRemoteStorage().getAuthentication() ) );
+                        prepository.setRemoteAuthenticationSettings( authenticationInfoConverter
+                            .convertAndValidateFromModel( repo.getRemoteStorage().getAuthentication() ) );
                     }
 
                     if ( repo.getRemoteStorage().getConnectionSettings() != null )
                     {
-                        prepository.setRemoteConnectionSettings( RemoteSettingsUtil.convertFromModel( repo
-                            .getRemoteStorage().getConnectionSettings() ) );
+                        prepository.setRemoteConnectionSettings( globalRemoteConnectionSettings
+                            .convertAndValidateFromModel( repo.getRemoteStorage().getConnectionSettings() ) );
                     }
 
                     if ( repo.getRemoteStorage().getHttpProxySettings() != null )
@@ -64,8 +79,8 @@ public abstract class AbstractProxyRepositoryConfigurator
                         }
                         else
                         {
-                            prepository.setRemoteProxySettings( RemoteSettingsUtil.convertFromModel( repo
-                                .getRemoteStorage().getHttpProxySettings() ) );
+                            prepository.setRemoteProxySettings( globalHttpProxySettings
+                                .convertAndValidateFromModel( repo.getRemoteStorage().getHttpProxySettings() ) );
                         }
                     }
                 }
@@ -89,14 +104,17 @@ public abstract class AbstractProxyRepositoryConfigurator
 
     @Override
     protected void doPrepareForSave( Repository repository, ApplicationConfiguration configuration,
-                                     CRepository repoConfig, ExternalConfiguration externalConfiguration )
+                                     CRepositoryCoreConfiguration coreConfiguration )
     {
-        super.doPrepareForSave( repository, configuration, repoConfig, externalConfiguration );
+        super.doPrepareForSave( repository, configuration, coreConfiguration );
 
         if ( repository instanceof ProxyRepository )
         {
             // real cast needed here, adapt would return null!
             ProxyRepository prepository = (ProxyRepository) repository;
+
+            // FIXME: hm, we are called when we are dirty, so....
+            CRepository repoConfig = coreConfiguration.getConfiguration( true );
 
             if ( repoConfig.getRemoteStorage() != null )
             {
@@ -105,7 +123,7 @@ public abstract class AbstractProxyRepositoryConfigurator
                 if ( rsc.hasRemoteAuthenticationSettings() )
                 {
                     repoConfig.getRemoteStorage().setAuthentication(
-                                                                     RemoteSettingsUtil.convertToModel( rsc
+                                                                     authenticationInfoConverter.convertToModel( rsc
                                                                          .getRemoteAuthenticationSettings() ) );
                 }
                 else
@@ -116,8 +134,9 @@ public abstract class AbstractProxyRepositoryConfigurator
                 if ( rsc.hasRemoteConnectionSettings() )
                 {
                     repoConfig.getRemoteStorage().setConnectionSettings(
-                                                                         RemoteSettingsUtil.convertToModel( rsc
-                                                                             .getRemoteConnectionSettings() ) );
+                                                                         globalRemoteConnectionSettings
+                                                                             .convertToModel( rsc
+                                                                                 .getRemoteConnectionSettings() ) );
                 }
                 else
                 {
@@ -129,7 +148,7 @@ public abstract class AbstractProxyRepositoryConfigurator
                     if ( rsc.getRemoteProxySettings() != null )
                     {
                         repoConfig.getRemoteStorage().setHttpProxySettings(
-                                                                            RemoteSettingsUtil.convertToModel( rsc
+                                                                            globalHttpProxySettings.convertToModel( rsc
                                                                                 .getRemoteProxySettings() ) );
                     }
                     else

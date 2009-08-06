@@ -11,20 +11,27 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.maven.maven2;
+package org.sonatype.nexus.configuration;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.configuration.ExternalConfiguration;
-import org.sonatype.nexus.proxy.repository.AbstractShadowRepositoryValidator;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.events.AbstractVetoableEvent;
 
-@Component( role = M2LayoutedM1ShadowRepositoryValidator.class )
-public class M2LayoutedM1ShadowRepositoryValidator
-    extends AbstractShadowRepositoryValidator
+/**
+ * An event fired on configuration prepare load, when configurable components should apply configs after load. This is a
+ * VetoableEvent, so, save may be vetoed.
+ * 
+ * @author cstamas
+ */
+public class ConfigurationPrepareForLoadEvent
+    extends AbstractVetoableEvent<ApplicationConfiguration>
 {
-    @Override
-    protected ExternalConfiguration createExternalConfiguration( Xpp3Dom dom )
+    public ConfigurationPrepareForLoadEvent( ApplicationConfiguration configuration )
     {
-        return new M2LayoutedM1ShadowRepositoryConfiguration( dom );
+        super( configuration );
+    }
+
+    public ApplicationConfiguration getConfiguration()
+    {
+        return getEventSender();
     }
 }

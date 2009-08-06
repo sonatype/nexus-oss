@@ -2,7 +2,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-public class AbstractProxyRepositoryConfiguration
+public abstract class AbstractProxyRepositoryConfiguration
     extends AbstractRepositoryConfiguration
 {
     private static final String PROXY_MODE = "proxyMode";
@@ -18,34 +18,33 @@ public class AbstractProxyRepositoryConfiguration
 
     public ProxyMode getProxyMode()
     {
-        return ProxyMode.valueOf( getNodeValue( getConfiguration( false ), PROXY_MODE, ProxyMode.ALLOW.toString() ) );
+        return ProxyMode.valueOf( getNodeValue( getRootNode(), PROXY_MODE, ProxyMode.ALLOW.toString() ) );
     }
 
     public void setProxyMode( ProxyMode mode )
     {
-        setNodeValue( getConfiguration( true ), PROXY_MODE, mode.toString() );
+        setNodeValue( getRootNode(), PROXY_MODE, mode.toString() );
     }
 
     public RepositoryStatusCheckMode getRepositoryStatusCheckMode()
     {
-        return RepositoryStatusCheckMode.valueOf( getNodeValue(
-            getConfiguration( false ),
-            REMOTE_STATUS_CHECK_MODE,
-            RepositoryStatusCheckMode.AUTO_BLOCKED_ONLY.toString() ) );
+        return RepositoryStatusCheckMode
+            .valueOf( getNodeValue( getRootNode(), REMOTE_STATUS_CHECK_MODE,
+                                    RepositoryStatusCheckMode.AUTO_BLOCKED_ONLY.toString() ) );
     }
 
     public void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode )
     {
-        setNodeValue( getConfiguration( true ), REMOTE_STATUS_CHECK_MODE, mode.toString() );
+        setNodeValue( getRootNode(), REMOTE_STATUS_CHECK_MODE, mode.toString() );
     }
 
     public int getItemMaxAge()
     {
-        return Integer.parseInt( getNodeValue( getConfiguration( false ), ITEM_MAX_AGE, "1440" ) );
+        return Integer.parseInt( getNodeValue( getRootNode(), ITEM_MAX_AGE, "1440" ) );
     }
 
     public void setItemMaxAge( int age )
     {
-        setNodeValue( getConfiguration( true ), ITEM_MAX_AGE, String.valueOf( age ) );
+        setNodeValue( getRootNode(), ITEM_MAX_AGE, String.valueOf( age ) );
     }
 }

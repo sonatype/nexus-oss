@@ -39,9 +39,9 @@ public abstract class AbstractMavenGroupRepository
     private RepositoryKind repositoryKind;
 
     @Override
-    protected AbstractMavenGroupRepositoryConfiguration getExternalConfiguration()
+    protected AbstractMavenGroupRepositoryConfiguration getExternalConfiguration( boolean forWrite )
     {
-        return (AbstractMavenGroupRepositoryConfiguration) super.getExternalConfiguration();
+        return (AbstractMavenGroupRepositoryConfiguration) super.getExternalConfiguration( forWrite );
     }
 
     public RepositoryKind getRepositoryKind()
@@ -49,20 +49,20 @@ public abstract class AbstractMavenGroupRepository
         if ( repositoryKind == null )
         {
             repositoryKind =
-                new DefaultRepositoryKind( GroupRepository.class,
-                                           Arrays.asList( new Class<?>[] { MavenGroupRepository.class } ) );
+                new DefaultRepositoryKind( GroupRepository.class, Arrays
+                    .asList( new Class<?>[] { MavenGroupRepository.class } ) );
         }
         return repositoryKind;
     }
 
     public boolean isMergeMetadata()
     {
-        return getExternalConfiguration().isMergeMetadata();
+        return getExternalConfiguration( false ).isMergeMetadata();
     }
 
     public void setMergeMetadata( boolean mergeMetadata )
     {
-        getExternalConfiguration().setMergeMetadata( mergeMetadata );
+        getExternalConfiguration( true ).setMergeMetadata( mergeMetadata );
     }
 
     public ArtifactPackagingMapper getArtifactPackagingMapper()

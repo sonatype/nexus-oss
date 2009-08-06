@@ -3,6 +3,7 @@ package org.sonatype.nexus.templates.repository.maven;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
+import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.maven.MavenShadowRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
@@ -43,7 +44,20 @@ public class Maven1Maven2ShadowRepositoryTemplate
 
         repo.setAllowWrite( false );
 
-        CRepositoryCoreConfiguration result = new CRepositoryCoreConfiguration( repo );
+        CRepositoryCoreConfiguration result =
+            new CRepositoryCoreConfiguration(
+                                              getTemplateProvider().getApplicationConfiguration(),
+                                              repo,
+                                              new CRepositoryExternalConfigurationHolderFactory<M2LayoutedM1ShadowRepositoryConfiguration>()
+                                              {
+                                                  public M2LayoutedM1ShadowRepositoryConfiguration createExternalConfigurationHolder(
+                                                                                                                                      CRepository config )
+                                                  {
+                                                      return new M2LayoutedM1ShadowRepositoryConfiguration(
+                                                                                                            (Xpp3Dom) config
+                                                                                                                .getExternalConfiguration() );
+                                                  }
+                                              } );
 
         return result;
     }

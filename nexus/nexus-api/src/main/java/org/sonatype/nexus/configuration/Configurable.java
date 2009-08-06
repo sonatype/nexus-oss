@@ -25,14 +25,6 @@ public interface Configurable
         throws ConfigurationException;
 
     /**
-     * cstamas: not sure about this yet.
-     * 
-     * @throws ConfigurationException
-     */
-    void configure()
-        throws ConfigurationException;
-
-    /**
      * Returns true if there are some unsaved changes.
      * 
      * @return
@@ -42,7 +34,8 @@ public interface Configurable
     /**
      * Commits the changes. Resets the state of config "back to normal" (saved).
      */
-    boolean commitChanges();
+    boolean commitChanges()
+        throws ConfigurationException;
 
     /**
      * Rollbacks the changes. Resets the state of config "back to normal" (saved).

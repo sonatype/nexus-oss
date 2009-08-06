@@ -3,6 +3,7 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Client;
 import org.restlet.data.ClientInfo;
 import org.restlet.data.Method;
@@ -14,6 +15,7 @@ import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.rest.RestApiConfiguration;
 
 /**
  * This is a "remote" strategy, uses HTTP GET for information fetch from the remoteUrl. Note: this class uses Restlet
@@ -25,6 +27,9 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 public class HttpGetDiscoveryStrategy
     extends AbstractRemoteDiscoveryStrategy
 {
+    @Requirement
+    private RestApiConfiguration restApiConfiguration;
+    
     public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
         throws NoSuchRepositoryException,
             IOException
@@ -72,7 +77,7 @@ public class HttpGetDiscoveryStrategy
     {
         Request rr = new Request( Method.GET, url );
 
-        rr.setReferrerRef( getNexus().getNexusConfiguration().getBaseUrl() );
+        rr.setReferrerRef( restApiConfiguration.getBaseUrl() );
 
         ClientInfo ci = new ClientInfo();
 

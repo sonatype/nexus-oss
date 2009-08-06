@@ -51,6 +51,7 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
  * The default configuration validator provider. It checks the model for semantical validity.
  * 
  * @author cstamas
+ * @deprecated see Configurable
  */
 @Component( role = ApplicationConfigurationValidator.class )
 public class DefaultApplicationConfigurationValidator
@@ -400,6 +401,11 @@ public class DefaultApplicationConfigurationValidator
                     + item.getId() + "'." );
 
             response.setModified( true );
+        }
+        
+        if (item.getRoutePatterns() == null || item.getRoutePatterns().isEmpty())
+        {
+            response.addValidationError( "The Route with ID='" + item.getId() + "' must contain at least one Route Pattern." );
         }
 
         for ( String regexp : (List<String>) item.getRoutePatterns() )

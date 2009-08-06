@@ -32,14 +32,13 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * The Smtp settings validation resource.
- *
+ * 
  * @author velo
  */
 @Component( role = PlexusResource.class, hint = "SmtpSettingsValidation" )
 public class SmtpSettingsValidationPlexusResource
     extends AbstractGlobalConfigurationPlexusResource
 {
-
     private static final Pattern EMAIL_PATTERN = Pattern.compile( ".+@.+\\.[a-z]+" );
 
     @Requirement
@@ -86,12 +85,9 @@ public class SmtpSettingsValidationPlexusResource
         CSmtpConfiguration config = new CSmtpConfiguration();
 
         config.setHostname( settings.getHost() );
-        
-        String oldPassword = null;
-        if( getNexusConfiguration().readSmtpConfiguration() != null)
-        {
-            oldPassword = getNexusConfiguration().readSmtpConfiguration().getPassword();
-        }
+
+        String oldPassword = getNexusEmailer().getSMTPPassword();
+
         config.setPassword( this.getActualPassword( settings.getPassword(), oldPassword ) );
         config.setPort( settings.getPort() );
         config.setSslEnabled( settings.isSslEnabled() );

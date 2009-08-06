@@ -13,7 +13,6 @@
  */
 package org.sonatype.nexus;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -106,14 +105,11 @@ public class DefaultNexusTest
     {
         Map<String, ContentClass> plexusContentClasses = getContainer().lookupMap( ContentClass.class );
 
-        Collection<ContentClass> contentClasses = repositoryTypeRegistry.getContentClasses();
+        Map<String, ContentClass> contentClasses = repositoryTypeRegistry.getContentClasses();
 
         assertEquals( plexusContentClasses.size(), contentClasses.size() );
 
-        for ( ContentClass cc : plexusContentClasses.values() )
-        {
-            assertTrue( contentClasses.contains( cc ) );
-        }
+        assertTrue( plexusContentClasses.values().containsAll( contentClasses.values() ) );
     }
 
     public void testBounceNexus()

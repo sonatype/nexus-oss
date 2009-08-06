@@ -220,7 +220,7 @@ public class DefaultTaskConfigManagerTest
 
     private List<CScheduledTask> getTaskConfiguration()
     {
-        return applicationConfiguration.getConfiguration().getTasks();
+        return applicationConfiguration.getConfigurationModel().getTasks();
     }
 
     public class TestCallable

@@ -1,118 +1,88 @@
 package org.sonatype.nexus.configuration.model;
 
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
-
-import com.thoughtworks.xstream.XStream;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 public abstract class AbstractCoreConfiguration
+    extends AbstractRevertableConfiguration
     implements CoreConfiguration
 {
-    private final XStream xstream = new XStream();
+    private ApplicationConfiguration applicationConfiguration;
 
-    private Object originalConfiguration;
+    private ExternalConfiguration<?> externalConfiguration;
 
-    private Object changedConfiguration;
-
-    public AbstractCoreConfiguration( Object configuration )
+    public AbstractCoreConfiguration( ApplicationConfiguration applicationConfiguration )
     {
-        setOriginalConfiguration( configuration );
+        setOriginalConfiguration( extractConfiguration( applicationConfiguration.getConfigurationModel() ) );
+
+        this.applicationConfiguration = applicationConfiguration;
     }
 
-    public Object getConfiguration( boolean forWrite )
+    protected ApplicationConfiguration getApplicationConfiguration()
     {
-        if ( forWrite )
+        return applicationConfiguration;
+    }
+
+    protected ExternalConfiguration<?> prepareExternalConfiguration( Object configuration )
+    {
+        // usually nothing, but CRepository and CPlugin does have them
+        return null;
+    }
+
+    public ExternalConfiguration<?> getExternalConfiguration()
+    {
+        if ( externalConfiguration == null )
         {
-            if ( getOriginalConfiguration() != null && getChangedConfiguration() == null )
-            {
-                // copy it
-                setChangedConfiguration( copyObject( getOriginalConfiguration() ) );
-
-                copyTransients( getOriginalConfiguration(), getChangedConfiguration() );
-            }
-
-            return getChangedConfiguration();
+            externalConfiguration = prepareExternalConfiguration( getOriginalConfiguration() );
         }
-        else
-        {
-            return getOriginalConfiguration();
-        }
+
+        return externalConfiguration;
     }
 
-    protected XStream getXStream()
-    {
-        return xstream;
-    }
-
-    protected Object getOriginalConfiguration()
-    {
-        return originalConfiguration;
-    }
-
-    public void setOriginalConfiguration( Object originalConfiguration )
-    {
-        this.originalConfiguration = originalConfiguration;
-    }
-
-    protected Object getChangedConfiguration()
-    {
-        return changedConfiguration;
-    }
-
-    public void setChangedConfiguration( Object changedConfiguration )
-    {
-        this.changedConfiguration = changedConfiguration;
-    }
-
-    protected Object copyObject( Object source )
-    {
-        // nice, isn't it?
-        return getXStream().fromXML( getXStream().toXML( source ) );
-    }
-
-    protected abstract void copyTransients( Object source, Object destination );
-
-    public abstract ExternalConfiguration getExternalConfiguration();
-
-    protected boolean isThisDirty()
-    {
-        return getChangedConfiguration() != null;
-    }
-
+    @Override
     public boolean isDirty()
     {
         return isThisDirty() || ( getExternalConfiguration() != null && getExternalConfiguration().isDirty() );
     }
 
-    public void commitChanges()
+    @Override
+    public void validateChanges()
+        throws ConfigurationException
     {
-        if ( isThisDirty() )
+        super.validateChanges();
+
+        if ( getExternalConfiguration() != null )
         {
-            // nice, isn't it?
-            setOriginalConfiguration( getXStream().fromXML( getXStream().toXML( getChangedConfiguration() ),
-                                                            getOriginalConfiguration() ) );
-
-            copyTransients( getChangedConfiguration(), getOriginalConfiguration() );
-
-            setChangedConfiguration( null );
+            getExternalConfiguration().validateChanges();
         }
+    }
 
-        if ( getExternalConfiguration() != null && getExternalConfiguration().isDirty() )
+    @Override
+    public void commitChanges()
+        throws ConfigurationException
+    {
+        super.commitChanges();
+
+        if ( getExternalConfiguration() != null )
         {
             getExternalConfiguration().commitChanges();
         }
     }
 
+    @Override
     public void rollbackChanges()
     {
-        if ( isThisDirty() )
-        {
-            setChangedConfiguration( null );
-        }
+        super.rollbackChanges();
 
-        if ( getExternalConfiguration() != null && getExternalConfiguration().isDirty() )
+        if ( getExternalConfiguration() != null )
         {
             getExternalConfiguration().rollbackChanges();
         }
     }
+
+    // ==
+
+    protected abstract Object extractConfiguration( Configuration configuration );
 }

@@ -8,6 +8,7 @@ import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
+import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.mirror.DefaultPublishedMirrors;
@@ -21,8 +22,7 @@ public class ConfigurableRepository
     @Override
     protected CRepository getCurrentConfiguration( boolean forWrite )
     {
-        return (CRepository) ( (CRepositoryCoreConfiguration) getCurrentCoreConfiguration() )
-            .getConfiguration( forWrite );
+        return ( (CRepositoryCoreConfiguration) getCurrentCoreConfiguration() ).getConfiguration( forWrite );
     }
 
     @Override
@@ -37,13 +37,23 @@ public class ConfigurableRepository
         return null;
     }
 
+    protected CRepositoryExternalConfigurationHolderFactory<?> getExternalConfigurationHolderFactory()
+    {
+        return null;
+    }
+
     @Override
     protected CoreConfiguration wrapConfiguration( Object configuration )
         throws ConfigurationException
     {
         if ( configuration instanceof CRepository )
         {
-            return new CRepositoryCoreConfiguration( (CRepository) configuration );
+            return new CRepositoryCoreConfiguration( getApplicationConfiguration(), (CRepository) configuration,
+                                                     getExternalConfigurationHolderFactory() );
+        }
+        else if ( configuration instanceof CRepositoryCoreConfiguration )
+        {
+            return (CRepositoryCoreConfiguration) configuration;
         }
         else
         {

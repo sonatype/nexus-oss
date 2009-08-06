@@ -13,11 +13,20 @@
  */
 package org.sonatype.nexus.rest.global;
 
-import org.sonatype.nexus.configuration.model.CErrorReporting;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
+import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
+import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.email.NexusEmailer;
+import org.sonatype.nexus.error.reporting.ErrorReportingManager;
+import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
@@ -36,50 +45,183 @@ public abstract class AbstractGlobalConfigurationPlexusResource
     public static final String SECURITY_OFF = "off";
 
     public static final String SECURITY_SIMPLE = "simple";
-    
+
     public static final String SECURITY_CUSTOM = "custom";
+
+    @Requirement
+    private NexusEmailer nexusEmailer;
+
+    @Requirement
+    private GlobalHttpProxySettings globalHttpProxySettings;
+
+    @Requirement
+    private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
     
-    public static SmtpSettings convert( CSmtpConfiguration settings )
+    @Requirement
+    private AuthenticationInfoConverter authenticationInfoConverter;
+
+    @Requirement
+    private ErrorReportingManager errorReportingManager;
+
+    protected NexusEmailer getNexusEmailer()
+    {
+        return nexusEmailer;
+    }
+
+    protected GlobalHttpProxySettings getGlobalHttpProxySettings()
+    {
+        return globalHttpProxySettings;
+    }
+
+    protected GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings()
+    {
+        return globalRemoteConnectionSettings;
+    }
+    
+    protected AuthenticationInfoConverter getAuthenticationInfoConverter()
+    {
+        return authenticationInfoConverter;
+    }
+
+    protected ErrorReportingManager getErrorReportingManager()
+    {
+        return errorReportingManager;
+    }
+
+    public static SmtpSettings convert( NexusEmailer nexusEmailer )
+    {
+        if ( nexusEmailer == null )
+        {
+            return null;
+        }
+
+        SmtpSettings result = new SmtpSettings();
+
+        result.setHost( nexusEmailer.getSMTPHostname() );
+
+        result.setPort( nexusEmailer.getSMTPPort() );
+
+        result.setSslEnabled( nexusEmailer.isSMTPSslEnabled() );
+
+        result.setTlsEnabled( nexusEmailer.isSMTPTlsEnabled() );
+
+        result.setUsername( nexusEmailer.getSMTPUsername() );
+
+        result.setPassword( PASSWORD_PLACE_HOLDER );
+
+        result.setSystemEmailAddress( nexusEmailer.getSMTPSystemEmailAddress().getMailAddress() );
+
+        return result;
+    }
+
+    public static ErrorReportingSettings convert( ErrorReportingManager errorReportingManager )
+    {
+        if ( errorReportingManager == null || errorReportingManager.isEnabled() == false )
+        {
+            return null;
+        }
+
+        ErrorReportingSettings result = new ErrorReportingSettings();
+
+        result.setJiraUsername( errorReportingManager.getJIRAUsername() );
+        result.setJiraPassword( PASSWORD_PLACE_HOLDER );
+        result.setUseGlobalProxy( errorReportingManager.isUseGlobalProxy() );
+
+        return result;
+    }
+
+    /**
+     * Externalized Nexus object to DTO's conversion.
+     * 
+     * @param resource
+     */
+    public static RemoteConnectionSettings convert( GlobalRemoteConnectionSettings settings )
     {
         if ( settings == null )
         {
             return null;
         }
-        
-        SmtpSettings result = new SmtpSettings();
-        
-        result.setHost( settings.getHostname() );
-        
-        result.setPassword( PASSWORD_PLACE_HOLDER );
-        
-        result.setPort( settings.getPort() );
-        
-        result.setSslEnabled( settings.isSslEnabled() );
-        
-        result.setSystemEmailAddress( settings.getSystemEmailAddress() );
-        
-        result.setTlsEnabled( settings.isTlsEnabled() );
-        
-        result.setUsername( settings.getUsername() );
-        
+
+        RemoteConnectionSettings result = new RemoteConnectionSettings();
+
+        result.setConnectionTimeout( settings.getConnectionTimeout() / 1000 );
+
+        result.setRetrievalRetryCount( settings.getRetrievalRetryCount() );
+
+        result.setQueryString( settings.getQueryString() );
+
+        result.setUserAgentString( settings.getUserAgentCustomizationString() );
+
         return result;
     }
-    
-    public static ErrorReportingSettings convert( CErrorReporting settings )
+
+    /**
+     * Externalized Nexus object to DTO's conversion.
+     * 
+     * @param resource
+     */
+    public static RemoteHttpProxySettings convert( GlobalHttpProxySettings settings )
     {
-        if ( settings == null || settings.isEnabled() == false )
+        if ( settings == null || !settings.isEnabled() )
         {
             return null;
         }
-        
-        ErrorReportingSettings result = new ErrorReportingSettings();
-       
-        result.setJiraUsername( settings.getJiraUsername() );
-        result.setJiraPassword( PASSWORD_PLACE_HOLDER );
-        result.setUseGlobalProxy( settings.isUseGlobalProxy() );
-        
+
+        RemoteHttpProxySettings result = new RemoteHttpProxySettings();
+
+        result.setProxyHostname( settings.getHostname() );
+
+        result.setProxyPort( settings.getPort() );
+
+        result.setAuthentication( convert( settings.getProxyAuthentication() ) );
+
         return result;
     }
+
+    /**
+     * Externalized Nexus object to DTO's conversion.
+     * 
+     * @param resource
+     */
+    public static AuthenticationSettings convert( RemoteAuthenticationSettings settings )
+    {
+        if ( settings == null )
+        {
+            return null;
+        }
+
+        AuthenticationSettings auth = new AuthenticationSettings();
+
+        if ( settings instanceof ClientSSLRemoteAuthenticationSettings )
+        {
+            // huh?
+        }
+        else if ( settings instanceof NtlmRemoteAuthenticationSettings )
+        {
+            NtlmRemoteAuthenticationSettings up = (NtlmRemoteAuthenticationSettings) settings;
+
+            auth.setUsername( up.getUsername() );
+
+            auth.setPassword( PASSWORD_PLACE_HOLDER );
+
+            auth.setNtlmHost( up.getNtlmHost() );
+
+            auth.setNtlmDomain( up.getNtlmDomain() );
+
+        }
+        else if ( settings instanceof UsernamePasswordRemoteAuthenticationSettings )
+        {
+            UsernamePasswordRemoteAuthenticationSettings up = (UsernamePasswordRemoteAuthenticationSettings) settings;
+
+            auth.setUsername( up.getUsername() );
+
+            auth.setPassword( PASSWORD_PLACE_HOLDER );
+        }
+
+        return auth;
+    }
+
+    // ==
 
     /**
      * Externalized Nexus object to DTO's conversion.
@@ -156,6 +298,32 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         // auth.setPassphrase( settings.getPassphrase() );
 
         return auth;
+    }
+
+    public static SmtpSettings convert( CSmtpConfiguration settings )
+    {
+        if ( settings == null )
+        {
+            return null;
+        }
+
+        SmtpSettings result = new SmtpSettings();
+
+        result.setHost( settings.getHostname() );
+
+        result.setPassword( PASSWORD_PLACE_HOLDER );
+
+        result.setPort( settings.getPort() );
+
+        result.setSslEnabled( settings.isSslEnabled() );
+
+        result.setSystemEmailAddress( settings.getSystemEmailAddress() );
+
+        result.setTlsEnabled( settings.isTlsEnabled() );
+
+        result.setUsername( settings.getUsername() );
+
+        return result;
     }
 
 }

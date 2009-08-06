@@ -39,7 +39,7 @@ public class DefaultRepositoryConfiguratorTest
         // change config
         cRepo.setNotFoundCacheTTL( 2 );
 
-        oldRepository.configure();
+        oldRepository.configure( cRepo );
 
         // make sure the item is NOT in NFC
         Assert.assertFalse( oldRepository.getNotFoundCache().contains( "test-path" ) );
@@ -70,7 +70,7 @@ public class DefaultRepositoryConfiguratorTest
         // NOTE: we don't care if it in the cache right now, because the retrieve item does not return it.
         // Assert.assertFalse( oldRepository.getNotFoundCache().contains( "test-path" ) );
 
-        oldRepository.configure();
+        oldRepository.configure( cRepo );
 
         // make sure the item is NOT in NFC
         Assert.assertFalse( oldRepository.getNotFoundCache().contains( "test-path" ) );

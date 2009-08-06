@@ -68,13 +68,6 @@ public interface ApplicationConfiguration
     boolean isSecurityEnabled();
 
     /**
-     * Gets the Configuration object.
-     * 
-     * @return
-     */
-    Configuration getConfiguration();
-
-    /**
      * Gets the top level remote storage context.
      * 
      * @return
@@ -88,4 +81,13 @@ public interface ApplicationConfiguration
      */
     void saveConfiguration()
         throws IOException;
+
+    /**
+     * Gets the Configuration object.
+     * 
+     * @return
+     * @deprecated you should use setters/getters directly on Configurable instances, and not tampering with
+     *             Configuration model directly!
+     */
+    Configuration getConfigurationModel();
 }

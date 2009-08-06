@@ -7,6 +7,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
 import junit.framework.Assert;
 
@@ -94,8 +95,14 @@ public class ErrorReportUtil
                 foundSecurityConfigXml = true;
             }
             else
-            {
-                foundOthers = true;
+            {   
+                String confDir = AbstractNexusIntegrationTest.WORK_CONF_DIR;
+                
+                // any extra plugin config goes in the zip, so if we find something from the conf dir that is ok.
+                if(! new File( confDir, entry.getName()).exists())
+                {
+                    foundOthers = true;
+                }
             }
         }
 

@@ -19,7 +19,6 @@ import java.util.Map;
 import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -38,8 +37,7 @@ public interface NexusConfiguration
      * @throws IOException
      */
     void loadConfiguration()
-        throws ConfigurationException,
-            IOException;
+        throws ConfigurationException, IOException;
 
     /**
      * Explicit loading of configuration. Enables to force reloading of config.
@@ -48,8 +46,7 @@ public interface NexusConfiguration
      * @throws IOException
      */
     void loadConfiguration( boolean forceReload )
-        throws ConfigurationException,
-            IOException;
+        throws ConfigurationException, IOException;
 
     ApplicationConfigurationSource getConfigurationSource();
 
@@ -59,15 +56,21 @@ public interface NexusConfiguration
 
     boolean isConfigurationDefaulted();
 
-    Repository createRepositoryFromModel( Configuration configuration, CRepository repository )
+    Repository createRepositoryFromModel( CRepository repository )
         throws ConfigurationException;
 
     // ------------------------------------------------------------------
     // Booting
 
+    /**
+     * Creates internals like reposes configured in nexus.xml. Called on startup.
+     */
     void createInternals()
         throws ConfigurationException;
 
+    /**
+     * Cleanups the internals, like on shutdown.
+     */
     void dropInternals();
 
     /**

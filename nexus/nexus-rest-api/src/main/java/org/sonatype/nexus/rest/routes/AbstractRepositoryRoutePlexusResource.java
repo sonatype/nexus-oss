@@ -16,11 +16,13 @@ package org.sonatype.nexus.rest.routes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
+import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
@@ -33,8 +35,15 @@ import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 public abstract class AbstractRepositoryRoutePlexusResource
     extends AbstractNexusPlexusResource
 {
-
     public static final String ROUTE_ID_KEY = "routeId";
+
+    @Requirement
+    private RequestRepositoryMapper repositoryMapper;
+
+    protected RequestRepositoryMapper getRepositoryMapper()
+    {
+        return repositoryMapper;
+    }
 
     /**
      * Creating a list of member reposes. Since this method is used in two Resource subclasses too, and those are
@@ -49,12 +58,12 @@ public abstract class AbstractRepositoryRoutePlexusResource
      * @throws ResourceException
      */
     protected List<RepositoryRouteMemberRepository> getRepositoryRouteMemberRepositoryList( Reference listBase,
-        List<String> reposList, Request request )
-        throws NoSuchRepositoryException,
-            ResourceException
+                                                                                            List<String> reposList,
+                                                                                            Request request )
+        throws NoSuchRepositoryException, ResourceException
     {
-        List<RepositoryRouteMemberRepository> members = new ArrayList<RepositoryRouteMemberRepository>( reposList
-            .size() );
+        List<RepositoryRouteMemberRepository> members =
+            new ArrayList<RepositoryRouteMemberRepository>( reposList.size() );
 
         for ( String repoId : reposList )
         {
@@ -83,19 +92,19 @@ public abstract class AbstractRepositoryRoutePlexusResource
         return members;
     }
 
-    protected String resource2configType( String type )
+    protected MappingType resource2configType( String type )
     {
         if ( RepositoryRouteResource.INCLUSION_RULE_TYPE.equals( type ) )
         {
-            return CPathMappingItem.INCLUSION_RULE_TYPE;
+            return MappingType.INCLUSION;
         }
         else if ( RepositoryRouteResource.EXCLUSION_RULE_TYPE.equals( type ) )
         {
-            return CPathMappingItem.EXCLUSION_RULE_TYPE;
+            return MappingType.EXCLUSION;
         }
         else if ( RepositoryRouteResource.BLOCKING_RULE_TYPE.equals( type ) )
         {
-            return CPathMappingItem.BLOCKING_RULE_TYPE;
+            return MappingType.BLOCKING;
         }
         else
         {
@@ -103,17 +112,17 @@ public abstract class AbstractRepositoryRoutePlexusResource
         }
     }
 
-    protected String config2resourceType( String type )
+    protected String config2resourceType( MappingType type )
     {
-        if ( CPathMappingItem.INCLUSION_RULE_TYPE.equals( type ) )
+        if ( MappingType.INCLUSION.equals( type ) )
         {
             return RepositoryRouteResource.INCLUSION_RULE_TYPE;
         }
-        else if ( CPathMappingItem.EXCLUSION_RULE_TYPE.equals( type ) )
+        else if ( MappingType.EXCLUSION.equals( type ) )
         {
             return RepositoryRouteResource.EXCLUSION_RULE_TYPE;
         }
-        else if ( CPathMappingItem.BLOCKING_RULE_TYPE.equals( type ) )
+        else if ( MappingType.BLOCKING.equals( type ) )
         {
             return RepositoryRouteResource.BLOCKING_RULE_TYPE;
         }

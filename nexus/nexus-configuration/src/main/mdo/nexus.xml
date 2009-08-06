@@ -576,7 +576,7 @@
     public transient String defaultLocalStorageUrl;
 
     /* A field to store actual external configuration implementation */
-    public transient org.sonatype.nexus.configuration.ExternalConfiguration externalConfigurationImple;
+    public transient Object externalConfigurationImple;
 ]]></code>
         </codeSegment>
       </codeSegments>

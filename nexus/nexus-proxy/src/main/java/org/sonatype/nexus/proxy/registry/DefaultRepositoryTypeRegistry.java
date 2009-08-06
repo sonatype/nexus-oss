@@ -93,9 +93,9 @@ public class DefaultRepositoryTypeRegistry
         return Collections.unmodifiableSet( result );
     }
 
-    public Set<ContentClass> getContentClasses()
+    public Map<String, ContentClass> getContentClasses()
     {
-        return Collections.unmodifiableSet( new HashSet<ContentClass>( contentClasses.values() ) );
+        return Collections.unmodifiableMap( new HashMap<String, ContentClass>( contentClasses ) );
     }
 
     public Set<String> getExistingRepositoryHints( String role )

@@ -33,9 +33,10 @@ public class ApplicationConfigurationAdapter
     @Requirement
     private NexusConfiguration nexusConfiguration;
 
-    public Configuration getConfiguration()
+    @Deprecated
+    public Configuration getConfigurationModel()
     {
-        return nexusConfiguration.getConfiguration();
+        return nexusConfiguration.getConfigurationModel();
     }
 
     public File getWorkingDirectory()

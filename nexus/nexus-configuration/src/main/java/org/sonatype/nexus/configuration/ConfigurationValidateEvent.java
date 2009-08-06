@@ -11,11 +11,27 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.maven;
+package org.sonatype.nexus.configuration;
 
-import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryValidator;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.events.AbstractVetoableEvent;
 
-public abstract class AbstractMavenGroupRepositoryValidator
-    extends AbstractGroupRepositoryValidator
+/**
+ * An event fired upon configuration load, when configurable components should validate configs. This is a
+ * VetoableEvent, so, save may be vetoed.
+ * 
+ * @author cstamas
+ */
+public class ConfigurationValidateEvent
+    extends AbstractVetoableEvent<ApplicationConfiguration>
 {
+    public ConfigurationValidateEvent( ApplicationConfiguration configuration )
+    {
+        super( configuration );
+    }
+
+    public ApplicationConfiguration getConfiguration()
+    {
+        return getEventSender();
+    }
 }

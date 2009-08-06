@@ -2,6 +2,7 @@ package org.sonatype.nexus.plugins;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -32,7 +33,7 @@ public class MockRepositoryTypeRegistry
 
     // == neglected all below
 
-    public Set<ContentClass> getContentClasses()
+    public Map<String, ContentClass> getContentClasses()
     {
         // TODO Auto-generated method stub
         return null;

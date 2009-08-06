@@ -11,7 +11,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -46,8 +45,7 @@ public abstract class AbstractRepositoryConfigurator
                                           CoreConfiguration config )
         throws ConfigurationException
     {
-        doApplyConfiguration( (Repository) target, configuration, ( (CRepositoryCoreConfiguration) config )
-            .getConfiguration( false ), config.getExternalConfiguration() );
+        doApplyConfiguration( (Repository) target, configuration, (CRepositoryCoreConfiguration) config );
 
         // config done, apply customizations
         for ( RepositoryCustomizer configurator : pluginRepositoryConfigurators.values() )
@@ -63,21 +61,18 @@ public abstract class AbstractRepositoryConfigurator
     {
         // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
         // later we will see about it
-        doPrepareForSave( (Repository) target, configuration, ( (CRepositoryCoreConfiguration) config )
-            .getConfiguration( true ), config.getExternalConfiguration() );
-    }
-
-    public ExternalConfiguration getExternalConfiguration( Repository repository )
-    {
-        return repository.getCurrentCoreConfiguration().getExternalConfiguration();
+        doPrepareForSave( (Repository) target, configuration, (CRepositoryCoreConfiguration) config );
     }
 
     protected void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
-                                         CRepository repo, ExternalConfiguration externalConfiguration )
+                                         CRepositoryCoreConfiguration coreConfiguration )
         throws ConfigurationException
     {
         // Setting common things on a repository
 
+        // FIXME: hm, we are called when we are dirty, so....
+        CRepository repo = coreConfiguration.getConfiguration( true );
+        
         // NX-198: filling up the default variable to store the "default" local URL
         File defaultStorageFile = new File( new File( configuration.getWorkingDirectory(), "storage" ), repo.getId() );
 
@@ -143,7 +138,7 @@ public abstract class AbstractRepositoryConfigurator
     }
 
     protected void doPrepareForSave( Repository repository, ApplicationConfiguration configuration,
-                                     CRepository repoConfig, ExternalConfiguration externalConfiguration )
+                                     CRepositoryCoreConfiguration coreConfiguration )
     {
         // Setting common things on a repository
     }

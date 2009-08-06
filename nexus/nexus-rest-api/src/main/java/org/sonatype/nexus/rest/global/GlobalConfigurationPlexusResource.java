@@ -28,12 +28,11 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.micromailer.Address;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
+import org.sonatype.nexus.rest.RestApiConfiguration;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
@@ -68,6 +67,9 @@ public class GlobalConfigurationPlexusResource
 
     @Requirement
     private SecuritySystem securitySystem;
+
+    @Requirement
+    private RestApiConfiguration restApiConfiguration;
 
     public GlobalConfigurationPlexusResource()
     {
@@ -151,65 +153,57 @@ public class GlobalConfigurationPlexusResource
                     {
                         SmtpSettings settings = resource.getSmtpSettings();
 
-                        CSmtpConfiguration config = new CSmtpConfiguration();
-
-                        config.setHostname( settings.getHost() );
+                        getNexusEmailer().setSMTPHostname( settings.getHost() );
 
                         // lookup old password
-                        String oldPassword = null;
-                        if( getNexusConfiguration().readSmtpConfiguration() != null)
-                        {
-                            oldPassword = getNexusConfiguration().readSmtpConfiguration().getPassword();
-                        }
-                        config.setPassword( this.getActualPassword( settings.getPassword(), oldPassword ) );
+                        String oldPassword = getNexusEmailer().getSMTPPassword();
 
-                        config.setPort( settings.getPort() );
+                        getNexusEmailer()
+                            .setSMTPPassword( this.getActualPassword( settings.getPassword(), oldPassword ) );
 
-                        config.setSslEnabled( settings.isSslEnabled() );
+                        getNexusEmailer().setSMTPPort( settings.getPort() );
 
-                        config.setTlsEnabled( settings.isTlsEnabled() );
+                        getNexusEmailer().setSMTPSslEnabled( settings.isSslEnabled() );
 
-                        config.setUsername( settings.getUsername() );
+                        getNexusEmailer().setSMTPTlsEnabled( settings.isTlsEnabled() );
 
-                        config.setSystemEmailAddress( settings.getSystemEmailAddress().trim() );
-                        
-                        getNexusConfiguration().updateSmtpConfiguration( config );
+                        getNexusEmailer().setSMTPUsername( settings.getUsername() );
+
+                        getNexusEmailer().setSMTPSystemEmailAddress(
+                                                                     new Address( settings.getSystemEmailAddress()
+                                                                         .trim() ) );
                     }
-                    
+
                     ErrorReportingSettings settings = resource.getErrorReportingSettings();
-                    CErrorReporting reporting = getNexusConfiguration().readErrorReporting();
-                    
+
                     if ( settings != null )
-                    {                           
-                        reporting.setEnabled( true );
-                        reporting.setJiraUsername( settings.getJiraUsername() );
-                     
+                    {
+                        getErrorReportingManager().setEnabled( true );
+                        getErrorReportingManager().setJIRAUsername( settings.getJiraUsername() );
+
                         // look up old password
-                        reporting.setJiraPassword( this.getActualPassword( settings.getJiraPassword(), reporting.getJiraPassword() ) );
-                        reporting.setUseGlobalProxy( settings.isUseGlobalProxy() );
+                        getErrorReportingManager().setJIRAPassword(
+                                                                    this.getActualPassword( settings.getJiraPassword(),
+                                                                                            getErrorReportingManager()
+                                                                                                .getJIRAPassword() ) );
+                        getErrorReportingManager().setUseGlobalProxy( settings.isUseGlobalProxy() );
                     }
                     else
                     {
-                        reporting.setEnabled( false );
+                        getErrorReportingManager().setEnabled( false );
                     }
-                    
-                    getNexusConfiguration().updateErrorReporting( reporting );
 
                     if ( resource.getGlobalConnectionSettings() != null )
                     {
                         RemoteConnectionSettings s = resource.getGlobalConnectionSettings();
 
-                        CRemoteConnectionSettings connection = new CRemoteConnectionSettings();
+                        getGlobalRemoteConnectionSettings().setConnectionTimeout( s.getConnectionTimeout() * 1000 );
 
-                        connection.setConnectionTimeout( s.getConnectionTimeout() * 1000 );
+                        getGlobalRemoteConnectionSettings().setRetrievalRetryCount( s.getRetrievalRetryCount() );
 
-                        connection.setRetrievalRetryCount( s.getRetrievalRetryCount() );
+                        getGlobalRemoteConnectionSettings().setQueryString( s.getQueryString() );
 
-                        connection.setQueryString( s.getQueryString() );
-
-                        connection.setUserAgentCustomizationString( s.getUserAgentString() );
-
-                        getNexusConfiguration().updateGlobalRemoteConnectionSettings( connection );
+                        getGlobalRemoteConnectionSettings().setUserAgentCustomizationString( s.getUserAgentString() );
                     }
 
                     if ( resource.getGlobalHttpProxySettings() != null
@@ -217,11 +211,9 @@ public class GlobalConfigurationPlexusResource
                     {
                         RemoteHttpProxySettings s = resource.getGlobalHttpProxySettings();
 
-                        CRemoteHttpProxySettings proxy = new CRemoteHttpProxySettings();
+                        getGlobalHttpProxySettings().setHostname( s.getProxyHostname() );
 
-                        proxy.setProxyHostname( s.getProxyHostname() );
-
-                        proxy.setProxyPort( s.getProxyPort() );
+                        getGlobalHttpProxySettings().setPort( s.getProxyPort() );
 
                         if ( s.getAuthentication() != null )
                         {
@@ -230,13 +222,15 @@ public class GlobalConfigurationPlexusResource
                             auth.setUsername( s.getAuthentication().getUsername() );
 
                             String oldPassword = null;
-                            if( this.getNexusConfiguration().readGlobalRemoteHttpProxySettings() != null && 
-                                this.getNexusConfiguration().readGlobalRemoteHttpProxySettings().getAuthentication() != null )
+                            if ( getGlobalHttpProxySettings().getProxyAuthentication() != null )
                             {
-                                oldPassword = this.getNexusConfiguration().readGlobalRemoteHttpProxySettings().getAuthentication().getPassword(); 
+                                oldPassword =
+                                    ( (UsernamePasswordRemoteAuthenticationSettings) getGlobalHttpProxySettings()
+                                        .getProxyAuthentication() ).getPassword();
                             }
-                            
-                            auth.setPassword( this.getActualPassword( s.getAuthentication().getPassword(), oldPassword ) );
+
+                            auth
+                                .setPassword( this.getActualPassword( s.getAuthentication().getPassword(), oldPassword ) );
 
                             auth.setNtlmDomain( s.getAuthentication().getNtlmDomain() );
 
@@ -246,14 +240,19 @@ public class GlobalConfigurationPlexusResource
 
                             // auth.setPassphrase( s.getAuthentication().getPassphrase() );
 
-                            proxy.setAuthentication( auth );
+                            getGlobalHttpProxySettings()
+                                .setProxyAuthentication(
+                                                         getAuthenticationInfoConverter()
+                                                             .convertAndValidateFromModel( auth ) );
                         }
-
-                        getNexusConfiguration().updateGlobalRemoteHttpProxySettings( proxy );
+                        else
+                        {
+                            getGlobalHttpProxySettings().setProxyAuthentication( null );
+                        }
                     }
                     else
                     {
-                        getNexusConfiguration().updateGlobalRemoteHttpProxySettings( null );
+                        getGlobalHttpProxySettings().disable();
                     }
 
                     getNexusConfiguration().setRealms( (List<String>) resource.getSecurityRealms() );
@@ -266,14 +265,16 @@ public class GlobalConfigurationPlexusResource
                         && !StringUtils.isEmpty( resource.getSecurityAnonymousUsername() )
                         && !StringUtils.isEmpty( resource.getSecurityAnonymousPassword() ) )
                     {
-                        
+
                         // check if the user/pass changed
                         String oldPassword = getNexusConfiguration().getAnonymousPassword();
-                        String newPassword = this.getActualPassword( resource.getSecurityAnonymousPassword(), oldPassword );
-                        
-                        if ( !StringUtils.equals( getNexusConfiguration().getAnonymousUsername(),  resource.getSecurityAnonymousUsername() ) || 
-                            !StringUtils.equals( newPassword, oldPassword ) )
-                        {                           
+                        String newPassword =
+                            this.getActualPassword( resource.getSecurityAnonymousPassword(), oldPassword );
+
+                        if ( !StringUtils.equals( getNexusConfiguration().getAnonymousUsername(), resource
+                            .getSecurityAnonymousUsername() )
+                            || !StringUtils.equals( newPassword, oldPassword ) )
+                        {
                             // test auth
                             try
                             {
@@ -287,13 +288,12 @@ public class GlobalConfigurationPlexusResource
                                 // the supplied anon auth info is wrong
                                 getLogger()
                                     .warn(
-                                        "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
-                                        e );
+                                           "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
+                                           e );
 
-                                throw new PlexusResourceException(
-                                    Status.CLIENT_ERROR_BAD_REQUEST,
-                                    e.getMessage(),
-                                    getNexusErrorResponse( "securityAnonymousUsername", e.getMessage() ) );
+                                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(),
+                                                                   getNexusErrorResponse( "securityAnonymousUsername",
+                                                                                          e.getMessage() ) );
                             }
                         }
 
@@ -306,11 +306,12 @@ public class GlobalConfigurationPlexusResource
                         // the supplied anon auth info is wrong
                         getLogger()
                             .warn(
-                                "Nexus refused to apply configuration, the supplied anonymous username/pwd information is empty." );
+                                   "Nexus refused to apply configuration, the supplied anonymous username/pwd information is empty." );
 
-                        throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, getNexusErrorResponse(
-                            "securityAnonymousUsername",
-                            "Cannot be empty when Anonynous access is enabled" ) );
+                        throw new PlexusResourceException(
+                                                           Status.CLIENT_ERROR_BAD_REQUEST,
+                                                           getNexusErrorResponse( "securityAnonymousUsername",
+                                                                                  "Cannot be empty when Anonynous access is enabled" ) );
                     }
 
                     if ( resource.getBaseUrl() != null )
@@ -318,27 +319,26 @@ public class GlobalConfigurationPlexusResource
                         if ( StringUtils.isEmpty( resource.getBaseUrl() ) )
                         {
                             // resetting it
-                            getNexusConfiguration().setBaseUrl( null );
+                            restApiConfiguration.setBaseUrl( null );
                         }
                         else
                         {
                             // setting it using reference object to normalize the hostname (all lowercase)
-                            getNexusConfiguration().setBaseUrl( new Reference( resource.getBaseUrl() ).getTargetRef().toString() );
+                            restApiConfiguration.setBaseUrl( new Reference( resource.getBaseUrl() ).getTargetRef()
+                                .toString() );
                         }
 
-                        getNexusConfiguration().setForceBaseUrl( resource.isForceBaseUrl() );
+                        restApiConfiguration.setForceBaseUrl( resource.isForceBaseUrl() );
                     }
-                    
+
                     getNexusConfiguration().saveConfiguration();
                 }
                 catch ( ConfigurationException e )
                 {
                     getLogger().warn( "Nexus refused to apply configuration.", e );
 
-                    throw new PlexusResourceException(
-                        Status.CLIENT_ERROR_BAD_REQUEST,
-                        e.getMessage(),
-                        getNexusErrorResponse( "*", e.getMessage() ) );
+                    throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(),
+                                                       getNexusErrorResponse( "*", e.getMessage() ) );
                 }
                 catch ( IOException e )
                 {
@@ -349,7 +349,7 @@ public class GlobalConfigurationPlexusResource
                 catch ( InvalidConfigurationException e )
                 {
                     // TODO: this should be removed from the Global config, as it is NO longer part of the nexus.xml
-                    getLogger().debug( "Configuraiton Exception while setting security values", e );   
+                    getLogger().debug( "Configuraiton Exception while setting security values", e );
                     this.handleInvalidConfigurationException( e );
                 }
 
@@ -383,7 +383,7 @@ public class GlobalConfigurationPlexusResource
 
         resource.setBaseUrl( getContextRoot( request ).getTargetRef().toString() );
 
-        resource.setForceBaseUrl( getNexusConfiguration().isForceBaseUrl() );
+        resource.setForceBaseUrl( restApiConfiguration.isForceBaseUrl() );
 
         resource.setSmtpSettings( convert( getNexus().readDefaultSmtpConfiguration() ) );
     }
@@ -405,17 +405,18 @@ public class GlobalConfigurationPlexusResource
 
         resource.setSecurityAnonymousPassword( PASSWORD_PLACE_HOLDER );
 
-        resource.setGlobalConnectionSettings( convert( getNexusConfiguration().readGlobalRemoteConnectionSettings() ) );
+        resource.setGlobalConnectionSettings( convert( getGlobalRemoteConnectionSettings() ) );
 
-        resource.setGlobalHttpProxySettings( convert( getNexusConfiguration().readGlobalRemoteHttpProxySettings() ) );
+        resource.setGlobalHttpProxySettings( convert( getGlobalHttpProxySettings() ) );
 
-        resource.setBaseUrl( StringUtils.isEmpty( getNexusConfiguration().getBaseUrl() ) ? getContextRoot( request ).getTargetRef().toString() : getNexusConfiguration().getBaseUrl() );
+        resource.setBaseUrl( StringUtils.isEmpty( restApiConfiguration.getBaseUrl() ) ? getContextRoot( request )
+            .getTargetRef().toString() : restApiConfiguration.getBaseUrl() );
 
-        resource.setForceBaseUrl( getNexusConfiguration().isForceBaseUrl() );
+        resource.setForceBaseUrl( restApiConfiguration.isForceBaseUrl() );
 
-        resource.setSmtpSettings( convert( getNexusConfiguration().readSmtpConfiguration() ) );
-        
-        resource.setErrorReportingSettings( convert( getNexusConfiguration().readErrorReporting() ) );
+        resource.setSmtpSettings( convert( getNexusEmailer() ) );
+
+        resource.setErrorReportingSettings( convert( getErrorReportingManager() ) );
     }
 
     protected String getSecurityConfiguration( boolean enabled, String authSourceType )

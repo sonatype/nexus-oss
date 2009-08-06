@@ -25,9 +25,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -39,7 +36,6 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
@@ -174,8 +170,6 @@ public class RepositoryListPlexusResource
 
             exConf.setSynchronizeAtStartup( repoResource.isSyncAtStartup() );
 
-            exConf.commitChanges();
-
         }
         else if ( REPO_TYPE_GROUP.equals( resource.getRepoType() ) )
         {
@@ -224,9 +218,6 @@ public class RepositoryListPlexusResource
 
                 appModel.getRemoteStorage().setProvider( "apacheHttpClient3x" );
             }
-
-            exConf.commitChanges();
-
         }
 
         appModel.setProviderHint( resource.getProvider() );
@@ -260,8 +251,6 @@ public class RepositoryListPlexusResource
         exConf.setArtifactMaxAge( model.getArtifactMaxAge() );
 
         exConf.setMetadataMaxAge( model.getMetadataMaxAge() );
-
-        exConf.commitChanges();
 
         if ( model.getRemoteStorage() != null )
         {

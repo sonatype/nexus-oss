@@ -16,6 +16,8 @@ package org.sonatype.nexus.proxy.mirror;
 import java.util.Arrays;
 import java.util.List;
 
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -26,12 +28,15 @@ import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClie
 public class DefaultDownloadMirrorsTest
     extends AbstractNexusTestCase
 {
+    protected ApplicationConfiguration applicationConfiguration;
 
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
+        
+        applicationConfiguration = lookup( ApplicationConfiguration.class );
     }
 
     public void testNoMirrors()
@@ -53,7 +58,7 @@ public class DefaultDownloadMirrorsTest
         conf.getRemoteStorage().setProvider( CommonsHttpClientRemoteStorage.PROVIDER_STRING );
         conf.getRemoteStorage().setUrl( "http://repo1.maven.org/maven2/" );
 
-        CRepositoryCoreConfiguration coreConfig = new CRepositoryCoreConfiguration( conf );
+        CRepositoryCoreConfiguration coreConfig = new CRepositoryCoreConfiguration( applicationConfiguration, conf, null );
 
         DefaultDownloadMirrors dMirrors = new DefaultDownloadMirrors( coreConfig );
 
@@ -61,9 +66,16 @@ public class DefaultDownloadMirrorsTest
         {
             dMirrors.setMirrors( Arrays.asList( mirrors ) );
         }
-        
+
         // to apply this
-        coreConfig.commitChanges();
+        try
+        {
+            coreConfig.commitChanges();
+        }
+        catch ( ConfigurationException e )
+        {
+            fail( e.getMessage() );
+        }
 
         return dMirrors;
     }
@@ -85,7 +97,7 @@ public class DefaultDownloadMirrorsTest
         List<Mirror> _mirrors = selector.getMirrors();
 
         assertEquals( maxMirrors, _mirrors.size() );
-        assertEquals( mirrors[0], _mirrors.get( 0 ));
+        assertEquals( mirrors[0], _mirrors.get( 0 ) );
         assertEquals( mirrors[1], _mirrors.get( 1 ) );
 
         selector.close();

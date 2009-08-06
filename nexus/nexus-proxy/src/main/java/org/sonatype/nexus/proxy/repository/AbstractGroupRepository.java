@@ -52,16 +52,21 @@ public abstract class AbstractGroupRepository
     private RequestRepositoryMapper requestRepositoryMapper;
 
     @Override
-    protected AbstractGroupRepositoryConfiguration getExternalConfiguration()
+    protected AbstractGroupRepositoryConfiguration getExternalConfiguration( boolean forWrite )
     {
-        return (AbstractGroupRepositoryConfiguration) super.getExternalConfiguration();
+        return (AbstractGroupRepositoryConfiguration) super.getExternalConfiguration( forWrite );
     }
 
     @Override
     public void onEvent( Event<?> evt )
     {
         // we must do this before the super.onEvent() call!
-        boolean membersChanged = getExternalConfiguration().isDirty() && getExternalConfiguration().membersChanged();
+        boolean membersChanged =
+            getCurrentCoreConfiguration().isDirty()
+                && ( getExternalConfiguration( false ).getMemberRepositoryIds().size() != getExternalConfiguration(
+                                                                                                                    true )
+                    .getMemberRepositoryIds().size() || !getExternalConfiguration( false ).getMemberRepositoryIds()
+                    .containsAll( getExternalConfiguration( true ).getMemberRepositoryIds() ) );
 
         super.onEvent( evt );
 
@@ -224,9 +229,10 @@ public abstract class AbstractGroupRepository
 
     public List<String> getMemberRepositoryIds()
     {
-        ArrayList<String> result = new ArrayList<String>( getExternalConfiguration().getMemberRepositoryIds().size() );
+        ArrayList<String> result =
+            new ArrayList<String>( getExternalConfiguration( false ).getMemberRepositoryIds().size() );
 
-        for ( String id : getExternalConfiguration().getMemberRepositoryIds() )
+        for ( String id : getExternalConfiguration( false ).getMemberRepositoryIds() )
         {
             result.add( id );
         }
@@ -237,26 +243,11 @@ public abstract class AbstractGroupRepository
     public void setMemberRepositoryIds( List<String> repositories )
         throws NoSuchRepositoryException, InvalidGroupingException
     {
-        getExternalConfiguration().clearMemberRepositoryIds();
+        getExternalConfiguration( true ).clearMemberRepositoryIds();
 
-        try
+        for ( String repoId : repositories )
         {
-            for ( String repoId : repositories )
-            {
-                addMemberRepositoryId( repoId );
-            }
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getExternalConfiguration().rollbackChanges();
-
-            throw e;
-        }
-        catch ( InvalidGroupingException e )
-        {
-            getExternalConfiguration().rollbackChanges();
-
-            throw e;
+            addMemberRepositoryId( repoId );
         }
     }
 
@@ -267,7 +258,7 @@ public abstract class AbstractGroupRepository
 
         if ( repo.getRepositoryContentClass().isCompatible( getRepositoryContentClass() ) )
         {
-            getExternalConfiguration().addMemberRepositoryId( repositoryId );
+            getExternalConfiguration( true ).addMemberRepositoryId( repositoryId );
         }
         else
         {
@@ -277,7 +268,7 @@ public abstract class AbstractGroupRepository
 
     public void removeMemberRepositoryId( String repositoryId )
     {
-        getExternalConfiguration().removeMemberRepositoryId( repositoryId );
+        getExternalConfiguration(true).removeMemberRepositoryId( repositoryId );
     }
 
     public List<Repository> getMemberRepositories()

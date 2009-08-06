@@ -15,6 +15,7 @@ package org.sonatype.nexus.rest.routes;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.PatternSyntaxException;
@@ -29,6 +30,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
@@ -37,10 +39,11 @@ import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 /**
  * Handles GET, PUT, DELETE for Repository route resources.
- *
+ * 
  * @author cstamas
  * @author tstevens
  */
@@ -86,7 +89,7 @@ public class RepositoryRoutePlexusResource
 
         try
         {
-            CPathMappingItem route = getNexusConfiguration().readGroupsSettingPathMapping( getRouteId( request ) );
+            RepositoryPathMapping route = getRepositoryMapper().getMappings().get( getRouteId( request ) );
 
             if ( route == null )
             {
@@ -97,22 +100,20 @@ public class RepositoryRoutePlexusResource
 
             resource.setId( getRouteId( request ) );
 
-            if ( !route.getGroupId().equals( "*" ) )
+            if ( !route.isAllGroups() )
             {
                 // XXX: added to check access to group
                 this.getRepositoryRegistry().getRepositoryWithFacet( route.getGroupId(), GroupRepository.class );
             }
             resource.setGroupId( route.getGroupId() );
 
-            resource.setRuleType( config2resourceType( route.getRouteType() ) );
+            resource.setRuleType( config2resourceType( route.getMappingType() ) );
 
             // XXX: cstamas -- a hack!
-            resource.setPattern( route.getRoutePatterns().get( 0 ).toString() );
+            resource.setPattern( route.getPatterns().get( 0 ).toString() );
 
-            resource.setRepositories( getRepositoryRouteMemberRepositoryList(
-                request.getResourceRef().getParentRef(),
-                route.getRepositories(),
-                request ) );
+            resource.setRepositories( getRepositoryRouteMemberRepositoryList( request.getResourceRef().getParentRef(),
+                                                                              route.getMappedRepositories(), request ) );
 
             result = new RepositoryRouteResourceResponse();
 
@@ -136,12 +137,7 @@ public class RepositoryRoutePlexusResource
 
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Route Not Found" );
         }
-        catch ( IOException e )
-        {
-            getLogger().warn( "Got IO Exception!", e );
 
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-        }
         return result;
     }
 
@@ -162,9 +158,10 @@ public class RepositoryRoutePlexusResource
                 || resource.getId() == null || !resource.getId().equals( getRouteId( request ) ) )
             {
                 throw new PlexusResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "The route cannot have zero repository members!",
-                    getNexusErrorResponse( "repositories", "The route cannot have zero repository members!" ) );
+                                                   Status.CLIENT_ERROR_BAD_REQUEST,
+                                                   "The route cannot have zero repository members!",
+                                                   getNexusErrorResponse( "repositories",
+                                                                          "The route cannot have zero repository members!" ) );
             }
             else if ( RepositoryRouteResource.BLOCKING_RULE_TYPE.equals( resource.getRuleType() ) )
             {
@@ -173,32 +170,28 @@ public class RepositoryRoutePlexusResource
 
             try
             {
-                CPathMappingItem route = getNexusConfiguration().readGroupsSettingPathMapping( getRouteId( request ) );
+                RepositoryPathMapping route = getRepositoryMapper().getMappings().get( getRouteId( request ) );
 
                 if ( route == null )
                 {
                     throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Route not found!" );
                 }
 
-                route.setId( getRouteId( request ) );
+                ArrayList<String> mappedReposes = new ArrayList<String>( resource.getRepositories().size() );
 
-                route.setGroupId( resource.getGroupId() );
-
-                route.setRoutePatterns( Collections.singletonList( resource.getPattern() ) );
-
-                route.setRouteType( resource2configType( resource.getRuleType() ) );
-
-                List<String> repositories = new ArrayList<String>( resource.getRepositories().size() );
-
-                for ( RepositoryRouteMemberRepository repo : resource
-                    .getRepositories() )
+                for ( RepositoryRouteMemberRepository member : resource.getRepositories() )
                 {
-                    repositories.add( repo.getId() );
+                    mappedReposes.add( member.getId() );
                 }
 
-                route.setRepositories( repositories );
+                RepositoryPathMapping newRoute =
+                    new RepositoryPathMapping( route.getId(), resource2configType( resource.getRuleType() ),
+                                               resource.getGroupId(), Arrays.asList( new String[] { resource
+                                                   .getPattern() } ), mappedReposes );
 
-                getNexusConfiguration().updateGroupsSettingPathMapping( route );
+                getRepositoryMapper().addMapping( newRoute );
+
+                getNexusConfiguration().saveConfiguration();
 
                 response.setStatus( Status.SUCCESS_NO_CONTENT );
             }
@@ -206,17 +199,21 @@ public class RepositoryRoutePlexusResource
             {
                 if ( e.getCause() != null && e.getCause() instanceof PatternSyntaxException )
                 {
-                    throw new PlexusResourceException(
-                        Status.CLIENT_ERROR_BAD_REQUEST,
-                        "Configuration error.",
-                        getNexusErrorResponse( "pattern", e.getMessage() ) );
+                    throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.",
+                                                       getNexusErrorResponse( "pattern", e.getMessage() ) );
                 }
                 else
                 {
                     handleConfigurationException( e );
                 }
             }
-            catch ( NoSuchRepositoryAccessException e )
+            catch ( PatternSyntaxException e )
+            {
+                // TODO: fix because this happens before we validate, we need to fix the validation.
+                ErrorResponse errorResponse = getNexusErrorResponse( "*", e.getMessage() );
+                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", errorResponse );
+            }
+/*            catch ( NoSuchRepositoryAccessException e )
             {
                 getLogger().debug( "Access Denied to a repository referenced within a route!", e );
 
@@ -227,10 +224,11 @@ public class RepositoryRoutePlexusResource
                 getLogger().warn( "Cannot find a repository referenced within a route!", e );
 
                 throw new PlexusResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Cannot find a repository referenced within a route!",
-                    getNexusErrorResponse( "repositories", "Cannot find a repository referenced within a route!" ) );
-            }
+                                                   Status.CLIENT_ERROR_BAD_REQUEST,
+                                                   "Cannot find a repository referenced within a route!",
+                                                   getNexusErrorResponse( "repositories",
+                                                                          "Cannot find a repository referenced within a route!" ) );
+            }*/
             catch ( IOException e )
             {
                 getLogger().warn( "Got IO Exception!", e );
@@ -248,14 +246,16 @@ public class RepositoryRoutePlexusResource
     {
         try
         {
-            CPathMappingItem route = getNexusConfiguration().readGroupsSettingPathMapping( getRouteId( request ) );
+            RepositoryPathMapping route = getRepositoryMapper().getMappings().get( getRouteId( request ) );
 
             if ( route == null )
             {
                 throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Route not found!" );
             }
 
-            getNexusConfiguration().deleteGroupsSettingPathMapping( getRouteId( request ) );
+            getRepositoryMapper().removeMapping( getRouteId( request ) );
+
+            getNexusConfiguration().saveConfiguration();
 
             response.setStatus( Status.SUCCESS_NO_CONTENT );
         }

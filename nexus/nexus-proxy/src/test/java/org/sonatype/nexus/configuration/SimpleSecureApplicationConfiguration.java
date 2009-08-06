@@ -13,87 +13,11 @@
  */
 package org.sonatype.nexus.configuration;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.proxy.AbstractNexusTestCase;
-import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
-public class SimpleSecureApplicationConfiguration
+public class SimpleSecureApplicationConfiguration extends SimpleApplicationConfiguration
     implements ApplicationConfiguration
 {
-    private Configuration configuration;
-    
-    private RemoteStorageContext remoteStorageContext = new DefaultRemoteStorageContext( null );
-
-    public SimpleSecureApplicationConfiguration()
-    {
-        super();
-
-        this.configuration = new Configuration();
-        
-        configuration.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
-        // configuration.setGlobalHttpProxySettings( new CRemoteHttpProxySettings() );
-        configuration.setRouting( new CRouting() );
-        configuration.setRepositoryGrouping( new CRepositoryGrouping() );
-    }
-    
-    public RemoteStorageContext getGlobalRemoteStorageContext()
-    {
-        return remoteStorageContext;
-    }
-
-    public Configuration getConfiguration()
-    {
-        return configuration;
-    }
-
-    public File getWorkingDirectory()
-    {
-        return AbstractNexusTestCase.WORK_HOME;
-    }
-
-    public File getConfigurationDirectory()
-    {
-        return AbstractNexusTestCase.CONF_HOME;
-    }
-
-    public File getWorkingDirectory( String key )
-    {
-        return new File( getWorkingDirectory(), key );
-    }
-
-    public File getTemporaryDirectory()
-    {
-        File result = new File( "target/tmp" );
-
-        result.mkdirs();
-
-        return result;
-    }
-
-    public File getWastebasketDirectory()
-    {
-        return new File( getWorkingDirectory(), "trash" );
-    }
-
-    public File getSecurityConfigurationFile()
-    {
-        return new File( getConfigurationDirectory(), "security.xml" );
-    }
-
-    public void saveConfiguration()
-        throws IOException
-    {
-        // NOTHING TO DO HERE
-    }
-
     public boolean isSecurityEnabled()
     {
         return true;

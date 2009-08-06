@@ -18,6 +18,7 @@ package org.sonatype.nexus.configuration.validator;
  * The validator used to validate current configuration in boot-up sequence.
  * 
  * @author cstamas
+ * @deprecated see Configurable
  */
 public interface ConfigurationValidator
 {

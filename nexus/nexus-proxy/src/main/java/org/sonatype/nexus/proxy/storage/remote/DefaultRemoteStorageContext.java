@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.storage.remote;
 
 import java.util.HashMap;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
@@ -36,18 +37,6 @@ public class DefaultRemoteStorageContext
     public DefaultRemoteStorageContext( RemoteStorageContext parent )
     {
         this.parent = parent;
-
-        if ( parent == null )
-        {
-            // Note: this is needed since RemoteConnectionsSettings, in contrary to the other two (HttpProxy and Auth)
-            // is _mandatory_ and is always used, while the other two is used if present, otherwise not (like
-            // HttpProxy).
-            // Also, when we have no "parent" (defaults, to delegate lookup to), that means that we have to create a
-            // default one.
-            RemoteConnectionSettings defaultRemoteConnectionSettings = new RemoteConnectionSettings();
-
-            setRemoteConnectionSettings( defaultRemoteConnectionSettings );
-        }
     }
 
     public long getLastChanged()
@@ -160,7 +149,43 @@ public class DefaultRemoteStorageContext
 
     public RemoteProxySettings getRemoteProxySettings()
     {
-        return (RemoteProxySettings) getRemoteConnectionContextObject( RemoteProxySettings.class.getName() );
+        // we have a special case here, need to track blockInheritance flag
+        // so, a little code duplication happens
+        // thre cases:
+        // 1. we have _no_ proxy settings in this context, fallback to original code
+        // 2. we have proxy settings with no proxyHost set, then obey the blockInheritance
+        // 3. we have proxy settings with set proxyHost, then return it
+
+        String key = RemoteProxySettings.class.getName();
+
+        if ( !context.containsKey( key ) )
+        {
+            // case 1
+            return (RemoteProxySettings) getRemoteConnectionContextObject( key );
+        }
+        else
+        {
+            RemoteProxySettings remoteProxySettings = (RemoteProxySettings) context.get( key );
+
+            if ( StringUtils.isBlank( remoteProxySettings.getHostname() ) )
+            {
+                // case 2
+                if ( !remoteProxySettings.isBlockInheritance() )
+                {
+                    return (RemoteProxySettings) getRemoteConnectionContextObject( key );
+                }
+                else
+                {
+                    // no proxy on this level, and do _not_ inherit
+                    return null;
+                }
+            }
+            else
+            {
+                // case 3
+                return remoteProxySettings;
+            }
+        }
     }
 
     public void setRemoteProxySettings( RemoteProxySettings settings )

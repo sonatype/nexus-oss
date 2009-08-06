@@ -84,7 +84,7 @@ public class DefaultNexusURLResolver
         {
             try
             {
-                String prefix = "/nexus/dav/repositories/" + mappedRepository.getId();
+                String prefix = "/nexus/content/repositories/" + mappedRepository.getId();
 
                 String repoPath = url.toString().substring( mappedRepository.getRemoteUrl().length() );
 

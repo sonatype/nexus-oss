@@ -25,13 +25,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
-import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
@@ -44,9 +43,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class PathBasedRequestRepositoryMapperTest
     extends AbstractNexusTestEnvironment
 {
-
-    private ApplicationConfiguration applicationConfiguration;
-
     private RepositoryRegistry registry;
 
     private Repository repoA;
@@ -63,13 +59,20 @@ public class PathBasedRequestRepositoryMapperTest
 
     private GroupRepository groupRepo;
 
-    protected PathBasedRequestRepositoryMapper prepare( Map<String, String[]> inclusions,
-        Map<String, String[]> exclusions, Map<String, String[]> blockings )
+    private RequestRepositoryMapper requestRepositoryMapper;
+
+    protected RequestRepositoryMapper prepare( Map<String, String[]> inclusions, Map<String, String[]> exclusions,
+                                               Map<String, String[]> blockings )
         throws Exception
     {
-        applicationConfiguration = lookup( ApplicationConfiguration.class );
+        requestRepositoryMapper = lookup( RequestRepositoryMapper.class );
 
-        applicationConfiguration.getConfiguration().getRepositoryGrouping().getPathMappings().clear();
+        // clear it
+        for ( String id : requestRepositoryMapper.getMappings().keySet() )
+        {
+            requestRepositoryMapper.removeMapping( id );
+        }
+        requestRepositoryMapper.commitChanges();
 
         registry = lookup( RepositoryRegistry.class );
 
@@ -112,18 +115,18 @@ public class PathBasedRequestRepositoryMapperTest
         expect( repoE.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
         expect( repoF.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
 
-        expect( repoA.getRepositoryKind() )
-            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
-        expect( repoB.getRepositoryKind() )
-            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
-        expect( repoC.getRepositoryKind() )
-            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
-        expect( repoD.getRepositoryKind() )
-            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
-        expect( repoE.getRepositoryKind() )
-            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
-        expect( repoF.getRepositoryKind() )
-            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+        expect( repoA.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) )
+            .anyTimes();
+        expect( repoB.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) )
+            .anyTimes();
+        expect( repoC.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) )
+            .anyTimes();
+        expect( repoD.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) )
+            .anyTimes();
+        expect( repoE.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) )
+            .anyTimes();
+        expect( repoF.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) )
+            .anyTimes();
 
         replay( repoA, repoB, repoC, repoD, repoE, repoF );
 
@@ -158,7 +161,6 @@ public class PathBasedRequestRepositoryMapperTest
         M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
         exGroupRepoConf.setMemberRepositoryIds( testgroup );
         exGroupRepoConf.setMergeMetadata( true );
-        exGroupRepoConf.commitChanges();
 
         groupRepo.configure( repoGroupConf );
 
@@ -168,13 +170,11 @@ public class PathBasedRequestRepositoryMapperTest
         {
             for ( String key : inclusions.keySet() )
             {
-                CPathMappingItem item = new CPathMappingItem();
-                item.setId( "I" + key );
-                item.setGroupId( CPathMappingItem.ALL_GROUPS );
-                item.addRoutePattern( key );
-                item.setRouteType( CPathMappingItem.INCLUSION_RULE_TYPE );
-                item.setRepositories( Arrays.asList( inclusions.get( key ) ) );
-                applicationConfiguration.getConfiguration().getRepositoryGrouping().addPathMapping( item );
+                RepositoryPathMapping item =
+                    new RepositoryPathMapping( "I" + key, MappingType.INCLUSION, "*", Arrays
+                        .asList( new String[] { key } ), Arrays.asList( inclusions.get( key ) ) );
+
+                requestRepositoryMapper.addMapping( item );
             }
         }
 
@@ -182,13 +182,11 @@ public class PathBasedRequestRepositoryMapperTest
         {
             for ( String key : exclusions.keySet() )
             {
-                CPathMappingItem item = new CPathMappingItem();
-                item.setId( "E" + key );
-                item.setGroupId( CPathMappingItem.ALL_GROUPS );
-                item.addRoutePattern( key );
-                item.setRouteType( CPathMappingItem.EXCLUSION_RULE_TYPE );
-                item.setRepositories( Arrays.asList( exclusions.get( key ) ) );
-                applicationConfiguration.getConfiguration().getRepositoryGrouping().addPathMapping( item );
+                RepositoryPathMapping item =
+                    new RepositoryPathMapping( "E" + key, MappingType.EXCLUSION, "*", Arrays
+                        .asList( new String[] { key } ), Arrays.asList( exclusions.get( key ) ) );
+
+                requestRepositoryMapper.addMapping( item );
             }
         }
 
@@ -196,19 +194,17 @@ public class PathBasedRequestRepositoryMapperTest
         {
             for ( String key : blockings.keySet() )
             {
-                CPathMappingItem item = new CPathMappingItem();
-                item.setId( "B" + key );
-                item.setGroupId( CPathMappingItem.ALL_GROUPS );
-                item.addRoutePattern( key );
-                item.setRouteType( CPathMappingItem.BLOCKING_RULE_TYPE );
-                item.setRepositories( Arrays.asList( blockings.get( key ) ) );
-                applicationConfiguration.getConfiguration().getRepositoryGrouping().addPathMapping( item );
+                RepositoryPathMapping item =
+                    new RepositoryPathMapping( "B" + key, MappingType.BLOCKING, "*", Arrays
+                        .asList( new String[] { key } ), Arrays.asList( blockings.get( key ) ) );
+
+                requestRepositoryMapper.addMapping( item );
             }
         }
 
-        PathBasedRequestRepositoryMapper pm = (PathBasedRequestRepositoryMapper) lookup( RequestRepositoryMapper.class );
+        requestRepositoryMapper.commitChanges();
 
-        return pm;
+        return requestRepositoryMapper;
     }
 
     public void testInclusionAndExclusion()
@@ -222,13 +218,13 @@ public class PathBasedRequestRepositoryMapperTest
         HashMap<String, String[]> exclusions = new HashMap<String, String[]>();
         exclusions.put( "/e/f/.*", new String[] { "*" } );
 
-        PathBasedRequestRepositoryMapper pm = prepare( inclusions, exclusions, null );
+        RequestRepositoryMapper pm = prepare( inclusions, exclusions, null );
 
         // using group to guarantee proper ordering
         List<Repository> resolvedRepositories = new ArrayList<Repository>();
 
-        resolvedRepositories.addAll( registry
-            .getRepositoryWithFacet( "test", GroupRepository.class ).getMemberRepositories() );
+        resolvedRepositories.addAll( registry.getRepositoryWithFacet( "test", GroupRepository.class )
+            .getMemberRepositories() );
 
         List<Repository> mappedRepositories;
 
@@ -262,13 +258,13 @@ public class PathBasedRequestRepositoryMapperTest
         exclusions.put( "/e/f/.*", new String[] { "repoE", "repoF" } );
         exclusions.put( "/e/f/all/.*", new String[] { "*" } );
 
-        PathBasedRequestRepositoryMapper pm = prepare( inclusions, exclusions, null );
+        RequestRepositoryMapper pm = prepare( inclusions, exclusions, null );
 
         // using group to guarantee proper ordering
         List<Repository> resolvedRepositories = new ArrayList<Repository>();
 
-        resolvedRepositories.addAll( registry
-            .getRepositoryWithFacet( "test", GroupRepository.class ).getMemberRepositories() );
+        resolvedRepositories.addAll( registry.getRepositoryWithFacet( "test", GroupRepository.class )
+            .getMemberRepositories() );
 
         List<Repository> mappedRepositories;
 
@@ -315,13 +311,13 @@ public class PathBasedRequestRepositoryMapperTest
         exclusions.put( "/empty/6/.*", new String[] { "" } );
         exclusions.put( "/empty/7/.*", new String[] { null } );
 
-        PathBasedRequestRepositoryMapper pm = prepare( inclusions, exclusions, null );
+        RequestRepositoryMapper pm = prepare( inclusions, exclusions, null );
 
         // using group to guarantee proper ordering
         List<Repository> resolvedRepositories = new ArrayList<Repository>();
 
-        resolvedRepositories.addAll( registry
-            .getRepositoryWithFacet( "test", GroupRepository.class ).getMemberRepositories() );
+        resolvedRepositories.addAll( registry.getRepositoryWithFacet( "test", GroupRepository.class )
+            .getMemberRepositories() );
 
         List<Repository> mappedRepositories;
 
@@ -356,13 +352,13 @@ public class PathBasedRequestRepositoryMapperTest
         HashMap<String, String[]> blockings = new HashMap<String, String[]>();
         blockings.put( "/blocked/1/.*", new String[] { "" } );
 
-        PathBasedRequestRepositoryMapper pm = prepare( null, null, blockings );
+        RequestRepositoryMapper pm = prepare( null, null, blockings );
 
         // using group to guarantee proper ordering
         List<Repository> resolvedRepositories = new ArrayList<Repository>();
 
-        resolvedRepositories.addAll( registry
-            .getRepositoryWithFacet( "test", GroupRepository.class ).getMemberRepositories() );
+        resolvedRepositories.addAll( registry.getRepositoryWithFacet( "test", GroupRepository.class )
+            .getMemberRepositories() );
 
         List<Repository> mappedRepositories;
 

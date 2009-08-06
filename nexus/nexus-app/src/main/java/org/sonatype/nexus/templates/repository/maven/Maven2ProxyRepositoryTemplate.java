@@ -4,6 +4,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
+import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -47,14 +48,26 @@ public class Maven2ProxyRepositoryTemplate
 
         M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
         exConf.setRepositoryPolicy( getRepositoryPolicy() );
-        exConf.commitChanges();
+
         repo.externalConfigurationImple = exConf;
 
         repo.setAllowWrite( true );
         repo.setNotFoundCacheTTL( 1440 );
         exConf.setArtifactMaxAge( -1 );
 
-        CRepositoryCoreConfiguration result = new CRepositoryCoreConfiguration( repo );
+        CRepositoryCoreConfiguration result =
+            new CRepositoryCoreConfiguration(
+                                              getTemplateProvider().getApplicationConfiguration(),
+                                              repo,
+                                              new CRepositoryExternalConfigurationHolderFactory<M2RepositoryConfiguration>()
+                                              {
+                                                  public M2RepositoryConfiguration createExternalConfigurationHolder(
+                                                                                                                      CRepository config )
+                                                  {
+                                                      return new M2RepositoryConfiguration( (Xpp3Dom) config
+                                                          .getExternalConfiguration() );
+                                                  }
+                                              } );
 
         return result;
     }

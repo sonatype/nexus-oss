@@ -36,7 +36,7 @@ public class MockApplicationConfiguration
         return remoteStorageContext;
     }
 
-    public Configuration getConfiguration()
+    public Configuration getConfigurationModel()
     {
         return configuration;
     }

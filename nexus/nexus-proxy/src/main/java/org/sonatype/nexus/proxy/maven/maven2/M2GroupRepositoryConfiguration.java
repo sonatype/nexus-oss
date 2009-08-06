@@ -14,6 +14,9 @@
 package org.sonatype.nexus.proxy.maven.maven2;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepositoryConfiguration;
 
 public class M2GroupRepositoryConfiguration
@@ -22,5 +25,12 @@ public class M2GroupRepositoryConfiguration
     public M2GroupRepositoryConfiguration( Xpp3Dom configuration )
     {
         super( configuration );
+    }
+
+    @Override
+    public void validate( ApplicationConfiguration applicationConfiguration, CoreConfiguration owner )
+        throws ConfigurationException
+    {
+        super.validate( applicationConfiguration, owner );
     }
 }

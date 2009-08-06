@@ -30,13 +30,14 @@ public class AccessTest
     extends AbstractProxyTestEnvironment
 {
     private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-    
+
+    protected ApplicationConfiguration applicationConfiguration;
 
     @Override
     public void setUp()
         throws Exception
     {
-        ApplicationConfiguration applicationConfiguration = this.lookup( ApplicationConfiguration.class );
+        applicationConfiguration = this.lookup( ApplicationConfiguration.class );
         applicationConfiguration.saveConfiguration();
 
         super.setUp();
@@ -47,10 +48,12 @@ public class AccessTest
 
         TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
 
-        Target t1 = new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays
-            .asList( new String[] { ".*" } ) );
+        Target t1 =
+            new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays.asList( new String[] { ".*" } ) );
 
         targetRegistry.addRepositoryTarget( t1 );
+
+        applicationConfiguration.saveConfiguration();
 
         // setup security
         this.lookup( SecuritySystem.class ).start(); // need to call start to clear caches
@@ -62,7 +65,7 @@ public class AccessTest
         super.customizeContext( ctx );
         ctx.put( "security-xml-file", new File( CONF_HOME, "security.xml" ).getAbsolutePath() );
     }
-    
+
     @Override
     protected EnvironmentBuilder getEnvironmentBuilder()
         throws Exception
@@ -76,8 +79,7 @@ public class AccessTest
     }
 
     public void testGroupAccess()
-        throws AuthenticationException,
-            Exception
+        throws AuthenticationException, Exception
     {
 
         // user does not have access to the group
@@ -99,8 +101,7 @@ public class AccessTest
     }
 
     public void testRepositoryAccess()
-        throws AuthenticationException,
-            Exception
+        throws AuthenticationException, Exception
     {
         // Not true, currently perms are always transitive
         // group access imples repository access, IF NOT EXPOSED, SO "UN"-EXPOSE IT
@@ -132,8 +133,7 @@ public class AccessTest
     // }
 
     private StorageItem getItem( String username, String repositoryId, String path )
-        throws AuthenticationException,
-            Exception
+        throws AuthenticationException, Exception
     {
         WebSecurityUtil.setupWebContext( username + "-" + repositoryId + "-" + path );
 

@@ -16,15 +16,25 @@ package org.sonatype.nexus.configuration.application;
 import java.io.File;
 import java.io.IOException;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.configuration.ConfigurationCommitEvent;
+import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
+import org.sonatype.nexus.configuration.ConfigurationSaveEvent;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
+@Component(role=ApplicationConfiguration.class)
 public class SimpleApplicationConfiguration
     implements ApplicationConfiguration
 {
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
+    
     private Configuration configuration;
 
     private RemoteStorageContext remoteStorageContext = new SimpleRemoteStorageContext();
@@ -46,7 +56,7 @@ public class SimpleApplicationConfiguration
         return remoteStorageContext;
     }
 
-    public Configuration getConfiguration()
+    public Configuration getConfigurationModel()
     {
         return configuration;
     }
@@ -88,7 +98,10 @@ public class SimpleApplicationConfiguration
     public void saveConfiguration()
         throws IOException
     {
-        // DO NOTHING, this is test
+        // send events out, but nothing else
+        applicationEventMulticaster.notifyEventListeners( new ConfigurationPrepareForSaveEvent( this ) );
+        applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
+        applicationEventMulticaster.notifyEventListeners( new ConfigurationSaveEvent( this ) );
     }
 
     public boolean isSecurityEnabled()

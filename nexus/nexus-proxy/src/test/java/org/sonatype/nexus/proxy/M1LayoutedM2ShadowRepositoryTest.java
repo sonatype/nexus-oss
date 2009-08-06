@@ -68,7 +68,6 @@ public class M1LayoutedM2ShadowRepositoryTest
             M1LayoutedM2ShadowRepositoryConfiguration exRepoConf = new M1LayoutedM2ShadowRepositoryConfiguration(
                 exRepo );
             exRepoConf.setMasterRepositoryId( master.getId() );
-            exRepoConf.commitChanges();
 
             shadow.configure( repoConf );
 
@@ -97,9 +96,8 @@ public class M1LayoutedM2ShadowRepositoryTest
 
         // we will check stuff on M1 places but,
         // we will get links as responses, since shadow reposes contains links only
-        getApplicationConfiguration().getConfiguration().getRouting().setResolveLinks( false );
-        getApplicationEventMulticaster().notifyEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
+        getRootRouter().setFollowLinks( false );
+        getApplicationConfiguration().saveConfiguration();
 
         item = getRootRouter().retrieveItem(
             new ResourceStoreRequest( "/repositories/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
@@ -111,9 +109,8 @@ public class M1LayoutedM2ShadowRepositoryTest
 
         // and now we will force the router itself to resolve links
         // and will expect the original contents
-        getApplicationConfiguration().getConfiguration().getRouting().setResolveLinks( true );
-        getApplicationEventMulticaster().notifyEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
+        getRootRouter().setFollowLinks( true );
+        getApplicationConfiguration().saveConfiguration();
 
         item = getRootRouter().retrieveItem(
             new ResourceStoreRequest( "/repositories/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
@@ -148,9 +145,8 @@ public class M1LayoutedM2ShadowRepositoryTest
 
         // and after sync, we will check stuff on M1 places but,
         // we will get links as responses, since shadow reposes contains links only
-        getApplicationConfiguration().getConfiguration().getRouting().setResolveLinks( false );
-        getApplicationEventMulticaster().notifyEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
+        getRootRouter().setFollowLinks( false );
+        getApplicationConfiguration().saveConfiguration();
 
         item = getRootRouter().retrieveItem(
             new ResourceStoreRequest( "/repositories/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
@@ -162,9 +158,8 @@ public class M1LayoutedM2ShadowRepositoryTest
 
         // and now we will force the router itself to resolve links
         // and will expect the original contents
-        getApplicationConfiguration().getConfiguration().getRouting().setResolveLinks( true );
-        getApplicationEventMulticaster().notifyEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
+        getRootRouter().setFollowLinks( true );
+        getApplicationConfiguration().saveConfiguration();
 
         item = getRootRouter().retrieveItem(
             new ResourceStoreRequest( "/repositories/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );

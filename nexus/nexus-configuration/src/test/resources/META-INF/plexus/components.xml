@@ -1,13 +1,11 @@
 <component-set>
 	<components>
-		<component>
-			<role>org.sonatype.nexus.configuration.application.ApplicationConfiguration</role>
-			<implementation>org.sonatype.nexus.configuration.application.SimpleApplicationConfiguration</implementation>
-		</component>
+<!-- is this needed or is a leftover when sec was here?
 		<component>
             <role>org.sonatype.nexus.configuration.security.SecurityConfiguration</role>
             <implementation>org.sonatype.nexus.configuration.security.SimpleSecurityConfiguration</implementation>
         </component>
+-->
 		<component>
             <role>org.sonatype.nexus.proxy.repository.Repository</role>
             <role-hint>maven1</role-hint>

@@ -22,11 +22,15 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.configuration.AbstractConfigurable;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CRoutingCoreConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -50,9 +54,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.util.ItemPathUtils;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * The simplest re-implementation for RepositoryRouter that does only routing.
@@ -61,11 +62,11 @@ import org.sonatype.plexus.appevents.EventListener;
  */
 @Component( role = RepositoryRouter.class )
 public class DefaultRepositoryRouter
-    extends AbstractLogEnabled
-    implements RepositoryRouter, EventListener, Initializable
+    extends AbstractConfigurable
+    implements RepositoryRouter
 {
     @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private Logger logger;
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -75,28 +76,76 @@ public class DefaultRepositoryRouter
 
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
-    
+
     @Requirement
     private NexusItemAuthorizer itemAuthorizer;
 
-    /** Should links be resolved? */
-    private boolean followLinks;
-
     public boolean isFollowLinks()
     {
-        return followLinks;
+        return getCurrentConfiguration( false ).isResolveLinks();
     }
 
     public void setFollowLinks( boolean followLinks )
     {
-        this.followLinks = followLinks;
+        getCurrentConfiguration( true ).setResolveLinks( followLinks );
     }
 
+    // =
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
+
+    // =
+
+    protected void initializeConfiguration()
+        throws ConfigurationException
+    {
+        if ( getApplicationConfiguration().getConfigurationModel() != null )
+        {
+            configure( getApplicationConfiguration() );
+        }
+    }
+
+    @Override
+    protected ApplicationConfiguration getApplicationConfiguration()
+    {
+        return applicationConfiguration;
+    }
+
+    @Override
+    protected Configurator getConfigurator()
+    {
+        return null;
+    }
+
+    @Override
+    protected CRouting getCurrentConfiguration( boolean forWrite )
+    {
+        return ( (CRoutingCoreConfiguration) getCurrentCoreConfiguration() ).getConfiguration( forWrite );
+    }
+
+    @Override
+    protected CoreConfiguration wrapConfiguration( Object configuration )
+        throws ConfigurationException
+    {
+        if ( configuration instanceof ApplicationConfiguration )
+        {
+            return new CRoutingCoreConfiguration( (ApplicationConfiguration) configuration );
+        }
+        else
+        {
+            throw new ConfigurationException( "The passed configuration object is of class \""
+                + configuration.getClass().getName() + "\" and not the required \""
+                + ApplicationConfiguration.class.getName() + "\"!" );
+        }
+    }
+
+    // =
+
     public StorageItem dereferenceLink( StorageLinkItem link )
-        throws AccessDeniedException,
-            ItemNotFoundException,
-            IllegalOperationException,
-            StorageException
+        throws AccessDeniedException, ItemNotFoundException, IllegalOperationException, StorageException
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -111,10 +160,7 @@ public class DefaultRepositoryRouter
     }
 
     public StorageItem retrieveItem( ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException
+        throws ItemNotFoundException, IllegalOperationException, StorageException, AccessDeniedException
     {
         RequestRoute route = getRequestRouteForRequest( request );
 
@@ -138,11 +184,8 @@ public class DefaultRepositoryRouter
     }
 
     public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
-        throws UnsupportedStorageOperationException,
-            ItemNotFoundException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException
+        throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
+        StorageException, AccessDeniedException
     {
         RequestRoute route = getRequestRouteForRequest( request );
 
@@ -165,11 +208,8 @@ public class DefaultRepositoryRouter
     }
 
     public void copyItem( ResourceStoreRequest from, ResourceStoreRequest to )
-        throws UnsupportedStorageOperationException,
-            ItemNotFoundException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException
+        throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
+        StorageException, AccessDeniedException
     {
         RequestRoute fromRoute = getRequestRouteForRequest( from );
 
@@ -194,10 +234,8 @@ public class DefaultRepositoryRouter
                 {
                     try
                     {
-                        toRoute.getTargetedRepository().storeItem(
-                            to,
-                            ( (StorageFileItem) item ).getInputStream(),
-                            item.getAttributes() );
+                        toRoute.getTargetedRepository().storeItem( to, ( (StorageFileItem) item ).getInputStream(),
+                                                                   item.getAttributes() );
                     }
                     catch ( IOException e )
                     {
@@ -237,11 +275,8 @@ public class DefaultRepositoryRouter
     }
 
     public void moveItem( ResourceStoreRequest from, ResourceStoreRequest to )
-        throws UnsupportedStorageOperationException,
-            ItemNotFoundException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException
+        throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
+        StorageException, AccessDeniedException
     {
         copyItem( from, to );
 
@@ -249,10 +284,7 @@ public class DefaultRepositoryRouter
     }
 
     public Collection<StorageItem> list( ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException
+        throws ItemNotFoundException, IllegalOperationException, StorageException, AccessDeniedException
     {
         RequestRoute route = getRequestRouteForRequest( request );
 
@@ -283,11 +315,8 @@ public class DefaultRepositoryRouter
     }
 
     public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
-        throws UnsupportedStorageOperationException,
-            ItemNotFoundException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException
+        throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
+        StorageException, AccessDeniedException
     {
         RequestRoute route = getRequestRouteForRequest( request );
 
@@ -310,11 +339,8 @@ public class DefaultRepositoryRouter
     }
 
     public void deleteItem( ResourceStoreRequest request )
-        throws UnsupportedStorageOperationException,
-            ItemNotFoundException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException
+        throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
+        StorageException, AccessDeniedException
     {
         RequestRoute route = getRequestRouteForRequest( request );
 
@@ -363,28 +389,12 @@ public class DefaultRepositoryRouter
         return result;
     }
 
-    public void initialize()
-    {
-        applicationEventMulticaster.addEventListener( this );
-    }
-
-    public void onEvent( Event evt )
-    {
-        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
-        {
-            followLinks = applicationConfiguration.getConfiguration().getRouting().isResolveLinks();
-        }
-    }
-
     // ===
     // Private
     // ===
 
     protected StorageItem mangle( boolean isList, ResourceStoreRequest request, RequestRoute route, StorageItem item )
-        throws AccessDeniedException,
-            ItemNotFoundException,
-            IllegalOperationException,
-            StorageException
+        throws AccessDeniedException, ItemNotFoundException, IllegalOperationException, StorageException
     {
         if ( isList )
         {
@@ -418,8 +428,9 @@ public class DefaultRepositoryRouter
 
         result.setResourceStoreRequest( request );
 
-        String correctedPath = request.getRequestPath().startsWith( RepositoryItemUid.PATH_SEPARATOR ) ? request
-            .getRequestPath().substring( 1, request.getRequestPath().length() ) : request.getRequestPath();
+        String correctedPath =
+            request.getRequestPath().startsWith( RepositoryItemUid.PATH_SEPARATOR ) ? request.getRequestPath()
+                .substring( 1, request.getRequestPath().length() ) : request.getRequestPath();
 
         String[] explodedPath = null;
 
@@ -453,9 +464,8 @@ public class DefaultRepositoryRouter
                 catch ( ClassNotFoundException e )
                 {
                     getLogger().info(
-                        "RepositoryType with role='" + rtd.getRole()
-                            + "' is registered, but not found on classpath, skipping it.",
-                        e );
+                                      "RepositoryType with role='" + rtd.getRole()
+                                          + "' is registered, but not found on classpath, skipping it.", e );
                 }
             }
 
@@ -578,14 +588,12 @@ public class DefaultRepositoryRouter
                     // check is there any repo registered
                     if ( !repositoryRegistry.getRepositoriesWithFacet( Class.forName( rtd.getRole() ) ).isEmpty() )
                     {
-                        ResourceStoreRequest req = new ResourceStoreRequest( ItemPathUtils.concatPaths( request
-                            .getRequestPath(), rtd.getPrefix() ) );
+                        ResourceStoreRequest req =
+                            new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(), rtd
+                                .getPrefix() ) );
 
-                        DefaultStorageCollectionItem repositories = new DefaultStorageCollectionItem(
-                            this,
-                            req,
-                            true,
-                            false );
+                        DefaultStorageCollectionItem repositories =
+                            new DefaultStorageCollectionItem( this, req, true, false );
 
                         repositories.getItemContext().putAll( request.getRequestContext() );
 
@@ -595,9 +603,8 @@ public class DefaultRepositoryRouter
                 catch ( ClassNotFoundException e )
                 {
                     getLogger().info(
-                        "RepositoryType with role='" + rtd.getRole()
-                            + "' is registered, but not found on classpath, skipping it.",
-                        e );
+                                      "RepositoryType with role='" + rtd.getRole()
+                                          + "' is registered, but not found on classpath, skipping it.", e );
                 }
             }
 
@@ -619,31 +626,30 @@ public class DefaultRepositoryRouter
                         kind = (Class<Repository>) Class.forName( rtd.getRole() );
 
                         repositories = repositoryRegistry.getRepositoriesWithFacet( kind );
-                        
+
                         break;
                     }
                 }
                 catch ( ClassNotFoundException e )
                 {
                     getLogger().info(
-                        "RepositoryType with role='" + rtd.getRole()
-                            + "' is registered, but not found on classpath, skipping it.",
-                        e );
+                                      "RepositoryType with role='" + rtd.getRole()
+                                          + "' is registered, but not found on classpath, skipping it.", e );
                 }
             }
-            
+
             repositories.get( 0 ).isExposed();
-            
+
             // if no prefix matched, Item not found
             if ( repositories == null || repositories.isEmpty() )
             {
                 throw new ItemNotFoundException( request.getRequestPath() );
             }
-            
+
             // filter access to the repositories
             // NOTE: do this AFTER the null/empty check so we return an empty list vs. an ItemNotFound
             repositories = this.filterAccessToRepositories( repositories );
-            
+
             ArrayList<StorageItem> result = new ArrayList<StorageItem>( repositories.size() );
 
             for ( Repository repository : repositories )
@@ -656,13 +662,15 @@ public class DefaultRepositoryRouter
 
                     if ( Repository.class.equals( kind ) )
                     {
-                        req = new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(), repository
-                            .getId() ) );
+                        req =
+                            new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(), repository
+                                .getId() ) );
                     }
                     else
                     {
-                        req = new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(), repository
-                            .getPathPrefix() ) );
+                        req =
+                            new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(), repository
+                                .getPathPrefix() ) );
                     }
 
                     repoItem = new DefaultStorageCollectionItem( this, req, true, false );
@@ -680,19 +688,19 @@ public class DefaultRepositoryRouter
             throw new ItemNotFoundException( request.getRequestPath() );
         }
     }
-    
+
     private List<Repository> filterAccessToRepositories( Collection<Repository> repositories )
     {
-        if( repositories == null)
+        if ( repositories == null )
         {
             return null;
         }
-        
+
         List<Repository> filteredRepositories = new ArrayList<Repository>();
-        
+
         for ( Repository repository : repositories )
         {
-            if( this.itemAuthorizer.isViewable( NexusItemAuthorizer.VIEW_REPOSITORY_KEY, repository.getId() ) )
+            if ( this.itemAuthorizer.isViewable( NexusItemAuthorizer.VIEW_REPOSITORY_KEY, repository.getId() ) )
             {
                 filteredRepositories.add( repository );
             }
@@ -727,4 +735,5 @@ public class DefaultRepositoryRouter
 
         return this.itemAuthorizer.authorizePath( matched, action );
     }
+
 }

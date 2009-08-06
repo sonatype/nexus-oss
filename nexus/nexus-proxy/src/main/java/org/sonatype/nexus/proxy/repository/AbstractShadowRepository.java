@@ -47,19 +47,18 @@ public abstract class AbstractShadowRepository
     private RepositoryRegistry repositoryRegistry;
 
     @Override
-    protected AbstractShadowRepositoryConfiguration getExternalConfiguration()
+    protected AbstractShadowRepositoryConfiguration getExternalConfiguration( boolean forModification )
     {
-        return (AbstractShadowRepositoryConfiguration) super.getExternalConfiguration();
+        return (AbstractShadowRepositoryConfiguration) super.getExternalConfiguration( forModification );
     }
 
     public String getMasterRepositoryId()
     {
-        return getExternalConfiguration().getMasterRepositoryId();
+        return getExternalConfiguration( false ).getMasterRepositoryId();
     }
 
     public void setMasterRepositoryId( String id )
-        throws NoSuchRepositoryException,
-            IncompatibleMasterRepositoryException
+        throws NoSuchRepositoryException, IncompatibleMasterRepositoryException
     {
         setMasterRepository( repositoryRegistry.getRepository( id ) );
     }
@@ -68,16 +67,15 @@ public abstract class AbstractShadowRepository
     {
         try
         {
-            return repositoryRegistry.getRepository( getExternalConfiguration().getMasterRepositoryId() );
+            return repositoryRegistry.getRepository( getExternalConfiguration( false ).getMasterRepositoryId() );
         }
         catch ( NoSuchRepositoryException e )
         {
             // erm?
 
             getLogger().warn(
-                "ShadowRepository ID='" + getId() + "' cannot fetch it's master repository with ID='"
-                    + getMasterRepositoryId() + "'!",
-                e );
+                              "ShadowRepository ID='" + getId() + "' cannot fetch it's master repository with ID='"
+                                  + getMasterRepositoryId() + "'!", e );
 
             return null;
         }
@@ -85,12 +83,12 @@ public abstract class AbstractShadowRepository
 
     public boolean isSynchronizeAtStartup()
     {
-        return getExternalConfiguration().isSynchronizeAtStartup();
+        return getExternalConfiguration( false ).isSynchronizeAtStartup();
     }
 
     public void setSynchronizeAtStartup( boolean val )
     {
-        getExternalConfiguration().setSynchronizeAtStartup( val );
+        getExternalConfiguration( true ).setSynchronizeAtStartup( val );
     }
 
     public void setMasterRepository( Repository masterRepository )
@@ -98,7 +96,7 @@ public abstract class AbstractShadowRepository
     {
         if ( getMasterRepositoryContentClass().getId().equals( masterRepository.getRepositoryContentClass().getId() ) )
         {
-            getExternalConfiguration().setMasterRepositoryId( masterRepository.getId() );
+            getExternalConfiguration( true ).setMasterRepositoryId( masterRepository.getId() );
         }
         else
         {
@@ -113,9 +111,8 @@ public abstract class AbstractShadowRepository
     public LocalStatus getLocalStatus()
     {
         return super.getLocalStatus().shouldServiceRequest()
-            && getMasterRepository().getLocalStatus().shouldServiceRequest()
-            ? LocalStatus.IN_SERVICE
-            : LocalStatus.OUT_OF_SERVICE;
+            && getMasterRepository().getLocalStatus().shouldServiceRequest() ? LocalStatus.IN_SERVICE
+                        : LocalStatus.OUT_OF_SERVICE;
     }
 
     @Override
@@ -150,20 +147,13 @@ public abstract class AbstractShadowRepository
     }
 
     protected abstract void deleteLink( StorageItem item )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException;
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException;
 
     protected abstract void createLink( StorageItem item )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            StorageException;
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException;
 
     protected void synchronizeLink( StorageItem item )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            StorageException
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
     {
         createLink( item );
     }
@@ -209,9 +199,7 @@ public abstract class AbstractShadowRepository
     }
 
     protected StorageItem doRetrieveItemFromMaster( ResourceStoreRequest request )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         return ( (AbstractRepository) getMasterRepository() ).doRetrieveItem( request );
     }

@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.registry;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -53,11 +54,11 @@ public interface RepositoryTypeRegistry
     Set<String> getRepositoryRoles();
 
     /**
-     * Returns the available content classes.
+     * Returns the available content classes as unmodifiable map.
      * 
      * @return
      */
-    Set<ContentClass> getContentClasses();
+    Map<String, ContentClass> getContentClasses();
 
     /**
      * Returns the set of hints for the given repository role.

@@ -28,11 +28,16 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
+import org.sonatype.nexus.configuration.AbstractConfigurable;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CProps;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
+import org.sonatype.nexus.configuration.model.CScheduledTaskCoreConfiguration;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.HourlySchedule;
@@ -44,14 +49,17 @@ import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
 /**
- * The default implementation of the Task Configuration manager. Will handle writing to and loading from the tasks.xml
- * file. Will also load a default set of tasks if there is no existing configuration
+ * The default implementation of the Task Configuration manager. Will handle writing to and loading from the tasks
+ * within nexus.xml file.
  */
 @Component( role = TaskConfigManager.class )
 public class DefaultTaskConfigManager
-    extends AbstractLogEnabled
+    extends AbstractConfigurable
     implements TaskConfigManager
 {
+    @Requirement
+    private Logger logger;
+
     /**
      * The app config holding tasks.
      */
@@ -69,10 +77,63 @@ public class DefaultTaskConfigManager
         return plexusContainer;
     }
 
+    // ==
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
+
+    // ==
+
+    public void initializeConfiguration()
+        throws ConfigurationException
+    {
+        if ( getApplicationConfiguration().getConfigurationModel() != null )
+        {
+            configure( getApplicationConfiguration() );
+        }
+    }
+
+    @Override
+    protected ApplicationConfiguration getApplicationConfiguration()
+    {
+        return applicationConfiguration;
+    }
+
+    @Override
+    protected Configurator getConfigurator()
+    {
+        return null;
+    }
+
+    @Override
+    protected List<CScheduledTask> getCurrentConfiguration( boolean forWrite )
+    {
+        return ( (CScheduledTaskCoreConfiguration) getCurrentCoreConfiguration() ).getConfiguration( forWrite );
+    }
+
+    @Override
+    protected CoreConfiguration wrapConfiguration( Object configuration )
+        throws ConfigurationException
+    {
+        if ( configuration instanceof ApplicationConfiguration )
+        {
+            return new CScheduledTaskCoreConfiguration( (ApplicationConfiguration) configuration );
+        }
+        else
+        {
+            throw new ConfigurationException( "The passed configuration object is of class \""
+                + configuration.getClass().getName() + "\" and not the required \""
+                + ApplicationConfiguration.class.getName() + "\"!" );
+        }
+    }
+
+    // ==
+
     public void initializeTasks( Scheduler scheduler )
     {
-        List<CScheduledTask> tasks = new ArrayList<CScheduledTask>( applicationConfiguration
-            .getConfiguration().getTasks() );
+        List<CScheduledTask> tasks = new ArrayList<CScheduledTask>( getCurrentConfiguration( false ) );
 
         if ( tasks != null )
         {
@@ -94,22 +155,17 @@ public class DefaultTaskConfigManager
                         nexusTask.addParameter( prop.getKey(), prop.getValue() );
                     }
 
-                    scheduler.initialize(
-                        task.getId(),
-                        task.getName(),
-                        task.getType(),
-                        nexusTask,
-                        translateFrom( task.getSchedule(), new Date( task.getNextRun() ) ) ).setEnabled( task.isEnabled() );
+                    scheduler.initialize( task.getId(), task.getName(), task.getType(), nexusTask,
+                                          translateFrom( task.getSchedule(), new Date( task.getNextRun() ) ) )
+                        .setEnabled( task.isEnabled() );
                 }
                 catch ( IllegalArgumentException e )
                 {
                     // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class
                     // name
-                    getLogger()
-                        .warn(
-                            "Unable to initialize task " + task.getName() + ", couldn't load service class "
-                                + task.getId(),
-                            e );
+                    getLogger().warn(
+                                      "Unable to initialize task " + task.getName() + ", couldn't load service class "
+                                          + task.getId(), e );
                 }
             }
         }
@@ -126,9 +182,9 @@ public class DefaultTaskConfigManager
 
         synchronized ( applicationConfiguration )
         {
-            List<CScheduledTask> tasks = applicationConfiguration.getConfiguration().getTasks();
+            List<CScheduledTask> tasks = getCurrentConfiguration( true );
 
-            CScheduledTask foundTask = findTask( task.getId() );
+            CScheduledTask foundTask = findTask( task.getId(), tasks );
 
             CScheduledTask storeableTask = translateFrom( task );
 
@@ -157,9 +213,9 @@ public class DefaultTaskConfigManager
     {
         synchronized ( applicationConfiguration )
         {
-            List<CScheduledTask> tasks = applicationConfiguration.getConfiguration().getTasks();
+            List<CScheduledTask> tasks = getCurrentConfiguration( true );
 
-            CScheduledTask foundTask = findTask( task.getId() );
+            CScheduledTask foundTask = findTask( task.getId(), tasks );
 
             if ( foundTask != null )
             {
@@ -175,6 +231,7 @@ public class DefaultTaskConfigManager
                 }
             }
         }
+
         // TODO: need to also add task to a history file
     }
 
@@ -198,12 +255,12 @@ public class DefaultTaskConfigManager
         return (T) createTaskInstance( taskType.getSimpleName() );
     }
 
-    private CScheduledTask findTask( String id )
+    // ==
+
+    private CScheduledTask findTask( String id, List<CScheduledTask> tasks )
     {
         synchronized ( applicationConfiguration )
         {
-            List<CScheduledTask> tasks = applicationConfiguration.getConfiguration().getTasks();
-
             for ( Iterator<CScheduledTask> iter = tasks.iterator(); iter.hasNext(); )
             {
                 CScheduledTask storedTask = iter.next();
@@ -265,8 +322,9 @@ public class DefaultTaskConfigManager
                 }
             }
 
-            schedule = new MonthlySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule
-                .getEndDate() ), daysToRun );
+            schedule =
+                new MonthlySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule.getEndDate() ),
+                                     daysToRun );
         }
         else if ( CScheduleConfig.TYPE_WEEKLY.equals( modelSchedule.getType() ) )
         {
@@ -286,18 +344,19 @@ public class DefaultTaskConfigManager
                 }
             }
 
-            schedule = new WeeklySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule
-                .getEndDate() ), daysToRun );
+            schedule =
+                new WeeklySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule.getEndDate() ),
+                                    daysToRun );
         }
         else if ( CScheduleConfig.TYPE_DAILY.equals( modelSchedule.getType() ) )
         {
-            schedule = new DailySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule
-                .getEndDate() ) );
+            schedule =
+                new DailySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule.getEndDate() ) );
         }
         else if ( CScheduleConfig.TYPE_HOURLY.equals( modelSchedule.getType() ) )
         {
-            schedule = new HourlySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule
-                .getEndDate() ) );
+            schedule =
+                new HourlySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule.getEndDate() ) );
         }
         else if ( CScheduleConfig.TYPE_ONCE.equals( modelSchedule.getType() ) )
         {
@@ -333,13 +392,13 @@ public class DefaultTaskConfigManager
         storeableTask.setName( task.getName() );
         storeableTask.setType( task.getType() );
         storeableTask.setStatus( task.getTaskState().name() );
-        
-        if( task.getLastRun() != null )
+
+        if ( task.getLastRun() != null )
         {
             storeableTask.setLastRun( task.getLastRun().getTime() );
         }
-        
-        if( task.getNextRun() != null )
+
+        if ( task.getNextRun() != null )
         {
             storeableTask.setNextRun( task.getNextRun().getTime() );
         }
@@ -369,7 +428,7 @@ public class DefaultTaskConfigManager
                 storeableSchedule.setType( CScheduleConfig.TYPE_MONTHLY );
 
                 storeableSchedule.setStartDate( ( (MonthlySchedule) schedule ).getStartDate().getTime() );
-                
+
                 Date endDate = ( (MonthlySchedule) schedule ).getEndDate();
 
                 if ( endDate != null )
@@ -390,7 +449,7 @@ public class DefaultTaskConfigManager
                 storeableSchedule.setType( CScheduleConfig.TYPE_WEEKLY );
 
                 storeableSchedule.setStartDate( ( (WeeklySchedule) schedule ).getStartDate().getTime() );
-                
+
                 Date endDate = ( (WeeklySchedule) schedule ).getEndDate();
 
                 if ( endDate != null )
@@ -411,7 +470,7 @@ public class DefaultTaskConfigManager
                 storeableSchedule.setType( CScheduleConfig.TYPE_DAILY );
 
                 storeableSchedule.setStartDate( ( (DailySchedule) schedule ).getStartDate().getTime() );
-                
+
                 Date endDate = ( (DailySchedule) schedule ).getEndDate();
 
                 if ( endDate != null )
@@ -424,7 +483,7 @@ public class DefaultTaskConfigManager
                 storeableSchedule.setType( CScheduleConfig.TYPE_HOURLY );
 
                 storeableSchedule.setStartDate( ( (HourlySchedule) schedule ).getStartDate().getTime() );
-                
+
                 Date endDate = ( (HourlySchedule) schedule ).getEndDate();
 
                 if ( endDate != null )

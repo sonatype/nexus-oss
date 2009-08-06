@@ -81,17 +81,17 @@ public class SecurityUpgradeEventInspector
         catch ( ConfigurationIsCorruptedException e )
         {
             this.getLogger().error( "Failed to upgrade security.xml: " + e );
-            startedEvent.putVeto( "Upgrade security.xml failed: " + e.getMessage() );
+            startedEvent.putVeto( this, e );
         }
         catch ( ConfigurationException e )
         {
             this.getLogger().error( "Failed to upgrade security.xml: " + e );
-            startedEvent.putVeto( "Upgrade security.xml failed: " + e.getMessage() );
+            startedEvent.putVeto( this, e );
         }
         catch ( IOException e )
         {
             this.getLogger().error( "Failed to upgrade security.xml: " + e );
-            startedEvent.putVeto( "Upgrade security.xml failed: " + e.getMessage() );
+            startedEvent.putVeto( this, e );
         }
     }
 }

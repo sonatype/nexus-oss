@@ -89,6 +89,8 @@ public class M1TestsuiteEnvironmentBuilder
 
             // repo.setCacheManager( env.getCacheManager() );
             reposes.add( repo.getId() );
+            
+            env.getApplicationConfiguration().getConfigurationModel().addRepository( repoConf );
 
             env.getRepositoryRegistry().addRepository( repo );
         }
@@ -116,6 +118,8 @@ public class M1TestsuiteEnvironmentBuilder
         repo.configure( repoConf );
 
         reposes.add( repo.getId() );
+
+        env.getApplicationConfiguration().getConfigurationModel().addRepository( repoConf );
 
         env.getRepositoryRegistry().addRepository( repo );
 
@@ -145,6 +149,8 @@ public class M1TestsuiteEnvironmentBuilder
 
         reposes.add( repoSnapshot.getId() );
 
+        env.getApplicationConfiguration().getConfigurationModel().addRepository( repoSnapshotConf );
+
         env.getRepositoryRegistry().addRepository( repoSnapshot );
 
         // add a group
@@ -168,6 +174,8 @@ public class M1TestsuiteEnvironmentBuilder
         exGroupRepoConf.setMergeMetadata( true );
 
         group.configure( repoGroupConf );
+
+        env.getApplicationConfiguration().getConfigurationModel().addRepository( repoGroupConf );
 
         env.getRepositoryRegistry().addRepository( group );
     }

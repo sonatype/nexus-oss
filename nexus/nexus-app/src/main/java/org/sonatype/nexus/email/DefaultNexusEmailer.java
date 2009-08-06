@@ -1,233 +1,288 @@
-/**
- * Sonatype Nexus (TM) Open Source Version.
- * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
- * Includes the third-party code listed at http://nexus.sonatype.org/dev/attributions.html
- * This program is licensed to you under Version 3 only of the GNU General Public License as published by the Free Software Foundation.
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License Version 3 for more details.
- * You should have received a copy of the GNU General Public License Version 3 along with this program.
- * If not, see http://www.gnu.org/licenses/.
- * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
- * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
- */
 package org.sonatype.nexus.email;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
 import org.sonatype.micromailer.EmailerConfiguration;
-import org.sonatype.micromailer.MailComposer;
 import org.sonatype.micromailer.MailRequest;
-import org.sonatype.micromailer.MailRequestSource;
 import org.sonatype.micromailer.MailRequestStatus;
-import org.sonatype.micromailer.MailSender;
-import org.sonatype.micromailer.MailStorage;
-import org.sonatype.micromailer.MailTypeSource;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.micromailer.imp.DefaultMailType;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.configuration.AbstractConfigurable;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.nexus.configuration.model.CSmtpConfigurationCoreConfiguration;
 
-/**
- * Default {@link NexusEmailer}.
- * Keeps the emailer synchornized to Nexus configuration.
- *
- * @author cstamas
- * @author Alin Dreghiciu
- */
 @Component( role = NexusEmailer.class )
 public class DefaultNexusEmailer
-    implements NexusEmailer, EventListener, Initializable
+    extends AbstractConfigurable
+    implements NexusEmailer
 {
+    /**
+     * The "name" of Nexus instance, as displayed on sent mails.
+     */
+    private static final String NEXUS_SENDER_NAME = "Nexus Repository Manager";
+
+    /**
+     * Custom header to deisgnate Nexus instance as sender
+     */
+    private static final String X_MESSAGE_SENDER_HEADER = "X-EMailer-Mail-Sender";
 
     @Requirement
-    private EMailer m_emailer;
+    private ApplicationConfiguration applicationConfiguration;
 
     @Requirement
-    private NexusConfiguration m_nexusConfiguration;
+    private ApplicationStatusSource applicationStatusSource;
 
     @Requirement
-    private ApplicationEventMulticaster m_eventMulticaster;
+    private EMailer eMailer;
 
-    /**
-     * Current SMTP configuration.
-     */
-    private CSmtpConfiguration m_smtpConfiguration;
+    // ==
 
-    /**
-     * Delegates to {@link EMailer}.
-     * {@inheritDoc}
-     */
-    public void configure( final EmailerConfiguration config )
+    public EMailer getEMailer()
     {
-        m_emailer.configure( config );
+        return eMailer;
     }
 
-    /**
-     * Delegates to {@link EMailer}.
-     * {@inheritDoc}
-     */
-    public MailComposer getMailComposer()
+    public String getDefaultMailTypeId()
     {
-        return m_emailer.getMailComposer();
+        return DefaultMailType.DEFAULT_TYPE_ID;
     }
 
-    /**
-     * Delegates to {@link EMailer}.
-     * {@inheritDoc}
-     */
-    public MailSender getMailSender()
+    public MailRequest getDefaultMailRequest( String subject, String body )
     {
-        return m_emailer.getMailSender();
+        MailRequest request = new MailRequest( getMailId(), getDefaultMailTypeId() );
+
+        request.getCustomHeaders().put( X_MESSAGE_SENDER_HEADER, getSenderId() );
+
+        request.setFrom( getSMTPSystemEmailAddress() );
+
+        request.getBodyContext().put( DefaultMailType.SUBJECT_KEY, subject );
+
+        request.getBodyContext().put( DefaultMailType.BODY_KEY, body );
+
+        return request;
     }
 
-    /**
-     * Delegates to {@link EMailer}.
-     * {@inheritDoc}
-     */
-    public MailStorage getMailStorage()
+    public MailRequestStatus sendMail( MailRequest request )
     {
-        return m_emailer.getMailStorage();
+        return eMailer.sendMail( request );
     }
 
-    /**
-     * Delegates to {@link EMailer}.
-     * {@inheritDoc}
-     */
-    public MailTypeSource getMailTypeSource()
-    {
-        return m_emailer.getMailTypeSource();
-    }
+    // ==
 
-    /**
-     * Delegates to {@link EMailer}.
-     * {@inheritDoc}
-     */
-    public MailRequestStatus sendMail( final MailRequest request )
+    @Override
+    protected void initializeConfiguration()
+        throws ConfigurationException
     {
-        return m_emailer.sendMail( request );
-    }
-
-    /**
-     * Delegates to {@link EMailer}.
-     * {@inheritDoc}
-     */
-    public void sendMailBatch( final MailRequestSource mailRequestSource )
-    {
-        m_emailer.sendMailBatch( mailRequestSource );
-    }
-
-    /**
-     * Current configured SMTP system email address.
-     * {@inheritDoc}
-     */
-    public String getSystemEmailAddress()
-    {
-        return m_smtpConfiguration.getSystemEmailAddress();
-    }
-
-    /**
-     * Accepts {@link ConfigurationChangeEvent}s of {@link ApplicationConfiguration}s.
-     * {@inheritDoc}
-     */
-    private boolean accepts( final Event<?> evt )
-    {
-        return evt != null
-               && evt instanceof ConfigurationChangeEvent
-               && ( (ConfigurationChangeEvent) evt ).getApplicationConfiguration() != null;
-    }
-
-    /**
-     * Update smtp configuration if changed.
-     * {@inheritDoc}
-     */
-    public void onEvent( final Event<?> evt )
-    {
-        if( !( accepts( evt ) ) )
+        if ( getApplicationConfiguration().getConfigurationModel() != null )
         {
-            return;
-        }
-        final ApplicationConfiguration config = ( (ConfigurationChangeEvent) evt ).getApplicationConfiguration();
-        final CSmtpConfiguration newSmtp = config.getConfiguration().getSmtpConfiguration();
-        if( configChanged( newSmtp ) )
-        {
-            updateConfig();
+            configure( getApplicationConfiguration() );
         }
     }
 
-    /**
-     * Initial emailer configuration.
-     *
-     * {@inheritDoc}
-     */
-    public void initialize()
+
+    @Override
+    protected ApplicationConfiguration getApplicationConfiguration()
     {
-        m_eventMulticaster.addEventListener( this );
-        // now initialize the smtp config
-        configChanged( m_nexusConfiguration.getConfiguration().getSmtpConfiguration() );
-        // update the config on the mailer component
-        updateConfig();
+        return applicationConfiguration;
     }
 
-    /**
-     * Configures emailer based on current SMTP configuration.
-     */
-    private void updateConfig()
+    @Override
+    protected Configurator getConfigurator()
     {
-        final EmailerConfiguration config = new EmailerConfiguration();
-        config.setDebug( m_smtpConfiguration.isDebugMode() );
-        config.setMailHost( m_smtpConfiguration.getHostname() );
-        config.setMailPort( m_smtpConfiguration.getPort() );
-        config.setPassword( m_smtpConfiguration.getPassword() );
-        config.setSsl( m_smtpConfiguration.isSslEnabled() );
-        config.setTls( m_smtpConfiguration.isTlsEnabled() );
-        config.setUsername( m_smtpConfiguration.getUsername() );
-
-        m_emailer.configure( config );
+        return null;
     }
 
-    /**
-     * Updates configuration (if changed).
-     *
-     * @param newSmtp new configuration
-     *
-     * @return if teh new configuration differs then old one
-     */
-    boolean configChanged( final CSmtpConfiguration newSmtp )
+    @Override
+    protected CSmtpConfiguration getCurrentConfiguration( boolean forWrite )
     {
-        if( m_smtpConfiguration == null
-            || ( m_smtpConfiguration.getHostname() == null
-                 && newSmtp.getHostname() != null )
-            || ( m_smtpConfiguration.getHostname() != null
-                 && !m_smtpConfiguration.getHostname().equals( newSmtp.getHostname() ) )
-            || ( m_smtpConfiguration.getUsername() == null
-                 && newSmtp.getUsername() != null )
-            || ( m_smtpConfiguration.getUsername() != null
-                 && !m_smtpConfiguration.getUsername().equals( newSmtp.getUsername() ) )
-            || ( m_smtpConfiguration.getPassword() == null
-                 && newSmtp.getPassword() != null )
-            || ( m_smtpConfiguration.getPassword() != null
-                 && !m_smtpConfiguration.getPassword().equals( newSmtp.getPassword() ) )
-            || !( m_smtpConfiguration.getPort() == newSmtp.getPort() )
-            || ( m_smtpConfiguration.getSystemEmailAddress() == null
-                 && newSmtp.getSystemEmailAddress() != null )
-            || ( m_smtpConfiguration.getSystemEmailAddress() != null
-                 && !m_smtpConfiguration.getSystemEmailAddress().equals( newSmtp.getSystemEmailAddress() ) )
-            || !( m_smtpConfiguration.isSslEnabled() == newSmtp.isSslEnabled() )
-            || !( m_smtpConfiguration.isTlsEnabled() == newSmtp.isTlsEnabled() )
-            || !( m_smtpConfiguration.isDebugMode() == newSmtp.isDebugMode() ) )
+        return ( (CSmtpConfigurationCoreConfiguration) getCurrentCoreConfiguration() ).getConfiguration( forWrite );
+    }
+
+    @Override
+    protected CoreConfiguration wrapConfiguration( Object configuration )
+        throws ConfigurationException
+    {
+        if ( configuration instanceof ApplicationConfiguration )
         {
-            m_smtpConfiguration = newSmtp;
-            return true;
+            return new CSmtpConfigurationCoreConfiguration( (ApplicationConfiguration) configuration );
+        }
+        else
+        {
+            throw new ConfigurationException( "The passed configuration object is of class \""
+                + configuration.getClass().getName() + "\" and not the required \""
+                + ApplicationConfiguration.class.getName() + "\"!" );
+        }
+    }
+
+    public boolean commitChanges()
+        throws ConfigurationException
+    {
+        boolean wasDirty = super.commitChanges();
+
+        if ( wasDirty )
+        {
+            this.configureEmailer();
         }
 
-        return false;
+        return wasDirty;
+    }
+    
+
+    @Override
+    protected void doConfigure()
+        throws ConfigurationException
+    {
+        super.doConfigure();
+        
+        this.configureEmailer();
+    }
+    
+    private synchronized void configureEmailer()
+    {
+        EmailerConfiguration config = new EmailerConfiguration();
+        config.setDebug( isSMTPDebug() );
+        config.setMailHost( getSMTPHostname() );
+        config.setMailPort( getSMTPPort() );
+        config.setSsl( isSMTPSslEnabled() );
+        config.setTls( isSMTPTlsEnabled() );
+        config.setUsername( getSMTPUsername() );
+        config.setPassword( getSMTPPassword() );
+
+        eMailer.configure( config );
+    }
+    
+    // ==
+
+    public String getSMTPHostname()
+    {
+        return getCurrentConfiguration( false ).getHostname();
     }
 
+    public void setSMTPHostname( String host )
+    {
+        getCurrentConfiguration( true ).setHostname( host );
+    }
 
+    public int getSMTPPort()
+    {
+        return getCurrentConfiguration( false ).getPort();
+    }
+
+    public void setSMTPPort( int port )
+    {
+        getCurrentConfiguration( true ).setPort( port );
+    }
+
+    public String getSMTPUsername()
+    {
+        return getCurrentConfiguration( false ).getUsername();
+    }
+
+    public void setSMTPUsername( String username )
+    {
+        getCurrentConfiguration( true ).setUsername( username );
+    }
+
+    public String getSMTPPassword()
+    {
+        return getCurrentConfiguration( false ).getPassword();
+    }
+
+    public void setSMTPPassword( String password )
+    {
+        getCurrentConfiguration( true ).setPassword( password );
+    }
+
+    public Address getSMTPSystemEmailAddress()
+    {
+        return new Address( getCurrentConfiguration( false ).getSystemEmailAddress(), NEXUS_SENDER_NAME );
+    }
+
+    public void setSMTPSystemEmailAddress( Address adr )
+    {
+        getCurrentConfiguration( true ).setSystemEmailAddress( adr.getMailAddress() );
+    }
+
+    public boolean isSMTPDebug()
+    {
+        return getCurrentConfiguration( false ).isDebugMode();
+    }
+
+    public void setSMTPDebug( boolean val )
+    {
+        getCurrentConfiguration( true ).setDebugMode( val );
+    }
+
+    public boolean isSMTPSslEnabled()
+    {
+        return getCurrentConfiguration( false ).isSslEnabled();
+    }
+
+    public void setSMTPSslEnabled( boolean val )
+    {
+        getCurrentConfiguration( true ).setSslEnabled( val );
+    }
+
+    public boolean isSMTPTlsEnabled()
+    {
+        return getCurrentConfiguration( false ).isTlsEnabled();
+    }
+
+    public void setSMTPTlsEnabled( boolean val )
+    {
+        getCurrentConfiguration( true ).setTlsEnabled( val );
+    }
+
+    // ==
+
+    protected String getMailId()
+    {
+        StringBuilder sb = new StringBuilder( "NX" );
+
+        sb.append( String.valueOf( System.currentTimeMillis() ) );
+
+        return sb.toString();
+
+    }
+
+    // ==
+    // TODO: this is a workaround, see NXCM-363
+
+    /**
+     * The edtion, that will tell us is there some change happened with installation.
+     */
+    private String platformEditionShort;
+
+    /**
+     * The lazily calculated invariant part of the UserAgentString.
+     */
+    private String userAgentPlatformInfo;
+
+    protected String getSenderId()
+    {
+        SystemStatus status = applicationStatusSource.getSystemStatus();
+
+        if ( platformEditionShort == null || !platformEditionShort.equals( status.getEditionShort() )
+            || userAgentPlatformInfo == null )
+        {
+            // make it "remember" to be able to detect license changes later
+            platformEditionShort = status.getEditionShort();
+
+            userAgentPlatformInfo =
+                new StringBuffer( "Nexus/" ).append( status.getVersion() ).append( " (" )
+                    .append( status.getEditionShort() ).append( "; " ).append( System.getProperty( "os.name" ) )
+                    .append( "; " ).append( System.getProperty( "os.version" ) ).append( "; " )
+                    .append( System.getProperty( "os.arch" ) ).append( "; " )
+                    .append( System.getProperty( "java.version" ) ).append( ") " ).toString();
+        }
+
+        return userAgentPlatformInfo;
+    }
 }

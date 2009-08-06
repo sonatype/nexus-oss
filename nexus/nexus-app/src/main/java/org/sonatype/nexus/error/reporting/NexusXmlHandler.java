@@ -15,7 +15,7 @@ public class NexusXmlHandler
     public File getFile( ConfigurationHelper configHelper, NexusConfiguration nexusConfig )
         throws IOException
     {
-        Configuration configuration = configHelper.clone( nexusConfig.getConfiguration() );
+        Configuration configuration = configHelper.clone( nexusConfig.getConfigurationModel() );
         
         // No config ?
         if ( configuration == null )

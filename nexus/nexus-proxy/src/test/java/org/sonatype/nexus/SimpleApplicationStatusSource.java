@@ -13,6 +13,9 @@
  */
 package org.sonatype.nexus;
 
+import org.codehaus.plexus.component.annotations.Component;
+
+@Component( role = ApplicationStatusSource.class )
 public class SimpleApplicationStatusSource
     implements ApplicationStatusSource
 {

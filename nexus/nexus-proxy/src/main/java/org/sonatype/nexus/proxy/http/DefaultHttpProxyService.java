@@ -22,16 +22,16 @@ import java.util.concurrent.Executors;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.configuration.AbstractConfigurable;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.nexus.configuration.model.CHttpProxyCoreConfiguration;
+import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 
 /**
  * A default HTTP Proxy service. A very simple network service based on Java 5 ExecutorService.
@@ -40,13 +40,13 @@ import org.sonatype.plexus.appevents.EventListener;
  */
 @Component( role = HttpProxyService.class )
 public class DefaultHttpProxyService
-    extends AbstractLogEnabled
-    implements HttpProxyService, EventListener, Initializable, Startable
+    extends AbstractConfigurable
+    implements HttpProxyService, Startable
 {
     public static final int DEFAULT_TIMEOUT = 20 * 1000;
 
     @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private Logger logger;
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -57,62 +57,130 @@ public class DefaultHttpProxyService
     @Configuration( value = "10" )
     private int poolSize;
 
-    private int port = -1;
-
     private ServerSocket serverSocket;
 
     private ExecutorService pool;
 
     private Thread serverThread;
 
-    private boolean running;
+    private volatile boolean running;
 
-    private HttpProxyPolicy httpProxyPolicy = HttpProxyPolicy.STRICT;
+    // ==
 
-    public void initialize()
-        throws InitializationException
+    protected Logger getLogger()
     {
-        applicationEventMulticaster.addEventListener( this );
+        return logger;
     }
 
-    public void onEvent( Event evt )
+    // ==
+
+    public boolean isEnabled()
     {
-        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
+        return getCurrentConfiguration( false ).isEnabled();
+    }
+
+    public void setEnabled( boolean enabled )
+    {
+        getCurrentConfiguration( true ).setEnabled( enabled );
+    }
+
+    public int getPort()
+    {
+        return getCurrentConfiguration( false ).getPort();
+    }
+
+    public void setPort( int port )
+    {
+        getCurrentConfiguration( true ).setPort( port );
+    }
+
+    public HttpProxyPolicy getHttpProxyPolicy()
+    {
+        String policyStr = getCurrentConfiguration( false ).getProxyPolicy();
+
+        if ( StringUtils.isBlank( policyStr ) )
         {
-            if ( applicationConfiguration.getConfiguration().getHttpProxy().isEnabled() )
-            {
-                httpProxyPolicy =
-                    HttpProxyPolicy.fromModel( applicationConfiguration.getConfiguration().getHttpProxy()
-                        .getProxyPolicy() );
+            policyStr = CHttpProxySettings.PROXY_POLICY_STRICT;
+        }
 
-                if ( port != applicationConfiguration.getConfiguration().getHttpProxy().getPort() )
-                {
-                    port = applicationConfiguration.getConfiguration().getHttpProxy().getPort();
+        return HttpProxyPolicy.fromModel( policyStr );
+    }
 
-                    if ( running )
-                    {
-                        stop();
+    public void setHttpProxyPolicy( HttpProxyPolicy httpProxyPolicy )
+    {
+        getCurrentConfiguration( true ).setProxyPolicy( HttpProxyPolicy.toModel( httpProxyPolicy ) );
+    }
 
-                        start();
-                    }
-                }
-            }
-            else
-            {
-                port = -1;
+    // ==
 
-                if ( running )
-                {
-                    stop();
-                }
-            }
+    @Override
+    protected void initializeConfiguration()
+        throws ConfigurationException
+    {
+        if ( getApplicationConfiguration().getConfigurationModel() != null )
+        {
+            configure( getApplicationConfiguration() );
         }
     }
 
-    public void start()
+    @Override
+    protected ApplicationConfiguration getApplicationConfiguration()
     {
-        if ( running || port == -1 )
+        return applicationConfiguration;
+    }
+
+    @Override
+    protected Configurator getConfigurator()
+    {
+        return null;
+    }
+
+    @Override
+    protected CHttpProxySettings getCurrentConfiguration( boolean forWrite )
+    {
+        return ( (CHttpProxyCoreConfiguration) getCurrentCoreConfiguration() ).getConfiguration( forWrite );
+    }
+
+    @Override
+    protected CoreConfiguration wrapConfiguration( Object configuration )
+        throws ConfigurationException
+    {
+        if ( configuration instanceof ApplicationConfiguration )
         {
+            return new CHttpProxyCoreConfiguration( (ApplicationConfiguration) configuration );
+        }
+        else
+        {
+            throw new ConfigurationException( "The passed configuration object is of class \""
+                + configuration.getClass().getName() + "\" and not the required \""
+                + ApplicationConfiguration.class.getName() + "\"!" );
+        }
+    }
+
+    @Override
+    public boolean commitChanges()
+        throws ConfigurationException
+    {
+        boolean wasDirty = super.commitChanges();
+
+        if ( wasDirty )
+        {
+            stop();
+
+            start();
+        }
+
+        return wasDirty;
+    }
+
+    // ==
+
+    public synchronized void start()
+    {
+        if ( running || !isEnabled() )
+        {
+            running = isEnabled();
+
             return;
         }
 
@@ -120,7 +188,7 @@ public class DefaultHttpProxyService
         {
             running = true;
 
-            serverSocket = new ServerSocket( port );
+            serverSocket = new ServerSocket( getPort() );
 
             pool = Executors.newFixedThreadPool( poolSize );
 
@@ -128,7 +196,7 @@ public class DefaultHttpProxyService
 
             serverThread.start();
 
-            getLogger().info( "HttpProxy service started on port " + port );
+            getLogger().info( "HttpProxy service started on port " + getPort() );
         }
         catch ( IOException e )
         {
@@ -138,7 +206,7 @@ public class DefaultHttpProxyService
         }
     }
 
-    public void stop()
+    public synchronized void stop()
     {
         getLogger().info( "HttpProxy service stopped." );
 
@@ -194,7 +262,8 @@ public class DefaultHttpProxyService
                 {
                     Socket socket = serverSocket.accept();
 
-                    HttpProxyHandler handler = new HttpProxyHandler( handlerLogger, service, httpProxyPolicy, socket );
+                    HttpProxyHandler handler =
+                        new HttpProxyHandler( handlerLogger, service, getHttpProxyPolicy(), socket );
 
                     pool.execute( handler );
                 }

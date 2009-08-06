@@ -13,5 +13,5 @@ public interface CoreConfiguration
      * 
      * @return
      */
-    ExternalConfiguration getExternalConfiguration();
+    ExternalConfiguration<?> getExternalConfiguration();
 }

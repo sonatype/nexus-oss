@@ -36,26 +36,24 @@ public abstract class AbstractWebSiteRepository
     implements WebSiteRepository
 {
     @Override
-    protected AbstractWebSiteRepositoryConfiguration getExternalConfiguration()
+    protected AbstractWebSiteRepositoryConfiguration getExternalConfiguration( boolean forModification )
     {
-        return (AbstractWebSiteRepositoryConfiguration) super.getExternalConfiguration();
+        return (AbstractWebSiteRepositoryConfiguration) super.getExternalConfiguration( forModification );
     }
 
     public List<String> getWelcomeFiles()
     {
-        return getExternalConfiguration().getWelcomeFiles();
+        return getExternalConfiguration( false ).getWelcomeFiles();
     }
 
     public void setWelcomeFiles( List<String> vals )
     {
-        getExternalConfiguration().setWelcomeFiles( vals );
+        getExternalConfiguration( true ).setWelcomeFiles( vals );
     }
 
     @Override
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         StorageItem result = super.doRetrieveItem( request );
 

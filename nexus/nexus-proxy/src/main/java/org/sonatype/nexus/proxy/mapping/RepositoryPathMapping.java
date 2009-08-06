@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -29,44 +30,59 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public class RepositoryPathMapping
 {
-    private String groupId;
+    public enum MappingType
+    {
+        BLOCKING, INCLUSION, EXCLUSION;
+    };
 
-    private boolean allGroups;
+    private String id;
+
+    private MappingType mappingType;
+
+    private String groupId;
 
     private List<Pattern> patterns;
 
-    private List<Repository> resourceStores;
+    private List<String> mappedRepositories;
 
-    public RepositoryPathMapping( boolean allGroups, String groupId, List<String> regexps,
-        List<Repository> resourceStores )
+    public RepositoryPathMapping( String id, MappingType mappingType, String groupId, List<String> regexps,
+                                  List<String> mappedRepositories )
         throws PatternSyntaxException
     {
-        if ( allGroups )
+        this.id = id;
+
+        this.mappingType = mappingType;
+
+        if ( StringUtils.isBlank( groupId ) || "*".equals( groupId ) )
         {
             this.groupId = "*";
-
-            this.allGroups = true;
         }
         else
         {
             this.groupId = groupId;
-
-            this.allGroups = false;
         }
 
         patterns = new ArrayList<Pattern>( regexps.size() );
 
         for ( String regexp : regexps )
         {
-            patterns.add( Pattern.compile( regexp ) );
+            if( StringUtils.isNotEmpty( regexp ) )
+            {
+                patterns.add( Pattern.compile( regexp ) );
+            }
         }
 
-        this.resourceStores = resourceStores;
+        this.mappedRepositories = mappedRepositories;
+    }
+
+    public boolean isAllGroups()
+    {
+        return "*".equals( getGroupId() );
     }
 
     public boolean matches( Repository repository, ResourceStoreRequest request )
     {
-        if ( allGroups
+        if ( isAllGroups()
             || ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) && groupId.equals( repository
                 .getId() ) ) )
         {
@@ -86,6 +102,16 @@ public class RepositoryPathMapping
         }
     }
 
+    public String getId()
+    {
+        return id;
+    }
+
+    public MappingType getMappingType()
+    {
+        return mappingType;
+    }
+
     public String getGroupId()
     {
         return groupId;
@@ -96,8 +122,26 @@ public class RepositoryPathMapping
         return patterns;
     }
 
-    public List<Repository> getResourceStores()
+    public List<String> getMappedRepositories()
     {
-        return resourceStores;
+        return mappedRepositories;
+    }
+
+    // ==
+
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder( getId() );
+        sb.append( "=[" );
+        sb.append( "type=" );
+        sb.append( getMappingType().toString() );
+        sb.append( ", groupId=" );
+        sb.append( getGroupId() );
+        sb.append( ", patterns=" );
+        sb.append( getPatterns().toString() );
+        sb.append( ", mappedRepositories=" );
+        sb.append( getMappedRepositories() );
+        sb.append( "]" );
+        return sb.toString();
     }
 }

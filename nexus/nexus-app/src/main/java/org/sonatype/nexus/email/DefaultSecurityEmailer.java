@@ -14,93 +14,78 @@
 package org.sonatype.nexus.email;
 
 import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.MailRequest;
-import org.sonatype.micromailer.imp.DefaultMailType;
 import org.sonatype.security.email.SecurityEmailer;
 
 /**
- * The default emailer.
- *
+ * The default emailer that is "stolen" by Security. Look at the NexusEmailer for the real thing.
+ * 
  * @author cstamas
- * @author Alin Dreghiciu
  */
 @Component( role = SecurityEmailer.class )
 public class DefaultSecurityEmailer
     implements SecurityEmailer
 {
-
     @Requirement
-    private NexusEmailer emailer;
+    private NexusEmailer nexusEmailer;
 
     public void sendNewUserCreated( String email, String userid, String password )
     {
-        MailRequest request = new MailRequest( NexusEmailer.NEXUS_MAIL_ID, DefaultMailType.DEFAULT_TYPE_ID );
-        request.setFrom( new Address( emailer.getSystemEmailAddress(), "Nexus Repository Manager" ) );
-        request.getToAddresses().add( new Address( email ) );
-        request.getBodyContext().put( DefaultMailType.SUBJECT_KEY, "Nexus: New user account created." );
-
         StringBuilder body = new StringBuilder();
         body.append( "User Account " );
         body.append( userid );
         body.append( " has been created.  Another email will be sent shortly containing your password." );
 
-        request.getBodyContext().put( DefaultMailType.BODY_KEY, body.toString() );
+        MailRequest request = nexusEmailer.getDefaultMailRequest( "Nexus: New user account created.", body.toString() );
 
-        emailer.sendMail( request );
-
-        request = new MailRequest( NexusEmailer.NEXUS_MAIL_ID, DefaultMailType.DEFAULT_TYPE_ID );
-        request.setFrom( new Address( emailer.getSystemEmailAddress(), "Nexus Repository Manager" ) );
         request.getToAddresses().add( new Address( email ) );
-        request.getBodyContext().put( DefaultMailType.SUBJECT_KEY, "Nexus: New user account created." );
+
+        nexusEmailer.sendMail( request );
 
         body = new StringBuilder();
         body.append( "Your new password is " );
         body.append( password );
 
-        request.getBodyContext().put( DefaultMailType.BODY_KEY, body.toString() );
+        request = nexusEmailer.getDefaultMailRequest( "Nexus: New user account created.", body.toString() );
 
-        emailer.sendMail( request );
+        request.getToAddresses().add( new Address( email ) );
+
+        nexusEmailer.sendMail( request );
     }
 
     public void sendForgotUsername( String email, List<String> userIds )
     {
-        MailRequest request = new MailRequest( NexusEmailer.NEXUS_MAIL_ID, DefaultMailType.DEFAULT_TYPE_ID );
-        request.setFrom( new Address( emailer.getSystemEmailAddress(), "Nexus Repository Manager" ) );
-        request.getToAddresses().add( new Address( email ) );
-        request.getBodyContext().put( DefaultMailType.SUBJECT_KEY, "Nexus: User account notification." );
-
         StringBuilder body = new StringBuilder();
 
         body.append( "Your email is associated with the following Nexus User Id(s):\n " );
-        for( String userId : userIds )
+        for ( String userId : userIds )
         {
             body.append( "\n - \"" );
             body.append( userId );
             body.append( "\"" );
         }
 
-        request.getBodyContext().put( DefaultMailType.BODY_KEY, body.toString() );
+        MailRequest request = nexusEmailer.getDefaultMailRequest( "Nexus: User account notification.", body.toString() );
 
-        emailer.sendMail( request );
+        request.getToAddresses().add( new Address( email ) );
+
+        nexusEmailer.sendMail( request );
     }
 
     public void sendResetPassword( String email, String password )
     {
-        MailRequest request = new MailRequest( NexusEmailer.NEXUS_MAIL_ID, DefaultMailType.DEFAULT_TYPE_ID );
-        request.setFrom( new Address( emailer.getSystemEmailAddress(), "Nexus Repository Manager" ) );
-        request.getToAddresses().add( new Address( email ) );
-        request.getBodyContext().put( DefaultMailType.SUBJECT_KEY, "Nexus: User account notification." );
-
         StringBuilder body = new StringBuilder();
         body.append( "Your password has been reset.  Your new password is: " );
         body.append( password );
 
-        request.getBodyContext().put( DefaultMailType.BODY_KEY, body.toString() );
+        MailRequest request = nexusEmailer.getDefaultMailRequest( "Nexus: User account notification.", body.toString() );
 
-        emailer.sendMail( request );
+        request.getToAddresses().add( new Address( email ) );
+
+        nexusEmailer.sendMail( request );
     }
-
 }

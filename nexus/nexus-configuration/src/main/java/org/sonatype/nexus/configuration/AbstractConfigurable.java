@@ -5,7 +5,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
@@ -28,6 +27,24 @@ public abstract class AbstractConfigurable
         throws InitializationException
     {
         applicationEventMulticaster.addEventListener( this );
+
+        try
+        {
+            initializeConfiguration();
+        }
+        catch ( ConfigurationException e )
+        {
+            throw new InitializationException( "Cannot configure the component!", e );
+        }
+    }
+
+    protected void initializeConfiguration()
+        throws ConfigurationException
+    {
+        // someone needs this, someone not
+        // for example, whoever is configged using framework, will not need this,
+        // but we still have components on their own, like DefaultTaskConfigManager
+        // that are driven by spice Scheduler
     }
 
     public void dispose()
@@ -38,22 +55,68 @@ public abstract class AbstractConfigurable
     public void onEvent( Event<?> evt )
     {
         // act automatically on config events
-        if ( evt instanceof ConfigurationPrepareForSaveEvent )
+        if ( evt instanceof ConfigurationPrepareForLoadEvent )
         {
-            if ( isDirty() && getConfigurator() != null )
-            {
-                // prepare for save: transfer what we have in memory (if any) to model
-                getConfigurator().prepareForSave( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
+            ConfigurationPrepareForLoadEvent vevt = (ConfigurationPrepareForLoadEvent) evt;
 
-                // register ourselves as changed
+            try
+            {
+                // validate
+                initializeConfiguration();
+            }
+            catch ( ConfigurationException e )
+            {
+                // put a veto
+                vevt.putVeto( this, e );
+            }
+        }
+        else if ( evt instanceof ConfigurationPrepareForSaveEvent )
+        {
+            if ( isDirty() )
+            {
                 ConfigurationPrepareForSaveEvent psevt = (ConfigurationPrepareForSaveEvent) evt;
 
-                psevt.getChanges().add( this );
+                try
+                {
+                    // prepare
+                    prepareForSave();
+
+                    // register ourselves as changed
+                    psevt.getChanges().add( this );
+                }
+                catch ( ConfigurationException e )
+                {
+                    // put a veto
+                    psevt.putVeto( this, e );
+                }
+            }
+        }
+        else if ( evt instanceof ConfigurationValidateEvent )
+        {
+            ConfigurationValidateEvent vevt = (ConfigurationValidateEvent) evt;
+
+            try
+            {
+                // validate
+                getCurrentCoreConfiguration().validateChanges();
+            }
+            catch ( ConfigurationException e )
+            {
+                // put a veto
+                vevt.putVeto( this, e );
             }
         }
         else if ( evt instanceof ConfigurationCommitEvent )
         {
-            commitChanges();
+            try
+            {
+                commitChanges();
+            }
+            catch ( ConfigurationException e )
+            {
+                // FIXME: log or something?
+                rollbackChanges();
+            }
         }
         else if ( evt instanceof ConfigurationRollbackEvent )
         {
@@ -75,32 +138,12 @@ public abstract class AbstractConfigurable
         return coreConfiguration;
     }
 
-    protected ExternalConfiguration getExternalConfiguration()
-    {
-        return getCurrentCoreConfiguration().getExternalConfiguration();
-    }
-
     public final void configure( Object config )
         throws ConfigurationException
     {
-        validateConfiguration( config );
+        this.coreConfiguration = wrapConfiguration( config );
 
-        if ( config instanceof CoreConfiguration )
-        {
-            this.coreConfiguration = (CoreConfiguration) config;
-        }
-        else
-        {
-            this.coreConfiguration = wrapConfiguration( config );
-        }
-
-        doConfigure( false );
-    }
-
-    public final void configure()
-        throws ConfigurationException
-    {
-        doConfigure( true );
+        doConfigure();
     }
 
     public boolean isDirty()
@@ -108,10 +151,29 @@ public abstract class AbstractConfigurable
         return getCurrentCoreConfiguration().isDirty();
     }
 
-    public boolean commitChanges()
+    // FIXME: who will call prepareForSave() if Configurable used directly?
+    public void prepareForSave()
+        throws ConfigurationException
     {
         if ( isDirty() )
         {
+            if ( getConfigurator() != null )
+            {
+                // prepare for save: transfer what we have in memory (if any) to model
+                getConfigurator().prepareForSave( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
+            }
+
+            getCurrentCoreConfiguration().validateChanges();
+        }
+    }
+
+    public boolean commitChanges()
+        throws ConfigurationException
+    {
+        if ( isDirty() )
+        {
+            prepareForSave();
+
             getCurrentCoreConfiguration().commitChanges();
 
             return true;
@@ -138,33 +200,11 @@ public abstract class AbstractConfigurable
 
     // ==
 
-    protected final void validateConfiguration( Object config )
+    protected void doConfigure()
         throws ConfigurationException
     {
-        if ( config == null )
-        {
-            throw new InvalidConfigurationException( "This configuration is null!" );
-        }
-
-        doValidateConfiguration( config );
-    }
-
-    protected void doValidateConfiguration( Object config )
-        throws ConfigurationException
-    {
-        if ( getValidator() != null )
-        {
-            getValidator().validate( getApplicationConfiguration(), config );
-        }
-    }
-
-    protected void doConfigure( boolean validate )
-        throws ConfigurationException
-    {
-        if ( validate )
-        {
-            doValidateConfiguration( getCurrentConfiguration( false ) );
-        }
+        // "pull" the config to make it dirty
+        getCurrentConfiguration( true );
 
         if ( getConfigurator() != null )
         {
@@ -175,12 +215,6 @@ public abstract class AbstractConfigurable
     }
 
     // ==
-
-    protected Validator getValidator()
-    {
-        // by default we do not have Validator
-        return null;
-    }
 
     protected abstract Configurator getConfigurator();
 

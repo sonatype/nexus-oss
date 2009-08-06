@@ -4,6 +4,29 @@
 	    <component>
 			<role>org.sonatype.nexus.configuration.application.ApplicationConfiguration</role>
 			<implementation>org.sonatype.nexus.configuration.SimpleSecureApplicationConfiguration</implementation>
+        <requirements>
+          <requirement>
+            <role>
+              org.sonatype.plexus.appevents.ApplicationEventMulticaster
+                </role>
+            <field>applicationEventMulticaster
+                </field>
+          </requirement>
+          <requirement>
+            <role>
+              org.sonatype.nexus.configuration.application.GlobalHttpProxySettings
+                </role>
+            <field>globalHttpProxySettings
+                </field>
+          </requirement>
+          <requirement>
+            <role>
+              org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings
+                </role>
+            <field>globalRemoteConnectionSettings
+                </field>
+          </requirement>
+        </requirements>
 		</component>
 
 		<component>

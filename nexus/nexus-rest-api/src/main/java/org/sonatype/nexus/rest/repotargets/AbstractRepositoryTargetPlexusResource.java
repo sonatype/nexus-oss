@@ -13,19 +13,40 @@
  */
 package org.sonatype.nexus.rest.repotargets;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.PatternSyntaxException;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
-import org.sonatype.nexus.configuration.model.CRepositoryTarget;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.proxy.target.Target;
+import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 
 public abstract class AbstractRepositoryTargetPlexusResource
     extends AbstractNexusPlexusResource
 {
+    @Requirement
+    private TargetRegistry targetRegistry;
 
-    @SuppressWarnings( "unchecked" )
-    protected RepositoryTargetResource getNexusToRestResource( CRepositoryTarget target, Request request )
+    @Requirement
+    private RepositoryTypeRegistry repositoryTypeRegistry;
+
+    protected TargetRegistry getTargetRegistry()
+    {
+        return targetRegistry;
+    }
+
+    protected RepositoryTypeRegistry getRepositoryTypeRegistry()
+    {
+        return repositoryTypeRegistry;
+    }
+
+    protected RepositoryTargetResource getNexusToRestResource( Target target, Request request )
     {
         RepositoryTargetResource resource = new RepositoryTargetResource();
 
@@ -35,9 +56,9 @@ public abstract class AbstractRepositoryTargetPlexusResource
 
         resource.setResourceURI( request.getResourceRef().getPath() );
 
-        resource.setContentClass( target.getContentClass() );
+        resource.setContentClass( target.getContentClass().getId() );
 
-        List<String> patterns = target.getPatterns();
+        List<String> patterns = new ArrayList<String>( target.getPatternTexts() );
 
         for ( String pattern : patterns )
         {
@@ -47,23 +68,18 @@ public abstract class AbstractRepositoryTargetPlexusResource
         return resource;
     }
 
-    @SuppressWarnings( "unchecked" )
-    protected CRepositoryTarget getRestToNexusResource( RepositoryTargetResource resource )
+    protected Target getRestToNexusResource( RepositoryTargetResource resource )
+        throws ConfigurationException, PatternSyntaxException
     {
-        CRepositoryTarget target = new CRepositoryTarget();
+        ContentClass cc = getRepositoryTypeRegistry().getContentClasses().get( resource.getContentClass() );
 
-        target.setId( resource.getId() );
-
-        target.setName( resource.getName() );
-
-        target.setContentClass( resource.getContentClass() );
-
-        List<String> patterns = resource.getPatterns();
-
-        for ( String pattern : patterns )
+        if ( cc == null )
         {
-            target.addPattern( pattern );
+            throw new ConfigurationException( "Content class with ID=\"" + resource.getContentClass()
+                + "\" does not exists!" );
         }
+
+        Target target = new Target( resource.getId(), resource.getName(), cc, resource.getPatterns() );
 
         return target;
     }
@@ -82,7 +98,7 @@ public abstract class AbstractRepositoryTargetPlexusResource
         {
             return false;
         }
-
+        
         return true;
     }
 

@@ -38,6 +38,11 @@ public abstract class AbstractRepositoryTemplate
         }
     }
 
+    protected DefaultRepositoryTemplateProvider getTemplateProvider()
+    {
+        return provider;
+    }
+
     public ContentClass getContentClass()
     {
         return contentClass;
@@ -68,14 +73,16 @@ public abstract class AbstractRepositoryTemplate
     public Repository create()
         throws ConfigurationException, IOException
     {
+        getCoreConfiguration().validateChanges();
+
         // to merge in user changes to CoreConfiguration
         getCoreConfiguration().commitChanges();
 
         // create a repository
         Repository result =
-            provider.getNexus().createRepository(
-                                                  ( (CRepositoryCoreConfiguration) getCoreConfiguration() )
-                                                      .getConfiguration( false ) );
+            getTemplateProvider().getNexus().createRepository(
+                                                               ( (CRepositoryCoreConfiguration) getCoreConfiguration() )
+                                                                   .getConfiguration( false ) );
 
         // reset the template
         setCoreConfiguration( null );

@@ -19,7 +19,8 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.plugin.ExtensionPoint;
 
 /**
- * A component responsible for "apply" (config -> repo) and "prepare" (repo -> config) steps.
+ * A component responsible for "apply" (config -> repo) and "prepare" (repo -> config) steps for all those config
+ * elements that does not map directly to a model and some extra processing is needed.
  * 
  * @author cstamas
  */
@@ -28,13 +29,13 @@ import org.sonatype.plugin.ExtensionPoint;
 public interface Configurator
 {
     /**
-     * Will apply the configuration parameters from repo model to the repository.
+     * Will apply the configuration parameters from coreConfiguratuin to the target.
      */
     void applyConfiguration( Object target, ApplicationConfiguration configuration, CoreConfiguration coreConfiguration )
         throws ConfigurationException;
 
     /**
-     * Will prepare repo model for save, by syncing it with repository state (if needed).
+     * Will prepare model for save, by syncing it with target state (if needed).
      */
-    void prepareForSave( Object repository, ApplicationConfiguration configuration, CoreConfiguration coreConfiguration );
+    void prepareForSave( Object target, ApplicationConfiguration configuration, CoreConfiguration coreConfiguration );
 }

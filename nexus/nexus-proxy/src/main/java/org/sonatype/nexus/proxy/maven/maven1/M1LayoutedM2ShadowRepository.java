@@ -15,10 +15,12 @@ package org.sonatype.nexus.proxy.maven.maven1;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.artifact.GavCalculator;
-import org.sonatype.nexus.configuration.Configurator;
-import org.sonatype.nexus.configuration.Validator;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
+import org.sonatype.nexus.configuration.Configurator;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -41,13 +43,22 @@ public class M1LayoutedM2ShadowRepository
     @Requirement
     private M1LayoutedM2ShadowRepositoryConfigurator m1LayoutedM2ShadowRepositoryConfigurator;
 
-    @Requirement
-    private M1LayoutedM2ShadowRepositoryValidator m1LayoutedM2ShadowRepositoryValidator;
+    @Override
+    public M1LayoutedM2ShadowRepositoryConfiguration getExternalConfiguration( boolean forWrite )
+    {
+        return (M1LayoutedM2ShadowRepositoryConfiguration) super.getExternalConfiguration( forWrite );
+    }
 
     @Override
-    public M1LayoutedM2ShadowRepositoryConfiguration getExternalConfiguration()
+    protected CRepositoryExternalConfigurationHolderFactory<M1LayoutedM2ShadowRepositoryConfiguration> getExternalConfigurationHolderFactory()
     {
-        return (M1LayoutedM2ShadowRepositoryConfiguration) super.getExternalConfiguration();
+        return new CRepositoryExternalConfigurationHolderFactory<M1LayoutedM2ShadowRepositoryConfiguration>()
+        {
+            public M1LayoutedM2ShadowRepositoryConfiguration createExternalConfigurationHolder( CRepository config )
+            {
+                return new M1LayoutedM2ShadowRepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
+            }
+        };
     }
 
     public GavCalculator getGavCalculator()
@@ -69,12 +80,6 @@ public class M1LayoutedM2ShadowRepository
     protected Configurator getConfigurator()
     {
         return m1LayoutedM2ShadowRepositoryConfigurator;
-    }
-
-    @Override
-    public Validator getValidator()
-    {
-        return m1LayoutedM2ShadowRepositoryValidator;
     }
 
     protected String transformMaster2Shadow( String path )

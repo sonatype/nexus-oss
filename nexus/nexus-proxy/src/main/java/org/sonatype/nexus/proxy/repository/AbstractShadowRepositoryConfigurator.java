@@ -14,9 +14,8 @@
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
@@ -27,15 +26,16 @@ public abstract class AbstractShadowRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {
     @Override
-    public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration, CRepository repo,
-        ExternalConfiguration externalConfiguration )
+    public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
+                                      CRepositoryCoreConfiguration coreConfig )
         throws ConfigurationException
     {
-        super.doApplyConfiguration( repository, configuration, repo, externalConfiguration );
+        super.doApplyConfiguration( repository, configuration, coreConfig );
 
         ShadowRepository shadowRepository = repository.adaptToFacet( ShadowRepository.class );
 
-        AbstractShadowRepositoryConfiguration extConf = (AbstractShadowRepositoryConfiguration) externalConfiguration;
+        AbstractShadowRepositoryConfiguration extConf =
+            (AbstractShadowRepositoryConfiguration) coreConfig.getExternalConfiguration().getConfiguration( false );
 
         try
         {
@@ -43,10 +43,9 @@ public abstract class AbstractShadowRepositoryConfigurator
         }
         catch ( IncompatibleMasterRepositoryException e )
         {
-            ValidationMessage message = new ValidationMessage(
-                "shadowOf",
-                e.getMessage(),
-                "The source nexus repository is of an invalid Format." );
+            ValidationMessage message =
+                new ValidationMessage( "shadowOf", e.getMessage(),
+                                       "The source nexus repository is of an invalid Format." );
 
             ValidationResponse response = new ApplicationValidationResponse();
 
@@ -56,10 +55,8 @@ public abstract class AbstractShadowRepositoryConfigurator
         }
         catch ( NoSuchRepositoryException e )
         {
-            ValidationMessage message = new ValidationMessage(
-                "shadowOf",
-                e.getMessage(),
-                "The source nexus repository is not existing." );
+            ValidationMessage message =
+                new ValidationMessage( "shadowOf", e.getMessage(), "The source nexus repository is not existing." );
 
             ValidationResponse response = new ApplicationValidationResponse();
 

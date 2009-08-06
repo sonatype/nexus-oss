@@ -5,7 +5,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.plexus.rest.DefaultReferenceFactory;
 import org.sonatype.plexus.rest.ReferenceFactory;
 
@@ -13,18 +12,17 @@ import org.sonatype.plexus.rest.ReferenceFactory;
 public class NexusReferenceFactory
     extends DefaultReferenceFactory
 {
-
     @Requirement
-    private NexusConfiguration nexusConfiguration;
-    
+    private RestApiConfiguration restApiConfiguration;
+
     @Override
     public Reference getContextRoot( Request request )
     {
         Reference result = null;
 
-        if ( this.nexusConfiguration != null && this.nexusConfiguration.isForceBaseUrl() )
+        if ( restApiConfiguration.isForceBaseUrl() )
         {
-            result = new Reference( this.nexusConfiguration.getBaseUrl() );
+            result = new Reference( restApiConfiguration.getBaseUrl() );
         }
         else
         {

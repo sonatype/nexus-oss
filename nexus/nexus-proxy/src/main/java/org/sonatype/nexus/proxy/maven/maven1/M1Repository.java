@@ -15,12 +15,14 @@ package org.sonatype.nexus.proxy.maven.maven1;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.M1ArtifactRecognizer;
 import org.sonatype.nexus.configuration.Configurator;
-import org.sonatype.nexus.configuration.Validator;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
@@ -50,13 +52,22 @@ public class M1Repository
     @Requirement
     private M1RepositoryConfigurator m1RepositoryConfigurator;
 
-    @Requirement
-    private M1RepositoryValidator m1RepositoryValidator;
+    @Override
+    public M1RepositoryConfiguration getExternalConfiguration( boolean forWrite )
+    {
+        return (M1RepositoryConfiguration) super.getExternalConfiguration( forWrite );
+    }
 
     @Override
-    public M1RepositoryConfiguration getExternalConfiguration()
+    protected CRepositoryExternalConfigurationHolderFactory<M1RepositoryConfiguration> getExternalConfigurationHolderFactory()
     {
-        return (M1RepositoryConfiguration) super.getExternalConfiguration();
+        return new CRepositoryExternalConfigurationHolderFactory<M1RepositoryConfiguration>()
+        {
+            public M1RepositoryConfiguration createExternalConfigurationHolder( CRepository config )
+            {
+                return new M1RepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
+            }
+        };
     }
 
     public ContentClass getRepositoryContentClass()
@@ -73,12 +84,6 @@ public class M1Repository
     protected Configurator getConfigurator()
     {
         return m1RepositoryConfigurator;
-    }
-
-    @Override
-    public Validator getValidator()
-    {
-        return m1RepositoryValidator;
     }
 
     /**

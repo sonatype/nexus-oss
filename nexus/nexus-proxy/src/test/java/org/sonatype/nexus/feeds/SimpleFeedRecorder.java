@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.timeline.TimelineFilter;
 
+@Component( role = FeedRecorder.class )
 public class SimpleFeedRecorder
     implements FeedRecorder
 
@@ -68,19 +70,19 @@ public class SimpleFeedRecorder
     }
 
     public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
-        TimelineFilter filter )
+                                                TimelineFilter filter )
     {
         return Collections.emptyList();
     }
 
     public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
-        TimelineFilter filter )
+                                                            TimelineFilter filter )
     {
         return Collections.emptyList();
     }
 
     public List<NexusArtifactEvent> getNexusArtifactEvents( Set<String> subtypes, Long ts, Integer count,
-        TimelineFilter filter )
+                                                            TimelineFilter filter )
     {
         return Collections.emptyList();
     }
@@ -91,13 +93,13 @@ public class SimpleFeedRecorder
     }
 
     public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count,
-        TimelineFilter filter )
+                                                      TimelineFilter filter )
     {
         return Collections.emptyList();
     }
 
     public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Long ts, Integer count,
-        TimelineFilter filter )
+                                                      TimelineFilter filter )
     {
         return Collections.emptyList();
     }
@@ -110,12 +112,14 @@ public class SimpleFeedRecorder
     {
     }
 
-    public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter )
+    public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count,
+                                                          TimelineFilter filter )
     {
         return Collections.emptyList();
     }
 
-    public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Long ts, Integer count, TimelineFilter filter )
+    public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Long ts, Integer count,
+                                                          TimelineFilter filter )
     {
         return Collections.emptyList();
     }

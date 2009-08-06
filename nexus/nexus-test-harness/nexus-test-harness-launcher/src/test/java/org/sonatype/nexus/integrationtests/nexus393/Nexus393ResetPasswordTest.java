@@ -42,6 +42,7 @@ public class Nexus393ResetPasswordTest
         server.waitForIncomingEmail( 1000, 1 );
 
         MimeMessage[] msgs = server.getReceivedMessages();
+        Assert.assertTrue( "Expected email.", msgs != null && msgs.length > 0 );
         MimeMessage msg = msgs[0];
 
         String password = null;

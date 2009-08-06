@@ -15,9 +15,8 @@ package org.sonatype.nexus.proxy.maven;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -30,11 +29,11 @@ public abstract class AbstractMavenRepositoryConfigurator
     private ItemContentValidator checksumValidator;
 
     @Override
-    public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration, CRepository repo,
-                                      ExternalConfiguration externalConfiguration )
+    public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
+                                      CRepositoryCoreConfiguration coreConfiguration )
         throws ConfigurationException
     {
-        super.doApplyConfiguration( repository, configuration, repo, externalConfiguration );
+        super.doApplyConfiguration( repository, configuration, coreConfiguration );
 
         if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {

@@ -14,6 +14,9 @@
 package org.sonatype.nexus.proxy.maven;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.repository.AbstractShadowRepositoryConfiguration;
 
 public abstract class LayoutConverterShadowRepositoryConfiguration
@@ -23,4 +26,13 @@ public abstract class LayoutConverterShadowRepositoryConfiguration
     {
         super( configuration );
     }
+
+    @Override
+    public void validate( ApplicationConfiguration applicationConfiguration, CoreConfiguration owner )
+        throws ConfigurationException
+    {
+        // TODO Auto-generated method stub
+        super.validate( applicationConfiguration, owner );
+    }
+
 }

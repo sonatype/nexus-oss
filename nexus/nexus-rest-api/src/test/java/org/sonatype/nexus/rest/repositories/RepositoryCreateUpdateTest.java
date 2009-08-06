@@ -5,6 +5,7 @@ import junit.framework.Assert;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
@@ -19,6 +20,23 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class RepositoryCreateUpdateTest
     extends AbstractNexusTestCase
 {
+    protected Nexus nexus;
+
+    @Override
+    protected boolean loadConfigurationAtSetUp()
+    {
+        return false;
+    }
+
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        nexus = lookup( Nexus.class );
+        
+        nexus.getNexusConfiguration().setSecurityEnabled( false );
+    }
 
     public void testCreate()
         throws Exception
@@ -76,14 +94,15 @@ public class RepositoryCreateUpdateTest
         // Assert.assertEquals( "privateKey2", resultAuth2.getPrivateKey() );
         Assert.assertEquals( "username2", resultAuth2.getUsername() );
     }
-    
-    public void testUpdate() throws Exception
+
+    public void testUpdate()
+        throws Exception
     {
-        
+
         RepositoryProxyResource originalResource = this.sendAndGetResponse();
-        
+
         originalResource.getRemoteStorage().setRemoteStorageUrl( "http://foo-new.com" );
-        
+
         AuthenticationSettings authSettings = originalResource.getRemoteStorage().getAuthentication();
         authSettings.setNtlmDomain( "ntlmDomain-new" );
         authSettings.setNtlmHost( "ntlmHost-new" );
@@ -106,30 +125,26 @@ public class RepositoryCreateUpdateTest
         proxyAuthSettings.setNtlmHost( "ntlmHost2-new" );
         proxyAuthSettings.setPassword( "password2-new" );
         proxyAuthSettings.setUsername( "username2-new" );
-        
-        RepositoryPlexusResource plexusResource = (RepositoryPlexusResource) this.lookup(
-            PlexusResource.class,
-            "RepositoryPlexusResource" );
-        
+
+        RepositoryPlexusResource plexusResource =
+            (RepositoryPlexusResource) this.lookup( PlexusResource.class, "RepositoryPlexusResource" );
+
         Request request = new Request();
         Response response = new Response( request );
-        
+
         request.getAttributes().put( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY, originalResource.getId() );
-        
+
         RepositoryResourceResponse repoRequest = new RepositoryResourceResponse();
         repoRequest.setData( originalResource );
-        
-        RepositoryResourceResponse repoResponse = (RepositoryResourceResponse) plexusResource.put(
-            null,
-            request,
-            response,
-            repoRequest );
+
+        RepositoryResourceResponse repoResponse =
+            (RepositoryResourceResponse) plexusResource.put( null, request, response, repoRequest );
         RepositoryProxyResource result = (RepositoryProxyResource) repoResponse.getData();
-        
+
         //
         // now check
         //
-        
+
         Assert.assertEquals( "test-id", result.getId() );
         // Assert.assertEquals( true, result.isAllowWrite() );
         Assert.assertEquals( 2, result.getArtifactMaxAge() );
@@ -176,10 +191,11 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER, resultAuth2.getPassword() );
         // Assert.assertEquals( "privateKey2-new", resultAuth2.getPrivateKey() );
         Assert.assertEquals( "username2-new", resultAuth2.getUsername() );
-        
+
     }
 
-    private RepositoryProxyResource sendAndGetResponse() throws Exception
+    private RepositoryProxyResource sendAndGetResponse()
+        throws Exception
     {
         RepositoryResourceResponse repoRequest = new RepositoryResourceResponse();
 
@@ -233,26 +249,23 @@ public class RepositoryCreateUpdateTest
         proxyAuthSettings.setPassword( "password2" );
         proxyAuthSettings.setUsername( "username2" );
 
-        RepositoryListPlexusResource plexusResource = (RepositoryListPlexusResource) this.lookup(
-            PlexusResource.class,
-            "RepositoryListPlexusResource" );
-        
+        RepositoryListPlexusResource plexusResource =
+            (RepositoryListPlexusResource) this.lookup( PlexusResource.class, "RepositoryListPlexusResource" );
+
         Request request = new Request();
         Response response = new Response( request );
-        
-        RepositoryResourceResponse repoResponse = (RepositoryResourceResponse) plexusResource.post(
-            null,
-            request,
-            response,
-            repoRequest );
+
+        RepositoryResourceResponse repoResponse =
+            (RepositoryResourceResponse) plexusResource.post( null, request, response, repoRequest );
         RepositoryProxyResource result = (RepositoryProxyResource) repoResponse.getData();
 
         return result;
     }
-    
-    public void testCreateAuthNoProxy() throws Exception
+
+    public void testCreateAuthNoProxy()
+        throws Exception
     {
-        
+
         RepositoryResourceResponse repoRequest = new RepositoryResourceResponse();
 
         RepositoryProxyResource repositoryResource = new RepositoryProxyResource();
@@ -278,48 +291,43 @@ public class RepositoryCreateUpdateTest
         repositoryResource.setRemoteStorage( remoteStorage );
 
         remoteStorage.setRemoteStorageUrl( "http://foo.com" );
-        
+
         AuthenticationSettings authSettings = new AuthenticationSettings();
         remoteStorage.setAuthentication( authSettings );
         authSettings.setNtlmDomain( "ntlmDomain" );
         authSettings.setNtlmHost( "ntlmHost" );
         authSettings.setPassword( "password" );
         authSettings.setUsername( "username" );
-        
-        RepositoryListPlexusResource plexusResource = (RepositoryListPlexusResource) this.lookup(
-            PlexusResource.class,
-            "RepositoryListPlexusResource" );
-        
+
+        RepositoryListPlexusResource plexusResource =
+            (RepositoryListPlexusResource) this.lookup( PlexusResource.class, "RepositoryListPlexusResource" );
+
         Request request = new Request();
         Response response = new Response( request );
-        
-        RepositoryResourceResponse repoResponse = (RepositoryResourceResponse) plexusResource.post(
-            null,
-            request,
-            response,
-            repoRequest );
+
+        RepositoryResourceResponse repoResponse =
+            (RepositoryResourceResponse) plexusResource.post( null, request, response, repoRequest );
         RepositoryProxyResource result = (RepositoryProxyResource) repoResponse.getData();
-        
+
         // 
         // make sure proxy is null
         //
-        
+
         Assert.assertNull( result.getRemoteStorage().getHttpProxySettings() );
-        
+
         // now do an update and test again
-        RepositoryPlexusResource updateResource = (RepositoryPlexusResource) this.lookup(
-            PlexusResource.class,
-            "RepositoryPlexusResource" );
-        
+        RepositoryPlexusResource updateResource =
+            (RepositoryPlexusResource) this.lookup( PlexusResource.class, "RepositoryPlexusResource" );
+
         request.getAttributes().put( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY, result.getId() );
-        
+
         repoResponse = (RepositoryResourceResponse) updateResource.put( null, request, response, repoResponse );
         result = (RepositoryProxyResource) repoResponse.getData();
-        
+
         // 
         // make sure proxy is null
         //
-        
+
         Assert.assertNull( result.getRemoteStorage().getHttpProxySettings() );
     }
 

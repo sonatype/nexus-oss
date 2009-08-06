@@ -69,9 +69,9 @@ public abstract class AbstractMavenRepository
     private ArtifactStoreHelper artifactStoreHelper;
 
     @Override
-    protected AbstractMavenRepositoryConfiguration getExternalConfiguration()
+    protected AbstractMavenRepositoryConfiguration getExternalConfiguration( boolean forModification )
     {
-        return (AbstractMavenRepositoryConfiguration) super.getExternalConfiguration();
+        return (AbstractMavenRepositoryConfiguration) super.getExternalConfiguration( forModification );
     }
 
     public ArtifactStoreHelper getArtifactStoreHelper()
@@ -150,8 +150,8 @@ public abstract class AbstractMavenRepository
             if ( !this.getLocalStorage().containsItem( this, request ) )
             {
                 getLogger().info(
-                    "Skip rebuilding Maven2 Metadata in repository ID='" + getId()
-                        + "' because it does not contain path='" + request.getRequestPath() + "'." );
+                                  "Skip rebuilding Maven2 Metadata in repository ID='" + getId()
+                                      + "' because it does not contain path='" + request.getRequestPath() + "'." );
 
                 return false;
             }
@@ -164,8 +164,8 @@ public abstract class AbstractMavenRepository
         }
 
         getLogger().info(
-            "Recreating Maven2 metadata in repository ID='" + getId() + "' from path='" + request.getRequestPath()
-                + "'" );
+                          "Recreating Maven2 metadata in repository ID='" + getId() + "' from path='"
+                              + request.getRequestPath() + "'" );
 
         return doRecreateMavenMetadata( request );
     }
@@ -199,7 +199,7 @@ public abstract class AbstractMavenRepository
 
     public boolean isDownloadRemoteIndexes()
     {
-        return getExternalConfiguration().isDownloadRemoteIndex();
+        return getExternalConfiguration( false ).isDownloadRemoteIndex();
     }
 
     public void setDownloadRemoteIndexes( boolean downloadRemoteIndexes )
@@ -207,7 +207,7 @@ public abstract class AbstractMavenRepository
         boolean oldValue = isDownloadRemoteIndexes();
         boolean newValue = downloadRemoteIndexes;
         
-        getExternalConfiguration().setDownloadRemoteIndex( downloadRemoteIndexes );
+        getExternalConfiguration( true ).setDownloadRemoteIndex( downloadRemoteIndexes );
         
         getApplicationEventMulticaster().notifyEventListeners(
             new RepositoryEventDownloadRemoteIndexChanged( this, oldValue, newValue ) );
@@ -215,52 +215,52 @@ public abstract class AbstractMavenRepository
 
     public RepositoryPolicy getRepositoryPolicy()
     {
-        return getExternalConfiguration().getRepositoryPolicy();
+        return getExternalConfiguration( false ).getRepositoryPolicy();
     }
 
     public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
     {
-        getExternalConfiguration().setRepositoryPolicy( repositoryPolicy );
+        getExternalConfiguration( true ).setRepositoryPolicy( repositoryPolicy );
     }
 
     public boolean isCleanseRepositoryMetadata()
     {
-        return getExternalConfiguration().isCleanseRepositoryMetadata();
+        return getExternalConfiguration( false ).isCleanseRepositoryMetadata();
     }
 
     public void setCleanseRepositoryMetadata( boolean cleanseRepositoryMetadata )
     {
-        getExternalConfiguration().setCleanseRepositoryMetadata( cleanseRepositoryMetadata );
+        getExternalConfiguration( true ).setCleanseRepositoryMetadata( cleanseRepositoryMetadata );
     }
 
     public ChecksumPolicy getChecksumPolicy()
     {
-        return getExternalConfiguration().getChecksumPolicy();
+        return getExternalConfiguration( false ).getChecksumPolicy();
     }
 
     public void setChecksumPolicy( ChecksumPolicy checksumPolicy )
     {
-        getExternalConfiguration().setChecksumPolicy( checksumPolicy );
+        getExternalConfiguration( true ).setChecksumPolicy( checksumPolicy );
     }
 
     public int getArtifactMaxAge()
     {
-        return getExternalConfiguration().getArtifactMaxAge();
+        return getExternalConfiguration( false ).getArtifactMaxAge();
     }
 
     public void setArtifactMaxAge( int maxAge )
     {
-        getExternalConfiguration().setArtifactMaxAge( maxAge );
+        getExternalConfiguration( true ).setArtifactMaxAge( maxAge );
     }
 
     public int getMetadataMaxAge()
     {
-        return getExternalConfiguration().getMetadataMaxAge();
+        return getExternalConfiguration( false ).getMetadataMaxAge();
     }
 
     public void setMetadataMaxAge( int metadataMaxAge )
     {
-        getExternalConfiguration().setMetadataMaxAge( metadataMaxAge );
+        getExternalConfiguration( true ).setMetadataMaxAge( metadataMaxAge );
     }
 
     public abstract boolean shouldServeByPolicies( ResourceStoreRequest request );

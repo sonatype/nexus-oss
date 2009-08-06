@@ -30,10 +30,12 @@ import org.apache.maven.mercury.repository.metadata.MetadataOperand;
 import org.apache.maven.mercury.repository.metadata.MetadataOperation;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.configuration.Configurator;
-import org.sonatype.nexus.configuration.Validator;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -69,13 +71,22 @@ public class M2GroupRepository
     @Requirement
     private M2GroupRepositoryConfigurator m2GroupRepositoryConfigurator;
 
-    @Requirement
-    private M2GroupRepositoryValidator m2GroupRepositoryValidator;
+    @Override
+    protected M2GroupRepositoryConfiguration getExternalConfiguration( boolean forWrite )
+    {
+        return (M2GroupRepositoryConfiguration) super.getExternalConfiguration( forWrite );
+    }
 
     @Override
-    protected M2GroupRepositoryConfiguration getExternalConfiguration()
+    protected CRepositoryExternalConfigurationHolderFactory<M2GroupRepositoryConfiguration> getExternalConfigurationHolderFactory()
     {
-        return (M2GroupRepositoryConfiguration) super.getExternalConfiguration();
+        return new CRepositoryExternalConfigurationHolderFactory<M2GroupRepositoryConfiguration>()
+        {
+            public M2GroupRepositoryConfiguration createExternalConfigurationHolder( CRepository config )
+            {
+                return new M2GroupRepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
+            }
+        };
     }
 
     public ContentClass getRepositoryContentClass()
@@ -92,12 +103,6 @@ public class M2GroupRepository
     protected Configurator getConfigurator()
     {
         return m2GroupRepositoryConfigurator;
-    }
-
-    @Override
-    public Validator getValidator()
-    {
-        return m2GroupRepositoryValidator;
     }
 
     @Override

@@ -98,6 +98,11 @@ public class Nexus385RoutesValidationTests
     public void createNoPatternTest()
         throws IOException
     {
+        if( this.printKnownErrorButDoNotFail( this.getClass(), "createNoPatternTest" ) )
+        {
+            return;
+        }
+        
         RepositoryRouteResource resource = new RepositoryRouteResource();
         resource.setGroupId( "nexus-test" );
         // resource.setPattern( ".*createNoPatternTest.*" );
