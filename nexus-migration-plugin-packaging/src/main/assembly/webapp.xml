@@ -33,13 +33,6 @@
         <include>org.sonatype.nexus.plugins:nexus-migration-plugin-configuration</include>
       </includes>
     </dependencySet>
-    <dependencySet>
-      <unpack>false</unpack>
-      <outputDirectory>runtime/apps/nexus/lib</outputDirectory>
-      <includes>
-        <include>org.sonatype.nexus.plugins:nexus-migration-plugin-artifactory-bridge</include>
-      </includes>
-    </dependencySet>
   </dependencySets>
 
 </assembly>

@@ -632,12 +632,22 @@ public class DefaultArtifactoryMigrator
             {
                 repoType = "maven1";
             }
+            else
+            {
+                group.setType( "maven2" );
+            }
 
             List<String> repositoriesIds = new ArrayList<String>();
 
             for ( final String repoId : virtualRepo.getResolvedRepositories() )
             {
                 RepositoryResolutionDTO repoResolution = result.getMigrationSummary().getRepositoryResolution( repoId );
+
+                if ( repoResolution == null )
+                {
+                    // will happen if the user decide to not import any repo
+                    continue;
+                }
 
                 if ( ERepositoryType.PROXY.equals( repoResolution.getType() )
                     && repoResolution.isMergeSimilarRepository() )

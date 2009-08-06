@@ -267,6 +267,7 @@ public class ArtifactoryFileLocationPlexusResource
             if ( nexusRepo != null )
             {
                 resolution.setAlreadyExists( true );
+                resolution.setImport( false );
             }
             else
             {

@@ -45,7 +45,8 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
         mapping: 'isMixed',
         convert: function( v, rec ) { return v ? rec.repositoryTypeResolution.toLowerCase().replace( /_/g, ' ' ) : ''; }
       },
-      { name: 'isImport', type: 'bool', defaultValue: true }
+      { name: 'isImport', type: 'bool', defaultValue: true },
+      { name: 'alreadyExists' }
     ]
   } );
 
@@ -73,7 +74,8 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
         mapping: 'isMixed',
         convert: function( v, rec ) { return v ? rec.mixResolution.toLowerCase().replace( /_/g, ' ' ) : ''; }
       },
-      { name: 'isImport', type: 'bool', defaultValue: true }
+      { name: 'isImport', type: 'bool', defaultValue: true },
+      { name: 'alreadyExists' }
     ]
   } );
 
@@ -100,7 +102,32 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
   var repoImportColumn = new Ext.grid.CheckColumn( {
     header: 'Import',
     dataIndex: 'isImport',
-    width: 45
+    width: 45,
+    onMouseDown : function(e, t)
+    {
+      if (t.className && t.className.indexOf('x-grid3-cc-'+this.id) != -1)
+      {
+        e.stopEvent();
+    
+        var index = this.grid.getView().findRowIndex(t);
+        var record = this.grid.store.getAt(index);
+    
+        var alreadyExists = record.data.alreadyExists;
+    
+        if ( alreadyExists ) {
+          var repoId  = record.data.repositoryId;
+          
+          Sonatype.MessageBox.show( {
+            title: 'Unable to import "' + repoId + '"',
+            msg: 'A repository with the same ID already exists!',
+            buttons: Sonatype.MessageBox.OK,
+            icon: Sonatype.MessageBox.WARNING
+          } );
+        } else {
+          record.set(this.dataIndex, !record.data[this.dataIndex]);        
+        }
+      }
+    } 
   } );
 
   var mapUrlsColumn = new Ext.grid.CheckColumn( {
@@ -145,6 +172,59 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
     width: 45
   } );
   
+  this.repositoryGrid = new Ext.grid.EditorGridPanel( {
+    xtype: 'editorgrid',
+    title: 'Repositories',
+    region: 'center',
+    frame: true,
+    ds: this.repoStore,
+    sortInfo: { field: 'repositoryId', direction: 'asc' },
+    loadMask: true,
+    deferredRender: true,
+    clicksToEdit: 1,
+    plugins: [ repoImportColumn, mapUrlsColumn, copyCachedArtifactsColumn, mergeWithColumn ],
+    columns: [
+      repoImportColumn,
+      { header: 'Repository ID', dataIndex: 'repositoryId', width: 200 },
+      { header: 'Type', dataIndex: 'displayType', width: 55 },
+      mapUrlsColumn,
+      copyCachedArtifactsColumn,
+      { 
+        header: 'Releases/Snapshots', 
+        dataIndex: 'displayMixedResolution', 
+        width: 120, 
+        editor: new Ext.form.ComboBox( {
+          typeAhead: true,
+          forceSelection: true,
+          selectOnFocus: true,
+          triggerAction: 'all',
+          store: mixResolutionStore,
+          mode: 'local',
+          displayField: 'value',
+          valueField: 'value',
+          lazyRender: true,
+          listClass: 'x-combo-list-small'
+        } )
+      },
+      mergeWithColumn
+    ],
+    listeners: {
+      beforeedit: function( e ) {
+          var rec = e.record;
+          var alreadyExists = rec.data.alreadyExists;
+          if( alreadyExists ) {
+              return false;
+          }
+
+        return e.value != '';
+      },
+      scope: this
+    },
+    tools: [
+      { id: 'help', qtip: 'List of repositories to be imported.  Uncheck "Import" flag to prevent the repository from being imported.', handler: function(){ } }
+    ]
+  } );
+  
   this.formPanel = new Ext.form.FormPanel( {
     region: 'center',
     trackResetOnLoad: true,
@@ -163,9 +243,10 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
       {
         style: 'padding: 10px;',
         cls: 'x-form-item',
-        html: 'The Artifactory Import is used to import an existing Artifactory configuration into Nexus.<br/><br/>' +
-          'In order to proceed, you will first place a .zip file with an Artifactory configuration backup to the server where Nexus is running.<br>' +
-          'Once the file is on the Nexus server, you will specify its location in Step 1. Load Artifactory Configuration, and then you will be presented with a list of available repositories and import options, which is customizable in Step 2. Customize Import on Artifactory Import.'
+        html: 'The Artifactory Import is used to import an existing Artifactory System Export into Nexus.  It is tested against Artifactory 1.2.5 and 2.0.6, but it should be compatible with other versions.<br/><br/>' +
+          '1 - Create an Artifactory "Entire System Export", the same used to migrate between Artifactory versions.  It can be zipped or not, both are supported.  The options "Include metadata" and "Create a .m2 compatible export" aren\'t relevant<br>' +
+          '2 - Place this System Export on the server where Nexus is running.<br>' +
+          '3 - Specify its location in Step 1. Load Artifactory Configuration, and then you will be presented with a list of available repositories and import options, which is customizable in Step 2. Customize Import on Artifactory Import.'
       },
       { 
         xtype: 'panel',
@@ -186,7 +267,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
               {
                 style: 'padding-bottom: 10px',
                 cls: 'x-form-item',
-                html: 'Enter the path on the server to the location of your .zip file containing the Artifactory configuration backup and select "Load".'
+                html: 'Enter the path on the server to the location of your Artifactory System Export and select "Load".'
               },
               {
                 xtype: 'panel',
@@ -284,6 +365,14 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                         } )
                       }
                     ],
+                   listeners: {
+                      beforeedit: function( e ) {
+                          var rec = e.record;
+                          var alreadyExists = rec.data.alreadyExists;
+                        return !alreadyExists;
+                      },
+                      scope: this
+                    },
                     tools: [
                       { id: 'help', qtip: 'List of groups to be imported.  Uncheck "Import" flag to prevent the group from being imported.', handler: function(){ } }
                     ]
@@ -296,52 +385,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
                 autoScroll: true,
                 layout: 'border',
                 items: [
-                  {
-                    xtype: 'editorgrid',
-                    title: 'Repositories',
-                    region: 'center',
-                    frame: true,
-                    ds: this.repoStore,
-                    sortInfo: { field: 'repositoryId', direction: 'asc' },
-                    loadMask: true,
-                    deferredRender: true,
-                    clicksToEdit: 1,
-                    plugins: [ repoImportColumn, mapUrlsColumn, copyCachedArtifactsColumn, mergeWithColumn ],
-                    columns: [
-                      repoImportColumn,
-                      { header: 'Repository ID', dataIndex: 'repositoryId', width: 200 },
-                      { header: 'Type', dataIndex: 'displayType', width: 55 },
-                      mapUrlsColumn,
-                      copyCachedArtifactsColumn,
-                      { 
-                        header: 'Releases/Snapshots', 
-                        dataIndex: 'displayMixedResolution', 
-                        width: 120, 
-                        editor: new Ext.form.ComboBox( {
-                          typeAhead: true,
-                          forceSelection: true,
-                          selectOnFocus: true,
-                          triggerAction: 'all',
-                          store: mixResolutionStore,
-                          mode: 'local',
-                          displayField: 'value',
-                          valueField: 'value',
-                          lazyRender: true,
-                          listClass: 'x-combo-list-small'
-                        } )
-                      },
-                      mergeWithColumn
-                    ],
-                    listeners: {
-                      beforeedit: function( e ) {
-                        return e.value != '';
-                      },
-                      scope: this
-                    },
-                    tools: [
-                      { id: 'help', qtip: 'List of repositories to be imported.  Uncheck "Import" flag to prevent the repository from being imported.', handler: function(){ } }
-                    ]
-                  }
+                  this.repositoryGrid
                 ]
               },
               {
@@ -541,7 +585,7 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
             this.formPanel.buttons[1].setDisabled( false );
             Sonatype.MessageBox.show( {
               title: 'Import Scheduled',
-              msg: 'Artifactory backup import scheduled',
+              msg: 'Artifactory importation started.  Click on "Show Log" for details.',
               buttons: Sonatype.MessageBox.OK,
               icon: Sonatype.MessageBox.INFO
             } );

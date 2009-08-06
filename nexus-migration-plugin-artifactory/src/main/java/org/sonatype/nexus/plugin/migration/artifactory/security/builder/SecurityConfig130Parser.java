@@ -21,6 +21,7 @@ import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryPermi
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryPermissionTarget;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactorySecurityConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.security.ArtifactoryUser;
+import org.sonatype.nexus.plugin.migration.artifactory.util.DomUtil;
 import org.sonatype.nexus.plugin.migration.artifactory.util.PatternConvertor;
 
 public class SecurityConfig130Parser
@@ -180,9 +181,9 @@ public class SecurityConfig130Parser
 
         for ( Xpp3Dom groupDom : groupsDom.getChildren() )
         {
-            String name = groupDom.getChild( "groupName" ).getValue();
+            String name = DomUtil.getValue( groupDom, "groupName" );
 
-            String description = groupDom.getChild( "description" ).getValue();
+            String description = DomUtil.getValue( groupDom, "description" );
 
             getConfig().addGroup( new ArtifactoryGroup( name, description ) );
         }

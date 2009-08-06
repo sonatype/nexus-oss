@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugin.migration.artifactory.dto;
 
+import org.codehaus.plexus.util.StringUtils;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias( "groupResolution" )
@@ -42,6 +44,10 @@ public class GroupResolutionDTO
 
     public ERepositoryTypeResolution getRepositoryTypeResolution()
     {
+        if ( StringUtils.isEmpty( repositoryTypeResolution ) )
+        {
+            return null;
+        }
         return ERepositoryTypeResolution.valueOf( repositoryTypeResolution );
     }
 

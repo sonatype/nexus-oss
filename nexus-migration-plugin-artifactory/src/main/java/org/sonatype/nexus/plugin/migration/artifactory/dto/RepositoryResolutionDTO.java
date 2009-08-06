@@ -17,23 +17,25 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias( "repositoryResolution" )
 public class RepositoryResolutionDTO
 {
-    private String repositoryId;
-
-    private String type;
-
-    private boolean mapUrls = true;
+    private boolean alreadyExists;
 
     private boolean copyCachedArtifacts = true;
 
+    private boolean isImport = true;
+
     private boolean isMixed = false;
 
-    private String mixResolution = EMixResolution.BOTH.name();
-
-    private String similarRepositoryId;
+    private boolean mapUrls = true;
 
     private boolean mergeSimilarRepository = false;
 
-    private boolean alreadyExists;
+    private String mixResolution = EMixResolution.BOTH.name();
+
+    private String repositoryId;
+
+    private String similarRepositoryId;
+
+    private String type;
 
     public RepositoryResolutionDTO()
     {
@@ -50,9 +52,19 @@ public class RepositoryResolutionDTO
         return repositoryId;
     }
 
+    public String getSimilarRepositoryId()
+    {
+        return similarRepositoryId;
+    }
+
     public ERepositoryType getType()
     {
         return ERepositoryType.valueOf( this.type );
+    }
+
+    public boolean isAlreadyExists()
+    {
+        return alreadyExists;
     }
 
     public boolean isCopyCachedArtifacts()
@@ -60,9 +72,19 @@ public class RepositoryResolutionDTO
         return copyCachedArtifacts;
     }
 
+    public final boolean isImport()
+    {
+        return isImport;
+    }
+
     public boolean isMapUrls()
     {
         return mapUrls;
+    }
+
+    public boolean isMergeSimilarRepository()
+    {
+        return mergeSimilarRepository;
     }
 
     public boolean isMixed()
@@ -70,14 +92,29 @@ public class RepositoryResolutionDTO
         return isMixed;
     }
 
+    public void setAlreadyExists( boolean alreadyExists )
+    {
+        this.alreadyExists = alreadyExists;
+    }
+
     public void setCopyCachedArtifacts( boolean copyCachedArtifacts )
     {
         this.copyCachedArtifacts = copyCachedArtifacts;
     }
 
+    public final void setImport( boolean isImport )
+    {
+        this.isImport = isImport;
+    }
+
     public void setMapUrls( boolean mapUrls )
     {
         this.mapUrls = mapUrls;
+    }
+
+    public void setMergeSimilarRepository( boolean mergeSimilarRepository )
+    {
+        this.mergeSimilarRepository = mergeSimilarRepository;
     }
 
     public void setMixed( boolean isMixed )
@@ -95,39 +132,14 @@ public class RepositoryResolutionDTO
         this.repositoryId = repositoryId;
     }
 
-    public void setType( ERepositoryType type )
-    {
-        this.type = type.name();
-    }
-
-    public String getSimilarRepositoryId()
-    {
-        return similarRepositoryId;
-    }
-
     public void setSimilarRepositoryId( String similarRepositoryId )
     {
         this.similarRepositoryId = similarRepositoryId;
     }
 
-    public boolean isMergeSimilarRepository()
+    public void setType( ERepositoryType type )
     {
-        return mergeSimilarRepository;
-    }
-
-    public void setMergeSimilarRepository( boolean mergeSimilarRepository )
-    {
-        this.mergeSimilarRepository = mergeSimilarRepository;
-    }
-
-    public void setAlreadyExists( boolean alreadyExists )
-    {
-        this.alreadyExists = alreadyExists;
-    }
-
-    public boolean isAlreadyExists()
-    {
-        return alreadyExists;
+        this.type = type.name();
     }
 
 }
