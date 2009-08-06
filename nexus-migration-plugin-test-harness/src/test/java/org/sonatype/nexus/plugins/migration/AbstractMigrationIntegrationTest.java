@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.After;
 import org.junit.Assert;
@@ -71,6 +72,11 @@ public abstract class AbstractMigrationIntegrationTest
         TestContainer.getInstance().getTestContext().setSecureTest( false );
 
         cleanWorkDir();
+        File logFile = new File( "./target/logs/migration.log" );
+        if ( logFile.isFile() )
+        {
+            FileUtils.forceDelete( logFile );
+        }
     }
 
     protected <E> void assertContains( ArrayList<E> collection, E item )
