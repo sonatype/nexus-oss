@@ -23,6 +23,7 @@ import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.scheduling.SchedulerTask;
 
 public class DefaultErrorReportingManagerTest
@@ -140,8 +141,8 @@ public class DefaultErrorReportingManagerTest
         IssueSubmissionRequest subRequest = manager.buildRequest( config, request );
         
         assertEquals( "NEXUS", subRequest.getProjectId() );
-        assertEquals( "Automated Problem Report: Test exception", subRequest.getSummary() );
-        assertEquals( "The following exception occurred: " + System.getProperty( "line.seperator" )
+        assertEquals( "APR: Test exception", subRequest.getSummary() );
+        assertEquals( "The following exception occurred: " + StringDigester.LINE_SEPERATOR
             + ExceptionUtils.getFullStackTrace( exception ), subRequest.getDescription() );
         assertNotNull( subRequest.getProblemReportBundle() );
         
