@@ -84,6 +84,8 @@ public class ReindexTest
         central.setDownloadRemoteIndexes( true );
 
         nexusConfiguration.saveConfiguration();
+        
+        waitForTasksToStop();
     }
 
     protected File getIndexFamilyDirectory( String path )

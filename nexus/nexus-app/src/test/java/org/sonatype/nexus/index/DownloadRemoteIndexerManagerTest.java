@@ -89,6 +89,8 @@ public class DownloadRemoteIndexerManagerTest
         central.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
 
         nexusConfiguration.saveConfiguration();
+        
+        waitForTasksToStop();
     }
 
     @Override

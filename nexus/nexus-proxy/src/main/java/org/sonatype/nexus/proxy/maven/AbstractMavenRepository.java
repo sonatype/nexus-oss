@@ -26,6 +26,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.RepositoryEventDownloadRemoteIndexChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateMavenMetadata;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -203,7 +204,13 @@ public abstract class AbstractMavenRepository
 
     public void setDownloadRemoteIndexes( boolean downloadRemoteIndexes )
     {
+        boolean oldValue = isDownloadRemoteIndexes();
+        boolean newValue = downloadRemoteIndexes;
+        
         getExternalConfiguration().setDownloadRemoteIndex( downloadRemoteIndexes );
+        
+        getApplicationEventMulticaster().notifyEventListeners(
+            new RepositoryEventDownloadRemoteIndexChanged( this, oldValue, newValue ) );
     }
 
     public RepositoryPolicy getRepositoryPolicy()

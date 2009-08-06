@@ -30,10 +30,13 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.index.context.IndexCreator;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
+    private NexusScheduler nexusScheduler;
+    
     protected static final String PROXY_SERVER_PORT = "proxy.server.port";
 
     public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
@@ -153,6 +156,8 @@ public abstract class AbstractNexusTestCase
     protected void setUp()
         throws Exception
     {
+        nexusScheduler = lookup( NexusScheduler.class );
+        
         FileUtils.deleteDirectory( PLEXUS_HOME );
 
         PLEXUS_HOME.mkdirs();
@@ -199,6 +204,15 @@ public abstract class AbstractNexusTestCase
         super.tearDown();
 
         FileUtils.deleteDirectory( PLEXUS_HOME );
+    }
+    
+    protected void waitForTasksToStop()
+        throws Exception
+    {
+        while ( nexusScheduler.getActiveTasks().size() > 0 )
+        {
+            Thread.sleep( 100 );
+        }
     }
 
     protected LoggerManager getLoggerManager()
