@@ -24,6 +24,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.RemoteSettingsUtil;
+import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
@@ -289,15 +290,6 @@ public class RepositoryPlexusResource
         
         try
         {
-            //Can't mess with nexus-managed repos
-            //NOTE
-            //this should be in app logic, but dropping staging repositories
-            //should be allowed, so need to figure some way to handle both cases
-            if ( !getRepositoryRegistry().getRepository( repoId ).isUserManaged() )
-            {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Not Found" );
-            }
-            
             getNexus().deleteRepository( repoId );
 
             response.setStatus( Status.SUCCESS_NO_CONTENT );
@@ -326,6 +318,13 @@ public class RepositoryPlexusResource
             getLogger().warn( "Got IO Exception!", e );
 
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+        }
+        catch ( AccessDeniedException e )
+        {
+            getLogger().warn( "Not allowed to delete repository '" + repoId + "'", e );
+
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Not allowed to delete repository '" + repoId
+                + "'" );
         }
     }
 

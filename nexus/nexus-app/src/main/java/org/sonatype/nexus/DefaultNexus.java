@@ -76,8 +76,8 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
+import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
 import org.sonatype.nexus.templates.TemplateManager;
@@ -302,9 +302,26 @@ public class DefaultNexus
     }
 
     public void deleteRepository( String id )
-        throws NoSuchRepositoryException, IOException, ConfigurationException
+        throws NoSuchRepositoryException,
+            IOException,
+            ConfigurationException,
+            AccessDeniedException
+    {
+        deleteRepository( id, false );
+    }
+
+    public void deleteRepository( String id, boolean force )
+        throws NoSuchRepositoryException,
+            IOException,
+            ConfigurationException,
+            AccessDeniedException
     {
         Repository repository = repositoryRegistry.getRepository( id );
+
+        if ( !force && !repository.isUserManaged() )
+        {
+            throw new AccessDeniedException( "Not allowed to delete non-user-managed repository '" + id + "'." );
+        }
 
         // remove the storage folders for the repository
         DeleteRepositoryFoldersTask task = nexusScheduler.createTaskInstance( DeleteRepositoryFoldersTask.class );

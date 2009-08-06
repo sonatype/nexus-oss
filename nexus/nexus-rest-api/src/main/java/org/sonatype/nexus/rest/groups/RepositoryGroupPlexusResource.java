@@ -24,6 +24,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.rest.NexusCompat;
@@ -229,6 +230,13 @@ public class RepositoryGroupPlexusResource
             getLogger().warn( "Got IO Exception!", e );
 
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+        }
+        catch ( AccessDeniedException e )
+        {
+            getLogger().warn( "Not allowed to delete Repository Group '" + getGroupId( request ) + "'", e );
+
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Not allowed to delete Repository Group '"
+                + getGroupId( request ) + "'" );
         }
     }
 

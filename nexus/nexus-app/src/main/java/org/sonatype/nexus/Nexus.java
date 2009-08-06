@@ -79,9 +79,38 @@ public interface Nexus
     public Repository createRepository( CRepository settings )
         throws ConfigurationException, IOException;
 
+    /**
+     * Delete a user managed repository
+     * 
+     * @param id
+     * @throws NoSuchRepositoryException
+     * @throws IOException
+     * @throws ConfigurationException
+     * @throws AccessDeniedException
+     * @see #deleteRepository(String, boolean)
+     */
     public void deleteRepository( String id )
-        throws NoSuchRepositoryException, IOException, ConfigurationException;
+        throws NoSuchRepositoryException,
+            IOException,
+            ConfigurationException,
+            AccessDeniedException;
 
+    /**
+     * Delete a repository, can only delete user managed repository unless force == true
+     * 
+     * @param id
+     * @param force
+     * @throws NoSuchRepositoryException
+     * @throws IOException
+     * @throws ConfigurationException
+     * @throws AccessDeniedException when try to delete a non-user-managed repository and without force enabled
+     */
+    public void deleteRepository( String id, boolean force )
+        throws NoSuchRepositoryException,
+            IOException,
+            ConfigurationException,
+            AccessDeniedException;
+    
     // ----------------------------------------------------------------------------
     // Maintenance
     // ----------------------------------------------------------------------------
