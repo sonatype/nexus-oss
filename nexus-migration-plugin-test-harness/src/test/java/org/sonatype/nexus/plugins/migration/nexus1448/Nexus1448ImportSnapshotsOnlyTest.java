@@ -14,7 +14,7 @@ public class Nexus1448ImportSnapshotsOnlyTest
         throws Exception
     {
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
-        RepositoryResolutionDTO mainLocal = migrationSummary.getRepositoriesResolution().get( 0 );
+        RepositoryResolutionDTO mainLocal = migrationSummary.getRepositoriesResolutions().get( 0 );
         mainLocal.setMixResolution( EMixResolution.SNAPSHOTS_ONLY );
         commitMigration( migrationSummary );
 

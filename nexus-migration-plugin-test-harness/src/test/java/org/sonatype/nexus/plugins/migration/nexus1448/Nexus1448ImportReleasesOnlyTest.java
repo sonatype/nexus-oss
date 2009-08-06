@@ -14,7 +14,7 @@ extends AbstractMigrationIntegrationTest
         throws Exception
     {
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
-        RepositoryResolutionDTO mainLocal = migrationSummary.getRepositoriesResolution().get( 0 );
+        RepositoryResolutionDTO mainLocal = migrationSummary.getRepositoriesResolutions().get( 0 );
         mainLocal.setMixResolution( EMixResolution.RELEASES_ONLY );
         commitMigration( migrationSummary );
 

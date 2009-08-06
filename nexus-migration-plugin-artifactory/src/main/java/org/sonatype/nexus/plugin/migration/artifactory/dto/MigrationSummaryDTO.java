@@ -28,7 +28,7 @@ public class MigrationSummaryDTO
 
     private boolean resolvePermission;
 
-    private List<RepositoryResolutionDTO> repositoriesResolution;
+    private List<RepositoryResolutionDTO> repositoriesResolutions;
 
     private List<GroupResolutionDTO> groupsResolution;
 
@@ -39,18 +39,18 @@ public class MigrationSummaryDTO
         super();
     }
 
-    public List<RepositoryResolutionDTO> getRepositoriesResolution()
+    public List<RepositoryResolutionDTO> getRepositoriesResolutions()
     {
-        if ( repositoriesResolution == null )
+        if ( repositoriesResolutions == null )
         {
-            repositoriesResolution = new ArrayList<RepositoryResolutionDTO>();
+            repositoriesResolutions = new ArrayList<RepositoryResolutionDTO>();
         }
-        return repositoriesResolution;
+        return repositoriesResolutions;
     }
 
-    public void setRepositoriesResolution( List<RepositoryResolutionDTO> repositoriesResolution )
+    public void setRepositoriesResolutions( List<RepositoryResolutionDTO> repositoriesResolution )
     {
-        this.repositoriesResolution = repositoriesResolution;
+        this.repositoriesResolutions = repositoriesResolution;
     }
 
     public String getBackupLocation()
@@ -108,7 +108,7 @@ public class MigrationSummaryDTO
             return null;
         }
 
-        for ( RepositoryResolutionDTO resolution : getRepositoriesResolution() )
+        for ( RepositoryResolutionDTO resolution : getRepositoriesResolutions() )
         {
             if ( repoId.equals( resolution.getRepositoryId() ) )
             {

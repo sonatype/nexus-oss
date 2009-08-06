@@ -72,7 +72,7 @@ public class RepositoryResolutionDTO
         return copyCachedArtifacts;
     }
 
-    public final boolean isImport()
+    public boolean isImport()
     {
         return isImport;
     }
@@ -102,7 +102,7 @@ public class RepositoryResolutionDTO
         this.copyCachedArtifacts = copyCachedArtifacts;
     }
 
-    public final void setImport( boolean isImport )
+    public void setImport( boolean isImport )
     {
         this.isImport = isImport;
     }

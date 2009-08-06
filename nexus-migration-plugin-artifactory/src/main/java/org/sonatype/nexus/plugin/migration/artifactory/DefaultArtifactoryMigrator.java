@@ -336,7 +336,7 @@ public class DefaultArtifactoryMigrator
 
         final Map<String, ArtifactoryRepository> artifactoryRepositories = cfg.getRepositories();
         final Map<String, ArtifactoryProxy> artifactoryProxies = cfg.getProxies();
-        final List<RepositoryResolutionDTO> repositories = result.getMigrationSummary().getRepositoriesResolution();
+        final List<RepositoryResolutionDTO> repositories = result.getMigrationSummary().getRepositoriesResolutions();
 
         for ( RepositoryResolutionDTO resolution : repositories )
         {
@@ -634,7 +634,7 @@ public class DefaultArtifactoryMigrator
             }
             else
             {
-                group.setType( "maven2" );
+                repoType = "maven2" ;
             }
 
             List<String> repositoriesIds = new ArrayList<String>();

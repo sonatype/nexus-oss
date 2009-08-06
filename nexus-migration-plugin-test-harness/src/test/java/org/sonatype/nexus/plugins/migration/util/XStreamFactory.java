@@ -12,10 +12,7 @@
  */
 package org.sonatype.nexus.plugins.migration.util;
 
-import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
-import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRequestDTO;
-import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryResponseDTO;
-import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
+import org.sonatype.nexus.plugin.migration.artifactory.util.XStreamUtil;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -26,10 +23,7 @@ public class XStreamFactory
     {
         XStream xs = org.sonatype.nexus.test.utils.XStreamFactory.getXmlXStream();
 
-        xs.processAnnotations( MigrationSummaryDTO.class );
-        xs.processAnnotations( MigrationSummaryResponseDTO.class );
-        xs.processAnnotations( MigrationSummaryRequestDTO.class );
-        xs.processAnnotations( RepositoryResolutionDTO.class );
+        processAnn( xs );
 
         return xs;
     }
@@ -38,12 +32,14 @@ public class XStreamFactory
     {
         XStream xs = org.sonatype.nexus.test.utils.XStreamFactory.getJsonXStream();
 
-        xs.processAnnotations( MigrationSummaryDTO.class );
-        xs.processAnnotations( MigrationSummaryResponseDTO.class );
-        xs.processAnnotations( MigrationSummaryRequestDTO.class );
-        xs.processAnnotations( RepositoryResolutionDTO.class );
+        processAnn( xs );
 
         return xs;
+    }
+
+    private static void processAnn( XStream xs )
+    {
+        XStreamUtil.configureMigration( xs );
     }
 
 }
