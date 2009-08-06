@@ -404,7 +404,7 @@ Sonatype.repoServer.RepositoryBrowsePanel = function( config ) {
 
   var root = new Ext.tree.AsyncTreeNode( {
     text: this.payload.data[this.titleColumn],
-    id: this.payload.data.resourceURI + Sonatype.config.browsePathSnippet + '/',
+    id: this.getBrowsePath( this.payload.data.resourceURI ),
     singleClickExpand: true,
     expanded: true
   } );
