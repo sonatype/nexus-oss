@@ -228,6 +228,9 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
                           return 'You cannot upload a snapshot version into a release repository';
                         }
                       }
+                      if ( !/^[\w\.-]+$/.test(v) ){
+                      	return 'Version is illegal, only letters, numbers, underscore(_), hyphon(-), and dot(.) are allowed.';
+                      }                      
                       return true;
                     },
                     disabled: true
