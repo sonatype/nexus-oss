@@ -30,6 +30,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
+import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.scheduling.TaskState;
 
@@ -293,6 +294,12 @@ public class TaskScheduleUtil
         throws Exception
     {
         return runTask( taskName, typeId, 40, properties );
+    }
+
+    public static void waitForAllTasksToStop( Class<? extends NexusTask<?>> taskClass )
+        throws Exception
+    {
+        waitForAllTasksToStop( taskClass.getSimpleName() );
     }
 
 }

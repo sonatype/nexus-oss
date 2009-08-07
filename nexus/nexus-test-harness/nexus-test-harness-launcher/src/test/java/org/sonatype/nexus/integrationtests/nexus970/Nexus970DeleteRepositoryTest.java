@@ -22,6 +22,8 @@ import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
  *When deleting a repository folders related to it is should be removed from disk
@@ -50,7 +52,7 @@ public class Nexus970DeleteRepositoryTest
         Status status = RequestFacade.sendMessage( uri, Method.DELETE ).getStatus();
         Assert.assertTrue( "Unable to delete nexus970-default repository", status.isSuccess() );
 
-        Thread.sleep( 1000 );
+        TaskScheduleUtil.waitForAllTasksToStop( DeleteRepositoryFoldersTask.class );
 
         Assert.assertFalse( "Artifacts shouldn't exists on deleted repo", artifactFile.exists() );
         Assert.assertFalse( "Storage dir should be deleted", storageDir.exists() );

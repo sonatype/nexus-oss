@@ -48,14 +48,14 @@ public class Nexus1375LogConfigTest
         LogConfigResource resource = messageUtil.getLogConfig();
 
         Assert.assertEquals( "DEBUG", resource.getRootLoggerLevel() );
-        
+
         Assert.assertEquals( "logfile", resource.getRootLoggerAppenders() );
 
         Assert.assertEquals( "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n", resource.getFileAppenderPattern() );
 
-        File expectedLoggerLocation = new File( getBasedir(), "target/logs/nexus.log" );
+        File expectedLoggerLocation = new File( "target/logs/nexus.log" ).getCanonicalFile();
 
-        File actualLoggerLocation = new File( resource.getFileAppenderLocation() );
+        File actualLoggerLocation = new File( resource.getFileAppenderLocation() ).getCanonicalFile();
 
         Assert.assertEquals( expectedLoggerLocation.getAbsolutePath(), actualLoggerLocation.getAbsolutePath() );
     }

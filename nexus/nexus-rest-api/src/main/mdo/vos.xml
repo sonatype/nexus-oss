@@ -489,6 +489,7 @@
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <defaultValue>true</defaultValue>
         </field>
         <field>
           <name>effectiveLocalStorageUrl</name>

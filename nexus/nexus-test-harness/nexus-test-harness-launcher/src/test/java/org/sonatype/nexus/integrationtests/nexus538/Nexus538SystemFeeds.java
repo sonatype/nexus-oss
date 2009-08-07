@@ -29,6 +29,7 @@ import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
+import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
@@ -44,7 +45,7 @@ public class Nexus538SystemFeeds
 
         NexusStatusUtil.doHardStop();
         NexusStatusUtil.doHardStart();
-        
+
         Assert.assertTrue( findFeedEntry( FeedUtil.getFeed( "systemChanges" ), "Booting", null ) );
     }
 
@@ -61,8 +62,12 @@ public class Nexus538SystemFeeds
         String newName = repo.getName() + "-new";
         repo.setName( newName );
         repoUtil.updateRepo( repo );
-                
-        Assert.assertTrue( findFeedEntry( FeedUtil.getFeed( "systemChanges" ), "Configuration change", new String[]{ newName, oldName } ) );
+
+        Thread.sleep( 10000 ); // give some time to events jump and feed get in place
+
+        final SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
+        Assert.assertTrue( "Update repo feed not found" + feed, findFeedEntry( feed, "Configuration change",
+                                                                               new String[] { newName, oldName } ) );
     }
 
     @Test
@@ -76,43 +81,47 @@ public class Nexus538SystemFeeds
         RepositoryStatusResource repo = repoUtil.getStatus( "release-proxy-repo-1" );
         repo.setProxyMode( ProxyMode.BLOCKED_AUTO.name() );
         repoUtil.updateStatus( repo );
-        
-        Assert.assertTrue( findFeedEntry( FeedUtil.getFeed( "systemChanges" ), "Repository proxy mode change", new String[]{ "release-proxy-repo-1" } ) );        
-        Assert.assertTrue( findFeedEntry( FeedUtil.getFeed( "systemRepositoryStatusChanges" ), "Repository proxy mode change", new String[]{ "release-proxy-repo-1" } ) );
+
+        Assert.assertTrue( findFeedEntry( FeedUtil.getFeed( "systemChanges" ), "Repository proxy mode change",
+                                          new String[] { "release-proxy-repo-1" } ) );
+        Assert.assertTrue( findFeedEntry( FeedUtil.getFeed( "systemRepositoryStatusChanges" ),
+                                          "Repository proxy mode change", new String[] { "release-proxy-repo-1" } ) );
     }
-    
+
     @SuppressWarnings( "unchecked" )
     private boolean findFeedEntry( SyndFeed feed, String title, String[] bodyPortions )
     {
         List<SyndEntry> entries = feed.getEntries();
-        
+
         for ( SyndEntry entry : entries )
         {
-            if ( entry.getTitle().equals( title ))
+            if ( entry.getTitle().equals( title ) )
             {
                 if ( bodyPortions == null )
                 {
                     return true;
                 }
-                
+
                 boolean missingPortion = false;
-                
-                for ( int i = 0 ; i < bodyPortions.length ; i++ )
+
+                SyndContent description = entry.getDescription();
+                String value = description.getValue();
+                for ( int i = 0; i < bodyPortions.length; i++ )
                 {
-                    if ( !entry.getDescription().getValue().contains( bodyPortions[i] ) )
+                    if ( !value.contains( bodyPortions[i] ) )
                     {
                         missingPortion = true;
                         break;
                     }
                 }
-                
+
                 if ( !missingPortion )
                 {
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
 

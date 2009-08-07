@@ -15,6 +15,8 @@ package org.sonatype.nexus.integrationtests.nexus688;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 
@@ -29,6 +31,7 @@ import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.repositories.RepositoryWritePolicy;
+import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -72,7 +75,7 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop();
+        TaskScheduleUtil.waitForAllTasksToStop(ReindexTask.class);
         
         this.downloadIndexFromRepository( resource.getId(), true );
     }
@@ -101,8 +104,8 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop();
-        
+        TaskScheduleUtil.waitForAllTasksToStop(ReindexTask.class);
+
         this.downloadIndexFromRepository( resource.getId(), false );
     }
 
@@ -134,8 +137,8 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop();
-        
+        TaskScheduleUtil.waitForAllTasksToStop(ReindexTask.class);
+
         this.downloadIndexFromRepository( resource.getId(), true );
     }
 
@@ -167,8 +170,8 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop();
-        
+        TaskScheduleUtil.waitForAllTasksToStop(ReindexTask.class);
+
         this.downloadIndexFromRepository( resource.getId(), true );
     }
 
@@ -200,8 +203,8 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop();
-        
+        TaskScheduleUtil.waitForAllTasksToStop(ReindexTask.class);
+
         this.downloadIndexFromRepository( resource.getId(), false );
     }
 
@@ -231,7 +234,7 @@ public class Nexus688ReindexOnRepoAdd
         url = new URL( repositoryUrl + INDEX_PROPERTIES + ".md5" );        
         downloadFromRepository( url, "target/downloads/index.properties.md5", repoId, shouldSucceed );
     }
-    
+
     private void downloadFromRepository( URL url, String target, String repoId, boolean shouldSucceed )
         throws Exception
     {

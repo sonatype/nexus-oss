@@ -13,17 +13,13 @@
  */
 package org.sonatype.nexus.integrationtests;
 
-import static org.junit.Assert.fail;
-
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.FileInputStream;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.classworlds.launcher.Launcher;
+import org.codehaus.plexus.context.Context;
+import org.sonatype.appbooter.PlexusAppBooter;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 public class TestContainer
@@ -35,9 +31,18 @@ public class TestContainer
 
     private PlexusContainer container;
 
+    private PlexusAppBooter plexusAppBooter;
+
     private TestContainer()
     {
-        this.setupContainer();
+        try
+        {
+            this.setupEnvironment();
+        }
+        catch ( Exception e )
+        {
+            throw new RuntimeException( e );
+        }
     }
 
     public static TestContainer getInstance()
@@ -52,39 +57,64 @@ public class TestContainer
         return SELF;
     }
 
-    private void setupContainer()
+    private void setupEnvironment()
+        throws Exception
     {
 
-        File f = new File( "target/plexus-home" );
+        final File f = new File( "target/plexus-home" );
 
         if ( !f.isDirectory() )
         {
             f.mkdirs();
         }
 
-        Map<Object, Object> context = new HashMap<Object, Object>();
-        context.put( "plexus.home", f.getAbsolutePath() );
-        context.putAll( TestProperties.getAll() );
+        File bundleRoot = new File( TestProperties.getAll().get( "nexus.base.dir" ) );
+        System.setProperty( "basedir", bundleRoot.getAbsolutePath() );
 
-        // ----------------------------------------------------------------------------
-        // Configuration
-        // ----------------------------------------------------------------------------
+        System.setProperty( "plexus.appbooter.customizers", "org.sonatype.nexus.NexusBooterCustomizer,"
+            + ITAppBooterCustomizer.class.getName() );
 
-        ContainerConfiguration containerConfiguration =
-            new DefaultContainerConfiguration().setName( "test" ).setContext( context );
+        File classworldsConf = new File( bundleRoot, "conf/classworlds.conf" );
 
-        containerConfiguration.setContainerConfigurationURL( this.getClass().getClassLoader().getResource(
-                                                                                                           "PlexusTestContainerConfig.xml" ) );
-
-        try
+        if ( !classworldsConf.isFile() )
         {
-            this.container = new DefaultPlexusContainer( containerConfiguration );
+            throw new IllegalStateException( "The bundle classworlds.conf file is not found (\""
+                + classworldsConf.getAbsolutePath() + "\")!" );
         }
-        catch ( PlexusContainerException e )
+
+        System.setProperty( "classworlds.conf", classworldsConf.getAbsolutePath() );
+
+        // this is non trivial here, since we are running Nexus in _same_ JVM as tests
+        // and the PlexusAppBooterJSWListener (actually theused WrapperManager in it) enforces then Nexus may be
+        // started only once in same JVM!
+        // So, we are _overrriding_ the in-bundle plexus app booter with the simplest one
+        // since we dont need all the bells-and-whistles in Service and JSW
+        // but we are still _reusing_ the whole bundle environment by tricking Classworlds Launcher
+
+        // Launcher trick -- begin
+        Launcher launcher = new Launcher();
+        launcher.setSystemClassLoader( Thread.currentThread().getContextClassLoader() );
+        launcher.configure( new FileInputStream( classworldsConf ) ); // launcher closes stream upon configuration
+        // Launcher trick -- end
+
+        // set the preconfigured world
+        final PlexusAppBooter plexusAppBooter = new PlexusAppBooter()
         {
-            e.printStackTrace();
-            fail( "Failed to create plexus container." );
-        }
+            @Override
+            protected void customizeContext( Context context )
+            {
+                super.customizeContext( context );
+
+                context.put( "plexus.app.booter", this );
+            }
+        };
+        plexusAppBooter.setWorld( launcher.getWorld() );
+
+        plexusAppBooter.startContainer();
+        this.plexusAppBooter = plexusAppBooter;
+
+        PlexusContainer container = plexusAppBooter.getContainer();
+        this.container = container;
     }
 
     public Object lookup( String role )
@@ -119,6 +149,11 @@ public class TestContainer
     public PlexusContainer getContainer()
     {
         return container;
+    }
+
+    public PlexusAppBooter getPlexusAppBooter()
+    {
+        return plexusAppBooter;
     }
 
 }

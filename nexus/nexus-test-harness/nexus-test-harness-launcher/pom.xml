@@ -64,6 +64,7 @@
             <exclude>**Suite*</exclude>
             <exclude>**/org/sonatype/nexus/integrationtests/client/nexus758/Nexus758ServiceStabilityTest.java</exclude>
             <exclude>**/org/sonatype/nexus/integrationtests/client/nexus758/Nexus758StatusService.java</exclude>
+            <exclude>**/Nexus748MultipleStartTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -121,6 +122,12 @@
       <groupId>httpunit</groupId>
       <artifactId>httpunit</artifactId>
       <version>1.6.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

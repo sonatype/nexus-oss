@@ -43,7 +43,7 @@ import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * A default FS based implementation.
- * 
+ *
  * @author cstamas
  */
 @Component( role = Wastebasket.class )
@@ -228,8 +228,7 @@ public class DefaultFSWastebasket
     {
         // TODO Auto-generated method stub
     }
-    
-    
+
     public void deleteRepositoryFolders( Repository repository, boolean deleteForever )
         throws IOException
     {
@@ -243,11 +242,18 @@ public class DefaultFSWastebasket
     private void deleteStorage( Repository repository, boolean deleteForever )
         throws IOException
     {
-        File defaultStorageFolder = new File(
-            new File( applicationConfiguration.getWorkingDirectory(), "storage" ),
-            repository.getId() );
+        File defaultStorageFolder =
+            new File( new File( applicationConfiguration.getWorkingDirectory(), "storage" ), repository.getId() );
 
-        if ( defaultStorageFolder.toURI().toURL().toString().equals( repository.getLocalUrl() + "/" ) )
+        String defaultStorageURI = defaultStorageFolder.toURI().toURL().toString();
+        defaultStorageURI = defaultStorageURI.endsWith( "/" ) ? defaultStorageURI : defaultStorageURI + "/";
+
+        String localURI = repository.getLocalUrl();
+        localURI = localURI.endsWith( "/" ) ? localURI : localURI + "/";
+
+        boolean sameLocation = defaultStorageURI.equals( localURI );
+
+        if ( sameLocation )
         {
             delete( defaultStorageFolder, deleteForever );
         }
@@ -256,9 +262,9 @@ public class DefaultFSWastebasket
     private void deleteProxyAttributes( Repository repository, boolean deleteForever )
         throws IOException
     {
-        File proxyAttributesFolder = new File( new File( new File(
-            applicationConfiguration.getWorkingDirectory(),
-            "proxy" ), "attributes" ), repository.getId() );
+        File proxyAttributesFolder =
+            new File( new File( new File( applicationConfiguration.getWorkingDirectory(), "proxy" ), "attributes" ),
+                      repository.getId() );
 
         delete( proxyAttributesFolder, true );
     }
@@ -280,7 +286,7 @@ public class DefaultFSWastebasket
 
     /**
      * Move the file to trash, or simply delete it forever
-     * 
+     *
      * @param file file to be deleted
      * @param deleteForever if it's true, delete the file forever, if it's false, move the file to trash
      * @throws IOException

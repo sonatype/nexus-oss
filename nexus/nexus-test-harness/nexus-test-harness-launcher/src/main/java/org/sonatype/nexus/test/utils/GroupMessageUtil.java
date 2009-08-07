@@ -76,7 +76,6 @@ public class GroupMessageUtil
         return responseResource;
     }
 
-    @SuppressWarnings( "unchecked" )
     public void validateResourceResponse( RepositoryGroupResource expected, RepositoryGroupResource actual )
         throws IOException
     {
@@ -219,7 +218,6 @@ public class GroupMessageUtil
      * @return
      * @throws IOException
      */
-    @SuppressWarnings( "unchecked" )
     public List<RepositoryGroupListResource> getList()
         throws IOException
     {
