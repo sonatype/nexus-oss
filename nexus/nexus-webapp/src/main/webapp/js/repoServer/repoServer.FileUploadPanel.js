@@ -21,8 +21,16 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
   
   this.fileInput = null;
   this.pomInput = null;
-  
-  this.gavDefinitionStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['pom','From POM'],['gav','GAV Parameters']]});
+
+  this.uploadModeTitle = this.uploadModeTitle ? this.uploadModeTitle : 'Select GAV Definition Source';
+  this.uploadModeLabel = this.uploadModeLabel ? this.uploadModeLabel : 'GAV Definition';
+  this.uploadModeStore = this.uploadModeStore ? this.uploadModeStore :  new Ext.data.SimpleStore({
+  	fields:['value','display'], data:[['pom','From POM'],['gav','GAV Parameters']]
+  });
+  this.uploadModeHt = this.uploadModeHt ? this.uploadModeHt : ht.gavDefinition;
+  this.uploadModeExplanation = this.uploadModeExplanation
+			? this.uploadModeExplanation
+			: 'Select a source for the GAV definition. GAV can be specified either manually or from a POM file. These settings will be applied to all artifacts specified below.'
   
   var packagingStore = new Ext.data.SimpleStore( {
     fields: ['value'], 
@@ -57,7 +65,7 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
       {
         xtype: 'fieldset',
         checkboxToggle:false,
-        title: 'Select GAV Definition Source',
+        title: this.uploadModeTitle,
         collapsible: false,
         autoHeight:true,
         width: '95%',
@@ -65,11 +73,11 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
           {
             xtype: 'combo',
             lazyInit: false,
-            fieldLabel: 'GAV Definition',
+            fieldLabel: this.uploadModeLabel,
             itemCls: 'required-field',
-            helpText: ht.gavDefinition,
+            helpText: this.uploadModeHt,
             name: 'gavDefinition',
-            store: this.gavDefinitionStore,
+            store: this.uploadModeStore,
             valueField:'value',
             displayField:'display',
             editable: false,
@@ -111,7 +119,7 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
                   items: [
                   {
                     xtype: 'label',
-                    text: 'Select a source for the GAV definition. GAV can be specified either manually or from a POM file. These settings will be applied to all artifacts specified below.'
+                    html: this.uploadModeExplanation
                   }
                 ]
               },
@@ -252,6 +260,7 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
       
       {
         xtype: 'fieldset',
+        id: 'artifacts-upload-fieldset',
         checkboxToggle:false,
         title: 'Select Artifact(s) for Upload',
         collapsible: false,
