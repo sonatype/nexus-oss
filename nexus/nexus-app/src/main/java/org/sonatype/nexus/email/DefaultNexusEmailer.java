@@ -71,6 +71,11 @@ public class DefaultNexusEmailer
 
     public MailRequestStatus sendMail( MailRequest request )
     {
+        if ( request.getFrom() == null )
+        {
+            request.setFrom( getSMTPSystemEmailAddress() );
+        }
+        
         return eMailer.sendMail( request );
     }
 
