@@ -14,6 +14,7 @@
 package org.sonatype.nexus.scheduling;
 
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Utilities related to tasks.
@@ -90,7 +91,7 @@ public class TaskUtils
      * @param task  a nexus task
      * @param email alert email address
      */
-    public static void setAlertEmail( final NexusTask<?> task,
+    public static void setAlertEmail( final SchedulerTask<?> task,
                                       final String email )
     {
         if( email == null || email.trim().length() == 0 )
@@ -109,7 +110,7 @@ public class TaskUtils
      * @param task a nexus task
      * @param id   task id
      */
-    public static void setId( final NexusTask<?> task,
+    public static void setId( final SchedulerTask<?> task,
                               final String id )
     {
         if( id == null || id.trim().length() == 0 )
@@ -128,7 +129,7 @@ public class TaskUtils
      * @param task a nexus task
      * @param name task name
      */
-    public static void setName( final NexusTask<?> task,
+    public static void setName( final SchedulerTask<?> task,
                                 final String name )
     {
         if( name == null || name.trim().length() == 0 )

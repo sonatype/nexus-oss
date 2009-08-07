@@ -38,6 +38,7 @@ import org.sonatype.nexus.configuration.model.CProps;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CScheduledTaskCoreConfiguration;
+import org.sonatype.nexus.scheduling.TaskUtils;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.HourlySchedule;
@@ -154,6 +155,9 @@ public class DefaultTaskConfigManager
                         CProps prop = (CProps) iter.next();
                         nexusTask.addParameter( prop.getKey(), prop.getValue() );
                     }
+
+                    TaskUtils.setId( nexusTask, task.getId() );
+                    TaskUtils.setName( nexusTask, task.getName() );
 
                     scheduler.initialize( task.getId(), task.getName(), task.getType(), nexusTask,
                                           translateFrom( task.getSchedule(), new Date( task.getNextRun() ) ) )
