@@ -194,7 +194,13 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
                     anchor: Sonatype.view.FIELD_OFFSET,
                     name: 'g',
                     allowBlank: false,
-                    disabled: true
+                    disabled: true,
+                    validator: function( v ){
+                      if ( !/^[\w\.-]+$/.test(v) ){
+                      	return 'Group ID is illegal, only letters, numbers, underscore(_), hyphon(-), and dot(.) are allowed.';
+                      }                      
+                      return true;                    	
+                    }                    
                   },
                   {
                     xtype: 'textfield',
@@ -204,7 +210,13 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config){
                     anchor: Sonatype.view.FIELD_OFFSET,
                     name: 'a',
                     allowBlank:false,
-                    disabled: true
+                    disabled: true,
+                    validator: function( v ){
+                      if ( !/^[\w\.-]+$/.test(v) ){
+                      	return 'Artifact ID is illegal, only letters, numbers, underscore(_), hyphon(-), and dot(.) are allowed.';
+                      }                      
+                      return true;                    	
+                    }
                   },
                   {
                     xtype: 'textfield',
