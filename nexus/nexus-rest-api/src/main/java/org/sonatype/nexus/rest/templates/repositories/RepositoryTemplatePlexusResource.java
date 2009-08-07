@@ -137,7 +137,7 @@ public class RepositoryTemplatePlexusResource
         repoRes.setRepoType( "virtual" );
 
         AbstractShadowRepositoryConfiguration cfg =
-            (AbstractShadowRepositoryConfiguration) template.getConfigurableRepository().getCurrentCoreConfiguration().getExternalConfiguration();
+            (AbstractShadowRepositoryConfiguration) template.getConfigurableRepository().getCurrentCoreConfiguration().getExternalConfiguration().getConfiguration( false );
 
         repoRes.setSyncAtStartup( cfg.isSynchronizeAtStartup() );
         repoRes.setShadowOf( cfg.getMasterRepositoryId() );
@@ -162,7 +162,7 @@ public class RepositoryTemplatePlexusResource
         repoRes.setNotFoundCacheTTL( cfg.getNotFoundCacheTimeToLive() );
 
         AbstractMavenRepositoryConfiguration repoCfg =
-            (AbstractMavenRepositoryConfiguration) template.getConfigurableRepository().getCurrentCoreConfiguration().getExternalConfiguration();
+            (AbstractMavenRepositoryConfiguration) template.getConfigurableRepository().getCurrentCoreConfiguration().getExternalConfiguration().getConfiguration( false );
 
 
         repoRes.setChecksumPolicy( repoCfg.getChecksumPolicy().name() );
