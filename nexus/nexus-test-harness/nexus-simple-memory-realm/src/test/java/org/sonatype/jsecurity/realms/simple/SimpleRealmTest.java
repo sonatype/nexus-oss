@@ -168,6 +168,13 @@ public class SimpleRealmTest
         this.lookup( SecuritySystem.class ).start();
     }
     
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        FileUtils.deleteDirectory( PLEXUS_HOME );
+    }
+    
 
     @Override
     protected void customizeContext( Context ctx )
