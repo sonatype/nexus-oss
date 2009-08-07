@@ -56,7 +56,7 @@ public class RepositoryCreateUpdateTest
 
         Assert.assertEquals( true, result.isExposed() );
         Assert.assertEquals( "maven2", result.getFormat() );
-        Assert.assertEquals( true, result.isIndexable() );
+        Assert.assertEquals( false, result.isIndexable() );
         Assert.assertEquals( 23, result.getMetadataMaxAge() );
         Assert.assertEquals( "test-name", result.getName() );
         Assert.assertEquals( 11, result.getNotFoundCacheTTL() );
@@ -154,7 +154,7 @@ public class RepositoryCreateUpdateTest
 
         Assert.assertEquals( true, result.isExposed() );
         Assert.assertEquals( "maven2", result.getFormat() );
-        Assert.assertEquals( true, result.isIndexable() );
+        Assert.assertEquals( false, result.isIndexable() );
         Assert.assertEquals( 23, result.getMetadataMaxAge() );
         Assert.assertEquals( "test-name", result.getName() );
         Assert.assertEquals( 11, result.getNotFoundCacheTTL() );
@@ -210,7 +210,7 @@ public class RepositoryCreateUpdateTest
         repositoryResource.setDownloadRemoteIndexes( true );
         repositoryResource.setExposed( true );
         repositoryResource.setFormat( "maven2" );
-        repositoryResource.setIndexable( true );
+        repositoryResource.setIndexable( false );
         repositoryResource.setMetadataMaxAge( 23 );
         repositoryResource.setName( "test-name" );
         repositoryResource.setNotFoundCacheTTL( 11 );
@@ -279,7 +279,7 @@ public class RepositoryCreateUpdateTest
         repositoryResource.setDownloadRemoteIndexes( true );
         repositoryResource.setExposed( true );
         repositoryResource.setFormat( "maven2" );
-        repositoryResource.setIndexable( true );
+        repositoryResource.setIndexable( false );
         repositoryResource.setMetadataMaxAge( 23 );
         repositoryResource.setName( "test-name" );
         repositoryResource.setNotFoundCacheTTL( 11 );

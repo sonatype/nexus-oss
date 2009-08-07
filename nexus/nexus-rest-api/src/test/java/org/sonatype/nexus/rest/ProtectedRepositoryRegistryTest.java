@@ -106,7 +106,8 @@ public class ProtectedRepositoryRegistryTest
         //FileUtils.copyURLToFile( url, new File( CONF_HOME, "security-configuration.xml" ) );
 
 //         this.securitySystem.start();
-
+        
+        waitForTasksToStop();
     }
 
     public void testRegistryWithViewAccess()
@@ -310,6 +311,7 @@ public class ProtectedRepositoryRegistryTest
         CRepository repoConfig = new DefaultCRepository();
         repoConfig.setProviderRole( Repository.class.getName() );
         repoConfig.setProviderHint( "maven2" );
+        repoConfig.setIndexable( false );
         repoConfig.setId( repoId );
 
         return nexus.createRepository( repoConfig );
@@ -321,6 +323,7 @@ public class ProtectedRepositoryRegistryTest
         CRepository repoConfig = new DefaultCRepository();
         repoConfig.setProviderRole( GroupRepository.class.getName() );
         repoConfig.setProviderHint( "maven2" );
+        repoConfig.setIndexable( false );
         repoConfig.setId( repoId );
         
         return nexus.createRepository( repoConfig );
@@ -332,6 +335,7 @@ public class ProtectedRepositoryRegistryTest
         CRepository repoConfig = new DefaultCRepository();
         repoConfig.setProviderRole( Repository.class.getName() );
         repoConfig.setProviderHint( "maven2" );
+        repoConfig.setIndexable( false );
         repoConfig.setId( repoId );
         
         nexus.createRepository( repoConfig );
@@ -340,6 +344,7 @@ public class ProtectedRepositoryRegistryTest
         CRepository shadowConfig = new DefaultCRepository();
         shadowConfig.setProviderRole( ShadowRepository.class.getName() );
         shadowConfig.setProviderHint( "m2-m1-shadow" );
+        shadowConfig.setIndexable( false );
         shadowConfig.setId( repoId + "-shadow" );
 
         Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );

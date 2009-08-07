@@ -31,6 +31,7 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryStatusCheckerThread;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * Repository registry. It holds handles to registered repositories and sorts them properly. This class is used to get a
@@ -230,6 +231,12 @@ public class DefaultRepositoryRegistry
         if ( !silently )
         {
             applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventRemove( this, repository ) );
+        }
+        
+        // dump the event listeners, as once deleted doesn't care about config changes any longer
+        if ( repository instanceof EventListener )
+        {
+            applicationEventMulticaster.removeEventListener( ( EventListener ) repository );
         }
 
         repositories.remove( repository.getId() );

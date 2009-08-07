@@ -16,6 +16,7 @@ package org.sonatype.nexus.scheduling;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 
 public class DefaultNexusSchedulerTest
@@ -51,23 +52,34 @@ public class DefaultNexusSchedulerTest
 
         rt1.setAllowConcurrentSubmission( true );
 
-        nexusScheduler.submit( "test1", rt1 );
+        ScheduledTask<?> t1 = nexusScheduler.submit( "test1", rt1 );
 
         DummyWaitingNexusTask rt2 = (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class
             .getName() );
 
         rt2.setAllowConcurrentSubmission( false );
 
+        ScheduledTask<?> t2 = null;
+        
         try
         {
             // the second submission should fail, since there is already a task of this type submitted
-            nexusScheduler.submit( "test2", rt2 );
+            t2 = nexusScheduler.submit( "test2", rt2 );
 
             fail();
         }
         catch ( RejectedExecutionException e )
         {
             // cool
+        }
+        finally
+        {
+            t1.cancel();
+            
+            if ( t2 != null )
+            {
+                t2.cancel();
+            }
         }
     }
 
@@ -79,27 +91,31 @@ public class DefaultNexusSchedulerTest
 
         rt1.setAllowConcurrentSubmission( true );
 
-        nexusScheduler.submit( "test1", rt1 );
+        ScheduledTask<?> t1 = nexusScheduler.submit( "test1", rt1 );
 
         DummyWaitingNexusTask rt2 = (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class
             .getName() );
 
         rt2.setAllowConcurrentSubmission( true );
 
+        ScheduledTask<?> t2 = null;
         try
         {
             // the second submission should succeed, since it is allowed
-            nexusScheduler.submit( "test2", rt2 );
+            t2 = nexusScheduler.submit( "test2", rt2 );
         }
         catch ( RejectedExecutionException e )
         {
             fail( "Concurrent submission should succeed." );
         }
+        finally
+        {
+            t1.cancel();
+            
+            if ( t2 != null )
+            {
+                t2.cancel();
+            }
+        }
     }
-
-    public void testConcurrentExecutionOfRepositoriesTask()
-        throws Exception
-    {
-    }
-
 }

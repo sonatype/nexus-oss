@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -31,6 +32,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.scheduling.ScheduledTask;
 
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase
@@ -203,17 +205,61 @@ public abstract class AbstractNexusTestCase
     protected void tearDown()
         throws Exception
     {
+        waitForTasksToStop();
+        
         super.tearDown();
 
         FileUtils.deleteDirectory( PLEXUS_HOME );
     }
     
+    protected void killActiveTasks()
+        throws Exception
+    {
+        Map<String,List<ScheduledTask<?>>> taskMap = nexusScheduler.getActiveTasks();
+        
+        for ( List<ScheduledTask<?>> taskList : taskMap.values() )
+        {
+            for ( ScheduledTask<?> task : taskList )
+            {
+                task.cancel();
+            }   
+        }
+    }
+    
     protected void waitForTasksToStop()
         throws Exception
     {
+        // Give task a chance to start
+        Thread.sleep( 50 );
+        
+        int counter = 0;
+        
         while ( nexusScheduler.getActiveTasks().size() > 0 )
         {
             Thread.sleep( 100 );
+            counter++;
+            
+            if ( counter > 300 )
+            {
+                System.out.println( "TIMEOUT WAITING FOR TASKS TO COMPLETE!!!  Will kill them." );
+                printActiveTasks();
+                killActiveTasks();
+                break;
+            }
+        }
+    }
+    
+    protected void printActiveTasks()
+        throws Exception
+    {
+        Map<String,List<ScheduledTask<?>>> taskMap = nexusScheduler.getActiveTasks();
+        
+        for ( List<ScheduledTask<?>> taskList : taskMap.values() )
+        {
+            for ( ScheduledTask<?> task : taskList )
+            {
+                System.out.println( task.getName() + " with id " + task.getId() + " is in state " + task.getTaskState().toString() );
+            }   
         }
     }
 
