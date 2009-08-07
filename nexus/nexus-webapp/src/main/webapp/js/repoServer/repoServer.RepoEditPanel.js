@@ -990,12 +990,14 @@ Ext.extend( Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.Abstr
   
   afterProviderSelectHandler: function( combo, rec, index ) {
     this.updateDownloadRemoteIndexCombo(rec.data.format);
+    this.updateIndexableCombo(rec.data.format);
   },
   
   showHandler: function ( panel ) {
     var formatField = this.form.findField('format');
     if ( formatField ){
       this.updateDownloadRemoteIndexCombo( formatField.getValue() );
+      this.updateIndexableCombo( formatField.getValue() );
     }
   },
   
@@ -1007,6 +1009,17 @@ Ext.extend( Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.Abstr
     else{
       downloadRemoteIndexCombo.setValue('False');
       downloadRemoteIndexCombo.disable();       
+    }
+  },
+  
+  updateIndexableCombo: function( repoFormat ){
+    var indexableCombo = this.form.findField('indexable');
+    if ( repoFormat == 'maven2'){
+      indexableCombo.enable();      
+    }
+    else{
+      indexableCombo.setValue('False');
+      indexableCombo.disable();       
     }
   }
 

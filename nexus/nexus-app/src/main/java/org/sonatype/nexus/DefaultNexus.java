@@ -275,10 +275,10 @@ public class DefaultNexus
 
         try
         {
-            indexerManager.setRepositoryIndexContextSearchable( settings.getId(), settings.isIndexable() );
+            indexerManager.setRepositoryIndexContextSearchable( settings.getId(), repository.isIndexable() );
 
             // create the initial index
-            if ( settings.isIndexable() )
+            if ( repository.isIndexable() )
             {
                 // Create the initial index for the repository
                 ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
