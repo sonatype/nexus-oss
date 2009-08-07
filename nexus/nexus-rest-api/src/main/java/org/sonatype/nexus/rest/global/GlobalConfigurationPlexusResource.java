@@ -44,6 +44,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * The GlobalConfiguration resource. It simply gets and builds the requested config REST model (DTO) and passes
@@ -280,20 +281,42 @@ public class GlobalConfigurationPlexusResource
                             {
                                 // try to "log in" with supplied credentials
                                 // the anon user a) should exists b) the pwd must work
+                                securitySystem.getUser( resource.getSecurityAnonymousUsername() );
+
                                 securitySystem.authenticate( new UsernamePasswordToken( resource
                                     .getSecurityAnonymousUsername(), newPassword ) );
+
+                            }
+                            catch ( UserNotFoundException e )
+                            {
+
+                                getLogger()
+                                    .warn(
+                                        "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
+                                        e );
+
+                                String msg = "User '" + resource.getSecurityAnonymousUsername() + "' does not exist.";
+
+                                throw new PlexusResourceException(
+                                    Status.CLIENT_ERROR_BAD_REQUEST,
+                                    msg,
+                                    getNexusErrorResponse( "securityAnonymousUsername", msg ) );
                             }
                             catch ( AuthenticationException e )
                             {
                                 // the supplied anon auth info is wrong
                                 getLogger()
                                     .warn(
-                                           "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
-                                           e );
+                                        "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
+                                        e );
 
-                                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(),
-                                                                   getNexusErrorResponse( "securityAnonymousUsername",
-                                                                                          e.getMessage() ) );
+                                String msg = "The password of user '" + resource.getSecurityAnonymousUsername()
+                                    + "' is incorrect.";
+
+                                throw new PlexusResourceException(
+                                    Status.CLIENT_ERROR_BAD_REQUEST,
+                                    msg,
+                                    getNexusErrorResponse( "securityAnonymousPassword", msg ) );
                             }
                         }
 
