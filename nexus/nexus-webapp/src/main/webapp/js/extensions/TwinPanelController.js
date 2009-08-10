@@ -369,7 +369,7 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
     var leftTree = this.getComponent( 0 );
     
     if ( this.containsInvalidNode() ) {
-      this.markTreeInvalid( leftTree, 'Invalid Repository contained in list' );
+      this.markTreeInvalid( leftTree, 'Invalid Repository Found' );
       return false;
     }
     
