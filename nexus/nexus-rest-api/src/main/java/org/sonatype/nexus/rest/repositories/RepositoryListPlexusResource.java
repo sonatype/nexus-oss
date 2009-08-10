@@ -182,7 +182,7 @@ public class RepositoryListPlexusResource
 
             RepositoryResource repoResource = (RepositoryResource) resource;
 
-            appModel.setAllowWrite( this.isWriteAllowed( repoResource.getWritePolicy() ) );
+            appModel.setWritePolicy( repoResource.getWritePolicy() );
 
             appModel.setBrowseable( repoResource.isBrowseable() );
 

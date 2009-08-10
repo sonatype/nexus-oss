@@ -1,6 +1,7 @@
 package org.sonatype.nexus.configuration.model;
 
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 
 public class DefaultCRepository
     extends CRepository
@@ -20,7 +21,7 @@ public class DefaultCRepository
         setUserManaged( true );
         setExposed( true );
         setBrowseable( true );
-        setAllowWrite( true );
+        setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE_ONCE.name() );
         setIndexable( true );
     }
 }

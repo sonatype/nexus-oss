@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
@@ -146,7 +147,10 @@ public class RepositoryPlexusResource
                         
                         repository.setExposed( resource.isExposed() );
 
-                        repository.setAllowWrite( this.isWriteAllowed( model.getWritePolicy() ) );
+                        // set null to read only
+                        RepositoryWritePolicy writePolicy = (model.getWritePolicy() != null) ? RepositoryWritePolicy.valueOf( model.getWritePolicy() ) : null;
+                        
+                        repository.setWritePolicy( writePolicy );
 
                         repository.setBrowseable( model.isBrowseable() );
 

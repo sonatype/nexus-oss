@@ -19,6 +19,7 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 
 public class RepositoryRedeployTest
     extends AbstractProxyTestEnvironment
@@ -40,7 +41,7 @@ public class RepositoryRedeployTest
     {
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
 
-        repo1.setAllowWrite( true );
+        repo1.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE );
         
         getApplicationConfiguration().saveConfiguration();
 

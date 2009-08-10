@@ -31,8 +31,8 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.nexus.rest.repositories.RepositoryWritePolicy;
 
 import com.thoughtworks.xstream.XStream;
 

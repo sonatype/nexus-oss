@@ -28,7 +28,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
@@ -55,7 +55,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
@@ -82,7 +82,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
@@ -109,7 +109,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
@@ -136,7 +136,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
@@ -163,7 +163,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
@@ -190,7 +190,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
@@ -217,7 +217,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
@@ -244,7 +244,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
@@ -271,7 +271,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
@@ -298,7 +298,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
@@ -325,7 +325,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -348,7 +348,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -371,7 +371,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -394,7 +394,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -416,6 +416,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
       <externalConfiguration>
         <masterRepositoryId>central</masterRepositoryId>
         <synchronizeAtStartup>false</synchronizeAtStartup>
@@ -431,6 +432,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
       <externalConfiguration>
         <masterRepositoryId>codehaus</masterRepositoryId>
         <synchronizeAtStartup>false</synchronizeAtStartup>
@@ -446,6 +448,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
@@ -471,6 +474,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
@@ -492,6 +496,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
@@ -510,6 +515,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
@@ -528,6 +534,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>

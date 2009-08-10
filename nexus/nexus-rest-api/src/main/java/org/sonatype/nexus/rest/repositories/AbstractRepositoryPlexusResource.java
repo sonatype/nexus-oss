@@ -40,6 +40,7 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.NexusCompat;
@@ -295,16 +296,8 @@ public abstract class AbstractRepositoryPlexusResource
 
         resource.setName( repository.getName() );
 
-        // FIXME: set ENUM correctly
-        if ( repository.isAllowWrite() )
-        {
-            resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
-        }
-        else
-        {
-            resource.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
-        }
-
+        resource.setWritePolicy( repository.getWritePolicy().name() );
+        
         resource.setBrowseable( repository.isBrowseable() );
 
         resource.setIndexable( repository.isIndexable() );
@@ -451,16 +444,5 @@ public abstract class AbstractRepositoryPlexusResource
         cRemoteConnectionSettings.setUserAgentCustomizationString( remoteConnectionSettings.getUserAgentString() );
 
         return cRemoteConnectionSettings;
-    }
-
-    // temporary method to allow refactoring
-    protected boolean isWriteAllowed( String writePolicy )
-    {
-        if ( StringUtils.isEmpty( writePolicy ) )
-        {
-            return false;
-        }
-
-        return RepositoryWritePolicy.ALLOW_WRITE.equals( RepositoryWritePolicy.valueOf( writePolicy ) );
     }
 }

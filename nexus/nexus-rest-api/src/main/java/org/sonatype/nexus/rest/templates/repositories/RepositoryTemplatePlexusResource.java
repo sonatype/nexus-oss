@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
@@ -35,7 +36,6 @@ import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
-import org.sonatype.nexus.rest.repositories.RepositoryWritePolicy;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.AbstractMavenRepositoryTemplate;
@@ -155,7 +155,7 @@ public class RepositoryTemplatePlexusResource
         repoRes.setRepoPolicy( m2Template.getRepositoryPolicy().name() );
 
         ConfigurableRepository cfg = template.getConfigurableRepository();       
-        repoRes.setWritePolicy( this.getAllowWrite( cfg.isAllowWrite() ) ); 
+        repoRes.setWritePolicy( cfg.getWritePolicy().name() ); 
         repoRes.setBrowseable( cfg.isBrowseable() );
         repoRes.setIndexable( cfg.isIndexable() );
         repoRes.setExposed( cfg.isExposed() );
@@ -183,7 +183,7 @@ public class RepositoryTemplatePlexusResource
         repoRes.setRepoPolicy( m2Template.getRepositoryPolicy().name() );
 
         ConfigurableRepository cfg = template.getConfigurableRepository();
-        repoRes.setWritePolicy( this.getAllowWrite( cfg.isAllowWrite() ) );
+        repoRes.setWritePolicy( cfg.getWritePolicy().name() );
         repoRes.setBrowseable( cfg.isBrowseable() );
         repoRes.setIndexable( cfg.isIndexable() );
         repoRes.setExposed( cfg.isExposed() );

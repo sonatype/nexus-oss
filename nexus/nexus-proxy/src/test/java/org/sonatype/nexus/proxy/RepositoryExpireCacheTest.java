@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 
 public class RepositoryExpireCacheTest
     extends AbstractProxyTestEnvironment
@@ -37,7 +38,7 @@ public class RepositoryExpireCacheTest
     {
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
 
-        repo1.setAllowWrite( true );
+        repo1.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE );
 
         return repo1;
 

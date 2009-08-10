@@ -14,6 +14,7 @@
 package org.sonatype.nexus.rest.repositories;
 
 import org.restlet.data.MediaType;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;

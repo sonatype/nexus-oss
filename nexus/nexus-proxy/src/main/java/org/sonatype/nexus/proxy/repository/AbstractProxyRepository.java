@@ -400,8 +400,6 @@ public abstract class AbstractProxyRepository
 
             getCurrentConfiguration( true ).getRemoteStorage().setProvider( remoteStorage.getProviderId() );
         }
-
-        setAllowWrite( remoteStorage == null );
     }
 
     public DownloadMirrors getDownloadMirrors()

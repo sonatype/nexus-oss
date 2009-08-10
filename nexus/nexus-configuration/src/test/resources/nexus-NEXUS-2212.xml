@@ -122,7 +122,7 @@
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <localStorage>
         <provider>file</provider>
@@ -155,7 +155,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <localStorage>
         <provider>file</provider>
@@ -182,7 +182,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <localStorage>
         <provider>file</provider>
@@ -329,7 +329,7 @@
       <notFoundCacheTTL>15</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <localStorage>
         <provider>file</provider>

@@ -37,8 +37,10 @@ import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
@@ -274,4 +276,18 @@ public class M2Repository
 
         return versions.get( versions.size() - 1 );
     }
+    
+    @Override
+    protected void enforceWritePolicy( ResourceStoreRequest request, Action action )
+        throws IllegalRequestException
+    {
+        // allow updating of metadata
+        // we also need to allow updating snapshots
+        if( !M2ArtifactRecognizer.isMetadata( request.getRequestPath() ) && 
+            !M2ArtifactRecognizer.isSnapshot( request.getRequestPath() ) )
+        {
+            super.enforceWritePolicy( request, action );
+        }
+    } 
+    
 }

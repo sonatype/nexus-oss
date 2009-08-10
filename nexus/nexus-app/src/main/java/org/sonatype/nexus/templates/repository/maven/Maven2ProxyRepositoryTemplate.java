@@ -11,6 +11,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
@@ -51,7 +52,7 @@ public class Maven2ProxyRepositoryTemplate
 
         repo.externalConfigurationImple = exConf;
 
-        repo.setAllowWrite( true );
+        repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
         repo.setNotFoundCacheTTL( 1440 );
         exConf.setArtifactMaxAge( -1 );
 

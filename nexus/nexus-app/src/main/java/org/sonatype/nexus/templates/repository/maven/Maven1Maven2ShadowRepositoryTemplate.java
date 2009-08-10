@@ -8,6 +8,7 @@ import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.maven.MavenShadowRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
@@ -42,7 +43,7 @@ public class Maven1Maven2ShadowRepositoryTemplate
         M2LayoutedM1ShadowRepositoryConfiguration exConf = new M2LayoutedM1ShadowRepositoryConfiguration( ex );
         repo.externalConfigurationImple = exConf;
 
-        repo.setAllowWrite( false );
+        repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
 
         CRepositoryCoreConfiguration result =
             new CRepositoryCoreConfiguration(

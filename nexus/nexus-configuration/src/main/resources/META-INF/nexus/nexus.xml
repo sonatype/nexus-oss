@@ -105,7 +105,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE_ONCE</writePolicy>
       <indexable>true</indexable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -128,7 +128,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE_ONCE</writePolicy>
       <indexable>true</indexable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -151,7 +151,7 @@
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-      <allowWrite>true</allowWrite>
+      <writePolicy>ALLOW_WRITE_ONCE</writePolicy>
       <indexable>true</indexable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>

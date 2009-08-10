@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 
 public class RouterTest
     extends M2ResourceStoreTest
@@ -32,7 +33,7 @@ public class RouterTest
     {
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
 
-        repo1.setAllowWrite( true );
+        repo1.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE );
         
         getApplicationConfiguration().saveConfiguration();
         

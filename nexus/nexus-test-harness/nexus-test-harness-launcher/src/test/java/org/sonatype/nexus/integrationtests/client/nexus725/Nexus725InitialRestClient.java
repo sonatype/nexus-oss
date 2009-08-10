@@ -32,7 +32,7 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.rest.repositories.RepositoryWritePolicy;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 
 /**
  * Tests the Nexus java/REST client.

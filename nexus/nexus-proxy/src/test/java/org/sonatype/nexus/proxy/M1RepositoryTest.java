@@ -23,6 +23,7 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 public class M1RepositoryTest
@@ -54,7 +55,7 @@ public class M1RepositoryTest
     {
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1-m1" );
 
-        repo1.setAllowWrite( true );
+        repo1.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE );
         
         getApplicationConfiguration().saveConfiguration();
 

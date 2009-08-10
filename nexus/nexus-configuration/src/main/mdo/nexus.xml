@@ -503,13 +503,20 @@
           </description>
           <required>true</required>
         </field>
-        <field>
+        <!-- <field>
           <name>allowWrite</name>
           <version>1.4.0+</version>
           <type>boolean</type>
           <description>
             If true, repository will deny any kind of deployment (write) request. Caching will still work.
           </description>
+          <required>true</required>
+        </field> -->
+         <field>
+          <name>writePolicy</name>
+          <version>1.4.0+</version>
+          <type>String</type>
+          <description>The policy of the repositories write capability, i.e. (ALLOW_WRITE, ALLOW_WRITE_ONCE, READ_ONLY).</description>
           <required>true</required>
         </field>
         <field>

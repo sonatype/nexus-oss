@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,6 +32,8 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -40,6 +43,8 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -48,6 +53,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.restlet.resource.StringRepresentation;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
@@ -672,7 +678,31 @@ public class AbstractNexusIntegrationTest
 
         return file;
     }
+    
+    protected Metadata downloadMetadataFromRepository( Gav gav, String repoId ) throws IOException, XmlPullParserException
+    {
+        String url = this.getBaseNexusUrl() + REPOSITORY_RELATIVE_URL + repoId + "/" + gav.getGroupId() + "/"
+            + gav.getArtifactId() + "/maven-metadata.xml";
 
+        Response response = RequestFacade.sendMessage( new URL( url ), Method.GET, null );
+        if( response.getStatus().isError() )
+        {
+            return null;
+        }
+        
+        InputStream stream = response.getEntity().getStream();
+        try
+        {
+            MetadataXpp3Reader metadataReader = new MetadataXpp3Reader();
+            return metadataReader.read( stream );
+        }
+        finally
+        {
+            IOUtil.close( stream );
+        }
+        
+    }
+    
     protected File downloadArtifact( Gav gav, String targetDirectory )
         throws IOException
     {

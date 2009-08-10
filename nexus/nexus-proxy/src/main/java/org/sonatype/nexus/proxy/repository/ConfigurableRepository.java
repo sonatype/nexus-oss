@@ -143,16 +143,17 @@ public class ConfigurableRepository
         getCurrentConfiguration( true ).setLocalStatus( localStatus.toString() );
     }
 
-    public boolean isAllowWrite()
+  //TODO: these might need to moved
+    public RepositoryWritePolicy getWritePolicy()
     {
-        return getCurrentConfiguration( false ).isAllowWrite();
+        return RepositoryWritePolicy.valueOf( getCurrentConfiguration( false ).getWritePolicy() );
     }
 
-    public void setAllowWrite( boolean allowWrite )
+    public void setWritePolicy( RepositoryWritePolicy writePolicy )
     {
-        getCurrentConfiguration( true ).setAllowWrite( allowWrite );
-    }
-
+        getCurrentConfiguration( true ).setWritePolicy( writePolicy.name() );
+    }    
+    
     public boolean isBrowseable()
     {
         return getCurrentConfiguration( false ).isBrowseable();

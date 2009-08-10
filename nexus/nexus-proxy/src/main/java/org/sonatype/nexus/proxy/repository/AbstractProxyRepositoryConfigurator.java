@@ -58,6 +58,9 @@ public abstract class AbstractProxyRepositoryConfigurator
                     rs.validateStorageUrl( repo.getRemoteStorage().getUrl() );
 
                     prepository.setRemoteStorage( rs );
+                    
+                    // the write policy on a proxy repo is read only
+                    prepository.setWritePolicy( RepositoryWritePolicy.READ_ONLY );
 
                     if ( repo.getRemoteStorage().getAuthentication() != null )
                     {

@@ -1083,12 +1083,17 @@ public abstract class AbstractRepository
             throw new IllegalRequestException( request, "Repository with ID='" + getId()
                 + "' is not available (localStatus=" + getLocalStatus().toString() + ")!" );
         }
-
-        if ( !isAllowWrite() && ( action.isWritingAction() ) )
+        
+        // check for writing to read only repo
+        // Readonly is ALWAYS read only
+        if( RepositoryWritePolicy.READ_ONLY.equals( this.getWritePolicy() ) && action.isWritingAction()  )
         {
             throw new IllegalRequestException( request, "Repository with ID='" + getId()
                 + "' is Read Only, but action was '" + action.toString() + "'!" );
         }
+        // but Write/write once may need to allow updating metadata
+        // check the write policy
+        this.enforceWritePolicy( request, action );
 
         if ( isExposed() )
         {
@@ -1106,6 +1111,16 @@ public abstract class AbstractRepository
         }
 
         return shouldProcess;
+    }
+    
+    protected void enforceWritePolicy( ResourceStoreRequest request, Action action ) throws IllegalRequestException
+    {   
+        // check for write once (no redeploy)
+        if( Action.update.equals( action ) && !RepositoryWritePolicy.ALLOW_WRITE.equals( this.getWritePolicy() ) )
+        {
+            throw new IllegalRequestException( request, "Repository with ID='" + getId()
+                + "' has does not allow updating artifacts." );
+        }
     }
 
     public boolean isCompatible( Repository repository )
@@ -1170,6 +1185,5 @@ public abstract class AbstractRepository
         }
 
         return localItem;
-    }
-
+    }    
 }

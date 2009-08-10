@@ -9,6 +9,7 @@ import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
 public class Maven2GroupRepositoryTemplate
@@ -41,7 +42,7 @@ public class Maven2GroupRepositoryTemplate
         M2GroupRepositoryConfiguration exConf = new M2GroupRepositoryConfiguration( ex );
         repo.externalConfigurationImple = exConf;
 
-        repo.setAllowWrite( true );
+        repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
 
         CRepositoryCoreConfiguration result =
             new CRepositoryCoreConfiguration(

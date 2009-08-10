@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
@@ -51,7 +52,7 @@ public class M2RepositoryTest
     {
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
 
-        repo1.setAllowWrite( true );
+        repo1.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE );
 
         getApplicationConfiguration().saveConfiguration();
 

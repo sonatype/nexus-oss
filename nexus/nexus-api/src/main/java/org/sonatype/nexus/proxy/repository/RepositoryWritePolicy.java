@@ -1,4 +1,4 @@
-package org.sonatype.nexus.rest.repositories;
+package org.sonatype.nexus.proxy.repository;
 
 public enum RepositoryWritePolicy
 {

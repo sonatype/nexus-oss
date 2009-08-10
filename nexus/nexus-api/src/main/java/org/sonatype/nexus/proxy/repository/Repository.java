@@ -332,20 +332,22 @@ public interface Repository
     void setBrowseable( boolean val );
 
     /**
-     * Is Repository read-only?.
+     * Specifies if the repo is write, readonly, or single deploy.
      * 
-     * @return true if is read only, otherwise false.
+     * @return the write policy for this repository.
      */
-    boolean isAllowWrite();
+    RepositoryWritePolicy getWritePolicy();
 
     /**
-     * Sets the read-only property of repository. If true, the repository will refuse to process any WRITE operation
-     * coming from "outside". This does not affect the in-repository caching using LocalStorage. It just says, that from
+     * Sets the write policy for the repo.
+     * See {@link RepositoryWritePolicy}.
+     * This does not affect the in-repository caching using LocalStorage. It just says, that from
      * the "outer" perspective, this repo behaves like read-only repository, and deployment is disabled for example.
      * 
      * @param val the val
      */
-    void setAllowWrite( boolean val );
+    void setWritePolicy( RepositoryWritePolicy writePolicy );
+   
 
     /**
      * Is Repository indexable?.

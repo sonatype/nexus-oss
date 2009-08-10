@@ -10,6 +10,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
 public class Maven2HostedRepositoryTemplate
@@ -45,7 +46,7 @@ public class Maven2HostedRepositoryTemplate
 
         repo.externalConfigurationImple = exConf;
 
-        repo.setAllowWrite( true );
+        repo.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE_ONCE.name() );
         repo.setNotFoundCacheTTL( 1440 );
 
         CRepositoryCoreConfiguration result =

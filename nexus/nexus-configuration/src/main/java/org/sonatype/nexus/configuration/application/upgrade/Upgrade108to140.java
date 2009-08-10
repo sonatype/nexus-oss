@@ -52,6 +52,7 @@ import org.sonatype.nexus.configuration.upgrade.Upgrader;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.util.ExternalConfigUtil;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
@@ -345,7 +346,6 @@ public class Upgrade108to140
         newrepo.setId( oldrepos.getId() );
         newrepo.setName( oldrepos.getName() );
         newrepo.setLocalStatus( this.localStatus.get( oldrepos.getLocalStatus() ) );
-        newrepo.setAllowWrite( oldrepos.isAllowWrite() );
         newrepo.setBrowseable( oldrepos.isBrowseable() );
         newrepo.setIndexable( oldrepos.isIndexable() );
         newrepo.setNotFoundCacheTTL( oldrepos.getNotFoundCacheTTL() );
@@ -358,6 +358,16 @@ public class Upgrade108to140
         newrepo.setProviderRole( Repository.class.getName() );
         newrepo.setUserManaged( oldrepos.isUserManaged() );
 
+        // set the write Policy
+        if( oldrepos.isAllowWrite() )
+        {
+            newrepo.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
+        }
+        else
+        {
+            newrepo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() ); 
+        }
+                
         // Manipulate the dom
         Xpp3Dom externalConfig = new Xpp3Dom( EXTERNAL_CONFIG );
         newrepo.setExternalConfiguration( externalConfig );
@@ -571,7 +581,7 @@ public class Upgrade108to140
             newShadow.setProviderRole( ShadowRepository.class.getName() );
             newShadow.setExposed( oldshadow.isExposed() );
             newShadow.setUserManaged( oldshadow.isUserManaged() );
-            newShadow.setAllowWrite( false );
+            newShadow.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
             newShadow.setBrowseable( true );
             newShadow.setIndexable( false );
             newShadow.setLocalStorage( null );
@@ -625,7 +635,7 @@ public class Upgrade108to140
             String providerHint = oldgroup.getType() != null ? oldgroup.getType() : "maven2";
             groupRepo.setProviderHint( providerHint );
             groupRepo.setProviderRole( GroupRepository.class.getName() );
-            groupRepo.setAllowWrite( false );
+            groupRepo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
             groupRepo.setBrowseable( true );
             groupRepo.setExposed( true );
             groupRepo.setIndexable( false );
