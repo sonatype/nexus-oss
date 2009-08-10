@@ -122,40 +122,40 @@ public class RepositoryGroupPlexusResource
         
         resource.setExposed( groupRepo.isExposed() );
 
-        try
+        // just to trigger list creation, and not stay null coz of XStream serialization
+        resource.getRepositories();
+
+        for ( String repoId : groupRepo.getMemberRepositoryIds() )
         {
-            // just to trigger list creation, and not stay null coz of XStream serialization
-            resource.getRepositories();
+            RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
 
-            for ( String repoId : groupRepo.getMemberRepositoryIds() )
+            member.setId( repoId );
+
+            try
             {
-                RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
-
-                member.setId( repoId );
-
                 // NOTE: we must hit the registry each time and NOT call groupRepo.getMemberRepositories, that doesn't block access
                 member.setName( getRepositoryRegistry().getRepository( repoId ).getName() );
-
-                member.setResourceURI( createChildReference( request, this, repoId ).toString() );
-
-                resource.addRepository( member );
             }
+            catch ( NoSuchRepositoryAccessException e)
+            {
+                // access denied 403
+                getLogger().debug( "Blocking access to repository group, based on permissions." );
+                
+                throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                getLogger().debug( "Found missing repo id: " + repoId + " contained in group" );
+            }            
 
-            result.setData( resource );
-        }
-        catch ( NoSuchRepositoryAccessException e)
-        {
-            // access denied 403
-            getLogger().debug( "Blocking access to repository group, based on permissions." );
-            
-            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getLogger().warn( "Cannot find a repository declared within a group!", e );
+            member.setResourceURI( createChildReference( request, this, repoId ).toString() );
 
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+            resource.addRepository( member );
         }
+
+        result.setData( resource );
+        
+        
         return result;
     }
 

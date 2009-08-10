@@ -366,14 +366,34 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
   },
 
   validate: function() {
+    var leftTree = this.getComponent( 0 );
+    
+    if ( this.containsInvalidNode() ) {
+      this.markTreeInvalid( leftTree, 'Invalid Repository contained in list' );
+      return false;
+    }
+    
     if ( ! this.required ) return true;
 
-    var leftTree = this.getComponent( 0 );
     var valid = leftTree.validate.call( leftTree );
     if ( ! valid ) {
       this.markTreeInvalid( leftTree, null );
     }
     return valid;
+  },
+  
+  containsInvalidNode: function() {
+    var root = this.getComponent( 0 ).root;
+    
+    var nodes = root.childNodes;
+    
+    for ( var i = 0; i < nodes.length; i++ ) {
+      if ( nodes[i].attributes.payload.invalid == true ) {
+        return true;
+      }        
+    }
+    
+    return false;
   },
   
   getValue: function() {
@@ -436,7 +456,8 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
           }
         };
         rec.data[this.valueField] = valueId;
-        rec.data[this.displayField] = name;
+        rec.data[this.displayField] = valueId + ' - (Invalid)';
+        rec.invalid = true;
         this.createNode( leftRoot, rec );
       }
     }
