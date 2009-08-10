@@ -202,8 +202,9 @@ public class EnvironmentMojo
         }
 
         File nexusBaseDir = new File( destination, bundle.getArtifactId() + "-" + bundle.getBaseVersion() );
+        File nexusWorkDir = new File( destination, "nexus-work-dir" );
         project.getProperties().put( "nexus-base-dir", getPath( nexusBaseDir ) );
-        project.getProperties().put( "nexus-work-dir", getPath( new File( destination, "nexus-work-dir" ) ) );
+        project.getProperties().put( "nexus-work-dir", getPath( nexusWorkDir ) );
 
         // conf dir
         project.getProperties().put( "application-conf", getPath( new File( destination, "nexus-work-dir/conf" ) ) );
@@ -276,6 +277,7 @@ public class EnvironmentMojo
         copyUrl( "/default-config/security-configuration.xml", new File( defaultConfig, "security-configuration.xml" ) );
         copyUrl( "/default-config/settings.xml", new File( defaultConfig, "settings.xml" ) );
         copyUrl( "/default-config/log4j.properties", new File( defaultConfig, "log4j.properties" ) );
+        copyUrl( "/default-config/log4j.properties", new File( nexusWorkDir, "conf/log4j.properties" ) );
 
         File sourceDefaultConfig = new File( resourcesSourceLocation, "default-config" );
         if ( sourceDefaultConfig.isDirectory() )
