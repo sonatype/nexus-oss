@@ -336,7 +336,7 @@ public class DefaultArtifactoryMigrator
 
         final Map<String, ArtifactoryRepository> artifactoryRepositories = cfg.getRepositories();
         final Map<String, ArtifactoryProxy> artifactoryProxies = cfg.getProxies();
-        final List<RepositoryResolutionDTO> repositories = result.getMigrationSummary().getRepositoriesResolutions();
+        final List<RepositoryResolutionDTO> repositories = result.getMigrationSummary().getRepositoriesResolution();
 
         for ( RepositoryResolutionDTO resolution : repositories )
         {
@@ -444,8 +444,6 @@ public class DefaultArtifactoryMigrator
             members.add( repoId );
         }
         exConf.setMemberRepositoryIds( members );
-
-        exConf.commitChanges();
 
         try
         {
@@ -589,8 +587,6 @@ public class DefaultArtifactoryMigrator
             }
 
         }
-
-        exConf.commitChanges();
 
         try
         {
@@ -784,7 +780,6 @@ public class DefaultArtifactoryMigrator
         M2LayoutedM1ShadowRepositoryConfiguration exConf = new M2LayoutedM1ShadowRepositoryConfiguration( ex );
         exConf.setMasterRepositoryId( shadowOfRepoId );
         exConf.setSynchronizeAtStartup( true );
-        exConf.commitChanges();
 
         try
         {

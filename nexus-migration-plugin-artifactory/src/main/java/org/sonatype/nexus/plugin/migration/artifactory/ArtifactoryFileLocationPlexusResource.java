@@ -161,7 +161,7 @@ public class ArtifactoryFileLocationPlexusResource
 
         List<RepositoryResolutionDTO> repositoriesResolution = resolve( repositories.values() );
 
-        data.setRepositoriesResolutions( repositoriesResolution );
+        data.setRepositoriesResolution( repositoriesResolution );
 
         List<GroupResolutionDTO> groupsResolution = resolve( cfg.getVirtualRepositories(), repositories );
 

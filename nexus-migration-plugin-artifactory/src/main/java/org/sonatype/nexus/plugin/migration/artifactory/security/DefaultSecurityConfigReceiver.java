@@ -15,9 +15,14 @@ package org.sonatype.nexus.plugin.migration.artifactory.security;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
+import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.proxy.target.Target;
+import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
@@ -29,7 +34,13 @@ public class DefaultSecurityConfigReceiver
 {
 
     @Requirement
-    private NexusConfiguration configuration;
+    private TargetRegistry targetRegistry;
+
+    @Requirement
+    private NexusConfiguration nexusConfiguration;
+
+    @Requirement
+    private RepositoryTypeRegistry repositoryTypeRegistry;
 
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager manager;
@@ -39,13 +50,22 @@ public class DefaultSecurityConfigReceiver
     {
         try
         {
-            configuration.createRepositoryTarget( repoTarget );
+            ContentClass cc = repositoryTypeRegistry.getContentClasses().get( repoTarget.getContentClass() );
+
+            if ( cc == null )
+            {
+                throw new ConfigurationException( "Content class with ID=\"" + repoTarget.getContentClass()
+                    + "\" does not exists!" );
+            }
+
+            Target target = new Target( repoTarget.getId(), repoTarget.getName(), cc, repoTarget.getPatterns() );
+            targetRegistry.addRepositoryTarget( target );
+            nexusConfiguration.saveConfiguration();
         }
         catch ( Exception e )
         {
             throw new ArtifactoryMigrationException( "Cannot create repository target with id " + repoTarget.getId(), e );
         }
-
     }
 
     public void receiveSecurityPrivilege( SecurityPrivilege privilege )

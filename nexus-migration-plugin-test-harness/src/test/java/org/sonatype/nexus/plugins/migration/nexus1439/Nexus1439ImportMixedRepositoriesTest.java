@@ -21,6 +21,8 @@ import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
+import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1439ImportMixedRepositoriesTest
     extends AbstractMigrationIntegrationTest
@@ -40,6 +42,7 @@ public class Nexus1439ImportMixedRepositoriesTest
 
         checkGroupContent();
 
+        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
         checkIndex( "main-local", "nxcm259", "released", "1.0" );
         checkIndex( "main-local", "nxcm259", "snapshot", "1.0-SNAPSHOT" );
 

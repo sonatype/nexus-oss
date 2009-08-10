@@ -25,6 +25,8 @@ import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractImportArtifactoryTest
     extends AbstractMigrationIntegrationTest
@@ -68,6 +70,8 @@ public abstract class AbstractImportArtifactoryTest
     private void checkIndexes()
         throws Exception
     {
+        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+
         checkIndex( "ext-releases", "nxcm254", "ext-releases", "1.0" );
         checkIndex( "ext-snapshots", "nxcm254", "ext-snapshots", "1.0-SNAPSHOT" );
         checkIndex( "libs-releases", "nxcm254", "libs-releases", "1.0" );
