@@ -702,6 +702,7 @@
         <artifactId>nexus-proxy</artifactId>
         <version>${project.version}</version>
         <classifier>tests</classifier>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -713,6 +714,7 @@
         <artifactId>nexus-app</artifactId>
         <version>${project.version}</version>
         <classifier>tests</classifier>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -729,6 +731,7 @@
         <artifactId>nexus-rest-api</artifactId>
         <version>${project.version}</version>
         <classifier>tests</classifier>
+        <scope>test</scope>
       </dependency>
 
       <!-- Plugins -->
