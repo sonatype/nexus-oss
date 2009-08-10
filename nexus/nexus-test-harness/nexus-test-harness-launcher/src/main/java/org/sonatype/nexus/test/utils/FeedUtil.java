@@ -56,8 +56,6 @@ public class FeedUtil
         Assert.assertTrue( "Expected content", response.getEntity().isAvailable());
         
         SyndFeed feed = input.build( new XmlReader( response.getEntity().getStream() ) );
-        // sort it by date
-        sortSyndEntryOrderByPublishedDate( feed );
 
         return feed;
     }

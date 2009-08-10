@@ -41,11 +41,6 @@ public class Nexus538SystemFeeds
     public void bootEventTest()
         throws Exception, IllegalArgumentException, FeedException
     {
-        // restart and look for event in feed
-
-        NexusStatusUtil.doHardStop();
-        NexusStatusUtil.doHardStart();
-
         Assert.assertTrue( findFeedEntry( FeedUtil.getFeed( "systemChanges" ), "Booting", null ) );
     }
 
@@ -63,10 +58,8 @@ public class Nexus538SystemFeeds
         repo.setName( newName );
         repoUtil.updateRepo( repo );
 
-        Thread.sleep( 10000 ); // give some time to events jump and feed get in place
-
         final SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
-        Assert.assertTrue( "Update repo feed not found" + feed, findFeedEntry( feed, "Configuration change",
+        Assert.assertTrue( "Update repo feed not found\r\n\r\n" + feed, findFeedEntry( feed, "Configuration change",
                                                                                new String[] { newName, oldName } ) );
     }
 
