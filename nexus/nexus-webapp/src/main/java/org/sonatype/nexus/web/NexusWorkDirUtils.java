@@ -42,12 +42,16 @@ public class NexusWorkDirUtils
     public static final String KEY_SECURITY_XML_FILE = "security-xml-file";
 
     public static final String KEY_APPLICATION_CONF = "application-conf";
+    
+    public static final String KEY_NEXUS_APP = "nexus-app";
 
     public static final String RELATIVE_PATH_RUNTIME = "/runtime";
-
+    
     public static final String RELATIVE_PATH_SECURITY_XML_FILE = "/conf/security.xml";
 
     public static final String RELATIVE_PATH_APPLICATION_CONF = "/conf";
+    
+    public static final String RELATIVE_PATH_NEXUS_APP = RELATIVE_PATH_RUNTIME + "/apps/nexus";
 
     public static void setUpNexusWorkDir( Map<Object, Object> context )
     {
@@ -111,6 +115,11 @@ public class NexusWorkDirUtils
         if ( StringUtils.isEmpty( (String) context.get( KEY_APPLICATION_CONF ) ) )
         {
             context.put( KEY_APPLICATION_CONF, new File( root, RELATIVE_PATH_APPLICATION_CONF ).getAbsolutePath() );
+        }
+        
+        if ( StringUtils.isEmpty( ( String ) context.get( KEY_NEXUS_APP ) ) )
+        {
+            context.put( KEY_NEXUS_APP, new File( root, RELATIVE_PATH_NEXUS_APP ).getAbsolutePath() );
         }
     }
 
