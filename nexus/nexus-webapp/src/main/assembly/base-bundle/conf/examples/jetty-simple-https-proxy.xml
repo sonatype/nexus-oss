@@ -4,7 +4,10 @@
 <!-- =============================================================== -->
 <!--                                                                 -->
 <!--  NOTE: Copy this file to ../jetty.xml to use it.                -->
-<!--                                                                 -->
+<!--   NOTE: As of this writing, the above configuration also requires an additional Jetty library, called jetty-rewrite-handler, -->
+<!--              that includes the rewrite support. Add this jar to the $(basedir)/runtime/apps/nexus/lib directory, so it is available when Nexus starts.-->
+<!--              http://repository.sonatype.org/content/groups/public/org/mortbay/jetty/jetty-rewrite-handler/6.1.14/jetty-rewrite-handler-6.1.14.jar -->
+<!--              See here for more information: https://docs.sonatype.com/display/NX/Jetty+Configuration -->
 <!-- Configure the Jetty Server                                      -->
 <!--                                                                 -->
 <!-- Documentation of this file format can be found at:              -->
