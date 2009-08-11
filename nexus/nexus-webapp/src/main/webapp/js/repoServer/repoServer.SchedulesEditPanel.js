@@ -1688,7 +1688,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     
     if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ)
       && (this.ctxRecord.data.status == 'SUBMITTED'
-      || this.ctxRecord.data.status == 'WAITING')) {
+      || this.ctxRecord.data.status == 'WAITING'
+      || this.ctxRecord.data.status == 'BROKEN' )) {
       menu.add(this.actions.run);
     }
     
