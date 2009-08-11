@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -206,11 +205,18 @@ public abstract class AbstractIndexPlexusResource
                     {
                         return new FlatSearchResponse( null, TOO_MANY_RESULTS, Collections.<ArtifactInfo>emptySet() );
                     }
+                    
+                    // Note that we are reusing the tree set from the indexer, otherwise using a new set
+                    // we will have to redefine the sorting as defined in indexer
                     if( artifacts == null )
                     {
-                        artifacts = new HashSet<ArtifactInfo>();
+                        artifacts = searchResponse.getResults();
                     }
-                    artifacts.addAll( searchResponse.getResults() );
+                    else
+                    {
+                        artifacts.addAll( searchResponse.getResults() );    
+                    }
+                    
                     totalHits += searchResponse.getTotalHits();
                 }
             }
