@@ -21,6 +21,7 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.rest.users.UserResetPlexusResource;
 
 import com.icegreen.greenmail.util.GreenMail;
@@ -115,7 +116,7 @@ public class ForgotPasswordTest
     }
 
     public void setUp()
-        throws IOException
+        throws Exception
     {
         ServerSocket socket = new ServerSocket( 0 );
         this.emailServerPort = socket.getLocalPort();
@@ -127,6 +128,8 @@ public class ForgotPasswordTest
         server = new GreenMail( smtp );
         server.setUser( "system@nexus.org", "smtp-username", "smtp-password" );
         server.start();
+        
+        this.lookup( SecuritySystem.class ).start();
     }
 
     public void tearDown()
