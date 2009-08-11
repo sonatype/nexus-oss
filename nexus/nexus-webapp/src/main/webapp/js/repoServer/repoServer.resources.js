@@ -160,12 +160,12 @@ Sonatype.repoServer.resources.help = {
     downloadRemoteIndexes : 'Indicates if the index stored on the remote repository should be downloaded and used for local searches.',
     checksumPolicy : 'The checksum policy for this repository: Ignore: Don\'t check remote checksums. Warn: Log a warning if the checksum is bad but serve the artifact anyway. (Default...there are currently known checksum errors on Central). StrictIfExists: Do not serve the artifact if the checksum exists but is invalid. Strict: Require that a checksum exists on the remote repository and that it is valid.',
     //remote
-    remoteUsername : 'The username used for authentication to the HTTP proxy.',
-    remotePassword : 'The password used for authentication to the HTTP proxy.',
-    remotePrivateKey : 'The ssl private key used for authentication to the HTTP proxy.',
+    remoteUsername : 'The username used for authentication to the remote repository.',
+    remotePassword : 'The password used for authentication to the remote repository.',
+    remotePrivateKey : 'The ssl private key used for authentication to the remote repository.',
     remotePassphrase : 'The passphase for the private key.',
-    remoteNtlmHost : 'The Windows NT Lan Manager for authentication.',
-    remoteNtlmDomain : 'The Windows NT Lan Manager domain for authentication.',
+    remoteNtlmHost : 'The Windows NT Lan Manager for authentication to the remote repository.',
+    remoteNtlmDomain : 'The Windows NT Lan Manager domain for authentication to the remote repository.',
   
     //proxy override fields
     userAgentString : userAgentString,
