@@ -27,7 +27,7 @@ public abstract class AbstractSecurityRestTest extends PlexusTestCase
         FileUtils.copyFile( new File( TEST_CONFIG ), new File( WORK_DIR, "/conf/security.xml" ) );
         
         // start security
-        this.lookup( SecuritySystem.class );
+        this.lookup( SecuritySystem.class ).start();
     }
 
     @Override
