@@ -44,6 +44,7 @@ public class SecurityAuthenticationTest
         super.setUp();
 
         security = (SecuritySystem) lookup( SecuritySystem.class );
+        security.start();
     }
 
     public void testSuccessfulAuthentication()

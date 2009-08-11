@@ -61,6 +61,8 @@ public abstract class AbstractSecurityTestCase
 
         config.setRealms( new ArrayList<String>( realmMap.keySet() ) );
         source.storeConfiguration();
+        
+        this.lookup( SecuritySystem.class ).start();
     }
 
     protected Configuration getConfigurationFromStream( InputStream is )

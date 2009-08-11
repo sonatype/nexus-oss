@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.subject.PrincipalCollection;
@@ -22,7 +24,7 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-public interface SecuritySystem extends Startable
+public interface SecuritySystem //extends Startable
 {
 
     // *********************
@@ -189,5 +191,11 @@ public interface SecuritySystem extends Startable
     boolean isSecurityEnabled();
 
     void setSecurityEnabled( boolean enabled );
+    
+    void start()
+    throws StartingException;
+
+    void stop()
+    throws StoppingException;
 
 }

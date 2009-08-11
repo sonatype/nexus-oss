@@ -23,6 +23,7 @@ import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.SimplePrincipalCollection;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.AbstractSecurityTestCase;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
@@ -67,6 +68,8 @@ public class XmlAuthorizingRealmTest
         configurationManager.clearCache();
         
         configFile.delete();
+        
+        this.lookup( SecuritySystem.class ).start();
     }
     
     public void testAuthorization()

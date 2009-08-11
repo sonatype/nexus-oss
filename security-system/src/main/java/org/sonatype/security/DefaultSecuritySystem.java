@@ -819,18 +819,21 @@ public class DefaultSecuritySystem
 
     private void clearRealmCaches()
     {
-        for ( Realm realm : this.securityManager.getRealms() )
+        if( this.securityManager.getRealms() != null)
         {
-            // check if its a AuthorizingRealm, if so clear the cache
-            if ( AuthorizingRealm.class.isInstance( realm ) )
+            for ( Realm realm : this.securityManager.getRealms() )
             {
-                // clear the cache
-                AuthorizingRealm aRealm = (AuthorizingRealm) realm;
-
-                Cache cache = aRealm.getAuthorizationCache();
-                if ( cache != null )
+                // check if its a AuthorizingRealm, if so clear the cache
+                if ( AuthorizingRealm.class.isInstance( realm ) )
                 {
-                    cache.clear();
+                    // clear the cache
+                    AuthorizingRealm aRealm = (AuthorizingRealm) realm;
+    
+                    Cache cache = aRealm.getAuthorizationCache();
+                    if ( cache != null )
+                    {
+                        cache.clear();
+                    }
                 }
             }
         }
@@ -850,22 +853,12 @@ public class DefaultSecuritySystem
             this.securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
         }
     }
-
+    
     public void initialize()
-        throws InitializationException
+    throws InitializationException
     {
-        // load the configuration
-        try
-        {
-            this.securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
-        }
-        catch ( Exception e )
-        {
-            throw new InitializationException( e.getMessage(), e );
-        }
-
         // add event handler
         this.eventMulticaster.addEventListener( this );
-
+    
     }
 }

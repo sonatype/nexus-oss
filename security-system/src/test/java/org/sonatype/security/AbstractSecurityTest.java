@@ -36,6 +36,8 @@ public abstract class AbstractSecurityTest
         // delete the plexus home dir
         FileUtils.deleteDirectory( PLEXUS_HOME );
 
+        this.getSecuritySystem().start();
+        
         super.setUp();
     }
 

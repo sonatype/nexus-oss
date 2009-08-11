@@ -15,6 +15,7 @@ public class CachingTest
         throws Exception
     {
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
+        securitySystem.start();
 
         MockRealmB mockRealmB = (MockRealmB) this.lookup( Realm.class, "MockRealmB" );
 
