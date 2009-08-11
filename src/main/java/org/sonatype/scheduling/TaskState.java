@@ -56,6 +56,11 @@ public enum TaskState
      */
     CANCELLED; // END
     
+    public boolean isRunnable()
+    {
+        return this.equals( SUBMITTED ) || this.equals( RUNNING ) || this.equals( SLEEPING ) || this.equals( WAITING ) || this.equals( BROKEN );
+    }
+    
     public boolean isActiveOrSubmitted()
     {
         return this.equals( SUBMITTED ) || this.equals( RUNNING ) || this.equals( SLEEPING ) || this.equals( WAITING );

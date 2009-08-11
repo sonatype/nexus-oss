@@ -312,7 +312,7 @@ public class DefaultScheduledTask<T>
         
         Future<T> nextFuture = null;
 
-        if ( ( isEnabled() || manualRun ) && getTaskState().isActiveOrSubmitted()) 
+        if ( ( isEnabled() || manualRun ) && getTaskState().isRunnable()) 
         {
             setTaskState( TaskState.RUNNING );
 
