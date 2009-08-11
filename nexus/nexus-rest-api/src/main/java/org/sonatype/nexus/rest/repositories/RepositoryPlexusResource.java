@@ -148,7 +148,7 @@ public class RepositoryPlexusResource
                         repository.setExposed( resource.isExposed() );
 
                         // set null to read only
-                        RepositoryWritePolicy writePolicy = (model.getWritePolicy() != null) ? RepositoryWritePolicy.valueOf( model.getWritePolicy() ) : null;
+                        RepositoryWritePolicy writePolicy = (model.getWritePolicy() != null) ? RepositoryWritePolicy.valueOf( model.getWritePolicy() ) : RepositoryWritePolicy.READ_ONLY;
                         
                         repository.setWritePolicy( writePolicy );
 
