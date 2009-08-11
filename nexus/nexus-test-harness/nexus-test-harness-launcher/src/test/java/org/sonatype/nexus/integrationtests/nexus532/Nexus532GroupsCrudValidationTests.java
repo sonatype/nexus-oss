@@ -146,11 +146,6 @@ public class Nexus532GroupsCrudValidationTests
     public void maven1Maven2GroupTest()
         throws IOException
     {
-        if( this.printKnownErrorButDoNotFail( this.getClass(), "maven1Maven2GroupTest" ) )
-        {
-            return;
-        }
-
         RepositoryGroupResource resource = new RepositoryGroupResource();
 
         resource.setId( "maven2Maven2GroupTest" );
@@ -204,12 +199,6 @@ public class Nexus532GroupsCrudValidationTests
     public void invalidRepoId()
         throws IOException
     {
-
-        if( this.printKnownErrorButDoNotFail( this.getClass(), "invalidRepoId" ) )
-        {
-            return;
-        }
-        
         RepositoryGroupResource resource = new RepositoryGroupResource();
 
         resource.setId( "invalidRepoId" );

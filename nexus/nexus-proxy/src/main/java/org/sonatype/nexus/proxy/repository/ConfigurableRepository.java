@@ -135,6 +135,10 @@ public class ConfigurableRepository
 
     public LocalStatus getLocalStatus()
     {
+        if( getCurrentConfiguration( false ).getLocalStatus() == null )
+        {
+            return null;
+        }
         return LocalStatus.valueOf( getCurrentConfiguration( false ).getLocalStatus() );
     }
 

@@ -76,7 +76,11 @@ public interface Nexus
     // Repo maintenance
     // ----------------------------------------------------------------------------
 
+    @Deprecated
     public Repository createRepository( CRepository settings )
+        throws ConfigurationException, IOException;
+    
+    public void addRepository( Repository repository )
         throws ConfigurationException, IOException;
 
     /**

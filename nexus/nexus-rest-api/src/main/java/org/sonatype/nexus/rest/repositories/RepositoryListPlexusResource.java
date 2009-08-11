@@ -16,6 +16,7 @@ package org.sonatype.nexus.rest.repositories;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -182,7 +183,11 @@ public class RepositoryListPlexusResource
 
             RepositoryResource repoResource = (RepositoryResource) resource;
 
-            appModel.setWritePolicy( repoResource.getWritePolicy() );
+            // we can use the default if the value is empty
+            if( StringUtils.isNotEmpty( repoResource.getWritePolicy() ))
+            {
+                appModel.setWritePolicy( repoResource.getWritePolicy() );
+            }
 
             appModel.setBrowseable( repoResource.isBrowseable() );
 

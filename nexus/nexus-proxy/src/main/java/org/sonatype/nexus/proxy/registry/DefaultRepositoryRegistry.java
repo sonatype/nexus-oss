@@ -19,10 +19,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
+import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -55,6 +63,9 @@ public class DefaultRepositoryRegistry
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
 
+    @Requirement
+    private PlexusContainer plexusContainer;
+    
     /** The repo register, [Repository.getId, Repository] */
     private Map<String, Repository> repositories = new HashMap<String, Repository>();
 
@@ -249,6 +260,28 @@ public class DefaultRepositoryRegistry
         }
     }
 
+    public <R extends Repository> R createNewRepository(String repoId, String type, String provider ) throws ConfigurationException
+    {
+        if( StringUtils.isEmpty( repoId ))
+        {
+            throw new InvalidConfigurationException( "Group or Repository Id cannot be empty." );
+        }
+        
+        try
+        {
+            Repository repo = (R) this.plexusContainer.lookup( type, provider );
+            CRepository cRepo = new DefaultCRepository();
+            cRepo.setId( repoId );
+            cRepo.setExternalConfiguration( new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME ) );
+            repo.configure( cRepo );
+            return (R) repo;
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new InvalidConfigurationException( "Could not lookup a new instance of Repository!", e );
+        }
+    }
+    
     public void dispose()
     {
         // kill the checker daemon threads

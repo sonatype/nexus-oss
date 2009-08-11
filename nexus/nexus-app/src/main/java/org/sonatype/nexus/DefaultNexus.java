@@ -38,6 +38,7 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
@@ -293,6 +294,40 @@ public class DefaultNexus
 
         return repository;
     }
+    
+    public void addRepository( Repository repository )
+    throws ConfigurationException, IOException
+    {
+        try
+        {
+            indexerManager.setRepositoryIndexContextSearchable( repository.getId(), repository.isIndexable() );
+    
+            // create the initial index
+            if ( repository.isIndexable() )
+            {
+                // Create the initial index for the repository
+                ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+                rt.setRepositoryId( repository.getId() );
+                nexusScheduler.submit( "Create initial index.", rt );
+            }
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // will not happen, just added it
+        }
+        
+        //commit the changes in the repo
+        repository.commitChanges();
+        // now add it to config, since it is validated and succesfully created
+        CRepositoryCoreConfiguration coreConfig = (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration();
+        this.getNexusConfiguration().getConfigurationModel().addRepository( coreConfig.getConfiguration( false ) );
+
+        this.getNexusConfiguration().saveConfiguration();
+        
+        // register with repoRegistry
+        repositoryRegistry.addRepository( repository );
+    }
+
 
     public void deleteRepository( String id )
         throws NoSuchRepositoryException,
