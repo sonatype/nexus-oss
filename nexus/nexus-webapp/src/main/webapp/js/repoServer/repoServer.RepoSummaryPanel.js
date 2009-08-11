@@ -169,7 +169,13 @@ Ext.extend( Sonatype.repoServer.ProxyRepositorySummaryPanel, Sonatype.repoServer
       srcObj,
       fpanel );
     
-    this.populateInformationField( 'Remote URL: ' + this.payload.data.remoteUri + '\n' );
+    var remoteUri = this.payload.data.remoteUri;
+    
+    if ( remoteUri == undefined ) {
+      remoteUri = this.payload.data.remoteStorage.remoteStorageUrl;
+    }
+    
+    this.populateInformationField( 'Remote URL: ' + remoteUri + '\n' );
   }
 } );
 
