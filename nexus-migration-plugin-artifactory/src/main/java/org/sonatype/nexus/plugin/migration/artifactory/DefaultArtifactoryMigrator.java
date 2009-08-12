@@ -77,6 +77,10 @@ public class DefaultArtifactoryMigrator
     extends AbstractLogEnabled
     implements ArtifactoryMigrator, Initializable
 {
+    private static final String MAVEN2 = "maven2";
+
+    private static final String MAVEN1 = "maven1";
+
     private static final String MIGRATION_LOG = "migration.log";
 
     private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER =
@@ -368,7 +372,7 @@ public class DefaultArtifactoryMigrator
                         String repoType = repo.getType();
                         if ( repoType == null )
                         {
-                            repoType = "maven2";
+                            repoType = MAVEN2;
                         }
                         CRepository nexusGroup =
                             createGroup( repo.getKey(), repoType, result, nexusRepoReleases.getId(),
@@ -525,15 +529,26 @@ public class DefaultArtifactoryMigrator
         String hint = repo.getType();
         if ( hint == null )
         {
-            hint = "maven2";
+            hint = MAVEN2;
         }
         nexusRepo.setProviderHint( hint );
 
+
+        boolean indexable;
+        if ( hint == MAVEN1 )
+        {
+            indexable = false;
+        }
+        else
+        {
+            indexable = true;
+        }
+
+        nexusRepo.setIndexable( indexable );
         nexusRepo.setUserManaged( true );
         nexusRepo.setExposed( true );
-        nexusRepo.setAllowWrite( true );
+        nexusRepo.setWritePolicy( "ALLOW_WRITE" );
         nexusRepo.setBrowseable( true );
-        nexusRepo.setIndexable( true );
 
         nexusRepo.setNotFoundCacheTTL( 1440 );
 
@@ -622,15 +637,15 @@ public class DefaultArtifactoryMigrator
             result.addInfoMessage( "Importing group: " + resolution.getGroupId() );
 
             ArtifactoryVirtualRepository virtualRepo = virtualRepositories.get( resolution.getGroupId() );
-            String repoType = "maven2";
+            String repoType;
 
             if ( ERepositoryTypeResolution.MAVEN_1_ONLY.equals( resolution.getRepositoryTypeResolution() ) )
             {
-                repoType = "maven1";
+                repoType = MAVEN1;
             }
             else
             {
-                repoType = "maven2" ;
+                repoType = MAVEN2;
             }
 
             List<String> repositoriesIds = new ArrayList<String>();
@@ -660,14 +675,14 @@ public class DefaultArtifactoryMigrator
                     String type = repo.getType();
                     if ( ERepositoryTypeResolution.MAVEN_1_ONLY.equals( resolution.getRepositoryTypeResolution() ) )
                     {
-                        if ( "maven1".equals( type ) )
+                        if ( MAVEN1.equals( type ) )
                         {
                             addRepository( repositoriesIds, repoId );
                         }
                     }
                     else if ( ERepositoryTypeResolution.VIRTUAL_BOTH.equals( resolution.getRepositoryTypeResolution() ) )
                     {
-                        if ( "maven1".equals( type ) )
+                        if ( MAVEN1.equals( type ) )
                         {
                             try
                             {
@@ -687,7 +702,7 @@ public class DefaultArtifactoryMigrator
                     else
                     // MAVEN2 only
                     {
-                        if ( type == null || "maven2".equals( type ) )
+                        if ( type == null || MAVEN2.equals( type ) )
                         {
                             addRepository( repositoriesIds, repoId );
                         }

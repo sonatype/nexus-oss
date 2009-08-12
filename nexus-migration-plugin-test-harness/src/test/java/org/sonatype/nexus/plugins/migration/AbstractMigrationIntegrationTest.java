@@ -36,6 +36,7 @@ import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
+import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -67,15 +68,17 @@ public abstract class AbstractMigrationIntegrationTest
 
     @BeforeClass
     public static void clean()
-        throws IOException
+        throws Exception
     {
         TestContainer.getInstance().getTestContext().setSecureTest( false );
+
+        NexusStatusUtil.stop();
 
         cleanWorkDir();
         File logFile = new File( "./target/logs/migration.log" );
         if ( logFile.isFile() )
         {
-            FileUtils.forceDelete( logFile );
+            FileUtils.writeStringToFile( logFile, "" );
         }
     }
 

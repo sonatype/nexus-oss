@@ -14,11 +14,10 @@ public class MigrationLog4jConfig
     {
         super( logConfig.getRootLogger(), logConfig.getFileAppenderLocation(), logConfig.getFileAppenderPattern() );
 
-        put( " key", "value " );
         put( "log4j.logger.org.sonatype.nexus.plugin.migration", "DEBUG, migrationlogfile" );
 
         put( "log4j.appender.migrationlogfile", "org.apache.log4j.DailyRollingFileAppender" );
-        put( "log4j.appender.migrationlogfile.File", migrationLog.getAbsolutePath() );
+        put( "log4j.appender.migrationlogfile.File", migrationLog.getAbsolutePath().replace( '\\', '/' ) );
         put( "log4j.appender.migrationlogfile.Append", "true" );
         put( "log4j.appender.migrationlogfile.DatePattern", "'.'yyyy-MM-dd" );
         put( "log4j.appender.migrationlogfile.layout", "org.sonatype.nexus.log4j.ConcisePatternLayout" );
