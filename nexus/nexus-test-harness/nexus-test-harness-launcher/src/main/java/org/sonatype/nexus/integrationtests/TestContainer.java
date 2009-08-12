@@ -16,7 +16,6 @@ package org.sonatype.nexus.integrationtests;
 import java.io.File;
 import java.io.FileInputStream;
 
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.appbooter.PlexusAppBooter;
@@ -28,8 +27,6 @@ public class TestContainer
     private static TestContainer SELF = null;
 
     private TestContext testContext = new TestContext();
-
-    private PlexusContainer container;
 
     private PlexusAppBooter plexusAppBooter;
 
@@ -112,43 +109,11 @@ public class TestContainer
 
         plexusAppBooter.startContainer();
         this.plexusAppBooter = plexusAppBooter;
-
-        PlexusContainer container = plexusAppBooter.getContainer();
-        this.container = container;
-    }
-
-    public Object lookup( String role )
-        throws Exception
-    {
-        return container.lookup( role );
-    }
-
-    public <E> E lookup( Class<E> role )
-        throws Exception
-    {
-        return container.lookup( role );
-    }
-
-    public Object lookup( String role, String id )
-        throws Exception
-    {
-        return container.lookup( role, id );
-    }
-
-    public <E> E lookup( Class<E> role, String id )
-        throws Exception
-    {
-        return container.lookup( role, id );
     }
 
     public TestContext getTestContext()
     {
         return testContext;
-    }
-
-    public PlexusContainer getContainer()
-    {
-        return container;
     }
 
     public PlexusAppBooter getPlexusAppBooter()

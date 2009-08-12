@@ -33,7 +33,7 @@ public class Nexus758StatusService
         throws Exception
     {
 
-        NexusClient client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
+        NexusClient client = (NexusClient) container.lookup( NexusClient.ROLE );
         TestContext context = TestContainer.getInstance().getTestContext();
         client.connect( AbstractNexusIntegrationTest.baseNexusUrl, context.getAdminUsername(),
                         context.getAdminPassword() );

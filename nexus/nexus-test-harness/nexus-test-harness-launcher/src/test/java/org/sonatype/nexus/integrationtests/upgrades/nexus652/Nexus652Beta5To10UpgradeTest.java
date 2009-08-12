@@ -45,7 +45,7 @@ public class Nexus652Beta5To10UpgradeTest
     {
         // if we made it this far the upgrade worked...
         
-        SecurityConfigurationSource securitySource = TestContainer.getInstance().lookup( SecurityConfigurationSource.class, "file" );
+        SecurityConfigurationSource securitySource = container.lookup( SecurityConfigurationSource.class, "file" );
         SecurityConfiguration securityConfig = securitySource.loadConfiguration();
 
         Configuration nexusConfig = NexusConfigUtil.getNexusConfig();

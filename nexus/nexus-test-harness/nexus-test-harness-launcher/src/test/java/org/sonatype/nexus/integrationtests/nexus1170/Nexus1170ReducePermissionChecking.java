@@ -43,18 +43,17 @@ public class Nexus1170ReducePermissionChecking
     extends AbstractNexusIntegrationTest
 {
 
-    @SuppressWarnings("unchecked")
     private int getExpectedPrivilegeCount() throws Exception
     {
-        NexusConfiguration configuration = (NexusConfiguration) TestContainer.getInstance().lookup( NexusConfiguration.class );
+        NexusConfiguration configuration = container.lookup( NexusConfiguration.class );
         ( ( FileConfigurationSource )configuration.getConfigurationSource()).setConfigurationFile( new File( getBasedir(), "target/plexus-home/nexus-work/conf/nexus.xml" ) );
         configuration.loadConfiguration();
-        ConfigurationManager configManager = (ConfigurationManager) TestContainer.getInstance().lookup( ConfigurationManager.class, "resourceMerging");
+        ConfigurationManager configManager = container.lookup( ConfigurationManager.class, "resourceMerging");
 
         Set<String> privIds = new HashSet<String>();
         for ( SecurityPrivilege priv : configManager.listPrivileges() )
         {
-            for ( CProperty prop : (List<CProperty>) priv.getProperties() )
+            for ( CProperty prop : priv.getProperties() )
             {
                 if ( prop.getKey().equals( "permission" ) )
                 {

@@ -30,7 +30,6 @@ import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationRequest;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
@@ -49,7 +48,7 @@ public class NexusConfigUtil
         NexusConfiguration config;
         try
         {
-            config = TestContainer.getInstance().lookup( NexusConfiguration.class );
+            config = AbstractNexusIntegrationTest.getStaticContainer().lookup( NexusConfiguration.class );
             config.loadConfiguration( true );
         }
         catch ( Exception e )
@@ -66,7 +65,6 @@ public class NexusConfigUtil
         return new File( AbstractNexusIntegrationTest.WORK_CONF_DIR, "nexus.xml" );
     }
 
-    @SuppressWarnings( "unchecked" )
     public static CPathMappingItem getRoute( String id )
         throws IOException
     {
@@ -88,10 +86,9 @@ public class NexusConfigUtil
     public static void enableSecurity( boolean enabled )
         throws Exception
     {
-        TestContainer.getInstance().lookup( SecuritySystem.class ).setSecurityEnabled( enabled );
+        AbstractNexusIntegrationTest.getStaticContainer().lookup( SecuritySystem.class ).setSecurityEnabled( enabled );
     }
 
-    @SuppressWarnings("unchecked")
     public static M2LayoutedM1ShadowRepositoryConfiguration getRepoShadow( String repoId )
         throws IOException
     {
@@ -114,7 +111,6 @@ public class NexusConfigUtil
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     public static CRepository getRepo( String repoId )
         throws IOException
     {
@@ -137,7 +133,7 @@ public class NexusConfigUtil
         throws Exception
     {
         ApplicationConfigurationValidator validator =
-            TestContainer.getInstance().lookup( ApplicationConfigurationValidator.class );
+            AbstractNexusIntegrationTest.getStaticContainer().lookup( ApplicationConfigurationValidator.class );
         ValidationResponse vResponse = validator.validateModel( new ValidationRequest( getNexusConfig() ) );
 
         if ( !vResponse.isValid() )
@@ -147,7 +143,6 @@ public class NexusConfigUtil
 
     }
 
-    @SuppressWarnings("unchecked")
     public static M2GroupRepositoryConfiguration getGroup( String groupId )
         throws IOException
     {
@@ -170,7 +165,6 @@ public class NexusConfigUtil
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     public static M2RepositoryConfiguration getM2Repo( String id )
         throws IOException
     {

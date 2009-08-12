@@ -53,7 +53,6 @@ import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.StringRepresentation;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
@@ -90,7 +89,7 @@ public class AbstractNexusIntegrationTest
 
     protected PlexusContainer container;
 
-    private Map<Object, Object> context;
+    protected static PlexusContainer staticContainer;
 
     private static boolean NEEDS_INIT = false;
 
@@ -145,8 +144,6 @@ public class AbstractNexusIntegrationTest
 
     protected AbstractNexusIntegrationTest( String testRepositoryId )
     {
-        this.setupContainer();
-
         // we also need to setup a couple fields, that need to be pulled out of a bundle
         this.testRepositoryId = testRepositoryId;
         // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
@@ -267,7 +264,7 @@ public class AbstractNexusIntegrationTest
                 public boolean accept( File dir, String name )
                 {
                     // anything but the plugin-repository directory
-                   return ( !name.contains( "plugin-repository" ) );
+                    return ( !name.contains( "plugin-repository" ) );
                 }
             } );
 
@@ -428,7 +425,7 @@ public class AbstractNexusIntegrationTest
         NexusStatusUtil.doSoftStart();
     }
 
-    private void stopNexus()
+    private static void stopNexus()
         throws Exception
     {
         log.info( "stopping Nexus" );
@@ -539,13 +536,24 @@ public class AbstractNexusIntegrationTest
 
     /**
      * See oncePerClassSetUp.
+     *
+     * @throws Exception
      */
     @BeforeClass
     public static void staticOncePerClassSetUp()
+        throws Exception
     {
+        startProfiler();
+
         log.debug( "staticOncePerClassSetUp" );
         // hacky state machine
         NEEDS_INIT = true;
+    }
+
+    @Before
+    public void createContainer()
+    {
+        this.container = setupContainer( getClass() );
     }
 
     @AfterClass
@@ -553,16 +561,78 @@ public class AbstractNexusIntegrationTest
         throws Exception
     {
         // stop nexus
-        new AbstractNexusIntegrationTest().stopNexus();
+        stopNexus();
+
+        if ( staticContainer != null )
+        {
+            staticContainer.dispose();
+        }
+        staticContainer = null;
+
+        takeSnapshot();
     }
 
-    protected void setupContainer()
+    @After
+    public void killContainer()
+        throws Exception
+    {
+        if ( container != null )
+        {
+            this.container.dispose();
+        }
+        this.container = null;
+    }
+
+    // profiling with yourkit, activate using -P youtkit-profile
+    private static Object profiler;
+
+    private static void startProfiler()
+    {
+        Class<?> controllerClazz;
+        try
+        {
+            controllerClazz = Class.forName( "com.yourkit.api.Controller" );
+        }
+        catch ( Exception e )
+        {
+            log.info( "Profiler not present" );
+            return;
+        }
+
+        try
+        {
+            profiler = controllerClazz.newInstance();
+            controllerClazz.getMethod( "captureMemorySnapshot" ).invoke( profiler );
+        }
+        catch ( Exception e )
+        {
+            fail( "Profiler was active, but failed due: " + e.getMessage() );
+        }
+    }
+
+    private static void takeSnapshot()
+    {
+        if ( profiler != null )
+        {
+            try
+            {
+                profiler.getClass().getMethod( "forceGC" ).invoke( profiler );
+                profiler.getClass().getMethod( "captureMemorySnapshot" ).invoke( profiler );
+            }
+            catch ( Exception e )
+            {
+                fail( "Profiler was active, but failed due: " + e.getMessage() );
+            }
+        }
+    }
+
+    protected static PlexusContainer setupContainer( Class<?> baseClass )
     {
         // ----------------------------------------------------------------------------
         // Context Setup
         // ----------------------------------------------------------------------------
 
-        context = new HashMap<Object, Object>();
+        Map<Object, Object> context = new HashMap<Object, Object>();
 
         context.put( "basedir", getBasedir() );
         context.putAll( TestProperties.getAll() );
@@ -587,19 +657,20 @@ public class AbstractNexusIntegrationTest
 
         ContainerConfiguration containerConfiguration =
             new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration(
-                                                                                                                   getClass().getName().replace(
-                                                                                                                                                 '.',
-                                                                                                                                                 '/' )
+                                                                                                                   baseClass.getName().replace(
+                                                                                                                                                '.',
+                                                                                                                                                '/' )
                                                                                                                        + ".xml" );
 
         try
         {
-            container = new DefaultPlexusContainer( containerConfiguration );
+            return new DefaultPlexusContainer( containerConfiguration );
         }
         catch ( PlexusContainerException e )
         {
             e.printStackTrace();
             fail( "Failed to create plexus container." );
+            return null;
         }
     }
 
@@ -678,18 +749,20 @@ public class AbstractNexusIntegrationTest
 
         return file;
     }
-    
-    protected Metadata downloadMetadataFromRepository( Gav gav, String repoId ) throws IOException, XmlPullParserException
+
+    protected Metadata downloadMetadataFromRepository( Gav gav, String repoId )
+        throws IOException, XmlPullParserException
     {
-        String url = this.getBaseNexusUrl() + REPOSITORY_RELATIVE_URL + repoId + "/" + gav.getGroupId() + "/"
-            + gav.getArtifactId() + "/maven-metadata.xml";
+        String url =
+            this.getBaseNexusUrl() + REPOSITORY_RELATIVE_URL + repoId + "/" + gav.getGroupId() + "/"
+                + gav.getArtifactId() + "/maven-metadata.xml";
 
         Response response = RequestFacade.sendMessage( new URL( url ), Method.GET, null );
-        if( response.getStatus().isError() )
+        if ( response.getStatus().isError() )
         {
             return null;
         }
-        
+
         InputStream stream = response.getEntity().getStream();
         try
         {
@@ -700,9 +773,9 @@ public class AbstractNexusIntegrationTest
         {
             IOUtil.close( stream );
         }
-        
+
     }
-    
+
     protected File downloadArtifact( Gav gav, String targetDirectory )
         throws IOException
     {
@@ -805,6 +878,10 @@ public class AbstractNexusIntegrationTest
 
     public PlexusContainer getContainer()
     {
+        if ( this.container == null )
+        {
+            this.container = setupContainer( getClass() );
+        }
         return this.container;
     }
 
@@ -877,6 +954,15 @@ public class AbstractNexusIntegrationTest
         throws ComponentLookupException
     {
         return getContainer().lookup( RepositoryTypeRegistry.class );
+    }
+
+    public static final PlexusContainer getStaticContainer()
+    {
+        if ( staticContainer == null )
+        {
+            staticContainer = setupContainer( AbstractNexusIntegrationTest.class );
+        }
+        return staticContainer;
     }
 
 }

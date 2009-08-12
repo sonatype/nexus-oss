@@ -32,7 +32,7 @@ public class Nexus748MultipleStartTest
 {
 
     protected static Logger logger = Logger.getLogger( Nexus748MultipleStartTest.class );
-    
+
     @Test
     public void multipleStartTest()
         throws Exception
@@ -40,7 +40,7 @@ public class Nexus748MultipleStartTest
 
         StopWatch stopWatch = new StopWatch();
 
-        NexusClient client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
+        NexusClient client = (NexusClient) AbstractNexusIntegrationTest.getStaticContainer().lookup( NexusClient.ROLE );
         TestContext context = TestContainer.getInstance().getTestContext();
         client.connect( AbstractNexusIntegrationTest.baseNexusUrl, context.getAdminUsername(),
                         context.getAdminPassword() );

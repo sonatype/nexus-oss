@@ -143,7 +143,7 @@
     <micromailer.version>1.0.3-SNAPSHOT</micromailer.version>
     <mercury.version>1.0-alpha-6</mercury.version>
     <restlet.version>1.1.1-b6</restlet.version>
-    <plexus-jetty6.version>1.6</plexus-jetty6.version>
+    <plexus-jetty6.version>1.7-SNAPSHOT</plexus-jetty6.version>
     <plexus-task-scheduler.version>1.2-SNAPSHOT</plexus-task-scheduler.version>
     <plexus-digest.version>1.1</plexus-digest.version>
     <plexus-cli.version>1.2</plexus-cli.version>

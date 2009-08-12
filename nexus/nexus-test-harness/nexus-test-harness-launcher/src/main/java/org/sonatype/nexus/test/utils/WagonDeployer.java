@@ -32,6 +32,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.Commandline;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.plexus.classworlds.io.ClassworldsConfWriter;
@@ -125,7 +126,7 @@ public class WagonDeployer
         Wagon wagon;
         try
         {
-            wagon = (Wagon) TestContainer.getInstance().lookup( Wagon.ROLE, protocol );
+            wagon = (Wagon) AbstractNexusIntegrationTest.getStaticContainer().lookup( Wagon.ROLE, protocol );
         }
         catch ( Exception e )
         {

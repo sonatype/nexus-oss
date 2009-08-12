@@ -20,7 +20,6 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
@@ -85,7 +84,7 @@ public class Nexus412RemoteLeakTest
         throws Exception
     {
 
-        ProxyRepository repo = (ProxyRepository) TestContainer.getInstance().lookup( Repository.class, "maven2" );
+        ProxyRepository repo = (ProxyRepository) container.lookup( Repository.class, "maven2" );
 
         CRepository cRepo = NexusConfigUtil.getRepo( repoId );
         M2RepositoryConfiguration cM2Repo = NexusConfigUtil.getM2Repo( repoId );

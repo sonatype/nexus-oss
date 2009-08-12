@@ -14,9 +14,11 @@
 package org.sonatype.nexus.integrationtests.nexus637;
 
 import java.io.File;
+import java.io.IOException;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -31,6 +33,13 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public class Nexus637PublishIndexTest
     extends AbstractNexusIntegrationTest
 {
+
+    @BeforeClass
+    public static void clean()
+        throws IOException
+    {
+        cleanWorkDir();
+    }
 
     public Nexus637PublishIndexTest()
     {

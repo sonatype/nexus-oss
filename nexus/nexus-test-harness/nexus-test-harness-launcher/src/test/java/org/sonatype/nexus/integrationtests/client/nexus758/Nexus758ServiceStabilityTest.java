@@ -34,7 +34,7 @@ public class Nexus758ServiceStabilityTest
     public static void init()
         throws Exception
     {
-        client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
+        client = (NexusClient) AbstractNexusIntegrationTest.getStaticContainer().lookup( NexusClient.ROLE );
         TestContext context = TestContainer.getInstance().getTestContext();
         client.connect( AbstractNexusIntegrationTest.baseNexusUrl, context.getAdminUsername(),
                         context.getAdminPassword() );

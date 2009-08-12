@@ -28,11 +28,11 @@ import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 
 /**
  * Tests the Nexus java/REST client.
@@ -40,14 +40,14 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 public class Nexus725InitialRestClient
     extends AbstractPrivilegeTest
 {
-    
+
     protected static Logger logger = Logger.getLogger( Nexus725InitialRestClient.class );
 
     private NexusClient getConnectedNexusClient()
         throws Exception
     {
 
-        NexusClient client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
+        NexusClient client = (NexusClient) container.lookup( NexusClient.ROLE );
         TestContext context = TestContainer.getInstance().getTestContext();
         client.connect( AbstractNexusIntegrationTest.baseNexusUrl, context.getAdminUsername(),
                         context.getAdminPassword() );
@@ -246,7 +246,7 @@ public class Nexus725InitialRestClient
         throws Exception
     {
 
-        NexusClient client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
+        NexusClient client = (NexusClient) container.lookup( NexusClient.ROLE );
         try
         {
             client.connect( "http://nexus.invalid.url/nexus", "", "" );
@@ -265,7 +265,7 @@ public class Nexus725InitialRestClient
     public void invalidPassword()
         throws Exception
     {
-        NexusClient client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
+        NexusClient client = (NexusClient) container.lookup( NexusClient.ROLE );
 
         try
         {
