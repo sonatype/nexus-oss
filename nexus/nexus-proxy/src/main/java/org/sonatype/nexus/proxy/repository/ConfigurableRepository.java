@@ -147,7 +147,6 @@ public class ConfigurableRepository
         getCurrentConfiguration( true ).setLocalStatus( localStatus.toString() );
     }
 
-  //TODO: these might need to moved
     public RepositoryWritePolicy getWritePolicy()
     {
         return RepositoryWritePolicy.valueOf( getCurrentConfiguration( false ).getWritePolicy() );

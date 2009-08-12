@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -123,6 +124,7 @@ public class Nexus2351DisableRedeployMaven2Test
                 this.getRepositoryUrl( repoId ),
                 artifact,
                 "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar" );
+            Assert.fail( "expected TransferFailedException" );
         }
         catch ( TransferFailedException e )
         {
@@ -137,6 +139,7 @@ public class Nexus2351DisableRedeployMaven2Test
                 this.getRepositoryUrl( repoId ),
                 artifact,
                 "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar" );
+            Assert.fail( "expected TransferFailedException" );
         }
         catch ( TransferFailedException e )
         {
@@ -151,6 +154,7 @@ public class Nexus2351DisableRedeployMaven2Test
                 this.getRepositoryUrl( repoId ),
                 artifactMD5,
                 "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar.md5" );
+            Assert.fail( "expected TransferFailedException" );
         }
         catch ( TransferFailedException e )
         {
@@ -181,6 +185,7 @@ public class Nexus2351DisableRedeployMaven2Test
                 this.getRepositoryUrl( repoId ),
                 artifact,
                 "testM2Repo/group/testM2ReleaseNoRedeployMultipleVersions/1.0.0/testM2ReleaseNoRedeployMultipleVersions-1.0.0.jar" );
+            Assert.fail( "expected TransferFailedException" );
         }
         catch ( TransferFailedException e )
         {
@@ -202,6 +207,7 @@ public class Nexus2351DisableRedeployMaven2Test
                 this.getRepositoryUrl( repoId ),
                 artifact,
                 "testM2Repo/group/testM2ReleaseNoRedeployMultipleVersions/1.0.1/testM2ReleaseNoRedeployMultipleVersions-1.0.1.jar" );
+            Assert.fail( "expected TransferFailedException" );
         }
         catch ( TransferFailedException e )
         {
@@ -228,6 +234,7 @@ public class Nexus2351DisableRedeployMaven2Test
                 this.getRepositoryUrl( repoId ),
                 artifact,
                 "testM2Repo/group/testM2ReleaseReadOnly/1.0.0/testM2ReleaseReadOnly-1.0.0.jar" );
+            Assert.fail( "expected TransferFailedException" );
 
         }
         catch ( TransferFailedException e )
@@ -244,6 +251,7 @@ public class Nexus2351DisableRedeployMaven2Test
                 this.getRepositoryUrl( repoId ),
                 artifactMD5,
                 "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseReadOnly-1.0.0.jar.md5" );
+            Assert.fail( "expected TransferFailedException" );
 
         }
         catch ( TransferFailedException e )
@@ -364,19 +372,12 @@ public class Nexus2351DisableRedeployMaven2Test
             artifact,
             "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar" );
 
-        try
-        {
-            DeployUtils.deployWithWagon(
-                this.getContainer(),
-                "http",
-                this.getRepositoryUrl( repoId ),
-                artifact,
-                "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar" );
-        }
-        catch ( TransferFailedException e )
-        {
-            // expected
-        }
+        DeployUtils.deployWithWagon(
+            this.getContainer(),
+            "http",
+            this.getRepositoryUrl( repoId ),
+            artifact,
+            "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar" );
         
         DeployUtils.deployWithWagon(
             this.getContainer(),
@@ -385,19 +386,12 @@ public class Nexus2351DisableRedeployMaven2Test
             artifactMD5,
             "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar.md5" );
 
-        try
-        {
-            DeployUtils.deployWithWagon(
-                this.getContainer(),
-                "http",
-                this.getRepositoryUrl( repoId ),
-                artifactMD5,
-                "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar.md5" );
-        }
-        catch ( TransferFailedException e )
-        {
-            // expected
-        }
+        DeployUtils.deployWithWagon(
+            this.getContainer(),
+            "http",
+            this.getRepositoryUrl( repoId ),
+            artifactMD5,
+            "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar.md5" );
     }
 
     @Test
@@ -418,6 +412,7 @@ public class Nexus2351DisableRedeployMaven2Test
                 this.getRepositoryUrl( repoId ),
                 artifact,
                 "testM2Repo/group/testM2SnapshotReadOnly/1.0.0-SNAPSHOT/testM2SnapshotReadOnly-20090729.054915-218.jar" );
+            Assert.fail( "expected TransferFailedException" );
 
         }
         catch ( TransferFailedException e )
@@ -433,6 +428,7 @@ public class Nexus2351DisableRedeployMaven2Test
                 this.getRepositoryUrl( repoId ),
                 artifactMD5,
                 "testM2Repo/group/testM2SnapshotReadOnly/1.0.0-SNAPSHOT/testM2SnapshotReadOnly-20090729.054915-218.jar.md5" );
+            Assert.fail( "expected TransferFailedException" );
 
         }
         catch ( TransferFailedException e )
@@ -448,6 +444,7 @@ public class Nexus2351DisableRedeployMaven2Test
                 this.getRepositoryUrl( repoId ),
                 artifactMD5,
                 "testM2Repo/group/testM2SnapshotReadOnly/1.0.0-SNAPSHOT/testM2SnapshotReadOnly-SNAPSHOT.jar.md5" );
+            Assert.fail( "expected TransferFailedException" );
 
         }
         catch ( TransferFailedException e )
@@ -463,6 +460,7 @@ public class Nexus2351DisableRedeployMaven2Test
                 this.getRepositoryUrl( repoId ),
                 artifact,
                 "testM2Repo/group/testM2SnapshotReadOnly/1.0.0-SNAPSHOT/testM2SnapshotReadOnly-SNAPSHOT.jar" );
+            Assert.fail( "expected TransferFailedException" );
 
         }
         catch ( TransferFailedException e )
