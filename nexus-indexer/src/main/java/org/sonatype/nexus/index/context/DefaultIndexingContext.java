@@ -26,6 +26,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2GavCalculator;
@@ -165,35 +166,77 @@ public class DefaultIndexingContext
     {
         if ( IndexReader.indexExists( indexDirectory ) )
         {
+            try
+            {
+                // unlock the dir forcibly
+                if ( IndexReader.isLocked( indexDirectory ) )
+                {
+                    IndexReader.unlock( indexDirectory );
+                }
+    
+                checkAndUpdateIndexDescriptor( reclaimIndex );
+            }
+            catch ( IOException e )
+            {
+                if ( reclaimIndex )
+                {
+                    prepareCleanIndex( true );
+                }
+                else
+                {
+                    throw e;
+                }
+            }
+        }
+        else
+        {
+            prepareCleanIndex( false );
+        }
+
+        timestamp = IndexUtils.getTimestamp( indexDirectory );
+    }
+    
+    private void prepareCleanIndex( boolean deleteExisting ) 
+        throws IOException
+    {
+        if ( deleteExisting )
+        {
+            if ( indexReader != null )
+            {
+                indexReader.close();
+            }
+            
+            indexReader = null;
+            
+            if ( indexWriter != null && !indexWriter.isClosed() )
+            {
+                indexWriter.close();
+            }
+            
+            indexWriter = null;
+            
             // unlock the dir forcibly
             if ( IndexReader.isLocked( indexDirectory ) )
             {
                 IndexReader.unlock( indexDirectory );
             }
-
-            checkAndUpdateIndexDescriptor( reclaimIndex );
+            
+            indexDirectory.close();
+            FileUtils.deleteDirectory( indexDirectoryFile );
+            indexDirectoryFile.mkdirs();
+            
+            indexDirectory = FSDirectory.getDirectory( indexDirectoryFile );
         }
-        else
+        
+        if ( StringUtils.isEmpty( getRepositoryId() ) )
         {
-            if ( StringUtils.isEmpty( getRepositoryId() ) )
-            {
-                throw new IllegalArgumentException( "The repositoryId cannot be null when creating new repository!" );
-            }
-
-            // create empty idx and store descriptor
-            new NexusIndexWriter( indexDirectory, analyzer, true ).close();
-
-            storeDescriptor();
+            throw new IllegalArgumentException( "The repositoryId cannot be null when creating new repository!" );
         }
 
-        timestamp = IndexUtils.getTimestamp( indexDirectory );
+        // create empty idx and store descriptor
+        new NexusIndexWriter( indexDirectory, analyzer, true ).close();
 
-        // if ( timestamp == null )
-        // {
-        // timestamp = new Date( System.currentTimeMillis() );
-        //
-        // IndexUtils.updateTimestamp( indexDirectory, timestamp );
-        // }
+        storeDescriptor();
     }
 
     private void checkAndUpdateIndexDescriptor( boolean reclaimIndex )
