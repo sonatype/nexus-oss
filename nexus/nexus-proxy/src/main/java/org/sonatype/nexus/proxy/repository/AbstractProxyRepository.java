@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.feeds.FeedRecorder;
@@ -36,7 +37,6 @@ import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
-import org.sonatype.nexus.proxy.events.RepositoryEventRemoteUrlChanged;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -65,6 +65,8 @@ public abstract class AbstractProxyRepository
     protected static final long REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
 
     private static final ExecutorService exec = Executors.newCachedThreadPool();
+    
+    public static final String CONFIG_REMOTE_URL = "remoteUrl";
 
     /**
      * Feed recorder.
@@ -201,9 +203,12 @@ public abstract class AbstractProxyRepository
             getRemoteStorage().validateStorageUrl( newRemoteUrl );
 
             getCurrentConfiguration( true ).getRemoteStorage().setUrl( newRemoteUrl );
-
-            getApplicationEventMulticaster().notifyEventListeners(
-                new RepositoryEventRemoteUrlChanged( this, oldRemoteUrl, newRemoteUrl ) );
+            
+            if ( ( StringUtils.isEmpty( oldRemoteUrl ) && StringUtils.isNotEmpty( newRemoteUrl ) )
+                || ( StringUtils.isNotEmpty( oldRemoteUrl ) && !oldRemoteUrl.equals( newRemoteUrl ) ) )
+            {
+                getConfigurationChanges().put( CONFIG_REMOTE_URL, newRemoteUrl );
+            }
         }
         else
         {

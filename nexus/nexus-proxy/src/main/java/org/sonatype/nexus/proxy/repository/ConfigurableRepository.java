@@ -18,6 +18,8 @@ public class ConfigurableRepository
     extends AbstractConfigurable
 {
     private PublishedMirrors pMirrors;
+    
+    public static final String CONFIG_LOCAL_URL = "localUrl";
 
     @Override
     protected CRepository getCurrentConfiguration( boolean forWrite )
@@ -123,14 +125,21 @@ public class ConfigurableRepository
     public void setLocalUrl( String localUrl )
         throws StorageException
     {
-        String trstr = localUrl.trim();
+        String oldLocalUrl = this.getLocalUrl();
 
-        if ( trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        String newLocalUrl = localUrl.trim();
+
+        if ( newLocalUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
-            trstr = trstr.substring( 0, trstr.length() - 1 );
+            newLocalUrl = newLocalUrl.substring( 0, newLocalUrl.length() - 1 );
+        }
+        
+        if ( !oldLocalUrl.equals( newLocalUrl ) )
+        {
+            getConfigurationChanges().put( CONFIG_LOCAL_URL, newLocalUrl );
         }
 
-        getCurrentConfiguration( true ).getLocalStorage().setUrl( trstr );
+        getCurrentConfiguration( true ).getLocalStorage().setUrl( newLocalUrl );
     }
 
     public LocalStatus getLocalStatus()

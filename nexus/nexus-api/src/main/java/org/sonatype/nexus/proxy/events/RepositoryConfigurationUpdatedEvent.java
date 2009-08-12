@@ -1,5 +1,7 @@
 package org.sonatype.nexus.proxy.events;
 
+import java.util.Map;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -10,8 +12,16 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class RepositoryConfigurationUpdatedEvent
     extends RepositoryEvent
 {
-    public RepositoryConfigurationUpdatedEvent( Repository repository )
+    Map<String, Object> changes;
+    public RepositoryConfigurationUpdatedEvent( Repository repository, Map<String,Object> changes )
     {
         super( repository );
+        
+        this.changes = changes;
+    }
+    
+    public Map<String, Object> getChanges()
+    {
+        return changes;
     }
 }

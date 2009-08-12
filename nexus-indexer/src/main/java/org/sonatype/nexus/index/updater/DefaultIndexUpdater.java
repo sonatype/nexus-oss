@@ -506,7 +506,6 @@ public class DefaultIndexUpdater
         throws IOException
     {
         NexusIndexWriter w = new NexusIndexWriter( d, new NexusAnalyzer(), true );
-        w.setRAMBufferSizeMB(50.0);
         try
         {
             IndexDataReader dr = new IndexDataReader( is );

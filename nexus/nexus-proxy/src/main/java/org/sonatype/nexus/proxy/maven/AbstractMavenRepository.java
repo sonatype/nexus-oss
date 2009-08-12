@@ -26,7 +26,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.events.RepositoryEventDownloadRemoteIndexChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateMavenMetadata;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -52,6 +51,8 @@ public abstract class AbstractMavenRepository
     extends AbstractProxyRepository
     implements MavenRepository, MavenHostedRepository, MavenProxyRepository
 {
+    public static final String CONFIG_DOWNLOAD_REMOTE_INDEX = "downloadRemoteIndex";
+    
     /**
      * Metadata manager.
      */
@@ -209,8 +210,10 @@ public abstract class AbstractMavenRepository
         
         getExternalConfiguration( true ).setDownloadRemoteIndex( downloadRemoteIndexes );
         
-        getApplicationEventMulticaster().notifyEventListeners(
-            new RepositoryEventDownloadRemoteIndexChanged( this, oldValue, newValue ) );
+        if ( oldValue != newValue )
+        {
+            getConfigurationChanges().put( CONFIG_DOWNLOAD_REMOTE_INDEX, newValue );
+        }
     }
 
     public RepositoryPolicy getRepositoryPolicy()

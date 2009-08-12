@@ -42,7 +42,6 @@ import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
-import org.sonatype.nexus.proxy.events.RepositoryEventLocalUrlChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
@@ -154,11 +153,13 @@ public abstract class AbstractRepository
     public boolean commitChanges()
         throws ConfigurationException
     {
+        Map<String,Object> changes = getConfigurationChanges();
+        
         boolean wasDirty = super.commitChanges();
 
         if ( wasDirty )
         {
-            getApplicationEventMulticaster().notifyEventListeners( new RepositoryConfigurationUpdatedEvent( this ) );
+            getApplicationEventMulticaster().notifyEventListeners( new RepositoryConfigurationUpdatedEvent( this, changes ) );
         }
 
         return wasDirty;
@@ -257,8 +258,6 @@ public abstract class AbstractRepository
     public void setLocalUrl( String localUrl )
         throws StorageException
     {
-        String oldLocalUrl = this.getLocalUrl();
-
         String newLocalUrl = localUrl.trim();
 
         if ( newLocalUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
@@ -269,10 +268,6 @@ public abstract class AbstractRepository
         getLocalStorage().validateStorageUrl( newLocalUrl );
 
         super.setLocalUrl( localUrl );
-
-        getApplicationEventMulticaster().notifyEventListeners(
-                                                               new RepositoryEventLocalUrlChanged( this, oldLocalUrl,
-                                                                                                   newLocalUrl ) );
     }
 
     @Override
