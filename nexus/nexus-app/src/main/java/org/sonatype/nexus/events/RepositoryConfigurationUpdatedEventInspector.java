@@ -8,9 +8,9 @@ import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.nexus.tasks.ReindexTask;
@@ -37,59 +37,73 @@ public class RepositoryConfigurationUpdatedEventInspector
             
             Map<String,Object> changes = event.getChanges();
             
-            // Only need to handle one or the other changed, not both, otherwise
-            // will expire cache twice
+            boolean evicting = false;
+            boolean indexing = false;
+            
             if ( changes.containsKey( ConfigurableRepository.CONFIG_LOCAL_URL ) )
             {
-                localUrlChanged( event.getRepository() );
+                getLogger().info(
+                    "The local url of repository '" + event.getRepository().getId()
+                        + "' has been changed, now expire its caches." );
+                
+                ExpireCacheTask task = nexusScheduler.createTaskInstance( ExpireCacheTask.class );
+
+                task.setRepositoryId( event.getRepository().getId() );
+                
+                nexusScheduler.submit( "Local URL Changed.", task );
+                
+                evicting = true;
             }
-            else if ( changes.containsKey( AbstractProxyRepository.CONFIG_REMOTE_URL ) )
+
+            if ( changes.containsKey( AbstractProxyRepository.CONFIG_REMOTE_URL ) )
             {
-                remoteUrlChanged( event.getRepository() );
+                if ( !evicting )
+                {
+                    getLogger().info(
+                        "The remote url of repository '" + event.getRepository().getId()
+                            + "' has been changed, now expire its caches." );
+    
+                    ExpireCacheTask task = nexusScheduler.createTaskInstance( ExpireCacheTask.class );
+    
+                    task.setRepositoryId( event.getRepository().getId() );
+    
+                    nexusScheduler.submit( "Remote URL Changed.", task );
+                    
+                    evicting = true;
+                }
+                
+                if ( event.getRepository().adaptToFacet( MavenProxyRepository.class ).isDownloadRemoteIndexes() )
+                {
+                    getLogger().info(
+                        "The remote url of repository '" + event.getRepository().getId()
+                            + "' has been changed, now reindex the repository." );
+                    
+                    // Create the initial index for the repository
+                    ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+                    rt.setRepositoryId( event.getRepository().getId() );
+                    rt.setFullReindex( true );
+                    nexusScheduler.submit( "Remote URL Changed.", rt );
+                }
+                
+                indexing = true;
             }
             
             if ( changes.containsKey( AbstractMavenRepository.CONFIG_DOWNLOAD_REMOTE_INDEX ) )
             {
-                downloadRemoteIndexesChanged( event.getRepository(), ( Boolean ) changes.get( AbstractMavenRepository.CONFIG_DOWNLOAD_REMOTE_INDEX  ) );
+                if ( !indexing && ( Boolean ) changes.get( AbstractMavenRepository.CONFIG_DOWNLOAD_REMOTE_INDEX  ).equals( Boolean.TRUE ) )
+                {
+                    getLogger().info(
+                        "The download remote index flag of repository '" + event.getRepository().getId()
+                            + "' has been changed, now reindex the repository." );
+                    
+                    // Create the initial index for the repository
+                    ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+                    rt.setRepositoryId( event.getRepository().getId() );
+                    rt.setFullReindex( true );
+                    nexusScheduler.submit( "Download remote index enabled.", rt );
+                    indexing = true;
+                }
             }
         }
-    }
-    
-    protected void downloadRemoteIndexesChanged( Repository repository, Boolean downloadIndexes )
-    {
-        if ( downloadIndexes.equals( Boolean.TRUE ) )
-        {
-            // Create the initial index for the repository
-            ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-            rt.setRepositoryId( repository.getId() );
-            rt.setFullReindex( true );
-            nexusScheduler.submit( "Download remote index enabled.", rt );
-        }
-    }
-    
-    protected void localUrlChanged( Repository repository )
-    {
-        getLogger().info(
-            "The local url of repository '" + repository.getId()
-                + "' has been changed, now expire its caches." );
-
-        ExpireCacheTask task = nexusScheduler.createTaskInstance( ExpireCacheTask.class );
-
-        task.setRepositoryId( repository.getId() );
-
-        nexusScheduler.submit( "Expire caches for repository '" + repository.getId() + "'.", task );        
-    }
-    
-    protected void remoteUrlChanged( Repository repository )
-    {
-        getLogger().info(
-            "The remote url of repository '" + repository.getId()
-                + "' has been changed, now expire its caches." );
-
-        ExpireCacheTask task = nexusScheduler.createTaskInstance( ExpireCacheTask.class );
-
-        task.setRepositoryId( repository.getId() );
-
-        nexusScheduler.submit( "Expire caches for repository '" + repository.getId() + "'.", task );
     }
 }
