@@ -499,10 +499,13 @@ public class DefaultIndexerManager
         throws NoSuchRepositoryException, IOException
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
-
-        reindexRepository( repository, fullReindex );
-
-        publishRepositoryIndex( repositoryId );
+        
+        if ( repository.isIndexable() )
+        {
+            reindexRepository( repository, fullReindex );
+    
+            publishRepositoryIndex( repositoryId );
+        }
     }
 
     public void reindexRepositoryGroup( String path, String repositoryGroupId, boolean fullReindex )
@@ -544,12 +547,11 @@ public class DefaultIndexerManager
     protected void reindexRepository( Repository repository, boolean fullReindex )
         throws IOException
     {
-        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) 
+            || !repository.isIndexable() )
         {
             return;
         }
-
-        boolean repositoryIndexable = repository.isIndexable();
 
         String repositoryId = repository.getId();
         Lock lock = getLock( repositoryId ).writeLock();
@@ -585,7 +587,7 @@ public class DefaultIndexerManager
         finally
         {
             lock.unlock();
-            repository.setIndexable( repositoryIndexable );
+            repository.setIndexable( true );
         }
     }
 
