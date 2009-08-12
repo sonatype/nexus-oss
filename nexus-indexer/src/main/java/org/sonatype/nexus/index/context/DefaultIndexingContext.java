@@ -365,7 +365,7 @@ public class DefaultIndexingContext
             {
                 indexWriter = new NexusIndexWriter( indexDirectory, analyzer, false );
 
-                indexWriter.setRAMBufferSizeMB(500);
+                indexWriter.setRAMBufferSizeMB(50);
             }
 
             return indexWriter;
