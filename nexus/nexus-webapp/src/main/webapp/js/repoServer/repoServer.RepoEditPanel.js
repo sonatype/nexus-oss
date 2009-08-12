@@ -124,7 +124,25 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
         }
     
       }
-  
+      
+      var writePolicyField = this.form.findField( 'writePolicy' );
+      
+      // filter out the redeploy option for SNAPSHOT repos
+      if( repoPolicy == 'snapshot' )
+      {
+        // first change the value if it is ALLOW_WRITE_ONCE
+        writePolicyField.setValue('ALLOW_WRITE');
+        
+      	this.writePolicyStore.filterBy(function(rec, id)
+      	{
+      	  return rec.data.value != 'ALLOW_WRITE_ONCE';
+      	});
+      }
+      else
+      {
+        writePolicyField.store.clearFilter();
+      }
+      
       this.lastPolicy = repoPolicy;
     }
   },
@@ -375,7 +393,8 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
             store: this.writePolicyStore,
             displayField: 'display',
             valueField: 'value',
-            width: 100
+            width: 120,
+            lastQuery: ''
           },
           {
             fieldLabel: 'Allow File Browsing',
