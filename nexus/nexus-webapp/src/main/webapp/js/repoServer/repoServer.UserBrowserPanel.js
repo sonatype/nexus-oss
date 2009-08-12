@@ -212,7 +212,7 @@ Sonatype.repoServer.UserBrowsePanel = function( config ) {
 
   var root = new Ext.tree.AsyncTreeNode( {
     text: this.payload.data[this.titleColumn],
-    id: this.payload.data.resourceURI + '/',
+    id: this.payload.data.resourceURI,
     singleClickExpand: true,
     expanded: true
   } );
