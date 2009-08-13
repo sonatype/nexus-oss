@@ -30,6 +30,9 @@ public abstract class AbstractShadowRepositoryConfigurator
                                       CRepositoryCoreConfiguration coreConfig )
         throws ConfigurationException
     {
+        // Shadows are read only
+        repository.setWritePolicy( RepositoryWritePolicy.READ_ONLY );
+        
         super.doApplyConfiguration( repository, configuration, coreConfig );
 
         ShadowRepository shadowRepository = repository.adaptToFacet( ShadowRepository.class );
