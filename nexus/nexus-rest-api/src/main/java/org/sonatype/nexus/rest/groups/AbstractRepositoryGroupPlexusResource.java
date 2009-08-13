@@ -154,7 +154,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
         catch ( NoSuchRepositoryAccessException e)
         {
             // access denied 403
-            getLogger().warn( "Repository referenced by Repository Group Access Eenied, ID=" + model.getId(), e );
+            getLogger().warn( "Repository referenced by Repository Group Access Denied, ID=" + model.getId(), e );
             
             throw new PlexusResourceException(
                 Status.CLIENT_ERROR_BAD_REQUEST,
