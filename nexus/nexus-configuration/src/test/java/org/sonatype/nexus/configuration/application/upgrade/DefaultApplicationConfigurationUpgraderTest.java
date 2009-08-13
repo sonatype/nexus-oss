@@ -15,12 +15,9 @@ package org.sonatype.nexus.configuration.application.upgrade;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.TimeZone;
 
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -36,12 +33,12 @@ import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 public class DefaultApplicationConfigurationUpgraderTest
     extends AbstractNexusTestCase
 {
-    private static final File SECURITY_CONF = new File( CONF_HOME, "security-configuration.xml" );
 
     protected ApplicationConfigurationUpgrader configurationUpgrader;
 
     private FileSecurityConfigurationSource securitySource;
 
+    @Override
     public void setUp()
         throws Exception
     {
@@ -49,7 +46,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         FileUtils.cleanDirectory( new File( getNexusConfiguration() ).getParentFile() );
 
-        this.configurationUpgrader = (ApplicationConfigurationUpgrader) lookup( ApplicationConfigurationUpgrader.class );
+        this.configurationUpgrader = lookup( ApplicationConfigurationUpgrader.class );
         this.securitySource = (FileSecurityConfigurationSource) this.lookup( SecurityConfigurationSource.class, "file" );
     }
 
@@ -205,13 +202,12 @@ public class DefaultApplicationConfigurationUpgraderTest
         // use UTC for this test
         TimeZone.setDefault( TimeZone.getTimeZone( "UTC" ) );
 
-        copyFromClasspathToFile(
-            "/org/sonatype/nexus/configuration/upgrade/103-1/nexus-103.xml",
-            getNexusConfiguration() );
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/103-1/nexus-103.xml",
+                                 getNexusConfiguration() );
 
         // trick: copying by nexus.xml the tasks.xml too
-        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/103-1/tasks.xml", new File( new File(
-            getNexusConfiguration() ).getParentFile(), "tasks.xml" ) );
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/103-1/tasks.xml",
+                                 new File( new File( getNexusConfiguration() ).getParentFile(), "tasks.xml" ) );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -233,9 +229,8 @@ public class DefaultApplicationConfigurationUpgraderTest
         throws Exception
     {
         // same as above, but we have no tasks.xml
-        copyFromClasspathToFile(
-            "/org/sonatype/nexus/configuration/upgrade/103-2/nexus-103.xml",
-            getNexusConfiguration() );
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/103-2/nexus-103.xml",
+                                 getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -279,9 +274,8 @@ public class DefaultApplicationConfigurationUpgraderTest
     public void testNEXUS1710()
         throws Exception
     {
-        copyFromClasspathToFile(
-            "/org/sonatype/nexus/configuration/upgrade/nexus1710/nexus.xml",
-            getNexusConfiguration() );
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus1710/nexus.xml",
+                                 getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -302,17 +296,17 @@ public class DefaultApplicationConfigurationUpgraderTest
     // throws Exception
     // {
     // copyFromClasspathToFile( "/META-INF/nexus/nexus.xml", getNexusConfiguration() );
-    //        
+    //
     // Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
     //
     // Assert.assertNotNull( configuration );
-    //        
+    //
     // NexusConfigurationXpp3Writer w = new NexusConfigurationXpp3Writer();
     //
     // StringWriter sw = new StringWriter();
     //
     // w.write( sw, configuration );
-    //        
+    //
     // File actual = new File( "target", "upgraded-nexus.xml" );
     // FileOutputStream out = new FileOutputStream( actual );
     // try
@@ -323,6 +317,20 @@ public class DefaultApplicationConfigurationUpgraderTest
     // {
     // IOUtil.close( out );
     // }
-    //        
+    //
     // }
+
+    public void testMirrorsFrom108()
+        throws Exception
+    {
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-108-with-mirrors.xml",
+                                 getNexusConfiguration() );
+
+        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
+
+        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
+
+        resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-108-with-mirrors.xml", configuration );
+    }
+
 }
