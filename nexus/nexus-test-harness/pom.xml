@@ -29,6 +29,7 @@
       </activation>
       <modules>
 	    <module>nexus-exception-plugin</module>
+		<module>nexus-timeout-plugin</module>
         <module>nexus-simple-memory-realm</module>
         <module>nexus-test-harness-launcher</module>
       </modules>
