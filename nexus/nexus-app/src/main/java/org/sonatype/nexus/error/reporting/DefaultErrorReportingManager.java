@@ -72,6 +72,8 @@ public class DefaultErrorReportingManager
     private static final String COMPONENT = "Nexus";
 
     private static final String ERROR_REPORT_DIR = "error-report-bundles";
+    
+    private Set<String> errorHashSet = new HashSet<String>();
 
     // ==
 
@@ -198,7 +200,8 @@ public class DefaultErrorReportingManager
     {
         CErrorReporting errorConfig = getCurrentConfiguration( false );
 
-        if ( isEnabled() )
+        if ( isEnabled() 
+            && shouldHandleReport( request ) )
         {
             IssueSubmissionRequest subRequest = buildRequest( errorConfig, request );
 
@@ -217,6 +220,27 @@ public class DefaultErrorReportingManager
                     "Not reporting problem as it already exists in database: "
                         + existingIssues.iterator().next().getLink() );
             }
+        }
+    }
+    
+    protected boolean shouldHandleReport( ErrorReportRequest request )
+    {
+        getLogger().error( "Message: " + request.getThrowable().getMessage() );
+        
+        String hash = StringDigester.getSha1Digest( request.getThrowable().getMessage() );
+        
+        getLogger().error( "Hash: " + hash );
+        
+        if ( errorHashSet.contains( hash ) )
+        {
+            getLogger().error( "Contained!!!" );
+            return false;
+        }
+        else
+        {
+            getLogger().error( "Not Contained!!!" );
+            errorHashSet.add( hash );
+            return true;
         }
     }
 
