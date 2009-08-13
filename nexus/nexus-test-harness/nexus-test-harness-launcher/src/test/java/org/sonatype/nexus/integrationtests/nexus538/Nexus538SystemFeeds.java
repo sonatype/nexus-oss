@@ -41,7 +41,9 @@ public class Nexus538SystemFeeds
     public void bootEventTest()
         throws Exception, IllegalArgumentException, FeedException
     {
-        Assert.assertTrue( findFeedEntry( FeedUtil.getFeed( "systemChanges" ), "Booting", null ) );
+        SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
+        this.validateLinksInFeeds( feed );
+        Assert.assertTrue( findFeedEntry( feed, "Booting", null ) );
     }
 
     @Test
@@ -59,6 +61,7 @@ public class Nexus538SystemFeeds
         repoUtil.updateRepo( repo );
 
         final SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
+        this.validateLinksInFeeds( feed );
         Assert.assertTrue( "Update repo feed not found\r\n\r\n" + feed, findFeedEntry( feed, "Configuration change",
                                                                                new String[] { newName, oldName } ) );
     }
@@ -75,9 +78,16 @@ public class Nexus538SystemFeeds
         repo.setProxyMode( ProxyMode.BLOCKED_AUTO.name() );
         repoUtil.updateStatus( repo );
 
-        Assert.assertTrue( findFeedEntry( FeedUtil.getFeed( "systemChanges" ), "Repository proxy mode change",
+        SyndFeed systemFeed = FeedUtil.getFeed( "systemChanges" );
+        this.validateLinksInFeeds( systemFeed );
+        
+        SyndFeed systemStatusFeed = FeedUtil.getFeed( "systemRepositoryStatusChanges" );
+        this.validateLinksInFeeds( systemStatusFeed );
+        
+        Assert.assertTrue( findFeedEntry( systemFeed, "Repository proxy mode change",
                                           new String[] { "release-proxy-repo-1" } ) );
-        Assert.assertTrue( findFeedEntry( FeedUtil.getFeed( "systemRepositoryStatusChanges" ),
+        
+        Assert.assertTrue( findFeedEntry( systemStatusFeed,
                                           "Repository proxy mode change", new String[] { "release-proxy-repo-1" } ) );
     }
 
@@ -118,4 +128,16 @@ public class Nexus538SystemFeeds
         return false;
     }
 
+    private void validateLinksInFeeds( SyndFeed feed )
+    {
+        Assert.assertTrue( "Feed link is wrong", feed.getLink().startsWith( this.getBaseNexusUrl() ));
+        
+        List<SyndEntry> entries = feed.getEntries();
+        
+        for ( SyndEntry syndEntry : entries )
+        {
+            Assert.assertNotNull( "Feed item link is empty.", syndEntry.getLink() );
+            Assert.assertTrue( "Feed item link is wrong, is: "+ syndEntry.getLink(), syndEntry.getLink().startsWith( this.getBaseNexusUrl() ));
+        }
+    }
 }

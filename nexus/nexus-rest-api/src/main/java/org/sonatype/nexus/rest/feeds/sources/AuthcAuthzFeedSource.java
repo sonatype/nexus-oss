@@ -104,7 +104,7 @@ public class AuthcAuthzFeedSource
 
             entry.setAuthor( feed.getAuthor() );
 
-            entry.setLink( "http://nexus.sonatype.org/" );
+            entry.setLink( "/" );
 
             entry.setDescription( content );
 

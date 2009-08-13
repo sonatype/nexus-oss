@@ -66,8 +66,6 @@ public abstract class AbstractSystemFeedSource
 
         String ipAddress = null;
 
-        String itemLink = null;
-
         int i = 0;
 
         for ( SystemEvent item : items )
@@ -185,15 +183,11 @@ public abstract class AbstractSystemFeedSource
 
             content.setValue( msg.toString() );
 
-            StringBuffer uriToAppend = new StringBuffer( "http://nexus.sonatype.org/" );
-
-            itemLink = uriToAppend.toString();
-
             entry.setPublishedDate( item.getEventDate() );
 
             entry.setAuthor( feed.getAuthor() );
 
-            entry.setLink( itemLink );
+            entry.setLink( "/" );
 
             entry.setDescription( content );
 

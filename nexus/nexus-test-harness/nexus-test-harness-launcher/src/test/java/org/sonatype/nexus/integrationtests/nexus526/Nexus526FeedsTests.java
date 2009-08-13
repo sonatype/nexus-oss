@@ -59,7 +59,8 @@ public class Nexus526FeedsTests
     public void recentCachedOrDeployedFileFeedTest()
         throws Exception
     {
-        SyndFeed feed = FeedUtil.getFeed( "recentlyCachedOrDeployedFiles" );
+        SyndFeed feed = FeedUtil.getFeed( "recentlyCachedOrDeployedFiles" );        
+        this.validateLinksInFeeds( feed );
 
         List<SyndEntry> entries = feed.getEntries();
 
@@ -81,6 +82,7 @@ public class Nexus526FeedsTests
         throws Exception
     {
         SyndFeed feed = FeedUtil.getFeed( "recentlyChangedFiles" );
+        this.validateLinksInFeeds( feed );
 
         List<SyndEntry> entries = feed.getEntries();
 
@@ -102,6 +104,7 @@ public class Nexus526FeedsTests
         throws Exception
     {
         SyndFeed feed = FeedUtil.getFeed( "recentlyDeployedFiles" );
+        this.validateLinksInFeeds( feed );
 
         List<SyndEntry> entries = feed.getEntries();
 
@@ -123,6 +126,7 @@ public class Nexus526FeedsTests
         throws Exception
     {
         SyndFeed feed = FeedUtil.getFeed( "recentlyCachedOrDeployedArtifacts" );
+        this.validateLinksInFeeds( feed );
 
         List<SyndEntry> entries = feed.getEntries();
 
@@ -142,6 +146,7 @@ public class Nexus526FeedsTests
         throws Exception
     {
         SyndFeed feed = FeedUtil.getFeed( "recentlyChangedArtifacts" );
+        this.validateLinksInFeeds( feed );
 
         List<SyndEntry> entries = feed.getEntries();
 
@@ -161,6 +166,7 @@ public class Nexus526FeedsTests
         throws Exception
     {
         SyndFeed feed = FeedUtil.getFeed( "recentlyDeployedArtifacts" );
+        this.validateLinksInFeeds( feed );
 
         List<SyndEntry> entries = feed.getEntries();
 
@@ -212,6 +218,18 @@ public class Nexus526FeedsTests
             String title = entry.getTitle();
 
             Assert.assertTrue( title.contains( pomName ) || title.contains( contentName ) );
+        }
+    }
+    
+    private void validateLinksInFeeds( SyndFeed feed )
+    {
+        Assert.assertTrue( "Feed link is wrong", feed.getLink().startsWith( this.getBaseNexusUrl() ));
+        
+        List<SyndEntry> entries = feed.getEntries();
+        
+        for ( SyndEntry syndEntry : entries )
+        {
+            Assert.assertTrue( "Feed item link is wrong, is: "+ syndEntry.getLink(), syndEntry.getLink().startsWith( this.getBaseNexusUrl() ));
         }
     }
 }
