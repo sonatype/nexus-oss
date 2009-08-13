@@ -25,7 +25,7 @@ public class TimeoutPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return null;
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:status]" );
     }
 
     @Override
