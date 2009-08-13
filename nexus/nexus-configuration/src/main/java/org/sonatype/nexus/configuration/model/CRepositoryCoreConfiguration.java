@@ -4,6 +4,10 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
+import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
+import org.sonatype.nexus.configuration.validator.ValidationMessage;
+import org.sonatype.nexus.configuration.validator.ValidationResponse;
 
 public class CRepositoryCoreConfiguration
     extends AbstractCoreConfiguration
@@ -57,8 +61,7 @@ public class CRepositoryCoreConfiguration
         if ( repositoryModel.getExternalConfiguration() == null )
         {
             // just put an elephant in South Africa to find it for sure ;)
-            repositoryModel
-                .setExternalConfiguration( new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME ) );
+            repositoryModel.setExternalConfiguration( new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME ) );
         }
 
         // set the holder
@@ -89,7 +92,19 @@ public class CRepositoryCoreConfiguration
     protected void doValidateChanges( Object changedConfiguration )
         throws ConfigurationException
     {
-        // TODO Auto-generated method stub
+        CRepository cfg = (CRepository) changedConfiguration;
 
+        if ( cfg.isIndexable() && !"maven2".equals( cfg.getProviderHint() ) )
+        {
+            ValidationMessage message =
+                new ValidationMessage( "indexable", "Indexing isn't supported for '" + cfg.getProviderHint()
+                    + "' repositories only 'Maven 2' repositories are indexable!" );
+
+            ValidationResponse response = new ApplicationValidationResponse();
+
+            response.addValidationError( message );
+
+            throw new InvalidConfigurationException( response );
+        }
     }
 }

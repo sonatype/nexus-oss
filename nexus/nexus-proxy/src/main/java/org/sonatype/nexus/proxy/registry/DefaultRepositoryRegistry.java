@@ -65,7 +65,7 @@ public class DefaultRepositoryRegistry
 
     @Requirement
     private PlexusContainer plexusContainer;
-    
+
     /** The repo register, [Repository.getId, Repository] */
     private Map<String, Repository> repositories = new HashMap<String, Repository>();
 
@@ -243,7 +243,7 @@ public class DefaultRepositoryRegistry
         {
             applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventRemove( this, repository ) );
         }
-        
+
         // dump the event listeners, as once deleted doesn't care about config changes any longer
         if ( repository instanceof EventListener )
         {
@@ -266,13 +266,16 @@ public class DefaultRepositoryRegistry
         {
             throw new InvalidConfigurationException( "Group or Repository Id cannot be empty." );
         }
-        
+
         try
         {
             Repository repo = (R) this.plexusContainer.lookup( type, provider );
             CRepository cRepo = new DefaultCRepository();
             cRepo.setId( repoId );
             cRepo.setExternalConfiguration( new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME ) );
+            cRepo.setProviderRole( type );
+            cRepo.setProviderHint( provider );
+            cRepo.setIndexable( "maven2".equals( provider ) );
             repo.configure( cRepo );
             return (R) repo;
         }
@@ -281,7 +284,7 @@ public class DefaultRepositoryRegistry
             throw new InvalidConfigurationException( "Could not lookup a new instance of Repository!", e );
         }
     }
-    
+
     public void dispose()
     {
         // kill the checker daemon threads

@@ -17,6 +17,12 @@ public class PlexusObjectFactory
 {
 
     private static final PlexusContainer container;
+
+    public static final PlexusContainer getContainer()
+    {
+        return container;
+    }
+
     static
     {
         try
@@ -69,7 +75,8 @@ public class PlexusObjectFactory
         // Launcher trick -- end
 
         // set the preconfigured world
-        final PlexusAppBooter plexusAppBooter = new PlexusAppBooter(){
+        final PlexusAppBooter plexusAppBooter = new PlexusAppBooter()
+        {
             @Override
             protected void customizeContext( Context context )
             {

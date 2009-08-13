@@ -3,9 +3,15 @@ package org.sonatype.nexus.mock;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -15,7 +21,9 @@ import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
 import org.sonatype.nexus.mock.util.SocketTestWaitCondition;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.nexus.testng.PlexusObjectFactory;
 import org.sonatype.spice.jscoverage.JsonReportHandler;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
@@ -236,4 +244,58 @@ public abstract class SeleniumTest
     {
         selenium.runScript( "window.Sonatype.utils.doLogin( null, '" + username + "', '" + password + "');" );
     }
+
+    @AfterClass
+    public void cleanInstance()
+        throws Exception
+    {
+        System.out.println( "Memory... free: " + Runtime.getRuntime().freeMemory() / 1024 / 1024 + " - total: "
+            + Runtime.getRuntime().totalMemory() / 1024 / 1024 );
+
+        PlexusObjectFactory.getContainer().release( this );
+        cleanFields();
+
+        System.gc();
+        System.out.println( "Memory gc... free: " + Runtime.getRuntime().freeMemory() / 1024 / 1024 + " - total: "
+            + Runtime.getRuntime().totalMemory() / 1024 / 1024 );
+
+    }
+
+    private void cleanFields()
+        throws IllegalArgumentException, IllegalAccessException
+    {
+        List<Field> fields = getFields( getClass() );
+        for ( Field field : fields )
+        {
+            if ( Modifier.isStatic( field.getModifiers() ) || Modifier.isFinal( field.getModifiers() ) )
+            {
+                continue;
+            }
+
+            field.setAccessible( true );
+            if ( field.getDeclaringClass().isPrimitive() )
+            {
+                field.set( this, 0 );
+            }
+            else
+            {
+                field.set( this, null );
+            }
+        }
+    }
+
+    private List<Field> getFields( Class<?> clazz )
+    {
+        if ( clazz == null )
+        {
+            return Collections.emptyList();
+        }
+
+        Field[] f = clazz.getDeclaredFields();
+        List<Field> fields = new ArrayList<Field>();
+        fields.addAll( Arrays.asList( f ) );
+        fields.addAll( getFields( clazz.getSuperclass() ) );
+        return fields;
+    }
+
 }
