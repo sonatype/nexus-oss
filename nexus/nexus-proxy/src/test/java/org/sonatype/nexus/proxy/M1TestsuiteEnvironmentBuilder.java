@@ -38,7 +38,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The Class JettyTestsuiteEnvironment.
- * 
+ *
  * @author cstamas
  */
 public class M1TestsuiteEnvironmentBuilder
@@ -50,6 +50,7 @@ public class M1TestsuiteEnvironmentBuilder
         super( servletServer );
     }
 
+    @Override
     public void buildEnvironment( AbstractProxyTestEnvironment env )
         throws ConfigurationException,
             IOException,
@@ -84,12 +85,13 @@ public class M1TestsuiteEnvironmentBuilder
             repoConf.setRemoteStorage( new CRemoteStorage() );
             repoConf.getRemoteStorage().setProvider( "apacheHttpClient3x" );
             repoConf.getRemoteStorage().setUrl( getServletServer().getUrl( remoteRepo.getName() ) );
+            repoConf.setIndexable( false );
 
             repo.configure( repoConf );
 
             // repo.setCacheManager( env.getCacheManager() );
             reposes.add( repo.getId() );
-            
+
             env.getApplicationConfiguration().getConfigurationModel().addRepository( repoConf );
 
             env.getRepositoryRegistry().addRepository( repo );
@@ -103,6 +105,7 @@ public class M1TestsuiteEnvironmentBuilder
         repoConf.setProviderRole( Repository.class.getName() );
         repoConf.setProviderHint( "maven1" );
         repoConf.setId( "inhouse" );
+        repoConf.setIndexable( false );
 
         repoConf.setLocalStorage( new CLocalStorage() );
         repoConf.getLocalStorage().setProvider( "file" );
@@ -131,6 +134,7 @@ public class M1TestsuiteEnvironmentBuilder
         repoSnapshotConf.setProviderRole( Repository.class.getName() );
         repoSnapshotConf.setProviderHint( "maven1" );
         repoSnapshotConf.setId( "inhouse-snapshot" );
+        repoSnapshotConf.setIndexable( false );
 
         repoSnapshotConf.setLocalStorage( new CLocalStorage() );
         repoSnapshotConf.getLocalStorage().setProvider( "file" );
@@ -161,6 +165,7 @@ public class M1TestsuiteEnvironmentBuilder
         repoGroupConf.setProviderRole( GroupRepository.class.getName() );
         repoGroupConf.setProviderHint( "maven1" );
         repoGroupConf.setId( "test" );
+        repoGroupConf.setIndexable( false );
 
         repoGroupConf.setLocalStorage( new CLocalStorage() );
         repoGroupConf.getLocalStorage().setProvider( "file" );

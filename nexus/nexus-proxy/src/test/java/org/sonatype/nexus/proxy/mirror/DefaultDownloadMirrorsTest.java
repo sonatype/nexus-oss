@@ -35,7 +35,7 @@ public class DefaultDownloadMirrorsTest
         throws Exception
     {
         super.setUp();
-        
+
         applicationConfiguration = lookup( ApplicationConfiguration.class );
     }
 
@@ -57,6 +57,7 @@ public class DefaultDownloadMirrorsTest
         conf.setRemoteStorage( new CRemoteStorage() );
         conf.getRemoteStorage().setProvider( CommonsHttpClientRemoteStorage.PROVIDER_STRING );
         conf.getRemoteStorage().setUrl( "http://repo1.maven.org/maven2/" );
+        conf.setIndexable( false );
 
         CRepositoryCoreConfiguration coreConfig = new CRepositoryCoreConfiguration( applicationConfiguration, conf, null );
 

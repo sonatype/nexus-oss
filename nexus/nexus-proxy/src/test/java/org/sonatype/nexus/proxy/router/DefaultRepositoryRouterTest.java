@@ -237,6 +237,8 @@ public class DefaultRepositoryRouterTest
         CRepository repoConfig = new DefaultCRepository();
         repoConfig.setId( repoId );
         repoConfig.setExposed( exposed );
+        repoConfig.setProviderRole( Repository.class.getName() );
+        repoConfig.setProviderHint( "maven2" );
         repo.configure( repoConfig );
         this.repositoryRegistry.addRepository( repo );
         this.applicationConfiguration.getConfigurationModel().addRepository( repoConfig );
@@ -251,6 +253,8 @@ public class DefaultRepositoryRouterTest
         CRepository repoConfig = new DefaultCRepository();
         repoConfig.setId( repoId );
         repoConfig.setExposed( exposed );
+        repoConfig.setProviderRole( GroupRepository.class.getName() );
+        repoConfig.setProviderHint( "maven2" );
         repo.configure( repoConfig );
         this.repositoryRegistry.addRepository( repo );
         this.applicationConfiguration.getConfigurationModel().addRepository( repoConfig );
@@ -265,6 +269,7 @@ public class DefaultRepositoryRouterTest
         CRepository repoConfig = new DefaultCRepository();
         repoConfig.setId( repoId );
         repoConfig.setExposed( exposed );
+        repoConfig.setIndexable( false );
         repo.configure( repoConfig );
         this.repositoryRegistry.addRepository( repo );
         this.applicationConfiguration.getConfigurationModel().addRepository( repoConfig );
@@ -277,6 +282,7 @@ public class DefaultRepositoryRouterTest
         shadowConfig.setExposed( exposed );
         shadowConfig.setProviderRole( ShadowRepository.class.getName() );
         shadowConfig.setProviderHint( "m2-m1-shadow" );
+        shadowConfig.setIndexable( false );
 
         Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
         shadowConfig.setExternalConfiguration( exRepo );

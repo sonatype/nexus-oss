@@ -24,6 +24,9 @@ public class DefaultRepositoryConfiguratorTest
         cRepo.setNotFoundCacheTTL( 1 );
         cRepo.setLocalStorage( new CLocalStorage() );
         cRepo.getLocalStorage().setProvider( "file" );
+        cRepo.setProviderRole( Repository.class.getName() );
+        cRepo.setProviderHint( "maven2" );
+
         Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
         cRepo.setExternalConfiguration( ex );
         M2RepositoryConfiguration extConf = new M2RepositoryConfiguration( ex );
@@ -60,6 +63,8 @@ public class DefaultRepositoryConfiguratorTest
         cRepo.setExternalConfiguration( ex );
         M2RepositoryConfiguration extConf = new M2RepositoryConfiguration( ex );
         extConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        cRepo.setProviderRole( Repository.class.getName() );
+        cRepo.setProviderHint( "maven2" );
 
         oldRepository.configure( cRepo );
 

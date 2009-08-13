@@ -154,7 +154,7 @@ public class RepositoryListPlexusResource
         appModel.setId( resource.getId() );
 
         appModel.setName( resource.getName() );
-        
+
         appModel.setExposed( resource.isExposed() );
 
         if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
@@ -162,6 +162,9 @@ public class RepositoryListPlexusResource
             appModel.setProviderRole( ShadowRepository.class.getName() );
 
             appModel.setExternalConfiguration( ex );
+
+            //indexer is unaware of the m2 layout conversion
+            appModel.setIndexable( false );
 
             RepositoryShadowResource repoResource = (RepositoryShadowResource) resource;
 

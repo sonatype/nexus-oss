@@ -18,7 +18,6 @@ import java.io.IOException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -39,7 +38,7 @@ public class M1LayoutedM2ShadowRepositoryTest
         throws Exception
     {
         ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
-        
+
         return new M2TestsuiteEnvironmentBuilder( ss );
     }
 
@@ -59,6 +58,7 @@ public class M1LayoutedM2ShadowRepositoryTest
             repoConf.setProviderRole( ShadowRepository.class.getName() );
             repoConf.setProviderHint( "m2-m1-shadow" );
             repoConf.setId( master.getId() + "-m1" );
+            repoConf.setIndexable( false );
 
             repoConf.setLocalStorage( new CLocalStorage() );
             repoConf.getLocalStorage().setProvider( "file" );
