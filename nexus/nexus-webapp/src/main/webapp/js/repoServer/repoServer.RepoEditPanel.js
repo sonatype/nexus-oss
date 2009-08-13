@@ -446,9 +446,32 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
       }
     ]
   } );
+  
+  this.on( 'show', this.showHandler, this );
 };
 
 Ext.extend( Sonatype.repoServer.HostedRepositoryEditor, Sonatype.repoServer.AbstractRepositoryEditor, {
+  afterProviderSelectHandler: function( combo, rec, index ) {
+    this.updateIndexableCombo(rec.data.format);
+  },
+  
+  showHandler: function ( panel ) {
+    var formatField = this.form.findField('format');
+    if ( formatField ){
+      this.updateIndexableCombo( formatField.getValue() );
+    }
+  },
+  
+  updateIndexableCombo: function( repoFormat ){
+    var indexableCombo = this.form.findField('indexable');
+    if ( repoFormat == 'maven2'){
+      indexableCombo.enable();      
+    }
+    else{
+      indexableCombo.setValue('False');
+      indexableCombo.disable();       
+    }
+  }
 } );
 
 Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
