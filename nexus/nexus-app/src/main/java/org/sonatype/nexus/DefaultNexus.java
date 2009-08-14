@@ -351,15 +351,15 @@ public class DefaultNexus
             throw new AccessDeniedException( "Not allowed to delete non-user-managed repository '" + id + "'." );
         }
 
+        // delete the configuration
+        nexusConfiguration.deleteRepository( id );
+        
         // remove the storage folders for the repository
         DeleteRepositoryFoldersTask task = nexusScheduler.createTaskInstance( DeleteRepositoryFoldersTask.class );
 
         task.setRepository( repository );
 
         nexusScheduler.submit( "Remove repository folder", task );
-
-        // delete the configuration
-        nexusConfiguration.deleteRepository( id );
     }
 
     // Maintenance
