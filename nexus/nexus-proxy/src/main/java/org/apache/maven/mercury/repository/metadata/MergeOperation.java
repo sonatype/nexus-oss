@@ -124,21 +124,42 @@ public class MergeOperation
             }
 
             // versioning.snapshot
-            // use the snapshot with highest build number
+            // use the snapshot with newest timestamp
             Snapshot sourceSnapshot = sourceMetadata.getVersioning().getSnapshot();
 
             if ( sourceSnapshot != null )
             {
-                int buildNumber = -1;
+                long timestamp = -1;
 
-                if ( targetMetadata.getVersioning() != null && targetMetadata.getVersioning().getSnapshot() != null )
+                if ( targetMetadata.getVersioning() != null 
+                    && targetMetadata.getVersioning().getSnapshot() != null 
+                    && targetMetadata.getVersioning().getSnapshot().getTimestamp() != null )
                 {
-                    buildNumber = targetMetadata.getVersioning().getSnapshot().getBuildNumber();
+                    try
+                    {
+                        timestamp = Long.parseLong( targetMetadata.getVersioning().getSnapshot().getTimestamp().replace( ".", "" ) );
+                    }
+                    catch ( NumberFormatException e )
+                    {
+                    }
                 }
-
-                if ( sourceSnapshot.getBuildNumber() > buildNumber )
+                
+                if ( sourceSnapshot.getTimestamp() != null )
                 {
-                    ops.add( new SetSnapshotOperation( new SnapshotOperand( sourceSnapshot ) ) );
+                    long sourceTimestamp = -1;
+                    
+                    try
+                    {
+                        sourceTimestamp = Long.parseLong( sourceSnapshot.getTimestamp().replace( ".", "" ) );
+                    }
+                    catch ( NumberFormatException e )
+                    {
+                    }
+                    
+                    if ( sourceTimestamp > timestamp )
+                    {
+                        ops.add( new SetSnapshotOperation( new SnapshotOperand( sourceSnapshot ) ) );    
+                    }
                 }
             }
         }

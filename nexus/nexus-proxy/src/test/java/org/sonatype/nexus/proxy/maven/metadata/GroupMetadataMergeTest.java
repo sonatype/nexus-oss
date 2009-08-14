@@ -134,6 +134,24 @@ public class GroupMetadataMergeTest
         assertEquals( 51, md.getVersioning().getSnapshot().getBuildNumber() );
         assertEquals( "20090527162714", md.getVersioning().getLastUpdated() );
     }
+    
+    public void testGAVMergeWithNewBuildNumberAndOldTimestamp()
+        throws Exception
+    {
+        String mdPath = "/md-merge/gav2/maven-metadata.xml";
+    
+        StorageItem item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath, false ) );
+        assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
+    
+        Metadata md = parseMetadata( (StorageFileItem) item );
+    
+        assertEquals( "org.sonatype.nexus", md.getGroupId() );
+        assertEquals( "nexus", md.getArtifactId() );
+        assertEquals( "1.3.4-SNAPSHOT", md.getVersion() );
+        assertEquals( "20090331.203702", md.getVersioning().getSnapshot().getTimestamp() );
+        assertEquals( 2, md.getVersioning().getSnapshot().getBuildNumber() );
+        assertEquals( "20090331203702", md.getVersioning().getLastUpdated() );
+    }
 
     public void testChecksum()
         throws Exception
