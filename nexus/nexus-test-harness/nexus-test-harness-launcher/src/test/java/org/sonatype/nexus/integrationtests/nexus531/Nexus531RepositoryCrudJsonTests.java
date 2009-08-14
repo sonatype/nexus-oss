@@ -226,7 +226,11 @@ public class Nexus531RepositoryCrudJsonTests
                 String storageURL =
                     repo.getDefaultLocalStorageUrl() != null ? repo.getDefaultLocalStorageUrl()
                                     : repo.getOverrideLocalStorageUrl();
-                Assert.assertEquals( storageURL, listRepo.getEffectiveLocalStorageUrl() );
+                    
+                storageURL = storageURL.endsWith( "/" ) ? storageURL : storageURL + "/";
+                String effectiveLocalStorage = listRepo.getEffectiveLocalStorageUrl().endsWith( "/" ) ? listRepo.getEffectiveLocalStorageUrl() : listRepo.getEffectiveLocalStorageUrl() + "/";
+                    
+                Assert.assertEquals( storageURL, effectiveLocalStorage );
             }
 
             // now check all agaist the the cRepo

@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.rest.repositories;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.Collection;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -22,6 +24,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
 import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
@@ -87,6 +90,9 @@ public abstract class AbstractRepositoryPlexusResource
 
     @Requirement
     private GlobalHttpProxySettings globalHttpProxySettings;
+    
+    @Requirement
+    private ApplicationConfiguration applicationConfiguration;
 
     protected AuthenticationInfoConverter getAuthenticationInfoConverter()
     {
@@ -306,9 +312,35 @@ public abstract class AbstractRepositoryPlexusResource
 
         resource.setNotFoundCacheTTL( repository.getNotFoundCacheTimeToLive() );
 
-        resource.setDefaultLocalStorageUrl( repository.getLocalUrl() );
-
-        resource.setOverrideLocalStorageUrl( repository.getLocalUrl() );
+        // TODO: remove the default local storage, this is a work around for NEXUS-1994
+        // the new 1.4 API doesn't store the default URL, well, it is part of the CRepo, but it is not exposed.
+        // so we can figure it out again, I think the default local Storage should be removed from the REST message
+        // which is part of the reason for not exposing it. The other part is it is not used anywhere except to set 
+        // the localUrl if not already set.
+        
+        File defaultStorageFile = new File( new File( this.applicationConfiguration.getWorkingDirectory(), "storage" ), repository.getId() );
+        //      make sure both URLs either end with '/' or do not end with '/'
+        String defaultLocalStorage = "";
+        try
+        {
+            defaultLocalStorage = defaultStorageFile.toURL().toString();
+            defaultLocalStorage = (defaultLocalStorage.endsWith( "/" )) ? defaultLocalStorage : defaultLocalStorage + "/";
+        }
+        catch ( MalformedURLException e )
+        {
+           this.getLogger().warn( "Could not figure out the default storage URL for repository: "+ repository.getId() );
+        }
+        
+        String currentLocalStorage = repository.getLocalUrl();
+        currentLocalStorage = (currentLocalStorage.endsWith( "/" )) ? currentLocalStorage : currentLocalStorage + "/";
+        
+        resource.setDefaultLocalStorageUrl( defaultLocalStorage );
+        
+        // now if the currentLocalStorage is different from the override local storage set it.
+        if( !defaultLocalStorage.equals( currentLocalStorage ) )
+        {
+            resource.setOverrideLocalStorageUrl( currentLocalStorage );
+        }
 
         if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
         {

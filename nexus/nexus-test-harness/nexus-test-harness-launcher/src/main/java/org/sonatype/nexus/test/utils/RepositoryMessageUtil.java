@@ -19,6 +19,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -292,7 +293,23 @@ public class RepositoryMessageUtil
             Assert.assertEquals( expected.getFormat(), expectedCc.getId() );
 
             Assert.assertEquals( expected.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL() );
-            Assert.assertEquals( expected.getOverrideLocalStorageUrl(), cRepo.getLocalStorage().getUrl() );
+            
+            // TODO: NEXUS-542, some times you get an extra "/"
+            String cRepoLocalStorage = cRepo.getLocalStorage().getUrl();
+            cRepoLocalStorage = cRepoLocalStorage.endsWith( "/" ) ? cRepoLocalStorage : cRepoLocalStorage +"/";
+            
+            String actualLocalStorage = cRepo.getLocalStorage().getUrl().endsWith( "/" ) ? cRepo.getLocalStorage().getUrl() : cRepo.getLocalStorage().getUrl() +"/";
+            
+            if( expected.getOverrideLocalStorageUrl() == null )
+            {
+                String defaultLocalStorage = expected.getDefaultLocalStorageUrl().endsWith( "/" ) ? expected.getDefaultLocalStorageUrl() : expected.getDefaultLocalStorageUrl() + "/";
+                Assert.assertEquals( defaultLocalStorage, actualLocalStorage );
+            }
+            else
+            {
+                String overridLocalStorage = expected.getOverrideLocalStorageUrl().endsWith( "/" ) ? expected.getOverrideLocalStorageUrl() : expected.getOverrideLocalStorageUrl() + "/";
+                Assert.assertEquals( overridLocalStorage, actualLocalStorage );
+            }
 
             if ( expected.getRemoteStorage() == null )
             {

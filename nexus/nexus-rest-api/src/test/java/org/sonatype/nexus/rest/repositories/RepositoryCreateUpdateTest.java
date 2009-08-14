@@ -2,6 +2,7 @@ package org.sonatype.nexus.rest.repositories;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -94,6 +95,10 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER, resultAuth2.getPassword() );
         // Assert.assertEquals( "privateKey2", resultAuth2.getPrivateKey() );
         Assert.assertEquals( "username2", resultAuth2.getUsername() );
+        
+        // NEXUS-1994 override local storage should be null
+        Assert.assertNull( result.getOverrideLocalStorageUrl() );
+        Assert.assertTrue( StringUtils.isNotEmpty( result.getDefaultLocalStorageUrl() ) );
     }
 
     public void testUpdate()
@@ -192,6 +197,9 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER, resultAuth2.getPassword() );
         // Assert.assertEquals( "privateKey2-new", resultAuth2.getPrivateKey() );
         Assert.assertEquals( "username2-new", resultAuth2.getUsername() );
+        // NEXUS-1994 override local storage should be null
+        Assert.assertNull( result.getOverrideLocalStorageUrl() );
+        Assert.assertTrue( StringUtils.isNotEmpty( result.getDefaultLocalStorageUrl() ) );
 
     }
 
@@ -330,6 +338,37 @@ public class RepositoryCreateUpdateTest
         //
 
         Assert.assertNull( result.getRemoteStorage().getHttpProxySettings() );
+        
+        // NEXUS-1994 override local storage should be null
+        Assert.assertNull( result.getOverrideLocalStorageUrl() );
+        Assert.assertTrue( StringUtils.isNotEmpty( result.getDefaultLocalStorageUrl() ) );
+    }
+    
+    public void testUpdateLocalStorage()
+        throws Exception
+    {
+
+        RepositoryProxyResource originalResource = this.sendAndGetResponse();
+        String newlocalStorage =  originalResource.getDefaultLocalStorageUrl().replaceAll( originalResource.getId(), "foo/bar" );
+        originalResource.setOverrideLocalStorageUrl(newlocalStorage );
+        
+        RepositoryPlexusResource plexusResource =
+            (RepositoryPlexusResource) this.lookup( PlexusResource.class, "RepositoryPlexusResource" );
+
+        Request request = new Request();
+        Response response = new Response( request );
+
+        request.getAttributes().put( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY, originalResource.getId() );
+
+        RepositoryResourceResponse repoRequest = new RepositoryResourceResponse();
+        repoRequest.setData( originalResource );
+
+        RepositoryResourceResponse repoResponse =
+            (RepositoryResourceResponse) plexusResource.put( null, request, response, repoRequest );
+        RepositoryProxyResource result = (RepositoryProxyResource) repoResponse.getData();
+        
+        Assert.assertEquals( newlocalStorage, result.getOverrideLocalStorageUrl() );
+        
     }
 
 }
