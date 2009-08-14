@@ -103,9 +103,10 @@ public class RepositoryTemplateListPlexusResource
 
             // policy
             // another hack
-            if ( template.getCoreConfiguration().getExternalConfiguration() instanceof AbstractMavenRepositoryConfiguration )
+            if ( template.getCoreConfiguration().getExternalConfiguration().getConfiguration( false ) instanceof AbstractMavenRepositoryConfiguration )
             {
-                repoRes.setRepoPolicy( ( (AbstractMavenRepositoryConfiguration) template.getCoreConfiguration().getExternalConfiguration() )
+                repoRes.setRepoPolicy( ( (AbstractMavenRepositoryConfiguration) template
+                    .getCoreConfiguration().getExternalConfiguration().getConfiguration( false ) )
                     .getRepositoryPolicy().toString() );
             }
 
