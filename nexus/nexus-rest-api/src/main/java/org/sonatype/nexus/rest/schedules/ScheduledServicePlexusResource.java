@@ -138,6 +138,8 @@ public class ScheduledServicePlexusResource
                 }
 
                 TaskUtils.setAlertEmail( task, resource.getAlertEmail() );
+                TaskUtils.setId( task, resource.getId() );
+                TaskUtils.setName( task, resource.getName() );
 
                 task.reset();
 

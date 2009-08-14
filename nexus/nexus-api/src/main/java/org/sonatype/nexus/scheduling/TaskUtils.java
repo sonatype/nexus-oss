@@ -107,6 +107,25 @@ public class TaskUtils
     /**
      * Sets the task id as a private task parameter.
      *
+     * @param task a scheduled task
+     * @param id   task id
+     */
+    public static void setId( final ScheduledTask<?> task,
+                              final String id )
+    {
+        if( id == null || id.trim().length() == 0 )
+        {
+            task.getTaskParams().remove( NexusTask.ID_KEY );
+        }
+        else
+        {
+            task.getTaskParams().put( NexusTask.ID_KEY, id );
+        }
+    }
+
+    /**
+     * Sets the task id as a private task parameter.
+     *
      * @param task a nexus task
      * @param id   task id
      */
@@ -120,6 +139,25 @@ public class TaskUtils
         else
         {
             task.addParameter( NexusTask.ID_KEY, id );
+        }
+    }
+
+    /**
+     * Sets the task name as a private task parameter.
+     *
+     * @param task a scheduled task
+     * @param name task name
+     */
+    public static void setName( final ScheduledTask<?> task,
+                                final String name )
+    {
+        if( name == null || name.trim().length() == 0 )
+        {
+            task.getTaskParams().remove( NexusTask.NAME_KEY );
+        }
+        else
+        {
+            task.getTaskParams().put( NexusTask.NAME_KEY, name );
         }
     }
 
