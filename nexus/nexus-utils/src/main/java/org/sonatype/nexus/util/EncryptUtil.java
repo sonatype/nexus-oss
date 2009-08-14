@@ -4,17 +4,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.util.Date;
 import java.util.Iterator;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.CompressionAlgorithmTags;
-import org.bouncycastle.bcpg.PublicKeyAlgorithmTags;
 import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPCompressedData;
@@ -22,7 +18,6 @@ import org.bouncycastle.openpgp.PGPCompressedDataGenerator;
 import org.bouncycastle.openpgp.PGPEncryptedDataGenerator;
 import org.bouncycastle.openpgp.PGPEncryptedDataList;
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPKeyPair;
 import org.bouncycastle.openpgp.PGPLiteralData;
 import org.bouncycastle.openpgp.PGPObjectFactory;
 import org.bouncycastle.openpgp.PGPOnePassSignatureList;
@@ -33,7 +28,6 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
-import org.bouncycastle.openpgp.PGPSignature;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.codehaus.plexus.util.IOUtil;
 
@@ -45,64 +39,6 @@ public class EncryptUtil
     static
     {
         Security.addProvider( new BouncyCastleProvider() );
-    }
-
-    public static void generateKeys( OutputStream publicOut, OutputStream privateOut, String identity, char[] passPhrase )
-        throws PGPException, IOException
-    {
-        publicOut = new ArmoredOutputStream( publicOut );
-        privateOut = new ArmoredOutputStream( privateOut );
-
-        try
-        {
-            KeyPairGenerator kpg;
-            try
-            {
-                kpg = KeyPairGenerator.getInstance( "RSA", PROVIDER );
-            }
-            catch ( Exception e )
-            {
-                // should never happen
-                throw new RuntimeException( "Error creating key generator instance", e );
-            }
-
-            kpg.initialize( 1024 );
-            KeyPair kp = kpg.generateKeyPair();
-            PGPKeyPair pgpKp;
-            try
-            {
-                pgpKp = new PGPKeyPair( PublicKeyAlgorithmTags.RSA_GENERAL, kp, new Date(), PROVIDER );
-            }
-            catch ( NoSuchProviderException e )
-            {
-                // should never happen
-                throw new RuntimeException( "Error creating key generator instance", e );
-            }
-
-            PGPSecretKey secretKey;
-            try
-            {
-                secretKey =
-                    new PGPSecretKey( PGPSignature.DEFAULT_CERTIFICATION, pgpKp, identity,
-                                      SymmetricKeyAlgorithmTags.CAST5, passPhrase, true, null, null,
-                                      new SecureRandom( identity.getBytes() ), PROVIDER );
-            }
-            catch ( NoSuchProviderException e )
-            {
-                // should never happen
-                throw new RuntimeException( e.getMessage(), e );
-            }
-
-            secretKey.encode( privateOut );
-
-            PGPPublicKey publicKey = secretKey.getPublicKey();
-            publicKey.encode( publicOut );
-        }
-        finally
-        {
-            IOUtil.close( privateOut );
-            IOUtil.close( publicOut );
-        }
     }
 
     @SuppressWarnings( "unchecked" )
@@ -151,7 +87,7 @@ public class EncryptUtil
         PGPPrivateKey privateKey;
         try
         {
-            privateKey = key.extractPrivateKey( passphrase, "BC" );
+            privateKey = key.extractPrivateKey( passphrase, PROVIDER );
         }
         catch ( NoSuchProviderException e )
         {
@@ -179,10 +115,10 @@ public class EncryptUtil
             PGPCompressedDataGenerator comData = new PGPCompressedDataGenerator( CompressionAlgorithmTags.ZIP );
             IOUtil.copy( plainInput, comData.open( bOut ) );
             comData.close();
-            IOUtil.close( plainInput );
 
             PGPEncryptedDataGenerator cPk =
-                new PGPEncryptedDataGenerator( SymmetricKeyAlgorithmTags.CAST5,true, new SecureRandom(), PROVIDER );
+                new PGPEncryptedDataGenerator( SymmetricKeyAlgorithmTags.CAST5, true, new SecureRandom(), PROVIDER );
+
             try
             {
                 cPk.addMethod( key );
@@ -205,7 +141,7 @@ public class EncryptUtil
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     public static void decrypt( InputStream encryptedInput, OutputStream plainOutput, InputStream secretKey,
                                 char[] passPhrase )
         throws IOException, PGPException
@@ -216,8 +152,8 @@ public class EncryptUtil
 
             PGPObjectFactory pgpF = new PGPObjectFactory( encryptedInput );
             PGPEncryptedDataList enc;
-            Object o = pgpF.nextObject();
 
+            Object o = pgpF.nextObject();
             //
             // the first object might be a PGP marker packet.
             //
@@ -239,6 +175,11 @@ public class EncryptUtil
             {
                 pbe = it.next();
                 key = readPrivateKey( secretKey, pbe.getKeyID(), passPhrase );
+            }
+
+            if ( key == null )
+            {
+                throw new IllegalArgumentException( "secret key for message not found." );
             }
 
             InputStream clear;
@@ -266,6 +207,7 @@ public class EncryptUtil
             if ( message instanceof PGPLiteralData )
             {
                 PGPLiteralData ld = (PGPLiteralData) message;
+
                 InputStream unc = ld.getInputStream();
                 IOUtil.copy( unc, plainOutput );
             }
@@ -276,6 +218,14 @@ public class EncryptUtil
             else
             {
                 throw new PGPException( "message is not a simple encrypted file - type unknown." );
+            }
+
+            if ( pbe.isIntegrityProtected() )
+            {
+                if ( !pbe.verify() )
+                {
+                    throw new PGPException( "message failed integrity check" );
+                }
             }
         }
         finally

@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import org.codehaus.plexus.swizzle.JiraIssueSubmitter;
 import org.codehaus.plexus.swizzle.jira.authentication.DefaultAuthenticationSource;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.swizzle.jira.Issue;
 import org.codehaus.swizzle.jira.Jira;
@@ -57,7 +59,7 @@ public class DefaultErrorReportingManager
 
     @Requirement( role = SecurityModelConfigurationSource.class, hint = "file" )
     private SecurityModelConfigurationSource securityXmlSource;
-    
+
     @Requirement( role = ApplicationStatusSource.class )
     ApplicationStatusSource applicationStatus;
 
@@ -72,7 +74,7 @@ public class DefaultErrorReportingManager
     private static final String COMPONENT = "Nexus";
 
     private static final String ERROR_REPORT_DIR = "error-report-bundles";
-    
+
     private Set<String> errorHashSet = new HashSet<String>();
 
     // ==
@@ -200,7 +202,7 @@ public class DefaultErrorReportingManager
     {
         CErrorReporting errorConfig = getCurrentConfiguration( false );
 
-        if ( isEnabled() 
+        if ( isEnabled()
             && shouldHandleReport( request ) )
         {
             IssueSubmissionRequest subRequest = buildRequest( errorConfig, request );
@@ -222,15 +224,15 @@ public class DefaultErrorReportingManager
             }
         }
     }
-    
+
     protected boolean shouldHandleReport( ErrorReportRequest request )
     {
         getLogger().error( "Message: " + request.getThrowable().getMessage() );
-        
+
         String hash = StringDigester.getSha1Digest( request.getThrowable().getMessage() );
-        
+
         getLogger().error( "Hash: " + hash );
-        
+
         if ( errorHashSet.contains( hash ) )
         {
             getLogger().error( "Contained!!!" );
@@ -254,7 +256,7 @@ public class DefaultErrorReportingManager
             jira.login( getJiraUsername( errorConfig ),
                 getJiraPassword( errorConfig ) );
 
-            List<Issue> issues = (List<Issue>) jira.getIssuesFromTextSearchWithProject( Arrays.asList( errorConfig
+            List<Issue> issues = jira.getIssuesFromTextSearchWithProject( Arrays.asList( errorConfig
                 .getJiraProject() ), "\"" + description + "\"", 20 );
 
             if ( !issues.isEmpty() )
@@ -300,17 +302,17 @@ public class DefaultErrorReportingManager
         throws IOException
     {
         String summary = "APR: " + request.getThrowable().getMessage();
-        
+
         if ( summary.length() > 255 )
         {
             summary = summary.substring( 0, 254 );
         }
-        
+
         IssueSubmissionRequest subRequest = new IssueSubmissionRequest();
 
         subRequest.setProjectId( errorConfig.getJiraProject() );
         subRequest.setSummary( summary );
-        subRequest.setDescription( "The following exception occurred: " 
+        subRequest.setDescription( "The following exception occurred: "
             + StringDigester.LINE_SEPERATOR
             + ExceptionUtils.getFullStackTrace( request.getThrowable() ) );
         subRequest.setProblemReportBundle( assembleBundle( request ) );
@@ -332,27 +334,27 @@ public class DefaultErrorReportingManager
     private String getJiraUsername( CErrorReporting errorConfig )
     {
         String username = DEFAULT_USERNAME;
-        
+
         if ( StringUtils.isNotEmpty( errorConfig.getJiraUsername() ) )
         {
             username = errorConfig.getJiraUsername();
         }
-        
+
         return username;
     }
-    
+
     private String getJiraPassword( CErrorReporting errorConfig )
     {
         String password = DEFAULT_USERNAME;
-        
+
         if ( StringUtils.isNotEmpty( errorConfig.getJiraPassword() ) )
         {
             password = errorConfig.getJiraPassword();
         }
-        
+
         return password;
     }
-    
+
 
     private String assembleEnvironment( ErrorReportRequest request )
     {
@@ -360,40 +362,40 @@ public class DefaultErrorReportingManager
         sb.append( "Nexus Version: " );
         sb.append( applicationStatus.getSystemStatus().getVersion() );
         sb.append( StringDigester.LINE_SEPERATOR );
-        
+
         sb.append( "Nexus Edition: " );
         sb.append( applicationStatus.getSystemStatus().getEditionLong() );
         sb.append( StringDigester.LINE_SEPERATOR );
-        
+
         sb.append( "java.vendor: " );
         sb.append( System.getProperty( "java.vendor" ) );
         sb.append( StringDigester.LINE_SEPERATOR );
-        
+
         sb.append( "java.version: " );
         sb.append( System.getProperty( "java.version" ) );
         sb.append( StringDigester.LINE_SEPERATOR );
-        
+
         sb.append( "os.name: " );
         sb.append( System.getProperty( "os.name" ) );
         sb.append( StringDigester.LINE_SEPERATOR );
-        
+
         sb.append( "os.version: " );
         sb.append( System.getProperty( "os.version" ) );
         sb.append( StringDigester.LINE_SEPERATOR );
-        
+
         sb.append( "os.arch: " );
         sb.append( System.getProperty( "os.arch" ) );
-        
+
         return sb.toString();
     }
-    
+
     private IssueSubmitter getIssueSubmitter( CErrorReporting errorConfig )
         throws IssueSubmissionException
     {
         try
-        {           
-            return new JiraIssueSubmitter( 
-                errorConfig.getJiraUrl(), 
+        {
+            return new JiraIssueSubmitter(
+                errorConfig.getJiraUrl(),
                 new DefaultAuthenticationSource(
                     getJiraUsername( errorConfig ),
                     getJiraPassword( errorConfig ) ) );
@@ -406,6 +408,14 @@ public class DefaultErrorReportingManager
 
     public File assembleBundle( ErrorReportRequest request )
         throws IOException
+    {
+        File bundleZip = createBundleZip( request );
+        File encriptedBundleZip = encryptBundleZip(bundleZip);
+        return encriptedBundleZip;
+    }
+
+    private File createBundleZip( ErrorReportRequest request )
+        throws IOException, FileNotFoundException
     {
         File nexusXml = new NexusXmlHandler().getFile( configHelper, nexusConfig );
         File securityXml = new SecurityXmlHandler().getFile( securityXmlSource, nexusConfig );
@@ -451,10 +461,7 @@ public class DefaultErrorReportingManager
             deleteFile( contextListing );
             deleteFile( exceptionListing );
 
-            if ( zStream != null )
-            {
-                zStream.close();
-            }
+            IOUtil.close( zStream );
         }
 
         return zipFile;
