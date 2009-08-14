@@ -40,6 +40,8 @@ public class CRepositoryCoreConfiguration
         ( (CRepository) destination ).setExternalConfiguration( ( (CRepository) source ).getExternalConfiguration() );
 
         ( (CRepository) destination ).externalConfigurationImple = ( (CRepository) source ).externalConfigurationImple;
+        
+        ( (CRepository) destination ).defaultLocalStorageUrl = ( (CRepository) source ).defaultLocalStorageUrl;
 
         // trick with RemoteStorage, which is an object, and XStream will not "overlap" it properly (ie. destionation !=
         // null but source == null)

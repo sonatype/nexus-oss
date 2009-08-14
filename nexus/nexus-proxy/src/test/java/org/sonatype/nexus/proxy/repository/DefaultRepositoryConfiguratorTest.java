@@ -81,4 +81,31 @@ public class DefaultRepositoryConfiguratorTest
         Assert.assertFalse( oldRepository.getNotFoundCache().contains( "test-path" ) );
     }
 
+    public void testDoNotStoreDefaultLocalStorage()
+        throws Exception
+    {
+
+        Repository repository = this.lookup( Repository.class, "maven2" );
+
+        CRepository cRepo = new DefaultCRepository();
+        cRepo.setId( "test-repo" );
+        cRepo.setLocalStatus( LocalStatus.IN_SERVICE.toString() );
+        cRepo.setNotFoundCacheTTL( 1 );
+        cRepo.setLocalStorage( new CLocalStorage() );
+        cRepo.getLocalStorage().setProvider( "file" );
+        cRepo.setProviderRole( Repository.class.getName() );
+        cRepo.setProviderHint( "maven2" );
+
+        Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
+        cRepo.setExternalConfiguration( ex );
+        M2RepositoryConfiguration extConf = new M2RepositoryConfiguration( ex );
+        extConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+
+        repository.configure( cRepo );
+
+        Assert.assertNotNull( repository.getLocalUrl() );
+        Assert.assertNull( cRepo.getLocalStorage().getUrl() );
+
+    }
+
 }

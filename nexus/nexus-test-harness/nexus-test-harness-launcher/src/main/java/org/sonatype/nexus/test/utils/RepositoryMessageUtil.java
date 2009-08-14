@@ -294,19 +294,13 @@ public class RepositoryMessageUtil
 
             Assert.assertEquals( expected.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL() );
             
-            // TODO: NEXUS-542, some times you get an extra "/"
-            String cRepoLocalStorage = cRepo.getLocalStorage().getUrl();
-            cRepoLocalStorage = cRepoLocalStorage.endsWith( "/" ) ? cRepoLocalStorage : cRepoLocalStorage +"/";
-            
-            String actualLocalStorage = cRepo.getLocalStorage().getUrl().endsWith( "/" ) ? cRepo.getLocalStorage().getUrl() : cRepo.getLocalStorage().getUrl() +"/";
-            
             if( expected.getOverrideLocalStorageUrl() == null )
             {
-                String defaultLocalStorage = expected.getDefaultLocalStorageUrl().endsWith( "/" ) ? expected.getDefaultLocalStorageUrl() : expected.getDefaultLocalStorageUrl() + "/";
-                Assert.assertEquals( defaultLocalStorage, actualLocalStorage );
+                Assert.assertNull( "Expected CRepo localstorage url not be set, because it is the default.", cRepo.getLocalStorage().getUrl() );
             }
             else
             {
+                String actualLocalStorage = cRepo.getLocalStorage().getUrl().endsWith( "/" ) ? cRepo.getLocalStorage().getUrl() : cRepo.getLocalStorage().getUrl() +"/";
                 String overridLocalStorage = expected.getOverrideLocalStorageUrl().endsWith( "/" ) ? expected.getOverrideLocalStorageUrl() : expected.getOverrideLocalStorageUrl() + "/";
                 Assert.assertEquals( overridLocalStorage, actualLocalStorage );
             }

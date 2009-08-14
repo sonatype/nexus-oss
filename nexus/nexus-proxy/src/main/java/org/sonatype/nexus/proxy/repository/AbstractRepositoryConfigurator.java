@@ -87,7 +87,8 @@ public abstract class AbstractRepositoryConfigurator
         }
 
         String localUrl = null;
-
+        boolean usingDefaultLocalUrl = false;
+        
         if ( repo.getLocalStorage() != null && !StringUtils.isEmpty( repo.getLocalStorage().getUrl() ) )
         {
             localUrl = repo.getLocalStorage().getUrl();
@@ -95,6 +96,7 @@ public abstract class AbstractRepositoryConfigurator
         else
         {
             localUrl = repo.defaultLocalStorageUrl;
+            usingDefaultLocalUrl = true;
 
             // Default dir is going to be valid
             defaultStorageFile.mkdirs();
@@ -113,7 +115,10 @@ public abstract class AbstractRepositoryConfigurator
         {
             ls.validateStorageUrl( localUrl );
 
-            repo.getLocalStorage().setUrl( localUrl );
+            if( !usingDefaultLocalUrl )
+            {
+                repo.getLocalStorage().setUrl( localUrl );
+            }
 
             repository.setLocalStorage( ls );
         }
