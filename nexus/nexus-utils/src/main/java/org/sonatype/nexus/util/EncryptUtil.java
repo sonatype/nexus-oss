@@ -16,9 +16,10 @@ import java.security.spec.X509EncodedKeySpec;
 
 import javax.crypto.Cipher;
 
-import org.apache.james.mime4j.codec.Base64InputStream;
-import org.apache.james.mime4j.codec.Base64OutputStream;
 import org.codehaus.plexus.util.IOUtil;
+
+import cryptix.util.mime.Base64InputStream;
+import cryptix.util.mime.Base64OutputStream;
 
 public class EncryptUtil
 {

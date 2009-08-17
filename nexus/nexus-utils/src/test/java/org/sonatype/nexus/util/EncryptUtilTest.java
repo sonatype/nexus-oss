@@ -75,7 +75,7 @@ public class EncryptUtilTest
         assertNotNull( privateKey );
     }
 
-    public void testDecryptTest()
+    public void testDecrypt()
         throws Exception
     {
         final ByteArrayOutputStream plainOutput = new ByteArrayOutputStream();
@@ -86,7 +86,7 @@ public class EncryptUtilTest
         assertEquals( "Simple decryption test!", decryptedText );
     }
 
-    public void testEncryptTest()
+    public void testEncDec()
         throws Exception
     {
         String textToEncrypt = "This is a simple text to be encrypted!!!";
