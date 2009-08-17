@@ -12,6 +12,7 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
@@ -265,22 +266,29 @@ public class Nexus2351DisableRedeployUploadTest
     private void deployWithMavenExpectFailure( File mavenProject )
     throws VerificationException,
         IOException
-{
-    // deploy using maven
-    Verifier verifier = this.createVerifier( mavenProject );
-    try
     {
-        verifier.executeGoal( "deploy" );
-
-        verifier.verifyErrorFreeLog();
-
-        Assert.fail( "Should return 401 error" );
+        // deploy using maven
+        Verifier verifier = this.createVerifier( mavenProject );
+        try
+        {
+            verifier.executeGoal( "deploy" );
+    
+            verifier.verifyErrorFreeLog();
+    
+            Assert.fail( "Should return 401 error" );
+        }
+        catch ( VerificationException e )
+        {
+            // expect error
+        }
+    
     }
-    catch ( VerificationException e )
+    
+    @BeforeClass
+    public static void clean()
+        throws IOException
     {
-        // expect error
+        cleanWorkDir();
     }
-
-}
 
 }
