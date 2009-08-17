@@ -1,9 +1,10 @@
 package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.restlet.data.Response;
+import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
@@ -44,16 +45,13 @@ public class HttpGetLvoDiscoveryStrategy
         DiscoveryResponse dr = new DiscoveryResponse( request );
 
         // handle
-        Response response = handleRequest( getRemoteUrl( request ), 3 );
+        InputStream is = handleRequest( getRemoteUrl( request ) );
 
-        if ( response.getStatus().isSuccess() && response.isEntityAvailable() )
+        if ( is != null )
         {
             try
             {
-                // if we are able to deserialize the response, then send forward the response
-                String lvoResponse = response.getEntity().getText();
-
-                DiscoveryResponse remoteResponse = (DiscoveryResponse) getXStream().fromXML( lvoResponse );
+                DiscoveryResponse remoteResponse = (DiscoveryResponse) getXStream().fromXML( is );
 
                 return remoteResponse;
             }
@@ -63,6 +61,10 @@ public class HttpGetLvoDiscoveryStrategy
                 dr.setSuccessful( false );
 
                 return dr;
+            }
+            finally
+            {
+                IOUtil.close( is );
             }
         }
 

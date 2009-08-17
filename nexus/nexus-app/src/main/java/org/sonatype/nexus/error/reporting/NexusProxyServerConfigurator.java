@@ -2,9 +2,9 @@ package org.sonatype.nexus.error.reporting;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.swizzle.ProxyServerConfigurator;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.HttpClientProxyUtil;
+import org.sonatype.spice.utils.proxyserver.ProxyServerConfigurator;
 
 public class NexusProxyServerConfigurator
     implements ProxyServerConfigurator

@@ -59,7 +59,12 @@ public class DefaultGlobalHttpProxySettings
 
     public boolean isBlockInheritance()
     {
-        return getCurrentConfiguration( false ).isBlockInheritance();
+        if ( isEnabled() )
+        {
+            return getCurrentConfiguration( false ).isBlockInheritance();
+        }
+        
+        return false;
     }
 
     public void setBlockInheritance( boolean val )
@@ -74,7 +79,12 @@ public class DefaultGlobalHttpProxySettings
 
     public String getHostname()
     {
-        return getCurrentConfiguration( false ).getProxyHostname();
+        if ( isEnabled() )
+        {
+            return getCurrentConfiguration( false ).getProxyHostname();
+        }
+        
+        return null;
     }
 
     public void setHostname( String hostname )
@@ -89,7 +99,12 @@ public class DefaultGlobalHttpProxySettings
 
     public int getPort()
     {
-        return getCurrentConfiguration( false ).getProxyPort();
+        if ( isEnabled() )
+        {
+            return getCurrentConfiguration( false ).getProxyPort();
+        }
+        
+        return -1;
     }
 
     public void setPort( int port )
@@ -104,19 +119,24 @@ public class DefaultGlobalHttpProxySettings
 
     public RemoteAuthenticationSettings getProxyAuthentication()
     {
-        try
+        if ( isEnabled() )
         {
-            return authenticationInfoConverter.convertAndValidateFromModel( getCurrentConfiguration( false )
-                .getAuthentication() );
+            try
+            {
+                return authenticationInfoConverter.convertAndValidateFromModel( getCurrentConfiguration( false )
+                    .getAuthentication() );
+            }
+            catch ( ConfigurationException e )
+            {
+                // FIXME: what here??
+    
+                setProxyAuthentication( null );
+    
+                return null;
+            }
         }
-        catch ( ConfigurationException e )
-        {
-            // FIXME: what here??
-
-            setProxyAuthentication( null );
-
-            return null;
-        }
+        
+        return null;
     }
 
     public void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication )

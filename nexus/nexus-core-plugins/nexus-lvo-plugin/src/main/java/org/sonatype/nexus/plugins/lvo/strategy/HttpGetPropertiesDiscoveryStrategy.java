@@ -6,7 +6,6 @@ import java.util.Properties;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.IOUtil;
-import org.restlet.data.Response;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
@@ -29,21 +28,19 @@ public class HttpGetPropertiesDiscoveryStrategy
         DiscoveryResponse dr = new DiscoveryResponse( request );
 
         // handle
-        Response response = handleRequest( getRemoteUrl( request ), 3 );
+        InputStream is = handleRequest( getRemoteUrl( request ) );
 
-        if ( response.getStatus().isSuccess() && response.isEntityAvailable() )
+        if ( is != null )
         {
             Properties properties = new Properties();
 
-            InputStream content = response.getEntity().getStream();
-
             try
             {
-                properties.load( content );
+                properties.load( is );
             }
             finally
             {
-                IOUtil.close( content );
+                IOUtil.close( is );
             }
 
             String keyPrefix = request.getKey() + ".";

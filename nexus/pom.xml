@@ -157,6 +157,7 @@
     <plexus-app-events.version>1.0.0-SNAPSHOT</plexus-app-events.version>
     <spice-timeline.version>1.0-SNAPSHOT</spice-timeline.version>
     <plexus-swizzle.version>1.0-alpha-3-SNAPSHOT</plexus-swizzle.version>
+    <spice-utils.version>1.0.0-SNAPSHOT</spice-utils.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -633,6 +634,11 @@
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.spice</groupId>
+        <artifactId>spice-utils</artifactId>
+        <version>${spice-utils.version}</version>
       </dependency>
 
       <!-- Tests -->

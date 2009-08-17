@@ -36,6 +36,10 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+        	<groupId>org.sonatype.spice</groupId>
+        	<artifactId>spice-utils</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.2</version>
