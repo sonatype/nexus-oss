@@ -7,4 +7,6 @@ public interface LvoPluginConfiguration
 {
     CLvoKey getLvoKey( String key )
         throws NoSuchKeyException;
+    
+    boolean isEnabled();
 }

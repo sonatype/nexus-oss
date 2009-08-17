@@ -29,29 +29,35 @@ public class DefaultLvoPlugin
             NoSuchRepositoryException,
             IOException
     {
-        CLvoKey info = lvoPluginConfiguration.getLvoKey( key );
-
-        String strategyId = info.getStrategy();
-
-        if ( StringUtils.isEmpty( strategyId ) )
+        if ( lvoPluginConfiguration.isEnabled() )
         {
-            // default it
-            strategyId = "index";
-        }
+            CLvoKey info = lvoPluginConfiguration.getLvoKey( key );
 
-        if ( strategies.containsKey( strategyId ) )
-        {
-            DiscoveryStrategy strategy = strategies.get( strategyId );
+            String strategyId = info.getStrategy();
 
-            DiscoveryRequest req = new DiscoveryRequest( key, info );
+            if ( StringUtils.isEmpty( strategyId ) )
+            {
+                // default it
+                strategyId = "index";
+            }
 
-            return strategy.discoverLatestVersion( req );
+            if ( strategies.containsKey( strategyId ) )
+            {
+                DiscoveryStrategy strategy = strategies.get( strategyId );
+
+                DiscoveryRequest req = new DiscoveryRequest( key, info );
+
+                return strategy.discoverLatestVersion( req );
+            }
+            else
+            {
+                throw new NoSuchStrategyException( info.getStrategy() );
+            }
         }
         else
         {
-            throw new NoSuchStrategyException( info.getStrategy() );
+            return getDisabledResponse();
         }
-
     }
 
     public DiscoveryResponse queryLatestVersionForKey( String key, String v )
@@ -60,33 +66,49 @@ public class DefaultLvoPlugin
             NoSuchRepositoryException,
             IOException
     {
-        DiscoveryResponse lv = getLatestVersionForKey( key );
-
-        if ( !lv.isSuccessful() )
+        if ( lvoPluginConfiguration.isEnabled() )
         {
-            // nothing to compare to
+            DiscoveryResponse lv = getLatestVersionForKey( key );
+
+            if ( !lv.isSuccessful() )
+            {
+                // nothing to compare to
+                return lv;
+            }
+
+            // compare the two versions
+
+            ArtifactInfo ca = new ArtifactInfo();
+            ca.groupId = "dummy";
+            ca.artifactId = "dummy";
+            ca.version = "[" + v + "]";
+
+            ArtifactInfo la = new ArtifactInfo();
+            la.groupId = "dummy";
+            la.artifactId = "dummy";
+            la.version = "[" + lv.getVersion() + "]";
+
+            if ( ArtifactInfo.VERSION_COMPARATOR.compare( la, ca ) >= 0 )
+            {
+                lv.getResponse().clear();
+
+                lv.setSuccessful( true );
+            }
+
             return lv;
         }
-
-        // compare the two versions
-
-        ArtifactInfo ca = new ArtifactInfo();
-        ca.groupId = "dummy";
-        ca.artifactId = "dummy";
-        ca.version = "[" + v + "]";
-
-        ArtifactInfo la = new ArtifactInfo();
-        la.groupId = "dummy";
-        la.artifactId = "dummy";
-        la.version = "[" + lv.getVersion() + "]";
-
-        if ( ArtifactInfo.VERSION_COMPARATOR.compare( la, ca ) >= 0 )
+        else
         {
-            lv.getResponse().clear();
-
-            lv.setSuccessful( true );
+            return getDisabledResponse();
         }
+    }
 
-        return lv;
+    protected DiscoveryResponse getDisabledResponse()
+    {
+        DiscoveryResponse response = new DiscoveryResponse( null );
+
+        response.setSuccessful( true );
+
+        return response;
     }
 }

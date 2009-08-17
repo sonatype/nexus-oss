@@ -40,12 +40,26 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>enabled</name>
+          <version>1.0.1+</version>
+          <description>Enable the LVO check</description>
+          <required>true</required>
+          <type>boolean</type>
+          <defaultValue>true</defaultValue>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
           <version>1.0.0</version>
           <code><![CDATA[
     public static final String MODEL_VERSION = "1.0.0";
+]]></code>
+        </codeSegment>
+        <codeSegment>
+          <version>1.0.1</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "1.0.1";
 ]]></code>
         </codeSegment>
       </codeSegments>

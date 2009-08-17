@@ -36,7 +36,6 @@ public class DefaultLvoPluginConfiguration
 
     private ReentrantLock lock = new ReentrantLock();
 
-    @SuppressWarnings( "unchecked" )
     public CLvoKey getLvoKey( String key )
         throws NoSuchKeyException
     {
@@ -63,6 +62,24 @@ public class DefaultLvoPluginConfiguration
         {
             throw new NoSuchKeyException( key );
         }
+    }
+    
+    public boolean isEnabled()
+    {
+        try
+        {
+            return getConfiguration().isEnabled();
+        }
+        catch ( ConfigurationException e )
+        {
+            getLogger().error( "Unable to read configuration", e );
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Unable to read configuration", e );
+        }
+        
+        return false;
     }
 
     protected Configuration getConfiguration()
