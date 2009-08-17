@@ -1,11 +1,9 @@
 package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
@@ -28,19 +26,19 @@ public class HttpGetPropertiesDiscoveryStrategy
         DiscoveryResponse dr = new DiscoveryResponse( request );
 
         // handle
-        InputStream is = handleRequest( getRemoteUrl( request ) );
+        RequestResult response = handleRequest( getRemoteUrl( request ) );
 
-        if ( is != null )
+        if ( response != null )
         {
             Properties properties = new Properties();
 
             try
             {
-                properties.load( is );
+                properties.load( response.getInputStream() );
             }
             finally
             {
-                IOUtil.close( is );
+                response.close();
             }
 
             String keyPrefix = request.getKey() + ".";

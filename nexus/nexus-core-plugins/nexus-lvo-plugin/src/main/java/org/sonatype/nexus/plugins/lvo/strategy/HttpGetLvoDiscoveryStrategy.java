@@ -1,10 +1,8 @@
 package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
@@ -45,13 +43,13 @@ public class HttpGetLvoDiscoveryStrategy
         DiscoveryResponse dr = new DiscoveryResponse( request );
 
         // handle
-        InputStream is = handleRequest( getRemoteUrl( request ) );
+        RequestResult response = handleRequest( getRemoteUrl( request ) );
 
-        if ( is != null )
+        if ( response != null )
         {
             try
             {
-                DiscoveryResponse remoteResponse = (DiscoveryResponse) getXStream().fromXML( is );
+                DiscoveryResponse remoteResponse = (DiscoveryResponse) getXStream().fromXML( response.getInputStream() );
 
                 return remoteResponse;
             }
@@ -64,7 +62,7 @@ public class HttpGetLvoDiscoveryStrategy
             }
             finally
             {
-                IOUtil.close( is );
+                response.close();
             }
         }
 

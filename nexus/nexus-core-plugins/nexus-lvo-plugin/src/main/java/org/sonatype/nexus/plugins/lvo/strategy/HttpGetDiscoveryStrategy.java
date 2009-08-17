@@ -45,13 +45,13 @@ public class HttpGetDiscoveryStrategy
         DiscoveryResponse dr = new DiscoveryResponse( request );
 
         // handle
-        InputStream is = handleRequest( getRemoteUrl( request ) );
+        RequestResult response = handleRequest( getRemoteUrl( request ) );
 
-        if ( is != null )
+        if ( response != null )
         {
             try
             {
-                BufferedReader reader = new BufferedReader( new InputStreamReader( is ) );
+                BufferedReader reader = new BufferedReader( new InputStreamReader( response.getInputStream() ) );
     
                 dr.setVersion( reader.readLine() );
     
@@ -59,46 +59,38 @@ public class HttpGetDiscoveryStrategy
             }
             finally
             {
-                IOUtil.close( is );
+                response.close();
             }
         }
 
         return dr;
     }
 
-    protected InputStream handleRequest( String url ) 
-        throws IOException
+    protected RequestResult handleRequest( String url )
     {
         HttpClient client = new HttpClient();
         
         new NexusProxyServerConfigurator( nexusConfig.getGlobalRemoteStorageContext(), getLogger() ).applyToClient( client );
         
-        client.getHttpConnectionManager().getParams().setConnectionTimeout( 10000 );
+        GetMethod method = new GetMethod( url );
         
-        GetMethod method = null;        
-        InputStream is = null;
+        RequestResult result = null;
         
         try
         {
-            method = new GetMethod( url );
-            method.setFollowRedirects( true );
-            
             int status = client.executeMethod( method );
             
             if ( HttpStatus.SC_OK == status )
             {
-                is = method.getResponseBodyAsStream();
+                result = new RequestResult( method );
             }
         }
-        finally
+        catch ( IOException e )
         {
-            if ( method != null )
-            {
-                method.releaseConnection();
-            }
+            getLogger().debug( "Error retrieving lvo data", e );
         }
         
-        return is;
+        return result;
     }
 
     protected String getRemoteUrl( DiscoveryRequest request )
@@ -119,5 +111,33 @@ public class HttpGetDiscoveryStrategy
         rr.setClientInfo( ci );
 
         return rr;
+    }
+    
+    protected static final class RequestResult
+    {
+        private InputStream is;
+        private GetMethod method;
+        
+        public RequestResult( GetMethod method ) 
+            throws IOException
+        {
+            this.is = method.getResponseBodyAsStream();
+            this.method = method;
+        }
+        
+        public InputStream getInputStream()
+        {
+            return this.is;
+        }
+        
+        public void close()
+        {
+            IOUtil.close( is );
+            
+            if ( this.method != null )
+            {
+                this.method.releaseConnection();
+            }
+        }
     }
 }
