@@ -962,8 +962,13 @@ Ext.extend( Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
         var roleName = sentRoles[i];
         var roleRec = this.roleDataStore.getAt( this.roleDataStore.find( 'id', roleName ) );
         if ( roleRec ) {
-          roles.push( roleRec.data );
-          roleName = roleRec.data.name;
+          var newRole = {
+            id: roleRec.data.id,
+            name: roleRec.data.name,
+            source: 'default'
+          }
+          roles.push( newRole );
+          roleName = newRole.name;
         }
         if ( s ) {
           s += ', ';
