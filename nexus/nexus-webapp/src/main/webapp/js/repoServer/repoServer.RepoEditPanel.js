@@ -125,23 +125,8 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
     
       }
       
-      var writePolicyField = this.form.findField( 'writePolicy' );
-      
-      // filter out the redeploy option for SNAPSHOT repos
-      if( repoPolicy == 'snapshot' )
-      {
-        // first change the value if it is ALLOW_WRITE_ONCE
-        writePolicyField.setValue('ALLOW_WRITE');
-        
-      	this.writePolicyStore.filterBy(function(rec, id)
-      	{
-      	  return rec.data.value != 'ALLOW_WRITE_ONCE';
-      	});
-      }
-      else
-      {
-        writePolicyField.store.clearFilter();
-      }
+      // filter the Deploy Policy combo
+      this.updateWritePolicy();
       
       this.lastPolicy = repoPolicy;
     }
@@ -460,6 +445,8 @@ Ext.extend( Sonatype.repoServer.HostedRepositoryEditor, Sonatype.repoServer.Abst
     if ( formatField ){
       this.updateIndexableCombo( formatField.getValue() );
     }
+    
+    this.updateWritePolicy();
   },
   
   updateIndexableCombo: function( repoFormat ){
@@ -471,6 +458,32 @@ Ext.extend( Sonatype.repoServer.HostedRepositoryEditor, Sonatype.repoServer.Abst
       indexableCombo.setValue('False');
       indexableCombo.disable();       
     }
+  },
+  updateWritePolicy: function(){
+  
+      var repoPolicyField = this.form.findField( 'repoPolicy' );
+      var repoPolicy = repoPolicyField.getValue();
+  
+      var writePolicyField = this.form.findField( 'writePolicy' );
+      
+      // filter out the redeploy option for SNAPSHOT repos
+      if( ("" + repoPolicy).toLowerCase() == 'snapshot' )
+      {
+        // first change the value if it is ALLOW_WRITE_ONCE
+        if( writePolicyField.getValue() != 'READ_ONLY' )
+        {
+        	writePolicyField.setValue('ALLOW_WRITE');
+        }
+        
+      	this.writePolicyStore.filterBy(function(rec, id)
+      	{
+      	  return rec.data.value != 'ALLOW_WRITE_ONCE';
+      	});
+      }
+      else
+      {
+        writePolicyField.store.clearFilter();
+      }
   }
 } );
 
