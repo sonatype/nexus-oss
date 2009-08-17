@@ -1,7 +1,7 @@
 Sonatype.headLinks = Ext.emptyFn;
 
 Ext.apply(Sonatype.headLinks.prototype, {
-	
+  linkEventApplied : false,	
 	/**
 	 * Update the head links based on the current status of Nexus
 	 * 
@@ -35,7 +35,7 @@ Ext.apply(Sonatype.headLinks.prototype, {
 	
 	updateRightWhenLoggedIn : function(linkEl){
 		linkEl.update('Log Out');
-		linkEl.on('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
+		this.setClickLink( linkEl );
 		linkEl.setStyle({
 			'color': '#15428B',
 			'cursor': 'pointer',
@@ -52,11 +52,17 @@ Ext.apply(Sonatype.headLinks.prototype, {
 	
 	updateRightWhenLoggedOut : function(linkEl){
 		linkEl.update('Log In');
-		linkEl.on('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
+		this.setClickLink( linkEl );
 		linkEl.setStyle({
 			'color': '#15428B',
 			'cursor': 'pointer',
 			'text-align': 'right'
 		});		
-	}	
+	},
+	setClickLink : function(el){
+	  if ( !this.linkEventApplied ){
+      el.on('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
+      this.linkEventApplied = true;
+    }
+	}
 });

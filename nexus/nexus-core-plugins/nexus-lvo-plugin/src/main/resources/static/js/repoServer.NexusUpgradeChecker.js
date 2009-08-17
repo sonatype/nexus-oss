@@ -15,24 +15,32 @@
  * Version 3 along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
+var checkedNewVersion = false;
+
 Sonatype.Events.addListener( 'nexusStatus', function() {
-  Ext.Ajax.request( {
-    method: 'GET',
-    suppressStatus: [404,401,-1],
-    url: Sonatype.config.servicePath + '/lvo/nexus-' +
-      Sonatype.utils.editionShort.substr( 0, 3 ).toLowerCase() + '/' + Sonatype.utils.versionShort,
-    success: function( response, options ) {
-      var r = Ext.decode( response.responseText );
-      
-      if ( r.response != null && r.response.isSuccessful && r.response.version ) {
-        Sonatype.utils.postWelcomePageAlert(
-          '<span style="color:#000">' +
-          '<b>UPGRADE AVAILABLE:</b> ' +
-          'Nexus ' + Sonatype.utils.edition + ' ' + r.response.version + ' is now available. ' +
-          '<a href="' + r.response.url + '" target="_blank">Download now!</a>' +
-          '</span>' 
-        );
+  if ( !checkedNewVersion ){
+    Ext.Ajax.request( {
+      method: 'GET',
+      suppressStatus: [404,401,-1],
+      url: Sonatype.config.servicePath + '/lvo/nexus-' +
+        Sonatype.utils.editionShort.substr( 0, 3 ).toLowerCase() + '/' + Sonatype.utils.versionShort,
+      success: function( response, options ) {
+        checkedNewVersion = true;
+        var r = Ext.decode( response.responseText );
+        
+        if ( r.response != null && r.response.isSuccessful && r.response.version ) {
+          Sonatype.utils.postWelcomePageAlert(
+            '<span style="color:#000">' +
+            '<b>UPGRADE AVAILABLE:</b> ' +
+            'Nexus ' + Sonatype.utils.edition + ' ' + r.response.version + ' is now available. ' +
+            '<a href="' + r.response.url + '" target="_blank">Download now!</a>' +
+            '</span>' 
+          );
+        }
+      },
+      failure: function() {
+        checkedNewVersion = true;
       }
-    }
-  } );
+    });
+  }
 } );
