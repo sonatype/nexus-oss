@@ -152,6 +152,8 @@ Sonatype.ext.TwinPanelChooser = function( config ){
   var config = config || {};
   var defaultConfig = {
     displayField: 'name',
+    validateLeftItems: false,
+    validateLeftItemsText: 'Invalid items selected.',
     nodeIcon: Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif'
   };
   Ext.apply( this, config, defaultConfig );
@@ -369,7 +371,7 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
     var leftTree = this.getComponent( 0 );
     
     if ( this.containsInvalidNode() ) {
-      this.markTreeInvalid( leftTree, 'Invalid Repository Found' );
+      this.markTreeInvalid( leftTree, this.validateLeftItemsText );
       return false;
     }
     
@@ -383,6 +385,9 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
   },
   
   containsInvalidNode: function() {
+    if ( !this.validateLeftItems ){
+      return false;
+    }
     var root = this.getComponent( 0 ).root;
     
     var nodes = root.childNodes;
