@@ -96,6 +96,10 @@ public abstract class AbstractMigrationIntegrationTest
         TaskScheduleUtil.waitForAllTasksToStop( ArtifactoryMigrationTaskDescriptor.ID );
 
         Thread.sleep( 2000 );
+
+        File logFile = new File( "./target/logs/migration.log" );
+        String log = FileUtils.readFileToString( logFile );
+        Assert.assertFalse( log, log.contains( "Exception" ) );
     }
 
     protected void checkArtifact( String repositoryId, String groupId, String artifactId, String version )

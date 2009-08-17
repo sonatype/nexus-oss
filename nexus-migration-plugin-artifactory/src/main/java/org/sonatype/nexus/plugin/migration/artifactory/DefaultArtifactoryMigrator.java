@@ -438,6 +438,17 @@ public class DefaultArtifactoryMigrator
         group.setExposed( true );
         group.setLocalStatus( LocalStatus.IN_SERVICE.name() );
 
+        boolean indexable;
+        if ( MAVEN2.equals( repoType ) )
+        {
+            indexable = true;
+        }
+        else
+        {
+            indexable = false;
+        }
+        group.setIndexable( indexable );
+
         Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
         group.setExternalConfiguration( ex );
         M2GroupRepositoryConfiguration exConf = new M2GroupRepositoryConfiguration( ex );
@@ -533,15 +544,14 @@ public class DefaultArtifactoryMigrator
         }
         nexusRepo.setProviderHint( hint );
 
-
         boolean indexable;
-        if ( hint == MAVEN1 )
+        if ( MAVEN2.equals( hint ) )
         {
-            indexable = false;
+            indexable = true;
         }
         else
         {
-            indexable = true;
+            indexable = false;
         }
 
         nexusRepo.setIndexable( indexable );
@@ -785,6 +795,7 @@ public class DefaultArtifactoryMigrator
 
         shadowRepo.setExposed( true );
         shadowRepo.setUserManaged( true );
+        shadowRepo.setIndexable( false );
 
         shadowRepo.setProviderRole( ShadowRepository.class.getName() );
         shadowRepo.setProviderHint( "m1-m2-shadow" );
