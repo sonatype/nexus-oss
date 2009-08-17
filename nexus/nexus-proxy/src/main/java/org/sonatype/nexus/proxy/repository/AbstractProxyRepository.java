@@ -891,6 +891,7 @@ public abstract class AbstractProxyRepository
                     }
                     catch ( StorageException e )
                     {
+                        getLogger().error( "Got Storage Exception while storing remote artifact, will attempt next mirror", e );
                         lastException = e;
 
                         selector.feedbackFailure( mirror );
