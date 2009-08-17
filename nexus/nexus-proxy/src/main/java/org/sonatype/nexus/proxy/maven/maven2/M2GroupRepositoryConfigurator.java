@@ -14,10 +14,23 @@
 package org.sonatype.nexus.proxy.maven.maven2;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepositoryConfigurator;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 @Component( role = M2GroupRepositoryConfigurator.class )
 public class M2GroupRepositoryConfigurator
     extends AbstractMavenGroupRepositoryConfigurator
 {
+    @Override
+    protected void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
+        CRepositoryCoreConfiguration coreConfiguration )
+        throws ConfigurationException
+    {
+        super.doApplyConfiguration( repository, configuration, coreConfiguration );
+        
+        repository.setIndexable( true );
+    }
 }

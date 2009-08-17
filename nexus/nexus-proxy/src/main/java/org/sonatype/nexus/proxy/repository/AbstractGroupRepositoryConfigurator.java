@@ -11,11 +11,13 @@ public abstract class AbstractGroupRepositoryConfigurator
     protected void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
         CRepositoryCoreConfiguration coreConfiguration )
         throws ConfigurationException
-    {
+    {        
+        super.doApplyConfiguration( repository, configuration, coreConfiguration );
+        
         // Groups are read only
         repository.setWritePolicy( RepositoryWritePolicy.READ_ONLY );
         
-        // TODO Auto-generated method stub
-        super.doApplyConfiguration( repository, configuration, coreConfiguration );
+        // Groups are non indexable by default
+        repository.setIndexable( false );
     }
 }

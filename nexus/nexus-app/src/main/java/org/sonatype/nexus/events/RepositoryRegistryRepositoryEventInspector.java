@@ -18,12 +18,14 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.index.IndexerManager;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -43,6 +45,9 @@ public class RepositoryRegistryRepositoryEventInspector
 
     @Requirement
     private IndexerManager indexerManager;
+    
+    @Requirement
+    private RepositoryRegistry repoRegistry;
 
     protected Logger getLogger()
     {
@@ -62,13 +67,6 @@ public class RepositoryRegistryRepositoryEventInspector
 
     public void inspect( Event evt )
     {
-        inspectForNexus( evt );
-
-        inspectForIndexerManager( evt );
-    }
-
-    private void inspectForNexus( Event evt )
-    {
         Repository repository = null;
 
         if ( evt instanceof RepositoryRegistryRepositoryEvent )
@@ -79,7 +77,25 @@ public class RepositoryRegistryRepositoryEventInspector
         {
             repository = ( (RepositoryConfigurationUpdatedEvent) evt ).getRepository();
         }
+        
+        try
+        {
+            //check registry for existance, wont be able to do much
+            //if doesn't exist yet
+            repoRegistry.getRepository( repository.getId() );
+            
+            inspectForNexus( evt, repository );
 
+            inspectForIndexerManager( evt, repository );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            getLogger().debug( "Attempted to handle repository that isn't yet in registry" );
+        }
+    }
+
+    private void inspectForNexus( Event evt, Repository repository )
+    {
         StringBuffer sb = new StringBuffer();
 
         if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
@@ -145,21 +161,10 @@ public class RepositoryRegistryRepositoryEventInspector
 
     }
 
-    private void inspectForIndexerManager( Event evt )
+    private void inspectForIndexerManager( Event evt, Repository repository )
     {
         try
         {
-            Repository repository = null;
-
-            if ( evt instanceof RepositoryRegistryRepositoryEvent )
-            {
-                repository = ( (RepositoryRegistryRepositoryEvent) evt ).getRepository();
-            }
-            else
-            {
-                repository = ( (RepositoryConfigurationUpdatedEvent) evt ).getRepository();
-            }
-
             // we are handling repo events, like addition and removal
             if ( evt instanceof RepositoryRegistryEventAdd )
             {

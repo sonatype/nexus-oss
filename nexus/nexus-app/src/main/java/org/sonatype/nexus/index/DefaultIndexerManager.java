@@ -511,16 +511,19 @@ public class DefaultIndexerManager
     public void reindexRepositoryGroup( String path, String repositoryGroupId, boolean fullReindex )
         throws NoSuchRepositoryException, IOException
     {
-        List<Repository> group =
-            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class )
-                .getMemberRepositories();
-
-        for ( Repository repository : group )
-        {
-            reindexRepository( repository, fullReindex );
+        GroupRepository groupRepo = repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
+        
+        if ( groupRepo.isIndexable() )
+        {    
+            List<Repository> group = groupRepo.getMemberRepositories();
+    
+            for ( Repository repository : group )
+            {
+                reindexRepository( repository, fullReindex );
+            }
+    
+            publishRepositoryGroupIndex( repositoryGroupId );
         }
-
-        publishRepositoryGroupIndex( repositoryGroupId );
     }
 
     public void resetGroupIndex( String groupId )
@@ -942,20 +945,24 @@ public class DefaultIndexerManager
         throws IOException, NoSuchRepositoryException
     {
         GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
-
-        for ( Repository repository : group.getMemberRepositories() )
+        
+        if ( group.isIndexable() )
         {
-            publishRepositoryIndex( repository );
+            for ( Repository repository : group.getMemberRepositories() )
+            {
+                publishRepositoryIndex( repository );
+            }
+    
+            publishRepositoryGroupIndex( group );
         }
-
-        publishRepositoryGroupIndex( group );
     }
 
     protected void publishRepositoryIndex( Repository repository )
         throws IOException
     {
         // shadows are not capable to publish indexes
-        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) 
+            || !repository.isIndexable())
         {
             return;
         }
@@ -1031,67 +1038,70 @@ public class DefaultIndexerManager
     protected void publishRepositoryGroupIndex( GroupRepository groupRepository )
         throws IOException
     {
-        String repoId = groupRepository.getId();
-        if ( getLogger().isDebugEnabled() )
+        if ( groupRepository.isIndexable() )
         {
-            getLogger().debug( "Publishing merged index for repository group " + repoId );
-        }
-
-        // groups contains the merged context in -remote idx context
-        IndexingContext context = getRepositoryRemoteIndexContext( groupRepository );
-
-        File targetDir = null;
-
-        Lock lock = getLock( repoId ).writeLock();
-        lock.lock();
-        try
-        {
-            targetDir = new File( getTempDirectory(), "nx-index" + System.currentTimeMillis() );
-
-            if ( !targetDir.mkdirs() )
-            {
-                throw new IOException( "Could not create temp dir for packing indexes: " + targetDir );
-            }
-
+            String repoId = groupRepository.getId();
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug( "Packing the merged index context." );
+                getLogger().debug( "Publishing merged index for repository group " + repoId );
             }
-
-            // copy the current properties file to the temp directory, this is what the indexer uses to decide
-            // if chunks are necessary, and what to label it as
-            copyIndexPropertiesToTempDir( groupRepository, targetDir );
-
-            IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
-
-            packReq.setCreateIncrementalChunks( true );
-
-            packReq.setUseTargetProperties( true );
-
-            indexPacker.packIndex( packReq );
-
-            File[] files = targetDir.listFiles();
-
-            if ( files != null )
+    
+            // groups contains the merged context in -remote idx context
+            IndexingContext context = getRepositoryRemoteIndexContext( groupRepository );
+    
+            File targetDir = null;
+    
+            Lock lock = getLock( repoId ).writeLock();
+            lock.lock();
+            try
             {
-                for ( File file : files )
+                targetDir = new File( getTempDirectory(), "nx-index" + System.currentTimeMillis() );
+    
+                if ( !targetDir.mkdirs() )
                 {
-                    storeItem( groupRepository, file, context );
+                    throw new IOException( "Could not create temp dir for packing indexes: " + targetDir );
                 }
-            }
-        }
-        finally
-        {
-            lock.unlock();
-
-            if ( targetDir != null )
-            {
+    
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug( "Cleanup of temp files..." );
+                    getLogger().debug( "Packing the merged index context." );
                 }
-
-                FileUtils.deleteDirectory( targetDir );
+    
+                // copy the current properties file to the temp directory, this is what the indexer uses to decide
+                // if chunks are necessary, and what to label it as
+                copyIndexPropertiesToTempDir( groupRepository, targetDir );
+    
+                IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
+    
+                packReq.setCreateIncrementalChunks( true );
+    
+                packReq.setUseTargetProperties( true );
+    
+                indexPacker.packIndex( packReq );
+    
+                File[] files = targetDir.listFiles();
+    
+                if ( files != null )
+                {
+                    for ( File file : files )
+                    {
+                        storeItem( groupRepository, file, context );
+                    }
+                }
+            }
+            finally
+            {
+                lock.unlock();
+    
+                if ( targetDir != null )
+                {
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug( "Cleanup of temp files..." );
+                    }
+    
+                    FileUtils.deleteDirectory( targetDir );
+                }
             }
         }
     }
