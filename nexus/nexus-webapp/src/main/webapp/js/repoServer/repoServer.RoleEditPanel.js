@@ -673,6 +673,7 @@ Ext.extend( Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
     return treeValid && this.form.isValid();
   },
   submitHandler: function( form, action, receivedData ) {
+  	receivedData.mapping = this.payload.data.mapping;
   },
   markTreeInvalid : function(tree) {
     var elp = tree.getEl();
