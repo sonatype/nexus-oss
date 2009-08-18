@@ -21,6 +21,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus2351DisableRedeployUploadTest
     extends AbstractMavenNexusIT
@@ -39,9 +40,7 @@ public class Nexus2351DisableRedeployUploadTest
     public void disableReleaseAllowRedeployWithMavenTest()
         throws Exception
     {
-        RepositoryResource repo = (RepositoryResource) this.repoUtil.getRepository( this.getTestRepositoryId() );
-        repo.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
-        repo = (RepositoryResource) this.repoUtil.updateRepo( repo );
+        setWritePolicy( this.getTestRepositoryId(), RepositoryWritePolicy.ALLOW_WRITE );
 
         Gav gav1 = new Gav( this.getTestId(), "release-deploy", "1.0.0", null, "jar", 0, new Date()
             .getTime(), "release-deploy", false, false, null, false, null );
@@ -88,9 +87,7 @@ public class Nexus2351DisableRedeployUploadTest
     public void disableReleaseAllowRedeployWithUploadTest()
         throws Exception
     {
-        RepositoryResource repo = (RepositoryResource) this.repoUtil.getRepository( this.getTestRepositoryId() );
-        repo.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
-        repo = (RepositoryResource) this.repoUtil.updateRepo( repo );
+        setWritePolicy( this.getTestRepositoryId(), RepositoryWritePolicy.ALLOW_WRITE );
 
         Gav gav = new Gav( this.getTestId(), "release-deploy", "1.0.0", null, "jar", 0, new Date()
             .getTime(), "release-deploy", false, false, null, false, null );
@@ -122,9 +119,7 @@ public class Nexus2351DisableRedeployUploadTest
     public void disableReleaseReadOnlyWithUploadTest()
         throws Exception
     {
-        RepositoryResource repo = (RepositoryResource) this.repoUtil.getRepository( this.getTestRepositoryId() );
-        repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
-        repo = (RepositoryResource) this.repoUtil.updateRepo( repo );
+        setWritePolicy( this.getTestRepositoryId(), RepositoryWritePolicy.READ_ONLY );
 
         Gav gav = new Gav(
             this.getTestId(),
@@ -151,9 +146,7 @@ public class Nexus2351DisableRedeployUploadTest
     public void disableReleaseReadOnlyWithMavenTest()
         throws Exception
     {
-        RepositoryResource repo = (RepositoryResource) this.repoUtil.getRepository( this.getTestRepositoryId() );
-        repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
-        repo = (RepositoryResource) this.repoUtil.updateRepo( repo );
+        setWritePolicy( this.getTestRepositoryId(), RepositoryWritePolicy.READ_ONLY );
 
         Gav gav = new Gav(
             this.getTestId(),
@@ -161,6 +154,7 @@ public class Nexus2351DisableRedeployUploadTest
             "1.0.0",
             null,
             "jar",
+        
             0,
             new Date().getTime(),
             "release-deploy",
@@ -180,9 +174,7 @@ public class Nexus2351DisableRedeployUploadTest
     public void disableReleaseNoRedeployWithUploadTest()
         throws Exception
     {
-        RepositoryResource repo = (RepositoryResource) this.repoUtil.getRepository( this.getTestRepositoryId() );
-        repo.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE_ONCE.name() );
-        repo = (RepositoryResource) this.repoUtil.updateRepo( repo );
+        setWritePolicy( this.getTestRepositoryId(), RepositoryWritePolicy.ALLOW_WRITE_ONCE );
 
         Gav gav = new Gav( this.getTestId(), "disableReleaseNoRedeployTest", "1.0.0", null, "jar", 0, new Date()
             .getTime(), "disableReleaseNoRedeployTest", false, false, null, false, null );
@@ -198,9 +190,7 @@ public class Nexus2351DisableRedeployUploadTest
     public void disableReleaseNoRedeployWithMavenTest()
         throws Exception
     {
-        RepositoryResource repo = (RepositoryResource) this.repoUtil.getRepository( this.getTestRepositoryId() );
-        repo.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE_ONCE.name() );
-        repo = (RepositoryResource) this.repoUtil.updateRepo( repo );
+        setWritePolicy( this.getTestRepositoryId(), RepositoryWritePolicy.ALLOW_WRITE_ONCE );
 
         Gav gav1 = new Gav( this.getTestId(), "disableReleaseNoRedeployTest", "1.0.0", null, "jar", 0, new Date()
             .getTime(), "disableReleaseNoRedeployTest", false, false, null, false, null );
@@ -289,6 +279,18 @@ public class Nexus2351DisableRedeployUploadTest
         throws IOException
     {
         cleanWorkDir();
+    }
+    
+    private RepositoryResource setWritePolicy( String repoId, RepositoryWritePolicy policy )
+        throws Exception
+    {
+        RepositoryResource repo = (RepositoryResource) this.repoUtil.getRepository( this.getTestRepositoryId() );
+        repo.setWritePolicy( policy.name() );
+        repo = (RepositoryResource) this.repoUtil.updateRepo( repo );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        return repo;
     }
 
 }

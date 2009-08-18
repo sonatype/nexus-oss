@@ -13,12 +13,10 @@
  */
 package org.sonatype.nexus.integrationtests.nexus538;
 
-import java.io.IOException;
 import java.util.List;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -26,21 +24,22 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.FeedUtil;
-import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.FeedException;
 
 public class Nexus538SystemFeeds
     extends AbstractNexusIntegrationTest
 {
     @Test
     public void bootEventTest()
-        throws Exception, IllegalArgumentException, FeedException
+        throws Exception
     {
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
         SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( feed );
         Assert.assertTrue( findFeedEntry( feed, "Booting", null ) );
@@ -48,7 +47,7 @@ public class Nexus538SystemFeeds
 
     @Test
     public void updateRepoTest()
-        throws IOException, IllegalArgumentException, FeedException, InterruptedException, ComponentLookupException
+        throws Exception
     {
         // change the name of the test repo
         RepositoryMessageUtil repoUtil =
@@ -59,6 +58,8 @@ public class Nexus538SystemFeeds
         String newName = repo.getName() + "-new";
         repo.setName( newName );
         repoUtil.updateRepo( repo );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         final SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( feed );
@@ -68,7 +69,7 @@ public class Nexus538SystemFeeds
 
     @Test
     public void changeProxyStatusTest()
-        throws IOException, IllegalArgumentException, FeedException, InterruptedException, ComponentLookupException
+        throws Exception
     {
         // change the name of the test repo
         RepositoryMessageUtil repoUtil =
@@ -77,6 +78,8 @@ public class Nexus538SystemFeeds
         RepositoryStatusResource repo = repoUtil.getStatus( "release-proxy-repo-1" );
         repo.setProxyMode( ProxyMode.BLOCKED_AUTO.name() );
         repoUtil.updateStatus( repo );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         SyndFeed systemFeed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( systemFeed );
@@ -128,6 +131,7 @@ public class Nexus538SystemFeeds
         return false;
     }
 
+    @SuppressWarnings( "unchecked" )
     private void validateLinksInFeeds( SyndFeed feed )
     {
         Assert.assertTrue( "Feed link is wrong", feed.getLink().startsWith( this.getBaseNexusUrl() ));
