@@ -63,7 +63,7 @@ public class DefaultLvoPluginConfiguration
             throw new NoSuchKeyException( key );
         }
     }
-    
+
     public boolean isEnabled()
     {
         try
@@ -78,8 +78,22 @@ public class DefaultLvoPluginConfiguration
         {
             getLogger().error( "Unable to read configuration", e );
         }
-        
+
         return false;
+    }
+
+    public void enable()
+        throws ConfigurationException,
+            IOException
+    {
+        getConfiguration().setEnabled( true );
+    }
+
+    public void disable()
+        throws ConfigurationException,
+            IOException
+    {
+        getConfiguration().setEnabled( false );
     }
 
     protected Configuration getConfiguration()

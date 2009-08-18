@@ -179,6 +179,12 @@
       <artifactId>nexus-rest-client-java</artifactId>
       <version>${project.version}</version>
     </dependency>
+	
+	<dependency>
+	  <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-lvo-plugin</artifactId>
+      <version>${project.version}</version>
+	</dependency>
 
     <dependency>
       <groupId>org.sonatype.security</groupId>
