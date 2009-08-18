@@ -767,6 +767,11 @@ Sonatype.utils = {
           Sonatype.utils.version = 'Version unavailable';
           Sonatype.utils.edition = '';
           Sonatype.utils.versionShort = '';
+          
+          Sonatype.user.curr.repoServer = null;
+          Sonatype.user.curr.isLoggedIn = null;
+          Sonatype.user.curr.username = null;
+          Sonatype.user.curr.loggedInUserSource = null;
         }
         
         Ext.get('version').update(Sonatype.utils.version);

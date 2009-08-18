@@ -100,6 +100,9 @@ Sonatype.repoServer.RepoServer = function(){
 
       Sonatype.Events.addListener( 'nexusNavigationInit',
         this.addNexusNavigationItems, this );
+        
+      Sonatype.Events.addListener( 'nexusStatus',
+        this.nexusStatusEvent, this );
       
       // Left Panel
       this.nexusPanel = new Sonatype.navigation.NavigationPanel({
@@ -209,6 +212,15 @@ Sonatype.repoServer.RepoServer = function(){
         //this.nexusPanel.enable();
       }
       
+    },
+    
+    nexusStatusEvent: function() {
+    	
+      // check the user status, if it is not set, then reset the panels
+      if( !Sonatype.user.curr.repoServer )
+      {
+        this.resetMainTabPanel();
+      }
     },
     
     addNexusNavigationItems: function( nexusPanel ) {      
