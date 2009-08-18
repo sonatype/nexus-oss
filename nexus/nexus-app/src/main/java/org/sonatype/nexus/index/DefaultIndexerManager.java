@@ -529,22 +529,27 @@ public class DefaultIndexerManager
     public void resetGroupIndex( String groupId )
         throws NoSuchRepositoryException, IOException
     {
-        getLogger().info( "Remerging group '" + groupId + "'" );
         GroupRepository group = repositoryRegistry.getRepositoryWithFacet( groupId, GroupRepository.class );
-        List<Repository> repositoriesList = group.getMemberRepositories();
-
-        purgeCurrentIndex( group );
-
-        // purge it, and below will be repopulated
-        purgeRepositoryGroupIndex( group );
-
-        for ( Repository repository : repositoriesList )
+        
+        if ( group.isIndexable() )
         {
-            getLogger().info( "Remerging '" + repository.getId() + "' to '" + groupId + "'" );
-            mergeRepositoryGroupIndexWithMember( repository );
+            getLogger().info( "Remerging group '" + groupId + "'" );
+            
+            List<Repository> repositoriesList = group.getMemberRepositories();
+    
+            purgeCurrentIndex( group );
+    
+            // purge it, and below will be repopulated
+            purgeRepositoryGroupIndex( group );
+    
+            for ( Repository repository : repositoriesList )
+            {
+                getLogger().info( "Remerging '" + repository.getId() + "' to '" + groupId + "'" );
+                mergeRepositoryGroupIndexWithMember( repository );
+            }
+    
+            publishRepositoryGroupIndex( groupId );
         }
-
-        publishRepositoryGroupIndex( groupId );
     }
 
     protected void reindexRepository( Repository repository, boolean fullReindex )
@@ -647,9 +652,12 @@ public class DefaultIndexerManager
 
         for ( ProxyRepository repository : reposes )
         {
-            if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) && downloadRepositoryIndex( repository ) )
+            if ( repository.isIndexable() )
             {
-                mergeRepositoryGroupIndexWithMember( repository );
+                if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) && downloadRepositoryIndex( repository ) )
+                {
+                    mergeRepositoryGroupIndexWithMember( repository );
+                }
             }
         }
     }
@@ -659,7 +667,8 @@ public class DefaultIndexerManager
     {
         ProxyRepository repository = repositoryRegistry.getRepositoryWithFacet( repositoryId, ProxyRepository.class );
 
-        if ( downloadRepositoryIndex( repository ) )
+        if ( repository.isIndexable() 
+            && downloadRepositoryIndex( repository ) )
         {
             mergeRepositoryGroupIndexWithMember( repository );
         }
@@ -674,7 +683,8 @@ public class DefaultIndexerManager
 
         for ( Repository repository : group )
         {
-            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+            if ( repository.isIndexable() 
+                && repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
                 if ( downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ) ) )
                 {
@@ -1613,11 +1623,14 @@ public class DefaultIndexerManager
         if ( evt instanceof RepositoryGroupMembersChangedEvent )
         {
             GroupRepository repo = ( (RepositoryGroupMembersChangedEvent) evt ).getGroupRepository();
-
-            // Update the repo
-            ResetGroupIndexTask rt = nexusScheduler.createTaskInstance( ResetGroupIndexTask.class );
-            rt.setRepositoryGroupId( repo.getId() );
-            nexusScheduler.submit( "Update group index.", rt );
+            
+            if ( repo.isIndexable() )
+            {
+                // Update the repo
+                ResetGroupIndexTask rt = nexusScheduler.createTaskInstance( ResetGroupIndexTask.class );
+                rt.setRepositoryGroupId( repo.getId() );
+                nexusScheduler.submit( "Update group index.", rt );
+            }
         }
     }
 

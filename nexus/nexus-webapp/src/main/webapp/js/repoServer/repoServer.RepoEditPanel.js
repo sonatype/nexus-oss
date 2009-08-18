@@ -461,10 +461,10 @@ Ext.extend( Sonatype.repoServer.HostedRepositoryEditor, Sonatype.repoServer.Abst
   },
   updateWritePolicy: function(){
   
-      var repoPolicyField = this.form.findField( 'repoPolicy' );
+      var repoPolicyField = this.find( 'name', 'repoPolicy' )[0];
       var repoPolicy = repoPolicyField.getValue();
   
-      var writePolicyField = this.form.findField( 'writePolicy' );
+      var writePolicyField = this.find( 'name', 'writePolicy' )[0];
       
       // filter out the redeploy option for SNAPSHOT repos
       if( ("" + repoPolicy).toLowerCase() == 'snapshot' )
