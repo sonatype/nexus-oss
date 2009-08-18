@@ -1,9 +1,5 @@
 package org.sonatype.nexus.configuration;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -23,8 +19,6 @@ public abstract class AbstractConfigurable
 {
     /** The configuration */
     private CoreConfiguration coreConfiguration;
-    
-    private Map<String,Object> changes = new HashMap<String,Object>();
 
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
@@ -181,8 +175,6 @@ public abstract class AbstractConfigurable
             prepareForSave();
 
             getCurrentCoreConfiguration().commitChanges();
-            
-            this.changes = new HashMap<String,Object>();
 
             return true;
         }
@@ -197,8 +189,6 @@ public abstract class AbstractConfigurable
         if ( isDirty() )
         {
             getCurrentCoreConfiguration().rollbackChanges();
-            
-            this.changes = new HashMap<String,Object>();
 
             return true;
         }
@@ -222,11 +212,6 @@ public abstract class AbstractConfigurable
         }
 
         getCurrentCoreConfiguration().commitChanges();
-    }
-    
-    public Map<String,Object> getConfigurationChanges()
-    {
-        return this.changes;
     }
 
     // ==

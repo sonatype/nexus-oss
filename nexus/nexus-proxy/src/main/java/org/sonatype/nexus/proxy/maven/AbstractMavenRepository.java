@@ -20,12 +20,14 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateMavenMetadata;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -50,9 +52,7 @@ import org.sonatype.nexus.proxy.walker.WalkerException;
 public abstract class AbstractMavenRepository
     extends AbstractProxyRepository
     implements MavenRepository, MavenHostedRepository, MavenProxyRepository
-{
-    public static final String CONFIG_DOWNLOAD_REMOTE_INDEX = "downloadRemoteIndex";
-    
+{    
     /**
      * Metadata manager.
      */
@@ -68,11 +68,46 @@ public abstract class AbstractMavenRepository
     private MutableProxyRepositoryKind repositoryKind;
 
     private ArtifactStoreHelper artifactStoreHelper;
+    
+    /** if download remote index flag changed, need special handling after save */
+    private boolean downloadRemoteIndexEnabled = false;
 
     @Override
     protected AbstractMavenRepositoryConfiguration getExternalConfiguration( boolean forModification )
     {
         return (AbstractMavenRepositoryConfiguration) super.getExternalConfiguration( forModification );
+    }
+    
+    @Override
+    public boolean commitChanges()
+        throws ConfigurationException
+    {
+        boolean result = super.commitChanges();
+        
+        if ( result )
+        {
+            this.downloadRemoteIndexEnabled = false;
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public boolean rollbackChanges()
+    {
+        this.downloadRemoteIndexEnabled = false;
+        
+        return super.rollbackChanges();
+    }
+    
+    @Override
+    protected RepositoryConfigurationUpdatedEvent getRepositoryConfigurationUpdatedEvent()
+    {
+        RepositoryConfigurationUpdatedEvent event = super.getRepositoryConfigurationUpdatedEvent();
+        
+        event.setDownloadRemoteIndexEnabled( this.downloadRemoteIndexEnabled );
+        
+        return event;
     }
 
     public ArtifactStoreHelper getArtifactStoreHelper()
@@ -210,9 +245,10 @@ public abstract class AbstractMavenRepository
         
         getExternalConfiguration( true ).setDownloadRemoteIndex( downloadRemoteIndexes );
         
-        if ( oldValue != newValue )
+        if ( oldValue == false 
+            && newValue == true )
         {
-            getConfigurationChanges().put( CONFIG_DOWNLOAD_REMOTE_INDEX, newValue );
+            this.downloadRemoteIndexEnabled = true;
         }
     }
 

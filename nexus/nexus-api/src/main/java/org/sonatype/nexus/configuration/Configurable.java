@@ -1,6 +1,5 @@
 package org.sonatype.nexus.configuration;
 
-import java.util.Map;
 
 /**
  * A Configurable component.
@@ -43,11 +42,4 @@ public interface Configurable
      * Rollbacks the changes. Resets the state of config "back to normal" (saved).
      */
     boolean rollbackChanges();
-    
-    /**
-     * Get the current list of changes to the Configurable object
-     * 
-     * @return
-     */
-    Map<String,Object> getConfigurationChanges();
 }

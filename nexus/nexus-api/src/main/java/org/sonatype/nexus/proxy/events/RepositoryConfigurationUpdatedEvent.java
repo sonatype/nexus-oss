@@ -1,7 +1,5 @@
 package org.sonatype.nexus.proxy.events;
 
-import java.util.Map;
-
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -12,16 +10,42 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class RepositoryConfigurationUpdatedEvent
     extends RepositoryEvent
 {
-    Map<String, Object> changes;
-    public RepositoryConfigurationUpdatedEvent( Repository repository, Map<String,Object> changes )
+    private boolean localUrlChanged = false;
+    private boolean remoteUrlChanged = false;
+    private boolean downloadRemoteIndexEnabled = false;
+    
+    public RepositoryConfigurationUpdatedEvent( Repository repository )
     {
         super( repository );
-        
-        this.changes = changes;
     }
     
-    public Map<String, Object> getChanges()
+    public boolean isLocalUrlChanged()
     {
-        return changes;
+        return localUrlChanged;
+    }
+    
+    public boolean isRemoteUrlChanged()
+    {
+        return remoteUrlChanged;
+    }
+    
+    public boolean isDownloadRemoteIndexEnabled()
+    {
+        return downloadRemoteIndexEnabled;
+    }
+    
+    public void setLocalUrlChanged( boolean localUrlChanged )
+    {
+        this.localUrlChanged = localUrlChanged;
+    }
+    
+    public void setRemoteUrlChanged( boolean remoteUrlChanged )
+    {
+        this.remoteUrlChanged = remoteUrlChanged;
+    }
+    
+    public void setDownloadRemoteIndexEnabled( boolean downloadRemoteIndexEnabled )
+    {
+        this.downloadRemoteIndexEnabled = downloadRemoteIndexEnabled;
     }
 }

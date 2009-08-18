@@ -1,16 +1,11 @@
 package org.sonatype.nexus.events;
 
-import java.util.Map;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
-import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
-import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.nexus.tasks.ReindexTask;
@@ -33,14 +28,12 @@ public class RepositoryConfigurationUpdatedEventInspector
     {
         if ( evt instanceof RepositoryConfigurationUpdatedEvent )
         {
+            boolean indexing = false;
+            boolean evicting = false;
+            
             RepositoryConfigurationUpdatedEvent event = ( RepositoryConfigurationUpdatedEvent ) evt;
             
-            Map<String,Object> changes = event.getChanges();
-            
-            boolean evicting = false;
-            boolean indexing = false;
-            
-            if ( changes.containsKey( ConfigurableRepository.CONFIG_LOCAL_URL ) )
+            if ( event.isLocalUrlChanged() )
             {
                 getLogger().info(
                     "The local url of repository '" + event.getRepository().getId()
@@ -55,7 +48,7 @@ public class RepositoryConfigurationUpdatedEventInspector
                 evicting = true;
             }
 
-            if ( changes.containsKey( AbstractProxyRepository.CONFIG_REMOTE_URL ) )
+            if ( event.isRemoteUrlChanged() )
             {
                 if ( !evicting )
                 {
@@ -72,7 +65,9 @@ public class RepositoryConfigurationUpdatedEventInspector
                     evicting = true;
                 }
                 
-                if ( event.getRepository().adaptToFacet( MavenProxyRepository.class ).isDownloadRemoteIndexes() )
+                MavenProxyRepository mavenRepo = event.getRepository().adaptToFacet( MavenProxyRepository.class );
+                
+                if ( mavenRepo != null && mavenRepo.isDownloadRemoteIndexes() )
                 {
                     getLogger().info(
                         "The remote url of repository '" + event.getRepository().getId()
@@ -83,14 +78,14 @@ public class RepositoryConfigurationUpdatedEventInspector
                     rt.setRepositoryId( event.getRepository().getId() );
                     rt.setFullReindex( true );
                     nexusScheduler.submit( "Remote URL Changed.", rt );
+                    
+                    indexing = true;
                 }
-                
-                indexing = true;
             }
             
-            if ( changes.containsKey( AbstractMavenRepository.CONFIG_DOWNLOAD_REMOTE_INDEX ) )
+            if ( event.isDownloadRemoteIndexEnabled() )
             {
-                if ( !indexing && ( Boolean ) changes.get( AbstractMavenRepository.CONFIG_DOWNLOAD_REMOTE_INDEX  ).equals( Boolean.TRUE ) )
+                if ( !indexing )
                 {
                     getLogger().info(
                         "The download remote index flag of repository '" + event.getRepository().getId()

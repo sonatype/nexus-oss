@@ -128,6 +128,9 @@ public abstract class AbstractRepository
 
     /** Request processors list */
     private Map<String, RequestProcessor> requestProcessors;
+    
+    /** if local url changed, need special handling after save */
+    private boolean localUrlChanged = false;
 
     // --
 
@@ -152,23 +155,39 @@ public abstract class AbstractRepository
     @Override
     public boolean commitChanges()
         throws ConfigurationException
-    {
-        Map<String,Object> changes = getConfigurationChanges();
-        
+    {        
         boolean wasDirty = super.commitChanges();
 
         if ( wasDirty )
-        {
-            getApplicationEventMulticaster().notifyEventListeners( new RepositoryConfigurationUpdatedEvent( this, changes ) );
+        {            
+            getApplicationEventMulticaster().notifyEventListeners( getRepositoryConfigurationUpdatedEvent() );
         }
+        
+        this.localUrlChanged = false;
 
         return wasDirty;
+    }
+    
+    @Override
+    public boolean rollbackChanges()
+    {
+        this.localUrlChanged = false;
+        
+        return super.rollbackChanges();
     }
 
     @Override
     protected ApplicationConfiguration getApplicationConfiguration()
     {
         return applicationConfiguration;
+    }
+    
+    protected RepositoryConfigurationUpdatedEvent getRepositoryConfigurationUpdatedEvent()
+    {
+        RepositoryConfigurationUpdatedEvent event = new RepositoryConfigurationUpdatedEvent( this );
+        event.setLocalUrlChanged( this.localUrlChanged );
+        
+        return event;
     }
 
     protected AbstractRepositoryConfiguration getExternalConfiguration( boolean forModification )
@@ -266,6 +285,11 @@ public abstract class AbstractRepository
         }
 
         getLocalStorage().validateStorageUrl( newLocalUrl );
+        
+        if ( !StringUtils.equals( newLocalUrl, getLocalUrl() ) )
+        {
+            this.localUrlChanged = true;
+        }
 
         super.setLocalUrl( localUrl );
     }

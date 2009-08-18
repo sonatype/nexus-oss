@@ -24,6 +24,7 @@ import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.feeds.FeedRecorder;
@@ -36,6 +37,7 @@ import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -66,7 +68,8 @@ public abstract class AbstractProxyRepository
 
     private static final ExecutorService exec = Executors.newCachedThreadPool();
     
-    public static final String CONFIG_REMOTE_URL = "remoteUrl";
+    /** if remote url changed, need special handling after save */
+    private boolean remoteUrlChanged = false;
 
     /**
      * Feed recorder.
@@ -100,6 +103,38 @@ public abstract class AbstractProxyRepository
     {
         return (AbstractProxyRepositoryConfiguration) getCurrentCoreConfiguration().getExternalConfiguration()
             .getConfiguration( forModification );
+    }
+    
+    @Override
+    public boolean commitChanges()
+        throws ConfigurationException
+    {
+        boolean result = super.commitChanges();
+        
+        if ( result )
+        {
+            this.remoteUrlChanged = false;
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public boolean rollbackChanges()
+    {
+        this.remoteUrlChanged = false;
+        
+        return super.rollbackChanges();
+    }
+    
+    @Override
+    protected RepositoryConfigurationUpdatedEvent getRepositoryConfigurationUpdatedEvent()
+    {
+        RepositoryConfigurationUpdatedEvent event = super.getRepositoryConfigurationUpdatedEvent();
+        
+        event.setRemoteUrlChanged( this.remoteUrlChanged );
+        
+        return event;
     }
 
     public Map<String, ItemContentValidator> getItemContentValidators()
@@ -207,7 +242,7 @@ public abstract class AbstractProxyRepository
             if ( ( StringUtils.isEmpty( oldRemoteUrl ) && StringUtils.isNotEmpty( newRemoteUrl ) )
                 || ( StringUtils.isNotEmpty( oldRemoteUrl ) && !oldRemoteUrl.equals( newRemoteUrl ) ) )
             {
-                getConfigurationChanges().put( CONFIG_REMOTE_URL, newRemoteUrl );
+                this.remoteUrlChanged = true;
             }
         }
         else
