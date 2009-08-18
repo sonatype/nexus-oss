@@ -1,11 +1,8 @@
 package org.sonatype.nexus.plugins.plexus;
 
-import static org.codehaus.plexus.component.CastUtils.isAssignableFrom;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -13,8 +10,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import static org.codehaus.plexus.component.CastUtils.*;
 import org.codehaus.plexus.component.composition.CompositionResolver;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.composition.DefaultCompositionResolver;
@@ -25,9 +24,6 @@ import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.plugins.PluginDescriptor;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-
 /**
  * @author Jason van Zyl
  */
@@ -35,6 +31,7 @@ public class NexusPluginsComponentRepository
     extends AbstractLogEnabled
     implements ComponentRepository
 {
+
     private final Map<ClassRealm, SortedMap<String, Multimap<String, ComponentDescriptor<?>>>> index =
         new LinkedHashMap<ClassRealm, SortedMap<String, Multimap<String, ComponentDescriptor<?>>>>();
 
@@ -107,7 +104,7 @@ public class NexusPluginsComponentRepository
                 // and add parents too
                 ClassRealm aRealm = realm.getParentRealm();
 
-                while ( aRealm != null )
+                while( aRealm != null )
                 {
                     realms.add( aRealm );
 
@@ -176,32 +173,49 @@ public class NexusPluginsComponentRepository
                 Multimap<String, ComponentDescriptor<?>> descriptors = roleIndex.get( role );
                 if ( descriptors != null )
                 {
-                    // Filter out non-exported components, if we had contributions from plugin
+                    roleHintIndex.putAll( descriptors );
+
                     if ( pluginDescriptor != null )
                     {
-                        for ( PluginDescriptor importedPlugin : pluginDescriptor.getImportedPlugins() )
-                        {
-                            if ( realm.equals( importedPlugin.getPluginRealm() ) )
-                            {
-                                for ( Iterator<ComponentDescriptor<?>> i = descriptors.values().iterator(); i.hasNext(); )
-                                {
-                                    ComponentDescriptor<?> cd = i.next();
-
-                                    if ( !importedPlugin.getExports().contains( cd.getImplementation() ) )
-                                    {
-                                        i.remove();
-                                    }
-                                }
-                            }
-                        }
+                        filterPrivateComponents( roleHintIndex, pluginDescriptor, realm, descriptors );
                     }
 
-                    roleHintIndex.putAll( descriptors );
+
                 }
             }
         }
 
         return Multimaps.unmodifiableMultimap( roleHintIndex );
+    }
+
+    /**
+     * Filter (remove) all private components (descriptors). Private components are those components that are
+     * implementing a role that is not exported by an imported plugin.
+     *
+     * @param roleHintIndex    components to be filtered
+     * @param pluginDescriptor descriptor of the plugin requiring the components
+     * @param realm            realm providing unfiltered list of components
+     * @param descriptors      unfiltered list of components
+     */
+    private void filterPrivateComponents( final Multimap<String, ComponentDescriptor<?>> roleHintIndex,
+                                          final PluginDescriptor pluginDescriptor,
+                                          final ClassRealm realm,
+                                          final Multimap<String, ComponentDescriptor<?>> descriptors )
+    {
+        for ( PluginDescriptor importedPlugin : pluginDescriptor.getImportedPlugins() )
+        {
+            if ( realm.equals( importedPlugin.getPluginRealm() ) )
+            {
+                for ( Map.Entry<String, ComponentDescriptor<?>> entry : descriptors.entries() )
+                {
+                    final ComponentDescriptor<?> cd = entry.getValue();
+                    if ( !importedPlugin.getExports().contains( cd.getRoleClass().getName() ) )
+                    {
+                        roleHintIndex.remove( entry.getKey(), entry.getValue() );
+                    }
+                }
+            }
+        }
     }
 
     public <T> ComponentDescriptor<T> getComponentDescriptor( Class<T> type, String role, String roleHint )
@@ -286,6 +300,13 @@ public class NexusPluginsComponentRepository
         throws CycleDetectedInComponentGraphException
     {
         ClassRealm classRealm = componentDescriptor.getRealm();
+
+        // use the role realm in order to allow plugins to depend only on api's (role)
+        final Class<?> roleClass = componentDescriptor.getRoleClass();
+        if ( roleClass != null && roleClass.getClassLoader() instanceof ClassRealm )
+        {
+            classRealm = (ClassRealm) roleClass.getClassLoader();
+        }
         SortedMap<String, Multimap<String, ComponentDescriptor<?>>> roleIndex = index.get( classRealm );
         if ( roleIndex == null )
         {
@@ -300,7 +321,11 @@ public class NexusPluginsComponentRepository
             roleHintIndex = Multimaps.newLinkedHashMultimap();
             roleIndex.put( role, roleHintIndex );
         }
-        roleHintIndex.put( componentDescriptor.getRoleHint(), componentDescriptor );
+        // do not add the component descriptor if already present (to not override)
+        if ( !roleHintIndex.containsEntry( componentDescriptor.getRoleHint(), componentDescriptor ) )
+        {
+            roleHintIndex.put( componentDescriptor.getRoleHint(), componentDescriptor );
+        }
 
         compositionResolver.addComponentDescriptor( componentDescriptor );
     }
