@@ -57,7 +57,7 @@ Sonatype.repoServer.RoleEditPanel = function( config ) {
           }
           
           if ( this.sp.checkPermission( 'security:roles', this.sp.CREATE )
-              && store.getCount() > 0 ) {
+              && store.getCount() > 0 && this.toolbarAddButton.menu.items.length == 1) {
             this.toolbarAddButton.menu.add( {
               text: 'External Role Mapping',
               handler: this.mapExternalRoles,
